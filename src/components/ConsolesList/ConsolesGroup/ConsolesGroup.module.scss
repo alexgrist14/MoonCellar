@@ -1,0 +1,21 @@
+.consoles{
+    &__group{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        .title{
+
+        }
+    }
+    &__item{
+        display: flex;
+        gap: 5px;
+        cursor: pointer;
+        
+    }
+}
+
+.checked{
+    background-color: rgb(82, 82, 83);
+    border-radius: 10px;
+}
