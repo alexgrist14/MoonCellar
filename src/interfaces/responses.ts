@@ -22,22 +22,21 @@ export interface IConsole {
   name: string;
 }
 
-
-export interface IAuth{
+export interface IAuth {
   userName: string;
   webApiKey: string;
 }
 
 export interface IGame {
-  title: string
-  id: number
-  consoleId: number
-  consoleName: string
-  imageIcon: string
-  numAchievements: number
-  numLeaderboards: number
-  points: number
-  dateModified: string
-  forumTopicId: number
-  hashes: string[]
+  title: string;
+  id: number;
+  consoleId: number;
+  consoleName: string;
+  imageIcon: string;
+  numAchievements: number;
+  numLeaderboards: number;
+  points: number;
+  dateModified: string;
+  forumTopicId: number;
+  hashes: string[];
 }

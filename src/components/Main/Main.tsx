@@ -1,14 +1,17 @@
 import { FC, useState } from "react";
 
 import ConsolesList from "../ConsolesList/ConsolesList";
-import Wheel from "../Wheel/Wheel";
+import WheelContainer from "../WheelContainer/WheelContainer";
+import { IGame } from "../../interfaces/responses";
+import { GameList } from "@retroachievements/api";
 
 const Main: FC = () => {
+  const [games,setGames] = useState<IGame[]>([]);
   const [selectedSystems, setSelectedSystems] = useState<number[]>([]);
   return (
     <div className="App">
-      <ConsolesList selectedSystems={selectedSystems} setSelectedSystems={setSelectedSystems}/>
-      <Wheel selectedSystems={selectedSystems}/>
+      <ConsolesList selectedSystems={selectedSystems} setSelectedSystems={setSelectedSystems} setGames={setGames}/>
+      <WheelContainer selectedSystems={selectedSystems}/>
     </div>
   );
 };

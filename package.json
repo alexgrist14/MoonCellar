@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@atlaskit/checkbox": "^13.0.1",
     "@reduxjs/toolkit": "^2.0.1",
     "@retroachievements/api": "^1.4.0",
     "@testing-library/jest-dom": "^5.14.1",
@@ -12,9 +13,9 @@
     "@types/node": "^16.7.13",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
-    "axios": "^1.6.5",
     "dotenv": "^16.3.1",
     "react": "^18.2.0",
+    "react-custom-roulette": "^1.4.1",
     "react-dom": "^18.2.0",
     "react-redux": "^9.1.0",
     "react-scripts": "5.0.1",
