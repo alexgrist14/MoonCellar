@@ -11,7 +11,7 @@ const Main: FC = () => {
   return (
     <div className="App">
       <ConsolesList selectedSystems={selectedSystems} setSelectedSystems={setSelectedSystems} setGames={setGames}/>
-      <WheelContainer selectedSystems={selectedSystems}/>
+      <WheelContainer games={games} selectedSystems={selectedSystems}/>
     </div>
   );
 };

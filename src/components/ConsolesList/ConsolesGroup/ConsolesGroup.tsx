@@ -1,4 +1,4 @@
-import { ChangeEvent, Dispatch, FC, SetStateAction, useState } from "react";
+import { Dispatch, FC, SetStateAction } from "react";
 import { IConsole, IGame } from "../../../interfaces/responses";
 import styles from "./ConsolesGroup.module.scss";
 import { consolesImages } from "../../../utils/consoleImages";
@@ -31,22 +31,35 @@ const ConsolesGroup: FC<ConsolesGroupProps> = ({
       consoleId: id,
       shouldOnlyRetrieveGamesWithAchievements: true,
     });
-    console.log(gameList)
-    setGames((prevState)=> [...prevState,...gameList]);
+    setGames((prevState) => [...prevState, ...gameList]);
   };
 
-  const handleCheckboxChange = (id: number, isChecked: boolean) => {
-    if (isChecked) {
-      setSelectedSystems((prevSelectedSystems) => [...prevSelectedSystems, id]);
+  // const handleCheckboxChange = (id: number, isChecked: boolean): void => {
+  //   if (isChecked) {
+  //     setSelectedSystems((prevSelectedSystems) => [...prevSelectedSystems, id]);
 
-      fetchGameList(id);
-    } else {
-      setSelectedSystems((prevSelectedSystems) =>
-        prevSelectedSystems.filter((selectedId) => selectedId !== id)
+  //     fetchGameList(id);
+  //   } else {
+  //     setSelectedSystems((prevSelectedSystems) =>
+  //       prevSelectedSystems.filter((selectedId) => selectedId !== id)
+  //     );
+  //     setGames((prevGames) =>
+  //       prevGames.filter((game) => game.consoleId !== id)
+  //     );
+  //   }
+  // };
+
+  const handleConsoleClick = (id: number): void => {
+    if (selectedSystems.includes(id)) {
+      setSelectedSystems((prevState) =>
+        prevState.filter((selectedId) => selectedId !== id)
       );
       setGames((prevGames) =>
         prevGames.filter((game) => game.consoleId !== id)
       );
+    } else {
+      setSelectedSystems((prevState) => [...prevState, id]);
+      fetchGameList(id);
     }
   };
 
@@ -61,6 +74,7 @@ const ConsolesGroup: FC<ConsolesGroupProps> = ({
                 ? styles.checked
                 : ""
             }`}
+            onClick={() => handleConsoleClick(consolesImages[i].id)}
             key={i}
           >
             <img
@@ -72,9 +86,7 @@ const ConsolesGroup: FC<ConsolesGroupProps> = ({
               {findConsoleNameById(consolesImages[i].id)}
             </div>
             <Checkbox
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                handleCheckboxChange(consolesImages[i].id, e.target.checked)
-              }
+              isChecked={selectedSystems.includes(consolesImages[i].id)}
             />
           </div>
         ) : null
