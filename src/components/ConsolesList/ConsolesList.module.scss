@@ -1,4 +1,10 @@
 .consoles__list{
     display: flex;
+    background: rgba(42, 46, 48, 0.9);
+    height: 100%;
+    max-height: 100vh;
+    overflow-y: scroll;
+    flex-wrap: wrap;
+    width: 500px;
     gap: 30px;
 }

@@ -1,8 +1,9 @@
-import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react'
+import React, { Dispatch, FC, ReactElement, SetStateAction, useEffect, useState } from 'react'
+import styles from "./WheelContainer.module.scss";
 
 interface WheelComponentProps {
     segments: string[];
-    setCurrentWinner: Dispatch<SetStateAction<string>>;
+    setCurrentWinner: Dispatch<SetStateAction<string | ReactElement>>;
     segColors: string[];
     winningSegment?: string;
     onFinished: (e: any)=>void;
@@ -14,6 +15,7 @@ interface WheelComponentProps {
     upDuration: number;
     downDuration: number;
     fontFamily?: string;
+    onClick: ()=>void;
 }
 
 const WheelComponent:FC<WheelComponentProps> = ({
@@ -29,7 +31,8 @@ const WheelComponent:FC<WheelComponentProps> = ({
   upDuration,
   downDuration,
   fontFamily = 'Roboto',
-  setCurrentWinner
+  setCurrentWinner,
+  onClick,
 }) => {
   let currentSegment = ''
   let isStarted = false
@@ -57,7 +60,7 @@ const WheelComponent:FC<WheelComponentProps> = ({
 
   const initCanvas = () => {
     let canvas:any  = document.getElementById('canvas')
-    
+    let button:HTMLElement | null = document.getElementById("spin")
     if (navigator.userAgent.indexOf('MSIE') !== -1) {
       canvas = document.createElement('canvas')
       canvas.setAttribute('width', 1000)
@@ -68,10 +71,12 @@ const WheelComponent:FC<WheelComponentProps> = ({
       if(wheel)
         wheel.appendChild(canvas)
     }
+    if(button)
         canvas.addEventListener('click', spin, false)
     canvasContext = canvas.getContext('2d')
   }
   const spin = () => {
+    //onClick();
     isStarted = true
     if (timerHandle === 0) {
       spinStart = new Date().getTime()
@@ -211,12 +216,12 @@ const WheelComponent:FC<WheelComponentProps> = ({
       Math.floor((change / (Math.PI * 2)) * segments.length) -
       1
     if (i < 0) i = i + segments.length
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillStyle = "white"
-    ctx.font = 'bold 1.5em ' + fontFamily
+    // ctx.textAlign = 'center'
+    // ctx.textBaseline = 'middle'
+    // ctx.fillStyle = "white"
+    // ctx.font = 'bold 1.5em ' + fontFamily
     currentSegment = segments[i]
-    isStarted && ctx.fillText(currentSegment, centerX + 10, centerY + size + 50)
+    //isStarted && ctx.fillText(currentSegment, centerX + 10, centerY + size + 50)
     setCurrentWinner(currentSegment);
     ///////////////////////////////////////
   }
@@ -226,11 +231,12 @@ const WheelComponent:FC<WheelComponentProps> = ({
     ctx.clearRect(0, 0, 1000, 800)
   }
   return (
-    <div id='wheel'>
+    <div id='wheel' className={styles.wheel} >
       <canvas
         id='canvas'
-        width='1000'
-        height='800'
+        className={styles.canvas}
+        width='620'
+        height='620'
         style={{
           pointerEvents: isFinished && isOnlyOnce ? 'none' : 'auto'
         }}

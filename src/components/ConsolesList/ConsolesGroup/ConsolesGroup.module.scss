@@ -9,9 +9,17 @@
     }
     &__item{
         display: flex;
+        justify-content: space-between;
         gap: 5px;
         cursor: pointer;
-        
+        &_title{
+            display: flex;
+            .text{
+                text-align: left;
+                margin-left: 5px;
+                width: 100px;
+            }
+        }
     }
 }
 

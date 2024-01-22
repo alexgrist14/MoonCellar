@@ -34,21 +34,6 @@ const ConsolesGroup: FC<ConsolesGroupProps> = ({
     setGames((prevState) => [...prevState, ...gameList]);
   };
 
-  // const handleCheckboxChange = (id: number, isChecked: boolean): void => {
-  //   if (isChecked) {
-  //     setSelectedSystems((prevSelectedSystems) => [...prevSelectedSystems, id]);
-
-  //     fetchGameList(id);
-  //   } else {
-  //     setSelectedSystems((prevSelectedSystems) =>
-  //       prevSelectedSystems.filter((selectedId) => selectedId !== id)
-  //     );
-  //     setGames((prevGames) =>
-  //       prevGames.filter((game) => game.consoleId !== id)
-  //     );
-  //   }
-  // };
-
   const handleConsoleClick = (id: number): void => {
     if (selectedSystems.includes(id)) {
       setSelectedSystems((prevState) =>
@@ -77,17 +62,20 @@ const ConsolesGroup: FC<ConsolesGroupProps> = ({
             onClick={() => handleConsoleClick(consolesImages[i].id)}
             key={i}
           >
-            <img
-              className={styles.image}
-              src={consolesImages[i].image}
-              alt="console"
-            />
-            <div className={styles.text}>
-              {findConsoleNameById(consolesImages[i].id)}
+            <div className={styles.consoles__item_title}>
+              <img
+                className={styles.image}
+                src={consolesImages[i].image}
+                alt="console"
+              />
+              <div className={styles.text}>
+                {findConsoleNameById(consolesImages[i].id)}
+              </div>
             </div>
             <Checkbox
               isChecked={selectedSystems.includes(consolesImages[i].id)}
             />
+            
           </div>
         ) : null
       )}

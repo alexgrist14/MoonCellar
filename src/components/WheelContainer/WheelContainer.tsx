@@ -1,33 +1,37 @@
-import { getGameList } from "@retroachievements/api";
-import { FC, useEffect, useState } from "react";
-import { authorization } from "../../utils/authorization";
-import { Wheel } from "react-custom-roulette";
+import { FC, ReactElement, useEffect, useState } from "react";
 import { IGame } from "../../interfaces/responses";
 import "react-wheel-of-prizes/dist/index.css";
 import WheelComponent from "./WheelComponent";
+import styles from "./WheelContainer.module.scss";
 
 interface WheelContainerProps {
-  selectedSystems: number[];
   games: IGame[];
 }
 
 const WheelContainer: FC<WheelContainerProps> = ({
-  selectedSystems,
-  games,
+  games
 }) => {
   const [gamesForSpin, setGamesForSpin] = useState<string[]>([]);
   const [forceUpdateKey, setForceUpdateKey] = useState(0);
-  const [currentWinner,setCurrentWinner] = useState<string>("");
+  const [currentWinner, setCurrentWinner] = useState<string | ReactElement>("");
 
   useEffect(() => {
-    if (games.length > 0) {
-      const randomGames = Array.from({ length: 15 }, (_, index) => {
-        const randomIndex = Math.floor(Math.random() * games.length);
-        return games[randomIndex].title;
-      });
-      setGamesForSpin(randomGames);
-    }
+    setRandomGames();
   }, [games]);
+
+  const setRandomGames = () =>{
+   
+    if (games.length > 0) {
+      const randomIndices: number[] = [];
+      while (randomIndices.length < 15) {
+        const randomIndex = Math.floor(Math.random() * games.length);
+        if (!randomIndices.includes(randomIndex)) {
+          randomIndices.push(randomIndex);
+        }
+      }
+      setGamesForSpin(randomIndices.map((index) => games[index].title));
+    }
+  }
 
   const segments = [
     "better luck next time",
@@ -63,8 +67,37 @@ const WheelContainer: FC<WheelContainerProps> = ({
     "#EC3F3F",
     "#FF9000",
   ];
-  const onFinished = (winner: any) => {
-    //console.log(winner)
+  const onFinished = (winner: string) => {
+    setCurrentWinner(
+      <div className={styles.winner__content}>
+        <img 
+          className={styles.img}
+          src={`https://retroachievements.org${
+            findGameIdByTitle(winner)?.image
+          }`}
+          alt="game"
+        />
+        <a
+          className={styles.link}
+          href={`https://retroachievements.org/game/${
+            findGameIdByTitle(winner)?.id
+          }`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          {winner}
+        </a>
+      </div>
+    );
+  };
+
+  const findGameIdByTitle = (
+    title: string
+  ): { id: number; image: string } | undefined => {
+    const foundGame = games.find((game) => game.title === title);
+    return foundGame
+      ? { id: foundGame.id, image: foundGame.imageIcon }
+      : undefined;
   };
 
   useEffect(() => {
@@ -72,7 +105,7 @@ const WheelContainer: FC<WheelContainerProps> = ({
   }, [gamesForSpin]);
 
   return (
-    <div>
+    <div className={styles.container}>
       <WheelComponent
         key={forceUpdateKey}
         setCurrentWinner={setCurrentWinner}
@@ -83,11 +116,16 @@ const WheelContainer: FC<WheelContainerProps> = ({
         contrastColor="white"
         buttonText="Spin"
         isOnlyOnce={false}
-        size={290}
+        size={295}
         upDuration={10}
         downDuration={100}
+        onClick={setRandomGames}
+        
       />
-      <div>{currentWinner}</div>
+      <div className={styles.winner}>
+        <div className={styles.winner__container}>{currentWinner}</div>
+      </div>
+      <button id={"spin"}>Spin</button>
     </div>
   );
 };
