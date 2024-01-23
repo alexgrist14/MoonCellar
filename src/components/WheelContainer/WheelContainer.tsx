@@ -118,7 +118,7 @@ const WheelContainer: FC<WheelContainerProps> = ({
 
   return (
     <div className={styles.container}>
-      <button className={styles.button} onClick={handleSpinClick} id={"spin"}>Spin</button>
+      
       <WheelComponent
         canvasRef={canvasRef}
         key={forceUpdateKey}
@@ -128,13 +128,14 @@ const WheelContainer: FC<WheelContainerProps> = ({
         onFinished={(winner) => onFinished(winner)}
         primaryColor="black"
         contrastColor="white"
-        buttonText=""
+        buttonText="Huh?"
         isOnlyOnce={true}
         size={295}
         upDuration={100}
         downDuration={300}
         
       />
+      <button className={styles.button} onClick={handleSpinClick} id={"spin"}>Spin</button>
       <div className={styles.winner}>
         <div className={styles.winner__container}>{currentWinner}</div>
       </div>
