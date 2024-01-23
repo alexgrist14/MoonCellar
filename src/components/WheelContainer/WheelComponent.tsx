@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, ReactElement, SetStateAction, useEffect, useState } from 'react'
+import React, { Dispatch, FC, ReactElement, RefObject, SetStateAction, useEffect, useState } from 'react'
 import styles from "./WheelContainer.module.scss";
 
 interface WheelComponentProps {
@@ -15,7 +15,7 @@ interface WheelComponentProps {
     upDuration: number;
     downDuration: number;
     fontFamily?: string;
-    onClick: ()=>void;
+    canvasRef: RefObject<HTMLCanvasElement>;
 }
 
 const WheelComponent:FC<WheelComponentProps> = ({
@@ -25,14 +25,14 @@ const WheelComponent:FC<WheelComponentProps> = ({
   onFinished,
   primaryColor = 'black',
   contrastColor = 'white',
-  buttonText = 'Spin',
+  buttonText = '',
   isOnlyOnce = false,
   size = 290,
   upDuration,
   downDuration,
   fontFamily = 'Roboto',
   setCurrentWinner,
-  onClick,
+  canvasRef,
 }) => {
   let currentSegment = ''
   let isStarted = false
@@ -60,7 +60,6 @@ const WheelComponent:FC<WheelComponentProps> = ({
 
   const initCanvas = () => {
     let canvas:any  = document.getElementById('canvas')
-    let button:HTMLElement | null = document.getElementById("spin")
     if (navigator.userAgent.indexOf('MSIE') !== -1) {
       canvas = document.createElement('canvas')
       canvas.setAttribute('width', 1000)
@@ -71,8 +70,9 @@ const WheelComponent:FC<WheelComponentProps> = ({
       if(wheel)
         wheel.appendChild(canvas)
     }
-    if(button)
-        canvas.addEventListener('click', spin, false)
+
+    canvas.style.pointerEvents = "none";
+    canvas.addEventListener('click', spin, false);
     canvasContext = canvas.getContext('2d')
   }
   const spin = () => {
@@ -233,6 +233,7 @@ const WheelComponent:FC<WheelComponentProps> = ({
   return (
     <div id='wheel' className={styles.wheel} >
       <canvas
+      ref={canvasRef} 
         id='canvas'
         className={styles.canvas}
         width='620'

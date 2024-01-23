@@ -1,4 +1,4 @@
-import { FC, ReactElement, useEffect, useState } from "react";
+import { FC, ReactElement, useEffect, useRef, useState } from "react";
 import { IGame } from "../../interfaces/responses";
 import "react-wheel-of-prizes/dist/index.css";
 import WheelComponent from "./WheelComponent";
@@ -14,6 +14,7 @@ const WheelContainer: FC<WheelContainerProps> = ({
   const [gamesForSpin, setGamesForSpin] = useState<string[]>([]);
   const [forceUpdateKey, setForceUpdateKey] = useState(0);
   const [currentWinner, setCurrentWinner] = useState<string | ReactElement>("");
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     setRandomGames();
@@ -30,6 +31,8 @@ const WheelContainer: FC<WheelContainerProps> = ({
         }
       }
       setGamesForSpin(randomIndices.map((index) => games[index].title));
+
+      console.log(gamesForSpin);
     }
   }
 
@@ -104,28 +107,38 @@ const WheelContainer: FC<WheelContainerProps> = ({
     setForceUpdateKey((prev) => prev + 1);
   }, [gamesForSpin]);
 
+  const handleSpinClick = ()=>{
+    if(canvasRef.current){
+      setRandomGames();
+      setTimeout(()=>{
+        canvasRef.current?.click();
+      },10)
+    }
+  }
+
   return (
     <div className={styles.container}>
+      <button className={styles.button} onClick={handleSpinClick} id={"spin"}>Spin</button>
       <WheelComponent
+        canvasRef={canvasRef}
         key={forceUpdateKey}
         setCurrentWinner={setCurrentWinner}
-        segments={gamesForSpin}
+        segments={gamesForSpin.length === 0 ? segments : gamesForSpin}
         segColors={segColors}
         onFinished={(winner) => onFinished(winner)}
         primaryColor="black"
         contrastColor="white"
-        buttonText="Spin"
-        isOnlyOnce={false}
+        buttonText=""
+        isOnlyOnce={true}
         size={295}
-        upDuration={10}
-        downDuration={100}
-        onClick={setRandomGames}
+        upDuration={100}
+        downDuration={300}
         
       />
       <div className={styles.winner}>
         <div className={styles.winner__container}>{currentWinner}</div>
       </div>
-      <button id={"spin"}>Spin</button>
+  
     </div>
   );
 };
