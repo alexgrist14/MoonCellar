@@ -92,7 +92,6 @@ const WheelComponent: FC<WheelComponentProps> = ({
   );
 
   const spin = useCallback(() => {
-    console.log("spin");
     timer.current = setInterval(
       () => onTimerTick(Math.PI / segmentsLength, spinStartDate.current, 0),
       10
@@ -117,21 +116,19 @@ const WheelComponent: FC<WheelComponentProps> = ({
         : undefined;
     };
 
+    const game = isFinished && findGameIdByTitle(currentSegment);
+
     setCurrentWinner(
-      isFinished ? (
+      isFinished && !!game ? (
         <div className={styles.winner__content}>
           <img
             className={styles.img}
-            src={`https://retroachievements.org${
-              findGameIdByTitle(currentSegment)?.image
-            }`}
+            src={`https://retroachievements.org${game.image}`}
             alt="game"
           />
           <a
             className={styles.link}
-            href={`https://retroachievements.org/game/${
-              findGameIdByTitle(currentSegment)?.id
-            }`}
+            href={`https://retroachievements.org/game/${game.id}`}
             target="_blank"
             rel="noreferrer"
           >
@@ -146,7 +143,6 @@ const WheelComponent: FC<WheelComponentProps> = ({
 
   useEffect(() => {
     if (!segments || !segments.length || isFinished) return;
-    console.log(segments);
 
     const centerX = 300;
     const centerY = 300;
@@ -234,16 +230,10 @@ const WheelComponent: FC<WheelComponentProps> = ({
         Math.floor((change / (Math.PI * 2)) * segments.length) -
         1;
 
-      if (i < 0) {
-        i = i + segments.length;
-      } else {
-        setCurrentSegment(segments[i]);
-      }
+      i < 0 && (i = i + segments.length);
 
-      console.log(segments[i]);
+      setCurrentSegment(segments[i]);
     };
-
-    console.log("draw");
 
     clear();
     drawWheel();
@@ -283,4 +273,5 @@ const WheelComponent: FC<WheelComponentProps> = ({
     </div>
   );
 };
+
 export default WheelComponent;
