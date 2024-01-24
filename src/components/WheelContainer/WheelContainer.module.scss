@@ -1,57 +1,37 @@
-.container{
-    position: relative;
+.container {
+  width: 100%;
+  .wheel {
+    .canvas {
+    }
+  }
+  .winner {
+    display: flex;
     width: 100%;
-    .wheel{
-        .canvas{
+    justify-content: center;
+    align-items: center;
+    color: white;
 
-        }
-    }
-    .winner{
-        display: flex;
-        width: 100%;
-        justify-content: center;
-        align-items: center;
-        
-        &__container{
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            background: black;
-            width: 500px;
-            text-align: center;
-            
-            border-radius: 30px;
-            height: 100px;
-        }
-        &__content{
-            width: 100%;
-            display: flex;
-            gap: 10px;
-            .img{
+    &__container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      background: black;
+      width: 500px;
+      text-align: center;
 
-            }
-            .link{
-
-            }
-        }
+      border-radius: 30px;
+      height: 100px;
     }
-    .button{
-        border-radius: 5px;
-        font-size: 32px;
-        cursor: pointer;
-        background: white;
-        border: 0;
-        width: 100px;
-        height: 50px;
-        margin-bottom: 5px;
-        transition: 0.1s;
-        &:hover{
-            background: rgb(236, 236, 236);
-            transition: 0.1s;
-        }
-        &:active{
-            background: rgb(195, 195, 196);
-        }
+    &__content {
+      width: 100%;
+      display: flex;
+      gap: 10px;
+      .img {
+      }
+      .link {
+      }
     }
+  }
 }
+
