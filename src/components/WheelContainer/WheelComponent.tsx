@@ -139,6 +139,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
         currentSegment
       )
     );
+
   }, [currentSegment, isFinished, setCurrentWinner, games]);
 
   useEffect(() => {

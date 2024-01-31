@@ -3,6 +3,7 @@ import { IGame } from "../../interfaces/responses";
 import "react-wheel-of-prizes/dist/index.css";
 import WheelComponent from "./WheelComponent";
 import styles from "./WheelContainer.module.scss";
+import helen from "../../assets/helen.png";
 
 interface WheelContainerProps {
   games: IGame[];
@@ -44,7 +45,18 @@ const WheelContainer: FC<WheelContainerProps> = ({ games }) => {
       />
       {currentWinner && (
         <div className={styles.winner}>
-          <div className={styles.winner__container}>{currentWinner}</div>
+          <div className={styles.winner__container}>
+            {typeof currentWinner === typeof "str" ?
+            <img className={styles.img} src={helen} alt="helen" />
+            :
+            ""
+          }
+            
+            <div>
+            {currentWinner}
+
+            </div>
+            </div>
         </div>
       )}
     </div>

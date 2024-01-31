@@ -4,19 +4,6 @@ export interface IPayload {
   houldRetrieveGameHashes?: boolean;
 }
 
-// export interface IGame {
-//   consoleId: number;
-//   consoleName: string;
-//   dateModified: string;
-//   forumTopicId: number;
-//   id: number;
-//   imageIcon: string;
-//   numAchievements: number;
-//   numLeaderboards: number;
-//   points: number;
-//   title: string;
-// }
-
 export interface IConsole {
   id: number;
   name: string;
@@ -39,4 +26,12 @@ export interface IGame {
   dateModified: string;
   forumTopicId: number;
   hashes: string[];
+}
+
+export interface IHowlongToBeat {
+  name: string;
+  gameplayMain: number;
+  gameplayMainExtra: number;
+  gameplayCompletionist: number;
+  imageUrl: string;
 }

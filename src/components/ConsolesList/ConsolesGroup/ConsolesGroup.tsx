@@ -2,8 +2,6 @@ import { Dispatch, FC, SetStateAction } from "react";
 import { IConsole, IGame } from "../../../interfaces/responses";
 import styles from "./ConsolesGroup.module.scss";
 import { consolesImages } from "../../../utils/consoleImages";
-import { getGameList } from "@retroachievements/api";
-import { authorization } from "../../../utils/authorization";
 import { Checkbox } from "@atlaskit/checkbox";
 
 interface ConsolesGroupProps {
@@ -12,6 +10,7 @@ interface ConsolesGroupProps {
   setSelectedSystems: Dispatch<SetStateAction<number[]>>;
   setGames: Dispatch<SetStateAction<IGame[]>>;
   selectedSystems: number[];
+  fetchGameList: (id: number, setGames: Dispatch<SetStateAction<IGame[]>>)=>void;
 }
 
 const ConsolesGroup: FC<ConsolesGroupProps> = ({
@@ -20,18 +19,11 @@ const ConsolesGroup: FC<ConsolesGroupProps> = ({
   setSelectedSystems,
   selectedSystems,
   setGames,
+  fetchGameList,
 }) => {
   const findConsoleNameById = (id: number): string | undefined => {
     const consoleItem = consoles.find((console) => console.id === id);
     return consoleItem ? consoleItem.name : undefined;
-  };
-
-  const fetchGameList = async (id: number) => {
-    const gameList: any = await getGameList(authorization, {
-      consoleId: id,
-      shouldOnlyRetrieveGamesWithAchievements: true,
-    });
-    setGames((prevState) => [...prevState, ...gameList]);
   };
 
   const handleConsoleClick = (id: number): void => {
@@ -44,7 +36,7 @@ const ConsolesGroup: FC<ConsolesGroupProps> = ({
       );
     } else {
       setSelectedSystems((prevState) => [...prevState, id]);
-      fetchGameList(id);
+      fetchGameList(id,setGames);
     }
   };
 
@@ -75,7 +67,6 @@ const ConsolesGroup: FC<ConsolesGroupProps> = ({
             <Checkbox
               isChecked={selectedSystems.includes(consolesImages[i].id)}
             />
-            
           </div>
         ) : null
       )}
