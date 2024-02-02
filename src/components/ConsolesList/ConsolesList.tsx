@@ -49,8 +49,12 @@ const ConsolesList: FC<ConsolesListProps> = ({
     fetchConsoleIds();
   }, []);
 
-  IGDBAgent("https://api.igdb.com/v4/genres").then((response) =>
-    console.log(response.data)
+  // IGDBAgent("https://api.igdb.com/v4/platforms", { fields: "name, platform_logo", limit: 500 }).then(
+  //   (response) => console.log(response.data)
+  // );
+
+  IGDBAgent("https://api.igdb.com/v4/games", { fields: "name, aggregated_rating", limit: 500, where: "id = 1942"}).then(
+    (response) => console.log(response.data)
   );
 
   return (
