@@ -1,10 +1,32 @@
 .container {
   width: 100%;
+  margin-top: 50px;
+
+  &__buttons {
+    margin-top: 10px;
+
+    & > button {
+      padding: 10px;
+      border-radius: 10px;
+      background-color: #2E353B;
+      color: white;
+      outline: 0;
+      border: 0;
+      transition: .3s;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #222222;
+      }
+    }
+  }
+
   .wheel {
     &_disabled {
       opacity: 0.8;
     }
   }
+
   .winner {
     display: flex;
     width: 100%;

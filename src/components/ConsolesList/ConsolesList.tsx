@@ -12,7 +12,7 @@ import { IIGDBGenre, IIGDBPlatform } from "../../interfaces";
 import { getGenres, getPlatforms } from "../../utils/IGDB";
 import { useDebouncedCallback } from "use-debounce";
 import { useAppDispatch, useAppSelector } from "../../store";
-import { setApiType, setLoading } from "../../store/commonSlice";
+import { setApiType, setLoading, setRoyalGames } from "../../store/commonSlice";
 
 interface ConsolesListProps {
   selectedSystems: number[];
@@ -34,7 +34,9 @@ const ConsolesList: FC<ConsolesListProps> = ({
   setGames,
 }) => {
   const dispatch = useAppDispatch();
-  const { isLoading, apiType } = useAppSelector((state) => state.common);
+  const { isLoading, apiType, royalGames } = useAppSelector(
+    (state) => state.common
+  );
 
   const [IGDBPlatforms, setIGDBPlatforms] = useState<IIGDBPlatform[]>([]);
   const [IGDBGenres, setIGDBGenres] = useState<IIGDBGenre[]>([]);
@@ -80,28 +82,44 @@ const ConsolesList: FC<ConsolesListProps> = ({
   );
 
   useEffect(() => {
-    fetchConsoleIds();
-    getGenres(setIGDBGenres);
-  }, []);
+    apiType === "RA" && fetchConsoleIds();
+    apiType === "IGDB" && getGenres(setIGDBGenres);
+  }, [apiType]);
 
   useEffect(() => {
-    dispatch(setLoading(true));
+    if (apiType !== "IGDB") return;
 
+    dispatch(setLoading(true));
     getPlatforms(setIGDBPlatforms, selectedGeneration);
-  }, [selectedGeneration, dispatch]);
+  }, [selectedGeneration, dispatch, apiType]);
 
   return (
     <div className={styles.consoles__list}>
       <div className={styles.consoles__options}>
         <label className={styles.consoles__toggle}>
+          <Toggle
+            isChecked={apiType === "RA"}
+            onChange={() => dispatch(setApiType("RA"))}
+          />
           RetroAchievements
+        </label>
+        <label className={styles.consoles__toggle}>
           <Toggle
             isChecked={apiType === "IGDB"}
             onChange={() =>
-              dispatch(setApiType(apiType === "RA" ? "IGDB" : "RA"))
+              dispatch(setApiType(apiType === "IGDB" ? "RA" : "IGDB"))
             }
           />
           IGDB
+        </label>
+        <label className={styles.consoles__toggle}>
+          <Toggle
+            isChecked={apiType === "Royal"}
+            onChange={() =>
+              dispatch(setApiType(apiType === "Royal" ? "RA" : "Royal"))
+            }
+          />
+          Royal
         </label>
       </div>
       {apiType === "IGDB" && (
@@ -167,6 +185,29 @@ const ConsolesList: FC<ConsolesListProps> = ({
                   )
                 }
               />
+            ))}
+          </div>
+        </div>
+      )}
+      {apiType === "Royal" && (
+        <div className={styles.consoles__royal}>
+          <h3>Games:</h3>
+          <div className={styles.consoles__games}>
+            {royalGames.map((game) => (
+              <div key={game.id} className={styles.consoles__game}>
+                <a href={game.url}>{game.name}</a>
+                <button
+                  onClick={() =>
+                    dispatch(
+                      setRoyalGames(
+                        royalGames.filter((_game) => game.id !== _game.id)
+                      )
+                    )
+                  }
+                >
+                  Remove
+                </button>
+              </div>
             ))}
           </div>
         </div>

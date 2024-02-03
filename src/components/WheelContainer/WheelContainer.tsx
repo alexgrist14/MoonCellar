@@ -4,6 +4,8 @@ import "react-wheel-of-prizes/dist/index.css";
 import WheelComponent from "./WheelComponent";
 import styles from "./WheelContainer.module.scss";
 import { IIGDBGame } from "../../interfaces";
+import { useAppDispatch, useAppSelector } from "../../store";
+import { setRoyalGames } from "../../store/commonSlice";
 
 interface WheelContainerProps {
   games: IGame[];
@@ -16,12 +18,14 @@ const WheelContainer: FC<WheelContainerProps> = ({
   gamesIGDB,
   callback,
 }) => {
+  const dispatch = useAppDispatch();
+  const { royalGames, winner, isFinished, isStarted, apiType } = useAppSelector(
+    (state) => state.common
+  );
+
   const [currentWinner, setCurrentWinner] = useState<string | ReactNode>();
 
-  const segColors = [
-    "#815CD1",
-    "#3DA5E0",
-  ];
+  const segColors = ["#815CD1", "#3DA5E0"];
 
   return (
     <div className={styles.container}>
@@ -38,13 +42,33 @@ const WheelContainer: FC<WheelContainerProps> = ({
         setCurrentWinner={setCurrentWinner}
         callback={callback}
       />
-      {currentWinner && (
+      {(!!isStarted || !!isFinished) && (
         <div className={styles.winner}>
           <div className={styles.winner__container}>
             <div>{currentWinner}</div>
           </div>
         </div>
       )}
+      <div className={styles.container__buttons}>
+        {!!winner && isFinished && apiType === "IGDB" && (
+          <button
+            onClick={() =>
+              dispatch(
+                setRoyalGames(
+                  royalGames.some((game) => game.id === winner.id)
+                    ? royalGames.filter((game) => game.id !== winner.id)
+                    : [...royalGames, winner]
+                )
+              )
+            }
+          >
+            {royalGames.some((game) => game.id === winner.id)
+              ? "Remove from"
+              : "Add to"}{" "}
+            Battle Royal
+          </button>
+        )}
+      </div>
     </div>
   );
 };
