@@ -3,31 +3,24 @@ import { IGame } from "../../interfaces/responses";
 import "react-wheel-of-prizes/dist/index.css";
 import WheelComponent from "./WheelComponent";
 import styles from "./WheelContainer.module.scss";
-import helen from "../../assets/helen.png";
+import { IIGDBGame } from "../../interfaces";
 
 interface WheelContainerProps {
   games: IGame[];
+  gamesIGDB: IIGDBGame[];
+  callback: () => void;
 }
 
-const WheelContainer: FC<WheelContainerProps> = ({ games }) => {
+const WheelContainer: FC<WheelContainerProps> = ({
+  games,
+  gamesIGDB,
+  callback,
+}) => {
   const [currentWinner, setCurrentWinner] = useState<string | ReactNode>();
 
   const segColors = [
-    "#EE4040",
-    "#F0CF50",
     "#815CD1",
     "#3DA5E0",
-    "#34A24F",
-    "#F9AA1F",
-    "#EC3F3F",
-    "#FF9000",
-    "#F0CF50",
-    "#815CD1",
-    "#3DA5E0",
-    "#34A24F",
-    "#F9AA1F",
-    "#EC3F3F",
-    "#FF9000",
   ];
 
   return (
@@ -41,22 +34,15 @@ const WheelContainer: FC<WheelContainerProps> = ({ games }) => {
         upDuration={100}
         downDuration={300}
         games={games}
+        gamesIGDB={gamesIGDB}
         setCurrentWinner={setCurrentWinner}
+        callback={callback}
       />
       {currentWinner && (
         <div className={styles.winner}>
           <div className={styles.winner__container}>
-            {typeof currentWinner === typeof "str" ?
-            <img className={styles.img} src={helen} alt="helen" />
-            :
-            ""
-          }
-            
-            <div>
-            {currentWinner}
-
-            </div>
-            </div>
+            <div>{currentWinner}</div>
+          </div>
         </div>
       )}
     </div>

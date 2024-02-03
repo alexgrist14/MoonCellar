@@ -1,10 +1,70 @@
-.consoles__list{
+.consoles {
+  &__list {
     display: flex;
+    flex-direction: column;
     background: rgba(42, 46, 48, 0.9);
-    height: 100%;
-    max-height: 100vh;
+    height: calc(100vh - 40px);
     overflow-y: scroll;
-    flex-wrap: wrap;
-    width: 500px;
-    gap: 30px;
+    gap: 40px;
+    padding: 20px;
+    width: 600px;
+
+    & h3 {
+      margin: 0;
+    }
+  }
+
+  &__igdb {
+    display: grid;
+    gap: 20px;
+  }
+
+  &__groups {
+    display: grid;
+    width: fit-content;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+
+  &__options {
+    display: grid;
+    justify-items: center;
+  }
+
+  &__families,
+  &__platforms {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    & label {
+      gap: 15px;
+    }
+
+    & span {
+      color: white;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      text-align: start;
+    }
+  }
+
+  &__generations {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    & > span {
+      white-space: nowrap;
+    }
+  }
+
+  &__toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-items: center;
+    align-items: center;
+    gap: 10px;
+  }
 }
+

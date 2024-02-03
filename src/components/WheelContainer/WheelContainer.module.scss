@@ -1,7 +1,8 @@
 .container {
   width: 100%;
   .wheel {
-    .canvas {
+    &_disabled {
+      opacity: 0.8;
     }
   }
   .winner {
@@ -36,7 +37,7 @@
         background: black;
         width: 500px;
         text-align: center;
-  
+
         border-radius: 30px;
         height: 100px;
       }

@@ -10,7 +10,10 @@ import {
 } from "react";
 import styles from "./WheelContainer.module.scss";
 import { IGame } from "../../interfaces/responses";
-import { getSegments } from "../../utils/getSegments";
+import { IIGDBGame } from "../../interfaces";
+import { useAppDispatch, useAppSelector } from "../../store";
+import { setLoading } from "../../store/commonSlice";
+import classNames from "classnames";
 
 interface WheelComponentProps {
   segColors: string[];
@@ -22,7 +25,9 @@ interface WheelComponentProps {
   downDuration: number;
   fontFamily?: string;
   games: IGame[];
+  gamesIGDB: IIGDBGame[];
   setCurrentWinner: Dispatch<SetStateAction<ReactNode | string>>;
+  callback: () => void;
 }
 
 const segmentsLength = 15;
@@ -37,12 +42,17 @@ const WheelComponent: FC<WheelComponentProps> = ({
   downDuration,
   fontFamily = "Roboto",
   games,
+  gamesIGDB,
   setCurrentWinner,
+  callback,
 }) => {
+  const dispatch = useAppDispatch();
+
+  const { isLoading, apiType } = useAppSelector((state) => state.common);
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [isFinished, setIsFinished] = useState(false);
-  const [isStarted, setIsStarted] = useState(false);
   const [currentSegment, setCurrentSegment] = useState("");
   const [angleCurrent, setAngleCurrent] = useState(0);
   const [segments, setSegments] = useState<string[]>();
@@ -61,86 +71,77 @@ const WheelComponent: FC<WheelComponentProps> = ({
     ctx && ctx.clearRect(0, 0, 1000, 800);
   }, []);
 
-  const onTimerTick = useCallback(
-    (maxSpeed: number, spinStartDate: number, initialAngle: number) => {
-      let angleDelta = initialAngle;
+  const onTimerTick = useCallback(() => {
+    let angleDelta = 0;
+    const maxSpeed = Math.PI / segmentsLength;
 
-      const duration = new Date().getTime() - spinStartDate;
+    const duration = new Date().getTime() - spinStartDate.current;
 
-      let progress = 0;
-      let finished = false;
+    let progress = 0;
+    let finished = false;
 
-      if (duration < upTime) {
-        progress = duration / upTime;
-        angleDelta = maxSpeed * Math.sin((progress * Math.PI) / 2);
-      } else {
-        progress = duration / downTime;
-        angleDelta =
-          maxSpeed * Math.sin((progress * Math.PI) / 2 + Math.PI / 2);
-        if (progress >= 1) finished = true;
-      }
+    if (duration < upTime) {
+      !isLoading && (progress = duration / upTime);
+      angleDelta = maxSpeed * Math.sin((progress * Math.PI) / 2);
+    } else {
+      !isLoading && (progress = duration / downTime);
+      angleDelta = maxSpeed * Math.sin((progress * Math.PI) / 2 + Math.PI / 2);
+      if (progress >= 1) finished = true;
+    }
 
-      if (finished) {
-        setIsStarted(false);
-        setIsFinished(true);
-        clearInterval(timer.current);
-      } else {
-        setAngleCurrent((angleCurrent) => angleCurrent + angleDelta);
-      }
-    },
-    [downTime, upTime]
-  );
+    if (finished) {
+      setIsFinished(true);
+      clearInterval(timer.current);
+    } else {
+      setAngleCurrent((angleCurrent) => angleCurrent + angleDelta);
+    }
+  }, [downTime, upTime, isLoading]);
 
   const spin = useCallback(() => {
-    timer.current = setInterval(
-      () => onTimerTick(Math.PI / segmentsLength, spinStartDate.current, 0),
-      10
-    );
+    spinStartDate.current = new Date().getTime();
+
+    timer.current = setInterval(() => onTimerTick(), 10);
   }, [onTimerTick]);
 
   useEffect(() => {
-    setSegments(getSegments(games, segmentsLength));
-  }, [games]);
+    setSegments(
+      (apiType === "RA" ? games : gamesIGDB).map((game, i) => game.id + "_" + i)
+    );
+  }, [games, gamesIGDB, apiType]);
 
   useEffect(() => {
     angleCurrent >= Math.PI * 2 && setAngleCurrent(angleCurrent - Math.PI * 2);
   }, [angleCurrent]);
 
   useEffect(() => {
-    const findGameIdByTitle = (
-      title: string
-    ): { id: number; image: string } | undefined => {
-      const foundGame = games.find((game) => game.title === title);
-      return foundGame
-        ? { id: foundGame.id, image: foundGame.imageIcon }
-        : undefined;
-    };
-
-    const game = isFinished && findGameIdByTitle(currentSegment);
-
-    setCurrentWinner(
-      isFinished && !!game ? (
-        <div className={styles.winner__content}>
-          <img
-            className={styles.img}
-            src={`https://retroachievements.org${game.image}`}
-            alt="game"
-          />
-          <a
-            className={styles.link}
-            href={`https://retroachievements.org/game/${game.id}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {currentSegment}
-          </a>
-        </div>
-      ) : (
-        currentSegment
-      )
-    );
-
-  }, [currentSegment, isFinished, setCurrentWinner, games]);
+    !!currentSegment &&
+      setCurrentWinner(
+        isFinished ? (
+          <div className={styles.winner__content}>
+            <a
+              className={styles.link}
+              href={
+                apiType === "RA"
+                  ? `https://retroachievements.org/game/${
+                      games[+currentSegment.split("_")[1]]?.id
+                    }`
+                  : gamesIGDB[+currentSegment.split("_")[1]]?.url || ""
+              }
+              target="_blank"
+              rel="noreferrer"
+            >
+              {apiType === "RA"
+                ? games[+currentSegment.split("_")[1]]?.title || ""
+                : gamesIGDB[+currentSegment.split("_")[1]]?.name || ""}
+            </a>
+          </div>
+        ) : apiType === "RA" ? (
+          games[+currentSegment.split("_")[1]]?.title || ""
+        ) : (
+          gamesIGDB[+currentSegment.split("_")[1]]?.name || ""
+        )
+      );
+  }, [currentSegment, isFinished, setCurrentWinner, games, gamesIGDB, apiType]);
 
   useEffect(() => {
     if (!segments || !segments.length || isFinished) return;
@@ -152,7 +153,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
     if (!ctx) return;
 
     const drawSegment = (key: any, lastAngle: any, angle: any) => {
-      const value = segments[key];
+      const value = apiType === "RA" ? games[key]?.title : gamesIGDB[key]?.name;
 
       ctx.save();
       ctx.beginPath();
@@ -160,7 +161,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
       ctx.arc(centerX, centerY, size, lastAngle, angle, false);
       ctx.lineTo(centerX, centerY);
       ctx.closePath();
-      ctx.fillStyle = segColors[key];
+      ctx.fillStyle = segColors[key % 2 ? 0 : 1];
       ctx.fill();
       ctx.stroke();
       ctx.save();
@@ -168,7 +169,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
       ctx.rotate((lastAngle + angle) / 2);
       ctx.fillStyle = contrastColor;
       ctx.font = "bold 1em " + fontFamily;
-      ctx.fillText(value.slice(0, 21), size / 2 + 20, 0);
+      ctx.fillText(value?.slice(0, 21) || "", size / 2 + 20, 0);
       ctx.restore();
     };
 
@@ -250,10 +251,17 @@ const WheelComponent: FC<WheelComponentProps> = ({
     size,
     angleCurrent,
     segments,
+    games,
+    gamesIGDB,
   ]);
 
   return (
-    <div id="wheel" className={styles.wheel}>
+    <div
+      id="wheel"
+      className={classNames(styles.wheel, {
+        [styles.wheel_disabled]: isLoading,
+      })}
+    >
       <canvas
         ref={canvasRef}
         id="canvas"
@@ -261,12 +269,12 @@ const WheelComponent: FC<WheelComponentProps> = ({
         width="600"
         height="600"
         onClick={() => {
-          if (isStarted) return;
+          if (isLoading) return;
 
-          setIsStarted(true);
           setIsFinished(false);
-          setSegments(getSegments(games, segmentsLength));
-          spinStartDate.current = new Date().getTime();
+          dispatch(setLoading(true));
+
+          callback();
 
           spin();
         }}

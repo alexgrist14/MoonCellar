@@ -10,7 +10,10 @@ interface ConsolesGroupProps {
   setSelectedSystems: Dispatch<SetStateAction<number[]>>;
   setGames: Dispatch<SetStateAction<IGame[]>>;
   selectedSystems: number[];
-  fetchGameList: (id: number, setGames: Dispatch<SetStateAction<IGame[]>>)=>void;
+  fetchGameList: (
+    id: number,
+    setGames: Dispatch<SetStateAction<IGame[]>>
+  ) => void;
 }
 
 const ConsolesGroup: FC<ConsolesGroupProps> = ({
@@ -36,7 +39,7 @@ const ConsolesGroup: FC<ConsolesGroupProps> = ({
       );
     } else {
       setSelectedSystems((prevState) => [...prevState, id]);
-      fetchGameList(id,setGames);
+      fetchGameList(id, setGames);
     }
   };
 

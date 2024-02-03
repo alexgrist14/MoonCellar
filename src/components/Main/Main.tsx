@@ -1,18 +1,72 @@
-import { FC, useState } from "react";
+import {
+  Dispatch,
+  FC,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 
 import ConsolesList from "../ConsolesList/ConsolesList";
 import WheelContainer from "../WheelContainer/WheelContainer";
 import { IGame } from "../../interfaces/responses";
 import styles from "./Main.module.scss";
+import { IIGDBGame } from "../../interfaces";
+import { getGames, getGamesCount } from "../../utils/IGDB";
+import { shuffle } from "../../utils/shuffle";
+import { useAppDispatch } from "../../store";
+import { setLoading } from "../../store/commonSlice";
 
 const Main: FC = () => {
-  const [games,setGames] = useState<IGame[]>([]);
+  const dispatch = useAppDispatch();
+  const [games, setGames] = useState<IGame[]>([]);
+  const [gamesIGDB, setGamesIGDB] = useState<IIGDBGame[]>([]);
+
   const [selectedSystems, setSelectedSystems] = useState<number[]>([]);
+  const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
+  const [selectedRating, setSelectedRating] = useState(0);
+
+  const getIGDBGames = useCallback(
+    () =>
+      getGamesCount(selectedSystems, selectedRating, selectedGenres).then(
+        (response) =>
+          !!response.data.count
+            ? getGames({
+                limit: 20,
+                platforms: selectedSystems,
+                total: response.data.count,
+                rating: selectedRating,
+                genres: selectedGenres,
+              }).then((response) => {
+                setGamesIGDB(shuffle(response.data));
+                dispatch(setLoading(false));
+              })
+            : setGamesIGDB([])
+      ),
+    [selectedSystems, selectedRating, selectedGenres, dispatch]
+  );
+
+  useEffect(() => {
+    dispatch(setLoading(true));
+    getIGDBGames();
+  }, [selectedSystems, selectedRating, selectedGenres, getIGDBGames, dispatch]);
 
   return (
     <div className={styles.App}>
-      <ConsolesList selectedSystems={selectedSystems} setSelectedSystems={setSelectedSystems} setGames={setGames}/>
-      <WheelContainer games={games}/>
+      <ConsolesList
+        selectedSystems={selectedSystems}
+        setSelectedSystems={setSelectedSystems}
+        selectedRating={selectedRating}
+        setSelectedRating={setSelectedRating}
+        selectedGenres={selectedGenres}
+        setSelectedGenres={setSelectedGenres}
+        setGames={setGames}
+      />
+      <WheelContainer
+        games={games}
+        gamesIGDB={gamesIGDB}
+        callback={getIGDBGames}
+      />
     </div>
   );
 };
