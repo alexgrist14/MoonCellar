@@ -1,6 +1,7 @@
 import express from "express";
 import axios from "axios";
 import * as https from "https";
+import fs from "fs-extra";
 
 const httpsAgent = new https.Agent({
   rejectUnauthorized: false,
@@ -8,7 +9,13 @@ const httpsAgent = new https.Agent({
 
 const app = express();
 
+fs.removeSync("hui.json");
+
 app.all("*", function (req, res) {
+  const data = Object.keys(req.query)
+    .map((key) => `${key} ${req.query[key]};`)
+    .join(" ");
+
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET, PUT, PATCH, POST, DELETE");
   res.header(
@@ -28,14 +35,15 @@ app.all("*", function (req, res) {
       return;
     }
 
-    console.log(req.query)
-    console.log(req.body)
-    console.log(req.data)
+    res.setTimeout(3000, () => {
+      console.log("Request has timed out.");
+      res.sendStatus(408);
+    });
 
     axios({
       url: targetURL,
       method: req.method,
-      data: req.body,
+      data: data,
       headers: {
         "Client-ID": req.header("Client-ID"),
         Authorization: req.header("Authorization"),
@@ -43,10 +51,16 @@ app.all("*", function (req, res) {
       httpsAgent,
     })
       .then((response) => {
+        const games = fs.existsSync("hui.json")
+          ? fs.readJSONSync("hui.json")
+          : [];
+
+        fs.writeJSONSync("hui.json", games.concat(response.data));
         res.status(response.status).send(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        !!error.response?.status &&
+          res.status(error.response.status).sendStatus(error.response.status);
       });
   }
 });

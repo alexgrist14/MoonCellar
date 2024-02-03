@@ -6,6 +6,7 @@ import { consolesImages } from "../../utils/consoleImages";
 import ConsolesGroup from "./ConsolesGroup/ConsolesGroup";
 import styles from "./ConsolesList.module.scss";
 import { IGDBAgent } from "../../api";
+import { AxiosResponse } from "axios";
 
 interface ConsolesListProps {
   selectedSystems: number[];
@@ -19,6 +20,7 @@ const ConsolesList: FC<ConsolesListProps> = ({
   setGames,
 }) => {
   const [consoles, setConsoles] = useState<IConsole[]>([]);
+  const [gamesNew, setGamesNew] = useState<any[]>([]);
 
   const fetchGameList = async (
     id: number,
@@ -53,9 +55,64 @@ const ConsolesList: FC<ConsolesListProps> = ({
   //   (response) => console.log(response.data)
   // );
 
-  IGDBAgent("https://api.igdb.com/v4/games", { fields: "name, aggregated_rating", limit: 500, where: "id = 1942"}).then(
-    (response) => console.log(response.data)
-  );
+  const getGames = (limit: number, offset: number) => {
+    return IGDBAgent("https://api.igdb.com/v4/games", {
+      fields:
+        "name, cover, screenshots, slug, total_rating, artworks, franchise, franchises, game_modes, genres, platforms, tags, themes, url",
+      limit: limit,
+      offset: offset,
+      where: "parent_game = null",
+    });
+  };
+
+  useEffect(() => {
+    const queries: Promise<AxiosResponse>[] = [];
+    const maxRetries = 5;
+
+    let attempt = 0;
+
+    for (let i = 0; i < 2; i++) {
+      queries.push(getGames(500, 500 * i));
+    }
+
+    const hui = async (queries: Promise<AxiosResponse>[]) => {
+      const results: any[] = await Promise.allSettled(queries);
+      console.log(results);
+
+      const retryPromises: Promise<AxiosResponse>[] = [];
+      const successResults: any[] = [];
+
+      results.forEach((result) =>
+        result.status === "rejected"
+          ? retryPromises.push(
+              getGames(
+                result.reason.config.params.limit,
+                result.reason.config.params.offset
+              )
+            )
+          : successResults.push(result)
+      );
+
+      setGamesNew((games) => {
+        return Array.from(
+          new Set(
+            games.concat(...successResults.map((result) => result.value.data))
+          )
+        );
+      });
+
+      console.log(retryPromises);
+
+      if (!!retryPromises?.length) {
+        attempt++;
+        attempt <= maxRetries && hui(retryPromises);
+      }
+    };
+
+    hui(queries);
+  }, []);
+
+  console.log(gamesNew);
 
   return (
     <div className={styles.consoles__list}>
