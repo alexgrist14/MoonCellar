@@ -25,6 +25,7 @@
     "react-scripts": "5.0.1",
     "react-wheel-of-prizes": "1.0.6",
     "redux": "^5.0.1",
+    "redux-persist": "^6.0.0",
     "sass": "^1.70.0",
     "typescript": "^4.4.2",
     "use-debounce": "^10.0.0",

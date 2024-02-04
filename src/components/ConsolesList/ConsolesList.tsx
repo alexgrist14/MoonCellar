@@ -1,4 +1,11 @@
-import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
+import {
+  Dispatch,
+  FC,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { IConsole, IGame } from "../../interfaces/responses";
 import { getConsoleIds, getGameList } from "@retroachievements/api";
 import { authorization } from "../../utils/authorization";
@@ -12,11 +19,16 @@ import { IIGDBGenre, IIGDBPlatform } from "../../interfaces";
 import { getGenres, getPlatforms } from "../../utils/IGDB";
 import { useDebouncedCallback } from "use-debounce";
 import { useAppDispatch, useAppSelector } from "../../store";
-import { setApiType, setLoading, setRoyalGames } from "../../store/commonSlice";
+import {
+  setApiType,
+  setRoyal,
+  setRoyalGamesIGDB,
+  setRoyalGamesRA,
+  setSystemsIGDB,
+} from "../../store/commonSlice";
+import { setLoading } from "../../store/statesSlice";
 
 interface ConsolesListProps {
-  selectedSystems: number[];
-  setSelectedSystems: Dispatch<SetStateAction<number[]>>;
   selectedRating: number;
   setSelectedRating: Dispatch<SetStateAction<number>>;
   selectedGenres: number[];
@@ -25,8 +37,6 @@ interface ConsolesListProps {
 }
 
 const ConsolesList: FC<ConsolesListProps> = ({
-  selectedSystems,
-  setSelectedSystems,
   selectedRating,
   setSelectedRating,
   selectedGenres,
@@ -34,9 +44,17 @@ const ConsolesList: FC<ConsolesListProps> = ({
   setGames,
 }) => {
   const dispatch = useAppDispatch();
-  const { isLoading, apiType, royalGames } = useAppSelector(
-    (state) => state.common
-  );
+  const {
+    apiType,
+    royalGamesRA,
+    royalGamesIGDB,
+    systemsIGDB,
+    systemsRA,
+    isRoyal,
+  } = useAppSelector((state) => state.common);
+  const { isLoading } = useAppSelector((state) => state.states);
+
+  const firstRender = useRef(true);
 
   const [IGDBPlatforms, setIGDBPlatforms] = useState<IIGDBPlatform[]>([]);
   const [IGDBGenres, setIGDBGenres] = useState<IIGDBGenre[]>([]);
@@ -82,16 +100,27 @@ const ConsolesList: FC<ConsolesListProps> = ({
   );
 
   useEffect(() => {
+    if (isRoyal) return;
+
     apiType === "RA" && fetchConsoleIds();
     apiType === "IGDB" && getGenres(setIGDBGenres);
-  }, [apiType]);
+  }, [apiType, isRoyal]);
 
   useEffect(() => {
-    if (apiType !== "IGDB") return;
+    if (firstRender.current) {
+      firstRender.current = false;
+
+      !!systemsRA?.length &&
+        systemsRA.forEach((system) => fetchGameList(system, setGames));
+    }
+  }, [systemsRA, setGames]);
+
+  useEffect(() => {
+    if (apiType !== "IGDB" || isRoyal) return;
 
     dispatch(setLoading(true));
     getPlatforms(setIGDBPlatforms, selectedGeneration);
-  }, [selectedGeneration, dispatch, apiType]);
+  }, [selectedGeneration, dispatch, apiType, isRoyal]);
 
   return (
     <div className={styles.consoles__list}>
@@ -114,15 +143,13 @@ const ConsolesList: FC<ConsolesListProps> = ({
         </label>
         <label className={styles.consoles__toggle}>
           <Toggle
-            isChecked={apiType === "Royal"}
-            onChange={() =>
-              dispatch(setApiType(apiType === "Royal" ? "RA" : "Royal"))
-            }
+            isChecked={isRoyal}
+            onChange={() => dispatch(setRoyal(!isRoyal))}
           />
           Royal
         </label>
       </div>
-      {apiType === "IGDB" && (
+      {apiType === "IGDB" && !isRoyal && (
         <div className={styles.consoles__igdb}>
           <h3>Rating</h3>
           <div className={styles.consoles__generations}>
@@ -175,13 +202,17 @@ const ConsolesList: FC<ConsolesListProps> = ({
               <Checkbox
                 key={platform.id}
                 label={platform.name}
-                isChecked={selectedSystems.includes(platform.id)}
+                isChecked={systemsIGDB?.includes(platform.id)}
                 isDisabled={isLoading}
                 onChange={() =>
-                  setSelectedSystems(
-                    !selectedSystems.includes(platform.id)
-                      ? [...selectedSystems, platform.id]
-                      : selectedSystems.filter((id) => id !== platform.id)
+                  dispatch(
+                    setSystemsIGDB(
+                      !!systemsIGDB?.length
+                        ? !systemsIGDB?.includes(platform.id)
+                          ? [...systemsIGDB, platform.id]
+                          : systemsIGDB.filter((id) => id !== platform.id)
+                        : [platform.id]
+                    )
                   )
                 }
               />
@@ -189,84 +220,103 @@ const ConsolesList: FC<ConsolesListProps> = ({
           </div>
         </div>
       )}
-      {apiType === "Royal" && (
+      {isRoyal && (
         <div className={styles.consoles__royal}>
           <h3>Games:</h3>
-          <div className={styles.consoles__games}>
-            {royalGames.map((game) => (
-              <div key={game.id} className={styles.consoles__game}>
-                <a href={game.url}>{game.name}</a>
-                <button
-                  onClick={() =>
-                    dispatch(
-                      setRoyalGames(
-                        royalGames.filter((_game) => game.id !== _game.id)
+          {apiType === "RA" ? (
+            <div className={styles.consoles__games}>
+              {!!royalGamesRA?.length
+                ? royalGamesRA.map((game) => (
+                    <div key={game.id} className={styles.consoles__game}>
+                      <a
+                        href={`https://retroachievements.org/game/${game.id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {game.title}
+                      </a>
+                      <button
+                        onClick={() =>
+                          dispatch(
+                            setRoyalGamesRA(
+                              royalGamesRA.filter(
+                                (_game) => game.id !== _game.id
+                              )
+                            )
+                          )
+                        }
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))
+                : null}
+            </div>
+          ) : (
+            <div className={styles.consoles__games}>
+              {royalGamesIGDB.map((game) => (
+                <div key={game.id} className={styles.consoles__game}>
+                  <a href={game.url} target="_blank" rel="noreferrer">
+                    {game.name}
+                  </a>
+                  <button
+                    onClick={() =>
+                      dispatch(
+                        setRoyalGamesIGDB(
+                          royalGamesIGDB.filter((_game) => game.id !== _game.id)
+                        )
                       )
-                    )
-                  }
-                >
-                  Remove
-                </button>
-              </div>
-            ))}
-          </div>
+                    }
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
-      {apiType === "RA" && (
+      {apiType === "RA" && !isRoyal && (
         <div className={styles.consoles__groups}>
           <ConsolesGroup
             system="Nintendo"
             consoles={consoles}
-            setSelectedSystems={setSelectedSystems}
-            selectedSystems={selectedSystems}
             setGames={setGames}
             fetchGameList={fetchGameList}
           />
           <ConsolesGroup
             system="Sony"
             consoles={consoles}
-            setSelectedSystems={setSelectedSystems}
-            selectedSystems={selectedSystems}
             setGames={setGames}
             fetchGameList={fetchGameList}
           />
           <ConsolesGroup
             system="Atari"
             consoles={consoles}
-            setSelectedSystems={setSelectedSystems}
-            selectedSystems={selectedSystems}
             setGames={setGames}
             fetchGameList={fetchGameList}
           />
           <ConsolesGroup
             system="Sega"
             consoles={consoles}
-            setSelectedSystems={setSelectedSystems}
-            selectedSystems={selectedSystems}
             setGames={setGames}
             fetchGameList={fetchGameList}
           />
           <ConsolesGroup
             system="NEC"
             consoles={consoles}
-            setSelectedSystems={setSelectedSystems}
-            selectedSystems={selectedSystems}
             setGames={setGames}
             fetchGameList={fetchGameList}
           />
           <ConsolesGroup
             system="SNK"
             consoles={consoles}
-            setSelectedSystems={setSelectedSystems}
-            selectedSystems={selectedSystems}
             setGames={setGames}
             fetchGameList={fetchGameList}
           />
           <ConsolesGroup
             system="Other"
             consoles={consoles}
-            setSelectedSystems={setSelectedSystems}
-            selectedSystems={selectedSystems}
             setGames={setGames}
             fetchGameList={fetchGameList}
           />

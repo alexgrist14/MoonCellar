@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import { IIGDBPlatform, IIGDBPlatformFamily } from "../../interfaces";
 import { IGDBAgent } from "../../api";
 import { store } from "../../store";
-import { setLoading } from "../../store/commonSlice";
+import { setLoading } from "../../store/statesSlice";
 
 export const getPlatforms = (
   setPlatforms: Dispatch<SetStateAction<IIGDBPlatform[]>>,
@@ -16,7 +16,11 @@ export const getPlatforms = (
       !!generation ? `generation <= ${generation} & ` : ""
     }platform_logo != null`,
   }).then((response) => {
-    setPlatforms(response.data.sort((a: IIGDBPlatform, b: IIGDBPlatform) => a.name > b.name ? 1 : -1));
+    setPlatforms(
+      response.data.sort((a: IIGDBPlatform, b: IIGDBPlatform) =>
+        a.name > b.name ? 1 : -1
+      )
+    );
     store.dispatch(setLoading(false));
   });
 };

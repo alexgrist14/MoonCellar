@@ -5,7 +5,7 @@ import WheelComponent from "./WheelComponent";
 import styles from "./WheelContainer.module.scss";
 import { IIGDBGame } from "../../interfaces";
 import { useAppDispatch, useAppSelector } from "../../store";
-import { setRoyalGames } from "../../store/commonSlice";
+import { setRoyalGamesIGDB, setRoyalGamesRA } from "../../store/commonSlice";
 
 interface WheelContainerProps {
   games: IGame[];
@@ -19,9 +19,9 @@ const WheelContainer: FC<WheelContainerProps> = ({
   callback,
 }) => {
   const dispatch = useAppDispatch();
-  const { royalGames, winner, isFinished, isStarted, apiType } = useAppSelector(
-    (state) => state.common
-  );
+  const { royalGamesRA, royalGamesIGDB, winner, apiType, isRoyal } =
+    useAppSelector((state) => state.common);
+  const { isStarted, isFinished } = useAppSelector((state) => state.states);
 
   const [currentWinner, setCurrentWinner] = useState<string | ReactNode>();
 
@@ -50,21 +50,43 @@ const WheelContainer: FC<WheelContainerProps> = ({
         </div>
       )}
       <div className={styles.container__buttons}>
-        {!!winner && isFinished && apiType === "IGDB" && (
+        {!!winner && !isRoyal && isFinished && apiType === "RA" && (
           <button
             onClick={() =>
               dispatch(
-                setRoyalGames(
-                  royalGames.some((game) => game.id === winner.id)
-                    ? royalGames.filter((game) => game.id !== winner.id)
-                    : [...royalGames, winner]
+                setRoyalGamesRA(
+                  !!royalGamesRA?.length
+                    ? royalGamesRA.some((game) => game.id === winner.id)
+                      ? royalGamesRA.filter((game) => game.id !== winner.id)
+                      : [...royalGamesRA, winner as IGame]
+                    : [winner as IGame]
                 )
               )
             }
           >
-            {royalGames.some((game) => game.id === winner.id)
-              ? "Remove from"
-              : "Add to"}{" "}
+            {royalGamesRA?.some((game) => game.id === winner.id)
+              ? "Remove from "
+              : "Add to "}
+            Battle Royal
+          </button>
+        )}
+        {!!winner && !isRoyal && isFinished && apiType === "IGDB" && (
+          <button
+            onClick={() =>
+              dispatch(
+                setRoyalGamesIGDB(
+                  !!royalGamesIGDB?.length
+                    ? royalGamesIGDB.some((game) => game.id === winner.id)
+                      ? royalGamesIGDB.filter((game) => game.id !== winner.id)
+                      : [...royalGamesIGDB, winner as IIGDBGame]
+                    : [winner as IIGDBGame]
+                )
+              )
+            }
+          >
+            {royalGamesIGDB?.some((game) => game.id === winner.id)
+              ? "Remove from "
+              : "Add to "}
             Battle Royal
           </button>
         )}

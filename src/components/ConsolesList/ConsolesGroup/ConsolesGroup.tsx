@@ -3,13 +3,13 @@ import { IConsole, IGame } from "../../../interfaces/responses";
 import styles from "./ConsolesGroup.module.scss";
 import { consolesImages } from "../../../utils/consoleImages";
 import { Checkbox } from "@atlaskit/checkbox";
+import { useAppDispatch, useAppSelector } from "../../../store";
+import { setSystemsRA } from "../../../store/commonSlice";
 
 interface ConsolesGroupProps {
   system: string;
   consoles: IConsole[];
-  setSelectedSystems: Dispatch<SetStateAction<number[]>>;
   setGames: Dispatch<SetStateAction<IGame[]>>;
-  selectedSystems: number[];
   fetchGameList: (
     id: number,
     setGames: Dispatch<SetStateAction<IGame[]>>
@@ -19,26 +19,28 @@ interface ConsolesGroupProps {
 const ConsolesGroup: FC<ConsolesGroupProps> = ({
   system,
   consoles,
-  setSelectedSystems,
-  selectedSystems,
   setGames,
   fetchGameList,
 }) => {
+  const dispatch = useAppDispatch();
+
+  const { systemsRA } = useAppSelector((state) => state.common);
+
   const findConsoleNameById = (id: number): string | undefined => {
     const consoleItem = consoles.find((console) => console.id === id);
     return consoleItem ? consoleItem.name : undefined;
   };
 
   const handleConsoleClick = (id: number): void => {
-    if (selectedSystems.includes(id)) {
-      setSelectedSystems((prevState) =>
-        prevState.filter((selectedId) => selectedId !== id)
+    if (systemsRA?.includes(id)) {
+      dispatch(
+        setSystemsRA(systemsRA.filter((selectedId) => selectedId !== id))
       );
       setGames((prevGames) =>
         prevGames.filter((game) => game.consoleId !== id)
       );
     } else {
-      setSelectedSystems((prevState) => [...prevState, id]);
+      dispatch(setSystemsRA(!!systemsRA?.length ? [...systemsRA, id] : [id]));
       fetchGameList(id, setGames);
     }
   };
@@ -50,9 +52,7 @@ const ConsolesGroup: FC<ConsolesGroupProps> = ({
         consolesImages[i].system === system.toLowerCase() ? (
           <div
             className={`${styles.consoles__item} ${
-              selectedSystems.includes(consolesImages[i].id)
-                ? styles.checked
-                : ""
+              systemsRA?.includes(consolesImages[i].id) ? styles.checked : ""
             }`}
             onClick={() => handleConsoleClick(consolesImages[i].id)}
             key={i}
@@ -67,9 +67,7 @@ const ConsolesGroup: FC<ConsolesGroupProps> = ({
                 {findConsoleNameById(consolesImages[i].id)}
               </div>
             </div>
-            <Checkbox
-              isChecked={selectedSystems.includes(consolesImages[i].id)}
-            />
+            <Checkbox isChecked={systemsRA?.includes(consolesImages[i].id)} />
           </div>
         ) : null
       )}
