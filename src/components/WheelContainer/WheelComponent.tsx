@@ -121,6 +121,10 @@ const WheelComponent: FC<WheelComponentProps> = ({
   }, [royalGames, isRoyal, dispatch]);
 
   useEffect(() => {
+    !segments?.length && setSegments(Array(16).fill(""));
+  }, [segments]);
+
+  useEffect(() => {
     angleCurrent >= Math.PI * 2 && setAngleCurrent(angleCurrent - Math.PI * 2);
   }, [angleCurrent]);
 
@@ -146,9 +150,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
       const getLink = () => {
         return !isRoyal
           ? games[+currentSegment.split("_")[1]]?.url || ""
-          : winner?.url ||
-              royalGames[+currentSegment.split("_")[1]]?.url ||
-              "";
+          : winner?.url || royalGames[+currentSegment.split("_")[1]]?.url || "";
       };
 
       const getImage = () => {
@@ -169,12 +171,13 @@ const WheelComponent: FC<WheelComponentProps> = ({
 
       setCurrentWinner(
         <div className={styles.winner__content}>
-          <img
+          <div
             className={classNames(styles.winner__image, {
               [styles.winner__image_active]: isFinished,
             })}
-            src={getImage()}
-            alt="cover"
+            style={{
+              ...(isFinished && { backgroundImage: `url(${getImage()})` }),
+            }}
           />
           <a
             className={styles.link}

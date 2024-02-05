@@ -84,6 +84,7 @@ const Main: FC = () => {
     dispatch(setWinner(undefined));
     dispatch(setFinished(false));
     dispatch(setStarted(false));
+    dispatch(setGames([]));
   }, [apiType, dispatch, isRoyal]);
 
   useEffect(() => {

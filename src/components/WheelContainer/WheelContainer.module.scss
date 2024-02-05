@@ -23,7 +23,7 @@
 
   .wheel {
     &_disabled {
-      opacity: 0.8;
+      pointer-events: none;
     }
   }
 
@@ -51,14 +51,17 @@
     &__image {
       border-radius: 10px 0 0 10px;
       height: 100%;
-      object-fit: cover;
+      width: 100%;
       opacity: 0;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 100% auto;
       transition: .3s;
       max-width: 0;
 
       &_active {
         opacity: 1;
-        max-width: 100%;
+        max-width: 130px;
       }
     }
 
