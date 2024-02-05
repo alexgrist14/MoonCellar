@@ -63,6 +63,16 @@ const ConsolesList: FC<ConsolesListProps> = ({
 
   const [consoles, setConsoles] = useState<IConsole[]>([]);
 
+  const consolesGroup = [
+    "Nintendo",
+    "Sony",
+    "Atari",
+    "Sega",
+    "NEC",
+    "SNK",
+    "Other",
+  ];
+
   const fetchGameList = async (
     id: number,
     setGames: Dispatch<SetStateAction<IGame[]>>
@@ -278,48 +288,14 @@ const ConsolesList: FC<ConsolesListProps> = ({
       )}
       {apiType === "RA" && !isRoyal && (
         <div className={styles.consoles__groups}>
-          <ConsolesGroup
-            system="Nintendo"
-            consoles={consoles}
-            setGames={setGames}
-            fetchGameList={fetchGameList}
-          />
-          <ConsolesGroup
-            system="Sony"
-            consoles={consoles}
-            setGames={setGames}
-            fetchGameList={fetchGameList}
-          />
-          <ConsolesGroup
-            system="Atari"
-            consoles={consoles}
-            setGames={setGames}
-            fetchGameList={fetchGameList}
-          />
-          <ConsolesGroup
-            system="Sega"
-            consoles={consoles}
-            setGames={setGames}
-            fetchGameList={fetchGameList}
-          />
-          <ConsolesGroup
-            system="NEC"
-            consoles={consoles}
-            setGames={setGames}
-            fetchGameList={fetchGameList}
-          />
-          <ConsolesGroup
-            system="SNK"
-            consoles={consoles}
-            setGames={setGames}
-            fetchGameList={fetchGameList}
-          />
-          <ConsolesGroup
-            system="Other"
-            consoles={consoles}
-            setGames={setGames}
-            fetchGameList={fetchGameList}
-          />
+          {consolesGroup.map((item) => (
+            <ConsolesGroup
+              system={item}
+              consoles={consoles}
+              setGames={setGames}
+              fetchGameList={fetchGameList}
+            />
+          ))}
         </div>
       )}
     </div>
