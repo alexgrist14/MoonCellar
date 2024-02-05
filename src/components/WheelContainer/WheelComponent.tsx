@@ -9,14 +9,8 @@ import {
   useState,
 } from "react";
 import styles from "./WheelContainer.module.scss";
-import { IGame } from "../../interfaces/responses";
-import { IIGDBGame } from "../../interfaces";
 import { useAppDispatch, useAppSelector } from "../../store";
-import {
-  setRoyalGamesIGDB,
-  setRoyalGamesRA,
-  setWinner,
-} from "../../store/commonSlice";
+import { setRoyalGames, setWinner } from "../../store/commonSlice";
 import classNames from "classnames";
 import { getSegments } from "../../utils/getSegments";
 import { setFinished, setStarted } from "../../store/statesSlice";
@@ -30,8 +24,6 @@ interface WheelComponentProps {
   upDuration: number;
   downDuration: number;
   fontFamily?: string;
-  games: IGame[];
-  gamesIGDB: IIGDBGame[];
   setCurrentWinner: Dispatch<SetStateAction<ReactNode | string>>;
   callback: () => void;
 }
@@ -47,15 +39,14 @@ const WheelComponent: FC<WheelComponentProps> = ({
   upDuration,
   downDuration,
   fontFamily = "Roboto",
-  games,
-  gamesIGDB,
   setCurrentWinner,
   callback,
 }) => {
   const dispatch = useAppDispatch();
 
-  const { royalGamesIGDB, royalGamesRA, isRoyal, apiType, winner } =
-    useAppSelector((state) => state.common);
+  const { royalGames, games, isRoyal, apiType, winner } = useAppSelector(
+    (state) => state.common
+  );
   const { isLoading, isFinished, isStarted } = useAppSelector(
     (state) => state.states
   );
@@ -114,32 +105,20 @@ const WheelComponent: FC<WheelComponentProps> = ({
   }, [onTimerTick]);
 
   useEffect(() => {
-    dispatch(setWinner(undefined));
-    dispatch(setFinished(false));
-    dispatch(setStarted(false));
-  }, [apiType, dispatch, isRoyal]);
+    if (isRoyal || !games?.length) return;
 
-  useEffect(() => {
-    if (isRoyal) return;
-
-    if (apiType === "RA" && !!games.length)
-      return setSegments(getSegments(games, segmentsLength));
-
-    if (apiType === "IGDB" && !!gamesIGDB.length)
-      return setSegments(gamesIGDB.map((game, i) => game.id + "_" + i));
-  }, [games, apiType, gamesIGDB, isRoyal]);
+    setSegments(getSegments(games, segmentsLength));
+  }, [games, apiType, isRoyal]);
 
   useEffect(() => {
     if (isRoyal) {
       return setSegments(
-        (apiType === "RA" ? royalGamesRA : royalGamesIGDB)?.length
-          ? (apiType === "RA" ? royalGamesRA : royalGamesIGDB).map(
-              (game, i) => game.id + "_" + i
-            )
+        royalGames?.length
+          ? royalGames.map((game, i) => game.id + "_" + i)
           : Array(16).fill("")
       );
     }
-  }, [apiType, royalGamesRA, royalGamesIGDB, isRoyal, dispatch]);
+  }, [royalGames, isRoyal, dispatch]);
 
   useEffect(() => {
     angleCurrent >= Math.PI * 2 && setAngleCurrent(angleCurrent - Math.PI * 2);
@@ -147,87 +126,65 @@ const WheelComponent: FC<WheelComponentProps> = ({
 
   useEffect(() => {
     if (!!currentSegment) {
-      if (isStarted && isFinished && apiType === "RA") {
+      if (isStarted && isFinished) {
         dispatch(setStarted(false));
         dispatch(setWinner(games[+currentSegment.split("_")[1]]));
       }
 
-      if (isStarted && isFinished && apiType === "IGDB") {
-        dispatch(setStarted(false));
-        dispatch(setWinner(gamesIGDB[+currentSegment.split("_")[1]]));
-      }
-
       if (isStarted && isFinished && isRoyal) {
         dispatch(setStarted(false));
+        dispatch(setWinner(royalGames[+currentSegment.split("_")[1]]));
         dispatch(
-          setWinner(
-            (apiType === "RA" ? royalGamesRA : royalGamesIGDB)[
-              +currentSegment.split("_")[1]
-            ]
+          setRoyalGames(
+            royalGames.filter(
+              (game) => game.id !== +currentSegment.split("_")[0]
+            )
           )
-        );
-        dispatch(
-          apiType === "RA"
-            ? setRoyalGamesRA(
-                royalGamesRA.filter(
-                  (game) => game.id !== +currentSegment.split("_")[0]
-                )
-              )
-            : setRoyalGamesIGDB(
-                royalGamesIGDB.filter(
-                  (game) => game.id !== +currentSegment.split("_")[0]
-                )
-              )
         );
       }
 
       const getLink = () => {
-        if (!isRoyal && apiType === "RA")
-          return `https://retroachievements.org/game/${
-            games[+currentSegment.split("_")[1]]?.id
-          }`;
-        if (!isRoyal && apiType === "IGDB")
-          return gamesIGDB[+currentSegment.split("_")[1]]?.url || "";
-        if (isRoyal)
-          return (
-            (apiType === "RA"
-              ? "https://retroachievements.org/game/" + (winner as IGame)?.id
-              : (winner as IIGDBGame)?.url) || ""
-          );
+        return !isRoyal
+          ? games[+currentSegment.split("_")[1]]?.url || ""
+          : winner?.url ||
+              royalGames[+currentSegment.split("_")[1]]?.url ||
+              "";
+      };
+
+      const getImage = () => {
+        return !isRoyal
+          ? games[+currentSegment.split("_")[1]]?.image || ""
+          : winner?.image ||
+              royalGames[+currentSegment.split("_")[1]]?.image ||
+              "";
       };
 
       const getTitle = () => {
-        if (!isRoyal && apiType === "RA")
-          return games[+currentSegment.split("_")[1]]?.title || "";
-        if (!isRoyal && apiType === "IGDB")
-          return gamesIGDB[+currentSegment.split("_")[1]]?.name || "";
-        if (isRoyal)
-          return (
-            (apiType === "RA"
-              ? (winner as IGame)?.title
-              : (winner as IIGDBGame)?.name) ||
-            (apiType === "RA"
-              ? royalGamesRA[+currentSegment.split("_")[1]]?.title
-              : royalGamesIGDB[+currentSegment.split("_")[1]]?.name) ||
-            ""
-          );
+        return !isRoyal
+          ? games[+currentSegment.split("_")[1]]?.name || ""
+          : winner?.name ||
+              royalGames[+currentSegment.split("_")[1]]?.name ||
+              "";
       };
 
       setCurrentWinner(
-        isFinished ? (
-          <div className={styles.winner__content}>
-            <a
-              className={styles.link}
-              href={getLink()}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {getTitle()}
-            </a>
-          </div>
-        ) : (
-          getTitle()
-        )
+        <div className={styles.winner__content}>
+          <img
+            className={classNames(styles.winner__image, {
+              [styles.winner__image_active]: isFinished,
+            })}
+            src={getImage()}
+            alt="cover"
+          />
+          <a
+            className={styles.link}
+            href={getLink()}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {getTitle()}
+          </a>
+        </div>
       );
     }
   }, [
@@ -237,10 +194,8 @@ const WheelComponent: FC<WheelComponentProps> = ({
     winner,
     setCurrentWinner,
     games,
-    gamesIGDB,
     isRoyal,
-    royalGamesRA,
-    royalGamesIGDB,
+    royalGames,
     apiType,
     dispatch,
   ]);
@@ -256,19 +211,10 @@ const WheelComponent: FC<WheelComponentProps> = ({
       let value = "";
 
       if (!isRoyal) {
-        apiType === "RA" &&
-          !!games.length &&
-          (value = games[+segments[key].split("_")[1]]?.title);
-        apiType === "IGDB" &&
-          !!gamesIGDB.length &&
-          (value = gamesIGDB[key]?.name);
+        !!games.length && (value = games[+segments[key].split("_")[1]]?.name);
       } else {
-        ((apiType === "RA" && !!royalGamesRA?.length) ||
-          (apiType === "IGDB" && !!royalGamesIGDB?.length)) &&
-          (value =
-            apiType === "RA"
-              ? royalGamesRA[+segments[key].split("_")[1]]?.title
-              : royalGamesIGDB[+segments[key].split("_")[1]]?.name);
+        !!royalGames?.length &&
+          (value = royalGames[+segments[key].split("_")[1]]?.name);
       }
 
       ctx.save();
@@ -368,9 +314,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
     angleCurrent,
     segments,
     games,
-    gamesIGDB,
-    royalGamesRA,
-    royalGamesIGDB,
+    royalGames,
     isRoyal,
     apiType,
   ]);
@@ -396,6 +340,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
           dispatch(setWinner(undefined));
 
           callback();
+          !isRoyal && setSegments(getSegments(games, segmentsLength));
 
           spin();
         }}

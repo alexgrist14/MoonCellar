@@ -1,20 +1,19 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import { IIGDBGame } from "../interfaces";
-import { IGame } from "../interfaces/responses";
+import { IGame } from "../interfaces/game";
 
 const initialState: {
   apiType: "RA" | "IGDB";
-  winner?: IIGDBGame | IGame;
-  royalGamesRA: IGame[];
-  royalGamesIGDB: IIGDBGame[];
+  winner?: IGame;
+  games: IGame[];
+  royalGames: IGame[];
   systemsRA: number[];
   systemsIGDB: number[];
   isRoyal: boolean;
 } = {
   apiType: "RA",
-  royalGamesRA: [],
-  royalGamesIGDB: [],
+  games: [],
+  royalGames: [],
   winner: undefined,
   systemsRA: [],
   systemsIGDB: [],
@@ -28,11 +27,11 @@ export const commonSlice = createSlice({
     setApiType: (state, action: PayloadAction<"RA" | "IGDB">) => {
       state.apiType = action.payload;
     },
-    setRoyalGamesRA: (state, action: PayloadAction<IGame[]>) => {
-      state.royalGamesRA = action.payload;
+    setGames: (state, action: PayloadAction<IGame[]>) => {
+      state.games = action.payload;
     },
-    setRoyalGamesIGDB: (state, action: PayloadAction<IIGDBGame[]>) => {
-      state.royalGamesIGDB = action.payload;
+    setRoyalGames: (state, action: PayloadAction<IGame[]>) => {
+      state.royalGames = action.payload;
     },
     setSystemsRA: (state, action: PayloadAction<number[]>) => {
       state.systemsRA = action.payload;
@@ -40,10 +39,7 @@ export const commonSlice = createSlice({
     setSystemsIGDB: (state, action: PayloadAction<number[]>) => {
       state.systemsIGDB = action.payload;
     },
-    setWinner: (
-      state,
-      action: PayloadAction<IIGDBGame | IGame | undefined>
-    ) => {
+    setWinner: (state, action: PayloadAction<IGame | undefined>) => {
       state.winner = action.payload;
     },
     setRoyal: (state, action: PayloadAction<boolean>) => {
@@ -55,8 +51,8 @@ export const commonSlice = createSlice({
 export const {
   setWinner,
   setApiType,
-  setRoyalGamesRA,
-  setRoyalGamesIGDB,
+  setGames,
+  setRoyalGames,
   setSystemsIGDB,
   setSystemsRA,
   setRoyal,

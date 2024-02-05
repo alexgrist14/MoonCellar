@@ -12,7 +12,7 @@ const initialState: {
 };
 
 export const statesSlice = createSlice({
-  name: "common",
+  name: "states",
   initialState,
   reducers: {
     setLoading: (state, action: PayloadAction<boolean>) => {

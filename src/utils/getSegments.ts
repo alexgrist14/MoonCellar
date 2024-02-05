@@ -1,4 +1,4 @@
-import { IGame } from "../interfaces/responses";
+import { IGame } from "../interfaces/game";
 
 export const getSegments = (games: IGame[], max: number) => {
   if (!!games?.length) {

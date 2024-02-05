@@ -29,3 +29,8 @@ export interface IIGDBGame extends IGDBDefault {
 export interface IIGDBGenre extends IGDBDefault {
   url: string;
 }
+
+export interface IIGDBCover {
+  url: string;
+  id: number;
+}

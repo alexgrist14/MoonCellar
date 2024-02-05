@@ -1,36 +1,36 @@
 import { FC, useCallback, useEffect, useState } from "react";
 import ConsolesList from "../ConsolesList/ConsolesList";
 import WheelContainer from "../WheelContainer/WheelContainer";
-import { IGame } from "../../interfaces/responses";
 import styles from "./Main.module.scss";
-import { IIGDBGame } from "../../interfaces";
 import { getGames, getGamesCount } from "../../utils/IGDB";
 import { shuffle } from "../../utils/shuffle";
 import { useAppDispatch, useAppSelector } from "../../store";
-import { setWinner } from "../../store/commonSlice";
-import { setLoading } from "../../store/statesSlice";
+import { setGames, setWinner } from "../../store/commonSlice";
+import { setFinished, setLoading, setStarted } from "../../store/statesSlice";
+import { auth } from "../../api";
+import { setAuth } from "../../store/authSlice";
+import { getCovers } from "../../utils/IGDB/getCovers";
+import { fetchGameList } from "../../utils/getGames";
 
 const Main: FC = () => {
   const dispatch = useAppDispatch();
 
-  const { apiType, systemsIGDB, isRoyal } = useAppSelector(
+  const { apiType, systemsIGDB, isRoyal, systemsRA } = useAppSelector(
     (state) => state.common
   );
 
-  const [games, setGames] = useState<IGame[]>([]);
-  const [gamesIGDB, setGamesIGDB] = useState<IIGDBGame[]>([]);
+  const { token } = useAppSelector((state) => state.auth);
 
-  // const [selectedSystems, setSelectedSystems] = useState<number[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
   const [selectedRating, setSelectedRating] = useState(0);
 
   const getIGDBGames = useCallback(() => {
-    if (apiType !== "IGDB" || isRoyal) return;
+    if (apiType !== "IGDB" || isRoyal || !token) return;
 
     dispatch(setLoading(true));
 
     getGamesCount(systemsIGDB, selectedRating, selectedGenres).then(
-      (response) =>
+      (response) => {
         !!response.data.count
           ? getGames({
               limit: 20,
@@ -39,17 +39,62 @@ const Main: FC = () => {
               rating: selectedRating,
               genres: selectedGenres,
             }).then((response) => {
-              setGamesIGDB(shuffle(response.data));
-              dispatch(setLoading(false));
+              getCovers(response.data.map((game) => game.id)).then(
+                (responseCovers) => {
+                  dispatch(
+                    setGames(
+                      shuffle(
+                        response.data.map((game) => ({
+                          name: game.name,
+                          id: game.id,
+                          url: game.url,
+                          platforms: game.platforms,
+                          image:
+                            "https:" +
+                              responseCovers.data.find(
+                                (cover) => cover.id === game.cover
+                              )?.url || "",
+                        }))
+                      )
+                    )
+                  );
+                  dispatch(setLoading(false));
+                }
+              );
             })
-          : setGamesIGDB([])
+          : dispatch(setGames([]));
+      }
     );
-  }, [systemsIGDB, selectedRating, selectedGenres, dispatch, apiType, isRoyal]);
+  }, [
+    systemsIGDB,
+    selectedRating,
+    selectedGenres,
+    dispatch,
+    apiType,
+    isRoyal,
+    token,
+  ]);
 
   useEffect(() => {
     getIGDBGames();
     dispatch(setWinner(undefined));
   }, [systemsIGDB, selectedRating, selectedGenres, getIGDBGames, dispatch]);
+
+  useEffect(() => {
+    dispatch(setWinner(undefined));
+    dispatch(setFinished(false));
+    dispatch(setStarted(false));
+  }, [apiType, dispatch, isRoyal]);
+
+  useEffect(() => {
+    if (apiType !== "RA") return;
+
+    !!systemsRA?.length && systemsRA.forEach((system) => fetchGameList(system));
+  }, [apiType, systemsRA]);
+
+  useEffect(() => {
+    auth().then((response) => dispatch(setAuth(response.data.access_token)));
+  }, [dispatch]);
 
   return (
     <div className={styles.App}>
@@ -58,13 +103,8 @@ const Main: FC = () => {
         setSelectedRating={setSelectedRating}
         selectedGenres={selectedGenres}
         setSelectedGenres={setSelectedGenres}
-        setGames={setGames}
       />
-      <WheelContainer
-        games={games}
-        gamesIGDB={gamesIGDB}
-        callback={getIGDBGames}
-      />
+      <WheelContainer callback={getIGDBGames} />
     </div>
   );
 };

@@ -8,7 +8,7 @@ export const getPlatforms = (
   setPlatforms: Dispatch<SetStateAction<IIGDBPlatform[]>>,
   generation?: number
 ) => {
-  IGDBAgent("https://api.igdb.com/v4/platforms", {
+  IGDBAgent<IIGDBPlatform[]>("https://api.igdb.com/v4/platforms", {
     fields:
       "name, slug, platform_family, platform_logo, created_at, generation",
     limit: 500,
@@ -28,8 +28,11 @@ export const getPlatforms = (
 export const getPlatformFamilies = (
   setPlatformFamilies: Dispatch<SetStateAction<IIGDBPlatformFamily[]>>
 ) => {
-  IGDBAgent("https://api.igdb.com/v4/platform_families", {
-    fields: "name, slug",
-    limit: 500,
-  }).then((response) => setPlatformFamilies(response.data));
+  IGDBAgent<IIGDBPlatformFamily[]>(
+    "https://api.igdb.com/v4/platform_families",
+    {
+      fields: "name, slug",
+      limit: 500,
+    }
+  ).then((response) => setPlatformFamilies(response.data));
 };

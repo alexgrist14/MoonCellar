@@ -5,7 +5,7 @@ import { IIGDBGenre } from "../../interfaces";
 export const getGenres = (
   setGenres: Dispatch<SetStateAction<IIGDBGenre[]>>
 ) => {
-  IGDBAgent("https://api.igdb.com/v4/genres", {
+  IGDBAgent<IIGDBGenre[]>("https://api.igdb.com/v4/genres", {
     limit: 500,
     fields: "name, slug, url",
   }).then((response) => setGenres(response.data));

@@ -6,8 +6,8 @@ import {
   useRef,
   useState,
 } from "react";
-import { IConsole, IGame } from "../../interfaces/responses";
-import { getConsoleIds, getGameList } from "@retroachievements/api";
+import { IConsole } from "../../interfaces/responses";
+import { getConsoleIds } from "@retroachievements/api";
 import { authorization } from "../../utils/authorization";
 import { consolesImages } from "../../utils/consoleImages";
 import ConsolesGroup from "./ConsolesGroup/ConsolesGroup";
@@ -22,18 +22,17 @@ import { useAppDispatch, useAppSelector } from "../../store";
 import {
   setApiType,
   setRoyal,
-  setRoyalGamesIGDB,
-  setRoyalGamesRA,
+  setRoyalGames,
   setSystemsIGDB,
 } from "../../store/commonSlice";
 import { setLoading } from "../../store/statesSlice";
+import { fetchGameList } from "../../utils/getGames";
 
 interface ConsolesListProps {
   selectedRating: number;
   setSelectedRating: Dispatch<SetStateAction<number>>;
   selectedGenres: number[];
   setSelectedGenres: Dispatch<SetStateAction<number[]>>;
-  setGames: Dispatch<SetStateAction<IGame[]>>;
 }
 
 const ConsolesList: FC<ConsolesListProps> = ({
@@ -41,18 +40,12 @@ const ConsolesList: FC<ConsolesListProps> = ({
   setSelectedRating,
   selectedGenres,
   setSelectedGenres,
-  setGames,
 }) => {
   const dispatch = useAppDispatch();
-  const {
-    apiType,
-    royalGamesRA,
-    royalGamesIGDB,
-    systemsIGDB,
-    systemsRA,
-    isRoyal,
-  } = useAppSelector((state) => state.common);
+  const { apiType, royalGames, systemsIGDB, systemsRA, isRoyal } =
+    useAppSelector((state) => state.common);
   const { isLoading } = useAppSelector((state) => state.states);
+  const { token } = useAppSelector((state) => state.auth);
 
   const firstRender = useRef(true);
 
@@ -72,22 +65,6 @@ const ConsolesList: FC<ConsolesListProps> = ({
     "SNK",
     "Other",
   ];
-
-  const fetchGameList = async (
-    id: number,
-    setGames: Dispatch<SetStateAction<IGame[]>>
-  ) => {
-    const gameList = (await getGameList(authorization, {
-      consoleId: id,
-      shouldOnlyRetrieveGamesWithAchievements: true,
-    })) as IGame[];
-
-    const gameListWithoutSubstets = gameList
-      .filter((game) => !game.title.includes("~"))
-      .filter((game) => !game.title.includes("Subset"));
-
-    setGames((prevState) => [...prevState, ...gameListWithoutSubstets]);
-  };
 
   const fetchConsoleIds = async () => {
     const consolesIds = await getConsoleIds(authorization);
@@ -113,41 +90,38 @@ const ConsolesList: FC<ConsolesListProps> = ({
     if (isRoyal) return;
 
     apiType === "RA" && fetchConsoleIds();
-    apiType === "IGDB" && getGenres(setIGDBGenres);
-  }, [apiType, isRoyal]);
+    apiType === "IGDB" && !!token && getGenres(setIGDBGenres);
+  }, [apiType, isRoyal, token]);
 
   useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
-
-      !!systemsRA?.length &&
-        systemsRA.forEach((system) => fetchGameList(system, setGames));
-    }
-  }, [systemsRA, setGames]);
-
-  useEffect(() => {
-    if (apiType !== "IGDB" || isRoyal) return;
+    if (apiType !== "IGDB" || isRoyal || !token) return;
 
     dispatch(setLoading(true));
     getPlatforms(setIGDBPlatforms, selectedGeneration);
-  }, [selectedGeneration, dispatch, apiType, isRoyal]);
+  }, [selectedGeneration, dispatch, apiType, isRoyal, token]);
 
   return (
     <div className={styles.consoles__list}>
       <div className={styles.consoles__options}>
         <label className={styles.consoles__toggle}>
           <Toggle
-            isChecked={apiType === "RA"}
-            onChange={() => dispatch(setApiType("RA"))}
+            isChecked={apiType === "RA" && !isRoyal}
+            onChange={() => {
+              isRoyal && dispatch(setRoyal(false));
+              dispatch(setApiType("RA"));
+            }}
           />
           RetroAchievements
         </label>
         <label className={styles.consoles__toggle}>
           <Toggle
-            isChecked={apiType === "IGDB"}
-            onChange={() =>
-              dispatch(setApiType(apiType === "IGDB" ? "RA" : "IGDB"))
-            }
+            isChecked={apiType === "IGDB" && !isRoyal}
+            onChange={() => {
+              isRoyal && dispatch(setRoyal(false));
+              dispatch(
+                setApiType(apiType === "IGDB" && !isRoyal ? "RA" : "IGDB")
+              );
+            }}
           />
           IGDB
         </label>
@@ -233,68 +207,38 @@ const ConsolesList: FC<ConsolesListProps> = ({
       {isRoyal && (
         <div className={styles.consoles__royal}>
           <h3>Games:</h3>
-          {apiType === "RA" ? (
-            <div className={styles.consoles__games}>
-              {!!royalGamesRA?.length
-                ? royalGamesRA.map((game) => (
-                    <div key={game.id} className={styles.consoles__game}>
-                      <a
-                        href={`https://retroachievements.org/game/${game.id}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {game.title}
-                      </a>
-                      <button
-                        onClick={() =>
-                          dispatch(
-                            setRoyalGamesRA(
-                              royalGamesRA.filter(
-                                (_game) => game.id !== _game.id
-                              )
-                            )
+          <div className={styles.consoles__games}>
+            {!!royalGames?.length
+              ? royalGames.map((game) => (
+                  <div key={game.id} className={styles.consoles__game}>
+                    <a
+                      href={`https://retroachievements.org/game/${game.id}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {game.name}
+                    </a>
+                    <button
+                      onClick={() =>
+                        dispatch(
+                          setRoyalGames(
+                            royalGames.filter((_game) => game.id !== _game.id)
                           )
-                        }
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  ))
-                : null}
-            </div>
-          ) : (
-            <div className={styles.consoles__games}>
-              {royalGamesIGDB.map((game) => (
-                <div key={game.id} className={styles.consoles__game}>
-                  <a href={game.url} target="_blank" rel="noreferrer">
-                    {game.name}
-                  </a>
-                  <button
-                    onClick={() =>
-                      dispatch(
-                        setRoyalGamesIGDB(
-                          royalGamesIGDB.filter((_game) => game.id !== _game.id)
                         )
-                      )
-                    }
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+                      }
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))
+              : null}
+          </div>
         </div>
       )}
       {apiType === "RA" && !isRoyal && (
         <div className={styles.consoles__groups}>
-          {consolesGroup.map((item) => (
-            <ConsolesGroup
-              system={item}
-              consoles={consoles}
-              setGames={setGames}
-              fetchGameList={fetchGameList}
-            />
+          {consolesGroup.map((item, i) => (
+            <ConsolesGroup key={i} system={item} consoles={consoles} />
           ))}
         </div>
       )}

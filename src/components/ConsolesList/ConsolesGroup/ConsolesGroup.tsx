@@ -1,30 +1,21 @@
-import { Dispatch, FC, SetStateAction } from "react";
-import { IConsole, IGame } from "../../../interfaces/responses";
+import { FC } from "react";
+import { IConsole } from "../../../interfaces/responses";
 import styles from "./ConsolesGroup.module.scss";
 import { consolesImages } from "../../../utils/consoleImages";
 import { Checkbox } from "@atlaskit/checkbox";
 import { useAppDispatch, useAppSelector } from "../../../store";
-import { setSystemsRA } from "../../../store/commonSlice";
+import { setGames, setSystemsRA } from "../../../store/commonSlice";
+import { fetchGameList } from "../../../utils/getGames";
 
 interface ConsolesGroupProps {
   system: string;
   consoles: IConsole[];
-  setGames: Dispatch<SetStateAction<IGame[]>>;
-  fetchGameList: (
-    id: number,
-    setGames: Dispatch<SetStateAction<IGame[]>>
-  ) => void;
 }
 
-const ConsolesGroup: FC<ConsolesGroupProps> = ({
-  system,
-  consoles,
-  setGames,
-  fetchGameList,
-}) => {
+const ConsolesGroup: FC<ConsolesGroupProps> = ({ system, consoles }) => {
   const dispatch = useAppDispatch();
 
-  const { systemsRA } = useAppSelector((state) => state.common);
+  const { systemsRA, games } = useAppSelector((state) => state.common);
 
   const findConsoleNameById = (id: number): string | undefined => {
     const consoleItem = consoles.find((console) => console.id === id);
@@ -36,12 +27,10 @@ const ConsolesGroup: FC<ConsolesGroupProps> = ({
       dispatch(
         setSystemsRA(systemsRA.filter((selectedId) => selectedId !== id))
       );
-      setGames((prevGames) =>
-        prevGames.filter((game) => game.consoleId !== id)
-      );
+      dispatch(setGames(games.filter((game) => game.platforms.includes(id))));
     } else {
       dispatch(setSystemsRA(!!systemsRA?.length ? [...systemsRA, id] : [id]));
-      fetchGameList(id, setGames);
+      fetchGameList(id);
     }
   };
 
