@@ -216,7 +216,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
       ctx.arc(centerX, centerY, size, lastAngle, angle, false);
       ctx.lineTo(centerX, centerY);
       ctx.closePath();
-      ctx.fillStyle = segColors[key % 2 ? 0 : 1];
+      ctx.fillStyle = segColors[key];
       ctx.fill();
       ctx.stroke();
       ctx.save();
