@@ -3,11 +3,11 @@ import { authorization } from "./authorization";
 import { store } from "../store";
 import { setGames } from "../store/commonSlice";
 
-export const fetchGameList = async (id: number) => {
+export const fetchGameList = async (id: number,withAchievements: boolean) => {
   const games = store.getState().common.games;
   const gameList: any[] = await getGameList(authorization, {
     consoleId: id,
-    shouldOnlyRetrieveGamesWithAchievements: true,
+    shouldOnlyRetrieveGamesWithAchievements: withAchievements,
   });
 
   const gameListWithoutSubsets = gameList

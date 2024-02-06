@@ -9,7 +9,7 @@ import Toggle from "@atlaskit/toggle";
 import { IIGDBGenre, IIGDBPlatform } from "../../interfaces";
 import { getGenres, getPlatforms } from "../../utils/IGDB";
 import { useAppDispatch, useAppSelector } from "../../store";
-import { setApiType, setRoyal } from "../../store/commonSlice";
+import { setApiType, setOnlyWithAchievements, setRoyal } from "../../store/commonSlice";
 import RoyalList from "./RoyalList/RoyalList";
 import IGDBList from "./IGDBList/IGDBLIst";
 import {setFinished} from "../../store/statesSlice";
@@ -25,7 +25,7 @@ const ConsolesList: FC<ConsolesListProps> = ({
   setSelectedRating,
 }) => {
   const dispatch = useAppDispatch();
-  const { apiType, isRoyal } = useAppSelector((state) => state.common);
+  const { apiType, isRoyal,onlyWithAchievements } = useAppSelector((state) => state.common);
   const { token } = useAppSelector((state) => state.auth);
 
   const [IGDBPlatforms, setIGDBPlatforms] = useState<IIGDBPlatform[]>([]);
@@ -84,6 +84,13 @@ const ConsolesList: FC<ConsolesListProps> = ({
         </label>
         <label className={styles.consoles__toggle}>
           <Toggle
+          isChecked={onlyWithAchievements}
+          onChange={()=>dispatch(setOnlyWithAchievements(!onlyWithAchievements))}
+          />
+          Only with achievements
+        </label>
+        <label className={styles.consoles__toggle}>
+          <Toggle
             isChecked={apiType === "IGDB" && !isRoyal}
             onChange={() => {
               resetStates();
@@ -119,7 +126,7 @@ const ConsolesList: FC<ConsolesListProps> = ({
       {apiType === "RA" && !isRoyal && (
         <div className={styles.consoles__groups}>
           {consolesGroup.map((item, i) => (
-            <ConsolesGroup key={i} system={item} consoles={consoles} />
+            <ConsolesGroup key={i} system={item} consoles={consoles}/>
           ))}
         </div>
       )}
