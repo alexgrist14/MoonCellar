@@ -14,11 +14,6 @@
     }
   }
 
-  &__igdb {
-    display: grid;
-    gap: 20px;
-  }
-
   &__groups {
     display: grid;
     width: fit-content;
@@ -31,81 +26,9 @@
     justify-items: flex-start;
   }
 
-  &__families,
-  &__platforms {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-
-    & label {
-      gap: 15px;
-    }
-
-    & span {
-      color: white;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
-      text-align: start;
-    }
-  }
-
-  &__generations {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-
-    & > span {
-      white-space: nowrap;
-    }
-  }
-
   &__toggle {
     display: flex;
     align-items: center;
     gap: 10px;
-  }
-
-  &__royal {
-    display: grid;
-    justify-items: flex-start;
-    gap: 20px;
-  }
-
-  &__games {
-    display: grid;
-    justify-items: flex-start;
-    gap: 10px;
-    width: 100%;
-  }
-
-  &__game {
-    display: grid;
-    grid-template-columns: 4fr 1fr;
-    width: 100%;
-    align-items: center;
-
-    & > a {
-      color: white;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      width: 90%;
-      text-align: start;
-    }
-
-    & > button {
-      padding: 10px;
-      border-radius: 10px;
-      background-color: #815CD1;
-      color: white;
-      outline: 0;
-      border: 0;
-      transition: 0.3s;
-      cursor: pointer;
-
-      &:hover {
-        background-color: #222222;
-      }
-    }
   }
 }

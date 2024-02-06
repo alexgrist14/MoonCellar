@@ -1,0 +1,32 @@
+.consoles {
+  &__igdb {
+    display: grid;
+    gap: 20px;
+  }
+  &__generations {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    & > span {
+      white-space: nowrap;
+    }
+  }
+  &__families,
+  &__platforms {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    & label {
+      gap: 15px;
+    }
+
+    & span {
+      color: white;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      text-align: start;
+    }
+  }
+}

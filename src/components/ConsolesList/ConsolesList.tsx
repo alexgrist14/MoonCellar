@@ -3,7 +3,6 @@ import {
   FC,
   SetStateAction,
   useEffect,
-  useRef,
   useState,
 } from "react";
 import { IConsole } from "../../interfaces/responses";
@@ -12,21 +11,14 @@ import { authorization } from "../../utils/authorization";
 import { consolesImages } from "../../utils/consoleImages";
 import ConsolesGroup from "./ConsolesGroup/ConsolesGroup";
 import styles from "./ConsolesList.module.scss";
-import { Checkbox } from "@atlaskit/checkbox";
-import Range from "@atlaskit/range";
 import Toggle from "@atlaskit/toggle";
 import { IIGDBGenre, IIGDBPlatform } from "../../interfaces";
 import { getGenres, getPlatforms } from "../../utils/IGDB";
-import { useDebouncedCallback } from "use-debounce";
 import { useAppDispatch, useAppSelector } from "../../store";
-import {
-  setApiType,
-  setRoyal,
-  setRoyalGames,
-  setSystemsIGDB,
-} from "../../store/commonSlice";
+import { setApiType, setRoyal } from "../../store/commonSlice";
 import { setLoading } from "../../store/statesSlice";
-import { fetchGameList } from "../../utils/getGames";
+import RoyalList from "./RoyalList/RoyalList";
+import IGDBList from "./IGDBList/IGDBLIst";
 
 interface ConsolesListProps {
   selectedRating: number;
@@ -42,12 +34,8 @@ const ConsolesList: FC<ConsolesListProps> = ({
   setSelectedGenres,
 }) => {
   const dispatch = useAppDispatch();
-  const { apiType, royalGames, systemsIGDB, systemsRA, isRoyal } =
-    useAppSelector((state) => state.common);
-  const { isLoading } = useAppSelector((state) => state.states);
+  const { apiType, isRoyal } = useAppSelector((state) => state.common);
   const { token } = useAppSelector((state) => state.auth);
-
-  const firstRender = useRef(true);
 
   const [IGDBPlatforms, setIGDBPlatforms] = useState<IIGDBPlatform[]>([]);
   const [IGDBGenres, setIGDBGenres] = useState<IIGDBGenre[]>([]);
@@ -75,16 +63,6 @@ const ConsolesList: FC<ConsolesListProps> = ({
     );
     setConsoles(consolesWithAchievements);
   };
-
-  const debouncedSetGeneration = useDebouncedCallback(
-    (number: number) => setSelectedGeneration(number),
-    500
-  );
-
-  const debouncedSetRating = useDebouncedCallback(
-    (number: number) => setSelectedRating(number),
-    500
-  );
 
   useEffect(() => {
     if (isRoyal) return;
@@ -134,106 +112,16 @@ const ConsolesList: FC<ConsolesListProps> = ({
         </label>
       </div>
       {apiType === "IGDB" && !isRoyal && (
-        <div className={styles.consoles__igdb}>
-          <h3>Rating</h3>
-          <div className={styles.consoles__generations}>
-            <Range
-              defaultValue={selectedRating}
-              min={0}
-              max={99}
-              step={1}
-              type="range"
-              onChange={(value) => debouncedSetRating(value)}
-              isDisabled={isLoading}
-            />
-            <span>{!!selectedRating ? ">= " + selectedRating : "All"}</span>
-          </div>
-          <h3>Generations</h3>
-          <div className={styles.consoles__generations}>
-            <Range
-              defaultValue={selectedGeneration}
-              min={0}
-              max={9}
-              type="range"
-              onChange={(value) => debouncedSetGeneration(value)}
-              isDisabled={isLoading}
-            />
-            <span>
-              {!!selectedGeneration ? "0 - " + selectedGeneration : "All"}
-            </span>
-          </div>
-          <h3>Genres</h3>
-          <div className={styles.consoles__families}>
-            {IGDBGenres.map((genre) => (
-              <Checkbox
-                key={genre.id}
-                label={genre.name}
-                isChecked={selectedGenres.includes(genre.id)}
-                isDisabled={isLoading}
-                onChange={() =>
-                  setSelectedGenres(
-                    !selectedGenres.includes(genre.id)
-                      ? [...selectedGenres, genre.id]
-                      : selectedGenres.filter((id) => id !== genre.id)
-                  )
-                }
-              />
-            ))}
-          </div>
-          <h3>Platforms</h3>
-          <div className={styles.consoles__platforms}>
-            {IGDBPlatforms.map((platform) => (
-              <Checkbox
-                key={platform.id}
-                label={platform.name}
-                isChecked={systemsIGDB?.includes(platform.id)}
-                isDisabled={isLoading}
-                onChange={() =>
-                  dispatch(
-                    setSystemsIGDB(
-                      !!systemsIGDB?.length
-                        ? !systemsIGDB?.includes(platform.id)
-                          ? [...systemsIGDB, platform.id]
-                          : systemsIGDB.filter((id) => id !== platform.id)
-                        : [platform.id]
-                    )
-                  )
-                }
-              />
-            ))}
-          </div>
-        </div>
-      )}
-      {isRoyal && (
-        <div className={styles.consoles__royal}>
-          <h3>Games:</h3>
-          <div className={styles.consoles__games}>
-            {!!royalGames?.length
-              ? royalGames.map((game) => (
-                  <div key={game.id} className={styles.consoles__game}>
-                    <a
-                      href={`https://retroachievements.org/game/${game.id}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {game.name}
-                    </a>
-                    <button
-                      onClick={() =>
-                        dispatch(
-                          setRoyalGames(
-                            royalGames.filter((_game) => game.id !== _game.id)
-                          )
-                        )
-                      }
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))
-              : null}
-          </div>
-        </div>
+        <IGDBList
+          setSelectedGeneration={setSelectedGeneration}
+          selectedRating={selectedRating}
+          setSelectedRating={setSelectedRating}
+          selectedGeneration={selectedGeneration}
+          selectedGenres={selectedGenres}
+          setSelectedGenres={setSelectedGenres}
+          IGDBPlatforms={IGDBPlatforms}
+          IGDBGenres={IGDBGenres}
+        />
       )}
       {apiType === "RA" && !isRoyal && (
         <div className={styles.consoles__groups}>
@@ -242,6 +130,7 @@ const ConsolesList: FC<ConsolesListProps> = ({
           ))}
         </div>
       )}
+      {isRoyal && <RoyalList />}
     </div>
   );
 };
