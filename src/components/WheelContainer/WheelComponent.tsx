@@ -16,7 +16,6 @@ import { getSegments } from "../../utils/getSegments";
 import {
   setFinished,
   setLoading,
-  setRemoved,
   setSegments,
   setStarted,
 } from "../../store/statesSlice";
@@ -51,10 +50,12 @@ const WheelComponent: FC<WheelComponentProps> = ({
   const { royalGames, games, isRoyal, apiType, winner } = useAppSelector(
     (state) => state.common
   );
-  const { isLoading, isFinished, isStarted, isRemoved, segments } =
-    useAppSelector((state) => state.states);
+  const { isLoading, isFinished, isStarted, segments } = useAppSelector(
+    (state) => state.states
+  );
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const isRemoved = useRef(false);
 
   const [currentSegment, setCurrentSegment] = useState("");
   const [angleCurrent, setAngleCurrent] = useState(0);
@@ -107,6 +108,10 @@ const WheelComponent: FC<WheelComponentProps> = ({
   }, [onTimerTick]);
 
   useEffect(() => {
+    !segments?.length && dispatch(setSegments(Array(segmentsLength).fill("")));
+  }, [segments, dispatch]);
+
+  useEffect(() => {
     angleCurrent >= Math.PI * 2 && setAngleCurrent(angleCurrent - Math.PI * 2);
   }, [angleCurrent]);
 
@@ -116,8 +121,8 @@ const WheelComponent: FC<WheelComponentProps> = ({
         dispatch(setWinner(games[+currentSegment.split("_")[1]]));
       }
 
-      if (!isRemoved && !isStarted && isFinished && isRoyal) {
-        dispatch(setRemoved(true));
+      if (!isRemoved.current && !isStarted && isFinished && isRoyal) {
+        isRemoved.current = true;
         dispatch(setWinner(royalGames[+currentSegment.split("_")[1]]));
 
         const excluded = royalGames.filter(
@@ -339,7 +344,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
             dispatch(
               setSegments(royalGames.map((game, i) => game.id + "_" + i))
             );
-            dispatch(setRemoved(false));
+            isRemoved.current = false;
             return dispatch(setStarted(true));
           }
 

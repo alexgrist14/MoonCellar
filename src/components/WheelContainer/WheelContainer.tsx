@@ -20,7 +20,11 @@ const WheelContainer: FC = () => {
   useEffect(() => {
     const generateRandomColors = (hue: number): string[] => {
       return segments.map((_, i) => {
-        const lightness = (100 / segments.length - 1) * i + "%";
+        const percent = 70 / segments.length;
+        const lightness =
+          (i < segments.length / 2
+            ? percent * i
+            : percent * (segments.length - i + 1)) + "%";
         const saturation = "60%";
 
         return `hsl(${hue}, ${saturation}, ${lightness})`;
