@@ -23,15 +23,11 @@ import IGDBList from "./IGDBList/IGDBLIst";
 interface ConsolesListProps {
   selectedRating: number;
   setSelectedRating: Dispatch<SetStateAction<number>>;
-  selectedGenres: number[];
-  setSelectedGenres: Dispatch<SetStateAction<number[]>>;
 }
 
 const ConsolesList: FC<ConsolesListProps> = ({
   selectedRating,
   setSelectedRating,
-  selectedGenres,
-  setSelectedGenres,
 }) => {
   const dispatch = useAppDispatch();
   const { apiType, isRoyal } = useAppSelector((state) => state.common);
@@ -117,8 +113,6 @@ const ConsolesList: FC<ConsolesListProps> = ({
           selectedRating={selectedRating}
           setSelectedRating={setSelectedRating}
           selectedGeneration={selectedGeneration}
-          selectedGenres={selectedGenres}
-          setSelectedGenres={setSelectedGenres}
           IGDBPlatforms={IGDBPlatforms}
           IGDBGenres={IGDBGenres}
         />

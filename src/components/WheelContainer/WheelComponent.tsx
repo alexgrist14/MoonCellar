@@ -187,6 +187,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
           >
             {getTitle()}
           </a>
+          <div></div>
         </div>
       );
     }

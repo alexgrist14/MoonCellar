@@ -5,15 +5,13 @@ import { useDebouncedCallback } from "use-debounce";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { IIGDBGenre, IIGDBPlatform } from "../../../interfaces";
 import Checkbox from "@atlaskit/checkbox";
-import { setSystemsIGDB } from "../../../store/commonSlice";
+import { setGenres, setSystemsIGDB } from "../../../store/commonSlice";
 
 interface IGDBListProps {
   setSelectedGeneration: Dispatch<SetStateAction<number>>;
   selectedRating: number;
   setSelectedRating: Dispatch<SetStateAction<number>>;
   selectedGeneration: number;
-  selectedGenres: number[];
-  setSelectedGenres: Dispatch<SetStateAction<number[]>>;
   IGDBPlatforms: IIGDBPlatform[];
   IGDBGenres: IIGDBGenre[];
 }
@@ -23,8 +21,6 @@ const IGDBList: FC<IGDBListProps> = ({
   selectedRating,
   setSelectedRating,
   selectedGeneration,
-  selectedGenres,
-  setSelectedGenres,
   IGDBPlatforms,
   IGDBGenres,
 }) => {
@@ -35,7 +31,7 @@ const IGDBList: FC<IGDBListProps> = ({
     setSelectedGenerationWithoutDebounce,
   ] = useState<number>(0);
 
-  const { systemsIGDB } = useAppSelector((state) => state.common);
+  const { systemsIGDB,genres } = useAppSelector((state) => state.common);
 
   const dispatch = useAppDispatch();
 
@@ -98,14 +94,14 @@ const IGDBList: FC<IGDBListProps> = ({
           <Checkbox
             key={genre.id}
             label={genre.name}
-            isChecked={selectedGenres.includes(genre.id)}
+            isChecked={genres?.includes(genre.id)}
             isDisabled={isLoading}
             onChange={() =>
-              setSelectedGenres(
-                !selectedGenres.includes(genre.id)
-                  ? [...selectedGenres, genre.id]
-                  : selectedGenres.filter((id) => id !== genre.id)
-              )
+             dispatch(setGenres(
+                !genres?.includes(genre.id)
+                  ? [...(!!genres ?  genres : []) , genre.id]
+                  : genres?.filter((id) => id !== genre.id)
+              ))
             }
           />
         ))}

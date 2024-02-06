@@ -10,6 +10,7 @@ const initialState: {
   systemsRA: number[];
   systemsIGDB: number[];
   isRoyal: boolean;
+  genres: number[];
 } = {
   apiType: "RA",
   games: [],
@@ -18,6 +19,7 @@ const initialState: {
   systemsRA: [],
   systemsIGDB: [],
   isRoyal: false,
+  genres:[],
 };
 
 export const commonSlice = createSlice({
@@ -45,6 +47,9 @@ export const commonSlice = createSlice({
     setRoyal: (state, action: PayloadAction<boolean>) => {
       state.isRoyal = action.payload;
     },
+    setGenres:(state, action: PayloadAction<number[]>)=>{
+      state.genres = action.payload;
+    }
   },
 });
 
@@ -56,5 +61,6 @@ export const {
   setSystemsIGDB,
   setSystemsRA,
   setRoyal,
+  setGenres,
 } = commonSlice.actions;
 export default commonSlice.reducer;

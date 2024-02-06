@@ -15,13 +15,15 @@ import { fetchGameList } from "../../utils/getGames";
 const Main: FC = () => {
   const dispatch = useAppDispatch();
 
-  const { apiType, systemsIGDB, isRoyal, systemsRA } = useAppSelector(
+  const { apiType, systemsIGDB, isRoyal, systemsRA, genres } = useAppSelector(
     (state) => state.common
   );
 
   const { token } = useAppSelector((state) => state.auth);
 
-  const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
+
+
+  //const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
   const [selectedRating, setSelectedRating] = useState(0);
 
   const getIGDBGames = useCallback(() => {
@@ -29,7 +31,7 @@ const Main: FC = () => {
 
     dispatch(setLoading(true));
 
-    getGamesCount(systemsIGDB, selectedRating, selectedGenres).then(
+    getGamesCount(systemsIGDB, selectedRating, genres).then(
       (response) => {
         !!response.data.count
           ? getGames({
@@ -37,7 +39,7 @@ const Main: FC = () => {
               platforms: systemsIGDB,
               total: response.data.count,
               rating: selectedRating,
-              genres: selectedGenres,
+              genres: genres,
             }).then((response) => {
               getCovers(response.data.map((game) => game.id)).then(
                 (responseCovers) => {
@@ -68,7 +70,7 @@ const Main: FC = () => {
   }, [
     systemsIGDB,
     selectedRating,
-    selectedGenres,
+    genres,
     dispatch,
     apiType,
     isRoyal,
@@ -78,7 +80,7 @@ const Main: FC = () => {
   useEffect(() => {
     getIGDBGames();
     dispatch(setWinner(undefined));
-  }, [systemsIGDB, selectedRating, selectedGenres, getIGDBGames, dispatch]);
+  }, [systemsIGDB, selectedRating, genres, getIGDBGames, dispatch]);
 
   useEffect(() => {
     dispatch(setWinner(undefined));
@@ -102,8 +104,6 @@ const Main: FC = () => {
       <ConsolesList
         selectedRating={selectedRating}
         setSelectedRating={setSelectedRating}
-        selectedGenres={selectedGenres}
-        setSelectedGenres={setSelectedGenres}
       />
       <WheelContainer callback={getIGDBGames} />
     </div>
