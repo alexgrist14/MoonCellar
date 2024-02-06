@@ -21,8 +21,6 @@ const Main: FC = () => {
 
   const { token } = useAppSelector((state) => state.auth);
 
-
-
   //const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
   const [selectedRating, setSelectedRating] = useState(0);
 
@@ -78,7 +76,7 @@ const Main: FC = () => {
   ]);
 
   useEffect(() => {
-    getIGDBGames();
+    // getIGDBGames();
     dispatch(setWinner(undefined));
   }, [systemsIGDB, selectedRating, genres, getIGDBGames, dispatch]);
 

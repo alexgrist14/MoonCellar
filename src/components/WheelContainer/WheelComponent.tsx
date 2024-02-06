@@ -337,7 +337,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
         width="600"
         height="600"
         onClick={() => {
-          if (isLoading || isStarted || !segments[0]) return;
+          if (isLoading || isStarted) return;
 
           dispatch(setStarted(true));
           dispatch(setFinished(false));
