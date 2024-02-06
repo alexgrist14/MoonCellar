@@ -14,24 +14,6 @@ const WheelContainer: FC = () => {
 
   const [currentWinner, setCurrentWinner] = useState<string | ReactNode>();
 
-  function generateRandomColors(): string[] {
-    const colors: string[] = [];
-
-    const hueValues = ['30', '200', '220', '240', '270']; // Исключаем желтый, оранжевый и желто-оранжевый
-    const lightnessValues = ['30%', '40%', '50%', '60%', '70%'];
-
-    for (let i = 0; i < 16; i++) {
-        const hue = hueValues[Math.floor(Math.random() * hueValues.length)];
-        const lightness = lightnessValues[Math.floor(Math.random() * lightnessValues.length)];
-        const saturation = '70%';
-
-        const color = `hsl(${hue}, ${saturation}, ${lightness})`;
-
-        colors.push(color);
-    }
-
-    return colors;
-}
   const segColors = ["#815CD1", "#3DA5E0"];
 
   return (

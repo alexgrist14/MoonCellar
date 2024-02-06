@@ -11,7 +11,6 @@ const initialState: {
   systemsIGDB: number[];
   isRoyal: boolean;
   genres: number[];
-  onlyWithAchievements: boolean;
 } = {
   apiType: "RA",
   games: [],
@@ -21,7 +20,6 @@ const initialState: {
   systemsIGDB: [],
   isRoyal: false,
   genres:[],
-  onlyWithAchievements: true,
 };
 
 export const commonSlice = createSlice({
@@ -51,9 +49,6 @@ export const commonSlice = createSlice({
     },
     setGenres:(state, action: PayloadAction<number[]>)=>{
       state.genres = action.payload;
-    },
-    setOnlyWithAchievements:(state, action: PayloadAction<boolean>)=>{
-      state.onlyWithAchievements = action.payload;
     }
   },
 });
@@ -67,6 +62,5 @@ export const {
   setSystemsRA,
   setRoyal,
   setGenres,
-  setOnlyWithAchievements
 } = commonSlice.actions;
 export default commonSlice.reducer;

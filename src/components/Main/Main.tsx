@@ -21,7 +21,7 @@ import { resetStates } from "../../utils/resetStates";
 const Main: FC = () => {
   const dispatch = useAppDispatch();
 
-  const { apiType, systemsIGDB, isRoyal, systemsRA, genres, onlyWithAchievements } = useAppSelector(
+  const { apiType, systemsIGDB, isRoyal, systemsRA, genres } = useAppSelector(
     (state) => state.common
   );
 
@@ -90,8 +90,8 @@ const Main: FC = () => {
   useEffect(() => {
     if (apiType !== "RA") return;
 
-    !!systemsRA?.length && systemsRA.forEach((system) => fetchGameList(system,onlyWithAchievements));
-  }, [apiType, systemsRA, onlyWithAchievements]);
+    !!systemsRA?.length && systemsRA.forEach((system) => fetchGameList(system));
+  }, [apiType, systemsRA]);
 
   useEffect(() => {
     auth().then((response) => dispatch(setAuth(response.data.access_token)));
