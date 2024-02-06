@@ -17,7 +17,7 @@ export const getGames = ({
     fields:
       "name, cover, screenshots, slug, total_rating, artworks, franchise, franchises, game_modes, genres, platforms, tags, themes, url",
     limit: limit,
-    offset: (Math.random() * (total - limit)) ^ 0,
+    offset: (Math.random() * (total > limit ? total - limit : total)) ^ 0,
     where: `parent_game = null${
       !!platforms?.length ? ` & platforms = (${platforms.join(", ")})` : ""
     }${!!rating ? ` & total_rating >= ${rating}` : ""}${

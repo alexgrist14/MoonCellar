@@ -13,7 +13,13 @@ import { useAppDispatch, useAppSelector } from "../../store";
 import { setRoyalGames, setWinner } from "../../store/commonSlice";
 import classNames from "classnames";
 import { getSegments } from "../../utils/getSegments";
-import { setFinished, setStarted } from "../../store/statesSlice";
+import {
+  setFinished,
+  setLoading,
+  setRemoved,
+  setSegments,
+  setStarted,
+} from "../../store/statesSlice";
 
 interface WheelComponentProps {
   segColors: string[];
@@ -25,7 +31,6 @@ interface WheelComponentProps {
   downDuration: number;
   fontFamily?: string;
   setCurrentWinner: Dispatch<SetStateAction<ReactNode | string>>;
-  callback: () => void;
 }
 
 const segmentsLength = 16;
@@ -40,22 +45,19 @@ const WheelComponent: FC<WheelComponentProps> = ({
   downDuration,
   fontFamily = "Roboto",
   setCurrentWinner,
-  callback,
 }) => {
   const dispatch = useAppDispatch();
 
   const { royalGames, games, isRoyal, apiType, winner } = useAppSelector(
     (state) => state.common
   );
-  const { isLoading, isFinished, isStarted } = useAppSelector(
-    (state) => state.states
-  );
+  const { isLoading, isFinished, isStarted, isRemoved, segments } =
+    useAppSelector((state) => state.states);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [currentSegment, setCurrentSegment] = useState("");
   const [angleCurrent, setAngleCurrent] = useState(0);
-  const [segments, setSegments] = useState<string[]>([]);
 
   const timer = useRef<NodeJS.Timer>();
   const spinStartDate = useRef(0);
@@ -91,7 +93,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
 
     if (finished) {
       dispatch(setFinished(true));
-
+      dispatch(setStarted(false));
       clearInterval(timer.current);
     } else {
       setAngleCurrent((angleCurrent) => angleCurrent + angleDelta);
@@ -105,46 +107,32 @@ const WheelComponent: FC<WheelComponentProps> = ({
   }, [onTimerTick]);
 
   useEffect(() => {
-    if (isRoyal || !games?.length) return;
-
-    setSegments(getSegments(games, segmentsLength));
-  }, [games, apiType, isRoyal]);
-
-  useEffect(() => {
-    if (isRoyal) {
-      return setSegments(
-        royalGames?.length
-          ? royalGames.map((game, i) => game.id + "_" + i)
-          : Array(16).fill("")
-      );
-    }
-  }, [royalGames, isRoyal, dispatch]);
-
-  useEffect(() => {
-    !segments?.length && setSegments(Array(16).fill(""));
-  }, [segments]);
-
-  useEffect(() => {
     angleCurrent >= Math.PI * 2 && setAngleCurrent(angleCurrent - Math.PI * 2);
   }, [angleCurrent]);
 
   useEffect(() => {
     if (!!currentSegment) {
-      if (isStarted && isFinished) {
-        dispatch(setStarted(false));
+      if (!isStarted && isFinished && !isRoyal) {
         dispatch(setWinner(games[+currentSegment.split("_")[1]]));
       }
 
-      if (isStarted && isFinished && isRoyal) {
-        dispatch(setStarted(false));
+      if (!isRemoved && !isStarted && isFinished && isRoyal) {
+        dispatch(setRemoved(true));
         dispatch(setWinner(royalGames[+currentSegment.split("_")[1]]));
+
+        const excluded = royalGames.filter(
+          (game) => game.id !== +currentSegment.split("_")[0]
+        );
+
         dispatch(
-          setRoyalGames(
-            royalGames.filter(
-              (game) => game.id !== +currentSegment.split("_")[0]
-            )
+          setSegments(
+            !!excluded?.length
+              ? excluded.map((game, i) => game.id + "_" + i)
+              : Array(segmentsLength).fill("")
           )
         );
+
+        dispatch(setRoyalGames(excluded));
       }
 
       const getLink = () => {
@@ -202,6 +190,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
     royalGames,
     apiType,
     dispatch,
+    isRemoved,
   ]);
 
   useEffect(() => {
@@ -323,6 +312,10 @@ const WheelComponent: FC<WheelComponentProps> = ({
     apiType,
   ]);
 
+  useEffect(() => {
+    isStarted && spin();
+  }, [isStarted, segments, spin]);
+
   return (
     <div
       id="wheel"
@@ -337,16 +330,26 @@ const WheelComponent: FC<WheelComponentProps> = ({
         width="600"
         height="600"
         onClick={() => {
-          if (isLoading || isStarted) return;
+          if (isLoading) return;
 
-          dispatch(setStarted(true));
           dispatch(setFinished(false));
           dispatch(setWinner(undefined));
 
-          callback();
-          !isRoyal && setSegments(getSegments(games, segmentsLength));
+          if (isRoyal) {
+            dispatch(
+              setSegments(royalGames.map((game, i) => game.id + "_" + i))
+            );
+            dispatch(setRemoved(false));
+            return dispatch(setStarted(true));
+          }
 
-          spin();
+          if (apiType === "RA") {
+            if (!games?.length) return;
+            dispatch(setSegments(getSegments(games, segmentsLength)));
+            dispatch(setStarted(true));
+          }
+
+          apiType === "IGDB" && dispatch(setLoading(true));
         }}
       />
     </div>

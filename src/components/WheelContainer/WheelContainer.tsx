@@ -5,11 +5,7 @@ import styles from "./WheelContainer.module.scss";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { setRoyalGames } from "../../store/commonSlice";
 
-interface WheelContainerProps {
-  callback: () => void;
-}
-
-const WheelContainer: FC<WheelContainerProps> = ({ callback }) => {
+const WheelContainer: FC = () => {
   const dispatch = useAppDispatch();
   const { royalGames, winner, isRoyal } = useAppSelector(
     (state) => state.common
@@ -31,7 +27,6 @@ const WheelContainer: FC<WheelContainerProps> = ({ callback }) => {
         upDuration={100}
         downDuration={300}
         setCurrentWinner={setCurrentWinner}
-        callback={callback}
       />
       {(!!isStarted || !!isFinished) && (
         <div className={styles.winner}>

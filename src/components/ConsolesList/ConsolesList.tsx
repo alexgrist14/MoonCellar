@@ -1,10 +1,4 @@
-import {
-  Dispatch,
-  FC,
-  SetStateAction,
-  useEffect,
-  useState,
-} from "react";
+import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
 import { IConsole } from "../../interfaces/responses";
 import { getConsoleIds } from "@retroachievements/api";
 import { authorization } from "../../utils/authorization";
@@ -16,9 +10,10 @@ import { IIGDBGenre, IIGDBPlatform } from "../../interfaces";
 import { getGenres, getPlatforms } from "../../utils/IGDB";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { setApiType, setRoyal } from "../../store/commonSlice";
-import { setLoading } from "../../store/statesSlice";
 import RoyalList from "./RoyalList/RoyalList";
 import IGDBList from "./IGDBList/IGDBLIst";
+import {setFinished} from "../../store/statesSlice";
+import {resetStates} from "../../utils/resetStates";
 
 interface ConsolesListProps {
   selectedRating: number;
@@ -70,7 +65,6 @@ const ConsolesList: FC<ConsolesListProps> = ({
   useEffect(() => {
     if (apiType !== "IGDB" || isRoyal || !token) return;
 
-    dispatch(setLoading(true));
     getPlatforms(setIGDBPlatforms, selectedGeneration);
   }, [selectedGeneration, dispatch, apiType, isRoyal, token]);
 
@@ -81,6 +75,7 @@ const ConsolesList: FC<ConsolesListProps> = ({
           <Toggle
             isChecked={apiType === "RA" && !isRoyal}
             onChange={() => {
+              resetStates();
               isRoyal && dispatch(setRoyal(false));
               dispatch(setApiType("RA"));
             }}
@@ -91,6 +86,7 @@ const ConsolesList: FC<ConsolesListProps> = ({
           <Toggle
             isChecked={apiType === "IGDB" && !isRoyal}
             onChange={() => {
+              resetStates();
               isRoyal && dispatch(setRoyal(false));
               dispatch(
                 setApiType(apiType === "IGDB" && !isRoyal ? "RA" : "IGDB")
@@ -102,7 +98,10 @@ const ConsolesList: FC<ConsolesListProps> = ({
         <label className={styles.consoles__toggle}>
           <Toggle
             isChecked={isRoyal}
-            onChange={() => dispatch(setRoyal(!isRoyal))}
+            onChange={() => {
+              resetStates();
+              dispatch(setRoyal(!isRoyal));
+            }}
           />
           Royal
         </label>
