@@ -15,7 +15,7 @@ interface ConsolesGroupProps {
 const ConsolesGroup: FC<ConsolesGroupProps> = ({ system, consoles }) => {
   const dispatch = useAppDispatch();
 
-  const { systemsRA, games } = useAppSelector((state) => state.common);
+  const { systemsRA, games, onlyWithAchievements } = useAppSelector((state) => state.common);
 
   const findConsoleNameById = (id: number): string | undefined => {
     const consoleItem = consoles.find((console) => console.id === id);
@@ -30,7 +30,7 @@ const ConsolesGroup: FC<ConsolesGroupProps> = ({ system, consoles }) => {
       dispatch(setGames(games.filter((game) => game.platforms.includes(id))));
     } else {
       dispatch(setSystemsRA(!!systemsRA?.length ? [...systemsRA, id] : [id]));
-      fetchGameList(id);
+      fetchGameList(id, onlyWithAchievements);
     }
   };
 
