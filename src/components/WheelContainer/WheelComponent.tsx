@@ -99,7 +99,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
     }
 
     if (finished) {
-      dispatch(setFinished(true));
+      dispatch(setFinished(true)); // ;
       dispatch(setStarted(false));
       clearInterval(timer.current);
     } else {
@@ -128,6 +128,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
       }
 
       if (!isRemoved.current && !isStarted && isFinished && isRoyal) {
+        console.log(isFinished);
         const setRoyalGames =
           apiType === "RA" ? setRoyalGamesRA : setRoyalGamesIGDB;
 
@@ -175,7 +176,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
         <div className={styles.winner__content}>
           <div
             className={classNames(styles.winner__image, {
-              [styles.winner__image_active]: isFinished,
+              [styles.winner__image_active]: isFinished && getImage(),
             })}
             style={{
               ...(isFinished && { backgroundImage: `url(${getImage()})` }),
@@ -233,6 +234,8 @@ const WheelComponent: FC<WheelComponentProps> = ({
       ctx.fillStyle = segColors[key];
       ctx.fill();
       ctx.stroke();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "black";
       ctx.save();
       ctx.translate(centerX, centerY);
       ctx.rotate((lastAngle + angle) / 2);
@@ -344,7 +347,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
         width="600"
         height="600"
         onClick={() => {
-          if (isLoading) return;
+          if (isLoading || (isRoyal && !royalGames?.length)) return;
 
           dispatch(setFinished(false));
           dispatch(setWinner(undefined));
@@ -353,17 +356,18 @@ const WheelComponent: FC<WheelComponentProps> = ({
             dispatch(
               setSegments(royalGames.map((game, i) => game.id + "_" + i))
             );
+
             isRemoved.current = false;
             return dispatch(setStarted(true));
-          }
+          } else {
+            if (apiType === "RA") {
+              if (!games?.length) return;
+              dispatch(setSegments(getSegments(games, segmentsLength)));
+              dispatch(setStarted(true));
+            }
 
-          if (apiType === "RA") {
-            if (!games?.length) return;
-            dispatch(setSegments(getSegments(games, segmentsLength)));
-            dispatch(setStarted(true));
+            apiType === "IGDB" && dispatch(setLoading(true));
           }
-
-          apiType === "IGDB" && dispatch(setLoading(true));
         }}
       />
     </div>

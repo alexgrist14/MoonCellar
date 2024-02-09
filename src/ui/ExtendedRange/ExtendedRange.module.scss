@@ -1,0 +1,14 @@
+.range {
+  display: grid;
+  gap: 5px;
+
+  &__wrapper {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    & > span {
+      white-space: nowrap;
+    }
+  }
+}

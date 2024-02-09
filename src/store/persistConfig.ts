@@ -4,6 +4,6 @@ export const persistConfig = {
   key: "root",
   storage,
   version: 1,
-  whitelist: ["selected"],
+  whitelist: ["selected", "excluded"],
   blacklist: [],
 };

@@ -10,7 +10,7 @@ const WheelContainer: FC = () => {
 
   const { winner } = useAppSelector((state) => state.common);
 
-  const { royalGamesRA, royalGamesIGDB, apiType } = useAppSelector(
+  const { royalGamesRA, royalGamesIGDB, apiType, isRoyal } = useAppSelector(
     (state) => state.selected
   );
 
@@ -27,21 +27,21 @@ const WheelContainer: FC = () => {
   useEffect(() => {
     const generateRandomColors = (hue: number): string[] => {
       return segments.map((_, i) => {
-        const percent = 70 / segments.length;
-        const lightness =
-          (i < segments.length / 2
-            ? percent * i
-            : percent * (segments.length - i + 1)) + "%";
+        const min = 10;
+        const percent =
+          i < segments.length / 2
+            ? (70 / segments.length) * i
+            : (70 / segments.length) * (segments.length - i + 1);
+
+        const lightness = (percent > min ? percent : min) + "%";
         const saturation = "60%";
 
         return `hsl(${hue}, ${saturation}, ${lightness})`;
       });
     };
 
-    const hues = [220, 260, 180];
-
     !!segments?.length &&
-      setColors(generateRandomColors(hues[(Math.random() * hues.length) ^ 0]));
+      setColors(generateRandomColors((180 + Math.random() * 90) ^ 0));
   }, [segments]);
 
   return (
@@ -62,7 +62,7 @@ const WheelContainer: FC = () => {
         </div>
       )}
       <div className={styles.container__buttons}>
-        {!!winner && isFinished && (
+        {!!winner && isFinished && !isRoyal && (
           <button
             onClick={() =>
               dispatch(

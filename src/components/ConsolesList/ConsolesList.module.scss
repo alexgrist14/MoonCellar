@@ -37,10 +37,16 @@
     gap: 10px;
   }
 
-  &__toggle {
+  &__type {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     justify-items: center;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__toggle {
+    display: flex;
     align-items: center;
     gap: 10px;
   }

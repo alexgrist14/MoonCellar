@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useEffect } from "react";
 import ConsolesList from "../ConsolesList/ConsolesList";
 import WheelContainer from "../WheelContainer/WheelContainer";
 import styles from "./Main.module.scss";
@@ -11,12 +11,9 @@ import { auth } from "../../api";
 import { setAuth } from "../../store/authSlice";
 import { getCovers } from "../../utils/IGDB/getCovers";
 import { fetchGameList } from "../../utils/getGames";
-import { resetStates } from "../../utils/resetStates";
 
 const Main: FC = () => {
   const dispatch = useAppDispatch();
-
-  const {} = useAppSelector((state) => state.common);
 
   const {
     apiType,
@@ -97,10 +94,6 @@ const Main: FC = () => {
   useEffect(() => {
     isLoading && !isRoyal && apiType === "IGDB" && getIGDBGames();
   }, [isLoading, getIGDBGames, apiType, isRoyal]);
-
-  useEffect(() => {
-    resetStates();
-  }, [selectedSystemsIGDB, selectedSystemsRA]);
 
   useEffect(() => {
     if (apiType !== "RA") return;

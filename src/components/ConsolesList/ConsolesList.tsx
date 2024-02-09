@@ -20,8 +20,14 @@ import { setSystemsRA } from "../../store/commonSlice";
 
 const ConsolesList: FC = () => {
   const dispatch = useAppDispatch();
-  const { apiType, isRoyal, isOnlyWithAchievements, selectedGeneration } =
-    useAppSelector((state) => state.selected);
+  const {
+    apiType,
+    isRoyal,
+    isOnlyWithAchievements,
+    selectedGeneration,
+    royalGamesRA,
+    royalGamesIGDB,
+  } = useAppSelector((state) => state.selected);
   const { token } = useAppSelector((state) => state.auth);
 
   const consolesGroup = [
@@ -33,6 +39,8 @@ const ConsolesList: FC = () => {
     "SNK",
     "Other",
   ];
+
+  const royalGames = apiType === "RA" ? royalGamesRA : royalGamesIGDB;
 
   useEffect(() => {
     if (isRoyal) return;
@@ -59,7 +67,7 @@ const ConsolesList: FC = () => {
 
   return (
     <div className={styles.consoles__list}>
-      <label className={styles.consoles__toggle}>
+      <label className={styles.consoles__type}>
         RetroAchievements
         <Toggle
           isChecked={apiType === "IGDB"}
@@ -91,7 +99,9 @@ const ConsolesList: FC = () => {
               dispatch(setRoyal(!isRoyal));
             }}
           />
-          Royal
+          <span>
+            Royal {!!royalGames?.length ? `(Games: ${royalGames.length})` : ""}
+          </span>
         </label>
       </div>
       {apiType === "IGDB" && !isRoyal && <IGDBList />}

@@ -1,0 +1,21 @@
+.checkbox {
+  display: grid;
+  gap: 15px;
+
+  &__list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    & label {
+      gap: 15px;
+    }
+
+    & span {
+      color: white;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      text-align: start;
+    }
+  }
+}
