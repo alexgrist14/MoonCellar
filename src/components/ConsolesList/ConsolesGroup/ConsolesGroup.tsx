@@ -4,62 +4,76 @@ import styles from "./ConsolesGroup.module.scss";
 import { consolesImages } from "../../../utils/consoleImages";
 import { Checkbox } from "@atlaskit/checkbox";
 import { useAppDispatch, useAppSelector } from "../../../store";
-import { setGames, setSystemsRA } from "../../../store/commonSlice";
+import { setGames } from "../../../store/commonSlice";
 import { fetchGameList } from "../../../utils/getGames";
+import { setSelectedSystemsRA } from "../../../store/selectedSlice";
 
 interface ConsolesGroupProps {
   system: string;
-  consoles: IConsole[];
 }
 
-const ConsolesGroup: FC<ConsolesGroupProps> = ({ system, consoles }) => {
+const ConsolesGroup: FC<ConsolesGroupProps> = ({ system }) => {
   const dispatch = useAppDispatch();
 
-  const { systemsRA, games, onlyWithAchievements } = useAppSelector((state) => state.common);
+  const { systemsRA, games } = useAppSelector((state) => state.common);
+  const { selectedSystemsRA, isOnlyWithAchievements } = useAppSelector(
+    (state) => state.selected
+  );
 
-  const findConsoleNameById = (id: number): string | undefined => {
-    const consoleItem = consoles.find((console) => console.id === id);
-    return consoleItem ? consoleItem.name : undefined;
-  };
-
-  const handleConsoleClick = (id: number): void => {
-    if (systemsRA?.includes(id)) {
+  const handleConsoleClick = (console: IConsole): void => {
+    if (selectedSystemsRA?.some((system) => system.id === console.id)) {
       dispatch(
-        setSystemsRA(systemsRA.filter((selectedId) => selectedId !== id))
+        setSelectedSystemsRA(
+          selectedSystemsRA.filter((system) => system.id !== console.id)
+        )
       );
-      dispatch(setGames(games.filter((game) => game.platforms.includes(id))));
+      dispatch(
+        setGames(games.filter((game) => game.platforms.includes(console.id)))
+      );
     } else {
-      dispatch(setSystemsRA(!!systemsRA?.length ? [...systemsRA, id] : [id]));
-      fetchGameList(id, onlyWithAchievements);
+      dispatch(
+        setSelectedSystemsRA(
+          !!selectedSystemsRA?.length
+            ? [...selectedSystemsRA, console]
+            : [console]
+        )
+      );
+      fetchGameList(console, isOnlyWithAchievements);
     }
   };
 
   return (
     <div className={styles.consoles__group}>
       <h3 className={styles.title}>{system}</h3>
-      {consoles?.map((console, i) =>
-        consolesImages[i].system === system.toLowerCase() ? (
+      {systemsRA?.map((console, i) => {
+        const image = consolesImages.find((image) => image.id === console.id);
+
+        return image?.system === system.toLowerCase() ? (
           <div
             className={`${styles.consoles__item} ${
-              systemsRA?.includes(consolesImages[i].id) ? styles.checked : ""
+              selectedSystemsRA?.some((system) => system.id === console.id)
+                ? styles.checked
+                : ""
             }`}
-            onClick={() => handleConsoleClick(consolesImages[i].id)}
+            onClick={() => handleConsoleClick(console)}
             key={i}
           >
             <div className={styles.consoles__item_title}>
               <img
                 className={styles.image}
-                src={consolesImages[i].image}
+                src={image?.image || ""}
                 alt="console"
               />
-              <div className={styles.text}>
-                {findConsoleNameById(consolesImages[i].id)}
-              </div>
+              <div className={styles.text}>{console.name}</div>
             </div>
-            <Checkbox isChecked={systemsRA?.includes(consolesImages[i].id)} />
+            <Checkbox
+              isChecked={selectedSystemsRA?.some(
+                (system) => system.id === console.id
+              )}
+            />
           </div>
-        ) : null
-      )}
+        ) : null;
+      })}
     </div>
   );
 };

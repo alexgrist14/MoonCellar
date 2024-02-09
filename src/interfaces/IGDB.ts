@@ -1,4 +1,4 @@
-interface IGDBDefault {
+export interface IGDBDefault {
   id: number;
   slug: string;
   name: string;

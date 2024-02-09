@@ -2,11 +2,15 @@ import { getGameList } from "@retroachievements/api";
 import { authorization } from "./authorization";
 import { store } from "../store";
 import { setGames } from "../store/commonSlice";
+import { IConsole } from "../interfaces/responses";
 
-export const fetchGameList = async (id: number,withAchievements: boolean) => {
+export const fetchGameList = async (
+  system: IConsole,
+  withAchievements: boolean
+) => {
   const games = store.getState().common.games;
   const gameList: any[] = await getGameList(authorization, {
-    consoleId: id,
+    consoleId: system.id,
     shouldOnlyRetrieveGamesWithAchievements: withAchievements,
   });
 

@@ -1,51 +1,60 @@
-import { Dispatch, FC, SetStateAction, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import styles from "./IGDBList.module.scss";
 import Range from "@atlaskit/range";
 import { useDebouncedCallback } from "use-debounce";
 import { useAppDispatch, useAppSelector } from "../../../store";
-import { IIGDBGenre, IIGDBPlatform } from "../../../interfaces";
 import Checkbox from "@atlaskit/checkbox";
-import { setGenres, setSystemsIGDB } from "../../../store/commonSlice";
-
-interface IGDBListProps {
-  setSelectedGeneration: Dispatch<SetStateAction<number>>;
-  selectedRating: number;
-  setSelectedRating: Dispatch<SetStateAction<number>>;
-  selectedGeneration: number;
-  IGDBPlatforms: IIGDBPlatform[];
-  IGDBGenres: IIGDBGenre[];
-}
-
-const IGDBList: FC<IGDBListProps> = ({
+import {
+  setSelectedGameModes,
   setSelectedGeneration,
-  selectedRating,
+  setSelectedGenres,
   setSelectedRating,
-  selectedGeneration,
-  IGDBPlatforms,
-  IGDBGenres,
-}) => {
+  setSelectedSystemsIGDB,
+} from "../../../store/selectedSlice";
+import { setExcludedGenres } from "../../../store/excludedSlice";
+import classNames from "classnames";
+
+const IGDBList: FC = () => {
+  const dispatch = useAppDispatch();
+
   const [selectedRatingWithoutDebounce, setSelectedRatingWithoutDebounce] =
     useState<number>(0);
+
   const [
     selectedGenerationWithoutDebounce,
     setSelectedGenerationWithoutDebounce,
   ] = useState<number>(0);
 
-  const { systemsIGDB,genres } = useAppSelector((state) => state.common);
+  const { gameModes, genres, systemsIGDB } = useAppSelector(
+    (state) => state.common
+  );
 
-  const dispatch = useAppDispatch();
+  const {
+    selectedSystemsIGDB,
+    selectedGenres,
+    selectedGameModes,
+    selectedGeneration,
+    selectedRating,
+  } = useAppSelector((state) => state.selected);
+
+  const { excludedGenres } = useAppSelector((state) => state.excluded);
 
   const { isLoading } = useAppSelector((state) => state.states);
 
   const debouncedSetGeneration = useDebouncedCallback(
-    (number: number) => setSelectedGeneration(number),
+    (number: number) => dispatch(setSelectedGeneration(number)),
     500
   );
 
   const debouncedSetRating = useDebouncedCallback(
-    (number: number) => setSelectedRating(number),
+    (number: number) => dispatch(setSelectedRating(number)),
     500
   );
+
+  useEffect(() => {
+    setSelectedRatingWithoutDebounce(selectedRating);
+    setSelectedGenerationWithoutDebounce(selectedGeneration);
+  }, [selectedRating, selectedGeneration]);
 
   return (
     <div className={styles.consoles__igdb}>
@@ -88,40 +97,104 @@ const IGDBList: FC<IGDBListProps> = ({
             : "All"}
         </span>
       </div>
-      <h3>Genres</h3>
-      <div className={styles.consoles__families}>
-        {IGDBGenres.map((genre) => (
+      <h3>Game Modes</h3>
+      <div className={styles.consoles__platforms}>
+        {gameModes.map((mode) => (
           <Checkbox
-            key={genre.id}
-            label={genre.name}
-            isChecked={genres?.includes(genre.id)}
+            key={mode.id}
+            label={mode.name}
+            isChecked={selectedGameModes?.some((gm) => gm.id === mode.id)}
             isDisabled={isLoading}
             onChange={() =>
-             dispatch(setGenres(
-                !genres?.includes(genre.id)
-                  ? [...(!!genres ?  genres : []) , genre.id]
-                  : genres?.filter((id) => id !== genre.id)
-              ))
+              dispatch(
+                setSelectedGameModes(
+                  !!selectedGameModes?.length
+                    ? !selectedGameModes?.some((gm) => gm.id === mode.id)
+                      ? [...selectedGameModes, mode]
+                      : selectedGameModes.filter((gm) => gm.id !== mode.id)
+                    : [mode]
+                )
+              )
             }
           />
         ))}
       </div>
+      <h3>Genres</h3>
+      <div className={styles.consoles__families}>
+        {genres.map((genre) => {
+          const isExcluded = excludedGenres?.some(
+            (excluded) => excluded.id === genre.id
+          );
+
+          const isSelected = selectedGenres?.some(
+            (selected) => selected.id === genre.id
+          );
+
+          return (
+            <Checkbox
+              key={genre.id}
+              label={genre.name}
+              isChecked={isSelected || isExcluded}
+              isIndeterminate={isExcluded}
+              isDisabled={isLoading}
+              onChange={() => {
+                if (isSelected) {
+                  dispatch(
+                    setExcludedGenres([
+                      ...(!!excludedGenres ? excludedGenres : []),
+                      genre,
+                    ])
+                  );
+                  dispatch(
+                    setSelectedGenres(
+                      selectedGenres?.filter(
+                        (selected) => selected.id !== genre.id
+                      )
+                    )
+                  );
+                } else if (isExcluded) {
+                  dispatch(
+                    setExcludedGenres(
+                      excludedGenres?.filter(
+                        (excluded) => excluded.id !== genre.id
+                      )
+                    )
+                  );
+                } else {
+                  dispatch(
+                    setSelectedGenres([
+                      ...(!!selectedGenres ? selectedGenres : []),
+                      genre,
+                    ])
+                  );
+                }
+              }}
+            />
+          );
+        })}
+      </div>
       <h3>Platforms</h3>
       <div className={styles.consoles__platforms}>
-        {IGDBPlatforms.map((platform) => (
+        {systemsIGDB.map((platform) => (
           <Checkbox
             key={platform.id}
             label={platform.name}
-            isChecked={systemsIGDB?.includes(platform.id)}
+            isChecked={selectedSystemsIGDB?.some(
+              (system) => system.id === platform.id
+            )}
             isDisabled={isLoading}
             onChange={() =>
               dispatch(
-                setSystemsIGDB(
-                  !!systemsIGDB?.length
-                    ? !systemsIGDB?.includes(platform.id)
-                      ? [...systemsIGDB, platform.id]
-                      : systemsIGDB.filter((id) => id !== platform.id)
-                    : [platform.id]
+                setSelectedSystemsIGDB(
+                  !!selectedSystemsIGDB?.length
+                    ? !selectedSystemsIGDB?.some(
+                        (system) => system.id === platform.id
+                      )
+                      ? [...selectedSystemsIGDB, platform]
+                      : selectedSystemsIGDB.filter(
+                          (system) => system.id !== platform.id
+                        )
+                    : [platform]
                 )
               )
             }

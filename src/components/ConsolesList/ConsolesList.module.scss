@@ -24,10 +24,23 @@
   &__options {
     display: grid;
     justify-items: flex-start;
+    gap: 10px;
+
+    & > h3 {
+      justify-self: center;
+    }
+  }
+
+  &__option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
   &__toggle {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-items: center;
     align-items: center;
     gap: 10px;
   }

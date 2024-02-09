@@ -1,72 +1,67 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { IGame } from "../interfaces/game";
+import {
+  IGDBDefault,
+  IIGDBGenre,
+  IIGDBPlatform,
+  IIGDBPlatformFamily,
+} from "../interfaces";
+import { IConsole } from "../interfaces/responses";
 
 const initialState: {
-  apiType: "RA" | "IGDB";
   winner?: IGame;
   games: IGame[];
-  royalGames: IGame[];
-  systemsRA: number[];
-  systemsIGDB: number[];
-  isRoyal: boolean;
-  genres: number[];
-  onlyWithAchievements: boolean;
+  systemsRA: IConsole[];
+  systemsIGDB: IIGDBPlatform[];
+  IGDBFamilies: IIGDBPlatformFamily[];
+  genres: IIGDBGenre[];
+  gameModes: IGDBDefault[];
 } = {
-  apiType: "RA",
   games: [],
-  royalGames: [],
   winner: undefined,
   systemsRA: [],
   systemsIGDB: [],
-  isRoyal: false,
-  genres:[],
-  onlyWithAchievements: true,
+  IGDBFamilies: [],
+  genres: [],
+  gameModes: [],
 };
 
 export const commonSlice = createSlice({
   name: "common",
   initialState,
   reducers: {
-    setApiType: (state, action: PayloadAction<"RA" | "IGDB">) => {
-      state.apiType = action.payload;
-    },
     setGames: (state, action: PayloadAction<IGame[]>) => {
       state.games = action.payload;
     },
-    setRoyalGames: (state, action: PayloadAction<IGame[]>) => {
-      state.royalGames = action.payload;
+    setGameModes: (state, action: PayloadAction<IGDBDefault[]>) => {
+      state.gameModes = action.payload;
     },
-    setSystemsRA: (state, action: PayloadAction<number[]>) => {
+    setSystemsRA: (state, action: PayloadAction<IConsole[]>) => {
       state.systemsRA = action.payload;
     },
-    setSystemsIGDB: (state, action: PayloadAction<number[]>) => {
+    setSystemsIGDB: (state, action: PayloadAction<IIGDBPlatform[]>) => {
       state.systemsIGDB = action.payload;
+    },
+    setIGDBFamilies: (state, action: PayloadAction<IIGDBPlatformFamily[]>) => {
+      state.IGDBFamilies = action.payload;
     },
     setWinner: (state, action: PayloadAction<IGame | undefined>) => {
       state.winner = action.payload;
     },
-    setRoyal: (state, action: PayloadAction<boolean>) => {
-      state.isRoyal = action.payload;
-    },
-    setGenres:(state, action: PayloadAction<number[]>)=>{
+    setGenres: (state, action: PayloadAction<IIGDBGenre[]>) => {
       state.genres = action.payload;
     },
-    setOnlyWithAchievements:(state, action: PayloadAction<boolean>)=>{
-      state.onlyWithAchievements = action.payload;
-    }
   },
 });
 
 export const {
   setWinner,
-  setApiType,
   setGames,
-  setRoyalGames,
   setSystemsIGDB,
   setSystemsRA,
-  setRoyal,
   setGenres,
-  setOnlyWithAchievements
+  setGameModes,
+  setIGDBFamilies,
 } = commonSlice.actions;
 export default commonSlice.reducer;

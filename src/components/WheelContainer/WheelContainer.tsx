@@ -3,19 +3,26 @@ import "react-wheel-of-prizes/dist/index.css";
 import WheelComponent from "./WheelComponent";
 import styles from "./WheelContainer.module.scss";
 import { useAppDispatch, useAppSelector } from "../../store";
-import { setRoyalGames } from "../../store/commonSlice";
+import { setRoyalGamesIGDB, setRoyalGamesRA } from "../../store/selectedSlice";
 
 const WheelContainer: FC = () => {
   const dispatch = useAppDispatch();
-  const { royalGames, winner, isRoyal } = useAppSelector(
-    (state) => state.common
+
+  const { winner } = useAppSelector((state) => state.common);
+
+  const { royalGamesRA, royalGamesIGDB, apiType } = useAppSelector(
+    (state) => state.selected
   );
+
   const { isStarted, isFinished, segments } = useAppSelector(
     (state) => state.states
   );
 
   const [currentWinner, setCurrentWinner] = useState<string | ReactNode>();
   const [colors, setColors] = useState<string[]>([]);
+
+  const royalGames = apiType === "RA" ? royalGamesRA : royalGamesIGDB;
+  const setRoyalGames = apiType === "RA" ? setRoyalGamesRA : setRoyalGamesIGDB;
 
   useEffect(() => {
     const generateRandomColors = (hue: number): string[] => {
@@ -31,7 +38,10 @@ const WheelContainer: FC = () => {
       });
     };
 
-    !!segments?.length && setColors(generateRandomColors(260));
+    const hues = [220, 260, 180];
+
+    !!segments?.length &&
+      setColors(generateRandomColors(hues[(Math.random() * hues.length) ^ 0]));
   }, [segments]);
 
   return (
@@ -52,7 +62,7 @@ const WheelContainer: FC = () => {
         </div>
       )}
       <div className={styles.container__buttons}>
-        {!!winner && !isRoyal && isFinished && (
+        {!!winner && isFinished && (
           <button
             onClick={() =>
               dispatch(

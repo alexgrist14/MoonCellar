@@ -1,12 +1,20 @@
 import { FC } from "react";
 import styles from "./RoyalList.module.scss";
 import { useAppDispatch, useAppSelector } from "../../../store";
-import { setRoyalGames } from "../../../store/commonSlice";
+import {
+  setRoyalGamesIGDB,
+  setRoyalGamesRA,
+} from "../../../store/selectedSlice";
 
 const RoyalList: FC = () => {
   const dispatch = useAppDispatch();
 
-  const { royalGames } = useAppSelector((state) => state.common);
+  const { royalGamesRA, royalGamesIGDB, apiType } = useAppSelector(
+    (state) => state.selected
+  );
+
+  const royalGames = apiType === "RA" ? royalGamesRA : royalGamesIGDB;
+  const setRoyalGames = apiType === "RA" ? setRoyalGamesRA : setRoyalGamesIGDB;
 
   return (
     <div className={styles.consoles__royal}>

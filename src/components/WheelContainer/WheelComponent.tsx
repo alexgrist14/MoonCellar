@@ -10,7 +10,7 @@ import {
 } from "react";
 import styles from "./WheelContainer.module.scss";
 import { useAppDispatch, useAppSelector } from "../../store";
-import { setRoyalGames, setWinner } from "../../store/commonSlice";
+import { setWinner } from "../../store/commonSlice";
 import classNames from "classnames";
 import { getSegments } from "../../utils/getSegments";
 import {
@@ -19,6 +19,7 @@ import {
   setSegments,
   setStarted,
 } from "../../store/statesSlice";
+import { setRoyalGamesIGDB, setRoyalGamesRA } from "../../store/selectedSlice";
 
 interface WheelComponentProps {
   segColors: string[];
@@ -47,9 +48,12 @@ const WheelComponent: FC<WheelComponentProps> = ({
 }) => {
   const dispatch = useAppDispatch();
 
-  const { royalGames, games, isRoyal, apiType, winner } = useAppSelector(
-    (state) => state.common
+  const { games, winner } = useAppSelector((state) => state.common);
+
+  const { isRoyal, royalGamesRA, royalGamesIGDB, apiType } = useAppSelector(
+    (state) => state.selected
   );
+
   const { isLoading, isFinished, isStarted, segments } = useAppSelector(
     (state) => state.states
   );
@@ -59,6 +63,8 @@ const WheelComponent: FC<WheelComponentProps> = ({
 
   const [currentSegment, setCurrentSegment] = useState("");
   const [angleCurrent, setAngleCurrent] = useState(0);
+
+  const royalGames = apiType === "RA" ? royalGamesRA : royalGamesIGDB;
 
   const timer = useRef<NodeJS.Timer>();
   const spinStartDate = useRef(0);
@@ -122,6 +128,9 @@ const WheelComponent: FC<WheelComponentProps> = ({
       }
 
       if (!isRemoved.current && !isStarted && isFinished && isRoyal) {
+        const setRoyalGames =
+          apiType === "RA" ? setRoyalGamesRA : setRoyalGamesIGDB;
+
         isRemoved.current = true;
         dispatch(setWinner(royalGames[+currentSegment.split("_")[1]]));
 
@@ -209,7 +218,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
       let value = "";
 
       if (!isRoyal) {
-        !!games.length && (value = games[+segments[key].split("_")[1]]?.name);
+        !!games?.length && (value = games[+segments[key].split("_")[1]]?.name);
       } else {
         !!royalGames?.length &&
           (value = royalGames[+segments[key].split("_")[1]]?.name);
