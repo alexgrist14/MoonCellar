@@ -72,14 +72,6 @@ const WheelComponent: FC<WheelComponentProps> = ({
   const upTime = segmentsLength * upDuration;
   const downTime = segmentsLength * downDuration;
 
-  const clear = useCallback(() => {
-    if (!canvasRef.current) return;
-
-    const ctx = canvasRef.current.getContext("2d");
-
-    ctx && ctx.clearRect(0, 0, 1000, 800);
-  }, []);
-
   const onTimerTick = useCallback(() => {
     let angleDelta = 0;
     const maxSpeed = Math.PI / segmentsLength;
@@ -309,13 +301,13 @@ const WheelComponent: FC<WheelComponentProps> = ({
       setCurrentSegment(segments[i]);
     };
 
-    clear();
+    ctx.clearRect(0, 0, 600, 600);
+
     drawWheel();
     drawNeedle();
   }, [
     isFinished,
     buttonText,
-    clear,
     contrastColor,
     fontFamily,
     primaryColor,
