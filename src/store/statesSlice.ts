@@ -3,11 +3,13 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 
 const initialState: {
   isLoading: boolean;
+  isPlatformsLoading: boolean;
   isStarted: boolean;
   isFinished: boolean;
   segments: string[];
 } = {
   isLoading: false,
+  isPlatformsLoading: false,
   isStarted: false,
   isFinished: false,
   segments: Array(16).fill(""),
@@ -19,6 +21,9 @@ export const statesSlice = createSlice({
   reducers: {
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
+    },
+    setPlatformsLoading: (state, action: PayloadAction<boolean>) => {
+      state.isPlatformsLoading = action.payload;
     },
     setStarted: (state, action: PayloadAction<boolean>) => {
       state.isStarted = action.payload;
@@ -32,6 +37,11 @@ export const statesSlice = createSlice({
   },
 });
 
-export const { setLoading, setStarted, setFinished, setSegments } =
-  statesSlice.actions;
+export const {
+  setLoading,
+  setStarted,
+  setFinished,
+  setSegments,
+  setPlatformsLoading,
+} = statesSlice.actions;
 export default statesSlice.reducer;

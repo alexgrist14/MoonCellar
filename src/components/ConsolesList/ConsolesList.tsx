@@ -17,6 +17,7 @@ import {
   setRoyal,
 } from "../../store/selectedSlice";
 import { setSystemsRA } from "../../store/commonSlice";
+import {setPlatformsLoading} from "../../store/statesSlice";
 
 const ConsolesList: FC = () => {
   const dispatch = useAppDispatch();
@@ -55,14 +56,19 @@ const ConsolesList: FC = () => {
     };
 
     apiType === "RA" && fetchConsoleIds();
-    apiType === "IGDB" && !!token && getGenres();
+
+    if (apiType === "IGDB" && !!token) {
+      getGenres();
+      getModes();
+    }
   }, [apiType, isRoyal, token, dispatch]);
 
   useEffect(() => {
     if (apiType !== "IGDB" || isRoyal || !token) return;
 
+    dispatch(setPlatformsLoading(true));
+
     getPlatforms(selectedGeneration);
-    getModes();
   }, [selectedGeneration, dispatch, apiType, isRoyal, token]);
 
   return (

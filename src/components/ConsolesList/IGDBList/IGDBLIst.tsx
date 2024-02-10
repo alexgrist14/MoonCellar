@@ -33,7 +33,9 @@ const IGDBList: FC = () => {
     (state) => state.excluded
   );
 
-  const { isLoading } = useAppSelector((state) => state.states);
+  const { isLoading, isPlatformsLoading } = useAppSelector(
+    (state) => state.states
+  );
 
   return (
     <div className={styles.consoles__igdb}>
@@ -45,16 +47,15 @@ const IGDBList: FC = () => {
           isDisabled={isLoading}
           min={0}
           max={99}
-          allType="min"
         />
         <ExtendedRange
           title="Generations"
           selected={selectedGeneration}
           setSelected={setSelectedGeneration}
           isDisabled={isLoading}
-          min={1}
+          min={0}
           max={9}
-          allType="max"
+          symbol="<= "
         />
       </div>
       <ExtendedCheckbox
@@ -75,15 +76,19 @@ const IGDBList: FC = () => {
         setExcluded={setExcludedGenres}
         setSelected={setSelectedGenres}
       />
-      <ExtendedCheckbox
-        title="Platforms"
-        list={systemsIGDB}
-        excluded={excludedSystems}
-        selected={selectedSystemsIGDB}
-        isDisabled={isLoading}
-        setExcluded={setExcludedSystems}
-        setSelected={setSelectedSystemsIGDB}
-      />
+      {isPlatformsLoading ? (
+        <div>Loading...</div>
+      ) : (
+        <ExtendedCheckbox
+          title="Platforms"
+          list={systemsIGDB}
+          excluded={excludedSystems}
+          selected={selectedSystemsIGDB}
+          isDisabled={isLoading}
+          setExcluded={setExcludedSystems}
+          setSelected={setSelectedSystemsIGDB}
+        />
+      )}
     </div>
   );
 };

@@ -26,7 +26,7 @@ const initialState: {
   selectedGameModes: [],
   isRoyal: false,
   isOnlyWithAchievements: true,
-  selectedGeneration: 9,
+  selectedGeneration: 0,
   selectedRating: 0,
 };
 

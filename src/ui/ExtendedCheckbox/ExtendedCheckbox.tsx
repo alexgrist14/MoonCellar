@@ -44,6 +44,7 @@ export const ExtendedCheckbox = <T,>({
             <div
               className={classNames(styles.checkbox__element, {
                 [styles.checkbox__element_excluded]: isExcluded,
+                [styles.checkbox__element_selected]: isSelected,
               })}
             >
               <Checkbox

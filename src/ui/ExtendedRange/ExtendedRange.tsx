@@ -12,7 +12,7 @@ export interface IExtendedCheckboxProps {
   isDisabled?: boolean;
   min: number;
   max: number;
-  allType: "max" | "min";
+  symbol?: string;
 }
 
 export const ExtendedRange: FC<IExtendedCheckboxProps> = ({
@@ -22,13 +22,14 @@ export const ExtendedRange: FC<IExtendedCheckboxProps> = ({
   isDisabled,
   max,
   min,
-  allType,
+  symbol,
 }) => {
   const dispatch = useAppDispatch();
   const [value, setValue] = useState(0);
 
-  const debouncedSetSelected = useDebouncedCallback((value: number) =>
-    dispatch(setSelected(value))
+  const debouncedSetSelected = useDebouncedCallback(
+    (value: number) => dispatch(setSelected(value)),
+    500
   );
 
   useEffect(() => {
@@ -50,12 +51,7 @@ export const ExtendedRange: FC<IExtendedCheckboxProps> = ({
           }}
           isDisabled={isDisabled}
         />
-        {allType === "max" && (
-          <span>{value !== max ? "<= " + value : "All"}</span>
-        )}
-        {allType === "min" && (
-          <span>{value !== min ? ">= " + value : "All"}</span>
-        )}
+        <span>{value !== min ? (symbol || ">= ") + value : "All"}</span>
       </div>
     </div>
   );

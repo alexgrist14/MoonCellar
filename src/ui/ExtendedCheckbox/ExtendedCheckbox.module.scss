@@ -23,9 +23,15 @@
     & g {
       transition: 0.3s;
     }
+
+    &_selected g {
+      color: #0052cc;
+      fill: white;
+      --checkbox-border-color: #0052cc;
+    }
+
     &_excluded g {
       color: #c126a9;
-      fill: white;
       --checkbox-border-color: #c126a9;
     }
   }

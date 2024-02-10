@@ -1,10 +1,13 @@
-import { Dispatch, SetStateAction } from "react";
 import { IIGDBPlatform, IIGDBPlatformFamily } from "../../interfaces";
 import { IGDBAgent } from "../../api";
 import { store } from "../../store";
 import { setIGDBFamilies, setSystemsIGDB } from "../../store/commonSlice";
+import { setSelectedSystemsIGDB } from "../../store/selectedSlice";
+import {setPlatformsLoading} from "../../store/statesSlice";
 
 export const getPlatforms = (generation?: number) => {
+  const { selectedSystemsIGDB } = store.getState().selected;
+
   IGDBAgent<IIGDBPlatform[]>("https://api.igdb.com/v4/platforms", {
     fields:
       "name, slug, platform_family, platform_logo, created_at, generation",
@@ -20,6 +23,16 @@ export const getPlatforms = (generation?: number) => {
         )
       )
     );
+
+    store.dispatch(
+      setSelectedSystemsIGDB(
+        selectedSystemsIGDB.filter((system) =>
+          response.data.some((platform) => platform.id === system.id)
+        )
+      )
+    );
+
+    store.dispatch(setPlatformsLoading(false));
   });
 };
 
