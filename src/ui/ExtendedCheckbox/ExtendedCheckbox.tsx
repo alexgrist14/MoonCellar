@@ -2,6 +2,7 @@ import styles from "./ExtendedCheckbox.module.scss";
 import { Checkbox } from "@atlaskit/checkbox";
 import { useAppDispatch } from "../../store";
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
+import classNames from "classnames";
 
 export interface IExtendedCheckboxProps<
   T extends { id: number; name: string }
@@ -40,35 +41,45 @@ export const ExtendedCheckbox = <T,>({
           );
 
           return (
-            <Checkbox
-              key={element.id}
-              label={element.name}
-              isChecked={isSelected || isExcluded}
-              isIndeterminate={isExcluded}
-              isDisabled={isDisabled}
-              onChange={() => {
-                if (isSelected) {
-                  dispatch(
-                    setExcluded([...(!!excluded ? excluded : []), element])
-                  );
-                  dispatch(
-                    setSelected(
-                      selected?.filter((selected) => selected.id !== element.id)
-                    )
-                  );
-                } else if (isExcluded) {
-                  dispatch(
-                    setExcluded(
-                      excluded?.filter((excluded) => excluded.id !== element.id)
-                    )
-                  );
-                } else {
-                  dispatch(
-                    setSelected([...(!!selected ? selected : []), element])
-                  );
-                }
-              }}
-            />
+            <div
+              className={classNames(styles.checkbox__element, {
+                [styles.checkbox__element_excluded]: isExcluded,
+              })}
+            >
+              <Checkbox
+                key={element.id}
+                label={element.name}
+                isChecked={isSelected || isExcluded}
+                isIndeterminate={isExcluded}
+                isDisabled={isDisabled}
+                onChange={() => {
+                  if (isSelected) {
+                    dispatch(
+                      setExcluded([...(!!excluded ? excluded : []), element])
+                    );
+                    dispatch(
+                      setSelected(
+                        selected?.filter(
+                          (selected) => selected.id !== element.id
+                        )
+                      )
+                    );
+                  } else if (isExcluded) {
+                    dispatch(
+                      setExcluded(
+                        excluded?.filter(
+                          (excluded) => excluded.id !== element.id
+                        )
+                      )
+                    );
+                  } else {
+                    dispatch(
+                      setSelected([...(!!selected ? selected : []), element])
+                    );
+                  }
+                }}
+              />
+            </div>
           );
         })}
       </div>

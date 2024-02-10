@@ -2,28 +2,19 @@ import { FC, useCallback, useEffect } from "react";
 import ConsolesList from "../ConsolesList/ConsolesList";
 import WheelContainer from "../WheelContainer/WheelContainer";
 import styles from "./Main.module.scss";
-import { getGames, getGamesCount } from "../../utils/IGDB";
-import { shuffle } from "../../utils/shuffle";
+import { getGames } from "../../utils/IGDB";
 import { useAppDispatch, useAppSelector } from "../../store";
-import { setGames, setWinner } from "../../store/commonSlice";
-import { setLoading, setSegments, setStarted } from "../../store/statesSlice";
+import { setGames } from "../../store/commonSlice";
+import { setLoading } from "../../store/statesSlice";
 import { auth } from "../../api";
 import { setAuth } from "../../store/authSlice";
-import { getCovers } from "../../utils/IGDB/getCovers";
 import { fetchGameList } from "../../utils/getGames";
 
 const Main: FC = () => {
   const dispatch = useAppDispatch();
 
-  const {
-    apiType,
-    selectedSystemsIGDB,
-    selectedSystemsRA,
-    isRoyal,
-    selectedGenres,
-    isOnlyWithAchievements,
-    selectedRating,
-  } = useAppSelector((state) => state.selected);
+  const { apiType, selectedSystemsRA, isRoyal, isOnlyWithAchievements } =
+    useAppSelector((state) => state.selected);
 
   const { token } = useAppSelector((state) => state.auth);
   const { isLoading } = useAppSelector((state) => state.states);
@@ -33,63 +24,8 @@ const Main: FC = () => {
 
     dispatch(setLoading(true));
 
-    getGamesCount(selectedSystemsIGDB, selectedRating, selectedGenres).then(
-      (response) => {
-        if (!!response.data.count) {
-          getGames({
-            limit: 20,
-            platforms: selectedSystemsIGDB,
-            total: response.data.count,
-            rating: selectedRating,
-            genres: selectedGenres,
-          }).then((response) => {
-            console.log(response);
-            !!response.data?.length
-              ? getCovers(response.data.map((game) => game.id)).then(
-                  (responseCovers) => {
-                    const games = shuffle(
-                      response.data.map((game) => ({
-                        name: game.name,
-                        id: game.id,
-                        url: game.url,
-                        platforms: game.platforms,
-                        image: !!responseCovers.data.find(
-                          (cover) => cover.id === game.cover
-                        )?.url
-                          ? "https:" +
-                            responseCovers.data.find(
-                              (cover) => cover.id === game.cover
-                            )?.url
-                          : "",
-                      }))
-                    );
-
-                    dispatch(setGames(games));
-                    dispatch(
-                      setSegments(games.map((game, i) => game.id + "_" + i))
-                    );
-                    dispatch(setLoading(false));
-                    dispatch(setStarted(true));
-                    dispatch(setWinner(undefined));
-                  }
-                )
-              : dispatch(setLoading(false));
-          });
-        } else {
-          dispatch(setGames([]));
-          dispatch(setLoading(false));
-        }
-      }
-    );
-  }, [
-    selectedSystemsIGDB,
-    selectedRating,
-    selectedGenres,
-    dispatch,
-    apiType,
-    isRoyal,
-    token,
-  ]);
+    getGames();
+  }, [dispatch, apiType, isRoyal, token]);
 
   useEffect(() => {
     isLoading && !isRoyal && apiType === "IGDB" && getIGDBGames();

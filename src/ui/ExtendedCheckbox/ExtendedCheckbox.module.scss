@@ -18,4 +18,15 @@
       text-align: start;
     }
   }
+
+  &__element {
+    & g {
+      transition: 0.3s;
+    }
+    &_excluded g {
+      color: #c126a9;
+      fill: white;
+      --checkbox-border-color: #c126a9;
+    }
+  }
 }
