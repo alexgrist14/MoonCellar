@@ -48,7 +48,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
 }) => {
   const dispatch = useAppDispatch();
 
-  const { games, winner } = useAppSelector((state) => state.common);
+  const { games, winner, systemsIGDB } = useAppSelector((state) => state.common);
 
   const { isRoyal, royalGamesRA, royalGamesIGDB, apiType } = useAppSelector(
     (state) => state.selected
@@ -152,17 +152,21 @@ const WheelComponent: FC<WheelComponentProps> = ({
         return !isRoyal
           ? games[+currentSegment.split("_")[1]]?.image || ""
           : winner?.image ||
-              royalGames[+currentSegment.split("_")[1]]?.image ||
-              "";
+          royalGames[+currentSegment.split("_")[1]]?.image ||
+          "";
       };
 
       const getTitle = () => {
         return !isRoyal
           ? games[+currentSegment.split("_")[1]]?.name || ""
           : winner?.name ||
-              royalGames[+currentSegment.split("_")[1]]?.name ||
-              "";
+          royalGames[+currentSegment.split("_")[1]]?.name ||
+          "";
       };
+
+      const getPlatform = () => {
+        return winner?.platforms[0] !== undefined ? winner?.platforms ? systemsIGDB.filter((item) => item.id === winner?.platforms[0])[0].name : "" : "N/A";
+      }
 
       setCurrentWinner(
         <div className={styles.winner__content}>
@@ -182,7 +186,9 @@ const WheelComponent: FC<WheelComponentProps> = ({
           >
             {getTitle()}
           </a>
-          <div></div>
+          {
+            isFinished && <div className={styles.platform}>Platform: {getPlatform()} </div>
+          }
         </div>
       );
     }
@@ -198,6 +204,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
     apiType,
     dispatch,
     isRemoved,
+    systemsIGDB
   ]);
 
   useEffect(() => {
