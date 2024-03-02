@@ -3,9 +3,12 @@ import axios from "axios";
 import * as https from "https";
 import fs from "fs-extra";
 
-const httpsAgent = new https.Agent({
-  rejectUnauthorized: false,
-});
+const privateKey  = fs.readFileSync('/etc/letsencrypt/live/gigatualet.ru/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/gigatualet.ru/fullchain.pem', 'utf8');
+
+const credentials = {key: privateKey, cert: certificate};
+
+const httpsAgent = new https.Agent(credentials);
 
 const app = express();
 
@@ -35,10 +38,10 @@ app.all("*", function (req, res) {
       return;
     }
 
-    res.setTimeout(3000, () => {
-      console.log("Request has timed out.");
-      res.sendStatus(408);
-    });
+    //res.setTimeout(3000, () => {
+      //console.log("Request has timed out.");
+      //res.sendStatus(408);
+    //});
 
     axios({
       url: targetURL,
@@ -65,8 +68,8 @@ app.all("*", function (req, res) {
   }
 });
 
-app.set("port", process.env.PORT || 3001);
-
-app.listen(app.get("port"), function () {
-  console.log("Proxy server listening on port " + app.get("port"));
-});
+https
+  .createServer(credentials, app)
+  .listen(4000, () => {
+    console.log('Server is runing at port 4000')
+  });
