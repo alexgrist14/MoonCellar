@@ -31,7 +31,7 @@ export const ExtendedCheckbox = <T,>({
     <div className={styles.checkbox}>
       <h3>{title}</h3>
       <div className={styles.checkbox__list}>
-        {list.map((element) => {
+        {list.map((element, i) => {
           const isExcluded = excluded?.some(
             (excluded) => excluded.id === element.id
           );
@@ -42,6 +42,7 @@ export const ExtendedCheckbox = <T,>({
 
           return (
             <div
+              key={i}
               className={classNames(styles.checkbox__element, {
                 [styles.checkbox__element_excluded]: isExcluded,
                 [styles.checkbox__element_selected]: isSelected,

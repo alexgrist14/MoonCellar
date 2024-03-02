@@ -10,14 +10,13 @@ import { getGenres, getModes, getPlatforms } from "../../utils/IGDB";
 import { useAppDispatch, useAppSelector } from "../../store";
 import RoyalList from "./RoyalList/RoyalList";
 import IGDBList from "./IGDBList/IGDBLIst";
-import { resetStates } from "../../utils/resetStates";
 import {
   setApiType,
   setOnlyWithAchievements,
   setRoyal,
 } from "../../store/selectedSlice";
 import { setSystemsRA } from "../../store/commonSlice";
-import {setPlatformsLoading} from "../../store/statesSlice";
+import { setPlatformsLoading } from "../../store/statesSlice";
 
 const ConsolesList: FC = () => {
   const dispatch = useAppDispatch();
@@ -78,7 +77,6 @@ const ConsolesList: FC = () => {
         <Toggle
           isChecked={apiType === "IGDB"}
           onChange={() => {
-            resetStates();
             dispatch(setApiType(apiType === "IGDB" ? "RA" : "IGDB"));
           }}
         />
@@ -101,7 +99,6 @@ const ConsolesList: FC = () => {
           <Toggle
             isChecked={isRoyal}
             onChange={() => {
-              resetStates();
               dispatch(setRoyal(!isRoyal));
             }}
           />

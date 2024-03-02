@@ -1,13 +1,4 @@
-import {
-  Dispatch,
-  FC,
-  ReactNode,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import styles from "./WheelContainer.module.scss";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { setWinner } from "../../store/commonSlice";
@@ -19,7 +10,6 @@ import {
   setSegments,
   setStarted,
 } from "../../store/statesSlice";
-import { setRoyalGamesIGDB, setRoyalGamesRA } from "../../store/selectedSlice";
 
 interface WheelComponentProps {
   segColors: string[];
@@ -27,10 +17,8 @@ interface WheelComponentProps {
   contrastColor: string;
   buttonText: string;
   size?: number;
-  upDuration: number;
-  downDuration: number;
   fontFamily?: string;
-  setCurrentWinner: Dispatch<SetStateAction<ReactNode | string>>;
+  time?: number;
 }
 
 const segmentsLength = 16;
@@ -41,14 +29,12 @@ const WheelComponent: FC<WheelComponentProps> = ({
   contrastColor = "white",
   buttonText = "Spin",
   size = 290,
-  upDuration,
-  downDuration,
   fontFamily = "Roboto",
-  setCurrentWinner,
+  time = 5,
 }) => {
   const dispatch = useAppDispatch();
 
-  const { games, winner, systemsIGDB } = useAppSelector((state) => state.common);
+  const { games } = useAppSelector((state) => state.common);
 
   const { isRoyal, royalGamesRA, royalGamesIGDB, apiType } = useAppSelector(
     (state) => state.selected
@@ -59,153 +45,46 @@ const WheelComponent: FC<WheelComponentProps> = ({
   );
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const isRemoved = useRef(false);
 
+  const angle = useRef(0);
+
+  const [winnerAngle, setWinnerAngle] = useState(0);
   const [currentSegment, setCurrentSegment] = useState("");
-  const [angleCurrent, setAngleCurrent] = useState(0);
 
   const royalGames = apiType === "RA" ? royalGamesRA : royalGamesIGDB;
 
-  const timer = useRef<NodeJS.Timer>();
-  const spinStartDate = useRef(0);
+  useEffect(() => {
+    setCurrentSegment("");
+  }, [apiType, isRoyal]);
 
-  const upTime = segmentsLength * upDuration;
-  const downTime = segmentsLength * downDuration;
-
-  const onTimerTick = useCallback(() => {
-    let angleDelta = 0;
-    const maxSpeed = Math.PI / segmentsLength;
-
-    const duration = new Date().getTime() - spinStartDate.current;
-
-    let progress = 0;
-    let finished = false;
-
-    if (duration < upTime) {
-      !isLoading && (progress = duration / upTime);
-      angleDelta = maxSpeed * Math.sin((progress * Math.PI) / 2);
-    } else {
-      !isLoading && (progress = duration / downTime);
-      angleDelta = maxSpeed * Math.sin((progress * Math.PI) / 2 + Math.PI / 2);
-      if (progress >= 1) finished = true;
+  useEffect(() => {
+    if (!segments?.length) {
+      dispatch(setSegments(Array(segmentsLength).fill("")));
     }
-
-    if (finished) {
-      dispatch(setFinished(true)); // ;
-      dispatch(setStarted(false));
-      clearInterval(timer.current);
-    } else {
-      setAngleCurrent((angleCurrent) => angleCurrent + angleDelta);
-    }
-  }, [downTime, upTime, isLoading, dispatch]);
-
-  const spin = useCallback(() => {
-    spinStartDate.current = new Date().getTime();
-
-    timer.current = setInterval(() => onTimerTick(), 10);
-  }, [onTimerTick]);
+  }, [segments, dispatch, isRoyal, royalGames]);
 
   useEffect(() => {
-    !segments?.length && dispatch(setSegments(Array(segmentsLength).fill("")));
-  }, [segments, dispatch]);
-
-  useEffect(() => {
-    angleCurrent >= Math.PI * 2 && setAngleCurrent(angleCurrent - Math.PI * 2);
-  }, [angleCurrent]);
-
-  useEffect(() => {
-    if (!!currentSegment) {
-      if (!isStarted && isFinished && !isRoyal) {
+    if (!!currentSegment && isFinished) {
+      if (!isRoyal) {
         dispatch(setWinner(games[+currentSegment.split("_")[1]]));
+
+        return;
       }
 
-      if (!isRemoved.current && !isStarted && isFinished && isRoyal) {
-        console.log(isFinished);
-        const setRoyalGames =
-          apiType === "RA" ? setRoyalGamesRA : setRoyalGamesIGDB;
+      dispatch(setWinner(royalGames[+currentSegment.split("_")[1]]));
 
-        isRemoved.current = true;
-        dispatch(setWinner(royalGames[+currentSegment.split("_")[1]]));
+      const filtered = segments.filter((segment) => segment !== currentSegment);
+      !filtered?.length && setCurrentSegment("");
 
-        const excluded = royalGames.filter(
-          (game) => game.id !== +currentSegment.split("_")[0]
-        );
-
-        dispatch(
-          setSegments(
-            !!excluded?.length
-              ? excluded.map((game, i) => game.id + "_" + i)
-              : Array(segmentsLength).fill("")
-          )
-        );
-
-        dispatch(setRoyalGames(excluded));
-      }
-
-      const getLink = () => {
-        return !isRoyal
-          ? games[+currentSegment.split("_")[1]]?.url || ""
-          : winner?.url || royalGames[+currentSegment.split("_")[1]]?.url || "";
-      };
-
-      const getImage = () => {
-        return !isRoyal
-          ? games[+currentSegment.split("_")[1]]?.image || ""
-          : winner?.image ||
-          royalGames[+currentSegment.split("_")[1]]?.image ||
-          "";
-      };
-
-      const getTitle = () => {
-        return !isRoyal
-          ? games[+currentSegment.split("_")[1]]?.name || ""
-          : winner?.name ||
-          royalGames[+currentSegment.split("_")[1]]?.name ||
-          "";
-      };
-
-      const getPlatform = () => {
-        return winner?.platforms[0] !== undefined ? winner?.platforms ? systemsIGDB.filter((item) => item.id === winner?.platforms[0])[0].name : "" : "N/A";
-      }
-
-      setCurrentWinner(
-        <div className={styles.winner__content}>
-          <div
-            className={classNames(styles.winner__image, {
-              [styles.winner__image_active]: isFinished && getImage(),
-            })}
-            style={{
-              ...(isFinished && { backgroundImage: `url(${getImage()})` }),
-            }}
-          />
-          <a
-            className={styles.link}
-            href={getLink()}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {getTitle()}
-          </a>
-          {
-            isFinished && <div className={styles.platform}>Platform: {getPlatform()} </div>
-          }
-        </div>
+      dispatch(
+        setSegments(
+          !!filtered?.length
+            ? filtered
+            : royalGames.map((game, i) => game.id + "_" + i)
+        )
       );
     }
-  }, [
-    currentSegment,
-    isFinished,
-    isStarted,
-    winner,
-    setCurrentWinner,
-    games,
-    isRoyal,
-    royalGames,
-    apiType,
-    dispatch,
-    isRemoved,
-    systemsIGDB
-  ]);
+  }, [currentSegment, isFinished, games, isRoyal, royalGames, dispatch]);
 
   useEffect(() => {
     const centerX = 300;
@@ -214,7 +93,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
 
     if (!ctx) return;
 
-    const drawSegment = (key: any, lastAngle: any, angle: any) => {
+    const drawSegment = (key: number, lastAngle: number, angle: number) => {
       let value = "";
 
       if (!isRoyal) {
@@ -233,14 +112,18 @@ const WheelComponent: FC<WheelComponentProps> = ({
       ctx.fillStyle = segColors[key];
       ctx.fill();
       ctx.stroke();
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 1;
       ctx.strokeStyle = "black";
       ctx.save();
       ctx.translate(centerX, centerY);
       ctx.rotate((lastAngle + angle) / 2);
       ctx.fillStyle = contrastColor;
       ctx.font = "bold 1em " + fontFamily;
-      ctx.fillText(value?.slice(0, 21) || "", size / 2 + 20, 0);
+      ctx.fillText(
+        value?.length > 19 ? value.slice(0, 20) + "..." : value || "",
+        size / 2 + 20,
+        0
+      );
       ctx.restore();
     };
 
@@ -248,7 +131,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
       const len = segments.length;
       const PI2 = Math.PI * 2;
 
-      let lastAngle = angleCurrent;
+      let lastAngle = 0;
 
       ctx.lineWidth = 1;
       ctx.strokeStyle = "primaryColor";
@@ -256,26 +139,12 @@ const WheelComponent: FC<WheelComponentProps> = ({
       ctx.textAlign = "center";
       ctx.font = "1em " + fontFamily;
       for (let i = 1; i <= len; i++) {
-        const angle = PI2 * (i / len) + angleCurrent;
+        const angle = PI2 * (i / len);
+
         drawSegment(i - 1, lastAngle, angle);
+
         lastAngle = angle;
       }
-
-      // Draw a center circle
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, 50, 0, PI2, false);
-      ctx.closePath();
-      ctx.fillStyle = primaryColor;
-      ctx.lineWidth = 10;
-      ctx.strokeStyle = contrastColor;
-      ctx.fill();
-      ctx.font = "bold 1em " + fontFamily;
-      ctx.fillStyle = contrastColor;
-      ctx.textAlign = "center";
-      ctx.fillText(buttonText, centerX, centerY + 3);
-      ctx.stroke();
-
-      // Draw outer circle
       ctx.beginPath();
       ctx.arc(centerX, centerY, size, 0, PI2, false);
       ctx.closePath();
@@ -285,78 +154,55 @@ const WheelComponent: FC<WheelComponentProps> = ({
       ctx.stroke();
     };
 
-    const drawNeedle = () => {
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = contrastColor;
-      ctx.fillStyle = contrastColor;
-      ctx.beginPath();
-      ctx.moveTo(centerX + 20, centerY - 50);
-      ctx.lineTo(centerX - 20, centerY - 50);
-      ctx.lineTo(centerX, centerY - 70);
-      ctx.closePath();
-      ctx.fill();
-
-      const change = angleCurrent + Math.PI / 2;
-
-      let i =
-        segments.length -
-        Math.floor((change / (Math.PI * 2)) * segments.length) -
-        1;
-
-      i < 0 && (i = i + segments.length);
-
-      setCurrentSegment(segments[i]);
-    };
-
     ctx.clearRect(0, 0, 600, 600);
 
     drawWheel();
-    drawNeedle();
   }, [
-    isFinished,
-    buttonText,
     contrastColor,
     fontFamily,
     primaryColor,
     segColors,
     size,
-    angleCurrent,
     segments,
     games,
     royalGames,
     isRoyal,
-    apiType,
   ]);
 
   useEffect(() => {
-    isStarted && spin();
-  }, [isStarted, segments, spin]);
+    if (isStarted) {
+      const winner = Math.ceil(Math.random() * (segments.length - 1));
+
+      angle.current += 360 * segments.length;
+
+      setWinnerAngle(
+        angle.current +
+          (360 - (360 / segments.length) * winner) -
+          Math.floor(Math.random() * (360 / segments.length))
+      );
+      dispatch(setStarted(false));
+
+      setTimeout(() => {
+        dispatch(setFinished(true));
+        setCurrentSegment(segments[winner]);
+      }, 5000);
+    }
+  }, [isStarted, segments, dispatch]);
 
   return (
     <div
       id="wheel"
       className={classNames(styles.wheel, {
         [styles.wheel_disabled]: isLoading,
+        [styles.wheel_active]: !isFinished || (isRoyal && !royalGames?.length),
       })}
     >
-      <canvas
-        ref={canvasRef}
-        id="canvas"
-        className={styles.canvas}
-        width="600"
-        height="600"
+      <button
         onClick={() => {
-          if (isLoading || (isRoyal && !royalGames?.length)) return;
-
           dispatch(setFinished(false));
           dispatch(setWinner(undefined));
 
           if (isRoyal) {
-            dispatch(
-              setSegments(royalGames.map((game, i) => game.id + "_" + i))
-            );
-
-            isRemoved.current = false;
             return dispatch(setStarted(true));
           } else {
             if (apiType === "RA") {
@@ -367,6 +213,22 @@ const WheelComponent: FC<WheelComponentProps> = ({
 
             apiType === "IGDB" && dispatch(setLoading(true));
           }
+        }}
+      >
+        {buttonText}
+      </button>
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <polyline points="0,0 50,50 0,100" stroke="white" strokeWidth={4} />
+      </svg>
+      <canvas
+        ref={canvasRef}
+        id="canvas"
+        className={styles.canvas}
+        width="600"
+        height="600"
+        style={{
+          rotate: `${winnerAngle}deg`,
+          transition: `${time}s`,
         }}
       />
     </div>

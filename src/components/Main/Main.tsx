@@ -4,8 +4,13 @@ import WheelContainer from "../WheelContainer/WheelContainer";
 import styles from "./Main.module.scss";
 import { getGames } from "../../utils/IGDB";
 import { useAppDispatch, useAppSelector } from "../../store";
-import { setGames } from "../../store/commonSlice";
-import { setLoading } from "../../store/statesSlice";
+import { setGames, setWinner } from "../../store/commonSlice";
+import {
+  setFinished,
+  setLoading,
+  setSegments,
+  setStarted,
+} from "../../store/statesSlice";
 import { auth } from "../../api";
 import { setAuth } from "../../store/authSlice";
 import { fetchGameList } from "../../utils/getGames";
@@ -13,11 +18,19 @@ import { fetchGameList } from "../../utils/getGames";
 const Main: FC = () => {
   const dispatch = useAppDispatch();
 
-  const { apiType, selectedSystemsRA, isRoyal, isOnlyWithAchievements } =
-    useAppSelector((state) => state.selected);
+  const {
+    apiType,
+    selectedSystemsRA,
+    isRoyal,
+    isOnlyWithAchievements,
+    royalGamesRA,
+    royalGamesIGDB,
+  } = useAppSelector((state) => state.selected);
 
   const { token } = useAppSelector((state) => state.auth);
   const { isLoading } = useAppSelector((state) => state.states);
+
+  const royalGames = apiType === "RA" ? royalGamesRA : royalGamesIGDB;
 
   const getIGDBGames = useCallback(() => {
     if (apiType !== "IGDB" || isRoyal || !token) return;
@@ -44,6 +57,18 @@ const Main: FC = () => {
   useEffect(() => {
     auth().then((response) => dispatch(setAuth(response.data.access_token)));
   }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(setWinner(undefined));
+    dispatch(setFinished(true));
+    dispatch(setStarted(false));
+    dispatch(setSegments([]));
+  }, [apiType, dispatch, isRoyal]);
+
+  useEffect(() => {
+    isRoyal &&
+      dispatch(setSegments(royalGames.map((game, i) => game.id + "_" + i)));
+  }, [isRoyal, royalGames, dispatch]);
 
   return (
     <div className={styles.App}>

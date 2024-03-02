@@ -1,28 +1,56 @@
-import { FC, ReactNode, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import "react-wheel-of-prizes/dist/index.css";
 import WheelComponent from "./WheelComponent";
 import styles from "./WheelContainer.module.scss";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { setRoyalGamesIGDB, setRoyalGamesRA } from "../../store/selectedSlice";
+import classNames from "classnames";
 
 const WheelContainer: FC = () => {
   const dispatch = useAppDispatch();
 
-  const { winner } = useAppSelector((state) => state.common);
+  const { winner, systemsIGDB, systemsRA } = useAppSelector(
+    (state) => state.common
+  );
 
   const { royalGamesRA, royalGamesIGDB, apiType, isRoyal } = useAppSelector(
     (state) => state.selected
   );
 
-  const { isStarted, isFinished, segments } = useAppSelector(
-    (state) => state.states
-  );
+  const { isFinished, segments } = useAppSelector((state) => state.states);
 
-  const [currentWinner, setCurrentWinner] = useState<string | ReactNode>();
   const [colors, setColors] = useState<string[]>([]);
 
   const royalGames = apiType === "RA" ? royalGamesRA : royalGamesIGDB;
   const setRoyalGames = apiType === "RA" ? setRoyalGamesRA : setRoyalGamesIGDB;
+
+  const getLink = () => {
+    return winner?.url || "";
+  };
+
+  const getImage = () => {
+    return winner?.image || "";
+  };
+
+  const getTitle = () => {
+    return winner?.name || "";
+  };
+
+  const getPlatform = () => {
+    if (!winner?.platforms?.length) return "";
+
+    const platforms = winner.platforms.reduce((result: string[], platform) => {
+      const system = (apiType === "RA" ? systemsRA : systemsIGDB).find(
+        (system) => system.id === platform
+      );
+
+      !!system && result.push(system.name);
+
+      return result;
+    }, []);
+
+    return !!platforms?.length ? "Platform: " + platforms.join(", ") : "";
+  };
 
   useEffect(() => {
     const generateRandomColors = (hue: number): string[] => {
@@ -52,15 +80,32 @@ const WheelContainer: FC = () => {
         contrastColor="white"
         buttonText="Spin"
         size={295}
-        upDuration={100}
-        downDuration={300}
-        setCurrentWinner={setCurrentWinner}
       />
-      {(!!isStarted || !!isFinished) && (
-        <div className={styles.winner}>
-          <div className={styles.winner__container}>{currentWinner}</div>
-        </div>
-      )}
+      <div className={styles.winner}>
+        <a
+          className={classNames(styles.winner__container, {
+            [styles.winner__container_active]: !!winner,
+          })}
+          href={getLink()}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <div className={styles.winner__content}>
+            <div
+              className={classNames(styles.winner__image, {
+                [styles.winner__image_active]: isFinished && getImage(),
+              })}
+              style={{
+                ...(isFinished && { backgroundImage: `url(${getImage()})` }),
+              }}
+            />
+            <div className={styles.winner__text}>
+              <span className={styles.winner__link}>{getTitle()}</span>
+              <span className={styles.winner__platform}>{getPlatform()}</span>
+            </div>
+          </div>
+        </a>
+      </div>
       <div className={styles.container__buttons}>
         {!!winner && isFinished && !isRoyal && (
           <button

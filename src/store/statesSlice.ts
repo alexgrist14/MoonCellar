@@ -11,7 +11,7 @@ const initialState: {
   isLoading: false,
   isPlatformsLoading: false,
   isStarted: false,
-  isFinished: false,
+  isFinished: true,
   segments: Array(16).fill(""),
 };
 

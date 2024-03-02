@@ -18,7 +18,7 @@ export const fetchGameList = async (
     .map((game) => ({
       id: game.id,
       name: game.title,
-      platforms: [game.consoleID],
+      platforms: [game.consoleId],
       url: `https://retroachievements.org/game/${game.id}`,
       image: `https://retroachievements.org/${game.imageIcon}`,
     }))
