@@ -173,7 +173,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
     if (isStarted) {
       const winner = Math.ceil(Math.random() * (segments.length - 1));
 
-      angle.current += 360 * segments.length;
+      angle.current += 360 * Math.ceil(time);
 
       setWinnerAngle(
         angle.current +
@@ -187,7 +187,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
         setCurrentSegment(segments[winner]);
       }, 5000);
     }
-  }, [isStarted, segments, dispatch]);
+  }, [isStarted, segments, dispatch, time]);
 
   return (
     <div
