@@ -3,16 +3,18 @@ import axios from "axios";
 import * as https from "https";
 import fs from "fs-extra";
 
-const privateKey  = fs.readFileSync('/etc/letsencrypt/live/gigatualet.ru/privkey.pem', 'utf8');
-const certificate = fs.readFileSync('/etc/letsencrypt/live/gigatualet.ru/fullchain.pem', 'utf8');
+const keyPath = "/etc/letsencrypt/live/gigatualet.ru/privkey.pem";
+const certificatePath = "/etc/letsencrypt/live/gigatualet.ru/fullchain.pem";
 
-const credentials = {key: privateKey, cert: certificate};
+const key = !!fs.existsSync(keyPath) && fs.readFileSync(keyPath);
+const cert =
+  !!fs.existsSync(certificatePath) && fs.readFileSync(certificatePath);
+
+const credentials = !!key && !!cert ? { key, cert } : undefined;
 
 const httpsAgent = new https.Agent(credentials);
 
 const app = express();
-
-fs.removeSync("hui.json");
 
 app.all("*", function (req, res) {
   const data = Object.keys(req.query)
@@ -39,8 +41,8 @@ app.all("*", function (req, res) {
     }
 
     //res.setTimeout(3000, () => {
-      //console.log("Request has timed out.");
-      //res.sendStatus(408);
+    //console.log("Request has timed out.");
+    //res.sendStatus(408);
     //});
 
     axios({
@@ -54,11 +56,6 @@ app.all("*", function (req, res) {
       httpsAgent,
     })
       .then((response) => {
-        const games = fs.existsSync("hui.json")
-          ? fs.readJSONSync("hui.json")
-          : [];
-
-        fs.writeJSONSync("hui.json", games.concat(response.data));
         res.status(response.status).send(response.data);
       })
       .catch((error) => {
@@ -68,8 +65,12 @@ app.all("*", function (req, res) {
   }
 });
 
-https
-  .createServer(credentials, app)
-  .listen(4000, () => {
-    console.log('Server is runing at port 4000')
+if (!credentials) {
+  app.listen(4000, () => {
+    console.log("Server is running at port 4000");
   });
+} else {
+  https.createServer(credentials, app).listen(4000, () => {
+    console.log("Server is running at port 4000");
+  });
+}
