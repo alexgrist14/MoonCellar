@@ -3,6 +3,7 @@ import Select from "react-select";
 import { useAppDispatch } from "../../store";
 import { multiSelectStyles } from "../../constants";
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
+import classNames from "classnames";
 
 export interface IExtendedSelectorProps<
   T extends { id: number; name: string }
@@ -30,14 +31,17 @@ export const ExtendedSelector = <T,>({
   const dispatch = useAppDispatch();
 
   return (
-    <div className={styles.option}>
+    <div
+      className={classNames(styles.option, {
+        [styles.option_disabled]: isDisabled,
+      })}
+    >
       <h3>{title}</h3>
       <div className={styles.option__selector}>
         <span>Include:</span>
         <Select
           isLoading={isLoading}
           isSearchable={true}
-          isDisabled={isDisabled}
           className={styles.option__select}
           styles={multiSelectStyles}
           isMulti={true}
@@ -54,12 +58,15 @@ export const ExtendedSelector = <T,>({
           }
         />
       </div>
-      <div className={styles.option__selector}>
+      <div
+        className={classNames(styles.option, {
+          [styles.option_disabled]: isDisabled,
+        })}
+      >
         <span>Exclude:</span>
         <Select
           isLoading={isLoading}
           isSearchable={true}
-          isDisabled={isDisabled}
           className={styles.option__select}
           styles={multiSelectStyles}
           isMulti={true}

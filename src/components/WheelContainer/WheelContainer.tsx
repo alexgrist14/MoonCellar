@@ -5,6 +5,7 @@ import styles from "./WheelContainer.module.scss";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { setRoyalGamesIGDB, setRoyalGamesRA } from "../../store/selectedSlice";
 import classNames from "classnames";
+import { apiNames } from "../../constants";
 
 const WheelContainer: FC = () => {
   const dispatch = useAppDispatch();
@@ -20,6 +21,7 @@ const WheelContainer: FC = () => {
   const { isFinished, segments } = useAppSelector((state) => state.states);
 
   const [colors, setColors] = useState<string[]>([]);
+  const [isMenuActive, setIsMenuActive] = useState(false);
 
   const royalGames = apiType === "RA" ? royalGamesRA : royalGamesIGDB;
   const setRoyalGames = apiType === "RA" ? setRoyalGamesRA : setRoyalGamesIGDB;
@@ -82,14 +84,42 @@ const WheelContainer: FC = () => {
         size={295}
       />
       <div className={styles.winner}>
-        <a
+        <div
           className={classNames(styles.winner__container, {
             [styles.winner__container_active]: !!winner,
           })}
-          href={getLink()}
-          target="_blank"
-          rel="noreferrer"
+          onMouseOver={() => setIsMenuActive(true)}
+          onMouseOut={() => setIsMenuActive(false)}
         >
+          <div
+            className={classNames(styles.winner__buttons, {
+              [styles.winner__buttons_active]: isMenuActive,
+            })}
+          >
+            {!!winner && isFinished && !isRoyal && (
+              <button
+                onClick={() =>
+                  dispatch(
+                    setRoyalGames(
+                      !!royalGames?.length
+                        ? royalGames.some((game) => game.id === winner.id)
+                          ? royalGames.filter((game) => game.id !== winner.id)
+                          : [...royalGames, winner]
+                        : [winner]
+                    )
+                  )
+                }
+              >
+                {royalGames?.some((game) => game.id === winner.id)
+                  ? "Remove from "
+                  : "Add to "}
+                Battle Royal
+              </button>
+            )}
+            <a href={getLink()} target="_blank" rel="noreferrer">
+              Open in {apiNames[apiType]}
+            </a>
+          </div>
           <div className={styles.winner__content}>
             <div
               className={classNames(styles.winner__image, {
@@ -104,29 +134,7 @@ const WheelContainer: FC = () => {
               <span className={styles.winner__platform}>{getPlatform()}</span>
             </div>
           </div>
-        </a>
-      </div>
-      <div className={styles.container__buttons}>
-        {!!winner && isFinished && !isRoyal && (
-          <button
-            onClick={() =>
-              dispatch(
-                setRoyalGames(
-                  !!royalGames?.length
-                    ? royalGames.some((game) => game.id === winner.id)
-                      ? royalGames.filter((game) => game.id !== winner.id)
-                      : [...royalGames, winner]
-                    : [winner]
-                )
-              )
-            }
-          >
-            {royalGames?.some((game) => game.id === winner.id)
-              ? "Remove from "
-              : "Add to "}
-            Battle Royal
-          </button>
-        )}
+        </div>
       </div>
     </div>
   );

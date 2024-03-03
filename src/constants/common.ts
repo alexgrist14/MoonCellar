@@ -1,5 +1,10 @@
 import { GroupBase, StylesConfig } from "react-select";
 
+export const apiNames: { [key: string]: string } = {
+  RA: "RetroAchievements",
+  IGDB: "IGDB",
+};
+
 export const singleSelectStyles: StylesConfig<
   {
     value: any;
@@ -11,10 +16,10 @@ export const singleSelectStyles: StylesConfig<
     label: string;
   }>
 > = {
-  control: (baseStyles) => ({
+  control: (baseStyles, { isFocused }) => ({
     ...baseStyles,
     ":hover": { borderColor: "#555555", boxShadow: "none" },
-    borderColor: "#444444",
+    borderColor: isFocused ? "#222222" : "#444444",
     boxShadow: "none",
     backgroundColor: "#333333",
     color: "white",
@@ -29,10 +34,15 @@ export const singleSelectStyles: StylesConfig<
     ...baseStyles,
     backgroundColor: "#555555",
   }),
-  option: (baseStyles, { isFocused, isSelected }) => ({
+  multiValueRemove: (baseStyles) => ({
     ...baseStyles,
+    color: "#777777",
+  }),
+  option: (baseStyles, { isFocused }) => ({
+    ...baseStyles,
+    ":active": { backgroundColor: "#222222" },
     cursor: "pointer",
-    backgroundColor: isSelected || isFocused ? "#222222" : "#333333",
+    backgroundColor: isFocused ? "#222222" : "#333333",
   }),
   menuList: (baseStyles) => ({
     ...baseStyles,
