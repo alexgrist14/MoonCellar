@@ -58,7 +58,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
 
   useEffect(() => {
     setCurrentSegment("");
-  }, [apiType, isRoyal, selectedSystemsRA]);
+  }, [apiType, isRoyal, selectedSystemsRA, royalGames]);
 
   useEffect(() => {
     if (!segments?.length) {
