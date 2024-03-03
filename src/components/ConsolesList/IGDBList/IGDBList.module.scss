@@ -8,4 +8,22 @@
     display: grid;
     gap: 10px;
   }
+
+  &__input {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    justify-items: center;
+    width: 100%;
+
+    & input {
+      padding: 10px;
+      border-radius: 4px;
+      width: calc(100% - 20px);
+      background-color: #333333;
+      border: 1px solid #555555;
+      color: white;
+      font-size: 14px;
+    }
+  }
 }

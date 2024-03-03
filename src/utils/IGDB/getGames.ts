@@ -2,7 +2,12 @@ import { IGDBAgent } from "../../api";
 import { store } from "../../store";
 import { setWinner } from "../../store/commonSlice";
 import { setGames } from "../../store/selectedSlice";
-import { setLoading, setSegments, setStarted } from "../../store/statesSlice";
+import {
+  setFinished,
+  setLoading,
+  setSegments,
+  setStarted,
+} from "../../store/statesSlice";
 import { getSegments } from "../getSegments";
 import { shuffle } from "../shuffle";
 import { getCovers } from "./getCovers";
@@ -15,11 +20,13 @@ export const getGames = () => {
     selectedSystemsIGDB,
     selectedRating,
     selectedGenres,
+    searchQuery,
   } = store.getState().selected;
   const { excludedGenres, excludedGameModes, excludedSystems } =
     store.getState().excluded;
 
   const data = {
+    ...(!!searchQuery && { search: `"${searchQuery}"` }),
     where: `parent_game = null${
       !!selectedSystemsIGDB?.length
         ? ` & platforms = (${selectedSystemsIGDB
@@ -72,38 +79,42 @@ export const getGames = () => {
         "https://api.igdb.com/v4/games",
         extendedData(response.data.count)
       ).then((response) => {
-        !!response.data?.length
-          ? getCovers(response.data.map((game) => game.id)).then(
-              (responseCovers) => {
-                const games = shuffle(
-                  response.data.map((game) => ({
-                    name: game.name,
-                    id: game.id,
-                    url: game.url,
-                    platforms: game.platforms,
-                    image: !!responseCovers.data.find(
-                      (cover) => cover.id === game.cover
-                    )?.url
-                      ? "https:" +
-                        responseCovers.data.find(
-                          (cover) => cover.id === game.cover
-                        )?.url
-                      : "",
-                  }))
-                );
+        if (!!response.data?.length) {
+          getCovers(response.data.map((game) => game.id)).then(
+            (responseCovers) => {
+              const games = shuffle(
+                response.data.map((game) => ({
+                  name: game.name,
+                  id: game.id,
+                  url: game.url,
+                  platforms: game.platforms,
+                  image: !!responseCovers.data.find(
+                    (cover) => cover.id === game.cover
+                  )?.url
+                    ? "https:" +
+                      responseCovers.data.find(
+                        (cover) => cover.id === game.cover
+                      )?.url
+                    : "",
+                }))
+              );
 
-                store.dispatch(setGames(games));
-                store.dispatch(setSegments(getSegments(games, limit)));
-                store.dispatch(setLoading(false));
-                store.dispatch(setStarted(true));
-                store.dispatch(setWinner(undefined));
-              }
-            )
-          : store.dispatch(setLoading(false));
+              store.dispatch(setGames(games));
+              store.dispatch(setSegments(getSegments(games, limit)));
+              store.dispatch(setLoading(false));
+              store.dispatch(setStarted(true));
+              store.dispatch(setWinner(undefined));
+            }
+          );
+        } else {
+          store.dispatch(setLoading(false));
+          store.dispatch(setFinished(true));
+        }
       });
     } else {
       store.dispatch(setGames([]));
       store.dispatch(setLoading(false));
+      store.dispatch(setFinished(true));
     }
   });
 };

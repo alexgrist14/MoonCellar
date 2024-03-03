@@ -11,7 +11,10 @@ export const fetchGameList = async () => {
   if (!!selectedSystemsRA?.length) {
     const filteredGames =
       games?.filter((game) =>
-        selectedSystemsRA.some((system) => system.id === game.platforms[0])
+        selectedSystemsRA?.some(
+          (system) =>
+            !!game.platforms?.length && system.id === game.platforms[0]
+        )
       ) || [];
 
     const result: IGame[][] = [];

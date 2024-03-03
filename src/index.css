@@ -30,3 +30,11 @@ a:focus-visible {
   outline: none;
   border: none;
 }
+
+input,
+input:focus,
+input:focus-visible {
+  text-decoration: none;
+  outline: none;
+  border: none;
+}

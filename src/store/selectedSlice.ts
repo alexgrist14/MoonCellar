@@ -5,7 +5,7 @@ import { IGDBDefault, IIGDBGenre, IIGDBPlatform } from "../interfaces";
 import { IConsole } from "../interfaces/responses";
 
 const initialState: {
-  apiType: "RA" | "IGDB";
+  apiType: string;
   games: IGame[];
   royalGamesRA: IGame[];
   royalGamesIGDB: IGame[];
@@ -17,6 +17,7 @@ const initialState: {
   isOnlyWithAchievements: boolean;
   selectedGeneration: number;
   selectedRating: number;
+  searchQuery: string;
 } = {
   apiType: "RA",
   games: [],
@@ -30,13 +31,14 @@ const initialState: {
   isOnlyWithAchievements: true,
   selectedGeneration: 0,
   selectedRating: 0,
+  searchQuery: "",
 };
 
 export const selectedSlice = createSlice({
   name: "selected",
   initialState,
   reducers: {
-    setApiType: (state, action: PayloadAction<"RA" | "IGDB">) => {
+    setApiType: (state, action: PayloadAction<string>) => {
       state.apiType = action.payload;
     },
     setGames: (state, action: PayloadAction<IGame[]>) => {
@@ -72,6 +74,9 @@ export const selectedSlice = createSlice({
     setSelectedGeneration: (state, action: PayloadAction<number>) => {
       state.selectedGeneration = action.payload;
     },
+    setSearchQuery: (state, action: PayloadAction<string>) => {
+      state.searchQuery = action.payload;
+    },
   },
 });
 
@@ -88,5 +93,6 @@ export const {
   setSelectedSystemsRA,
   setSelectedGeneration,
   setSelectedRating,
+  setSearchQuery,
 } = selectedSlice.actions;
 export default selectedSlice.reducer;
