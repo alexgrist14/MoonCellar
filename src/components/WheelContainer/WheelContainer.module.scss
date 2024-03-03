@@ -1,12 +1,14 @@
 .container {
-  height: calc(100vh - 150px);
-  padding: 75px;
+  height: calc(100vh - 100px);
+  padding: 50px;
   display: grid;
-  grid-template-rows: 60% 1fr;
+  grid-template-rows: 70% 1fr;
   gap: 30px;
   margin-inline: auto;
+  min-width: 500px;
 
   @media screen and (max-width: 820px) {
+    min-width: auto;
     padding: 10px;
     padding-top: 50px;
     grid-template-rows: min-content 1fr;
@@ -142,11 +144,10 @@
       background-size: cover;
       transition: 0.3s;
       max-width: 0;
-      flex-basis: 40%;
 
       &_active {
         opacity: 1;
-        max-width: 40%;
+        max-width: 30%;
       }
     }
 
