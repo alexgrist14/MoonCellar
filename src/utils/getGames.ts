@@ -49,5 +49,7 @@ export const fetchGameList = async () => {
     });
 
     Promise.all(queries).then(() => store.dispatch(setLoading(false)));
+  } else {
+    store.dispatch(setLoading(false));
   }
 };
