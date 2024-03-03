@@ -1,29 +1,35 @@
-.consoles{
-    &__group{
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        .title{
+.consoles {
+  &__group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    .title {
+    }
+  }
+  &__item {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    cursor: pointer;
+    transition: 0.3s;
 
-        }
+    &_title {
+      display: flex;
+      .text {
+        text-align: left;
+        margin-left: 5px;
+        width: 100px;
+      }
     }
-    &__item{
-        display: flex;
-        justify-content: space-between;
-        gap: 5px;
-        cursor: pointer;
-        &_title{
-            display: flex;
-            .text{
-                text-align: left;
-                margin-left: 5px;
-                width: 100px;
-            }
-        }
-    }
+  }
 }
 
-.checked{
-    background-color: rgb(82, 82, 83);
-    border-radius: 10px;
+.checked {
+  background-color: rgb(82, 82, 83);
+  border-radius: 10px;
+}
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
 }

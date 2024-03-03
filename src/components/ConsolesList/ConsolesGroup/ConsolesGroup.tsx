@@ -5,6 +5,7 @@ import { consolesImages } from "../../../utils/consoleImages";
 import { Checkbox } from "@atlaskit/checkbox";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { setSelectedSystemsRA } from "../../../store/selectedSlice";
+import classNames from "classnames";
 
 interface ConsolesGroupProps {
   system: string;
@@ -15,6 +16,7 @@ const ConsolesGroup: FC<ConsolesGroupProps> = ({ system }) => {
 
   const { systemsRA } = useAppSelector((state) => state.common);
   const { selectedSystemsRA } = useAppSelector((state) => state.selected);
+  const { isLoading } = useAppSelector((state) => state.states);
 
   const handleConsoleClick = (console: IConsole): void => {
     if (selectedSystemsRA?.some((system) => system.id === console.id)) {
@@ -42,11 +44,15 @@ const ConsolesGroup: FC<ConsolesGroupProps> = ({ system }) => {
 
         return image?.system === system.toLowerCase() ? (
           <div
-            className={`${styles.consoles__item} ${
+            className={classNames(
+              styles.consoles__item,
               selectedSystemsRA?.some((system) => system.id === console.id)
                 ? styles.checked
-                : ""
-            }`}
+                : "",
+              {
+                [styles.disabled]: isLoading,
+              }
+            )}
             onClick={() => handleConsoleClick(console)}
             key={i}
           >

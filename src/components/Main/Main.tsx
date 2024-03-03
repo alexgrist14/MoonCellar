@@ -41,6 +41,7 @@ const Main: FC = () => {
   useEffect(() => {
     if (apiType !== "RA") return;
 
+    dispatch(setLoading(true));
     fetchGameList();
   }, [apiType, selectedSystemsRA, dispatch]);
 
