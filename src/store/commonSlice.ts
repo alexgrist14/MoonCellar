@@ -11,14 +11,12 @@ import { IConsole } from "../interfaces/responses";
 
 const initialState: {
   winner?: IGame;
-  games: IGame[];
   systemsRA: IConsole[];
   systemsIGDB: IIGDBPlatform[];
   IGDBFamilies: IIGDBPlatformFamily[];
   genres: IIGDBGenre[];
   gameModes: IGDBDefault[];
 } = {
-  games: [],
   winner: undefined,
   systemsRA: [],
   systemsIGDB: [],
@@ -31,9 +29,6 @@ export const commonSlice = createSlice({
   name: "common",
   initialState,
   reducers: {
-    setGames: (state, action: PayloadAction<IGame[]>) => {
-      state.games = action.payload;
-    },
     setGameModes: (state, action: PayloadAction<IGDBDefault[]>) => {
       state.gameModes = action.payload;
     },
@@ -57,7 +52,6 @@ export const commonSlice = createSlice({
 
 export const {
   setWinner,
-  setGames,
   setSystemsIGDB,
   setSystemsRA,
   setGenres,

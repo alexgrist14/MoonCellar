@@ -6,6 +6,7 @@ import { IConsole } from "../interfaces/responses";
 
 const initialState: {
   apiType: "RA" | "IGDB";
+  games: IGame[];
   royalGamesRA: IGame[];
   royalGamesIGDB: IGame[];
   selectedSystemsRA: IConsole[];
@@ -18,6 +19,7 @@ const initialState: {
   selectedRating: number;
 } = {
   apiType: "RA",
+  games: [],
   royalGamesRA: [],
   royalGamesIGDB: [],
   selectedSystemsRA: [],
@@ -36,6 +38,9 @@ export const selectedSlice = createSlice({
   reducers: {
     setApiType: (state, action: PayloadAction<"RA" | "IGDB">) => {
       state.apiType = action.payload;
+    },
+    setGames: (state, action: PayloadAction<IGame[]>) => {
+      state.games = action.payload;
     },
     setSelectedGameModes: (state, action: PayloadAction<IGDBDefault[]>) => {
       state.selectedGameModes = action.payload;
@@ -72,6 +77,7 @@ export const selectedSlice = createSlice({
 
 export const {
   setApiType,
+  setGames,
   setRoyalGamesRA,
   setRoyalGamesIGDB,
   setRoyal,

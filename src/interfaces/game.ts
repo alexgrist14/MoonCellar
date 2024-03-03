@@ -4,4 +4,5 @@ export interface IGame {
   url: string;
   image: string;
   platforms: number[];
+  achievements?: number;
 }

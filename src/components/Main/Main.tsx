@@ -4,7 +4,7 @@ import WheelContainer from "../WheelContainer/WheelContainer";
 import styles from "./Main.module.scss";
 import { getGames } from "../../utils/IGDB";
 import { useAppDispatch, useAppSelector } from "../../store";
-import { setGames, setWinner } from "../../store/commonSlice";
+import { setWinner } from "../../store/commonSlice";
 import {
   setFinished,
   setLoading,
@@ -18,14 +18,8 @@ import { fetchGameList } from "../../utils/getGames";
 const Main: FC = () => {
   const dispatch = useAppDispatch();
 
-  const {
-    apiType,
-    selectedSystemsRA,
-    isRoyal,
-    isOnlyWithAchievements,
-    royalGamesRA,
-    royalGamesIGDB,
-  } = useAppSelector((state) => state.selected);
+  const { apiType, selectedSystemsRA, isRoyal, royalGamesRA, royalGamesIGDB } =
+    useAppSelector((state) => state.selected);
 
   const { token } = useAppSelector((state) => state.auth);
   const { isLoading } = useAppSelector((state) => state.states);
@@ -47,12 +41,8 @@ const Main: FC = () => {
   useEffect(() => {
     if (apiType !== "RA") return;
 
-    dispatch(setGames([]));
-    !!selectedSystemsRA?.length &&
-      selectedSystemsRA.forEach((system) =>
-        fetchGameList(system, isOnlyWithAchievements)
-      );
-  }, [apiType, selectedSystemsRA, isOnlyWithAchievements, dispatch]);
+    fetchGameList();
+  }, [apiType, selectedSystemsRA, dispatch]);
 
   useEffect(() => {
     auth().then((response) => dispatch(setAuth(response.data.access_token)));
@@ -63,7 +53,7 @@ const Main: FC = () => {
     dispatch(setFinished(true));
     dispatch(setStarted(false));
     dispatch(setSegments([]));
-  }, [apiType, dispatch, isRoyal]);
+  }, [apiType, dispatch, isRoyal, selectedSystemsRA]);
 
   useEffect(() => {
     isRoyal &&

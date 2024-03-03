@@ -21,7 +21,7 @@ interface WheelComponentProps {
   time?: number;
 }
 
-const segmentsLength = 16;
+const max = 16;
 
 const WheelComponent: FC<WheelComponentProps> = ({
   segColors,
@@ -34,11 +34,14 @@ const WheelComponent: FC<WheelComponentProps> = ({
 }) => {
   const dispatch = useAppDispatch();
 
-  const { games } = useAppSelector((state) => state.common);
-
-  const { isRoyal, royalGamesRA, royalGamesIGDB, apiType } = useAppSelector(
-    (state) => state.selected
-  );
+  const {
+    isRoyal,
+    royalGamesRA,
+    royalGamesIGDB,
+    apiType,
+    selectedSystemsRA,
+    games,
+  } = useAppSelector((state) => state.selected);
 
   const { isLoading, isFinished, isStarted, segments } = useAppSelector(
     (state) => state.states
@@ -55,11 +58,11 @@ const WheelComponent: FC<WheelComponentProps> = ({
 
   useEffect(() => {
     setCurrentSegment("");
-  }, [apiType, isRoyal]);
+  }, [apiType, isRoyal, selectedSystemsRA]);
 
   useEffect(() => {
     if (!segments?.length) {
-      dispatch(setSegments(Array(segmentsLength).fill("")));
+      dispatch(setSegments(Array(max).fill("")));
     }
   }, [segments, dispatch, isRoyal, royalGames]);
 
@@ -207,7 +210,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
           } else {
             if (apiType === "RA") {
               if (!games?.length) return;
-              dispatch(setSegments(getSegments(games, segmentsLength)));
+              dispatch(setSegments(getSegments(games, max)));
               dispatch(setStarted(true));
             }
 

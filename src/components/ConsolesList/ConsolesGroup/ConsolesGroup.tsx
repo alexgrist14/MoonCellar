@@ -4,8 +4,6 @@ import styles from "./ConsolesGroup.module.scss";
 import { consolesImages } from "../../../utils/consoleImages";
 import { Checkbox } from "@atlaskit/checkbox";
 import { useAppDispatch, useAppSelector } from "../../../store";
-import { setGames } from "../../../store/commonSlice";
-import { fetchGameList } from "../../../utils/getGames";
 import { setSelectedSystemsRA } from "../../../store/selectedSlice";
 
 interface ConsolesGroupProps {
@@ -15,10 +13,8 @@ interface ConsolesGroupProps {
 const ConsolesGroup: FC<ConsolesGroupProps> = ({ system }) => {
   const dispatch = useAppDispatch();
 
-  const { systemsRA, games } = useAppSelector((state) => state.common);
-  const { selectedSystemsRA, isOnlyWithAchievements } = useAppSelector(
-    (state) => state.selected
-  );
+  const { systemsRA } = useAppSelector((state) => state.common);
+  const { selectedSystemsRA } = useAppSelector((state) => state.selected);
 
   const handleConsoleClick = (console: IConsole): void => {
     if (selectedSystemsRA?.some((system) => system.id === console.id)) {
@@ -26,9 +22,6 @@ const ConsolesGroup: FC<ConsolesGroupProps> = ({ system }) => {
         setSelectedSystemsRA(
           selectedSystemsRA.filter((system) => system.id !== console.id)
         )
-      );
-      dispatch(
-        setGames(games.filter((game) => game.platforms.includes(console.id)))
       );
     } else {
       dispatch(
@@ -38,7 +31,6 @@ const ConsolesGroup: FC<ConsolesGroupProps> = ({ system }) => {
             : [console]
         )
       );
-      fetchGameList(console, isOnlyWithAchievements);
     }
   };
 

@@ -1,12 +1,15 @@
 import { IGDBAgent } from "../../api";
 import { store } from "../../store";
-import { setGames, setWinner } from "../../store/commonSlice";
+import { setWinner } from "../../store/commonSlice";
+import { setGames } from "../../store/selectedSlice";
 import { setLoading, setSegments, setStarted } from "../../store/statesSlice";
+import { getSegments } from "../getSegments";
 import { shuffle } from "../shuffle";
 import { getCovers } from "./getCovers";
 
 export const getGames = () => {
-  const limit = 20;
+  const limit = 16;
+
   const {
     selectedGameModes,
     selectedSystemsIGDB,
@@ -90,9 +93,7 @@ export const getGames = () => {
                 );
 
                 store.dispatch(setGames(games));
-                store.dispatch(
-                  setSegments(games.map((game, i) => game.id + "_" + i))
-                );
+                store.dispatch(setSegments(getSegments(games, limit)));
                 store.dispatch(setLoading(false));
                 store.dispatch(setStarted(true));
                 store.dispatch(setWinner(undefined));
