@@ -1,9 +1,9 @@
 import styles from "./ExtendedSelector.module.scss";
 import Select from "react-select";
 import { useAppDispatch } from "../../store";
-import { multiSelectStyles } from "../../constants";
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import classNames from "classnames";
+import { selectStyles } from "../../constants";
 
 export interface IExtendedSelectorProps<
   T extends { id: number; name: string }
@@ -31,19 +31,16 @@ export const ExtendedSelector = <T,>({
   const dispatch = useAppDispatch();
 
   return (
-    <div
-      className={classNames(styles.option, {
-        [styles.option_disabled]: isDisabled,
-      })}
-    >
+    <div className={styles.option}>
       <h3>{title}</h3>
       <div className={styles.option__selector}>
-        <span>Include:</span>
         <Select
           isLoading={isLoading}
           isSearchable={true}
-          className={styles.option__select}
-          styles={multiSelectStyles}
+          className={classNames(styles.option__select, {
+            [styles.option__select_disabled]: isDisabled,
+          })}
+          styles={selectStyles("include")}
           isMulti={true}
           options={list.map((item) => ({
             value: item,
@@ -53,22 +50,20 @@ export const ExtendedSelector = <T,>({
             value: item,
             label: item.name,
           }))}
+          placeholder="Include..."
           onChange={(values) =>
             dispatch(setSelected(values.map((value) => value.value)))
           }
         />
       </div>
-      <div
-        className={classNames(styles.option, {
-          [styles.option_disabled]: isDisabled,
-        })}
-      >
-        <span>Exclude:</span>
+      <div className={styles.option__selector}>
         <Select
           isLoading={isLoading}
           isSearchable={true}
-          className={styles.option__select}
-          styles={multiSelectStyles}
+          className={classNames(styles.option__select, {
+            [styles.option__select_disabled]: isDisabled,
+          })}
+          styles={selectStyles("exclude")}
           isMulti={true}
           defaultValue={excluded.map((item) => ({
             value: item,
@@ -78,6 +73,7 @@ export const ExtendedSelector = <T,>({
             value: item,
             label: item.name,
           }))}
+          placeholder="Exclude..."
           onChange={(values) =>
             dispatch(setExcluded(values.map((value) => value.value)))
           }

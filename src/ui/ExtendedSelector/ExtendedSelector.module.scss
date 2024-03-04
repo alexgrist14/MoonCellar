@@ -3,14 +3,8 @@
   flex-direction: column;
   gap: 10px;
 
-  &_disabled {
-    opacity: .5;
-    pointer-events: none;
-  }
-
   &__selector {
-    display: grid;
-    grid-template-columns: 20% 1fr;
+    display: flex;
     gap: 10px;
     align-items: center;
     width: 100%;
@@ -18,5 +12,10 @@
 
   &__select {
     width: 100%;
+
+    &_disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
   }
 }
