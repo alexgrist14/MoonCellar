@@ -5,57 +5,57 @@ import {
   IGDBDefault,
   IIGDBGenre,
   IIGDBPlatform,
-  IIGDBPlatformFamily,
+  IIGDBPlatformFamily
 } from "../interfaces";
 import { IConsole } from "../interfaces/responses";
 
 const initialState: {
-  winner?: IGame;
-  systemsRA: IConsole[];
-  systemsIGDB: IIGDBPlatform[];
-  IGDBFamilies: IIGDBPlatformFamily[];
-  genres: IIGDBGenre[];
-  gameModes: IGDBDefault[];
+  winner?: IGame
+  systemsRA: IConsole[]
+  systemsIGDB: IIGDBPlatform[]
+  IGDBFamilies: IIGDBPlatformFamily[]
+  genres: IIGDBGenre[]
+  gameModes: IGDBDefault[]
 } = {
-  winner: undefined,
-  systemsRA: [],
-  systemsIGDB: [],
   IGDBFamilies: [],
-  genres: [],
   gameModes: [],
+  genres: [],
+  systemsIGDB: [],
+  systemsRA: [],
+  winner: undefined
 };
 
 export const commonSlice = createSlice({
-  name: "common",
   initialState,
+  name: "common",
   reducers: {
     setGameModes: (state, action: PayloadAction<IGDBDefault[]>) => {
       state.gameModes = action.payload;
     },
-    setSystemsRA: (state, action: PayloadAction<IConsole[]>) => {
-      state.systemsRA = action.payload;
-    },
-    setSystemsIGDB: (state, action: PayloadAction<IIGDBPlatform[]>) => {
-      state.systemsIGDB = action.payload;
+    setGenres: (state, action: PayloadAction<IIGDBGenre[]>) => {
+      state.genres = action.payload;
     },
     setIGDBFamilies: (state, action: PayloadAction<IIGDBPlatformFamily[]>) => {
       state.IGDBFamilies = action.payload;
     },
+    setSystemsIGDB: (state, action: PayloadAction<IIGDBPlatform[]>) => {
+      state.systemsIGDB = action.payload;
+    },
+    setSystemsRA: (state, action: PayloadAction<IConsole[]>) => {
+      state.systemsRA = action.payload;
+    },
     setWinner: (state, action: PayloadAction<IGame | undefined>) => {
       state.winner = action.payload;
-    },
-    setGenres: (state, action: PayloadAction<IIGDBGenre[]>) => {
-      state.genres = action.payload;
-    },
-  },
+    }
+  }
 });
 
 export const {
-  setWinner,
+  setGameModes,
+  setGenres,
+  setIGDBFamilies,
   setSystemsIGDB,
   setSystemsRA,
-  setGenres,
-  setGameModes,
-  setIGDBFamilies,
+  setWinner
 } = commonSlice.actions;
 export default commonSlice.reducer;
