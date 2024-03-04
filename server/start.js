@@ -2,6 +2,7 @@ import express from "express";
 import axios from "axios";
 import * as https from "https";
 import fs from "fs-extra";
+import cors from "cors";
 
 const keyPath = "/etc/letsencrypt/live/gigatualet.ru/privkey.pem";
 const certificatePath = "/etc/letsencrypt/live/gigatualet.ru/fullchain.pem";
@@ -15,6 +16,32 @@ const credentials = !!key && !!cert ? { key, cert } : undefined;
 const httpsAgent = new https.Agent(credentials);
 
 const app = express();
+
+//////////////////Visitors/////////////////////////////
+
+app.use(cors());
+
+app.get('/api', function (req, res) {
+  if (req.url === '/favicon.ico') {
+    res.end();
+  }
+
+  const json = fs.readFileSync('count.json', 'utf-8');
+  const parsedCount = JSON.parse(json);
+
+  parsedCount.pageviews = parsedCount.pageviews + 1;
+  
+  if (req.query.type === "visit-pageview") {
+    parsedCount.visits = parsedCount.visits + 1;
+  }
+
+  const newJSON = JSON.stringify(parsedCount);
+  fs.writeFileSync('count.json', newJSON);
+
+  res.send(newJSON);
+})
+//////////////////////////////////////////////////////
+
 
 app.all("*", function (req, res) {
   const data = Object.keys(req.query)

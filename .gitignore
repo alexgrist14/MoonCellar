@@ -5,6 +5,9 @@
 /server
 /.pnp
 .pnp.js
+server/node_modules/
+server
+server/node_modules
 
 # testing
 /coverage
@@ -25,7 +28,7 @@ yarn-error.log*
 yarn.lock
 .env
 
-**/Session.vim**
+
 server/node_modules/
 server
 server/node_modules

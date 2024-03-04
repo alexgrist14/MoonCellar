@@ -8,7 +8,7 @@ import {
   setFinished,
   setLoading,
   setSegments,
-  setStarted,
+  setStarted
 } from "../../store/statesSlice";
 
 interface WheelComponentProps {
@@ -24,26 +24,26 @@ interface WheelComponentProps {
 const max = 16;
 
 const WheelComponent: FC<WheelComponentProps> = ({
-  segColors,
-  primaryColor = "black",
-  contrastColor = "white",
   buttonText = "Spin",
-  size = 290,
+  contrastColor = "white",
   fontFamily = "Roboto",
-  time = 5,
+  primaryColor = "black",
+  segColors,
+  size = 290,
+  time = 5
 }) => {
   const dispatch = useAppDispatch();
 
   const {
-    isRoyal,
-    royalGamesRA,
-    royalGamesIGDB,
     apiType,
-    selectedSystemsRA,
     games,
+    isRoyal,
+    royalGamesIGDB,
+    royalGamesRA,
+    selectedSystemsRA
   } = useAppSelector((state) => state.selected);
 
-  const { isLoading, isFinished, isStarted, segments } = useAppSelector(
+  const { isFinished, isLoading, isStarted, segments } = useAppSelector(
     (state) => state.states
   );
 
@@ -81,7 +81,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
 
       dispatch(
         setSegments(
-          !!filtered?.length
+          filtered?.length
             ? filtered
             : royalGames.map((game, i) => game.id + "_" + i)
         )
@@ -169,7 +169,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
     segments,
     games,
     royalGames,
-    isRoyal,
+    isRoyal
   ]);
 
   useEffect(() => {
@@ -180,8 +180,8 @@ const WheelComponent: FC<WheelComponentProps> = ({
 
       setWinnerAngle(
         angle.current +
-          (360 - (360 / segments.length) * winner) -
-          Math.floor(Math.random() * (360 / segments.length))
+        (360 - (360 / segments.length) * winner) -
+        Math.floor(Math.random() * (360 / segments.length))
       );
       dispatch(setStarted(false));
 
@@ -196,8 +196,8 @@ const WheelComponent: FC<WheelComponentProps> = ({
     <div
       id="wheel"
       className={classNames(styles.wheel, {
-        [styles.wheel_disabled]: isLoading,
         [styles.wheel_active]: !isFinished || (isRoyal && !royalGames?.length),
+        [styles.wheel_disabled]: isLoading
       })}
     >
       <button
@@ -231,7 +231,7 @@ const WheelComponent: FC<WheelComponentProps> = ({
         height="600"
         style={{
           rotate: `${winnerAngle}deg`,
-          transition: `${time}s`,
+          transition: `${time}s`
         }}
       />
     </div>
