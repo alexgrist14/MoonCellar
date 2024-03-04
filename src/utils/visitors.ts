@@ -1,9 +1,10 @@
 import axios from "axios";
 
-
 const countVisitors = () => {
+
   function updateCounter(type: string) {
-    axios.get("http://localhost:4000/api?" + type);
+      axios.get(`${process.env.REACT_APP_CORS_SERVER}/api?` + type);
+
   }
 
   if (sessionStorage.getItem('visit') === null) {
