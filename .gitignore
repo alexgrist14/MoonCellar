@@ -28,7 +28,5 @@ yarn-error.log*
 yarn.lock
 .env
 
-
-server/node_modules/
-server
-server/node_modules
+**/Session.vim**
+**/node_modules**
