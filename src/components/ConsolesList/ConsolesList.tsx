@@ -14,12 +14,11 @@ import {
   setApiType,
   setOnlyWithAchievements,
   setRoyal,
-  setSearchQuery,
 } from "../../store/selectedSlice";
 import { setSystemsRA } from "../../store/commonSlice";
 import { setPlatformsLoading } from "../../store/statesSlice";
 import Select from "react-select";
-import { singleSelectStyles } from "../../constants";
+import { selectStyles } from "../../constants";
 
 const ConsolesList: FC = () => {
   const dispatch = useAppDispatch();
@@ -30,7 +29,6 @@ const ConsolesList: FC = () => {
     selectedGeneration,
     royalGamesRA,
     royalGamesIGDB,
-    searchQuery,
   } = useAppSelector((state) => state.selected);
   const { isLoading } = useAppSelector((state) => state.states);
   const { token } = useAppSelector((state) => state.auth);
@@ -80,7 +78,7 @@ const ConsolesList: FC = () => {
       <Select
         isDisabled={isLoading}
         isSearchable={false}
-        styles={singleSelectStyles}
+        styles={selectStyles("default")}
         placeholder="Select Type"
         isClearable={false}
         isMulti={false}

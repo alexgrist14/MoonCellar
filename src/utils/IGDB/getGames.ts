@@ -1,3 +1,4 @@
+import { AxiosResponse } from "axios";
 import { IGDBAgent } from "../../api";
 import { store } from "../../store";
 import { setWinner } from "../../store/commonSlice";
@@ -13,8 +14,6 @@ import { shuffle } from "../shuffle";
 import { getCovers } from "./getCovers";
 
 export const getGames = () => {
-  const limit = 16;
-
   const {
     selectedGameModes,
     selectedSystemsIGDB,
@@ -62,12 +61,12 @@ export const getGames = () => {
     }`,
   };
 
-  const extendedData = (total: number) => ({
+  const extendedData = (limit: number, offset: number) => ({
     ...data,
     fields:
       "name, cover, screenshots, slug, total_rating, artworks, franchise, franchises, game_modes, genres, platforms, tags, themes, url",
-    limit: limit,
-    offset: (Math.random() * (total <= limit ? 0 : total - limit)) ^ 0,
+    limit,
+    offset,
   });
 
   IGDBAgent<{ count: number }>(
@@ -75,37 +74,63 @@ export const getGames = () => {
     data
   ).then((response) => {
     if (!!response.data?.count) {
-      IGDBAgent<any[]>(
-        "https://api.igdb.com/v4/games",
-        extendedData(response.data.count)
-      ).then((response) => {
-        if (!!response.data?.length) {
-          getCovers(response.data.map((game) => game.id)).then(
-            (responseCovers) => {
-              const games = shuffle(
-                response.data.map((game) => ({
-                  name: game.name,
-                  id: game.id,
-                  url: game.url,
-                  platforms: game.platforms,
-                  image: !!responseCovers.data.find(
-                    (cover) => cover.id === game.cover
-                  )?.url
-                    ? "https:" +
-                      responseCovers.data.find(
-                        (cover) => cover.id === game.cover
-                      )?.url
-                    : "",
-                }))
-              );
+      const queries: Promise<AxiosResponse<any[]>>[] = [];
+      const { count } = response.data;
+      const limit = 16;
+      const parts = 4;
 
-              store.dispatch(setGames(games));
-              store.dispatch(setSegments(getSegments(games, limit)));
-              store.dispatch(setLoading(false));
-              store.dispatch(setStarted(true));
-              store.dispatch(setWinner(undefined));
-            }
+      if (count <= limit) {
+        queries.push(
+          IGDBAgent<any[]>(
+            "https://api.igdb.com/v4/games",
+            extendedData(limit, 0)
+          )
+        );
+      } else {
+        for (let i = 0; i < parts; i++) {
+          const total = Math.floor(count / parts);
+
+          const min = i * total;
+          const max = min + (total - parts);
+
+          const offset = Math.floor(Math.random() * (max - min) + min);
+
+          queries.push(
+            IGDBAgent<any[]>(
+              "https://api.igdb.com/v4/games",
+              extendedData(parts, offset)
+            )
           );
+        }
+      }
+
+      Promise.all(queries).then((response) => {
+        const data = response.map((res) => res.data).flat();
+
+        if (!!data?.length) {
+          getCovers(data.map((game) => game.id)).then((responseCovers) => {
+            const games = shuffle(
+              data.map((game) => ({
+                name: game.name,
+                id: game.id,
+                url: game.url,
+                platforms: game.platforms,
+                image: !!responseCovers.data.find(
+                  (cover) => cover.id === game.cover
+                )?.url
+                  ? "https:" +
+                    responseCovers.data.find((cover) => cover.id === game.cover)
+                      ?.url
+                  : "",
+              }))
+            );
+
+            store.dispatch(setGames(games));
+            store.dispatch(setSegments(getSegments(games, limit)));
+            store.dispatch(setLoading(false));
+            store.dispatch(setStarted(true));
+            store.dispatch(setWinner(undefined));
+          });
         } else {
           store.dispatch(setLoading(false));
           store.dispatch(setFinished(true));
