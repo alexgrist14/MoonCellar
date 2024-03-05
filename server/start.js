@@ -6,6 +6,7 @@ import cors from "cors";
 
 const keyPath = "/etc/letsencrypt/live/gigatualet.ru/privkey.pem";
 const certificatePath = "/etc/letsencrypt/live/gigatualet.ru/fullchain.pem";
+const serverPath = "/root/RetroAchievements-Gauntlet/server"
 
 const key = !!fs.existsSync(keyPath) && fs.readFileSync(keyPath);
 const cert =
@@ -26,19 +27,17 @@ app.get('/api', function (req, res) {
     res.end();
   }
 
-  const json = fs.readFileSync('count.json', 'utf-8');
-  const parsedCount = JSON.parse(json);
+  const json = fs.readJsonSync(`${serverPath}/count.json`);
 
-  parsedCount.pageviews = parsedCount.pageviews + 1;
+  json.pageviews = json.pageviews + 1;
   
   if (req.query.type === "visit-pageview") {
-    parsedCount.visits = parsedCount.visits + 1;
+    json.visits = json.visits + 1;
   }
 
-  const newJSON = JSON.stringify(parsedCount);
-  fs.writeFileSync('count.json', newJSON);
+  fs.writeJsonSync(`${serverPath}/count.json`, json);
 
-  res.send(newJSON);
+  res.send(json);
 })
 //////////////////////////////////////////////////////
 
