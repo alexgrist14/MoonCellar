@@ -14,6 +14,7 @@ import {
 import { auth } from "../../api";
 import { setAuth } from "../../store/authSlice";
 import { fetchGameList } from "../../utils/getGames";
+import Footer from "../Footer/Footer";
 
 const Main: FC = () => {
   const dispatch = useAppDispatch();
@@ -65,6 +66,7 @@ const Main: FC = () => {
     <div className={styles.App}>
       <ConsolesList />
       <WheelContainer />
+      <Footer/>
     </div>
   );
 };
