@@ -10,7 +10,7 @@ const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 
- // countVisitors();
+ countVisitors();
 
 root.render(
   <Provider store={store}>
