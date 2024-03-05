@@ -1,14 +1,16 @@
 {
   "files": {
-    "main.css": "./static/css/main.35d5707f.css",
-    "main.js": "./static/js/main.091581ed.js",
-    "static/media/peakpx.jpg": "./static/media/peakpx.276d7496ac605a81f070.jpg",
-    "index.html": "./index.html",
-    "main.35d5707f.css.map": "./static/css/main.35d5707f.css.map",
-    "main.091581ed.js.map": "./static/js/main.091581ed.js.map"
+    "main.css": "/RetroAchievements-Gauntlet/static/css/main.2f8d46fb.css",
+    "main.js": "/RetroAchievements-Gauntlet/static/js/main.4783a849.js",
+    "static/media/peakpx.jpg": "/RetroAchievements-Gauntlet/static/media/peakpx.276d7496ac605a81f070.jpg",
+    "static/media/clown.png": "/RetroAchievements-Gauntlet/static/media/clown.6438a69bd60b79211d42.png",
+    "static/media/alexgrist.png": "/RetroAchievements-Gauntlet/static/media/alexgrist.49f268cf71473304798a.png",
+    "index.html": "/RetroAchievements-Gauntlet/index.html",
+    "main.2f8d46fb.css.map": "/RetroAchievements-Gauntlet/static/css/main.2f8d46fb.css.map",
+    "main.4783a849.js.map": "/RetroAchievements-Gauntlet/static/js/main.4783a849.js.map"
   },
   "entrypoints": [
-    "static/css/main.35d5707f.css",
-    "static/js/main.091581ed.js"
+    "static/css/main.2f8d46fb.css",
+    "static/js/main.4783a849.js"
   ]
 }
