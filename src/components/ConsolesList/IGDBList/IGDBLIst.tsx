@@ -40,16 +40,6 @@ const IGDBList: FC = () => {
 
   return (
     <div className={styles.consoles__igdb}>
-      <div className={styles.consoles__options}>
-        <ExtendedRange
-          title="Rating"
-          selected={selectedRating}
-          setSelected={setSelectedRating}
-          isDisabled={isLoading}
-          min={0}
-          max={99}
-        />
-      </div>
       <div className={styles.consoles__input}>
         <h3>Search</h3>
         <input
@@ -86,6 +76,16 @@ const IGDBList: FC = () => {
         setExcluded={setExcludedSystems}
         setSelected={setSelectedSystemsIGDB}
       />
+      <div className={styles.consoles__options}>
+        <ExtendedRange
+          title="Rating"
+          selected={selectedRating}
+          setSelected={setSelectedRating}
+          isDisabled={isLoading}
+          min={0}
+          max={99}
+        />
+      </div>
     </div>
   );
 };
