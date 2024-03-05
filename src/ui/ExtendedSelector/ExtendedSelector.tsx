@@ -36,46 +36,58 @@ export const ExtendedSelector = <T,>({
       <div className={styles.option__selector}>
         <Select
           isLoading={isLoading}
+          closeMenuOnSelect={false}
           isSearchable={true}
           className={classNames(styles.option__select, {
             [styles.option__select_disabled]: isDisabled,
           })}
-          styles={selectStyles("include")}
+          styles={selectStyles<string>("include")}
           isMulti={true}
           options={list.map((item) => ({
-            value: item,
+            value: JSON.stringify(item),
             label: item.name,
           }))}
           defaultValue={selected.map((item) => ({
-            value: item,
+            value: JSON.stringify(item),
             label: item.name,
           }))}
           placeholder="Include..."
+          menuPlacement="top"
+          maxMenuHeight={250}
           onChange={(values) =>
-            dispatch(setSelected(values.map((value) => value.value)))
+            !!values &&
+            dispatch(
+              setSelected(values.map((value) => JSON.parse(value.value)))
+            )
           }
         />
       </div>
       <div className={styles.option__selector}>
         <Select
           isLoading={isLoading}
+          closeMenuOnSelect={false}
           isSearchable={true}
           className={classNames(styles.option__select, {
             [styles.option__select_disabled]: isDisabled,
           })}
-          styles={selectStyles("exclude")}
+          styles={selectStyles<string>("exclude")}
           isMulti={true}
           defaultValue={excluded.map((item) => ({
-            value: item,
+            value: JSON.stringify(item),
             label: item.name,
           }))}
           options={list.map((item) => ({
-            value: item,
+            value: JSON.stringify(item),
             label: item.name,
           }))}
           placeholder="Exclude..."
+          menuPlacement="top"
+          maxMenuHeight={250}
           onChange={(values) =>
-            dispatch(setExcluded(values.map((value) => value.value)))
+            !!values &&
+            dispatch(
+              setExcluded(values.map((value) => JSON.parse(value.value)))
+            )
           }
         />
       </div>

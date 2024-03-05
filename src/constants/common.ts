@@ -5,21 +5,23 @@ export const apiNames: { [key: string]: string } = {
   IGDB: "IGDB",
 };
 
-export const selectStyles = (
+export const selectStyles = <T>(
   type: "default" | "include" | "exclude"
 ): StylesConfig<
   {
-    value: any;
+    value: T;
     label: string;
+    image?: string;
   },
   boolean,
   GroupBase<{
-    value: any;
+    value: T;
     label: string;
+    image?: string;
   }>
 > => {
   const getControlBorder = (isFocused?: boolean) => {
-    if (type === "default") return isFocused ? "#555555" : "#444444";
+    if (type === "default") return isFocused ? "#777777" : "#555555";
     if (type === "include") return isFocused ? "#aad998" : "#1CD998";
     if (type === "exclude") return isFocused ? "#a9534F" : "#D9534F";
   };
@@ -50,16 +52,37 @@ export const selectStyles = (
       ...baseStyles,
       color: "#777777",
     }),
-    option: (baseStyles, { isFocused }) => ({
+    option: (baseStyles, { isFocused, data }) => ({
       ...baseStyles,
       ":active": { backgroundColor: "#222222" },
+      ...(!!data.image && {
+        "::before": {
+          content: '""',
+          width: "30px",
+          height: "30px",
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "center",
+          backgroundImage: `url(${data.image})`,
+        },
+      }),
+      display: "grid",
+      gridTemplateColumns: !!data.image ? "5% 1fr" : "1fr",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: "10px",
       cursor: "pointer",
-      backgroundColor: isFocused ? "#222222" : "#333333",
+      backgroundColor: !isFocused ? "#333333" : "#555555",
     }),
     menuList: (baseStyles) => ({
       ...baseStyles,
-      maxHeight: "250px",
       backgroundColor: "#333333",
+      borderRadius: "5px"
+    }),
+    menu: (baseStyles) => ({
+      ...baseStyles,
+      backgroundColor: "#333333",
+      border: `1px solid ${getControlBorder()}`,
+      boxShadow: "0 0 10px 5px #222222",
     }),
     singleValue: (baseStyles) => ({
       ...baseStyles,

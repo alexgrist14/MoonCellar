@@ -78,7 +78,7 @@ const ConsolesList: FC = () => {
       <Select
         isDisabled={isLoading}
         isSearchable={false}
-        styles={selectStyles("default")}
+        styles={selectStyles<string>("default")}
         placeholder="Select Type"
         isClearable={false}
         isMulti={false}
@@ -87,7 +87,7 @@ const ConsolesList: FC = () => {
           label: { RA: "RetroAchievements", IGDB: "IGDB" }[apiType] || "",
         }}
         onChange={(item) => {
-          !!item?.value && dispatch(setApiType(item.value as string));
+          !!item?.value && dispatch(setApiType(item.value));
         }}
         options={[
           { value: "RA", label: "RetroAchievements" },

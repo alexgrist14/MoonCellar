@@ -2,9 +2,10 @@ import { FC } from "react";
 import { IConsole } from "../../../interfaces/responses";
 import styles from "./ConsolesGroup.module.scss";
 import { consolesImages } from "../../../utils/consoleImages";
-import { Checkbox } from "@atlaskit/checkbox";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { setSelectedSystemsRA } from "../../../store/selectedSlice";
+import Select from "react-select";
+import { selectStyles } from "../../../constants";
 import classNames from "classnames";
 
 interface ConsolesGroupProps {
@@ -18,60 +19,60 @@ const ConsolesGroup: FC<ConsolesGroupProps> = ({ system }) => {
   const { selectedSystemsRA } = useAppSelector((state) => state.selected);
   const { isLoading } = useAppSelector((state) => state.states);
 
-  const handleConsoleClick = (console: IConsole): void => {
-    if (selectedSystemsRA?.some((system) => system.id === console.id)) {
-      dispatch(
-        setSelectedSystemsRA(
-          selectedSystemsRA.filter((system) => system.id !== console.id)
-        )
-      );
-    } else {
-      dispatch(
-        setSelectedSystemsRA(
-          !!selectedSystemsRA?.length
-            ? [...selectedSystemsRA, console]
-            : [console]
-        )
-      );
-    }
-  };
+  const filteredSystems = systemsRA.filter(
+    (console) =>
+      consolesImages.find((image) => image.id === console.id)?.system ===
+      system.toLowerCase()
+  );
+
+  const otherSelectedSystems = selectedSystemsRA.filter(
+    (console) =>
+      consolesImages.find((image) => image.id === console.id)?.system !==
+      system.toLowerCase()
+  );
+
+  const filteredSelectedSystems = selectedSystemsRA.filter(
+    (console) =>
+      consolesImages.find((image) => image.id === console.id)?.system ===
+      system.toLowerCase()
+  );
 
   return (
     <div className={styles.consoles__group}>
       <h3 className={styles.title}>{system}</h3>
-      {systemsRA?.map((console, i) => {
-        const image = consolesImages.find((image) => image.id === console.id);
-
-        return image?.system === system.toLowerCase() ? (
-          <div
-            className={classNames(
-              styles.consoles__item,
-              selectedSystemsRA?.some((system) => system.id === console.id)
-                ? styles.checked
-                : "",
-              {
-                [styles.disabled]: isLoading,
-              }
-            )}
-            onClick={() => handleConsoleClick(console)}
-            key={i}
-          >
-            <div className={styles.consoles__item_title}>
-              <img
-                className={styles.image}
-                src={image?.image || ""}
-                alt="console"
-              />
-              <div className={styles.text}>{console.name}</div>
-            </div>
-            <Checkbox
-              isChecked={selectedSystemsRA?.some(
-                (system) => system.id === console.id
-              )}
-            />
-          </div>
-        ) : null;
-      })}
+      <Select
+        className={classNames({ [styles.consoles_disabled]: isLoading })}
+        isMulti
+        placeholder="Select systems..."
+        closeMenuOnSelect={false}
+        maxMenuHeight={250}
+        menuPlacement="top"
+        defaultValue={filteredSelectedSystems.map((system) => {
+          const image = consolesImages.find((image) => image.id === system.id);
+          return {
+            label: system.name,
+            value: JSON.stringify(system),
+            ...(!!image && { image: image?.image }),
+          };
+        })}
+        options={filteredSystems.map((system) => {
+          const image = consolesImages.find((image) => image.id === system.id);
+          return {
+            label: system.name,
+            value: JSON.stringify(system),
+            ...(!!image && { image: image?.image }),
+          };
+        })}
+        styles={{ ...selectStyles<string>("default") }}
+        onChange={(selected) => {
+          dispatch(
+            setSelectedSystemsRA([
+              ...otherSelectedSystems,
+              ...selected.map((item) => JSON.parse(item.value)),
+            ])
+          );
+        }}
+      />
     </div>
   );
 };

@@ -3,11 +3,11 @@
     display: flex;
     flex-direction: column;
     background: rgba(42, 46, 48, 0.9);
-    max-height: 90vh;
-    overflow-y: scroll;
+    height: calc(100vh - 95px);
     gap: 40px;
     padding: 20px;
     width: 400px;
+    overflow: hidden;
 
     & h3 {
       margin: 0;
@@ -20,10 +20,12 @@
   }
 
   &__groups {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     width: fit-content;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
+    gap: 20px;
+    width: 100%;
+
     @media screen and (max-width: 1140px) {
       display: flex;
       flex-wrap: wrap;
