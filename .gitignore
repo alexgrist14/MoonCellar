@@ -1,0 +1,5 @@
+node_modules
+src
+.env
+build
+yarn.lock
