@@ -29,8 +29,6 @@ a:focus-visible {
   text-decoration: none;
   outline: none;
   border: none;
-  display: inline-flex;
-  justify-content: center;
 }
 
 input,

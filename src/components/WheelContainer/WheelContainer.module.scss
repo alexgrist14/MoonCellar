@@ -104,6 +104,8 @@
         background-color: transparent;
         width: 100%;
         user-select: none;
+        display: inline-flex;
+        justify-content: center;
 
         &:hover {
           background-color: #222222;
