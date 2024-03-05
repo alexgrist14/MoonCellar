@@ -1,6 +1,6 @@
 {
   "name": "gauntlet",
-  "homepage": "https://alexgrist14.github.io/RetroAchievements-Gauntlet",
+  "homepage": "./",
   "version": "0.2.0",
   "private": true,
   "dependencies": {
