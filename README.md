@@ -1,5 +1,5 @@
 # RetroAchievements-Gauntlet
-Random games spinner for RetroAchievements
+Random games spinner for RetroAchievements(hui)
 
 [https://alexgrist14.github.io/RetroAchievements-Gauntlet/](https://alexgrist14.github.io/RetroAchievements-Gauntlet/)
 
