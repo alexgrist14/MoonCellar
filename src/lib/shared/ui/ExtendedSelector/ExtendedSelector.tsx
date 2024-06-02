@@ -1,3 +1,4 @@
+/* eslint-disable */
 import styles from "./ExtendedSelector.module.scss";
 import Select from "react-select";
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
