@@ -74,9 +74,9 @@ export const WheelContainer: FC = () => {
     };
 
     !!segments?.length &&
-      segments.some((segment) => !!segment) &&
+      !isLoading &&
       setColors(generateRandomColors((180 + Math.random() * 90) ^ 0));
-  }, [segments]);
+  }, [segments, isLoading]);
 
   return (
     <div className={styles.container}>
