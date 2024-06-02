@@ -1,6 +1,6 @@
 import { GroupBase, StylesConfig } from "react-select";
 
-export const API_URL = "http://77.222.42.88:3228";
+export const API_URL = "https://api.gigatualet.ru";
 
 export const apiNames: { [key: string]: string } = {
   RA: "RetroAchievements",
