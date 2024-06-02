@@ -1,0 +1,62 @@
+.toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  cursor: pointer;
+  width: 60px;
+  height: 30px;
+  background: #231f34;
+  border-radius: 100px;
+  outline: 2px solid;
+  position: relative;
+  transition: all 0.2s;
+  font-size: 10px;
+  font-weight: 600;
+
+  &_left {
+    outline-color: rgba($off, 0.5);
+  }
+
+  &_right {
+    outline-color: rgba($on, 0.5);
+  }
+
+  &_active {
+    pointer-events: none;
+    opacity: 0.7;
+  }
+
+  &__left,
+  &__right {
+    color: white;
+  }
+
+  &__left {
+    margin-inline: auto;
+  }
+
+  &__right {
+    margin-inline: auto;
+  }
+
+  &__button {
+    position: absolute;
+    top: 0;
+    width: 30px;
+    height: 100%;
+    border-radius: 50%;
+    transition: 0.3s;
+    opacity: 0.5;
+    box-shadow: 0 0 2px 0 rgba(10, 10, 10, 0.29);
+
+    &_left {
+      left: 0;
+      background-color: $off;
+    }
+
+    &_right {
+      left: calc(100% - 30px);
+      background-color: $on;
+    }
+  }
+}

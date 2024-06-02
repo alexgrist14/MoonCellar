@@ -1,0 +1,16 @@
+.App {
+  display: flex;
+  flex-wrap: wrap;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-image: url("/images/peakpx.jpg");
+  justify-content: space-between;
+  text-align: center;
+  overflow: hidden;
+}
+
+@media screen and (max-width: 1140px) {
+  .App {
+    flex-direction: column;
+  }
+}
