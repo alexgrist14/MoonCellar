@@ -13,7 +13,7 @@ import { SvgChevron, SvgClose } from "../svg";
 import { useRouter } from "next/router";
 import { Button } from "../Button";
 import useCloseEvents from "../../hooks/useCloseEvents";
-import { Scrollbar } from "../Scrollbar/Scrollbar";
+import { Scrollbar } from "../Scrollbar";
 
 interface IDropDownListProps {
   className?: string;

@@ -1,1 +1,1 @@
-export * from './ScrollBar';
+export * from './Scrollbar';
