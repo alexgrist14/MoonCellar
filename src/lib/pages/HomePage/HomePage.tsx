@@ -8,7 +8,6 @@ import { auth } from "../../shared/api";
 import { setWinner } from "../../app/store/slices/commonSlice";
 import {
   setFinished,
-  setLoading,
   setSegments,
   setStarted,
 } from "../../app/store/slices/statesSlice";

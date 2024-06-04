@@ -1,11 +1,9 @@
 import { FC } from "react";
 import styles from "./ConsolesGroup.module.scss";
-import Select from "react-select";
-import classNames from "classnames";
 import { useAppDispatch, useAppSelector } from "@/src/lib/app/store";
 import { consolesImages } from "@/src/lib/shared/utils/consoleImages";
-import { selectStyles } from "@/src/lib/shared/constants";
 import { setSelectedSystemsRA } from "@/src/lib/app/store/slices/selectedSlice";
+import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 
 interface ConsolesGroupProps {
   system: string;
@@ -39,38 +37,27 @@ export const ConsolesGroup: FC<ConsolesGroupProps> = ({ system }) => {
   return (
     <div className={styles.consoles__group}>
       <h3 className={styles.title}>{system}</h3>
-      <Select
-        className={classNames({ [styles.consoles_disabled]: isLoading })}
+      <Dropdown
+        isCompact
+        isDisabled={isLoading}
         isMulti
         placeholder="Select systems..."
-        closeMenuOnSelect={false}
-        maxMenuHeight={250}
-        menuPlacement="top"
-        defaultValue={filteredSelectedSystems.map((system) => {
-          const image = consolesImages.find((image) => image.id === system.id);
-          return {
-            label: system.name,
-            value: JSON.stringify(system),
-            ...(!!image && { image: image?.image }),
-          };
-        })}
-        options={filteredSystems.map((system) => {
-          const image = consolesImages.find((image) => image.id === system.id);
-          return {
-            label: system.name,
-            value: JSON.stringify(system),
-            ...(!!image && { image: image?.image }),
-          };
-        })}
-        styles={{ ...selectStyles<string>("default") }}
-        onChange={(selected) => {
+        overflowRootId="consoles"
+        list={filteredSystems.map((system) => system.name)}
+        overwriteValue={filteredSelectedSystems
+          .map((system) => system.name)
+          .join(", ")}
+        initialMultiValue={filteredSelectedSystems.map((system) =>
+          filteredSystems.findIndex((sys) => sys.id === system.id)
+        )}
+        getIndexes={(indexes) =>
           dispatch(
             setSelectedSystemsRA([
               ...otherSelectedSystems,
-              ...selected.map((item) => JSON.parse(item.value)),
+              ...indexes.map((index) => filteredSystems[index]),
             ])
-          );
-        }}
+          )
+        }
       />
     </div>
   );

@@ -3,8 +3,7 @@ import styles from "./ConsolesList.module.scss";
 import { useAppDispatch, useAppSelector } from "@/src/lib/app/store";
 import { getRoyalGames } from "@/src/lib/shared/utils/getRoyalGames";
 import { getGenres, getModes, getPlatforms } from "@/src/lib/shared/utils/IGDB";
-import { apiNames, selectStyles } from "@/src/lib/shared/constants";
-import ReactSelect from "react-select";
+import { apiNames } from "@/src/lib/shared/constants";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import { setSystemsRA } from "@/src/lib/app/store/slices/commonSlice";
 import { setPlatformsLoading } from "@/src/lib/app/store/slices/statesSlice";
@@ -15,6 +14,7 @@ import {
   setRoyal,
 } from "@/src/lib/app/store/slices/selectedSlice";
 import { API } from "@/src/lib/shared/api";
+import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 
 export const ConsolesList: FC = () => {
   const dispatch = useAppDispatch();
@@ -60,28 +60,15 @@ export const ConsolesList: FC = () => {
   }, [selectedGeneration, dispatch, apiType, isRoyal, token]);
 
   return (
-    <div className={styles.consoles__list}>
-      <ReactSelect
-        isDisabled={isLoading}
-        isSearchable={false}
-        styles={selectStyles<string>("default")}
+    <div id="consoles" className={styles.consoles__list}>
+      <Dropdown
         placeholder="Select Type"
-        isClearable={false}
-        isMulti={false}
-        defaultValue={{
-          value: apiType,
-          label: apiNames[apiType] || "",
-        }}
-        onChange={(item) => {
-          !!item?.value && dispatch(setApiType(item.value));
-        }}
-        options={Object.keys(apiNames).map((type) => ({
-          label: apiNames[type],
-          value: type,
-        }))}
+        isDisabled={isLoading}
+        initialValue={apiNames[apiType]}
+        list={Object.values(apiNames)}
+        getIndex={(index) => dispatch(setApiType(Object.keys(apiNames)[index]))}
       />
       <div className={styles.consoles__options}>
-        <h3>Options</h3>
         {apiType === "RA" && (
           <label className={styles.consoles__option}>
             <ToggleSwitch

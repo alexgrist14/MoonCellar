@@ -3,18 +3,18 @@
     display: flex;
     flex-direction: column;
     background: rgba(42, 46, 48, 0.9);
-    height: calc(100vh - 95px);
-    gap: 40px;
+    height: 100vh;
+    gap: 20px;
     padding: 20px;
     width: 400px;
-    overflow-y: auto;
+    overflow: visible;
 
     & h3 {
       margin: 0;
     }
 
-    @media screen and (max-width: 1140px) {
-      width: auto;
+    @include mediaMax($screenGt)  {
+      width: 100%;
       height: fit-content;
     }
   }
@@ -26,12 +26,12 @@
     gap: 20px;
     width: 100%;
 
-    @media screen and (max-width: 1140px) {
+    @include mediaMax($screenGt)  {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
     }
-    @media screen and (max-width: 430px) {
+    @include mediaMax($screenSm)  {
       justify-content: center;
     }
   }

@@ -9,7 +9,7 @@
   overflow: hidden;
 }
 
-@media screen and (max-width: 1140px) {
+@include mediaMax($screenGt) {
   .App {
     flex-direction: column;
   }

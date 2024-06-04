@@ -1,0 +1,63 @@
+$screenSm: 500px;
+$screenMd: 768px;
+$screen960: 960px;
+$screenLg: 996px;
+$screenGt: 1200px;
+$screenEx: 1440px;
+$screenXx: 1624px;
+
+@mixin media($min, $max) {
+  @media (min-width: $min) and (max-width: $max) {
+    @content;
+  }
+}
+
+@mixin mediaMin($min) {
+  @media (min-width: $min) {
+    @content;
+  }
+}
+
+@mixin mediaMax($max) {
+  @media (max-width: $max) {
+    @content;
+  }
+}
+
+@mixin mediaXx{
+  @media (max-width: $screenXx) {
+      @content;
+  }
+}
+
+@mixin mediaEx{
+  @media (max-width: $screenEx) {
+      @content;
+  }
+}
+@mixin mediaGt{
+  @media (max-width: $screenGt) {
+      @content;
+  }
+}
+@mixin mediaLg{
+  @media (max-width: $screenLg) {
+      @content;
+  }
+}
+
+@mixin media960{
+  @media (max-width: $screen960) {
+      @content;
+  }
+}
+@mixin mediaMd{
+  @media (max-width: $screenMd) {
+      @content;
+  }
+}
+@mixin mediaSm{
+  @media (max-width: $screenSm) {
+      @content;
+  }
+}

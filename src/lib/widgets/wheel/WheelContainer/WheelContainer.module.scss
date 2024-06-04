@@ -7,7 +7,7 @@
   margin-inline: auto;
   min-width: 500px;
 
-  @media screen and (max-width: 820px) {
+  @include mediaMax($screenSm) {
     min-width: auto;
     padding: 10px;
     padding-top: 50px;
@@ -53,6 +53,7 @@
         user-select: none;
         display: inline-flex;
         justify-content: center;
+        align-items: center;
 
         &:hover {
           background-color: #222222;

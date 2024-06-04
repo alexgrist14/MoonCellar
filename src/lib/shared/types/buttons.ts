@@ -1,0 +1,21 @@
+import { ReactNode } from "react";
+
+export type IButtonColor =
+  | "default"
+  | "blue"
+  | "red"
+  | "violet"
+  | "breeze"
+  | "green"
+  | "greenBorder"
+  | "transparent";
+
+export interface IButtonGroupItem {
+  title: string | ReactNode;
+  callback?: () => void;
+  link?: string;
+  color?: IButtonColor;
+  isActive?: boolean;
+  isDisabled?: boolean;
+  isHidden?: boolean;
+}

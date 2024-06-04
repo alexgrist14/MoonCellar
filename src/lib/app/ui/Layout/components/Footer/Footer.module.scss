@@ -8,6 +8,11 @@
   width: 100%;
   height: 55px;
   background-color: rgba(0, 0, 0, 0.774);
+  z-index: 2;
+
+  @include mediaMax($screenMd) {
+    display: none;
+  }
 
   a {
     display: inline-flex;

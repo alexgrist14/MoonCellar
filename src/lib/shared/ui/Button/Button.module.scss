@@ -1,0 +1,82 @@
+.button {
+  @include flexCenter;
+
+  text-align: center;
+
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 4px;
+  font-size: 14px;
+
+  height: 34px;
+
+  transition: 0.2s;
+  outline: none;
+
+  padding-inline: 12px;
+
+  path {
+    fill: #fff;
+  }
+
+  &:hover {
+    filter: brightness(0.9);
+  }
+
+  &_defaultColor {
+    background-color: $dark;
+    border-color: $textColor;
+    color: $whiteTextColor;
+  }
+
+  &_blueColor {
+    background-color: $blue;
+    border-color: $blue;
+    color: #fff;
+  }
+
+  &_violetColor {
+    background-color: $violet;
+    border-color: $violet;
+    color: #fff;
+  }
+
+  &_breezeColor {
+    background-color: #00abc7;
+    border-color: #00abc7;
+    color: #fff;
+  }
+
+  &_redColor {
+    background-color: #d9534f;
+    border-color: #d9534f;
+    color: #fff;
+  }
+
+  &_greenColor {
+    background-color: #27a745;
+    border-color: #27a745;
+    color: #fff;
+  }
+
+  &_greenBorderColor {
+    border-color: #27a745;
+    color: #fff;
+  }
+
+  &_transparentColor {
+    background-color: transparent;
+    border-color: transparent;
+    color: #000;
+  }
+
+  &_disabled {
+    opacity: 0.4;
+    cursor: not-allowed !important;
+  }
+
+  &_active {
+    box-shadow: $buttonShadow;
+    filter: brightness(0.8);
+  }
+}

@@ -38,8 +38,6 @@ export const IGDBList: FC = () => {
     (state) => state.states
   );
 
-  console.log(systemsIGDB, genres, gameModes)
-
   return (
     <div className={styles.consoles__igdb}>
       <div className={styles.consoles__input}>
@@ -73,8 +71,7 @@ export const IGDBList: FC = () => {
         list={systemsIGDB}
         excluded={excludedSystems}
         selected={selectedSystemsIGDB}
-        isDisabled={isLoading}
-        isLoading={isPlatformsLoading}
+        isDisabled={isLoading || isPlatformsLoading}
         setExcluded={setExcludedSystems}
         setSelected={setSelectedSystemsIGDB}
       />

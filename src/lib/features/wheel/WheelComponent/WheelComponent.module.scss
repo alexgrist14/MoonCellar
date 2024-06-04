@@ -6,7 +6,7 @@
   aspect-ratio: 1;
   height: 100%;
 
-  @media screen and (max-width: 820px) {
+  @include mediaMax($screenSm) {
     aspect-ratio: unset;
     height: fit-content;
   }

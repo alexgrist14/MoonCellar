@@ -1,0 +1,254 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dropdown {
+  display: flex;
+  position: relative;
+  background-color: $dark;
+  border-radius: $radius;
+  height: 40px;
+  user-select: none;
+  width: 100%;
+  transition: all 0.15s;
+
+  &_compact {
+    height: 30px;
+
+    & p {
+      font-size: 13px;
+    }
+
+    & label {
+      font-size: 12px;
+    }
+  }
+
+  &_active {
+    border-radius: $radius $radius 0 0;
+  }
+
+  &__controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    position: absolute;
+    top: calc(50% - 10px);
+    right: 20px;
+    z-index: 1;
+  }
+
+  &__search {
+    padding: 5px;
+    margin: 10px;
+    width: calc(100% - 20px);
+    border-radius: $radius;
+    border: 1px solid $textColor;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    color: $whiteTextColor;
+    background-color: $gray;
+
+    &::placeholder {
+      color: $whiteTextColor;
+    }
+  }
+
+  &__value {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    border: none;
+    outline: none;
+    color: $whiteTextColor;
+  }
+
+  &__field {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    border-radius: $radius;
+    border: 1px solid $textColor;
+    padding-inline: 10px 20px;
+    font-size: 15px;
+    line-height: 24px;
+    transition: all 0.15s;
+    cursor: pointer;
+    transition: 0.2s;
+    height: inherit;
+    max-height: inherit;
+    color: $whiteTextColor;
+    background-color: $dark;
+    text-align: left;
+
+    &_red {
+      border-color: $off;
+    }
+
+    &_green {
+      border-color: $on;
+    }
+
+    &_active {
+      border-radius: $radius $radius 0 0;
+    }
+
+    &_overflow {
+      border-radius: $radius;
+    }
+
+    &:not(&_disabled):hover,
+    &:not(&_disabled):focus {
+      filter: brightness(1.3);
+    }
+
+    &_disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      text-align: center;
+      justify-content: center;
+    }
+  }
+
+  &__close {
+    width: 20px;
+    height: 20px;
+
+    & path {
+      fill: $whiteTextColor;
+    }
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    transition: 0.2s;
+    cursor: pointer;
+
+    & path {
+      fill: $whiteTextColor;
+    }
+
+    &_active {
+      transform: rotate(180deg);
+    }
+
+    &_disabled {
+      opacity: 0;
+    }
+  }
+
+  &__inner {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    height: fit-content;
+    background-color: $dark;
+    opacity: 0;
+    transition: 0.2s;
+    overscroll-behavior: contain;
+    overflow: hidden;
+    transform-origin: top;
+    pointer-events: none;
+    z-index: 10;
+    border: 0 solid $textColor;
+    border-radius: 0 0 $radius $radius;
+
+    &_red {
+      border-color: $off;
+    }
+
+    &_green {
+      border-color: $on;
+    }
+
+    &_active {
+      border-width: 1px;
+      border-top-width: 0;
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    &_overflow {
+      border-width: 1px;
+      border-radius: $radius;
+    }
+  }
+
+  &__list {
+    display: grid;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    overscroll-behavior: contain;
+    pointer-events: none;
+    height: fit-content;
+    visibility: hidden;
+
+    &::-webkit-scrollbar {
+      width: 0;
+    }
+
+    &_active {
+      pointer-events: all;
+      visibility: visible;
+    }
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: 5px;
+    padding-inline: 15px 23px;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 15px;
+    letter-spacing: 0.04em;
+    color: $whiteTextColor;
+    height: fit-content;
+    white-space: normal;
+    word-break: break-word;
+    background-color: $dark;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid $textColor;
+    }
+
+    &:hover {
+      cursor: pointer;
+      filter: brightness(1.3);
+    }
+  }
+
+  &__checkbox {
+    cursor: pointer;
+
+    &:focus,
+    &:focus-visible {
+      outline: none;
+    }
+  }
+}
+
+.scrollbars {
+  div &__content {
+    padding: 0;
+  }
+
+  div &__scrollbar {
+    right: 8px;
+  }
+
+  div &__thumb {
+    padding-inline: 5px;
+  }
+}

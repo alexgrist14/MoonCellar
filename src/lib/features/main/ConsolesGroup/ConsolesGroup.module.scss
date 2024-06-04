@@ -4,7 +4,7 @@
     flex-direction: column;
     gap: 10px;
 
-    @media screen and (max-width: 430px) {
+    @include mediaMax($screenSm) {
       width: 100%;
     }
   }
@@ -24,7 +24,7 @@
         width: 100px;
       }
     }
-    @media screen and (max-width: 430px) {
+    @include mediaMax($screenSm) {
       width: 100%;
     }
   }

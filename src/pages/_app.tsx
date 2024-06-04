@@ -1,3 +1,4 @@
+import "../lib/shared/styles/_reset.scss";
 import "../lib/shared/styles/_common.scss";
 import { Provider } from "react-redux";
 import { persistor, store } from "../lib/app/store";

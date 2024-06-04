@@ -1,7 +1,7 @@
 .consoles {
   &__igdb {
     display: grid;
-    gap: 40px;
+    gap: 20px;
   }
 
   &__options {
@@ -17,9 +17,9 @@
     width: 100%;
 
     & input {
-      padding: 10px;
+      padding: 5px;
       border-radius: 4px;
-      width: calc(100% - 20px);
+      width: 100%;
       background-color: #333333;
       border: 1px solid #555555;
       color: white;
