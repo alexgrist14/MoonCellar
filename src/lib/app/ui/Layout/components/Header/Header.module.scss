@@ -1,0 +1,15 @@
+.container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-inline: 20px;
+    width: 100%;
+    height: 55px;
+    border-bottom: 1px $borderColor solid;
+    .search_field{
+        width: 200px;
+        height: 30px;
+        background: #374151;
+        border-radius: 5px;
+    }
+}

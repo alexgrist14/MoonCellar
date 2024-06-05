@@ -1,0 +1,14 @@
+.container{
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .content{
+        display: flex;
+        flex-direction: column;
+        gap: 50px;
+        padding: 100px;
+        border: 1px solid #666;
+        border-radius: 20px;
+    }
+}

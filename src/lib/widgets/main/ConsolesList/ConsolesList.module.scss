@@ -2,7 +2,8 @@
   &__list {
     display: flex;
     flex-direction: column;
-    background: rgba(42, 46, 48, 0.9);
+    background: $background;
+    border-right: 1px $borderColor solid;
     height: 100vh;
     gap: 20px;
     padding: 20px;

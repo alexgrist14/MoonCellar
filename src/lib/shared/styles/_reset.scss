@@ -317,3 +317,20 @@ a {
 ul {
   margin: 0;
 }
+
+a{
+  color: inherit;
+  &:visited{
+    color: inherit;
+  }
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+  box-shadow: none;
+  border: none;
+}

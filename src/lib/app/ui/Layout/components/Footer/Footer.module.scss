@@ -7,7 +7,8 @@
   bottom: 0;
   width: 100%;
   height: 55px;
-  background-color: rgba(0, 0, 0, 0.774);
+  background-color: $background;
+  border-top: 1px $borderColor solid;
   z-index: 2;
 
   @include mediaMax($screenMd) {
