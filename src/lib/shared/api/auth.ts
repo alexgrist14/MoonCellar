@@ -1,26 +1,48 @@
 import axios from "axios";
+import { LoginDto, SignUpDto } from "../types/auth";
 
-export const singup = async (email: string, username: string, password: string): Promise<void>=>{
-    try{
-     
-        const data = JSON.stringify({
-            email:email,
-            username:username,
-            password:password
-        })
-
-        const config = {
-            method: "post",
-            url: `https://gigatualet.ru:3228/auth/signup`,
-            headers: {
-              "Content-Type": "application/json",
-            },
-            data: data,
-          };
-
-
-        await axios.request(config);
-    }catch(err){
-        return;
+export const signup = async (signUpDto: SignUpDto): Promise<void> => {
+  try {
+    const response = await axios.post(
+      "http://localhost:3228/auth/signup",
+      signUpDto,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Credentials": true,
+        },
+        withCredentials: true,
+      }
+    );
+    return response.data;
+  } catch (err: any) {
+    if (err.response && err.response.data) {
+      throw new Error(err.response.data.message);
+    } else {
+      throw new Error("SignUp failed");
     }
-}
+  }
+};
+
+export const login = async (loginDto: LoginDto): Promise<void> => {
+  try {
+    const response = await axios.post(
+      "http://localhost:3228/auth/login",
+      loginDto,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Credentials": true,
+        },
+        withCredentials: true,
+      }
+    );
+    return response.data;
+  } catch (err: any) {
+    if (err.response && err.response.data) {
+      throw new Error(err.response.data.message);
+    } else {
+      throw new Error("Login failed");
+    }
+  }
+};

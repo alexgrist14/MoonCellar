@@ -12,7 +12,7 @@ export const Layout: FC<ILayoutProps> = ({ children }) => {
     <div className={styles.layout}>
       <Header/>
       {children}
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };

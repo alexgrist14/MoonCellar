@@ -7,13 +7,15 @@ interface InputProps{
     width?: number;
     height?: number;
     inputType?: InputType;
+    value: string;
     onChange: (e: ChangeEvent<HTMLInputElement>)=>void;
+    required?: boolean
 }
 
-const Input: FC<InputProps> = ({placeholder, width=200, height=30, inputType = InputType.text,onChange})=>{
+const Input: FC<InputProps> = ({placeholder, width=200, height=30, inputType = InputType.text,onChange, value, required=false})=>{
     return(
         <div className={styles.container} style={{width: width + 'px', height: height + 'px'}}>
-            <input onChange={onChange} type={inputType} className={styles.input} placeholder={placeholder}/>
+            <input onChange={onChange} value={value} type={inputType} className={styles.input} placeholder={placeholder} required={required}/>
         </div>
     ) 
 }
