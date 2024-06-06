@@ -19,7 +19,7 @@ const Login: FC = () => {
     const loginDto: LoginDto = { email, password };
     try {
       const response = await login(loginDto);
-      dispatch(setAuth({email: email, user: "123"}))
+      dispatch(setUser({email: email, user: "123"}))
     } catch (err: any) {
       setError(err.message);
     }
@@ -62,3 +62,7 @@ const Login: FC = () => {
 };
 
 export default Login;
+function setUser(arg0: { email: string; user: string; }): any {
+  throw new Error("Function not implemented.");
+}
+
