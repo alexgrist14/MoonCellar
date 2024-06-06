@@ -22,16 +22,16 @@ export const HomePage: FC = () => {
     (state) => state.selected
   );
 
-  const { token } = useAppSelector((state) => state.auth);
+  const { email, user } = useAppSelector((state) => state.auth);
   const { isLoading } = useAppSelector((state) => state.states);
 
   const royalGames = getRoyalGames();
 
   const getIGDBGames = useCallback(() => {
-    if (apiType !== "IGDB" || isRoyal || !token) return;
+    if (apiType !== "IGDB" || isRoyal) return;
 
     getGames();
-  }, [apiType, isRoyal, token]);
+  }, [apiType, isRoyal]);
 
   useEffect(() => {
     auth().then((response) => dispatch(setAuth(response.data.access_token)));
