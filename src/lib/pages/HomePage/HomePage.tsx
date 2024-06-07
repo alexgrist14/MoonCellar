@@ -50,11 +50,12 @@ export const HomePage: FC = () => {
     }).then((response) => {
       const games = response.data.map((game) => ({
         id: game.id,
-        image: "https:" + game.cover[0].url,
+        image: !!game.cover[0] ? "https:" + game.cover[0].url : "",
         name: game.name,
         platforms: game.platforms.map((platform) => platform._id),
         url: game.url,
       }));
+
       dispatch(setGames(games));
       dispatch(setSegments(getSegments(games, 16)));
 
