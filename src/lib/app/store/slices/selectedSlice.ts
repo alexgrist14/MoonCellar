@@ -1,8 +1,8 @@
 import { IGame } from "@/src/lib/shared/types/game";
 import {
   IGDBDefault,
-  IIGDBGenre,
-  IIGDBPlatform,
+  IGDBGenre,
+  IGDBPlatform,
 } from "@/src/lib/shared/types/igdb";
 import { IConsole } from "@/src/lib/shared/types/responses";
 import { createSlice } from "@reduxjs/toolkit";
@@ -14,9 +14,9 @@ const initialState: {
   royalGamesRA: IGame[];
   royalGamesIGDB: IGame[];
   selectedSystemsRA: IConsole[];
-  selectedSystemsIGDB: IIGDBPlatform[];
+  selectedSystemsIGDB: IGDBPlatform[];
   isRoyal: boolean;
-  selectedGenres: IIGDBGenre[];
+  selectedGenres: IGDBGenre[];
   selectedGameModes: IGDBDefault[];
   isOnlyWithAchievements: boolean;
   selectedGeneration: number;
@@ -60,13 +60,13 @@ export const selectedSlice = createSlice({
     setSelectedSystemsRA: (state, action: PayloadAction<IConsole[]>) => {
       state.selectedSystemsRA = action.payload;
     },
-    setSelectedSystemsIGDB: (state, action: PayloadAction<IIGDBPlatform[]>) => {
+    setSelectedSystemsIGDB: (state, action: PayloadAction<IGDBPlatform[]>) => {
       state.selectedSystemsIGDB = action.payload;
     },
     setRoyal: (state, action: PayloadAction<boolean>) => {
       state.isRoyal = action.payload;
     },
-    setSelectedGenres: (state, action: PayloadAction<IIGDBGenre[]>) => {
+    setSelectedGenres: (state, action: PayloadAction<IGDBGenre[]>) => {
       state.selectedGenres = action.payload;
     },
     setOnlyWithAchievements: (state, action: PayloadAction<boolean>) => {

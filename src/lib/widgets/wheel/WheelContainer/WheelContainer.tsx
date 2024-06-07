@@ -9,6 +9,7 @@ import {
 import classNames from "classnames";
 import { apiNames } from "@/src/lib/shared/constants";
 import { WheelComponent } from "@/src/lib/features/wheel";
+import { IGDBPlatform } from "@/src/lib/shared/types/igdb";
 
 export const WheelContainer: FC = () => {
   const dispatch = useAppDispatch();
@@ -46,7 +47,9 @@ export const WheelContainer: FC = () => {
 
     const platforms = winner.platforms.reduce((result: string[], platform) => {
       const system = (apiType === "RA" ? systemsRA : systemsIGDB).find(
-        (system) => system.id === platform
+        (system) =>
+          (apiType === "IGDB" ? (system as IGDBPlatform)._id : system.id) ===
+          platform
       );
 
       !!system && result.push(system.name);

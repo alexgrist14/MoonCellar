@@ -2,23 +2,26 @@ import { FC, useEffect } from "react";
 import styles from "./ConsolesList.module.scss";
 import { useAppDispatch, useAppSelector } from "@/src/lib/app/store";
 import { getRoyalGames } from "@/src/lib/shared/utils/getRoyalGames";
-import { getGenres, getModes, getPlatforms } from "@/src/lib/shared/utils/IGDB";
 import { apiNames } from "@/src/lib/shared/constants";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
-import { setSystemsRA } from "@/src/lib/app/store/slices/commonSlice";
-import { setPlatformsLoading } from "@/src/lib/app/store/slices/statesSlice";
+import {
+  setGameModes,
+  setGenres,
+  setSystemsIGDB,
+  setSystemsRA,
+} from "@/src/lib/app/store/slices/commonSlice";
 import { ConsolesGroup, IGDBList, RoyalList } from "@/src/lib/features/main";
 import {
   setApiType,
   setOnlyWithAchievements,
   setRoyal,
 } from "@/src/lib/app/store/slices/selectedSlice";
-import { API } from "@/src/lib/shared/api";
+import { API, IGDBApi } from "@/src/lib/shared/api";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 
 export const ConsolesList: FC = () => {
   const dispatch = useAppDispatch();
-  const { apiType, isRoyal, isOnlyWithAchievements, selectedGeneration } =
+  const { apiType, isRoyal, isOnlyWithAchievements } =
     useAppSelector((state) => state.selected);
   const { isLoading } = useAppSelector((state) => state.states);
   const { token } = useAppSelector((state) => state.auth);
@@ -46,18 +49,17 @@ export const ConsolesList: FC = () => {
     apiType === "RA" && fetchConsoleIds();
 
     if (apiType === "IGDB" && !!token) {
-      getGenres();
-      getModes();
+      IGDBApi.getGenres().then((response) =>
+        dispatch(setGenres(response.data))
+      );
+      IGDBApi.getModes().then((response) =>
+        dispatch(setGameModes(response.data))
+      );
+      IGDBApi.getPlatforms().then((response) =>
+        dispatch(setSystemsIGDB(response.data))
+      );
     }
   }, [apiType, isRoyal, token, dispatch]);
-
-  useEffect(() => {
-    if (apiType !== "IGDB" || isRoyal || !token) return;
-
-    dispatch(setPlatformsLoading(true));
-
-    getPlatforms(selectedGeneration);
-  }, [selectedGeneration, dispatch, apiType, isRoyal, token]);
 
   return (
     <div id="consoles" className={styles.consoles__list}>

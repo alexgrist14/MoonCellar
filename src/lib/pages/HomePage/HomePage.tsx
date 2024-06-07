@@ -3,24 +3,33 @@ import styles from "./HomePage.module.scss";
 import { ConsolesList } from "../../widgets/main";
 import { useAppDispatch, useAppSelector } from "../../app/store";
 import { getRoyalGames } from "../../shared/utils/getRoyalGames";
-import { getGames } from "../../shared/utils/IGDB";
-import { auth } from "../../shared/api";
+import { IGDBApi, auth } from "../../shared/api";
 import { setWinner } from "../../app/store/slices/commonSlice";
 import {
   setFinished,
+  setLoading,
   setSegments,
   setStarted,
 } from "../../app/store/slices/statesSlice";
 import { setAuth } from "../../app/store/slices/authSlice";
 import { WheelContainer } from "../../widgets/wheel";
 import { fetchGameList } from "../../shared/utils/getGames";
+import { setGames } from "../../app/store/slices/selectedSlice";
+import { getSegments } from "../../shared/utils/getSegments";
 
 export const HomePage: FC = () => {
   const dispatch = useAppDispatch();
 
-  const { apiType, selectedSystemsRA, isRoyal } = useAppSelector(
-    (state) => state.selected
-  );
+  const {
+    apiType,
+    selectedSystemsRA,
+    isRoyal,
+    selectedGenres,
+    selectedRating,
+    selectedGameModes,
+    selectedSystemsIGDB,
+    searchQuery,
+  } = useAppSelector((state) => state.selected);
 
   const { token } = useAppSelector((state) => state.auth);
   const { isLoading } = useAppSelector((state) => state.states);
@@ -30,8 +39,40 @@ export const HomePage: FC = () => {
   const getIGDBGames = useCallback(() => {
     if (apiType !== "IGDB" || isRoyal || !token) return;
 
-    getGames();
-  }, [apiType, isRoyal, token]);
+    IGDBApi.getGames({
+      genres: selectedGenres.map((genre) => genre._id),
+      modes: selectedGameModes.map((mode) => mode._id),
+      take: 16,
+      rating: selectedRating,
+      platforms: selectedSystemsIGDB.map((system) => system._id),
+      search: searchQuery,
+      isRandom: true,
+    }).then((response) => {
+      const games = response.data.map((game) => ({
+        id: game.id,
+        image: "https:" + game.cover[0].url,
+        name: game.name,
+        platforms: game.platforms.map((platform) => platform._id),
+        url: game.url,
+      }));
+      dispatch(setGames(games));
+      dispatch(setSegments(getSegments(games, 16)));
+
+      dispatch(setStarted(true));
+      dispatch(setLoading(false));
+      dispatch(setWinner(undefined));
+    });
+  }, [
+    apiType,
+    isRoyal,
+    token,
+    dispatch,
+    searchQuery,
+    selectedGenres,
+    selectedRating,
+    selectedGameModes,
+    selectedSystemsIGDB,
+  ]);
 
   useEffect(() => {
     auth().then((response) => dispatch(setAuth(response.data.access_token)));

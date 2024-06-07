@@ -1,36 +1,38 @@
 export interface IGDBDefault {
+  _id: string;
   id: number;
   slug: string;
   name: string;
 }
 
-export interface IIGDBPlatform extends IGDBDefault {
+export interface IGDBPlatform extends IGDBDefault {
   platform_family: number;
   platform_logo: number;
 }
 
-export type IIGDBPlatformFamily = IGDBDefault;
+export type IGDBFamily = IGDBDefault;
 
-export interface IIGDBGame extends IGDBDefault {
-  cover: number;
+export interface IGDBGame extends IGDBDefault {
+  cover: IGDBCover[];
   screenshots: number[];
   total_rating: number;
   artworks: number[];
   franchise: number;
   franchises: number[];
-  game_modes: number[];
-  genres: number[];
-  platforms: number[];
+  game_modes: IGDBDefault[];
+  genres: IGDBGenre[];
+  platforms: IGDBPlatform[];
   tags: number[];
   themes: number[];
   url: string;
 }
 
-export interface IIGDBGenre extends IGDBDefault {
+export interface IGDBGenre extends IGDBDefault {
   url: string;
 }
 
-export interface IIGDBCover {
+export interface IGDBCover {
   url: string;
   id: number;
+  _id: string;
 }

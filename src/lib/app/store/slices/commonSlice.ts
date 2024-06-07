@@ -1,9 +1,9 @@
 import { IGame } from "@/src/lib/shared/types/game";
 import {
   IGDBDefault,
-  IIGDBGenre,
-  IIGDBPlatform,
-  IIGDBPlatformFamily,
+  IGDBFamily,
+  IGDBGenre,
+  IGDBPlatform,
 } from "@/src/lib/shared/types/igdb";
 import { IConsole } from "@/src/lib/shared/types/responses";
 import { createSlice } from "@reduxjs/toolkit";
@@ -12,9 +12,9 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 const initialState: {
   winner?: IGame;
   systemsRA: IConsole[];
-  systemsIGDB: IIGDBPlatform[];
-  IGDBFamilies: IIGDBPlatformFamily[];
-  genres: IIGDBGenre[];
+  systemsIGDB: IGDBPlatform[];
+  IGDBFamilies: IGDBFamily[];
+  genres: IGDBGenre[];
   gameModes: IGDBDefault[];
 } = {
   IGDBFamilies: [],
@@ -32,13 +32,13 @@ export const commonSlice = createSlice({
     setGameModes: (state, action: PayloadAction<IGDBDefault[]>) => {
       state.gameModes = action.payload;
     },
-    setGenres: (state, action: PayloadAction<IIGDBGenre[]>) => {
+    setGenres: (state, action: PayloadAction<IGDBGenre[]>) => {
       state.genres = action.payload;
     },
-    setIGDBFamilies: (state, action: PayloadAction<IIGDBPlatformFamily[]>) => {
+    setIGDBFamilies: (state, action: PayloadAction<IGDBFamily[]>) => {
       state.IGDBFamilies = action.payload;
     },
-    setSystemsIGDB: (state, action: PayloadAction<IIGDBPlatform[]>) => {
+    setSystemsIGDB: (state, action: PayloadAction<IGDBPlatform[]>) => {
       state.systemsIGDB = action.payload;
     },
     setSystemsRA: (state, action: PayloadAction<IConsole[]>) => {
