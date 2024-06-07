@@ -52,8 +52,8 @@ export const HomePage: FC = () => {
         id: game.id,
         image: !!game.cover[0] ? "https:" + game.cover[0].url : "",
         name: game.name,
-        platforms: game.platforms.map((platform) => platform._id),
-        url: game.url,
+        platforms: game.platforms?.map((platform) => platform._id) || [],
+        url: game?.url || "",
       }));
 
       dispatch(setGames(games));
