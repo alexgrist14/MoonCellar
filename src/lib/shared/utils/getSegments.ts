@@ -20,10 +20,9 @@ export const getSegments = (games: IGame[], max: number) => {
   return !!randomGames?.length
     ? randomGames.map(
         (game) =>
-          game._id ||
-          game.id +
-            "_" +
-            games.findIndex((el) => (el._id || el.id) === (game._id || game.id))
+          (game._id || game.id) +
+          "_" +
+          games.findIndex((el) => (el._id || el.id) === (game._id || game.id))
       )
     : [];
 };
