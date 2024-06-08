@@ -2,11 +2,11 @@ import { login } from "@/src/lib/shared/api/auth";
 import { LoginDto } from "@/src/lib/shared/types/auth";
 import { InputType } from "@/src/lib/shared/types/input.enum";
 import { Button } from "@/src/lib/shared/ui/Button";
-import Input from "@/src/lib/shared/ui/Input/Input";
 import { FC, useState } from "react";
 import styles from "./Login.module.scss";
 import { useAppDispatch } from "@/src/lib/app/store";
 import { setAuth } from "@/src/lib/app/store/slices/authSlice";
+import { Input } from "@/src/lib/shared/ui/Input";
 
 const Login: FC = () => {
   const dispatch = useAppDispatch();
@@ -19,7 +19,7 @@ const Login: FC = () => {
     const loginDto: LoginDto = { email, password };
     try {
       const response = await login(loginDto);
-      dispatch(setUser({email: email, user: "123"}))
+      dispatch(setUser({ email: email, user: "123" }));
     } catch (err: any) {
       setError(err.message);
     }
@@ -27,7 +27,6 @@ const Login: FC = () => {
 
   return (
     <div className={styles.container}>
-      
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -35,11 +34,11 @@ const Login: FC = () => {
         }}
         className={styles.content}
       >
-         <h1>Login</h1>
+        <h1>Login</h1>
         <div>
           <label>Email:</label>
           <Input
-            inputType={InputType.email}
+            type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required={true}
@@ -48,21 +47,22 @@ const Login: FC = () => {
         <div>
           <label>Password:</label>
           <Input
-            inputType={InputType.password}
+            type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required={true}
           />
         </div>
         {error && <p style={{ color: "red" }}>{error}</p>}
-        <Button color="blue" type="submit">Login</Button>
+        <Button color="blue" type="submit">
+          Login
+        </Button>
       </form>
     </div>
   );
 };
 
 export default Login;
-function setUser(arg0: { email: string; user: string; }): any {
+function setUser(arg0: { email: string; user: string }): any {
   throw new Error("Function not implemented.");
 }
-
