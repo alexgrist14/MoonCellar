@@ -4,7 +4,7 @@ import { LoginDto, SignUpDto } from "../types/auth";
 export const signup = async (signUpDto: SignUpDto): Promise<void> => {
   try {
     const response = await axios.post(
-      "http://localhost:3228/auth/signup",
+      `${process.env.NEXT_PUBLIC_NEST_SERVER}/auth/signup`,
       signUpDto,
       {
         headers: {
@@ -27,7 +27,7 @@ export const signup = async (signUpDto: SignUpDto): Promise<void> => {
 export const login = async (loginDto: LoginDto): Promise<void> => {
   try {
     const response = await axios.post(
-      "http://localhost:3228/auth/login",
+      `${process.env.NEXT_PUBLIC_NEST_SERVER}/auth/login`,
       loginDto,
       {
         headers: {
