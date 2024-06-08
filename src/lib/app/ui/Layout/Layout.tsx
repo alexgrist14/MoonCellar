@@ -1,7 +1,6 @@
 import { FC, ReactNode } from "react";
 import styles from "./Layout.module.scss";
-import { Footer } from "./components/Footer/Footer";
-import Header from "./components/Header/Header";
+import { Header } from "./components";
 
 interface ILayoutProps {
   children: ReactNode;
@@ -10,9 +9,8 @@ interface ILayoutProps {
 export const Layout: FC<ILayoutProps> = ({ children }) => {
   return (
     <div className={styles.layout}>
-      <Header/>
+      <Header />
       {children}
-      {/* <Footer /> */}
     </div>
   );
 };

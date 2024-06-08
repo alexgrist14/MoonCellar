@@ -1,16 +1,24 @@
 //main colors
-$textColor: #222222;
-$borderColor: #374151;
 $whiteTextColor: #ffffff;
+$textColor: $whiteTextColor;
 $dark: #333333;
 $gray: #666666;
 
-$accent: #4a27a1;
+$accent: #288ba1;
 
-$background: #1f2937;
+$bg: #1f2937;
+$background: $bg;
+$lightBg: #374151;
+$lightBackground: $lightBg;
 
 $on: #1bd897;
 $off: #d8534f;
+
+//border colors
+$borderColor: $lightBg;
+$darkBorder: $dark;
+$lightBorder: $whiteTextColor;
+$blackBorder: #000000;
 
 //various colors
 $blue: #337ab7;
@@ -18,8 +26,8 @@ $violet: #4f4f88;
 $errorColor: #ee1111;
 $gridBlue: #2196f3;
 $red: #ffa0a0b8;
-$green: #1CD998;
-$coral: #FFA686;
+$green: #1cd998;
+$coral: #ffa686;
 $summer: #f3a247;
 $winter: #53b3f3;
 $青: #3142c4;

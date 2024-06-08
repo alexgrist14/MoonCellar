@@ -49,6 +49,7 @@ export const HomePage: FC = () => {
       isRandom: true,
     }).then((response) => {
       const games = response.data.map((game) => ({
+        _id: game._id,
         id: game.id,
         image: !!game.cover[0] ? "https:" + game.cover[0].url : "",
         name: game.name,
@@ -101,7 +102,7 @@ export const HomePage: FC = () => {
   }, [isRoyal, royalGames, dispatch]);
 
   return (
-    <div className={styles.App}>
+    <div className={styles.page}>
       <ConsolesList />
       <WheelContainer />
     </div>

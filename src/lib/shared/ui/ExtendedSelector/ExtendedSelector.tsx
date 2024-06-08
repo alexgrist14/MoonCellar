@@ -36,7 +36,6 @@ export const ExtendedSelector = <T,>({
           isWithReset
           isDisabled={isDisabled}
           list={list.map((item) => item.name)}
-          wrapperStyle={{ width: "100%" }}
           borderTheme="green"
           isMulti
           isWithSearch
@@ -57,7 +56,6 @@ export const ExtendedSelector = <T,>({
           isWithReset
           isDisabled={isDisabled}
           list={list.map((item) => item.name)}
-          wrapperStyle={{ width: "100%" }}
           borderTheme="red"
           isMulti
           isWithSearch

@@ -2,12 +2,12 @@
   display: flex;
   flex-direction: column;
   gap: 5px;
+  width: 100%;
 }
 
 .dropdown {
   display: flex;
   position: relative;
-  background-color: $dark;
   border-radius: $radius;
   height: 40px;
   user-select: none;
@@ -45,13 +45,13 @@
     margin: 10px;
     width: calc(100% - 20px);
     border-radius: $radius;
-    border: 1px solid $textColor;
+    border: 1px solid $blackBorder;
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
     line-height: 16px;
     color: $whiteTextColor;
-    background-color: $gray;
+    background-color: $bg;
 
     &::placeholder {
       color: $whiteTextColor;
@@ -68,11 +68,11 @@
   }
 
   &__field {
-    display: flex;
+    display: grid;
     align-items: center;
     width: 100%;
     border-radius: $radius;
-    border: 1px solid $textColor;
+    border: 1px solid $blackBorder;
     padding-inline: 10px 20px;
     font-size: 15px;
     line-height: 24px;
@@ -82,7 +82,7 @@
     height: inherit;
     max-height: inherit;
     color: $whiteTextColor;
-    background-color: $dark;
+    background-color: $lightBg;
     text-align: left;
 
     &_red {
@@ -151,7 +151,7 @@
     right: 0;
     left: 0;
     height: fit-content;
-    background-color: $dark;
+    background-color: $lightBg;
     opacity: 0;
     transition: 0.2s;
     overscroll-behavior: contain;
@@ -159,7 +159,7 @@
     transform-origin: top;
     pointer-events: none;
     z-index: 10;
-    border: 0 solid $textColor;
+    border: 0 solid $blackBorder;
     border-radius: 0 0 $radius $radius;
 
     &_red {
@@ -217,10 +217,10 @@
     height: fit-content;
     white-space: normal;
     word-break: break-word;
-    background-color: $dark;
+    background-color: $lightBg;
 
     &:not(:last-child) {
-      border-bottom: 1px solid $textColor;
+      border-bottom: 1px solid $blackBorder;
     }
 
     &:hover {

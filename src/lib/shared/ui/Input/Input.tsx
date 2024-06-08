@@ -1,23 +1,32 @@
-import { ChangeEvent, FC } from "react";
-import styles from './Input.module.scss';
-import { InputType } from "../../types/input.enum";
+import { CSSProperties, FC, InputHTMLAttributes } from "react";
+import styles from "./Input.module.scss";
+import classNames from "classnames";
 
-interface InputProps{
-    placeholder?: string;
-    width?: number;
-    height?: number;
-    inputType?: InputType;
-    value: string;
-    onChange: (e: ChangeEvent<HTMLInputElement>)=>void;
-    required?: boolean
+interface InputProps
+  extends Pick<
+    InputHTMLAttributes<HTMLInputElement>,
+    | "placeholder"
+    | "required"
+    | "type"
+    | "value"
+    | "className"
+    | "style"
+    | "onChange"
+    | "disabled"
+    | "defaultValue"
+  > {
+  containerStyles?: CSSProperties;
 }
 
-const Input: FC<InputProps> = ({placeholder, width=200, height=30, inputType = InputType.text,onChange, value, required=false})=>{
-    return(
-        <div className={styles.container} style={{width: width + 'px', height: height + 'px'}}>
-            <input onChange={onChange} value={value} type={inputType} className={styles.input} placeholder={placeholder} required={required}/>
-        </div>
-    ) 
-}
+export const Input: FC<InputProps> = ({
+  containerStyles,
+  className,
+  ...props
+}) => {
+  return (
+    <div className={styles.container} style={containerStyles}>
+      <input className={classNames(styles.input, className)} {...props} />
+    </div>
+  );
+};
 
-export default Input;

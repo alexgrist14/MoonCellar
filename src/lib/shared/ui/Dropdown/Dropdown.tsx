@@ -262,9 +262,7 @@ export const Dropdown: FC<IDropDownListProps> = ({
             [styles[`dropdown__inner_${borderTheme}`]]: !!borderTheme,
           })}
           style={{
-            transform: `translate(${
-              !!offset.current ? "calc(100% + 10px)" : "0"
-            }, ${offset.current}px)`,
+            transform: `translateY(${offset.current}px)`,
           }}
         >
           {(isWithSearch === undefined ? list.length > 10 : isWithSearch) && (

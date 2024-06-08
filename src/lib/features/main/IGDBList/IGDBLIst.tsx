@@ -15,6 +15,7 @@ import {
   setExcludedGenres,
   setExcludedSystems,
 } from "@/src/lib/app/store/slices/excludedSlice";
+import { Input } from "@/src/lib/shared/ui/Input";
 
 export const IGDBList: FC = () => {
   const dispatch = useAppDispatch();
@@ -40,14 +41,13 @@ export const IGDBList: FC = () => {
 
   return (
     <div className={styles.consoles__igdb}>
-      <div className={styles.consoles__input}>
-        <h3>Search</h3>
-        <input
-          disabled={isLoading}
-          value={searchQuery}
-          onChange={(e) => dispatch(setSearchQuery(e.target.value))}
-        ></input>
-      </div>
+      <Input
+        containerStyles={{ width: "100%" }}
+        placeholder="Search query..."
+        disabled={isLoading}
+        value={searchQuery}
+        onChange={(e) => dispatch(setSearchQuery(e.target.value))}
+      />
       <ExtendedSelector
         title="Game Modes"
         list={gameModes}

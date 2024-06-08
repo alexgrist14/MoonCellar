@@ -1,20 +1,52 @@
 .consoles {
+  display: grid;
+  grid-template-columns: 1fr 30px;
+  position: absolute;
+  width: max(30%, 360px);
+  height: 100%;
+  transition: 0.3s;
+  z-index: 3;
+
+  &_active {
+    transform: translateX(calc(-100% + 30px));
+  }
+
+  &__expand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background-color: $lightBg;
+    cursor: pointer;
+  }
+
+  &__chevron {
+    transition: 0.3s;
+    rotate: 270deg;
+
+    & path {
+      fill: $whiteTextColor;
+    }
+
+    &_active {
+      rotate: 90deg;
+    }
+  }
+
   &__list {
     display: flex;
     flex-direction: column;
     background: $background;
-    border-right: 1px $borderColor solid;
-    height: 100vh;
+    height: 100%;
     gap: 20px;
     padding: 20px;
-    width: 400px;
     overflow: visible;
 
     & h3 {
       margin: 0;
     }
 
-    @include mediaMax($screenGt)  {
+    @include mediaMax($screenGt) {
       width: 100%;
       height: fit-content;
     }
@@ -27,12 +59,12 @@
     gap: 20px;
     width: 100%;
 
-    @include mediaMax($screenGt)  {
+    @include mediaMax($screenGt) {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
     }
-    @include mediaMax($screenSm)  {
+    @include mediaMax($screenSm) {
       justify-content: center;
     }
   }

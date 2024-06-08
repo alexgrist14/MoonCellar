@@ -1,16 +1,13 @@
-.App {
+.page {
   display: flex;
-  flex-wrap: wrap;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background: $background;
   justify-content: space-between;
   text-align: center;
-  overflow: hidden;
+  position: relative;
+  height: 100%;
 }
 
 @include mediaMax($screenGt) {
-  .App {
+  .page {
     flex-direction: column;
   }
 }

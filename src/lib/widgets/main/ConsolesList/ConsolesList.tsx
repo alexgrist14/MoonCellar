@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 import styles from "./ConsolesList.module.scss";
 import { useAppDispatch, useAppSelector } from "@/src/lib/app/store";
 import { getRoyalGames } from "@/src/lib/shared/utils/getRoyalGames";
@@ -18,13 +18,18 @@ import {
 } from "@/src/lib/app/store/slices/selectedSlice";
 import { API, IGDBApi } from "@/src/lib/shared/api";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
+import { SvgChevron } from "@/src/lib/shared/ui/svg";
+import classNames from "classnames";
 
 export const ConsolesList: FC = () => {
   const dispatch = useAppDispatch();
-  const { apiType, isRoyal, isOnlyWithAchievements } =
-    useAppSelector((state) => state.selected);
+  const { apiType, isRoyal, isOnlyWithAchievements } = useAppSelector(
+    (state) => state.selected
+  );
   const { isLoading } = useAppSelector((state) => state.states);
   const { token } = useAppSelector((state) => state.auth);
+
+  const [isActive, setIsActive] = useState(false);
 
   const consolesGroup = [
     "Nintendo",
@@ -62,47 +67,67 @@ export const ConsolesList: FC = () => {
   }, [apiType, isRoyal, token, dispatch]);
 
   return (
-    <div id="consoles" className={styles.consoles__list}>
-      <Dropdown
-        placeholder="Select Type"
-        isDisabled={isLoading}
-        initialValue={apiNames[apiType]}
-        list={Object.values(apiNames)}
-        getIndex={(index) => dispatch(setApiType(Object.keys(apiNames)[index]))}
-      />
-      <div className={styles.consoles__options}>
-        {apiType === "RA" && (
-          <label className={styles.consoles__option}>
+    <div
+      id="consoles"
+      className={classNames(styles.consoles, {
+        [styles.consoles_active]: !isActive,
+      })}
+    >
+      <div className={styles.consoles__list}>
+        <Dropdown
+          placeholder="Select Type"
+          isDisabled={isLoading}
+          initialValue={apiNames[apiType]}
+          list={Object.values(apiNames)}
+          getIndex={(index) =>
+            dispatch(setApiType(Object.keys(apiNames)[index]))
+          }
+        />
+        <div className={styles.consoles__options}>
+          {apiType === "RA" && (
+            <label className={styles.consoles__option}>
+              <ToggleSwitch
+                defaultValue={isOnlyWithAchievements ? "right" : "left"}
+                clickCallback={() =>
+                  dispatch(setOnlyWithAchievements(!isOnlyWithAchievements))
+                }
+                isDisabled={isLoading}
+              />
+              Only with achievements
+            </label>
+          )}
+          <label className={styles.consoles__toggle}>
             <ToggleSwitch
-              defaultValue={isOnlyWithAchievements ? "right" : "left"}
-              clickCallback={() =>
-                dispatch(setOnlyWithAchievements(!isOnlyWithAchievements))
-              }
+              defaultValue={isRoyal ? "right" : "left"}
+              clickCallback={() => dispatch(setRoyal(!isRoyal))}
               isDisabled={isLoading}
             />
-            Only with achievements
+            <span>
+              Royal{" "}
+              {!!royalGames?.length ? `(Games: ${royalGames.length})` : ""}
+            </span>
           </label>
-        )}
-        <label className={styles.consoles__toggle}>
-          <ToggleSwitch
-            defaultValue={isRoyal ? "right" : "left"}
-            clickCallback={() => dispatch(setRoyal(!isRoyal))}
-            isDisabled={isLoading}
-          />
-          <span>
-            Royal {!!royalGames?.length ? `(Games: ${royalGames.length})` : ""}
-          </span>
-        </label>
-      </div>
-      {apiType === "IGDB" && !isRoyal && <IGDBList />}
-      {apiType === "RA" && !isRoyal && (
-        <div className={styles.consoles__groups}>
-          {consolesGroup.map((item, i) => (
-            <ConsolesGroup key={i} system={item} />
-          ))}
         </div>
-      )}
-      {isRoyal && <RoyalList />}
+        {apiType === "IGDB" && !isRoyal && <IGDBList />}
+        {apiType === "RA" && !isRoyal && (
+          <div className={styles.consoles__groups}>
+            {consolesGroup.map((item, i) => (
+              <ConsolesGroup key={i} system={item} />
+            ))}
+          </div>
+        )}
+        {isRoyal && <RoyalList />}
+      </div>
+      <div
+        className={styles.consoles__expand}
+        onClick={() => setIsActive(!isActive)}
+      >
+        <SvgChevron
+          className={classNames(styles.consoles__chevron, {
+            [styles.consoles__chevron_active]: isActive,
+          })}
+        />
+      </div>
     </div>
   );
 };
