@@ -5,6 +5,7 @@ import { Scrollbar } from "../Scrollbar";
 import { SvgChevron } from "../svg";
 import { useAppDispatch, useAppSelector } from "@/src/lib/app/store";
 import { setExpandPosition } from "@/src/lib/app/store/slices/commonSlice";
+import { useWindowResizeAction } from "../../hooks";
 
 interface IExpandMenuProps
   extends Pick<HTMLAttributes<HTMLDivElement>, "children" | "id"> {
@@ -17,9 +18,13 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
   ...props
 }) => {
   const dispatch = useAppDispatch();
-  const { expandPosition } = useAppSelector((state) => state.common);
+  const { expandPosition, isMobile } = useAppSelector((state) => state.common);
 
   const [isActive, setIsActive] = useState(false);
+
+  useWindowResizeAction(() => {
+    setIsActive(false);
+  });
 
   useEffect(() => {
     dispatch(setExpandPosition(isActive ? position : undefined));
@@ -32,7 +37,9 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
       })}
       style={{
         pointerEvents:
-          !!expandPosition && expandPosition !== position ? "none" : "auto",
+          !!expandPosition && expandPosition !== position && isMobile
+            ? "none"
+            : "auto",
         right: position === "right" ? "0" : "unset",
         direction: position === "right" ? "rtl" : "ltr",
         transform: !isActive

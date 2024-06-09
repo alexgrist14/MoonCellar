@@ -17,6 +17,7 @@ const initialState: {
   genres: IGDBGenre[];
   gameModes: IGDBDefault[];
   expandPosition?: "left" | "right";
+  isMobile?: boolean;
 } = {
   IGDBFamilies: [],
   gameModes: [],
@@ -54,6 +55,9 @@ export const commonSlice = createSlice({
     ) => {
       state.expandPosition = action.payload;
     },
+    setIsMobile: (state, action: PayloadAction<boolean | undefined>) => {
+      state.isMobile = action.payload;
+    },
   },
 });
 
@@ -65,5 +69,6 @@ export const {
   setSystemsRA,
   setWinner,
   setExpandPosition,
+  setIsMobile,
 } = commonSlice.actions;
 export default commonSlice.reducer;
