@@ -9,7 +9,7 @@
 
   @include mediaMax($screenSm) {
     min-width: auto;
-    padding: 10px;
+    padding: 40px;
     padding-top: 50px;
     grid-template-rows: min-content 1fr;
   }
@@ -41,7 +41,6 @@
 
       & > button,
       & > a {
-        font-size: 12px;
         padding: 10px;
         color: white;
         outline: 0;
@@ -111,7 +110,6 @@
     }
 
     &__link {
-      font-size: 18px;
       text-align: center;
       color: white;
     }

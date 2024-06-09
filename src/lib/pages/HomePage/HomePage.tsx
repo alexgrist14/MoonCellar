@@ -3,7 +3,7 @@ import styles from "./HomePage.module.scss";
 import { ConsolesList } from "../../widgets/main";
 import { useAppDispatch, useAppSelector } from "../../app/store";
 import { getRoyalGames } from "../../shared/utils/getRoyalGames";
-import { IGDBApi, auth } from "../../shared/api";
+import { IGDBApi } from "../../shared/api";
 import { setWinner } from "../../app/store/slices/commonSlice";
 import {
   setFinished,
@@ -11,11 +11,11 @@ import {
   setSegments,
   setStarted,
 } from "../../app/store/slices/statesSlice";
-import { setAuth } from "../../app/store/slices/authSlice";
 import { WheelContainer } from "../../widgets/wheel";
 import { fetchGameList } from "../../shared/utils/getGames";
 import { setGames } from "../../app/store/slices/selectedSlice";
 import { getSegments } from "../../shared/utils/getSegments";
+import {ExpandMenu} from "../../shared/ui/ExpandMenu";
 
 export const HomePage: FC = () => {
   const dispatch = useAppDispatch();
@@ -31,13 +31,12 @@ export const HomePage: FC = () => {
     searchQuery,
   } = useAppSelector((state) => state.selected);
 
-  const { token } = useAppSelector((state) => state.auth);
   const { isLoading } = useAppSelector((state) => state.states);
 
   const royalGames = getRoyalGames();
 
   const getIGDBGames = useCallback(() => {
-    if (apiType !== "IGDB" || isRoyal || !token) return;
+    if (apiType !== "IGDB" || isRoyal) return;
 
     IGDBApi.getGames({
       genres: selectedGenres.map((genre) => genre._id),
@@ -67,7 +66,6 @@ export const HomePage: FC = () => {
   }, [
     apiType,
     isRoyal,
-    token,
     dispatch,
     searchQuery,
     selectedGenres,
@@ -75,10 +73,6 @@ export const HomePage: FC = () => {
     selectedGameModes,
     selectedSystemsIGDB,
   ]);
-
-  useEffect(() => {
-    auth().then((response) => dispatch(setAuth(response.data.access_token)));
-  }, [dispatch]);
 
   useEffect(() => {
     dispatch(setWinner(undefined));
@@ -105,6 +99,7 @@ export const HomePage: FC = () => {
     <div className={styles.page}>
       <ConsolesList />
       <WheelContainer />
+      <ExpandMenu position="right" ></ExpandMenu>
     </div>
   );
 };

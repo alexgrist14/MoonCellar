@@ -77,7 +77,7 @@ export const IGDBList: FC = () => {
       />
       <div className={styles.consoles__options}>
         <ExtendedRange
-          title="Rating"
+          text="All ratings"
           selected={selectedRating}
           setSelected={setSelectedRating}
           isDisabled={isLoading}

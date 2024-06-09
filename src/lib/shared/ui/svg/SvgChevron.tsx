@@ -3,7 +3,8 @@ import { CSSProperties, FC } from "react";
 export const SvgChevron: FC<{
   className?: string;
   pathStyle?: CSSProperties;
-}> = ({ className, pathStyle }) => {
+  style?: CSSProperties;
+}> = ({ className, pathStyle, style }) => {
   return (
     <svg
       className={className}
@@ -11,6 +12,7 @@ export const SvgChevron: FC<{
       height="16"
       width="16"
       viewBox="0 0 512 512"
+      style={style}
     >
       <path
         style={pathStyle}

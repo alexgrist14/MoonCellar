@@ -1,0 +1,27 @@
+.checkbox {
+  width: 15px;
+  aspect-ratio: 1;
+  background-color: $bg;
+  border: 1px solid black;
+  border-radius: 50%;
+  cursor: pointer;
+  appearance: none;
+  transition: 0.3s;
+
+  &_accent {
+    background-color: $accent;
+  }
+
+  &_on {
+    background-color: $on;
+  }
+
+  &_off {
+    background-color: $off;
+  }
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+  }
+}

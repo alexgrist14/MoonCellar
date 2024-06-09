@@ -6,13 +6,14 @@ import { useAppDispatch } from "@/src/lib/app/store";
 import { RangeSelector } from "../RangeSelector";
 
 export interface IExtendedCheckboxProps {
-  title: string;
+  title?: string;
   selected: number;
   setSelected: ActionCreatorWithPayload<number>;
   isDisabled?: boolean;
   min: number;
   max: number;
   symbol?: string;
+  text?: string;
 }
 
 export const ExtendedRange: FC<IExtendedCheckboxProps> = ({
@@ -23,6 +24,7 @@ export const ExtendedRange: FC<IExtendedCheckboxProps> = ({
   max,
   min,
   symbol,
+  text,
 }) => {
   const dispatch = useAppDispatch();
   const [value, setValue] = useState(0);
@@ -38,10 +40,10 @@ export const ExtendedRange: FC<IExtendedCheckboxProps> = ({
 
   return (
     <div className={styles.range}>
-      <h3>{title}</h3>
+      {!!title && <h3>{title}</h3>}
       <div className={styles.range__wrapper}>
         <RangeSelector
-          text={value !== min ? (symbol || "From ") + value : "All"}
+          text={value !== min ? (symbol || "From ") + value : text || "All"}
           defaultValue={value}
           min={min}
           max={max}

@@ -1,0 +1,48 @@
+.menu {
+  display: grid;
+  grid-template-columns: 1fr 30px;
+  position: absolute;
+  width: max(30%, 360px);
+  height: 100%;
+  transition: 0.3s;
+  z-index: 3;
+  background: $background;
+
+  @include mediaMax($screenMd) {
+    width: 100%;
+  }
+
+  &__expand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background-color: $lightBg;
+    cursor: pointer;
+  }
+
+  &__chevron {
+    transition: 0.3s;
+    rotate: 270deg;
+
+    & path {
+      fill: $whiteTextColor;
+    }
+
+    &_active {
+      rotate: 90deg;
+    }
+  }
+}
+
+.scrollbars {
+  &__scrollbar {
+    margin-right: 5px;
+  }
+
+  div &__content {
+    margin: 0;
+    padding: 20px;
+    max-height: calc(100vh - 55px);
+  }
+}

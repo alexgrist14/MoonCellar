@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef } from "react";
 import styles from "./ConsolesList.module.scss";
 import { useAppDispatch, useAppSelector } from "@/src/lib/app/store";
 import { getRoyalGames } from "@/src/lib/shared/utils/getRoyalGames";
@@ -18,8 +18,7 @@ import {
 } from "@/src/lib/app/store/slices/selectedSlice";
 import { API, IGDBApi } from "@/src/lib/shared/api";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
-import { SvgChevron } from "@/src/lib/shared/ui/svg";
-import classNames from "classnames";
+import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
 
 export const ConsolesList: FC = () => {
   const dispatch = useAppDispatch();
@@ -27,9 +26,6 @@ export const ConsolesList: FC = () => {
     (state) => state.selected
   );
   const { isLoading } = useAppSelector((state) => state.states);
-  const { token } = useAppSelector((state) => state.auth);
-
-  const [isActive, setIsActive] = useState(false);
 
   const consolesGroup = [
     "Nintendo",
@@ -53,7 +49,7 @@ export const ConsolesList: FC = () => {
 
     apiType === "RA" && fetchConsoleIds();
 
-    if (apiType === "IGDB" && !!token) {
+    if (apiType === "IGDB") {
       IGDBApi.getGenres().then((response) =>
         dispatch(setGenres(response.data))
       );
@@ -64,16 +60,13 @@ export const ConsolesList: FC = () => {
         dispatch(setSystemsIGDB(response.data))
       );
     }
-  }, [apiType, isRoyal, token, dispatch]);
+  }, [apiType, isRoyal, dispatch]);
+
+  const contentRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div
-      id="consoles"
-      className={classNames(styles.consoles, {
-        [styles.consoles_active]: !isActive,
-      })}
-    >
-      <div className={styles.consoles__list}>
+    <ExpandMenu id="consoles">
+      <div ref={contentRef} className={styles.consoles__list}>
         <Dropdown
           placeholder="Select Type"
           isDisabled={isLoading}
@@ -118,16 +111,6 @@ export const ConsolesList: FC = () => {
         )}
         {isRoyal && <RoyalList />}
       </div>
-      <div
-        className={styles.consoles__expand}
-        onClick={() => setIsActive(!isActive)}
-      >
-        <SvgChevron
-          className={classNames(styles.consoles__chevron, {
-            [styles.consoles__chevron_active]: isActive,
-          })}
-        />
-      </div>
-    </div>
+    </ExpandMenu>
   );
 };

@@ -14,6 +14,8 @@ import { useRouter } from "next/router";
 import { Button } from "../Button";
 import useCloseEvents from "../../hooks/useCloseEvents";
 import { Scrollbar } from "../Scrollbar";
+import { ExtendedCheckbox } from "../ExtendedCheckbox";
+import { Checkbox } from "../Checkbox";
 
 interface IDropDownListProps {
   className?: string;
@@ -223,7 +225,8 @@ export const Dropdown: FC<IDropDownListProps> = ({
           style={fieldStyle}
           className={cl(styles.dropdown__field, {
             [styles.dropdown__field_active]: isActive,
-            [styles.dropdown__inner_overflow]: !!offset.current,
+            [styles.dropdown__field_overflow]: !!offset.current,
+            [styles.dropdown__field_compact]: isCompact,
             [styles[`dropdown__field_${borderTheme}`]]: !!borderTheme,
             [styles.dropdown__field_disabled]:
               isDisabled || (!list.length && !isWithSearch && !isWithInput),
@@ -300,27 +303,31 @@ export const Dropdown: FC<IDropDownListProps> = ({
                   const isChecked = multiValue.includes(
                     !!queryList ? queryList[index].index : index
                   );
+                  const key = `${item.replace(/[^W+]/g, "_")}-${index}`;
 
                   return (
-                    <label
-                      key={index}
+                    <div
+                      key={key}
                       className={styles.dropdown__item}
-                      htmlFor={`${item}-${index}`}
                       onClick={() => {
-                        !isMulti && clickHandler(index, item, isChecked);
+                        clickHandler(index, item, isChecked);
                       }}
                     >
-                      {item}
+                      <span>{item}</span>
                       {isMulti && (
-                        <input
-                          id={`${item}-${index}`}
-                          className={styles.dropdown__checkbox}
-                          type="checkbox"
+                        <Checkbox
+                          colorTheme={
+                            borderTheme === "green"
+                              ? "on"
+                              : borderTheme === "red"
+                              ? "off"
+                              : "accent"
+                          }
                           onChange={() => clickHandler(index, item, isChecked)}
                           checked={isChecked}
                         />
                       )}
-                    </label>
+                    </div>
                   );
                 }
               )}

@@ -32,17 +32,16 @@ export const ExtendedSelector = <T,>({
       <div className={styles.option__selector}>
         <Dropdown
           overflowRootId="consoles"
-          isCompact
-          isWithReset
           isDisabled={isDisabled}
           list={list.map((item) => item.name)}
           borderTheme="green"
           isMulti
-          isWithSearch
-          overwriteValue={selected.map((item) => item.name).join(", ")}
-          initialMultiValue={selected.map((item) =>
-            list.findIndex((el) => el.id === item.id)
-          )}
+          overwriteValue={selected.map((item) => item?.name)?.join(", ") || ""}
+          initialMultiValue={
+            selected.map((item) =>
+              list.findIndex((el) => el.id === item?.id)
+            ) || []
+          }
           placeholder="Include..."
           getIndexes={(indexes) =>
             dispatch(setSelected(indexes.map((index) => list[index])))
@@ -52,17 +51,16 @@ export const ExtendedSelector = <T,>({
       <div className={styles.option__selector}>
         <Dropdown
           overflowRootId="consoles"
-          isCompact
-          isWithReset
           isDisabled={isDisabled}
           list={list.map((item) => item.name)}
           borderTheme="red"
           isMulti
-          isWithSearch
-          overwriteValue={excluded.map((item) => item.name).join(", ")}
-          initialMultiValue={excluded.map((item) =>
-            list.findIndex((el) => el.id === item.id)
-          )}
+          overwriteValue={excluded.map((item) => item?.name)?.join(", ") || ""}
+          initialMultiValue={
+            excluded.map((item) =>
+              list.findIndex((el) => el.id === item?.id)
+            ) || []
+          }
           placeholder="Exclude..."
           getIndexes={(indexes) =>
             dispatch(setExcluded(indexes.map((index) => list[index])))

@@ -1,7 +1,5 @@
 .page {
-  display: flex;
-  justify-content: space-between;
-  text-align: center;
+  display: grid;
   position: relative;
   height: 100%;
 }

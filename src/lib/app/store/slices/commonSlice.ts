@@ -16,6 +16,7 @@ const initialState: {
   IGDBFamilies: IGDBFamily[];
   genres: IGDBGenre[];
   gameModes: IGDBDefault[];
+  expandPosition?: "left" | "right";
 } = {
   IGDBFamilies: [],
   gameModes: [],
@@ -47,6 +48,12 @@ export const commonSlice = createSlice({
     setWinner: (state, action: PayloadAction<IGame | undefined>) => {
       state.winner = action.payload;
     },
+    setExpandPosition: (
+      state,
+      action: PayloadAction<"left" | "right" | undefined>
+    ) => {
+      state.expandPosition = action.payload;
+    },
   },
 });
 
@@ -57,5 +64,6 @@ export const {
   setSystemsIGDB,
   setSystemsRA,
   setWinner,
+  setExpandPosition,
 } = commonSlice.actions;
 export default commonSlice.reducer;

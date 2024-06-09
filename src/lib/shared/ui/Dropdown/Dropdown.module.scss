@@ -13,6 +13,7 @@
   user-select: none;
   width: 100%;
   transition: all 0.15s;
+  overflow: hidden;
 
   &_compact {
     height: 30px;
@@ -28,6 +29,8 @@
 
   &_active {
     border-radius: $radius $radius 0 0;
+    overflow: visible;
+    box-shadow: $basicShadow;
   }
 
   &__controls {
@@ -72,7 +75,7 @@
     align-items: center;
     width: 100%;
     border-radius: $radius;
-    border: 1px solid $blackBorder;
+    border: 2px solid $blackBorder;
     padding-inline: 10px 20px;
     font-size: 15px;
     line-height: 24px;
@@ -85,6 +88,10 @@
     background-color: $lightBg;
     text-align: left;
 
+    &_compact {
+      border-width: 1px;
+    }
+
     &_red {
       border-color: $off;
     }
@@ -95,10 +102,12 @@
 
     &_active {
       border-radius: $radius $radius 0 0;
+      z-index: 11;
     }
 
     &_overflow {
       border-radius: $radius;
+      z-index: unset;
     }
 
     &:not(&_disabled):hover,
@@ -159,8 +168,10 @@
     transform-origin: top;
     pointer-events: none;
     z-index: 10;
-    border: 0 solid $blackBorder;
+    border: 2px solid $blackBorder;
+    border-top-width: 0;
     border-radius: 0 0 $radius $radius;
+    box-shadow: $basicShadow;
 
     &_red {
       border-color: $off;
@@ -171,14 +182,12 @@
     }
 
     &_active {
-      border-width: 1px;
-      border-top-width: 0;
       opacity: 1;
       pointer-events: all;
     }
 
     &_overflow {
-      border-width: 1px;
+      border-width: 2px;
       border-radius: $radius;
     }
   }
@@ -206,8 +215,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-block: 5px;
-    padding-inline: 15px 23px;
+    padding-block: 10px;
+    padding-inline: 15px 20px;
     font-style: normal;
     font-weight: 400;
     font-size: 13px;
@@ -218,6 +227,7 @@
     white-space: normal;
     word-break: break-word;
     background-color: $lightBg;
+    gap: 5px;
 
     &:not(:last-child) {
       border-bottom: 1px solid $blackBorder;
@@ -226,15 +236,6 @@
     &:hover {
       cursor: pointer;
       filter: brightness(1.3);
-    }
-  }
-
-  &__checkbox {
-    cursor: pointer;
-
-    &:focus,
-    &:focus-visible {
-      outline: none;
     }
   }
 }

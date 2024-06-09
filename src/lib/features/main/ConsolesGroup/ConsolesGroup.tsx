@@ -36,9 +36,8 @@ export const ConsolesGroup: FC<ConsolesGroupProps> = ({ system }) => {
 
   return (
     <div className={styles.consoles__group}>
-      <h3 className={styles.title}>{system}</h3>
       <Dropdown
-        isCompact
+        title={system}
         isDisabled={isLoading}
         isMulti
         placeholder="Select systems..."

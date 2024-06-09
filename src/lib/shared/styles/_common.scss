@@ -18,3 +18,7 @@ body {
   background: $background;
   font-family: "General", sans-serif;
 }
+
+*::-webkit-scrollbar {
+    display: none;
+}

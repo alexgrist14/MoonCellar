@@ -87,7 +87,9 @@ export const WheelContainer: FC = () => {
         segColors={colors}
         primaryColor="black"
         contrastColor="white"
-        buttonText={isLoading ? "Loading..." : "Spin"}
+        buttonText={
+          isLoading ? "Loading..." : !isFinished ? "Spinning..." : "Spin"
+        }
         size={295}
       />
       <div className={styles.winner}>
@@ -117,14 +119,16 @@ export const WheelContainer: FC = () => {
                   )
                 }
               >
-                {royalGames?.some((game) => game.id === winner.id)
-                  ? "Remove from "
-                  : "Add to "}
-                Battle Royal
+                <p>
+                  {royalGames?.some((game) => game.id === winner.id)
+                    ? "Remove from "
+                    : "Add to "}
+                  Battle Royal
+                </p>
               </button>
             )}
             <a href={getLink()} target="_blank" rel="noreferrer">
-              Open in {apiNames[apiType]}
+              <p>Open in {apiNames[apiType]}</p>
             </a>
           </div>
           <div className={styles.winner__content}>
@@ -137,8 +141,8 @@ export const WheelContainer: FC = () => {
               }}
             />
             <div className={styles.winner__text}>
-              <span className={styles.winner__link}>{getTitle()}</span>
-              <span className={styles.winner__platform}>{getPlatform()}</span>
+              <p className={styles.winner__link}>{getTitle()}</p>
+              <p className={styles.winner__platform}>{getPlatform()}</p>
             </div>
           </div>
         </div>
