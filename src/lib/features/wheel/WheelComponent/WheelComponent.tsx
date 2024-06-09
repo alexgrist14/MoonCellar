@@ -183,8 +183,6 @@ export const WheelComponent: FC<WheelComponentProps> = ({
     }
   }, [isStarted, segments, dispatch, time]);
 
-  console.log(segments)
-
   return (
     <div
       id="wheel"

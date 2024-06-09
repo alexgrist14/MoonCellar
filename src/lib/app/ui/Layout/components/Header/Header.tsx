@@ -8,7 +8,7 @@ export const Header: FC = () => {
     <div className={styles.container}>
       <div className={styles.container__left}>
         <Link href="/" className={styles.title}>
-          Gemdisu
+          MoonCellar
         </Link>
         <Input
           defaultValue={""}

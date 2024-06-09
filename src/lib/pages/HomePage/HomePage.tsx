@@ -15,7 +15,7 @@ import { WheelContainer } from "../../widgets/wheel";
 import { fetchGameList } from "../../shared/utils/getGames";
 import { setGames } from "../../app/store/slices/selectedSlice";
 import { getSegments } from "../../shared/utils/getSegments";
-import {ExpandMenu} from "../../shared/ui/ExpandMenu";
+import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 
 export const HomePage: FC = () => {
   const dispatch = useAppDispatch();
@@ -97,9 +97,11 @@ export const HomePage: FC = () => {
 
   return (
     <div className={styles.page}>
-      <ConsolesList />
+      <ExpandMenu id="consoles">
+        <ConsolesList />
+      </ExpandMenu>
       <WheelContainer />
-      <ExpandMenu position="right" ></ExpandMenu>
+      <ExpandMenu position="right"></ExpandMenu>
     </div>
   );
 };

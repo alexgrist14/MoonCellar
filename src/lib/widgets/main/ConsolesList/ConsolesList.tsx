@@ -18,7 +18,6 @@ import {
 } from "@/src/lib/app/store/slices/selectedSlice";
 import { API, IGDBApi } from "@/src/lib/shared/api";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
-import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
 
 export const ConsolesList: FC = () => {
   const dispatch = useAppDispatch();
@@ -65,52 +64,47 @@ export const ConsolesList: FC = () => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   return (
-    <ExpandMenu id="consoles">
-      <div ref={contentRef} className={styles.consoles__list}>
-        <Dropdown
-          placeholder="Select Type"
-          isDisabled={isLoading}
-          initialValue={apiNames[apiType]}
-          list={Object.values(apiNames)}
-          getIndex={(index) =>
-            dispatch(setApiType(Object.keys(apiNames)[index]))
-          }
-        />
-        <div className={styles.consoles__options}>
-          {apiType === "RA" && (
-            <label className={styles.consoles__option}>
-              <ToggleSwitch
-                defaultValue={isOnlyWithAchievements ? "right" : "left"}
-                clickCallback={() =>
-                  dispatch(setOnlyWithAchievements(!isOnlyWithAchievements))
-                }
-                isDisabled={isLoading}
-              />
-              Only with achievements
-            </label>
-          )}
-          <label className={styles.consoles__toggle}>
+    <div ref={contentRef} className={styles.consoles__list}>
+      <Dropdown
+        placeholder="Select Type"
+        isDisabled={isLoading}
+        initialValue={apiNames[apiType]}
+        list={Object.values(apiNames)}
+        getIndex={(index) => dispatch(setApiType(Object.keys(apiNames)[index]))}
+      />
+      <div className={styles.consoles__options}>
+        {apiType === "RA" && (
+          <label className={styles.consoles__option}>
             <ToggleSwitch
-              defaultValue={isRoyal ? "right" : "left"}
-              clickCallback={() => dispatch(setRoyal(!isRoyal))}
+              defaultValue={isOnlyWithAchievements ? "right" : "left"}
+              clickCallback={() =>
+                dispatch(setOnlyWithAchievements(!isOnlyWithAchievements))
+              }
               isDisabled={isLoading}
             />
-            <span>
-              Royal{" "}
-              {!!royalGames?.length ? `(Games: ${royalGames.length})` : ""}
-            </span>
+            Only with achievements
           </label>
-        </div>
-        {apiType === "IGDB" && !isRoyal && <IGDBList />}
-        {apiType === "RA" && !isRoyal && (
-          <div className={styles.consoles__groups}>
-            {consolesGroup.map((item, i) => (
-              <ConsolesGroup key={i} system={item} />
-            ))}
-          </div>
         )}
-        {isRoyal && <RoyalList />}
+        <label className={styles.consoles__toggle}>
+          <ToggleSwitch
+            defaultValue={isRoyal ? "right" : "left"}
+            clickCallback={() => dispatch(setRoyal(!isRoyal))}
+            isDisabled={isLoading}
+          />
+          <span>
+            Royal {!!royalGames?.length ? `(Games: ${royalGames.length})` : ""}
+          </span>
+        </label>
       </div>
-    </ExpandMenu>
+      {apiType === "IGDB" && !isRoyal && <IGDBList />}
+      {apiType === "RA" && !isRoyal && (
+        <div className={styles.consoles__groups}>
+          {consolesGroup.map((item, i) => (
+            <ConsolesGroup key={i} system={item} />
+          ))}
+        </div>
+      )}
+      {isRoyal && <RoyalList />}
+    </div>
   );
 };
