@@ -16,7 +16,7 @@ import {
   setOnlyWithAchievements,
   setRoyal,
 } from "@/src/lib/app/store/slices/selectedSlice";
-import { API, IGDBApi } from "@/src/lib/shared/api";
+import { IGDBApi, RetroachievementsApi } from "@/src/lib/shared/api";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 
 export const ConsolesList: FC = () => {
@@ -42,7 +42,7 @@ export const ConsolesList: FC = () => {
     if (isRoyal) return;
 
     const fetchConsoleIds = async () => {
-      const { data: consoles } = await API.getConsoles();
+      const { data: consoles } = await RetroachievementsApi.getConsoles();
       dispatch(setSystemsRA(consoles));
     };
 

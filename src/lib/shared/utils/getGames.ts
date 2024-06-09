@@ -7,7 +7,7 @@ import {
   setSegments,
   setStarted,
 } from "../../app/store/slices/statesSlice";
-import { API } from "../api";
+import { RetroachievementsApi } from "../api";
 import { getSegments } from "./getSegments";
 
 export const fetchGameList = async () => {
@@ -15,7 +15,7 @@ export const fetchGameList = async () => {
     store.getState().selected;
 
   if (!!selectedSystemsRA?.length) {
-    const { data: games } = await API.getRandomGames(
+    const { data: games } = await RetroachievementsApi.getRandomGames(
       selectedSystemsRA.map((system) => system.id).join(","),
       isOnlyWithAchievements
     );

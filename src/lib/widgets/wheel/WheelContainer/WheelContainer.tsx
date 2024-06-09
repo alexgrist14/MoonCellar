@@ -76,9 +76,8 @@ export const WheelContainer: FC = () => {
       });
     };
 
-    !!segments?.length &&
-      !isLoading &&
-      setColors(generateRandomColors((180 + Math.random() * 0) ^ 0));
+    segments?.some((segment) => !segment) &&
+      setColors(generateRandomColors((180 + Math.random() * 20) ^ 0));
   }, [segments, isLoading]);
 
   return (

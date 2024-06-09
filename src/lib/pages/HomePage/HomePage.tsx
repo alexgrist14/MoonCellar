@@ -31,6 +31,9 @@ export const HomePage: FC = () => {
     searchQuery,
   } = useAppSelector((state) => state.selected);
 
+  const { excludedGameModes, excludedGenres, excludedSystems } = useAppSelector(
+    (state) => state.excluded
+  );
   const { isLoading } = useAppSelector((state) => state.states);
 
   const royalGames = getRoyalGames();
@@ -39,29 +42,42 @@ export const HomePage: FC = () => {
     if (apiType !== "IGDB" || isRoyal) return;
 
     IGDBApi.getGames({
-      genres: selectedGenres.map((genre) => genre._id),
-      modes: selectedGameModes.map((mode) => mode._id),
+      selected: {
+        genres: selectedGenres.map((genre) => genre._id),
+        platforms: selectedSystemsIGDB.map((system) => system._id),
+        modes: selectedGameModes.map((mode) => mode._id),
+      },
+      excluded: {
+        genres: excludedGenres.map((genre) => genre._id),
+        platforms: excludedSystems.map((system) => system._id),
+        modes: excludedGameModes.map((mode) => mode._id),
+      },
       take: 16,
       rating: selectedRating,
-      platforms: selectedSystemsIGDB.map((system) => system._id),
       search: searchQuery,
       isRandom: true,
     }).then((response) => {
-      const games = response.data.map((game) => ({
-        _id: game._id,
-        id: game.id,
-        image: !!game.cover[0] ? "https:" + game.cover[0].url : "",
-        name: game.name,
-        platforms: game.platforms?.map((platform) => platform._id) || [],
-        url: game?.url || "",
-      }));
+      if (!!response.data.length) {
+        const games = response.data.map((game) => ({
+          _id: game._id,
+          id: game.id,
+          image: !!game.cover[0] ? "https:" + game.cover[0].url : "",
+          name: game.name,
+          platforms: game.platforms?.map((platform) => platform._id) || [],
+          url: game?.url || "",
+        }));
 
-      dispatch(setGames(games));
-      dispatch(setSegments(getSegments(games, 16)));
+        dispatch(setGames(games));
+        dispatch(setSegments(getSegments(games, 16)));
 
-      dispatch(setStarted(true));
-      dispatch(setLoading(false));
-      dispatch(setWinner(undefined));
+        dispatch(setStarted(true));
+        dispatch(setLoading(false));
+        dispatch(setWinner(undefined));
+      } else {
+        dispatch(setLoading(false));
+        dispatch(setFinished(true));
+        dispatch(setWinner(undefined));
+      }
     });
   }, [
     apiType,
@@ -72,6 +88,9 @@ export const HomePage: FC = () => {
     selectedRating,
     selectedGameModes,
     selectedSystemsIGDB,
+    excludedGenres,
+    excludedSystems,
+    excludedGameModes,
   ]);
 
   useEffect(() => {
@@ -83,8 +102,6 @@ export const HomePage: FC = () => {
 
   useEffect(() => {
     if (isLoading && !isRoyal) {
-      dispatch(setSegments([]));
-
       apiType === "IGDB" && getIGDBGames();
       apiType === "RA" && fetchGameList();
     }

@@ -12,7 +12,7 @@ const getConsoles = () => {
   return agent<IConsole[]>(`${API_URL}/ra-consoles`, "get");
 };
 
-export const API = {
+export const RetroachievementsApi = {
   getRandomGames,
   getConsoles,
 };

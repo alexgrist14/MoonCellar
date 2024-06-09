@@ -2,17 +2,28 @@ import { API_URL } from "../constants";
 import { IGDBDefault, IGDBGame, IGDBGenre, IGDBPlatform } from "../types/igdb";
 import { agent } from "./agent";
 
-const getGames = (params: {
-  search?: string;
-  rating?: number;
+interface IGDBFilters {
   genres?: string[];
   modes?: string[];
   platforms?: string[];
+}
+
+const getGames = (params: {
+  search?: string;
+  rating?: number;
   isRandom?: boolean;
   take?: number;
   page?: number;
+  selected?: IGDBFilters;
+  excluded?: IGDBFilters;
 }) => {
-  return agent<IGDBGame[]>(`${API_URL}/igdb/games`, "get", { params });
+  return agent<IGDBGame[]>(`${API_URL}/igdb/games`, "get", {
+    params: {
+      ...params,
+      selected: !!params.selected ? JSON.stringify(params.selected) : undefined,
+      excluded: !!params.excluded ? JSON.stringify(params.excluded) : undefined,
+    },
+  });
 };
 
 const getGenres = () => {
