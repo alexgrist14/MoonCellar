@@ -72,7 +72,7 @@ const SingUp: FC = () => {
           <Input value={name} onChange={handleUserNameChange} required />
         </div>
         {error && <p style={{ color: "red" }}>{error}</p>}
-        <Button type="submit" color="blue">
+        <Button type="submit" color="accent">
           Sign up
         </Button>
       </form>
