@@ -1,12 +1,21 @@
-.container{
-    height: 100%;
-    @include flexCenter;
-    .content{
-        display: flex;
-        flex-direction: column;
-        gap: 50px;
-        padding: 100px;
-        border: 1px solid #666;
-        border-radius: 20px;
+.container {
+  display: grid;
+  height: 100%;
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+
+    &__inputs {
+      display: grid;
+      gap: 10px;
     }
+
+    &__buttons {
+      display: grid;
+      gap: 10px;
+    }
+  }
 }
+

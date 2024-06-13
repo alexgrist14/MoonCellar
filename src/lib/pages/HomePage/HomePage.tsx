@@ -16,6 +16,7 @@ import { fetchGameList } from "../../shared/utils/getGames";
 import { setGames } from "../../app/store/slices/selectedSlice";
 import { getSegments } from "../../shared/utils/getSegments";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
+import Login from "../../features/auth/Login/Login";
 
 export const HomePage: FC = () => {
   const dispatch = useAppDispatch();
@@ -118,7 +119,9 @@ export const HomePage: FC = () => {
         <ConsolesList />
       </ExpandMenu>
       <WheelContainer />
-      <ExpandMenu position="right"></ExpandMenu>
+      <ExpandMenu position="right">
+        <Login />
+      </ExpandMenu>
     </div>
   );
 };

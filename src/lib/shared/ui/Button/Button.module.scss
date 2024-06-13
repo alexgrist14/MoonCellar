@@ -15,52 +15,36 @@
 
   padding-inline: 12px;
 
-  path {
-    fill: #fff;
-  }
-
   &:hover {
-    filter: brightness(0.9);
+    filter: brightness(0.8);
   }
 
   &_defaultColor {
-    background-color: $dark;
-    border-color: $textColor;
+    background-color: $lightBg;
+    border-color: $darkBorderColor;
     color: $whiteTextColor;
   }
 
-  &_blueColor {
-    background-color: $blue;
-    border-color: $blue;
-    color: #fff;
-  }
-
-  &_violetColor {
-    background-color: $violet;
-    border-color: $violet;
-    color: #fff;
-  }
-
-  &_breezeColor {
-    background-color: #00abc7;
-    border-color: #00abc7;
-    color: #fff;
+  &_accentColor {
+    background-color: $accent;
+    border-color: $darkBorderColor;
+    color: $whiteTextColor;
   }
 
   &_redColor {
-    background-color: #d9534f;
-    border-color: #d9534f;
+    background-color: $off;
+    border-color: $off;
     color: #fff;
   }
 
   &_greenColor {
-    background-color: #27a745;
-    border-color: #27a745;
+    background-color: $on;
+    border-color: $on;
     color: #fff;
   }
 
   &_greenBorderColor {
-    border-color: #27a745;
+    border-color: $on;
     color: #fff;
   }
 

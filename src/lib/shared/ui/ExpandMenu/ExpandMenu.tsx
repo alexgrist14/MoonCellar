@@ -41,7 +41,9 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
             ? "none"
             : "auto",
         right: position === "right" ? "0" : "unset",
-        direction: position === "right" ? "rtl" : "ltr",
+        gridTemplateColumns: position === "left" ? "1fr 30px" : "30px 1fr",
+        gridTemplateAreas:
+          position === "left" ? "'content expand'" : "'expand content'",
         transform: !isActive
           ? position === "right"
             ? "translateX(calc(100% - 30px))"
@@ -50,7 +52,7 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
       }}
       {...props}
     >
-      <Scrollbar type="absolute" stl={styles}>
+      <Scrollbar type="absolute" stl={styles} className={styles.menu__content}>
         {children}
       </Scrollbar>
       <div

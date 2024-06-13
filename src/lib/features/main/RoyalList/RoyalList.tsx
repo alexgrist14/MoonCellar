@@ -1,7 +1,11 @@
 import { FC } from "react";
 import styles from "./RoyalList.module.scss";
 import { useAppDispatch, useAppSelector } from "@/src/lib/app/store";
-import {setRoyalGamesIGDB, setRoyalGamesRA} from "@/src/lib/app/store/slices/selectedSlice";
+import {
+  setRoyalGamesIGDB,
+  setRoyalGamesRA,
+} from "@/src/lib/app/store/slices/selectedSlice";
+import { Button } from "@/src/lib/shared/ui/Button";
 
 export const RoyalList: FC = () => {
   const dispatch = useAppDispatch();
@@ -27,7 +31,7 @@ export const RoyalList: FC = () => {
                 >
                   {game.name}
                 </a>
-                <button
+                <Button
                   onClick={() =>
                     dispatch(
                       setRoyalGames(
@@ -37,7 +41,7 @@ export const RoyalList: FC = () => {
                   }
                 >
                   Remove
-                </button>
+                </Button>
               </div>
             ))
           : null}

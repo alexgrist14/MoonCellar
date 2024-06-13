@@ -1,33 +1,22 @@
 //main colors
 $whiteTextColor: #ffffff;
-$textColor: $whiteTextColor;
-$dark: #333333;
-$gray: #666666;
+$textColor: #000000;
+$gray: #AFB3B9;
 
-$accent: #288ba1;
+$accent: #1F467D;
+$placeholder: $gray;
 
-$bg: #1f2937;
+$bg: #191D24;
+$bgAlt: #212731;
 $background: $bg;
 $lightBg: #374151;
 $lightBackground: $lightBg;
 
-$on: #1bd897;
-$off: #d8534f;
+$on: #467D1E;
+$off: #7D1E46;
 
 //border colors
 $borderColor: $lightBg;
-$darkBorder: $dark;
-$lightBorder: $whiteTextColor;
-$blackBorder: #000000;
-
-//various colors
-$blue: #337ab7;
-$violet: #4f4f88;
-$errorColor: #ee1111;
-$gridBlue: #2196f3;
-$red: #ffa0a0b8;
-$green: #1cd998;
-$coral: #ffa686;
-$summer: #f3a247;
-$winter: #53b3f3;
-$青: #3142c4;
+$darkBorderColor: $bg;
+$whiteBorderColor: $whiteTextColor;
+$blackBorderColor: $textColor;

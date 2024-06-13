@@ -43,7 +43,7 @@ export const IGDBList: FC = () => {
     <div className={styles.consoles__igdb}>
       <Input
         containerStyles={{ width: "100%" }}
-        placeholder="Search query..."
+        placeholder="Name..."
         disabled={isLoading}
         value={searchQuery}
         onChange={(e) => dispatch(setSearchQuery(e.target.value))}

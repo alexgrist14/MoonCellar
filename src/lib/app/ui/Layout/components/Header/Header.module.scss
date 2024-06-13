@@ -9,12 +9,15 @@
 
   &__left {
     display: flex;
-    gap: 20px;
-    width: max(360px, 30%);
+    height: 34px;
+    align-items: center;
+    gap: 10px;
   }
 
   &__right {
     display: flex;
+    align-items: center;
+    height: 34px;
     gap: 10px;
   }
 
@@ -22,14 +25,11 @@
     display: flex;
     align-items: center;
     font-family: "Pentagra";
-    border-right: 1px solid $lightBg;
-    padding-inline: 5px 20px;
+    padding-inline: 14px;
   }
+}
 
-  .link {
-    &:not(:last-child) {
-    padding-right: 10px;
-      border-right: 1px solid $lightBg;
-    }
-  }
+.svg {
+  color: $whiteTextColor;
+  width: 22px;
 }

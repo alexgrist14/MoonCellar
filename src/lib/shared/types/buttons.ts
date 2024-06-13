@@ -2,10 +2,8 @@ import { ReactNode } from "react";
 
 export type IButtonColor =
   | "default"
-  | "blue"
+  | "accent"
   | "red"
-  | "violet"
-  | "breeze"
   | "green"
   | "greenBorder"
   | "transparent";

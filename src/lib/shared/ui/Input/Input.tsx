@@ -1,4 +1,4 @@
-import { CSSProperties, FC, InputHTMLAttributes } from "react";
+import { CSSProperties, InputHTMLAttributes, forwardRef } from "react";
 import styles from "./Input.module.scss";
 import classNames from "classnames";
 
@@ -18,15 +18,18 @@ interface InputProps
   containerStyles?: CSSProperties;
 }
 
-export const Input: FC<InputProps> = ({
-  containerStyles,
-  className,
-  ...props
-}) => {
-  return (
-    <div className={styles.container} style={containerStyles}>
-      <input className={classNames(styles.input, className)} {...props} />
-    </div>
-  );
-};
+export const Input = forwardRef<HTMLInputElement, InputProps>(
+  ({ containerStyles, className, ...props }, ref) => {
+    return (
+      <div className={styles.container} style={containerStyles}>
+        <input
+          ref={ref}
+          className={classNames(styles.input, className)}
+          {...props}
+        />
+      </div>
+    );
+  }
+);
 
+Input.displayName = "Input";

@@ -28,9 +28,9 @@
   display: flex;
   position: relative;
   width: 100%;
-  background-color: rgba($off, 0.5);
+  background-color: rgba($off, 1);
   height: 2px;
-  border: 1px solid rgba($off, 0.5);
+  border: 1px solid rgba($off, 1);
   border-radius: 3px;
   margin-top: 1px;
 
@@ -65,8 +65,8 @@
 
   &__bar {
     position: absolute;
-    background-color: rgba($on, 0.5);
-    outline: 1px solid rgba($on, 0.5);
+    background-color: rgba($on, 1);
+    outline: 1px solid rgba($on, 1);
     border-radius: 3px;
     top: 0;
     height: 100%;

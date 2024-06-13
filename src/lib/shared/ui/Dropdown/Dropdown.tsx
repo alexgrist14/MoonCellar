@@ -14,7 +14,6 @@ import { useRouter } from "next/router";
 import { Button } from "../Button";
 import useCloseEvents from "../../hooks/useCloseEvents";
 import { Scrollbar } from "../Scrollbar";
-import { ExtendedCheckbox } from "../ExtendedCheckbox";
 import { Checkbox } from "../Checkbox";
 
 interface IDropDownListProps {
