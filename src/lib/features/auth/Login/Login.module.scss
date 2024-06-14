@@ -15,7 +15,13 @@
     &__buttons {
       display: grid;
       gap: 10px;
+      text-align: center;
+      .link{
+        color: $linkColor;
+        &:hover{
+          cursor: pointer;
+        }
+      }
     }
   }
 }
-
