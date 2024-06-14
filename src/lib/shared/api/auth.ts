@@ -1,10 +1,11 @@
 import axios from "axios";
 import { LoginDto, SignUpDto } from "../types/auth";
+import { API_URL } from "../constants";
 
 export const signup = async (signUpDto: SignUpDto): Promise<void> => {
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_NEST_SERVER}/auth/signup`,
+      `${API_URL}/auth/signup`,
       signUpDto,
       {
         headers: {
@@ -27,7 +28,7 @@ export const signup = async (signUpDto: SignUpDto): Promise<void> => {
 export const login = async (loginDto: LoginDto): Promise<void> => {
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_NEST_SERVER}/auth/login`,
+      `${API_URL}/auth/login`,
       loginDto,
       {
         headers: {
