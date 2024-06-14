@@ -1,8 +1,8 @@
 import axios from "axios";
-import { LoginDto, SignUpDto } from "../types/auth";
+import { IAuth, LoginDto, SignUpDto } from "../types/auth";
 import { API_URL } from "../constants";
 
-export const signup = async (signUpDto: SignUpDto): Promise<void> => {
+export const signup = async (signUpDto: IAuth): Promise<void> => {
   try {
     const response = await axios.post(
       `${API_URL}/auth/signup`,
@@ -25,7 +25,7 @@ export const signup = async (signUpDto: SignUpDto): Promise<void> => {
   }
 };
 
-export const login = async (loginDto: LoginDto): Promise<void> => {
+export const login = async (loginDto: IAuth): Promise<void> => {
   try {
     const response = await axios.post(
       `${API_URL}/auth/login`,
