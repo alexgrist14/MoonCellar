@@ -10,11 +10,6 @@ export interface IConsole {
   iconUrl: string;
 }
 
-export interface IAuth {
-  userName: string;
-  webApiKey: string;
-}
-
 export interface IGame {
   title: string;
   id: number;

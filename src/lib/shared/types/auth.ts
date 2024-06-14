@@ -8,3 +8,9 @@ export interface SignUpDto{
   email:string;
   password: string;
 }
+
+export interface IAuth{
+  name?: string,
+  email: string,
+  password: string,
+}
