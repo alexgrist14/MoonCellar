@@ -37,16 +37,18 @@ export const ConsolesList: FC = () => {
   ];
 
   const royalGames = getRoyalGames();
-
+  console.log('123');
   useEffect(() => {
+    console.log('123');
     if (isRoyal) return;
 
-    const fetchConsoleIds = async () => {
+    const fetchRAConsoleIds = async () => {
       const { data: consoles } = await RetroachievementsApi.getConsoles();
       dispatch(setSystemsRA(consoles));
     };
 
-    apiType === "RA" && fetchConsoleIds();
+    apiType === "RA" && fetchRAConsoleIds();
+    
 
     if (apiType === "IGDB") {
       IGDBApi.getGenres().then((response) =>
