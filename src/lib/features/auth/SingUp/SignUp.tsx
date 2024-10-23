@@ -1,15 +1,17 @@
 import { ChangeEvent, FC, useState } from "react";
 import styles from "./SingUp.module.scss";
-import { InputType } from "@/src/lib/shared/types/input.enum";
 import { Button } from "@/src/lib/shared/ui/Button";
 import { useAppDispatch } from "@/src/lib/app/store";
-import { setAuth } from "@/src/lib/app/store/slices/authSlice";
+import { setUser } from "@/src/lib/app/store/slices/authSlice";
 import { signup } from "@/src/lib/shared/api/auth";
 import { SignUpDto } from "@/src/lib/shared/types/auth";
 import { Input } from "@/src/lib/shared/ui/Input";
+import { useRouter } from "next/router";
 
 const SingUp: FC = () => {
   const dispatch = useAppDispatch();
+
+  const router = useRouter();
 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -31,12 +33,21 @@ const SingUp: FC = () => {
   const handleSignUp = async () => {
     setError(null);
     const signUpDto: SignUpDto = { name, email, password };
-    try {
-      const response = await signup(signUpDto);
-      console.log(response);
-    } catch (err: any) {
-      setError(err.message);
-    }
+    await signup(signUpDto)
+      .then((res) => {
+        console.log(res.user.email);
+        dispatch(
+          setUser({
+            id: res.user._id,
+            email: res.user.email,
+            user: res.user.name,
+          })
+        );
+        router.push(`/user/${res.user._id}`)
+      })
+      .catch((err) => {
+        setError(err.message);
+      });
   };
 
   return (

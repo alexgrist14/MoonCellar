@@ -1,3 +1,12 @@
 .container {
+  display: flex;
   color: $whiteTextColor;
+  justify-content: center;
+  .content{
+    display: flex;
+    max-width: 80%;
+    width: 100%;
+    background: #09121c;
+    border-radius: 20px;
+  }
 }

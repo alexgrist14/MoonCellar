@@ -1,10 +1,9 @@
 import axios from "axios";
-import { IAuth, LoginDto, SignUpDto } from "../types/auth";
+import { IAuth, IUser, LoginDto, SignUpDto } from "../types/auth";
 import { API_URL } from "../constants";
 
-export const signup = async (signUpDto: IAuth): Promise<void> => {
+export const signup = async (signUpDto: IAuth): Promise<IUser> => {
   try {
-    console.log('worked');
     const response = await axios.post(
       `${API_URL}/auth/signup`,
       signUpDto,
