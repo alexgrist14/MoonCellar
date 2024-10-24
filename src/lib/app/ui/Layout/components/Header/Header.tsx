@@ -4,13 +4,13 @@ import Link from "next/link";
 import { Separator } from "@/src/lib/shared/ui/Separator";
 import { Button } from "@/src/lib/shared/ui/Button";
 import { SvgMenu, SvgSearch } from "@/src/lib/shared/ui/svg";
-import { useAppSelector } from "@/src/lib/app/store";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { useRouter } from "next/router";
+import { useCommonStore } from "@/src/lib/shared/store/common.store";
 
 export const Header: FC = () => {
   const { asPath } = useRouter();
-  const { isMobile } = useAppSelector((state) => state.common);
+  const { isMobile } = useCommonStore();
 
   const tabs = [
     { tabName: "Home", tabLink: "/" },

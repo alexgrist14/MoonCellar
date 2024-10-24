@@ -1,27 +1,25 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import styles from "./UserProfile.module.scss";
 import Image from "next/image";
-import { useAppSelector } from "../../app/store";
-import { useRouter } from "next/router";
 
 interface UserProfileProps{
     name: string;
     email: string;
 }
 
-const UserProfile: FC<UserProfileProps> = ({name, email})=>{
+const UserProfile: FC<UserProfileProps> = ({ email})=>{
     function getCookie(name: string) {
-        const matches = document.cookie.match(
-          new RegExp(
-            '(?:^|; )' +
-              name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') +
-              '=([^;]*)',
-          ),
-        );
-        const res = matches ? decodeURIComponent(matches[1]) : undefined;
+        // const matches = document.cookie.match(
+        //   new RegExp(
+        //     '(?:^|; )' +
+        //       name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') +
+        //       '=([^;]*)',
+        //   ),
+        // );
+        // const res = matches ? decodeURIComponent(matches[1]) : undefined;
       
-        if (typeof res === 'string') return res;
-        if (typeof res === 'object') return JSON.parse(res);
+        // if (typeof res === 'string') return res;
+        // if (typeof res === 'object') return JSON.parse(res);
       }
       console.log(getCookie('refreshToken'))
 
@@ -29,10 +27,11 @@ const UserProfile: FC<UserProfileProps> = ({name, email})=>{
       
     const [token,setToken] = useState<string | undefined>('');
     const hnldClick = ()=>{
-        setToken(getCookie('refreshToken')?.toString())
+        // setToken(getCookie('refreshToken')?.toString())
         console.log('click')
     }
     console.log() 
+
     return(
         <div className={styles.container}>
             <div className={styles.content}>

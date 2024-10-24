@@ -1,12 +1,8 @@
-import { store } from "../../app/store";
 import { IGame } from "../types/game";
 import { shuffle } from "./shuffle";
 
 export const getSegments = (games: IGame[], max: number) => {
-  const { isOnlyWithAchievements, apiType } = store.getState().selected;
-  const filteredGames = games.filter(
-    (game) => apiType !== "RA" || !isOnlyWithAchievements || !!game.achievements
-  );
+  const filteredGames = games.filter((game) => !!game.achievements);
 
   const sortedGames = shuffle(filteredGames);
 

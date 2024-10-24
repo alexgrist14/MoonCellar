@@ -1,43 +1,36 @@
 import { FC } from "react";
 import styles from "./IGDBList.module.scss";
-import { useAppDispatch, useAppSelector } from "@/src/lib/app/store";
 import { ExtendedSelector } from "@/src/lib/shared/ui/ExtendedSelector";
 import { ExtendedRange } from "@/src/lib/shared/ui/ExtendedRange";
-import {
-  setSearchQuery,
-  setSelectedGameModes,
-  setSelectedGenres,
-  setSelectedRating,
-  setSelectedSystemsIGDB,
-} from "@/src/lib/app/store/slices/selectedSlice";
-import {
-  setExcludedGameModes,
-  setExcludedGenres,
-  setExcludedSystems,
-} from "@/src/lib/app/store/slices/excludedSlice";
 import { Input } from "@/src/lib/shared/ui/Input";
+import { useSelectedStore } from "@/src/lib/shared/store/selected.store";
+import { useExcludedStore } from "@/src/lib/shared/store/excluded.store";
+import { useCommonStore } from "@/src/lib/shared/store/common.store";
+import { useStatesStore } from "@/src/lib/shared/store/states.store";
 
 export const IGDBList: FC = () => {
-  const dispatch = useAppDispatch();
-  const { gameModes, genres, systemsIGDB } = useAppSelector(
-    (state) => state.common
-  );
-
+  const { gameModes, genres, systems } = useCommonStore();
+  const { isLoading, isPlatformsLoading } = useStatesStore();
   const {
-    selectedSystemsIGDB,
+    setSelectedGameModes,
+    setSelectedGenres,
+    setSelectedRating,
+    setSelectedSystems,
+    selectedSystems,
+    selectedRating,
     selectedGenres,
     selectedGameModes,
-    selectedRating,
     searchQuery,
-  } = useAppSelector((state) => state.selected);
-
-  const { excludedGenres, excludedGameModes, excludedSystems } = useAppSelector(
-    (state) => state.excluded
-  );
-
-  const { isLoading, isPlatformsLoading } = useAppSelector(
-    (state) => state.states
-  );
+    setSearchQuery,
+  } = useSelectedStore();
+  const {
+    setExcludedGameModes,
+    setExcludedGenres,
+    setExcludedSystems,
+    excludedGameModes,
+    excludedGenres,
+    excludedSystems,
+  } = useExcludedStore();
 
   return (
     <div className={styles.consoles__igdb}>
@@ -46,39 +39,39 @@ export const IGDBList: FC = () => {
         placeholder="Name..."
         disabled={isLoading}
         value={searchQuery}
-        onChange={(e) => dispatch(setSearchQuery(e.target.value))}
+        onChange={(e) => setSearchQuery(e.target.value)}
       />
       <ExtendedSelector
         title="Game Modes"
-        list={gameModes}
-        excluded={excludedGameModes}
-        selected={selectedGameModes}
+        list={gameModes || []}
+        excluded={excludedGameModes || []}
+        selected={selectedGameModes || []}
         isDisabled={isLoading}
         setExcluded={setExcludedGameModes}
         setSelected={setSelectedGameModes}
       />
       <ExtendedSelector
         title="Genres"
-        list={genres}
-        excluded={excludedGenres}
-        selected={selectedGenres}
+        list={genres || []}
+        excluded={excludedGenres || []}
+        selected={selectedGenres || []}
         isDisabled={isLoading}
         setExcluded={setExcludedGenres}
         setSelected={setSelectedGenres}
       />
       <ExtendedSelector
         title="Platforms"
-        list={systemsIGDB}
-        excluded={excludedSystems}
-        selected={selectedSystemsIGDB}
+        list={systems || []}
+        excluded={excludedSystems || []}
+        selected={selectedSystems || []}
         isDisabled={isLoading || isPlatformsLoading}
         setExcluded={setExcludedSystems}
-        setSelected={setSelectedSystemsIGDB}
+        setSelected={setSelectedSystems}
       />
       <div className={styles.consoles__options}>
         <ExtendedRange
           text="All ratings"
-          selected={selectedRating}
+          selected={selectedRating || 0}
           setSelected={setSelectedRating}
           isDisabled={isLoading}
           min={0}

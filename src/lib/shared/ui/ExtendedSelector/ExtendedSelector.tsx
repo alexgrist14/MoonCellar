@@ -1,6 +1,4 @@
 import styles from "./ExtendedSelector.module.scss";
-import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
-import { useAppDispatch } from "@/src/lib/app/store";
 import { Dropdown } from "../Dropdown";
 
 export interface IExtendedSelectorProps<
@@ -10,8 +8,8 @@ export interface IExtendedSelectorProps<
   list: T[];
   excluded: T[];
   selected: T[];
-  setExcluded: ActionCreatorWithPayload<T[]>;
-  setSelected: ActionCreatorWithPayload<T[]>;
+  setExcluded: any;
+  setSelected: any;
   isDisabled?: boolean;
 }
 
@@ -24,8 +22,6 @@ export const ExtendedSelector = <T,>({
   setSelected,
   isDisabled,
 }: IExtendedSelectorProps<T & { id: number; name: string }>) => {
-  const dispatch = useAppDispatch();
-
   return (
     <div className={styles.option}>
       <h3>{title}</h3>
@@ -44,7 +40,7 @@ export const ExtendedSelector = <T,>({
           }
           placeholder="Include..."
           getIndexes={(indexes) =>
-            dispatch(setSelected(indexes.map((index) => list[index])))
+            setSelected(indexes.map((index) => list[index]))
           }
         />
       </div>
@@ -63,7 +59,7 @@ export const ExtendedSelector = <T,>({
           }
           placeholder="Exclude..."
           getIndexes={(indexes) =>
-            dispatch(setExcluded(indexes.map((index) => list[index])))
+            setExcluded(indexes.map((index) => list[index]))
           }
         />
       </div>

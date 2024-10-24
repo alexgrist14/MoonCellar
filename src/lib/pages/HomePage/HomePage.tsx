@@ -1,57 +1,46 @@
 import { FC, useCallback, useEffect } from "react";
 import styles from "./HomePage.module.scss";
 import { ConsolesList } from "../../widgets/main";
-import { useAppDispatch, useAppSelector } from "../../app/store";
-import { getRoyalGames } from "../../shared/utils/getRoyalGames";
 import { IGDBApi } from "../../shared/api";
-import { setWinner } from "../../app/store/slices/commonSlice";
-import {
-  setFinished,
-  setLoading,
-  setSegments,
-  setStarted,
-} from "../../app/store/slices/statesSlice";
 import { WheelContainer } from "../../widgets/wheel";
-import { fetchGameList } from "../../shared/utils/getGames";
-import { setGames } from "../../app/store/slices/selectedSlice";
 import { getSegments } from "../../shared/utils/getSegments";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
-import Login from "../../features/auth/Login/Login";
+import { useSelectedStore } from "../../shared/store/selected.store";
+import { useExcludedStore } from "../../shared/store/excluded.store";
+import { useStatesStore } from "../../shared/store/states.store";
+import { useCommonStore } from "../../shared/store/common.store";
 
 export const HomePage: FC = () => {
-  const dispatch = useAppDispatch();
-
   const {
-    apiType,
-    selectedSystemsRA,
     isRoyal,
     selectedGenres,
     selectedRating,
     selectedGameModes,
-    selectedSystemsIGDB,
+    selectedSystems,
     searchQuery,
-  } = useAppSelector((state) => state.selected);
+    royalGames,
+    setGames,
+  } = useSelectedStore();
 
-  const { excludedGameModes, excludedGenres, excludedSystems } = useAppSelector(
-    (state) => state.excluded
-  );
-  const { isLoading } = useAppSelector((state) => state.states);
-
-  const royalGames = getRoyalGames();
+  const { excludedGameModes, excludedGenres, excludedSystems } =
+    useExcludedStore();
+  const { isLoading, setSegments, setStarted, setFinished, setLoading } =
+    useStatesStore();
+  const { setWinner } = useCommonStore();
 
   const getIGDBGames = useCallback(() => {
-    if (apiType !== "IGDB" || isRoyal) return;
+    if (isRoyal) return;
 
     IGDBApi.getGames({
       selected: {
-        genres: selectedGenres.map((genre) => genre._id),
-        platforms: selectedSystemsIGDB.map((system) => system._id),
-        modes: selectedGameModes.map((mode) => mode._id),
+        genres: selectedGenres?.map((genre) => genre._id),
+        platforms: selectedSystems?.map((system) => system._id),
+        modes: selectedGameModes?.map((mode) => mode._id),
       },
       excluded: {
-        genres: excludedGenres.map((genre) => genre._id),
-        platforms: excludedSystems.map((system) => system._id),
-        modes: excludedGameModes.map((mode) => mode._id),
+        genres: excludedGenres?.map((genre) => genre._id),
+        platforms: excludedSystems?.map((system) => system._id),
+        modes: excludedGameModes?.map((mode) => mode._id),
       },
       take: 16,
       rating: selectedRating,
@@ -68,50 +57,54 @@ export const HomePage: FC = () => {
           url: game?.url || "",
         }));
 
-        dispatch(setGames(games));
-        dispatch(setSegments(getSegments(games, 16)));
+        setGames(games);
+        setSegments(getSegments(games, 16));
 
-        dispatch(setStarted(true));
-        dispatch(setLoading(false));
-        dispatch(setWinner(undefined));
+        setStarted(true);
+        setLoading(false);
+        setWinner(undefined);
       } else {
-        dispatch(setLoading(false));
-        dispatch(setFinished(true));
-        dispatch(setWinner(undefined));
+        setLoading(false);
+        setFinished(true);
+        setWinner(undefined);
       }
     });
   }, [
-    apiType,
+    setLoading,
+    setSegments,
+    setStarted,
+    setWinner,
     isRoyal,
-    dispatch,
     searchQuery,
     selectedGenres,
     selectedRating,
     selectedGameModes,
-    selectedSystemsIGDB,
+    selectedSystems,
+    setFinished,
+    setGames,
     excludedGenres,
     excludedSystems,
     excludedGameModes,
   ]);
 
   useEffect(() => {
-    dispatch(setWinner(undefined));
-    dispatch(setFinished(true));
-    dispatch(setStarted(false));
-    dispatch(setSegments([]));
-  }, [apiType, dispatch, isRoyal, selectedSystemsRA]);
+    setWinner(undefined);
+    setFinished(true);
+    setStarted(false);
+    setSegments([]);
+  }, [isRoyal]);
 
   useEffect(() => {
     if (isLoading && !isRoyal) {
-      apiType === "IGDB" && getIGDBGames();
-      apiType === "RA" && fetchGameList();
+      getIGDBGames();
     }
-  }, [isLoading, getIGDBGames, apiType, isRoyal, dispatch]);
+  }, [isLoading, getIGDBGames, isRoyal]);
 
   useEffect(() => {
     isRoyal &&
-      dispatch(setSegments(royalGames.map((game, i) => game.id + "_" + i)));
-  }, [isRoyal, royalGames, dispatch]);
+      !!royalGames &&
+      setSegments(royalGames.map((game, i) => game.id + "_" + i));
+  }, [isRoyal, royalGames, setSegments]);
 
   return (
     <div className={styles.page}>
@@ -119,9 +112,7 @@ export const HomePage: FC = () => {
         <ConsolesList />
       </ExpandMenu>
       <WheelContainer />
-      <ExpandMenu position="right">
-        <Login />
-      </ExpandMenu>
+      <ExpandMenu position="right"></ExpandMenu>
     </div>
   );
 };
