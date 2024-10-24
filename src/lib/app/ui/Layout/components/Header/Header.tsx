@@ -7,11 +7,11 @@ import { SvgMenu, SvgSearch } from "@/src/lib/shared/ui/svg";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { useRouter } from "next/router";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
-import { getCookie } from "@/src/lib/shared/utils/cookie";
 import { jwtDecode } from "jwt-decode";
 import { isTokenExpired } from "@/src/lib/shared/utils/token";
 import Image from "next/image";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
+import { getCookie } from "@/src/lib/shared/utils/getCookie";
 
 export const Header: FC = () => {
   const { asPath } = useRouter();
