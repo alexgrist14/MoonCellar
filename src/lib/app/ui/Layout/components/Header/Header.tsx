@@ -21,11 +21,13 @@ export const Header: FC = () => {
 
   useEffect(() => {
     const token = getCookie("refresh_token");
-    const decoded: any = jwtDecode(token);
-    console.log(decoded);
-    if (decoded.exp) {
-      setAuth(!isTokenExpired(decoded.exp));
-      setUserId(decoded.id);
+    if (token) {
+      const decoded: any = jwtDecode(token);
+      console.log(decoded);
+      if (decoded.exp) {
+        setAuth(!isTokenExpired(decoded.exp));
+        setUserId(decoded.id);
+      }
     }
   }, [setAuth, setUserId]);
 
