@@ -2,7 +2,7 @@ import axios from "axios";
 import { IAuth, IUser, LoginDto, SignUpDto } from "../types/auth";
 import { API_URL } from "../constants";
 
-export const signup = async (signUpDto: IAuth): Promise<IUser> => {
+export const signup = async (signUpDto: IAuth): Promise<{userId: string}> => {
   try {
     const response = await axios.post(
       `${API_URL}/auth/signup`,

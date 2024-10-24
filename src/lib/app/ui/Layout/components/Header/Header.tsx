@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import styles from "./Header.module.scss";
 import Link from "next/link";
 import { Separator } from "@/src/lib/shared/ui/Separator";
@@ -7,10 +7,31 @@ import { SvgMenu, SvgSearch } from "@/src/lib/shared/ui/svg";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { useRouter } from "next/router";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
+import { getCookie } from "@/src/lib/shared/utils/cookie";
+import { jwtDecode } from "jwt-decode";
+import { isTokenExpired } from "@/src/lib/shared/utils/token";
+import Image from "next/image";
+import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 
 export const Header: FC = () => {
   const { asPath } = useRouter();
   const { isMobile } = useCommonStore();
+  const { setAuth, isAuth, setUserId, userId } = useAuthStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = getCookie("refresh_token");
+    const decoded: any = jwtDecode(token);
+    console.log(decoded);
+    if (decoded.exp) {
+      setAuth(!isTokenExpired(decoded.exp));
+      setUserId(decoded.id);
+    }
+  }, [setAuth, setUserId]);
+
+  const handleProfileClick = () => {
+    router.push(`/user/${userId}`);
+  };
 
   const tabs = [
     { tabName: "Home", tabLink: "/" },
@@ -52,6 +73,16 @@ export const Header: FC = () => {
               contents={tabs}
             />
           </>
+        )}
+        {isAuth && (
+          <div className={styles.profile} onClick={handleProfileClick}>
+            <Image
+              src={"/images/user.png"}
+              width={40}
+              height={40}
+              alt="profile"
+            />
+          </div>
         )}
       </div>
     </div>
