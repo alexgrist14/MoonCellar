@@ -1,19 +1,23 @@
 import UserProfile from "@/src/lib/pages/UserProfile/UserProfile";
 import { getUserById } from "@/src/lib/shared/api/user";
-import { GetServerSideProps } from "next";
+import { IUser } from "@/src/lib/shared/types/auth";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { FC } from "react";
 
-const User: FC = () => {
+interface UserProps{
+  user: any;
+  id: string;
+}
 
-
-  return <UserProfile name={"alex"} email={"alex@mail.com"}  />;
+const User: FC<UserProps> = ({user, id}) => {
+  console.log(user)
+  return <UserProfile name={user.name} email={user.email}  />;
 };
 
 
-// export const getServerSideProps = (async () => {
-//   // Fetch data from external API
-//   const user = await getUserById(id);
-//   // Pass data to the page via props
-//   return { props: { user } }
-// })
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+  const {query} = context;
+  const user = await getUserById(query.id as string);
+  return { props: { user, id: query.id } };
+};
 export default User;

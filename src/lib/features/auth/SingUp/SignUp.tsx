@@ -35,15 +35,8 @@ const SingUp: FC = () => {
     const signUpDto: SignUpDto = { name, email, password };
     await signup(signUpDto)
       .then((res) => {
-        console.log(res.user.email);
-        dispatch(
-          setUser({
-            id: res.user._id,
-            email: res.user.email,
-            user: res.user.name,
-          })
-        );
-        router.push(`/user/${res.user._id}`)
+
+        router.push(`/user/${res.userId}`)
       })
       .catch((err) => {
         setError(err.message);

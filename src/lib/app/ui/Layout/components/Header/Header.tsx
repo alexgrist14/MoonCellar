@@ -7,10 +7,21 @@ import { SvgMenu, SvgSearch } from "@/src/lib/shared/ui/svg";
 import { useAppSelector } from "@/src/lib/app/store";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { useRouter } from "next/router";
+import Image from "next/image";
+import { getCookie } from "@/src/lib/shared/utils/getCookie";
+import { jwtDecode } from "jwt-decode";
+import { isTokenExpired } from "@/src/lib/shared/utils/token";
 
 export const Header: FC = () => {
   const { asPath } = useRouter();
   const { isMobile } = useAppSelector((state) => state.common);
+
+  const token = getCookie('access_token');
+  const decoded = jwtDecode(token)
+ 
+  if(decoded.exp){
+   console.log(isTokenExpired(decoded.exp))
+  }
 
   const tabs = [
     { tabName: "Home", tabLink: "/" },
@@ -53,6 +64,9 @@ export const Header: FC = () => {
             />
           </>
         )}
+        <div className={styles.profile}>
+          <Image src={'/images/user.png'} width={40} height={40} alt="profile"/>
+        </div>
       </div>
     </div>
   );

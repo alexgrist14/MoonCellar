@@ -29,7 +29,7 @@ const Login: FC = () => {
     };
 
     login(loginDto)
-      .then(() => dispatch(setUser({ email: data.email, user: "123" })))
+      .then((res) =>{console.log(res)})
       .catch((err) => setError(err.message));
   };
 

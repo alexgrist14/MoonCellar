@@ -37,9 +37,7 @@ export const ConsolesList: FC = () => {
   ];
 
   const royalGames = getRoyalGames();
-  console.log('123');
   useEffect(() => {
-    console.log('123');
     if (isRoyal) return;
 
     const fetchRAConsoleIds = async () => {
@@ -48,7 +46,6 @@ export const ConsolesList: FC = () => {
     };
 
     apiType === "RA" && fetchRAConsoleIds();
-    
 
     if (apiType === "IGDB") {
       IGDBApi.getGenres().then((response) =>

@@ -5,10 +5,12 @@ const initialState: {
   id: string;
   email: string;
   user: string;
+  isAuth: boolean;
 } = {
   id: "",
   email: "",
   user: "",
+  isAuth: false,
 };
 
 export const authSlice = createSlice({
@@ -23,8 +25,13 @@ export const authSlice = createSlice({
       state.email = action.payload.email;
       state.user = action.payload.user;
     },
+    setAuth:(
+      state, action: PayloadAction<{isAuth: boolean}>
+    )=>{
+      state.isAuth = action.payload.isAuth
+    }
   },
 });
 
-export const { setUser } = authSlice.actions;
+export const { setUser,setAuth } = authSlice.actions;
 export default authSlice.reducer;
