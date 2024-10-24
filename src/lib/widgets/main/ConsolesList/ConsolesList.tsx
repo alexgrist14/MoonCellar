@@ -12,41 +12,6 @@ export const ConsolesList: FC = () => {
   const { isLoading } = useStatesStore();
   const { setGenres, setGameModes, setSystems } = useCommonStore();
 
-<<<<<<< HEAD
-  const consolesGroup = [
-    "Nintendo",
-    "Sony",
-    "Atari",
-    "Sega",
-    "NEC",
-    "SNK",
-    "Other",
-  ];
-
-  const royalGames = getRoyalGames();
-  useEffect(() => {
-    if (isRoyal) return;
-
-    const fetchRAConsoleIds = async () => {
-      const { data: consoles } = await RetroachievementsApi.getConsoles();
-      dispatch(setSystemsRA(consoles));
-    };
-
-    apiType === "RA" && fetchRAConsoleIds();
-
-    if (apiType === "IGDB") {
-      IGDBApi.getGenres().then((response) =>
-        dispatch(setGenres(response.data))
-      );
-      IGDBApi.getModes().then((response) =>
-        dispatch(setGameModes(response.data))
-      );
-      IGDBApi.getPlatforms().then((response) =>
-        dispatch(setSystemsIGDB(response.data))
-      );
-    }
-  }, [apiType, isRoyal, dispatch]);
-=======
   useEffect(() => {
     if (isRoyal) return;
 
@@ -54,7 +19,6 @@ export const ConsolesList: FC = () => {
     IGDBApi.getModes().then((response) => setGameModes(response.data));
     IGDBApi.getPlatforms().then((response) => setSystems(response.data));
   }, [isRoyal]);
->>>>>>> 6a78590649a70331eb592735d141bdef52fb4d4f
 
   const contentRef = useRef<HTMLDivElement>(null);
 

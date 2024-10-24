@@ -8,19 +8,6 @@ interface UserProfileProps {
   email: string;
 }
 
-<<<<<<< HEAD
-const UserProfile: FC<UserProfileProps> = ({ name, email }) => {
-  return (
-    <div className={styles.container}>
-      <div className={styles.content}>
-        <div className={styles.profile_image}>
-          <Image
-            src="/images/user.png"
-            width={150}
-            height={150}
-            alt="profile"
-          ></Image>
-=======
 const UserProfile: FC<UserProfileProps> = ({ email})=>{
     function getCookie(name: string) {
         // const matches = document.cookie.match(
@@ -55,7 +42,6 @@ const UserProfile: FC<UserProfileProps> = ({ email})=>{
                 <div className={styles.profile_email}onClick={hnldClick}>{email}</div>
             </div>
             </div>
->>>>>>> 6a78590649a70331eb592735d141bdef52fb4d4f
         </div>
         <div className={styles.profile_info}>
           <div className={styles.profile_name}>{name}</div>
