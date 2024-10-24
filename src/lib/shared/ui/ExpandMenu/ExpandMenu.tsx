@@ -3,9 +3,8 @@ import styles from "./ExpandMenu.module.scss";
 import classNames from "classnames";
 import { Scrollbar } from "../Scrollbar";
 import { SvgChevron } from "../svg";
-import { useAppDispatch, useAppSelector } from "@/src/lib/app/store";
-import { setExpandPosition } from "@/src/lib/app/store/slices/commonSlice";
 import { useWindowResizeAction } from "../../hooks";
+import { useCommonStore } from "../../store/common.store";
 
 interface IExpandMenuProps
   extends Pick<HTMLAttributes<HTMLDivElement>, "children" | "id"> {
@@ -17,8 +16,7 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
   position = "left",
   ...props
 }) => {
-  const dispatch = useAppDispatch();
-  const { expandPosition, isMobile } = useAppSelector((state) => state.common);
+  const { expandPosition, isMobile, setExpandPosition } = useCommonStore();
 
   const [isActive, setIsActive] = useState(false);
 
@@ -27,8 +25,8 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
   });
 
   useEffect(() => {
-    dispatch(setExpandPosition(isActive ? position : undefined));
-  }, [isActive, dispatch, position]);
+    setExpandPosition(isActive ? position : undefined);
+  }, [isActive, setExpandPosition, position]);
 
   return (
     <div

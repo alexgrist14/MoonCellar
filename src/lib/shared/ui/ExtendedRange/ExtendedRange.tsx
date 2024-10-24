@@ -1,14 +1,12 @@
-import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import styles from "./ExtendedRange.module.scss";
 import { FC, useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import { useAppDispatch } from "@/src/lib/app/store";
 import { RangeSelector } from "../RangeSelector";
 
 export interface IExtendedCheckboxProps {
   title?: string;
   selected: number;
-  setSelected: ActionCreatorWithPayload<number>;
+  setSelected: any;
   isDisabled?: boolean;
   min: number;
   max: number;
@@ -26,11 +24,10 @@ export const ExtendedRange: FC<IExtendedCheckboxProps> = ({
   symbol,
   text,
 }) => {
-  const dispatch = useAppDispatch();
   const [value, setValue] = useState(0);
 
   const debouncedSetSelected = useDebouncedCallback(
-    (value: number) => dispatch(setSelected(value)),
+    (value: number) => setSelected(value),
     500
   );
 

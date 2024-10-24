@@ -1,31 +1,18 @@
 import { FC, useEffect, useRef } from "react";
 import styles from "./ConsolesList.module.scss";
-import { useAppDispatch, useAppSelector } from "@/src/lib/app/store";
-import { getRoyalGames } from "@/src/lib/shared/utils/getRoyalGames";
-import { apiNames } from "@/src/lib/shared/constants";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
-import {
-  setGameModes,
-  setGenres,
-  setSystemsIGDB,
-  setSystemsRA,
-} from "@/src/lib/app/store/slices/commonSlice";
-import { ConsolesGroup, IGDBList, RoyalList } from "@/src/lib/features/main";
-import {
-  setApiType,
-  setOnlyWithAchievements,
-  setRoyal,
-} from "@/src/lib/app/store/slices/selectedSlice";
-import { IGDBApi, RetroachievementsApi } from "@/src/lib/shared/api";
-import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
+import { IGDBList, RoyalList } from "@/src/lib/features/main";
+import { IGDBApi } from "@/src/lib/shared/api";
+import { useSelectedStore } from "@/src/lib/shared/store/selected.store";
+import { useStatesStore } from "@/src/lib/shared/store/states.store";
+import { useCommonStore } from "@/src/lib/shared/store/common.store";
 
 export const ConsolesList: FC = () => {
-  const dispatch = useAppDispatch();
-  const { apiType, isRoyal, isOnlyWithAchievements } = useAppSelector(
-    (state) => state.selected
-  );
-  const { isLoading } = useAppSelector((state) => state.states);
+  const { isRoyal, royalGames, setRoyal } = useSelectedStore();
+  const { isLoading } = useStatesStore();
+  const { setGenres, setGameModes, setSystems } = useCommonStore();
 
+<<<<<<< HEAD
   const consolesGroup = [
     "Nintendo",
     "Sony",
@@ -59,35 +46,25 @@ export const ConsolesList: FC = () => {
       );
     }
   }, [apiType, isRoyal, dispatch]);
+=======
+  useEffect(() => {
+    if (isRoyal) return;
+
+    IGDBApi.getGenres().then((response) => setGenres(response.data));
+    IGDBApi.getModes().then((response) => setGameModes(response.data));
+    IGDBApi.getPlatforms().then((response) => setSystems(response.data));
+  }, [isRoyal]);
+>>>>>>> 6a78590649a70331eb592735d141bdef52fb4d4f
 
   const contentRef = useRef<HTMLDivElement>(null);
 
   return (
     <div ref={contentRef} className={styles.consoles__list}>
-      <Dropdown
-        placeholder="Select Type"
-        isDisabled={isLoading}
-        initialValue={apiNames[apiType]}
-        list={Object.values(apiNames)}
-        getIndex={(index) => dispatch(setApiType(Object.keys(apiNames)[index]))}
-      />
       <div className={styles.consoles__options}>
-        {apiType === "RA" && (
-          <label className={styles.consoles__option}>
-            <ToggleSwitch
-              defaultValue={isOnlyWithAchievements ? "right" : "left"}
-              clickCallback={() =>
-                dispatch(setOnlyWithAchievements(!isOnlyWithAchievements))
-              }
-              isDisabled={isLoading}
-            />
-            Only with achievements
-          </label>
-        )}
         <label className={styles.consoles__toggle}>
           <ToggleSwitch
             defaultValue={isRoyal ? "right" : "left"}
-            clickCallback={() => dispatch(setRoyal(!isRoyal))}
+            clickCallback={() => setRoyal(!isRoyal)}
             isDisabled={isLoading}
           />
           <span>
@@ -95,14 +72,8 @@ export const ConsolesList: FC = () => {
           </span>
         </label>
       </div>
-      {apiType === "IGDB" && !isRoyal && <IGDBList />}
-      {apiType === "RA" && !isRoyal && (
-        <div className={styles.consoles__groups}>
-          {consolesGroup.map((item, i) => (
-            <ConsolesGroup key={i} system={item} />
-          ))}
-        </div>
-      )}
+      {!isRoyal && <IGDBList />}
+
       {isRoyal && <RoyalList />}
     </div>
   );

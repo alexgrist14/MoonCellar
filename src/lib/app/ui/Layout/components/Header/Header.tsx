@@ -4,17 +4,20 @@ import Link from "next/link";
 import { Separator } from "@/src/lib/shared/ui/Separator";
 import { Button } from "@/src/lib/shared/ui/Button";
 import { SvgMenu, SvgSearch } from "@/src/lib/shared/ui/svg";
-import { useAppSelector } from "@/src/lib/app/store";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { useRouter } from "next/router";
+<<<<<<< HEAD
 import Image from "next/image";
 import { getCookie } from "@/src/lib/shared/utils/getCookie";
 import { jwtDecode } from "jwt-decode";
 import { isTokenExpired } from "@/src/lib/shared/utils/token";
+=======
+import { useCommonStore } from "@/src/lib/shared/store/common.store";
+>>>>>>> 6a78590649a70331eb592735d141bdef52fb4d4f
 
 export const Header: FC = () => {
   const { asPath } = useRouter();
-  const { isMobile } = useAppSelector((state) => state.common);
+  const { isMobile } = useCommonStore();
 
   const token = getCookie('access_token');
   const decoded = jwtDecode(token)

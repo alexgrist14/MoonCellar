@@ -1,21 +1,10 @@
 import { FC } from "react";
 import styles from "./RoyalList.module.scss";
-import { useAppDispatch, useAppSelector } from "@/src/lib/app/store";
-import {
-  setRoyalGamesIGDB,
-  setRoyalGamesRA,
-} from "@/src/lib/app/store/slices/selectedSlice";
 import { Button } from "@/src/lib/shared/ui/Button";
+import { useSelectedStore } from "@/src/lib/shared/store/selected.store";
 
 export const RoyalList: FC = () => {
-  const dispatch = useAppDispatch();
-
-  const { royalGamesRA, royalGamesIGDB, apiType } = useAppSelector(
-    (state) => state.selected
-  );
-
-  const royalGames = apiType === "RA" ? royalGamesRA : royalGamesIGDB;
-  const setRoyalGames = apiType === "RA" ? setRoyalGamesRA : setRoyalGamesIGDB;
+  const { royalGames, setRoyalGames } = useSelectedStore();
 
   return (
     <div className={styles.consoles__royal}>
@@ -33,10 +22,8 @@ export const RoyalList: FC = () => {
                 </a>
                 <Button
                   onClick={() =>
-                    dispatch(
-                      setRoyalGames(
-                        royalGames.filter((_game) => game.id !== _game.id)
-                      )
+                    setRoyalGames(
+                      royalGames.filter((_game) => game.id !== _game.id)
                     )
                   }
                 >

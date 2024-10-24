@@ -2,19 +2,18 @@ import { FC, ReactNode } from "react";
 import styles from "./Layout.module.scss";
 import { Header } from "./components";
 import { useWindowResizeAction } from "@/src/lib/shared/hooks";
-import { useAppDispatch } from "../../store";
-import { setIsMobile } from "../../store/slices/commonSlice";
 import { screenMd } from "@/src/lib/shared/constants";
+import { useCommonStore } from "@/src/lib/shared/store/common.store";
 
 interface ILayoutProps {
   children: ReactNode;
 }
 
 export const Layout: FC<ILayoutProps> = ({ children }) => {
-  const dispatch = useAppDispatch();
+  const { setIsMobile } = useCommonStore();
 
   useWindowResizeAction(() => {
-    dispatch(setIsMobile(window.innerWidth <= screenMd));
+    setIsMobile(window.innerWidth <= screenMd);
   });
 
   return (

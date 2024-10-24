@@ -1,15 +1,9 @@
 import { FC, useEffect, useRef, useState } from "react";
 import styles from "./WheelComponent.module.scss";
-import { useAppDispatch, useAppSelector } from "@/src/lib/app/store";
-import { getRoyalGames } from "@/src/lib/shared/utils/getRoyalGames";
-import {
-  setFinished,
-  setLoading,
-  setSegments,
-  setStarted,
-} from "@/src/lib/app/store/slices/statesSlice";
-import { setWinner } from "@/src/lib/app/store/slices/commonSlice";
 import classNames from "classnames";
+import { useCommonStore } from "@/src/lib/shared/store/common.store";
+import { useSelectedStore } from "@/src/lib/shared/store/selected.store";
+import { useStatesStore } from "@/src/lib/shared/store/states.store";
 
 interface WheelComponentProps {
   segColors: string[];
@@ -32,13 +26,19 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   size = 290,
   time = 5,
 }) => {
-  const dispatch = useAppDispatch();
+  const { setWinner } = useCommonStore();
+  const { games, isRoyal, royalGames } = useSelectedStore();
 
-  const { games, isRoyal } = useAppSelector((state) => state.selected);
-
-  const { isFinished, isLoading, isStarted, segments } = useAppSelector(
-    (state) => state.states
-  );
+  const {
+    isFinished,
+    isLoading,
+    isStarted,
+    segments,
+    setSegments,
+    setFinished,
+    setStarted,
+    setLoading,
+  } = useStatesStore();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -47,36 +47,33 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   const [winnerAngle, setWinnerAngle] = useState(0);
   const [currentSegment, setCurrentSegment] = useState("");
 
-  const royalGames = getRoyalGames();
-
   useEffect(() => {
     if (!segments?.length) {
-      dispatch(setSegments(Array(max).fill("")));
+      setSegments(Array(max).fill(""));
     }
-  }, [segments, dispatch, isRoyal, royalGames]);
+  }, [segments, setSegments, isRoyal, royalGames]);
 
   useEffect(() => {
     if (!!currentSegment && isFinished) {
       if (!isRoyal) {
-        dispatch(setWinner(games[+currentSegment.split("_")[1]]));
+        !!games && setWinner(games[+currentSegment.split("_")[1]]);
       } else {
-        dispatch(setWinner(royalGames[+currentSegment.split("_")[1]]));
+        !!royalGames && setWinner(royalGames[+currentSegment.split("_")[1]]);
 
-        const filtered = segments.filter(
+        const filtered = segments?.filter(
           (segment) => segment !== currentSegment
         );
         !filtered?.length && setCurrentSegment("");
 
-        dispatch(
+        !!royalGames &&
           setSegments(
             filtered?.length
               ? filtered
               : royalGames.map((game, i) => game.id + "_" + i)
-          )
-        );
+          );
       }
     }
-  }, [currentSegment, isFinished, games, isRoyal, royalGames, dispatch]);
+  }, [currentSegment, isFinished, games, isRoyal, royalGames]);
 
   useEffect(() => {
     const centerX = 300;
@@ -87,6 +84,8 @@ export const WheelComponent: FC<WheelComponentProps> = ({
 
     const drawSegment = (key: number, lastAngle: number, angle: number) => {
       let value = "";
+
+      if (!segments) return;
 
       if (!isRoyal) {
         !!games?.length && (value = games[+segments[key].split("_")[1]]?.name);
@@ -120,6 +119,8 @@ export const WheelComponent: FC<WheelComponentProps> = ({
     };
 
     const drawWheel = () => {
+      if (!segments) return;
+
       const len = segments.length;
       const PI2 = Math.PI * 2;
 
@@ -162,7 +163,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   ]);
 
   useEffect(() => {
-    if (isStarted) {
+    if (isStarted && !!segments) {
       const winner = Math.ceil(Math.random() * (segments.length - 1));
 
       angle.current += 360 * Math.ceil(time);
@@ -172,16 +173,16 @@ export const WheelComponent: FC<WheelComponentProps> = ({
           (360 - (360 / segments.length) * winner) -
           Math.floor(Math.random() * (360 / segments.length))
       );
-      dispatch(setStarted(false));
+      setStarted(false);
 
       setTimeout(() => {
-        dispatch(setFinished(true));
-        setCurrentSegment(segments[winner]);
+        setFinished(true);
+        !!segments && setCurrentSegment(segments[winner]);
       }, 5000);
     } else {
       setCurrentSegment("");
     }
-  }, [isStarted, segments, dispatch, time]);
+  }, [isStarted, segments, time, setFinished, setStarted]);
 
   return (
     <div
@@ -193,13 +194,13 @@ export const WheelComponent: FC<WheelComponentProps> = ({
     >
       <button
         onClick={() => {
-          dispatch(setFinished(false));
-          dispatch(setWinner(undefined));
+          setFinished(false);
+          setWinner(undefined);
 
           if (isRoyal) {
-            return dispatch(setStarted(true));
+            return setStarted(true);
           } else {
-            dispatch(setLoading(true));
+            setLoading(true);
           }
         }}
       >

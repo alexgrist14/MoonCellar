@@ -1,34 +1,22 @@
 import { FC, useEffect, useState } from "react";
 import styles from "./WheelContainer.module.scss";
-import { useAppDispatch, useAppSelector } from "@/src/lib/app/store";
-import { getRoyalGames } from "@/src/lib/shared/utils/getRoyalGames";
-import {
-  setRoyalGamesIGDB,
-  setRoyalGamesRA,
-} from "@/src/lib/app/store/slices/selectedSlice";
 import classNames from "classnames";
 import { apiNames } from "@/src/lib/shared/constants";
 import { WheelComponent } from "@/src/lib/features/wheel";
 import { IGDBPlatform } from "@/src/lib/shared/types/igdb";
+import { useCommonStore } from "@/src/lib/shared/store/common.store";
+import { useStatesStore } from "@/src/lib/shared/store/states.store";
+import { useSelectedStore } from "@/src/lib/shared/store/selected.store";
 
 export const WheelContainer: FC = () => {
-  const dispatch = useAppDispatch();
+  const { winner, systems } = useCommonStore();
 
-  const { winner, systemsIGDB, systemsRA } = useAppSelector(
-    (state) => state.common
-  );
+  const { isRoyal, royalGames, setRoyalGames } = useSelectedStore();
 
-  const { apiType, isRoyal } = useAppSelector((state) => state.selected);
-
-  const { isFinished, segments, isLoading } = useAppSelector(
-    (state) => state.states
-  );
+  const { isFinished, segments, isLoading } = useStatesStore();
 
   const [colors, setColors] = useState<string[]>([]);
   const [isMenuActive, setIsMenuActive] = useState(false);
-
-  const royalGames = getRoyalGames();
-  const setRoyalGames = apiType === "RA" ? setRoyalGamesRA : setRoyalGamesIGDB;
 
   const getLink = () => {
     return winner?.url || "";
@@ -46,11 +34,7 @@ export const WheelContainer: FC = () => {
     if (!winner?.platforms?.length) return "";
 
     const platforms = winner.platforms.reduce((result: string[], platform) => {
-      const system = (apiType === "RA" ? systemsRA : systemsIGDB).find(
-        (system) =>
-          (apiType === "IGDB" ? (system as IGDBPlatform)._id : system.id) ===
-          platform
-      );
+      const system = systems?.find((system) => system._id === platform);
 
       !!system && result.push(system.name);
 
@@ -62,18 +46,20 @@ export const WheelContainer: FC = () => {
 
   useEffect(() => {
     const generateRandomColors = (hue: number): string[] => {
-      return segments.map((_, i) => {
-        const min = 10;
-        const percent =
-          i < segments.length / 2
-            ? (70 / segments.length) * i
-            : (70 / segments.length) * (segments.length - i + 1);
+      return (
+        segments?.map((_, i) => {
+          const min = 10;
+          const percent =
+            i < segments.length / 2
+              ? (70 / segments.length) * i
+              : (70 / segments.length) * (segments.length - i + 1);
 
-        const lightness = (percent > min ? percent : min) + "%";
-        const saturation = "60%";
+          const lightness = (percent > min ? percent : min) + "%";
+          const saturation = "60%";
 
-        return `hsl(${hue}, ${saturation}, ${lightness})`;
-      });
+          return `hsl(${hue}, ${saturation}, ${lightness})`;
+        }) || []
+      );
     };
 
     segments?.some((segment) => !segment) &&
@@ -107,14 +93,12 @@ export const WheelContainer: FC = () => {
             {!!winner && isFinished && !isRoyal && (
               <button
                 onClick={() =>
-                  dispatch(
-                    setRoyalGames(
-                      !!royalGames?.length
-                        ? royalGames.some((game) => game.id === winner.id)
-                          ? royalGames.filter((game) => game.id !== winner.id)
-                          : [...royalGames, winner]
-                        : [winner]
-                    )
+                  setRoyalGames(
+                    !!royalGames?.length
+                      ? royalGames.some((game) => game.id === winner.id)
+                        ? royalGames.filter((game) => game.id !== winner.id)
+                        : [...royalGames, winner]
+                      : [winner]
                   )
                 }
               >
@@ -127,7 +111,7 @@ export const WheelContainer: FC = () => {
               </button>
             )}
             <a href={getLink()} target="_blank" rel="noreferrer">
-              <p>Open in {apiNames[apiType]}</p>
+              <p>Open in IGDB</p>
             </a>
           </div>
           <div className={styles.winner__content}>
