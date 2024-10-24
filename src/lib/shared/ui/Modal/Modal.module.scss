@@ -1,0 +1,74 @@
+@keyframes popup-appearance {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.modal {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  pointer-events: none;
+  animation: popup-appearance 0.3s;
+
+  @include mediaMax($screenSm) {
+    padding: 8px;
+    align-items: flex-end;
+  }
+
+  &__content {
+    z-index: 2;
+    width: fit-content;
+    position: relative;
+    pointer-events: all;
+  }
+
+  &__overlay {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: all;
+    background-color: $colorBgModal;
+    z-index: 1;
+  }
+
+  &__close {
+    position: absolute;
+    top: -26px;
+    right: 0;
+    z-index: 2;
+    pointer-events: all;
+
+    & svg {
+      height: 26px;
+      width: 26px;
+    }
+
+    path {
+      transition: 0.15s ease-out;
+    }
+
+    &:hover {
+      path {
+        stroke: $colorIconPrimary;
+      }
+    }
+
+    @include mediaMax($screenSm) {
+      // display: none;
+    }
+  }
+}

@@ -1,0 +1,4 @@
+// ms
+const TOAST_DISPLAY_TIME = 3000;
+
+export const TOAST_SETTINGS = { DISPLAY_TIME: TOAST_DISPLAY_TIME };

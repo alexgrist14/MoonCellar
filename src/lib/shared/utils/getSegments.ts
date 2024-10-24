@@ -2,9 +2,7 @@ import { IGame } from "../types/game";
 import { shuffle } from "./shuffle";
 
 export const getSegments = (games: IGame[], max: number) => {
-  const filteredGames = games.filter((game) => !!game.achievements);
-
-  const sortedGames = shuffle(filteredGames);
+  const sortedGames = shuffle(games);
 
   const startIndex =
     sortedGames.length - max >= 0

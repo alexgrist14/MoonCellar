@@ -1,8 +1,86 @@
+$fontMain: "General", sans-serif;
+
+@mixin font($fz, $lh, $fw) {
+  font-family: $fontMain;
+  font-weight: $fw;
+  font-size: $fz;
+  line-height: $lh;
+}
+
+@mixin scroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  @-moz-document url-prefix() {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #6d8097 transparent;
+    }
+  }
+
+  &::-webkit-scrollbar {
+    transition: 0.2s;
+    background-color: transparent;
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    width: 8px;
+    border-radius: 24px !important;
+
+    &:hover {
+      transition: all 0.2s;
+      background-color: #6d809752;
+    }
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #5e636e;
+    border-radius: 24px !important;
+    width: 8px;
+  }
+}
+
+@mixin scrollHorizontal($borderColor: transparent) {
+  overflow-y: hidden;
+  overflow-x: auto;
+
+  @-moz-document url-prefix() {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #5e636e transparent;
+    }
+  }
+
+  &::-webkit-scrollbar {
+    transition: 0.2s;
+    background-color: transparent;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #5e636e;
+    border-radius: 24px !important;
+    border: 16px solid $borderColor;
+    cursor: grab;
+
+    &:hover {
+      transition: all 0.2s;
+      background-color: #878787;
+    }
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+}
+
 @mixin flexCenter {
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 @mixin scrollDisable {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -10,4 +88,18 @@
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+@mixin flexPage {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+@mixin lineClamp($count) {
+  display: -webkit-box;
+  -webkit-line-clamp: $count;
+  -webkit-box-orient: vertical;
+  line-clamp: $count;
+  overflow: hidden;
 }
