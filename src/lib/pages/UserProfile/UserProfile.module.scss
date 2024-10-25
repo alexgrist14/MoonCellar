@@ -2,11 +2,44 @@
   display: flex;
   color: $whiteTextColor;
   justify-content: center;
-  .content{
+  .content {
     display: flex;
     max-width: 80%;
     width: 100%;
     background: #09121c;
     border-radius: 20px;
+    .profile {
+      &_image {
+        position: relative;
+        overflow: hidden;
+        border-radius: 50%;
+        cursor: pointer;
+        .background {
+          position: absolute;
+          top: 0;
+          width: 100%;
+          opacity: 0;
+          height: 100%;
+          background-color: #09121c;
+          transition: 0.5s all;
+        }
+        .svg {
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          position: absolute;
+          width: 40px;
+          height: 40px;
+          opacity: 0;
+          transition: 0.5s all;
+        }
+        .hover {
+          opacity: 0.5;
+          &_svg{
+            opacity: 1;
+          }
+        }
+      }
+    }
   }
 }

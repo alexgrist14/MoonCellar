@@ -6,3 +6,4 @@ export * from "./SvgCheckCircle";
 export * from "./SvgPlus";
 export * from "./SvgSearch";
 export * from "./SvgMenu";
+export * from "./SvgCamera";
