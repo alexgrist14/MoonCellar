@@ -1,6 +1,4 @@
-import { useAppDispatch } from "@/src/lib/app/store";
 import styles from "./ExtendedCheckbox.module.scss";
-import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import classNames from "classnames";
 
 export interface IExtendedCheckboxProps<
@@ -10,8 +8,8 @@ export interface IExtendedCheckboxProps<
   list: T[];
   excluded: T[];
   selected: T[];
-  setExcluded: ActionCreatorWithPayload<T[]>;
-  setSelected: ActionCreatorWithPayload<T[]>;
+  setExcluded: any;
+  setSelected: any;
   isDisabled?: boolean;
 }
 
@@ -24,8 +22,6 @@ export const ExtendedCheckbox = <T,>({
   setSelected,
   isDisabled,
 }: IExtendedCheckboxProps<T & { id: number; name: string }>) => {
-  const dispatch = useAppDispatch();
-
   return (
     <div className={styles.checkbox}>
       <h3>{title}</h3>
@@ -55,28 +51,16 @@ export const ExtendedCheckbox = <T,>({
                 disabled={isDisabled}
                 onChange={() => {
                   if (isSelected) {
-                    dispatch(
-                      setExcluded([...(!!excluded ? excluded : []), element])
-                    );
-                    dispatch(
-                      setSelected(
-                        selected?.filter(
-                          (selected) => selected.id !== element.id
-                        )
-                      )
+                    setExcluded([...(!!excluded ? excluded : []), element]);
+                    setSelected(
+                      selected?.filter((selected) => selected.id !== element.id)
                     );
                   } else if (isExcluded) {
-                    dispatch(
-                      setExcluded(
-                        excluded?.filter(
-                          (excluded) => excluded.id !== element.id
-                        )
-                      )
+                    setExcluded(
+                      excluded?.filter((excluded) => excluded.id !== element.id)
                     );
                   } else {
-                    dispatch(
-                      setSelected([...(!!selected ? selected : []), element])
-                    );
+                    setSelected([...(!!selected ? selected : []), element]);
                   }
                 }}
               />

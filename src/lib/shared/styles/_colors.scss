@@ -22,3 +22,122 @@ $whiteBorderColor: $whiteTextColor;
 $blackBorderColor: $textColor;
 
 $linkColor: #396db8;
+
+$neutral-10: #0D1011;
+$neutral-20: #161B1D;
+$neutral-30: #1F2628;
+$neutral-40: #2F3537;
+$neutral-50: #3F4750; 
+$neutral-60: #5E6A6E;
+$neutral-80: #9192A1;
+$neutral-90: #D9D9D9;
+$neutral-100: #FFFFFF;
+
+$blue-10: #C2C4D6;
+$blue-20: #59ACF9;
+$blue-50: #4E60FF;
+$blue-100: #140062;
+
+$red-50: #F14654;
+
+$green-50: #34CC71;
+
+$yellow-50: #CCB434;
+
+
+$colorBgGlobe: $neutral-10; 
+$colorBgNav: $neutral-10;
+$colorBgFooter: $neutral-10;
+$colorBgPrimary: $neutral-40;
+$colorBgSecondary: $neutral-30;
+$colorBgTertiary: $neutral-20;
+$colorBgAccent: $blue-50;
+$colorBgModal: rgba($neutral-10, 0.7);
+$colorBgField: $neutral-40;
+
+$colorTextPrimary: $neutral-100; 
+$colorTextSecondary: $neutral-90; 
+$colorTextTertiary: $neutral-80;
+$colorTextFourth: $neutral-60;
+$colorTextLink: $blue-50;
+$colorTextAccentPrimary: $blue-50;
+$colorTextAccentSecondary: $blue-10;
+$colorTextPositive: $green-50;
+$colorTextNegative: $red-50;
+
+$colorBorderPrimary: $neutral-40;
+$colorBorderSecondary: $neutral-30;
+$colorBorderPositive: $green-50;
+$colorBorderNegative: $red-50;
+
+$colorIconPrimary: $neutral-100;
+$colorIconSecondary: $neutral-90;
+$colorIconTertiary: $neutral-80;
+$colorIconFourth: $neutral-60;
+$colorIconAccentPrimary: $blue-50;
+$colorIconAccentSecondary: $blue-10;
+$colorIconPositive: $green-50;
+$colorIconNegative: $red-50;
+
+
+$colorStateHoverPrimary: $neutral-100;
+$colorStateHoverSecondary: $neutral-80;
+$colorStateHoverAccent: $blue-20;
+$colorStateActivePrimary: $neutral-100;
+$colorStateActiveAccent: $blue-50;
+
+$colorShadowPrimary: #14141480;
+
+$buttonAccent: $colorBgAccent;
+$buttonAccentHover: $colorStateHoverAccent;
+$buttonAccentDisabled: #3d6cc3;
+
+$buttonGrayLight: $neutral-50;
+$buttonGrayLightHover: #444747;
+$buttonGrayLightDisabled: #393939;
+
+$buttonPrimary: $colorBgPrimary;
+$buttonPrimaryHover: #444747;
+$buttonPrimaryDisabled: #393939;
+
+$buttonBGRed: $red-50;
+
+$buttonTextColor: $neutral-100;
+$buttonTextColorDisabled: #ededed7a;
+
+
+$inputBG: $colorBgField;
+$inputTextColor: $colorTextPrimary;
+$inputPlaceholder: $colorTextTertiary;
+$inputHoverBorderColor: $colorStateHoverSecondary;
+$inputActiveBorderColor: $colorStateActiveAccent;
+$inputErrorBorderColor: $colorBorderNegative;
+
+$dropdownBGColor: $colorBgField;
+$dropdownTextColor: $colorTextPrimary;
+$dropdownPlaceholderColor: $colorTextTertiary;
+$dropdownBorderColor: $colorBorderPrimary;
+$dropdownArrowColor: $colorBgAccent;
+
+$wrapperBGColor: $colorBgTertiary;
+$wrapperHeadBGColor: $colorBgTertiary;
+$wrapperTextColor: $colorTextPrimary;
+$wrapperBorderColor: $colorBorderPrimary;
+
+$toggleOffColor: $red-50;
+$toggleOnColor: $green-50;
+
+$codeBGColor: #212828;
+$codeButtonColor: #686868;
+
+$toastBG: $colorBgPrimary;
+$toastTitleColor: $colorTextPrimary;
+$toastTextColor: $colorTextSecondary;
+$toastErrorColor: $colorTextNegative;
+$toastProgressColor: $colorBgSecondary;
+
+$tableHeaderBGColor: #111111;
+$tableBGColor: #1b1b1b;
+$tableBorderColor: $colorBorderPrimary;
+
+$scrollbarBGLine: #1b1b1b;

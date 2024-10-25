@@ -1,0 +1,48 @@
+@mixin titleH1 {
+  @include font(54px, 60px, 700);
+
+  @include mediaLg {
+    font-size: 32px;
+    line-height: 34px;
+  }
+}
+
+@mixin titleH2 {
+  @include font(32px, 40px, 700);
+
+  @include mediaLg {
+    font-size: 24px;
+    line-height: 26px;
+  }
+}
+
+@mixin titleH3 {
+  @include font(18px, 24px, 700);
+}
+
+
+@mixin textRegular {
+  @include fontRoboto(16px, 20px, 400);
+}
+
+@mixin textArticle {
+  @include fontRoboto(20px, 32px, 400);
+}
+
+@mixin textBtn {
+  @include fontRoboto(16px, 24px, 500);
+}
+
+@mixin textControl {
+  @include font(14px, 20px, 700);
+}
+
+@mixin textCaption {
+  @include font(14px, 16px, 600);
+}
+
+@mixin textCompact {
+  @include fontRoboto(12px, 14px, 400);
+}
+
+ 

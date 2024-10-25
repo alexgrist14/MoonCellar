@@ -95,6 +95,7 @@ export const HomePage: FC = () => {
   }, [isRoyal]);
 
   useEffect(() => {
+    console.log(isLoading, isRoyal);
     if (isLoading && !isRoyal) {
       getIGDBGames();
     }

@@ -1,9 +1,7 @@
 import { FC, useEffect, useState } from "react";
 import styles from "./WheelContainer.module.scss";
 import classNames from "classnames";
-import { apiNames } from "@/src/lib/shared/constants";
 import { WheelComponent } from "@/src/lib/features/wheel";
-import { IGDBPlatform } from "@/src/lib/shared/types/igdb";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { useSelectedStore } from "@/src/lib/shared/store/selected.store";
