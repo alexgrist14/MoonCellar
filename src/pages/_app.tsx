@@ -10,9 +10,9 @@ export default function App({ Component, pageProps }: AppProps) {
     <div>
       <Layout>
         <Component {...pageProps} />
+        <ToastConnector />
+        <ModalsConnector />
       </Layout>
-      <ToastConnector />
-      <ModalsConnector />
     </div>
   );
 }

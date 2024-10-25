@@ -80,10 +80,8 @@ export const ToastConnector = () => {
     //eslint-disable-next-line
   }, []);
 
-  if (!toasters.length) return <></>;
-
   return (
-    <div className={styles.connector}>
+    <div id="toast" className={styles.connector}>
       {toasters.map((item) => (
         <div
           key={item.id}

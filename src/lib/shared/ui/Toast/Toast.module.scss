@@ -64,6 +64,13 @@
   }
 }
 
+.connector {
+  position: fixed;
+  bottom: 20px;
+  width: 100%;
+  @include flexCenter;
+}
+
 @keyframes display {
   from {
     opacity: 0;
