@@ -4,6 +4,7 @@
   justify-content: center;
   .content {
     display: flex;
+    padding: 10px;
     max-width: 80%;
     width: 100%;
     background: #09121c;
@@ -12,7 +13,9 @@
       &_image {
         position: relative;
         overflow: hidden;
-        border-radius: 50%;
+        width: 160px;
+        height: 160px;
+        border-radius: 100%;
         cursor: pointer;
         .background {
           position: absolute;
@@ -35,11 +38,19 @@
         }
         .hover {
           opacity: 0.5;
-          &_svg{
+          &_svg {
             opacity: 1;
           }
         }
       }
+      &_label {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+    }
+    .error {
+      color: red;
     }
   }
 }

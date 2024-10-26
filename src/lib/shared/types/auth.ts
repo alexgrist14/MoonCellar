@@ -16,9 +16,7 @@ export interface IAuth {
 }
 
 export interface IUser {
-  user: {
-    _id: string;
+    id: string;
     name: string;
     email: string;
-  };
 }
