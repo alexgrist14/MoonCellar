@@ -36,7 +36,7 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
         src={
           !!game?.cover?.length
             ? "https:" + game?.cover[0]?.url.replace("thumb", "cover_big")
-            : "/images/helen.png"
+            : "/images/cover.png"
         }
         width={200}
         height={300}

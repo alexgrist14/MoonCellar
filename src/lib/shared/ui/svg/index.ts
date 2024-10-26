@@ -7,3 +7,4 @@ export * from "./SvgPlus";
 export * from "./SvgSearch";
 export * from "./SvgMenu";
 export * from "./SvgCamera";
+export * from "./SvgFavicon";

@@ -6,9 +6,9 @@ export default function Home() {
     <>
       <Head>
         <title>MoonCellar</title>
-        <meta name="description" content="Gaming Paradise" />
+        <meta name="description" content="Random game gauntlet" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/images/favicon.png" />
       </Head>
       <HomePage />
     </>
