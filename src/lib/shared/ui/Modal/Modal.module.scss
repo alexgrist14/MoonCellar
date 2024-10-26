@@ -44,31 +44,4 @@
     background-color: $colorBgModal;
     z-index: 1;
   }
-
-  &__close {
-    position: absolute;
-    top: -26px;
-    right: 0;
-    z-index: 2;
-    pointer-events: all;
-
-    & svg {
-      height: 26px;
-      width: 26px;
-    }
-
-    path {
-      transition: 0.15s ease-out;
-    }
-
-    &:hover {
-      path {
-        stroke: $colorIconPrimary;
-      }
-    }
-
-    @include mediaMax($screenSm) {
-      // display: none;
-    }
-  }
 }

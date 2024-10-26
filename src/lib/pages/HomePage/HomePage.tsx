@@ -47,8 +47,8 @@ export const HomePage: FC = () => {
       search: searchQuery,
       isRandom: true,
     }).then((response) => {
-      if (!!response.data.length) {
-        const games = response.data.map((game) => ({
+      if (!!response.data.results.length) {
+        const games = response.data.results.map((game) => ({
           _id: game._id,
           id: game.id,
           image: !!game.cover[0] ? "https:" + game.cover[0].url : "",

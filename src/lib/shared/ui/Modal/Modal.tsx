@@ -20,9 +20,6 @@ export const Modal: FC<IModalProps> = ({ children, onClose }) => {
   return (
     <div className={cn(styles.modal)}>
       <div ref={modalRef} className={styles.modal__content}>
-        <button className={styles.modal__close} onClick={onClose}>
-          <SvgClose />
-        </button>
         {children}
       </div>
       <div className={styles.modal__overlay}></div>

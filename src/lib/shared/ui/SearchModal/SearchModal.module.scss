@@ -1,0 +1,47 @@
+.modal {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background-color: $bgAlt;
+  width: 80vw;
+  border-radius: $radius;
+
+  &__search {
+    & > div {
+      width: 100%;
+    }
+  }
+
+  &__result {
+    aspect-ratio: 2/3;
+    border-radius: $radius;
+    overflow: hidden;
+    transition: all 0.3s;
+    position: relative;
+  }
+
+  &__more {
+    height: 100%;
+  }
+}
+
+.scrollbars {
+  &__scrollbar {
+    margin-right: 5px;
+  }
+
+  div &__container {
+    margin-top: 20px;
+  }
+
+  div &__content {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    height: fit-content;
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+    padding-right: 10px;
+    max-height: calc(80vh - 90px);
+  }
+}

@@ -17,13 +17,25 @@ const getGames = (params: {
   selected?: IGDBFilters;
   excluded?: IGDBFilters;
 }) => {
-  return agent<IGDBGame[]>(`${API_URL}/igdb/games`, "get", {
-    params: {
-      ...params,
-      selected: !!params.selected ? JSON.stringify(params.selected) : undefined,
-      excluded: !!params.excluded ? JSON.stringify(params.excluded) : undefined,
-    },
-  });
+  return agent<{ results: IGDBGame[]; total: number }>(
+    `${API_URL}/igdb/games`,
+    "get",
+    {
+      params: {
+        ...params,
+        selected: !!params.selected
+          ? JSON.stringify(params.selected)
+          : undefined,
+        excluded: !!params.excluded
+          ? JSON.stringify(params.excluded)
+          : undefined,
+      },
+    }
+  );
+};
+
+const getGameById = (id: string) => {
+  return agent<IGDBGame>(`${API_URL}/igdb/${id}`, "get");
 };
 
 const getGenres = () => {
@@ -40,6 +52,7 @@ const getModes = () => {
 
 export const IGDBApi = {
   getGames,
+  getGameById,
   getGenres,
   getPlatforms,
   getModes,
