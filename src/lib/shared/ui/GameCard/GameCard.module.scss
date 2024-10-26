@@ -1,0 +1,38 @@
+.card {
+  aspect-ratio: 2/3;
+  border-radius: $radius;
+  overflow: hidden;
+  transition: all 0.3s;
+  position: relative;
+
+  &__title {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+    background-color: rgba($bg, 0.9);
+    transition: all 0.3s;
+    opacity: 0;
+    position: absolute;
+    text-align: center;
+    border-radius: $radius;
+    border: 2px solid $gray;
+    padding: 10px;
+
+    & > span {
+      @include font(10px, 12px, 400);
+    }
+
+    &_active {
+      opacity: 1;
+    }
+  }
+
+  &__cover {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
+}

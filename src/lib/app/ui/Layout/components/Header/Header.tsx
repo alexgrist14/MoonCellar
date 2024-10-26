@@ -3,8 +3,7 @@ import styles from "./Header.module.scss";
 import Link from "next/link";
 import { Separator } from "@/src/lib/shared/ui/Separator";
 import { Button } from "@/src/lib/shared/ui/Button";
-import { SvgMenu, SvgSearch } from "@/src/lib/shared/ui/svg";
-import { Tabs } from "@/src/lib/shared/ui/Tabs";
+import { SvgSearch } from "@/src/lib/shared/ui/svg";
 import { useRouter } from "next/router";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { jwtDecode } from "jwt-decode";
@@ -12,12 +11,13 @@ import { isTokenExpired } from "@/src/lib/shared/utils/token";
 import Image from "next/image";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { getCookie } from "@/src/lib/shared/utils/getCookie";
+import { modal } from "@/src/lib/shared/ui/Modal";
+import { SearchModal } from "@/src/lib/shared/ui/SearchModal";
 
 export const Header: FC = () => {
-  const { asPath } = useRouter();
   const { isMobile } = useCommonStore();
   const { setAuth, isAuth, setUserId, userId } = useAuthStore();
-  const router = useRouter();
+  const { push } = useRouter();
 
   useEffect(() => {
     const token = getCookie("refresh_token");
@@ -32,14 +32,12 @@ export const Header: FC = () => {
   }, [setAuth, setUserId]);
 
   const handleProfileClick = () => {
-    router.push(`/user/${userId}`);
+    push(`/user/${userId}`);
   };
 
-  const tabs = [
-    { tabName: "Home", tabLink: "/" },
-    { tabName: "Gauntlet", tabLink: "/gauntlet" },
-    { tabName: "Games", tabLink: "/games" },
-  ];
+  const searchClickHandler = () => {
+    modal.open(<SearchModal />);
+  };
 
   return (
     <div className={styles.container}>
@@ -50,32 +48,13 @@ export const Header: FC = () => {
         {!isMobile && (
           <>
             <Separator />
-            <Button color="transparent">
+            <Button color="transparent" onClick={searchClickHandler}>
               <SvgSearch className={styles.svg} />
             </Button>
           </>
         )}
       </div>
       <div className={styles.container__right}>
-        {isMobile ? (
-          <>
-            <Button color="transparent">
-              <SvgSearch className={styles.svg} />
-            </Button>
-            <Separator />
-            <Button color="transparent">
-              <SvgMenu className={styles.svg} />
-            </Button>
-          </>
-        ) : (
-          <>
-            <Tabs
-              isUseDefaultIndex
-              defaultTabIndex={tabs.findIndex((tab) => tab.tabLink === asPath)}
-              contents={tabs}
-            />
-          </>
-        )}
         {isAuth && (
           <div className={styles.profile} onClick={handleProfileClick}>
             <Image

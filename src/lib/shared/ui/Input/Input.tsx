@@ -14,6 +14,7 @@ interface InputProps
     | "onChange"
     | "disabled"
     | "defaultValue"
+    | "autoFocus"
   > {
   containerStyles?: CSSProperties;
 }
