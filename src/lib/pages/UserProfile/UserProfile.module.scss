@@ -10,12 +10,13 @@
     background: #09121c;
     border-radius: 20px;
     .profile {
-      &_image {
+      &_holder {
         position: relative;
         overflow: hidden;
         width: 160px;
         height: 160px;
         border-radius: 100%;
+        aspect-ratio: 2/3;
         cursor: pointer;
         .background {
           position: absolute;
@@ -42,6 +43,9 @@
             opacity: 1;
           }
         }
+      }
+      &_image{
+        object-fit: cover;
       }
       &_label {
         display: flex;
