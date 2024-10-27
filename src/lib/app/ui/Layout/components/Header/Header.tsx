@@ -45,14 +45,10 @@ export const Header: FC = () => {
         <Link href="/" className={styles.title}>
           MoonCellar
         </Link>
-        {!isMobile && (
-          <>
-            <Separator />
-            <Button color="transparent" onClick={searchClickHandler}>
-              <SvgSearch className={styles.svg} />
-            </Button>
-          </>
-        )}
+        <Separator />
+        <Button color="transparent" onClick={searchClickHandler}>
+          <SvgSearch className={styles.svg} />
+        </Button>
       </div>
       <div className={styles.container__right}>
         {isAuth && (

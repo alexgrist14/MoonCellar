@@ -21,8 +21,13 @@
   }
 
   &__right {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 10px;
+
+    & > div:last-of-type {
+      margin-top: auto
+    }
   }
 
   &__text {

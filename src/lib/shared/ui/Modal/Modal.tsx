@@ -3,7 +3,6 @@ import { IModalParams } from "./Modal.types";
 import cn from "classnames";
 import styles from "./Modal.module.scss";
 import useCloseEvents from "../../hooks/useCloseEvents";
-import { SvgClose } from "../svg";
 
 interface IModalProps extends IModalParams {
   children: ReactNode;

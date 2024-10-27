@@ -11,6 +11,7 @@ import classNames from "classnames";
 import { Scrollbar } from "../Scrollbar";
 import { useCommonStore } from "../../store/common.store";
 import { useRouter } from "next/router";
+import { useWindowResizeAction } from "../../hooks";
 
 interface IExpandMenuProps
   extends Pick<HTMLAttributes<HTMLDivElement>, "children" | "id"> {
@@ -32,6 +33,7 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
     useCommonStore();
 
   const [isActive, setIsActive] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
 
   const isNotExtendedMobile =
     !!expandPosition && expandPosition !== position && isMobile;
@@ -53,6 +55,14 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
   }, [asPath]);
 
   // useCloseEvents([expandRef], () => setIsActive(false));
+  useEffect(() => {
+    const handler = () => {
+      setScrollY(window.scrollY);
+    };
+
+    document.addEventListener("scroll", handler);
+    return () => document.removeEventListener("scroll", handler);
+  }, []);
 
   return (
     <div
@@ -61,6 +71,7 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
         [styles.menu_active]: !isActive,
       })}
       style={{
+        top: scrollY > 0 ? Math.max(0, 55 - scrollY) : "55px",
         pointerEvents: isNotExtendedMobile ? "none" : "auto",
         opacity: isNotExtendedMobile ? "0" : "1",
         right: position === "right" ? "0" : "unset",
