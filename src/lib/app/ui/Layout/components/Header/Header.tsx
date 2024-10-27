@@ -13,6 +13,9 @@ import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { getCookie } from "@/src/lib/shared/utils/getCookie";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { SearchModal } from "@/src/lib/shared/ui/SearchModal";
+import { Dropdown } from 'rsuite';
+import DropdownItem from "rsuite/esm/Dropdown/DropdownItem";
+import { Nav } from 'rsuite';
 
 export const Header: FC = () => {
   const { isMobile } = useCommonStore();
@@ -57,12 +60,18 @@ export const Header: FC = () => {
       <div className={styles.container__right}>
         {isAuth && (
           <div className={styles.profile} onClick={handleProfileClick}>
-            <Image
+              <Image
               src={"/images/user.png"}
               width={40}
               height={40}
               alt="profile"
             />
+            <Dropdown open>
+            <Dropdown.Item as={Link} href="/user">
+  About
+</Dropdown.Item>;
+            </Dropdown>
+          
           </div>
         )}
       </div>

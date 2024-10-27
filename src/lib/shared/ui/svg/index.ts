@@ -8,3 +8,4 @@ export * from "./SvgSearch";
 export * from "./SvgMenu";
 export * from "./SvgCamera";
 export * from "./SvgFavicon";
+export * from "./SvgProfile";
