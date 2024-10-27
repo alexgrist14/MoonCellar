@@ -8,7 +8,7 @@
       grid-template: none;
     }
     &--horizontal {
-      grid-template: 1fr 16px / auto;
+      grid-template: 1fr 8px / auto;
       gap: 12px;
       .scrollbars__content {
         overscroll-behavior: auto;

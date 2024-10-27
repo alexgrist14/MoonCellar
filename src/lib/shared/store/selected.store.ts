@@ -1,11 +1,10 @@
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
-import { IGame } from "../types/game";
-import { IGDBDefault, IGDBGenre, IGDBPlatform } from "../types/igdb";
+import { IGDBDefault, IGDBGame, IGDBGenre, IGDBPlatform } from "../types/igdb";
 
 type IState = {
-  games?: IGame[];
-  royalGames?: IGame[];
+  games?: IGDBGame[];
+  royalGames?: IGDBGame[];
   selectedSystems?: IGDBPlatform[];
   isRoyal?: boolean;
   selectedGenres?: IGDBGenre[];
@@ -16,9 +15,9 @@ type IState = {
 };
 
 type IAction = {
-  setGames: (games: IGame[]) => void;
+  setGames: (games: IGDBGame[]) => void;
   setSelectedGameModes: (gameModes: IGDBDefault[]) => void;
-  setRoyalGames: (royalGames: IGame[]) => void;
+  setRoyalGames: (royalGames: IGDBGame[]) => void;
   setSelectedSystems: (selectedSystems: IGDBPlatform[]) => void;
   setRoyal: (royal: boolean) => void;
   setSelectedGenres: (selectedGenres: IGDBGenre[]) => void;

@@ -13,18 +13,18 @@ export interface IGDBPlatform extends IGDBDefault {
 export type IGDBFamily = IGDBDefault;
 
 export interface IGDBGame extends IGDBDefault {
-  cover: IGDBCover[];
-  screenshots: number[];
+  cover: IGDBCover;
+  screenshots: IGDBScreenshot[];
   total_rating: number;
-  artworks: number[];
-  franchise: number;
-  franchises: number[];
+  aggregated_rating: number;
+  artworks: IGDBScreenshot[];
   game_modes: IGDBDefault[];
   genres: IGDBGenre[];
   platforms: IGDBPlatform[];
-  tags: number[];
-  themes: number[];
-  url: string;
+  keywords: IGDBDefault[];
+  themes: IGDBDefault[];
+  summary: string;
+  storyline: string;
 }
 
 export interface IGDBGenre extends IGDBDefault {
@@ -32,7 +32,17 @@ export interface IGDBGenre extends IGDBDefault {
 }
 
 export interface IGDBCover {
-  url: string;
-  id: number;
   _id: string;
+  id: number;
+  url: string;
+  width: number;
+  height: number;
+}
+
+export interface IGDBScreenshot {
+  _id: string;
+  id: number;
+  url: string;
+  width: number;
+  height: number;
 }

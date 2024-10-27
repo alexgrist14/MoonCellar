@@ -54,11 +54,18 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   }, [segments, setSegments, isRoyal, royalGames]);
 
   useEffect(() => {
+    console.log(currentSegment);
     if (!!currentSegment && isFinished) {
       if (!isRoyal) {
-        !!games && setWinner(games[+currentSegment.split("_")[1]]);
+        !!games &&
+          setWinner(
+            games.find((game) => game._id === currentSegment.split("_")[0])
+          );
       } else {
-        !!royalGames && setWinner(royalGames[+currentSegment.split("_")[1]]);
+        !!royalGames &&
+          setWinner(
+            royalGames.find((game) => game._id === currentSegment.split("_")[0])
+          );
 
         const filtered = segments?.filter(
           (segment) => segment !== currentSegment

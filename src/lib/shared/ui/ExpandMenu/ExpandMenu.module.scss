@@ -1,11 +1,12 @@
 .menu {
   display: grid;
-  position: absolute;
+  position: fixed;
   width: max(25%, 360px);
   height: 100%;
   transition: 0.3s;
   z-index: 3;
   background: $bgAlt;
+  top: 55px;
 
   @include mediaMax($screenMd) {
     width: 100%;
@@ -23,6 +24,7 @@
     background-color: $lightBg;
     cursor: pointer;
     grid-area: expand;
+    position: relative;
   }
 
   &__chevron {
@@ -35,6 +37,22 @@
 
     &_active {
       rotate: 90deg;
+    }
+  }
+
+  &__title {
+    @include flexCenter;
+    position: absolute;
+    top: 0;
+    background-color: $lightBg;
+    width: fit-content;
+    padding: 10px;
+    user-select: none;
+    transition: all 0.3s;
+    white-space: nowrap;
+
+    & > span {
+      margin-top: -2px;
     }
   }
 }

@@ -1,7 +1,7 @@
-import { IGame } from "../types/game";
+import {IGDBGame} from "../types/igdb";
 import { shuffle } from "./shuffle";
 
-export const getSegments = (games: IGame[], max: number) => {
+export const getSegments = (games: IGDBGame[], max: number) => {
   const sortedGames = shuffle(games);
 
   const startIndex =

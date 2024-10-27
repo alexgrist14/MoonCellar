@@ -1,5 +1,5 @@
 import { FC, useCallback, useEffect } from "react";
-import styles from "./HomePage.module.scss";
+import styles from "./GauntletPage.module.scss";
 import { ConsolesList } from "../../widgets/main";
 import { IGDBApi } from "../../shared/api";
 import { WheelContainer } from "../../widgets/wheel";
@@ -10,7 +10,7 @@ import { useExcludedStore } from "../../shared/store/excluded.store";
 import { useStatesStore } from "../../shared/store/states.store";
 import { useCommonStore } from "../../shared/store/common.store";
 
-export const HomePage: FC = () => {
+export const GauntletPage: FC = () => {
   const {
     isRoyal,
     selectedGenres,
@@ -48,17 +48,8 @@ export const HomePage: FC = () => {
       isRandom: true,
     }).then((response) => {
       if (!!response.data.results.length) {
-        const games = response.data.results.map((game) => ({
-          _id: game._id,
-          id: game.id,
-          image: !!game.cover[0] ? "https:" + game.cover[0].url : "",
-          name: game.name,
-          platforms: game.platforms?.map((platform) => platform._id) || [],
-          url: game?.url || "",
-        }));
-
-        setGames(games);
-        setSegments(getSegments(games, 16));
+        setGames(response.data.results);
+        setSegments(getSegments(response.data.results, 16));
 
         setStarted(true);
         setLoading(false);
@@ -109,11 +100,10 @@ export const HomePage: FC = () => {
 
   return (
     <div className={styles.page}>
-      <ExpandMenu id="consoles">
+      <ExpandMenu id="consoles" titleOpen="Filters">
         <ConsolesList />
       </ExpandMenu>
       <WheelContainer />
-      <ExpandMenu position="right"></ExpandMenu>
     </div>
   );
 };
