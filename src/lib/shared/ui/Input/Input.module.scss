@@ -1,12 +1,12 @@
 .container {
-  width: 300px;
-  height: 30px;
+  width: 100%;
 
   .input {
     width: 100%;
     height: 100%;
-    background: $lightBg;
+    background: $bg;
     border-radius: $radius;
+    border: 2px solid $lightBg;
     padding: 10px;
 
     &::placeholder {

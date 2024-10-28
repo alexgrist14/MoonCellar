@@ -50,6 +50,10 @@
     display: flex;
     align-items: center;
     gap: 10px;
+
+    & > span {
+      margin-top: -2px;
+    }
   }
 
   &__select {

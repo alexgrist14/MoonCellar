@@ -30,7 +30,6 @@
   &_active {
     border-radius: $radius $radius 0 0;
     overflow: visible;
-    box-shadow: $basicShadow;
   }
 
   &__controls {
@@ -44,17 +43,23 @@
   }
 
   &__search {
-    padding: 5px;
-    margin: 10px;
-    width: calc(100% - 20px);
-    border-radius: $radius;
-    border: 1px solid $blackBorderColor;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 16px;
-    color: $whiteTextColor;
-    background-color: $bg;
+    @include flexCenter;
+    padding: 10px 5px;
+    pointer-events: all;
+    background-color: $lightBg;
+
+    & input {
+      font-style: normal;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 16px;
+      padding: 5px;
+      background-color: $bg;
+      width: calc(100% - 10px);
+      border-radius: $radius;
+      border: 2px solid $blackBorderColor;
+      color: $whiteTextColor;
+    }
 
     &::placeholder {
       color: $whiteTextColor;
@@ -75,8 +80,8 @@
     align-items: center;
     width: 100%;
     border-radius: $radius;
-    border: 2px solid $blackBorderColor;
-    padding-inline: 10px 20px;
+    border-bottom: 2px solid $blackBorderColor;
+    padding-left: 10px;
     font-size: 15px;
     line-height: 24px;
     transition: all 0.15s;
@@ -85,7 +90,7 @@
     height: inherit;
     max-height: inherit;
     color: $whiteTextColor;
-    background-color: $lightBg;
+    background-color: $bg;
     text-align: left;
 
     &_compact {
@@ -102,7 +107,6 @@
 
     &_active {
       border-radius: $radius $radius 0 0;
-      z-index: 11;
     }
 
     &_overflow {
@@ -156,22 +160,19 @@
 
   &__inner {
     position: absolute;
-    top: 100%;
+    top: 0;
     right: 0;
     left: 0;
     height: fit-content;
-    background-color: $lightBg;
     opacity: 0;
     transition: 0.2s;
     overscroll-behavior: contain;
     overflow: hidden;
     transform-origin: top;
     pointer-events: none;
-    z-index: 10;
+    border-radius: $radius;
+    z-index: 2;
     border: 2px solid $blackBorderColor;
-    border-top-width: 0;
-    border-radius: 0 0 $radius $radius;
-    box-shadow: $basicShadow;
 
     &_red {
       border-color: $off;
@@ -181,14 +182,14 @@
       border-color: $on;
     }
 
-    &_active {
-      opacity: 1;
-      pointer-events: all;
-    }
-
     &_overflow {
       border-width: 2px;
       border-radius: $radius;
+    }
+
+    &_active {
+      opacity: 1;
+      box-shadow: $basicShadow;
     }
   }
 
@@ -200,6 +201,7 @@
     pointer-events: none;
     height: fit-content;
     visibility: hidden;
+    background-color: $lightBg;
 
     &::-webkit-scrollbar {
       width: 0;
@@ -238,6 +240,11 @@
       filter: brightness(1.3);
     }
   }
+
+  &__placeholder {
+    height: 38px;
+    opacity: 0;
+  }
 }
 
 .scrollbars {
@@ -247,6 +254,7 @@
 
   div &__scrollbar {
     right: 8px;
+    pointer-events: all;
   }
 
   div &__thumb {

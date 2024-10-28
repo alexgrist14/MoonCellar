@@ -5,8 +5,18 @@ import { Layout } from "../lib/app/ui/Layout";
 import { ToastConnector } from "../lib/shared/ui/Toast";
 import { ModalsConnector } from "../lib/shared/ui/Modal";
 import Head from "next/head";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
+import { useCommonStore } from "../lib/shared/store/common.store";
 
 export default function App({ Component, pageProps }: AppProps) {
+  const { asPath } = useRouter();
+  const { setWinner } = useCommonStore();
+
+  useEffect(() => {
+    setWinner(undefined);
+  }, [asPath, setWinner]);
+
   return (
     <>
       <Head>

@@ -25,5 +25,11 @@
       text-align: start;
     }
   }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
 }
 

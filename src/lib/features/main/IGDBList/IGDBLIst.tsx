@@ -36,7 +36,7 @@ export const IGDBList: FC = () => {
     <div className={styles.consoles__igdb}>
       <Input
         containerStyles={{ width: "100%" }}
-        placeholder="Name..."
+        placeholder="Enter name of the game..."
         disabled={isLoading}
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
