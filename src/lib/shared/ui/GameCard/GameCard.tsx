@@ -17,7 +17,7 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
   return (
     <Link
       className={styles.card}
-      href={`/games/${game._id}`}
+      href={`/games/${game.slug}`}
       onMouseOver={() => setIsHover(true)}
       onMouseOut={() => setIsHover(false)}
       onClick={() => modal.close()}
