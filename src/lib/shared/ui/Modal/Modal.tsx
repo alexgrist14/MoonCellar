@@ -1,4 +1,4 @@
-import { FC, ReactNode, useRef } from "react";
+import { FC, ReactNode, useEffect, useRef, useState } from "react";
 import { IModalParams } from "./Modal.types";
 import cn from "classnames";
 import styles from "./Modal.module.scss";
@@ -8,7 +8,7 @@ interface IModalProps extends IModalParams {
   children: ReactNode;
 }
 
-export const Modal: FC<IModalProps> = ({ children, onClose }) => {
+export const Modal: FC<IModalProps> = ({ children, onClose, id }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const closePopup = () => {
     if (onClose) onClose();
@@ -17,7 +17,7 @@ export const Modal: FC<IModalProps> = ({ children, onClose }) => {
   useCloseEvents([modalRef], () => closePopup());
 
   return (
-    <div className={cn(styles.modal)}>
+    <div className={cn(styles.modal)} id={id} key={id}>
       <div ref={modalRef} className={styles.modal__content}>
         {children}
       </div>

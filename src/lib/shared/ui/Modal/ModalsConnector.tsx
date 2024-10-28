@@ -2,13 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import EventEmitter from "events";
 import { IModal, IModalPropsState } from "./Modal.types";
 import { Modal } from "./Modal";
-import { useDisableScroll } from "../../hooks";
 
 const ev = new EventEmitter();
 
 export const modal: IModal = {
-  open: (component, id, props) => {
-    ev.emit("open", { component, props, id });
+  open: (component, props) => {
+    ev.emit("open", { component, props });
   },
   close: (id) => {
     ev.emit("close", id);
@@ -44,15 +43,13 @@ export const ModalsConnector = () => {
     };
   }, [openModal, closeModal]);
 
-  // useDisableScroll(content.length > 0);
-
   return (
     <div id="modals">
-      {content.map(({ component, props, id }, i) => (
+      {content.map(({ component, props }, i) => (
         <Modal
           key={i}
           onClose={() => {
-            closeModal(id);
+            closeModal(props?.id);
             if (props?.onClose) props.onClose();
           }}
         >

@@ -25,6 +25,8 @@ export interface IGDBGame extends IGDBDefault {
   themes: IGDBDefault[];
   summary: string;
   storyline: string;
+  first_release_date: number;
+  category: number;
 }
 
 export interface IGDBGenre extends IGDBDefault {

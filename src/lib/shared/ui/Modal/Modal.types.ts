@@ -1,14 +1,13 @@
-import { ReactNode } from 'react';
+import { ReactNode } from "react";
 
 export interface IModalParams {
   onClose?: () => void;
+  id?: string;
+  // deps?: unknown[];
 }
 
 export interface IModal {
-  open: (component: ReactNode, id?: string, props?: IModalParams) => void;
-  /**
-   * @param id Закрывает попап с id, иначе все сразу.
-   */
+  open: (component: ReactNode, props?: IModalParams) => void;
   close: (id?: string) => void;
 }
 

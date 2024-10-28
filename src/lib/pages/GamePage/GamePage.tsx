@@ -78,12 +78,14 @@ export const GamePage: FC = () => {
           </div>
         )}
         {!!game.screenshots?.length && (
-          <Slideshow
-            pictures={[
-              ...game.screenshots,
-              ...(!!game.artworks?.length ? game.artworks : []),
-            ]}
-          />
+          <div className={styles.page__screenshots}>
+            <Slideshow
+              pictures={[
+                ...game.screenshots,
+                ...(!!game.artworks?.length ? game.artworks : []),
+              ]}
+            />
+          </div>
         )}
       </div>
     </div>
