@@ -15,12 +15,14 @@
   }
 
   .winner {
-    display: flex;
-    width: 100%;
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 10px;
+    height: 200px;
+    max-width: 600px;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     color: white;
-    height: fit-content;
 
     &__buttons {
       display: flex;

@@ -1,3 +1,50 @@
 .page {
   display: grid;
+  grid-template-columns: 1fr 3fr;
+  padding-inline: 20px;
+  padding-block: 50px;
+  gap: 50px;
+
+  @include mediaMax($screenMd) {
+    grid-template-columns: 1fr;
+  }
+
+  &__left {
+    border-radius: $radius;
+    overflow: hidden;
+
+    & > img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__right {
+    display: grid;
+    gap: 10px;
+  }
+
+  &__text {
+    & h4 {
+      @include font(16px, 20px, 500);
+    }
+
+    & p {
+      @include font(14px, 18px, 400);
+      color: $gray;
+    }
+  }
+
+  &__info {
+    & span {
+      @include font(16px, 20px, 500);
+      color: $whiteTextColor;
+    }
+
+    & p {
+      @include font(14px, 18px, 400);
+      color: $gray;
+    }
+  }
 }

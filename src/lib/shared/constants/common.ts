@@ -7,21 +7,46 @@ export const apiNames: { [key: string]: string } = {
 };
 
 export const links = [
-  { tabName: "Home", tabLink: "/" },
-  { tabName: "Gauntlet", tabLink: "/gauntlet" },
-  { tabName: "Games", tabLink: "/games" },
-  { tabName: "Profile", tabLink: "/user" },
+  { name: "Home", link: "/" },
+  { name: "Gauntlet", link: "/gauntlet" },
+  { name: "Games", link: "/games" },
+  { name: "Profile", link: "/user" },
 ];
 
-export const imageTypes = [
-  "thumb",
-  "cover_small",
-  "screenshot_med",
-  "cover_big",
-  "logo_med",
-  "screenshot_big",
-  "screenshot_huge",
-  "micro",
-  "720p",
-  "1080p",
+export const getImageLink = (
+  url: string,
+  size:
+    | "thumb"
+    | "micro"
+    | "cover_big"
+    | "cover_small"
+    | "screenshot_big"
+    | "screenshot_med"
+    | "screenshot_huge"
+    | "logo_med"
+    | "720p"
+    | "1080p",
+  multiply?: number
+) => {
+  return (
+    "https:" + url.replace("thumb", !!multiply ? `${size}_${multiply}x` : size)
+  );
+};
+
+export const gameCategories = [
+  "main_game",
+  "dlc_addon",
+  "expansion",
+  "bundle",
+  "standalone_expansion",
+  "mod",
+  "episode",
+  "season",
+  "remake",
+  "remaster",
+  "expanded_game",
+  "port",
+  "fork",
+  "pack",
+  "update",
 ];

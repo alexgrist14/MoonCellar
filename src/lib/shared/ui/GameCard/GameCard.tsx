@@ -4,6 +4,8 @@ import Link from "next/link";
 import { IGDBGame } from "../../types/igdb";
 import classNames from "classnames";
 import Image from "next/image";
+import { modal } from "../Modal";
+import { getImageLink } from "../../constants";
 
 interface IGameCardProps {
   game: IGDBGame;
@@ -15,9 +17,10 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
   return (
     <Link
       className={styles.card}
-      href={`/game/${game._id}`}
+      href={`/games/${game._id}`}
       onMouseOver={() => setIsHover(true)}
       onMouseOut={() => setIsHover(false)}
+      onClick={() => modal.close()}
     >
       <div
         className={classNames(styles.card__title, {
@@ -34,12 +37,12 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
       <Image
         alt="Game cover"
         src={
-          !!game?.cover?.length
-            ? "https:" + game?.cover[0]?.url.replace("thumb", "cover_big")
+          !!game?.cover
+            ? getImageLink(game?.cover?.url, "cover_big")
             : "/images/cover.png"
         }
-        width={200}
-        height={300}
+        width={500}
+        height={500}
         className={styles.card__cover}
       />
     </Link>
