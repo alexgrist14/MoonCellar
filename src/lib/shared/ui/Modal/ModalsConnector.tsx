@@ -44,7 +44,7 @@ export const ModalsConnector = () => {
     };
   }, [openModal, closeModal]);
 
-  useDisableScroll(content.length > 0);
+  // useDisableScroll(content.length > 0);
 
   return (
     <div id="modals">

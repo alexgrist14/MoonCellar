@@ -18,7 +18,7 @@ export const ConsolesList: FC = () => {
     IGDBApi.getGenres().then((response) => setGenres(response.data));
     IGDBApi.getModes().then((response) => setGameModes(response.data));
     IGDBApi.getPlatforms().then((response) => setSystems(response.data));
-  }, [isRoyal]);
+  }, [isRoyal, setGenres, setGameModes, setSystems]);
 
   const contentRef = useRef<HTMLDivElement>(null);
 

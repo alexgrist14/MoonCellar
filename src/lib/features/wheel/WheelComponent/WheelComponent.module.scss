@@ -7,8 +7,8 @@
   height: 100%;
 
   @include mediaMax($screenSm) {
-    aspect-ratio: unset;
-    height: fit-content;
+    aspect-ratio: 1;
+    height: 100%;
   }
 
   &_disabled {
@@ -29,7 +29,7 @@
     border: 3px solid white;
     border-radius: 50%;
     user-select: none;
-    font-family: 'Pentagra';
+    font-family: "Pentagra";
   }
 
   & canvas {

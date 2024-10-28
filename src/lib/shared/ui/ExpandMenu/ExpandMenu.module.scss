@@ -3,10 +3,9 @@
   position: fixed;
   width: max(25%, 360px);
   height: 100%;
-  transition: 0.3s;
+  transition: opacity 0.3s, transform 0.3s;
   z-index: 3;
   background: $bgAlt;
-  top: 55px;
 
   @include mediaMax($screenMd) {
     width: 100%;
@@ -50,6 +49,7 @@
     user-select: none;
     transition: all 0.3s;
     white-space: nowrap;
+    z-index: 4;
 
     & > span {
       margin-top: -2px;
@@ -66,5 +66,10 @@
     margin: 0;
     padding: 20px;
     max-height: calc(100vh - 55px);
+  }
+
+  div &__scrollbar {
+    margin-block: 50px;
+    height: calc(100% - 100px);
   }
 }
