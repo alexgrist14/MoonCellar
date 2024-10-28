@@ -14,44 +14,41 @@ interface UserProfileProps {
 }
 
 const UserProfile: FC<UserProfileProps> = ({ email, name }) => {
+  const { userId, profilePicture, setProfilePicture } = useAuthStore();
+
   const [isPictureLarge, setIsPictureLarge] = useState<boolean>(false);
-  const [avatar, setAvatar] = useState<string | null>();
+  const [avatar, setAvatar] = useState<string | undefined>(profilePicture);
   const [tempAvatar, setTempAvatar] = useState<File>();
   const [profileHover, setProfileHover] = useState<boolean>(false);
-  const {userId} = useAuthStore();
 
-  useEffect(()=>{
-    if(userId){
-      (async ()=>{
-        await getAvatar(userId).then((res)=>{
+  useEffect(() => {
+    if (userId) {
+      (async () => {
+        await getAvatar(userId).then((res) => {
           setAvatar(`${API_URL}/photos/${res.fileName}`);
-        })
-      })() 
+        });
+      })();
     }
-    
-  },[userId])
+  }, [userId]);
   const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files !== null) {
       const file = event.target.files[0];
       const fileSize = Math.round(event.target.files[0].size / 1024);
-      
-      if (fileSize > 1024){
+
+      if (fileSize > 1024) {
         setIsPictureLarge(true);
-      } else{
+      } else {
         setTempAvatar(file);
-        setAvatar(null);
+        setAvatar(undefined);
         setIsPictureLarge(false);
       }
-
     }
   };
-  const handleUpload = async ()=>{
-    if(userId && tempAvatar){
-      const res = await addAvatar(userId, tempAvatar);
-      console.log(res);
-
+  const handleUpload = async () => {
+    if (userId && tempAvatar) {
+      await addAvatar(userId, tempAvatar);
     }
-  }
+  };
   return (
     <div className={styles.container}>
       <div className={styles.content}>
@@ -67,9 +64,9 @@ const UserProfile: FC<UserProfileProps> = ({ email, name }) => {
           >
             <Image
               src={
-                !!avatar ? avatar : 
-                
-                !!tempAvatar
+                !!avatar
+                  ? avatar
+                  : !!tempAvatar
                   ? URL.createObjectURL(tempAvatar)
                   : "/images/user.png"
               }
@@ -84,15 +81,16 @@ const UserProfile: FC<UserProfileProps> = ({ email, name }) => {
             <SvgCamera
               className={`${styles.svg} ${profileHover && styles.hover_svg}`}
             />
-                      
           </div>
-          {tempAvatar && !isPictureLarge && <Button onClick={handleUpload}>Upload</Button>}
+          {tempAvatar && !isPictureLarge && (
+            <Button onClick={handleUpload}>Upload</Button>
+          )}
           {isPictureLarge && (
             <p className={styles.error}>Avatar must me smaller than 1mb</p>
           )}
           <input type="file" id="avatar" hidden onChange={handleInput} />
         </label>
-      
+
         <div className={styles.profile_info}>
           <div className={styles.profile_name}>{name}</div>
           <div className={styles.profile_email}>{email}</div>

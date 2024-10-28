@@ -15,10 +15,42 @@
   }
 
   &__right {
+    position: relative;
     display: flex;
     align-items: center;
     height: 34px;
     gap: 10px;
+    .profile{
+      &_image{
+        width: 40px;
+        height: 40px;
+      }
+    }
+    .dropdown{
+      display: flex;
+      visibility: hidden;
+      flex-direction: column;
+      right: 0;
+      position: absolute;
+      border: 1px solid $neutral-50;
+      text-align: left;
+      z-index: 4;
+      box-shadow: 10px;
+      &_item{
+        text-align: left;
+        width: 200px;
+        background-color: #282e3a;
+        padding-block: 20px;
+        padding-left: 10px;
+        z-index: 4;
+        &:hover{
+          background-color: rgb(28, 47, 71);
+        }
+      }
+    }
+    .active{
+      visibility: visible;
+    }
   }
 
   .title {

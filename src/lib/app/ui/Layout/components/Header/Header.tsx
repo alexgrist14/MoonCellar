@@ -1,9 +1,9 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 import styles from "./Header.module.scss";
 import Link from "next/link";
 import { Separator } from "@/src/lib/shared/ui/Separator";
 import { Button } from "@/src/lib/shared/ui/Button";
-import { SvgSearch } from "@/src/lib/shared/ui/svg";
+import { SvgProfile, SvgSearch } from "@/src/lib/shared/ui/svg";
 import { useRouter } from "next/router";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { jwtDecode } from "jwt-decode";
@@ -13,20 +13,28 @@ import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { getCookie } from "@/src/lib/shared/utils/getCookie";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { SearchModal } from "@/src/lib/shared/ui/SearchModal";
-import { Dropdown } from 'rsuite';
-import DropdownItem from "rsuite/esm/Dropdown/DropdownItem";
-import { Nav } from 'rsuite';
+import { API_URL } from "@/src/lib/shared/constants";
+import { getAvatar } from "@/src/lib/shared/api/avatar";
+import { AuthModal } from "@/src/lib/shared/ui/AuthModal";
+import { logout } from "@/src/lib/shared/api";
 
 export const Header: FC = () => {
   const { isMobile } = useCommonStore();
-  const { setAuth, isAuth, setUserId, userId } = useAuthStore();
+  const [isMenuActive, setIsMenuActive] = useState(false);
+  const {
+    setAuth,
+    isAuth,
+    setUserId,
+    userId,
+    profilePicture,
+    setProfilePicture,
+  } = useAuthStore();
   const { push } = useRouter();
 
   useEffect(() => {
     const token = getCookie("refresh_token");
     if (token) {
       const decoded: any = jwtDecode(token);
-      console.log(decoded);
       if (decoded.exp) {
         setAuth(!isTokenExpired(decoded.exp));
         setUserId(decoded.id);
@@ -34,12 +42,27 @@ export const Header: FC = () => {
     }
   }, [setAuth, setUserId]);
 
+  useEffect(() => {
+    if (userId) {
+      (async () => {
+        await getAvatar(userId).then((res) => {
+          setProfilePicture(`${API_URL}/photos/${res.fileName}`);
+        });
+      })();
+    }
+  }, [setProfilePicture, userId]);
+
   const handleProfileClick = () => {
-    push(`/user/${userId}`);
+    if (isAuth) push(`/user/${userId}`);
+    else modal.open(<AuthModal />);
   };
 
   const searchClickHandler = () => {
     modal.open(<SearchModal />);
+  };
+
+  const handleLogoutClick = () => {
+    if (userId) logout(userId);
   };
 
   return (
@@ -58,20 +81,37 @@ export const Header: FC = () => {
         )}
       </div>
       <div className={styles.container__right}>
-        {isAuth && (
-          <div className={styles.profile} onClick={handleProfileClick}>
-              <Image
-              src={"/images/user.png"}
+        {isAuth ? (
+          <div
+            className={styles.profile}
+            onMouseLeave={() => setIsMenuActive(false)}
+            onClick={handleProfileClick}
+          >
+            <Image
+              className={styles.profile_image}
+              onMouseEnter={() => setIsMenuActive(true)}
+              src={!!profilePicture ? profilePicture : "/images/user.png"}
               width={40}
               height={40}
               alt="profile"
             />
-            <Dropdown open>
-            <Dropdown.Item as={Link} href="/user">
-  About
-</Dropdown.Item>;
-            </Dropdown>
-          
+            <div
+              className={`${styles.dropdown} ${isMenuActive && styles.active}`}
+            >
+              <Link className={styles.dropdown_item} href="/user">
+                Profile
+              </Link>
+              <Link className={styles.dropdown_item} href="/settings">
+                Settings
+              </Link>
+              <Link className={styles.dropdown_item} href="/gauntlet" onClick={handleLogoutClick}>
+                Logout
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <SvgProfile className={styles.profile_image} />
           </div>
         )}
       </div>

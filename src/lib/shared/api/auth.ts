@@ -2,19 +2,15 @@ import axios from "axios";
 import { IAuth, IUser, LoginDto, SignUpDto } from "../types/auth";
 import { API_URL } from "../constants";
 
-export const signup = async (signUpDto: IAuth): Promise<{userId: string}> => {
+export const signup = async (signUpDto: IAuth): Promise<{ userId: string }> => {
   try {
-    const response = await axios.post(
-      `${API_URL}/auth/signup`,
-      signUpDto,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Credentials": true,
-        },
-        withCredentials: true,
-      }
-    );
+    const response = await axios.post(`${API_URL}/auth/signup`, signUpDto, {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Credentials": true,
+      },
+      withCredentials: true,
+    });
     return response.data;
   } catch (err: any) {
     if (err.response && err.response.data) {
@@ -27,17 +23,13 @@ export const signup = async (signUpDto: IAuth): Promise<{userId: string}> => {
 
 export const login = async (loginDto: IAuth): Promise<void> => {
   try {
-    const response = await axios.post(
-      `${API_URL}/auth/login`,
-      loginDto,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Credentials": true,
-        },
-        withCredentials: true,
-      }
-    );
+    const response = await axios.post(`${API_URL}/auth/login`, loginDto, {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Credentials": true,
+      },
+      withCredentials: true,
+    });
     return response.data;
   } catch (err: any) {
     if (err.response && err.response.data) {
@@ -46,4 +38,16 @@ export const login = async (loginDto: IAuth): Promise<void> => {
       throw new Error("Login failed");
     }
   }
+};
+
+export const logout = async (userId: string): Promise<{ message: string }> => {
+  const response = await axios.post(`${API_URL}/auth/${userId}/logout`, {
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Credentials": true,
+    },
+    withCredentials: true,
+  });
+
+  return response.data;
 };
