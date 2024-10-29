@@ -27,6 +27,7 @@ export const ExtendedSelector = <T,>({
       <h3>{title}</h3>
       <div className={styles.option__selector}>
         <Dropdown
+          isWithReset
           overflowRootId="consoles"
           isDisabled={isDisabled}
           list={list.map((item) => item.name)}
@@ -40,12 +41,15 @@ export const ExtendedSelector = <T,>({
           }
           placeholder="Include..."
           getIndexes={(indexes) =>
-            setSelected(indexes.map((index) => list[index]))
+            setSelected(
+              !!indexes?.length ? indexes.map((index) => list[index]) : []
+            )
           }
         />
       </div>
       <div className={styles.option__selector}>
         <Dropdown
+          isWithReset
           overflowRootId="consoles"
           isDisabled={isDisabled}
           list={list.map((item) => item.name)}

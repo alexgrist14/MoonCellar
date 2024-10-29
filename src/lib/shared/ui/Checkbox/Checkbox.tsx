@@ -8,15 +8,18 @@ interface ICheckboxProps
     "required" | "disabled" | "onChange" | "id" | "checked" | "className"
   > {
   colorTheme?: "accent" | "on" | "off";
+  borderColor?: string;
 }
 
 export const Checkbox: FC<ICheckboxProps> = ({
   className,
   colorTheme = "accent",
+  borderColor,
   ...props
 }) => {
   return (
     <input
+      style={{ borderColor }}
       className={classNames(styles.checkbox, className, {
         [styles[`checkbox_${colorTheme}`]]: props.checked,
       })}

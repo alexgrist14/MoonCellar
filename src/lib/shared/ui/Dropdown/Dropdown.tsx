@@ -16,6 +16,11 @@ import useCloseEvents from "../../hooks/useCloseEvents";
 import { Scrollbar } from "../Scrollbar";
 import { Checkbox } from "../Checkbox";
 
+interface IIndexedItem {
+  value: string;
+  index: number;
+}
+
 interface IDropDownListProps {
   className?: string;
   list: string[];
@@ -41,6 +46,7 @@ interface IDropDownListProps {
   isWithReset?: boolean;
   isWithSearch?: boolean;
   isWithInput?: boolean;
+  isWithAll?: boolean;
   borderTheme?: "default" | "green" | "red";
 }
 
@@ -69,6 +75,7 @@ export const Dropdown: FC<IDropDownListProps> = ({
   isWithReset,
   isWithSearch,
   isWithInput,
+  isWithAll,
   borderTheme,
 }) => {
   const router = useRouter();
@@ -81,44 +88,66 @@ export const Dropdown: FC<IDropDownListProps> = ({
   const offset = useRef<number>(0);
 
   const [query, setQuery] = useState("");
-  const [queryList, setQueryList] =
-    useState<{ index: number; value: string }[]>();
+  const [indexedList, setIndexedList] = useState<IIndexedItem[]>([]);
+  const [sortedList, setSortedList] = useState<IIndexedItem[]>([]);
 
   const listRef = useRef<HTMLUListElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
-  const changeRef = useRef(false);
 
   const debouncedQueryChange = useDebouncedCallback((value: string) => {
-    const values = list.reduce(
-      (result: { index: number; value: string }[], element, index) => {
-        element.toLowerCase().includes(value.toLowerCase()) &&
-          result.push({ index: index, value: element });
+    const values = sortedList.reduce(
+      (result: { index: number; value: string }[], element) => {
+        element.value.toLowerCase().includes(value.toLowerCase()) &&
+          result.push(element);
         return result;
       },
       []
     );
 
-    setQueryList(values);
+    setSortedList(values);
   }, 300);
 
-  const clickHandler = (index: number, value: string, isChecked?: boolean) => {
+  const clickHandler = (
+    item: IIndexedItem | undefined,
+    options: { isChecked?: boolean; isReset?: boolean; isAll?: boolean }
+  ) => {
+    const { index, value } = item || { index: -1, value: "" };
+    const { isChecked, isReset, isAll } = options;
+
     if (!isMulti) {
       setValue(value);
       setIsActive(false);
+
       isActive && (offset.current = 0);
+
       !!getValue && getValue(value || null);
-      !!getIndex && getIndex(!!queryList ? queryList[index].index : index);
+      !!getIndex && getIndex(index);
     } else {
-      if (isChecked) {
-        setMultiValue((v) =>
-          v.filter((i) => i !== (!!queryList ? queryList[index].index : index))
-        );
-      } else
-        setMultiValue((v) =>
-          [...v, !!queryList ? queryList[index].index : index].sort(
-            (a, b) => a - b
+      let values: number[] = [];
+
+      if (isReset) {
+        values = [];
+      } else if (isAll) {
+        values = sortedList.map((item) => item.index);
+      } else {
+        values = isChecked
+          ? multiValue.filter((i) => i !== index)
+          : [...multiValue, index].sort((a, b) => a - b);
+      }
+
+      setMultiValue(values);
+
+      !!getIndexes && getIndexes(values);
+      !!getValues &&
+        getValues(
+          indexedList.reduce(
+            (res: string[], item) =>
+              values.some((value) => value === item.index)
+                ? [...res, item.value]
+                : res,
+            []
           )
         );
     }
@@ -139,7 +168,9 @@ export const Dropdown: FC<IDropDownListProps> = ({
         ? rootRect.bottom - 25 - listRect.bottom
         : 0;
 
-    !isDisabled && (!!list.length || isWithSearch) && setIsActive(!isActive);
+    !isDisabled &&
+      (!!indexedList.length || isWithSearch) &&
+      setIsActive(!isActive);
   };
 
   const defaultPlaceholder = isWithInput
@@ -150,6 +181,10 @@ export const Dropdown: FC<IDropDownListProps> = ({
     isActive && (offset.current = 0);
     setIsActive(false);
   });
+
+  useEffect(() => {
+    setIndexedList(list.map((item, i) => ({ value: item, index: i })));
+  }, [list]);
 
   useEffect(() => {
     if (!!value && !isWithInput && !overwriteValue) {
@@ -166,24 +201,37 @@ export const Dropdown: FC<IDropDownListProps> = ({
   }, [initialMultiValue]);
 
   useEffect(() => {
-    if (!isActive && changeRef.current && isMulti) {
-      changeRef.current = false;
-      getIndexes && getIndexes(multiValue);
-      getValues && getValues(multiValue.map((index) => list[index]));
-    }
-  }, [multiValue, getIndexes, isActive, isMulti, getValues, list]);
+    isActive &&
+      setTimeout(
+        () =>
+          isActive &&
+          !isWithInput &&
+          !!searchRef.current &&
+          searchRef.current.focus(),
+        220
+      );
+  }, [isActive, isWithInput]);
 
   useEffect(() => {
-    isActive && (changeRef.current = true);
-    setTimeout(
-      () =>
-        isActive &&
-        !isWithInput &&
-        !!searchRef.current &&
-        searchRef.current.focus(),
-      220
-    );
-  }, [isActive, isWithInput]);
+    isActive
+      ? setSortedList((list) => (!!list?.length ? list : indexedList))
+      : setSortedList(() => {
+          const first: IIndexedItem[] = [];
+          const second: IIndexedItem[] = [];
+
+          indexedList.forEach((item) => {
+            multiValue.includes(item.index)
+              ? first.push(item)
+              : second.push(item);
+          });
+
+          return [...first, ...second];
+        });
+  }, [indexedList, multiValue, isActive]);
+
+  useEffect(() => {
+    !isActive && setQuery("");
+  }, [isActive]);
 
   return (
     <div className={styles.wrapper} style={wrapperStyle}>
@@ -197,23 +245,42 @@ export const Dropdown: FC<IDropDownListProps> = ({
         ref={dropdownRef}
       >
         <div className={styles.dropdown__controls}>
-          {!isMulti && isWithReset && !isDisabled && !!value && (
+          {isWithReset && !isDisabled && !!value && (
             <Button
               color="red"
               style={{ padding: "2px" }}
               className={styles.dropdown__close}
               onClick={() => {
-                clickHandler(-1, "");
+                clickHandler({ index: -1, value: "" }, { isReset: true });
               }}
             >
               <SvgClose />
             </Button>
           )}
+          {isWithAll && isMulti && (
+            <Checkbox
+              borderColor="white"
+              colorTheme="on"
+              onChange={() =>
+                clickHandler(undefined, {
+                  isAll: indexedList.some(
+                    (item) => !multiValue.includes(item.index)
+                  ),
+                  isReset: !indexedList.some(
+                    (item) => !multiValue.includes(item.index)
+                  ),
+                })
+              }
+              checked={
+                !indexedList.some((item) => !multiValue.includes(item.index))
+              }
+            />
+          )}
           <div
             className={cl(styles.dropdown__icon, {
               [styles.dropdown__icon_active]: isActive,
               [styles.dropdown__icon_disabled]:
-                isDisabled || (!list.length && !isWithSearch),
+                isDisabled || (!indexedList.length && !isWithSearch),
             })}
             onClick={fieldClickHandler}
           >
@@ -221,14 +288,19 @@ export const Dropdown: FC<IDropDownListProps> = ({
           </div>
         </div>
         <div
-          style={fieldStyle}
+          style={{
+            ...fieldStyle,
+            paddingRight:
+              15 + 10 * ((isWithReset ? 1 : 0) + (isWithAll ? 1 : 0)),
+          }}
           className={cl(styles.dropdown__field, {
             [styles.dropdown__field_active]: isActive,
             [styles.dropdown__field_overflow]: !!offset.current,
             [styles.dropdown__field_compact]: isCompact,
             [styles[`dropdown__field_${borderTheme}`]]: !!borderTheme,
             [styles.dropdown__field_disabled]:
-              isDisabled || (!list.length && !isWithSearch && !isWithInput),
+              isDisabled ||
+              (!indexedList.length && !isWithSearch && !isWithInput),
           })}
           onClick={fieldClickHandler}
         >
@@ -267,22 +339,26 @@ export const Dropdown: FC<IDropDownListProps> = ({
             transform: `translateY(${offset.current}px)`,
           }}
         >
-          {(isWithSearch === undefined ? list.length > 10 : isWithSearch) && (
-            <input
-              ref={searchRef}
-              className={styles.dropdown__search}
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
+          <div className={styles.dropdown__placeholder}></div>
+          {(isWithSearch === undefined
+            ? indexedList.length > 10
+            : isWithSearch) && (
+            <div className={styles.dropdown__search}>
+              <input
+                ref={searchRef}
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
 
-                if (!!getSearchQuery) {
-                  return getSearchQuery(e.target.value);
-                }
+                  if (!!getSearchQuery) {
+                    return getSearchQuery(e.target.value);
+                  }
 
-                debouncedQueryChange(e.target.value);
-              }}
-              placeholder="Search..."
-            />
+                  debouncedQueryChange(e.target.value);
+                }}
+                placeholder="Search..."
+              />
+            </div>
           )}
           <Scrollbar
             contentDefRef={innerRef}
@@ -297,39 +373,35 @@ export const Dropdown: FC<IDropDownListProps> = ({
                 [styles.dropdown__list_active]: isActive,
               })}
             >
-              {(queryList?.map((element) => element.value) || list).map(
-                (item, index) => {
-                  const isChecked = multiValue.includes(
-                    !!queryList ? queryList[index].index : index
-                  );
-                  const key = `${item.replace(/[^W+]/g, "_")}-${index}`;
+              {sortedList.map((item, index) => {
+                const isChecked = multiValue.includes(item.index);
+                const key = `${item.value.replace(/[^W+]/g, "_")}-${index}`;
 
-                  return (
-                    <div
-                      key={key}
-                      className={styles.dropdown__item}
-                      onClick={() => {
-                        clickHandler(index, item, isChecked);
-                      }}
-                    >
-                      <span>{item}</span>
-                      {isMulti && (
-                        <Checkbox
-                          colorTheme={
-                            borderTheme === "green"
-                              ? "on"
-                              : borderTheme === "red"
-                              ? "off"
-                              : "accent"
-                          }
-                          onChange={() => clickHandler(index, item, isChecked)}
-                          checked={isChecked}
-                        />
-                      )}
-                    </div>
-                  );
-                }
-              )}
+                return (
+                  <div
+                    key={key}
+                    className={styles.dropdown__item}
+                    onClick={() => {
+                      clickHandler(item, { isChecked });
+                    }}
+                  >
+                    <span>{item.value}</span>
+                    {isMulti && (
+                      <Checkbox
+                        colorTheme={
+                          borderTheme === "green"
+                            ? "on"
+                            : borderTheme === "red"
+                            ? "off"
+                            : "accent"
+                        }
+                        onChange={() => clickHandler(item, { isChecked })}
+                        checked={isChecked}
+                      />
+                    )}
+                  </div>
+                );
+              })}
             </ul>
           </Scrollbar>
         </div>

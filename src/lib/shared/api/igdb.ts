@@ -35,7 +35,11 @@ const getGames = (params: {
 };
 
 const getGameById = (id: string) => {
-  return agent<IGDBGame>(`${API_URL}/igdb/${id}`, "get");
+  return agent<IGDBGame>(`${API_URL}/igdb/by-id/${id}`, "get");
+};
+
+const getGameBySlug = (slug: string) => {
+  return agent<IGDBGame>(`${API_URL}/igdb/by-slug/${slug}`, "get");
 };
 
 const getGenres = () => {
@@ -53,6 +57,7 @@ const getModes = () => {
 export const IGDBApi = {
   getGames,
   getGameById,
+  getGameBySlug,
   getGenres,
   getPlatforms,
   getModes,

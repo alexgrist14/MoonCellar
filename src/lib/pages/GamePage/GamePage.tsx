@@ -14,8 +14,8 @@ export const GamePage: FC = () => {
   const [game, setGame] = useState<IGDBGame>();
 
   useEffect(() => {
-    !!query.id &&
-      IGDBApi.getGameById(query.id as string)
+    !!query.slug &&
+      IGDBApi.getGameBySlug(query.slug as string)
         .then((response) => setGame(response.data))
         .catch(axiosUtils.toastError);
   }, [query]);
@@ -25,19 +25,17 @@ export const GamePage: FC = () => {
   return (
     <div className={styles.page}>
       <div className={styles.page__left}>
-        {!!game.cover && (
-          <Image
-            key={game.cover._id}
-            alt="Cover"
-            src={
-              !!game.cover && game.cover.url
-                ? getImageLink(game.cover.url, "cover_big", 2)
-                : "/images/helen.png"
-            }
-            width={game.cover.width || 700}
-            height={game.cover.height || 900}
-          />
-        )}
+        <Image
+          key={game.cover?._id}
+          alt="Cover"
+          src={
+            !!game.cover?.url
+              ? getImageLink(game.cover.url, "cover_big", 2)
+              : "/images/cover.png"
+          }
+          width={700}
+          height={900}
+        />
       </div>
       <div className={styles.page__right}>
         <h2>{game.name}</h2>
@@ -67,10 +65,12 @@ export const GamePage: FC = () => {
             </p>
           )}
         </div>
-        <div className={styles.page__text}>
-          <h4>Summary:</h4>
-          <p>{game.summary}</p>
-        </div>
+        {!!game.summary && (
+          <div className={styles.page__text}>
+            <h4>Summary:</h4>
+            <p>{game.summary}</p>
+          </div>
+        )}
         {!!game.storyline && (
           <div className={styles.page__text}>
             <h4>Storyline:</h4>

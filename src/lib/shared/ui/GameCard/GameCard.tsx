@@ -17,7 +17,7 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
   return (
     <Link
       className={styles.card}
-      href={`/games/${game._id}`}
+      href={`/games/${game.slug}`}
       onMouseOver={() => setIsHover(true)}
       onMouseOut={() => setIsHover(false)}
       onClick={() => modal.close()}
@@ -44,6 +44,7 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
         width={500}
         height={500}
         className={styles.card__cover}
+        priority
       />
     </Link>
   );

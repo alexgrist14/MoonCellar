@@ -5,13 +5,15 @@
   cursor: pointer;
   width: 60px;
   height: 30px;
-  background: #231f34;
-  border-radius: 100px;
-  outline: 2px solid;
+  background: $bg;
+  border-radius: $radius;
+  outline: 3px solid transparent;
   position: relative;
   transition: all 0.2s;
   font-size: 10px;
   font-weight: 600;
+  overflow: hidden;
+  user-select: none;
 
   & span {
     z-index: 1;
@@ -57,17 +59,16 @@
     top: 0;
     width: 30px;
     height: 100%;
-    border-radius: 50%;
     transition: 0.3s;
     box-shadow: 0 0 2px 0 rgba(10, 10, 10, 0.29);
 
     &_left {
-      left: 0;
+      transform: translateX(0);
       background-color: $off;
     }
 
     &_right {
-      left: calc(100% - 30px);
+      transform: translateX(100%);
       background-color: $on;
     }
   }

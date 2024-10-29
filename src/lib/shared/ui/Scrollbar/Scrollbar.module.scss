@@ -9,7 +9,8 @@
     }
     &--horizontal {
       grid-template: 1fr 8px / auto;
-      gap: 12px;
+      gap: 8px;
+
       .scrollbars__content {
         overscroll-behavior: auto;
       }
@@ -17,7 +18,6 @@
   }
 
   &__content {
-    -ms-overflow-style: none;
     overflow: auto;
     padding: 0 1rem;
     scrollbar-width: none;
@@ -55,7 +55,7 @@
     bottom: 0;
     cursor: pointer;
     position: absolute;
-    z-index: 100;
+    z-index: 1;
     top: 0;
     width: 8px;
     background-color: #c3c3c34c;

@@ -26,7 +26,7 @@ export const GauntletPage: FC = () => {
     useExcludedStore();
   const { isLoading, setSegments, setStarted, setFinished, setLoading } =
     useStatesStore();
-  const { setWinner } = useCommonStore();
+  const { setWinner, setExpanded } = useCommonStore();
 
   const getIGDBGames = useCallback(() => {
     if (isRoyal) return;
@@ -97,6 +97,10 @@ export const GauntletPage: FC = () => {
       !!royalGames &&
       setSegments(royalGames.map((game, i) => game.id + "_" + i));
   }, [isRoyal, royalGames, setSegments]);
+
+  useEffect(() => {
+    setExpanded("left");
+  }, [setExpanded]);
 
   return (
     <div className={styles.page}>
