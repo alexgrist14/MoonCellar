@@ -5,8 +5,10 @@ import { FC, useState } from "react";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { SubmitHandler, useForm } from "react-hook-form";
 import styles from "./AuthModal.module.scss";
+import { useRouter } from "next/router";
 
 export const AuthModal: FC = () => {
+  const router = useRouter();
   const [isRegister, setIsRegister] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,22 +29,22 @@ export const AuthModal: FC = () => {
 
     login(loginDto)
       .then((res) => {
-        console.log(res);
+        router.push(`/user/${res.userId}`)
       })
       .catch((err) => setError(err.message));
   };
 
   const handleSignUp: SubmitHandler<IAuth> = (data) => {
-    // setError(null);
-    // const singUpDto: IAuth = {
-    //   name: data.name,
-    //   email: data.email,
-    //   password: data.password,
-    // };
-    //
-    // signup(singUpDto)
-    //   .then(() => dispatch(setUser({ email: data.email, user: "123" })))
-    //   .catch((err) => setError(err.message));
+    setError(null);
+    const singUpDto: IAuth = {
+      name: data.name,
+      email: data.email,
+      password: data.password,
+    };
+    
+    signup(singUpDto)
+      .then((res) => router.push(`/user/${res.userId}`))
+      .catch((err) => setError(err.message));
   };
 
   return (

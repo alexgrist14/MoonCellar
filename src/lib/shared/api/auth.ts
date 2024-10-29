@@ -21,7 +21,7 @@ export const signup = async (signUpDto: IAuth): Promise<{ userId: string }> => {
   }
 };
 
-export const login = async (loginDto: IAuth): Promise<void> => {
+export const login = async (loginDto: IAuth): Promise<{ userId: string }> => {
   try {
     const response = await axios.post(`${API_URL}/auth/login`, loginDto, {
       headers: {

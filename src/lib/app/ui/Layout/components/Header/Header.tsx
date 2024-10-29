@@ -32,13 +32,16 @@ export const Header: FC = () => {
   const { push } = useRouter();
 
   useEffect(() => {
-    const token = getCookie("refresh_token");
+    const token = getCookie("refreshMoonToken");
     if (token) {
       const decoded: any = jwtDecode(token);
       if (decoded.exp) {
         setAuth(!isTokenExpired(decoded.exp));
         setUserId(decoded.id);
       }
+    }else{
+      setAuth(false);
+      setUserId("");
     }
   }, [setAuth, setUserId]);
 
@@ -47,13 +50,15 @@ export const Header: FC = () => {
       (async () => {
         await getAvatar(userId).then((res) => {
           setProfilePicture(`${API_URL}/photos/${res.fileName}`);
-        });
+        }).catch(()=>{setProfilePicture('')});
       })();
     }
   }, [setProfilePicture, userId]);
 
   const handleProfileClick = () => {
-    if (isAuth) push(`/user/${userId}`);
+    if (isAuth){
+      push(`/user/${userId}`);
+    } 
     else modal.open(<AuthModal />);
   };
 
@@ -62,7 +67,7 @@ export const Header: FC = () => {
   };
 
   const handleLogoutClick = () => {
-    if (userId) logout(userId);
+    if (isAuth && userId) logout(userId);
   };
 
   return (
@@ -106,7 +111,7 @@ export const Header: FC = () => {
             </div>
           </div>
         ) : (
-          <div>
+          <div onClick={handleProfileClick}>
             <SvgProfile className={styles.profile_image} />
           </div>
         )}

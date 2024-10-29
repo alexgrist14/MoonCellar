@@ -19,13 +19,13 @@ export const addAvatar = async (id: string, file: File): Promise<string> => {
   return response.data;
 };
 
-export const getAvatar = async (id: string): Promise<{fileName: string}> => {
-  const response = await axios.get(`${API_URL}/user/${id}/profile-picture`, {
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Credentials": true,
-    },
-    withCredentials: true,
-  });
-  return response.data;
+export const getAvatar = async (id: string): Promise<{ fileName: string }> => {
+    const response = await axios.get(`${API_URL}/user/${id}/profile-picture`, {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Credentials": true,
+      },
+      withCredentials: true,
+    });
+    return response.data;
 };

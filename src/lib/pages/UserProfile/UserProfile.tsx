@@ -24,16 +24,20 @@ const UserProfile: FC<UserProfileProps> = ({ email, name }) => {
   useEffect(() => {
     if (userId) {
       (async () => {
-        await getAvatar(userId).then((res) => {
-          setAvatar(`${API_URL}/photos/${res.fileName}`);
-        });
+        await getAvatar(userId)
+          .then((res) => {
+            setAvatar(`${API_URL}/photos/${res.fileName}`);
+          })
+          .catch(() => {
+            setProfilePicture("");
+          });
       })();
     }
   }, [userId]);
   const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files !== null) {
       const file = event.target.files[0];
-      const fileSize = Math.round(event.target.files[0].size / 1024);
+      const fileSize = Math.round(file.size / 1024);
 
       if (fileSize > 1024) {
         setIsPictureLarge(true);
