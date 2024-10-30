@@ -6,6 +6,7 @@ import classNames from "classnames";
 import Image from "next/image";
 import { modal } from "../Modal";
 import { getImageLink } from "../../constants";
+import { Cover } from "../Cover";
 
 interface IGameCardProps {
   game: IGDBGame;
@@ -34,18 +35,18 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
           </span>
         )}
       </div>
-      <Image
+      {!!game?.cover ?(
+        <Image
         alt="Game cover"
-        src={
-          !!game?.cover
-            ? getImageLink(game?.cover?.url, "cover_big")
-            : "/images/cover.png"
+        src={getImageLink(game?.cover?.url, "cover_big")
         }
         width={500}
         height={500}
         className={styles.card__cover}
         priority
       />
+      ) : <Cover className={styles.card__cover}/>}
+      
     </Link>
   );
 };

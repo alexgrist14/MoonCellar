@@ -4,7 +4,6 @@ import { API_URL } from "../constants";
 export const addAvatar = async (id: string, file: File): Promise<string> => {
   const formData = new FormData();
   formData.append("file", file);
-  console.log(formData);
   const response = await axios.post(
     `${API_URL}/user/${id}/profile-picture`,
     formData,

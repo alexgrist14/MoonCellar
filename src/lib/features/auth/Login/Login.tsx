@@ -50,6 +50,7 @@ const Login: FC = () => {
           isRegister ? handleSubmit(handleSignUp) : handleSubmit(handleLogin)
         }
         className={styles.content}
+        autoComplete="on"
       >
         <div className={styles.content__inputs}>
           {isRegister && (
@@ -60,13 +61,15 @@ const Login: FC = () => {
           )}
           <div>
             <label>Email</label>
-            <Input type="email" {...register("email", { required: true })} />
+            <Input type="email" id="email" {...register("email", { required: true })}/>
           </div>
           <div>
             <label>Password</label>
             <Input
               type="password"
+              id="password"
               {...register("password", { required: true, minLength: 6 })}
+              autoComplete="current-password"
             />
           </div>
         </div>

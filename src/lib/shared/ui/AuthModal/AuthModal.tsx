@@ -6,18 +6,23 @@ import { Input } from "@/src/lib/shared/ui/Input";
 import { SubmitHandler, useForm } from "react-hook-form";
 import styles from "./AuthModal.module.scss";
 import { useRouter } from "next/router";
+import { modal } from "../Modal";
+import { useAuthStore } from "../../store/auth.store";
+import { SvgClose } from "../svg";
 
 export const AuthModal: FC = () => {
   const router = useRouter();
   const [isRegister, setIsRegister] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const { setAuth } = useAuthStore();
+  const { push } = useRouter();
 
   const {
     register,
     handleSubmit,
     formState: { isValid },
   } = useForm<IAuth>({
-    mode: "onBlur",
+    mode: "onChange",
   });
 
   const handleLogin: SubmitHandler<IAuth> = (data) => {
@@ -29,7 +34,9 @@ export const AuthModal: FC = () => {
 
     login(loginDto)
       .then((res) => {
-        router.push(`/user/${res.userId}`)
+        modal.close();
+        router.push(`/user/${res.userId}`);
+        setAuth(true);
       })
       .catch((err) => setError(err.message));
   };
@@ -41,9 +48,12 @@ export const AuthModal: FC = () => {
       email: data.email,
       password: data.password,
     };
-    
+
     signup(singUpDto)
-      .then((res) => router.push(`/user/${res.userId}`))
+      .then((res) => {
+        modal.close();
+        router.push(`/user/${res.userId}`);
+      })
       .catch((err) => setError(err.message));
   };
 
@@ -54,6 +64,7 @@ export const AuthModal: FC = () => {
           isRegister ? handleSubmit(handleSignUp) : handleSubmit(handleLogin)
         }
         className={styles.content}
+        autoComplete="on"
       >
         <div className={styles.content__inputs}>
           {isRegister && (
@@ -64,13 +75,19 @@ export const AuthModal: FC = () => {
           )}
           <div>
             <label>Email</label>
-            <Input type="email" {...register("email", { required: true })} />
+            <Input
+              type="email"
+              id="email"
+              {...register("email", { required: true })}
+            />
           </div>
           <div>
             <label>Password</label>
             <Input
               type="password"
+              id="password"
               {...register("password", { required: true, minLength: 6 })}
+              autoComplete="current-password"
             />
           </div>
         </div>
@@ -78,7 +95,7 @@ export const AuthModal: FC = () => {
         <div className={styles.content__buttons}>
           {isRegister ? (
             <>
-              <Button color="accent" type="submit" disabled={!isValid}>
+              <Button color="accent" className={styles.btn} type="submit" disabled={!isValid}>
                 Sign up
               </Button>
               <p>
@@ -93,7 +110,7 @@ export const AuthModal: FC = () => {
             </>
           ) : (
             <>
-              <Button color="accent" type="submit" disabled={!isValid}>
+              <Button color="accent" className={styles.btn} type="submit" disabled={!isValid}>
                 Sign in
               </Button>
               <p>
@@ -109,6 +126,10 @@ export const AuthModal: FC = () => {
           )}
         </div>
       </form>
+      <div className={styles.close} onClick={()=>{modal.close()}}>
+        <SvgClose className={styles.svg} />
+      </div>
+      <div className={styles.background}></div>
     </div>
   );
 };

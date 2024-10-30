@@ -11,9 +11,10 @@ import { API_URL } from "../../shared/constants";
 interface UserProfileProps {
   name: string;
   email: string;
+  id: string;
 }
 
-const UserProfile: FC<UserProfileProps> = ({ email, name }) => {
+const UserProfile: FC<UserProfileProps> = ({ email, name, id }) => {
   const { userId, profilePicture, setProfilePicture } = useAuthStore();
 
   const [isPictureLarge, setIsPictureLarge] = useState<boolean>(false);
@@ -21,23 +22,17 @@ const UserProfile: FC<UserProfileProps> = ({ email, name }) => {
   const [tempAvatar, setTempAvatar] = useState<File>();
   const [profileHover, setProfileHover] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (userId) {
-      (async () => {
-        await getAvatar(userId)
-          .then((res) => {
-            setAvatar(`${API_URL}/photos/${res.fileName}`);
-          })
-          .catch(() => {
-            setProfilePicture("");
-          });
-      })();
+  const handleUpload = async () => {
+    if (userId && tempAvatar) {
+      await addAvatar(userId, tempAvatar);
     }
-  }, [userId]);
-  const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
+  };
+
+  const handleInput = async (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files !== null) {
       const file = event.target.files[0];
       const fileSize = Math.round(file.size / 1024);
+      console.log(fileSize);
 
       if (fileSize > 1024) {
         setIsPictureLarge(true);
@@ -45,14 +40,27 @@ const UserProfile: FC<UserProfileProps> = ({ email, name }) => {
         setTempAvatar(file);
         setAvatar(undefined);
         setIsPictureLarge(false);
+        handleUpload();
       }
     }
   };
-  const handleUpload = async () => {
-    if (userId && tempAvatar) {
-      await addAvatar(userId, tempAvatar);
-    }
-  };
+
+  useEffect(() => {
+    (async () => {
+      await getAvatar(id)
+        .then((res) => {
+          setAvatar(`${API_URL}/photos/${res.fileName}`);
+        })
+        .catch(() => {
+          setProfilePicture("");
+        });
+    })();
+  }, [id, setProfilePicture]);
+
+  useEffect(() => {
+    if (!isPictureLarge) handleUpload();
+  }, [tempAvatar]);
+
   return (
     <div className={styles.container}>
       <div className={styles.content}>
@@ -86,13 +94,10 @@ const UserProfile: FC<UserProfileProps> = ({ email, name }) => {
               className={`${styles.svg} ${profileHover && styles.hover_svg}`}
             />
           </div>
-          {tempAvatar && !isPictureLarge && (
-            <Button onClick={handleUpload}>Upload</Button>
-          )}
           {isPictureLarge && (
             <p className={styles.error}>Avatar must me smaller than 1mb</p>
           )}
-          <input type="file" id="avatar" hidden onChange={handleInput} />
+          <input type="file" id="avatar" hidden onChange={handleInput} accept="image/jpeg,image/png,image/jpg,image/webp" />
         </label>
 
         <div className={styles.profile_info}>

@@ -10,15 +10,21 @@ import { jwtDecode } from "jwt-decode";
 import { isTokenExpired } from "@/src/lib/shared/utils/token";
 import Image from "next/image";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { getCookie } from "@/src/lib/shared/utils/getCookie";
+import { deleteCookie, getCookie } from "@/src/lib/shared/utils/cookies";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { SearchModal } from "@/src/lib/shared/ui/SearchModal";
 import { API_URL } from "@/src/lib/shared/constants";
 import { getAvatar } from "@/src/lib/shared/api/avatar";
 import { AuthModal } from "@/src/lib/shared/ui/AuthModal";
 import { logout } from "@/src/lib/shared/api";
+import { GetServerSidePropsContext } from "next";
 
-export const Header: FC = () => {
+interface HeaderPros{
+  cookies: any;
+}
+
+export const Header: FC<HeaderPros> = ({cookies}) => {
+  const router = useRouter();
   const { isMobile } = useCommonStore();
   const [isMenuActive, setIsMenuActive] = useState(false);
   const {
@@ -46,14 +52,14 @@ export const Header: FC = () => {
   }, [setAuth, setUserId]);
 
   useEffect(() => {
-    if (userId) {
+    if (userId && isAuth) {
       (async () => {
         await getAvatar(userId).then((res) => {
           setProfilePicture(`${API_URL}/photos/${res.fileName}`);
         }).catch(()=>{setProfilePicture('')});
       })();
     }
-  }, [setProfilePicture, userId]);
+  }, [isAuth, setProfilePicture, userId]);
 
   const handleProfileClick = () => {
     if (isAuth){
@@ -67,7 +73,13 @@ export const Header: FC = () => {
   };
 
   const handleLogoutClick = () => {
-    if (isAuth && userId) logout(userId);
+    if (isAuth && userId){
+      logout(userId);
+      deleteCookie('accessMoonToken');
+      deleteCookie('refreshMoonToken');
+      router.push("/");
+      router.reload();
+    } 
   };
 
   return (
@@ -118,4 +130,12 @@ export const Header: FC = () => {
       </div>
     </div>
   );
+};
+
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  const cookies = context.req.headers.cookie
+  
+  return { props: { cookies } };
 };

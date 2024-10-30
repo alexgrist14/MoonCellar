@@ -10,7 +10,7 @@ interface IProps {
 }
 
 const User: FC<IProps> = ({ user, id }) => {
-  return <UserProfile name={user.name} email={user.email} />;
+  return <UserProfile name={user.name} email={user.email} id={id} />;
 };
 
 export const getServerSideProps = async (

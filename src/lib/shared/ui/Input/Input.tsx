@@ -15,6 +15,9 @@ interface InputProps
     | "disabled"
     | "defaultValue"
     | "autoFocus"
+    | "autoComplete"
+    | "id"
+    | "name"
   > {
   containerStyles?: CSSProperties;
 }
