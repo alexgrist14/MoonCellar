@@ -19,11 +19,7 @@ import { AuthModal } from "@/src/lib/shared/ui/AuthModal";
 import { logout } from "@/src/lib/shared/api";
 import { GetServerSidePropsContext } from "next";
 
-interface HeaderPros{
-  cookies: any;
-}
-
-export const Header: FC<HeaderPros> = ({cookies}) => {
+export const Header: FC = () => {
   const router = useRouter();
   const { isMobile } = useCommonStore();
   const [isMenuActive, setIsMenuActive] = useState(false);
@@ -45,7 +41,7 @@ export const Header: FC<HeaderPros> = ({cookies}) => {
         setAuth(!isTokenExpired(decoded.exp));
         setUserId(decoded.id);
       }
-    }else{
+    } else {
       setAuth(false);
       setUserId("");
     }
@@ -54,18 +50,21 @@ export const Header: FC<HeaderPros> = ({cookies}) => {
   useEffect(() => {
     if (userId && isAuth) {
       (async () => {
-        await getAvatar(userId).then((res) => {
-          setProfilePicture(`${API_URL}/photos/${res.fileName}`);
-        }).catch(()=>{setProfilePicture('')});
+        await getAvatar(userId)
+          .then((res) => {
+            setProfilePicture(`${API_URL}/photos/${res.fileName}`);
+          })
+          .catch(() => {
+            setProfilePicture("");
+          });
       })();
     }
   }, [isAuth, setProfilePicture, userId]);
 
   const handleProfileClick = () => {
-    if (isAuth){
+    if (isAuth) {
       push(`/user/${userId}`);
-    } 
-    else modal.open(<AuthModal />);
+    } else modal.open(<AuthModal />);
   };
 
   const searchClickHandler = () => {
@@ -73,13 +72,13 @@ export const Header: FC<HeaderPros> = ({cookies}) => {
   };
 
   const handleLogoutClick = () => {
-    if (isAuth && userId){
+    if (isAuth && userId) {
       logout(userId);
-      deleteCookie('accessMoonToken');
-      deleteCookie('refreshMoonToken');
+      deleteCookie("accessMoonToken");
+      deleteCookie("refreshMoonToken");
       router.push("/");
       router.reload();
-    } 
+    }
   };
 
   return (
@@ -117,7 +116,11 @@ export const Header: FC<HeaderPros> = ({cookies}) => {
               <Link className={styles.dropdown_item} href="/settings">
                 Settings
               </Link>
-              <Link className={styles.dropdown_item} href="/gauntlet" onClick={handleLogoutClick}>
+              <Link
+                className={styles.dropdown_item}
+                href="/gauntlet"
+                onClick={handleLogoutClick}
+              >
                 Logout
               </Link>
             </div>
@@ -135,7 +138,7 @@ export const Header: FC<HeaderPros> = ({cookies}) => {
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  const cookies = context.req.headers.cookie
-  
+  const cookies = context.req.headers.cookie;
+
   return { props: { cookies } };
 };

@@ -35,8 +35,8 @@ export function setCookie(
 
   for (const optionKey in options) {
     updatedCookie += '; ' + optionKey;
-
-    const optionValue = options[optionKey];
+    //@ts-ignore
+    const optionValue:any = options[optionKey] as any;
     if (optionValue !== true) {
       updatedCookie += '=' + optionValue;
     }
