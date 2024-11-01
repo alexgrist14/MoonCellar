@@ -1,7 +1,7 @@
 import { login, signup } from "@/src/lib/shared/api/auth";
 import { IAuth } from "@/src/lib/shared/types/auth";
 import { Button } from "@/src/lib/shared/ui/Button";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { SubmitHandler, useForm } from "react-hook-form";
 import styles from "./AuthModal.module.scss";
@@ -14,8 +14,11 @@ export const AuthModal: FC = () => {
   const router = useRouter();
   const [isRegister, setIsRegister] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { setAuth } = useAuthStore();
   const { push } = useRouter();
+
+
 
   const {
     register,
@@ -129,7 +132,7 @@ export const AuthModal: FC = () => {
       <div className={styles.close} onClick={()=>{modal.close()}}>
         <SvgClose className={styles.svg} />
       </div>
-      <div className={styles.background}></div>
+      <div className={styles.background} ></div>
     </div>
   );
 };

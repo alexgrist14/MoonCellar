@@ -12,12 +12,16 @@
   &__left {
     overflow: hidden;
 
-    & > img {
+    & > img, div  {
       width: 100%;
       height: fit-content;
       object-position: top;
       object-fit: contain;
       border-radius: $radius;
+    }
+    .cover{
+      height: 100%;
+      background-color: $lightBackground;
     }
   }
 

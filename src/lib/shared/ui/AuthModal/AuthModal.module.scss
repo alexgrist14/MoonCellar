@@ -1,36 +1,50 @@
 .container {
   position: relative;
-  display: grid;
+  display: flex;
   border-radius: $radius;
   width: 300px;
   height: 600px;
   overflow: hidden;
   z-index: 1;
+  @include mediaMd {
+    width: 95vw;
+    height: 600px;
+  }
+
   .background {
     position: absolute;
-    width: 50vw;
+    width: 60vw;
     height: 70vh;
     background-image: url("/images/moon.jpg");
+    transition: background-image 1s ease-in-out;
     background-size: cover;
     background-repeat: no-repeat;
     z-index: 0;
     opacity: 1;
     border-radius: $radius;
-    animation: moving 30s linear infinite;
+    animation: moving 60s linear infinite;
     @keyframes moving {
-      from {
+      0% {
         transform: translateX(0);
-      }
-      to {
+    }
+    50% {
         transform: translateX(-200px);
-      }
+    }
+    100% {
+        transform: translateX(0);
+    }
+    }
+    @include mediaMd{
+      width: 1000px;
+      height: 600px;
     }
   }
 
   .content {
-    background-color: $bg;
+    background-color: rgba($color: #000000, $alpha: 0.4);
     border-radius: $radius;
     z-index: 1;
+
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -38,8 +52,8 @@
     align-content: center;
     align-self: center;
     margin-inline: auto;
-    width: 250px;
-    height: 400px;
+    width: 100%;
+    height: 100%;
     gap: 30px;
 
     &__inputs {

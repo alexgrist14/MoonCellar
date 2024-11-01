@@ -23,7 +23,6 @@
 
   @include mediaMax($screenSm) {
     padding: 8px;
-    align-items: flex-end;
   }
 
   &__content {

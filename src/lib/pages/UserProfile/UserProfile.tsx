@@ -64,6 +64,7 @@ const UserProfile: FC<UserProfileProps> = ({ email, name, id }) => {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
+        <div className={styles.content__top}>
         <label htmlFor="avatar" className={styles.profile_label}>
           <div
             className={styles.profile_holder}
@@ -104,6 +105,13 @@ const UserProfile: FC<UserProfileProps> = ({ email, name, id }) => {
           <div className={styles.profile_name}>{name}</div>
           <div className={styles.profile_email}>{email}</div>
         </div>
+        <div className={styles.history}>
+
+        </div>
+        </div>
+          <div className={styles.content__bottom}>
+            
+          </div>
       </div>
     </div>
   );

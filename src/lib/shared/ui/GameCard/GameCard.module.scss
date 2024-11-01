@@ -33,8 +33,19 @@
   }
 
   &__cover {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 30px;
+    background: $lightBgSecond;
     object-fit: cover;
+    font-family: 'Pentagra', sans-serif;
     width: 100%;
     height: 100%;
+    svg{
+      width: 72px;
+      height: 72px;
+    }
   }
 }

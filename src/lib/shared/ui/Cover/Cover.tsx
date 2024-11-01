@@ -1,5 +1,4 @@
 import { FC } from "react";
-import styles from "./Cover.module.sass";
 import { SvgLogo } from "../svg";
 
 interface CoverProps{
@@ -9,6 +8,7 @@ export const Cover: FC<CoverProps> = ({className})=>{
     return(
         <div className={className}>
             <SvgLogo/>
+            <span>Cover Missing</span>
         </div>
     )
 }
