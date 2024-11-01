@@ -7,7 +7,9 @@ interface CoverProps{
 export const Cover: FC<CoverProps> = ({className})=>{
     return(
         <div className={className}>
-            <SvgLogo/>
+            <div>
+                <SvgLogo/>
+            </div>
             <span>Cover Missing</span>
         </div>
     )
