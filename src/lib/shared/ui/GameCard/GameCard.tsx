@@ -45,7 +45,7 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
         className={styles.card__cover}
         priority
       />
-      ) : <Cover className={styles.card__cover}/>}
+      ) : <Cover/>}
       
     </Link>
   );
