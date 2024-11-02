@@ -74,7 +74,7 @@
 
   &__thumb {
     position: absolute;
-    z-index: 100;
+    z-index: 3;
     top: 0;
     height: 65px;
     touch-action: none;
@@ -98,7 +98,7 @@
   }
   &__thumb--horizontal {
     position: absolute;
-    z-index: 100;
+    z-index: 3;
     top: 0;
     height: 8px;
     touch-action: none;
@@ -134,6 +134,7 @@
     &_top {
       top: 0;
       transform: rotate(180deg);
+
       &--horizontal {
         height: 100%;
         bottom: unset;

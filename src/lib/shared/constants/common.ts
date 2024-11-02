@@ -50,3 +50,16 @@ export const gameCategories = [
   "pack",
   "update",
 ];
+
+export const dateRegions = [
+  "Europe",
+  "North America",
+  "Australia",
+  "New Zealand",
+  "Japan",
+  "China",
+  "Asia",
+  "Worldwide",
+  "Korea",
+  "Brazil",
+];

@@ -1,5 +1,5 @@
 export interface IGDBDefault {
-  _id: string;
+  _id: number;
   id: number;
   slug: string;
   name: string;
@@ -27,6 +27,49 @@ export interface IGDBGame extends IGDBDefault {
   storyline: string;
   first_release_date: number;
   category: number;
+  websites: IGDBWebsite[];
+  involved_companies: IGDBInvolvedCompany[];
+  url: string;
+  release_dates: IGDBReleaseDate[];
+}
+
+export interface IGDBReleaseDate {
+  _id: number;
+  category: number;
+  date: number;
+  human: string;
+  m: number;
+  y: number;
+  platform: IGDBPlatform;
+  region: number;
+}
+
+export interface IGDBWebsite {
+  _id: number;
+  category: number;
+  url: string;
+}
+
+export interface IGDBInvolvedCompany {
+  _id: number;
+  company: IGDBCompany;
+  developer: boolean;
+  porting: boolean;
+  publisher: boolean;
+  supporting: boolean;
+}
+
+export interface IGDBCompany {
+  _id: number;
+  logo: number;
+  name: string;
+  slug: string;
+  description: string;
+  country: number;
+  developed: number[];
+  published: number[];
+  url: string;
+  start_date: string;
 }
 
 export interface IGDBGenre extends IGDBDefault {
@@ -34,7 +77,7 @@ export interface IGDBGenre extends IGDBDefault {
 }
 
 export interface IGDBCover {
-  _id: string;
+  _id: number;
   id: number;
   url: string;
   width: number;
@@ -42,7 +85,7 @@ export interface IGDBCover {
 }
 
 export interface IGDBScreenshot {
-  _id: string;
+  _id: number;
   id: number;
   url: string;
   width: number;

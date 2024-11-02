@@ -28,25 +28,31 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
           [styles.card__title_active]: isHover,
         })}
       >
-        <p>{game.name}</p>
+        <p>
+          {game.name}
+          {!!game.release_dates?.length
+            ? ` (${game.release_dates?.[0].y})`
+            : ""}
+        </p>
+        <p></p>
         {!!game.platforms?.length && (
           <span>
             {game.platforms.map((platform) => platform.name).join(", ")}
           </span>
         )}
       </div>
-      {!!game?.cover ?(
+      {!!game?.cover ? (
         <Image
-        alt="Game cover"
-        src={getImageLink(game?.cover?.url, "cover_big")
-        }
-        width={500}
-        height={500}
-        className={styles.card__cover}
-        priority
-      />
-      ) : <Cover/>}
-      
+          alt="Game cover"
+          src={getImageLink(game?.cover?.url, "cover_big")}
+          width={500}
+          height={500}
+          className={styles.card__cover}
+          priority
+        />
+      ) : (
+        <Cover />
+      )}
     </Link>
   );
 };
