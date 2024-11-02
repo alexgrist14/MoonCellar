@@ -18,20 +18,26 @@ import { getAvatar } from "@/src/lib/shared/api/avatar";
 import { AuthModal } from "@/src/lib/shared/ui/AuthModal";
 import { logout } from "@/src/lib/shared/api";
 import { GetServerSidePropsContext } from "next";
+import { useDisableScroll } from "@/src/lib/shared/hooks";
+import { getUserById } from "@/src/lib/shared/api/user";
 
 export const Header: FC = () => {
   const router = useRouter();
   const { isMobile } = useCommonStore();
+
   const [isMenuActive, setIsMenuActive] = useState(false);
   const {
     setAuth,
     isAuth,
-    setUserId,
+    setUserName,
     userId,
+    userName,
+    setUserId,
     profilePicture,
     setProfilePicture,
   } = useAuthStore();
   const { push } = useRouter();
+
 
   useEffect(() => {
     const token = getCookie("refreshMoonToken");
@@ -39,13 +45,16 @@ export const Header: FC = () => {
       const decoded: any = jwtDecode(token);
       if (decoded.exp) {
         setAuth(!isTokenExpired(decoded.exp));
+        setUserId(decoded.id)
+        getUserById(decoded.id).then((res)=>setUserName(res.name));
         setUserId(decoded.id);
       }
     } else {
       setAuth(false);
       setUserId("");
+      setUserName("")
     }
-  }, [setAuth, setUserId]);
+  }, [setAuth, setUserId, setUserName]);
 
   useEffect(() => {
     if (userId && isAuth) {
@@ -63,7 +72,7 @@ export const Header: FC = () => {
 
   const handleProfileClick = () => {
     if (isAuth) {
-      push(`/user/${userId}`);
+      push(`/user/${userName}`);
     } else modal.open(<AuthModal />);
   };
 

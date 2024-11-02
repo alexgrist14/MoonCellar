@@ -4,16 +4,16 @@ import { FC, useEffect } from "react";
 import { useAuthStore } from "../lib/shared/store/auth.store";
 
 const User:FC = ()=>{
-    const { userId } = useAuthStore();
+    const { userName } = useAuthStore();
     const router = useRouter();
 
     useEffect(()=>{
-        if(userId !== undefined){
-            router.push(`/user/${userId}`)
+        if(userName !== undefined){
+            router.push(`/user/${userName}`)
         }else{
             router.push('/auth/login')
         }
-    },[userId])
+    },[userName])
     return null;
 }
 

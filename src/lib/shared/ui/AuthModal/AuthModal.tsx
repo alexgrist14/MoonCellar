@@ -9,6 +9,8 @@ import { useRouter } from "next/router";
 import { modal } from "../Modal";
 import { useAuthStore } from "../../store/auth.store";
 import { SvgClose } from "../svg";
+import Background from "../Background/Background";
+import { useDisableScroll } from "../../hooks";
 
 export const AuthModal: FC = () => {
   const router = useRouter();
@@ -17,8 +19,6 @@ export const AuthModal: FC = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { setAuth } = useAuthStore();
   const { push } = useRouter();
-
-
 
   const {
     register,
@@ -98,7 +98,12 @@ export const AuthModal: FC = () => {
         <div className={styles.content__buttons}>
           {isRegister ? (
             <>
-              <Button color="accent" className={styles.btn} type="submit" disabled={!isValid}>
+              <Button
+                color="accent"
+                className={styles.btn}
+                type="submit"
+                disabled={!isValid}
+              >
                 Sign up
               </Button>
               <p>
@@ -113,7 +118,12 @@ export const AuthModal: FC = () => {
             </>
           ) : (
             <>
-              <Button color="accent" className={styles.btn} type="submit" disabled={!isValid}>
+              <Button
+                color="accent"
+                className={styles.btn}
+                type="submit"
+                disabled={!isValid}
+              >
                 Sign in
               </Button>
               <p>
@@ -129,10 +139,15 @@ export const AuthModal: FC = () => {
           )}
         </div>
       </form>
-      <div className={styles.close} onClick={()=>{modal.close()}}>
+      <div
+        className={styles.close}
+        onClick={() => {
+          modal.close();
+        }}
+      >
         <SvgClose className={styles.svg} />
       </div>
-      <div className={styles.background} ></div>
+      <Background />
     </div>
   );
 };

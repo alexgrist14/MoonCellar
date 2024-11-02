@@ -9,3 +9,7 @@ export * from "./SvgMenu";
 export * from "./SvgCamera";
 export * from "./SvgLogo";
 export * from "./SvgProfile";
+export * from "./SvgBan";
+export * from "./SvgDone";
+export * from "./SvgPlay";
+export * from "./SvgStar";
