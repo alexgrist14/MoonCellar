@@ -59,12 +59,16 @@ export const WheelComponent: FC<WheelComponentProps> = ({
       if (!isRoyal) {
         !!games &&
           setWinner(
-            games.find((game) => game._id === currentSegment.split("_")[0])
+            games.find(
+              (game) => game._id.toString() === currentSegment.split("_")[0]
+            )
           );
       } else {
         !!royalGames &&
           setWinner(
-            royalGames.find((game) => game._id === currentSegment.split("_")[0])
+            royalGames.find(
+              (game) => game._id.toString() === currentSegment.split("_")[0]
+            )
           );
 
         const filtered = segments?.filter(

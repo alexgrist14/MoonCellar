@@ -3,9 +3,9 @@ import { IGDBDefault, IGDBGame, IGDBGenre, IGDBPlatform } from "../types/igdb";
 import { agent } from "./agent";
 
 interface IGDBFilters {
-  genres?: string[];
-  modes?: string[];
-  platforms?: string[];
+  genres?: number[];
+  modes?: number[];
+  platforms?: number[];
 }
 
 const getGames = (params: {
