@@ -8,22 +8,22 @@ import {
   SvgPlay,
   SvgStar,
 } from "../../shared/ui/svg";
-import { toast } from "../../shared/utils/toast";
 import { Button } from "../../shared/ui/Button";
 import { useAuthStore } from "../../shared/store/auth.store";
-import { addAvatar, getAvatar } from "../../shared/api/avatar";
 import { API_URL, mockGame } from "../../shared/constants";
 import Link from "next/link";
 import { GameCard } from "../../shared/ui/GameCard";
+import { userAPI } from "../../shared/api";
 
 interface UserProfileProps {
   name: string;
   email: string;
-  id: string;
+  _id: string;
 }
 
-const UserProfile: FC<UserProfileProps> = ({ email, name, id }) => {
+const UserProfile: FC<UserProfileProps> = ({ name, _id: id }) => {
   const { userId, profilePicture, setProfilePicture } = useAuthStore();
+  const { addAvatar, getAvatar } = userAPI;
 
   const [isPictureLarge, setIsPictureLarge] = useState<boolean>(false);
   const [avatar, setAvatar] = useState<string | undefined>(profilePicture);
@@ -53,16 +53,14 @@ const UserProfile: FC<UserProfileProps> = ({ email, name, id }) => {
   };
 
   useEffect(() => {
-    (async () => {
-      await getAvatar(id)
-        .then((res) => {
-          setAvatar(`${API_URL}/photos/${res.fileName}`);
-        })
-        .catch(() => {
-          setProfilePicture("");
-        });
-    })();
-  }, [id, setProfilePicture]);
+    getAvatar(id)
+      .then((res) => {
+        setAvatar(`${API_URL}/photos/${res.data.fileName}`);
+      })
+      .catch(() => {
+        setProfilePicture("");
+      });
+  }, [id, setProfilePicture, getAvatar]);
 
   useEffect(() => {
     if (!isPictureLarge) handleUpload();
@@ -85,11 +83,10 @@ const UserProfile: FC<UserProfileProps> = ({ email, name, id }) => {
               >
                 <Image
                   src={
-                    !!avatar
-                      ? avatar
-                      : !!tempAvatar
+                    avatar ||
+                    (!!tempAvatar
                       ? URL.createObjectURL(tempAvatar)
-                      : "/images/user.png"
+                      : "/images/user.png")
                   }
                   width={160}
                   height={160}

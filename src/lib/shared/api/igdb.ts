@@ -8,6 +8,8 @@ interface IGDBFilters {
   platforms?: number[];
 }
 
+const IGDB_URL = `${API_URL}/igdb`;
+
 const getGames = (params: {
   search?: string;
   rating?: number;
@@ -17,9 +19,8 @@ const getGames = (params: {
   selected?: IGDBFilters;
   excluded?: IGDBFilters;
 }) => {
-  return agent<{ results: IGDBGame[]; total: number }>(
-    `${API_URL}/igdb/games`,
-    "get",
+  return agent.get<{ results: IGDBGame[]; total: number }>(
+    `${IGDB_URL}/games`,
     {
       params: {
         ...params,
@@ -35,23 +36,23 @@ const getGames = (params: {
 };
 
 const getGameById = (id: string) => {
-  return agent<IGDBGame>(`${API_URL}/igdb/by-id/${id}`, "get");
+  return agent.get<IGDBGame>(`${IGDB_URL}/by-id/${id}`);
 };
 
 const getGameBySlug = (slug: string) => {
-  return agent<IGDBGame>(`${API_URL}/igdb/by-slug/${slug}`, "get");
+  return agent.get<IGDBGame>(`${IGDB_URL}/by-slug/${slug}`);
 };
 
 const getGenres = () => {
-  return agent<IGDBGenre[]>(`${API_URL}/igdb/genres`, "get");
+  return agent.get<IGDBGenre[]>(`${IGDB_URL}/genres`);
 };
 
 const getPlatforms = () => {
-  return agent<IGDBPlatform[]>(`${API_URL}/igdb/platforms`, "get");
+  return agent.get<IGDBPlatform[]>(`${IGDB_URL}/platforms`);
 };
 
 const getModes = () => {
-  return agent<IGDBDefault[]>(`${API_URL}/igdb/modes`, "get");
+  return agent.get<IGDBDefault[]>(`${IGDB_URL}/modes`);
 };
 
 export const IGDBApi = {

@@ -13,6 +13,7 @@ import { Button } from "../../shared/ui/Button";
 import Link from "next/link";
 import { useSelectedStore } from "../../shared/store/selected.store";
 import { Cover } from "../../shared/ui/Cover";
+import { GameControls } from "../../shared/ui/GameControls";
 
 export const GamePage: FC = () => {
   const { query } = useRouter();
@@ -78,7 +79,7 @@ export const GamePage: FC = () => {
               <Cover />
             )}
           </div>
-          <div className={styles.page__buttons}></div>
+          <GameControls game={game} />
         </div>
         <div className={styles.page__right}>
           <h2>

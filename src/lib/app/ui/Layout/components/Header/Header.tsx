@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, MouseEvent, useEffect, useState } from "react";
 import styles from "./Header.module.scss";
 import Link from "next/link";
 import { Separator } from "@/src/lib/shared/ui/Separator";
@@ -13,17 +13,17 @@ import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { deleteCookie, getCookie } from "@/src/lib/shared/utils/cookies";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { SearchModal } from "@/src/lib/shared/ui/SearchModal";
-import { API_URL } from "@/src/lib/shared/constants";
-import { getAvatar } from "@/src/lib/shared/api/avatar";
+import { API_URL, REFRESH_TOKEN } from "@/src/lib/shared/constants";
 import { AuthModal } from "@/src/lib/shared/ui/AuthModal";
-import { logout } from "@/src/lib/shared/api";
 import { GetServerSidePropsContext } from "next";
-import { useDisableScroll } from "@/src/lib/shared/hooks";
-import { getUserById } from "@/src/lib/shared/api/user";
+import { authAPI, userAPI } from "@/src/lib/shared/api";
 
 export const Header: FC = () => {
   const router = useRouter();
+
   const { isMobile } = useCommonStore();
+  const { getById, getAvatar } = userAPI;
+  const { logout } = authAPI;
 
   const [isMenuActive, setIsMenuActive] = useState(false);
   const {
@@ -35,24 +35,25 @@ export const Header: FC = () => {
     setUserId,
     profilePicture,
     setProfilePicture,
+    clear,
   } = useAuthStore();
   const { push } = useRouter();
 
-
   useEffect(() => {
-    const token = getCookie("refreshMoonToken");
+    const token = getCookie(REFRESH_TOKEN);
     if (token) {
       const decoded: any = jwtDecode(token);
       if (decoded.exp) {
         setAuth(!isTokenExpired(decoded.exp));
-        setUserId(decoded.id)
-        getUserById(decoded.id).then((res)=>setUserName(res.name));
-        setUserId(decoded.id);
+        getById(decoded.id).then((res) => {
+          setUserName(res.data.name);
+          setUserId(decoded.id);
+        });
       }
     } else {
       setAuth(false);
       setUserId("");
-      setUserName("")
+      setUserName("");
     }
   }, [setAuth, setUserId, setUserName]);
 
@@ -61,7 +62,7 @@ export const Header: FC = () => {
       (async () => {
         await getAvatar(userId)
           .then((res) => {
-            setProfilePicture(`${API_URL}/photos/${res.fileName}`);
+            setProfilePicture(`${API_URL}/photos/${res.data.fileName}`);
           })
           .catch(() => {
             setProfilePicture("");
@@ -80,13 +81,17 @@ export const Header: FC = () => {
     modal.open(<SearchModal />);
   };
 
-  const handleLogoutClick = () => {
+  const handleLogoutClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+
     if (isAuth && userId) {
-      logout(userId);
-      deleteCookie("accessMoonToken");
-      deleteCookie("refreshMoonToken");
-      router.push("/");
-      router.reload();
+      logout(userId).then(() => {
+        // deleteCookie("accessMoonToken");
+        clear();
+        // deleteCookie("refreshMoonToken");
+
+        router.push("/");
+      });
     }
   };
 
@@ -127,7 +132,7 @@ export const Header: FC = () => {
               </Link>
               <Link
                 className={styles.dropdown_item}
-                href="/gauntlet"
+                href="#"
                 onClick={handleLogoutClick}
               >
                 Logout

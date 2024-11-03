@@ -1,7 +1,6 @@
-import { login, signup } from "@/src/lib/shared/api/auth";
 import { IAuth } from "@/src/lib/shared/types/auth";
 import { Button } from "@/src/lib/shared/ui/Button";
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { SubmitHandler, useForm } from "react-hook-form";
 import styles from "./AuthModal.module.scss";
@@ -10,15 +9,15 @@ import { modal } from "../Modal";
 import { useAuthStore } from "../../store/auth.store";
 import { SvgClose } from "../svg";
 import Background from "../Background/Background";
-import { useDisableScroll } from "../../hooks";
+import { authAPI, userAPI } from "../../api";
+import { axiosUtils } from "../../utils/axios";
 
 export const AuthModal: FC = () => {
-  const router = useRouter();
   const [isRegister, setIsRegister] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const { setAuth } = useAuthStore();
+  const { setAuth, setUserId, setUserName } = useAuthStore();
   const { push } = useRouter();
+  const { login, signup } = authAPI;
 
   const {
     register,
@@ -30,7 +29,8 @@ export const AuthModal: FC = () => {
 
   const handleLogin: SubmitHandler<IAuth> = (data) => {
     setError(null);
-    const loginDto: IAuth = {
+
+    const loginDto: Omit<IAuth, "name"> = {
       email: data.email,
       password: data.password,
     };
@@ -38,14 +38,21 @@ export const AuthModal: FC = () => {
     login(loginDto)
       .then((res) => {
         modal.close();
-        router.push(`/user/${res.userId}`);
-        setAuth(true);
+
+        userAPI.getById(res.data.userId).then((res) => {
+          push(`/user/${res.data.name}`);
+          setUserId(res.data._id);
+          setUserName(res.data.name);
+
+          setAuth(true);
+        });
       })
-      .catch((err) => setError(err.message));
+      .catch(axiosUtils.toastError);
   };
 
   const handleSignUp: SubmitHandler<IAuth> = (data) => {
     setError(null);
+
     const singUpDto: IAuth = {
       name: data.name,
       email: data.email,
@@ -55,9 +62,14 @@ export const AuthModal: FC = () => {
     signup(singUpDto)
       .then((res) => {
         modal.close();
-        router.push(`/user/${res.userId}`);
+
+        setAuth(true);
+        setUserId(res.data.userId);
+        setUserName(data.name);
+
+        push(`/user/${data.name}`);
       })
-      .catch((err) => setError(err.message));
+      .catch(axiosUtils.toastError);
   };
 
   return (

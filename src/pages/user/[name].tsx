@@ -1,5 +1,5 @@
 import UserProfile from "@/src/lib/pages/UserProfile/UserProfile";
-import { getUserById, getUserByName } from "@/src/lib/shared/api/user";
+import { userAPI } from "@/src/lib/shared/api";
 import { IUser } from "@/src/lib/shared/types/auth";
 import { GetServerSidePropsContext } from "next";
 import { FC } from "react";
@@ -9,15 +9,16 @@ interface IProps {
 }
 
 const User: FC<IProps> = ({ user }) => {
-  return <UserProfile name={user.name} email={user.email} id={user._id} />;
+  return <UserProfile {...user} />;
 };
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
   const { query } = context;
-  const user = await getUserByName(query.name as string);
+  const user = (await userAPI.getByName(query.name as string)).data;
 
   return { props: { user } };
 };
+
 export default User;

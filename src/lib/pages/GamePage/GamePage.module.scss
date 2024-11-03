@@ -1,12 +1,13 @@
 .page {
   display: grid;
-  grid-template-columns: 1fr 3fr;
+  grid-template-columns: 320px 1fr;
   padding-inline: 20px;
   padding-block: 50px;
   gap: 50px;
 
   @include mediaMax($screenMd) {
     grid-template-columns: 1fr;
+    justify-items: center;
   }
 
   &__left {
@@ -16,16 +17,17 @@
   }
 
   &__cover {
-    aspect-ratio: 4/5;
+    aspect-ratio: 528/704;
     border-radius: $radius;
     overflow: hidden;
     background: $lightBg;
+    max-width: 320px;
 
     & > img {
       width: 100%;
-      height: fit-content;
-      object-position: top;
-      object-fit: contain;
+      height: 100%;
+      object-position: center;
+      object-fit: cover;
     }
   }
 
@@ -109,12 +111,5 @@
     @include mediaMax($screenMd) {
       flex-direction: column;
     }
-  }
-
-  &__buttons {
-    background-color: $lightBg;
-    width: 100%;
-    height: 50px;
-    border-radius: $radius;
   }
 }

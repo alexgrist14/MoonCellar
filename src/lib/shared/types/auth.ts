@@ -10,13 +10,13 @@ export interface SignUpDto {
 }
 
 export interface IAuth {
-  name?: string;
+  name: string;
   email: string;
   password: string;
 }
 
 export interface IUser {
-    _id: string;
-    name: string;
-    email: string;
+  _id: string;
+  name: string;
+  email: string;
 }

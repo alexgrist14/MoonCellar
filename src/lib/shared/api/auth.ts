@@ -1,53 +1,23 @@
-import axios from "axios";
-import { IAuth, IUser, LoginDto, SignUpDto } from "../types/auth";
+import { IAuth } from "../types/auth";
 import { API_URL } from "../constants";
+import agent from "./agent";
 
-export const signup = async (signUpDto: IAuth): Promise<{ userId: string }> => {
-  try {
-    const response = await axios.post(`${API_URL}/auth/signup`, signUpDto, {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Credentials": true,
-      },
-      withCredentials: true,
-    });
-    return response.data;
-  } catch (err: any) {
-    if (err.response && err.response.data) {
-      throw new Error(err.response.data.message);
-    } else {
-      throw new Error("SignUp failed");
-    }
-  }
+const AUTH_URL = `${API_URL}/auth`;
+
+const signup = (signUpDto: IAuth) => {
+  return agent.post<{ userId: string }>(`${AUTH_URL}/signup`, signUpDto);
 };
 
-export const login = async (loginDto: IAuth): Promise<{ userId: string }> => {
-  try {
-    const response = await axios.post(`${API_URL}/auth/login`, loginDto, {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Credentials": true,
-      },
-      withCredentials: true,
-    });
-    return response.data;
-  } catch (err: any) {
-    if (err.response && err.response.data) {
-      throw new Error(err.response.data.message);
-    } else {
-      throw new Error("Login failed");
-    }
-  }
+const login = (loginDto: Omit<IAuth, "name">) => {
+  return agent.post<{ userId: string }>(`${AUTH_URL}/login`, loginDto);
 };
 
-export const logout = async (userId: string): Promise<{ message: string }> => {
-  const response = await axios.post(`${API_URL}/auth/${userId}/logout`, {
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Credentials": true,
-    },
-    withCredentials: true,
-  });
+const logout = (userId: string) => {
+  return agent.post<{ message: string }>(`${AUTH_URL}/${userId}/logout`);
+};
 
-  return response.data;
+export const authAPI = {
+  signup,
+  login,
+  logout,
 };
