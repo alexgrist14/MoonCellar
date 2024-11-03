@@ -30,7 +30,7 @@ export const ModalsConnector = () => {
         setContent((st) => st.filter((prop) => prop.id !== id));
       }
     },
-    [setContent]
+    [setContent],
   );
 
   useEffect(() => {

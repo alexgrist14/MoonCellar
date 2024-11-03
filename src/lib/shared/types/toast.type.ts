@@ -1,5 +1,5 @@
-import { ComponentProps } from 'react';
-import { Toast } from '../ui/Toast/Toast';
+import { ComponentProps } from "react";
+import { Toast } from "../ui/Toast/Toast";
 
 export type IToast = ComponentProps<typeof Toast> & {
   // id будет равен дате создания тостера

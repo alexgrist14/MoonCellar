@@ -1,1 +1,1 @@
-export * from './GameControls';
+export * from "./GameControls";

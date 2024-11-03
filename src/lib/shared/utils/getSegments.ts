@@ -1,4 +1,4 @@
-import {IGDBGame} from "../types/igdb";
+import { IGDBGame } from "../types/igdb";
 import { shuffle } from "./shuffle";
 
 export const getSegments = (games: IGDBGame[], max: number) => {
@@ -16,7 +16,7 @@ export const getSegments = (games: IGDBGame[], max: number) => {
         (game) =>
           (game._id || game.id) +
           "_" +
-          games.findIndex((el) => (el._id || el.id) === (game._id || game.id))
+          games.findIndex((el) => (el._id || el.id) === (game._id || game.id)),
       )
     : [];
 };

@@ -25,7 +25,7 @@ export const RoyalList: FC = () => {
                 <Button
                   onClick={() =>
                     setRoyalGames(
-                      royalGames.filter((_game) => game._id !== _game._id)
+                      royalGames.filter((_game) => game._id !== _game._id),
                     )
                   }
                 >

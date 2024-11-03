@@ -1,12 +1,12 @@
 export const getCookie = (name: string) => {
   const matches =
-    typeof document !== 'undefined' &&
+    typeof document !== "undefined" &&
     document.cookie.match(
       new RegExp(
         "(?:^|; )" +
           name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, "\\$1") +
-          "=([^;]*)"
-      )
+          "=([^;]*)",
+      ),
     );
   const res = matches ? decodeURIComponent(matches[1]) : undefined;
 
@@ -22,7 +22,7 @@ export function setCookie(
     "max-age"?: number;
     domain?: string;
     secure?: boolean;
-  } = {}
+  } = {},
 ) {
   options = {
     path: "/",
@@ -51,11 +51,10 @@ export function deleteCookie(
   name: string,
   options: {
     domain?: string;
-  } = {}
+  } = {},
 ) {
   setCookie(name, "", {
     "max-age": -1,
     ...options,
   });
 }
-

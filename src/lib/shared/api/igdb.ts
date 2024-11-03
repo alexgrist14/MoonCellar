@@ -31,7 +31,7 @@ const getGames = (params: {
           ? JSON.stringify(params.excluded)
           : undefined,
       },
-    }
+    },
   );
 };
 

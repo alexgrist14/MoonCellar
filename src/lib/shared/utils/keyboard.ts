@@ -1,7 +1,7 @@
-import { KeyboardEvent } from 'react';
+import { KeyboardEvent } from "react";
 
 const blurOnKey = (e: KeyboardEvent) => {
-  if (['Enter', 'Escape'].includes(e.key)) {
+  if (["Enter", "Escape"].includes(e.key)) {
     (document.activeElement as HTMLElement).blur();
   }
 };

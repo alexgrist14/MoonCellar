@@ -1,1 +1,1 @@
-export * from './ExtendedCheckbox';
+export * from "./ExtendedCheckbox";

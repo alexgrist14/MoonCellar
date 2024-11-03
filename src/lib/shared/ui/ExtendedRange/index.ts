@@ -1,1 +1,1 @@
-export * from './ExtendedRange';
+export * from "./ExtendedRange";

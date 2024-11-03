@@ -60,19 +60,19 @@ export const WheelComponent: FC<WheelComponentProps> = ({
         !!games &&
           setWinner(
             games.find(
-              (game) => game._id.toString() === currentSegment.split("_")[0]
-            )
+              (game) => game._id.toString() === currentSegment.split("_")[0],
+            ),
           );
       } else {
         !!royalGames &&
           setWinner(
             royalGames.find(
-              (game) => game._id.toString() === currentSegment.split("_")[0]
-            )
+              (game) => game._id.toString() === currentSegment.split("_")[0],
+            ),
           );
 
         const filtered = segments?.filter(
-          (segment) => segment !== currentSegment
+          (segment) => segment !== currentSegment,
         );
         !filtered?.length && setCurrentSegment("");
 
@@ -80,7 +80,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
           setSegments(
             filtered?.length
               ? filtered
-              : royalGames.map((game, i) => game.id + "_" + i)
+              : royalGames.map((game, i) => game.id + "_" + i),
           );
       }
     }
@@ -124,7 +124,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
       ctx.fillText(
         value?.length > 19 ? value.slice(0, 20) + "..." : value || "",
         size / 2 + 20,
-        0
+        0,
       );
       ctx.restore();
     };
@@ -182,7 +182,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
       setWinnerAngle(
         angle.current +
           (360 - (360 / segments.length) * winner) -
-          Math.floor(Math.random() * (360 / segments.length))
+          Math.floor(Math.random() * (360 / segments.length)),
       );
       setStarted(false);
 

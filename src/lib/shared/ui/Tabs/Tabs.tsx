@@ -30,7 +30,7 @@ export const Tabs: FC<ITabs> = ({
   const [tabIndex, setTabIndex] = useState(
     defaultTabIndex > contents.length - 1
       ? contents.length - 1
-      : defaultTabIndex
+      : defaultTabIndex,
   );
 
   useEffect(() => {

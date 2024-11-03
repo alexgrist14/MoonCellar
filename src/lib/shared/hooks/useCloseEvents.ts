@@ -1,4 +1,4 @@
-import { RefObject, useEffect } from 'react';
+import { RefObject, useEffect } from "react";
 
 const useCloseEvents = (
   refs: RefObject<HTMLElement>[],
@@ -14,15 +14,15 @@ const useCloseEvents = (
     };
 
     const keydownHandler = (e: KeyboardEvent): void => {
-      e.key === 'Escape' && callback();
+      e.key === "Escape" && callback();
     };
 
-    document.addEventListener('mousedown', clickHandler);
-    document.addEventListener('keydown', keydownHandler);
+    document.addEventListener("mousedown", clickHandler);
+    document.addEventListener("keydown", keydownHandler);
 
     return () => {
-      document.removeEventListener('mousedown', clickHandler);
-      document.removeEventListener('keydown', keydownHandler);
+      document.removeEventListener("mousedown", clickHandler);
+      document.removeEventListener("keydown", keydownHandler);
     };
   }, [refs, callback]);
 };

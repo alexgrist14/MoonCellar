@@ -102,16 +102,16 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
                   ? "0 0 0 8px"
                   : "0 0 8px 0"
                 : isActive
-                ? "0 0 8px 0"
-                : "0 0 0 8px",
+                  ? "0 0 8px 0"
+                  : "0 0 0 8px",
             transform: `translateX(${
               position === "left"
                 ? isActive
                   ? "-50%"
                   : "50%"
                 : isActive
-                ? "50%"
-                : "-50%"
+                  ? "50%"
+                  : "-50%"
             })`,
           }}
         >

@@ -13,7 +13,7 @@ const User: FC<IProps> = ({ user }) => {
 };
 
 export const getServerSideProps = async (
-  context: GetServerSidePropsContext
+  context: GetServerSidePropsContext,
 ) => {
   const { query } = context;
   const user = (await userAPI.getByName(query.name as string)).data;

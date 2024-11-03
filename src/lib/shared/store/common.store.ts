@@ -44,6 +44,6 @@ export const useCommonStore = create<IState & IAction>()(
     }),
     {
       name: "common",
-    }
-  )
+    },
+  ),
 );

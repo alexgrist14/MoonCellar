@@ -59,7 +59,7 @@ export const ButtonGroup: FC<IButtonGroupProps> = ({
           >
             {button.title}
           </Button>
-        )
+        ),
       )}
     </div>
   );

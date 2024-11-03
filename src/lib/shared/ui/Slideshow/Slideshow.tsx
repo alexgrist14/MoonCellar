@@ -34,7 +34,7 @@ export const Slideshow: FC<ISlideshowProps> = ({ pictures }) => {
             alt="screenshot"
             src={getImageLink(screenshot.url, "1080p", 2)}
           />
-        </div>
+        </div>,
       );
   }, [isLoading, screenshot]);
 
@@ -60,7 +60,7 @@ export const Slideshow: FC<ISlideshowProps> = ({ pictures }) => {
                 priority
               />
             </div>
-          )
+          ),
       )}
     </Scrollbar>
   );

@@ -29,7 +29,7 @@ export const getImageLink = (
     | "logo_med"
     | "720p"
     | "1080p",
-  multiply?: number
+  multiply?: number,
 ) => {
   return (
     "https:" + url.replace("thumb", !!multiply ? `${size}_${multiply}x` : size)

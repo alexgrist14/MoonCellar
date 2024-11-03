@@ -1,4 +1,4 @@
-import { IImageData } from '../types/common.type';
+import { IImageData } from "../types/common.type";
 
 const getDate = (dateString: string, isWithTime?: boolean) => {
   const date = new Date(dateString);
@@ -8,7 +8,7 @@ const getDate = (dateString: string, isWithTime?: boolean) => {
 
   return `${day > 9 ? day : `0${day}`}.${
     month > 9 ? month : `0${month}`
-  }.${date.getFullYear()}${isWithTime ? ' ' + time : ''}`;
+  }.${date.getFullYear()}${isWithTime ? " " + time : ""}`;
 };
 
 const upFL = (string: string) => {

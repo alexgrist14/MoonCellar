@@ -1,1 +1,1 @@
-export * from './ModalsConnector';
+export * from "./ModalsConnector";

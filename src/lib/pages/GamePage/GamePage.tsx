@@ -42,7 +42,7 @@ export const GamePage: FC = () => {
               setRoyalGames(
                 royalGames?.some((royal) => royal._id === game._id)
                   ? royalGames.filter((royal) => royal._id !== game._id)
-                  : [...(!!royalGames?.length ? royalGames : []), game]
+                  : [...(!!royalGames?.length ? royalGames : []), game],
               );
             }}
           >

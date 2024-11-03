@@ -22,7 +22,7 @@ export const useExcludedStore = create<IState & IAction>()(
         setExcludedGenres: (excludedGenres) => set({ excludedGenres }),
         setExcludedSystems: (excludedSystems) => set({ excludedSystems }),
       }),
-      { name: "excluded" }
-    )
-  )
+      { name: "excluded" },
+    ),
+  ),
 );

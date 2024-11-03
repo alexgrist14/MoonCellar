@@ -26,6 +26,6 @@ export const useStatesStore = create<IState & IAction>()(
       setSegments: (segments) => set({ segments }),
       setStarted: (isStarted) => set({ isStarted }),
     }),
-    { name: "states" }
-  )
+    { name: "states" },
+  ),
 );

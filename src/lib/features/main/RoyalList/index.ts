@@ -1,1 +1,1 @@
-export * from './RoyalList';
+export * from "./RoyalList";

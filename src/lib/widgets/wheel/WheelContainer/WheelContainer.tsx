@@ -61,7 +61,7 @@ export const WheelContainer: FC = () => {
                     winner,
                   ])
                 : setRoyalGames(
-                    royalGames?.filter((game) => game._id !== winner._id) || []
+                    royalGames?.filter((game) => game._id !== winner._id) || [],
                   );
             }}
           >

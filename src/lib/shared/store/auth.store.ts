@@ -12,7 +12,7 @@ type IAction = {
   setAuth: (isAuth: boolean) => void;
   setUserName: (userName: string) => void;
   setUserId: (userId: string) => void;
-  setProfilePicture:(profilePicture: string) => void;
+  setProfilePicture: (profilePicture: string) => void;
   clear: () => void;
 };
 
@@ -22,9 +22,9 @@ export const useAuthStore = create<IState & IAction>()(
       (set) => ({
         isAuth: false,
         setAuth: (isAuth) => set({ isAuth }),
-        setUserName: (userName) => set({userName}),
-        setUserId: (userId) => set({userId}),
-        setProfilePicture: (profilePicture) => set({profilePicture}),
+        setUserName: (userName) => set({ userName }),
+        setUserId: (userId) => set({ userId }),
+        setProfilePicture: (profilePicture) => set({ profilePicture }),
         clear: () => {
           set({
             isAuth: false,
@@ -34,7 +34,7 @@ export const useAuthStore = create<IState & IAction>()(
           });
         },
       }),
-      { name: "auth" }
-    )
-  )
+      { name: "auth" },
+    ),
+  ),
 );

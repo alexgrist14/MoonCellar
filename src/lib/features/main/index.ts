@@ -1,2 +1,2 @@
-export * from './IGDBList';
-export * from './RoyalList';
+export * from "./IGDBList";
+export * from "./RoyalList";

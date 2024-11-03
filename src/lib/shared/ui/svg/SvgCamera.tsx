@@ -1,5 +1,5 @@
 import React from "react";
-import type { FC} from "react";
+import type { FC } from "react";
 
 export const SvgCamera: FC<{ className?: string }> = ({ className }) => {
   return (

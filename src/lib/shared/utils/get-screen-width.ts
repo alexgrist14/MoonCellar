@@ -1,5 +1,5 @@
 export const getScreenWidth = () => {
-  if (typeof window === 'undefined') return 0;
+  if (typeof window === "undefined") return 0;
   return window.innerWidth;
 };
 

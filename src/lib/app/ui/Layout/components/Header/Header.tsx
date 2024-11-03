@@ -150,7 +150,7 @@ export const Header: FC = () => {
 };
 
 export const getServerSideProps = async (
-  context: GetServerSidePropsContext
+  context: GetServerSidePropsContext,
 ) => {
   const cookies = context.req.headers.cookie;
 

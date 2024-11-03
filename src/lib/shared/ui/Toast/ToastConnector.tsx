@@ -24,12 +24,12 @@ export const ToastConnector = () => {
 
         // already exists toaster with same title (originalTitle)
         const existsToaster = prev.findLast(
-          (item) => item.originalTitle === toasterData.originalTitle
+          (item) => item.originalTitle === toasterData.originalTitle,
         );
 
         if (existsToaster) {
           _prev = _prev.filter(
-            (item) => item.originalTitle !== toasterData.originalTitle
+            (item) => item.originalTitle !== toasterData.originalTitle,
           );
 
           if (existsToaster.count > 1) {

@@ -1,1 +1,1 @@
-export * from './IGDBLIst';
+export * from "./IGDBLIst";

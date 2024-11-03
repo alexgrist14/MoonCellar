@@ -1,1 +1,1 @@
-export * from './GauntletPage';
+export * from "./GauntletPage";

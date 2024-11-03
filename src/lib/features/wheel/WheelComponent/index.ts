@@ -1,1 +1,1 @@
-export * from './WheelComponent';
+export * from "./WheelComponent";

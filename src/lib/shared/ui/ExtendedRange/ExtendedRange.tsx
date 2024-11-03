@@ -28,7 +28,7 @@ export const ExtendedRange: FC<IExtendedCheckboxProps> = ({
 
   const debouncedSetSelected = useDebouncedCallback(
     (value: number) => setSelected(value),
-    500
+    500,
   );
 
   useEffect(() => {

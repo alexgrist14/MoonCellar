@@ -27,7 +27,8 @@ export const ConsolesList: FC = () => {
       <div className={styles.consoles__options}>
         <label className={styles.consoles__toggle}>
           <span>
-            Royal{!!royalGames?.length ? ` (Games: ${royalGames.length}):` : ":"}
+            Royal
+            {!!royalGames?.length ? ` (Games: ${royalGames.length}):` : ":"}
           </span>
           <ToggleSwitch
             defaultValue={isRoyal ? "right" : "left"}

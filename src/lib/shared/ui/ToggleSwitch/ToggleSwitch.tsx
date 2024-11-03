@@ -26,7 +26,7 @@ export const ToggleSwitch: FC<ToggleSwitchProps> = ({
 }) => {
   const [isActive, setIsActive] = useState(false);
   const [toggleValue, setToggleValue] = useState<string>(
-    defaultValue || "left"
+    defaultValue || "left",
   );
 
   const debouncedCallback = useDebouncedCallback(clickCallback, 200);
@@ -51,14 +51,14 @@ export const ToggleSwitch: FC<ToggleSwitchProps> = ({
         styles[`toggle_${value || toggleValue}`],
         {
           [styles.toggle_active]: isActive || isDisabled,
-        }
+        },
       )}
       style={{ scale: scale }}
     >
       <div
         className={classNames(
           styles.toggle__button,
-          styles[`toggle__button_${value || toggleValue}`]
+          styles[`toggle__button_${value || toggleValue}`],
         )}
       />
       <span className={styles.toggle__left}>{leftContent}</span>

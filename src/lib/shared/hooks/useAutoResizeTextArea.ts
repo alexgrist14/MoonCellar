@@ -1,4 +1,4 @@
-import { RefObject, useEffect } from 'react';
+import { RefObject, useEffect } from "react";
 
 export const useAutoResizeTextArea = (
   textAreaRef: RefObject<HTMLTextAreaElement>,
@@ -8,7 +8,7 @@ export const useAutoResizeTextArea = (
     if (textAreaRef.current) {
       const { style, scrollHeight } = textAreaRef.current;
 
-      style.height = scrollHeight + 'px';
+      style.height = scrollHeight + "px";
     }
   }, [textAreaRef, value]);
 };

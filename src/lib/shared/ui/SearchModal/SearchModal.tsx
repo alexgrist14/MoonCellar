@@ -24,7 +24,7 @@ export const SearchModal: FC = () => {
 
   const isSearchActive = useMemo(
     () => !!searchQuery && searchQuery.length >= 2,
-    [searchQuery]
+    [searchQuery],
   );
 
   const originalTake = useMemo(() => (isMobile ? 19 : 20), [isMobile]);
@@ -72,9 +72,7 @@ export const SearchModal: FC = () => {
               [styles.modal__results_loading]: isLoading,
             })}
           >
-            {games?.map((game) => (
-              <GameCard key={game._id} game={game} />
-            ))}
+            {games?.map((game) => <GameCard key={game._id} game={game} />)}
             {!!games?.length && take < total && (
               <Button
                 className={styles.modal__more}

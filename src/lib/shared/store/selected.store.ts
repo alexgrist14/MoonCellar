@@ -41,7 +41,7 @@ export const useSelectedStore = create<IState & IAction>()(
         setSelectedRating: (selectedRating) => set({ selectedRating }),
         setSelectedSystems: (selectedSystems) => set({ selectedSystems }),
       }),
-      { name: "selected" }
-    )
-  )
+      { name: "selected" },
+    ),
+  ),
 );

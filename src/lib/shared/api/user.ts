@@ -24,7 +24,7 @@ const addAvatar = (id: string, file: File) => {
 
 const getAvatar = (id: string) => {
   return agent.get<{ fileName: string }>(
-    `${API_URL}/user/profile-picture/${id}`
+    `${API_URL}/user/profile-picture/${id}`,
   );
 };
 
