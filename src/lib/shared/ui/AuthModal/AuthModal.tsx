@@ -42,8 +42,6 @@ export const AuthModal: FC = () => {
         modal.close();
 
         userAPI.getById(res1.data.userId).then((res) => {
-          setCookie(ACCESS_TOKEN,res1.data.accessToken, {"max-age":24 * 60 * 60 * 1000})
-          setCookie(REFRESH_TOKEN,res1.data.refreshToken, {"max-age":30 * 24 * 60 * 60 * 1000})
           push(`/user/${res.data.userName}`);
 
         });
