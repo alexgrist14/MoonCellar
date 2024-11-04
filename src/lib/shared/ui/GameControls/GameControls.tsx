@@ -23,15 +23,15 @@ export const GameControls: FC<IGameControlsProps> = ({
   style,
   isWithoutTooltips,
 }) => {
-  const { userId, profile, setProfile } = useAuthStore();
+  const { profile, setProfile } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
 
   const addToList = (name: categoriesType) => {
-    if (!userId) return;
+    if (!profile) return;
     setIsLoading(true);
 
     return userAPI
-      .addGameToCategory(userId, game._id, name)
+      .addGameToCategory(profile._id, game._id, name)
       .then((res) => {
         setProfile(res.data);
 
@@ -42,11 +42,11 @@ export const GameControls: FC<IGameControlsProps> = ({
   };
 
   const removeFromList = (name: categoriesType) => {
-    if (!userId) return;
+    if (!profile) return;
     setIsLoading(true);
 
     return userAPI
-      .removeGameFromCategory(userId, game._id, name)
+      .removeGameFromCategory(profile._id, game._id, name)
       .then((res) => {
         setProfile(res.data);
 
@@ -65,7 +65,7 @@ export const GameControls: FC<IGameControlsProps> = ({
   return (
     <div
       className={classNames(styles.controls, className, {
-        [styles.controls_disabled]: !userId || isLoading,
+        [styles.controls_disabled]: !profile || isLoading,
       })}
       style={style}
     >

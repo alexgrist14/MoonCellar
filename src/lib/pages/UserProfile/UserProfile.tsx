@@ -16,12 +16,12 @@ import { GameCard } from "../../shared/ui/GameCard";
 import { userAPI } from "../../shared/api";
 
 interface UserProfileProps {
-  name: string;
+  userName: string;
   email: string;
   _id: string;
 }
 
-const UserProfile: FC<UserProfileProps> = ({ name, _id: id }) => {
+const UserProfile: FC<UserProfileProps> = ({ userName, _id: id }) => {
   const { profile } = useAuthStore();
   const { addAvatar } = userAPI;
 
@@ -115,7 +115,7 @@ const UserProfile: FC<UserProfileProps> = ({ name, _id: id }) => {
               />
             </label>
             <div>
-              <div className={styles.profile_name}>{name}</div>
+              <div className={styles.profile_name}>{userName}</div>
               <div className={styles.profile_stats}>
                 <h3 className={styles.profile_stats__title}>Games stats</h3>
                 <div className={styles.profile_stats__list}>
