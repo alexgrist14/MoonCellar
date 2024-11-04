@@ -5,11 +5,11 @@ import agent from "./agent";
 const AUTH_URL = `${API_URL}/auth`;
 
 const signup = (signUpDto: IAuth) => {
-  return agent.post<{ userId: string }>(`${AUTH_URL}/signup`, signUpDto);
+  return agent.post<{ accessToken: string, refreshToken: string }>(`${AUTH_URL}/signup`, signUpDto);
 };
 
 const login = (loginDto: Omit<IAuth, "userName">) => {
-  return agent.post<{ userId: string }>(`${AUTH_URL}/login`, loginDto);
+  return agent.post<{ accessToken: string, refreshToken: string,userId: string }>(`${AUTH_URL}/login`, loginDto);
 };
 
 const logout = (userId: string) => {

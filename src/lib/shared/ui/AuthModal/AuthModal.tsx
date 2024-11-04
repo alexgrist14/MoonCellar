@@ -11,6 +11,8 @@ import { SvgClose } from "../svg";
 import Background from "../Background/Background";
 import { authAPI, userAPI } from "../../api";
 import { axiosUtils } from "../../utils/axios";
+import { setCookie } from "../../utils/cookies";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../constants";
 
 export const AuthModal: FC = () => {
   const [isRegister, setIsRegister] = useState<boolean>(true);
@@ -36,10 +38,12 @@ export const AuthModal: FC = () => {
     };
 
     login(loginDto)
-      .then((res) => {
+      .then((res1) => {
         modal.close();
 
-        userAPI.getById(res.data.userId).then((res) => {
+        userAPI.getById(res1.data.userId).then((res) => {
+          setCookie(ACCESS_TOKEN,res1.data.accessToken, {"max-age":24 * 60 * 60 * 1000})
+          setCookie(REFRESH_TOKEN,res1.data.refreshToken, {"max-age":30 * 24 * 60 * 60 * 1000})
           push(`/user/${res.data.userName}`);
 
         });
