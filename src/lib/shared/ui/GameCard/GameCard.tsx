@@ -17,20 +17,21 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
   const [isHover, setIsHover] = useState(false);
 
   return (
-    <Link
+    <div
       className={styles.card}
-      href={`/games/${game.slug}`}
       onMouseOver={() => setIsHover(true)}
       onMouseOut={() => setIsHover(false)}
-      onClick={() => modal.close()}
     >
       <div
         className={classNames(styles.card__info, {
           [styles.card__info_active]: isHover,
         })}
       >
-        <div
-        className={styles.card__title}>
+        <Link
+          className={styles.card__title}
+          href={`/games/${game.slug}`}
+          onClick={() => modal.close()}
+        >
           <p>
             {game.name}
             {!!game.release_dates?.length
@@ -42,8 +43,12 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
               {game.platforms.map((platform) => platform.name).join(", ")}
             </span>
           )}
-        </div>
-        <GameControls className={styles.card__controls} game={game} />
+        </Link>
+        <GameControls
+          isWithoutTooltips
+          className={styles.card__controls}
+          game={game}
+        />
       </div>
       {!!game?.cover ? (
         <Image
@@ -57,6 +62,6 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
       ) : (
         <Cover />
       )}
-    </Link>
+    </div>
   );
 };

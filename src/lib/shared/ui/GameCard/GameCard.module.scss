@@ -8,22 +8,26 @@
   position: relative;
 
   &__title {
+    display: grid;
+    gap: 30px;
     padding: 10px;
     text-align: center;
 
     & > p {
       @include font(12px, 12px, 400);
+      @include lineClamp(4);
     }
 
     & > span {
       @include font(10px, 12px, 400);
+      @include lineClamp(3);
     }
   }
 
   &__info {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
+    display: grid;
+    grid-template-rows: 1fr 30px;
+    align-content: space-between;
     gap: 10px;
     width: 100%;
     height: 100%;
@@ -41,6 +45,11 @@
 
   &__controls {
     height: 30px;
+    border-radius: 0 0 $radius $radius;
+
+    & button {
+      padding: 2px;
+    }
   }
 
   &__cover {

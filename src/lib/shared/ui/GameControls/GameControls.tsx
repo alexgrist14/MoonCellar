@@ -14,12 +14,14 @@ interface IGameControlsProps {
   style?: CSSProperties;
   className?: string;
   game: IGDBGame;
+  isWithoutTooltips?: boolean;
 }
 
 export const GameControls: FC<IGameControlsProps> = ({
   game,
   className,
   style,
+  isWithoutTooltips,
 }) => {
   const { userId, profile, setProfile } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
@@ -72,7 +74,11 @@ export const GameControls: FC<IGameControlsProps> = ({
           isPlayed ? removeFromList("playing") : addToList("playing")
         }
         color="transparent"
-        tooltip={`${isPlayed ? "Remove from" : "Add to"} playing`}
+        tooltip={
+          isWithoutTooltips
+            ? undefined
+            : `${isPlayed ? "Remove from" : "Add to"} playing`
+        }
         className={classNames(styles.controls__action, {
           [styles.controls__action_active]: isPlayed,
         })}
@@ -84,7 +90,11 @@ export const GameControls: FC<IGameControlsProps> = ({
           isCompleted ? removeFromList("completed") : addToList("completed")
         }
         color="transparent"
-        tooltip={`${isCompleted ? "Remove from" : "Add to"} completed`}
+        tooltip={
+          isWithoutTooltips
+            ? undefined
+            : `${isCompleted ? "Remove from" : "Add to"} completed`
+        }
         className={classNames(styles.controls__action, {
           [styles.controls__action_active]: profile?.games?.completed.some(
             (id) => game._id === id
@@ -98,7 +108,11 @@ export const GameControls: FC<IGameControlsProps> = ({
           isWishlisted ? removeFromList("wishlist") : addToList("wishlist")
         }
         color="transparent"
-        tooltip={`${isWishlisted ? "Remove from" : "Add to"} wishlist`}
+        tooltip={
+          isWithoutTooltips
+            ? undefined
+            : `${isWishlisted ? "Remove from" : "Add to"} wishlist`
+        }
         className={classNames(styles.controls__action, {
           [styles.controls__action_active]: profile?.games?.wishlist.some(
             (id) => game._id === id
@@ -112,7 +126,11 @@ export const GameControls: FC<IGameControlsProps> = ({
           isBacklogged ? removeFromList("backlog") : addToList("backlog")
         }
         color="transparent"
-        tooltip={`${isBacklogged ? "Remove from" : "Add to"} backlog`}
+        tooltip={
+          isWithoutTooltips
+            ? undefined
+            : `${isBacklogged ? "Remove from" : "Add to"} backlog`
+        }
         className={classNames(styles.controls__action, {
           [styles.controls__action_active]: profile?.games?.backlog.some(
             (id) => game._id === id
@@ -126,7 +144,11 @@ export const GameControls: FC<IGameControlsProps> = ({
           isDropped ? removeFromList("dropped") : addToList("dropped")
         }
         color="transparent"
-        tooltip={`${isDropped ? "Remove from" : "Add to"} dropped`}
+        tooltip={
+          isWithoutTooltips
+            ? undefined
+            : `${isDropped ? "Remove from" : "Add to"} dropped`
+        }
         className={classNames(styles.controls__action, {
           [styles.controls__action_active]: profile?.games?.dropped.some(
             (id) => game._id === id
