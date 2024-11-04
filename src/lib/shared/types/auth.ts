@@ -6,21 +6,21 @@ export interface LoginDto {
 }
 
 export interface SignUpDto {
-  name: string;
+  userName: string;
   email: string;
   password: string;
 }
 
 export interface IAuth {
-  name: string;
+  userName: string;
   email: string;
   password: string;
 }
 
 export interface IUser {
   _id: string;
-  name: string;
+  userName: string;
   email: string;
   games: Record<categoriesType, number[]>;
-  avatar: string;
+  profilePicture: string;
 }

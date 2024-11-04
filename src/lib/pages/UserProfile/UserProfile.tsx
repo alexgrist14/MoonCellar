@@ -22,19 +22,23 @@ interface UserProfileProps {
 }
 
 const UserProfile: FC<UserProfileProps> = ({ name, _id: id }) => {
-  const { userId, profilePicture, setProfilePicture } = useAuthStore();
-  const { addAvatar, getAvatar } = userAPI;
+  const { profile } = useAuthStore();
+  const { addAvatar } = userAPI;
 
   const [isPictureLarge, setIsPictureLarge] = useState<boolean>(false);
-  const [avatar, setAvatar] = useState<string | undefined>(profilePicture);
+  const [avatar, setAvatar] = useState<string | undefined>("");
   const [tempAvatar, setTempAvatar] = useState<File>();
   const [profileHover, setProfileHover] = useState<boolean>(false);
 
   const handleUpload = async () => {
-    if (userId && tempAvatar) {
-      await addAvatar(userId, tempAvatar);
+    if (profile && tempAvatar) {
+      await addAvatar(profile._id, tempAvatar);
     }
   };
+
+  useEffect(() => {
+    if (profile) setAvatar(`${API_URL}/photos/${profile.profilePicture}`);
+  }, [profile]);
 
   const handleInput = async (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files !== null) {
@@ -53,14 +57,8 @@ const UserProfile: FC<UserProfileProps> = ({ name, _id: id }) => {
   };
 
   useEffect(() => {
-    getAvatar(id)
-      .then((res) => {
-        setAvatar(`${API_URL}/photos/${res.data.fileName}`);
-      })
-      .catch(() => {
-        setProfilePicture("");
-      });
-  }, [id, setProfilePicture, getAvatar]);
+    if (profile) setAvatar(`${API_URL}/photos/${profile.profilePicture}`);
+  }, []);
 
   useEffect(() => {
     if (!isPictureLarge) handleUpload();

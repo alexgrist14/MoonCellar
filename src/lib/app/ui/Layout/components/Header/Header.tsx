@@ -13,7 +13,11 @@ import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { deleteCookie, getCookie } from "@/src/lib/shared/utils/cookies";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { SearchModal } from "@/src/lib/shared/ui/SearchModal";
-import { API_URL, REFRESH_TOKEN } from "@/src/lib/shared/constants";
+import {
+  ACCESS_TOKEN,
+  API_URL,
+  REFRESH_TOKEN,
+} from "@/src/lib/shared/constants";
 import { AuthModal } from "@/src/lib/shared/ui/AuthModal";
 import { GetServerSidePropsContext } from "next";
 import { authAPI, userAPI } from "@/src/lib/shared/api";
@@ -22,60 +26,15 @@ export const Header: FC = () => {
   const router = useRouter();
 
   const { isMobile } = useCommonStore();
-  const { getById, getAvatar } = userAPI;
   const { logout } = authAPI;
 
   const [isMenuActive, setIsMenuActive] = useState(false);
-  const {
-    setAuth,
-    isAuth,
-    setUserName,
-    userId,
-    userName,
-    setUserId,
-    profilePicture,
-    setProfilePicture,
-    clear,
-    setProfile,
-  } = useAuthStore();
+  const { isAuth, profile, clear } = useAuthStore();
   const { push } = useRouter();
 
-  useEffect(() => {
-    const token = getCookie(REFRESH_TOKEN);
-    if (token) {
-      const decoded: any = jwtDecode(token);
-      if (decoded.exp) {
-        setAuth(!isTokenExpired(decoded.exp));
-        getById(decoded.id).then((res) => {
-          setUserName(res.data.name);
-          setUserId(decoded.id);
-          setProfile(res.data);
-        });
-      }
-    } else {
-      setAuth(false);
-      setUserId("");
-      setUserName("");
-    }
-  }, [setAuth, setUserId, setUserName]);
-
-  useEffect(() => {
-    if (userId && isAuth) {
-      (async () => {
-        await getAvatar(userId)
-          .then((res) => {
-            setProfilePicture(`${API_URL}/photos/${res.data.fileName}`);
-          })
-          .catch(() => {
-            setProfilePicture("");
-          });
-      })();
-    }
-  }, [isAuth, setProfilePicture, userId]);
-
   const handleProfileClick = () => {
-    if (isAuth) {
-      push(`/user/${userName}`);
+    if (isAuth && profile) {
+      push(`/user/${profile.userName}`);
     } else modal.open(<AuthModal />);
   };
 
@@ -86,11 +45,11 @@ export const Header: FC = () => {
   const handleLogoutClick = (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
 
-    if (isAuth && userId) {
-      logout(userId).then(() => {
-        // deleteCookie("accessMoonToken");
+    if (isAuth && profile) {
+      logout(profile._id).then(() => {
+        deleteCookie(ACCESS_TOKEN);
+        deleteCookie(REFRESH_TOKEN);
         clear();
-        // deleteCookie("refreshMoonToken");
 
         router.push("/");
       });
@@ -118,7 +77,11 @@ export const Header: FC = () => {
             <Image
               className={styles.profile_image}
               onMouseEnter={() => setIsMenuActive(true)}
-              src={!!profilePicture ? profilePicture : "/images/user.png"}
+              src={
+                !!profile
+                  ? `${API_URL}/photos/${profile.profilePicture}`
+                  : "/images/user.png"
+              }
               width={40}
               height={40}
               alt="profile"
@@ -126,7 +89,7 @@ export const Header: FC = () => {
             <div
               className={`${styles.dropdown} ${isMenuActive && styles.active}`}
             >
-              <Link className={styles.dropdown_item} href="/user">
+              <Link className={styles.dropdown_item} href={`/user/${profile?.userName}`}>
                 Profile
               </Link>
               <Link className={styles.dropdown_item} href="/settings">

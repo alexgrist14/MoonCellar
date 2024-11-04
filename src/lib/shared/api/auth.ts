@@ -8,7 +8,7 @@ const signup = (signUpDto: IAuth) => {
   return agent.post<{ userId: string }>(`${AUTH_URL}/signup`, signUpDto);
 };
 
-const login = (loginDto: Omit<IAuth, "name">) => {
+const login = (loginDto: Omit<IAuth, "userName">) => {
   return agent.post<{ userId: string }>(`${AUTH_URL}/login`, loginDto);
 };
 

@@ -15,7 +15,7 @@ import { axiosUtils } from "../../utils/axios";
 export const AuthModal: FC = () => {
   const [isRegister, setIsRegister] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const { setAuth, setUserId, setUserName } = useAuthStore();
+  const { setAuth,setProfile } = useAuthStore();
   const { push } = useRouter();
   const { login, signup } = authAPI;
 
@@ -30,7 +30,7 @@ export const AuthModal: FC = () => {
   const handleLogin: SubmitHandler<IAuth> = (data) => {
     setError(null);
 
-    const loginDto: Omit<IAuth, "name"> = {
+    const loginDto: Omit<IAuth, "userName"> = {
       email: data.email,
       password: data.password,
     };
@@ -40,11 +40,8 @@ export const AuthModal: FC = () => {
         modal.close();
 
         userAPI.getById(res.data.userId).then((res) => {
-          push(`/user/${res.data.name}`);
-          setUserId(res.data._id);
-          setUserName(res.data.name);
+          push(`/user/${res.data.userName}`);
 
-          setAuth(true);
         });
       })
       .catch(axiosUtils.toastError);
@@ -54,7 +51,7 @@ export const AuthModal: FC = () => {
     setError(null);
 
     const singUpDto: IAuth = {
-      name: data.name,
+      userName: data.userName,
       email: data.email,
       password: data.password,
     };
@@ -62,12 +59,7 @@ export const AuthModal: FC = () => {
     signup(singUpDto)
       .then((res) => {
         modal.close();
-
-        setAuth(true);
-        setUserId(res.data.userId);
-        setUserName(data.name);
-
-        push(`/user/${data.name}`);
+        push(`/user/${data.userName}`);s
       })
       .catch(axiosUtils.toastError);
   };
@@ -85,7 +77,7 @@ export const AuthModal: FC = () => {
           {isRegister && (
             <div>
               <label>User Name</label>
-              <Input type="text" {...register("name", { required: true })} />
+              <Input type="text" {...register("userName", { required: true })} />
             </div>
           )}
           <div>
