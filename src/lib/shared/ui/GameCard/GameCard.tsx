@@ -7,6 +7,7 @@ import Image from "next/image";
 import { modal } from "../Modal";
 import { getImageLink } from "../../constants";
 import { Cover } from "../Cover";
+import { GameControls } from "../GameControls";
 
 interface IGameCardProps {
   game: IGDBGame;
@@ -24,22 +25,25 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
       onClick={() => modal.close()}
     >
       <div
-        className={classNames(styles.card__title, {
-          [styles.card__title_active]: isHover,
+        className={classNames(styles.card__info, {
+          [styles.card__info_active]: isHover,
         })}
       >
-        <p>
-          {game.name}
-          {!!game.release_dates?.length
-            ? ` (${game.release_dates?.[0].y})`
-            : ""}
-        </p>
-        <p></p>
-        {!!game.platforms?.length && (
-          <span>
-            {game.platforms.map((platform) => platform.name).join(", ")}
-          </span>
-        )}
+        <div
+        className={styles.card__title}>
+          <p>
+            {game.name}
+            {!!game.release_dates?.length
+              ? ` (${game.release_dates?.[0].y})`
+              : ""}
+          </p>
+          {!!game.platforms?.length && (
+            <span>
+              {game.platforms.map((platform) => platform.name).join(", ")}
+            </span>
+          )}
+        </div>
+        <GameControls className={styles.card__controls} game={game} />
       </div>
       {!!game?.cover ? (
         <Image

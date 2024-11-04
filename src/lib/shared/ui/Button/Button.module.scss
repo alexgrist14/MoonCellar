@@ -51,7 +51,7 @@
   &_transparentColor {
     background-color: transparent;
     border-color: transparent;
-    color: #000;
+    border-radius: 0;
   }
 
   &_disabled {
@@ -62,5 +62,25 @@
   &_active {
     box-shadow: $buttonShadow;
     filter: brightness(0.8);
+  }
+
+  &__tooltip {
+    position: absolute;
+    padding: 5px 10px;
+    background-color: $bg;
+    border: 2px solid $lightBg;
+    color: $whiteTextColor;
+    border-radius: $radius;
+    opacity: 0;
+    transition: 0.3s;
+    @include font(14px, 16px, 500);
+    margin: 0;
+    height: fit-content;
+    display: flex;
+    align-items: center;
+    animation: appearOpacity 0.3s 1 forwards;
+    pointer-events: none;
+    width: fit-content;
+    white-space: nowrap;
   }
 }

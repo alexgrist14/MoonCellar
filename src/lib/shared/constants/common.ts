@@ -4,11 +4,6 @@ export const API_URL =
 export const ACCESS_TOKEN = "accessMoonToken";
 export const REFRESH_TOKEN = "refreshMoonToken";
 
-export const apiNames: { [key: string]: string } = {
-  RA: "RetroAchievements",
-  IGDB: "IGDB",
-};
-
 export const links = [
   { name: "Home", link: "/" },
   { name: "Gauntlet", link: "/gauntlet" },

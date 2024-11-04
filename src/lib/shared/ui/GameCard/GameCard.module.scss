@@ -8,6 +8,19 @@
   position: relative;
 
   &__title {
+    padding: 10px;
+    text-align: center;
+
+    & > p {
+      @include font(12px, 12px, 400);
+    }
+
+    & > span {
+      @include font(10px, 12px, 400);
+    }
+  }
+
+  &__info {
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
@@ -18,18 +31,16 @@
     transition: all 0.3s;
     opacity: 0;
     position: absolute;
-    text-align: center;
     border-radius: $radius;
     border: 2px solid $gray;
-    padding: 10px;
-
-    & > span {
-      @include font(10px, 12px, 400);
-    }
 
     &_active {
       opacity: 1;
     }
+  }
+
+  &__controls {
+    height: 30px;
   }
 
   &__cover {
@@ -40,14 +51,14 @@
     gap: 30px;
     background: $lightBgSecond;
     object-fit: cover;
-    font-family: 'Pentagra', sans-serif;
+    font-family: "Pentagra", sans-serif;
     width: 100%;
     height: 100%;
-    div{
+    div {
       width: 72px;
       height: 30%;
       aspect-ratio: 1;
-      svg{
+      svg {
         width: 100%;
         height: 100%;
       }

@@ -1,11 +1,13 @@
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
+import { IUser } from "../types/auth";
 
 type IState = {
   isAuth?: boolean;
   userName?: string;
   userId?: string;
   profilePicture?: string;
+  profile?: IUser;
 };
 
 type IAction = {
@@ -13,6 +15,7 @@ type IAction = {
   setUserName: (userName: string) => void;
   setUserId: (userId: string) => void;
   setProfilePicture: (profilePicture: string) => void;
+  setProfile: (user: IUser) => void;
   clear: () => void;
 };
 
@@ -25,6 +28,7 @@ export const useAuthStore = create<IState & IAction>()(
         setUserName: (userName) => set({ userName }),
         setUserId: (userId) => set({ userId }),
         setProfilePicture: (profilePicture) => set({ profilePicture }),
+        setProfile: (profile) => set({ profile }),
         clear: () => {
           set({
             isAuth: false,
@@ -34,7 +38,7 @@ export const useAuthStore = create<IState & IAction>()(
           });
         },
       }),
-      { name: "auth" },
-    ),
-  ),
+      { name: "auth" }
+    )
+  )
 );

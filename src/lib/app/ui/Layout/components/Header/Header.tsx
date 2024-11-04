@@ -36,6 +36,7 @@ export const Header: FC = () => {
     profilePicture,
     setProfilePicture,
     clear,
+    setProfile,
   } = useAuthStore();
   const { push } = useRouter();
 
@@ -48,6 +49,7 @@ export const Header: FC = () => {
         getById(decoded.id).then((res) => {
           setUserName(res.data.name);
           setUserId(decoded.id);
+          setProfile(res.data);
         });
       }
     } else {
@@ -150,7 +152,7 @@ export const Header: FC = () => {
 };
 
 export const getServerSideProps = async (
-  context: GetServerSidePropsContext,
+  context: GetServerSidePropsContext
 ) => {
   const cookies = context.req.headers.cookie;
 
