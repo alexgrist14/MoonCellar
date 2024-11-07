@@ -13,12 +13,13 @@
   &__left {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    position: relative;
+    height: fit-content;
   }
 
   &__cover {
     aspect-ratio: 528/704;
-    border-radius: $radius;
+    border-radius: $radius $radius 0 0;
     overflow: hidden;
     background: $lightBg;
     max-width: 320px;
