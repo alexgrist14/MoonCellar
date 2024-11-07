@@ -14,6 +14,10 @@ const nextConfig = {
         protocol:"http",
         hostname:"localhost",
         port: "3228",
+      },
+      {
+        protocol: "https",
+        hostname: "api.mooncellar.space"
       }
     ],
   },
