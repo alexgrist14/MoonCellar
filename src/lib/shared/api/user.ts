@@ -1,7 +1,8 @@
 import { IUser } from "../types/auth";
 import { API_URL } from "../constants";
 import agent from "./agent";
-import { categoriesType } from "../types/user.type";
+import { categoriesType, IUserGames } from "../types/user.type";
+import { IGDBGame } from "../types/igdb";
 
 const USER_URL = `${API_URL}/user`;
 
@@ -26,6 +27,10 @@ const addAvatar = (id: string, file: File) => {
 const getAvatar = (id: string) => {
   return agent.get<{ fileName: string }>(`${USER_URL}/profile-picture/${id}`);
 };
+
+const getUserGames = (id: string)=>{
+  return agent.get<IUserGames>(`${USER_URL}/games/${id}`);
+}
 
 const addGameToCategory = (
   userId: string,
@@ -56,4 +61,5 @@ export const userAPI = {
   getAvatar,
   addGameToCategory,
   removeGameFromCategory,
+  getUserGames
 };

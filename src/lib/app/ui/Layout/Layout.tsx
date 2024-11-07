@@ -24,7 +24,6 @@ export const Layout: FC<ILayoutProps> = ({ children }) => {
 
   useEffect(() => {
     const token = getCookie(REFRESH_TOKEN);
-    console.log(token)
     if (token) {
       const decoded: any = jwtDecode(token);
       if (decoded.exp) {

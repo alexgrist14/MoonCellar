@@ -1,15 +1,4 @@
-import { categoriesType } from "./user.type";
-
-export interface LoginDto {
-  email: string;
-  password: string;
-}
-
-export interface SignUpDto {
-  userName: string;
-  email: string;
-  password: string;
-}
+import { categoriesType, IGamesRating, ILogs } from "./user.type";
 
 export interface IAuth {
   userName: string;
@@ -22,5 +11,7 @@ export interface IUser {
   userName: string;
   email: string;
   games: Record<categoriesType, number[]>;
+  gamesRating: IGamesRating[];
+  logs: ILogs[];
   profilePicture: string;
 }

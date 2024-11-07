@@ -21,12 +21,14 @@ import {
 import { AuthModal } from "@/src/lib/shared/ui/AuthModal";
 import { GetServerSidePropsContext } from "next";
 import { authAPI, userAPI } from "@/src/lib/shared/api";
+import { useAuth } from "@/src/lib/shared/hooks/auth";
 
 export const Header: FC = () => {
   const router = useRouter();
+  const {logout} = useAuth()
 
   const { isMobile } = useCommonStore();
-  const { logout } = authAPI;
+  
 
   const [isMenuActive, setIsMenuActive] = useState(false);
   const { isAuth, profile, clear } = useAuthStore();
@@ -46,13 +48,7 @@ export const Header: FC = () => {
     e.preventDefault();
 
     if (isAuth && profile) {
-      logout(profile._id).then(() => {
-        deleteCookie(ACCESS_TOKEN);
-        deleteCookie(REFRESH_TOKEN);
-        clear();
-
-        router.push("/");
-      });
+      logout(profile._id);
     }
   };
 

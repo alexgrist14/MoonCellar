@@ -11,13 +11,14 @@ import { SvgClose } from "../svg";
 import Background from "../Background/Background";
 import { authAPI, userAPI } from "../../api";
 import { axiosUtils } from "../../utils/axios";
+import { useAuth } from "../../hooks/auth";
 
 export const AuthModal: FC = () => {
   const [isRegister, setIsRegister] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const { setAuth, setProfile } = useAuthStore();
+  const {login,signup} = useAuth()
   const { push } = useRouter();
-  const { login, signup } = authAPI;
 
   const {
     register,
@@ -35,15 +36,7 @@ export const AuthModal: FC = () => {
       password: data.password,
     };
 
-    login(loginDto)
-      .then((res1) => {
-        modal.close();
-
-        userAPI.getById(res1.data.userId).then((res) => {
-          push(`/user/${res.data.userName}`);
-        });
-      })
-      .catch(axiosUtils.toastError);
+    login(loginDto);
   };
 
   const handleSignUp: SubmitHandler<IAuth> = (data) => {
@@ -55,12 +48,7 @@ export const AuthModal: FC = () => {
       password: data.password,
     };
 
-    signup(singUpDto)
-      .then((res) => {
-        modal.close();
-        push(`/user/${data.userName}`);
-      })
-      .catch(axiosUtils.toastError);
+    signup(singUpDto);
   };
 
   return (

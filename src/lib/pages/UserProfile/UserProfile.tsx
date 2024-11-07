@@ -13,7 +13,8 @@ import { useAuthStore } from "../../shared/store/auth.store";
 import { API_URL, mockGame } from "../../shared/constants";
 import Link from "next/link";
 import { GameCard } from "../../shared/ui/GameCard";
-import { userAPI } from "../../shared/api";
+import { IGDBApi, userAPI } from "../../shared/api";
+import { IGDBGame } from "../../shared/types/igdb";
 
 interface UserProfileProps {
   userName: string;
@@ -23,12 +24,21 @@ interface UserProfileProps {
 
 const UserProfile: FC<UserProfileProps> = ({ userName, _id: id }) => {
   const { profile } = useAuthStore();
-  const { addAvatar } = userAPI;
+  const [favoriteGames, setFavoriteGames] = useState<IGDBGame[]>([]);
+  const { addAvatar, getUserGames } = userAPI;
+  const { getGameById } = IGDBApi;
 
   const [isPictureLarge, setIsPictureLarge] = useState<boolean>(false);
   const [avatar, setAvatar] = useState<string | undefined>("");
   const [tempAvatar, setTempAvatar] = useState<File>();
   const [profileHover, setProfileHover] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (profile)
+      getUserGames(profile._id).then((res) => {
+        setFavoriteGames(res.data.games.completed);
+      });
+  }, [getUserGames, profile]);
 
   const handleUpload = async () => {
     if (profile && tempAvatar) {
@@ -169,18 +179,11 @@ const UserProfile: FC<UserProfileProps> = ({ userName, _id: id }) => {
           <div className={styles.favorites}>
             <h3 className={styles.favorites_title}>Favorite games</h3>
             <div className={styles.favorites_list}>
-              <div className={styles.favorites_list__item}>
-                <GameCard game={mockGame} />
-              </div>
-              <div className={styles.favorites_list__item}>
-                <GameCard game={mockGame} />
-              </div>
-              <div className={styles.favorites_list__item}>
-                <GameCard game={mockGame} />
-              </div>
-              <div className={styles.favorites_list__item}>
-                <GameCard game={mockGame} />
-              </div>
+              {favoriteGames.slice(0,4).map((game, i) => (
+                <div key={i} className={styles.favorites_list__item}>
+                  <GameCard game={game} />
+                </div>
+              ))}
             </div>
           </div>
           <div className={styles.friends}>
