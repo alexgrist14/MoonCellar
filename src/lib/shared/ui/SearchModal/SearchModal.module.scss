@@ -30,8 +30,8 @@
 
   &__results {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 30px;
     opacity: 0;
     height: fit-content;
     animation: appearOpacity 0.4s ease forwards 1;
@@ -42,11 +42,11 @@
     }
 
     @include mediaMax($screenGt) {
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(4, 1fr);
     }
 
     @include mediaMax($screenMd) {
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
     }
 
     @include mediaMax($screenSm) {

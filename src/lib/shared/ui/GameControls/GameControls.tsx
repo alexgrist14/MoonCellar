@@ -1,4 +1,4 @@
-import { CSSProperties, FC, useState } from "react";
+import { CSSProperties, FC, useRef, useState } from "react";
 import styles from "./GameControls.module.scss";
 import { IGDBGame } from "../../types/igdb";
 import { Icon } from "@iconify/react";
@@ -9,6 +9,7 @@ import { userAPI } from "../../api";
 import { useAuthStore } from "../../store/auth.store";
 import { axiosUtils } from "../../utils/axios";
 import { toast } from "../../utils/toast";
+import useCloseEvents from "../../hooks/useCloseEvents";
 
 interface IGameControlsProps {
   style?: CSSProperties;
@@ -24,7 +25,13 @@ export const GameControls: FC<IGameControlsProps> = ({
   isWithoutTooltips,
 }) => {
   const { profile, setProfile } = useAuthStore();
+
+  const ratingsRef = useRef<HTMLDivElement>(null);
+  const controlsRef = useRef<HTMLDivElement>(null);
+  const ratingButtonRef = useRef<HTMLButtonElement>(null);
+
   const [isLoading, setIsLoading] = useState(false);
+  const [isRatingActive, setIsRatingActive] = useState(false);
 
   const addToList = (name: categoriesType) => {
     if (!profile) return;
@@ -36,7 +43,7 @@ export const GameControls: FC<IGameControlsProps> = ({
         setProfile(res.data);
 
         setIsLoading(false);
-        toast.success({ title: `Game successfully added to ${name}` });
+        toast.success({ content: `Game successfully added to ${name}` });
       })
       .catch(axiosUtils.toastError);
   };
@@ -51,7 +58,7 @@ export const GameControls: FC<IGameControlsProps> = ({
         setProfile(res.data);
 
         setIsLoading(false);
-        toast.success({ title: `Game successfully removed from ${name}` });
+        toast.success({ content: `Game successfully removed from ${name}` });
       })
       .catch(axiosUtils.toastError);
   };
@@ -62,13 +69,82 @@ export const GameControls: FC<IGameControlsProps> = ({
   const isBacklogged = profile?.games?.backlog.some((id) => game._id === id);
   const isDropped = profile?.games?.dropped.some((id) => game._id === id);
 
+  let rating = profile?.gamesRating?.find((rating) => rating.game === game._id);
+
+  useCloseEvents([ratingsRef, ratingButtonRef], () => {
+    setIsRatingActive(false);
+  });
+
   return (
     <div
       className={classNames(styles.controls, className, {
         [styles.controls_disabled]: !profile || isLoading,
       })}
       style={style}
+      ref={controlsRef}
     >
+      <div
+        ref={ratingsRef}
+        style={{
+          bottom: `calc(${controlsRef.current?.clientHeight}px + 1px)`,
+          left: `calc(100% - ${controlsRef.current?.clientHeight}px)`,
+          height: `calc(100% - ${controlsRef.current?.clientHeight}px - 1px)`,
+          width: `${controlsRef.current?.clientHeight}px`,
+        }}
+        className={classNames(styles.controls__ratings, {
+          [styles.controls__ratings_active]: isRatingActive,
+        })}
+      >
+        {Array(10)
+          .fill("")
+          .map((_, i) => (
+            <div
+              key={i}
+              className={styles.controls__rating}
+              onClick={() => {
+                if (!profile) return;
+                setIsRatingActive(false);
+
+                !!rating
+                  ? userAPI
+                      .removeGameRating(profile?._id, game._id)
+                      .then((res) => {
+                        toast.success({
+                          content: "Rating was successfully removed",
+                        });
+
+                        setProfile(res.data);
+                      })
+                      .catch(axiosUtils.toastError)
+                  : userAPI
+                      .addGameRating(profile._id, game._id, i + 1)
+                      .then((res) => {
+                        toast.success({
+                          content: `Game was successfully rated (${i + 1})`,
+                        });
+
+                        setProfile(res.data);
+                      })
+                      .catch(axiosUtils.toastError);
+              }}
+            >
+              <Icon
+                className={classNames(styles.controls__heart, {
+                  [styles.controls__heart_active]:
+                    !!rating && rating.rating >= i + 1,
+                })}
+                icon="iconamoon:heart-thin"
+              />
+              <Icon
+                className={classNames(styles.controls__number, {
+                  [styles.controls__number_active]:
+                    !!rating && rating.rating >= i + 1,
+                })}
+                icon={`mdi:numeric-${i + 1}`}
+              />
+            </div>
+          ))}
+      </div>
       <Button
         onClick={() =>
           isPlayed ? removeFromList("playing") : addToList("playing")
@@ -83,7 +159,10 @@ export const GameControls: FC<IGameControlsProps> = ({
           [styles.controls__action_active]: isPlayed,
         })}
       >
-        <Icon icon="iconamoon:play-circle-light" />
+        <Icon
+          className={styles.controls__icon}
+          icon="iconamoon:play-circle-thin"
+        />
       </Button>
       <Button
         onClick={() =>
@@ -101,7 +180,10 @@ export const GameControls: FC<IGameControlsProps> = ({
           ),
         })}
       >
-        <Icon icon="iconamoon:check-circle-1-light" />
+        <Icon
+          className={styles.controls__icon}
+          icon="iconamoon:check-circle-1-thin"
+        />
       </Button>
       <Button
         onClick={() =>
@@ -119,7 +201,10 @@ export const GameControls: FC<IGameControlsProps> = ({
           ),
         })}
       >
-        <Icon icon="iconamoon:sign-plus-circle-light" />
+        <Icon
+          className={styles.controls__icon}
+          icon="iconamoon:sign-plus-circle-thin"
+        />
       </Button>
       <Button
         onClick={() =>
@@ -137,7 +222,10 @@ export const GameControls: FC<IGameControlsProps> = ({
           ),
         })}
       >
-        <Icon icon="iconamoon:menu-kebab-horizontal-circle-light" />
+        <Icon
+          className={styles.controls__icon}
+          icon="iconamoon:menu-kebab-horizontal-circle-thin"
+        />
       </Button>
       <Button
         onClick={() =>
@@ -155,7 +243,36 @@ export const GameControls: FC<IGameControlsProps> = ({
           ),
         })}
       >
-        <Icon icon="iconamoon:sign-times-circle-light" />
+        <Icon
+          className={styles.controls__icon}
+          icon="iconamoon:close-circle-1-thin"
+        />
+      </Button>
+      <Button
+        ref={ratingButtonRef}
+        onClick={() => {
+          setIsRatingActive(!isRatingActive);
+        }}
+        color="transparent"
+        className={classNames(styles.controls__action, {
+          [styles.controls__action_active]: !!rating,
+        })}
+      >
+        <Icon
+          style={{ width: "100%" }}
+          className={classNames(styles.controls__heart, {
+            [styles.controls__heart_active]: !!rating,
+          })}
+          icon="iconamoon:heart-thin"
+        />
+        {!!rating?.rating && (
+          <Icon
+            className={classNames(styles.controls__number, {
+              [styles.controls__number_active]: !!rating,
+            })}
+            icon={`mdi:numeric-${rating.rating}`}
+          />
+        )}
       </Button>
     </div>
   );

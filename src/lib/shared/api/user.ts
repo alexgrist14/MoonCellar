@@ -28,9 +28,9 @@ const getAvatar = (id: string) => {
   return agent.get<{ fileName: string }>(`${USER_URL}/profile-picture/${id}`);
 };
 
-const getUserGames = (id: string)=>{
+const getUserGames = (id: string) => {
   return agent.get<IUserGames>(`${USER_URL}/games/${id}`);
-}
+};
 
 const addGameToCategory = (
   userId: string,
@@ -54,6 +54,17 @@ const removeGameFromCategory = (
   });
 };
 
+const addGameRating = (userId: string, game: number, rating: number) => {
+  return agent.patch<IUser>(`${USER_URL}/rating/${userId}`, {
+    game,
+    rating,
+  });
+};
+
+const removeGameRating = (userId: string, gameId: number) => {
+  return agent.delete<IUser>(`${USER_URL}/rating/${userId}/${gameId}`);
+};
+
 export const userAPI = {
   getById,
   getByName,
@@ -61,5 +72,7 @@ export const userAPI = {
   getAvatar,
   addGameToCategory,
   removeGameFromCategory,
-  getUserGames
+  getUserGames,
+  addGameRating,
+  removeGameRating,
 };
