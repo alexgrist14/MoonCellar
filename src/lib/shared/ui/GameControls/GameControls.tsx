@@ -105,7 +105,7 @@ export const GameControls: FC<IGameControlsProps> = ({
                 if (!profile) return;
                 setIsRatingActive(false);
 
-                !!rating
+                !!rating && rating.rating === i + 1
                   ? userAPI
                       .removeGameRating(profile?._id, game._id)
                       .then((res) => {
