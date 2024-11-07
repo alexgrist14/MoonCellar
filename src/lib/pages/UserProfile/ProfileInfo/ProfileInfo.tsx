@@ -37,7 +37,12 @@ const ProfileInfo: FC<ProfileInfoProps> = ({ games, userName, _id: id }) => {
     if (!isPictureLarge) handleUpload();
   }, [tempAvatar]);
   useEffect(() => {
-    if (profile) setAvatar(`${API_URL}/photos/${profile.profilePicture}`);
+    if (profile){
+      setAvatar(`${API_URL}/photos/${profile.profilePicture}`);
+      console.log(API_URL)
+    console.log(`${API_URL}/photos/${profile.profilePicture}`)
+    } 
+    
   }, [profile]);
 
   const handleUpload = async () => {
