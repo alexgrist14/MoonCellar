@@ -24,40 +24,40 @@ $screenXx: 1624px;
   }
 }
 
-@mixin mediaXx{
+@mixin mediaXx {
   @media (max-width: $screenXx) {
-      @content;
+    @content;
   }
 }
 
-@mixin mediaEx{
+@mixin mediaEx {
   @media (max-width: $screenEx) {
-      @content;
+    @content;
   }
 }
-@mixin mediaGt{
+@mixin mediaGt {
   @media (max-width: $screenGt) {
-      @content;
+    @content;
   }
 }
-@mixin mediaLg{
+@mixin mediaLg {
   @media (max-width: $screenLg) {
-      @content;
+    @content;
   }
 }
 
-@mixin media960{
+@mixin media960 {
   @media (max-width: $screen960) {
-      @content;
+    @content;
   }
 }
-@mixin mediaMd{
+@mixin mediaMd {
   @media (max-width: $screenMd) {
-      @content;
+    @content;
   }
 }
-@mixin mediaSm{
+@mixin mediaSm {
   @media (max-width: $screenSm) {
-      @content;
+    @content;
   }
 }

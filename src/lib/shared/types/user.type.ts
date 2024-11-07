@@ -15,8 +15,10 @@ export interface ILogs {
   gameId: number;
 }
 
+export type UserGamesType = Record<categoriesType, IGDBGame[]>;
+
 export interface IUserGames {
-  games: Record<categoriesType, IGDBGame[]>
+  games: UserGamesType;
 }
 
 export interface IGamesRating{

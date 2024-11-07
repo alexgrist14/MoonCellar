@@ -1,0 +1,190 @@
+@mixin profileTitle {
+  width: 100%;
+  height: 30px;
+  border-radius: inherit;
+  background: $lightBg;
+  font-size: 1.2rem;
+  padding-left: 10px;
+  padding-top: 3px;
+  box-shadow: 0 2px 6px 2px rgba(0, 0, 0, 0.2);
+}
+
+.content__top {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  @include mediaMd{
+    gap: 20px;
+  }
+  .friends {
+    width: 100%;
+    max-width: 50%;
+    border-radius: $radius;
+    @include mediaMd{
+      max-width: unset;
+    }
+    &_title {
+      @include profileTitle();
+    }
+    &_list {
+      display: flex;
+      padding: 10px 0 0 10px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 5px;
+      &__item {
+        transition: 0.2s all;
+        cursor: pointer;
+        &:hover {
+          color: $accent;
+        }
+      }
+    }
+  }
+  .history {
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+    border-radius: $radius;
+    gap: 10px;
+    &_link {
+      @include profileTitle();
+    }
+    &_list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      border-radius: inherit;
+      list-style: none;
+      padding-left: 5px;
+      li {
+        height: 64px;
+        display: flex;
+        gap: 5px;
+        border-radius: $radius;
+        .card {
+          width: 40px;
+          border-radius: $radius;
+        }
+      }
+    }
+  }
+  .profile {
+    &_info {
+      display: flex;
+      gap: 20px;
+    }
+    &_name {
+      font-size: 1.5rem;
+    }
+    &_stats {
+      margin-top: 20px;
+      &__title {
+        border-bottom: 1px solid $lightBg;
+      }
+      &__list {
+        display: flex;
+        margin-top: 10px;
+        flex-direction: column;
+        a {
+          display: flex;
+          gap: 5px;
+          align-items: center;
+          transition: 0.2s all;
+          &:hover {
+            color: $accent;
+          }
+          .completed {
+            color: rgb(50, 202, 50);
+          }
+          .playing {
+            color: rgb(0, 153, 255);
+          }
+          .wishlist {
+            color: #fae25e;
+          }
+          .dropped {
+            color: rgb(206, 27, 27);
+          }
+        }
+      }
+    }
+    &_holder {
+      position: relative;
+      overflow: hidden;
+      width: 160px;
+      height: 160px;
+      border-radius: 100%;
+      aspect-ratio: 2/3;
+      cursor: pointer;
+      .background {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        opacity: 0;
+        height: 100%;
+        background-color: #09121c;
+        transition: 0.5s all;
+      }
+      .svg {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        opacity: 0;
+        transition: 0.5s all;
+      }
+      .hover {
+        opacity: 0.5;
+        &_svg {
+          opacity: 1;
+        }
+      }
+    }
+    &_image {
+      object-fit: cover;
+    }
+    &_label {
+      display: flex;
+      flex-direction: column;
+      max-width: 160px;
+      max-height: 160px;
+      gap: 20px;
+    }
+  }
+  .error {
+    color: red;
+  }
+}
+
+.content__bottom {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  gap: 20px;
+  justify-content: space-between;
+  .games {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    border-radius: $radius;
+    &_title {
+      @include profileTitle();
+    }
+    &_list {
+      display: flex;
+      flex-wrap: wrap;
+      padding-top: 20px;
+      gap: 30px;
+      @include mediaMd() {
+      }
+      &__item {
+        max-width: 150px;
+        width: 100%;
+      }
+    }
+  }
+}

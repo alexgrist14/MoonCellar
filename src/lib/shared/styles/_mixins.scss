@@ -103,3 +103,9 @@ $fontMain: "General", sans-serif;
   line-clamp: $count;
   overflow: hidden;
 }
+
+@mixin textEllipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

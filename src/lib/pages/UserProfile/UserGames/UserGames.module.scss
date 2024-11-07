@@ -1,0 +1,23 @@
+.container {
+  
+  .content{
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 30px;
+  }
+
+  .game {
+    width: fit-content;
+    max-width: 200px;
+    @include mediaMd(){
+        max-width: 120px;
+    }
+    &_title {
+      padding-top: 10px;
+      width: 100%;
+      font-size: 1rem;
+      @include textEllipsis();
+    }
+  }
+}

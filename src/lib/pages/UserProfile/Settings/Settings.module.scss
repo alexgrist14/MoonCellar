@@ -1,0 +1,19 @@
+.container{
+    .title{
+        font-size: 2rem;
+        margin-bottom: 20px;
+    }
+    .content{
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        .field{
+            width: 300px;
+        }
+        .btn{
+            font-size: 1rem;
+            width: 100px;
+            height: 40px;
+        }
+    }
+}

@@ -39,12 +39,13 @@
       &_item{
         text-align: left;
         width: 200px;
-        background-color: #282e3a;
+        background-color: $bgAlt;
         padding-block: 20px;
         padding-left: 10px;
         z-index: 4;
+        transition: 0.2s all;
         &:hover{
-          background-color: rgb(28, 47, 71);
+          background-color: $bg;
         }
       }
     }
