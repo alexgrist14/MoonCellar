@@ -1,34 +1,52 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import styles from "./UserProfile.module.scss";
-import { IGDBGame } from "../../shared/types/igdb";
-import { categoriesType, UserGamesType } from "../../shared/types/user.type";
+import { UserGamesType } from "../../shared/types/user.type";
 import { Tabs } from "../../shared/ui/Tabs";
 import { ITabContent } from "../../shared/types/tabs";
-import ProfileInfo from "./ProfileInfo/ProfileInfo";
+import ProfileInfo from "./UserInfo/UserInfo";
 import { UserGames } from "./UserGames";
 import { Settings } from "./Settings";
+import { API_URL } from "../../shared/constants";
 
 interface UserProfileProps {
   userName: string;
   _id: string;
   games: UserGamesType;
+  profilePicture: string;
 }
 
-const UserProfile: FC<UserProfileProps> = ({ userName, _id, games }) => {
+const UserProfile: FC<UserProfileProps> = ({
+  userName,
+  _id,
+  games,
+  profilePicture,
+}) => {
+  const [avatar, setAvatar] = useState<string | undefined>(
+    profilePicture ? `${API_URL}/photos/${profilePicture}` : ""
+  );
 
   const tabs: ITabContent[] = [
     {
       tabName: "Profile",
-      tabBody: <ProfileInfo userName={userName} _id={_id} games={games}/>,
-      className: `${styles.tabs__button}` 
+      tabBody: (
+        <ProfileInfo
+          userName={userName}
+          _id={_id}
+          games={games}
+          avatar={avatar}
+        />
+      ),
+      className: `${styles.tabs__button}`,
     },
-    { tabName: "Games List", 
-      tabBody: <UserGames games={games}/>,
-      className: `${styles.tabs__button}` 
+    {
+      tabName: "Games List",
+      tabBody: <UserGames games={games} />,
+      className: `${styles.tabs__button}`,
     },
-    { tabName: "Settings", 
-      tabBody: <Settings/>,
-      className: `${styles.tabs__button}` 
+    {
+      tabName: "Settings",
+      tabBody: <Settings avatar={avatar} setAvatar={setAvatar} />,
+      className: `${styles.tabs__button}`,
     },
   ];
 

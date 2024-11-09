@@ -13,14 +13,14 @@
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-  @include mediaMd{
+  @include mediaMd {
     gap: 20px;
   }
   .friends {
     width: 100%;
     max-width: 50%;
     border-radius: $radius;
-    @include mediaMd{
+    @include mediaMd {
       max-width: unset;
     }
     &_title {
@@ -110,49 +110,15 @@
         }
       }
     }
-    &_holder {
-      position: relative;
-      overflow: hidden;
+
+    &_image {
       width: 160px;
       height: 160px;
-      border-radius: 100%;
       aspect-ratio: 2/3;
-      cursor: pointer;
-      .background {
-        position: absolute;
-        top: 0;
-        width: 100%;
-        opacity: 0;
-        height: 100%;
-        background-color: #09121c;
-        transition: 0.5s all;
+      .image {
+        object-fit: cover;
+        border-radius: 100%;
       }
-      .svg {
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        position: absolute;
-        width: 40px;
-        height: 40px;
-        opacity: 0;
-        transition: 0.5s all;
-      }
-      .hover {
-        opacity: 0.5;
-        &_svg {
-          opacity: 1;
-        }
-      }
-    }
-    &_image {
-      object-fit: cover;
-    }
-    &_label {
-      display: flex;
-      flex-direction: column;
-      max-width: 160px;
-      max-height: 160px;
-      gap: 20px;
     }
   }
   .error {
@@ -184,6 +150,11 @@
       &__item {
         max-width: 150px;
         width: 100%;
+      }
+      .more {
+        max-width: 150px;
+        width: 100%;
+        border-radius: $radius;
       }
     }
   }

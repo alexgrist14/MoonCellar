@@ -1,17 +1,17 @@
 .container {
-  
-  .content{
+  .content {
     display: flex;
     flex-wrap: wrap;
     width: 100%;
     gap: 30px;
+    row-gap: 50px;
   }
 
   .game {
     width: fit-content;
     max-width: 200px;
-    @include mediaMd(){
-        max-width: 120px;
+    @include mediaMd() {
+      max-width: 120px;
     }
     &_title {
       padding-top: 10px;
