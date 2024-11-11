@@ -1,6 +1,9 @@
-import { FC, useState } from "react";
+import { Dispatch, FC, SetStateAction, useState } from "react";
 import styles from "./UserInfo.module.scss";
-import { categoriesType } from "@/src/lib/shared/types/user.type";
+import {
+  categoriesType,
+  UserGamesType,
+} from "@/src/lib/shared/types/user.type";
 import Image from "next/image";
 import { IGDBGame } from "@/src/lib/shared/types/igdb";
 import { SvgBan, SvgDone, SvgPlay, SvgStar } from "@/src/lib/shared/ui/svg";
@@ -8,19 +11,45 @@ import { Button } from "@/src/lib/shared/ui/Button";
 import Link from "next/link";
 import { GameCard } from "@/src/lib/shared/ui/GameCard";
 import { userListCategories } from "@/src/lib/shared/constants/user.const";
+import { commonUtils } from "@/src/lib/shared/utils/common";
+import { useWindowResizeAction } from "@/src/lib/shared/hooks";
+import { screenGt } from "@/src/lib/shared/constants";
 
 interface UserInfoProps {
   userName: string;
   _id: string;
-  games: Record<categoriesType, IGDBGame[]>;
+  games: UserGamesType;
   avatar?: string;
+  setTabIndex: Dispatch<SetStateAction<number>>;
 }
 
-const UserInfo: FC<UserInfoProps> = ({ games, userName, _id: id, avatar }) => {
-  const [userGames, setUserGames] =
-    useState<Record<categoriesType, IGDBGame[]>>(games);
+const UserInfo: FC<UserInfoProps> = ({
+  games,
+  userName,
+  _id: id,
+  avatar,
+  setTabIndex,
+}) => {
+  const [userGames, setUserGames] = useState<UserGamesType>(games);
+  const [template, setTemplate] = useState<string>("repeat(10, 1fr)");
+  const [slicedUserGames, setSlicedUserGames] = useState<UserGamesType>();
 
-  const handleShowMoreClick = async () => {};
+  const handleShowMoreClick = (i: number) => {
+    setTabIndex(i);
+  };
+
+  useWindowResizeAction(() => {
+    const temp = structuredClone(userGames);
+    console.log(window.screenX)
+    if (window.screenX < screenGt) {
+      setTemplate("repeat(6, 1fr)");
+      Object.keys(userGames).forEach((key) => {
+        const tempKey = key as categoriesType;
+        temp[tempKey] = userGames[tempKey].slice(0, 4);
+      });
+      setSlicedUserGames(temp);
+    }
+  });
 
   return (
     <>
@@ -71,33 +100,37 @@ const UserInfo: FC<UserInfoProps> = ({ games, userName, _id: id, avatar }) => {
           </div>
         </div>
       </div>
-      <div className={styles.content__bottom}>
-        {userListCategories.map(
-          (category) =>
-            !!userGames[category].length && (
-              <div key={category} className={styles.games}>
-                <h3 className={styles.games_title}>
-                  {category.charAt(0).toUpperCase() + category.slice(1)}
-                </h3>
-                <div className={styles.games_list}>
-                  {userGames[category].slice(0, 9).map((game, i) => (
-                    <div key={i} className={styles.games_list__item}>
-                      <GameCard game={game} />
-                    </div>
-                  ))}
-                  {userGames[category].length > 10 && (
-                    <Button
-                      className={styles.more}
-                      onClick={handleShowMoreClick}
-                    >
-                      Show More
-                    </Button>
-                  )}
+      {/* <div className={styles.content__bottom}>
+        {!!slicedUserGames &&
+          userListCategories.map(
+            (category, i) =>
+              !!slicedUserGames[category].length && (
+                <div key={category} className={styles.games}>
+                  <h3 className={styles.games_title}>
+                    {commonUtils.upFL(category)}
+                  </h3>
+                  <div
+                    className={styles.games_list}
+                    style={{ gridTemplateColumns: template }}
+                  >
+                    {slicedUserGames[category].map((game, i) => (
+                      <div key={i} className={styles.games_list__item}>
+                        <GameCard game={game} />
+                      </div>
+                    ))}
+                    {userGames[category].length > 10 && (
+                      <Button
+                        className={styles.more}
+                        onClick={() => handleShowMoreClick(i + 1)}
+                      >
+                        Show More
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )
-        )}
-      </div>
+              )
+          )}
+      </div> */}
     </>
   );
 };

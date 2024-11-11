@@ -3,35 +3,28 @@
   color: $whiteTextColor;
   justify-content: center;
   padding: 50px 20px 50px 20px;
+
   .content {
     padding: 0 20px 20px 20px;
     width: 100%;
     background: #09121c;
     border-radius: 20px;
     height: 100%;
-    .tabs {
-      width: 100%;
-      &__body {
-        display: flex;
-        flex-direction: column;
+
+    .games {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 20px;
+
+      &__game {
+        display: grid;
+        gap: 3px;
       }
-      &__buttons {
-        width: 100%;
-        margin-inline: auto;
-      }
-      &__button {
-        all: unset;
-        flex-grow: 1;
-        background: none;
-        transition: 0.2s all;
-        height: 50px;
-        cursor: pointer;
-        text-align: center;
-        border-bottom: $lightBg 1px solid;
-        &:hover {
-          border-bottom: $accent 1px solid;
-          transition: 0.2s all;
-        }
+
+      &__title {
+        @include textEllipsis;
+        text-align: center
+
       }
     }
   }

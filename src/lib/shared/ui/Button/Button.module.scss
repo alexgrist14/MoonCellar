@@ -15,7 +15,7 @@
 
   padding-inline: 12px;
 
-  &:hover {
+  &:hover:not(&_fancyColor) {
     filter: brightness(0.8);
   }
 
@@ -59,9 +59,30 @@
     cursor: not-allowed !important;
   }
 
-  &_active {
-    box-shadow: $buttonShadow;
-    filter: brightness(0.8);
+  // &_active:not(&_fancyColor) {
+  //   box-shadow: $buttonShadow;
+  //   filter: brightness(0.8);
+  // }
+  // &_active &_fancyColor, &:hover &_fancyColor {
+  //   border-bottom: $accent 1px solid;
+  //     transition: 0.2s all;
+  // }
+
+  &_fancyColor {
+    flex-grow: 1;
+    background: none;
+    transition: 0.2s all;
+    height: 50px;
+    text-align: center;
+    border: 0;
+    border-radius: 0;
+    border-bottom: $lightBg 1px solid;
+    
+    &:hover,
+    &_active {
+      border-bottom: $accent 1px solid;
+      transition: 0.2s all;
+    }
   }
 
   &__tooltip {

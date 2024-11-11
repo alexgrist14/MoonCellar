@@ -6,7 +6,8 @@ export type IButtonColor =
   | "red"
   | "green"
   | "greenBorder"
-  | "transparent";
+  | "transparent"
+  | "fancy";
 
 export interface IButtonGroupItem {
   title: string | ReactNode;

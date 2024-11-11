@@ -1,8 +1,8 @@
 import {categoriesType} from "../types/user.type";
 
 export const userListCategories: categoriesType[] = [
-  'completed',
   'playing',
+  'completed',
   'wishlist',
   'backlog',
   'dropped',

@@ -85,6 +85,7 @@ export const Button = forwardRef(
           className,
           {
             [styles.button_active]: active,
+            [styles[`button_${color}Color_active`]]: active,
             [styles.button_disabled]: disabled,
           }
         )}

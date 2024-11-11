@@ -41,35 +41,6 @@
       }
     }
   }
-  .history {
-    display: flex;
-    flex-direction: column;
-    width: 200px;
-    border-radius: $radius;
-    gap: 10px;
-    &_link {
-      @include profileTitle();
-    }
-    &_list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      width: 100%;
-      border-radius: inherit;
-      list-style: none;
-      padding-left: 5px;
-      li {
-        height: 64px;
-        display: flex;
-        gap: 5px;
-        border-radius: $radius;
-        .card {
-          width: 40px;
-          border-radius: $radius;
-        }
-      }
-    }
-  }
   .profile {
     &_info {
       display: flex;
@@ -132,21 +103,22 @@
   margin-top: 20px;
   gap: 20px;
   justify-content: space-between;
+
   .games {
     display: flex;
     width: 100%;
     flex-direction: column;
     border-radius: $radius;
+
     &_title {
       @include profileTitle();
     }
+
     &_list {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
       padding-top: 20px;
       gap: 30px;
-      @include mediaMd() {
-      }
+
       &__item {
         max-width: 150px;
         width: 100%;

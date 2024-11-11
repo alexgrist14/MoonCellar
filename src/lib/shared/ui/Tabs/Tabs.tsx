@@ -30,7 +30,7 @@ export const Tabs: FC<ITabs> = ({
   const [tabIndex, setTabIndex] = useState(
     defaultTabIndex > contents.length - 1
       ? contents.length - 1
-      : defaultTabIndex,
+      : defaultTabIndex
   );
 
   useEffect(() => {
@@ -54,6 +54,7 @@ export const Tabs: FC<ITabs> = ({
               className={cl(styles.tabs__link, content.className)}
             >
               <Button
+                color="fancy"
                 style={content.style}
                 className={cl({
                   [styles.tabs__button_adaptive]: isAdaptive,
@@ -70,6 +71,7 @@ export const Tabs: FC<ITabs> = ({
             </Link>
           ) : (
             <Button
+              color="fancy"
               className={cl(styles.tabs__button, content.className, {
                 [styles.tabs__button_adaptive]: isAdaptive,
               })}
