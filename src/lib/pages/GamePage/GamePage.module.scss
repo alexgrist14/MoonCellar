@@ -20,11 +20,11 @@
   &__cover {
     aspect-ratio: 528/704;
     border-radius: $radius $radius 0 0;
-    overflow: hidden;
     background: $lightBg;
     max-width: 320px;
 
     & > img {
+      border-radius: $radius $radius 0 0;
       width: 100%;
       height: 100%;
       object-position: center;

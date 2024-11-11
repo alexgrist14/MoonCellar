@@ -102,6 +102,7 @@ $fontMain: "General", sans-serif;
   -webkit-box-orient: vertical;
   line-clamp: $count;
   overflow: hidden;
+  height: fit-content;
 }
 
 @mixin textEllipsis {

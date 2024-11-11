@@ -86,7 +86,6 @@ export const GauntletPage: FC = () => {
   }, [isRoyal]);
 
   useEffect(() => {
-    console.log(isLoading, isRoyal);
     if (isLoading && !isRoyal) {
       getIGDBGames();
     }
@@ -95,7 +94,7 @@ export const GauntletPage: FC = () => {
   useEffect(() => {
     isRoyal &&
       !!royalGames &&
-      setSegments(royalGames.map((game, i) => game.id + "_" + i));
+      setSegments(royalGames.map((game, i) => game._id + "_" + i));
   }, [isRoyal, royalGames, setSegments]);
 
   useEffect(() => {

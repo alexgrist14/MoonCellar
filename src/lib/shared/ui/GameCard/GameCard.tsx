@@ -32,17 +32,16 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
           href={`/games/${game.slug}`}
           onClick={() => modal.close()}
         >
+          <span>
+            {!!game.platforms?.length &&
+              game.platforms.map((platform) => platform.name).join(", ")}
+          </span>
           <p>
             {game.name}
             {!!game.release_dates?.length
               ? ` (${game.release_dates?.[0].y})`
               : ""}
           </p>
-          {!!game.platforms?.length && (
-            <span>
-              {game.platforms.map((platform) => platform.name).join(", ")}
-            </span>
-          )}
         </Link>
         <GameControls
           isWithoutTooltips
