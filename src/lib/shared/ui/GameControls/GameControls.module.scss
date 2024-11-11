@@ -16,7 +16,7 @@
     pointer-events: none;
   }
 
-  &__action {
+  div &__action {
     @include flexCenter;
     padding: 2px;
     width: 100%;
