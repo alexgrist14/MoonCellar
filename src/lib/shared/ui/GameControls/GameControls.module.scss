@@ -1,17 +1,22 @@
 .controls {
   width: 100%;
-  transition: 0.3s;
+  transition: opacity 0.3s, transform 0.3s;
   background-color: $lightBg;
   border-radius: 0 0 $radius $radius;
-  border-top: 1px solid $bgAlt;
   display: flex;
+  overflow: hidden;
+  z-index: 2;
+
+  &_overflow {
+    border-radius: 0 0 0 $radius;
+  }
 
   &_disabled {
     opacity: 0.7;
     pointer-events: none;
   }
 
-  &__action {
+  div &__action {
     @include flexCenter;
     padding: 2px;
     width: 100%;
@@ -23,12 +28,7 @@
 
     &:hover:not(:disabled),
     &_active {
-      background-color: rgba($bgAlt, 0.7);
-
-      & g {
-        transition: 0.3s;
-        stroke: $accent;
-      }
+      background-color: $bgAlt;
     }
 
     &:disabled {
@@ -40,6 +40,15 @@
   &__icon {
     width: 100%;
     height: 100%;
+
+    &:hover,
+    &_active {
+      & path,
+      & g {
+        transition: 0.3s;
+        stroke: $blue;
+      }
+    }
   }
 
   &__ratings {
@@ -48,14 +57,15 @@
     height: 100%;
     position: absolute;
     opacity: 0;
-    transition: 0.3s;
-    z-index: 2;
+    transition: opacity 0.3s, transform 0.3s;
     pointer-events: none;
     background-color: inherit;
-    border-radius: 0 $radius 0 0;
+    border-radius: $radius $radius $radius 0;
     border-left: 1px solid $bgAlt;
     overflow: hidden;
-    transform: translateX(5%);
+    transform: translateX(-5%);
+    right: 0;
+    bottom: 0;
 
     &_active {
       transform: translateX(0);
@@ -64,35 +74,18 @@
     }
   }
 
-  &__number {
-    position: absolute;
-    height: 60%;
-    width: 100%;
-    margin-top: -1px;
-
-    &_active {
-      & path {
-        fill: $bg;
-      }
-    }
-  }
-
   &__rating {
     @include flexCenter;
-    transition: 0.3s;
+    transition: opacity 0.3s, transform 0.3s;
     position: relative;
     cursor: pointer;
     flex: 1;
     padding: 2px;
+    aspect-ratio: 1;
 
     &:hover:not(:disabled),
     &_active {
       background-color: $bgAlt;
-
-      & g {
-        transition: 0.3s;
-        stroke: $accent;
-      }
     }
 
     &:disabled {
@@ -101,18 +94,33 @@
     }
   }
 
+  &__number {
+    position: absolute;
+    height: 40%;
+    width: fit-content;
+    top: 20%;
+    left: 40%;
+    transition: 0.3s;
+    fill: $whiteTextColor;
+
+    &_active path {
+      transition: 0.3s;
+      stroke: $accent;
+      fill: $accent;
+    }
+  }
+
   &__heart {
     width: inherit;
     height: 100%;
+    transition: 0.3s;
+    stroke: $accent;
+    fill: $whiteTextColor;
 
-    & path {
-      stroke: $red;
-    }
-
-    &_active {
-      & path {
-        fill: $red;
-      }
+    &_active path {
+      transition: 0.3s;
+      stroke: $accent;
+      fill: $accent;
     }
   }
 }

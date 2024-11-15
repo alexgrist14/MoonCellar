@@ -1,11 +1,11 @@
 .container {
-  height: calc(100vh - 100px);
-  padding: 50px;
+  height: calc(100vh - 200px);
+  padding: 30px;
   display: grid;
-  grid-template-rows: 70% 1fr;
-  gap: 30px;
+  grid-template-rows: 60% 1fr;
+  gap: 15px;
   margin-inline: auto;
-  min-width: 500px;
+  justify-items: center;
 
   @include mediaMax($screenSm) {
     min-width: auto;
@@ -16,121 +16,8 @@
 
   .winner {
     display: grid;
-    grid-template-columns: 150px 1fr;
     gap: 10px;
-    height: fit-content;
-    max-width: 600px;
-    justify-content: center;
-    align-items: flex-start;
     color: white;
-
-    @include mediaMax($screenSm) {
-      grid-template-columns: 120px 1fr;
-    }
-
-    &__buttons {
-      display: flex;
-      background-color: #2e353b;
-      width: 100%;
-      position: absolute;
-      bottom: 0;
-      border-radius: 0 0 10px 10px;
-      opacity: 0;
-      pointer-events: none;
-      overflow: hidden;
-      transition: 0.4s;
-
-      &_active {
-        opacity: 0.9;
-        pointer-events: all;
-      }
-
-      & > button,
-      & > a {
-        padding: 10px;
-        color: white;
-        outline: 0;
-        border: 0;
-        transition: 0.3s;
-        cursor: pointer;
-        background-color: transparent;
-        width: 100%;
-        user-select: none;
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-
-        &:hover {
-          background-color: #222222;
-        }
-      }
-    }
-
-    &__container {
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 24px;
-      background: black;
-      width: 500px;
-      text-align: center;
-      aspect-ratio: 8/2;
-      border-radius: 10px;
-      border: 2px solid black;
-      box-shadow: black 0 0 20px;
-      pointer-events: none;
-      max-width: 500px;
-      width: 100%;
-      transition: 0.3s;
-
-      &_active {
-        pointer-events: all;
-      }
-    }
-
-    &__image {
-      border-radius: 10px 0 0 10px;
-      height: auto;
-      width: 100%;
-      opacity: 0;
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: cover;
-      transition: 0.3s;
-      max-width: 0;
-
-      &_active {
-        opacity: 1;
-        max-width: 30%;
-      }
-    }
-
-    &__content {
-      width: 100%;
-      height: fit-content;
-      min-height: 100%;
-      display: flex;
-      gap: 10px;
-      transition: 0.3s;
-    }
-
-    &__link {
-      text-align: center;
-      color: white;
-    }
-
-    &__text {
-      display: grid;
-      width: 100%;
-      padding: 10px;
-      gap: 10px;
-      height: fit-content;
-    }
-
-    &__platform {
-      font-size: 14px;
-    }
   }
 }
 

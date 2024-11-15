@@ -9,7 +9,7 @@ import { Button } from "@/src/lib/shared/ui/Button";
 
 export const WheelContainer: FC = () => {
   const { winner } = useCommonStore();
-  const { setRoyalGames, royalGames } = useSelectedStore();
+  const { setRoyalGames, royalGames, isRoyal } = useSelectedStore();
 
   const { isFinished, segments, isLoading } = useStatesStore();
 
@@ -53,23 +53,27 @@ export const WheelContainer: FC = () => {
       {!!winner && (
         <div className={styles.winner}>
           <GameCard game={winner} />
-          <Button
-            onClick={() => {
-              !royalGames?.some((game) => game._id === winner._id)
-                ? setRoyalGames([
-                    ...(!!royalGames?.length ? royalGames : []),
-                    winner,
-                  ])
-                : setRoyalGames(
-                    royalGames?.filter((game) => game._id !== winner._id) || [],
-                  );
-            }}
-          >
-            {royalGames?.some((game) => game._id === winner._id)
-              ? "Remove from"
-              : "Add to"}{" "}
-            royal games
-          </Button>
+          {!isRoyal && (
+            <Button
+              style={{ height: "30px" }}
+              onClick={() => {
+                !royalGames?.some((game) => game._id === winner._id)
+                  ? setRoyalGames([
+                      ...(!!royalGames?.length ? royalGames : []),
+                      winner,
+                    ])
+                  : setRoyalGames(
+                      royalGames?.filter((game) => game._id !== winner._id) ||
+                        []
+                    );
+              }}
+            >
+              {royalGames?.some((game) => game._id === winner._id)
+                ? "Remove from"
+                : "Add to"}{" "}
+              royal games
+            </Button>
+          )}
         </div>
       )}
     </div>

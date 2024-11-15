@@ -32,6 +32,7 @@ export const GameControls: FC<IGameControlsProps> = ({
 
   const [isLoading, setIsLoading] = useState(false);
   const [isRatingActive, setIsRatingActive] = useState(false);
+  const [hoverIndex, setHoverIndex] = useState<number>(-1);
 
   const addToList = (name: categoriesType) => {
     if (!profile) return;
@@ -79,17 +80,19 @@ export const GameControls: FC<IGameControlsProps> = ({
     <div
       className={classNames(styles.controls, className, {
         [styles.controls_disabled]: !profile || isLoading,
+        [styles.controls_overflow]: isRatingActive,
       })}
       style={style}
       ref={controlsRef}
     >
       <div
         ref={ratingsRef}
+        onMouseOut={() => setHoverIndex(-1)}
         style={{
-          bottom: `calc(${controlsRef.current?.clientHeight}px + 1px)`,
-          left: `calc(100% - ${controlsRef.current?.clientHeight}px)`,
-          height: `calc(100% - ${controlsRef.current?.clientHeight}px - 1px)`,
-          width: `${controlsRef.current?.clientHeight}px`,
+          // bottom: `calc(${ratingButtonRef.current?.offsetHeight}px)`,
+          right: `calc(-${ratingButtonRef.current?.offsetWidth}px)`,
+          // height: `calc(${ratingButtonRef.current?.offsetHeight}px)`,
+          width: `calc(${ratingButtonRef.current?.offsetWidth}px)`,
         }}
         className={classNames(styles.controls__ratings, {
           [styles.controls__ratings_active]: isRatingActive,
@@ -100,7 +103,11 @@ export const GameControls: FC<IGameControlsProps> = ({
           .map((_, i) => (
             <div
               key={i}
-              className={styles.controls__rating}
+              className={classNames(styles.controls__rating, {
+                [styles.controls__rating_active]:
+                  (!!rating && rating.rating >= i + 1) || i <= hoverIndex,
+              })}
+              onMouseOver={() => setHoverIndex(i)}
               onClick={() => {
                 if (!profile) return;
                 setIsRatingActive(false);
@@ -133,7 +140,7 @@ export const GameControls: FC<IGameControlsProps> = ({
                   [styles.controls__heart_active]:
                     !!rating && rating.rating >= i + 1,
                 })}
-                icon="iconamoon:heart-thin"
+                icon="f7:moon-circle"
               />
               <Icon
                 className={classNames(styles.controls__number, {
@@ -159,10 +166,7 @@ export const GameControls: FC<IGameControlsProps> = ({
           [styles.controls__action_active]: isPlayed,
         })}
       >
-        <Icon
-          className={styles.controls__icon}
-          icon="iconamoon:play-circle-thin"
-        />
+        <Icon className={styles.controls__icon} icon="iconamoon:play-circle" />
       </Button>
       <Button
         onClick={() =>
@@ -182,7 +186,7 @@ export const GameControls: FC<IGameControlsProps> = ({
       >
         <Icon
           className={styles.controls__icon}
-          icon="iconamoon:check-circle-1-thin"
+          icon="iconamoon:check-circle-1"
         />
       </Button>
       <Button
@@ -203,7 +207,7 @@ export const GameControls: FC<IGameControlsProps> = ({
       >
         <Icon
           className={styles.controls__icon}
-          icon="iconamoon:sign-plus-circle-thin"
+          icon="iconamoon:sign-plus-circle"
         />
       </Button>
       <Button
@@ -224,7 +228,7 @@ export const GameControls: FC<IGameControlsProps> = ({
       >
         <Icon
           className={styles.controls__icon}
-          icon="iconamoon:menu-kebab-horizontal-circle-thin"
+          icon="iconamoon:menu-kebab-horizontal-circle"
         />
       </Button>
       <Button
@@ -238,14 +242,14 @@ export const GameControls: FC<IGameControlsProps> = ({
             : `${isDropped ? "Remove from" : "Add to"} dropped`
         }
         className={classNames(styles.controls__action, {
-          [styles.controls__action_active]: profile?.games?.dropped.some(
-            (id) => game._id === id
-          ),
+          [styles.controls__action_active]: isDropped,
         })}
       >
         <Icon
-          className={styles.controls__icon}
-          icon="iconamoon:close-circle-1-thin"
+          className={classNames(styles.controls__icon, {
+            [styles.controls__icon_active]: isDropped,
+          })}
+          icon="iconamoon:close-circle-1"
         />
       </Button>
       <Button
@@ -259,11 +263,10 @@ export const GameControls: FC<IGameControlsProps> = ({
         })}
       >
         <Icon
-          style={{ width: "100%" }}
           className={classNames(styles.controls__heart, {
             [styles.controls__heart_active]: !!rating,
           })}
-          icon="iconamoon:heart-thin"
+          icon="f7:moon-circle"
         />
         {!!rating?.rating && (
           <Icon
