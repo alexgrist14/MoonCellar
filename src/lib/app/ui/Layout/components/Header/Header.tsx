@@ -82,7 +82,7 @@ export const Header: FC = () => {
               height={40}
               alt="profile"
             />
-            <div
+            {/* <div
               className={`${styles.dropdown} ${isMenuActive && styles.active}`}
             >
               <Link className={styles.dropdown_item} href={`/user/${profile?.userName}`}>
@@ -98,7 +98,7 @@ export const Header: FC = () => {
               >
                 Logout
               </Link>
-            </div>
+            </div> */}
           </div>
         ) : (
           <div onClick={handleProfileClick}>
