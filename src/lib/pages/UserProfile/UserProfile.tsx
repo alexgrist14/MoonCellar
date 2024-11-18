@@ -10,6 +10,7 @@ import { API_URL } from "../../shared/constants";
 import { userListCategories } from "../../shared/constants/user.const";
 import { GameCard } from "../../shared/ui/GameCard";
 import { commonUtils } from "../../shared/utils/common";
+import { useSearchParams } from "next/navigation";
 
 interface UserProfileProps {
   userName: string;
@@ -28,6 +29,10 @@ const UserProfile: FC<UserProfileProps> = ({
     profilePicture ? `${API_URL}/photos/${profilePicture}` : ""
   );
   const [tabIndex, setTabIndex] = useState(0);
+
+  const searchParams = useSearchParams()
+  const search = searchParams.get("search");
+  console.log(search);
 
   const tabs: ITabContent[] = [
     {
