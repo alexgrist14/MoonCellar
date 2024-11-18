@@ -7,18 +7,17 @@ import { IGDBApi } from "../../shared/api";
 import { axiosUtils } from "../../shared/utils/axios";
 import { dateRegions, getImageLink } from "../../shared/constants";
 import { Slideshow } from "../../shared/ui/Slideshow";
-import { commonUtils } from "../../shared/utils/common";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { Button } from "../../shared/ui/Button";
 import Link from "next/link";
-import { useSelectedStore } from "../../shared/store/selected.store";
 import { Cover } from "../../shared/ui/Cover";
 import { GameControls } from "../../shared/ui/GameControls";
+import { useGauntletFiltersStore } from "../../shared/store/gauntlet-filters.store";
 
 export const GamePage: FC = () => {
   const { query } = useRouter();
 
-  const { royalGames, setRoyalGames } = useSelectedStore();
+  const { royalGames, setRoyalGames } = useGauntletFiltersStore();
 
   const [game, setGame] = useState<IGDBGame>();
 
@@ -42,7 +41,7 @@ export const GamePage: FC = () => {
               setRoyalGames(
                 royalGames?.some((royal) => royal._id === game._id)
                   ? royalGames.filter((royal) => royal._id !== game._id)
-                  : [...(!!royalGames?.length ? royalGames : []), game],
+                  : [...(!!royalGames?.length ? royalGames : []), game]
               );
             }}
           >

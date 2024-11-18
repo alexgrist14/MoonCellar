@@ -3,12 +3,12 @@ import styles from "./ConsolesList.module.scss";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import { IGDBList, RoyalList } from "@/src/lib/features/main";
 import { IGDBApi } from "@/src/lib/shared/api";
-import { useSelectedStore } from "@/src/lib/shared/store/selected.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
+import { useGauntletFiltersStore } from "@/src/lib/shared/store/gauntlet-filters.store";
 
 export const ConsolesList: FC = () => {
-  const { isRoyal, royalGames, setRoyal } = useSelectedStore();
+  const { isRoyal, royalGames, setRoyal } = useGauntletFiltersStore();
   const { isLoading } = useStatesStore();
   const { setGenres, setGameModes, setSystems } = useCommonStore();
 
@@ -31,7 +31,7 @@ export const ConsolesList: FC = () => {
             {!!royalGames?.length ? ` (Games: ${royalGames.length}):` : ":"}
           </span>
           <ToggleSwitch
-            defaultValue={isRoyal ? "right" : "left"}
+            value={isRoyal ? "right" : "left"}
             clickCallback={() => setRoyal(!isRoyal)}
             isDisabled={isLoading}
           />

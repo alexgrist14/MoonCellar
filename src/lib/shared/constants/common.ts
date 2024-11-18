@@ -5,9 +5,8 @@ export const REFRESH_TOKEN = "refreshMoonToken";
 
 export const links = [
   { name: "Home", link: "/" },
-  { name: "Gauntlet", link: "/gauntlet" },
   { name: "Games", link: "/games" },
-  { name: "Profile", link: "/user" },
+  { name: "Gauntlet", link: "/gauntlet" },
 ];
 
 export const getImageLink = (
@@ -23,7 +22,7 @@ export const getImageLink = (
     | "logo_med"
     | "720p"
     | "1080p",
-  multiply?: number,
+  multiply?: number
 ) => {
   return (
     "https:" + url.replace("thumb", !!multiply ? `${size}_${multiply}x` : size)

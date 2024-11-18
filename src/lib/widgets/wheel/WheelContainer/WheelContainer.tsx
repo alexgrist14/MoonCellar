@@ -4,12 +4,12 @@ import { WheelComponent } from "@/src/lib/features/wheel";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { GameCard } from "@/src/lib/shared/ui/GameCard";
-import { useSelectedStore } from "@/src/lib/shared/store/selected.store";
 import { Button } from "@/src/lib/shared/ui/Button";
+import { useGauntletFiltersStore } from "@/src/lib/shared/store/gauntlet-filters.store";
 
 export const WheelContainer: FC = () => {
   const { winner } = useCommonStore();
-  const { setRoyalGames, royalGames, isRoyal } = useSelectedStore();
+  const { setRoyalGames, royalGames, isRoyal } = useGauntletFiltersStore();
 
   const { isFinished, segments, isLoading } = useStatesStore();
 

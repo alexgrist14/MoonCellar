@@ -1,13 +1,13 @@
 import { FC } from "react";
-import styles from "./IGDBList.module.scss";
-import { ExtendedSelector } from "@/src/lib/shared/ui/ExtendedSelector";
-import { ExtendedRange } from "@/src/lib/shared/ui/ExtendedRange";
-import { Input } from "@/src/lib/shared/ui/Input";
-import { useCommonStore } from "@/src/lib/shared/store/common.store";
-import { useStatesStore } from "@/src/lib/shared/store/states.store";
-import { useGauntletFiltersStore } from "@/src/lib/shared/store/gauntlet-filters.store";
+import styles from "./Filters.module.scss";
+import { useGamesFiltersStore } from "../../store/games-filters.store";
+import { useCommonStore } from "../../store/common.store";
+import { useStatesStore } from "../../store/states.store";
+import { Input } from "../Input";
+import { ExtendedSelector } from "../ExtendedSelector";
+import { ExtendedRange } from "../ExtendedRange";
 
-export const IGDBList: FC = () => {
+export const Filters: FC = () => {
   const { gameModes, genres, systems } = useCommonStore();
   const { isLoading, isPlatformsLoading } = useStatesStore();
   const {
@@ -27,10 +27,10 @@ export const IGDBList: FC = () => {
     excludedGameModes,
     excludedGenres,
     excludedSystems,
-  } = useGauntletFiltersStore();
+  } = useGamesFiltersStore();
 
   return (
-    <div className={styles.consoles__igdb}>
+    <div className={styles.filters}>
       <Input
         containerStyles={{ width: "100%" }}
         placeholder="Enter name of the game..."

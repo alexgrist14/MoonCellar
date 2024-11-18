@@ -2,8 +2,8 @@ import { FC, useEffect, useRef, useState } from "react";
 import styles from "./WheelComponent.module.scss";
 import classNames from "classnames";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
-import { useSelectedStore } from "@/src/lib/shared/store/selected.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
+import { useGauntletFiltersStore } from "@/src/lib/shared/store/gauntlet-filters.store";
 
 interface WheelComponentProps {
   segColors: string[];
@@ -27,7 +27,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   time = 5,
 }) => {
   const { setWinner } = useCommonStore();
-  const { games, isRoyal, royalGames } = useSelectedStore();
+  const { games, isRoyal, royalGames } = useGauntletFiltersStore();
 
   const {
     isFinished,

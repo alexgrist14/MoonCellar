@@ -45,8 +45,11 @@
   &__search {
     @include flexCenter;
     padding: 10px 5px;
-    pointer-events: all;
     background-color: $lightBg;
+
+    &_active {
+      pointer-events: all;
+    }
 
     & input {
       font-style: normal;

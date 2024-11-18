@@ -1,6 +1,5 @@
 import React, {
   ButtonHTMLAttributes,
-  FC,
   forwardRef,
   ReactNode,
   useEffect,
