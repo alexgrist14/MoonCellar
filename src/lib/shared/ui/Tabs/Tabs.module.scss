@@ -4,6 +4,11 @@
   width: 100%;
   gap: 50px;
 
+  // &__link {
+  //   width: 100%;
+  //   flex: 1;
+  // }
+
   &__buttons {
     display: flex;
     max-width: calc(100vw - 160px);
@@ -29,6 +34,7 @@
   &__link > button {
     border-radius: 0;
     margin-left: -1px;
+    //width: 100%;
   }
 
   &__button {
@@ -36,6 +42,5 @@
       height: max(1.8vw, 18px);
       font-size: max(0.8vw, 12px);
     }
-    
   }
 }

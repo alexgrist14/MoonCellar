@@ -14,4 +14,5 @@ export interface IUser {
   gamesRating: IGamesRating[];
   logs: ILogs[];
   profilePicture: string;
+  followings: string[];
 }

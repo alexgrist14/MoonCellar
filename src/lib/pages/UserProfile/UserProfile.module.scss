@@ -23,8 +23,7 @@
 
       &__title {
         @include textEllipsis;
-        text-align: center
-
+        text-align: center;
       }
     }
   }

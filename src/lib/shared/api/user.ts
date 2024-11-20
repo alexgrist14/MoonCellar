@@ -1,7 +1,7 @@
 import { IUser } from "../types/auth";
 import { API_URL } from "../constants";
 import agent from "./agent";
-import { categoriesType, IUserGames } from "../types/user.type";
+import { categoriesType, IFollowings, IUserGames } from "../types/user.type";
 import { IGDBGame } from "../types/igdb";
 
 const USER_URL = `${API_URL}/user`;
@@ -65,6 +65,18 @@ const removeGameRating = (userId: string, gameId: number) => {
   return agent.delete<IUser>(`${USER_URL}/rating/${userId}/${gameId}`);
 };
 
+const getUserFollowings = (userId: string)=>{
+  return agent.get<IFollowings>(`${USER_URL}/followings/${userId}`)
+}
+
+const addUserFollowing = (userId: string, followingId: string)=>{
+  return agent.patch<IUser>(`${USER_URL}/followings/${userId}/${followingId}`);
+}
+
+const removeUserFollowing = (userId: string, followingId: string)=>{
+  return agent.delete<IUser>(`${USER_URL}/followings/${userId}/${followingId}`)
+}
+
 export const userAPI = {
   getById,
   getByName,
@@ -75,4 +87,7 @@ export const userAPI = {
   getUserGames,
   addGameRating,
   removeGameRating,
+  getUserFollowings,
+  addUserFollowing,
+  removeUserFollowing
 };
