@@ -12,6 +12,9 @@ type IState = {
   selectedGeneration?: number;
   selectedRating?: number;
   searchQuery?: string;
+  excludedSystems?: IGDBPlatform[];
+  excludedGenres?: IGDBGenre[];
+  excludedGameModes?: IGDBDefault[];
 };
 
 type IAction = {
@@ -24,9 +27,12 @@ type IAction = {
   setSelectedRating: (selectedRating: number) => void;
   setSelectedGeneration: (selectedGeneration: number) => void;
   setSearchQuery: (searchQuery: string) => void;
+  setExcludedGameModes: (gameModes: IGDBDefault[]) => void;
+  setExcludedSystems: (excludedSystems: IGDBPlatform[]) => void;
+  setExcludedGenres: (excludedGenres: IGDBGenre[]) => void;
 };
 
-export const useSelectedStore = create<IState & IAction>()(
+export const useGamesFiltersStore = create<IState & IAction>()(
   devtools(
     persist(
       (set) => ({
@@ -40,8 +46,11 @@ export const useSelectedStore = create<IState & IAction>()(
         setSelectedGenres: (selectedGenres) => set({ selectedGenres }),
         setSelectedRating: (selectedRating) => set({ selectedRating }),
         setSelectedSystems: (selectedSystems) => set({ selectedSystems }),
+        setExcludedGameModes: (excludedGameModes) => set({ excludedGameModes }),
+        setExcludedGenres: (excludedGenres) => set({ excludedGenres }),
+        setExcludedSystems: (excludedSystems) => set({ excludedSystems }),
       }),
-      { name: "selected" },
-    ),
-  ),
+      { name: "gamesFilters" }
+    )
+  )
 );

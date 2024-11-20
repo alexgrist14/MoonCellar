@@ -1,11 +1,11 @@
 import { FC } from "react";
 import styles from "./RoyalList.module.scss";
 import { Button } from "@/src/lib/shared/ui/Button";
-import { useSelectedStore } from "@/src/lib/shared/store/selected.store";
 import Link from "next/link";
+import { useGauntletFiltersStore } from "@/src/lib/shared/store/gauntlet-filters.store";
 
 export const RoyalList: FC = () => {
-  const { royalGames, setRoyalGames } = useSelectedStore();
+  const { royalGames, setRoyalGames } = useGauntletFiltersStore();
 
   return (
     <div className={styles.consoles__royal}>
@@ -25,7 +25,7 @@ export const RoyalList: FC = () => {
                 <Button
                   onClick={() =>
                     setRoyalGames(
-                      royalGames.filter((_game) => game._id !== _game._id),
+                      royalGames.filter((_game) => game._id !== _game._id)
                     )
                   }
                 >

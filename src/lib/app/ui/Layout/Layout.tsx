@@ -45,7 +45,7 @@ export const Layout: FC<ILayoutProps> = ({ children }) => {
     <div className={styles.layout}>
       <Header />
       {children}
-      <ExpandMenu position="right" titleOpen="Menu">
+      <ExpandMenu position="right" titleOpen="Navigation">
         <Navigation />
       </ExpandMenu>
     </div>

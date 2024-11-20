@@ -5,10 +5,9 @@ import { IGDBApi } from "../../shared/api";
 import { WheelContainer } from "../../widgets/wheel";
 import { getSegments } from "../../shared/utils/getSegments";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
-import { useSelectedStore } from "../../shared/store/selected.store";
-import { useExcludedStore } from "../../shared/store/excluded.store";
 import { useStatesStore } from "../../shared/store/states.store";
 import { useCommonStore } from "../../shared/store/common.store";
+import { useGauntletFiltersStore } from "../../shared/store/gauntlet-filters.store";
 
 export const GauntletPage: FC = () => {
   const {
@@ -20,10 +19,11 @@ export const GauntletPage: FC = () => {
     searchQuery,
     royalGames,
     setGames,
-  } = useSelectedStore();
+    excludedGameModes,
+    excludedGenres,
+    excludedSystems,
+  } = useGauntletFiltersStore();
 
-  const { excludedGameModes, excludedGenres, excludedSystems } =
-    useExcludedStore();
   const { isLoading, setSegments, setStarted, setFinished, setLoading } =
     useStatesStore();
   const { setWinner, setExpanded } = useCommonStore();

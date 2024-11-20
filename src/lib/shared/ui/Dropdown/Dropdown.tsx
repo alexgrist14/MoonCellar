@@ -15,6 +15,7 @@ import { Button } from "../Button";
 import useCloseEvents from "../../hooks/useCloseEvents";
 import { Scrollbar } from "../Scrollbar";
 import { Checkbox } from "../Checkbox";
+import classNames from "classnames";
 
 interface IIndexedItem {
   value: string;
@@ -339,11 +340,15 @@ export const Dropdown: FC<IDropDownListProps> = ({
             transform: `translateY(${offset.current}px)`,
           }}
         >
-          <div className={styles.dropdown__placeholder}></div>
+          {!offset && <div className={styles.dropdown__placeholder}></div>}
           {(isWithSearch === undefined
             ? indexedList.length > 10
             : isWithSearch) && (
-            <div className={styles.dropdown__search}>
+            <div
+              className={classNames(styles.dropdown__search, {
+                [styles.dropdown__search_active]: isActive,
+              })}
+            >
               <input
                 ref={searchRef}
                 value={query}
