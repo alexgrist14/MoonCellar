@@ -15,6 +15,11 @@ interface IGameCardProps {
 
 export const GameCard: FC<IGameCardProps> = ({ game }) => {
   const [isHover, setIsHover] = useState(false);
+  const releaseYear = game.release_dates?.reduce(
+    (year: number | undefined, date) =>
+      !!date.y ? (!!year && date.y > year ? year : (year = date.y)) : year,
+    undefined
+  );
 
   return (
     <div
@@ -38,9 +43,7 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
           </span>
           <p>
             {game.name}
-            {!!game.release_dates?.length
-              ? ` (${game.release_dates?.[0].y})`
-              : ""}
+            {!!releaseYear ? ` (${releaseYear})` : ""}
           </p>
         </Link>
         <GameControls

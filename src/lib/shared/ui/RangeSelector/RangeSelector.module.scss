@@ -32,7 +32,6 @@
   height: 2px;
   border: 1px solid rgba($off, 1);
   border-radius: 3px;
-  margin-top: 1px;
 
   &__input {
     position: absolute;
@@ -44,11 +43,12 @@
     margin: 0;
     top: 0;
     cursor: pointer;
+    height: 5px;
+    margin-top: -2px;
   }
 
   &__pointer {
     position: absolute;
-    background-color: $on;
     height: 15px;
     border-radius: 50%;
     top: 50%;
@@ -56,6 +56,14 @@
     aspect-ratio: 1;
     cursor: pointer;
     transition: opacity 0.4s;
+
+    &_accent {
+      background-color: $accent;
+    }
+
+    &_green {
+      background-color: $on;
+    }
 
     &:hover,
     &_active {
@@ -65,10 +73,19 @@
 
   &__bar {
     position: absolute;
-    background-color: rgba($on, 1);
-    outline: 1px solid rgba($on, 1);
     border-radius: 3px;
     top: 0;
     height: 100%;
+    pointer-events: none;
+
+    &_accent {
+      background-color: rgba($accent, 1);
+      outline: 1px solid rgba($accent, 1);
+    }
+
+    &_green {
+      background-color: rgba($on, 1);
+      outline: 1px solid rgba($on, 1);
+    }
   }
 }

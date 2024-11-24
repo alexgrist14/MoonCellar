@@ -5,6 +5,7 @@
   border-radius: $radius;
   transition: all 0.3s;
   position: relative;
+  overflow: hidden;
 
   &__title {
     display: grid;

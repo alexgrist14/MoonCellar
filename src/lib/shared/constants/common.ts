@@ -1,7 +1,10 @@
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.mooncellar.space";
+export const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://api.mooncellar.space";
 
 export const ACCESS_TOKEN = "accessMoonToken";
 export const REFRESH_TOKEN = "refreshMoonToken";
+
+export const accentColor = "#6951ee";
 
 export const links = [
   { name: "Home", link: "/" },

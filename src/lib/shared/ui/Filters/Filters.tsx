@@ -6,8 +6,9 @@ import { useStatesStore } from "../../store/states.store";
 import { Input } from "../Input";
 import { ExtendedSelector } from "../ExtendedSelector";
 import { ExtendedRange } from "../ExtendedRange";
+import { Button } from "../Button";
 
-export const Filters: FC = () => {
+export const Filters: FC<{ callback?: () => void }> = ({ callback }) => {
   const { gameModes, genres, systems } = useCommonStore();
   const { isLoading, isPlatformsLoading } = useStatesStore();
   const {
@@ -32,10 +33,11 @@ export const Filters: FC = () => {
   return (
     <div className={styles.filters}>
       <Input
+        onKeyDown={(e) => e.key === "Enter" && !!callback && callback()}
         containerStyles={{ width: "100%" }}
         placeholder="Enter name of the game..."
         disabled={isLoading}
-        value={searchQuery}
+        value={searchQuery || ""}
         onChange={(e) => setSearchQuery(e.target.value)}
       />
       <ExtendedSelector
@@ -75,6 +77,9 @@ export const Filters: FC = () => {
           max={99}
         />
       </div>
+      <Button className={styles.filters__button} onClick={callback}>
+        Filter games
+      </Button>
     </div>
   );
 };

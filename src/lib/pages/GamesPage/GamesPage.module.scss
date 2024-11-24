@@ -1,4 +1,6 @@
 .page {
+  min-height: 100vh;
+
   &__games {
     padding: 50px 20px;
     display: grid;
@@ -20,5 +22,11 @@
     @include mediaSm {
       grid-template-columns: repeat(2, 1fr);
     }
+  }
+
+  &__loader {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 }

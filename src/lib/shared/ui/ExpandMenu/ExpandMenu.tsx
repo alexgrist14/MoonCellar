@@ -7,11 +7,9 @@ import {
   useState,
 } from "react";
 import styles from "./ExpandMenu.module.scss";
-import classNames from "classnames";
 import { Scrollbar } from "../Scrollbar";
 import { useCommonStore } from "../../store/common.store";
 import { useRouter } from "next/router";
-import { useWindowResizeAction } from "../../hooks";
 
 interface IExpandMenuProps
   extends Pick<HTMLAttributes<HTMLDivElement>, "children" | "id"> {
@@ -29,7 +27,7 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
 }) => {
   const { asPath } = useRouter();
   const expandRef = useRef<HTMLDivElement>(null);
-  const { expandPosition, isMobile, setExpandPosition, expanded } =
+  const { expandPosition, isMobile, setExpandPosition, expanded, setExpanded } =
     useCommonStore();
 
   const [isActive, setIsActive] = useState(false);
@@ -43,18 +41,9 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
   }, [isActive, setExpandPosition, position]);
 
   useEffect(() => {
-    if (expanded === "none") {
-      setIsActive(false);
-    } else {
-      setIsActive(position === expanded || expanded === "both");
-    }
-  }, [expanded, position]);
-
-  useEffect(() => {
     setIsActive(false);
   }, [asPath]);
 
-  // useCloseEvents([expandRef], () => setIsActive(false));
   useEffect(() => {
     const handler = () => {
       setScrollY(window.scrollY);
@@ -64,12 +53,18 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
     return () => document.removeEventListener("scroll", handler);
   }, []);
 
+  useEffect(() => {
+    if (expanded === "none") {
+      setIsActive(false);
+    } else {
+      setIsActive(position === expanded || expanded === "both");
+    }
+  }, [expanded, position]);
+
   return (
     <div
       ref={expandRef}
-      className={classNames(styles.menu, {
-        [styles.menu_active]: !isActive,
-      })}
+      className={styles.menu}
       style={{
         top: scrollY > 0 ? Math.max(0, 55 - scrollY) : "55px",
         pointerEvents: isNotExtendedMobile ? "none" : "auto",
@@ -78,11 +73,12 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
         gridTemplateColumns: position === "left" ? "1fr 5px" : "5px 1fr",
         gridTemplateAreas:
           position === "left" ? "'content expand'" : "'expand content'",
-        transform: !isActive
-          ? position === "right"
-            ? "translateX(calc(100% - 5px))"
-            : "translateX(calc(-100% + 5px)"
-          : "none",
+        transform:
+          expanded !== "both" && (expanded === "none" || expanded !== position)
+            ? position === "right"
+              ? "translateX(calc(100% - 5px))"
+              : "translateX(calc(-100% + 5px)"
+            : "unset",
       }}
       {...props}
     >
@@ -91,7 +87,18 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
       </Scrollbar>
       <div
         className={styles.menu__expand}
-        onClick={() => setIsActive(!isActive)}
+        onClick={() => {
+          if (expanded === "both")
+            return setExpanded(position === "left" ? "right" : "left");
+
+          setExpanded(
+            expanded !== "none" && expanded !== position
+              ? "both"
+              : expanded === "none" || expanded !== position
+              ? position
+              : "none"
+          );
+        }}
       >
         <div
           className={styles.menu__title}
@@ -102,16 +109,16 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
                   ? "0 0 0 8px"
                   : "0 0 8px 0"
                 : isActive
-                  ? "0 0 8px 0"
-                  : "0 0 0 8px",
+                ? "0 0 8px 0"
+                : "0 0 0 8px",
             transform: `translateX(${
               position === "left"
                 ? isActive
                   ? "-50%"
                   : "50%"
                 : isActive
-                  ? "50%"
-                  : "-50%"
+                ? "50%"
+                : "-50%"
             })`,
           }}
         >

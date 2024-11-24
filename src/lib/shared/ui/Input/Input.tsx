@@ -16,6 +16,7 @@ interface InputProps
     | "defaultValue"
     | "autoFocus"
     | "autoComplete"
+    | "onKeyDown"
     | "id"
     | "name"
   > {
@@ -33,7 +34,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         />
       </div>
     );
-  },
+  }
 );
 
 Input.displayName = "Input";

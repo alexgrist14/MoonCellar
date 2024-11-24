@@ -1,4 +1,4 @@
-import { CSSProperties, FC, useRef, useState } from "react";
+import { CSSProperties, FC, useEffect, useRef, useState } from "react";
 import styles from "./GameControls.module.scss";
 import { IGDBGame } from "../../types/igdb";
 import { Icon } from "@iconify/react";
@@ -10,6 +10,8 @@ import { useAuthStore } from "../../store/auth.store";
 import { axiosUtils } from "../../utils/axios";
 import { toast } from "../../utils/toast";
 import useCloseEvents from "../../hooks/useCloseEvents";
+import { RangeSelector } from "../RangeSelector";
+import { accentColor } from "../../constants";
 
 interface IGameControlsProps {
   style?: CSSProperties;
@@ -32,7 +34,9 @@ export const GameControls: FC<IGameControlsProps> = ({
 
   const [isLoading, setIsLoading] = useState(false);
   const [isRatingActive, setIsRatingActive] = useState(false);
-  const [hoverIndex, setHoverIndex] = useState<number>(-1);
+  const [isListsActive, setIsListsActive] = useState(false);
+
+  const [ratingValue, setRatingValue] = useState(0);
 
   const addToList = (name: categoriesType) => {
     if (!profile) return;
@@ -72,85 +76,86 @@ export const GameControls: FC<IGameControlsProps> = ({
 
   let rating = profile?.gamesRating?.find((rating) => rating.game === game._id);
 
+  const getMoonPhase = (rating: number) => {
+    switch (rating) {
+      case 1:
+        return "wi:moon-alt-waxing-gibbous-4";
+      case 2:
+        return "wi:moon-alt-waxing-gibbous-3";
+      case 3:
+        return "wi:moon-alt-waxing-gibbous-2";
+      case 4:
+        return "wi:moon-alt-waxing-gibbous-1";
+      case 5:
+        return "wi:moon-alt-first-quarter";
+      case 6:
+        return "wi:moon-alt-waxing-crescent-6";
+      case 7:
+        return "wi:moon-alt-waxing-crescent-4";
+      case 8:
+        return "wi:moon-alt-waxing-crescent-2";
+      case 9:
+        return "wi:moon-alt-waxing-crescent-1";
+      case 10:
+        return "wi:moon-alt-new";
+      default:
+        return "f7:moon-circle";
+    }
+  };
+
   useCloseEvents([ratingsRef, ratingButtonRef], () => {
     setIsRatingActive(false);
   });
+
+  useEffect(() => {
+    !!rating && setRatingValue(rating.rating);
+  }, [rating]);
 
   return (
     <div
       className={classNames(styles.controls, className, {
         [styles.controls_disabled]: !profile || isLoading,
-        [styles.controls_overflow]: isRatingActive,
       })}
       style={style}
       ref={controlsRef}
     >
       <div
         ref={ratingsRef}
-        onMouseOut={() => setHoverIndex(-1)}
         style={{
-          // bottom: `calc(${ratingButtonRef.current?.offsetHeight}px)`,
-          right: `calc(-${ratingButtonRef.current?.offsetWidth}px)`,
-          // height: `calc(${ratingButtonRef.current?.offsetHeight}px)`,
-          width: `calc(${ratingButtonRef.current?.offsetWidth}px)`,
+          bottom: `calc(${ratingButtonRef.current?.offsetHeight}px)`,
         }}
         className={classNames(styles.controls__ratings, {
           [styles.controls__ratings_active]: isRatingActive,
         })}
       >
-        {Array(10)
-          .fill("")
-          .map((_, i) => (
-            <div
-              key={i}
-              className={classNames(styles.controls__rating, {
-                [styles.controls__rating_active]:
-                  (!!rating && rating.rating >= i + 1) || i <= hoverIndex,
-              })}
-              onMouseOver={() => setHoverIndex(i)}
-              onClick={() => {
-                if (!profile) return;
-                setIsRatingActive(false);
-
-                !!rating && rating.rating === i + 1
-                  ? userAPI
-                      .removeGameRating(profile?._id, game._id)
-                      .then((res) => {
-                        toast.success({
-                          content: "Rating was successfully removed",
-                        });
-
-                        setProfile(res.data);
-                      })
-                      .catch(axiosUtils.toastError)
-                  : userAPI
-                      .addGameRating(profile._id, game._id, i + 1)
-                      .then((res) => {
-                        toast.success({
-                          content: `Game was successfully rated (${i + 1})`,
-                        });
-
-                        setProfile(res.data);
-                      })
-                      .catch(axiosUtils.toastError);
-              }}
-            >
-              <Icon
-                className={classNames(styles.controls__heart, {
-                  [styles.controls__heart_active]:
-                    !!rating && rating.rating >= i + 1,
-                })}
-                icon="f7:moon-circle"
-              />
-              <Icon
-                className={classNames(styles.controls__number, {
-                  [styles.controls__number_active]:
-                    !!rating && rating.rating >= i + 1,
-                })}
-                icon={`mdi:numeric-${i + 1}`}
-              />
-            </div>
-          ))}
+        {
+          <RangeSelector
+            callback={(value) => setRatingValue(value)}
+            finalCallback={(value) =>
+              !!profile &&
+              value !== rating?.rating &&
+              userAPI[!!value ? "addGameRating" : "removeGameRating"](
+                profile._id,
+                game._id,
+                value
+              )
+                .then((res) => {
+                  toast.success({
+                    description: `${
+                      !!value ? `Set rating - ${value}` : "Remove rating"
+                    } for ${game.name}`,
+                  });
+                  setProfile(res.data);
+                })
+                .catch(axiosUtils.toastError)
+            }
+            text={!!ratingValue ? ratingValue.toString() : "No rating"}
+            min={0}
+            max={10}
+            defaultValue={ratingValue || rating?.rating}
+            disabled={false}
+          />
+        }
       </div>
       <Button
         onClick={() =>
@@ -166,7 +171,12 @@ export const GameControls: FC<IGameControlsProps> = ({
           [styles.controls__action_active]: isPlayed,
         })}
       >
-        <Icon className={styles.controls__icon} icon="iconamoon:play-circle" />
+        <Icon
+          className={classNames(styles.controls__icon, {
+            [styles.controls__icon_active]: isPlayed,
+          })}
+          icon="iconamoon:play-circle"
+        />
       </Button>
       <Button
         onClick={() =>
@@ -185,7 +195,9 @@ export const GameControls: FC<IGameControlsProps> = ({
         })}
       >
         <Icon
-          className={styles.controls__icon}
+          className={classNames(styles.controls__icon, {
+            [styles.controls__icon_active]: isCompleted,
+          })}
           icon="iconamoon:check-circle-1"
         />
       </Button>
@@ -206,7 +218,9 @@ export const GameControls: FC<IGameControlsProps> = ({
         })}
       >
         <Icon
-          className={styles.controls__icon}
+          className={classNames(styles.controls__icon, {
+            [styles.controls__icon_active]: isWishlisted,
+          })}
           icon="iconamoon:sign-plus-circle"
         />
       </Button>
@@ -227,7 +241,9 @@ export const GameControls: FC<IGameControlsProps> = ({
         })}
       >
         <Icon
-          className={styles.controls__icon}
+          className={classNames(styles.controls__icon, {
+            [styles.controls__icon_active]: isBacklogged,
+          })}
           icon="iconamoon:menu-kebab-horizontal-circle"
         />
       </Button>
@@ -259,23 +275,27 @@ export const GameControls: FC<IGameControlsProps> = ({
         }}
         color="transparent"
         className={classNames(styles.controls__action, {
-          [styles.controls__action_active]: !!rating,
+          [styles.controls__action_active]: !!ratingValue || isRatingActive,
         })}
       >
         <Icon
           className={classNames(styles.controls__heart, {
-            [styles.controls__heart_active]: !!rating,
+            [styles.controls__heart_active]: !!ratingValue,
           })}
-          icon="f7:moon-circle"
+          style={{
+            filter: `drop-shadow(0 0 ${ratingValue * 0.1}rem ${accentColor})`,
+            boxShadow: `0 0 ${ratingValue * 1}px 0 ${accentColor}, inset 0 0 ${
+              ratingValue * 2
+            }px 0 ${accentColor}`,
+          }}
+          icon={getMoonPhase(ratingValue)}
         />
-        {!!rating?.rating && (
-          <Icon
-            className={classNames(styles.controls__number, {
-              [styles.controls__number_active]: !!rating,
-            })}
-            icon={`mdi:numeric-${rating.rating}`}
-          />
-        )}
+        <Icon
+          className={classNames(styles.controls__number, {
+            [styles.controls__number_active]: !!ratingValue,
+          })}
+          icon={`mdi:numeric-${ratingValue}`}
+        />
       </Button>
     </div>
   );

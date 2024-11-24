@@ -10,7 +10,10 @@ import { axiosUtils } from "../../shared/utils/axios";
 import { GameCard } from "../../shared/ui/GameCard";
 import { useStatesStore } from "../../shared/store/states.store";
 import { Button } from "../../shared/ui/Button";
-import { PulseLoader } from "react-spinners";
+import { PacmanLoader, PulseLoader } from "react-spinners";
+import { useDebouncedCallback } from "use-debounce";
+
+const step = 35;
 
 export const GamesPage: FC = () => {
   const {
@@ -24,13 +27,43 @@ export const GamesPage: FC = () => {
     excludedGameModes,
     searchQuery,
   } = useGamesFiltersStore();
-  const { isLoading, isPlatformsLoading, setLoading } = useStatesStore();
-  const { setGenres, setGameModes, setSystems } = useCommonStore();
-  const gamesRef = useRef<HTMLDivElement>(null);
+  const { isLoading, setLoading } = useStatesStore();
+  const { setGenres, setGameModes, setSystems, isMobile, setExpanded } =
+    useCommonStore();
 
   const [games, setGames] = useState<IGDBGame[]>([]);
-  const [take, setTake] = useState(50);
+  const [take, setTake] = useState(step);
   const [total, setTotal] = useState(0);
+
+  const debouncedGamesFetch = useDebouncedCallback(() => {
+    setLoading(true);
+
+    IGDBApi.getGames({
+      search: searchQuery,
+      excluded: {
+        genres: excludedGenres?.map((item) => item._id),
+        modes: excludedGameModes?.map((item) => item._id),
+        platforms: excludedSystems?.map((item) => item._id),
+      },
+      selected: {
+        genres: selectedGenres?.map((item) => item._id),
+        modes: selectedGameModes?.map((item) => item._id),
+        platforms: selectedSystems?.map((item) => item._id),
+      },
+      page: 1,
+      take,
+      rating: selectedRating,
+    })
+      .then((res) => {
+        setGames(res.data.results);
+        setTotal(res.data.total);
+      })
+      .catch(axiosUtils.toastError)
+      .finally(() => {
+        setLoading(false);
+        setExpanded("none");
+      });
+  }, 100);
 
   useEffect(() => {
     if (isRoyal) return;
@@ -41,65 +74,27 @@ export const GamesPage: FC = () => {
   }, [isRoyal, setGenres, setGameModes, setSystems]);
 
   useEffect(() => {
-    if (!isPlatformsLoading && !isLoading) {
-      IGDBApi.getGames({
-        search: searchQuery,
-        excluded: {
-          genres: excludedGenres?.map((item) => item._id),
-          modes: excludedGameModes?.map((item) => item._id),
-          platforms: excludedSystems?.map((item) => item._id),
-        },
-        selected: {
-          genres: selectedGenres?.map((item) => item._id),
-          modes: selectedGameModes?.map((item) => item._id),
-          platforms: selectedSystems?.map((item) => item._id),
-        },
-        page: 1,
-        take,
-        rating: selectedRating,
-      })
-        .then((res) => {
-          setGames(res.data.results);
-          setTotal(res.data.total);
-        })
-        .catch(axiosUtils.toastError)
-        .finally(() => setLoading(false));
-    } else {
-      setLoading(true);
-    }
-  }, [
-    searchQuery,
-    excludedGenres,
-    excludedSystems,
-    excludedGameModes,
-    selectedGenres,
-    selectedRating,
-    selectedSystems,
-    selectedGameModes,
-    isPlatformsLoading,
-    isLoading,
-    take,
-    setLoading,
-  ]);
-
-  useEffect(() => {
-    // ref
-  }, [gamesRef]);
+    debouncedGamesFetch();
+  }, [debouncedGamesFetch, take]);
 
   return (
     <div className={styles.page}>
       <ExpandMenu position="left" titleOpen="Filters">
-        <Filters />
+        <Filters callback={() => debouncedGamesFetch()} />
       </ExpandMenu>
-      {!!total && (
-        <div ref={gamesRef} className={styles.page__games}>
+      {isLoading && !games.length ? (
+        <PacmanLoader color="#ffffff" className={styles.page__loader} />
+      ) : (
+        <div className={styles.page__games}>
           {games.map((game) => (
             <GameCard key={game._id} game={game} />
           ))}
           {!!games?.length && take < total && (
             <Button
               className={styles.modal__more}
-              onClick={() => setTake(take + take)}
+              onClick={() =>
+                setTake(take + step + (isMobile ? (take + step) / step - 1 : 0))
+              }
             >
               {isLoading ? <PulseLoader color="#ffffff" /> : "More games"}
             </Button>

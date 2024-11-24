@@ -7,10 +7,6 @@
   overflow: hidden;
   z-index: 2;
 
-  &_overflow {
-    border-radius: 0 0 0 $radius;
-  }
-
   &_disabled {
     opacity: 0.7;
     pointer-events: none;
@@ -53,60 +49,44 @@
 
   &__ratings {
     display: flex;
-    flex-direction: column-reverse;
-    height: 100%;
+    flex-direction: column;
+    width: 100%;
+    height: 50px;
     position: absolute;
     opacity: 0;
     transition: opacity 0.3s, transform 0.3s;
     pointer-events: none;
     background-color: inherit;
-    border-radius: $radius $radius $radius 0;
-    border-left: 1px solid $bgAlt;
+    border-radius: $radius $radius 0 0;
+    border-bottom: 1px solid $bgAlt;
     overflow: hidden;
-    transform: translateX(-5%);
+    transform: translateY(5%);
     right: 0;
     bottom: 0;
+    padding-top: 5px;
 
     &_active {
-      transform: translateX(0);
+      transform: translateY(0);
       opacity: 1;
       pointer-events: all;
     }
   }
 
-  &__rating {
-    @include flexCenter;
-    transition: opacity 0.3s, transform 0.3s;
-    position: relative;
-    cursor: pointer;
-    flex: 1;
-    padding: 2px;
-    aspect-ratio: 1;
-
-    &:hover:not(:disabled),
-    &_active {
-      background-color: $bgAlt;
-    }
-
-    &:disabled {
-      cursor: not-allowed;
-      opacity: 0.7;
-    }
-  }
-
   &__number {
     position: absolute;
-    height: 40%;
     width: fit-content;
-    top: 20%;
-    left: 40%;
     transition: 0.3s;
-    fill: $whiteTextColor;
+    height: 90%;
+
+    & path {
+      transition: 0.3s;
+      opacity: 0;
+      stroke: $whiteTextColor;
+      fill: $accent;
+    }
 
     &_active path {
-      transition: 0.3s;
-      stroke: $accent;
-      fill: $accent;
+      opacity: 1;
     }
   }
 
@@ -114,13 +94,15 @@
     width: inherit;
     height: 100%;
     transition: 0.3s;
-    stroke: $accent;
-    fill: $whiteTextColor;
+    border-radius: 50%;
+
+    & path {
+      transition: 0.3s;
+    }
 
     &_active path {
-      transition: 0.3s;
-      stroke: $accent;
-      fill: $accent;
+      stroke: $whiteTextColor;
+      fill: $whiteTextColor;
     }
   }
 }
