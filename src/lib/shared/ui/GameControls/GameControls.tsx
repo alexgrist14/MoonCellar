@@ -283,10 +283,7 @@ export const GameControls: FC<IGameControlsProps> = ({
             [styles.controls__heart_active]: !!ratingValue,
           })}
           style={{
-            filter: `drop-shadow(0 0 ${ratingValue * 0.1}rem ${accentColor})`,
-            boxShadow: `0 0 ${ratingValue * 1}px 0 ${accentColor}, inset 0 0 ${
-              ratingValue * 2
-            }px 0 ${accentColor}`,
+            filter: `drop-shadow(0 0 ${ratingValue * 0.05}rem ${accentColor})`,
           }}
           icon={getMoonPhase(ratingValue)}
         />

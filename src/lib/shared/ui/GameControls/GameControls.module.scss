@@ -76,13 +76,13 @@
     position: absolute;
     width: fit-content;
     transition: 0.3s;
-    height: 90%;
+    height: 70%;
 
     & path {
       transition: 0.3s;
       opacity: 0;
       stroke: $whiteTextColor;
-      fill: $accent;
+      fill: $whiteTextColor;
     }
 
     &_active path {
@@ -101,8 +101,9 @@
     }
 
     &_active path {
-      stroke: $whiteTextColor;
-      fill: $whiteTextColor;
+      stroke-width: 2;
+      stroke: $accent;
+      fill: $accent;
     }
   }
 }
