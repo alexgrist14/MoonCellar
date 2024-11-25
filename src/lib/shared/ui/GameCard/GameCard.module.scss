@@ -7,6 +7,7 @@
   transition: all 0.3s;
   position: relative;
   overflow: hidden;
+  background: $lightBgSecond;
 
   &__title {
     display: flex;
@@ -51,11 +52,17 @@
     justify-content: center;
     flex-direction: column;
     gap: 30px;
-    background: $lightBgSecond;
     object-fit: cover;
     font-family: "Pentagra", sans-serif;
     width: 100%;
     height: 100%;
     border-radius: $radius;
+    z-index: 1;
+    opacity: 0;
+    transition: 0.3s;
+
+    &_active {
+      opacity: 1;
+    }
   }
 }

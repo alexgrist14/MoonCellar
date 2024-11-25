@@ -33,8 +33,11 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
 
   useCloseEvents([cardRef], () => setStepIndex(0));
 
+  if (!game) return null;
+
   return (
     <div
+      key={game._id}
       ref={cardRef}
       className={styles.card}
       onMouseOver={() => setIsHover(true)}
@@ -70,16 +73,17 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
         </Link>
         <GameControls game={game} />
       </div>
-      {isLoading && <Loader />}
+      {isLoading && <Loader key={game._id + "_loader"} />}
       {!!game?.cover ? (
         <Image
-          onLoadingComplete={() => setIsLoading(false)}
+          onLoad={() => setTimeout(() => setIsLoading(false), 200)}
           alt="Game cover"
           src={getImageLink(game?.cover?.url, "720p")}
           width={700}
           height={500}
-          className={styles.card__cover}
-          priority
+          className={classNames(styles.card__cover, {
+            [styles.card__cover_active]: !isLoading,
+          })}
         />
       ) : (
         <Cover />
