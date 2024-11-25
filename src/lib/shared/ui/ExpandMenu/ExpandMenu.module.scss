@@ -3,7 +3,7 @@
   position: fixed;
   width: max(25%, 360px);
   height: 100%;
-  transition: opacity 0.3s, transform 0.3s;
+  transition: 0.4s;
   z-index: 3;
   background: $bgAlt;
 
@@ -47,7 +47,7 @@
     width: fit-content;
     padding: 10px;
     user-select: none;
-    transition: all 0.3s;
+    transition: 0.3s;
     white-space: nowrap;
     z-index: 4;
 

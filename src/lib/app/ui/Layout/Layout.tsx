@@ -51,14 +51,3 @@ export const Layout: FC<ILayoutProps> = ({ children }) => {
     </div>
   );
 };
-function setAuth(arg0: boolean) {
-  throw new Error("Function not implemented.");
-}
-
-function getById(id: any) {
-  throw new Error("Function not implemented.");
-}
-
-function setProfile(data: any) {
-  throw new Error("Function not implemented.");
-}

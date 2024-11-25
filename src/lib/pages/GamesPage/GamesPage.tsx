@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./GamesPage.module.scss";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { Filters } from "../../shared/ui/Filters";
@@ -12,8 +12,6 @@ import { useStatesStore } from "../../shared/store/states.store";
 import { Button } from "../../shared/ui/Button";
 import { PacmanLoader, PulseLoader } from "react-spinners";
 import { useDebouncedCallback } from "use-debounce";
-
-const step = 35;
 
 export const GamesPage: FC = () => {
   const {
@@ -30,6 +28,8 @@ export const GamesPage: FC = () => {
   const { isLoading, setLoading } = useStatesStore();
   const { setGenres, setGameModes, setSystems, isMobile, setExpanded } =
     useCommonStore();
+
+  const step = useMemo(() => (isMobile ? 34 : 35), [isMobile]);
 
   const [games, setGames] = useState<IGDBGame[]>([]);
   const [take, setTake] = useState(step);
@@ -51,7 +51,7 @@ export const GamesPage: FC = () => {
         platforms: selectedSystems?.map((item) => item._id),
       },
       page: 1,
-      take,
+      take: take + (!isMobile ? Math.ceil(take / step) - 1 : -1),
       rating: selectedRating,
     })
       .then((res) => {
@@ -92,9 +92,7 @@ export const GamesPage: FC = () => {
           {!!games?.length && take < total && (
             <Button
               className={styles.modal__more}
-              onClick={() =>
-                setTake(take + step + (isMobile ? (take + step) / step - 1 : 0))
-              }
+              onClick={() => setTake(take + step)}
             >
               {isLoading ? <PulseLoader color="#ffffff" /> : "More games"}
             </Button>

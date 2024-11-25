@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useRef, useState } from "react";
 import styles from "./GameCard.module.scss";
 import Link from "next/link";
 import { IGDBGame } from "../../types/igdb";
@@ -8,55 +8,75 @@ import { modal } from "../Modal";
 import { getImageLink } from "../../constants";
 import { Cover } from "../Cover";
 import { GameControls } from "../GameControls";
+import { useCommonStore } from "../../store/common.store";
+import useCloseEvents from "../../hooks/useCloseEvents";
+import { Loader } from "../Loader";
 
 interface IGameCardProps {
   game: IGDBGame;
 }
 
 export const GameCard: FC<IGameCardProps> = ({ game }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+
   const [isHover, setIsHover] = useState(false);
+  const [stepIndex, setStepIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(!!game.cover);
+
+  const { isMobile } = useCommonStore();
+
   const releaseYear = game.release_dates?.reduce(
     (year: number | undefined, date) =>
       !!date.y ? (!!year && date.y > year ? year : (year = date.y)) : year,
     undefined
   );
 
+  useCloseEvents([cardRef], () => setStepIndex(0));
+
   return (
     <div
+      ref={cardRef}
       className={styles.card}
       onMouseOver={() => setIsHover(true)}
       onMouseOut={() => setIsHover(false)}
     >
       <div
         className={classNames(styles.card__info, {
-          [styles.card__info_active]: isHover,
+          [styles.card__info_active]: isHover || (stepIndex === 1 && isMobile),
         })}
       >
         <Link
           className={styles.card__title}
           href={`/games/${game.slug}`}
-          onClick={() => modal.close()}
+          onClick={(e) => {
+            if (!stepIndex && isMobile) {
+              e.preventDefault();
+              e.stopPropagation();
+
+              return setStepIndex(1);
+            }
+
+            modal.close();
+          }}
         >
-          <span>
-            {!!game.platforms?.length &&
-              game.platforms.map((platform) => platform.name).join(", ")}
-          </span>
           <p>
             {game.name}
             {!!releaseYear ? ` (${releaseYear})` : ""}
           </p>
+          <span>
+            {!!game.platforms?.length &&
+              game.platforms.map((platform) => platform.name).join(", ")}
+          </span>
         </Link>
-        <GameControls
-          isWithoutTooltips
-          className={styles.card__controls}
-          game={game}
-        />
+        <GameControls game={game} />
       </div>
+      {isLoading && <Loader />}
       {!!game?.cover ? (
         <Image
+          onLoadingComplete={() => setIsLoading(false)}
           alt="Game cover"
-          src={getImageLink(game?.cover?.url, "cover_big")}
-          width={500}
+          src={getImageLink(game?.cover?.url, "720p")}
+          width={700}
           height={500}
           className={styles.card__cover}
           priority

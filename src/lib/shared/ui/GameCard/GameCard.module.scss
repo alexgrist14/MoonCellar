@@ -1,14 +1,16 @@
 .card {
   height: 100%;
   width: 100%;
-  aspect-ratio: 2/3;
+  max-width: 240px;
+  aspect-ratio: $coverRatio;
   border-radius: $radius;
   transition: all 0.3s;
   position: relative;
   overflow: hidden;
 
   &__title {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 30px;
     padding: 10px;
     text-align: center;
@@ -26,7 +28,7 @@
 
   &__info {
     display: grid;
-    grid-template-rows: 1fr 30px;
+    grid-template-rows: 1fr auto;
     align-content: space-between;
     gap: 10px;
     width: 100%;

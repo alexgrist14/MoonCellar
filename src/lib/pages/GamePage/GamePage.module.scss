@@ -1,6 +1,6 @@
 .page {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: auto 1fr;
   padding-inline: 20px;
   padding-block: 50px;
   gap: 50px;
@@ -15,13 +15,14 @@
     flex-direction: column;
     position: relative;
     height: fit-content;
+    width: 240px;
   }
 
   &__cover {
     aspect-ratio: 528/704;
     border-radius: $radius $radius 0 0;
     background: $lightBg;
-    max-width: 320px;
+    width: 100%;
 
     & > img {
       border-radius: $radius $radius 0 0;

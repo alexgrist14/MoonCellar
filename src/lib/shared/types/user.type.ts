@@ -6,7 +6,9 @@ export type categoriesType =
   | "wishlist"
   | "dropped"
   | "playing"
-  | "backlog";
+  | "backlog"
+  | "mastered"
+  | "played";
 
 export interface ILogs {
   date: Date;

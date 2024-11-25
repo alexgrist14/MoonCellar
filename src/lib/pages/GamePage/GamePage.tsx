@@ -13,6 +13,7 @@ import Link from "next/link";
 import { Cover } from "../../shared/ui/Cover";
 import { GameControls } from "../../shared/ui/GameControls";
 import { useGauntletFiltersStore } from "../../shared/store/gauntlet-filters.store";
+import { Loader } from "../../shared/ui/Loader";
 
 export const GamePage: FC = () => {
   const { query } = useRouter();
@@ -20,6 +21,7 @@ export const GamePage: FC = () => {
   const { royalGames, setRoyalGames } = useGauntletFiltersStore();
 
   const [game, setGame] = useState<IGDBGame>();
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     !!query.slug &&
@@ -28,9 +30,11 @@ export const GamePage: FC = () => {
         .catch(axiosUtils.toastError);
   }, [query]);
 
-  if (!game) return null;
+  useEffect(() => {
+    !!game && setIsLoading(!!game.cover);
+  }, [game]);
 
-  console.log();
+  if (!game) return null;
 
   return (
     <>
@@ -66,8 +70,10 @@ export const GamePage: FC = () => {
       <div className={styles.page}>
         <div className={styles.page__left}>
           <div className={styles.page__cover}>
+            {isLoading && <Loader />}
             {!!game.cover?.url ? (
               <Image
+                onLoadingComplete={() => setIsLoading(false)}
                 key={game.cover._id}
                 alt="Cover"
                 src={getImageLink(game.cover.url, "cover_big", 2)}

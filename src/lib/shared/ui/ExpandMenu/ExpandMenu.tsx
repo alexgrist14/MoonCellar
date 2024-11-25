@@ -78,7 +78,7 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
             ? position === "right"
               ? "translateX(calc(100% - 5px))"
               : "translateX(calc(-100% + 5px)"
-            : "unset",
+            : "translateX(0)",
       }}
       {...props}
     >
@@ -88,16 +88,15 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
       <div
         className={styles.menu__expand}
         onClick={() => {
+          if (expanded === undefined) return setExpanded(position);
           if (expanded === "both")
             return setExpanded(position === "left" ? "right" : "left");
+          if (expanded !== "none" && expanded !== position)
+            return setExpanded("both");
+          if (expanded === "none" || expanded !== position)
+            return setExpanded(position);
 
-          setExpanded(
-            expanded !== "none" && expanded !== position
-              ? "both"
-              : expanded === "none" || expanded !== position
-              ? position
-              : "none"
-          );
+          setExpanded("none");
         }}
       >
         <div

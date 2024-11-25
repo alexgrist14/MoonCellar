@@ -17,14 +17,39 @@ interface IGameControlsProps {
   style?: CSSProperties;
   className?: string;
   game: IGDBGame;
-  isWithoutTooltips?: boolean;
 }
+
+const getMoonPhase = (rating: number) => {
+  switch (rating) {
+    case 1:
+      return "wi:moon-alt-waxing-gibbous-4";
+    case 2:
+      return "wi:moon-alt-waxing-gibbous-3";
+    case 3:
+      return "wi:moon-alt-waxing-gibbous-2";
+    case 4:
+      return "wi:moon-alt-waxing-gibbous-1";
+    case 5:
+      return "wi:moon-alt-first-quarter";
+    case 6:
+      return "wi:moon-alt-waxing-crescent-6";
+    case 7:
+      return "wi:moon-alt-waxing-crescent-4";
+    case 8:
+      return "wi:moon-alt-waxing-crescent-2";
+    case 9:
+      return "wi:moon-alt-waxing-crescent-1";
+    case 10:
+      return "wi:moon-alt-new";
+    default:
+      return "f7:moon-circle";
+  }
+};
 
 export const GameControls: FC<IGameControlsProps> = ({
   game,
   className,
   style,
-  isWithoutTooltips,
 }) => {
   const { profile, setProfile } = useAuthStore();
 
@@ -34,7 +59,8 @@ export const GameControls: FC<IGameControlsProps> = ({
 
   const [isLoading, setIsLoading] = useState(false);
   const [isRatingActive, setIsRatingActive] = useState(false);
-  const [isListsActive, setIsListsActive] = useState(false);
+  const [isPlayedActive, setIsPlayedActive] = useState(false);
+  const [isPauseActive, setIsPauseActive] = useState(false);
 
   const [ratingValue, setRatingValue] = useState(0);
 
@@ -48,7 +74,9 @@ export const GameControls: FC<IGameControlsProps> = ({
         setProfile(res.data);
 
         setIsLoading(false);
-        toast.success({ content: `Game successfully added to ${name}` });
+        toast.success({
+          description: `${game.name} successfully added to ${name}`,
+        });
       })
       .catch(axiosUtils.toastError);
   };
@@ -63,45 +91,22 @@ export const GameControls: FC<IGameControlsProps> = ({
         setProfile(res.data);
 
         setIsLoading(false);
-        toast.success({ content: `Game successfully removed from ${name}` });
+        toast.success({
+          description: `${game.name} successfully removed from ${name}`,
+        });
       })
       .catch(axiosUtils.toastError);
   };
 
-  const isPlayed = profile?.games?.playing.some((id) => game._id === id);
+  const isPlaying = profile?.games?.playing.some((id) => game._id === id);
+  const isPlayed = profile?.games?.played.some((id) => game._id === id);
+  const isMastered = profile?.games?.mastered.some((id) => game._id === id);
   const isCompleted = profile?.games?.completed.some((id) => game._id === id);
   const isWishlisted = profile?.games?.wishlist.some((id) => game._id === id);
   const isBacklogged = profile?.games?.backlog.some((id) => game._id === id);
   const isDropped = profile?.games?.dropped.some((id) => game._id === id);
 
   let rating = profile?.gamesRating?.find((rating) => rating.game === game._id);
-
-  const getMoonPhase = (rating: number) => {
-    switch (rating) {
-      case 1:
-        return "wi:moon-alt-waxing-gibbous-4";
-      case 2:
-        return "wi:moon-alt-waxing-gibbous-3";
-      case 3:
-        return "wi:moon-alt-waxing-gibbous-2";
-      case 4:
-        return "wi:moon-alt-waxing-gibbous-1";
-      case 5:
-        return "wi:moon-alt-first-quarter";
-      case 6:
-        return "wi:moon-alt-waxing-crescent-6";
-      case 7:
-        return "wi:moon-alt-waxing-crescent-4";
-      case 8:
-        return "wi:moon-alt-waxing-crescent-2";
-      case 9:
-        return "wi:moon-alt-waxing-crescent-1";
-      case 10:
-        return "wi:moon-alt-new";
-      default:
-        return "f7:moon-circle";
-    }
-  };
 
   useCloseEvents([ratingsRef, ratingButtonRef], () => {
     setIsRatingActive(false);
@@ -119,6 +124,58 @@ export const GameControls: FC<IGameControlsProps> = ({
       style={style}
       ref={controlsRef}
     >
+      <div
+        style={{
+          bottom: `calc(${ratingButtonRef.current?.offsetHeight}px)`,
+        }}
+        className={classNames(styles.controls__list, {
+          [styles.controls__list_active]: isPlayedActive,
+        })}
+      >
+        {(["played", "completed", "mastered"] as categoriesType[]).map(
+          (key) => (
+            <Button
+              key={key}
+              active={profile?.games?.[key].some((id) => game._id === id)}
+              onClick={() =>
+                profile?.games?.[key].some((id) => game._id === id)
+                  ? removeFromList(key)
+                  : addToList(key)
+              }
+            >
+              {profile?.games?.[key].some((id) => game._id === id)
+                ? "Remove from"
+                : "Add to"}{" "}
+              {key}
+            </Button>
+          )
+        )}
+      </div>
+      <div
+        style={{
+          bottom: `calc(${ratingButtonRef.current?.offsetHeight}px)`,
+        }}
+        className={classNames(styles.controls__list, {
+          [styles.controls__list_active]: isPauseActive,
+        })}
+      >
+        {(["wishlist", "backlog", "dropped"] as categoriesType[]).map((key) => (
+          <Button
+            key={key}
+            active={profile?.games?.[key].some((id) => game._id === id)}
+            onClick={() =>
+              profile?.games?.[key].some((id) => game._id === id)
+                ? removeFromList(key)
+                : addToList(key)
+            }
+          >
+            {profile?.games?.[key].some((id) => game._id === id)
+              ? "Remove from"
+              : "Add to"}{" "}
+            {key}
+          </Button>
+        ))}
+      </div>
       <div
         ref={ratingsRef}
         style={{
@@ -158,120 +215,81 @@ export const GameControls: FC<IGameControlsProps> = ({
         }
       </div>
       <Button
-        onClick={() =>
-          isPlayed ? removeFromList("playing") : addToList("playing")
-        }
+        onClick={() => {
+          setIsPauseActive(false);
+          setIsPlayedActive(false);
+          setIsRatingActive(false);
+
+          isPlaying ? removeFromList("playing") : addToList("playing");
+        }}
         color="transparent"
-        tooltip={
-          isWithoutTooltips
-            ? undefined
-            : `${isPlayed ? "Remove from" : "Add to"} playing`
-        }
         className={classNames(styles.controls__action, {
-          [styles.controls__action_active]: isPlayed,
+          [styles.controls__action_active]: isPlaying,
         })}
       >
         <Icon
           className={classNames(styles.controls__icon, {
-            [styles.controls__icon_active]: isPlayed,
+            [styles.controls__icon_active]: isPlaying,
           })}
           icon="iconamoon:play-circle"
         />
       </Button>
       <Button
-        onClick={() =>
-          isCompleted ? removeFromList("completed") : addToList("completed")
-        }
+        onClick={() => {
+          setIsPlayedActive(!isPlayedActive);
+          setIsPauseActive(false);
+          setIsRatingActive(false);
+        }}
         color="transparent"
-        tooltip={
-          isWithoutTooltips
-            ? undefined
-            : `${isCompleted ? "Remove from" : "Add to"} completed`
-        }
         className={classNames(styles.controls__action, {
-          [styles.controls__action_active]: profile?.games?.completed.some(
-            (id) => game._id === id
-          ),
+          [styles.controls__action_active]:
+            !!profile?.games &&
+            [
+              ...profile.games.mastered,
+              ...profile.games.played,
+              ...profile.games.completed,
+            ].some((id) => game._id === id),
         })}
       >
         <Icon
           className={classNames(styles.controls__icon, {
-            [styles.controls__icon_active]: isCompleted,
+            [styles.controls__icon_active]:
+              isCompleted || isPlayed || isMastered,
           })}
           icon="iconamoon:check-circle-1"
         />
       </Button>
       <Button
-        onClick={() =>
-          isWishlisted ? removeFromList("wishlist") : addToList("wishlist")
-        }
+        onClick={() => {
+          setIsPauseActive(!isPauseActive);
+          setIsPlayedActive(false);
+          setIsRatingActive(false);
+        }}
         color="transparent"
-        tooltip={
-          isWithoutTooltips
-            ? undefined
-            : `${isWishlisted ? "Remove from" : "Add to"} wishlist`
-        }
         className={classNames(styles.controls__action, {
-          [styles.controls__action_active]: profile?.games?.wishlist.some(
-            (id) => game._id === id
-          ),
+          [styles.controls__action_active]:
+            !!profile?.games &&
+            [
+              ...profile.games.wishlist,
+              ...profile.games.backlog,
+              ...profile.games.dropped,
+            ].some((id) => game._id === id),
         })}
       >
         <Icon
           className={classNames(styles.controls__icon, {
-            [styles.controls__icon_active]: isWishlisted,
-          })}
-          icon="iconamoon:sign-plus-circle"
-        />
-      </Button>
-      <Button
-        onClick={() =>
-          isBacklogged ? removeFromList("backlog") : addToList("backlog")
-        }
-        color="transparent"
-        tooltip={
-          isWithoutTooltips
-            ? undefined
-            : `${isBacklogged ? "Remove from" : "Add to"} backlog`
-        }
-        className={classNames(styles.controls__action, {
-          [styles.controls__action_active]: profile?.games?.backlog.some(
-            (id) => game._id === id
-          ),
-        })}
-      >
-        <Icon
-          className={classNames(styles.controls__icon, {
-            [styles.controls__icon_active]: isBacklogged,
+            [styles.controls__icon_active]:
+              isDropped || isWishlisted || isBacklogged,
           })}
           icon="iconamoon:menu-kebab-horizontal-circle"
-        />
-      </Button>
-      <Button
-        onClick={() =>
-          isDropped ? removeFromList("dropped") : addToList("dropped")
-        }
-        color="transparent"
-        tooltip={
-          isWithoutTooltips
-            ? undefined
-            : `${isDropped ? "Remove from" : "Add to"} dropped`
-        }
-        className={classNames(styles.controls__action, {
-          [styles.controls__action_active]: isDropped,
-        })}
-      >
-        <Icon
-          className={classNames(styles.controls__icon, {
-            [styles.controls__icon_active]: isDropped,
-          })}
-          icon="iconamoon:close-circle-1"
         />
       </Button>
       <Button
         ref={ratingButtonRef}
         onClick={() => {
           setIsRatingActive(!isRatingActive);
+          setIsPauseActive(false);
+          setIsPlayedActive(false);
         }}
         color="transparent"
         className={classNames(styles.controls__action, {

@@ -97,10 +97,6 @@ export const GauntletPage: FC = () => {
       setSegments(royalGames.map((game, i) => game._id + "_" + i));
   }, [isRoyal, royalGames, setSegments]);
 
-  useEffect(() => {
-    setExpanded("left");
-  }, [setExpanded]);
-
   return (
     <div className={styles.page}>
       <ExpandMenu id="consoles" titleOpen="Filters">
