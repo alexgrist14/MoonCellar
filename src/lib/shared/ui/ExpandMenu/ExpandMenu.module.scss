@@ -3,9 +3,16 @@
   position: fixed;
   width: max(25%, 360px);
   height: 100%;
-  transition: 0.4s;
+  transition: transform 0.4s, filter 0.4s;
   z-index: 3;
   background: $bgAlt;
+  filter: drop-shadow(0 0 0.2rem $accent);
+
+  &_disabled {
+    filter: unset;
+    pointer-events: none;
+    z-index: -1;
+  }
 
   @include mediaMax($screenMd) {
     width: 100%;

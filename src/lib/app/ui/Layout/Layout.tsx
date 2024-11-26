@@ -2,7 +2,7 @@ import { FC, ReactNode, useEffect } from "react";
 import styles from "./Layout.module.scss";
 import { Header } from "./components";
 import { useWindowResizeAction } from "@/src/lib/shared/hooks";
-import { links, REFRESH_TOKEN, screenMd } from "@/src/lib/shared/constants";
+import { REFRESH_TOKEN, screenMd } from "@/src/lib/shared/constants";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
 import { Navigation } from "@/src/lib/shared/ui/Navigation";
@@ -45,7 +45,7 @@ export const Layout: FC<ILayoutProps> = ({ children }) => {
     <div className={styles.layout}>
       <Header />
       {children}
-      <ExpandMenu position="right" titleOpen="Navigation">
+      <ExpandMenu position="right" titleOpen="Menu">
         <Navigation />
       </ExpandMenu>
     </div>

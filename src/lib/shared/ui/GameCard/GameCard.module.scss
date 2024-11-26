@@ -1,5 +1,4 @@
 .card {
-  height: 100%;
   width: 100%;
   max-width: 240px;
   aspect-ratio: $coverRatio;
@@ -31,7 +30,6 @@
     display: grid;
     grid-template-rows: 1fr auto;
     align-content: space-between;
-    gap: 10px;
     width: 100%;
     height: 100%;
     background-color: rgba($bg, 0.9);

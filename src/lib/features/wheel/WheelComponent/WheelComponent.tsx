@@ -3,7 +3,7 @@ import styles from "./WheelComponent.module.scss";
 import classNames from "classnames";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
-import { useGauntletFiltersStore } from "@/src/lib/shared/store/gauntlet-filters.store";
+import { useGauntletFiltersStore } from "@/src/lib/shared/store/filters.store";
 
 interface WheelComponentProps {
   segColors: string[];
@@ -27,7 +27,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   time = 5,
 }) => {
   const { setWinner } = useCommonStore();
-  const { games, isRoyal, royalGames } = useGauntletFiltersStore();
+  const { games, royalGames } = useGauntletFiltersStore();
 
   const {
     isFinished,
@@ -38,6 +38,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
     setFinished,
     setStarted,
     setLoading,
+    isRoyal,
   } = useStatesStore();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -80,7 +81,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
           setSegments(
             filtered?.length
               ? filtered
-              : royalGames.map((game, i) => game.id + "_" + i)
+              : royalGames.map((game, i) => game._id + "_" + i)
           );
       }
     }

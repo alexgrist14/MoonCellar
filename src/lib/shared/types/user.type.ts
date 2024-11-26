@@ -1,5 +1,5 @@
 import { IUser } from "./auth";
-import { IGDBGame } from "./igdb";
+import { IGDBGame, IGDBGameMinimal } from "./igdb";
 
 export type categoriesType =
   | "completed"
@@ -22,7 +22,7 @@ export interface IFollowings {
   followings: Pick<IUser, "_id" | "userName" | "profilePicture">[];
 }
 
-export type UserGamesType = Record<categoriesType, IGDBGame[]>;
+export type UserGamesType = Record<categoriesType, IGDBGameMinimal[]>;
 
 export interface IUserGames {
   games: UserGamesType;

@@ -1,12 +1,12 @@
 import { FC } from "react";
 import styles from "./Filters.module.scss";
-import { useGamesFiltersStore } from "../../store/games-filters.store";
 import { useCommonStore } from "../../store/common.store";
 import { useStatesStore } from "../../store/states.store";
 import { Input } from "../Input";
 import { ExtendedSelector } from "../ExtendedSelector";
 import { ExtendedRange } from "../ExtendedRange";
 import { Button } from "../Button";
+import { useGamesFiltersStore } from "../../store/filters.store";
 
 export const Filters: FC<{ callback?: () => void }> = ({ callback }) => {
   const { gameModes, genres, systems } = useCommonStore();

@@ -12,13 +12,15 @@ import { Button } from "../../shared/ui/Button";
 import Link from "next/link";
 import { Cover } from "../../shared/ui/Cover";
 import { GameControls } from "../../shared/ui/GameControls";
-import { useGauntletFiltersStore } from "../../shared/store/gauntlet-filters.store";
 import { Loader } from "../../shared/ui/Loader";
+import { useGauntletFiltersStore } from "../../shared/store/filters.store";
+import { ButtonGroup } from "../../shared/ui/Button/ButtonGroup";
 
 export const GamePage: FC = () => {
   const { query } = useRouter();
 
-  const { royalGames, setRoyalGames } = useGauntletFiltersStore();
+  const { royalGames, addRoyalGame, removeRoyalGame } =
+    useGauntletFiltersStore();
 
   const [game, setGame] = useState<IGDBGame>();
   const [isLoading, setIsLoading] = useState(false);
@@ -36,36 +38,54 @@ export const GamePage: FC = () => {
 
   if (!game) return null;
 
+  const minimalGame = {
+    ...game,
+    screenshots: game.screenshots.map((item) => item._id),
+    artworks: game.artworks.map((item) => item._id),
+    game_modes: game.game_modes.map((item) => item._id),
+    genres: game.genres.map((item) => item._id),
+    involved_companies: game.involved_companies.map((item) => item._id),
+    keywords: game.keywords.map((item) => item._id),
+    themes: game.themes.map((item) => item._id),
+    websites: game.websites.map((item) => item._id),
+  };
+
   return (
     <>
       <ExpandMenu position="left" titleOpen="Actions">
-        <div className={styles.page__actions}>
-          <Button
-            onClick={() => {
-              setRoyalGames(
+        <ButtonGroup
+          wrapperClassName={styles.page__actions}
+          buttons={[
+            {
+              color: "accent",
+              title:
+                (royalGames?.some((royal) => royal._id === game._id)
+                  ? "Remove from"
+                  : "Add to") + " royal games",
+              callback: () => {
                 royalGames?.some((royal) => royal._id === game._id)
-                  ? royalGames.filter((royal) => royal._id !== game._id)
-                  : [...(!!royalGames?.length ? royalGames : []), game]
-              );
-            }}
-          >
-            {royalGames?.some((royal) => royal._id === game._id)
-              ? "Remove from"
-              : "Add to"}{" "}
-            royal games
-          </Button>
-          <Link
-            href={`https://www.youtube.com/results?search_query=${game.name}`}
-            target="_blank"
-          >
-            <Button>Search on Youtube</Button>
-          </Link>
-          {!!game.url && (
-            <Link href={game.url} target="_blank">
-              <Button>Open in IGDB</Button>
-            </Link>
-          )}
-        </div>
+                  ? removeRoyalGame(minimalGame)
+                  : addRoyalGame(minimalGame);
+              },
+            },
+            {
+              title: "Search on Youtube",
+              link: `https://www.youtube.com/results?search_query=${game.name}`,
+              target: "_blank",
+            },
+            {
+              title: "Search on RetroAchievements",
+              link: `https://retroachievements.org/searchresults.php?s=${game.name}&t=1`,
+              target: "_blank",
+            },
+            {
+              title: "Search on HowLongToBeat",
+              link: `https://howlongtobeat.com/?q=${encodeURI(game.name)}`,
+              target: "_blank",
+            },
+            { title: "Open in IGDB", link: game.url, isHidden: !game.url },
+          ]}
+        />
       </ExpandMenu>
       <div className={styles.page}>
         <div className={styles.page__left}>
@@ -84,7 +104,7 @@ export const GamePage: FC = () => {
               <Cover />
             )}
           </div>
-          <GameControls game={game} />
+          <GameControls game={minimalGame} />
         </div>
         <div className={styles.page__right}>
           <h2>

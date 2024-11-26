@@ -1,6 +1,6 @@
 import { CSSProperties, FC, useEffect, useRef, useState } from "react";
 import styles from "./GameControls.module.scss";
-import { IGDBGame } from "../../types/igdb";
+import { IGDBGameMinimal } from "../../types/igdb";
 import { Icon } from "@iconify/react";
 import classNames from "classnames";
 import { Button } from "../Button";
@@ -16,7 +16,7 @@ import { accentColor } from "../../constants";
 interface IGameControlsProps {
   style?: CSSProperties;
   className?: string;
-  game: IGDBGame;
+  game: IGDBGameMinimal;
 }
 
 const getMoonPhase = (rating: number) => {

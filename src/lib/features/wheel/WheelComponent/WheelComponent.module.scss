@@ -5,6 +5,7 @@
   justify-self: center;
   aspect-ratio: 1;
   height: 100%;
+  filter: drop-shadow(0 0 1rem $accent);
 
   @include mediaMax($screenSm) {
     aspect-ratio: 1;

@@ -18,7 +18,9 @@ export const Navigation: FC = () => {
             setExpanded("none");
           }}
         >
-          <Button color="transparent" className={styles.nav__button}>{link.name}</Button>
+          <Button color="default" className={styles.nav__button}>
+            {link.name}
+          </Button>
         </Link>
       ))}
     </div>

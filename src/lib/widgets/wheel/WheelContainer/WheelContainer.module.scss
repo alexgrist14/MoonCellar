@@ -2,8 +2,8 @@
   height: calc(100vh - 55px);
   padding: 30px;
   display: grid;
-  grid-template-rows: 50% 50%;
-  gap: 15px;
+  grid-template-rows: 50% 45%;
+  gap: 30px;
   margin-inline: auto;
   justify-items: center;
   overflow: hidden;
@@ -15,7 +15,8 @@
   }
 
   .winner {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 10px;
     color: white;
     min-width: 240px;

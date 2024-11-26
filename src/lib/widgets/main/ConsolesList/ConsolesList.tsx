@@ -5,12 +5,14 @@ import { IGDBList, RoyalList } from "@/src/lib/features/main";
 import { IGDBApi } from "@/src/lib/shared/api";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
-import { useGauntletFiltersStore } from "@/src/lib/shared/store/gauntlet-filters.store";
+import { useGauntletFiltersStore } from "@/src/lib/shared/store/filters.store";
 
 export const ConsolesList: FC = () => {
-  const { isRoyal, royalGames, setRoyal } = useGauntletFiltersStore();
-  const { isLoading } = useStatesStore();
+  const { royalGames } = useGauntletFiltersStore();
   const { setGenres, setGameModes, setSystems } = useCommonStore();
+  const { isLoading, setSegments, setStarted, setFinished, setRoyal, isRoyal } =
+    useStatesStore();
+  const { setWinner } = useCommonStore();
 
   useEffect(() => {
     if (isRoyal) return;
@@ -32,7 +34,13 @@ export const ConsolesList: FC = () => {
           </span>
           <ToggleSwitch
             value={isRoyal ? "right" : "left"}
-            clickCallback={() => setRoyal(!isRoyal)}
+            clickCallback={() => {
+              setRoyal(!isRoyal);
+              setWinner(undefined);
+              setFinished(true);
+              setStarted(false);
+              setSegments([]);
+            }}
             isDisabled={isLoading}
           />
         </label>

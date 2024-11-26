@@ -79,14 +79,16 @@
     }
   }
 
-  &__actions {
-    display: grid;
+  div &__actions {
+    flex-direction: column;
     gap: 5px;
     width: 100%;
     padding-top: 40px;
 
-    & button {
+    & button, a {
       width: 100%;
+      height: 40px;
+      max-height: 40px;
     }
   }
 

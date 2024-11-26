@@ -10,6 +10,8 @@ import styles from "./ExpandMenu.module.scss";
 import { Scrollbar } from "../Scrollbar";
 import { useCommonStore } from "../../store/common.store";
 import { useRouter } from "next/router";
+import { accentColor } from "../../constants";
+import classNames from "classnames";
 
 interface IExpandMenuProps
   extends Pick<HTMLAttributes<HTMLDivElement>, "children" | "id"> {
@@ -64,11 +66,11 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
   return (
     <div
       ref={expandRef}
-      className={styles.menu}
+      className={classNames(styles.menu, {
+        [styles.menu_disabled]: isNotExtendedMobile,
+      })}
       style={{
         top: scrollY > 0 ? Math.max(0, 55 - scrollY) : "55px",
-        pointerEvents: isNotExtendedMobile ? "none" : "auto",
-        opacity: isNotExtendedMobile ? "0" : "1",
         right: position === "right" ? "0" : "unset",
         gridTemplateColumns: position === "left" ? "1fr 5px" : "5px 1fr",
         gridTemplateAreas:

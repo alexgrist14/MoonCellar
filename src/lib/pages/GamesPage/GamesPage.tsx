@@ -1,21 +1,20 @@
-import { FC, useEffect, useMemo, useRef, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import styles from "./GamesPage.module.scss";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { Filters } from "../../shared/ui/Filters";
 import { IGDBApi } from "../../shared/api";
-import { useGamesFiltersStore } from "../../shared/store/games-filters.store";
 import { useCommonStore } from "../../shared/store/common.store";
-import { IGDBGame } from "../../shared/types/igdb";
+import { IGDBGameMinimal } from "../../shared/types/igdb";
 import { axiosUtils } from "../../shared/utils/axios";
 import { GameCard } from "../../shared/ui/GameCard";
 import { useStatesStore } from "../../shared/store/states.store";
 import { Button } from "../../shared/ui/Button";
 import { PacmanLoader, PulseLoader } from "react-spinners";
 import { useDebouncedCallback } from "use-debounce";
+import { useGamesFiltersStore } from "../../shared/store/filters.store";
 
 export const GamesPage: FC = () => {
   const {
-    isRoyal,
     selectedGenres,
     selectedRating,
     selectedSystems,
@@ -25,13 +24,13 @@ export const GamesPage: FC = () => {
     excludedGameModes,
     searchQuery,
   } = useGamesFiltersStore();
-  const { isLoading, setLoading } = useStatesStore();
+  const { isLoading, setLoading, isRoyal } = useStatesStore();
   const { setGenres, setGameModes, setSystems, isMobile, setExpanded } =
     useCommonStore();
 
   const step = useMemo(() => (isMobile ? 34 : 35), [isMobile]);
 
-  const [games, setGames] = useState<IGDBGame[]>([]);
+  const [games, setGames] = useState<IGDBGameMinimal[]>([]);
   const [take, setTake] = useState(step);
   const [total, setTotal] = useState(0);
 

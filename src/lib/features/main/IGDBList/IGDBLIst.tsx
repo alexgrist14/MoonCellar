@@ -5,7 +5,7 @@ import { ExtendedRange } from "@/src/lib/shared/ui/ExtendedRange";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
-import { useGauntletFiltersStore } from "@/src/lib/shared/store/gauntlet-filters.store";
+import { useGauntletFiltersStore } from "@/src/lib/shared/store/filters.store";
 
 export const IGDBList: FC = () => {
   const { gameModes, genres, systems } = useCommonStore();

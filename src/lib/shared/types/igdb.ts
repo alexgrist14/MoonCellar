@@ -1,6 +1,5 @@
 export interface IGDBDefault {
   _id: number;
-  id: number;
   slug: string;
   name: string;
 }
@@ -31,6 +30,28 @@ export interface IGDBGame extends IGDBDefault {
   involved_companies: IGDBInvolvedCompany[];
   url: string;
   release_dates: IGDBReleaseDate[];
+}
+
+export interface IGDBGameMinimal
+  extends Omit<
+    IGDBGame,
+    | "screenshots"
+    | "artworks"
+    | "game_modes"
+    | "genres"
+    | "keywords"
+    | "themes"
+    | "websites"
+    | "involved_companies"
+  > {
+  screenshots: number[];
+  artworks: number[];
+  game_modes: number[];
+  genres: number[];
+  keywords: number[];
+  themes: number[];
+  websites: number[];
+  involved_companies: number[];
 }
 
 export interface IGDBReleaseDate {
@@ -78,7 +99,6 @@ export interface IGDBGenre extends IGDBDefault {
 
 export interface IGDBCover {
   _id: number;
-  id: number;
   url: string;
   width: number;
   height: number;
@@ -86,7 +106,6 @@ export interface IGDBCover {
 
 export interface IGDBScreenshot {
   _id: number;
-  id: number;
   url: string;
   width: number;
   height: number;

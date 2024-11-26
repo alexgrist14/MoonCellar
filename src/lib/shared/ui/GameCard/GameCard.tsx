@@ -1,7 +1,7 @@
 import { FC, useRef, useState } from "react";
 import styles from "./GameCard.module.scss";
 import Link from "next/link";
-import { IGDBGame } from "../../types/igdb";
+import { IGDBGameMinimal } from "../../types/igdb";
 import classNames from "classnames";
 import Image from "next/image";
 import { modal } from "../Modal";
@@ -13,7 +13,7 @@ import useCloseEvents from "../../hooks/useCloseEvents";
 import { Loader } from "../Loader";
 
 interface IGameCardProps {
-  game: IGDBGame;
+  game: IGDBGameMinimal;
 }
 
 export const GameCard: FC<IGameCardProps> = ({ game }) => {

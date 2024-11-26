@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import styles from "./GauntletPage.module.scss";
 import { ConsolesList } from "../../widgets/main";
 import { IGDBApi } from "../../shared/api";
@@ -7,11 +7,18 @@ import { getSegments } from "../../shared/utils/getSegments";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { useStatesStore } from "../../shared/store/states.store";
 import { useCommonStore } from "../../shared/store/common.store";
-import { useGauntletFiltersStore } from "../../shared/store/gauntlet-filters.store";
+import { getImageLink } from "../../shared/constants";
+import { useGauntletFiltersStore } from "../../shared/store/filters.store";
+import { axiosUtils } from "../../shared/utils/axios";
+import Image from "next/image";
+import classNames from "classnames";
+import { IGDBScreenshot } from "../../shared/types/igdb";
 
 export const GauntletPage: FC = () => {
+  const [bg, setBg] = useState<IGDBScreenshot & { gameId: number }>();
+  const [isImageReady, setIsImageReady] = useState(true);
+
   const {
-    isRoyal,
     selectedGenres,
     selectedRating,
     selectedGameModes,
@@ -24,9 +31,15 @@ export const GauntletPage: FC = () => {
     excludedSystems,
   } = useGauntletFiltersStore();
 
-  const { isLoading, setSegments, setStarted, setFinished, setLoading } =
-    useStatesStore();
-  const { setWinner, setExpanded } = useCommonStore();
+  const {
+    isLoading,
+    setSegments,
+    setStarted,
+    setFinished,
+    setLoading,
+    isRoyal,
+  } = useStatesStore();
+  const { setWinner, winner } = useCommonStore();
 
   const getIGDBGames = useCallback(() => {
     if (isRoyal) return;
@@ -79,13 +92,6 @@ export const GauntletPage: FC = () => {
   ]);
 
   useEffect(() => {
-    setWinner(undefined);
-    setFinished(true);
-    setStarted(false);
-    setSegments([]);
-  }, [isRoyal]);
-
-  useEffect(() => {
     if (isLoading && !isRoyal) {
       getIGDBGames();
     }
@@ -97,8 +103,42 @@ export const GauntletPage: FC = () => {
       setSegments(royalGames.map((game, i) => game._id + "_" + i));
   }, [isRoyal, royalGames, setSegments]);
 
+  useEffect(() => {
+    const pictures: number[] = [];
+
+    if (!!winner) {
+      winner.artworks.forEach((id) => pictures.push(id));
+      winner.screenshots.forEach((id) => pictures.push(id));
+
+      const id = pictures[Math.floor(Math.random() * (pictures.length - 1))];
+
+      !!id &&
+        IGDBApi.getArt(id)
+          .then((res) => {
+            setIsImageReady(false);
+            setBg({ ...res.data, gameId: winner._id });
+          })
+          .catch(axiosUtils.toastError);
+    }
+  }, [winner]);
+
   return (
     <div className={styles.page}>
+      <div
+        className={classNames(styles.page__bg, {
+          [styles.page__bg_active]:
+            !!bg && !!winner && winner._id === bg.gameId && isImageReady,
+        })}
+      >
+        <Image
+          onLoad={() => setIsImageReady(true)}
+          key={bg?._id}
+          alt="Background"
+          src={!!bg ? getImageLink(bg.url, "1080p") : ""}
+          width={1920}
+          height={1080}
+        />
+      </div>
       <ExpandMenu id="consoles" titleOpen="Filters">
         <ConsolesList />
       </ExpandMenu>

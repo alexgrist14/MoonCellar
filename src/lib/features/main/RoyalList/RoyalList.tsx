@@ -2,7 +2,7 @@ import { FC } from "react";
 import styles from "./RoyalList.module.scss";
 import { Button } from "@/src/lib/shared/ui/Button";
 import Link from "next/link";
-import { useGauntletFiltersStore } from "@/src/lib/shared/store/gauntlet-filters.store";
+import { useGauntletFiltersStore } from "@/src/lib/shared/store/filters.store";
 
 export const RoyalList: FC = () => {
   const { royalGames, setRoyalGames } = useGauntletFiltersStore();
@@ -18,7 +18,7 @@ export const RoyalList: FC = () => {
       <div className={styles.consoles__games}>
         {!!royalGames?.length
           ? royalGames.map((game) => (
-              <div key={game.id} className={styles.consoles__game}>
+              <div key={game._id} className={styles.consoles__game}>
                 <Link href={`/games/${game.slug}`} target="_blank">
                   {game.name}
                 </Link>

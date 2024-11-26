@@ -1,5 +1,12 @@
 import { API_URL } from "../constants";
-import { IGDBDefault, IGDBGame, IGDBGenre, IGDBPlatform } from "../types/igdb";
+import {
+  IGDBDefault,
+  IGDBGame,
+  IGDBGameMinimal,
+  IGDBGenre,
+  IGDBPlatform,
+  IGDBScreenshot,
+} from "../types/igdb";
 import { agent } from "./agent";
 
 interface IGDBFilters {
@@ -19,7 +26,7 @@ const getGames = (params: {
   selected?: IGDBFilters;
   excluded?: IGDBFilters;
 }) => {
-  return agent.get<{ results: IGDBGame[]; total: number }>(
+  return agent.get<{ results: IGDBGameMinimal[]; total: number }>(
     `${IGDB_URL}/games`,
     {
       params: {
@@ -31,7 +38,7 @@ const getGames = (params: {
           ? JSON.stringify(params.excluded)
           : undefined,
       },
-    },
+    }
   );
 };
 
@@ -55,6 +62,10 @@ const getModes = () => {
   return agent.get<IGDBDefault[]>(`${IGDB_URL}/modes`);
 };
 
+const getArt = (id: number) => {
+  return agent.get<IGDBScreenshot>(`${IGDB_URL}/art/${id}`);
+};
+
 export const IGDBApi = {
   getGames,
   getGameById,
@@ -62,4 +73,5 @@ export const IGDBApi = {
   getGenres,
   getPlatforms,
   getModes,
+  getArt,
 };

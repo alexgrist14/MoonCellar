@@ -7,31 +7,29 @@ import { IButtonGroupItem } from "../../../types/buttons";
 
 interface IButtonGroupProps {
   buttons: IButtonGroupItem[];
-  isWithoutPadding?: boolean;
   style?: CSSProperties;
   wrapperStyle?: CSSProperties;
   isCompact?: boolean;
-  className?: string;
+  wrapperClassName?: string;
 }
 
 export const ButtonGroup: FC<IButtonGroupProps> = ({
   buttons,
-  isWithoutPadding,
   style,
   wrapperStyle,
   isCompact,
-  className,
+  wrapperClassName,
 }) => {
   return (
     <div
-      style={{ ...wrapperStyle, padding: isWithoutPadding ? "initial" : "5px" }}
-      className={classNames(styles.group, className, {
+      style={wrapperStyle}
+      className={classNames(styles.group, wrapperClassName, {
         [styles.group_compact]: isCompact,
       })}
     >
       {buttons.map((button, i) =>
         !!button.link ? (
-          <Link key={i} href={button.link}>
+          <Link key={i} href={button.link} target={button.target}>
             <Button
               style={{ ...style, ...(button.isHidden && { display: "none" }) }}
               onClick={button.callback}
@@ -59,7 +57,7 @@ export const ButtonGroup: FC<IButtonGroupProps> = ({
           >
             {button.title}
           </Button>
-        ),
+        )
       )}
     </div>
   );

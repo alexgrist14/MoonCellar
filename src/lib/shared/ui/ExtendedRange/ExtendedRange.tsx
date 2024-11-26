@@ -28,7 +28,7 @@ export const ExtendedRange: FC<IExtendedCheckboxProps> = ({
 
   const debouncedSetSelected = useDebouncedCallback(
     (value: number) => setSelected(value),
-    500,
+    500
   );
 
   useEffect(() => {
@@ -40,6 +40,7 @@ export const ExtendedRange: FC<IExtendedCheckboxProps> = ({
       {!!title && <h3>{title}</h3>}
       <div className={styles.range__wrapper}>
         <RangeSelector
+          variant="green"
           text={value !== min ? (symbol || "From ") + value : text || "All"}
           defaultValue={value}
           min={min}

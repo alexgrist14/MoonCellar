@@ -3,10 +3,10 @@ import { Input } from "../Input";
 import styles from "./SearchModal.module.scss";
 import { FC, useEffect, useMemo, useState } from "react";
 import { IGDBApi } from "../../api";
-import { IGDBGame } from "../../types/igdb";
+import { IGDBGameMinimal } from "../../types/igdb";
 import { Scrollbar } from "../Scrollbar";
 import { Button } from "../Button";
-import { PacmanLoader, PulseLoader } from "react-spinners";
+import { PacmanLoader } from "react-spinners";
 import { GameCard } from "../GameCard";
 import classNames from "classnames";
 import { useCommonStore } from "../../store/common.store";
@@ -15,7 +15,7 @@ import { Loader } from "../Loader";
 export const SearchModal: FC = () => {
   const { isMobile } = useCommonStore();
 
-  const [games, setGames] = useState<IGDBGame[]>([]);
+  const [games, setGames] = useState<IGDBGameMinimal[]>([]);
   const [total, setTotal] = useState(0);
 
   const [take, setTake] = useState(0);
