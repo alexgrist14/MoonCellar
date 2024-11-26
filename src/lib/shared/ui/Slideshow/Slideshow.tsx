@@ -1,42 +1,66 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import styles from "./Slideshow.module.scss";
 import { Scrollbar } from "../Scrollbar";
 import { modal } from "../Modal";
-import Image from "next/image";
 import { IGDBScreenshot } from "../../types/igdb";
-import { getImageLink } from "../../constants";
-import { PulseLoader } from "react-spinners";
-import { Loader } from "../Loader";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import { Button } from "../Button";
+import { SlideshowImage } from "./components/SlideshowImage";
 
 interface ISlideshowProps {
   pictures: IGDBScreenshot[];
 }
 
 export const Slideshow: FC<ISlideshowProps> = ({ pictures }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [screenshot, setScreenshot] = useState<IGDBScreenshot>();
+  const [screenshotIndex, setScreenshotIndex] = useState<number>();
+
+  const screenshots = useMemo(
+    () =>
+      pictures.map((picture) => (
+        <SlideshowImage key={picture._id} picture={picture} />
+      )),
+    [pictures]
+  );
 
   useEffect(() => {
     modal.close();
 
-    !!screenshot &&
+    screenshotIndex !== undefined &&
       modal.open(
         <div
           className={styles.slideshow__wrapper}
-          onClick={() => modal.close()}
+          onClick={() => {
+            modal.close();
+            setScreenshotIndex(undefined);
+          }}
         >
-          {isLoading && <Loader />}
-          <Image
-            onLoadingComplete={() => setIsLoading(false)}
-            key={screenshot._id}
-            width={1920}
-            height={1080}
-            alt="screenshot"
-            src={getImageLink(screenshot.url, "1080p", 2)}
-          />
+          <Button
+            color="transparent"
+            className={styles.slideshow__prev}
+            disabled={screenshotIndex === 0}
+            onClick={(e) => {
+              e.stopPropagation();
+              setScreenshotIndex(screenshotIndex - 1);
+            }}
+          >
+            <Icon icon={"ooui:previous-ltr"} />
+          </Button>
+          {screenshots[screenshotIndex]}
+          <Button
+            color="transparent"
+            className={styles.slideshow__next}
+            disabled={screenshotIndex === screenshots.length - 1}
+            onClick={(e) => {
+              e.stopPropagation();
+              setScreenshotIndex(screenshotIndex + 1);
+            }}
+          >
+            <Icon icon={"ooui:previous-rtl"} />
+          </Button>
         </div>,
+        { onClose: () => setScreenshotIndex(undefined) }
       );
-  }, [isLoading, screenshot]);
+  }, [screenshotIndex, screenshots]);
 
   return (
     <Scrollbar stl={styles} isHorizontal>
@@ -47,20 +71,12 @@ export const Slideshow: FC<ISlideshowProps> = ({ pictures }) => {
               key={i}
               className={styles.slideshow__screenshot}
               onClick={() => {
-                setIsLoading(true);
-                setScreenshot(picture);
+                setScreenshotIndex(i);
               }}
             >
-              <Image
-                key={picture._id}
-                alt="screenshot"
-                width={889}
-                height={500}
-                src={getImageLink(picture.url, "screenshot_big")}
-                priority
-              />
+              {screenshots[i]}
             </div>
-          ),
+          )
       )}
     </Scrollbar>
   );

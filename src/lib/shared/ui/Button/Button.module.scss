@@ -15,7 +15,7 @@
 
   padding-inline: 12px;
 
-  &:hover:not(&_fancyColor) {
+  &:hover:not(&_fancyColor):not(&_transparentColor) {
     filter: brightness(0.8);
   }
 

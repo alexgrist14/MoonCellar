@@ -10,6 +10,7 @@ import { PacmanLoader, PulseLoader } from "react-spinners";
 import { GameCard } from "../GameCard";
 import classNames from "classnames";
 import { useCommonStore } from "../../store/common.store";
+import { Loader } from "../Loader";
 
 export const SearchModal: FC = () => {
   const { isMobile } = useCommonStore();
@@ -80,7 +81,7 @@ export const SearchModal: FC = () => {
                 className={styles.modal__more}
                 onClick={() => setTake(take + originalTake)}
               >
-                {isLoading ? <PulseLoader color="#ffffff" /> : "More games"}
+                {isLoading ? <Loader /> : "More games"}
               </Button>
             )}
           </div>

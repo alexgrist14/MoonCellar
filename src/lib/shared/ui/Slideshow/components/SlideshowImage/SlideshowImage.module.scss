@@ -1,0 +1,8 @@
+.image {
+  opacity: 0;
+  transition: 0.4s;
+
+  &_active {
+    opacity: 1;
+  }
+}
