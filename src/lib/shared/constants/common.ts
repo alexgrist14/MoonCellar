@@ -45,7 +45,7 @@ export const dateRegions = [
   "Brazil",
 ];
 
-export const gameCategories = {
+export const gameCategories: { [key: string]: number } = {
   main_game: 0,
   dlc_addon: 1,
   expansion: 2,
@@ -61,4 +61,22 @@ export const gameCategories = {
   fork: 12,
   pack: 13,
   update: 14,
+};
+
+export const gameCategoryNames: { [key: string]: string } = {
+  main_game: "Game",
+  dlc_addon: "DLC",
+  expansion: "Expansion",
+  bundle: "Bundle",
+  standalone_expansion: "Standalone expansion",
+  mod: "Mod",
+  episode: "Episode",
+  season: "Season",
+  remake: "Remake",
+  remaster: "Remaster",
+  expanded_game: "Expanded game",
+  port: "Port",
+  fork: "Fork",
+  pack: "Pack",
+  update: "Update",
 };

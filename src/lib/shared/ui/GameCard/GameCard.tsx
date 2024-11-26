@@ -5,7 +5,11 @@ import { IGDBGameMinimal } from "../../types/igdb";
 import classNames from "classnames";
 import Image from "next/image";
 import { modal } from "../Modal";
-import { getImageLink } from "../../constants";
+import {
+  gameCategories,
+  gameCategoryNames,
+  getImageLink,
+} from "../../constants";
 import { Cover } from "../Cover";
 import { GameControls } from "../GameControls";
 import { useCommonStore } from "../../store/common.store";
@@ -65,6 +69,13 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
           <p>
             {game.name}
             {!!releaseYear ? ` (${releaseYear})` : ""}
+            {` (${
+              gameCategoryNames[
+                Object.keys(gameCategories).find(
+                  (key) => gameCategories[key] === game.category
+                ) || ""
+              ]
+            })`}
           </p>
           <span>
             {!!game.platforms?.length &&

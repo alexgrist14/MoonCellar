@@ -5,7 +5,12 @@ import { IGDBGame } from "../../shared/types/igdb";
 import { useRouter } from "next/router";
 import { IGDBApi } from "../../shared/api";
 import { axiosUtils } from "../../shared/utils/axios";
-import { dateRegions, getImageLink } from "../../shared/constants";
+import {
+  dateRegions,
+  gameCategories,
+  gameCategoryNames,
+  getImageLink,
+} from "../../shared/constants";
 import { Slideshow } from "../../shared/ui/Slideshow";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { Button } from "../../shared/ui/Button";
@@ -49,6 +54,12 @@ export const GamePage: FC = () => {
     themes: game.themes.map((item) => item._id),
     websites: game.websites.map((item) => item._id),
   };
+
+  const releaseYear = game.release_dates?.reduce(
+    (year: number | undefined, date) =>
+      !!date.y ? (!!year && date.y > year ? year : (year = date.y)) : year,
+    undefined
+  );
 
   return (
     <>
@@ -108,8 +119,14 @@ export const GamePage: FC = () => {
         </div>
         <div className={styles.page__right}>
           <h2>
-            {game.name}{" "}
-            {!!game.release_dates?.length ? `(${game.release_dates[0].y})` : ""}
+            {game.name} {!!releaseYear ? ` (${releaseYear})` : ""}
+            {` (${
+              gameCategoryNames[
+                Object.keys(gameCategories).find(
+                  (key) => gameCategories[key] === game.category
+                ) || ""
+              ]
+            })`}
           </h2>
           <div className={styles.page__developers}>
             {game.involved_companies.some((comp) => comp.developer) && (
