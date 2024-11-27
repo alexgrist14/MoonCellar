@@ -5,8 +5,8 @@ export interface IGDBDefault {
 }
 
 export interface IGDBPlatform extends IGDBDefault {
-  platform_family: number;
-  platform_logo: number;
+  platform_family: IGDBDefault;
+  platform_logo: IGDBScreenshot;
 }
 
 export type IGDBFamily = IGDBDefault;

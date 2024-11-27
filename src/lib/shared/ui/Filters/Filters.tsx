@@ -7,6 +7,7 @@ import { ExtendedSelector } from "../ExtendedSelector";
 import { ExtendedRange } from "../ExtendedRange";
 import { Button } from "../Button";
 import { useGamesFiltersStore } from "../../store/filters.store";
+import { getImageLink } from "../../constants";
 
 export const Filters: FC<{ callback?: () => void }> = ({ callback }) => {
   const { gameModes, genres, systems } = useCommonStore();

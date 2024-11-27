@@ -46,6 +46,7 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
       className={styles.card}
       onMouseOver={() => setIsHover(true)}
       onMouseOut={() => setIsHover(false)}
+      draggable={false}
     >
       <div
         className={classNames(styles.card__info, {
@@ -53,6 +54,7 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
         })}
       >
         <Link
+          draggable={false}
           className={styles.card__title}
           href={`/games/${game.slug}`}
           onClick={(e) => {
@@ -66,23 +68,27 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
             modal.close();
           }}
         >
-          <p>
-            {game.name}
-            {!!releaseYear ? ` (${releaseYear})` : ""}
-            {` (${
+          <p>{game.name}</p>
+          <span>
+            {`${
               gameCategoryNames[
                 Object.keys(gameCategories).find(
                   (key) => gameCategories[key] === game.category
                 ) || ""
               ]
-            })`}
-          </p>
+            }`}
+            {!!releaseYear ? ` - ${releaseYear}` : ""}
+          </span>
           <span>
             {!!game.platforms?.length &&
               game.platforms.map((platform) => platform.name).join(", ")}
           </span>
+          {!!game.summary &&
+            (cardRef.current?.getBoundingClientRect().height || 0) > 250 && (
+              <span>{game.summary}</span>
+            )}
         </Link>
-        <GameControls game={game} />
+        <GameControls className={styles.card__controls} game={game} />
       </div>
       {isLoading && <Loader key={game._id + "_loader"} />}
       {!!game?.cover ? (

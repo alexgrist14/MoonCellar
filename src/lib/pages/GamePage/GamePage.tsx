@@ -118,16 +118,25 @@ export const GamePage: FC = () => {
           <GameControls game={minimalGame} />
         </div>
         <div className={styles.page__right}>
-          <h2>
-            {game.name} {!!releaseYear ? ` (${releaseYear})` : ""}
-            {` (${
-              gameCategoryNames[
-                Object.keys(gameCategories).find(
-                  (key) => gameCategories[key] === game.category
-                ) || ""
-              ]
-            })`}
-          </h2>
+          <h2>{game.name}</h2>
+          <div className={styles.page__info}>
+            {!!releaseYear && (
+              <p>
+                <span>Year: </span>
+                {releaseYear}
+              </p>
+            )}
+            <p>
+              <span>Category: </span>
+              {
+                gameCategoryNames[
+                  Object.keys(gameCategories).find(
+                    (key) => gameCategories[key] === game.category
+                  ) || ""
+                ]
+              }
+            </p>
+          </div>
           <div className={styles.page__developers}>
             {game.involved_companies.some((comp) => comp.developer) && (
               <p>

@@ -3,7 +3,7 @@
   flex-direction: column;
   padding: 20px;
   background-color: $bgAlt;
-  width: 80vw;
+  width: 85vw;
   border-radius: $radius;
   position: fixed;
   top: 5%;
@@ -29,9 +29,10 @@
   }
 
   &__results {
+    padding: 5px;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 30px;
+    gap: 20px;
     opacity: 0;
     height: fit-content;
     animation: appearOpacity 0.4s ease forwards 1;
@@ -57,6 +58,7 @@
   &__more {
     height: 100%;
     position: relative;
+    border-radius: $radius;
   }
 
   &__empty {

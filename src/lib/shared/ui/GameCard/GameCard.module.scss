@@ -5,25 +5,30 @@
   border-radius: $radius;
   transition: all 0.3s;
   position: relative;
-  overflow: hidden;
   background: $lightBgSecond;
+  user-select: none;
 
   &__title {
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 20px;
     padding: 10px;
     text-align: center;
 
     & > p {
-      @include font(12px, 12px, 400);
+      @include font(12px, 13px, 400);
       @include lineClamp(4);
     }
 
     & > span {
-      @include font(10px, 12px, 400);
+      @include font(11px, 12px, 400);
       @include lineClamp(3);
     }
+  }
+
+  &__controls {
+    position: absolute;
+    bottom: 0;
   }
 
   &__info {
@@ -37,7 +42,7 @@
     opacity: 0;
     position: absolute;
     border-radius: $radius;
-    border: 2px solid $gray;
+    outline: 2px solid $accent;
 
     &_active {
       opacity: 1;

@@ -119,7 +119,8 @@ export const GameControls: FC<IGameControlsProps> = ({
   return (
     <div
       className={classNames(styles.controls, className, {
-        [styles.controls_disabled]: !profile || isLoading,
+        [styles.controls_disabled]: isLoading,
+        [styles.controls_hidden]: !profile,
       })}
       style={style}
       ref={controlsRef}

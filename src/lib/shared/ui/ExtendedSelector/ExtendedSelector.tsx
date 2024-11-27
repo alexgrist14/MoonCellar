@@ -11,6 +11,7 @@ export interface IExtendedSelectorProps<
   setExcluded: any;
   setSelected: any;
   isDisabled?: boolean;
+  icons?: string[];
 }
 
 export const ExtendedSelector = <T,>({
@@ -21,12 +22,14 @@ export const ExtendedSelector = <T,>({
   setExcluded,
   setSelected,
   isDisabled,
+  icons,
 }: IExtendedSelectorProps<T & { _id: number; name: string }>) => {
   return (
     <div className={styles.option}>
       <h3>{title}</h3>
       <div className={styles.option__selector}>
         <Dropdown
+          icons={icons}
           isWithReset
           overflowRootId="consoles"
           isDisabled={isDisabled}
@@ -49,6 +52,7 @@ export const ExtendedSelector = <T,>({
       </div>
       <div className={styles.option__selector}>
         <Dropdown
+          icons={icons}
           isWithReset
           overflowRootId="consoles"
           isDisabled={isDisabled}

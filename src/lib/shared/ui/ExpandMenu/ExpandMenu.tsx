@@ -9,8 +9,6 @@ import {
 import styles from "./ExpandMenu.module.scss";
 import { Scrollbar } from "../Scrollbar";
 import { useCommonStore } from "../../store/common.store";
-import { useRouter } from "next/router";
-import { accentColor } from "../../constants";
 import classNames from "classnames";
 
 interface IExpandMenuProps
@@ -27,24 +25,14 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
   titleOpen,
   ...props
 }) => {
-  const { asPath } = useRouter();
   const expandRef = useRef<HTMLDivElement>(null);
-  const { expandPosition, isMobile, setExpandPosition, expanded, setExpanded } =
-    useCommonStore();
+  const { expandPosition, isMobile, expanded, setExpanded } = useCommonStore();
 
-  const [isActive, setIsActive] = useState(false);
   const [scrollY, setScrollY] = useState(0);
 
   const isNotExtendedMobile =
     !!expandPosition && expandPosition !== position && isMobile;
-
-  useEffect(() => {
-    setExpandPosition(isActive ? position : undefined);
-  }, [isActive, setExpandPosition, position]);
-
-  useEffect(() => {
-    setIsActive(false);
-  }, [asPath]);
+  const isActive = expanded === "both" || expanded === position;
 
   useEffect(() => {
     const handler = () => {
@@ -55,32 +43,19 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
     return () => document.removeEventListener("scroll", handler);
   }, []);
 
-  useEffect(() => {
-    if (expanded === "none") {
-      setIsActive(false);
-    } else {
-      setIsActive(position === expanded || expanded === "both");
-    }
-  }, [expanded, position]);
-
   return (
     <div
       ref={expandRef}
       className={classNames(styles.menu, {
         [styles.menu_disabled]: isNotExtendedMobile,
+        [styles.menu_right]: position === "right",
+        [styles.menu_active]: isActive,
       })}
       style={{
         top: scrollY > 0 ? Math.max(0, 55 - scrollY) : "55px",
-        right: position === "right" ? "0" : "unset",
         gridTemplateColumns: position === "left" ? "1fr 5px" : "5px 1fr",
         gridTemplateAreas:
           position === "left" ? "'content expand'" : "'expand content'",
-        transform:
-          expanded !== "both" && (expanded === "none" || expanded !== position)
-            ? position === "right"
-              ? "translateX(calc(100% - 5px))"
-              : "translateX(calc(-100% + 5px)"
-            : "translateX(0)",
       }}
       {...props}
     >

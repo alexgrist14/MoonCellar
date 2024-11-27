@@ -16,6 +16,7 @@ import useCloseEvents from "../../hooks/useCloseEvents";
 import { Scrollbar } from "../Scrollbar";
 import { Checkbox } from "../Checkbox";
 import classNames from "classnames";
+import Image from "next/image";
 
 interface IIndexedItem {
   value: string;
@@ -35,9 +36,9 @@ interface IDropDownListProps {
   getValues?: (values: string[]) => void;
   getIndex?: (index: number) => void;
   getIndexes?: (indexes: number[]) => void;
+  getSearchQuery?: (value: string) => void;
   title?: string;
   rootRef?: RefObject<HTMLDivElement>;
-  getSearchQuery?: (value: string) => void;
   overwriteValue?: string;
   overflowRootId?: string;
   maxHeight?: string;
@@ -49,6 +50,7 @@ interface IDropDownListProps {
   isWithInput?: boolean;
   isWithAll?: boolean;
   borderTheme?: "default" | "green" | "red";
+  icons?: string[];
 }
 
 export const Dropdown: FC<IDropDownListProps> = ({
@@ -78,6 +80,7 @@ export const Dropdown: FC<IDropDownListProps> = ({
   isWithInput,
   isWithAll,
   borderTheme,
+  icons,
 }) => {
   const router = useRouter();
   const [isActive, setIsActive] = useState(false);
@@ -98,7 +101,7 @@ export const Dropdown: FC<IDropDownListProps> = ({
   const searchRef = useRef<HTMLInputElement>(null);
 
   const debouncedQueryChange = useDebouncedCallback((value: string) => {
-    const values = sortedList.reduce(
+    const values = indexedList.reduce(
       (result: { index: number; value: string }[], element) => {
         element.value.toLowerCase().includes(value.toLowerCase()) &&
           result.push(element);
@@ -381,6 +384,7 @@ export const Dropdown: FC<IDropDownListProps> = ({
               {sortedList.map((item, index) => {
                 const isChecked = multiValue.includes(item.index);
                 const key = `${item.value.replace(/[^W+]/g, "_")}-${index}`;
+                const icon = !!icons?.length ? icons[item.index] : "";
 
                 return (
                   <div
@@ -389,7 +393,23 @@ export const Dropdown: FC<IDropDownListProps> = ({
                     onClick={() => {
                       clickHandler(item, { isChecked });
                     }}
+                    style={{
+                      gridTemplateColumns: !!icon
+                        ? "40px 1fr 20px "
+                        : "1fr 20px",
+                    }}
                   >
+                    {!!icon && (
+                      <div className={styles.dropdown__image}>
+                        <Image
+                          alt="Icon"
+                          src={icon}
+                          width={200}
+                          height={90}
+                          priority
+                        />
+                      </div>
+                    )}
                     <span>{item.value}</span>
                     {isMulti && (
                       <Checkbox

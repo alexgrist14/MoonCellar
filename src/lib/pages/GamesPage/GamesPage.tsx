@@ -12,6 +12,7 @@ import { Button } from "../../shared/ui/Button";
 import { PacmanLoader, PulseLoader } from "react-spinners";
 import { useDebouncedCallback } from "use-debounce";
 import { useGamesFiltersStore } from "../../shared/store/filters.store";
+import { Loader } from "../../shared/ui/Loader";
 
 export const GamesPage: FC = () => {
   const {
@@ -50,7 +51,7 @@ export const GamesPage: FC = () => {
         platforms: selectedSystems?.map((item) => item._id),
       },
       page: 1,
-      take: take + (!isMobile ? Math.ceil(take / step) - 1 : -1),
+      take: take + (!isMobile ? Math.ceil(take / step) - 1 : 0),
       rating: selectedRating,
     })
       .then((res) => {
@@ -90,10 +91,10 @@ export const GamesPage: FC = () => {
           ))}
           {!!games?.length && take < total && (
             <Button
-              className={styles.modal__more}
+              className={styles.page__more}
               onClick={() => setTake(take + step)}
             >
-              {isLoading ? <PulseLoader color="#ffffff" /> : "More games"}
+              {isLoading ? <Loader /> : "More games"}
             </Button>
           )}
         </div>
