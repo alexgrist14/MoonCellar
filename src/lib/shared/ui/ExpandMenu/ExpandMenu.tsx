@@ -26,12 +26,10 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
   ...props
 }) => {
   const expandRef = useRef<HTMLDivElement>(null);
-  const { expandPosition, isMobile, expanded, setExpanded } = useCommonStore();
+  const { isMobile, expanded, setExpanded } = useCommonStore();
 
   const [scrollY, setScrollY] = useState(0);
 
-  const isNotExtendedMobile =
-    !!expandPosition && expandPosition !== position && isMobile;
   const isActive = expanded === "both" || expanded === position;
 
   useEffect(() => {
@@ -47,7 +45,8 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
     <div
       ref={expandRef}
       className={classNames(styles.menu, {
-        [styles.menu_disabled]: isNotExtendedMobile,
+        [styles.menu_disabled]:
+          isMobile && !isActive && !!expanded && expanded !== "none",
         [styles.menu_right]: position === "right",
         [styles.menu_active]: isActive,
       })}
