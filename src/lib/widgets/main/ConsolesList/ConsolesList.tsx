@@ -6,6 +6,9 @@ import { IGDBApi } from "@/src/lib/shared/api";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { useGauntletFiltersStore } from "@/src/lib/shared/store/filters.store";
+import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
+import { title } from "process";
+import { Tabs } from "@/src/lib/shared/ui/Tabs";
 
 export const ConsolesList: FC = () => {
   const { royalGames } = useGauntletFiltersStore();
@@ -27,23 +30,34 @@ export const ConsolesList: FC = () => {
   return (
     <div ref={contentRef} className={styles.consoles__list}>
       <div className={styles.consoles__options}>
-        <label className={styles.consoles__toggle}>
-          <span>
-            Royal
-            {!!royalGames?.length ? ` (Games: ${royalGames.length}):` : ":"}
-          </span>
-          <ToggleSwitch
-            value={isRoyal ? "right" : "left"}
-            clickCallback={() => {
-              setRoyal(!isRoyal);
-              setWinner(undefined);
-              setFinished(true);
-              setStarted(false);
-              setSegments([]);
-            }}
-            isDisabled={isLoading}
-          />
-        </label>
+        <Tabs
+          contents={[
+            {
+              tabName: "General",
+              style: { flexBasis: "50%" },
+              onTabClick: () => {
+                setRoyal(false);
+                setWinner(undefined);
+                setFinished(true);
+                setStarted(false);
+                setSegments([]);
+              },
+            },
+            {
+              tabName:
+                "Royal" +
+                (!!royalGames?.length ? ` (Games: ${royalGames.length})` : ""),
+              style: { flexBasis: "50%" },
+              onTabClick: () => {
+                setRoyal(true);
+                setWinner(undefined);
+                setFinished(true);
+                setStarted(false);
+                setSegments([]);
+              },
+            },
+          ]}
+        />
       </div>
       {!isRoyal && <IGDBList />}
       {isRoyal && <RoyalList />}
