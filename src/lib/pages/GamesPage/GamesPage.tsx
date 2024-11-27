@@ -83,7 +83,7 @@ export const GamesPage: FC = () => {
         <Filters callback={() => debouncedGamesFetch()} />
       </ExpandMenu>
       {isLoading && !games.length ? (
-        <PacmanLoader color="#ffffff" className={styles.page__loader} />
+        <Loader type="pacman" />
       ) : (
         <div className={styles.page__games}>
           {games.map((game) => (
