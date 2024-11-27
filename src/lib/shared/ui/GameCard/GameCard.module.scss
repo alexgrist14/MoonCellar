@@ -68,4 +68,8 @@
       opacity: 1;
     }
   }
+
+  &__placeholder {
+    border-radius: $radius;
+  }
 }

@@ -103,7 +103,7 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
           })}
         />
       ) : (
-        <Cover />
+        <Cover className={styles.card__placeholder} />
       )}
     </div>
   );
