@@ -1,7 +1,7 @@
 # RetroAchievements-Gauntlet
 Random games spinner for RetroAchievements
 
-[https://alexgrist14.github.io/RetroAchievements-Gauntlet/](https://alexgrist14.github.io/RetroAchievements-Gauntlet/)
+[https://mooncellar.space/](https://mooncellar.space/)
 
 
 [Server](https://github.com/alexgrist14/Game-Gauntlet-Server)
