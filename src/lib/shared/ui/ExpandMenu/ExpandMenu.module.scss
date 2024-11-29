@@ -10,11 +10,11 @@
   right: calc(100% - 2px);
 
   &_active {
-    transform: translateX(calc(100% - 5px));
+    transform: translateX(calc(100% - 2px));
   }
 
   &_right.menu_active {
-    transform: translateX(calc(-100% + 5px));
+    transform: translateX(calc(-100% + 2px));
   }
 
   &_right {
