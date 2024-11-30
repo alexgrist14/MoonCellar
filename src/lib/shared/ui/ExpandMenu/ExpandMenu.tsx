@@ -62,7 +62,7 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
         {children}
       </Scrollbar>
       <div
-        className={styles.menu__expand}
+        className={classNames(styles.menu__expand)}
         onClick={() => {
           if (expanded === undefined) return setExpanded(position);
           if (expanded === "both")

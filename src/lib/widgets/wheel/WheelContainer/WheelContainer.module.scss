@@ -15,8 +15,8 @@
   }
 
   .winner {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: calc(100% - 40px) 1fr;
     gap: 10px;
     color: white;
     min-width: 240px;

@@ -26,7 +26,7 @@ export const ExtendedSelector = <T,>({
 }: IExtendedSelectorProps<T & { _id: number; name: string }>) => {
   return (
     <div className={styles.option}>
-      <h3>{title}</h3>
+      <h4>{title}</h4>
       <div className={styles.option__selector}>
         <Dropdown
           icons={icons}

@@ -1,5 +1,7 @@
 .card {
+  height: 100%;
   width: 100%;
+  justify-self: center;
   max-width: 240px;
   aspect-ratio: $coverRatio;
   border-radius: $radius;

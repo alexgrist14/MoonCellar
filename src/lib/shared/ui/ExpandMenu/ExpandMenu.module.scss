@@ -6,19 +6,18 @@
   transition: transform 0.4s, filter 0.4s;
   z-index: 3;
   background: $bgAlt;
-  filter: drop-shadow(0 0 0.1rem $accent);
-  right: calc(100% - 2px);
+  right: calc(100% - 5px);
 
   &_active {
-    transform: translateX(calc(100% - 2px));
+    transform: translateX(calc(100% - 5px));
   }
 
   &_right.menu_active {
-    transform: translateX(calc(-100% + 2px));
+    transform: translateX(calc(-100% + 5px));
   }
 
   &_right {
-    left: calc(100% - 2px);
+    left: calc(100% - 5px);
   }
 
   &_disabled {

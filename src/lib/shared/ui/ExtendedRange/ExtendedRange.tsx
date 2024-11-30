@@ -37,7 +37,7 @@ export const ExtendedRange: FC<IExtendedCheckboxProps> = ({
 
   return (
     <div className={styles.range}>
-      {!!title && <h3>{title}</h3>}
+      {!!title && <h4>{title}</h4>}
       <div className={styles.range__wrapper}>
         <RangeSelector
           variant="green"
