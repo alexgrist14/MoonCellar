@@ -17,7 +17,7 @@ export const Filters: FC<{ callback?: () => void; isGauntlet?: boolean }> = ({
   callback,
   isGauntlet,
 }) => {
-  const { gameModes, genres, systems } = useCommonStore();
+  const { gameModes, genres, systems, themes } = useCommonStore();
   const { isLoading, isPlatformsLoading } = useStatesStore();
   const {
     setSelectedGameModes,
@@ -42,6 +42,11 @@ export const Filters: FC<{ callback?: () => void; isGauntlet?: boolean }> = ({
     setSelectedCategories,
     selectedYears,
     setSelectedYears,
+    selectedThemes,
+    setSelectedThemes,
+    excludedThemes,
+    setExcludedThemes,
+    clear,
   } = (isGauntlet ? useGauntletFiltersStore : useGamesFiltersStore)();
 
   return (
@@ -84,7 +89,7 @@ export const Filters: FC<{ callback?: () => void; isGauntlet?: boolean }> = ({
               ])
             }
           />
-          {"-"}
+          <div className={styles.filters__line}></div>
           <Input
             onKeyDown={(e) => e.key === "Enter" && !!callback && callback()}
             containerStyles={{ width: "100%" }}
@@ -131,13 +136,13 @@ export const Filters: FC<{ callback?: () => void; isGauntlet?: boolean }> = ({
         />
       </div>
       <ExtendedSelector
-        title="Game Modes"
-        list={gameModes || []}
-        excluded={excludedGameModes || []}
-        selected={selectedGameModes || []}
-        isDisabled={isLoading}
-        setExcluded={setExcludedGameModes}
-        setSelected={setSelectedGameModes}
+        title="Platforms"
+        list={systems || []}
+        excluded={excludedSystems || []}
+        selected={selectedSystems || []}
+        isDisabled={isLoading || isPlatformsLoading}
+        setExcluded={setExcludedSystems}
+        setSelected={setSelectedSystems}
       />
       <ExtendedSelector
         title="Genres"
@@ -149,13 +154,22 @@ export const Filters: FC<{ callback?: () => void; isGauntlet?: boolean }> = ({
         setSelected={setSelectedGenres}
       />
       <ExtendedSelector
-        title="Platforms"
-        list={systems || []}
-        excluded={excludedSystems || []}
-        selected={selectedSystems || []}
-        isDisabled={isLoading || isPlatformsLoading}
-        setExcluded={setExcludedSystems}
-        setSelected={setSelectedSystems}
+        title="Themes"
+        list={themes || []}
+        excluded={excludedThemes || []}
+        selected={selectedThemes || []}
+        isDisabled={isLoading}
+        setExcluded={setExcludedThemes}
+        setSelected={setSelectedThemes}
+      />
+      <ExtendedSelector
+        title="Game Modes"
+        list={gameModes || []}
+        excluded={excludedGameModes || []}
+        selected={selectedGameModes || []}
+        isDisabled={isLoading}
+        setExcluded={setExcludedGameModes}
+        setSelected={setSelectedGameModes}
       />
       <div className={styles.consoles__options}>
         <ExtendedRange
@@ -167,11 +181,23 @@ export const Filters: FC<{ callback?: () => void; isGauntlet?: boolean }> = ({
           max={99}
         />
       </div>
-      {!isGauntlet && (
-        <Button className={styles.filters__button} onClick={callback}>
-          Filter games
+      <div className={styles.filters__buttons}>
+        {!isGauntlet && (
+          <Button className={styles.filters__button} onClick={callback}>
+            Filter games
+          </Button>
+        )}
+        <Button
+          className={styles.filters__button}
+          color="red"
+          onClick={() => {
+            clear();
+            !!callback && callback();
+          }}
+        >
+          Clear filters
         </Button>
-      )}
+      </div>
     </div>
   );
 };

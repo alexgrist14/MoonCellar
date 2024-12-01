@@ -38,6 +38,7 @@ export const GamePage: FC = () => {
     setSearchCompany,
     setSelectedSystems,
     setSelectedGameModes,
+    setSelectedThemes,
     clear,
   } = useGamesFiltersStore();
 
@@ -289,24 +290,21 @@ export const GamePage: FC = () => {
             {!!game.themes?.length && (
               <p>
                 <span>Themes: </span>
-                {game.themes.map((theme) => theme.name).join(", ")}
-              </p>
-            )}
-            {!!game.keywords?.length && (
-              <p>
-                <span>Keywords: </span>
-                <span
-                  className={classNames(styles.page__keywords, {
-                    [styles.page__keywords_limit]: !isKeywordsMore,
-                  })}
-                >
-                  {game.keywords.map((key) => key.name).join(", ")}
-                </span>
-                <Button
-                  onClick={() => setIsKeywordsMore(!isKeywordsMore)}
-                >
-                  {isKeywordsMore ? "Less" : "More"}
-                </Button>
+                {game.themes.map((theme, i, array) => (
+                  <>
+                    <Link
+                      key={theme._id}
+                      href={"/games"}
+                      onClick={() => {
+                        clear();
+                        !!theme && setSelectedThemes([theme]);
+                      }}
+                    >
+                      {theme.name}
+                    </Link>
+                    {i !== array.length - 1 ? ", " : ""}
+                  </>
+                ))}
               </p>
             )}
           </div>

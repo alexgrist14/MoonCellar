@@ -23,6 +23,8 @@ type IState = {
   excludedGameModes?: IGDBDefault[];
   selectedCategories?: (keyof typeof gameCategories)[];
   selectedYears?: [number, number];
+  selectedThemes?: IGDBDefault[];
+  excludedThemes?: IGDBDefault[];
 };
 
 type IAction = {
@@ -42,6 +44,8 @@ type IAction = {
   removeRoyalGame: (game: IGDBGameMinimal) => void;
   setSelectedCategories: (categories: (keyof typeof gameCategories)[]) => void;
   setSelectedYears: (selectedYears: [number, number]) => void;
+  setSelectedThemes: (selectedThemes: IGDBDefault[]) => void;
+  setExcludedThemes: (excludedThemes: IGDBDefault[]) => void;
   clear: () => void;
 };
 
@@ -60,6 +64,8 @@ const getActions = (set: any): IAction => ({
   setExcludedSystems: (excludedSystems) => set({ excludedSystems }),
   setSelectedCategories: (selectedCategories) => set({ selectedCategories }),
   setSelectedYears: (selectedYears) => set({ selectedYears }),
+  setSelectedThemes: (selectedThemes) => set({ selectedThemes }),
+  setExcludedThemes: (excludedThemes) => set({ excludedThemes }),
   addRoyalGame: (game) =>
     set((state: IState) => ({
       royalGames: [
@@ -87,6 +93,8 @@ const getActions = (set: any): IAction => ({
       excludedGameModes: undefined,
       selectedCategories: undefined,
       selectedYears: undefined,
+      selectedThemes: undefined,
+      excludedThemes: undefined,
     });
   },
 });

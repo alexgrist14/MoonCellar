@@ -27,10 +27,18 @@ export const GamesPage: FC = () => {
     searchCompany,
     selectedCategories,
     selectedYears,
+    selectedThemes,
+    excludedThemes,
   } = useGamesFiltersStore();
   const { isLoading, setLoading, isRoyal } = useStatesStore();
-  const { setGenres, setGameModes, setSystems, isMobile, setExpanded } =
-    useCommonStore();
+  const {
+    setGenres,
+    setGameModes,
+    setSystems,
+    isMobile,
+    setExpanded,
+    setThemes,
+  } = useCommonStore();
 
   const step = useMemo(() => (isMobile ? 34 : 35), [isMobile]);
 
@@ -49,11 +57,13 @@ export const GamesPage: FC = () => {
         genres: excludedGenres?.map((item) => item._id),
         modes: excludedGameModes?.map((item) => item._id),
         platforms: excludedSystems?.map((item) => item._id),
+        themes: excludedThemes?.map((item) => item._id),
       },
       selected: {
         genres: selectedGenres?.map((item) => item._id),
         modes: selectedGameModes?.map((item) => item._id),
         platforms: selectedSystems?.map((item) => item._id),
+        themes: selectedThemes?.map((item) => item._id),
       },
       page: 1,
       take: take + (!isMobile ? Math.ceil(take / step) - 1 : 0),
@@ -76,7 +86,8 @@ export const GamesPage: FC = () => {
     IGDBApi.getGenres().then((response) => setGenres(response.data));
     IGDBApi.getModes().then((response) => setGameModes(response.data));
     IGDBApi.getPlatforms().then((response) => setSystems(response.data));
-  }, [isRoyal, setGenres, setGameModes, setSystems]);
+    IGDBApi.getThemes().then((response) => setThemes(response.data));
+  }, [isRoyal, setGenres, setGameModes, setSystems, setThemes]);
 
   useEffect(() => {
     debouncedGamesFetch();

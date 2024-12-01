@@ -1,6 +1,5 @@
 import { FC, useEffect, useRef } from "react";
 import styles from "./ConsolesList.module.scss";
-import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import { RoyalList } from "@/src/lib/features/main";
 import { IGDBApi } from "@/src/lib/shared/api";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
@@ -11,7 +10,7 @@ import { Filters } from "@/src/lib/shared/ui/Filters";
 
 export const ConsolesList: FC = () => {
   const { royalGames } = useGauntletFiltersStore();
-  const { setGenres, setGameModes, setSystems } = useCommonStore();
+  const { setGenres, setGameModes, setSystems, setThemes } = useCommonStore();
   const { setSegments, setStarted, setFinished, setRoyal, isRoyal } =
     useStatesStore();
   const { setWinner } = useCommonStore();
@@ -22,7 +21,8 @@ export const ConsolesList: FC = () => {
     IGDBApi.getGenres().then((response) => setGenres(response.data));
     IGDBApi.getModes().then((response) => setGameModes(response.data));
     IGDBApi.getPlatforms().then((response) => setSystems(response.data));
-  }, [isRoyal, setGenres, setGameModes, setSystems]);
+    IGDBApi.getThemes().then((response) => setThemes(response.data));
+  }, [isRoyal, setGenres, setGameModes, setSystems, setThemes]);
 
   const contentRef = useRef<HTMLDivElement>(null);
 

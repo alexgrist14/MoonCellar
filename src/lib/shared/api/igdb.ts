@@ -13,6 +13,8 @@ interface IGDBFilters {
   genres?: number[];
   modes?: number[];
   platforms?: number[];
+  themes?: number[];
+  keywords?: number[];
 }
 
 const IGDB_URL = `${API_URL}/igdb`;
@@ -69,6 +71,10 @@ const getArt = (id: number) => {
   return agent.get<IGDBScreenshot>(`${IGDB_URL}/art/${id}`);
 };
 
+const getThemes = () => {
+  return agent.get<IGDBDefault[]>(`${IGDB_URL}/themes`);
+};
+
 export const IGDBApi = {
   getGames,
   getGameById,
@@ -77,4 +83,5 @@ export const IGDBApi = {
   getPlatforms,
   getModes,
   getArt,
+  getThemes,
 };
