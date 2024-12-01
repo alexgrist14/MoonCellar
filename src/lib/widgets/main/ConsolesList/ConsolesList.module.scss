@@ -25,8 +25,9 @@
   &__options {
     display: grid;
     justify-items: flex-start;
-    padding-top: 10px;
+    align-self: center;
     gap: 10px;
+    width: calc(100% - 60px);
 
     & > h3 {
       justify-self: center;

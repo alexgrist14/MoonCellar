@@ -29,12 +29,6 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
 
   const { isMobile } = useCommonStore();
 
-  const releaseYear = game.release_dates?.reduce(
-    (year: number | undefined, date) =>
-      !!date.y ? (!!year && date.y > year ? year : (year = date.y)) : year,
-    undefined
-  );
-
   useCloseEvents([cardRef], () => setStepIndex(0));
 
   if (!game) return null;
@@ -77,7 +71,9 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
                 ) || ""
               ]
             }`}
-            {!!releaseYear ? ` - ${releaseYear}` : ""}
+            {!!game.first_release_date
+              ? ` - ${new Date(game.first_release_date * 1000).getFullYear()}`
+              : ""}
           </span>
           <span>
             {!!game.platforms?.length &&

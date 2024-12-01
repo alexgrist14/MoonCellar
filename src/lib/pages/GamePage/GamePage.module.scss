@@ -67,7 +67,7 @@
 
   &__info,
   &__developers {
-    & span {
+    & span:not(.page__keywords) {
       @include font(16px, 20px, 500);
       color: $whiteTextColor;
     }
@@ -75,6 +75,18 @@
     & p {
       @include font(14px, 18px, 400);
       color: $gray;
+    }
+
+    & button {
+      margin-top: 5px;
+    }
+  }
+
+  &__keywords {
+    @include font(14px, 18px, 400);
+    color: $gray;
+
+    &_limit {
       @include lineClamp(2);
     }
   }
@@ -85,7 +97,8 @@
     width: 100%;
     padding-top: 40px;
 
-    & button, a {
+    & button,
+    a {
       width: 100%;
       height: 40px;
       max-height: 40px;
@@ -96,16 +109,6 @@
     display: flex;
     flex-direction: column;
     gap: 5px;
-
-    & a {
-      @include font(14px, 18px, 400);
-      color: $gray;
-      width: fit-content;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
   }
 
   &__bottom {
@@ -114,6 +117,16 @@
 
     @include mediaMax($screenMd) {
       flex-direction: column;
+    }
+  }
+
+  & a {
+    @include font(14px, 18px, 400);
+    color: $gray;
+    width: fit-content;
+
+    &:hover {
+      text-decoration: underline;
     }
   }
 }

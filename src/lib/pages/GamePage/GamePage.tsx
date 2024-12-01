@@ -13,13 +13,17 @@ import {
 } from "../../shared/constants";
 import { Slideshow } from "../../shared/ui/Slideshow";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
-import { Button } from "../../shared/ui/Button";
 import Link from "next/link";
 import { Cover } from "../../shared/ui/Cover";
 import { GameControls } from "../../shared/ui/GameControls";
 import { Loader } from "../../shared/ui/Loader";
-import { useGauntletFiltersStore } from "../../shared/store/filters.store";
+import {
+  useGamesFiltersStore,
+  useGauntletFiltersStore,
+} from "../../shared/store/filters.store";
 import { ButtonGroup } from "../../shared/ui/Button/ButtonGroup";
+import { Button } from "../../shared/ui/Button";
+import classNames from "classnames";
 
 export const GamePage: FC = () => {
   const { query } = useRouter();
@@ -27,8 +31,19 @@ export const GamePage: FC = () => {
   const { royalGames, addRoyalGame, removeRoyalGame } =
     useGauntletFiltersStore();
 
+  const {
+    setSelectedYears,
+    setSelectedCategories,
+    setSelectedGenres,
+    setSearchCompany,
+    setSelectedSystems,
+    setSelectedGameModes,
+    clear,
+  } = useGamesFiltersStore();
+
   const [game, setGame] = useState<IGDBGame>();
   const [isLoading, setIsLoading] = useState(false);
+  const [isKeywordsMore, setIsKeywordsMore] = useState(false);
 
   useEffect(() => {
     !!query.slug &&
@@ -55,10 +70,9 @@ export const GamePage: FC = () => {
     websites: game.websites.map((item) => item._id),
   };
 
-  const releaseYear = game.release_dates?.reduce(
-    (year: number | undefined, date) =>
-      !!date.y ? (!!year && date.y > year ? year : (year = date.y)) : year,
-    undefined
+  const releaseDate = new Date(game.first_release_date * 1000).getFullYear();
+  const category = Object.keys(gameCategories).find(
+    (key) => gameCategories[key] === game.category
   );
 
   return (
@@ -120,22 +134,34 @@ export const GamePage: FC = () => {
         <div className={styles.page__right}>
           <h2>{game.name}</h2>
           <div className={styles.page__info}>
-            {!!releaseYear && (
+            {!!game.first_release_date && (
               <p>
                 <span>Year: </span>
-                {releaseYear}
+                <Link
+                  href={"/games"}
+                  onClick={() => {
+                    clear();
+                    setSelectedYears([releaseDate, releaseDate]);
+                  }}
+                >
+                  {releaseDate}
+                </Link>
               </p>
             )}
-            <p>
-              <span>Category: </span>
-              {
-                gameCategoryNames[
-                  Object.keys(gameCategories).find(
-                    (key) => gameCategories[key] === game.category
-                  ) || ""
-                ]
-              }
-            </p>
+            {!!category && (
+              <p>
+                <span>Category: </span>
+                <Link
+                  href={"/games"}
+                  onClick={() => {
+                    clear();
+                    setSelectedCategories([category]);
+                  }}
+                >
+                  {gameCategoryNames[category]}
+                </Link>
+              </p>
+            )}
           </div>
           <div className={styles.page__developers}>
             {game.involved_companies.some((comp) => comp.developer) && (
@@ -150,8 +176,22 @@ export const GamePage: FC = () => {
                 </span>
                 {game.involved_companies
                   .filter((comp) => comp.developer)
-                  ?.map((comp) => comp.company.name)
-                  .join(", ")}
+                  ?.map((comp, i, array) => (
+                    <>
+                      <Link
+                        key={comp._id}
+                        href={"/games"}
+                        onClick={() => {
+                          clear();
+                          !!comp?.company.name &&
+                            setSearchCompany(comp.company.name);
+                        }}
+                      >
+                        {comp.company.name}
+                      </Link>
+                      {i !== array.length - 1 ? ", " : ""}
+                    </>
+                  ))}
               </p>
             )}
             {game.involved_companies.some((comp) => comp.publisher) && (
@@ -166,8 +206,22 @@ export const GamePage: FC = () => {
                 </span>
                 {game.involved_companies
                   .filter((comp) => comp.publisher)
-                  ?.map((comp) => comp.company.name)
-                  .join(", ")}
+                  ?.map((comp, i, array) => (
+                    <>
+                      <Link
+                        key={comp._id}
+                        href={"/games"}
+                        onClick={() => {
+                          clear();
+                          !!comp?.company.name &&
+                            setSearchCompany(comp.company.name);
+                        }}
+                      >
+                        {comp.company.name}
+                      </Link>
+                      {i !== array.length - 1 ? ", " : ""}
+                    </>
+                  ))}
               </p>
             )}
           </div>
@@ -175,13 +229,61 @@ export const GamePage: FC = () => {
             {!!game.platforms?.length && (
               <p>
                 <span>Platforms: </span>
-                {game.platforms.map((platform) => platform.name).join(", ")}
+                {game.platforms.map((platform, i, array) => (
+                  <>
+                    <Link
+                      key={platform._id}
+                      href={"/games"}
+                      onClick={() => {
+                        clear();
+                        !!platform && setSelectedSystems([platform]);
+                      }}
+                    >
+                      {platform.name}
+                    </Link>
+                    {i !== array.length - 1 ? ", " : ""}
+                  </>
+                ))}
               </p>
             )}
             {!!game.genres?.length && (
               <p>
                 <span>Genres: </span>
-                {game.genres.map((genre) => genre.name).join(", ")}
+                {game.genres.map((genre, i, array) => (
+                  <>
+                    <Link
+                      key={genre._id}
+                      href={"/games"}
+                      onClick={() => {
+                        clear();
+                        !!genre && setSelectedGenres([genre]);
+                      }}
+                    >
+                      {genre.name}
+                    </Link>
+                    {i !== array.length - 1 ? ", " : ""}
+                  </>
+                ))}
+              </p>
+            )}
+            {!!game.game_modes?.length && (
+              <p>
+                <span>Game modes: </span>
+                {game.game_modes.map((mode, i, array) => (
+                  <>
+                    <Link
+                      key={mode._id}
+                      href={"/games"}
+                      onClick={() => {
+                        clear();
+                        !!mode && setSelectedGameModes([mode]);
+                      }}
+                    >
+                      {mode.name}
+                    </Link>
+                    {i !== array.length - 1 ? ", " : ""}
+                  </>
+                ))}
               </p>
             )}
             {!!game.themes?.length && (
@@ -193,7 +295,18 @@ export const GamePage: FC = () => {
             {!!game.keywords?.length && (
               <p>
                 <span>Keywords: </span>
-                {game.keywords.map((key) => key.name).join(", ")}
+                <span
+                  className={classNames(styles.page__keywords, {
+                    [styles.page__keywords_limit]: !isKeywordsMore,
+                  })}
+                >
+                  {game.keywords.map((key) => key.name).join(", ")}
+                </span>
+                <Button
+                  onClick={() => setIsKeywordsMore(!isKeywordsMore)}
+                >
+                  {isKeywordsMore ? "Less" : "More"}
+                </Button>
               </p>
             )}
           </div>

@@ -1,9 +1,19 @@
 .filters {
   display: grid;
   gap: 20px;
-  padding-top: 30px;
 
   &__button {
-    margin-top: 40px;
+    margin-top: 30px;
+  }
+
+  &__wrapper {
+    display: grid;
+    gap: 10px;
+  }
+
+  &__dates {
+    display: flex;
+    align-items: center;
+    gap: 5px;
   }
 }

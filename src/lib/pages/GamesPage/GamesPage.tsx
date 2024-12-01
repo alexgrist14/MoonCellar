@@ -9,10 +9,10 @@ import { axiosUtils } from "../../shared/utils/axios";
 import { GameCard } from "../../shared/ui/GameCard";
 import { useStatesStore } from "../../shared/store/states.store";
 import { Button } from "../../shared/ui/Button";
-import { PacmanLoader, PulseLoader } from "react-spinners";
 import { useDebouncedCallback } from "use-debounce";
 import { useGamesFiltersStore } from "../../shared/store/filters.store";
 import { Loader } from "../../shared/ui/Loader";
+import classNames from "classnames";
 
 export const GamesPage: FC = () => {
   const {
@@ -24,6 +24,9 @@ export const GamesPage: FC = () => {
     excludedSystems,
     excludedGameModes,
     searchQuery,
+    searchCompany,
+    selectedCategories,
+    selectedYears,
   } = useGamesFiltersStore();
   const { isLoading, setLoading, isRoyal } = useStatesStore();
   const { setGenres, setGameModes, setSystems, isMobile, setExpanded } =
@@ -37,9 +40,11 @@ export const GamesPage: FC = () => {
 
   const debouncedGamesFetch = useDebouncedCallback(() => {
     setLoading(true);
-
     IGDBApi.getGames({
       search: searchQuery,
+      company: searchCompany,
+      categories: selectedCategories,
+      years: selectedYears,
       excluded: {
         genres: excludedGenres?.map((item) => item._id),
         modes: excludedGameModes?.map((item) => item._id),
@@ -85,7 +90,11 @@ export const GamesPage: FC = () => {
       {isLoading && !games.length ? (
         <Loader type="pacman" />
       ) : (
-        <div className={styles.page__games}>
+        <div
+          className={classNames(styles.page__games, {
+            [styles.page__games_loading]: isLoading,
+          })}
+        >
           {games.map((game) => (
             <GameCard key={game._id} game={game} />
           ))}

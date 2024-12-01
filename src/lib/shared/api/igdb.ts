@@ -1,4 +1,4 @@
-import { API_URL } from "../constants";
+import { API_URL, gameCategories } from "../constants";
 import {
   IGDBDefault,
   IGDBGame,
@@ -25,6 +25,9 @@ const getGames = (params: {
   page?: number;
   selected?: IGDBFilters;
   excluded?: IGDBFilters;
+  company?: string;
+  years?: [number, number];
+  categories?: (keyof typeof gameCategories)[];
 }) => {
   return agent.get<{ results: IGDBGameMinimal[]; total: number }>(
     `${IGDB_URL}/games`,

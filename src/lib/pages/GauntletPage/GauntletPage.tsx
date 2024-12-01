@@ -29,6 +29,8 @@ export const GauntletPage: FC = () => {
     excludedGameModes,
     excludedGenres,
     excludedSystems,
+    selectedCategories,
+    searchCompany,
   } = useGauntletFiltersStore();
 
   const {
@@ -55,6 +57,8 @@ export const GauntletPage: FC = () => {
         platforms: excludedSystems?.map((system) => system._id),
         modes: excludedGameModes?.map((mode) => mode._id),
       },
+      company: searchCompany,
+      categories: selectedCategories,
       take: 16,
       rating: selectedRating,
       search: searchQuery,
@@ -89,6 +93,8 @@ export const GauntletPage: FC = () => {
     excludedGenres,
     excludedSystems,
     excludedGameModes,
+    searchCompany,
+    selectedCategories,
   ]);
 
   useEffect(() => {

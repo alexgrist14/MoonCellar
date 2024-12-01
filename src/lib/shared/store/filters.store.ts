@@ -6,6 +6,7 @@ import {
   IGDBGenre,
   IGDBPlatform,
 } from "../types/igdb";
+import { gameCategories } from "../constants";
 
 type IState = {
   games?: IGDBGameMinimal[];
@@ -16,9 +17,12 @@ type IState = {
   selectedGeneration?: number;
   selectedRating?: number;
   searchQuery?: string;
+  searchCompany?: string;
   excludedSystems?: IGDBPlatform[];
   excludedGenres?: IGDBGenre[];
   excludedGameModes?: IGDBDefault[];
+  selectedCategories?: (keyof typeof gameCategories)[];
+  selectedYears?: [number, number];
 };
 
 type IAction = {
@@ -30,17 +34,22 @@ type IAction = {
   setSelectedRating: (selectedRating: number) => void;
   setSelectedGeneration: (selectedGeneration: number) => void;
   setSearchQuery: (searchQuery: string) => void;
+  setSearchCompany: (searchCompany: string) => void;
   setExcludedGameModes: (gameModes: IGDBDefault[]) => void;
   setExcludedSystems: (excludedSystems: IGDBPlatform[]) => void;
   setExcludedGenres: (excludedGenres: IGDBGenre[]) => void;
   addRoyalGame: (game: IGDBGameMinimal) => void;
   removeRoyalGame: (game: IGDBGameMinimal) => void;
+  setSelectedCategories: (categories: (keyof typeof gameCategories)[]) => void;
+  setSelectedYears: (selectedYears: [number, number]) => void;
+  clear: () => void;
 };
 
 const getActions = (set: any): IAction => ({
   setGames: (games) => set({ games }),
   setRoyalGames: (royalGames) => set({ royalGames }),
   setSearchQuery: (searchQuery) => set({ searchQuery }),
+  setSearchCompany: (searchCompany) => set({ searchCompany }),
   setSelectedGameModes: (selectedGameModes) => set({ selectedGameModes }),
   setSelectedGeneration: (selectedGeneration) => set({ selectedGeneration }),
   setSelectedGenres: (selectedGenres) => set({ selectedGenres }),
@@ -49,6 +58,8 @@ const getActions = (set: any): IAction => ({
   setExcludedGameModes: (excludedGameModes) => set({ excludedGameModes }),
   setExcludedGenres: (excludedGenres) => set({ excludedGenres }),
   setExcludedSystems: (excludedSystems) => set({ excludedSystems }),
+  setSelectedCategories: (selectedCategories) => set({ selectedCategories }),
+  setSelectedYears: (selectedYears) => set({ selectedYears }),
   addRoyalGame: (game) =>
     set((state: IState) => ({
       royalGames: [
@@ -62,10 +73,30 @@ const getActions = (set: any): IAction => ({
         ? state.royalGames.filter((royal) => royal._id !== game._id)
         : undefined,
     })),
+  clear: () => {
+    set({
+      selectedSystems: undefined,
+      selectedGenres: undefined,
+      selectedGameModes: undefined,
+      selectedGeneration: undefined,
+      selectedRating: undefined,
+      searchQuery: undefined,
+      searchCompany: undefined,
+      excludedSystems: undefined,
+      excludedGenres: undefined,
+      excludedGameModes: undefined,
+      selectedCategories: undefined,
+      selectedYears: undefined,
+    });
+  },
 });
 
 export const useGauntletFiltersStore = create<IState & IAction>()(
-  devtools(persist((set) => getActions(set), { name: "gauntletFilters" }))
+  devtools(
+    persist((set) => getActions(set), {
+      name: "gauntletFilters",
+    })
+  )
 );
 
 export const useGamesFiltersStore = create<IState & IAction>()(
