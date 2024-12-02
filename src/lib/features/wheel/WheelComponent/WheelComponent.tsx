@@ -176,7 +176,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
 
   useEffect(() => {
     if (isStarted && !!segments) {
-      const winner = Math.floor(Math.random() * segments.length - 1);
+      const winner = Math.floor(Math.random() * segments.length);
 
       angle.current += 360 * Math.ceil(time);
 
