@@ -31,6 +31,9 @@ export const GauntletPage: FC = () => {
     excludedSystems,
     selectedCategories,
     searchCompany,
+    selectedYears,
+    selectedThemes,
+    excludedThemes,
   } = useGauntletFiltersStore();
 
   const {
@@ -51,11 +54,13 @@ export const GauntletPage: FC = () => {
         genres: selectedGenres?.map((genre) => genre._id),
         platforms: selectedSystems?.map((system) => system._id),
         modes: selectedGameModes?.map((mode) => mode._id),
+        themes: selectedThemes?.map((mode) => mode._id),
       },
       excluded: {
         genres: excludedGenres?.map((genre) => genre._id),
         platforms: excludedSystems?.map((system) => system._id),
         modes: excludedGameModes?.map((mode) => mode._id),
+        themes: excludedThemes?.map((mode) => mode._id),
       },
       company: searchCompany,
       categories: selectedCategories,
@@ -63,6 +68,7 @@ export const GauntletPage: FC = () => {
       rating: selectedRating,
       search: searchQuery,
       isRandom: true,
+      years: selectedYears,
     }).then((response) => {
       if (!!response.data.results.length) {
         setGames(response.data.results);
@@ -95,6 +101,9 @@ export const GauntletPage: FC = () => {
     excludedGameModes,
     searchCompany,
     selectedCategories,
+    excludedThemes,
+    selectedThemes,
+    selectedYears,
   ]);
 
   useEffect(() => {
