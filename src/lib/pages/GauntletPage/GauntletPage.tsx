@@ -122,18 +122,24 @@ export const GauntletPage: FC = () => {
     const pictures: number[] = [];
 
     if (!!winner) {
-      winner.artworks.forEach((id) => pictures.push(id));
-      winner.screenshots.forEach((id) => pictures.push(id));
+      if (!!winner.artworks?.length) {
+        winner.artworks.forEach((id) => pictures.push(id));
+      } else {
+        winner.screenshots.forEach((id) => pictures.push(id));
+      }
 
       const id = pictures[Math.floor(Math.random() * (pictures.length - 1))];
 
-      !!id &&
-        IGDBApi.getArt(id)
-          .then((res) => {
-            setIsImageReady(false);
-            setBg({ ...res.data, gameId: winner._id });
-          })
-          .catch(axiosUtils.toastError);
+      if (!id) return;
+
+      (!!winner.artworks?.length ? IGDBApi.getArtwork : IGDBApi.getScreenshot)(
+        id
+      )
+        .then((res) => {
+          setIsImageReady(false);
+          setBg({ ...res.data, gameId: winner._id });
+        })
+        .catch(axiosUtils.toastError);
     }
   }, [winner]);
 

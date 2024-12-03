@@ -67,8 +67,12 @@ const getModes = () => {
   return agent.get<IGDBDefault[]>(`${IGDB_URL}/modes`);
 };
 
-const getArt = (id: number) => {
-  return agent.get<IGDBScreenshot>(`${IGDB_URL}/art/${id}`);
+const getScreenshot = (id: number) => {
+  return agent.get<IGDBScreenshot>(`${IGDB_URL}/screenshot/${id}`);
+};
+
+const getArtwork = (id: number) => {
+  return agent.get<IGDBScreenshot>(`${IGDB_URL}/artwork/${id}`);
 };
 
 const getThemes = () => {
@@ -82,6 +86,7 @@ export const IGDBApi = {
   getGenres,
   getPlatforms,
   getModes,
-  getArt,
+  getScreenshot,
+  getArtwork,
   getThemes,
 };
