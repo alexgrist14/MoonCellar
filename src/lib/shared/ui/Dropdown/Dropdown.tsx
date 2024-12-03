@@ -201,7 +201,7 @@ export const Dropdown: FC<IDropDownListProps> = ({
   }, [overwriteValue]);
 
   useEffect(() => {
-    initialMultiValue && !multiValue && setMultiValue(initialMultiValue);
+    !!initialMultiValue && setMultiValue(initialMultiValue);
   }, [initialMultiValue, multiValue]);
 
   useEffect(() => {

@@ -12,6 +12,7 @@ import {
 } from "../../store/filters.store";
 import { Dropdown } from "../Dropdown";
 import { gameCategories, gameCategoryNames } from "../../constants";
+import { ButtonGroup } from "../Button/ButtonGroup";
 
 export const Filters: FC<{ callback?: () => void; isGauntlet?: boolean }> = ({
   callback,
@@ -182,21 +183,25 @@ export const Filters: FC<{ callback?: () => void; isGauntlet?: boolean }> = ({
         />
       </div>
       <div className={styles.filters__buttons}>
-        {!isGauntlet && (
-          <Button className={styles.filters__button} onClick={callback}>
-            Filter games
-          </Button>
-        )}
-        <Button
-          className={styles.filters__button}
-          color="red"
-          onClick={() => {
-            clear();
-            !!callback && callback();
-          }}
-        >
-          Clear filters
-        </Button>
+        <ButtonGroup
+          wrapperStyle={{ width: "100%" }}
+          buttons={[
+            {
+              title: "Filter games",
+              color: "accent",
+              callback,
+              isHidden: isGauntlet,
+            },
+            {
+              title: "Clear filters",
+              color: "red",
+              callback: () => {
+                clear();
+                !!callback && callback();
+              },
+            },
+          ]}
+        />
       </div>
     </div>
   );
