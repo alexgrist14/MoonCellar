@@ -27,7 +27,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   time = 5,
 }) => {
   const { setWinner } = useCommonStore();
-  const { games, royalGames, addHistoryGame } = useGamesStore();
+  const { games, royalGames, addHistoryGame, setRoyalGames } = useGamesStore();
 
   const {
     isFinished,
@@ -57,24 +57,36 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   useEffect(() => {
     if (!currentSegment || !isFinished) return;
 
-    const filtered = segments?.filter((segment) => segment !== currentSegment);
+    const filtered =
+      segments?.filter((segment) => segment !== currentSegment) || [];
 
     const winner = isRoyal
-      ? royalGames?.find(
-          (game) => game._id.toString() === currentSegment.split("_")[0]
+      ? royalGames?.find((game) =>
+          filtered.length === 1
+            ? game._id.toString() === filtered[0].split("_")[0]
+            : game._id.toString() === currentSegment.split("_")[0]
         )
       : games?.find(
           (game) => game._id.toString() === currentSegment.split("_")[0]
         );
 
-    isRoyal && setSegments(filtered || []);
+    if (!winner) return setWinner(undefined);
 
-    if (isRoyal && !filtered?.length) {
+    if (isRoyal) {
+      setSegments(filtered.length > 1 ? filtered : []);
+      setRoyalGames(
+        filtered.length > 1
+          ? royalGames?.filter((game) => game._id !== winner._id) || []
+          : []
+      );
+    }
+
+    if (isRoyal && !filtered?.length && !!winner) {
       setCurrentSegment("");
     }
 
-    setWinner(winner || undefined);
-    !!winner && addHistoryGame(winner);
+    setWinner(winner);
+    !!winner && !isRoyal && addHistoryGame(winner);
   }, [currentSegment, isFinished]);
 
   useEffect(() => {
@@ -198,11 +210,11 @@ export const WheelComponent: FC<WheelComponentProps> = ({
         onClick={() => {
           setFinished(false);
           setWinner(undefined);
-          setSegments([]);
 
           if (isRoyal) {
             return setStarted(true);
           } else {
+            setSegments([]);
             setLoading(true);
           }
         }}
