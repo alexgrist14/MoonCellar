@@ -13,12 +13,15 @@ import {
 import { Dropdown } from "../Dropdown";
 import { gameCategories, gameCategoryNames } from "../../constants";
 import { ButtonGroup } from "../Button/ButtonGroup";
+import { ToggleSwitch } from "../ToggleSwitch";
+import { useGamesStore } from "../../store/games.store";
 
 export const Filters: FC<{ callback?: () => void; isGauntlet?: boolean }> = ({
   callback,
   isGauntlet,
 }) => {
   const { gameModes, genres, systems, themes } = useCommonStore();
+  const { historyGames } = useGamesStore();
   const { isLoading, isPlatformsLoading } = useStatesStore();
   const {
     setSelectedGameModes,
@@ -47,67 +50,71 @@ export const Filters: FC<{ callback?: () => void; isGauntlet?: boolean }> = ({
     setSelectedThemes,
     excludedThemes,
     setExcludedThemes,
+    isExcludeHistory,
+    setExcludeHistory,
+    setSelectedVotes,
+    selectedVotes,
     clear,
   } = (isGauntlet ? useGauntletFiltersStore : useGamesFiltersStore)();
 
   return (
     <div className={styles.filters}>
-      <div className={styles.filters__wrapper}>
-        <h4>Game name</h4>
-        <Input
-          onKeyDown={(e) => e.key === "Enter" && !!callback && callback()}
-          containerStyles={{ width: "100%" }}
-          placeholder="Enter name of the game..."
-          disabled={isLoading}
-          value={searchQuery || ""}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
-      <div className={styles.filters__wrapper}>
-        <h4>Company name</h4>
-        <Input
-          onKeyDown={(e) => e.key === "Enter" && !!callback && callback()}
-          containerStyles={{ width: "100%" }}
-          placeholder="Enter name of the developer..."
-          disabled={isLoading}
-          value={searchCompany || ""}
-          onChange={(e) => setSearchCompany(e.target.value)}
-        />
-      </div>
-      <div className={styles.filters__wrapper}>
-        <h4>Years</h4>
-        <div className={styles.filters__dates}>
+      <div className={styles.filters__top}>
+        <div className={styles.filters__wrapper}>
           <Input
             onKeyDown={(e) => e.key === "Enter" && !!callback && callback()}
             containerStyles={{ width: "100%" }}
+            placeholder="Enter name of the game..."
             disabled={isLoading}
-            type="number"
-            value={!!selectedYears?.[0] ? selectedYears[0].toString() : ""}
-            onChange={(e) =>
-              setSelectedYears([
-                Number(e.target.value),
-                selectedYears?.[1] || 0,
-              ])
-            }
+            value={searchQuery || ""}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <div className={styles.filters__line}></div>
+        </div>
+        <div className={styles.filters__wrapper}>
           <Input
             onKeyDown={(e) => e.key === "Enter" && !!callback && callback()}
             containerStyles={{ width: "100%" }}
+            placeholder="Enter name of the developer..."
             disabled={isLoading}
-            type="number"
-            value={!!selectedYears?.[1] ? selectedYears[1].toString() : ""}
-            onChange={(e) =>
-              setSelectedYears([
-                selectedYears?.[0] || 0,
-                Number(e.target.value),
-              ])
-            }
+            value={searchCompany || ""}
+            onChange={(e) => setSearchCompany(e.target.value)}
           />
+        </div>
+        <div className={styles.filters__wrapper}>
+          <div className={styles.filters__dates}>
+            <Input
+              onKeyDown={(e) => e.key === "Enter" && !!callback && callback()}
+              containerStyles={{ width: "100%" }}
+              disabled={isLoading}
+              placeholder="First year"
+              type="number"
+              value={!!selectedYears?.[0] ? selectedYears[0].toString() : ""}
+              onChange={(e) =>
+                setSelectedYears([
+                  Number(e.target.value),
+                  selectedYears?.[1] || 0,
+                ])
+              }
+            />
+            <div className={styles.filters__line}></div>
+            <Input
+              onKeyDown={(e) => e.key === "Enter" && !!callback && callback()}
+              containerStyles={{ width: "100%" }}
+              disabled={isLoading}
+              placeholder="Second year"
+              type="number"
+              value={!!selectedYears?.[1] ? selectedYears[1].toString() : ""}
+              onChange={(e) =>
+                setSelectedYears([
+                  selectedYears?.[0] || 0,
+                  Number(e.target.value),
+                ])
+              }
+            />
+          </div>
         </div>
       </div>
       <div className={styles.filters__wrapper}>
-        <h4>Game categories</h4>
         <Dropdown
           isWithReset
           overflowRootId="consoles"
@@ -182,6 +189,27 @@ export const Filters: FC<{ callback?: () => void; isGauntlet?: boolean }> = ({
           max={99}
         />
       </div>
+      <div className={styles.consoles__options}>
+        <ExtendedRange
+          symbol="More than "
+          text="Any votes count"
+          selected={selectedVotes || 0}
+          setSelected={setSelectedVotes}
+          isDisabled={isLoading}
+          step={10}
+          min={0}
+          max={1000}
+        />
+      </div>
+      {isGauntlet && (
+        <div className={styles.filters__toggle}>
+          <ToggleSwitch
+            value={isExcludeHistory ? "right" : "left"}
+            clickCallback={() => setExcludeHistory(!isExcludeHistory)}
+          />
+          <p>Exclude history</p>
+        </div>
+      )}
       <div className={styles.filters__buttons}>
         <ButtonGroup
           wrapperStyle={{ width: "100%" }}

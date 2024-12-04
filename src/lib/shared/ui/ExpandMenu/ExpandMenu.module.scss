@@ -84,11 +84,12 @@
   div &__content {
     margin: 0;
     padding: 20px;
+    padding-top: 50px;
     max-height: calc(100vh - 55px);
   }
 
   div &__scrollbar {
-    margin-block: 50px;
-    height: calc(100% - 100px);
+    margin-block: 60px;
+    height: calc(100vh - 55px - 80px);
   }
 }

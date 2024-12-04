@@ -1,21 +1,15 @@
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
-import {
-  IGDBDefault,
-  IGDBGameMinimal,
-  IGDBGenre,
-  IGDBPlatform,
-} from "../types/igdb";
+import { IGDBDefault, IGDBGenre, IGDBPlatform } from "../types/igdb";
 import { gameCategories } from "../constants";
 
 type IState = {
-  games?: IGDBGameMinimal[];
-  royalGames?: IGDBGameMinimal[];
   selectedSystems?: IGDBPlatform[];
   selectedGenres?: IGDBGenre[];
   selectedGameModes?: IGDBDefault[];
   selectedGeneration?: number;
   selectedRating?: number;
+  selectedVotes?: number;
   searchQuery?: string;
   searchCompany?: string;
   excludedSystems?: IGDBPlatform[];
@@ -25,39 +19,38 @@ type IState = {
   selectedYears?: [number, number];
   selectedThemes?: IGDBDefault[];
   excludedThemes?: IGDBDefault[];
+  isExcludeHistory: boolean;
 };
 
 type IAction = {
-  setGames: (games: IGDBGameMinimal[]) => void;
   setSelectedGameModes: (gameModes: IGDBDefault[]) => void;
-  setRoyalGames: (royalGames: IGDBGameMinimal[]) => void;
   setSelectedSystems: (selectedSystems: IGDBPlatform[]) => void;
   setSelectedGenres: (selectedGenres: IGDBGenre[]) => void;
   setSelectedRating: (selectedRating: number) => void;
+  setSelectedVotes: (selectedVotes: number) => void;
   setSelectedGeneration: (selectedGeneration: number) => void;
   setSearchQuery: (searchQuery: string) => void;
   setSearchCompany: (searchCompany: string) => void;
   setExcludedGameModes: (gameModes: IGDBDefault[]) => void;
   setExcludedSystems: (excludedSystems: IGDBPlatform[]) => void;
   setExcludedGenres: (excludedGenres: IGDBGenre[]) => void;
-  addRoyalGame: (game: IGDBGameMinimal) => void;
-  removeRoyalGame: (game: IGDBGameMinimal) => void;
   setSelectedCategories: (categories: (keyof typeof gameCategories)[]) => void;
   setSelectedYears: (selectedYears: [number, number]) => void;
   setSelectedThemes: (selectedThemes: IGDBDefault[]) => void;
   setExcludedThemes: (excludedThemes: IGDBDefault[]) => void;
+  setExcludeHistory: (isExcludeHistory: boolean) => void;
   clear: () => void;
 };
 
-const getActions = (set: any): IAction => ({
-  setGames: (games) => set({ games }),
-  setRoyalGames: (royalGames) => set({ royalGames }),
+const getActions = (set: any): IAction & IState => ({
+  isExcludeHistory: false,
   setSearchQuery: (searchQuery) => set({ searchQuery }),
   setSearchCompany: (searchCompany) => set({ searchCompany }),
   setSelectedGameModes: (selectedGameModes) => set({ selectedGameModes }),
   setSelectedGeneration: (selectedGeneration) => set({ selectedGeneration }),
   setSelectedGenres: (selectedGenres) => set({ selectedGenres }),
   setSelectedRating: (selectedRating) => set({ selectedRating }),
+  setSelectedVotes: (selectedVotes) => set({ selectedVotes }),
   setSelectedSystems: (selectedSystems) => set({ selectedSystems }),
   setExcludedGameModes: (excludedGameModes) => set({ excludedGameModes }),
   setExcludedGenres: (excludedGenres) => set({ excludedGenres }),
@@ -66,19 +59,7 @@ const getActions = (set: any): IAction => ({
   setSelectedYears: (selectedYears) => set({ selectedYears }),
   setSelectedThemes: (selectedThemes) => set({ selectedThemes }),
   setExcludedThemes: (excludedThemes) => set({ excludedThemes }),
-  addRoyalGame: (game) =>
-    set((state: IState) => ({
-      royalGames: [
-        ...(!!state.royalGames?.length ? state.royalGames : []),
-        game,
-      ],
-    })),
-  removeRoyalGame: (game) =>
-    set((state: IState) => ({
-      royalGames: !!state.royalGames?.length
-        ? state.royalGames.filter((royal) => royal._id !== game._id)
-        : undefined,
-    })),
+  setExcludeHistory: (isExcludeHistory) => set({ isExcludeHistory }),
   clear: () => {
     set({
       selectedSystems: undefined,
@@ -95,6 +76,8 @@ const getActions = (set: any): IAction => ({
       selectedYears: undefined,
       selectedThemes: undefined,
       excludedThemes: undefined,
+      selectedVotes: undefined,
+      isExcludeHistory: false,
     });
   },
 });

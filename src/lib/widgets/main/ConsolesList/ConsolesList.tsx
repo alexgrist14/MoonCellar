@@ -1,19 +1,32 @@
-import { FC, useEffect, useRef } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import styles from "./ConsolesList.module.scss";
-import { RoyalList } from "@/src/lib/features/main";
 import { IGDBApi } from "@/src/lib/shared/api";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
-import { useGauntletFiltersStore } from "@/src/lib/shared/store/filters.store";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { Filters } from "@/src/lib/shared/ui/Filters";
+import { useGamesStore } from "@/src/lib/shared/store/games.store";
+import { GamesList } from "@/src/lib/shared/ui/GamesList";
 
 export const ConsolesList: FC = () => {
-  const { royalGames } = useGauntletFiltersStore();
+  const {
+    royalGames,
+    setRoyalGames,
+    removeRoyalGame,
+    historyGames,
+    setHistoryGames,
+    removeHistoryGame,
+  } = useGamesStore();
   const { setGenres, setGameModes, setSystems, setThemes } = useCommonStore();
-  const { setSegments, setStarted, setFinished, setRoyal, isRoyal } =
-    useStatesStore();
+  const {
+    setSegments,
+    setStarted,
+    setFinished,
+    setRoyal,
+    isRoyal,
+  } = useStatesStore();
   const { setWinner } = useCommonStore();
+  const [tabIndex, setTabIndex] = useState(0);
 
   useEffect(() => {
     if (isRoyal) return;
@@ -37,24 +50,52 @@ export const ConsolesList: FC = () => {
     <div ref={contentRef} className={styles.consoles__list}>
       <div className={styles.consoles__options}>
         <Tabs
+          defaultTabIndex={tabIndex}
           contents={[
             {
               tabName: "General",
-              style: { flexBasis: "50%" },
-              onTabClick: () => setRoyal(false),
+              style: { flexBasis: "33%" },
+              onTabClick: () => {
+                setRoyal(false);
+                setTabIndex(0);
+              },
             },
             {
               tabName:
                 "Royal" +
                 (!!royalGames?.length ? ` (${royalGames.length})` : ""),
-              style: { flexBasis: "50%" },
-              onTabClick: () => setRoyal(true),
+              style: { flexBasis: "33%" },
+              onTabClick: () => {
+                setRoyal(true);
+                setTabIndex(1);
+              },
+            },
+            {
+              tabName: "History",
+              style: { flexBasis: "33%" },
+              onTabClick: () => {
+                setRoyal(false);
+                setTabIndex(2);
+              },
             },
           ]}
         />
       </div>
-      {!isRoyal && <Filters isGauntlet />}
-      {isRoyal && <RoyalList />}
+      {tabIndex === 0 && <Filters isGauntlet />}
+      {tabIndex === 1 && (
+        <GamesList
+          games={royalGames || []}
+          getGames={(games) => setRoyalGames(games)}
+          removeGame={(game) => removeRoyalGame(game)}
+        />
+      )}
+      {tabIndex === 2 && (
+        <GamesList
+          games={historyGames || []}
+          getGames={(games) => setHistoryGames(games)}
+          removeGame={(game) => removeHistoryGame(game)}
+        />
+      )}
     </div>
   );
 };

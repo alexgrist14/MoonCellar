@@ -13,6 +13,7 @@ import { axiosUtils } from "../../shared/utils/axios";
 import Image from "next/image";
 import classNames from "classnames";
 import { IGDBScreenshot } from "../../shared/types/igdb";
+import { useGamesStore } from "../../shared/store/games.store";
 
 export const GauntletPage: FC = () => {
   const [bg, setBg] = useState<IGDBScreenshot & { gameId: number }>();
@@ -24,8 +25,6 @@ export const GauntletPage: FC = () => {
     selectedGameModes,
     selectedSystems,
     searchQuery,
-    royalGames,
-    setGames,
     excludedGameModes,
     excludedGenres,
     excludedSystems,
@@ -34,8 +33,10 @@ export const GauntletPage: FC = () => {
     selectedYears,
     selectedThemes,
     excludedThemes,
+    isExcludeHistory,
+    selectedVotes,
   } = useGauntletFiltersStore();
-
+  const { royalGames, setGames, historyGames } = useGamesStore();
   const {
     isLoading,
     setSegments,
@@ -66,9 +67,14 @@ export const GauntletPage: FC = () => {
       categories: selectedCategories,
       take: 16,
       rating: selectedRating,
+      votes: selectedVotes,
       search: searchQuery,
       isRandom: true,
       years: selectedYears,
+      ...(isExcludeHistory &&
+        !!historyGames?.length && {
+          excludeGames: historyGames.map((game) => game._id),
+        }),
     }).then((response) => {
       if (!!response.data.results.length) {
         setGames(response.data.results);
@@ -81,6 +87,7 @@ export const GauntletPage: FC = () => {
         setLoading(false);
         setFinished(true);
         setWinner(undefined);
+        setSegments([]);
       }
     });
   }, [
@@ -104,6 +111,9 @@ export const GauntletPage: FC = () => {
     excludedThemes,
     selectedThemes,
     selectedYears,
+    historyGames,
+    isExcludeHistory,
+    selectedVotes,
   ]);
 
   useEffect(() => {

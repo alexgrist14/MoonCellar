@@ -29,6 +29,7 @@ export const GamesPage: FC = () => {
     selectedYears,
     selectedThemes,
     excludedThemes,
+    selectedVotes,
   } = useGamesFiltersStore();
   const { isLoading, setLoading, isRoyal } = useStatesStore();
   const {
@@ -68,6 +69,7 @@ export const GamesPage: FC = () => {
       page: 1,
       take: take + (!isMobile ? Math.ceil(take / step) - 1 : 0),
       rating: selectedRating,
+      votes: selectedVotes,
     })
       .then((res) => {
         setGames(res.data.results);

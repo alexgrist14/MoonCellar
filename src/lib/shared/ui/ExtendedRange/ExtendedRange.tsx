@@ -12,6 +12,7 @@ export interface IExtendedCheckboxProps {
   max: number;
   symbol?: string;
   text?: string;
+  step?: number;
 }
 
 export const ExtendedRange: FC<IExtendedCheckboxProps> = ({
@@ -23,6 +24,7 @@ export const ExtendedRange: FC<IExtendedCheckboxProps> = ({
   min,
   symbol,
   text,
+  step,
 }) => {
   const [value, setValue] = useState(0);
 
@@ -45,6 +47,7 @@ export const ExtendedRange: FC<IExtendedCheckboxProps> = ({
           defaultValue={value}
           min={min}
           max={max}
+          step={step}
           callback={(value) => {
             setValue(value);
             debouncedSetSelected(value);

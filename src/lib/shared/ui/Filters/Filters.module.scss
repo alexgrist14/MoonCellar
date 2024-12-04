@@ -32,4 +32,20 @@
     border-radius: $radius;
     opacity: 0.7;
   }
+
+  &__toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+
+    & > p {
+      margin-top: -2px;
+    }
+  }
+
+  &__top {
+    display: grid;
+    gap: 10px;
+  }
 }

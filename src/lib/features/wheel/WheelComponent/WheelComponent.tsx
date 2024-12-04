@@ -3,7 +3,7 @@ import styles from "./WheelComponent.module.scss";
 import classNames from "classnames";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
-import { useGauntletFiltersStore } from "@/src/lib/shared/store/filters.store";
+import { useGamesStore } from "@/src/lib/shared/store/games.store";
 
 interface WheelComponentProps {
   segColors: string[];
@@ -27,7 +27,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   time = 5,
 }) => {
   const { setWinner } = useCommonStore();
-  const { games, royalGames } = useGauntletFiltersStore();
+  const { games, royalGames, addHistoryGame } = useGamesStore();
 
   const {
     isFinished,
@@ -55,37 +55,27 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   }, [segments, setSegments, isRoyal, royalGames]);
 
   useEffect(() => {
-    if (!!currentSegment && isFinished) {
-      if (!isRoyal) {
-        !!games &&
-          setWinner(
-            games.find(
-              (game) => game._id.toString() === currentSegment.split("_")[0]
-            )
-          );
-      } else {
-        console.log(royalGames, currentSegment);
-        !!royalGames &&
-          setWinner(
-            royalGames?.find(
-              (game) => game._id.toString() === currentSegment.split("_")[0]
-            )
-          );
+    if (!currentSegment || !isFinished) return;
 
-        const filtered = segments?.filter(
-          (segment) => segment !== currentSegment
+    const filtered = segments?.filter((segment) => segment !== currentSegment);
+
+    const winner = isRoyal
+      ? royalGames?.find(
+          (game) => game._id.toString() === currentSegment.split("_")[0]
+        )
+      : games?.find(
+          (game) => game._id.toString() === currentSegment.split("_")[0]
         );
-        !filtered?.length && setCurrentSegment("");
 
-        !!royalGames &&
-          setSegments(
-            filtered?.length
-              ? filtered
-              : royalGames.map((game, i) => game._id + "_" + i)
-          );
-      }
+    isRoyal && setSegments(filtered || []);
+
+    if (isRoyal && !filtered?.length) {
+      setCurrentSegment("");
     }
-  }, [currentSegment, isFinished, games, isRoyal, royalGames]);
+
+    setWinner(winner || undefined);
+    !!winner && addHistoryGame(winner);
+  }, [currentSegment, isFinished]);
 
   useEffect(() => {
     const centerX = 300;
@@ -208,6 +198,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
         onClick={() => {
           setFinished(false);
           setWinner(undefined);
+          setSegments([]);
 
           if (isRoyal) {
             return setStarted(true);

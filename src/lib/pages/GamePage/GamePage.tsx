@@ -17,19 +17,14 @@ import Link from "next/link";
 import { Cover } from "../../shared/ui/Cover";
 import { GameControls } from "../../shared/ui/GameControls";
 import { Loader } from "../../shared/ui/Loader";
-import {
-  useGamesFiltersStore,
-  useGauntletFiltersStore,
-} from "../../shared/store/filters.store";
+import { useGamesFiltersStore } from "../../shared/store/filters.store";
 import { ButtonGroup } from "../../shared/ui/Button/ButtonGroup";
-import { Button } from "../../shared/ui/Button";
-import classNames from "classnames";
+import { useGamesStore } from "../../shared/store/games.store";
 
 export const GamePage: FC = () => {
-  const { query } = useRouter();
+  const { query, isReady } = useRouter();
 
-  const { royalGames, addRoyalGame, removeRoyalGame } =
-    useGauntletFiltersStore();
+  const { royalGames, addRoyalGame, removeRoyalGame } = useGamesStore();
 
   const {
     setSelectedYears,
@@ -44,12 +39,15 @@ export const GamePage: FC = () => {
 
   const [game, setGame] = useState<IGDBGame>();
   const [isLoading, setIsLoading] = useState(false);
-  const [isKeywordsMore, setIsKeywordsMore] = useState(false);
+  const [isGameLoading, setIsGameLoading] = useState(true);
 
   useEffect(() => {
     !!query.slug &&
       IGDBApi.getGameBySlug(query.slug as string)
-        .then((response) => setGame(response.data))
+        .then((response) => {
+          setGame(response.data);
+          setTimeout(() => setIsGameLoading(false), 200);
+        })
         .catch(axiosUtils.toastError);
   }, [query]);
 
@@ -75,6 +73,8 @@ export const GamePage: FC = () => {
   const category = Object.keys(gameCategories).find(
     (key) => gameCategories[key] === game.category
   );
+
+  if (isGameLoading || !isReady) return <Loader type="pacman" />;
 
   return (
     <>

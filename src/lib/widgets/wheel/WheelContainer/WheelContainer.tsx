@@ -5,12 +5,11 @@ import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { GameCard } from "@/src/lib/shared/ui/GameCard";
 import { Button } from "@/src/lib/shared/ui/Button";
-import { useGauntletFiltersStore } from "@/src/lib/shared/store/filters.store";
+import { useGamesStore } from "@/src/lib/shared/store/games.store";
 
 export const WheelContainer: FC = () => {
   const { winner } = useCommonStore();
-  const { royalGames, addRoyalGame, removeRoyalGame } =
-    useGauntletFiltersStore();
+  const { royalGames, addRoyalGame, removeRoyalGame } = useGamesStore();
 
   const { isFinished, segments, isLoading, isRoyal } = useStatesStore();
 

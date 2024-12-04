@@ -5,15 +5,15 @@
   cursor: pointer;
   width: 60px;
   height: 30px;
-  background: $bg;
-  border-radius: $radius;
+  border-radius: 12px;
+  border: 2px solid $bgAlt;
   outline: 3px solid transparent;
   position: relative;
   transition: all 0.2s;
   font-size: 10px;
   font-weight: 600;
-  overflow: hidden;
   user-select: none;
+  background: $bg;
 
   & span {
     z-index: 1;
@@ -22,18 +22,14 @@
     &:first-of-type {
       padding-right: 2px;
     }
-
-    &:last-of-type {
-      padding-left: 2px;
-    }
   }
 
   &_left {
-    outline-color: rgba($off, 1);
+    outline-color: $off;
   }
 
   &_right {
-    outline-color: rgba($on, 1);
+    outline-color: $on;
   }
 
   &_active {
@@ -44,23 +40,16 @@
   &__left,
   &__right {
     color: white;
-  }
-
-  &__left {
-    margin-inline: auto;
-  }
-
-  &__right {
-    margin-inline: auto;
+    @include flexCenter;
   }
 
   &__button {
     position: absolute;
     top: 0;
-    width: 30px;
+    width: 50%;
     height: 100%;
     transition: 0.3s;
-    box-shadow: 0 0 2px 0 rgba(10, 10, 10, 0.29);
+    border-radius: $radius;
 
     &_left {
       transform: translateX(0);

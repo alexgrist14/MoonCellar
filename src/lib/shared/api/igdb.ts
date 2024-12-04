@@ -22,6 +22,7 @@ const IGDB_URL = `${API_URL}/igdb`;
 const getGames = (params: {
   search?: string;
   rating?: number;
+  votes?: number;
   isRandom?: boolean;
   take?: number;
   page?: number;
@@ -29,6 +30,7 @@ const getGames = (params: {
   excluded?: IGDBFilters;
   company?: string;
   years?: [number, number];
+  excludeGames?: number[];
   categories?: (keyof typeof gameCategories)[];
 }) => {
   return agent.get<{ results: IGDBGameMinimal[]; total: number }>(
