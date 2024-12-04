@@ -6,7 +6,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import styles from "./ProfileAvatar.module.scss";
+import styles from "./AvatarSettings.module.scss";
 import Image from "next/image";
 import { useAuthStore } from "../../store/auth.store";
 import { userAPI } from "../../api";

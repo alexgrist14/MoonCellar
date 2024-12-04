@@ -3,7 +3,7 @@ import styles from "./Settings.module.scss";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { Button } from "@/src/lib/shared/ui/Button";
-import ProfileAvatar from "@/src/lib/shared/ui/ProfileAvatar/ProfileAvatar";
+import ProfileAvatar from "@/src/lib/shared/ui/AvatarSettings/AvatarSettings";
 
 interface SettingsProps {
   avatar?: string;

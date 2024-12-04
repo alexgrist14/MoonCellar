@@ -19,48 +19,17 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    .profile{
-      height: 36px;
-      border-radius: 50%;
-      overflow: hidden;
-      transition: 0.3s all;
-      outline: 2px solid transparent;
-      aspect-ratio: 1;
-      &:hover{
-        outline: 2px solid $accent;
-      }
-      &_image{
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-
-      }
-    }
-    .dropdown{
-      display: flex;
-      visibility: hidden;
-      flex-direction: column;
-      right: 0;
-      position: absolute;
-      border: 1px solid $neutral-50;
-      text-align: left;
-      z-index: 4;
-      box-shadow: 10px;
-      &_item{
-        text-align: left;
-        width: 200px;
-        background-color: $bgAlt;
-        padding-block: 20px;
-        padding-left: 10px;
-        z-index: 4;
-        transition: 0.2s all;
-        &:hover{
-          background-color: $bg;
+    .profile {
+      &__link {
+        height: 36px;
+        overflow: hidden;
+        transition: 0.3s all;
+        outline: 2px solid transparent;
+        aspect-ratio: 1;
+        &:hover {
+          outline: 2px solid $accent;
         }
       }
-    }
-    .active{
-      visibility: visible;
     }
   }
 
@@ -70,12 +39,8 @@
     font-family: "Pentagra";
     padding-inline: 14px;
   }
-  .profile{
-    cursor: pointer;
+  .svg{
+    color: $whiteTextColor;
+    width: 22px;
   }
-}
-
-.svg {
-  color: $whiteTextColor;
-  width: 22px;
 }

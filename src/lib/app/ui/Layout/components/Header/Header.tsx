@@ -1,27 +1,18 @@
-import { FC, MouseEvent, useEffect, useState } from "react";
-import styles from "./Header.module.scss";
-import Link from "next/link";
-import { Separator } from "@/src/lib/shared/ui/Separator";
-import { Button } from "@/src/lib/shared/ui/Button";
-import { SvgProfile, SvgSearch } from "@/src/lib/shared/ui/svg";
-import { useRouter } from "next/router";
-import { useCommonStore } from "@/src/lib/shared/store/common.store";
-import { jwtDecode } from "jwt-decode";
-import { isTokenExpired } from "@/src/lib/shared/utils/token";
-import Image from "next/image";
+import { useAuth } from "@/src/lib/shared/hooks/auth";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { deleteCookie, getCookie } from "@/src/lib/shared/utils/cookies";
+import { useCommonStore } from "@/src/lib/shared/store/common.store";
+import { AuthModal } from "@/src/lib/shared/ui/AuthModal";
+import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
+import { Button } from "@/src/lib/shared/ui/Button";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { SearchModal } from "@/src/lib/shared/ui/SearchModal";
-import {
-  ACCESS_TOKEN,
-  API_URL,
-  REFRESH_TOKEN,
-} from "@/src/lib/shared/constants";
-import { AuthModal } from "@/src/lib/shared/ui/AuthModal";
+import { Separator } from "@/src/lib/shared/ui/Separator";
+import { SvgSearch } from "@/src/lib/shared/ui/svg";
 import { GetServerSidePropsContext } from "next";
-import { authAPI, userAPI } from "@/src/lib/shared/api";
-import { useAuth } from "@/src/lib/shared/hooks/auth";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { FC, MouseEvent, useState } from "react";
+import styles from "./Header.module.scss";
 
 export const Header: FC = () => {
   const router = useRouter();
@@ -31,7 +22,7 @@ export const Header: FC = () => {
   
 
   const [isMenuActive, setIsMenuActive] = useState(false);
-  const { isAuth, profile, clear } = useAuthStore();
+  const { isAuth, profile } = useAuthStore();
   const { push } = useRouter();
 
   const handleProfileClick = () => {
@@ -64,47 +55,9 @@ export const Header: FC = () => {
         </Button>
       </div>
       <div className={styles.container__right}>
-        {isAuth ? (
-          <div
-            className={styles.profile}
-            onMouseLeave={() => setIsMenuActive(false)}
-            onClick={handleProfileClick}
-          >
-            <Image
-              className={styles.profile_image}
-              onMouseEnter={() => setIsMenuActive(true)}
-              src={
-                !!profile
-                  ? `${API_URL}/photos/${profile.profilePicture}`
-                  : "/images/user.png"
-              }
-              width={40}
-              height={40}
-              alt="profile"
-            />
-            {/* <div
-              className={`${styles.dropdown} ${isMenuActive && styles.active}`}
-            >
-              <Link className={styles.dropdown_item} href={`/user/${profile?.userName}`}>
-                Profile
-              </Link>
-              <Link className={styles.dropdown_item} href="/settings">
-                Settings
-              </Link>
-              <Link
-                className={styles.dropdown_item}
-                href="#"
-                onClick={handleLogoutClick}
-              >
-                Logout
-              </Link>
-            </div> */}
-          </div>
-        ) : (
-          <div onClick={handleProfileClick}>
-            <SvgProfile className={styles.profile_image} />
-          </div>
-        )}
+        <Link href={`/user/${profile?.userName}`} className={styles.profile__link}>
+        <Avatar user={profile}/>
+        </Link>
       </div>
     </div>
   );
