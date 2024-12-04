@@ -25,7 +25,7 @@ const UserProfile: FC<UserProfileProps> = ({
   profilePicture,
 }) => {
   const [avatar, setAvatar] = useState<string | undefined>(
-    profilePicture ? `${API_URL}/photos/${profilePicture}` : ""
+    profilePicture ? `https://api.mooncellar.space/photos/${profilePicture}` : ""
   );
   const [tabIndex, setTabIndex] = useState(0);
   const { query, replace } = useRouter();

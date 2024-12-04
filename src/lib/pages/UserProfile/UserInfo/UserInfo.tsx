@@ -6,6 +6,9 @@ import Link from "next/link";
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
 import styles from "./UserInfo.module.scss";
 import { API_URL } from "@/src/lib/shared/constants";
+import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
+import { useAuthStore } from "@/src/lib/shared/store/auth.store";
+import { useRouter } from "next/router";
 
 interface UserInfoProps {
   userName: string;
@@ -23,6 +26,9 @@ const UserInfo: FC<UserInfoProps> = ({
   setTabIndex,
 }) => {
   const [userFollowings, setUserFollowing] = useState<IFollowings>();
+  const { profile } = useAuthStore();
+  const router = useRouter();
+
   useEffect(() => {
     userAPI
       .getUserFollowings(id)
@@ -69,23 +75,12 @@ const UserInfo: FC<UserInfoProps> = ({
           </div>
         </div>
         <div className={styles.friends}>
-          <h3 className={styles.friends_title}>Friends</h3>
-          <div className={styles.friends_list}>
+          <h3 className={styles.friends__title}>Friends</h3>
+          <div className={styles.friends__list}>
             {!!userFollowings &&
               userFollowings.followings.map((item, i) => (
-                <Link href={`/user/${item.userName}`} key={i}>
-                  <div>
-                    <Image
-                      width={32}
-                      height={32}
-                      src={
-                        `${API_URL}/photos/${item.profilePicture}` ||
-                        "/images/user.png"
-                      }
-                      alt="profile"
-                    />
-                  </div>
-                  {item.userName}
+                <Link href={`/user/${item.userName}`} className={styles.friends__item} key={i}>
+                  <Avatar user={item}/>
                 </Link>
               ))}
           </div>

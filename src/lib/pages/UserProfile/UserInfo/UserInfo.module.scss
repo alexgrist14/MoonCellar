@@ -23,22 +23,19 @@
     @include mediaMd {
       max-width: unset;
     }
-    &_title {
+    &__title {
       @include profileTitle();
     }
-    &_list {
+    &__list {
       display: flex;
       padding: 10px 0 0 10px;
       flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 5px;
-      &__item {
-        transition: 0.2s all;
-        cursor: pointer;
-        &:hover {
-          color: $accent;
-        }
-      }
+      gap: 10px;
+    }
+    &__item {
+      width: 34px;
+      height: 34px;
+      transition: 0.2s all;
     }
   }
   .profile {
