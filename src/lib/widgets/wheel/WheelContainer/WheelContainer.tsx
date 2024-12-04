@@ -5,13 +5,13 @@ import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { GameCard } from "@/src/lib/shared/ui/GameCard";
 import { Button } from "@/src/lib/shared/ui/Button";
-import { useGauntletFiltersStore } from "@/src/lib/shared/store/gauntlet-filters.store";
+import { useGamesStore } from "@/src/lib/shared/store/games.store";
 
 export const WheelContainer: FC = () => {
   const { winner } = useCommonStore();
-  const { setRoyalGames, royalGames, isRoyal } = useGauntletFiltersStore();
+  const { royalGames, addRoyalGame, removeRoyalGame } = useGamesStore();
 
-  const { isFinished, segments, isLoading } = useStatesStore();
+  const { isFinished, segments, isLoading, isRoyal } = useStatesStore();
 
   const [colors, setColors] = useState<string[]>([]);
 
@@ -33,11 +33,8 @@ export const WheelContainer: FC = () => {
       );
     };
 
-    segments?.some((segment) => !segment) &&
-      setColors(generateRandomColors((200 + Math.random() * 20) ^ 0));
+    setColors(generateRandomColors((200 + Math.random() * 20) ^ 0));
   }, [segments, isLoading]);
-
-  console.log(winner);
 
   return (
     <div className={styles.container}>
@@ -55,17 +52,12 @@ export const WheelContainer: FC = () => {
           <GameCard game={winner} />
           {!isRoyal && (
             <Button
+              color="accent"
               style={{ height: "30px" }}
               onClick={() => {
                 !royalGames?.some((game) => game._id === winner._id)
-                  ? setRoyalGames([
-                      ...(!!royalGames?.length ? royalGames : []),
-                      winner,
-                    ])
-                  : setRoyalGames(
-                      royalGames?.filter((game) => game._id !== winner._id) ||
-                        []
-                    );
+                  ? addRoyalGame(winner)
+                  : removeRoyalGame(winner);
               }}
             >
               {royalGames?.some((game) => game._id === winner._id)

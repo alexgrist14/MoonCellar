@@ -3,18 +3,19 @@ import { Input } from "../Input";
 import styles from "./SearchModal.module.scss";
 import { FC, useEffect, useMemo, useState } from "react";
 import { IGDBApi } from "../../api";
-import { IGDBGame } from "../../types/igdb";
+import { IGDBGameMinimal } from "../../types/igdb";
 import { Scrollbar } from "../Scrollbar";
 import { Button } from "../Button";
-import { PacmanLoader, PulseLoader } from "react-spinners";
+import { PacmanLoader } from "react-spinners";
 import { GameCard } from "../GameCard";
 import classNames from "classnames";
 import { useCommonStore } from "../../store/common.store";
+import { Loader } from "../Loader";
 
 export const SearchModal: FC = () => {
   const { isMobile } = useCommonStore();
 
-  const [games, setGames] = useState<IGDBGame[]>([]);
+  const [games, setGames] = useState<IGDBGameMinimal[]>([]);
   const [total, setTotal] = useState(0);
 
   const [take, setTake] = useState(0);
@@ -24,15 +25,15 @@ export const SearchModal: FC = () => {
 
   const isSearchActive = useMemo(
     () => !!searchQuery && searchQuery.length >= 2,
-    [searchQuery],
+    [searchQuery]
   );
 
-  const originalTake = useMemo(() => (isMobile ? 19 : 20), [isMobile]);
+  const originalTake = 19;
 
   const debouncedSearch = useDebouncedCallback(() => {
     IGDBApi.getGames({
       search: searchQuery,
-      take: take + (take / originalTake - 1),
+      take: take + Math.ceil(take / originalTake - 1),
     }).then((response) => {
       setGames(response.data.results);
       setTotal(response.data.total);
@@ -72,13 +73,15 @@ export const SearchModal: FC = () => {
               [styles.modal__results_loading]: isLoading,
             })}
           >
-            {games?.map((game) => <GameCard key={game._id} game={game} />)}
+            {games?.map((game) => (
+              <GameCard key={game._id} game={game} />
+            ))}
             {!!games?.length && take < total && (
               <Button
                 className={styles.modal__more}
-                onClick={() => setTake(take + (isMobile ? 19 : 20))}
+                onClick={() => setTake(take + originalTake)}
               >
-                {isLoading ? <PulseLoader color="#ffffff" /> : "More games"}
+                {isLoading ? <Loader /> : "More games"}
               </Button>
             )}
           </div>

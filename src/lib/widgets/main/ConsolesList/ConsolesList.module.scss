@@ -25,10 +25,16 @@
   &__options {
     display: grid;
     justify-items: flex-start;
+    align-self: center;
     gap: 10px;
+    width: calc(100% - 10px);
 
     & > h3 {
       justify-self: center;
+    }
+
+    & button {
+      height: fit-content;
     }
   }
 

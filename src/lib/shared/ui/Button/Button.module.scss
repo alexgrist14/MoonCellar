@@ -15,7 +15,7 @@
 
   padding-inline: 12px;
 
-  &:hover:not(&_fancyColor) {
+  &:hover:not(&_fancyColor):not(&_transparentColor) {
     filter: brightness(0.8);
   }
 
@@ -23,12 +23,17 @@
     background-color: $lightBg;
     border-color: $darkBorderColor;
     color: $whiteTextColor;
+
+    &_active {
+      color: $accent;
+      background-color: $bgAlt;
+    }
   }
 
   &_accentColor {
     background-color: $accent;
     border-color: $darkBorderColor;
-    color: $whiteTextColor;
+    color: $textColor;
   }
 
   &_redColor {
@@ -58,15 +63,6 @@
     opacity: 0.4;
     cursor: not-allowed !important;
   }
-
-  // &_active:not(&_fancyColor) {
-  //   box-shadow: $buttonShadow;
-  //   filter: brightness(0.8);
-  // }
-  // &_active &_fancyColor, &:hover &_fancyColor {
-  //   border-bottom: $accent 1px solid;
-  //     transition: 0.2s all;
-  // }
 
   &_fancyColor {
     flex-grow: 1;

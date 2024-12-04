@@ -2,7 +2,7 @@ import styles from "./ExtendedSelector.module.scss";
 import { Dropdown } from "../Dropdown";
 
 export interface IExtendedSelectorProps<
-  T extends { id: number; name: string },
+  T extends { _id: number; name: string }
 > {
   title: string;
   list: T[];
@@ -11,6 +11,7 @@ export interface IExtendedSelectorProps<
   setExcluded: any;
   setSelected: any;
   isDisabled?: boolean;
+  icons?: string[];
 }
 
 export const ExtendedSelector = <T,>({
@@ -21,12 +22,14 @@ export const ExtendedSelector = <T,>({
   setExcluded,
   setSelected,
   isDisabled,
-}: IExtendedSelectorProps<T & { id: number; name: string }>) => {
+  icons,
+}: IExtendedSelectorProps<T & { _id: number; name: string }>) => {
   return (
     <div className={styles.option}>
-      <h3>{title}</h3>
+      <h4>{title}</h4>
       <div className={styles.option__selector}>
         <Dropdown
+          icons={icons}
           isWithReset
           overflowRootId="consoles"
           isDisabled={isDisabled}
@@ -36,19 +39,20 @@ export const ExtendedSelector = <T,>({
           overwriteValue={selected.map((item) => item?.name)?.join(", ") || ""}
           initialMultiValue={
             selected.map((item) =>
-              list.findIndex((el) => el.id === item?.id),
+              list.findIndex((el) => el._id === item?._id)
             ) || []
           }
           placeholder="Include..."
           getIndexes={(indexes) =>
             setSelected(
-              !!indexes?.length ? indexes.map((index) => list[index]) : [],
+              !!indexes?.length ? indexes.map((index) => list[index]) : []
             )
           }
         />
       </div>
       <div className={styles.option__selector}>
         <Dropdown
+          icons={icons}
           isWithReset
           overflowRootId="consoles"
           isDisabled={isDisabled}
@@ -58,7 +62,7 @@ export const ExtendedSelector = <T,>({
           overwriteValue={excluded.map((item) => item?.name)?.join(", ") || ""}
           initialMultiValue={
             excluded.map((item) =>
-              list.findIndex((el) => el.id === item?.id),
+              list.findIndex((el) => el._id === item?._id)
             ) || []
           }
           placeholder="Exclude..."

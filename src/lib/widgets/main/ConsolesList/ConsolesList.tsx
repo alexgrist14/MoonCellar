@@ -1,16 +1,32 @@
-import { FC, useEffect, useRef } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import styles from "./ConsolesList.module.scss";
-import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
-import { IGDBList, RoyalList } from "@/src/lib/features/main";
 import { IGDBApi } from "@/src/lib/shared/api";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
-import { useGauntletFiltersStore } from "@/src/lib/shared/store/gauntlet-filters.store";
+import { Tabs } from "@/src/lib/shared/ui/Tabs";
+import { Filters } from "@/src/lib/shared/ui/Filters";
+import { useGamesStore } from "@/src/lib/shared/store/games.store";
+import { GamesList } from "@/src/lib/shared/ui/GamesList";
 
 export const ConsolesList: FC = () => {
-  const { isRoyal, royalGames, setRoyal } = useGauntletFiltersStore();
-  const { isLoading } = useStatesStore();
-  const { setGenres, setGameModes, setSystems } = useCommonStore();
+  const {
+    royalGames,
+    setRoyalGames,
+    removeRoyalGame,
+    historyGames,
+    setHistoryGames,
+    removeHistoryGame,
+  } = useGamesStore();
+  const { setGenres, setGameModes, setSystems, setThemes } = useCommonStore();
+  const {
+    setSegments,
+    setStarted,
+    setFinished,
+    setRoyal,
+    isRoyal,
+  } = useStatesStore();
+  const { setWinner } = useCommonStore();
+  const [tabIndex, setTabIndex] = useState(0);
 
   useEffect(() => {
     if (isRoyal) return;
@@ -18,27 +34,68 @@ export const ConsolesList: FC = () => {
     IGDBApi.getGenres().then((response) => setGenres(response.data));
     IGDBApi.getModes().then((response) => setGameModes(response.data));
     IGDBApi.getPlatforms().then((response) => setSystems(response.data));
-  }, [isRoyal, setGenres, setGameModes, setSystems]);
+    IGDBApi.getThemes().then((response) => setThemes(response.data));
+  }, [isRoyal, setGenres, setGameModes, setSystems, setThemes]);
 
   const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setWinner(undefined);
+    setFinished(true);
+    setStarted(false);
+    setSegments([]);
+  }, [isRoyal, setFinished, setWinner, setStarted, setSegments]);
 
   return (
     <div ref={contentRef} className={styles.consoles__list}>
       <div className={styles.consoles__options}>
-        <label className={styles.consoles__toggle}>
-          <span>
-            Royal
-            {!!royalGames?.length ? ` (Games: ${royalGames.length}):` : ":"}
-          </span>
-          <ToggleSwitch
-            value={isRoyal ? "right" : "left"}
-            clickCallback={() => setRoyal(!isRoyal)}
-            isDisabled={isLoading}
-          />
-        </label>
+        <Tabs
+          defaultTabIndex={tabIndex}
+          contents={[
+            {
+              tabName: "General",
+              style: { flexBasis: "33%" },
+              onTabClick: () => {
+                setRoyal(false);
+                setTabIndex(0);
+              },
+            },
+            {
+              tabName:
+                "Royal" +
+                (!!royalGames?.length ? ` (${royalGames.length})` : ""),
+              style: { flexBasis: "33%" },
+              onTabClick: () => {
+                setRoyal(true);
+                setTabIndex(1);
+              },
+            },
+            {
+              tabName: "History",
+              style: { flexBasis: "33%" },
+              onTabClick: () => {
+                setRoyal(false);
+                setTabIndex(2);
+              },
+            },
+          ]}
+        />
       </div>
-      {!isRoyal && <IGDBList />}
-      {isRoyal && <RoyalList />}
+      {tabIndex === 0 && <Filters isGauntlet />}
+      {tabIndex === 1 && (
+        <GamesList
+          games={royalGames || []}
+          getGames={(games) => setRoyalGames(games)}
+          removeGame={(game) => removeRoyalGame(game)}
+        />
+      )}
+      {tabIndex === 2 && (
+        <GamesList
+          games={historyGames || []}
+          getGames={(games) => setHistoryGames(games)}
+          removeGame={(game) => removeHistoryGame(game)}
+        />
+      )}
     </div>
   );
 };

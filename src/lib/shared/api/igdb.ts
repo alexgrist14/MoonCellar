@@ -1,11 +1,20 @@
-import { API_URL } from "../constants";
-import { IGDBDefault, IGDBGame, IGDBGenre, IGDBPlatform } from "../types/igdb";
+import { API_URL, gameCategories } from "../constants";
+import {
+  IGDBDefault,
+  IGDBGame,
+  IGDBGameMinimal,
+  IGDBGenre,
+  IGDBPlatform,
+  IGDBScreenshot,
+} from "../types/igdb";
 import { agent } from "./agent";
 
 interface IGDBFilters {
   genres?: number[];
   modes?: number[];
   platforms?: number[];
+  themes?: number[];
+  keywords?: number[];
 }
 
 const IGDB_URL = `${API_URL}/igdb`;
@@ -13,13 +22,18 @@ const IGDB_URL = `${API_URL}/igdb`;
 const getGames = (params: {
   search?: string;
   rating?: number;
+  votes?: number;
   isRandom?: boolean;
   take?: number;
   page?: number;
   selected?: IGDBFilters;
   excluded?: IGDBFilters;
+  company?: string;
+  years?: [number, number];
+  excludeGames?: number[];
+  categories?: (keyof typeof gameCategories)[];
 }) => {
-  return agent.get<{ results: IGDBGame[]; total: number }>(
+  return agent.get<{ results: IGDBGameMinimal[]; total: number }>(
     `${IGDB_URL}/games`,
     {
       params: {
@@ -31,7 +45,7 @@ const getGames = (params: {
           ? JSON.stringify(params.excluded)
           : undefined,
       },
-    },
+    }
   );
 };
 
@@ -55,6 +69,18 @@ const getModes = () => {
   return agent.get<IGDBDefault[]>(`${IGDB_URL}/modes`);
 };
 
+const getScreenshot = (id: number) => {
+  return agent.get<IGDBScreenshot>(`${IGDB_URL}/screenshot/${id}`);
+};
+
+const getArtwork = (id: number) => {
+  return agent.get<IGDBScreenshot>(`${IGDB_URL}/artwork/${id}`);
+};
+
+const getThemes = () => {
+  return agent.get<IGDBDefault[]>(`${IGDB_URL}/themes`);
+};
+
 export const IGDBApi = {
   getGames,
   getGameById,
@@ -62,4 +88,7 @@ export const IGDBApi = {
   getGenres,
   getPlatforms,
   getModes,
+  getScreenshot,
+  getArtwork,
+  getThemes,
 };

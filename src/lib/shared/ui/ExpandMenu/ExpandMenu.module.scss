@@ -3,9 +3,28 @@
   position: fixed;
   width: max(25%, 360px);
   height: 100%;
-  transition: opacity 0.3s, transform 0.3s;
+  transition: transform 0.4s, filter 0.4s;
   z-index: 3;
   background: $bgAlt;
+  right: calc(100% - 5px);
+
+  &_active {
+    transform: translateX(calc(100% - 5px));
+  }
+
+  &_right.menu_active {
+    transform: translateX(calc(-100% + 5px));
+  }
+
+  &_right {
+    left: calc(100% - 5px);
+  }
+
+  &_disabled {
+    filter: unset;
+    pointer-events: none;
+    z-index: -1;
+  }
 
   @include mediaMax($screenMd) {
     width: 100%;
@@ -47,7 +66,7 @@
     width: fit-content;
     padding: 10px;
     user-select: none;
-    transition: all 0.3s;
+    transition: 0.3s;
     white-space: nowrap;
     z-index: 4;
 
@@ -65,11 +84,12 @@
   div &__content {
     margin: 0;
     padding: 20px;
+    padding-top: 50px;
     max-height: calc(100vh - 55px);
   }
 
   div &__scrollbar {
-    margin-block: 50px;
-    height: calc(100% - 100px);
+    margin-block: 60px;
+    height: calc(100vh - 55px - 80px);
   }
 }

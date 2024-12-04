@@ -3,17 +3,18 @@ import { devtools } from "zustand/middleware";
 import {
   IGDBDefault,
   IGDBFamily,
-  IGDBGame,
+  IGDBGameMinimal,
   IGDBGenre,
   IGDBPlatform,
 } from "../types/igdb";
 
 type IState = {
-  winner?: IGDBGame;
+  winner?: IGDBGameMinimal;
   systems?: IGDBPlatform[];
   families?: IGDBFamily[];
   genres?: IGDBGenre[];
   gameModes?: IGDBDefault[];
+  themes?: IGDBDefault[];
   expandPosition?: "left" | "right";
   expanded?: "left" | "right" | "both" | "none";
   isMobile?: boolean;
@@ -21,10 +22,11 @@ type IState = {
 
 type IAction = {
   setGameModes: (modes: IGDBDefault[]) => void;
+  setThemes: (themes: IGDBDefault[]) => void;
   setGenres: (genres: IGDBGenre[]) => void;
   setFamilies: (families: IGDBFamily[]) => void;
   setSystems: (platforms: IGDBPlatform[]) => void;
-  setWinner: (game: IGDBGame | undefined) => void;
+  setWinner: (game: IGDBGameMinimal | undefined) => void;
   setExpandPosition: (position: "left" | "right" | undefined) => void;
   setExpanded: (expanded: "left" | "right" | "both" | "none") => void;
   setIsMobile: (isMobile: boolean | undefined) => void;
@@ -41,9 +43,10 @@ export const useCommonStore = create<IState & IAction>()(
       setFamilies: (families) => set({ families }),
       setExpandPosition: (position) => set({ expandPosition: position }),
       setGameModes: (modes) => set({ gameModes: modes }),
+      setThemes: (themes) => set({ themes }),
     }),
     {
       name: "common",
-    },
-  ),
+    }
+  )
 );

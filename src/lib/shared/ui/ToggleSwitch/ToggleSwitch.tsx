@@ -53,7 +53,7 @@ export const ToggleSwitch: FC<ToggleSwitchProps> = ({
           [styles.toggle_active]: isActive || isDisabled,
         }
       )}
-      style={{ scale: scale }}
+      style={{ scale }}
     >
       <div
         className={classNames(

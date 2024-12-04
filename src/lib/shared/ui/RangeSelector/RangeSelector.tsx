@@ -5,11 +5,13 @@ import classNames from "classnames";
 interface RangeSelectorProps extends Pick<HTMLInputElement, "disabled"> {
   text?: string;
   textPosition?: "above" | "left" | "right";
+  variant?: "accent" | "green";
   min?: number;
   max?: number;
   step?: number;
   defaultValue?: number;
   callback?: (value: number) => void;
+  finalCallback?: (value: number) => void;
 }
 
 export const RangeSelector: FC<RangeSelectorProps> = ({
@@ -20,6 +22,8 @@ export const RangeSelector: FC<RangeSelectorProps> = ({
   step,
   defaultValue,
   callback,
+  finalCallback,
+  variant = "accent",
   ...props
 }) => {
   const [rangeValue, setRangeValue] = useState<string>("0");
@@ -62,15 +66,23 @@ export const RangeSelector: FC<RangeSelectorProps> = ({
       {!!text && <span className={styles.selector__text}>{text}</span>}
       <div className={styles.slider}>
         <div
-          className={classNames(styles.slider__pointer, {
-            [styles.slider__pointer_active]: isActive,
-          })}
+          className={classNames(
+            styles.slider__pointer,
+            styles[`slider__pointer_${variant}`],
+            {
+              [styles.slider__pointer_active]: isActive,
+            }
+          )}
+          onDragEnd={() => console.log(rangeValue)}
           style={{
             left,
           }}
         ></div>
         <div
-          className={styles.slider__bar}
+          className={classNames(
+            styles.slider__bar,
+            styles[`slider__bar_${variant}`]
+          )}
           style={{
             width,
           }}
@@ -89,6 +101,8 @@ export const RangeSelector: FC<RangeSelectorProps> = ({
             setRangeValue(e.target.value);
             !!callback && callback(+e.target.value);
           }}
+          onMouseUp={() => !!finalCallback && finalCallback(+rangeValue)}
+          onTouchEnd={() => !!finalCallback && finalCallback(+rangeValue)}
           min={min || 0}
           max={max || 100}
           step={step || 1}

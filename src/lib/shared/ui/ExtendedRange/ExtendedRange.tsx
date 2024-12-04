@@ -12,6 +12,7 @@ export interface IExtendedCheckboxProps {
   max: number;
   symbol?: string;
   text?: string;
+  step?: number;
 }
 
 export const ExtendedRange: FC<IExtendedCheckboxProps> = ({
@@ -23,12 +24,13 @@ export const ExtendedRange: FC<IExtendedCheckboxProps> = ({
   min,
   symbol,
   text,
+  step,
 }) => {
   const [value, setValue] = useState(0);
 
   const debouncedSetSelected = useDebouncedCallback(
     (value: number) => setSelected(value),
-    500,
+    500
   );
 
   useEffect(() => {
@@ -37,13 +39,15 @@ export const ExtendedRange: FC<IExtendedCheckboxProps> = ({
 
   return (
     <div className={styles.range}>
-      {!!title && <h3>{title}</h3>}
+      {!!title && <h4>{title}</h4>}
       <div className={styles.range__wrapper}>
         <RangeSelector
+          variant="green"
           text={value !== min ? (symbol || "From ") + value : text || "All"}
           defaultValue={value}
           min={min}
           max={max}
+          step={step}
           callback={(value) => {
             setValue(value);
             debouncedSetSelected(value);

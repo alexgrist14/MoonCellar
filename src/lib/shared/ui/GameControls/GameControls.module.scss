@@ -1,19 +1,19 @@
 .controls {
   width: 100%;
-  transition: opacity 0.3s, transform 0.3s;
+  transition: filter 0.3s, opacity 0.3s, transform 0.3s;
   background-color: $lightBg;
   border-radius: 0 0 $radius $radius;
   display: flex;
-  overflow: hidden;
   z-index: 2;
-
-  &_overflow {
-    border-radius: 0 0 0 $radius;
-  }
+  max-height: 35px;
 
   &_disabled {
-    opacity: 0.7;
+    filter: brightness(0.8);
     pointer-events: none;
+  }
+
+  &_hidden {
+    display: none
   }
 
   div &__action {
@@ -25,6 +25,14 @@
     flex: 1;
     cursor: pointer;
     position: relative;
+
+    &:first-of-type {
+      border-radius: 0 0 0 $radius;
+    }
+
+    &:last-of-type {
+      border-radius: 0 0 $radius 0;
+    }
 
     &:hover:not(:disabled),
     &_active {
@@ -46,67 +54,49 @@
       & path,
       & g {
         transition: 0.3s;
-        stroke: $blue;
+        stroke: $accent;
       }
     }
   }
 
   &__ratings {
     display: flex;
-    flex-direction: column-reverse;
-    height: 100%;
+    flex-direction: column;
+    width: 100%;
+    height: 50px;
     position: absolute;
     opacity: 0;
     transition: opacity 0.3s, transform 0.3s;
     pointer-events: none;
     background-color: inherit;
-    border-radius: $radius $radius $radius 0;
-    border-left: 1px solid $bgAlt;
+    border-radius: $radius $radius 0 0;
+    border-bottom: 1px solid $bgAlt;
     overflow: hidden;
-    transform: translateX(-5%);
-    right: 0;
-    bottom: 0;
+    transform: translateY(5%);
+    padding-top: 5px;
 
     &_active {
-      transform: translateX(0);
+      transform: translateY(0);
       opacity: 1;
       pointer-events: all;
     }
   }
 
-  &__rating {
-    @include flexCenter;
-    transition: opacity 0.3s, transform 0.3s;
-    position: relative;
-    cursor: pointer;
-    flex: 1;
-    padding: 2px;
-    aspect-ratio: 1;
-
-    &:hover:not(:disabled),
-    &_active {
-      background-color: $bgAlt;
-    }
-
-    &:disabled {
-      cursor: not-allowed;
-      opacity: 0.7;
-    }
-  }
-
   &__number {
     position: absolute;
-    height: 40%;
     width: fit-content;
-    top: 20%;
-    left: 40%;
     transition: 0.3s;
-    fill: $whiteTextColor;
+    height: 70%;
+
+    & path {
+      transition: 0.3s;
+      opacity: 0;
+      stroke: $whiteTextColor;
+      fill: $whiteTextColor;
+    }
 
     &_active path {
-      transition: 0.3s;
-      stroke: $accent;
-      fill: $accent;
+      opacity: 1;
     }
   }
 
@@ -114,13 +104,52 @@
     width: inherit;
     height: 100%;
     transition: 0.3s;
-    stroke: $accent;
-    fill: $whiteTextColor;
+    border-radius: 50%;
+
+    & path {
+      transition: 0.3s;
+    }
 
     &_active path {
-      transition: 0.3s;
+      stroke-width: 2;
       stroke: $accent;
       fill: $accent;
+    }
+  }
+
+  &__list {
+    display: grid;
+    justify-items: center;
+    position: absolute;
+    background-color: inherit;
+    border-radius: $radius $radius 0 0;
+    width: 100%;
+    transition: opacity 0.3s, transform 0.3s;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(5%);
+    border-bottom: 1px solid $bgAlt;
+
+    &_active {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    & button {
+      width: 100%;
+      height: 35px;
+      border-radius: 0;
+      border-bottom: 0;
+      border-inline: 0;
+
+      &:first-of-type {
+        border-radius: $radius $radius 0 0;
+      }
+
+      @include mediaSm {
+        @include font(12px, 14px, 400);
+      }
     }
   }
 }

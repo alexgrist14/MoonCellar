@@ -1,7 +1,7 @@
-import { IGDBGame } from "../types/igdb";
+import { IGDBGameMinimal } from "../types/igdb";
 import { shuffle } from "./shuffle";
 
-export const getSegments = (games: IGDBGame[], max: number) => {
+export const getSegments = (games: IGDBGameMinimal[], max: number) => {
   const sortedGames = shuffle(games);
 
   const startIndex =
@@ -13,10 +13,7 @@ export const getSegments = (games: IGDBGame[], max: number) => {
 
   return !!randomGames?.length
     ? randomGames.map(
-        (game) =>
-          (game._id || game.id) +
-          "_" +
-          games.findIndex((el) => (el._id || el.id) === (game._id || game.id)),
+        (game) => game._id + "_" + games.findIndex((el) => el._id === game._id)
       )
     : [];
 };

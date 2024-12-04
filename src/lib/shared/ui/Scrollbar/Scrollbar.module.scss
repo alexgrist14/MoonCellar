@@ -55,7 +55,6 @@
     bottom: 0;
     cursor: pointer;
     position: absolute;
-    z-index: 1;
     top: 0;
     width: 8px;
     background-color: #c3c3c34c;
@@ -74,7 +73,6 @@
 
   &__thumb {
     position: absolute;
-    z-index: 3;
     top: 0;
     height: 65px;
     touch-action: none;
@@ -98,7 +96,6 @@
   }
   &__thumb--horizontal {
     position: absolute;
-    z-index: 3;
     top: 0;
     height: 8px;
     touch-action: none;
@@ -124,7 +121,6 @@
   &__line {
     height: 40px;
     position: absolute;
-    z-index: 50;
     left: 0px;
     right: 0;
     background: linear-gradient(180deg, rgba($lightBg, 0) 0%, $lightBg 100%);

@@ -1,33 +1,42 @@
 .card {
   height: 100%;
   width: 100%;
-  aspect-ratio: 2/3;
+  justify-self: center;
+  max-width: 240px;
+  aspect-ratio: $coverRatio;
   border-radius: $radius;
   transition: all 0.3s;
   position: relative;
+  background: $lightBgSecond;
+  user-select: none;
 
   &__title {
-    display: grid;
-    gap: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     padding: 10px;
     text-align: center;
 
     & > p {
-      @include font(12px, 12px, 400);
+      @include font(12px, 13px, 400);
       @include lineClamp(4);
     }
 
     & > span {
-      @include font(10px, 12px, 400);
+      @include font(11px, 12px, 400);
       @include lineClamp(3);
     }
   }
 
+  &__controls {
+    position: absolute;
+    bottom: 0;
+  }
+
   &__info {
     display: grid;
-    grid-template-rows: 1fr 30px;
+    grid-template-rows: 1fr auto;
     align-content: space-between;
-    gap: 10px;
     width: 100%;
     height: 100%;
     background-color: rgba($bg, 0.9);
@@ -35,7 +44,7 @@
     opacity: 0;
     position: absolute;
     border-radius: $radius;
-    border: 2px solid $gray;
+    outline: 2px solid $accent;
 
     &_active {
       opacity: 1;
@@ -48,11 +57,21 @@
     justify-content: center;
     flex-direction: column;
     gap: 30px;
-    background: $lightBgSecond;
     object-fit: cover;
     font-family: "Pentagra", sans-serif;
     width: 100%;
     height: 100%;
+    border-radius: $radius;
+    z-index: 1;
+    opacity: 0;
+    transition: 0.3s;
+
+    &_active {
+      opacity: 1;
+    }
+  }
+
+  &__placeholder {
     border-radius: $radius;
   }
 }

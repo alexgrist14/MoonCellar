@@ -1,9 +1,16 @@
 .page {
+  min-height: 100vh;
+
   &__games {
     padding: 50px 20px;
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     gap: 20px;
+
+    &_loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
 
     @include mediaGt {
       grid-template-columns: repeat(5, 1fr);
@@ -20,5 +27,9 @@
     @include mediaSm {
       grid-template-columns: repeat(2, 1fr);
     }
+  }
+
+  &__more {
+    border-radius: $radius;
   }
 }

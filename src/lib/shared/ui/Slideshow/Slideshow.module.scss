@@ -2,6 +2,7 @@
   &__screenshot {
     width: 240px;
     min-width: 240px;
+    aspect-ratio: 16/9;
     height: auto;
     display: flex;
     cursor: pointer;
@@ -9,10 +10,12 @@
     overflow: hidden;
     transition: all 0.3s;
     border: 2px solid transparent;
+    background-color: $bgAlt;
+    position: relative;
 
     &:hover {
       filter: brightness(0.6);
-      border-color: $gray;
+      border-color: $accent;
     }
 
     & img {
@@ -24,22 +27,67 @@
 
   &__wrapper {
     @include flexCenter;
-    margin: 20px;
     min-height: 50px;
-    min-width: 150px;
     max-height: 70vh;
-    aspect-ratio: 16/9;
-    border: 2px solid $gray;
+    aspect-ratio: 1920/1080;
+    outline: 2px solid $gray;
     border-radius: $radius;
-    overflow: hidden;
     position: relative;
     background-color: $bg;
+    user-select: none;
+    width: calc(100vw - 180px);
 
     & img {
-      width: 100%;
       height: 100%;
       object-fit: contain;
-      z-index: 2;
+      overflow: hidden;
+      border-radius: $radius;
+    }
+
+    @include mediaSm {
+      width: calc(100vw - 10px);
+    }
+  }
+
+  &__prev,
+  &__next {
+    position: absolute;
+    width: 70px;
+    aspect-ratio: 1;
+    height: 100%;
+    opacity: 0.6;
+    z-index: 1;
+    transition: 0.3s;
+
+    & svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    &:hover {
+      filter: contrast(0.2);
+    }
+
+    @include mediaSm {
+      opacity: 0.3;
+    }
+  }
+
+  &__prev {
+    right: 100%;
+
+    @include mediaSm {
+      left: 0;
+      right: unset;
+    }
+  }
+
+  &__next {
+    left: 100%;
+
+    @include mediaSm {
+      right: 0;
+      left: unset;
     }
   }
 }
@@ -50,5 +98,6 @@
     gap: 5px;
     padding: 0;
     border-radius: $radius;
+    user-select: none;
   }
 }
