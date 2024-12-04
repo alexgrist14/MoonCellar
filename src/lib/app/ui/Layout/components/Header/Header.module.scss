@@ -22,13 +22,7 @@
     .profile {
       &__link {
         height: 36px;
-        overflow: hidden;
-        transition: 0.3s all;
-        outline: 2px solid transparent;
-        aspect-ratio: 1;
-        &:hover {
-          outline: 2px solid $accent;
-        }
+
       }
     }
   }
