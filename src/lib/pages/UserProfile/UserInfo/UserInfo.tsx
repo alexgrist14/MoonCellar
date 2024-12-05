@@ -42,6 +42,7 @@ const UserInfo: FC<UserInfoProps> = ({
         <div className={styles.profile_info}>
           <div className={styles.profile_image}>
             <Image
+              key={id}
               src={avatar || "/images/user.png"}
               width={160}
               height={160}
@@ -79,8 +80,12 @@ const UserInfo: FC<UserInfoProps> = ({
           <div className={styles.friends__list}>
             {!!userFollowings &&
               userFollowings.followings.map((item, i) => (
-                <Link href={`/user/${item.userName}`} className={styles.friends__item} key={i}>
-                  <Avatar user={item}/>
+                <Link
+                  href={`/user/${item.userName}`}
+                  className={styles.friends__item}
+                  key={i}
+                >
+                  <Avatar user={item} />
                 </Link>
               ))}
           </div>
