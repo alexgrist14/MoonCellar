@@ -25,11 +25,15 @@ const UserInfo: FC<UserInfoProps> = ({
   avatar,
   setTabIndex,
 }) => {
-  const [userFollowings, setUserFollowing] = useState<IFollowings>();
+  const [userFollowings, setUserFollowing] = useState<
+    IFollowings | undefined
+  >();
   const { profile } = useAuthStore();
   const router = useRouter();
 
   useEffect(() => {
+    setUserFollowing(undefined);
+
     userAPI
       .getUserFollowings(id)
       .then((res) => setUserFollowing(res.data))
