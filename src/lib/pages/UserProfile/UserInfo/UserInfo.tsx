@@ -83,7 +83,7 @@ const UserInfo: FC<UserInfoProps> = ({
                 <Link
                   href={`/user/${item.userName}`}
                   className={styles.friends__item}
-                  key={i}
+                  key={`${id}_${i}`}
                 >
                   <Avatar user={item} />
                 </Link>
