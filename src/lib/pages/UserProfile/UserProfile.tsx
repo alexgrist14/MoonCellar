@@ -28,8 +28,6 @@ const UserProfile: FC<UserProfileProps> = ({
   const [tabIndex, setTabIndex] = useState(0);
   const { query, replace } = useRouter();
 
-  console.log(profilePicture);
-
   const tabs = useMemo((): ITabContent[] => {
     return [
       {

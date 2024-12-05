@@ -2,9 +2,6 @@ import { FC, useEffect, useState } from "react";
 import styles from "./GamePage.module.scss";
 import Image from "next/image";
 import { IGDBGame } from "../../shared/types/igdb";
-import { useRouter } from "next/router";
-import { IGDBApi } from "../../shared/api";
-import { axiosUtils } from "../../shared/utils/axios";
 import {
   dateRegions,
   gameCategories,
@@ -21,9 +18,7 @@ import { useGamesFiltersStore } from "../../shared/store/filters.store";
 import { ButtonGroup } from "../../shared/ui/Button/ButtonGroup";
 import { useGamesStore } from "../../shared/store/games.store";
 
-export const GamePage: FC = () => {
-  const { query, isReady } = useRouter();
-
+export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
   const { royalGames, addRoyalGame, removeRoyalGame } = useGamesStore();
 
   const {
@@ -37,19 +32,7 @@ export const GamePage: FC = () => {
     clear,
   } = useGamesFiltersStore();
 
-  const [game, setGame] = useState<IGDBGame>();
   const [isLoading, setIsLoading] = useState(false);
-  const [isGameLoading, setIsGameLoading] = useState(true);
-
-  useEffect(() => {
-    !!query.slug &&
-      IGDBApi.getGameBySlug(query.slug as string)
-        .then((response) => {
-          setGame(response.data);
-          setTimeout(() => setIsGameLoading(false), 200);
-        })
-        .catch(axiosUtils.toastError);
-  }, [query]);
 
   useEffect(() => {
     !!game && setIsLoading(!!game.cover);
@@ -73,8 +56,6 @@ export const GamePage: FC = () => {
   const category = Object.keys(gameCategories).find(
     (key) => gameCategories[key] === game.category
   );
-
-  if (isGameLoading || !isReady) return <Loader type="pacman" />;
 
   return (
     <>
@@ -178,9 +159,8 @@ export const GamePage: FC = () => {
                 {game.involved_companies
                   .filter((comp) => comp.developer)
                   ?.map((comp, i, array) => (
-                    <>
+                    <span key={comp._id}>
                       <Link
-                        key={comp._id}
                         href={"/games"}
                         onClick={() => {
                           clear();
@@ -191,7 +171,7 @@ export const GamePage: FC = () => {
                         {comp.company.name}
                       </Link>
                       {i !== array.length - 1 ? ", " : ""}
-                    </>
+                    </span>
                   ))}
               </p>
             )}
@@ -208,9 +188,8 @@ export const GamePage: FC = () => {
                 {game.involved_companies
                   .filter((comp) => comp.publisher)
                   ?.map((comp, i, array) => (
-                    <>
+                    <span key={comp._id}>
                       <Link
-                        key={comp._id}
                         href={"/games"}
                         onClick={() => {
                           clear();
@@ -221,7 +200,7 @@ export const GamePage: FC = () => {
                         {comp.company.name}
                       </Link>
                       {i !== array.length - 1 ? ", " : ""}
-                    </>
+                    </span>
                   ))}
               </p>
             )}
@@ -231,9 +210,8 @@ export const GamePage: FC = () => {
               <p>
                 <span>Platforms: </span>
                 {game.platforms.map((platform, i, array) => (
-                  <>
+                  <span key={platform._id}>
                     <Link
-                      key={platform._id}
                       href={"/games"}
                       onClick={() => {
                         clear();
@@ -243,7 +221,7 @@ export const GamePage: FC = () => {
                       {platform.name}
                     </Link>
                     {i !== array.length - 1 ? ", " : ""}
-                  </>
+                  </span>
                 ))}
               </p>
             )}
@@ -251,9 +229,8 @@ export const GamePage: FC = () => {
               <p>
                 <span>Genres: </span>
                 {game.genres.map((genre, i, array) => (
-                  <>
+                  <span key={genre._id}>
                     <Link
-                      key={genre._id}
                       href={"/games"}
                       onClick={() => {
                         clear();
@@ -263,7 +240,7 @@ export const GamePage: FC = () => {
                       {genre.name}
                     </Link>
                     {i !== array.length - 1 ? ", " : ""}
-                  </>
+                  </span>
                 ))}
               </p>
             )}
@@ -271,9 +248,8 @@ export const GamePage: FC = () => {
               <p>
                 <span>Game modes: </span>
                 {game.game_modes.map((mode, i, array) => (
-                  <>
+                  <span key={mode._id}>
                     <Link
-                      key={mode._id}
                       href={"/games"}
                       onClick={() => {
                         clear();
@@ -283,7 +259,7 @@ export const GamePage: FC = () => {
                       {mode.name}
                     </Link>
                     {i !== array.length - 1 ? ", " : ""}
-                  </>
+                  </span>
                 ))}
               </p>
             )}
@@ -291,9 +267,8 @@ export const GamePage: FC = () => {
               <p>
                 <span>Themes: </span>
                 {game.themes.map((theme, i, array) => (
-                  <>
+                  <span key={theme._id}>
                     <Link
-                      key={theme._id}
                       href={"/games"}
                       onClick={() => {
                         clear();
@@ -303,7 +278,7 @@ export const GamePage: FC = () => {
                       {theme.name}
                     </Link>
                     {i !== array.length - 1 ? ", " : ""}
-                  </>
+                  </span>
                 ))}
               </p>
             )}
@@ -336,8 +311,8 @@ export const GamePage: FC = () => {
             {!!game.release_dates?.length && (
               <div className={styles.page__links}>
                 <h4>Release dates:</h4>
-                {game.release_dates.map((date, i) => (
-                  <p key={i}>
+                {game.release_dates.map((date) => (
+                  <p key={date._id}>
                     {date.human}: {date.platform.name}
                     <span> ({dateRegions[date.region - 1]})</span>
                   </p>
@@ -347,8 +322,8 @@ export const GamePage: FC = () => {
             {!!game.websites?.length && (
               <div className={styles.page__links}>
                 <h4>Links:</h4>
-                {game.websites.map((link, i) => (
-                  <Link target="_blank" key={i} href={link.url}>
+                {game.websites.map((link) => (
+                  <Link target="_blank" key={link._id} href={link.url}>
                     {link.url.split("/")[2]}
                   </Link>
                 ))}
