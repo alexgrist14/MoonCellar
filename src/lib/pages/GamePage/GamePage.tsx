@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import styles from "./GamePage.module.scss";
 import Image from "next/image";
 import { IGDBGame } from "../../shared/types/igdb";
@@ -32,11 +32,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
     clear,
   } = useGamesFiltersStore();
 
-  const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    !!game && setIsLoading(!!game.cover);
-  }, [game]);
+  const [isLoading, setIsLoading] = useState<boolean>(!!game.cover?.url);
 
   if (!game) return null;
 
@@ -105,7 +101,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
             {isLoading && <Loader />}
             {!!game.cover?.url ? (
               <Image
-                onLoadingComplete={() => setIsLoading(false)}
+                onLoad={() => setIsLoading(false)}
                 key={game.cover._id}
                 alt="Cover"
                 src={getImageLink(game.cover.url, "cover_big", 2)}

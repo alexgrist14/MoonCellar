@@ -11,6 +11,8 @@ import { GameCard } from "../GameCard";
 import classNames from "classnames";
 import { useCommonStore } from "../../store/common.store";
 import { Loader } from "../Loader";
+import { ButtonGroup } from "../Button/ButtonGroup";
+import { modal } from "../Modal";
 
 export const SearchModal: FC = () => {
   const { isMobile } = useCommonStore();
@@ -28,7 +30,7 @@ export const SearchModal: FC = () => {
     [searchQuery]
   );
 
-  const originalTake = 19;
+  const originalTake = 17;
 
   const debouncedSearch = useDebouncedCallback(() => {
     IGDBApi.getGames({
@@ -65,35 +67,40 @@ export const SearchModal: FC = () => {
           autoFocus
           onChange={(e) => setSearchQuery(e.target.value)}
         />
+        <ButtonGroup
+          buttons={[
+            {
+              title: "Advanced search",
+              link: "/games",
+              callback: () => modal.close(),
+            },
+          ]}
+        />
       </div>
-      {!!games?.length && (
-        <Scrollbar stl={styles} type="absolute">
-          <div
-            className={classNames(styles.modal__results, {
-              [styles.modal__results_loading]: isLoading,
-            })}
-          >
-            {games?.map((game) => (
-              <GameCard key={game._id} game={game} />
-            ))}
-            {!!games?.length && take < total && (
-              <Button
-                className={styles.modal__more}
-                onClick={() => setTake(take + originalTake)}
-              >
-                {isLoading ? <Loader /> : "More games"}
-              </Button>
-            )}
-          </div>
+      {isSearchActive && (
+        <Scrollbar
+          stl={styles}
+          type="absolute"
+          classNameContent={classNames(styles.modal__results, {
+            [styles.modal__results_loading]: isLoading,
+          })}
+        >
+          {games?.map((game) => (
+            <GameCard key={game._id} game={game} />
+          ))}
+          {!!games?.length && take < total && (
+            <Button
+              className={styles.modal__more}
+              onClick={() => setTake(take + originalTake)}
+            >
+              {isLoading ? <Loader /> : "More games"}
+            </Button>
+          )}
         </Scrollbar>
       )}
       {!games?.length && isSearchActive && (
         <div className={styles.modal__empty}>
-          {isLoading ? (
-            <PacmanLoader color="#ffffff" speedMultiplier={2} />
-          ) : (
-            "Games not found"
-          )}
+          {isLoading ? <Loader type="pacman" /> : "Games not found"}
         </div>
       )}
     </div>

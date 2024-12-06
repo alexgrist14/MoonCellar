@@ -189,9 +189,10 @@ export const GameControls: FC<IGameControlsProps> = ({
         {
           <RangeSelector
             callback={(value) => setRatingValue(value)}
-            finalCallback={(value) =>
-              !!profile &&
-              value !== rating?.rating &&
+            finalCallback={(value) => {
+              if (!rating?.rating && !value) return;
+              if (!profile || value === rating?.rating) return;
+
               userAPI[!!value ? "addGameRating" : "removeGameRating"](
                 profile._id,
                 game._id,
@@ -205,8 +206,8 @@ export const GameControls: FC<IGameControlsProps> = ({
                   });
                   setProfile(res.data);
                 })
-                .catch(axiosUtils.toastError)
-            }
+                .catch(axiosUtils.toastError);
+            }}
             text={!!ratingValue ? ratingValue.toString() : "No rating"}
             min={0}
             max={10}

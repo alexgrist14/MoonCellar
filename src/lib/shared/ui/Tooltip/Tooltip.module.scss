@@ -1,0 +1,19 @@
+.tooltip {
+  @include font(13px, 16px, 600);
+  background-color: $bgAlt;
+  border-radius: $radius;
+  padding: 10px;
+  color: $whiteTextColor;
+  z-index: 1000;
+  pointer-events: none;
+  min-width: fit-content;
+  height: fit-content;
+  opacity: 0;
+  transition: 0.3s;
+  animation: appearOpacity 0.3s ease-out 1 forwards;
+  transform: translateY(calc(-100% - 5px));
+
+  @include mediaMax($screenSm) {
+    max-width: calc(100vw - 32px);
+  }
+}

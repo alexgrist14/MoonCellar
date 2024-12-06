@@ -15,6 +15,14 @@
   }
 
   &__search {
+    display: grid;
+    grid-template-columns: 1fr 150px;
+    gap: 10px;
+
+    @include mediaSm {
+      grid-template-columns: 1fr;
+    }
+
     & > div {
       width: 100%;
     }
@@ -31,10 +39,9 @@
   &__results {
     padding: 5px;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 20px;
     opacity: 0;
-    height: fit-content;
     animation: appearOpacity 0.4s ease forwards 1;
 
     &_loading {
@@ -69,22 +76,18 @@
 }
 
 .scrollbars {
-  &__scrollbar {
-    margin-right: 5px;
-  }
-
   div &__container {
     margin-top: 20px;
   }
 
   div &__content {
     margin: 0;
-    padding: 0;
+    padding: 5px;
     border-radius: $radius;
-    max-height: calc(80vh - 90px);
+    height: calc(80vh - 80px);
   }
 
   div &__scrollbar {
-    margin-right: -15px;
+    margin-right: -12px;
   }
 }

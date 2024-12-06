@@ -1,16 +1,33 @@
 import { FC } from "react";
 import styles from "./Loader.module.scss";
 import { PacmanLoader, PropagateLoader, PulseLoader } from "react-spinners";
+import classNames from "classnames";
 
 export const Loader: FC<{
   type?: "pulse" | "propogate" | "pacman";
   color?: string;
-}> = ({ type = "pulse", color }) => {
+  speedMultiplier?: number;
+}> = ({ type = "pulse", color, speedMultiplier }) => {
   return (
-    <div className={styles.loader}>
-      {type === "pulse" && <PulseLoader color={color || "#ffffff"} />}
-      {type === "propogate" && <PropagateLoader color={color || "#ffffff"} />}
-      {type === "pacman" && <PacmanLoader color={color || "#ffffff"} />}
+    <div className={classNames(styles.loader)}>
+      {type === "pulse" && (
+        <PulseLoader
+          speedMultiplier={speedMultiplier}
+          color={color || "#ffffff"}
+        />
+      )}
+      {type === "propogate" && (
+        <PropagateLoader
+          speedMultiplier={speedMultiplier}
+          color={color || "#ffffff"}
+        />
+      )}
+      {type === "pacman" && (
+        <PacmanLoader
+          speedMultiplier={speedMultiplier}
+          color={color || "#ffffff"}
+        />
+      )}
     </div>
   );
 };

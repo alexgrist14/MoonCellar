@@ -17,6 +17,9 @@ interface InputProps
     | "autoFocus"
     | "autoComplete"
     | "onKeyDown"
+    | "onBlur"
+    | "onMouseOver"
+    | "onMouseOut"
     | "id"
     | "name"
   > {
