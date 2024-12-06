@@ -90,7 +90,12 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
               link: `https://howlongtobeat.com/?q=${encodeURI(game.name)}`,
               target: "_blank",
             },
-            { title: "Open in IGDB", link: game.url, isHidden: !game.url },
+            {
+              title: "Open in IGDB",
+              link: game.url,
+              isHidden: !game.url,
+              target: "_blank",
+            },
           ]}
         />
       </ExpandMenu>

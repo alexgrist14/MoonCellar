@@ -2,10 +2,26 @@ import { GamePage } from "@/src/lib/pages/GamePage";
 import { IGDBApi } from "@/src/lib/shared/api";
 import { IGDBGame } from "@/src/lib/shared/types/igdb";
 import { GetServerSidePropsContext } from "next";
+import Head from "next/head";
 import { FC } from "react";
 
 const GamePageIndex: FC<{ game: IGDBGame }> = ({ game }) => {
-  return <GamePage game={game} />;
+  return (
+    <div>
+      <Head>
+        <title>{game.name}</title>
+        <meta property="title" content={game.name} key="title" />
+        {!!game.summary && (
+          <meta property="description" content={game.summary} key="title" />
+        )}
+        <meta property="og:title" content={game.name} key="title" />
+        {!!game.summary && (
+          <meta property="og:description" content={game.summary} key="title" />
+        )}
+      </Head>
+      <GamePage game={game} />
+    </div>
+  );
 };
 
 export const getServerSideProps = async (
