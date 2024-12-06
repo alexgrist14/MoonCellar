@@ -13,8 +13,15 @@ import { useGamesFiltersStore } from "../../shared/store/filters.store";
 import { Loader } from "../../shared/ui/Loader";
 import classNames from "classnames";
 import { Pagination } from "../../shared/ui/Pagination";
-
-const take = 18;
+import { useWindowResizeAction } from "../../shared/hooks";
+import {
+  screenEx,
+  screenGt,
+  screenLg,
+  screenMd,
+  screenSm,
+  screenXx,
+} from "../../shared/constants";
 
 export const GamesPage: FC = () => {
   const {
@@ -40,6 +47,7 @@ export const GamesPage: FC = () => {
   const [games, setGames] = useState<IGDBGameMinimal[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
+  const [take, setTake] = useState(80);
 
   const debouncedGamesFetch = useDebouncedCallback(() => {
     setLoading(true);
@@ -88,7 +96,20 @@ export const GamesPage: FC = () => {
 
   useEffect(() => {
     debouncedGamesFetch();
-  }, [debouncedGamesFetch, page]);
+  }, [debouncedGamesFetch, page, take]);
+
+  useWindowResizeAction(() => {
+    console.log(window.innerWidth);
+
+    if (window.innerWidth >= screenXx) return setTake(80);
+    if (window.innerWidth >= screenEx) return setTake(70);
+    if (window.innerWidth >= screenGt) return setTake(60);
+    if (window.innerWidth >= screenLg) return setTake(50);
+    if (window.innerWidth >= screenMd) return setTake(40);
+    if (window.innerWidth >= screenSm) return setTake(30);
+
+    return setTake(20);
+  });
 
   return (
     <div className={styles.page}>

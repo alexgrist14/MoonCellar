@@ -4,7 +4,7 @@ $screen960: 960px;
 $screenLg: 996px;
 $screenGt: 1200px;
 $screenEx: 1440px;
-$screenXx: 1624px;
+$screenXx: 1724px;
 
 @mixin media($min, $max) {
   @media (min-width: $min) and (max-width: $max) {

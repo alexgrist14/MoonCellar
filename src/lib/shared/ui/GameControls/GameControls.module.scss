@@ -141,8 +141,10 @@
       border-radius: 0;
       border-bottom: 0;
       border-inline: 0;
+      border-width: 1px;
 
       &:first-of-type {
+        border-top: 0;
         border-radius: $radius $radius 0 0;
       }
 
