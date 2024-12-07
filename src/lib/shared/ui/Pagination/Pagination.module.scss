@@ -1,0 +1,28 @@
+.pagination {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  margin-inline: auto;
+  padding: 3px 6px;
+  background-color: $lightBg;
+  border-radius: $radius;
+
+  &_fixed {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    border-radius: 0 0 $radius $radius;
+  }
+
+  &__input {
+    text-align: center;
+  }
+
+  &__button {
+    height: fit-content;
+    padding: 0;
+    aspect-ratio: 1;
+    width: 28px;
+  }
+}

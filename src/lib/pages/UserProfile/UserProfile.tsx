@@ -24,9 +24,7 @@ const UserProfile: FC<UserProfileProps> = ({
   games,
   profilePicture,
 }) => {
-  const [avatar, setAvatar] = useState<string | undefined>(
-    profilePicture ? `https://api.mooncellar.space/photos/${profilePicture}` : ""
-  );
+  const [avatar, setAvatar] = useState<string | undefined>('');
   const [tabIndex, setTabIndex] = useState(0);
   const { query, replace } = useRouter();
 
@@ -90,6 +88,14 @@ const UserProfile: FC<UserProfileProps> = ({
         )
       : setTabIndex(0);
   }, [query, tabs]);
+
+  useEffect(() => {
+    setAvatar(
+      profilePicture
+        ? `https://api.mooncellar.space/photos/${profilePicture}`
+        : ""
+    );
+  }, [profilePicture]);
 
   return (
     <div className={styles.container}>

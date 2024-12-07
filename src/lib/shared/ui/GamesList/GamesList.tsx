@@ -18,7 +18,10 @@ export const GamesList: FC<IGamesListProps> = ({
   return (
     <div className={styles.consoles__royal}>
       <div className={styles.consoles__title}>
-        <h3>{!!games?.length ? "Games:" : "List is empty"}</h3>
+        {!!games?.length && <h3>Games:</h3>}
+        {!games?.length && (
+          <h3 style={{ width: "100%", textAlign: "center" }}>List is empty</h3>
+        )}
         {!!games?.length && (
           <Button onClick={() => getGames([])}>Remove all</Button>
         )}

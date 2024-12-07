@@ -60,10 +60,8 @@
   }
 
   &__ratings {
-    display: flex;
-    flex-direction: column;
+    @include flexCenter;
     width: 100%;
-    height: 50px;
     position: absolute;
     opacity: 0;
     transition: opacity 0.3s, transform 0.3s;
@@ -73,7 +71,8 @@
     border-bottom: 1px solid $bgAlt;
     overflow: hidden;
     transform: translateY(5%);
-    padding-top: 5px;
+    padding-inline: 5px;
+    padding-block: 5px 15px;
 
     &_active {
       transform: translateY(0);
@@ -142,8 +141,10 @@
       border-radius: 0;
       border-bottom: 0;
       border-inline: 0;
+      border-width: 1px;
 
       &:first-of-type {
+        border-top: 0;
         border-radius: $radius $radius 0 0;
       }
 

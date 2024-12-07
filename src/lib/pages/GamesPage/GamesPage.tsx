@@ -8,11 +8,20 @@ import { IGDBGameMinimal } from "../../shared/types/igdb";
 import { axiosUtils } from "../../shared/utils/axios";
 import { GameCard } from "../../shared/ui/GameCard";
 import { useStatesStore } from "../../shared/store/states.store";
-import { Button } from "../../shared/ui/Button";
 import { useDebouncedCallback } from "use-debounce";
 import { useGamesFiltersStore } from "../../shared/store/filters.store";
 import { Loader } from "../../shared/ui/Loader";
 import classNames from "classnames";
+import { Pagination } from "../../shared/ui/Pagination";
+import { useWindowResizeAction } from "../../shared/hooks";
+import {
+  screenEx,
+  screenGt,
+  screenLg,
+  screenMd,
+  screenSm,
+  screenXx,
+} from "../../shared/constants";
 
 export const GamesPage: FC = () => {
   const {
@@ -32,23 +41,17 @@ export const GamesPage: FC = () => {
     selectedVotes,
   } = useGamesFiltersStore();
   const { isLoading, setLoading, isRoyal } = useStatesStore();
-  const {
-    setGenres,
-    setGameModes,
-    setSystems,
-    isMobile,
-    setExpanded,
-    setThemes,
-  } = useCommonStore();
-
-  const step = useMemo(() => (isMobile ? 34 : 35), [isMobile]);
+  const { setGenres, setGameModes, setSystems, setExpanded, setThemes } =
+    useCommonStore();
 
   const [games, setGames] = useState<IGDBGameMinimal[]>([]);
-  const [take, setTake] = useState(step);
   const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [take, setTake] = useState(80);
 
   const debouncedGamesFetch = useDebouncedCallback(() => {
     setLoading(true);
+
     IGDBApi.getGames({
       search: searchQuery,
       company: searchCompany,
@@ -66,8 +69,8 @@ export const GamesPage: FC = () => {
         platforms: selectedSystems?.map((item) => item._id),
         themes: selectedThemes?.map((item) => item._id),
       },
-      page: 1,
-      take: take + (!isMobile ? Math.ceil(take / step) - 1 : 0),
+      page,
+      take,
       rating: selectedRating,
       votes: selectedVotes,
     })
@@ -93,14 +96,35 @@ export const GamesPage: FC = () => {
 
   useEffect(() => {
     debouncedGamesFetch();
-  }, [debouncedGamesFetch, take]);
+  }, [debouncedGamesFetch, page, take]);
+
+  useWindowResizeAction(() => {
+    console.log(window.innerWidth);
+
+    if (window.innerWidth >= screenXx) return setTake(80);
+    if (window.innerWidth >= screenEx) return setTake(70);
+    if (window.innerWidth >= screenGt) return setTake(60);
+    if (window.innerWidth >= screenLg) return setTake(50);
+    if (window.innerWidth >= screenMd) return setTake(40);
+    if (window.innerWidth >= screenSm) return setTake(30);
+
+    return setTake(20);
+  });
 
   return (
     <div className={styles.page}>
       <ExpandMenu position="left" titleOpen="Filters">
         <Filters callback={() => debouncedGamesFetch()} />
       </ExpandMenu>
-      {isLoading && !games.length ? (
+      <Pagination
+        page={page}
+        setPage={setPage}
+        take={take}
+        total={total}
+        isFixed
+      />
+
+      {isLoading ? (
         <Loader type="pacman" />
       ) : (
         <div
@@ -111,14 +135,6 @@ export const GamesPage: FC = () => {
           {games.map((game) => (
             <GameCard key={game._id} game={game} />
           ))}
-          {!!games?.length && take < total && (
-            <Button
-              className={styles.page__more}
-              onClick={() => setTake(take + step)}
-            >
-              {isLoading ? <Loader /> : "More games"}
-            </Button>
-          )}
         </div>
       )}
     </div>

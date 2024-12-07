@@ -61,6 +61,7 @@ export const Filters: FC<{ callback?: () => void; isGauntlet?: boolean }> = ({
     <div className={styles.filters}>
       <div className={styles.filters__top}>
         <div className={styles.filters__wrapper}>
+          <h4>Game name</h4>
           <Input
             onKeyDown={(e) => e.key === "Enter" && !!callback && callback()}
             containerStyles={{ width: "100%" }}
@@ -71,6 +72,7 @@ export const Filters: FC<{ callback?: () => void; isGauntlet?: boolean }> = ({
           />
         </div>
         <div className={styles.filters__wrapper}>
+          <h4>Game company</h4>
           <Input
             onKeyDown={(e) => e.key === "Enter" && !!callback && callback()}
             containerStyles={{ width: "100%" }}
@@ -81,12 +83,13 @@ export const Filters: FC<{ callback?: () => void; isGauntlet?: boolean }> = ({
           />
         </div>
         <div className={styles.filters__wrapper}>
+          <h4>Years</h4>
           <div className={styles.filters__dates}>
             <Input
               onKeyDown={(e) => e.key === "Enter" && !!callback && callback()}
               containerStyles={{ width: "100%" }}
               disabled={isLoading}
-              placeholder="First year"
+              placeholder="Start..."
               type="number"
               value={!!selectedYears?.[0] ? selectedYears[0].toString() : ""}
               onChange={(e) =>
@@ -101,7 +104,7 @@ export const Filters: FC<{ callback?: () => void; isGauntlet?: boolean }> = ({
               onKeyDown={(e) => e.key === "Enter" && !!callback && callback()}
               containerStyles={{ width: "100%" }}
               disabled={isLoading}
-              placeholder="Second year"
+              placeholder="End..."
               type="number"
               value={!!selectedYears?.[1] ? selectedYears[1].toString() : ""}
               onChange={(e) =>
@@ -115,6 +118,7 @@ export const Filters: FC<{ callback?: () => void; isGauntlet?: boolean }> = ({
         </div>
       </div>
       <div className={styles.filters__wrapper}>
+        <h4>Categories</h4>
         <Dropdown
           isWithReset
           overflowRootId="consoles"
@@ -225,7 +229,6 @@ export const Filters: FC<{ callback?: () => void; isGauntlet?: boolean }> = ({
               color: "red",
               callback: () => {
                 clear();
-                !!callback && callback();
               },
             },
           ]}

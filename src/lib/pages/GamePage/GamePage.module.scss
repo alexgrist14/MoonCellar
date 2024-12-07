@@ -23,6 +23,7 @@
     border-radius: $radius $radius 0 0;
     background: $lightBg;
     width: 100%;
+    overflow: hidden;
 
     & > img {
       border-radius: $radius $radius 0 0;

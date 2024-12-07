@@ -1,14 +1,14 @@
 .scrollbars {
   &__container {
     display: grid;
-    grid-template: auto / 1fr 16px;
+    grid-template: auto / 1fr 12px;
     position: relative;
 
     &_absolute {
       grid-template: none;
     }
     &--horizontal {
-      grid-template: 1fr 8px / auto;
+      grid-template: 1fr 6px / auto;
       gap: 8px;
 
       .scrollbars__content {
@@ -56,14 +56,14 @@
     cursor: pointer;
     position: absolute;
     top: 0;
-    width: 8px;
+    width: 6px;
     background-color: #c3c3c34c;
     opacity: 0;
 
     &--horizontal {
       width: 100%;
       left: 0;
-      height: 8px;
+      height: 6px;
     }
 
     &:hover {
@@ -81,7 +81,7 @@
     &::before {
       content: "";
       display: block;
-      width: 8px;
+      width: 6px;
       height: 100%;
       background: #acafbc;
       border-radius: 7px;
@@ -97,7 +97,7 @@
   &__thumb--horizontal {
     position: absolute;
     top: 0;
-    height: 8px;
+    height: 6px;
     touch-action: none;
     transition: height 0.2s;
 
@@ -105,7 +105,7 @@
       content: "";
       display: block;
       width: 100%;
-      height: 8px;
+      height: 6px;
       background: #acafbc;
       border-radius: 7px;
       transition: opacity 0.2s;

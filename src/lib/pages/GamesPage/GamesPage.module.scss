@@ -1,15 +1,23 @@
 .page {
-  min-height: 100vh;
-
   &__games {
-    padding: 50px 20px;
+    padding-block: 50px 10px;
+    padding-inline: 20px;
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    margin-inline: auto;
     gap: 20px;
+    grid-template-columns: repeat(8, 1fr);
 
     &_loading {
       opacity: 0.7;
       pointer-events: none;
+    }
+
+    @include mediaXx {
+      grid-template-columns: repeat(7, 1fr);
+    }
+
+    @include mediaEx {
+      grid-template-columns: repeat(6, 1fr);
     }
 
     @include mediaGt {
@@ -31,5 +39,6 @@
 
   &__more {
     border-radius: $radius;
+    position: relative;
   }
 }

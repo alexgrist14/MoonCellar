@@ -1,15 +1,10 @@
-import {
-  FC,
-  HTMLAttributes,
-  ReactNode,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { FC, HTMLAttributes, ReactNode, useRef, useState } from "react";
 import styles from "./ExpandMenu.module.scss";
 import { Scrollbar } from "../Scrollbar";
 import { useCommonStore } from "../../store/common.store";
 import classNames from "classnames";
+import { createPortal } from "react-dom";
+import { useWindowScroll } from "../../hooks/useWindowScroll";
 
 interface IExpandMenuProps
   extends Pick<HTMLAttributes<HTMLDivElement>, "children" | "id"> {
@@ -28,20 +23,17 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
   const expandRef = useRef<HTMLDivElement>(null);
   const { isMobile, expanded, setExpanded } = useCommonStore();
 
-  const [scrollY, setScrollY] = useState(0);
+  const [top, setTop] = useState<string>();
 
   const isActive = expanded === "both" || expanded === position;
 
-  useEffect(() => {
-    const handler = () => {
-      setScrollY(window.scrollY);
-    };
+  useWindowScroll(() =>
+    setTop(`${window.scrollY > 0 ? Math.max(0, 55 - window.scrollY) : 55}px`)
+  );
 
-    document.addEventListener("scroll", handler);
-    return () => document.removeEventListener("scroll", handler);
-  }, []);
+  if (!top) return null;
 
-  return (
+  return createPortal(
     <div
       ref={expandRef}
       className={classNames(styles.menu, {
@@ -51,7 +43,8 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
         [styles.menu_active]: isActive,
       })}
       style={{
-        top: scrollY > 0 ? Math.max(0, 55 - scrollY) : "55px",
+        top,
+        height: `calc(100vh - ${top})`,
         gridTemplateColumns: position === "left" ? "1fr 5px" : "5px 1fr",
         gridTemplateAreas:
           position === "left" ? "'content expand'" : "'expand content'",
@@ -100,6 +93,7 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
           <span>{isActive ? titleClose || "Close" : titleOpen || "Open"}</span>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

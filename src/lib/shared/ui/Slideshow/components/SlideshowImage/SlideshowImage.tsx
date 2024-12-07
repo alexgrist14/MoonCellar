@@ -15,7 +15,7 @@ export const SlideshowImage: FC<{ picture: IGDBScreenshot }> = ({
     <>
       {isLoading && <Loader />}
       <Image
-        onLoad={() => setTimeout(() => setIsLoading(false), 200)}
+        onLoad={() => setIsLoading(false)}
         className={classNames(styles.image, {
           [styles.image_active]: !isLoading,
         })}
@@ -24,7 +24,6 @@ export const SlideshowImage: FC<{ picture: IGDBScreenshot }> = ({
         width={1920}
         height={1080}
         src={getImageLink(picture.url, "1080p")}
-        priority
       />
     </>
   );
