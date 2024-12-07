@@ -3,12 +3,20 @@ import { IFollowings, UserGamesType } from "@/src/lib/shared/types/user.type";
 import { SvgBan, SvgDone, SvgPlay, SvgStar } from "@/src/lib/shared/ui/svg";
 import Image from "next/image";
 import Link from "next/link";
-import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
+import {
+  Dispatch,
+  FC,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import styles from "./UserInfo.module.scss";
 import { API_URL } from "@/src/lib/shared/constants";
 import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useRouter } from "next/router";
+import { Tooltip } from "@/src/lib/shared/ui/Tooltip";
 
 interface UserInfoProps {
   userName: string;
@@ -28,9 +36,7 @@ const UserInfo: FC<UserInfoProps> = ({
   const [userFollowings, setUserFollowing] = useState<
     IFollowings | undefined
   >();
-  const { profile } = useAuthStore();
-  const router = useRouter();
-
+  const followingsRef = useRef(null);
   useEffect(() => {
     setUserFollowing(undefined);
 
@@ -80,7 +86,7 @@ const UserInfo: FC<UserInfoProps> = ({
         </div>
         <div className={styles.friends}>
           <h3 className={styles.friends__title}>Friends</h3>
-          <div className={styles.friends__list}>
+          <div className={styles.friends__list} ref={followingsRef}>
             {!!userFollowings &&
               userFollowings.followings.map((item, i) => (
                 <Link
@@ -89,6 +95,9 @@ const UserInfo: FC<UserInfoProps> = ({
                   key={`${id}_${i}`}
                 >
                   <Avatar user={item} />
+                  <Tooltip positionRef={followingsRef}>
+                    {item.userName}
+                  </Tooltip>
                 </Link>
               ))}
           </div>
