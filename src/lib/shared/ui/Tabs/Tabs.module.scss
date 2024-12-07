@@ -4,11 +4,6 @@
   width: 100%;
   gap: 50px;
 
-  // &__link {
-  //   width: 100%;
-  //   flex: 1;
-  // }
-
   &__buttons {
     display: flex;
     max-width: calc(100vw - 160px);
@@ -17,6 +12,10 @@
     flex-wrap: wrap;
     row-gap: 5px;
     padding: 1px;
+
+    @include mediaMd{
+      flex-direction: column;
+    }
 
     &_adaptive {
       justify-content: center;

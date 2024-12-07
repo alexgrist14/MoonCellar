@@ -18,7 +18,7 @@
   }
   .friends {
     width: 100%;
-    max-width: 50%;
+    max-width: 400px;
     border-radius: $radius;
     @include mediaMd {
       max-width: unset;

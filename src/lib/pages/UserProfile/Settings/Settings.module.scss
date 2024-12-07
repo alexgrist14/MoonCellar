@@ -1,19 +1,30 @@
-.container{
-    .title{
-        font-size: 2rem;
-        margin-bottom: 20px;
-    }
-    .content{
+.container {
+  .title {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  .content {
+    display: flex;
+    flex-direction: column;
+    max-width: 300px;
+    gap: 30px;
+
+    &__top{
         display: flex;
         flex-direction: column;
+        justify-content: flex-start;
         gap: 30px;
-        .field{
-            width: 300px;
-        }
-        .btn{
-            font-size: 1rem;
-            width: 100px;
-            height: 40px;
-        }
     }
+
+    .field {
+      width: 300px;
+    }
+
+    .btn {
+      font-size: 1rem;
+      width: 100px;
+      height: 40px;
+      color: $whiteTextColor;
+    }
+  }
 }

@@ -16,7 +16,6 @@ import styles from "./Header.module.scss";
 
 export const Header: FC = () => {
   const router = useRouter();
-  const {logout} = useAuth()
 
   const { isMobile } = useCommonStore();
   
@@ -25,23 +24,17 @@ export const Header: FC = () => {
   const { isAuth, profile } = useAuthStore();
   const { push } = useRouter();
 
-  const handleProfileClick = () => {
-    if (isAuth && profile) {
-      push(`/user/${profile.userName}`);
-    } else modal.open(<AuthModal />);
+  const handleProfileClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    if (!isAuth || !profile) {
+      e.preventDefault()
+      modal.open(<AuthModal />);
+    }
   };
 
   const searchClickHandler = () => {
     modal.open(<SearchModal />);
   };
 
-  const handleLogoutClick = (e: MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-
-    if (isAuth && profile) {
-      logout(profile._id);
-    }
-  };
 
   return (
     <div className={styles.container}>
@@ -55,7 +48,7 @@ export const Header: FC = () => {
         </Button>
       </div>
       <div className={styles.container__right}>
-        <Link href={`/user/${profile?.userName}`} className={styles.profile__link}>
+        <Link href={`/user/${profile?.userName}`} onClick={handleProfileClick} className={styles.profile__link}>
         <Avatar user={profile}/>
         </Link>
       </div>
