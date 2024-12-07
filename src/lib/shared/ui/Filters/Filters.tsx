@@ -229,7 +229,6 @@ export const Filters: FC<{ callback?: () => void; isGauntlet?: boolean }> = ({
               color: "red",
               callback: () => {
                 clear();
-                !!callback && callback();
               },
             },
           ]}

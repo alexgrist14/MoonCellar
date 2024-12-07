@@ -75,7 +75,7 @@ export const Pagination: FC<{
         <Input
           onMouseOver={() => setIsHover(true)}
           onMouseOut={() => setIsHover(false)}
-          style={{ padding: "4px", width: "40px" }}
+          style={{ padding: "4px", width: "75px" }}
           className={styles.pagination__input}
           type="number"
           value={value}
