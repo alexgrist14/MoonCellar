@@ -3,6 +3,7 @@
   width: 100%;
   justify-self: center;
   max-width: 200px;
+  max-height: calc(200px * 1.25);
   aspect-ratio: $coverRatio;
   border-radius: $radius;
   transition: all 0.3s;
