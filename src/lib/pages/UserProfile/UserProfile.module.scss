@@ -3,6 +3,9 @@
   color: $whiteTextColor;
   justify-content: center;
   padding: 50px 20px 50px 20px;
+  @include mediaMd{
+    padding:  50px 0 0 0;
+  }
 
   .content {
     padding: 0 20px 20px 20px;
@@ -15,6 +18,18 @@
       display: grid;
       grid-template-columns: repeat(6, 1fr);
       gap: 20px;
+
+      @include mediaLg{
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      @include mediaMd{
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      @include mediaSm{
+        grid-template-columns: repeat(2, 1fr);
+      }
 
       &__game {
         display: grid;
