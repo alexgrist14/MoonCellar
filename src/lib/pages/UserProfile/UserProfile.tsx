@@ -10,6 +10,7 @@ import { userListCategories } from "../../shared/constants/user.const";
 import { GameCard } from "../../shared/ui/GameCard";
 import { commonUtils } from "../../shared/utils/common";
 import { useRouter } from "next/router";
+import { Scrollbar } from "../../shared/ui/Scrollbar";
 
 interface UserProfileProps {
   userName: string;
@@ -87,7 +88,7 @@ const UserProfile: FC<UserProfileProps> = ({
         },
       },
     ];
-  }, [userName, _id, games, avatar, replace]);
+  }, [userName, _id, games, avatar, replace, gamesRating]);
 
   useEffect(() => {
     !!query?.list
@@ -118,6 +119,7 @@ const UserProfile: FC<UserProfileProps> = ({
           buttonsClassName={styles.tabs__buttons}
           contents={tabs}
         />
+        <Scrollbar />
       </div>
     </div>
   );
