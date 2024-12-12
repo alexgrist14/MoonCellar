@@ -106,7 +106,7 @@ export const GameControls: FC<IGameControlsProps> = ({
   const isBacklogged = profile?.games?.backlog.some((id) => game._id === id);
   const isDropped = profile?.games?.dropped.some((id) => game._id === id);
 
-  let rating = profile?.gamesRating?.find((rating) => rating.game === game._id);
+  const rating = profile?.gamesRating?.find((rating) => rating.game === game._id);
 
   useCloseEvents([ratingsRef, ratingButtonRef], () => {
     setIsRatingActive(false);

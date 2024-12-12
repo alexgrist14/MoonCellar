@@ -1,8 +1,8 @@
 .card {
   width: 100%;
   justify-self: center;
-  max-width: 200px;
-  max-height: calc(200px * 1.25);
+  max-width: 240px;
+  max-height: calc(240px / $coverRatio);
   aspect-ratio: $coverRatio;
   border-radius: $radius;
   transition: all 0.3s;

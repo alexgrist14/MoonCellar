@@ -80,7 +80,7 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
               game.platforms.map((platform) => platform.name).join(", ")}
           </span>
           {!!game.summary &&
-            (cardRef.current?.getBoundingClientRect().height || 0) > 250 && (
+            (cardRef.current?.getBoundingClientRect().height || 0) >= 250 && (
               <span>{game.summary}</span>
             )}
         </Link>
