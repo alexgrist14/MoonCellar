@@ -1,17 +1,15 @@
 import { IAuth } from "@/src/lib/shared/types/auth";
 import { Button } from "@/src/lib/shared/ui/Button";
-import { FC, useState } from "react";
 import { Input } from "@/src/lib/shared/ui/Input";
-import { SubmitHandler, useForm } from "react-hook-form";
-import styles from "./AuthModal.module.scss";
 import { useRouter } from "next/router";
-import { modal } from "../Modal";
-import { useAuthStore } from "../../store/auth.store";
-import { SvgClose } from "../svg";
-import Background from "../Background/Background";
-import { authAPI, userAPI } from "../../api";
-import { axiosUtils } from "../../utils/axios";
+import { FC, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { useAuth } from "../../hooks/auth";
+import { useAuthStore } from "../../store/auth.store";
+import Background from "../Background/Background";
+import { modal } from "../Modal";
+import { SvgClose } from "../svg";
+import styles from "./AuthModal.module.scss";
 
 export const AuthModal: FC = () => {
   const [isRegister, setIsRegister] = useState<boolean>(true);

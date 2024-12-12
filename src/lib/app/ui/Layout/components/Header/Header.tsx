@@ -18,7 +18,6 @@ export const Header: FC = () => {
   const router = useRouter();
 
   const { isMobile } = useCommonStore();
-  
 
   const [isMenuActive, setIsMenuActive] = useState(false);
   const { isAuth, profile } = useAuthStore();
@@ -26,7 +25,7 @@ export const Header: FC = () => {
 
   const handleProfileClick = (e: MouseEvent<HTMLAnchorElement>) => {
     if (!isAuth || !profile) {
-      e.preventDefault()
+      e.preventDefault();
       modal.open(<AuthModal />);
     }
   };
@@ -34,7 +33,6 @@ export const Header: FC = () => {
   const searchClickHandler = () => {
     modal.open(<SearchModal />);
   };
-
 
   return (
     <div className={styles.container}>
@@ -48,8 +46,12 @@ export const Header: FC = () => {
         </Button>
       </div>
       <div className={styles.container__right}>
-        <Link href={`/user/${profile?.userName}`} onClick={handleProfileClick} className={styles.profile__link}>
-        <Avatar user={profile}/>
+        <Link
+          href={`/user/${profile?.userName}`}
+          onClick={handleProfileClick}
+          className={styles.profile__link}
+        >
+          <Avatar user={profile} />
         </Link>
       </div>
     </div>

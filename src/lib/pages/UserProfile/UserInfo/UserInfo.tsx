@@ -1,22 +1,13 @@
 import { userAPI } from "@/src/lib/shared/api";
 import { IFollowings, UserGamesType } from "@/src/lib/shared/types/user.type";
-import { SvgBan, SvgDone, SvgPlay, SvgStar } from "@/src/lib/shared/ui/svg";
+import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  Dispatch,
-  FC,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
 import styles from "./UserInfo.module.scss";
-import { API_URL } from "@/src/lib/shared/constants";
-import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
-import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { useRouter } from "next/router";
-import { Tooltip } from "@/src/lib/shared/ui/Tooltip";
+import { userListCategories } from "@/src/lib/shared/constants/user.const";
+import { API_URL, FRONT_URL } from "@/src/lib/shared/constants";
+import { commonUtils } from "@/src/lib/shared/utils/common";
 
 interface UserInfoProps {
   userName: string;
@@ -36,7 +27,7 @@ const UserInfo: FC<UserInfoProps> = ({
   const [userFollowings, setUserFollowing] = useState<
     IFollowings | undefined
   >();
-  const followingsRef = useRef(null);
+
   useEffect(() => {
     setUserFollowing(undefined);
 
@@ -64,29 +55,23 @@ const UserInfo: FC<UserInfoProps> = ({
             <div className={styles.profile_name}>{userName}</div>
             <div className={styles.profile_stats}>
               <div className={styles.profile_stats__list}>
-                <Link href="completed">
-                  <SvgDone className={styles.completed} />
-                  <span>Completed: {games.completed.length}</span>
-                </Link>
-                <Link href="playing">
-                  <SvgPlay className={styles.playing} />
-                  <span>Playing: {games.playing.length}</span>
-                </Link>
-                <Link href="wishlist">
-                  <SvgStar className={styles.wishlist} />
-                  <span>Wishlist: {games.wishlist.length}</span>
-                </Link>
-                <Link href="dropped">
-                  <SvgBan className={styles.dropped} />
-                  <span>Dropped: {games.dropped.length}</span>
-                </Link>
+                {userListCategories.map((category, i) => (
+                  <Link
+                    href={`${FRONT_URL}/user/${userName}?list=${category}`}
+                    key={i}
+                  >
+                    <span>{`${commonUtils.upFL(category)}: ${
+                      games[category].length
+                    }`}</span>
+                  </Link>
+                ))}
               </div>
             </div>
           </div>
         </div>
         <div className={styles.friends}>
           <h3 className={styles.friends__title}>Friends</h3>
-          <div className={styles.friends__list} ref={followingsRef}>
+          <div className={styles.friends__list}>
             {!!userFollowings &&
               userFollowings.followings.map((item, i) => (
                 <Link
@@ -95,9 +80,6 @@ const UserInfo: FC<UserInfoProps> = ({
                   key={`${id}_${i}`}
                 >
                   <Avatar user={item} />
-                  <Tooltip positionRef={followingsRef}>
-                    {item.userName}
-                  </Tooltip>
                 </Link>
               ))}
           </div>

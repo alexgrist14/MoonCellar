@@ -1,6 +1,9 @@
 export const API_URL =
   process.env.NEXT_PUBLIC_API_URL || "https://api.mooncellar.space";
 
+export const FRONT_URL =
+  process.env.NEXT_PUBLIC_FRONT_URL || "https://mooncellar.space/";
+
 export const ACCESS_TOKEN = "accessMoonToken";
 export const REFRESH_TOKEN = "refreshMoonToken";
 

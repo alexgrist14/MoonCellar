@@ -1,6 +1,6 @@
 import { FC, useEffect, useMemo, useState } from "react";
 import styles from "./UserProfile.module.scss";
-import { UserGamesType } from "../../shared/types/user.type";
+import { IGamesRating, UserGamesType } from "../../shared/types/user.type";
 import { Tabs } from "../../shared/ui/Tabs";
 import { ITabContent } from "../../shared/types/tabs";
 import UserInfo from "./UserInfo/UserInfo";
@@ -16,6 +16,7 @@ interface UserProfileProps {
   _id: string;
   games: UserGamesType;
   profilePicture: string;
+  gamesRating: IGamesRating[];
 }
 
 const UserProfile: FC<UserProfileProps> = ({
@@ -23,8 +24,9 @@ const UserProfile: FC<UserProfileProps> = ({
   _id,
   games,
   profilePicture,
+  gamesRating,
 }) => {
-  const [avatar, setAvatar] = useState<string | undefined>('');
+  const [avatar, setAvatar] = useState<string | undefined>("");
   const [tabIndex, setTabIndex] = useState(0);
   const { query, replace } = useRouter();
 
@@ -54,7 +56,15 @@ const UserProfile: FC<UserProfileProps> = ({
             {games[tabName].map((game, i) => (
               <div key={tabName + i} className={styles.games__game}>
                 <GameCard game={game} />
-                <p className={styles.games__title}>{game.name}</p>
+                <div className={styles.games__info}>
+                  <p className={styles.games__title}>{game.name}</p>
+                  <span className={styles.games__rating}>
+                    {gamesRating
+                      ? gamesRating.find((rating) => rating.game === game._id)
+                          ?.rating
+                      : ""}
+                  </span>
+                </div>
               </div>
             ))}
             {!games[tabName].length && <p>There is no games</p>}

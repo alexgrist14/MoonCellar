@@ -35,7 +35,7 @@ export const useAuth = () => {
       userAPI.getById(decoded.id).then((res) => {
         setProfile(res.data);
         modal.close();
-        push(`/user/${res.data.userName}`);
+        //push(`/user/${res.data.userName}`);
       });
     }
   };

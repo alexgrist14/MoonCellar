@@ -40,6 +40,18 @@
         @include textEllipsis;
         text-align: center;
       }
+      &__info{
+        @include flexCenter;
+        justify-content: space-between;
+        max-width: 50%;
+      }
+      &__rating{
+        width: 20px;
+        height: 20px;
+        background-color: $accent;
+        border-radius: 50%;
+        text-align: center;
+      }
     }
   }
 }
