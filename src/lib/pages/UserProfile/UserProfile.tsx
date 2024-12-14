@@ -11,6 +11,7 @@ import { GameCard } from "../../shared/ui/GameCard";
 import { commonUtils } from "../../shared/utils/common";
 import { useRouter } from "next/router";
 import { Scrollbar } from "../../shared/ui/Scrollbar";
+import { UserGames } from "./UserGames";
 
 interface UserProfileProps {
   userName: string;
@@ -53,23 +54,11 @@ const UserProfile: FC<UserProfileProps> = ({
       ...userListCategories.map((tabName, _i) => ({
         tabName: commonUtils.upFL(tabName),
         tabBody: (
-          <div className={styles.games}>
-            {games[tabName].map((game, i) => (
-              <div key={tabName + i} className={styles.games__game}>
-                <GameCard game={game} />
-                <div className={styles.games__info}>
-                  <p className={styles.games__title}>{game.name}</p>
-                  <span className={styles.games__rating}>
-                    {gamesRating
-                      ? gamesRating.find((rating) => rating.game === game._id)
-                          ?.rating
-                      : ""}
-                  </span>
-                </div>
-              </div>
-            ))}
-            {!games[tabName].length && <p>There is no games</p>}
-          </div>
+          <UserGames
+            userGames={games}
+            gamesCategory={tabName}
+            gamesRating={gamesRating}
+          />
         ),
         className: `${styles.tabs__button}`,
         onTabClick: () => {

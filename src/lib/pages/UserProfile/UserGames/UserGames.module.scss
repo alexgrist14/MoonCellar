@@ -1,0 +1,52 @@
+.sort__icon{
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  //transform: rotateY(180deg);
+}
+
+.games {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 20px;
+
+  @include mediaLg {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @include mediaMd {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @include mediaSm {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  &__game {
+    display: grid;
+    width: fit-content;
+    max-width: 240px;
+    gap: 3px;
+  }
+
+  &__title {
+    @include textEllipsis;
+  }
+  &__info {
+    display: grid;
+    grid-template-columns: 1fr 20px;
+    border-radius: $radius;
+    gap: 5px;
+    overflow: hidden;
+  }
+  &__rating {
+    width: 20px;
+    height: 20px;
+    background-color: $accent;
+    border-radius: 50%;
+    text-align: center;
+    user-select: none;
+    opacity: 0.9;
+    filter: drop-shadow(0 0 0.6rem $accent);
+  }
+}
