@@ -26,25 +26,19 @@ export const useAuth = () => {
         clear();
       });
   };
-  const authUpdate = (token: string) => {
-    const decoded: any = jwtDecode(token);
-
-    //setCookie(ACCESS_TOKEN, response.data.accessToken);
-    if (decoded.exp) {
-      setAuth(!isTokenExpired(decoded.exp));
-      userAPI.getById(decoded.id).then((res) => {
-        setProfile(res.data);
-        modal.close();
-        //push(`/user/${res.data.userName}`);
-      });
-    }
+  const authUpdate = (userId: string) => {
+    setAuth(true);
+    userAPI.getById(userId).then((res) => {
+      setProfile(res.data);
+      modal.close();
+    });
   };
 
   const login = (data: Omit<IAuth, "userName">) => {
     authAPI
       .login(data)
       .then((response) => {
-        authUpdate(response.data.accessToken);
+        authUpdate(response.data.userId);
       })
       .catch((e: IAxiosErrorResponse) => {
         axiosUtils.toastError(e);
@@ -55,16 +49,12 @@ export const useAuth = () => {
     authAPI
       .signup(data)
       .then((response) => {
-        authUpdate(response.data.accessToken);
+        authUpdate(response.data.userId);
       })
       .catch((e: IAxiosErrorResponse) => {
         axiosUtils.toastError(e);
       });
   };
-
-  // const refresh = () => {
-  //   authApi.refresh();
-  // };
 
   return { logout, login, signup };
 };

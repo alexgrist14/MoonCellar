@@ -8,11 +8,9 @@ export const agent = axios.create({
 
 agent.interceptors.request.use(
   (config) => {
-    const token = getCookie(ACCESS_TOKEN);
 
     config.headers["Content-Type"] =
       config.headers["Content-Type"] || `application/json`;
-    config.headers.Authorization = `Bearer ${token}`;
 
     return config;
   },

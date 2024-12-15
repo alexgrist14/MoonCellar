@@ -1,16 +1,14 @@
-import { FC, ReactNode, useEffect } from "react";
-import styles from "./Layout.module.scss";
-import { Header } from "./components";
+import { authAPI, userAPI } from "@/src/lib/shared/api";
+import { screenMd } from "@/src/lib/shared/constants";
 import { useWindowResizeAction } from "@/src/lib/shared/hooks";
-import { REFRESH_TOKEN, screenMd } from "@/src/lib/shared/constants";
+import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
 import { Navigation } from "@/src/lib/shared/ui/Navigation";
-import { getCookie } from "@/src/lib/shared/utils/cookies";
-import { jwtDecode } from "jwt-decode";
-import { isTokenExpired } from "@/src/lib/shared/utils/token";
-import { userAPI } from "@/src/lib/shared/api";
-import { useAuthStore } from "@/src/lib/shared/store/auth.store";
+import { axiosUtils } from "@/src/lib/shared/utils/axios";
+import { FC, ReactNode, useEffect } from "react";
+import styles from "./Layout.module.scss";
+import { Header } from "./components";
 
 interface ILayoutProps {
   children: ReactNode;
@@ -19,23 +17,21 @@ interface ILayoutProps {
 export const Layout: FC<ILayoutProps> = ({ children }) => {
   const { setIsMobile } = useCommonStore();
   const { getById } = userAPI;
+  const {refreshToken} = authAPI;
 
   const { setAuth, setProfile, clear } = useAuthStore();
 
   useEffect(() => {
-    const token = getCookie(REFRESH_TOKEN);
-    if (token) {
-      const decoded: any = jwtDecode(token);
-      if (decoded.exp) {
-        setAuth(!isTokenExpired(decoded.exp));
-        getById(decoded.id).then((res) => {
-          setProfile(res.data);
-        });
-      }
-    } else {
+    refreshToken().then((res)=>{
+      setAuth(true);
+      getById(res.data.userId).then((res)=>{
+        setProfile(res.data);
+      })
+    }).catch((error)=>{
+      axiosUtils.toastError(error);
       clear();
-    }
-  }, [clear, getById, setAuth, setProfile]);
+    })
+  }, [clear, getById, refreshToken, setAuth, setProfile]);
 
   useWindowResizeAction(() => {
     setIsMobile(window.innerWidth <= screenMd);

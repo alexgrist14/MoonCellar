@@ -37,7 +37,6 @@ export const UserGames: FC<UserGamesProps> = ({
   const currentGames = sortedGames.slice((page - 1) * take, page * take);
 
   useEffect(() => {
-    console.log(games);
     setTotal(games[gamesCategory].length);
     return () => {
       setPage(1);

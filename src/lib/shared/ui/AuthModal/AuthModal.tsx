@@ -15,7 +15,7 @@ export const AuthModal: FC = () => {
   const [isRegister, setIsRegister] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const { setAuth, setProfile } = useAuthStore();
-  const {login,signup} = useAuth()
+  const { login, signup } = useAuth();
   const { push } = useRouter();
 
   const {
