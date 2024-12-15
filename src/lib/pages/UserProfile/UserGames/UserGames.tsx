@@ -43,13 +43,17 @@ export const UserGames: FC<UserGamesProps> = ({
     };
   }, [games, gamesCategory]);
 
-  const toggleSortOrder = ()=>{
-    setSortOrder((prev)=> (prev === "asc" ? "desc" : "asc"));
-  }
+  const toggleSortOrder = () => {
+    setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+  };
 
   return (
     <>
-    <Icon className={styles.sort__icon} onClick={toggleSortOrder} icon="iconamoon:sorting-left"/>
+      <Icon
+        className={styles.sort__icon}
+        onClick={toggleSortOrder}
+        icon="iconamoon:sorting-left"
+      />
       <div className={styles.games}>
         {currentGames.map((game, i) => (
           <div key={gamesCategory + i} className={styles.games__game}>

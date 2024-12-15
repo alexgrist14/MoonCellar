@@ -1,14 +1,12 @@
-import { jwtDecode } from "jwt-decode";
-import { useAuthStore } from "../store/auth.store";
-import { deleteCookie, setCookie } from "../utils/cookies";
-import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
-import { authAPI, userAPI } from "../api";
-import { IAuth } from "../types/auth";
-import { isTokenExpired } from "../utils/token";
 import { useRouter } from "next/router";
-import { axiosUtils } from "../utils/axios";
-import { modal } from "../ui/Modal";
+import { authAPI, userAPI } from "../api";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
+import { useAuthStore } from "../store/auth.store";
+import { IAuth } from "../types/auth";
 import { IAxiosErrorResponse } from "../types/common.type";
+import { modal } from "../ui/Modal";
+import { axiosUtils } from "../utils/axios";
+import { deleteCookie } from "../utils/cookies";
 
 export const useAuth = () => {
   const { clear, setProfile, setAuth } = useAuthStore();

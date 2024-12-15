@@ -21,6 +21,8 @@ export const getServerSideProps = async (
   const { query } = context;
   const user = (await userAPI.getByName(query.name as string)).data;
   const userGames = (await userAPI.getUserGames(user._id)).data.games;
+  const cookies = context.req.cookies;
+  console.log(cookies);
 
   return { props: { user, userGames } };
 };

@@ -17,20 +17,21 @@ interface ILayoutProps {
 export const Layout: FC<ILayoutProps> = ({ children }) => {
   const { setIsMobile } = useCommonStore();
   const { getById } = userAPI;
-  const {refreshToken} = authAPI;
-
+  const { refreshToken } = authAPI;
   const { setAuth, setProfile, clear } = useAuthStore();
 
   useEffect(() => {
-    refreshToken().then((res)=>{
-      setAuth(true);
-      getById(res.data.userId).then((res)=>{
-        setProfile(res.data);
+    refreshToken()
+      .then((res) => {
+        setAuth(true);
+        getById(res.data.userId).then((res) => {
+          setProfile(res.data);
+        });
       })
-    }).catch((error)=>{
-      axiosUtils.toastError(error);
-      clear();
-    })
+      .catch((error) => {
+        axiosUtils.toastError(error);
+        clear();
+      });
   }, [clear, getById, refreshToken, setAuth, setProfile]);
 
   useWindowResizeAction(() => {
