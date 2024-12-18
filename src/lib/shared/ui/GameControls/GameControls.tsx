@@ -12,6 +12,8 @@ import { toast } from "../../utils/toast";
 import useCloseEvents from "../../hooks/useCloseEvents";
 import { RangeSelector } from "../RangeSelector";
 import { accentColor } from "../../constants";
+import { useCommonStore } from "../../store/common.store";
+import { useGamesStore } from "../../store/games.store";
 
 interface IGameControlsProps {
   style?: CSSProperties;
@@ -52,6 +54,7 @@ export const GameControls: FC<IGameControlsProps> = ({
   style,
 }) => {
   const { profile, setProfile } = useAuthStore();
+  const { royalGames, addRoyalGame, removeRoyalGame } = useGamesStore();
 
   const ratingsRef = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<HTMLDivElement>(null);
@@ -106,7 +109,11 @@ export const GameControls: FC<IGameControlsProps> = ({
   const isBacklogged = profile?.games?.backlog.some((id) => game._id === id);
   const isDropped = profile?.games?.dropped.some((id) => game._id === id);
 
-  const rating = profile?.gamesRating?.find((rating) => rating.game === game._id);
+  const rating = profile?.gamesRating?.find(
+    (rating) => rating.game === game._id
+  );
+
+  const isRoyal = royalGames?.some((royal) => royal._id === game?._id);
 
   useCloseEvents([ratingsRef, ratingButtonRef], () => {
     setIsRatingActive(false);
@@ -176,6 +183,13 @@ export const GameControls: FC<IGameControlsProps> = ({
             {key}
           </Button>
         ))}
+        <Button
+          active={isRoyal}
+          onClick={() => (isRoyal ? removeRoyalGame(game) : addRoyalGame(game))}
+        >
+          {isRoyal ? "Remove from" : "Add to"}
+          {" royal games"}
+        </Button>
       </div>
       <div
         ref={ratingsRef}
