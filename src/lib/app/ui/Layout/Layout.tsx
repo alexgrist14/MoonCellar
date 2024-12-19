@@ -34,6 +34,7 @@ export const Layout: FC<ILayoutProps> = ({ children }) => {
       .catch((error) => {
         axiosUtils.toastError(error);
         clear();
+        setLoading(false);
       });
   }, [clear, getById, refreshToken, setAuth, setProfile]);
 
