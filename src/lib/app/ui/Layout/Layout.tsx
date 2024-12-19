@@ -6,7 +6,7 @@ import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
 import { Navigation } from "@/src/lib/shared/ui/Navigation";
 import { axiosUtils } from "@/src/lib/shared/utils/axios";
-import { FC, ReactNode, useEffect } from "react";
+import { FC, ReactNode, useEffect, useState } from "react";
 import styles from "./Layout.module.scss";
 import { Header } from "./components";
 
@@ -19,6 +19,7 @@ export const Layout: FC<ILayoutProps> = ({ children }) => {
   const { getById } = userAPI;
   const { refreshToken } = authAPI;
   const { setAuth, setProfile, clear } = useAuthStore();
+  const [isLoading,setLoading] = useState(true);
 
   useEffect(() => {
     refreshToken()
@@ -26,7 +27,9 @@ export const Layout: FC<ILayoutProps> = ({ children }) => {
         setAuth(true);
         getById(res.data.userId).then((res) => {
           setProfile(res.data);
+          setLoading(false);
         });
+        
       })
       .catch((error) => {
         axiosUtils.toastError(error);
@@ -39,6 +42,7 @@ export const Layout: FC<ILayoutProps> = ({ children }) => {
   });
 
   return (
+    !isLoading &&
     <div className={styles.layout}>
       <Header />
       {children}
