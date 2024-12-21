@@ -43,6 +43,12 @@ export const UserGames: FC<UserGamesProps> = ({
     };
   }, [games, gamesCategory]);
 
+  useEffect(() => {
+    let prevPage = page;
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    console.log("action");
+  }, [page]);
+
   const toggleSortOrder = () => {
     setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
   };

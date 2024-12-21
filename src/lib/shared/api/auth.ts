@@ -17,12 +17,12 @@ const logout = (userId: string) => {
 };
 
 const refreshToken = () => {
-  return agent.post<{userId: string}>(`${AUTH_URL}/refresh-token`)
+  return agent.post<{ userId: string }>(`${AUTH_URL}/refresh-token`);
 };
 
 export const authAPI = {
   signup,
   login,
   logout,
-  refreshToken
+  refreshToken,
 };

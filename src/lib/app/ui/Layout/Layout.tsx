@@ -19,37 +19,37 @@ export const Layout: FC<ILayoutProps> = ({ children }) => {
   const { setIsMobile } = useCommonStore();
   const { getById } = userAPI;
   const { refreshToken } = authAPI;
-  const { setAuth, setProfile, clear } = useAuthStore();
-  const [isLoading,setLoading] = useState(true);
+  const { setAuth, setProfile, clear, isAuth } = useAuthStore();
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    refreshToken()
-      .then((res) => {
-        setAuth(true);
-        getById(res.data.userId).then((res) => {
-          setProfile(res.data);
+    if (isAuth) {
+      refreshToken()
+        .then((res) => {
+          setAuth(true);
+          getById(res.data.userId).then((res) => {
+            setProfile(res.data);
+            setLoading(false);
+          });
+        })
+        .catch(() => {
+          clear();
           setLoading(false);
         });
-        
-      })
-      .catch(() => {
-        clear();
-        setLoading(false);
-      });
-  }, [clear, getById, refreshToken, setAuth, setProfile]);
+    }
+  }, [clear, getById, isAuth, refreshToken, setAuth, setProfile]);
 
   useWindowResizeAction(() => {
     setIsMobile(window.innerWidth <= screenMd);
   });
 
   return (
-    !isLoading &&
-    <div className={styles.layout}>
-      <Header />
-      {children}
-      <ExpandMenu position="right" titleOpen="Menu">
-        <Navigation />
-      </ExpandMenu>
-    </div>
+      <div className={styles.layout}>
+        <Header />
+        {children}
+        <ExpandMenu position="right" titleOpen="Menu">
+          <Navigation />
+        </ExpandMenu>
+      </div>
   );
 };
