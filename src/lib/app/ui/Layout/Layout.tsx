@@ -9,6 +9,7 @@ import { axiosUtils } from "@/src/lib/shared/utils/axios";
 import { FC, ReactNode, useEffect, useState } from "react";
 import styles from "./Layout.module.scss";
 import { Header } from "./components";
+import { AxiosError } from "axios";
 
 interface ILayoutProps {
   children: ReactNode;
@@ -31,8 +32,7 @@ export const Layout: FC<ILayoutProps> = ({ children }) => {
         });
         
       })
-      .catch((error) => {
-        axiosUtils.toastError(error);
+      .catch(() => {
         clear();
         setLoading(false);
       });
