@@ -8,6 +8,7 @@ type IState = {
   isFinished: boolean;
   isRoyal?: boolean;
   isHistory?: boolean;
+  isExcludeHistory: boolean;
   segments?: string[];
 };
 
@@ -19,12 +20,14 @@ type IAction = {
   setRoyal: (royal: boolean) => void;
   setHistory: (isHistory: boolean) => void;
   setSegments: (segments: string[]) => void;
+  setExcludeHistory: (isExcludeHistory: boolean) => void;
 };
 
 export const useStatesStore = create<IState & IAction>()(
   devtools(
     (set) => ({
       isFinished: true,
+      isExcludeHistory: false,
       setFinished: (isFinished) => set({ isFinished }),
       setLoading: (isLoading) => set({ isLoading }),
       setPlatformsLoading: (isPlatformsLoading) => set({ isPlatformsLoading }),
@@ -32,8 +35,8 @@ export const useStatesStore = create<IState & IAction>()(
       setStarted: (isStarted) => set({ isStarted }),
       setRoyal: (isRoyal) => set({ isRoyal }),
       setHistory: (isHistory) => set({ isHistory }),
+      setExcludeHistory: (isExcludeHistory) => set({ isExcludeHistory }),
     }),
     { name: "states" }
   )
 );
-

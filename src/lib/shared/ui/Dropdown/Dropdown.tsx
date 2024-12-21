@@ -29,13 +29,16 @@ interface IDropDownListProps {
   placeholder?: string;
   initialValue?: string;
   initialMultiValue?: number[];
+  initialExcludeValue?: number[];
   style?: CSSProperties;
   fieldStyle?: CSSProperties;
   wrapperStyle?: CSSProperties;
   getValue?: (value: string | null) => void;
   getValues?: (values: string[]) => void;
+  getExcludeValues?: (values: string[]) => void;
   getIndex?: (index: number) => void;
   getIndexes?: (indexes: number[]) => void;
+  getExcludeIndexes?: (indexes: number[]) => void;
   getSearchQuery?: (value: string) => void;
   title?: string;
   rootRef?: RefObject<HTMLDivElement>;
@@ -49,6 +52,7 @@ interface IDropDownListProps {
   isWithSearch?: boolean;
   isWithInput?: boolean;
   isWithAll?: boolean;
+  isWithExclude?: boolean;
   borderTheme?: "default" | "green" | "red";
   icons?: string[];
 }
@@ -59,13 +63,16 @@ export const Dropdown: FC<IDropDownListProps> = ({
   placeholder,
   initialValue,
   initialMultiValue,
+  initialExcludeValue,
   style,
   fieldStyle,
   wrapperStyle,
   getValue,
   getValues,
+  getExcludeValues,
   getIndex,
   getIndexes,
+  getExcludeIndexes,
   title,
   rootRef,
   getSearchQuery,
@@ -79,6 +86,7 @@ export const Dropdown: FC<IDropDownListProps> = ({
   isWithSearch,
   isWithInput,
   isWithAll,
+  isWithExclude,
   borderTheme,
   icons,
 }) => {
@@ -88,10 +96,14 @@ export const Dropdown: FC<IDropDownListProps> = ({
   const [multiValue, setMultiValue] = useState<number[]>(
     initialMultiValue || []
   );
+  const [excludeValue, setExcludeValue] = useState<number[]>(
+    initialExcludeValue || []
+  );
 
   const offset = useRef<number>(0);
 
   const [query, setQuery] = useState("");
+
   const [indexedList, setIndexedList] = useState<IIndexedItem[]>([]);
   const [sortedList, setSortedList] = useState<IIndexedItem[]>([]);
 
@@ -115,10 +127,15 @@ export const Dropdown: FC<IDropDownListProps> = ({
 
   const clickHandler = (
     item: IIndexedItem | undefined,
-    options: { isChecked?: boolean; isReset?: boolean; isAll?: boolean }
+    options: {
+      isChecked?: boolean;
+      isExcluded?: boolean;
+      isReset?: boolean;
+      isAll?: boolean;
+    }
   ) => {
     const { index, value } = item || { index: -1, value: "" };
-    const { isChecked, isReset, isAll } = options;
+    const { isChecked, isReset, isAll, isExcluded } = options;
 
     if (!isMulti) {
       setValue(value);
@@ -129,19 +146,33 @@ export const Dropdown: FC<IDropDownListProps> = ({
       !!getValue && getValue(value || null);
       !!getIndex && getIndex(index);
     } else {
-      let values: number[] = [];
+      let values: number[] = multiValue;
+      let excludedValues: number[] = excludeValue;
 
       if (isReset) {
         values = [];
+        isWithExclude && (excludedValues = []);
       } else if (isAll) {
         values = sortedList.map((item) => item.index);
       } else {
-        values = isChecked
-          ? multiValue.filter((i) => i !== index)
-          : [...multiValue, index].sort((a, b) => a - b);
+        if (isWithExclude) {
+          if (!isChecked && !isExcluded) {
+            values = [...multiValue, index].sort((a, b) => a - b);
+          } else if (isChecked) {
+            values = multiValue.filter((i) => i !== index);
+            excludedValues = [...excludeValue, index].sort((a, b) => a - b);
+          } else if (isExcluded) {
+            excludedValues = excludeValue.filter((i) => i !== index);
+          }
+        } else {
+          !isChecked
+            ? (values = [...multiValue, index].sort((a, b) => a - b))
+            : (values = multiValue.filter((i) => i !== index));
+        }
       }
 
       setMultiValue(values);
+      isWithExclude && setExcludeValue(excludedValues);
 
       !!getIndexes && getIndexes(values);
       !!getValues &&
@@ -154,6 +185,20 @@ export const Dropdown: FC<IDropDownListProps> = ({
             []
           )
         );
+
+      if (isWithExclude) {
+        !!getExcludeIndexes && getExcludeIndexes(excludedValues);
+        !!getExcludeValues &&
+          getExcludeValues(
+            sortedList.reduce(
+              (res: string[], item) =>
+                excludedValues.some((value) => value === item.index)
+                  ? [...res, item.value]
+                  : res,
+              []
+            )
+          );
+      }
     }
   };
 
@@ -202,7 +247,11 @@ export const Dropdown: FC<IDropDownListProps> = ({
 
   useEffect(() => {
     !!initialMultiValue && setMultiValue(initialMultiValue);
-  }, [initialMultiValue, multiValue]);
+  }, [initialMultiValue]);
+
+  useEffect(() => {
+    !!initialExcludeValue && setExcludeValue(initialExcludeValue);
+  }, [initialExcludeValue]);
 
   useEffect(() => {
     isActive &&
@@ -222,16 +271,19 @@ export const Dropdown: FC<IDropDownListProps> = ({
       : setSortedList(() => {
           const first: IIndexedItem[] = [];
           const second: IIndexedItem[] = [];
+          const third: IIndexedItem[] = [];
 
           indexedList.forEach((item) => {
             multiValue.includes(item.index)
               ? first.push(item)
-              : second.push(item);
+              : isWithExclude && excludeValue.includes(item.index)
+              ? second.push(item)
+              : third.push(item);
           });
 
-          return [...first, ...second];
+          return [...first, ...second, ...third];
         });
-  }, [indexedList, multiValue, isActive]);
+  }, [indexedList, multiValue, excludeValue, isActive, isWithExclude]);
 
   useEffect(() => {
     !isActive && setQuery("");
@@ -249,18 +301,21 @@ export const Dropdown: FC<IDropDownListProps> = ({
         ref={dropdownRef}
       >
         <div className={styles.dropdown__controls}>
-          {isWithReset && !isDisabled && !!value && (
-            <Button
-              color="red"
-              style={{ padding: "2px" }}
-              className={styles.dropdown__close}
-              onClick={() => {
-                clickHandler({ index: -1, value: "" }, { isReset: true });
-              }}
-            >
-              <SvgClose />
-            </Button>
-          )}
+          {isWithReset &&
+            !isDisabled &&
+            ((!isMulti && !!value) ||
+              (isMulti && (!!multiValue.length || !!excludeValue.length))) && (
+              <Button
+                color="red"
+                style={{ padding: "2px" }}
+                className={styles.dropdown__close}
+                onClick={() => {
+                  clickHandler({ index: -1, value: "" }, { isReset: true });
+                }}
+              >
+                <SvgClose />
+              </Button>
+            )}
           {isWithAll && isMulti && (
             <Checkbox
               borderColor="white"
@@ -383,6 +438,8 @@ export const Dropdown: FC<IDropDownListProps> = ({
             >
               {sortedList.map((item, index) => {
                 const isChecked = multiValue.includes(item.index);
+                const isExcluded = excludeValue.includes(item.index);
+
                 const key = `${item.value.replace(/[^W+]/g, "_")}-${index}`;
                 const icon = !!icons?.length ? icons[item.index] : "";
 
@@ -391,12 +448,10 @@ export const Dropdown: FC<IDropDownListProps> = ({
                     key={key}
                     className={styles.dropdown__item}
                     onClick={() => {
-                      clickHandler(item, { isChecked });
+                      clickHandler(item, { isChecked, isExcluded });
                     }}
                     style={{
-                      gridTemplateColumns: !!icon
-                        ? "40px 1fr 20px "
-                        : "1fr 20px",
+                      gridTemplateColumns: `${!!icon ? "40px " : ""}1fr auto`,
                     }}
                   >
                     {!!icon && (
@@ -412,17 +467,20 @@ export const Dropdown: FC<IDropDownListProps> = ({
                     )}
                     <span>{item.value}</span>
                     {isMulti && (
-                      <Checkbox
-                        colorTheme={
-                          borderTheme === "green"
-                            ? "on"
-                            : borderTheme === "red"
-                            ? "off"
-                            : "accent"
-                        }
-                        onChange={() => clickHandler(item, { isChecked })}
-                        checked={isChecked}
-                      />
+                      <div className={styles.dropdown__check}>
+                        <Checkbox
+                          isBorderFromTheme
+                          colorTheme={
+                            isWithExclude
+                              ? isExcluded
+                                ? "off"
+                                : "on"
+                              : "accent"
+                          }
+                          checked={isChecked || isExcluded || false}
+                          onChange={() => {}}
+                        />
+                      </div>
                     )}
                   </div>
                 );

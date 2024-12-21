@@ -1,12 +1,22 @@
 .checkbox {
-  width: 15px;
+  width: 18px;
   aspect-ratio: 1;
   background-color: $bg;
-  border: 2px solid black;
+  border: 2px solid $textColor;
   border-radius: 50%;
   cursor: pointer;
   appearance: none;
   transition: 0.3s;
+
+  &__border {
+    &_on {
+      border-color: $on;
+    }
+
+    &_off {
+      border-color: $off;
+    }
+  }
 
   &_accent {
     background-color: $accent;
@@ -14,10 +24,12 @@
 
   &_on {
     background-color: $on;
+    border-color: $textColor;
   }
 
   &_off {
     background-color: $off;
+    border-color: $textColor;
   }
 
   &:focus,

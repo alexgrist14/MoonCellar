@@ -8,34 +8,20 @@ import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { useStatesStore } from "../../shared/store/states.store";
 import { useCommonStore } from "../../shared/store/common.store";
 import { getImageLink } from "../../shared/constants";
-import { useGauntletFiltersStore } from "../../shared/store/filters.store";
 import { axiosUtils } from "../../shared/utils/axios";
 import Image from "next/image";
 import classNames from "classnames";
 import { IGDBScreenshot } from "../../shared/types/igdb";
 import { useGamesStore } from "../../shared/store/games.store";
+import { parseQueryFilters } from "../../shared/utils/filters.util";
+import { useRouter } from "next/router";
 
 export const GauntletPage: FC = () => {
+  const { asPath } = useRouter();
+
   const [bg, setBg] = useState<IGDBScreenshot & { gameId: number }>();
   const [isImageReady, setIsImageReady] = useState(true);
 
-  const {
-    selectedGenres,
-    selectedRating,
-    selectedGameModes,
-    selectedSystems,
-    searchQuery,
-    excludedGameModes,
-    excludedGenres,
-    excludedSystems,
-    selectedCategories,
-    searchCompany,
-    selectedYears,
-    selectedThemes,
-    excludedThemes,
-    isExcludeHistory,
-    selectedVotes,
-  } = useGauntletFiltersStore();
   const { royalGames, setGames, historyGames } = useGamesStore();
   const {
     isLoading,
@@ -44,33 +30,19 @@ export const GauntletPage: FC = () => {
     setFinished,
     setLoading,
     isRoyal,
+    isExcludeHistory,
   } = useStatesStore();
   const { setWinner, winner } = useCommonStore();
 
   const getIGDBGames = useCallback(() => {
     if (isRoyal) return;
 
+    const filters = parseQueryFilters(asPath);
+
     IGDBApi.getGames({
-      selected: {
-        genres: selectedGenres?.map((genre) => genre._id),
-        platforms: selectedSystems?.map((system) => system._id),
-        modes: selectedGameModes?.map((mode) => mode._id),
-        themes: selectedThemes?.map((mode) => mode._id),
-      },
-      excluded: {
-        genres: excludedGenres?.map((genre) => genre._id),
-        platforms: excludedSystems?.map((system) => system._id),
-        modes: excludedGameModes?.map((mode) => mode._id),
-        themes: excludedThemes?.map((mode) => mode._id),
-      },
-      company: searchCompany,
-      categories: selectedCategories,
-      take: 16,
-      rating: selectedRating,
-      votes: selectedVotes,
-      search: searchQuery,
+      ...filters,
       isRandom: true,
-      years: selectedYears,
+      take: 16,
       ...(isExcludeHistory &&
         !!historyGames?.length && {
           excludeGames: historyGames.map((game) => game._id),
@@ -96,24 +68,11 @@ export const GauntletPage: FC = () => {
     setStarted,
     setWinner,
     isRoyal,
-    searchQuery,
-    selectedGenres,
-    selectedRating,
-    selectedGameModes,
-    selectedSystems,
-    setFinished,
-    setGames,
-    excludedGenres,
-    excludedSystems,
-    excludedGameModes,
-    searchCompany,
-    selectedCategories,
-    excludedThemes,
-    selectedThemes,
-    selectedYears,
     historyGames,
     isExcludeHistory,
-    selectedVotes,
+    asPath,
+    setFinished,
+    setGames,
   ]);
 
   useEffect(() => {
@@ -165,7 +124,7 @@ export const GauntletPage: FC = () => {
           onLoad={() => setIsImageReady(true)}
           key={bg?._id}
           alt="Background"
-          src={!!bg ? getImageLink(bg.url, "1080p") : ""}
+          src={!!bg?.url ? getImageLink(bg.url, "1080p") : "/images/moon.jpg"}
           width={1920}
           height={1080}
         />

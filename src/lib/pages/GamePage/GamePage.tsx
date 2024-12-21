@@ -14,23 +14,11 @@ import Link from "next/link";
 import { Cover } from "../../shared/ui/Cover";
 import { GameControls } from "../../shared/ui/GameControls";
 import { Loader } from "../../shared/ui/Loader";
-import { useGamesFiltersStore } from "../../shared/store/filters.store";
 import { ButtonGroup } from "../../shared/ui/Button/ButtonGroup";
 import { useGamesStore } from "../../shared/store/games.store";
 
 export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
   const { royalGames, addRoyalGame, removeRoyalGame } = useGamesStore();
-
-  const {
-    setSelectedYears,
-    setSelectedCategories,
-    setSelectedGenres,
-    setSearchCompany,
-    setSelectedSystems,
-    setSelectedGameModes,
-    setSelectedThemes,
-    clear,
-  } = useGamesFiltersStore();
 
   const [isLoading, setIsLoading] = useState<boolean>(!!game.cover?.url);
 
@@ -121,11 +109,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
               <p>
                 <span>Year: </span>
                 <Link
-                  href={"/games"}
-                  onClick={() => {
-                    clear();
-                    setSelectedYears([releaseDate, releaseDate]);
-                  }}
+                  href={`/games?years[]=${releaseDate}&years[]=${releaseDate}`}
                 >
                   {releaseDate}
                 </Link>
@@ -134,13 +118,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
             {!!category && (
               <p>
                 <span>Category: </span>
-                <Link
-                  href={"/games"}
-                  onClick={() => {
-                    clear();
-                    setSelectedCategories([category]);
-                  }}
-                >
+                <Link href={`/games?categories[]=${category}`}>
                   {gameCategoryNames[category]}
                 </Link>
               </p>
@@ -161,14 +139,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
                   .filter((comp) => comp.developer)
                   ?.map((comp, i, array) => (
                     <span key={comp._id}>
-                      <Link
-                        href={"/games"}
-                        onClick={() => {
-                          clear();
-                          !!comp?.company.name &&
-                            setSearchCompany(comp.company.name);
-                        }}
-                      >
+                      <Link href={`/games?company=${comp.company.name}`}>
                         {comp.company.name}
                       </Link>
                       {i !== array.length - 1 ? ", " : ""}
@@ -190,14 +161,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
                   .filter((comp) => comp.publisher)
                   ?.map((comp, i, array) => (
                     <span key={comp._id}>
-                      <Link
-                        href={"/games"}
-                        onClick={() => {
-                          clear();
-                          !!comp?.company.name &&
-                            setSearchCompany(comp.company.name);
-                        }}
-                      >
+                      <Link href={`/games?company=${comp.company.name}`}>
                         {comp.company.name}
                       </Link>
                       {i !== array.length - 1 ? ", " : ""}
@@ -212,13 +176,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
                 <span>Platforms: </span>
                 {game.platforms.map((platform, i, array) => (
                   <span key={platform._id}>
-                    <Link
-                      href={"/games"}
-                      onClick={() => {
-                        clear();
-                        !!platform && setSelectedSystems([platform]);
-                      }}
-                    >
+                    <Link href={`/games?selectedPlatforms[]=${platform._id}`}>
                       {platform.name}
                     </Link>
                     {i !== array.length - 1 ? ", " : ""}
@@ -231,13 +189,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
                 <span>Genres: </span>
                 {game.genres.map((genre, i, array) => (
                   <span key={genre._id}>
-                    <Link
-                      href={"/games"}
-                      onClick={() => {
-                        clear();
-                        !!genre && setSelectedGenres([genre]);
-                      }}
-                    >
+                    <Link href={`/games?selectedGenres[]=${genre._id}`}>
                       {genre.name}
                     </Link>
                     {i !== array.length - 1 ? ", " : ""}
@@ -250,13 +202,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
                 <span>Game modes: </span>
                 {game.game_modes.map((mode, i, array) => (
                   <span key={mode._id}>
-                    <Link
-                      href={"/games"}
-                      onClick={() => {
-                        clear();
-                        !!mode && setSelectedGameModes([mode]);
-                      }}
-                    >
+                    <Link href={`/games?selectedModes[]=${mode._id}`}>
                       {mode.name}
                     </Link>
                     {i !== array.length - 1 ? ", " : ""}
@@ -269,13 +215,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
                 <span>Themes: </span>
                 {game.themes.map((theme, i, array) => (
                   <span key={theme._id}>
-                    <Link
-                      href={"/games"}
-                      onClick={() => {
-                        clear();
-                        !!theme && setSelectedThemes([theme]);
-                      }}
-                    >
+                    <Link href={`/games?selectedThemes[]=${theme._id}`}>
                       {theme.name}
                     </Link>
                     {i !== array.length - 1 ? ", " : ""}

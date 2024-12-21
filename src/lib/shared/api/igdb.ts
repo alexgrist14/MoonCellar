@@ -9,7 +9,8 @@ import {
 } from "../types/igdb";
 import { agent } from "./agent";
 
-interface IGDBFilters {
+export interface IGDBFilters {
+  [key: string]: number[] | undefined;
   genres?: number[];
   modes?: number[];
   platforms?: number[];

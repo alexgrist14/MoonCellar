@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import styles from "./GamesPage.module.scss";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { Filters } from "../../shared/ui/Filters";
@@ -9,7 +9,6 @@ import { axiosUtils } from "../../shared/utils/axios";
 import { GameCard } from "../../shared/ui/GameCard";
 import { useStatesStore } from "../../shared/store/states.store";
 import { useDebouncedCallback } from "use-debounce";
-import { useGamesFiltersStore } from "../../shared/store/filters.store";
 import { Loader } from "../../shared/ui/Loader";
 import classNames from "classnames";
 import { Pagination } from "../../shared/ui/Pagination";
@@ -22,24 +21,12 @@ import {
   screenSm,
   screenXx,
 } from "../../shared/constants";
+import { useRouter } from "next/router";
+import { parseQueryFilters } from "../../shared/utils/filters.util";
 
 export const GamesPage: FC = () => {
-  const {
-    selectedGenres,
-    selectedRating,
-    selectedSystems,
-    selectedGameModes,
-    excludedGenres,
-    excludedSystems,
-    excludedGameModes,
-    searchQuery,
-    searchCompany,
-    selectedCategories,
-    selectedYears,
-    selectedThemes,
-    excludedThemes,
-    selectedVotes,
-  } = useGamesFiltersStore();
+  const { asPath } = useRouter();
+
   const { isLoading, setLoading, isRoyal } = useStatesStore();
   const { setGenres, setGameModes, setSystems, setExpanded, setThemes } =
     useCommonStore();
@@ -52,27 +39,12 @@ export const GamesPage: FC = () => {
   const debouncedGamesFetch = useDebouncedCallback(() => {
     setLoading(true);
 
+    const filters = parseQueryFilters(asPath);
+
     IGDBApi.getGames({
-      search: searchQuery,
-      company: searchCompany,
-      categories: selectedCategories,
-      years: selectedYears,
-      excluded: {
-        genres: excludedGenres?.map((item) => item._id),
-        modes: excludedGameModes?.map((item) => item._id),
-        platforms: excludedSystems?.map((item) => item._id),
-        themes: excludedThemes?.map((item) => item._id),
-      },
-      selected: {
-        genres: selectedGenres?.map((item) => item._id),
-        modes: selectedGameModes?.map((item) => item._id),
-        platforms: selectedSystems?.map((item) => item._id),
-        themes: selectedThemes?.map((item) => item._id),
-      },
+      ...filters,
       page,
       take,
-      rating: selectedRating,
-      votes: selectedVotes,
     })
       .then((res) => {
         setGames(res.data.results);
@@ -96,11 +68,9 @@ export const GamesPage: FC = () => {
 
   useEffect(() => {
     debouncedGamesFetch();
-  }, [debouncedGamesFetch, page, take]);
+  }, [debouncedGamesFetch, page, take, asPath]);
 
   useWindowResizeAction(() => {
-    console.log(window.innerWidth);
-
     if (window.innerWidth >= screenXx) return setTake(80);
     if (window.innerWidth >= screenEx) return setTake(70);
     if (window.innerWidth >= screenGt) return setTake(60);
