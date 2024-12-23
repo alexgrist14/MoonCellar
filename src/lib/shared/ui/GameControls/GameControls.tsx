@@ -12,7 +12,6 @@ import { toast } from "../../utils/toast";
 import useCloseEvents from "../../hooks/useCloseEvents";
 import { RangeSelector } from "../RangeSelector";
 import { accentColor } from "../../constants";
-import { useCommonStore } from "../../store/common.store";
 import { useGamesStore } from "../../store/games.store";
 
 interface IGameControlsProps {
@@ -117,6 +116,8 @@ export const GameControls: FC<IGameControlsProps> = ({
 
   useCloseEvents([ratingsRef, ratingButtonRef], () => {
     setIsRatingActive(false);
+    setIsPauseActive(false);
+    setIsPlayedActive(false);
   });
 
   useEffect(() => {

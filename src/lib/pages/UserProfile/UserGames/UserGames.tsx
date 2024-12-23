@@ -8,6 +8,7 @@ import {
 import { GameCard } from "@/src/lib/shared/ui/GameCard";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { Icon } from "@iconify/react";
+import { useRouter } from "next/router";
 
 interface UserGamesProps {
   userGames: UserGamesType;
@@ -20,9 +21,12 @@ export const UserGames: FC<UserGamesProps> = ({
   gamesRating,
   gamesCategory,
 }) => {
+  const { query } = useRouter();
+
+  const page = Number(query.page);
+
   const [games, setGames] = useState(userGames);
   const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
   const [take, setTake] = useState(30);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
@@ -38,16 +42,7 @@ export const UserGames: FC<UserGamesProps> = ({
 
   useEffect(() => {
     setTotal(games[gamesCategory].length);
-    return () => {
-      setPage(1);
-    };
   }, [games, gamesCategory]);
-
-  useEffect(() => {
-    let prevPage = page;
-    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-    console.log("action");
-  }, [page]);
 
   const toggleSortOrder = () => {
     setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
@@ -79,13 +74,7 @@ export const UserGames: FC<UserGamesProps> = ({
             </div>
           </div>
         ))}
-        <Pagination
-          page={page}
-          setPage={setPage}
-          take={take}
-          total={total}
-          isFixed
-        />
+        <Pagination take={take} total={total} isFixed />
         {!games[gamesCategory].length && <p>There is no games</p>}
       </div>
     </>

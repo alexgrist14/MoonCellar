@@ -469,7 +469,6 @@ export const Dropdown: FC<IDropDownListProps> = ({
                     {isMulti && (
                       <div className={styles.dropdown__check}>
                         <Checkbox
-                          isBorderFromTheme
                           colorTheme={
                             isWithExclude
                               ? isExcluded

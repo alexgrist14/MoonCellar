@@ -94,7 +94,7 @@ export const Filters: FC<{
   }, [asPath]);
 
   return (
-    <div className={styles.filters}>
+    <div className={styles.filters} id="filters">
       <div className={styles.filters__top}>
         <div className={styles.filters__wrapper}>
           <h4>Game name</h4>
@@ -134,7 +134,7 @@ export const Filters: FC<{
         <Dropdown
           isWithReset
           isWithAll
-          overflowRootId="consoles"
+          overflowRootId="filters"
           isDisabled={isLoading}
           list={Object.keys(gameCategories).map(
             (item) => gameCategoryNames[item]
@@ -171,7 +171,7 @@ export const Filters: FC<{
           isWithAll
           isMulti
           isWithExclude
-          overflowRootId="consoles"
+          overflowRootId="filters"
           isDisabled={isLoading || isPlatformsLoading}
           list={systems?.map((item) => item.name) || []}
           overwriteValue={getValue("platforms")}
@@ -190,7 +190,7 @@ export const Filters: FC<{
           isWithAll
           isMulti
           isWithExclude
-          overflowRootId="consoles"
+          overflowRootId="filters"
           isDisabled={isLoading}
           list={genres?.map((item) => item.name) || []}
           overwriteValue={getValue("genres")}
@@ -209,7 +209,7 @@ export const Filters: FC<{
           isWithAll
           isMulti
           isWithExclude
-          overflowRootId="consoles"
+          overflowRootId="filters"
           isDisabled={isLoading}
           list={themes?.map((item) => item.name) || []}
           overwriteValue={getValue("themes")}
@@ -228,7 +228,7 @@ export const Filters: FC<{
           isWithAll
           isMulti
           isWithExclude
-          overflowRootId="consoles"
+          overflowRootId="filters"
           isDisabled={isLoading}
           list={gameModes?.map((item) => item.name) || []}
           overwriteValue={getValue("modes")}
@@ -282,7 +282,6 @@ export const Filters: FC<{
       </div>
       <div className={styles.range__wrapper}>
         <RangeSelector
-          variant="green"
           text={!!filters?.rating ? "From " + filters.rating : "Any rating"}
           defaultValue={filters?.rating}
           min={0}
@@ -301,7 +300,6 @@ export const Filters: FC<{
       </div>
       <div className={styles.range__wrapper}>
         <RangeSelector
-          variant="green"
           text={!!filters?.votes ? "From " + filters.votes : "Any votes count"}
           defaultValue={filters?.votes}
           min={0}

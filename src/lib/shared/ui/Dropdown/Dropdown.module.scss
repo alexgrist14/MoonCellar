@@ -83,7 +83,7 @@
     align-items: center;
     width: 100%;
     border-radius: $radius;
-    border-bottom: 2px solid $blackBorderColor;
+    border-bottom: 2px solid $accent;
     padding-left: 10px;
     font-size: 15px;
     line-height: 24px;
@@ -173,7 +173,7 @@
     pointer-events: none;
     border-radius: $radius;
     z-index: 2;
-    border: 2px solid $blackBorderColor;
+    border: 2px solid $accent;
 
     &_red {
       border-color: $off;

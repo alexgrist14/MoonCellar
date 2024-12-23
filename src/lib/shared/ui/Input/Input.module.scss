@@ -8,9 +8,15 @@
     border-radius: $radius;
     border: 2px solid $lightBg;
     padding: 8px;
+    transition: 0.3s;
 
     &::placeholder {
       color: $placeholder;
+    }
+
+    &:focus,
+    &:focus-visible {
+      border-color: $accent;
     }
   }
 }

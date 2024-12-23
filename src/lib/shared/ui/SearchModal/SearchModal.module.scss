@@ -70,6 +70,8 @@
 
   &__empty {
     @include flexCenter;
+    position: absolute;
+    @include positionCenter;
     padding-top: 20px;
     animation: appearOpacity 0.4s ease forwards 1;
   }

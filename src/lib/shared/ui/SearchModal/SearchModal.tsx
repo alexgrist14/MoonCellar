@@ -6,7 +6,6 @@ import { IGDBApi } from "../../api";
 import { IGDBGameMinimal } from "../../types/igdb";
 import { Scrollbar } from "../Scrollbar";
 import { Button } from "../Button";
-import { PacmanLoader } from "react-spinners";
 import { GameCard } from "../GameCard";
 import classNames from "classnames";
 import { useCommonStore } from "../../store/common.store";
@@ -15,7 +14,7 @@ import { ButtonGroup } from "../Button/ButtonGroup";
 import { modal } from "../Modal";
 
 export const SearchModal: FC = () => {
-  const { isMobile } = useCommonStore();
+  const { isMobile, setExpanded } = useCommonStore();
 
   const [games, setGames] = useState<IGDBGameMinimal[]>([]);
   const [total, setTotal] = useState(0);
@@ -72,7 +71,10 @@ export const SearchModal: FC = () => {
             {
               title: "Advanced search",
               link: "/games",
-              callback: () => modal.close(),
+              callback: () => {
+                modal.close();
+                setExpanded("left");
+              },
             },
           ]}
         />

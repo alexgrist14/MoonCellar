@@ -81,6 +81,12 @@ $fontMain: "General", sans-serif;
   justify-content: center;
 }
 
+@mixin positionCenter {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 @mixin scrollDisable {
   -ms-overflow-style: none;
   scrollbar-width: none;

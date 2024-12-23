@@ -1,11 +1,4 @@
-import {
-  Dispatch,
-  FC,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
 import styles from "./Pagination.module.scss";
 import { Button } from "../Button";
 import { Input } from "../Input";
@@ -14,31 +7,49 @@ import classNames from "classnames";
 import { Tooltip } from "../Tooltip";
 import { useWindowScroll } from "../../hooks/useWindowScroll";
 import { createPortal } from "react-dom";
+import { useRouter } from "next/router";
+import queryString from "query-string";
 
 export const Pagination: FC<{
   total: number;
-  page: number;
   take: number;
-  setPage: Dispatch<SetStateAction<number>>;
   isFixed?: boolean;
-}> = ({ page, setPage, take, total, isFixed }) => {
-  const centerRef = useRef<HTMLDivElement>(null);
+}> = ({ take, total, isFixed }) => {
+  const { query, push, pathname } = useRouter();
 
-  const [value, setValue] = useState("");
+  const centerRef = useRef<HTMLDivElement>(null);
+  const page = Number(query.page);
+
   const [top, setTop] = useState<string>();
   const [isHover, setIsHover] = useState(false);
+  const [value, setValue] = useState("");
 
   const max = Math.ceil(total / take);
+
+  const setPage = useCallback(
+    (page: number) => {
+      push(
+        { pathname, query: queryString.stringify({ ...query, page }) },
+        undefined,
+        { shallow: true }
+      );
+    },
+    [pathname, push, query]
+  );
 
   useWindowScroll(() =>
     setTop(`${window.scrollY > 0 ? Math.max(0, 55 - window.scrollY) : 55}px`)
   );
 
   useEffect(() => {
-    setValue(page.toString());
+    !query.page && setPage(1);
+  }, [setPage, query]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   }, [page]);
 
-  if (!value) return null;
+  if (!page) return null;
 
   return createPortal(
     <div
@@ -71,6 +82,7 @@ export const Pagination: FC<{
         <Tooltip
           isActive={isHover}
           positionRef={centerRef}
+          className={styles.pagination__tooltip}
         >{`${page} of ${max}`}</Tooltip>
         <Input
           onMouseOver={() => setIsHover(true)}
@@ -78,20 +90,13 @@ export const Pagination: FC<{
           style={{ padding: "4px", width: "75px" }}
           className={styles.pagination__input}
           type="number"
-          value={value}
+          value={value || page}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={keyboardUtils.blurOnKey}
           onBlur={(e) => {
             const value = Number(e.target.value);
 
-            if (!value) return setValue(page.toString());
-
-            if (value > max) {
-              setValue(max.toString());
-              setPage(max);
-            } else {
-              setPage(value);
-            }
+            setPage(value > max ? max : value);
           }}
         />
       </div>

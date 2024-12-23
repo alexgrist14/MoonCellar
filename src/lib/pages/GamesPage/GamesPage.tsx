@@ -25,36 +25,35 @@ import { useRouter } from "next/router";
 import { parseQueryFilters } from "../../shared/utils/filters.util";
 
 export const GamesPage: FC = () => {
-  const { asPath } = useRouter();
+  const { asPath, query } = useRouter();
 
   const { isLoading, setLoading, isRoyal } = useStatesStore();
-  const { setGenres, setGameModes, setSystems, setExpanded, setThemes } =
-    useCommonStore();
+  const { setGenres, setGameModes, setSystems, setThemes } = useCommonStore();
 
   const [games, setGames] = useState<IGDBGameMinimal[]>([]);
   const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
   const [take, setTake] = useState(80);
 
   const debouncedGamesFetch = useDebouncedCallback(() => {
     setLoading(true);
 
     const filters = parseQueryFilters(asPath);
+    const page = Number(query.page);
 
-    IGDBApi.getGames({
-      ...filters,
-      page,
-      take,
-    })
-      .then((res) => {
-        setGames(res.data.results);
-        setTotal(res.data.total);
+    !!page &&
+      IGDBApi.getGames({
+        ...filters,
+        page,
+        take,
       })
-      .catch(axiosUtils.toastError)
-      .finally(() => {
-        setLoading(false);
-        setExpanded("none");
-      });
+        .then((res) => {
+          setGames(res.data.results);
+          setTotal(res.data.total);
+        })
+        .catch(axiosUtils.toastError)
+        .finally(() => {
+          setLoading(false);
+        });
   }, 100);
 
   useEffect(() => {
@@ -68,17 +67,17 @@ export const GamesPage: FC = () => {
 
   useEffect(() => {
     debouncedGamesFetch();
-  }, [debouncedGamesFetch, page, take, asPath]);
+  }, [debouncedGamesFetch, take, asPath, query]);
 
   useWindowResizeAction(() => {
-    if (window.innerWidth >= screenXx) return setTake(80);
-    if (window.innerWidth >= screenEx) return setTake(70);
-    if (window.innerWidth >= screenGt) return setTake(60);
-    if (window.innerWidth >= screenLg) return setTake(50);
-    if (window.innerWidth >= screenMd) return setTake(40);
-    if (window.innerWidth >= screenSm) return setTake(30);
+    if (window.innerWidth >= screenXx) return setTake(56);
+    if (window.innerWidth >= screenEx) return setTake(49);
+    if (window.innerWidth >= screenGt) return setTake(42);
+    if (window.innerWidth >= screenLg) return setTake(35);
+    if (window.innerWidth >= screenMd) return setTake(28);
+    if (window.innerWidth >= screenSm) return setTake(21);
 
-    return setTake(20);
+    return setTake(14);
   });
 
   return (
@@ -86,13 +85,7 @@ export const GamesPage: FC = () => {
       <ExpandMenu position="left" titleOpen="Filters">
         <Filters callback={() => debouncedGamesFetch()} />
       </ExpandMenu>
-      <Pagination
-        page={page}
-        setPage={setPage}
-        take={take}
-        total={total}
-        isFixed
-      />
+      <Pagination take={take} total={total} isFixed />
 
       {isLoading ? (
         <Loader type="pacman" />
