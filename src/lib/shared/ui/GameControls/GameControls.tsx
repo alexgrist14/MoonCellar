@@ -1,4 +1,4 @@
-import { CSSProperties, FC, useEffect, useRef, useState } from "react";
+import { CSSProperties, FC, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./GameControls.module.scss";
 import { IGDBGameMinimal } from "../../types/igdb";
 import { Icon } from "@iconify/react";
@@ -108,8 +108,9 @@ export const GameControls: FC<IGameControlsProps> = ({
   const isBacklogged = profile?.games?.backlog.some((id) => game._id === id);
   const isDropped = profile?.games?.dropped.some((id) => game._id === id);
 
-  const rating = profile?.gamesRating?.find(
-    (rating) => rating.game === game._id
+  const rating = useMemo(
+    () => profile?.gamesRating?.find((rating) => rating.game === game._id),
+    [game, profile]
   );
 
   const isRoyal = royalGames?.some((royal) => royal._id === game?._id);
@@ -121,7 +122,7 @@ export const GameControls: FC<IGameControlsProps> = ({
   });
 
   useEffect(() => {
-    !!rating && setRatingValue(rating.rating);
+    setRatingValue(!!rating ? rating.rating : 0);
   }, [rating]);
 
   return (
