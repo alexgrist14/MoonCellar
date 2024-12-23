@@ -185,13 +185,6 @@ export const GameControls: FC<IGameControlsProps> = ({
             {key}
           </Button>
         ))}
-        <Button
-          active={isRoyal}
-          onClick={() => (isRoyal ? removeRoyalGame(game) : addRoyalGame(game))}
-        >
-          {isRoyal ? "Remove from" : "Add to"}
-          {" royal games"}
-        </Button>
       </div>
       <div
         ref={ratingsRef}
@@ -241,6 +234,7 @@ export const GameControls: FC<IGameControlsProps> = ({
           isPlaying ? removeFromList("playing") : addToList("playing");
         }}
         color="transparent"
+        tooltip={(isPlaying ? "Remove from" : "Add to") + " playing"}
         className={classNames(styles.controls__action, {
           [styles.controls__action_active]: isPlaying,
         })}
@@ -300,6 +294,21 @@ export const GameControls: FC<IGameControlsProps> = ({
               isDropped || isWishlisted || isBacklogged,
           })}
           icon="iconamoon:menu-kebab-horizontal-circle"
+        />
+      </Button>
+      <Button
+        onClick={() => (isRoyal ? removeRoyalGame(game) : addRoyalGame(game))}
+        tooltip={(isRoyal ? "Remove from" : "Add to") + " royal games"}
+        color="transparent"
+        className={classNames(styles.controls__action, {
+          [styles.controls__action_active]: isRoyal,
+        })}
+      >
+        <Icon
+          className={classNames(styles.controls__icon, {
+            [styles.controls__icon_active]: isRoyal,
+          })}
+          icon="icon-park-outline:crown-two"
         />
       </Button>
       <Button
