@@ -23,9 +23,11 @@ import {
 } from "../../shared/constants";
 import { useRouter } from "next/router";
 import { parseQueryFilters } from "../../shared/utils/filters.util";
+import { setPage } from "../../shared/utils/query";
 
 export const GamesPage: FC = () => {
-  const { asPath, query } = useRouter();
+  const router = useRouter();
+  const { asPath, query } = router;
 
   const { isLoading, setLoading, isRoyal } = useStatesStore();
   const { setGenres, setGameModes, setSystems, setThemes } = useCommonStore();
@@ -35,6 +37,8 @@ export const GamesPage: FC = () => {
   const [take, setTake] = useState(80);
 
   const debouncedGamesFetch = useDebouncedCallback(() => {
+    if (!query.page) return;
+
     setLoading(true);
 
     const filters = parseQueryFilters(asPath);
@@ -79,6 +83,10 @@ export const GamesPage: FC = () => {
 
     return setTake(14);
   });
+
+  useEffect(() => {
+    !query.page && setPage(1, router);
+  }, [router, query]);
 
   return (
     <div className={styles.page}>

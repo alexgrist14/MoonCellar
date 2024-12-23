@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import styles from "./Pagination.module.scss";
 import { Button } from "../Button";
 import { Input } from "../Input";
@@ -8,17 +8,17 @@ import { Tooltip } from "../Tooltip";
 import { useWindowScroll } from "../../hooks/useWindowScroll";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/router";
-import queryString from "query-string";
+import { setPage } from "../../utils/query";
 
 export const Pagination: FC<{
   total: number;
   take: number;
   isFixed?: boolean;
 }> = ({ take, total, isFixed }) => {
-  const { query, push, pathname } = useRouter();
+  const router = useRouter();
 
   const centerRef = useRef<HTMLDivElement>(null);
-  const page = Number(query.page);
+  const page = Number(router.query.page);
 
   const [top, setTop] = useState<string>();
   const [isHover, setIsHover] = useState(false);
@@ -26,24 +26,9 @@ export const Pagination: FC<{
 
   const max = Math.ceil(total / take);
 
-  const setPage = useCallback(
-    (page: number) => {
-      push(
-        { pathname, query: queryString.stringify({ ...query, page }) },
-        undefined,
-        { shallow: true }
-      );
-    },
-    [pathname, push, query]
-  );
-
   useWindowScroll(() =>
     setTop(`${window.scrollY > 0 ? Math.max(0, 55 - window.scrollY) : 55}px`)
   );
-
-  useEffect(() => {
-    !query.page && setPage(1);
-  }, [setPage, query]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
@@ -63,7 +48,7 @@ export const Pagination: FC<{
         className={styles.pagination__button}
         disabled={page === 1}
         onClick={() => {
-          setPage(1);
+          setPage(1, router);
         }}
       >
         {"<<"}
@@ -73,7 +58,7 @@ export const Pagination: FC<{
         className={styles.pagination__button}
         disabled={page === 1}
         onClick={() => {
-          setPage(page - 1);
+          setPage(page - 1, router);
         }}
       >
         {"<"}
@@ -96,7 +81,7 @@ export const Pagination: FC<{
           onBlur={(e) => {
             const value = Number(e.target.value);
 
-            setPage(value > max ? max : value);
+            setPage(value > max ? max : value, router);
           }}
         />
       </div>
@@ -105,7 +90,7 @@ export const Pagination: FC<{
         className={styles.pagination__button}
         disabled={page === max}
         onClick={() => {
-          setPage(page + 1);
+          setPage(page + 1, router);
         }}
       >
         {">"}
@@ -115,7 +100,7 @@ export const Pagination: FC<{
         className={styles.pagination__button}
         disabled={page === max}
         onClick={() => {
-          setPage(max);
+          setPage(max, router);
         }}
       >
         {">>"}
