@@ -49,7 +49,7 @@ export const Pagination: FC<{
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   }, [page]);
 
-  if (!page) return null;
+  if (!total || !page) return null;
 
   return createPortal(
     <div
