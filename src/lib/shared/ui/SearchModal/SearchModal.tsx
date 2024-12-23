@@ -58,7 +58,7 @@ export const SearchModal: FC = () => {
     setTake(originalTake);
   }, [searchQuery, isMobile, originalTake]);
 
-  useDisableScroll(true);
+  useDisableScroll();
 
   return (
     <div className={styles.modal}>

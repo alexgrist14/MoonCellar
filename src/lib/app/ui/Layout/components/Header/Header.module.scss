@@ -5,6 +5,8 @@
   padding-inline: 20px;
   width: 100%;
   min-height: 55px;
+  // background-color: $bgAlt;
+  background: rgba($bgAlt, 0.7);
   border-bottom: 2px $borderColor solid;
 
   &__left {

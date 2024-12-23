@@ -114,7 +114,7 @@ export const GameControls: FC<IGameControlsProps> = ({
 
   const isRoyal = royalGames?.some((royal) => royal._id === game?._id);
 
-  useCloseEvents([ratingsRef, ratingButtonRef], () => {
+  useCloseEvents([controlsRef], () => {
     setIsRatingActive(false);
     setIsPauseActive(false);
     setIsPlayedActive(false);

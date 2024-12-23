@@ -3,7 +3,7 @@
   color: $whiteTextColor;
   justify-content: center;
   padding: 50px 20px 50px 20px;
-  
+
   @include mediaMd {
     padding: 50px 0 0 0;
   }
@@ -11,7 +11,7 @@
   .content {
     padding: 0 20px 20px 20px;
     width: 100%;
-    background: #09121c;
+    background: rgba($bgAlt, 0.7);
     border-radius: 20px;
     height: 100%;
   }

@@ -1,18 +1,16 @@
 import { useEffect, useRef } from "react";
-import { mediaMin } from "../utils/get-screen-width";
-import { screenSize } from "../styles/constants";
 
-export const useDisableScroll = (isActive: boolean, isMobile?: boolean) => {
+export const useDisableScroll = () => {
   const scrollYWindow = useRef(0);
   useEffect(() => {
     scrollYWindow.current = window.scrollY;
-    if (isMobile && mediaMin(screenSize.Sm)) return;
-    if (isActive) {
-      document.body.style.position = "fixed";
-      document.body.style.left = "0";
-      document.body.style.right = "0";
-      document.body.style.top = `-${scrollYWindow.current}px`;
-    } else {
+
+    document.body.style.position = "fixed";
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.top = `-${scrollYWindow.current}px`;
+
+    return () => {
       const scrollY = document.body.style.top;
       document.body.style.position = "";
       document.body.style.top = "";
@@ -20,6 +18,6 @@ export const useDisableScroll = (isActive: boolean, isMobile?: boolean) => {
         top: parseInt(scrollY || "0") * -1,
         behavior: "instant",
       });
-    }
-  }, [isActive]);
+    };
+  }, []);
 };

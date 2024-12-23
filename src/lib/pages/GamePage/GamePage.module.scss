@@ -1,9 +1,11 @@
 .page {
   display: grid;
   grid-template-columns: auto 1fr;
-  padding-inline: 20px;
-  padding-block: 50px;
-  gap: 50px;
+  margin-inline: 20px;
+  margin-block: 50px;
+  gap: 30px;
+  height: 100%;
+  position: relative;
 
   @include mediaMax($screenMd) {
     grid-template-columns: 1fr;
@@ -16,6 +18,8 @@
     position: relative;
     height: fit-content;
     width: 240px;
+    box-shadow: $basicShadow;
+    border-radius: $radius;
   }
 
   &__cover {
@@ -38,12 +42,15 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    background: rgba($bgAlt, 0.7);
+    padding: 10px 15px;
+    border-radius: $radius;
+    height: fit-content;
   }
 
   &__screenshots {
     display: grid;
     gap: 5px;
-    margin-top: auto;
 
     & h4 {
       @include font(16px, 20px, 500);
@@ -115,6 +122,31 @@
 
     &:hover {
       text-decoration: underline;
+    }
+  }
+
+  &__bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transition: 0.4s;
+    opacity: 0;
+    position: fixed;
+    z-index: -1;
+    height: 100%;
+    width: 100%;
+    user-select: none;
+    pointer-events: none;
+
+    & img {
+      object-fit: cover;
+      height: 100%;
+      width: 100%;
+      opacity: 0.2;
+    }
+
+    &_active {
+      opacity: 1;
     }
   }
 }

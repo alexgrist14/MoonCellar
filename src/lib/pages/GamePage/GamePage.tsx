@@ -1,7 +1,7 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import styles from "./GamePage.module.scss";
 import Image from "next/image";
-import { IGDBGame } from "../../shared/types/igdb";
+import { IGDBGame, IGDBScreenshot } from "../../shared/types/igdb";
 import {
   dateRegions,
   gameCategories,
@@ -16,11 +16,39 @@ import { GameControls } from "../../shared/ui/GameControls";
 import { Loader } from "../../shared/ui/Loader";
 import { ButtonGroup } from "../../shared/ui/Button/ButtonGroup";
 import { useGamesStore } from "../../shared/store/games.store";
+import classNames from "classnames";
+import { axiosUtils } from "../../shared/utils/axios";
+import { IGDBApi } from "../../shared/api";
 
 export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
   const { royalGames, addRoyalGame, removeRoyalGame } = useGamesStore();
 
   const [isLoading, setIsLoading] = useState<boolean>(!!game.cover?.url);
+  const [bg, setBg] = useState<IGDBScreenshot & { gameId: number }>();
+  const [isImageReady, setIsImageReady] = useState(true);
+
+  useEffect(() => {
+    const pictures: number[] = [];
+
+    if (!!game) {
+      if (!!game.artworks?.length) {
+        game.artworks.forEach((art) => pictures.push(art._id));
+      } else {
+        game.screenshots.forEach((screen) => pictures.push(screen._id));
+      }
+
+      const id = pictures[Math.floor(Math.random() * (pictures.length - 1))];
+
+      if (!id) return;
+
+      (!!game.artworks?.length ? IGDBApi.getArtwork : IGDBApi.getScreenshot)(id)
+        .then((res) => {
+          setIsImageReady(false);
+          setBg({ ...res.data, gameId: game._id });
+        })
+        .catch(axiosUtils.toastError);
+    }
+  }, [game]);
 
   if (!game) return null;
 
@@ -84,6 +112,21 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
         />
       </ExpandMenu>
       <div className={styles.page}>
+        <div
+          className={classNames(styles.page__bg, {
+            [styles.page__bg_active]:
+              !!bg && !!game && game._id === bg.gameId && isImageReady,
+          })}
+        >
+          <Image
+            onLoad={() => setIsImageReady(true)}
+            key={bg?._id}
+            alt="Background"
+            src={!!bg?.url ? getImageLink(bg.url, "1080p") : "/images/moon.jpg"}
+            width={1920}
+            height={1080}
+          />
+        </div>
         <div className={styles.page__left}>
           <div className={styles.page__cover}>
             {isLoading && <Loader />}
