@@ -5,7 +5,6 @@
   max-height: calc(240px / $coverRatio);
   aspect-ratio: $coverRatio;
   border-radius: $radius;
-  transition: all 0.3s;
   position: relative;
   background: $lightBgSecond;
   user-select: none;

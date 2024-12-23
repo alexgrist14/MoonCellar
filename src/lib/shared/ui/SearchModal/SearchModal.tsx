@@ -12,6 +12,7 @@ import { useCommonStore } from "../../store/common.store";
 import { Loader } from "../Loader";
 import { ButtonGroup } from "../Button/ButtonGroup";
 import { modal } from "../Modal";
+import { useDisableScroll } from "../../hooks";
 
 export const SearchModal: FC = () => {
   const { isMobile, setExpanded } = useCommonStore();
@@ -56,6 +57,8 @@ export const SearchModal: FC = () => {
   useEffect(() => {
     setTake(originalTake);
   }, [searchQuery, isMobile, originalTake]);
+
+  useDisableScroll(true);
 
   return (
     <div className={styles.modal}>
