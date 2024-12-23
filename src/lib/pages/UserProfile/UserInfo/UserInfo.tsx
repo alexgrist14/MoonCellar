@@ -14,7 +14,6 @@ interface UserInfoProps {
   _id: string;
   games: UserGamesType;
   avatar?: string;
-  setTabIndex: Dispatch<SetStateAction<number>>;
 }
 
 const UserInfo: FC<UserInfoProps> = ({
@@ -22,7 +21,6 @@ const UserInfo: FC<UserInfoProps> = ({
   userName,
   _id: id,
   avatar,
-  setTabIndex,
 }) => {
   const [userFollowings, setUserFollowing] = useState<
     IFollowings | undefined
