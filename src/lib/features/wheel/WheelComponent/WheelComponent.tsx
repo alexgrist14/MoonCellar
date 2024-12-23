@@ -74,11 +74,6 @@ export const WheelComponent: FC<WheelComponentProps> = ({
 
     if (isRoyal) {
       setSegments(filtered.length > 1 ? filtered : []);
-      setRoyalGames(
-        filtered.length > 1
-          ? royalGames?.filter((game) => game._id !== winner._id) || []
-          : []
-      );
     }
 
     if (isRoyal && !filtered?.length && !!winner) {
