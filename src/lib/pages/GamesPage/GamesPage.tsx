@@ -27,7 +27,7 @@ import { setPage } from "../../shared/utils/query";
 
 export const GamesPage: FC = () => {
   const router = useRouter();
-  const { asPath, query } = router;
+  const { isReady, asPath, query } = router;
 
   const { isLoading, setLoading, isRoyal } = useStatesStore();
   const { setGenres, setGameModes, setSystems, setThemes } = useCommonStore();
@@ -85,8 +85,8 @@ export const GamesPage: FC = () => {
   });
 
   useEffect(() => {
-    !query.page && setPage(1, router);
-  }, [router, query]);
+    isReady && !query.page && setPage(1, router);
+  }, [router, query, isReady]);
 
   return (
     <div className={styles.page}>
