@@ -11,11 +11,22 @@ export type categoriesType =
   | "played";
 
 export interface ILogs {
-  date: Date;
-  action: string;
-  isAdd: boolean;
-  rating?: number;
-  gameId: number;
+    date: Date;
+    action: string;
+    isAdd: boolean;
+    rating?: number;
+    gameId: number;
+    game:{
+      cover:{
+        url: string;
+      },
+      name: string;
+      slug: string;
+    }
+}
+
+export interface IUserLogs {
+  logs: ILogs[];
 }
 
 export interface IFollowings {

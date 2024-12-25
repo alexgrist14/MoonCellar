@@ -47,8 +47,10 @@
         }
       }
       .btn{
+        position: relative;
         width: 100%;
         max-width: 185px;
+        min-height: 31px;
       }
     }
   }

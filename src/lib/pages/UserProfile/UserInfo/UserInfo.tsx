@@ -1,19 +1,25 @@
 import { userAPI } from "@/src/lib/shared/api";
-import { IFollowings, UserGamesType } from "@/src/lib/shared/types/user.type";
+import {
+  IFollowings,
+  ILogs,
+  UserGamesType,
+} from "@/src/lib/shared/types/user.type";
 import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
 import Image from "next/image";
 import Link from "next/link";
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
 import styles from "./UserInfo.module.scss";
 import { userListCategories } from "@/src/lib/shared/constants/user.const";
-import { API_URL, FRONT_URL } from "@/src/lib/shared/constants";
+import { API_URL, FRONT_URL, getImageLink } from "@/src/lib/shared/constants";
 import { commonUtils } from "@/src/lib/shared/utils/common";
+
 
 interface UserInfoProps {
   userName: string;
   _id: string;
   games: UserGamesType;
   avatar?: string;
+  logs: ILogs[];
 }
 
 const UserInfo: FC<UserInfoProps> = ({
@@ -21,10 +27,21 @@ const UserInfo: FC<UserInfoProps> = ({
   userName,
   _id: id,
   avatar,
+  logs,
 }) => {
   const [userFollowings, setUserFollowing] = useState<
     IFollowings | undefined
   >();
+
+  console.log(commonUtils.getHumanDate("2024-12-11T13:46:52.373+00:00"));
+
+  const setActivityType = (action:string, isAdd: boolean, rating?: number) =>{
+    if(rating){
+      return `${isAdd ? `Set rating to ${rating}` : `Removed rating`}`;
+    } else {
+      return `${isAdd ? `Added to ${action}` : `Removed from ${action}`}`;
+    }
+  }
 
   useEffect(() => {
     setUserFollowing(undefined);
@@ -80,6 +97,34 @@ const UserInfo: FC<UserInfoProps> = ({
                   <Avatar user={item} />
                 </Link>
               ))}
+          </div>
+        </div>
+      </div>
+      <div className={styles.content__bottom}>
+        <div className={styles.activity}>
+          <h3 className={styles.activity__title}>Activity</h3>
+          <div className={styles.activity__list}>
+            {logs.map((log, i) => (
+              <div className={styles.item} key={i}>
+                <Link href={`/games/${log.game.slug}`} className={styles.item__img} target="_blank">
+                    <Image width={80} height={120} src={getImageLink(log.game.cover.url, "cover_small") } alt="cover"/>
+                </Link>
+                <div className={styles.item__text}>
+                  <p>{log.game.name}</p>
+                  <p>
+                    {
+                      setActivityType(log.action, log.isAdd, log?.rating)
+                    }
+
+                  </p>
+                  <p className={styles.date}>
+                  {
+                    commonUtils.getHumanDate(log.date)
+                  }
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

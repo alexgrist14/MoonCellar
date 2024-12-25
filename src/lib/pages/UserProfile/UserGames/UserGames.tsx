@@ -9,6 +9,9 @@ import { GameCard } from "@/src/lib/shared/ui/GameCard";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { Icon } from "@iconify/react";
 import { useRouter } from "next/router";
+import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
+import classNames from "classnames";
+import { Tooltip } from "@/src/lib/shared/ui/Tooltip";
 
 interface UserGamesProps {
   userGames: UserGamesType;
@@ -29,16 +32,25 @@ export const UserGames: FC<UserGamesProps> = ({
   const [total, setTotal] = useState(0);
   const [take, setTake] = useState(30);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [sortedGames, setSortedGames] = useState([...games[gamesCategory]]);
+  //const sortedGames = [...games[gamesCategory]]
 
-  const sortedGames = [...games[gamesCategory]].sort((a, b) => {
-    const ratingA =
-      gamesRating.find((rating) => rating.game === a._id)?.rating || 0;
-    const ratingB =
-      gamesRating.find((rating) => rating.game === b._id)?.rating || 0;
-    return sortOrder === "asc" ? ratingA - ratingB : ratingB - ratingA;
-  });
+  //const [currentGames, setCurrentGames] = useState<IGDBGameMinimal[]>(sortedGames.slice((page - 1) * take, page * take));
+
+  // const sortedGames = [...games[gamesCategory]].sort((a, b) => {
+  //   const ratingA =
+  //     gamesRating.find((rating) => rating.game === a._id)?.rating || 0;
+  //   const ratingB =
+  //     gamesRating.find((rating) => rating.game === b._id)?.rating || 0;
+  //   return sortOrder === "asc" ? ratingA - ratingB : ratingB - ratingA;
+  // });
 
   const currentGames = sortedGames.slice((page - 1) * take, page * take);
+
+  useEffect(() => {
+    setSortedGames([...games[gamesCategory]]);
+    //setCurrentGames(sortedGames.slice((page - 1) * take, page * take))
+  }, [games, gamesCategory]);
 
   useEffect(() => {
     setTotal(games[gamesCategory].length);
@@ -46,15 +58,22 @@ export const UserGames: FC<UserGamesProps> = ({
 
   const toggleSortOrder = () => {
     setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    setSortedGames((prev) => prev.reverse());
   };
 
   return (
-    <>
-      <Icon
-        className={styles.sort__icon}
-        onClick={toggleSortOrder}
-        icon="iconamoon:sorting-left"
-      />
+    <div>
+      <div className={styles.sort} onClick={toggleSortOrder}>
+        <Icon
+          className={classNames(styles.sort__icon, {
+            [styles.sort__icon_active]: sortOrder === "asc",
+          })}
+
+          icon="iconamoon:sorting-left"
+        />
+        <p>Date</p>
+      </div>
+
       <div className={styles.games}>
         {currentGames.map((game, i) => (
           <div key={gamesCategory + i} className={styles.games__game}>
@@ -77,6 +96,6 @@ export const UserGames: FC<UserGamesProps> = ({
         <Pagination take={take} total={total} isFixed />
         {!games[gamesCategory].length && <p>There is no games</p>}
       </div>
-    </>
+    </div>
   );
 };

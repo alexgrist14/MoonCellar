@@ -1,7 +1,7 @@
 import { IUser } from "../types/auth";
 import { API_URL } from "../constants";
 import agent from "./agent";
-import { categoriesType, IFollowings, IUserGames } from "../types/user.type";
+import { categoriesType, IFollowings, ILogs, IUserGames, IUserLogs } from "../types/user.type";
 import { IGDBGame } from "../types/igdb";
 
 const USER_URL = `${API_URL}/user`;
@@ -69,6 +69,10 @@ const getUserFollowings = (userId: string)=>{
   return agent.get<IFollowings>(`${USER_URL}/followings/${userId}`)
 }
 
+const getUserLogs = (userId: string) =>{
+  return agent.get<IUserLogs[]>(`${USER_URL}/logs/${userId}`);
+}
+
 const addUserFollowing = (userId: string, followingId: string)=>{
   return agent.patch<IUser>(`${USER_URL}/followings/${userId}/${followingId}`);
 }
@@ -89,5 +93,6 @@ export const userAPI = {
   removeGameRating,
   getUserFollowings,
   addUserFollowing,
-  removeUserFollowing
+  removeUserFollowing,
+  getUserLogs
 };

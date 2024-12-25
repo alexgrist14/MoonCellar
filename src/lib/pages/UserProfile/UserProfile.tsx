@@ -1,6 +1,6 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./UserProfile.module.scss";
-import { IGamesRating, UserGamesType } from "../../shared/types/user.type";
+import { IGamesRating, ILogs, UserGamesType } from "../../shared/types/user.type";
 import { Tabs } from "../../shared/ui/Tabs";
 import { ITabContent } from "../../shared/types/tabs";
 import UserInfo from "./UserInfo/UserInfo";
@@ -16,21 +16,18 @@ import queryString from "query-string";
 import classNames from "classnames";
 import Image from "next/image";
 import Background from "../../shared/ui/Background/Background";
+import { IUser } from "../../shared/types/auth";
 
 interface UserProfileProps {
-  userName: string;
-  _id: string;
+  user: IUser;
+  logs: ILogs[];
   games: UserGamesType;
-  profilePicture: string;
-  gamesRating: IGamesRating[];
 }
 
 const UserProfile: FC<UserProfileProps> = ({
-  userName,
-  _id,
+  user,
   games,
-  profilePicture,
-  gamesRating,
+  logs,
 }) => {
   const { query, push, pathname } = useRouter();
 
@@ -60,10 +57,11 @@ const UserProfile: FC<UserProfileProps> = ({
         tabName: "Profile",
         tabBody: (
           <UserInfo
-            userName={userName}
-            _id={_id}
+            userName={user.userName}
+            _id={user._id}
             games={games}
             avatar={avatar}
+            logs={logs}
           />
         ),
         className: `${styles.tabs__button}`,
@@ -77,7 +75,7 @@ const UserProfile: FC<UserProfileProps> = ({
           <UserGames
             userGames={games}
             gamesCategory={tabName}
-            gamesRating={gamesRating}
+            gamesRating={user.gamesRating}
           />
         ),
         className: `${styles.tabs__button}`,
@@ -95,15 +93,15 @@ const UserProfile: FC<UserProfileProps> = ({
         },
       },
     ];
-  }, [userName, _id, games, avatar, pushTab, gamesRating]);
+  }, [user.userName, user._id, user.gamesRating, games, avatar, logs, pushTab]);
 
   useEffect(() => {
     setAvatar(
-      profilePicture
-        ? `https://api.mooncellar.space/photos/${profilePicture}`
+      user.profilePicture
+        ? `https://api.mooncellar.space/photos/${user.profilePicture}`
         : ""
     );
-  }, [profilePicture]);
+  }, [user.profilePicture]);
 
   return (
     <div className={styles.container}>

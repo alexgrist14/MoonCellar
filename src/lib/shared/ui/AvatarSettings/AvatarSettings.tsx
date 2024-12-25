@@ -35,7 +35,7 @@ const ProfileAvatar: FC<ProfileAvatarProps> = ({ setAvatar, avatar }) => {
       const file = event.target.files[0];
       const fileSize = Math.round(file.size / 1024);
 
-      if (fileSize > 1024) {
+      if (fileSize > 2048) {
         setIsPictureLarge(true);
       } else {
         setTempAvatar(file);
@@ -83,7 +83,7 @@ const ProfileAvatar: FC<ProfileAvatarProps> = ({ setAvatar, avatar }) => {
         />
       </div>
       {isPictureLarge && (
-        <p className={styles.error}>Avatar must me smaller than 1mb</p>
+        <p className={styles.error}>Avatar must me smaller than 2mb</p>
       )}
       <input
         type="file"

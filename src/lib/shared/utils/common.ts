@@ -11,6 +11,35 @@ const getDate = (dateString: string, isWithTime?: boolean) => {
   }.${date.getFullYear()}${isWithTime ? " " + time : ""}`;
 };
 
+const getHumanDate = (inputDate: Date | string) => {
+  const currentDate = new Date();
+  const targetDate = new Date(inputDate);
+
+  const differenceInMs = targetDate.getTime() - currentDate.getTime();
+
+  const differenceInMinutes = Math.round(differenceInMs / (1000 * 60));
+  const differenceInHours = Math.round(differenceInMs / (1000 * 60 * 60));
+  const differenceInDays = Math.round(differenceInMs / (1000 * 60 * 60 * 24));
+  const differenceInMonths = Math.round(differenceInDays / 30);
+  const differenceInYears = Math.round(differenceInMonths / 12);
+
+  const relativeTime = new Intl.RelativeTimeFormat("en", {
+    numeric: "auto",
+  });
+
+  if (Math.abs(differenceInMinutes) < 60) {
+    return relativeTime.format(differenceInMinutes, "minute");
+  } else if (Math.abs(differenceInHours) < 24) {
+    return relativeTime.format(differenceInHours, "hour");
+  } else if (Math.abs(differenceInDays) < 30) {
+    return relativeTime.format(differenceInDays, "day");
+  } else if (Math.abs(differenceInMonths) < 12) {
+    return relativeTime.format(differenceInMonths, "month");
+  } else {
+    return relativeTime.format(differenceInYears, "year");
+  }
+};
+
 const upFL = (string: string) => {
   return string.slice(0, 1).toUpperCase() + string.slice(1).toLowerCase();
 };
@@ -63,7 +92,7 @@ const getMaxLength = (array: Object[]): number => {
       Object.values(item).length > result
         ? (result = Object.values(item).length)
         : result,
-    0,
+    0
   );
 };
 
@@ -73,14 +102,14 @@ const getMaxElement = (array: Object[]) => {
       Object.values(item).length > Object.values(result).length
         ? (result = item)
         : result,
-    {},
+    {}
   );
 };
 
 const getAllKeys = (array: Object[]): string[] => {
   return array.reduce<string[]>((result, item) => {
     Object.keys(item).forEach(
-      (key) => !result.some((item) => item === key) && result.push(key),
+      (key) => !result.some((item) => item === key) && result.push(key)
     );
 
     return result;
@@ -97,4 +126,5 @@ export const commonUtils = {
   getMaxLength,
   getMaxElement,
   getAllKeys,
+  getHumanDate,
 };

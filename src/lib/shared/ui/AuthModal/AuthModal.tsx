@@ -1,22 +1,23 @@
 import { IAuth } from "@/src/lib/shared/types/auth";
 import { Button } from "@/src/lib/shared/ui/Button";
 import { Input } from "@/src/lib/shared/ui/Input";
-import { useRouter } from "next/router";
 import { FC, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useAuth } from "../../hooks/auth";
-import { useAuthStore } from "../../store/auth.store";
 import Background from "../Background/Background";
+import { Loader } from "../Loader";
 import { modal } from "../Modal";
 import { SvgClose } from "../svg";
 import styles from "./AuthModal.module.scss";
+import { authAPI } from "../../api";
+import { IAxiosErrorResponse } from "../../types/common.type";
+import { axiosUtils } from "../../utils/axios";
 
 export const AuthModal: FC = () => {
+  const { login, signup, authUpdate } = useAuth();
   const [isRegister, setIsRegister] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const { setAuth, setProfile } = useAuthStore();
-  const { login, signup } = useAuth();
-  const { push } = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
@@ -28,17 +29,29 @@ export const AuthModal: FC = () => {
 
   const handleLogin: SubmitHandler<IAuth> = (data) => {
     setError(null);
+    setIsLoading(true);
 
     const loginDto: Omit<IAuth, "userName"> = {
       email: data.email,
       password: data.password,
     };
 
+    // authAPI
+    //   .login(loginDto)
+    //   .then((response) => {
+    //     authUpdate(response.data.userId);
+
+    //   })
+    //   .catch((e: IAxiosErrorResponse) => {
+    //     axiosUtils.toastError(e);
+    //   });
+
     login(loginDto);
   };
 
   const handleSignUp: SubmitHandler<IAuth> = (data) => {
     setError(null);
+    setIsLoading(true);
 
     const singUpDto: IAuth = {
       userName: data.userName,
@@ -96,7 +109,7 @@ export const AuthModal: FC = () => {
                 type="submit"
                 disabled={!isValid}
               >
-                Sign up
+                {isLoading ? <Loader type="pulse" /> : "Sign up"}
               </Button>
               <p>
                 Already have an account?{" "}
@@ -116,7 +129,7 @@ export const AuthModal: FC = () => {
                 type="submit"
                 disabled={!isValid}
               >
-                Sign in
+                {isLoading ? <Loader type="pulse" /> : "Sign in"}
               </Button>
               <p>
                 Don&apos;t have an account?{" "}

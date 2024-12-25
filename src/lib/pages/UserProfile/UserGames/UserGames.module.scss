@@ -1,19 +1,26 @@
-.sort__icon{
+.sort {
+  display: flex;
+  width: 70px;
+  justify-content: flex-start;
+  align-items: center;
   cursor: pointer;
-  width: 32px;
-  height: 32px;
-  //transform: rotateY(180deg);
+  &__icon {
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    margin-inline: auto;
+    transition: transform 0.2s;
+    &_active {
+      transform: rotateX(180deg);
+    }
+  }
 }
 
 .games {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  // justify-items: center;
-  // align-items: center;
-  // justify-content: center;
-  // align-content: center;
-  width: fit-content;
   margin-inline: auto;
+  margin-top: 20px;
   gap: 40px;
 
   @include mediaLg {

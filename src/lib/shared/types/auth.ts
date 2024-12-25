@@ -12,7 +12,6 @@ export interface IUser {
   email: string;
   games: Record<categoriesType, number[]>;
   gamesRating: IGamesRating[];
-  logs: ILogs[];
   profilePicture: string;
   followings: string[];
 }
