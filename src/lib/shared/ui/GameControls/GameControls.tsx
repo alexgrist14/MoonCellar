@@ -1,4 +1,4 @@
-import { CSSProperties, FC, useEffect, useRef, useState } from "react";
+import { CSSProperties, FC, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./GameControls.module.scss";
 import { IGDBGameMinimal } from "../../types/igdb";
 import { Icon } from "@iconify/react";
@@ -108,8 +108,9 @@ export const GameControls: FC<IGameControlsProps> = ({
   const isBacklogged = profile?.games?.backlog.some((id) => game._id === id);
   const isDropped = profile?.games?.dropped.some((id) => game._id === id);
 
-  const rating = profile?.gamesRating?.find(
-    (rating) => rating.game === game._id
+  const rating = useMemo(
+    () => profile?.gamesRating?.find((rating) => rating.game === game._id),
+    [game, profile]
   );
 
   const isRoyal = royalGames?.some((royal) => royal._id === game?._id);
@@ -121,7 +122,7 @@ export const GameControls: FC<IGameControlsProps> = ({
   });
 
   useEffect(() => {
-    !!rating && setRatingValue(rating.rating);
+    setRatingValue(!!rating ? rating.rating : 0);
   }, [rating]);
 
   return (
@@ -184,13 +185,6 @@ export const GameControls: FC<IGameControlsProps> = ({
             {key}
           </Button>
         ))}
-        <Button
-          active={isRoyal}
-          onClick={() => (isRoyal ? removeRoyalGame(game) : addRoyalGame(game))}
-        >
-          {isRoyal ? "Remove from" : "Add to"}
-          {" royal games"}
-        </Button>
       </div>
       <div
         ref={ratingsRef}
@@ -240,6 +234,7 @@ export const GameControls: FC<IGameControlsProps> = ({
           isPlaying ? removeFromList("playing") : addToList("playing");
         }}
         color="transparent"
+        tooltip={(isPlaying ? "Remove from" : "Add to") + " playing"}
         className={classNames(styles.controls__action, {
           [styles.controls__action_active]: isPlaying,
         })}
@@ -299,6 +294,21 @@ export const GameControls: FC<IGameControlsProps> = ({
               isDropped || isWishlisted || isBacklogged,
           })}
           icon="iconamoon:menu-kebab-horizontal-circle"
+        />
+      </Button>
+      <Button
+        onClick={() => (isRoyal ? removeRoyalGame(game) : addRoyalGame(game))}
+        tooltip={(isRoyal ? "Remove from" : "Add to") + " royal games"}
+        color="transparent"
+        className={classNames(styles.controls__action, {
+          [styles.controls__action_active]: isRoyal,
+        })}
+      >
+        <Icon
+          className={classNames(styles.controls__icon, {
+            [styles.controls__icon_active]: isRoyal,
+          })}
+          icon="icon-park-outline:crown-two"
         />
       </Button>
       <Button
