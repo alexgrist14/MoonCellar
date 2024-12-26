@@ -1,7 +1,7 @@
 import { ILogs } from "../types/user.type";
 
 export const removeDuplicateLogs = (logs: ILogs[]) => {
-  return logs.reduce<ILogs[]>((acc, curr) => {
+  return logs.reduce<ILogs[]>((acc, curr, i) => {
     const lastLog = acc[acc.length - 1];
 
     if (
