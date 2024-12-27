@@ -14,6 +14,9 @@ import { IGDBScreenshot } from "../../shared/types/igdb";
 import { useGamesStore } from "../../shared/store/games.store";
 import { parseQueryFilters } from "../../shared/utils/filters.util";
 import { useRouter } from "next/router";
+import { FixedMenu } from "../../shared/ui/FixedMenu";
+import { modal } from "../../shared/ui/Modal";
+import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
 
 export const GauntletPage: FC = () => {
   const { asPath } = useRouter();
@@ -113,6 +116,37 @@ export const GauntletPage: FC = () => {
 
   return (
     <div className={styles.page}>
+      <FixedMenu
+        buttons={[
+          {
+            title: "Filters",
+            callback: () =>
+              modal.open(
+                <WrapperTemplate isWithScrollBar>
+                  <ConsolesList initialTabIndex={0} />
+                </WrapperTemplate>
+              ),
+          },
+          {
+            title: "Royal games",
+            callback: () =>
+              modal.open(
+                <WrapperTemplate isWithScrollBar>
+                  <ConsolesList initialTabIndex={1} />
+                </WrapperTemplate>
+              ),
+          },
+          {
+            title: "History",
+            callback: () =>
+              modal.open(
+                <WrapperTemplate isWithScrollBar>
+                  <ConsolesList initialTabIndex={2} />
+                </WrapperTemplate>
+              ),
+          },
+        ]}
+      />
       <div
         className={classNames(styles.page__bg, {
           [styles.page__bg_active]:
