@@ -1,6 +1,5 @@
 import { FC, useEffect, useState } from "react";
 import styles from "./GamesPage.module.scss";
-import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { Filters } from "../../shared/ui/Filters";
 import { IGDBApi } from "../../shared/api";
 import { useCommonStore } from "../../shared/store/common.store";
@@ -90,9 +89,6 @@ export const GamesPage: FC = () => {
 
   return (
     <div className={styles.page}>
-      <ExpandMenu position="left" titleOpen="Filters">
-        <Filters callback={() => debouncedGamesFetch()} />
-      </ExpandMenu>
       <Pagination take={take} total={total} isFixed />
 
       {isLoading ? (

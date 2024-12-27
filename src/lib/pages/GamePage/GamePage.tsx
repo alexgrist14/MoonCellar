@@ -9,7 +9,6 @@ import {
   getImageLink,
 } from "../../shared/constants";
 import { Slideshow } from "../../shared/ui/Slideshow";
-import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import Link from "next/link";
 import { Cover } from "../../shared/ui/Cover";
 import { GameControls } from "../../shared/ui/GameControls";
@@ -71,46 +70,6 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
 
   return (
     <>
-      <ExpandMenu position="left" titleOpen="Actions">
-        <ButtonGroup
-          wrapperClassName={styles.page__actions}
-          buttons={[
-            {
-              color: "accent",
-              title:
-                (royalGames?.some((royal) => royal._id === game._id)
-                  ? "Remove from"
-                  : "Add to") + " royal games",
-              callback: () => {
-                royalGames?.some((royal) => royal._id === game._id)
-                  ? removeRoyalGame(minimalGame)
-                  : addRoyalGame(minimalGame);
-              },
-            },
-            {
-              title: "Search on Youtube",
-              link: `https://www.youtube.com/results?search_query=${game.name}`,
-              target: "_blank",
-            },
-            {
-              title: "Search on RetroAchievements",
-              link: `https://retroachievements.org/searchresults.php?s=${game.name}&t=1`,
-              target: "_blank",
-            },
-            {
-              title: "Search on HowLongToBeat",
-              link: `https://howlongtobeat.com/?q=${encodeURI(game.name)}`,
-              target: "_blank",
-            },
-            {
-              title: "Open in IGDB",
-              link: game.url,
-              isHidden: !game.url,
-              target: "_blank",
-            },
-          ]}
-        />
-      </ExpandMenu>
       <div className={styles.page}>
         <div
           className={classNames(styles.page__bg, {
