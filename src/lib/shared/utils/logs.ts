@@ -14,6 +14,7 @@ export const removeDuplicateLogs = (logs: ILogs[]) => {
     }
 
     acc.push(curr);
+    //acc.splice(0,0,curr);
     return acc;
   }, []);
 };

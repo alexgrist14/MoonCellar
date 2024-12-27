@@ -22,14 +22,16 @@ import Image from "next/image";
 import Background from "../../shared/ui/Background/Background";
 import { IUser } from "../../shared/types/auth";
 import { useAuthStore } from "../../shared/store/auth.store";
+import { IGDBGameMinimal } from "../../shared/types/igdb";
+import { userAPI } from "../../shared/api";
+import { axiosUtils } from "../../shared/utils/axios";
 
 interface UserProfileProps {
   user: IUser;
   logs: ILogs[];
-  games: UserGamesType;
 }
 
-const UserProfile: FC<UserProfileProps> = ({ user, games, logs }) => {
+const UserProfile: FC<UserProfileProps> = ({ user,logs }) => {
   const { query, push, pathname } = useRouter();
 
   const { profile } = useAuthStore();
@@ -57,6 +59,9 @@ const UserProfile: FC<UserProfileProps> = ({ user, games, logs }) => {
     [pathname, push, query]
   );
 
+
+  
+
   useEffect(() => {
     !query.list && pushTab("profile");
   }, [pushTab, query.list]);
@@ -69,7 +74,6 @@ const UserProfile: FC<UserProfileProps> = ({ user, games, logs }) => {
           <UserInfo
             userName={user.userName}
             _id={user._id}
-            games={games}
             avatar={avatar}
             logs={logs}
           />
@@ -83,14 +87,14 @@ const UserProfile: FC<UserProfileProps> = ({ user, games, logs }) => {
         tabName: commonUtils.upFL(tabName),
         tabBody: (
           <UserGames
-            userGames={games}
+          userId={user._id}
             gamesCategory={tabName}
             gamesRating={user.gamesRating}
           />
         ),
         className: `${styles.tabs__button}`,
         onTabClick: () => {
-          pushTab(tabName.toLowerCase(), 1);
+            pushTab(tabName.toLowerCase(), 1);
         },
       })),
     ];
@@ -110,7 +114,6 @@ const UserProfile: FC<UserProfileProps> = ({ user, games, logs }) => {
     user.userName,
     user._id,
     user.gamesRating,
-    games,
     avatar,
     logs,
     profile?.userName,

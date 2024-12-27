@@ -9,12 +9,12 @@ import { FC } from "react";
 
 interface IProps {
   user: IUser;
-  userGames: Record<categoriesType, IGDBGameMinimal[]>;
+
   userLogs: ILogs[];
 }
 
-const User: FC<IProps> = ({ user, userGames, userLogs }) => {
-  return <UserProfile {...{ user, games: userGames, logs: userLogs }} />;
+const User: FC<IProps> = ({ user, userLogs }) => {
+  return <UserProfile {...{ user, logs: userLogs }} />;
 };
 
 export const getServerSideProps = async (
@@ -22,14 +22,13 @@ export const getServerSideProps = async (
 ) => {
   const { query } = context;
   const user = (await userAPI.getByName(query.name as string)).data;
-  const userGames = (await userAPI.getUserGames(user._id)).data.games;
   const logsResult = (await userAPI.getUserLogs(user._id)).data;
   let userLogs: ILogs[];
   if (logsResult.length > 0) {
     userLogs = removeDuplicateLogs(logsResult[0].logs).reverse();
   } else userLogs = [];
 
-  return { props: { user, userGames, userLogs } };
+  return { props: { user, userLogs } };
 };
 
 export default User;

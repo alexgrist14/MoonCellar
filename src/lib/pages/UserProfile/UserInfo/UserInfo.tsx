@@ -19,13 +19,13 @@ import { mergeLogs } from "@/src/lib/shared/utils/logs";
 interface UserInfoProps {
   userName: string;
   _id: string;
-  games: UserGamesType;
+  //games: UserGamesType;
   avatar?: string;
   logs: ILogs[];
 }
 
 const UserInfo: FC<UserInfoProps> = ({
-  games,
+ // games,
   userName,
   _id: id,
   avatar,
@@ -104,7 +104,7 @@ const UserInfo: FC<UserInfoProps> = ({
             <div className={styles.profile__name}>{userName}</div>
             <div className={styles.profile__stats}>
               <div className={styles.profile__stats__list}>
-                {userListCategories.map((category, i) => (
+                {/* {userListCategories.map((category, i) => (
                   <Link
                     href={`${FRONT_URL}/user/${userName}?list=${category}`}
                     key={i}
@@ -113,7 +113,7 @@ const UserInfo: FC<UserInfoProps> = ({
                       games[category].length
                     }`}</span>
                   </Link>
-                ))}
+                ))} */}
               </div>
             </div>
           </div>
