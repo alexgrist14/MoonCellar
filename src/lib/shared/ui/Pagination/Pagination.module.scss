@@ -3,7 +3,7 @@
   gap: 3px;
   align-items: center;
   margin-inline: auto;
-  padding: 5px 10px;
+  padding: 3px 6px;
   background-color: $lightBg;
   border-radius: $radius;
 
@@ -12,8 +12,7 @@
     left: 50%;
     transform: translateX(-50%);
     z-index: 2;
-    bottom: 0;
-    border-radius: $radius $radius 0 0;
+    border-radius: 0 0 $radius $radius;
   }
 
   &__input {
@@ -30,13 +29,5 @@
   &__tooltip {
     width: 75px;
     text-align: center;
-  }
-
-  &__center {
-    display: flex;
-    gap: 2px;
-    align-items: center;
-    white-space: nowrap;
-    padding-inline: 10px;
   }
 }

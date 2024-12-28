@@ -128,50 +128,22 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
           />
         </div>
         <div className={styles.page__left}>
-          <div className={styles.page__wrapper}>
-            <div className={styles.page__cover}>
-              {isLoading && <Loader />}
-              {!!game.cover?.url ? (
-                <Image
-                  onLoad={() => setIsLoading(false)}
-                  key={game.cover._id}
-                  alt="Cover"
-                  src={getImageLink(game.cover.url, "cover_big", 2)}
-                  width={700}
-                  height={900}
-                />
-              ) : (
-                <Cover />
-              )}
-            </div>
-            <GameControls game={minimalGame} />
+          <div className={styles.page__cover}>
+            {isLoading && <Loader />}
+            {!!game.cover?.url ? (
+              <Image
+                onLoad={() => setIsLoading(false)}
+                key={game.cover._id}
+                alt="Cover"
+                src={getImageLink(game.cover.url, "cover_big", 2)}
+                width={700}
+                height={900}
+              />
+            ) : (
+              <Cover />
+            )}
           </div>
-          <ButtonGroup
-            wrapperClassName={styles.page__actions}
-            buttons={[
-              {
-                title: "Search on Youtube",
-                link: `https://www.youtube.com/results?search_query=${game.name}`,
-                target: "_blank",
-              },
-              {
-                title: "Search on RetroAchievements",
-                link: `https://retroachievements.org/searchresults.php?s=${game.name}&t=1`,
-                target: "_blank",
-              },
-              {
-                title: "Search on HowLongToBeat",
-                link: `https://howlongtobeat.com/?q=${encodeURI(game.name)}`,
-                target: "_blank",
-              },
-              {
-                title: "Open in IGDB",
-                link: game.url,
-                isHidden: !game.url,
-                target: "_blank",
-              },
-            ]}
-          />
+          <GameControls game={minimalGame} />
         </div>
         <div className={styles.page__right}>
           <h2>{game.name}</h2>

@@ -1,6 +1,10 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./UserProfile.module.scss";
-import { IGamesRating, ILogs, UserGamesType } from "../../shared/types/user.type";
+import {
+  IGamesRating,
+  ILogs,
+  UserGamesType,
+} from "../../shared/types/user.type";
 import { Tabs } from "../../shared/ui/Tabs";
 import { ITabContent } from "../../shared/types/tabs";
 import UserInfo from "./UserInfo/UserInfo";
@@ -17,19 +21,20 @@ import classNames from "classnames";
 import Image from "next/image";
 import Background from "../../shared/ui/Background/Background";
 import { IUser } from "../../shared/types/auth";
+import { useAuthStore } from "../../shared/store/auth.store";
+import { IGDBGameMinimal } from "../../shared/types/igdb";
+import { userAPI } from "../../shared/api";
+import { axiosUtils } from "../../shared/utils/axios";
 
 interface UserProfileProps {
   user: IUser;
   logs: ILogs[];
-  games: UserGamesType;
 }
 
-const UserProfile: FC<UserProfileProps> = ({
-  user,
-  games,
-  logs,
-}) => {
+const UserProfile: FC<UserProfileProps> = ({ user,logs }) => {
   const { query, push, pathname } = useRouter();
+
+  const { profile } = useAuthStore();
 
   const [avatar, setAvatar] = useState<string | undefined>("");
   const [isImageReady, setIsImageReady] = useState(false);
@@ -39,7 +44,14 @@ const UserProfile: FC<UserProfileProps> = ({
   const pushTab = useCallback(
     (tab: string, page?: number) => {
       push(
-        { pathname, query: queryString.stringify({ ...query, list: tab, page: page || query.page }) },
+        {
+          pathname,
+          query: queryString.stringify({
+            ...query,
+            list: tab,
+            page: page || query.page,
+          }),
+        },
         undefined,
         { shallow: true }
       );
@@ -47,19 +59,21 @@ const UserProfile: FC<UserProfileProps> = ({
     [pathname, push, query]
   );
 
+
+  
+
   useEffect(() => {
     !query.list && pushTab("profile");
   }, [pushTab, query.list]);
 
   const tabs = useMemo((): ITabContent[] => {
-    return [
+    const baseTabs = [
       {
         tabName: "Profile",
         tabBody: (
           <UserInfo
             userName={user.userName}
             _id={user._id}
-            games={games}
             avatar={avatar}
             logs={logs}
           />
@@ -73,27 +87,38 @@ const UserProfile: FC<UserProfileProps> = ({
         tabName: commonUtils.upFL(tabName),
         tabBody: (
           <UserGames
-            userGames={games}
+          userId={user._id}
             gamesCategory={tabName}
             gamesRating={user.gamesRating}
           />
         ),
         className: `${styles.tabs__button}`,
         onTabClick: () => {
-          pushTab(tabName.toLowerCase(),1);
+            pushTab(tabName.toLowerCase(), 1);
         },
       })),
+    ];
 
-      {
+    if (profile?.userName === user.userName) {
+      baseTabs.push({
         tabName: "Settings",
         tabBody: <Settings avatar={avatar} setAvatar={setAvatar} />,
         className: `${styles.tabs__button}`,
         onTabClick: () => {
           pushTab("settings");
         },
-      },
-    ];
-  }, [user.userName, user._id, user.gamesRating, games, avatar, logs, pushTab]);
+      });
+    }
+    return baseTabs;
+  }, [
+    user.userName,
+    user._id,
+    user.gamesRating,
+    avatar,
+    logs,
+    profile?.userName,
+    pushTab,
+  ]);
 
   useEffect(() => {
     setAvatar(

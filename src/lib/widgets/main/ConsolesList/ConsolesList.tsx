@@ -8,9 +8,7 @@ import { Filters } from "@/src/lib/shared/ui/Filters";
 import { useGamesStore } from "@/src/lib/shared/store/games.store";
 import { GamesList } from "@/src/lib/shared/ui/GamesList";
 
-export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
-  initialTabIndex,
-}) => {
+export const ConsolesList: FC = () => {
   const {
     royalGames,
     setRoyalGames,
@@ -20,10 +18,15 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
     removeHistoryGame,
   } = useGamesStore();
   const { setGenres, setGameModes, setSystems, setThemes } = useCommonStore();
-  const { setSegments, setStarted, setFinished, setRoyal, isRoyal } =
-    useStatesStore();
+  const {
+    setSegments,
+    setStarted,
+    setFinished,
+    setRoyal,
+    isRoyal,
+  } = useStatesStore();
   const { setWinner } = useCommonStore();
-  const [tabIndex, setTabIndex] = useState(initialTabIndex || 0);
+  const [tabIndex, setTabIndex] = useState(0);
 
   useEffect(() => {
     if (isRoyal) return;
@@ -34,6 +37,8 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
     IGDBApi.getThemes().then((response) => setThemes(response.data));
   }, [isRoyal, setGenres, setGameModes, setSystems, setThemes]);
 
+  const contentRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     setWinner(undefined);
     setFinished(true);
@@ -42,7 +47,7 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
   }, [isRoyal, setFinished, setWinner, setStarted, setSegments]);
 
   return (
-    <div className={styles.consoles__list}>
+    <div ref={contentRef} className={styles.consoles__list}>
       <div className={styles.consoles__options}>
         <Tabs
           defaultTabIndex={tabIndex}
