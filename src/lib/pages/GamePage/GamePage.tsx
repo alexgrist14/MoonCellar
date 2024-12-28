@@ -19,9 +19,11 @@ import { useGamesStore } from "../../shared/store/games.store";
 import classNames from "classnames";
 import { axiosUtils } from "../../shared/utils/axios";
 import { IGDBApi } from "../../shared/api";
+import { useStatesStore } from "../../shared/store/states.store";
 
 export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
   const { royalGames, addRoyalGame, removeRoyalGame } = useGamesStore();
+  const { isMobile } = useStatesStore();
 
   const [isLoading, setIsLoading] = useState<boolean>(!!game.cover?.url);
   const [bg, setBg] = useState<IGDBScreenshot & { gameId: number }>();
@@ -71,46 +73,48 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
 
   return (
     <>
-      <ExpandMenu position="left" titleOpen="Actions">
-        <ButtonGroup
-          wrapperClassName={styles.page__actions}
-          buttons={[
-            {
-              color: "accent",
-              title:
-                (royalGames?.some((royal) => royal._id === game._id)
-                  ? "Remove from"
-                  : "Add to") + " royal games",
-              callback: () => {
-                royalGames?.some((royal) => royal._id === game._id)
-                  ? removeRoyalGame(minimalGame)
-                  : addRoyalGame(minimalGame);
+      {isMobile && (
+        <ExpandMenu position="left" titleOpen="Actions">
+          <ButtonGroup
+            wrapperClassName={styles.page__actions}
+            buttons={[
+              {
+                color: "accent",
+                title:
+                  (royalGames?.some((royal) => royal._id === game._id)
+                    ? "Remove from"
+                    : "Add to") + " royal games",
+                callback: () => {
+                  royalGames?.some((royal) => royal._id === game._id)
+                    ? removeRoyalGame(minimalGame)
+                    : addRoyalGame(minimalGame);
+                },
               },
-            },
-            {
-              title: "Search on Youtube",
-              link: `https://www.youtube.com/results?search_query=${game.name}`,
-              target: "_blank",
-            },
-            {
-              title: "Search on RetroAchievements",
-              link: `https://retroachievements.org/searchresults.php?s=${game.name}&t=1`,
-              target: "_blank",
-            },
-            {
-              title: "Search on HowLongToBeat",
-              link: `https://howlongtobeat.com/?q=${encodeURI(game.name)}`,
-              target: "_blank",
-            },
-            {
-              title: "Open in IGDB",
-              link: game.url,
-              isHidden: !game.url,
-              target: "_blank",
-            },
-          ]}
-        />
-      </ExpandMenu>
+              {
+                title: "Search on Youtube",
+                link: `https://www.youtube.com/results?search_query=${game.name}`,
+                target: "_blank",
+              },
+              {
+                title: "Search on RetroAchievements",
+                link: `https://retroachievements.org/searchresults.php?s=${game.name}&t=1`,
+                target: "_blank",
+              },
+              {
+                title: "Search on HowLongToBeat",
+                link: `https://howlongtobeat.com/?q=${encodeURI(game.name)}`,
+                target: "_blank",
+              },
+              {
+                title: "Open in IGDB",
+                link: game.url,
+                isHidden: !game.url,
+                target: "_blank",
+              },
+            ]}
+          />
+        </ExpandMenu>
+      )}
       <div className={styles.page}>
         <div
           className={classNames(styles.page__bg, {
@@ -146,32 +150,37 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
             </div>
             <GameControls game={minimalGame} />
           </div>
-          <ButtonGroup
-            wrapperClassName={styles.page__actions}
-            buttons={[
-              {
-                title: "Search on Youtube",
-                link: `https://www.youtube.com/results?search_query=${game.name}`,
-                target: "_blank",
-              },
-              {
-                title: "Search on RetroAchievements",
-                link: `https://retroachievements.org/searchresults.php?s=${game.name}&t=1`,
-                target: "_blank",
-              },
-              {
-                title: "Search on HowLongToBeat",
-                link: `https://howlongtobeat.com/?q=${encodeURI(game.name)}`,
-                target: "_blank",
-              },
-              {
-                title: "Open in IGDB",
-                link: game.url,
-                isHidden: !game.url,
-                target: "_blank",
-              },
-            ]}
-          />
+          {!isMobile && (
+            <ButtonGroup
+              wrapperClassName={classNames(
+                styles.page__actions,
+                styles.page__actions_standalone
+              )}
+              buttons={[
+                {
+                  title: "Search on Youtube",
+                  link: `https://www.youtube.com/results?search_query=${game.name}`,
+                  target: "_blank",
+                },
+                {
+                  title: "Search on RetroAchievements",
+                  link: `https://retroachievements.org/searchresults.php?s=${game.name}&t=1`,
+                  target: "_blank",
+                },
+                {
+                  title: "Search on HowLongToBeat",
+                  link: `https://howlongtobeat.com/?q=${encodeURI(game.name)}`,
+                  target: "_blank",
+                },
+                {
+                  title: "Open in IGDB",
+                  link: game.url,
+                  isHidden: !game.url,
+                  target: "_blank",
+                },
+              ]}
+            />
+          )}
         </div>
         <div className={styles.page__right}>
           <h2>{game.name}</h2>

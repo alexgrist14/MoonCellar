@@ -1,10 +1,9 @@
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import styles from "./ConsolesList.module.scss";
 import { IGDBApi } from "@/src/lib/shared/api";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
-import { Filters } from "@/src/lib/shared/ui/Filters";
 import { useGamesStore } from "@/src/lib/shared/store/games.store";
 import { GamesList } from "@/src/lib/shared/ui/GamesList";
 
@@ -12,6 +11,7 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
   initialTabIndex,
 }) => {
   const {
+    games,
     royalGames,
     setRoyalGames,
     removeRoyalGame,
@@ -20,9 +20,8 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
     removeHistoryGame,
   } = useGamesStore();
   const { setGenres, setGameModes, setSystems, setThemes } = useCommonStore();
-  const { setSegments, setStarted, setFinished, setRoyal, isRoyal } =
-    useStatesStore();
-  const { setWinner } = useCommonStore();
+  const { setRoyal, isRoyal } = useStatesStore();
+
   const [tabIndex, setTabIndex] = useState(initialTabIndex || 0);
 
   useEffect(() => {
@@ -34,13 +33,6 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
     IGDBApi.getThemes().then((response) => setThemes(response.data));
   }, [isRoyal, setGenres, setGameModes, setSystems, setThemes]);
 
-  useEffect(() => {
-    setWinner(undefined);
-    setFinished(true);
-    setStarted(false);
-    setSegments([]);
-  }, [isRoyal, setFinished, setWinner, setStarted, setSegments]);
-
   return (
     <div className={styles.consoles__list}>
       <div className={styles.consoles__options}>
@@ -48,7 +40,7 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
           defaultTabIndex={tabIndex}
           contents={[
             {
-              tabName: "General",
+              tabName: "Gauntlet",
               style: { flexBasis: "33%" },
               onTabClick: () => {
                 setRoyal(false);
@@ -76,7 +68,7 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
           ]}
         />
       </div>
-      {tabIndex === 0 && <Filters isGauntlet />}
+      {tabIndex === 0 && <GamesList games={games || royalGames || []} />}
       {tabIndex === 1 && (
         <GamesList
           games={royalGames || []}

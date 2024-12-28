@@ -6,8 +6,8 @@ import { IGDBGameMinimal } from "../../types/igdb";
 
 interface IGamesListProps {
   games: IGDBGameMinimal[];
-  getGames: (games: IGDBGameMinimal[]) => void;
-  removeGame: (game: IGDBGameMinimal) => void;
+  getGames?: (games: IGDBGameMinimal[]) => void;
+  removeGame?: (game: IGDBGameMinimal) => void;
 }
 
 export const GamesList: FC<IGamesListProps> = ({
@@ -22,7 +22,7 @@ export const GamesList: FC<IGamesListProps> = ({
         {!games?.length && (
           <h3 style={{ width: "100%", textAlign: "center" }}>List is empty</h3>
         )}
-        {!!games?.length && (
+        {!!games?.length && !!getGames && (
           <Button onClick={() => getGames([])}>Remove all</Button>
         )}
       </div>
@@ -33,7 +33,9 @@ export const GamesList: FC<IGamesListProps> = ({
                 <Link href={`/games/${game.slug}`} target="_blank">
                   {game.name}
                 </Link>
-                <Button onClick={() => removeGame(game)}>Remove</Button>
+                {!!removeGame && (
+                  <Button onClick={() => removeGame(game)}>Remove</Button>
+                )}
               </div>
             ))
           : null}

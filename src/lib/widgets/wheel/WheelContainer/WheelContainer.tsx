@@ -1,29 +1,25 @@
 import { FC, useEffect, useState } from "react";
 import styles from "./WheelContainer.module.scss";
 import { WheelComponent } from "@/src/lib/features/wheel";
-import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { GameCard } from "@/src/lib/shared/ui/GameCard";
-import { Button } from "@/src/lib/shared/ui/Button";
 import { useGamesStore } from "@/src/lib/shared/store/games.store";
 
 export const WheelContainer: FC = () => {
-  const { winner } = useCommonStore();
-  const { royalGames, addRoyalGame, removeRoyalGame } = useGamesStore();
-
-  const { isFinished, segments, isLoading, isRoyal } = useStatesStore();
+  const { winner, games } = useGamesStore();
+  const { isFinished, isLoading } = useStatesStore();
 
   const [colors, setColors] = useState<string[]>([]);
 
   useEffect(() => {
     const generateRandomColors = (hue: number): string[] => {
       return (
-        segments?.map((_, i) => {
+        games?.map((_, i) => {
           const min = 10;
           const percent =
-            i < segments.length / 2
-              ? (70 / segments.length) * i
-              : (70 / segments.length) * (segments.length - i + 1);
+            i < games.length / 2
+              ? (70 / games.length) * i
+              : (70 / games.length) * (games.length - i + 1);
 
           const lightness = (percent > min ? percent : min) + "%";
           const saturation = "60%";
@@ -34,7 +30,7 @@ export const WheelContainer: FC = () => {
     };
 
     setColors(generateRandomColors((200 + Math.random() * 20) ^ 0));
-  }, [segments, isLoading]);
+  }, [games, isLoading]);
 
   return (
     <div className={styles.container}>

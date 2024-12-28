@@ -13,9 +13,11 @@ import { Loader } from "../Loader";
 import { ButtonGroup } from "../Button/ButtonGroup";
 import { modal } from "../Modal";
 import { useDisableScroll } from "../../hooks";
+import { useStatesStore } from "../../store/states.store";
 
 export const SearchModal: FC = () => {
-  const { isMobile, setExpanded } = useCommonStore();
+  const { setExpanded } = useCommonStore();
+  const { isMobile } = useStatesStore();
 
   const [games, setGames] = useState<IGDBGameMinimal[]>([]);
   const [total, setTotal] = useState(0);

@@ -5,19 +5,20 @@
   height: 100%;
   transition: transform 0.4s, filter 0.4s;
   z-index: 3;
-  background: $bgAlt;
-  right: calc(100% - 5px);
+  background: rgba($bgAlt, 0.7);
+  right: calc(100% - 2px);
+  filter: drop-shadow(0 0 0.2rem $bg);
 
   &_active {
-    transform: translateX(calc(100% - 5px));
+    transform: translateX(calc(100% - 2px));
   }
 
   &_right.menu_active {
-    transform: translateX(calc(-100% + 5px));
+    transform: translateX(calc(-100% + 2px));
   }
 
   &_right {
-    left: calc(100% - 5px);
+    left: calc(100% - 2px);
   }
 
   &_disabled {
@@ -28,10 +29,6 @@
 
   @include mediaMax($screenMd) {
     width: 100%;
-  }
-
-  &__content {
-    grid-area: content;
   }
 
   &__expand {
@@ -69,7 +66,8 @@
     transition: 0.3s;
     white-space: nowrap;
     z-index: 4;
-    width: 70px;
+    width: 45vw;
+    max-width: 240px;
     @include textEllipsis;
 
     & > span {
@@ -86,6 +84,7 @@
   div &__container {
     max-height: 100%;
     overflow: hidden;
+    grid-area: content;
   }
 
   div &__content {

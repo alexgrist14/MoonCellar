@@ -3,10 +3,8 @@ import styles from "./GauntletPage.module.scss";
 import { ConsolesList } from "../../widgets/main";
 import { IGDBApi } from "../../shared/api";
 import { WheelContainer } from "../../widgets/wheel";
-import { getSegments } from "../../shared/utils/getSegments";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { useStatesStore } from "../../shared/store/states.store";
-import { useCommonStore } from "../../shared/store/common.store";
 import { getImageLink } from "../../shared/constants";
 import { axiosUtils } from "../../shared/utils/axios";
 import Image from "next/image";
@@ -15,9 +13,8 @@ import { IGDBScreenshot } from "../../shared/types/igdb";
 import { useGamesStore } from "../../shared/store/games.store";
 import { parseQueryFilters } from "../../shared/utils/filters.util";
 import { useRouter } from "next/router";
-import { FixedMenu } from "../../shared/ui/FixedMenu";
-import { modal } from "../../shared/ui/Modal";
-import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
+import { useCommonStore } from "../../shared/store/common.store";
+import { Filters } from "../../shared/ui/Filters";
 
 export const GauntletPage: FC = () => {
   const { asPath } = useRouter();
@@ -25,17 +22,17 @@ export const GauntletPage: FC = () => {
   const [bg, setBg] = useState<IGDBScreenshot & { gameId: number }>();
   const [isImageReady, setIsImageReady] = useState(true);
 
-  const { royalGames, setGames, historyGames } = useGamesStore();
+  const { setGames, historyGames, winner, setWinner } = useGamesStore();
   const {
     isLoading,
-    setSegments,
     setStarted,
     setFinished,
     setLoading,
     isRoyal,
     isExcludeHistory,
+    isMobile,
   } = useStatesStore();
-  const { setWinner, winner } = useCommonStore();
+  const { setExpanded } = useCommonStore();
 
   const getIGDBGames = useCallback(() => {
     if (isRoyal) return;
@@ -53,7 +50,6 @@ export const GauntletPage: FC = () => {
     }).then((response) => {
       if (!!response.data.results.length) {
         setGames(response.data.results);
-        setSegments(getSegments(response.data.results, 16));
 
         setStarted(true);
         setLoading(false);
@@ -62,12 +58,10 @@ export const GauntletPage: FC = () => {
         setLoading(false);
         setFinished(true);
         setWinner(undefined);
-        setSegments([]);
       }
     });
   }, [
     setLoading,
-    setSegments,
     setStarted,
     setWinner,
     isRoyal,
@@ -83,12 +77,6 @@ export const GauntletPage: FC = () => {
       getIGDBGames();
     }
   }, [isLoading, getIGDBGames, isRoyal]);
-
-  useEffect(() => {
-    isRoyal &&
-      !!royalGames &&
-      setSegments(royalGames.map((game, i) => game._id + "_" + i));
-  }, [isRoyal, royalGames, setSegments]);
 
   useEffect(() => {
     const pictures: number[] = [];
@@ -115,8 +103,18 @@ export const GauntletPage: FC = () => {
     }
   }, [winner]);
 
+  useEffect(() => {
+    isMobile === false && setExpanded("both");
+  }, [setExpanded, isMobile]);
+
   return (
     <div className={classNames("container", styles.page)}>
+      <ExpandMenu id="consoles" titleOpen="Filters" position="left">
+        <Filters isGauntlet />
+      </ExpandMenu>
+      <ExpandMenu id="consoles" titleOpen="Lists" position="right">
+        <ConsolesList />
+      </ExpandMenu>
       <div
         className={classNames(styles.page__bg, {
           [styles.page__bg_active]:
@@ -132,9 +130,6 @@ export const GauntletPage: FC = () => {
           height={1080}
         />
       </div>
-      <ExpandMenu id="consoles" titleOpen="Filters">
-        <ConsolesList />
-      </ExpandMenu>
       <WheelContainer />
     </div>
   );

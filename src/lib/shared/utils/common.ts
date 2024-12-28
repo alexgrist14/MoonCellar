@@ -64,7 +64,9 @@ const getImageData = async (url: string): Promise<IImageData> => {
 };
 
 export const shuffle = <T>(arr: T[]) => {
-  let count = arr.length,
+  const tempArr = structuredClone(arr);
+
+  let count = tempArr.length,
     temp: T,
     index: number;
 
@@ -72,12 +74,12 @@ export const shuffle = <T>(arr: T[]) => {
     index = Math.floor(Math.random() * count);
     count--;
 
-    temp = arr[count];
-    arr[count] = arr[index];
-    arr[index] = temp;
+    temp = tempArr[count];
+    tempArr[count] = tempArr[index];
+    tempArr[index] = temp;
   }
 
-  return arr;
+  return tempArr;
 };
 
 const getWordEnding = (num: number, words: [string, string, string]) => {

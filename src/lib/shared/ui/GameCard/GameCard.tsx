@@ -12,9 +12,9 @@ import {
 } from "../../constants";
 import { Cover } from "../Cover";
 import { GameControls } from "../GameControls";
-import { useCommonStore } from "../../store/common.store";
 import useCloseEvents from "../../hooks/useCloseEvents";
 import { Loader } from "../Loader";
+import { useStatesStore } from "../../store/states.store";
 
 interface IGameCardProps {
   game: IGDBGameMinimal;
@@ -27,7 +27,7 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
   const [stepIndex, setStepIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(!!game.cover);
 
-  const { isMobile } = useCommonStore();
+  const { isMobile } = useStatesStore();
 
   useCloseEvents([cardRef], () => setStepIndex(0));
 

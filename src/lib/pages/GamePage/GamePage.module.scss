@@ -104,13 +104,20 @@
     flex-direction: column;
     gap: 5px;
     width: 100%;
-    padding-top: 40px;
 
     & button,
     a {
       width: 100%;
       height: 40px;
       max-height: 40px;
+    }
+
+    &_standalone {
+      margin-top: 40px;
+      background: rgba($bgAlt, 0.7);
+      box-shadow: $basicShadow;
+      border-radius: $radius;
+      padding: 10px;
     }
   }
 

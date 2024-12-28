@@ -1,6 +1,5 @@
 import { useAuth } from "@/src/lib/shared/hooks/auth";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { AuthModal } from "@/src/lib/shared/ui/AuthModal";
 import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
 import { Button } from "@/src/lib/shared/ui/Button";
@@ -13,11 +12,12 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { FC, MouseEvent, useState } from "react";
 import styles from "./Header.module.scss";
+import { useStatesStore } from "@/src/lib/shared/store/states.store";
 
 export const Header: FC = () => {
   const router = useRouter();
 
-  const { isMobile } = useCommonStore();
+  const { isMobile } = useStatesStore();
 
   const [isMenuActive, setIsMenuActive] = useState(false);
   const { isAuth, profile } = useAuthStore();

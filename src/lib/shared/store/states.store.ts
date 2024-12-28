@@ -9,7 +9,7 @@ type IState = {
   isRoyal?: boolean;
   isHistory?: boolean;
   isExcludeHistory: boolean;
-  segments?: string[];
+  isMobile?: boolean;
 };
 
 type IAction = {
@@ -19,8 +19,8 @@ type IAction = {
   setFinished: (isFinished: boolean) => void;
   setRoyal: (royal: boolean) => void;
   setHistory: (isHistory: boolean) => void;
-  setSegments: (segments: string[]) => void;
   setExcludeHistory: (isExcludeHistory: boolean) => void;
+  setMobile: (isMobile: boolean | undefined) => void;
 };
 
 export const useStatesStore = create<IState & IAction>()(
@@ -31,11 +31,18 @@ export const useStatesStore = create<IState & IAction>()(
       setFinished: (isFinished) => set({ isFinished }),
       setLoading: (isLoading) => set({ isLoading }),
       setPlatformsLoading: (isPlatformsLoading) => set({ isPlatformsLoading }),
-      setSegments: (segments) => set({ segments }),
       setStarted: (isStarted) => set({ isStarted }),
       setRoyal: (isRoyal) => set({ isRoyal }),
       setHistory: (isHistory) => set({ isHistory }),
       setExcludeHistory: (isExcludeHistory) => set({ isExcludeHistory }),
+      setMobile: (isMobile) => set({ isMobile }),
+      clear: () =>
+        set({
+          isFinished: true,
+          isLoading: false,
+          isPlatformsLoading: false,
+          isStarted: false,
+        }),
     }),
     { name: "states" }
   )

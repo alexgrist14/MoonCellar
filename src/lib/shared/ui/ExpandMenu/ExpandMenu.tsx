@@ -5,6 +5,7 @@ import { useCommonStore } from "../../store/common.store";
 import classNames from "classnames";
 import { createPortal } from "react-dom";
 import { useWindowScroll } from "../../hooks/useWindowScroll";
+import { useStatesStore } from "../../store/states.store";
 
 interface IExpandMenuProps
   extends Pick<HTMLAttributes<HTMLDivElement>, "children" | "id"> {
@@ -21,7 +22,8 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
   ...props
 }) => {
   const expandRef = useRef<HTMLDivElement>(null);
-  const { isMobile, expanded, setExpanded } = useCommonStore();
+  const { expanded, setExpanded } = useCommonStore();
+  const { isMobile } = useStatesStore();
 
   const [top, setTop] = useState<string>();
 
@@ -45,13 +47,13 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
       style={{
         top,
         height: `calc(100vh - ${top})`,
-        gridTemplateColumns: position === "left" ? "1fr 5px" : "5px 1fr",
+        gridTemplateColumns: position === "left" ? "1fr 2px" : "2px 1fr",
         gridTemplateAreas:
           position === "left" ? "'content expand'" : "'expand content'",
       }}
       {...props}
     >
-      <Scrollbar type="absolute" stl={styles} className={styles.menu__content}>
+      <Scrollbar type="absolute" stl={styles}>
         {children}
       </Scrollbar>
       <div
