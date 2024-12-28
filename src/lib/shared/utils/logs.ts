@@ -1,7 +1,7 @@
 import { ILogs } from "../types/user.type";
 
 export const removeDuplicateLogs = (logs: ILogs[]) => {
-  return logs.reduce<ILogs[]>((acc, curr) => {
+  return logs.reverse().reduce<ILogs[]>((acc, curr) => {
     !acc.some(
       (item) =>
         (item.action === "rating" && item.action === curr.action) ||
