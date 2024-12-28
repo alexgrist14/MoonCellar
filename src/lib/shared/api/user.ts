@@ -1,14 +1,13 @@
-import { IUser } from "../types/auth";
 import { API_URL } from "../constants";
-import agent from "./agent";
+import { IUser } from "../types/auth";
 import {
-  categoriesType,
+  CategoriesCount,
+  CategoriesType,
   IFollowings,
-  ILogs,
   IUserGames,
-  IUserLogs,
+  IUserLogs
 } from "../types/user.type";
-import { IGDBGame, IGDBGameMinimal } from "../types/igdb";
+import agent from "./agent";
 
 const USER_URL = `${API_URL}/user`;
 
@@ -34,14 +33,18 @@ const getAvatar = (id: string) => {
   return agent.get<{ fileName: string }>(`${USER_URL}/profile-picture/${id}`);
 };
 
-const getUserGames = (id: string, category: categoriesType) => {
+const getUserGames = (id: string, category: CategoriesType) => {
   return agent.get<IUserGames>(`${USER_URL}/games/${id}?category=${category}`);
+};
+
+const getUserGamesLength = (id: string) => {
+  return agent.get<CategoriesCount>(`${USER_URL}/games/length/${id}`);
 };
 
 const addGameToCategory = (
   userId: string,
   gameId: number,
-  category: categoriesType
+  category: CategoriesType
 ) => {
   return agent.patch<IUser>(
     `${USER_URL}/${userId}/games/${gameId}`,
@@ -53,7 +56,7 @@ const addGameToCategory = (
 const removeGameFromCategory = (
   userId: string,
   gameId: number,
-  category: categoriesType
+  category: CategoriesType
 ) => {
   return agent.delete<IUser>(`${USER_URL}/${userId}/games/${gameId}`, {
     params: { category },
@@ -101,4 +104,5 @@ export const userAPI = {
   addUserFollowing,
   removeUserFollowing,
   getUserLogs,
+  getUserGamesLength
 };

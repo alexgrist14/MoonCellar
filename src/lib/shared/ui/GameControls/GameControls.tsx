@@ -4,7 +4,7 @@ import { IGDBGameMinimal } from "../../types/igdb";
 import { Icon } from "@iconify/react";
 import classNames from "classnames";
 import { Button } from "../Button";
-import { categoriesType } from "../../types/user.type";
+import { CategoriesType } from "../../types/user.type";
 import { userAPI } from "../../api";
 import { useAuthStore } from "../../store/auth.store";
 import { axiosUtils } from "../../utils/axios";
@@ -66,7 +66,7 @@ export const GameControls: FC<IGameControlsProps> = ({
 
   const [ratingValue, setRatingValue] = useState(0);
 
-  const addToList = (name: categoriesType) => {
+  const addToList = (name: CategoriesType) => {
     if (!profile) return;
     setIsLoading(true);
 
@@ -83,7 +83,7 @@ export const GameControls: FC<IGameControlsProps> = ({
       .catch(axiosUtils.toastError);
   };
 
-  const removeFromList = (name: categoriesType) => {
+  const removeFromList = (name: CategoriesType) => {
     if (!profile) return;
     setIsLoading(true);
 
@@ -142,7 +142,7 @@ export const GameControls: FC<IGameControlsProps> = ({
           [styles.controls__list_active]: isPlayedActive,
         })}
       >
-        {(["played", "completed", "mastered"] as categoriesType[]).map(
+        {(["played", "completed", "mastered"] as CategoriesType[]).map(
           (key) => (
             <Button
               key={key}
@@ -169,7 +169,7 @@ export const GameControls: FC<IGameControlsProps> = ({
           [styles.controls__list_active]: isPauseActive,
         })}
       >
-        {(["wishlist", "backlog", "dropped"] as categoriesType[]).map((key) => (
+        {(["wishlist", "backlog", "dropped"] as CategoriesType[]).map((key) => (
           <Button
             key={key}
             active={profile?.games?.[key].some((id) => game._id === id)}

@@ -1,7 +1,7 @@
 import { IUser } from "./auth";
 import { IGDBGame, IGDBGameMinimal } from "./igdb";
 
-export type categoriesType =
+export type CategoriesType =
   | "completed"
   | "wishlist"
   | "dropped"
@@ -9,6 +9,9 @@ export type categoriesType =
   | "backlog"
   | "mastered"
   | "played";
+
+export type CategoriesCount = Record<CategoriesType, number>;
+
 
 export interface ILogs {
     date: Date;
@@ -33,7 +36,7 @@ export interface IFollowings {
   followings: Pick<IUser, "_id" | "userName" | "profilePicture">[];
 }
 
-export type UserGamesType = Record<categoriesType, IGDBGameMinimal[]>;
+export type UserGamesType = Record<CategoriesType, IGDBGameMinimal[]>;
 
 export interface IUserGames {
   games: UserGamesType;

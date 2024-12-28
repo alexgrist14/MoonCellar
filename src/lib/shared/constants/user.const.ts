@@ -1,6 +1,6 @@
-import { categoriesType } from "../types/user.type";
+import { CategoriesType } from "../types/user.type";
 
-export const userListCategories: categoriesType[] = [
+export const userListCategories: CategoriesType[] = [
   "playing",
   "completed",
   "mastered",

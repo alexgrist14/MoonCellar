@@ -1,10 +1,15 @@
 import { FC } from "react";
 import styles from "./Loader.module.scss";
-import { PacmanLoader, PropagateLoader, PulseLoader } from "react-spinners";
+import {
+  PacmanLoader,
+  PropagateLoader,
+  PulseLoader,
+  MoonLoader,
+} from "react-spinners";
 import classNames from "classnames";
 
 export const Loader: FC<{
-  type?: "pulse" | "propogate" | "pacman";
+  type?: "pulse" | "propogate" | "pacman" | "moon";
   color?: string;
   speedMultiplier?: number;
 }> = ({ type = "pulse", color, speedMultiplier }) => {
@@ -24,6 +29,12 @@ export const Loader: FC<{
       )}
       {type === "pacman" && (
         <PacmanLoader
+          speedMultiplier={speedMultiplier}
+          color={color || "#ffffff"}
+        />
+      )}
+      {type === "moon" && (
+        <MoonLoader
           speedMultiplier={speedMultiplier}
           color={color || "#ffffff"}
         />

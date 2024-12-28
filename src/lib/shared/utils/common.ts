@@ -17,6 +17,7 @@ const getHumanDate = (inputDate: Date | string) => {
 
   const differenceInMs = targetDate.getTime() - currentDate.getTime();
 
+  const differenceInSeconds = Math.round(differenceInMs / 1000);
   const differenceInMinutes = Math.round(differenceInMs / (1000 * 60));
   const differenceInHours = Math.round(differenceInMs / (1000 * 60 * 60));
   const differenceInDays = Math.round(differenceInMs / (1000 * 60 * 60 * 24));

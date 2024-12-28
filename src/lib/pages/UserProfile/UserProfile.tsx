@@ -1,6 +1,7 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./UserProfile.module.scss";
 import {
+  CategoriesCount,
   IGamesRating,
   ILogs,
   UserGamesType,
@@ -28,10 +29,11 @@ import { axiosUtils } from "../../shared/utils/axios";
 
 interface UserProfileProps {
   user: IUser;
+  userGamesLength: CategoriesCount;
   logs: ILogs[];
 }
 
-const UserProfile: FC<UserProfileProps> = ({ user,logs }) => {
+const UserProfile: FC<UserProfileProps> = ({ user, logs, userGamesLength }) => {
   const { query, push, pathname } = useRouter();
 
   const { profile } = useAuthStore();
@@ -59,9 +61,6 @@ const UserProfile: FC<UserProfileProps> = ({ user,logs }) => {
     [pathname, push, query]
   );
 
-
-  
-
   useEffect(() => {
     !query.list && pushTab("profile");
   }, [pushTab, query.list]);
@@ -73,6 +72,7 @@ const UserProfile: FC<UserProfileProps> = ({ user,logs }) => {
         tabBody: (
           <UserInfo
             userName={user.userName}
+            userGamesLength={userGamesLength}
             _id={user._id}
             avatar={avatar}
             logs={logs}
@@ -87,14 +87,14 @@ const UserProfile: FC<UserProfileProps> = ({ user,logs }) => {
         tabName: commonUtils.upFL(tabName),
         tabBody: (
           <UserGames
-          userId={user._id}
+            userId={user._id}
             gamesCategory={tabName}
             gamesRating={user.gamesRating}
           />
         ),
         className: `${styles.tabs__button}`,
         onTabClick: () => {
-            pushTab(tabName.toLowerCase(), 1);
+          pushTab(tabName.toLowerCase(), 1);
         },
       })),
     ];
@@ -114,6 +114,7 @@ const UserProfile: FC<UserProfileProps> = ({ user,logs }) => {
     user.userName,
     user._id,
     user.gamesRating,
+    userGamesLength,
     avatar,
     logs,
     profile?.userName,

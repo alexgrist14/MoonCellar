@@ -1,5 +1,6 @@
 import { userAPI } from "@/src/lib/shared/api";
 import {
+  CategoriesCount,
   IFollowings,
   ILogs,
   UserGamesType,
@@ -18,22 +19,20 @@ import { mergeLogs } from "@/src/lib/shared/utils/logs";
 
 interface UserInfoProps {
   userName: string;
+  userGamesLength: CategoriesCount;
   _id: string;
-  //games: UserGamesType;
   avatar?: string;
   logs: ILogs[];
 }
 
 const UserInfo: FC<UserInfoProps> = ({
- // games,
   userName,
+  userGamesLength,
   _id: id,
   avatar,
   logs,
 }) => {
   const { profile } = useAuthStore();
-
-  //const mergedLogs = mergeLogs(logs);
 
   const [userFollowings, setUserFollowing] = useState<
     IFollowings | undefined
@@ -104,16 +103,16 @@ const UserInfo: FC<UserInfoProps> = ({
             <div className={styles.profile__name}>{userName}</div>
             <div className={styles.profile__stats}>
               <div className={styles.profile__stats__list}>
-                {/* {userListCategories.map((category, i) => (
+                {userListCategories.map((category, i) => (
                   <Link
                     href={`${FRONT_URL}/user/${userName}?list=${category}`}
                     key={i}
                   >
                     <span>{`${commonUtils.upFL(category)}: ${
-                      games[category].length
+                      userGamesLength[category]
                     }`}</span>
                   </Link>
-                ))} */}
+                ))}
               </div>
             </div>
           </div>

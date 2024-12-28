@@ -91,7 +91,7 @@
         object-fit: cover;
         border-radius: 100%;
       }
-      .btn{
+      .btn {
         width: 90%;
       }
     }
@@ -105,24 +105,22 @@
   @include flexCenter;
   margin-top: 20px;
 
-  .activity{
+  .activity {
     width: 100%;
-    &__title{
-      @include profileTitle
-
+    &__title {
+      @include profileTitle;
     }
-    &__list{
+    &__list {
       @include flexPage;
       margin-top: 20px;
       gap: 20px;
-      
     }
-    .item{
+    .item {
       display: flex;
       gap: 30px;
-      &__img{
+      &__img {
         border-radius: $radius;
-        img{
+        img {
           max-height: calc(240px / $coverRatio);
           max-width: 240px;
           aspect-ratio: $coverRatio;
@@ -130,20 +128,20 @@
           border-radius: inherit;
         }
       }
-      &__text{
+      &__text {
         display: flex;
         flex-direction: column;
         gap: 10px;
-        p{
-          &:first-child{
+        p {
+          &:first-child {
             font-weight: bold;
           }
-          &:nth-child(2){
+          &:nth-child(2) {
             color: $neutral-90;
           }
         }
 
-        .date{
+        .date {
           color: $gray;
         }
       }
