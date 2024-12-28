@@ -33,7 +33,7 @@ const UserInfo: FC<UserInfoProps> = ({
 }) => {
   const { profile } = useAuthStore();
 
-  const mergedLogs = mergeLogs(logs);
+  //const mergedLogs = mergeLogs(logs);
 
   const [userFollowings, setUserFollowing] = useState<
     IFollowings | undefined
@@ -139,7 +139,7 @@ const UserInfo: FC<UserInfoProps> = ({
           <div className={styles.activity}>
             <h3 className={styles.activity__title}>Activity</h3>
             <div className={styles.activity__list}>
-              {mergedLogs.map((log, i) => (
+              {logs.map((log, i) => (
                 <div className={styles.item} key={i}>
                   <Link
                     href={`/games/${log.game.slug}`}

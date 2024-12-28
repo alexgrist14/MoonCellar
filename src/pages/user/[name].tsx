@@ -3,7 +3,7 @@ import { userAPI } from "@/src/lib/shared/api";
 import { IUser } from "@/src/lib/shared/types/auth";
 import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
 import { categoriesType, ILogs } from "@/src/lib/shared/types/user.type";
-import { removeDuplicateLogs } from "@/src/lib/shared/utils/logs";
+import { mergeLogs, removeDuplicateLogs } from "@/src/lib/shared/utils/logs";
 import { GetServerSidePropsContext } from "next";
 import { FC } from "react";
 
@@ -25,7 +25,9 @@ export const getServerSideProps = async (
   const logsResult = (await userAPI.getUserLogs(user._id)).data;
   let userLogs: ILogs[];
   if (logsResult.length > 0) {
-    userLogs = removeDuplicateLogs(logsResult[0].logs).reverse();
+    //console.log(removeDuplicateLogs(logsResult[0].logs))
+    userLogs = mergeLogs(logsResult[0].logs);
+    console.log(userLogs)
   } else userLogs = [];
 
   return { props: { user, userLogs } };
