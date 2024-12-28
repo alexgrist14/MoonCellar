@@ -39,14 +39,14 @@
     }
   }
   .profile {
-    &__info {
+    &_info {
       display: flex;
       gap: 20px;
     }
-    &__name {
+    &_name {
       font-size: 1.5rem;
     }
-    &__stats {
+    &_stats {
       margin-top: 20px;
       &__title {
         border-bottom: 1px solid $lightBg;
@@ -79,20 +79,13 @@
       }
     }
 
-    &__image {
-      display: flex;
-      gap: 10px;
-      flex-direction: column;
-      align-items: center;
+    &_image {
       width: 160px;
       height: 160px;
       aspect-ratio: 2/3;
       .image {
         object-fit: cover;
         border-radius: 100%;
-      }
-      .btn{
-        width: 90%;
       }
     }
   }
@@ -123,6 +116,7 @@
       &__img{
         border-radius: $radius;
         img{
+          width: auto;
           max-height: calc(240px / $coverRatio);
           max-width: 240px;
           aspect-ratio: $coverRatio;

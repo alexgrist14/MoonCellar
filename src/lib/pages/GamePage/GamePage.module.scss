@@ -10,6 +10,7 @@
   @include mediaMax($screenMd) {
     grid-template-columns: 1fr;
     justify-items: center;
+    align-content: flex-start;
   }
 
   &__left {
@@ -18,6 +19,9 @@
     position: relative;
     height: fit-content;
     width: 240px;
+  }
+
+  &__wrapper {
     box-shadow: $basicShadow;
     border-radius: $radius;
   }
@@ -46,6 +50,16 @@
     padding: 10px 15px;
     border-radius: $radius;
     height: fit-content;
+
+    & a {
+      @include font(14px, 18px, 400);
+      color: $gray;
+      width: fit-content;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 
   &__screenshots {
@@ -112,16 +126,6 @@
 
     @include mediaMax($screenMd) {
       flex-direction: column;
-    }
-  }
-
-  & a {
-    @include font(14px, 18px, 400);
-    color: $gray;
-    width: fit-content;
-
-    &:hover {
-      text-decoration: underline;
     }
   }
 
