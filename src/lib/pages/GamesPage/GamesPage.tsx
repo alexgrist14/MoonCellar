@@ -1,5 +1,6 @@
 import { FC, useEffect, useRef, useState } from "react";
 import styles from "./GamesPage.module.scss";
+import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { Filters } from "../../shared/ui/Filters";
 import { IGDBApi } from "../../shared/api";
 import { useCommonStore } from "../../shared/store/common.store";
@@ -18,7 +19,6 @@ import { parseQueryFilters } from "../../shared/utils/filters.util";
 import { setPage } from "../../shared/utils/query";
 import { Shadow } from "../../shared/ui/Shadow";
 import { useWindowScroll } from "../../shared/hooks/useWindowScroll";
-import { ButtonGroup } from "../../shared/ui/Button/ButtonGroup";
 import { modal } from "../../shared/ui/Modal";
 import { FixedMenu } from "../../shared/ui/FixedMenu";
 import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
@@ -103,6 +103,9 @@ export const GamesPage: FC = () => {
 
   return (
     <div className={classNames("container", styles.page)}>
+      <ExpandMenu position="left" titleOpen="Filters">
+        <Filters callback={() => debouncedGamesFetch()} />
+      </ExpandMenu>
       <FixedMenu
         buttons={[
           {

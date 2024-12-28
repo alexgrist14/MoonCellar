@@ -4,6 +4,7 @@ import { ConsolesList } from "../../widgets/main";
 import { IGDBApi } from "../../shared/api";
 import { WheelContainer } from "../../widgets/wheel";
 import { getSegments } from "../../shared/utils/getSegments";
+import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { useStatesStore } from "../../shared/store/states.store";
 import { useCommonStore } from "../../shared/store/common.store";
 import { getImageLink } from "../../shared/constants";
@@ -162,6 +163,9 @@ export const GauntletPage: FC = () => {
           height={1080}
         />
       </div>
+      <ExpandMenu id="consoles" titleOpen="Filters">
+        <ConsolesList />
+      </ExpandMenu>
       <WheelContainer />
     </div>
   );
