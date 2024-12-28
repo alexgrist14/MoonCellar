@@ -25,9 +25,7 @@ export const getServerSideProps = async (
   const logsResult = (await userAPI.getUserLogs(user._id)).data;
   let userLogs: ILogs[];
   if (logsResult.length > 0) {
-    //console.log(removeDuplicateLogs(logsResult[0].logs))
     userLogs = mergeLogs(logsResult[0].logs);
-    console.log(userLogs)
   } else userLogs = [];
 
   return { props: { user, userLogs } };

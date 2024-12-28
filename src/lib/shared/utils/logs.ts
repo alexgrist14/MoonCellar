@@ -4,7 +4,7 @@ export const removeDuplicateLogs = (logs: ILogs[]) => {
   return logs.reverse().reduce<ILogs[]>((acc, curr) => {
     !acc.some(
       (item) =>
-        (item.action === "rating" && item.action === curr.action) ||
+        (item.action === "rating" && item.action === curr.action && item.gameId === curr.gameId) ||
         (item.action !== "rating" && item.gameId === curr.gameId)) && acc.push(curr)
 
     return acc;
