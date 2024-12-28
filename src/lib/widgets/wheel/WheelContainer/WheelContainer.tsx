@@ -50,22 +50,6 @@ export const WheelContainer: FC = () => {
       {!!winner && (
         <div className={styles.winner}>
           <GameCard game={winner} />
-          {!isRoyal && (
-            <Button
-              color="accent"
-              style={{ height: "30px" }}
-              onClick={() => {
-                !royalGames?.some((game) => game._id === winner._id)
-                  ? addRoyalGame(winner)
-                  : removeRoyalGame(winner);
-              }}
-            >
-              {royalGames?.some((game) => game._id === winner._id)
-                ? "Remove from"
-                : "Add to"}{" "}
-              royal games
-            </Button>
-          )}
         </div>
       )}
     </div>

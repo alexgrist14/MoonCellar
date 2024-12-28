@@ -12,16 +12,15 @@ import { useRouter } from "next/router";
 import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
 import classNames from "classnames";
 import { Tooltip } from "@/src/lib/shared/ui/Tooltip";
-import { userAPI } from "@/src/lib/shared/api";
 
 interface UserGamesProps {
-  userId: string;
+  userGames: UserGamesType;
   gamesCategory: categoriesType;
   gamesRating: IGamesRating[];
 }
 
 export const UserGames: FC<UserGamesProps> = ({
-  userId,
+  userGames,
   gamesRating,
   gamesCategory,
 }) => {
@@ -29,13 +28,14 @@ export const UserGames: FC<UserGamesProps> = ({
 
   const page = Number(query.page);
 
-  const [games, setGames] = useState<IGDBGameMinimal[]>([]);
+  const [games, setGames] = useState(userGames);
   const [total, setTotal] = useState(0);
   const [take, setTake] = useState(30);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-  const [sortedGames, setSortedGames] = useState(games);
+  const [sortedGames, setSortedGames] = useState([...games[gamesCategory]]);
+  //const sortedGames = [...games[gamesCategory]]
 
-  const [currentGames, setCurrentGames] = useState<IGDBGameMinimal[]>(sortedGames.slice((page - 1) * take, page * take));
+  //const [currentGames, setCurrentGames] = useState<IGDBGameMinimal[]>(sortedGames.slice((page - 1) * take, page * take));
 
   // const sortedGames = [...games[gamesCategory]].sort((a, b) => {
   //   const ratingA =
@@ -45,22 +45,16 @@ export const UserGames: FC<UserGamesProps> = ({
   //   return sortOrder === "asc" ? ratingA - ratingB : ratingB - ratingA;
   // });
 
-
-  useEffect(()=>{
-    userAPI.getUserGames(userId,gamesCategory).then((res)=>{
-      setSortedGames(res.data.games[`${gamesCategory}`]);
-    })
-  },[gamesCategory, userId])
+  const currentGames = sortedGames.slice((page - 1) * take, page * take);
 
   useEffect(() => {
-    setCurrentGames(sortedGames.slice((page - 1) * take, page * take));
-    console.log('action');
-  }, [gamesCategory, page, sortedGames, take]);
+    setSortedGames([...games[gamesCategory]]);
+    //setCurrentGames(sortedGames.slice((page - 1) * take, page * take))
+  }, [games, gamesCategory]);
 
   useEffect(() => {
-    if(sortedGames)
-    setTotal(sortedGames.length);
-  }, [sortedGames]);
+    setTotal(games[gamesCategory].length);
+  }, [games, gamesCategory]);
 
   const toggleSortOrder = () => {
     setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
@@ -100,7 +94,7 @@ export const UserGames: FC<UserGamesProps> = ({
           </div>
         ))}
         <Pagination take={take} total={total} isFixed />
-        {!sortedGames.length && <p>There is no games</p>}
+        {!games[gamesCategory].length && <p>There is no games</p>}
       </div>
     </div>
   );

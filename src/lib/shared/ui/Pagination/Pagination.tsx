@@ -20,15 +20,10 @@ export const Pagination: FC<{
   const centerRef = useRef<HTMLDivElement>(null);
   const page = Number(router.query.page);
 
-  const [top, setTop] = useState<string>();
   const [isHover, setIsHover] = useState(false);
   const [value, setValue] = useState("");
 
   const max = Math.ceil(total / take);
-
-  useWindowScroll(() =>
-    setTop(`${window.scrollY > 0 ? Math.max(0, 55 - window.scrollY) : 55}px`)
-  );
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
@@ -41,7 +36,6 @@ export const Pagination: FC<{
       className={classNames(styles.pagination, {
         [styles.pagination_fixed]: isFixed,
       })}
-      style={{ top }}
     >
       <Button
         color="accent"
@@ -64,11 +58,6 @@ export const Pagination: FC<{
         {"<"}
       </Button>
       <div className={styles.pagination__center} ref={centerRef}>
-        <Tooltip
-          isActive={isHover}
-          positionRef={centerRef}
-          className={styles.pagination__tooltip}
-        >{`${page} of ${max}`}</Tooltip>
         <Input
           onMouseOver={() => setIsHover(true)}
           onMouseOut={() => setIsHover(false)}
@@ -84,6 +73,7 @@ export const Pagination: FC<{
             setPage(value > max ? max : value, router);
           }}
         />
+        {` of ${max}`}
       </div>
       <Button
         color="accent"

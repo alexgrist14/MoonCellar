@@ -1,0 +1,64 @@
+.template {
+  display: flex;
+  flex-direction: column;
+  border-radius: $radius;
+  width: 100%;
+  min-width: 320px;
+  max-width: calc(100vw - 40px);
+  margin-inline: auto;
+  background-color: $wrapperBGColor;
+  color: $wrapperTextColor;
+
+  &__title {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+    padding: 32px 32px 15px;
+    border-bottom: 1px solid $wrapperBorderColor;
+    background-color: $wrapperBGColor;
+    border-radius: 8px 8px 0 0;
+
+    @include mediaMax($screenSm) {
+      padding-inline: 16px;
+    }
+
+    &_external {
+      padding: 0;
+      border: none;
+      color: $wrapperTextColor;
+      background-color: transparent;
+    }
+
+    &_vertical {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  &__content {
+    padding: 24px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    @include mediaSm {
+      padding: 12px 16px;
+    }
+  }
+}
+
+.wrapper {
+  display: grid;
+  gap: 8px;
+}
+
+.scrollbars {
+  &__scrollbar {
+    right: -8px;
+  }
+
+  &__content {
+    max-height: 90vh;
+    padding: 0;
+  }
+}

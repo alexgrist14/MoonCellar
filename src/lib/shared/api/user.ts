@@ -1,14 +1,8 @@
 import { IUser } from "../types/auth";
 import { API_URL } from "../constants";
 import agent from "./agent";
-import {
-  categoriesType,
-  IFollowings,
-  ILogs,
-  IUserGames,
-  IUserLogs,
-} from "../types/user.type";
-import { IGDBGame, IGDBGameMinimal } from "../types/igdb";
+import { categoriesType, IFollowings, ILogs, IUserGames, IUserLogs } from "../types/user.type";
+import { IGDBGame } from "../types/igdb";
 
 const USER_URL = `${API_URL}/user`;
 
@@ -34,8 +28,8 @@ const getAvatar = (id: string) => {
   return agent.get<{ fileName: string }>(`${USER_URL}/profile-picture/${id}`);
 };
 
-const getUserGames = (id: string, category: categoriesType) => {
-  return agent.get<IUserGames>(`${USER_URL}/games/${id}?category=${category}`);
+const getUserGames = (id: string) => {
+  return agent.get<IUserGames>(`${USER_URL}/games/${id}`);
 };
 
 const addGameToCategory = (
@@ -71,21 +65,21 @@ const removeGameRating = (userId: string, gameId: number) => {
   return agent.delete<IUser>(`${USER_URL}/rating/${userId}/${gameId}`);
 };
 
-const getUserFollowings = (userId: string) => {
-  return agent.get<IFollowings>(`${USER_URL}/followings/${userId}`);
-};
+const getUserFollowings = (userId: string)=>{
+  return agent.get<IFollowings>(`${USER_URL}/followings/${userId}`)
+}
 
-const getUserLogs = (userId: string) => {
+const getUserLogs = (userId: string) =>{
   return agent.get<IUserLogs[]>(`${USER_URL}/logs/${userId}`);
-};
+}
 
-const addUserFollowing = (userId: string, followingId: string) => {
+const addUserFollowing = (userId: string, followingId: string)=>{
   return agent.patch<IUser>(`${USER_URL}/followings/${userId}/${followingId}`);
-};
+}
 
-const removeUserFollowing = (userId: string, followingId: string) => {
-  return agent.delete<IUser>(`${USER_URL}/followings/${userId}/${followingId}`);
-};
+const removeUserFollowing = (userId: string, followingId: string)=>{
+  return agent.delete<IUser>(`${USER_URL}/followings/${userId}/${followingId}`)
+}
 
 export const userAPI = {
   getById,
@@ -100,5 +94,5 @@ export const userAPI = {
   getUserFollowings,
   addUserFollowing,
   removeUserFollowing,
-  getUserLogs,
+  getUserLogs
 };
