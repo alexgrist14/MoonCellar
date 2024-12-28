@@ -1,17 +1,13 @@
 .container {
   height: calc(100vh - 55px);
-  padding: 50px;
+  padding: 20px;
   display: grid;
-  grid-template-rows: 50% 45%;
-  gap: 30px;
   margin-inline: auto;
   justify-items: center;
   overflow: hidden;
 
   @include mediaMax($screenSm) {
     min-width: auto;
-    padding: 20px;
-    padding-top: 50px;
   }
 
   .winner {

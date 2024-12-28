@@ -7,7 +7,7 @@
   height: 100%;
   filter: drop-shadow(0 0 0.4rem $accent);
   max-width: 80vw;
-  max-height: 80vw;
+  max-height: min(450px, 80vw);
 
   @include mediaMax($screenSm) {
     aspect-ratio: 1;
