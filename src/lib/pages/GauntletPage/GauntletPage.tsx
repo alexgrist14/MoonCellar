@@ -116,38 +116,7 @@ export const GauntletPage: FC = () => {
   }, [winner]);
 
   return (
-    <div className={styles.page}>
-      <FixedMenu
-        buttons={[
-          {
-            title: "Filters",
-            callback: () =>
-              modal.open(
-                <WrapperTemplate isWithScrollBar>
-                  <ConsolesList initialTabIndex={0} />
-                </WrapperTemplate>
-              ),
-          },
-          {
-            title: "Royal games",
-            callback: () =>
-              modal.open(
-                <WrapperTemplate isWithScrollBar>
-                  <ConsolesList initialTabIndex={1} />
-                </WrapperTemplate>
-              ),
-          },
-          {
-            title: "History",
-            callback: () =>
-              modal.open(
-                <WrapperTemplate isWithScrollBar>
-                  <ConsolesList initialTabIndex={2} />
-                </WrapperTemplate>
-              ),
-          },
-        ]}
-      />
+    <div className={classNames("container", styles.page)}>
       <div
         className={classNames(styles.page__bg, {
           [styles.page__bg_active]:
