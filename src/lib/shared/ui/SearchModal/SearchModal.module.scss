@@ -37,6 +37,7 @@
   }
 
   &__results {
+    align-content: flex-start;
     padding: 5px;
     display: grid;
     grid-template-columns: repeat(6, 1fr);
