@@ -24,11 +24,6 @@ import {
 import { useRouter } from "next/router";
 import { parseQueryFilters } from "../../shared/utils/filters.util";
 import { setPage } from "../../shared/utils/query";
-import { Shadow } from "../../shared/ui/Shadow";
-import { useWindowScroll } from "../../shared/hooks/useWindowScroll";
-import { modal } from "../../shared/ui/Modal";
-import { FixedMenu } from "../../shared/ui/FixedMenu";
-import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
 
 export const GamesPage: FC = () => {
   const router = useRouter();
@@ -94,23 +89,10 @@ export const GamesPage: FC = () => {
   }, [router, query, isReady]);
 
   return (
-    <div className={classNames("container", styles.page)}>
+    <div className={styles.page}>
       <ExpandMenu position="left" titleOpen="Filters">
         <Filters callback={() => debouncedGamesFetch()} />
       </ExpandMenu>
-      <FixedMenu
-        buttons={[
-          {
-            title: "Filters",
-            callback: () =>
-              modal.open(
-                <WrapperTemplate isWithScrollBar>
-                  <Filters callback={() => debouncedGamesFetch()} />
-                </WrapperTemplate>
-              ),
-          },
-        ]}
-      />
       <Pagination take={take} total={total} isFixed />
 
       {isLoading ? (
