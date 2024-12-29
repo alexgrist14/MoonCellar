@@ -121,7 +121,7 @@ export const GauntletPage: FC = () => {
         <ConsolesList />
       </ExpandMenu>
       <div
-        className={classNames(styles.page__bg, {
+        className={classNames(styles.page__bg, styles.page__bg_default, {
           [styles.page__bg_hidden]: isImageActive,
         })}
       >
@@ -133,7 +133,7 @@ export const GauntletPage: FC = () => {
         />
       </div>
       <div
-        className={classNames(styles.page__bg, styles.page__bg_game, {
+        className={classNames(styles.page__bg, {
           [styles.page__bg_active]: isImageActive,
         })}
       >

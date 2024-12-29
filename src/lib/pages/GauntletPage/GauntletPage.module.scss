@@ -14,7 +14,7 @@
     pointer-events: none;
     top: 0;
     left: 0;
-    animation: appearOpacity 0.4s forwards 1 ease;
+    opacity: 0;
 
     & img {
       object-fit: cover;
@@ -23,8 +23,9 @@
       opacity: 0.3;
     }
 
-    &_game {
-      opacity: 0;
+    &_default {
+      animation: appearOpacity 0.4s 1 ease;
+      opacity: 1;
     }
 
     &_active {
