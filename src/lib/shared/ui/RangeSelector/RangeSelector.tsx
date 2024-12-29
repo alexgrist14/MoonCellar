@@ -2,7 +2,8 @@ import { CSSProperties, FC, useEffect, useState } from "react";
 import styles from "./RangeSelector.module.scss";
 import classNames from "classnames";
 
-interface RangeSelectorProps extends Pick<HTMLInputElement, "disabled"> {
+interface RangeSelectorProps
+  extends Partial<Pick<HTMLInputElement, "disabled">> {
   text?: string;
   textPosition?: "above" | "left" | "right";
   variant?: "accent" | "green";

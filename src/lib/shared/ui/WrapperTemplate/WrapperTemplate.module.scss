@@ -3,10 +3,10 @@
   flex-direction: column;
   border-radius: $radius;
   width: 100%;
-  min-width: 320px;
   max-width: calc(100vw - 40px);
   margin-inline: auto;
-  background-color: $wrapperBGColor;
+  background: rgba($wrapperBGColor, 0.8);
+  box-shadow: $basicShadow;
   color: $wrapperTextColor;
 
   &__title {
@@ -50,6 +50,7 @@
 .wrapper {
   display: grid;
   gap: 8px;
+  width: 100%;
 }
 
 .scrollbars {

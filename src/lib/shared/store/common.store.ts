@@ -3,7 +3,6 @@ import { devtools } from "zustand/middleware";
 import {
   IGDBDefault,
   IGDBFamily,
-  IGDBGameMinimal,
   IGDBGenre,
   IGDBPlatform,
 } from "../types/igdb";
@@ -15,6 +14,7 @@ type IState = {
   gameModes?: IGDBDefault[];
   themes?: IGDBDefault[];
   expanded?: "left" | "right" | "both" | "none";
+  timer: number;
 };
 
 type IAction = {
@@ -24,17 +24,20 @@ type IAction = {
   setFamilies: (families: IGDBFamily[]) => void;
   setSystems: (platforms: IGDBPlatform[]) => void;
   setExpanded: (expanded: "left" | "right" | "both" | "none") => void;
+  setTimer: (timer: number) => void;
 };
 
 export const useCommonStore = create<IState & IAction>()(
   devtools(
     (set) => ({
+      timer: 5,
       setGenres: (genres) => set({ genres }),
       setExpanded: (expanded) => set({ expanded }),
       setSystems: (systems) => set({ systems }),
       setFamilies: (families) => set({ families }),
       setGameModes: (modes) => set({ gameModes: modes }),
       setThemes: (themes) => set({ themes }),
+      setTimer: (timer) => set({ timer }),
     }),
     {
       name: "common",

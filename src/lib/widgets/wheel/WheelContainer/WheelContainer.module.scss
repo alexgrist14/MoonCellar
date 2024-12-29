@@ -1,22 +1,12 @@
 .container {
-  height: calc(100vh - 55px);
-  padding: 20px;
+  padding-inline: 20px;
   display: grid;
   margin-inline: auto;
   justify-items: center;
-  overflow: hidden;
+  grid-template-rows: 55px 45% 260px;
+  gap: 30px;
 
   @include mediaMax($screenSm) {
-    min-width: auto;
-  }
-
-  .winner {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    color: white;
-    min-width: 240px;
   }
 }
 

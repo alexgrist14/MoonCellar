@@ -1,10 +1,17 @@
-import { FC, useEffect, useRef, useState } from "react";
+import {
+  Dispatch,
+  FC,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import styles from "./WheelComponent.module.scss";
 import classNames from "classnames";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { useGamesStore } from "@/src/lib/shared/store/games.store";
 import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
-import { shuffle } from "@/src/lib/shared/utils/common";
+import { emptyGames } from "@/src/lib/shared/constants/games.const";
 
 interface WheelComponentProps {
   segColors: string[];
@@ -14,33 +21,9 @@ interface WheelComponentProps {
   size?: number;
   fontFamily?: string;
   time?: number;
+  wheelGames: IGDBGameMinimal[];
+  setWheelGames: Dispatch<SetStateAction<IGDBGameMinimal[]>>;
 }
-
-const emptyGames: IGDBGameMinimal[] = Array(16)
-  .fill("")
-  .map(() => ({
-    name: "",
-    _id: -1,
-    aggregated_rating: 0,
-    artworks: [],
-    category: 0,
-    cover: { _id: -1, height: 0, url: "", width: 0 },
-    first_release_date: 0,
-    game_modes: [],
-    genres: [],
-    involved_companies: [],
-    keywords: [],
-    platforms: [],
-    release_dates: [],
-    screenshots: [],
-    slug: "",
-    storyline: "",
-    summary: "",
-    themes: [],
-    total_rating: 0,
-    url: "",
-    websites: [],
-  }));
 
 export const WheelComponent: FC<WheelComponentProps> = ({
   buttonText = "Spin",
@@ -50,8 +33,10 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   segColors,
   size = 290,
   time = 5,
+  wheelGames,
+  setWheelGames,
 }) => {
-  const { games, royalGames, addHistoryGame, setWinner } = useGamesStore();
+  const { addHistoryGame, setWinner } = useGamesStore();
 
   const {
     isFinished,
@@ -68,22 +53,13 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   const angle = useRef(0);
 
   const [winnerAngle, setWinnerAngle] = useState(0);
-  const [wheelGames, setWheelGames] = useState<IGDBGameMinimal[]>();
 
   useEffect(() => {
-    if (isRoyal) {
-      setWheelGames(!!royalGames?.length ? shuffle(royalGames) : emptyGames);
-    } else {
-      setWheelGames(!!games?.length ? shuffle(games) : emptyGames);
-    }
+    if (!canvasRef.current) return;
 
-    setWinner(undefined);
-  }, [royalGames, games, isRoyal, setWinner]);
-
-  useEffect(() => {
-    const centerX = 300;
-    const centerY = 300;
-    const ctx = canvasRef.current?.getContext("2d");
+    const centerX = canvasRef.current.width / 2;
+    const centerY = canvasRef.current.height / 2;
+    const ctx = canvasRef.current.getContext("2d");
 
     if (!ctx) return;
 
@@ -117,7 +93,6 @@ export const WheelComponent: FC<WheelComponentProps> = ({
     };
 
     const drawWheel = () => {
-      console.log('wheel');
       if (!wheelGames?.length) return;
 
       const len = wheelGames.length;
@@ -130,6 +105,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
       ctx.textBaseline = "middle";
       ctx.textAlign = "center";
       ctx.font = "1em " + fontFamily;
+
       for (let i = 1; i <= len; i++) {
         const angle = PI2 * (i / len);
 
@@ -137,6 +113,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
 
         lastAngle = angle;
       }
+
       ctx.beginPath();
       ctx.arc(centerX, centerY, size, 0, PI2, false);
       ctx.closePath();
@@ -146,14 +123,13 @@ export const WheelComponent: FC<WheelComponentProps> = ({
       ctx.stroke();
     };
 
-    ctx.clearRect(0, 0, 600, 600);
+    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
     drawWheel();
   }, [contrastColor, fontFamily, primaryColor, segColors, size, wheelGames]);
 
   useEffect(() => {
     if (isStarted && !!wheelGames?.length && wheelGames[0]._id !== -1) {
-      console.log('here');
       const winner = Math.floor(Math.random() * wheelGames.length);
 
       angle.current += 360 * Math.ceil(time);
@@ -168,18 +144,17 @@ export const WheelComponent: FC<WheelComponentProps> = ({
 
       setTimeout(() => {
         setFinished(true);
-        setWinner(wheelGames[winner]);
 
         if (isRoyal) {
-          const filtered =
-            wheelGames?.filter((game) => game._id !== wheelGames[winner]._id) ||
-            [];
-
-          setWheelGames(filtered.length > 1 ? filtered : []);
+          setWheelGames((wheelGames) =>
+            wheelGames.filter((game) => game._id !== wheelGames[winner]._id)
+          );
         } else {
           addHistoryGame(wheelGames[winner]);
         }
-      }, 5000);
+
+        setWinner(wheelGames[winner]);
+      }, time * 1000);
     }
   }, [
     isStarted,
@@ -190,13 +165,14 @@ export const WheelComponent: FC<WheelComponentProps> = ({
     setWinner,
     isRoyal,
     addHistoryGame,
+    setWheelGames,
   ]);
 
   return (
     <div
       id="wheel"
       className={classNames(styles.wheel, {
-        [styles.wheel_active]: !isFinished || (isRoyal && !royalGames?.length),
+        [styles.wheel_active]: !isFinished,
         [styles.wheel_disabled]: isLoading,
       })}
     >
