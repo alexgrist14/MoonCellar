@@ -5,16 +5,16 @@
   overflow: hidden;
 
   &__bg {
-    transition: 0.4s;
-    opacity: 0;
     position: fixed;
+    transition: 0.4s;
     z-index: -1;
-    height: 100%;
-    width: 100%;
+    height: 100vh;
+    width: 100vw;
     user-select: none;
     pointer-events: none;
     top: 0;
     left: 0;
+    animation: appearOpacity 0.4s forwards 1 ease;
 
     & img {
       object-fit: cover;
@@ -23,8 +23,16 @@
       opacity: 0.3;
     }
 
+    &_game {
+      opacity: 0;
+    }
+
     &_active {
       opacity: 1;
+    }
+
+    &_hidden {
+      opacity: 0;
     }
   }
 }

@@ -72,6 +72,9 @@ export const GauntletPage: FC = () => {
     setGames,
   ]);
 
+  const isImageActive =
+    !!bg && !!winner && winner._id === bg.gameId && isImageReady;
+
   useEffect(() => {
     if (isLoading && !isRoyal) {
       getIGDBGames();
@@ -80,6 +83,8 @@ export const GauntletPage: FC = () => {
 
   useEffect(() => {
     const pictures: number[] = [];
+
+    setIsImageReady(false);
 
     if (!!winner) {
       if (!!winner.artworks?.length) {
@@ -117,8 +122,19 @@ export const GauntletPage: FC = () => {
       </ExpandMenu>
       <div
         className={classNames(styles.page__bg, {
-          [styles.page__bg_active]:
-            !!bg && !!winner && winner._id === bg.gameId && isImageReady,
+          [styles.page__bg_hidden]: isImageActive,
+        })}
+      >
+        <Image
+          alt="Background"
+          src={"/images/moon.jpg"}
+          width={1920}
+          height={1080}
+        />
+      </div>
+      <div
+        className={classNames(styles.page__bg, styles.page__bg_game, {
+          [styles.page__bg_active]: isImageActive,
         })}
       >
         <Image
