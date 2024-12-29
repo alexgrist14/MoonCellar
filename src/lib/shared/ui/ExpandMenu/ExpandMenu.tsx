@@ -38,6 +38,8 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
   return createPortal(
     <div
       ref={expandRef}
+      id={position}
+      key={position}
       className={classNames(styles.menu, {
         [styles.menu_disabled]:
           isMobile && !isActive && !!expanded && expanded !== "none",
@@ -71,26 +73,13 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
         }}
       >
         <div
-          className={styles.menu__title}
-          style={{
-            borderRadius:
-              position === "left"
-                ? isActive
-                  ? "0 0 0 8px"
-                  : "0 0 8px 0"
-                : isActive
-                ? "0 0 8px 0"
-                : "0 0 0 8px",
-            transform: `translateX(${
-              position === "left"
-                ? isActive
-                  ? "-50%"
-                  : "50%"
-                : isActive
-                ? "50%"
-                : "-50%"
-            })`,
-          }}
+          className={classNames(
+            styles.menu__title,
+            styles[`menu__title_${position}`],
+            {
+              [styles[`menu__title_${position}_active`]]: isActive,
+            }
+          )}
         >
           <span>{isActive ? titleClose || "Close" : titleOpen || "Open"}</span>
         </div>

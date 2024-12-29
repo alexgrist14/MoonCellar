@@ -1,7 +1,6 @@
 import { FC, useEffect, useRef, useState } from "react";
 import styles from "./WheelComponent.module.scss";
 import classNames from "classnames";
-import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { useGamesStore } from "@/src/lib/shared/store/games.store";
 import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
@@ -16,6 +15,32 @@ interface WheelComponentProps {
   fontFamily?: string;
   time?: number;
 }
+
+const emptyGames: IGDBGameMinimal[] = Array(16)
+  .fill("")
+  .map(() => ({
+    name: "",
+    _id: -1,
+    aggregated_rating: 0,
+    artworks: [],
+    category: 0,
+    cover: { _id: -1, height: 0, url: "", width: 0 },
+    first_release_date: 0,
+    game_modes: [],
+    genres: [],
+    involved_companies: [],
+    keywords: [],
+    platforms: [],
+    release_dates: [],
+    screenshots: [],
+    slug: "",
+    storyline: "",
+    summary: "",
+    themes: [],
+    total_rating: 0,
+    url: "",
+    websites: [],
+  }));
 
 export const WheelComponent: FC<WheelComponentProps> = ({
   buttonText = "Spin",
@@ -46,7 +71,12 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   const [wheelGames, setWheelGames] = useState<IGDBGameMinimal[]>();
 
   useEffect(() => {
-    setWheelGames(shuffle(isRoyal ? royalGames || [] : games || []));
+    if (isRoyal) {
+      setWheelGames(!!royalGames?.length ? shuffle(royalGames) : emptyGames);
+    } else {
+      setWheelGames(!!games?.length ? shuffle(games) : emptyGames);
+    }
+
     setWinner(undefined);
   }, [royalGames, games, isRoyal, setWinner]);
 
@@ -87,6 +117,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
     };
 
     const drawWheel = () => {
+      console.log('wheel');
       if (!wheelGames?.length) return;
 
       const len = wheelGames.length;
@@ -121,7 +152,8 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   }, [contrastColor, fontFamily, primaryColor, segColors, size, wheelGames]);
 
   useEffect(() => {
-    if (isStarted && !!wheelGames?.length) {
+    if (isStarted && !!wheelGames?.length && wheelGames[0]._id !== -1) {
+      console.log('here');
       const winner = Math.floor(Math.random() * wheelGames.length);
 
       angle.current += 360 * Math.ceil(time);
@@ -176,7 +208,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
           if (isRoyal) {
             return setStarted(true);
           } else {
-            setWheelGames([]);
+            setWheelGames(emptyGames);
             setLoading(true);
           }
         }}
