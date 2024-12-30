@@ -12,20 +12,19 @@ export type CategoriesType =
 
 export type CategoriesCount = Record<CategoriesType, number>;
 
-
 export interface ILogs {
-    date: Date;
-    action: string;
-    isAdd: boolean;
-    rating?: number;
-    gameId: number;
-    game:{
-      cover:{
-        url: string;
-      },
-      name: string;
-      slug: string;
-    }
+  date: Date;
+  action: string;
+  isAdd: boolean;
+  rating?: number;
+  gameId: number;
+  game: {
+    cover: {
+      url: string;
+    };
+    name: string;
+    slug: string;
+  };
 }
 
 export interface IUserLogs {
@@ -46,3 +45,9 @@ export interface IGamesRating {
   game: number;
   rating: number;
 }
+
+export interface IUserFilter {
+  name: string;
+  filter: string;
+}
+

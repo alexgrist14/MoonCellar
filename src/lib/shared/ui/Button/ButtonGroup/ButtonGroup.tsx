@@ -7,7 +7,6 @@ import { IButtonGroupItem } from "../../../types/buttons";
 
 interface IButtonGroupProps {
   buttons: IButtonGroupItem[];
-  style?: CSSProperties;
   wrapperStyle?: CSSProperties;
   isCompact?: boolean;
   wrapperClassName?: string;
@@ -15,9 +14,8 @@ interface IButtonGroupProps {
 
 export const ButtonGroup: FC<IButtonGroupProps> = ({
   buttons,
-  style,
-  wrapperStyle,
   isCompact,
+  wrapperStyle,
   wrapperClassName,
 }) => {
   return (
@@ -31,7 +29,10 @@ export const ButtonGroup: FC<IButtonGroupProps> = ({
         !!button.link ? (
           <Link key={i} href={button.link} target={button.target}>
             <Button
-              style={{ ...style, ...(button.isHidden && { display: "none" }) }}
+              style={{
+                ...button.style,
+                ...(button.isHidden && { display: "none" }),
+              }}
               onClick={button.callback}
               active={button.isActive}
               disabled={button.isDisabled}
@@ -46,7 +47,10 @@ export const ButtonGroup: FC<IButtonGroupProps> = ({
         ) : (
           <Button
             key={i}
-            style={{ ...style, ...(button.isHidden && { display: "none" }) }}
+            style={{
+              ...button.style,
+              ...(button.isHidden && { display: "none" }),
+            }}
             onClick={button.callback}
             active={button.isActive}
             disabled={button.isDisabled}

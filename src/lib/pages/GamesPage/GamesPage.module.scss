@@ -1,5 +1,7 @@
 .page {
   &__games {
+    width: 100%;
+    height: 100%;
     display: grid;
     margin-inline: auto;
     gap: 20px;

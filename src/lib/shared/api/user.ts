@@ -4,8 +4,9 @@ import {
   CategoriesCount,
   CategoriesType,
   IFollowings,
+  IUserFilter,
   IUserGames,
-  IUserLogs
+  IUserLogs,
 } from "../types/user.type";
 import agent from "./agent";
 
@@ -90,6 +91,26 @@ const removeUserFollowing = (userId: string, followingId: string) => {
   return agent.delete<IUser>(`${USER_URL}/followings/${userId}/${followingId}`);
 };
 
+const addFilter = (userId: string, filter: IUserFilter) => {
+  return agent.post<Pick<IUser, "_id" | "filters">>(
+    `${USER_URL}/filters/${userId}`,
+    filter
+  );
+};
+
+const removeFilter = (userId: string, name: string) => {
+  return agent.delete<Pick<IUser, "_id" | "filters">>(
+    `${USER_URL}/filters/${userId}`,
+    { params: { name } }
+  );
+};
+
+const getFilters = (userId: string) => {
+  return agent.get<Pick<IUser, "_id" | "filters">>(
+    `${USER_URL}/filters/${userId}`
+  );
+};
+
 export const userAPI = {
   getById,
   getByName,
@@ -104,5 +125,8 @@ export const userAPI = {
   addUserFollowing,
   removeUserFollowing,
   getUserLogs,
-  getUserGamesLength
+  getUserGamesLength,
+  addFilter,
+  removeFilter,
+  getFilters,
 };

@@ -33,6 +33,8 @@
   }
 
   &__button {
+    height: fit-content;
+
     &_adaptive {
       height: max(1.8vw, 18px);
       font-size: max(0.8vw, 12px);

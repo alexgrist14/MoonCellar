@@ -20,6 +20,7 @@ import classNames from "classnames";
 import { axiosUtils } from "../../shared/utils/axios";
 import { IGDBApi } from "../../shared/api";
 import { useStatesStore } from "../../shared/store/states.store";
+import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
 
 export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
   const { royalGames, addRoyalGame, removeRoyalGame } = useGamesStore();
@@ -132,7 +133,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
           />
         </div>
         <div className={styles.page__left}>
-          <div className={styles.page__wrapper}>
+          <WrapperTemplate contentStyle={{ padding: "0", gap: "0" }}>
             <div className={styles.page__cover}>
               {isLoading && <Loader />}
               {!!game.cover?.url ? (
@@ -149,40 +150,44 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
               )}
             </div>
             <GameControls game={minimalGame} />
-          </div>
+          </WrapperTemplate>
           {!isMobile && (
-            <ButtonGroup
-              wrapperClassName={classNames(
-                styles.page__actions,
-                styles.page__actions_standalone
-              )}
-              buttons={[
-                {
-                  title: "Search on Youtube",
-                  link: `https://www.youtube.com/results?search_query=${game.name}`,
-                  target: "_blank",
-                },
-                {
-                  title: "Search on RetroAchievements",
-                  link: `https://retroachievements.org/searchresults.php?s=${game.name}&t=1`,
-                  target: "_blank",
-                },
-                {
-                  title: "Search on HowLongToBeat",
-                  link: `https://howlongtobeat.com/?q=${encodeURI(game.name)}`,
-                  target: "_blank",
-                },
-                {
-                  title: "Open in IGDB",
-                  link: game.url,
-                  isHidden: !game.url,
-                  target: "_blank",
-                },
-              ]}
-            />
+            <WrapperTemplate
+              wrapperStyle={{ marginTop: "40px" }}
+              contentStyle={{ padding: "10px" }}
+            >
+              <ButtonGroup
+                wrapperClassName={styles.page__actions}
+                buttons={[
+                  {
+                    title: "Search on Youtube",
+                    link: `https://www.youtube.com/results?search_query=${game.name}`,
+                    target: "_blank",
+                  },
+                  {
+                    title: "Search on RetroAchievements",
+                    link: `https://retroachievements.org/searchresults.php?s=${game.name}&t=1`,
+                    target: "_blank",
+                  },
+                  {
+                    title: "Search on HowLongToBeat",
+                    link: `https://howlongtobeat.com/?q=${encodeURI(
+                      game.name
+                    )}`,
+                    target: "_blank",
+                  },
+                  {
+                    title: "Open in IGDB",
+                    link: game.url,
+                    isHidden: !game.url,
+                    target: "_blank",
+                  },
+                ]}
+              />
+            </WrapperTemplate>
           )}
         </div>
-        <div className={styles.page__right}>
+        <WrapperTemplate classNameContent={styles.page__right}>
           <h2>{game.name}</h2>
           <div className={styles.page__info}>
             {!!game.first_release_date && (
@@ -351,7 +356,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
               </div>
             )}
           </div>
-        </div>
+        </WrapperTemplate>
       </div>
     </>
   );

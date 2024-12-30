@@ -1,4 +1,4 @@
-import { HTMLAttributeAnchorTarget, ReactNode } from "react";
+import { CSSProperties, HTMLAttributeAnchorTarget, ReactNode } from "react";
 
 export type IButtonColor =
   | "default"
@@ -18,4 +18,5 @@ export interface IButtonGroupItem {
   isDisabled?: boolean;
   isHidden?: boolean;
   target?: HTMLAttributeAnchorTarget;
+  style?: CSSProperties;
 }

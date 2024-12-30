@@ -16,17 +16,15 @@ import { useWindowResizeAction } from "../../shared/hooks";
 import { screenGt, screenLg, screenMd, screenSm } from "../../shared/constants";
 import { useRouter } from "next/router";
 import { parseQueryFilters } from "../../shared/utils/filters.util";
-import { setPage } from "../../shared/utils/query";
 import { Shadow } from "../../shared/ui/Shadow";
 import { useWindowScroll } from "../../shared/hooks/useWindowScroll";
+import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
 
 export const GamesPage: FC = () => {
   const router = useRouter();
-  const { isReady, asPath, query } = router;
+  const { asPath, query } = router;
 
-  const gamesRef = useRef<HTMLDivElement>(null);
-
-  const { isLoading, setLoading, isRoyal } = useStatesStore();
+  const { isLoading, setLoading, isRoyal, isMobile } = useStatesStore();
   const { setGenres, setGameModes, setSystems, setThemes } = useCommonStore();
 
   const [games, setGames] = useState<IGDBGameMinimal[]>([]);
@@ -36,12 +34,10 @@ export const GamesPage: FC = () => {
   const [isShadowActive, setIsShadowActive] = useState(false);
 
   const debouncedGamesFetch = useDebouncedCallback(() => {
-    if (!query.page) return;
-
     setLoading(true);
 
     const filters = parseQueryFilters(asPath);
-    const page = Number(query.page);
+    const page = Number(query.page || 1);
 
     !!page &&
       IGDBApi.getGames({
@@ -81,10 +77,6 @@ export const GamesPage: FC = () => {
     return setTake(14);
   });
 
-  useEffect(() => {
-    isReady && !query.page && setPage(1, router);
-  }, [router, query, isReady]);
-
   useWindowScroll(() => {
     const height =
       document.body.scrollHeight -
@@ -104,21 +96,27 @@ export const GamesPage: FC = () => {
         <Filters callback={() => debouncedGamesFetch()} />
       </ExpandMenu>
       <Pagination take={take} total={total} isFixed />
-      {isLoading ? (
-        <Loader type="pacman" />
-      ) : (
-        <div
-          ref={gamesRef}
-          className={classNames(styles.page__games, {
-            [styles.page__games_loading]: isLoading,
-          })}
-        >
-          {games.map((game) => (
-            <GameCard key={game._id} game={game} />
-          ))}
-          <Shadow isActive={isShadowActive} isFixed />
-        </div>
-      )}
+      <WrapperTemplate
+        contentStyle={{
+          padding: isMobile ? "10px" : "20px",
+          minHeight: "calc(100vh - 155px)",
+        }}
+      >
+        {isLoading ? (
+          <Loader type="pacman" />
+        ) : (
+          <div
+            className={classNames(styles.page__games, {
+              [styles.page__games_loading]: isLoading,
+            })}
+          >
+            {games.map((game) => (
+              <GameCard key={game._id} game={game} />
+            ))}
+          </div>
+        )}
+      </WrapperTemplate>
+      <Shadow isActive={isShadowActive} isFixed />
     </div>
   );
 };

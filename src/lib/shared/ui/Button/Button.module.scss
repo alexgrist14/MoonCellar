@@ -1,5 +1,6 @@
 .button {
   @include flexCenter;
+  @include textEllipsis;
   text-align: center;
 
   border-width: 2px;

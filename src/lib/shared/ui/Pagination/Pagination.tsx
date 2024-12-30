@@ -4,8 +4,6 @@ import { Button } from "../Button";
 import { Input } from "../Input";
 import { keyboardUtils } from "../../utils/keyboard";
 import classNames from "classnames";
-import { Tooltip } from "../Tooltip";
-import { useWindowScroll } from "../../hooks/useWindowScroll";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/router";
 import { setPage } from "../../utils/query";
@@ -18,9 +16,8 @@ export const Pagination: FC<{
   const router = useRouter();
 
   const centerRef = useRef<HTMLDivElement>(null);
-  const page = Number(router.query.page);
+  const page = Number(router.query.page || 1);
 
-  const [isHover, setIsHover] = useState(false);
   const [value, setValue] = useState("");
 
   const max = Math.ceil(total / take);
@@ -59,8 +56,6 @@ export const Pagination: FC<{
       </Button>
       <div className={styles.pagination__center} ref={centerRef}>
         <Input
-          onMouseOver={() => setIsHover(true)}
-          onMouseOut={() => setIsHover(false)}
           style={{ padding: "4px", width: "75px" }}
           className={styles.pagination__input}
           type="number"

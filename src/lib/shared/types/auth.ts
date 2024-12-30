@@ -1,4 +1,4 @@
-import { CategoriesType, IGamesRating, ILogs } from "./user.type";
+import { CategoriesType, IGamesRating, ILogs, IUserFilter } from "./user.type";
 
 export interface IAuth {
   userName: string;
@@ -14,4 +14,5 @@ export interface IUser {
   gamesRating: IGamesRating[];
   profilePicture: string;
   followings: string[];
+  filters: IUserFilter[];
 }

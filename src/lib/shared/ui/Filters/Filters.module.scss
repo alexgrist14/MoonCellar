@@ -1,6 +1,7 @@
 .filters {
   display: grid;
   gap: 20px;
+  align-content: flex-start;
 
   &__buttons {
     display: grid;
@@ -47,5 +48,14 @@
   &__top {
     display: grid;
     gap: 10px;
+  }
+
+  &__saved {
+    display: grid;
+    gap: 5px;
+
+    & button {
+      width: 100%;
+    }
   }
 }

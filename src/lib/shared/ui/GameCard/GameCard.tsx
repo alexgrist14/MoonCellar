@@ -1,4 +1,4 @@
-import { FC, useRef, useState } from "react";
+import { CSSProperties, FC, useRef, useState } from "react";
 import styles from "./GameCard.module.scss";
 import Link from "next/link";
 import { IGDBGameMinimal } from "../../types/igdb";
@@ -18,9 +18,11 @@ import { useStatesStore } from "../../store/states.store";
 
 interface IGameCardProps {
   game: IGDBGameMinimal;
+  className?: string;
+  style?: CSSProperties;
 }
 
-export const GameCard: FC<IGameCardProps> = ({ game }) => {
+export const GameCard: FC<IGameCardProps> = ({ game, className, style }) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
   const [isHover, setIsHover] = useState(false);
@@ -37,7 +39,8 @@ export const GameCard: FC<IGameCardProps> = ({ game }) => {
     <div
       key={game._id}
       ref={cardRef}
-      className={styles.card}
+      className={classNames(styles.card, className)}
+      style={style}
       onMouseOver={() => setIsHover(true)}
       onMouseOut={() => setIsHover(false)}
       draggable={false}

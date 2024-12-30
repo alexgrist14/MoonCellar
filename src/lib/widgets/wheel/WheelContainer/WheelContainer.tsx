@@ -83,7 +83,7 @@ export const WheelContainer: FC = () => {
         }
         size={295}
       />
-      {!!winner && <GameCard game={winner} />}
+      {!!winner && <GameCard className={styles.winner} game={winner} />}
     </div>
   );
 };

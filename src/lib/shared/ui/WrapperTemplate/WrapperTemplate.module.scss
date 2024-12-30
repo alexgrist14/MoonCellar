@@ -3,10 +3,11 @@
   flex-direction: column;
   border-radius: $radius;
   width: 100%;
+  height: fit-content;
   max-width: calc(100vw - 40px);
   margin-inline: auto;
-  background: rgba($wrapperBGColor, 0.8);
-  box-shadow: $basicShadow;
+  background: rgba($wrapperBGColor, 0.7);
+  filter: drop-shadow(0 0 0.4rem $textColor);
   color: $wrapperTextColor;
 
   &__title {
@@ -51,6 +52,7 @@
   display: grid;
   gap: 8px;
   width: 100%;
+  height: fit-content;
 }
 
 .scrollbars {

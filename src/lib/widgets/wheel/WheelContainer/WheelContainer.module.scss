@@ -5,9 +5,6 @@
   justify-items: center;
   grid-template-rows: 55px 45% 260px;
   gap: 30px;
-
-  @include mediaMax($screenSm) {
-  }
 }
 
 .img {
@@ -16,4 +13,9 @@
   width: 96px;
   height: 96px;
   border-radius: 30px;
+}
+
+.winner {
+  height: 100%;
+  width: auto;
 }
