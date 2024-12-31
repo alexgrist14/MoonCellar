@@ -34,13 +34,12 @@ const UserInfo: FC<UserInfoProps> = ({
 }) => {
   const { profile } = useAuthStore();
 
+  const [follow, setFollow] = useState('');
+  //console.log('Outside useEffect: '+ profile?.followings);
+
   const [userFollowings, setUserFollowing] = useState<
     IFollowings | undefined
   >();
-
-  const [follow, setFollow] = useState(
-    profile?.followings.includes(id) ? "Unfollow" : "Follow"
-  );
 
   const setActivityType = (action: string, isAdd: boolean, rating?: number) => {
     const actions = action.split(" and ");
@@ -55,27 +54,43 @@ const UserInfo: FC<UserInfoProps> = ({
   };
 
   useEffect(() => {
-    if (profile?.followings.includes(id)) {
-      setFollow("Unfollow");
-    } else setFollow("Follow");
-  }, [id, profile?.followings]);
-
-  useEffect(() => {
     setUserFollowing(undefined);
 
     userAPI
       .getUserFollowings(id)
-      .then((res) => setUserFollowing(res.data))
+      .then((res) =>{
+        setUserFollowing(res.data)
+      } )
       .catch();
   }, [id]);
+
+  useEffect(()=>{
+    if(profile){
+      userAPI.getUserFollowings(profile?._id).then((res)=>{
+        res.data.followings.some((item)=>item._id === id) ? setFollow('Unfollow') : setFollow('Follow');
+      })
+    }
+  },[id, profile])
+
+  // useEffect(()=>{
+  //   setFollow('');
+  //   if(profile){
+  //     profile.followings.includes(id) ? setFollow('Unfollow') : setFollow('Follow');
+  //     //console.log('Inside useEffect: '+ profile?.followings);
+  //   }
+      
+  // },[id, profile])
 
   const handleFollowClick = () => {
     if (profile?.followings.includes(id)) {
       userAPI.removeUserFollowing(profile._id, id);
-      setFollow("Follow");
+      profile.followings = [];
+      setFollow('Follow');
+      //profile.followings = profile.followings.filter((item) => item !== id);
     } else if (profile) {
       userAPI.addUserFollowing(profile._id, id);
-      setFollow("Unfollow");
+      profile.followings = [];
+      setFollow('Unfollow');
     }
   };
 
@@ -94,8 +109,9 @@ const UserInfo: FC<UserInfoProps> = ({
             />
             {id !== profile?._id && (
               <Button className={styles.btn} onClick={handleFollowClick}>
-                {follow}
+                                {follow || ' '}
               </Button>
+
             )}
           </div>
 

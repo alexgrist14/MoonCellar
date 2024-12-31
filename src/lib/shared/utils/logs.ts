@@ -1,28 +1,33 @@
 import { ILogs } from "../types/user.type";
 
 export const removeDuplicateLogs = (logs: ILogs[]) => {
-  return logs.reverse().reduce<ILogs[]>((acc, curr) => {
-    !acc.some(
-      (item) =>
-        (item.action === "rating" && item.action === curr.action && item.gameId === curr.gameId) ||
-        (item.action !== "rating" && item.gameId === curr.gameId)) && acc.push(curr)
+  return logs.reverse().reduce<ILogs[]>((acc, curr, i) => {
+    const lastLog = acc[acc.length - 1];
 
+    if (
+      lastLog &&
+      lastLog.gameId === curr.gameId &&
+      ((lastLog.action !== "rating" && curr.action !== "rating") ||
+        (lastLog.rating && curr.rating))
+    ) {
+      acc.pop();
+    }
+
+    acc.push(curr);
     return acc;
   }, []);
 };
 
 export const mergeLogs = (logs: ILogs[]) => {
   return removeDuplicateLogs(logs).reduce<ILogs[]>((prev, curr) => {
-    const existed = prev.find((item) => item.gameId === curr.gameId);
+    const lastLog = prev[prev.length - 1];
 
-    if (!!existed) {
-      existed.action = `${existed.action} and ${curr.action}`;
-      if (curr.rating) existed.rating = curr.rating;
+    if (lastLog && lastLog.gameId === curr.gameId) {
+      lastLog.action = `${lastLog.action} and ${curr.action}`;
+      if (curr.rating) lastLog.rating = curr.rating;
       return prev;
-    } else {
-      prev.push(curr);
-      
     }
+    prev.push({ ...curr });
     return prev;
   }, []);
 };
