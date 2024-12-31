@@ -25,6 +25,7 @@ interface IButton
   color?: IButtonColor;
   active?: boolean;
   tooltip?: string | ReactNode;
+  tooltipAlign?: "left" | "right" | "center";
 }
 
 export const Button = forwardRef(
@@ -36,6 +37,7 @@ export const Button = forwardRef(
       active,
       tooltip,
       color = "default",
+      tooltipAlign,
       ...props
     }: IButton,
     ref
@@ -57,12 +59,17 @@ export const Button = forwardRef(
         !!tooltipRect &&
         !!rect
       ) {
-        setTooltipCoords([
-          rect.x,
-          window.scrollY + rect.y - 5 - tooltipRect.height,
-        ]);
+        console.log(window.screenX)
+        const x =
+          tooltipAlign === "left"
+            ? rect.x
+            : tooltipAlign === "right"
+            ? rect.x + rect.width - tooltipRect.width
+            : rect.x + rect.width / 2 - tooltipRect.width / 2;
+
+        setTooltipCoords([x, window.scrollY + rect.y - 5 - tooltipRect.height]);
       }
-    }, [tooltipCoords, isHover]);
+    }, [tooltipCoords, isHover, tooltipAlign]);
 
     return (
       <button

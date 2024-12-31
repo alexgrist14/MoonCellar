@@ -114,9 +114,11 @@ export const GauntletPage: FC = () => {
 
   return (
     <div className={classNames("container", styles.page)}>
-      <ExpandMenu id="consoles" titleOpen="Filters" position="left">
-        <Filters isGauntlet />
-      </ExpandMenu>
+      {!isRoyal && (
+        <ExpandMenu id="consoles" titleOpen="Filters" position="left">
+          <Filters isGauntlet />
+        </ExpandMenu>
+      )}
       <ExpandMenu id="consoles" titleOpen="Lists" position="right">
         <ConsolesList />
       </ExpandMenu>

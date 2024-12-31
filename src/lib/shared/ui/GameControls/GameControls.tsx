@@ -235,6 +235,7 @@ export const GameControls: FC<IGameControlsProps> = ({
         }}
         color="transparent"
         tooltip={(isPlaying ? "Remove from" : "Add to") + " playing"}
+        tooltipAlign="left"
         className={classNames(styles.controls__action, {
           [styles.controls__action_active]: isPlaying,
         })}
@@ -313,6 +314,8 @@ export const GameControls: FC<IGameControlsProps> = ({
       </Button>
       <Button
         ref={ratingButtonRef}
+        tooltip={"Set rating"}
+        tooltipAlign="right"
         onClick={() => {
           setIsRatingActive(!isRatingActive);
           setIsPauseActive(false);

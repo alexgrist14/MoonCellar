@@ -30,7 +30,7 @@ type IAction = {
 export const useCommonStore = create<IState & IAction>()(
   devtools(
     (set) => ({
-      timer: 5,
+      timer: 3,
       setGenres: (genres) => set({ genres }),
       setExpanded: (expanded) => set({ expanded }),
       setSystems: (systems) => set({ systems }),

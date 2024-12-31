@@ -3,6 +3,7 @@ import styles from "./GamesList.module.scss";
 import { Button } from "@/src/lib/shared/ui/Button";
 import Link from "next/link";
 import { IGDBGameMinimal } from "../../types/igdb";
+import { ButtonGroup } from "../Button/ButtonGroup";
 
 interface IGamesListProps {
   games: IGDBGameMinimal[];
@@ -23,20 +24,37 @@ export const GamesList: FC<IGamesListProps> = ({
           <h3 style={{ width: "100%", textAlign: "center" }}>List is empty</h3>
         )}
         {!!games?.length && !!getGames && (
-          <Button onClick={() => getGames([])}>Remove all</Button>
+          <Button color="red" onClick={() => getGames([])}>
+            Remove all
+          </Button>
         )}
       </div>
       <div className={styles.consoles__games}>
         {!!games?.length
-          ? games.map((game) => (
-              <div key={game._id} className={styles.consoles__game}>
-                <Link href={`/games/${game.slug}`} target="_blank">
-                  {game.name}
-                </Link>
-                {!!removeGame && (
-                  <Button onClick={() => removeGame(game)}>Remove</Button>
-                )}
-              </div>
+          ? games.map((game, i) => (
+              <ButtonGroup
+                key={`${game._id}_${i}`}
+                wrapperStyle={{
+                  gridTemplateColumns: !!removeGame ? "1fr 20%" : "1fr",
+                }}
+                isCompact
+                wrapperClassName={styles.consoles__game}
+                buttons={[
+                  {
+                    title: game.name,
+                    link: `/games/${game.slug}`,
+                    target: "_blank",
+                    color: "fancy",
+                    style: { textAlign: "start" },
+                  },
+                  {
+                    title: "Remove",
+                    color: "red",
+                    isHidden: !removeGame,
+                    callback: () => !!removeGame && removeGame(game),
+                  },
+                ]}
+              />
             ))
           : null}
       </div>

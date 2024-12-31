@@ -226,6 +226,10 @@ export const Dropdown: FC<IDropDownListProps> = ({
     ? "Enter/Select value..."
     : "Select...";
 
+  const isWithValue =
+    (!isMulti && !!value) ||
+    (isMulti && (!!multiValue.length || !!excludeValue.length));
+
   useCloseEvents([dropdownRef], () => {
     isActive && (offset.current = 0);
     setIsActive(false);
@@ -301,21 +305,18 @@ export const Dropdown: FC<IDropDownListProps> = ({
         ref={dropdownRef}
       >
         <div className={styles.dropdown__controls}>
-          {isWithReset &&
-            !isDisabled &&
-            ((!isMulti && !!value) ||
-              (isMulti && (!!multiValue.length || !!excludeValue.length))) && (
-              <Button
-                color="red"
-                style={{ padding: "2px" }}
-                className={styles.dropdown__close}
-                onClick={() => {
-                  clickHandler({ index: -1, value: "" }, { isReset: true });
-                }}
-              >
-                <SvgClose />
-              </Button>
-            )}
+          {isWithReset && !isDisabled && isWithValue && (
+            <Button
+              color="red"
+              style={{ padding: "2px" }}
+              className={styles.dropdown__close}
+              onClick={() => {
+                clickHandler({ index: -1, value: "" }, { isReset: true });
+              }}
+            >
+              <SvgClose />
+            </Button>
+          )}
           {isWithAll && isMulti && (
             <Checkbox
               borderColor="white"
@@ -354,6 +355,7 @@ export const Dropdown: FC<IDropDownListProps> = ({
           }}
           className={cl(styles.dropdown__field, {
             [styles.dropdown__field_active]: isActive,
+            [styles.dropdown__field_exists]: isWithValue,
             [styles.dropdown__field_overflow]: !!offset.current,
             [styles.dropdown__field_compact]: isCompact,
             [styles[`dropdown__field_${borderTheme}`]]: !!borderTheme,

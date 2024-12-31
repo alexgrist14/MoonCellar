@@ -83,7 +83,7 @@
     align-items: center;
     width: 100%;
     border-radius: $radius;
-    border-bottom: 2px solid $accent;
+    border-bottom: 2px solid $blackBorderColor;
     padding-left: 10px;
     font-size: 15px;
     line-height: 24px;
@@ -95,6 +95,10 @@
     color: $whiteTextColor;
     background-color: $bg;
     text-align: left;
+
+    &_exists {
+      border-color: $accent;
+    }
 
     &_compact {
       border-width: 1px;
@@ -129,8 +133,13 @@
   }
 
   &__close {
+    @include flexCenter;
     width: 20px;
-    height: 20px;
+    aspect-ratio: 1;
+
+    & svg {
+      margin-left: -2px;
+    }
 
     & path {
       fill: $whiteTextColor;

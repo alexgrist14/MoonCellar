@@ -6,8 +6,8 @@
   height: fit-content;
   max-width: calc(100vw - 40px);
   margin-inline: auto;
-  background: rgba($wrapperBGColor, 0.7);
-  filter: drop-shadow(0 0 0.4rem $textColor);
+  background: rgba($wrapperBGColor, 0.8);
+  box-shadow: $shadowBorder;
   color: $wrapperTextColor;
 
   &__title {

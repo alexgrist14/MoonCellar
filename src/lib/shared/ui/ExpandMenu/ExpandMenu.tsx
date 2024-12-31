@@ -6,6 +6,7 @@ import classNames from "classnames";
 import { createPortal } from "react-dom";
 import { useWindowScroll } from "../../hooks/useWindowScroll";
 import { useStatesStore } from "../../store/states.store";
+import { useResizeDetector } from "react-resize-detector";
 
 interface IExpandMenuProps
   extends Pick<HTMLAttributes<HTMLDivElement>, "children" | "id"> {
@@ -33,6 +34,11 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
     setTop(`${window.scrollY > 0 ? Math.max(0, 55 - window.scrollY) : 55}px`)
   );
 
+  const { ref } = useResizeDetector({
+    refreshMode: "debounce",
+    refreshRate: 200,
+  });
+
   if (!top) return null;
 
   return createPortal(
@@ -56,7 +62,7 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
       {...props}
     >
       <Scrollbar type="absolute" stl={styles}>
-        {children}
+        <div ref={ref}>{children}</div>
       </Scrollbar>
       <div
         className={classNames(styles.menu__expand)}

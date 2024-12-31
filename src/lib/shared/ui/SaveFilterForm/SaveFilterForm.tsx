@@ -1,5 +1,5 @@
 import { Dispatch, FC, SetStateAction, useState } from "react";
-import styles from "./SaveFilterForm.module.scss";
+// import styles from "./SaveFilterForm.module.scss";
 import { WrapperTemplate } from "../WrapperTemplate";
 import { Input } from "../Input";
 import { Button } from "../Button";
@@ -19,31 +19,30 @@ export const SaveFilterForm: FC<{
   const { profile } = useAuthStore();
   const [name, setName] = useState("");
 
+  const submitHandler = () =>
+    !!profile &&
+    userAPI
+      .addFilter(profile._id, {
+        name,
+        filter: getFiltersForQuery(filters),
+      })
+      .then((res) => {
+        setSavedFilters(res.data.filters);
+        toast.success({ description: "Filter was successfully saved!" });
+        modal.close();
+      })
+      .catch(axiosUtils.toastError);
+
   return (
     <WrapperTemplate>
       <Input
         autoFocus
         value={name}
         onChange={(e) => setName(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && submitHandler()}
         placeholder="Enter filter name..."
       />
-      <Button
-        disabled={!name}
-        onClick={() =>
-          !!profile &&
-          userAPI
-            .addFilter(profile._id, {
-              name,
-              filter: getFiltersForQuery(filters),
-            })
-            .then((res) => {
-              setSavedFilters(res.data.filters);
-              toast.success({ description: "Filter was successfully saved!" });
-              modal.close();
-            })
-            .catch(axiosUtils.toastError)
-        }
-      >
+      <Button color="accent" disabled={!name} onClick={() => submitHandler()}>
         Save
       </Button>
     </WrapperTemplate>
