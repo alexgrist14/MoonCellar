@@ -5,7 +5,6 @@ $radius: 10px;
 $coverRatio: 528/704;
 
 //shadows
-$basicShadow: 0px 8px 24px 0px black;
-$buttonShadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-
+$shadowBorder: 0px 0px 5px 0px $blackBorderColor;
+$basicShadow: 0px 8px 24px 0px $blackBorderColor;
 $toastShadow: 0px 8px 24px 0px #14141480;

@@ -1,19 +1,14 @@
 .button {
-  @include flexCenter;
   @include textEllipsis;
   text-align: center;
-
   border-width: 2px;
   border-style: solid;
   border-radius: 4px;
   border-color: $darkBorderColor;
   font-size: 14px;
-
   padding: 5px 10px;
-
   transition: 0.2s;
   outline: none;
-
   padding-inline: 12px;
 
   &:hover:not(&_fancyColor):not(&_transparentColor) {
@@ -82,7 +77,6 @@
     position: absolute;
     padding: 5px 10px;
     background-color: $bg;
-    border: 2px solid $lightBg;
     color: $whiteTextColor;
     border-radius: $radius;
     opacity: 0;

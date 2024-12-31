@@ -20,11 +20,9 @@ import { userAPI } from "../../api";
 import { useAuthStore } from "../../store/auth.store";
 import { Loader } from "../Loader";
 import { axiosUtils } from "../../utils/axios";
-import { Button } from "../Button";
 import { IUserFilter } from "../../types/user.type";
 import { modal } from "../Modal";
 import { SaveFilterForm } from "../SaveFilterForm";
-import queryString from "query-string";
 import { toast } from "../../utils/toast";
 
 export const Filters: FC<{
@@ -54,6 +52,13 @@ export const Filters: FC<{
   const getSelectedArray = (key: string, array?: { _id: number }[]) =>
     !!array
       ? filters?.selected?.[key]?.map((id) =>
+          array.findIndex((el) => el._id === id)
+        ) || []
+      : [];
+
+  const getExcludedArray = (key: string, array?: { _id: number }[]) =>
+    !!array
+      ? filters?.excluded?.[key]?.map((id) =>
           array.findIndex((el) => el._id === id)
         ) || []
       : [];
@@ -212,6 +217,7 @@ export const Filters: FC<{
               list={systems?.map((item) => item.name) || []}
               overwriteValue={getValue("platforms")}
               initialMultiValue={getSelectedArray("platforms", systems)}
+              initialExcludeValue={getExcludedArray("platforms", systems)}
               placeholder="Select platforms..."
               getIndexes={(indexes) =>
                 setSelected("platforms", indexes, systems)
@@ -233,6 +239,7 @@ export const Filters: FC<{
               list={genres?.map((item) => item.name) || []}
               overwriteValue={getValue("genres")}
               initialMultiValue={getSelectedArray("genres", genres)}
+              initialExcludeValue={getExcludedArray("genres", genres)}
               placeholder="Select genres..."
               getIndexes={(indexes) => setSelected("genres", indexes, genres)}
               getExcludeIndexes={(indexes) =>
@@ -252,6 +259,7 @@ export const Filters: FC<{
               list={themes?.map((item) => item.name) || []}
               overwriteValue={getValue("themes")}
               initialMultiValue={getSelectedArray("themes", themes)}
+              initialExcludeValue={getExcludedArray("themes", themes)}
               placeholder="Select themes..."
               getIndexes={(indexes) => setSelected("themes", indexes, themes)}
               getExcludeIndexes={(indexes) =>
@@ -271,6 +279,7 @@ export const Filters: FC<{
               list={gameModes?.map((item) => item.name) || []}
               overwriteValue={getValue("modes")}
               initialMultiValue={getSelectedArray("modes", gameModes)}
+              initialExcludeValue={getExcludedArray("modes", gameModes)}
               placeholder="Select modes..."
               getIndexes={(indexes) => setSelected("modes", indexes, gameModes)}
               getExcludeIndexes={(indexes) =>
@@ -406,45 +415,46 @@ export const Filters: FC<{
         <div>
           {!!savedFilters ? (
             <div className={styles.filters__saved}>
-              {!!savedFilters?.length
-                ? savedFilters.map((filter, i) => (
-                    <ButtonGroup
-                      key={i}
-                      isCompact
-                      wrapperStyle={{
-                        padding: "0",
-                        display: "grid",
-                        gridTemplateColumns: "1fr 20%",
-                        width: "100%",
-                      }}
-                      buttons={[
-                        {
-                          title: filter.name,
-                          color: "fancy",
-                          style: { justifyContent: "flex-start" },
-                          callback: () =>
-                            router.push({ ...router, query: filter.filter }),
-                        },
-                        {
-                          title: "Remove",
-                          callback: () =>
-                            !!profile &&
-                            userAPI
-                              .removeFilter(profile._id, filter.name)
-                              .then((res) => {
-                                toast.success({
-                                  description:
-                                    "Filter was successfully removed!",
-                                });
-                                setSavedFilters(res.data.filters);
-                              })
-                              .catch(axiosUtils.toastError),
-                          color: "red",
-                        },
-                      ]}
-                    />
-                  ))
-                : "List is empty"}
+              {!!savedFilters?.length ? (
+                savedFilters.map((filter, i) => (
+                  <ButtonGroup
+                    key={i}
+                    isCompact
+                    wrapperStyle={{
+                      padding: "0",
+                      display: "grid",
+                      gridTemplateColumns: "1fr 20%",
+                      width: "100%",
+                    }}
+                    buttons={[
+                      {
+                        title: filter.name,
+                        color: "fancy",
+                        style: { textAlign: "start" },
+                        callback: () =>
+                          router.push({ ...router, query: filter.filter }),
+                      },
+                      {
+                        title: "Remove",
+                        callback: () =>
+                          !!profile &&
+                          userAPI
+                            .removeFilter(profile._id, filter.name)
+                            .then((res) => {
+                              toast.success({
+                                description: "Filter was successfully removed!",
+                              });
+                              setSavedFilters(res.data.filters);
+                            })
+                            .catch(axiosUtils.toastError),
+                        color: "red",
+                      },
+                    ]}
+                  />
+                ))
+              ) : (
+                <p style={{ textAlign: "center" }}>List is empty</p>
+              )}
             </div>
           ) : (
             <Loader type="propogate" />

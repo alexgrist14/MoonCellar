@@ -4,24 +4,25 @@
     justify-items: flex-start;
     gap: 20px;
   }
+
   &__games {
     display: grid;
     justify-items: flex-start;
     gap: 10px;
     width: 100%;
   }
+
   &__game {
     display: grid;
-    grid-template-columns: 4fr 1fr;
     width: 100%;
     align-items: center;
+    padding: 0px;
 
     & > a {
       color: $whiteTextColor;
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
-      width: 90%;
       text-align: start;
     }
   }
@@ -33,4 +34,3 @@
     width: 100%;
   }
 }
-

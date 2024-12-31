@@ -57,7 +57,7 @@
     position: absolute;
     top: 0;
     width: 6px;
-    background-color: #c3c3c34c;
+    background-color: $bg;
     opacity: 0;
 
     &--horizontal {
@@ -83,38 +83,24 @@
       display: block;
       width: 6px;
       height: 100%;
-      background: #acafbc;
+      background: $lightBg;
       border-radius: 7px;
       transition: opacity 0.2s;
     }
 
     &:hover {
       &::before {
-        background: #87888c;
+        filter: brightness(1.2);
       }
     }
   }
+
   &__thumb--horizontal {
-    position: absolute;
-    top: 0;
     height: 6px;
-    touch-action: none;
-    transition: height 0.2s;
 
     &::before {
-      content: "";
-      display: block;
       width: 100%;
       height: 6px;
-      background: #acafbc;
-      border-radius: 7px;
-      transition: opacity 0.2s;
-    }
-
-    &:hover {
-      &::before {
-        background: #87888c;
-      }
     }
   }
 
