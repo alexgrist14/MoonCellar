@@ -2,6 +2,7 @@ import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./UserProfile.module.scss";
 import {
   CategoriesCount,
+  IFollowings,
   IGamesRating,
   ILogs,
   UserGamesType,
@@ -31,9 +32,11 @@ interface UserProfileProps {
   user: IUser;
   userGamesLength: CategoriesCount;
   logs: ILogs[];
+  authUserFollowings: IFollowings;
+  authUserId: string;
 }
 
-const UserProfile: FC<UserProfileProps> = ({ user, logs, userGamesLength }) => {
+const UserProfile: FC<UserProfileProps> = ({ user, logs, userGamesLength, authUserFollowings, authUserId }) => {
   const { query, push, pathname } = useRouter();
 
   const { profile } = useAuthStore();
@@ -71,10 +74,10 @@ const UserProfile: FC<UserProfileProps> = ({ user, logs, userGamesLength }) => {
         tabName: "Profile",
         tabBody: (
           <UserInfo
-            userName={user.userName}
+            user={user}
+            authUserFollowings={authUserFollowings}
+            authUserId={authUserId}
             userGamesLength={userGamesLength}
-            _id={user._id}
-            avatar={avatar}
             logs={logs}
           />
         ),

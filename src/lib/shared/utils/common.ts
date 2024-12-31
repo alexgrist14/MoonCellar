@@ -1,3 +1,4 @@
+import { IUser } from "../types/auth";
 import { IImageData } from "../types/common.type";
 
 const getDate = (dateString: string, isWithTime?: boolean) => {
@@ -62,6 +63,12 @@ const getImageData = async (url: string): Promise<IImageData> => {
 
   return { imageMeta, imageAR, imageBlob, imageBuffer };
 };
+
+const getAvatar = (user: IUser) =>{
+  return user.profilePicture
+  ? `https://api.mooncellar.space/photos/${user.profilePicture}`
+  : ""
+}
 
 export const shuffle = <T>(arr: T[]) => {
   const tempArr = structuredClone(arr);
@@ -130,4 +137,5 @@ export const commonUtils = {
   getMaxElement,
   getAllKeys,
   getHumanDate,
+  getAvatar,
 };

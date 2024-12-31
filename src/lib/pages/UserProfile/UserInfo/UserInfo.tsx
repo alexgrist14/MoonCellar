@@ -8,7 +8,14 @@ import {
 import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
 import Image from "next/image";
 import Link from "next/link";
-import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
+import {
+  Dispatch,
+  FC,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import styles from "./UserInfo.module.scss";
 import { userListCategories } from "@/src/lib/shared/constants/user.const";
 import { API_URL, FRONT_URL, getImageLink } from "@/src/lib/shared/constants";
@@ -16,26 +23,27 @@ import { commonUtils } from "@/src/lib/shared/utils/common";
 import { Button } from "@/src/lib/shared/ui/Button";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { mergeLogs } from "@/src/lib/shared/utils/logs";
+import { IUser } from "@/src/lib/shared/types/auth";
 
 interface UserInfoProps {
-  userName: string;
+  user: IUser;
   userGamesLength: CategoriesCount;
-  _id: string;
-  avatar?: string;
   logs: ILogs[];
+  authUserFollowings: IFollowings;
+  authUserId: string;
 }
 
 const UserInfo: FC<UserInfoProps> = ({
-  userName,
+  user,
   userGamesLength,
-  _id: id,
-  avatar,
+  authUserFollowings,
+  authUserId,
   logs,
 }) => {
   const { profile } = useAuthStore();
+  const { _id: id, followings, profilePicture, userName } = user;
 
-  const [follow, setFollow] = useState('');
-  //console.log('Outside useEffect: '+ profile?.followings);
+  const [follow, setFollow] = useState("");
 
   const [userFollowings, setUserFollowing] = useState<
     IFollowings | undefined
@@ -53,45 +61,27 @@ const UserInfo: FC<UserInfoProps> = ({
     return commonUtils.upFL(result.join(" and "));
   };
 
+  const isFollow = useMemo(() => {
+    return authUserFollowings?.followings.map((follow) => follow._id).includes(id);
+  }, [authUserFollowings?.followings, id]);
+
   useEffect(() => {
     setUserFollowing(undefined);
 
     userAPI
       .getUserFollowings(id)
-      .then((res) =>{
-        setUserFollowing(res.data)
-      } )
+      .then((res) => {
+        setUserFollowing(res.data);
+      })
       .catch();
   }, [id]);
 
-  useEffect(()=>{
-    if(profile){
-      userAPI.getUserFollowings(profile?._id).then((res)=>{
-        res.data.followings.some((item)=>item._id === id) ? setFollow('Unfollow') : setFollow('Follow');
-      })
-    }
-  },[id, profile])
-
-  // useEffect(()=>{
-  //   setFollow('');
-  //   if(profile){
-  //     profile.followings.includes(id) ? setFollow('Unfollow') : setFollow('Follow');
-  //     //console.log('Inside useEffect: '+ profile?.followings);
-  //   }
-      
-  // },[id, profile])
-
   const handleFollowClick = () => {
-    if (profile?.followings.includes(id)) {
-      userAPI.removeUserFollowing(profile._id, id);
-      profile.followings = [];
-      setFollow('Follow');
-      //profile.followings = profile.followings.filter((item) => item !== id);
-    } else if (profile) {
-      userAPI.addUserFollowing(profile._id, id);
-      profile.followings = [];
-      setFollow('Unfollow');
-    }
+    if (!authUserId) return;
+    console.log(isFollow)
+    isFollow
+      ? userAPI.removeUserFollowing(authUserId, id).then(()=>setFollow('Follow'))
+      : userAPI.addUserFollowing(authUserId, id).then(()=>setFollow('Unfollow'));
   };
 
   return (
@@ -101,17 +91,16 @@ const UserInfo: FC<UserInfoProps> = ({
           <div className={styles.profile__image}>
             <Image
               key={id}
-              src={avatar || "/images/user.png"}
+              src={commonUtils.getAvatar(user) || "/images/user.png"}
               width={160}
               height={160}
               alt="profile"
               className={styles.image}
             />
-            {id !== profile?._id && (
+            {id !== authUserId && (
               <Button className={styles.btn} onClick={handleFollowClick}>
-                                {follow || ' '}
+                {isFollow ? follow || "Unfollow" : follow || "Follow"}
               </Button>
-
             )}
           </div>
 

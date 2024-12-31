@@ -1,36 +1,55 @@
 import UserProfile from "@/src/lib/pages/UserProfile/UserProfile";
 import { userAPI } from "@/src/lib/shared/api";
+import { ACCESS_TOKEN } from "@/src/lib/shared/constants";
 import { IUser } from "@/src/lib/shared/types/auth";
-import { CategoriesCount, ILogs } from "@/src/lib/shared/types/user.type";
+import { CategoriesCount, IFollowings, ILogs } from "@/src/lib/shared/types/user.type";
 import { mergeLogs } from "@/src/lib/shared/utils/logs";
 import { GetServerSidePropsContext } from "next";
 import { FC } from "react";
+import { jwtDecode } from "jwt-decode";
 
 interface IProps {
   user: IUser;
   userGamesLength: CategoriesCount;
-
   userLogs: ILogs[];
+  authUserFollowings: IFollowings;
+  authUserId: string;
 }
 
-const User: FC<IProps> = ({ user, userGamesLength, userLogs }) => {
-  return <UserProfile {...{ user, logs: userLogs, userGamesLength }} />;
+const User: FC<IProps> = ({ user, userGamesLength, userLogs,authUserFollowings, authUserId }) => {
+  return <UserProfile {...{ user, logs: userLogs, userGamesLength,authUserFollowings, authUserId }} />;
 };
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  const { query } = context;
-  const user = (await userAPI.getByName(query.name as string)).data;
-  const userGamesLength = (await userAPI.getUserGamesLength(user._id)).data;
-  console.log(userGamesLength);
-  const logsResult = (await userAPI.getUserLogs(user._id)).data;
-  let userLogs: ILogs[];
-  if (logsResult.length > 0) {
-    userLogs = mergeLogs(logsResult[0].logs);
-  } else userLogs = [];
+  const { query, req } = context;
 
-  return { props: { user, userLogs, userGamesLength } };
+  const token = req.cookies[ACCESS_TOKEN];
+  const authUserInfo: { id: string } | undefined = !!token
+    ? jwtDecode(token)
+    : undefined;
+
+  const authUserFollowings = !!authUserInfo
+    ? (await userAPI.getUserFollowings(authUserInfo.id)).data
+    : undefined;
+
+  const user = (await userAPI.getByName(query.name as string)).data;
+  const userFollowings = (await userAPI.getUserFollowings(user._id)).data;
+  const userGamesLength = (await userAPI.getUserGamesLength(user._id)).data;
+  const logsResult = (await userAPI.getUserLogs(user._id)).data;
+  const userLogs: ILogs[] =
+    logsResult.length > 0 ? mergeLogs(logsResult[0].logs) : [];
+
+  return {
+    props: {
+      user: { ...user, followings: userFollowings },
+      userLogs,
+      userGamesLength,
+      authUserFollowings,
+      authUserId: authUserInfo?.id,
+    },
+  };
 };
 
 export default User;
