@@ -76,7 +76,7 @@ const UserInfo: FC<UserInfoProps> = ({
   return (
     <>
       <div className={styles.content__top}>
-        <div className={styles.profile__info}>
+        <div className={styles.profile}>
           <div className={styles.profile__image}>
             <Image
               key={id}
@@ -93,7 +93,7 @@ const UserInfo: FC<UserInfoProps> = ({
             )}
           </div>
 
-          <div>
+          <div className={styles.profile__info}>
             <div className={styles.profile__name}>{userName}</div>
             <div className={styles.date}>
               <span>Last seen:</span> {commonUtils.getHumanDate(user.updatedAt)}

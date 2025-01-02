@@ -40,14 +40,16 @@
     }
   }
   .profile {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
     &__info {
-      display: flex;
-      gap: 20px;
+      margin-bottom: 20px;
     }
     &__name {
       font-size: 1.5rem;
     }
-    &__description{
+    &__description {
       margin-top: 10px;
       max-width: 600px;
       border-radius: $radius;
@@ -132,15 +134,13 @@
             color: $neutral-90;
           }
         }
-
       }
     }
   }
 }
 .date {
   color: $gray;
-  span{
+  span {
     color: $whiteTextColor;
-
   }
 }

@@ -38,10 +38,6 @@ const getUserGames = (id: string, category: CategoriesType) => {
   return agent.get<IUserGames>(`${USER_URL}/games/${id}?category=${category}`);
 };
 
-const getUserGamesLength = (id: string) => {
-  return agent.get<CategoriesCount>(`${USER_URL}/games/length/${id}`);
-};
-
 const addGameToCategory = (
   userId: string,
   gameId: number,
@@ -129,7 +125,6 @@ export const userAPI = {
   addUserFollowing,
   removeUserFollowing,
   getUserLogs,
-  getUserGamesLength,
   addFilter,
   removeFilter,
   getFilters,
