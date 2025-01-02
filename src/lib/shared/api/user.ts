@@ -25,7 +25,7 @@ const addAvatar = (id: string, file: File) => {
 
   formData.append("file", file);
 
-  return agent.post<string>(`${USER_URL}/profile-picture/${id}`, formData, {
+  return agent.post<string>(`https://api.mooncellar.space/user/profile-picture/${id}`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
 };
@@ -84,11 +84,11 @@ const getUserLogs = (userId: string) => {
 };
 
 const addUserFollowing = (userId: string, followingId: string) => {
-  return agent.patch<IUser>(`${USER_URL}/followings/${userId}/${followingId}`);
+  return agent.patch<IFollowings>(`${USER_URL}/followings/${userId}/${followingId}`);
 };
 
 const removeUserFollowing = (userId: string, followingId: string) => {
-  return agent.delete<IUser>(`${USER_URL}/followings/${userId}/${followingId}`);
+  return agent.delete<IFollowings>(`${USER_URL}/followings/${userId}/${followingId}`);
 };
 
 const addFilter = (userId: string, filter: IUserFilter) => {

@@ -1,22 +1,18 @@
-import { Dispatch, FC, SetStateAction, MouseEvent } from "react";
-import styles from "./Settings.module.scss";
-import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { Input } from "@/src/lib/shared/ui/Input";
-import { Button } from "@/src/lib/shared/ui/Button";
-import ProfileAvatar from "@/src/lib/shared/ui/AvatarSettings/AvatarSettings";
 import { useAuth } from "@/src/lib/shared/hooks/auth";
+import { useAuthStore } from "@/src/lib/shared/store/auth.store";
+import AvatarSettings from "@/src/lib/shared/ui/AvatarSettings/AvatarSettings";
+import { Button } from "@/src/lib/shared/ui/Button";
+import { Input } from "@/src/lib/shared/ui/Input";
+import { FC } from "react";
+import styles from "./Settings.module.scss";
 
-interface SettingsProps {
-  avatar?: string;
-  setAvatar: Dispatch<SetStateAction<string | undefined>>;
-}
+interface SettingsProps {}
 
-export const Settings: FC<SettingsProps> = ({ avatar, setAvatar }) => {
+export const Settings: FC<SettingsProps> = ({}) => {
   const { isAuth, profile } = useAuthStore();
-  const {logout} = useAuth();
+  const { logout } = useAuth();
 
-
-  const handleLogoutClick = (e: MouseEvent<HTMLButtonElement>) => {
+  const handleLogoutClick = () => {
     if (isAuth && profile) {
       logout(profile._id);
     }
@@ -27,10 +23,15 @@ export const Settings: FC<SettingsProps> = ({ avatar, setAvatar }) => {
       <h2 className={styles.title}>Profile Settings</h2>
       <div className={styles.content}>
         <div className={styles.content__top}>
-        <ProfileAvatar avatar={avatar} setAvatar={setAvatar} />
-        <Button className={styles.btn} color={'red'} onClick={handleLogoutClick}>Logout</Button>
+          <AvatarSettings />
+          <Button
+            className={styles.btn}
+            color={"red"}
+            onClick={handleLogoutClick}
+          >
+            Logout
+          </Button>
         </div>
-
 
         <div className={styles.field}>
           <label htmlFor="userName">User Name</label>

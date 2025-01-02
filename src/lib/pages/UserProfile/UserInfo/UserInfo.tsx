@@ -27,7 +27,6 @@ import { IUser } from "@/src/lib/shared/types/auth";
 
 interface UserInfoProps {
   user: IUser;
-  userGamesLength: CategoriesCount;
   logs: ILogs[];
   authUserFollowings: IFollowings;
   authUserId: string;
@@ -35,19 +34,14 @@ interface UserInfoProps {
 
 const UserInfo: FC<UserInfoProps> = ({
   user,
-  userGamesLength,
   authUserFollowings,
   authUserId,
   logs,
 }) => {
-  const { profile } = useAuthStore();
-  const { _id: id, followings, profilePicture, userName } = user;
+  const { _id: id, followings: userFollowings, userName, games } = user;
 
-  const [follow, setFollow] = useState("");
-
-  const [userFollowings, setUserFollowing] = useState<
-    IFollowings | undefined
-  >();
+  const [userAuthFollowings, setUserAuthFollowings] =
+    useState<IFollowings>(authUserFollowings);
 
   const setActivityType = (action: string, isAdd: boolean, rating?: number) => {
     const actions = action.split(" and ");
@@ -62,26 +56,20 @@ const UserInfo: FC<UserInfoProps> = ({
   };
 
   const isFollow = useMemo(() => {
-    return authUserFollowings?.followings.map((follow) => follow._id).includes(id);
-  }, [authUserFollowings?.followings, id]);
-
-  useEffect(() => {
-    setUserFollowing(undefined);
-
-    userAPI
-      .getUserFollowings(id)
-      .then((res) => {
-        setUserFollowing(res.data);
-      })
-      .catch();
-  }, [id]);
+    return userAuthFollowings?.followings
+      .map((follow) => follow._id)
+      .includes(id);
+  }, [id, userAuthFollowings?.followings]);
 
   const handleFollowClick = () => {
     if (!authUserId) return;
-    console.log(isFollow)
     isFollow
-      ? userAPI.removeUserFollowing(authUserId, id).then(()=>setFollow('Follow'))
-      : userAPI.addUserFollowing(authUserId, id).then(()=>setFollow('Unfollow'));
+      ? userAPI
+          .removeUserFollowing(authUserId, id)
+          .then((res) => setUserAuthFollowings(res.data))
+      : userAPI
+          .addUserFollowing(authUserId, id)
+          .then((res) => setUserAuthFollowings(res.data));
   };
 
   return (
@@ -99,7 +87,7 @@ const UserInfo: FC<UserInfoProps> = ({
             />
             {id !== authUserId && (
               <Button className={styles.btn} onClick={handleFollowClick}>
-                {isFollow ? follow || "Unfollow" : follow || "Follow"}
+                {isFollow ? "Unfollow" : "Follow"}
               </Button>
             )}
           </div>
@@ -114,7 +102,7 @@ const UserInfo: FC<UserInfoProps> = ({
                     key={i}
                   >
                     <span>{`${commonUtils.upFL(category)}: ${
-                      userGamesLength[category]
+                      games[`${category}`].length
                     }`}</span>
                   </Link>
                 ))}

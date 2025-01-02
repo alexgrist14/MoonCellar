@@ -2,22 +2,33 @@ import UserProfile from "@/src/lib/pages/UserProfile/UserProfile";
 import { userAPI } from "@/src/lib/shared/api";
 import { ACCESS_TOKEN } from "@/src/lib/shared/constants";
 import { IUser } from "@/src/lib/shared/types/auth";
-import { CategoriesCount, IFollowings, ILogs } from "@/src/lib/shared/types/user.type";
+import {
+  IFollowings,
+  ILogs
+} from "@/src/lib/shared/types/user.type";
 import { mergeLogs } from "@/src/lib/shared/utils/logs";
+import { jwtDecode } from "jwt-decode";
 import { GetServerSidePropsContext } from "next";
 import { FC } from "react";
-import { jwtDecode } from "jwt-decode";
 
 interface IProps {
   user: IUser;
-  userGamesLength: CategoriesCount;
   userLogs: ILogs[];
   authUserFollowings: IFollowings;
   authUserId: string;
 }
 
-const User: FC<IProps> = ({ user, userGamesLength, userLogs,authUserFollowings, authUserId }) => {
-  return <UserProfile {...{ user, logs: userLogs, userGamesLength,authUserFollowings, authUserId }} />;
+const User: FC<IProps> = ({
+  user,
+  userLogs,
+  authUserFollowings,
+  authUserId,
+}) => {
+  return (
+    <UserProfile
+      {...{ user, logs: userLogs, authUserFollowings, authUserId }}
+    />
+  );
 };
 
 export const getServerSideProps = async (
@@ -36,7 +47,6 @@ export const getServerSideProps = async (
 
   const user = (await userAPI.getByName(query.name as string)).data;
   const userFollowings = (await userAPI.getUserFollowings(user._id)).data;
-  const userGamesLength = (await userAPI.getUserGamesLength(user._id)).data;
   const logsResult = (await userAPI.getUserLogs(user._id)).data;
   const userLogs: ILogs[] =
     logsResult.length > 0 ? mergeLogs(logsResult[0].logs) : [];
@@ -45,7 +55,6 @@ export const getServerSideProps = async (
     props: {
       user: { ...user, followings: userFollowings },
       userLogs,
-      userGamesLength,
       authUserFollowings,
       authUserId: authUserInfo?.id,
     },

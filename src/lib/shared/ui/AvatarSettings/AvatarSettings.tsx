@@ -1,34 +1,31 @@
-import {
-  ChangeEvent,
-  Dispatch,
-  FC,
-  SetStateAction,
-  useEffect,
-  useState,
-} from "react";
-import styles from "./AvatarSettings.module.scss";
 import Image from "next/image";
-import { useAuthStore } from "../../store/auth.store";
+import { ChangeEvent, FC, useCallback, useEffect, useState } from "react";
 import { userAPI } from "../../api";
+import { useAuthStore } from "../../store/auth.store";
 import { SvgCamera } from "../svg";
+import styles from "./AvatarSettings.module.scss";
 
-interface ProfileAvatarProps {
-  avatar?: string;
-  setAvatar: Dispatch<SetStateAction<string | undefined>>;
-}
+interface AvatarSettingsProps {}
 
-const ProfileAvatar: FC<ProfileAvatarProps> = ({ setAvatar, avatar }) => {
+const AvatarSettings: FC<AvatarSettingsProps> = ({}) => {
   const [profileHover, setProfileHover] = useState<boolean>(false);
+
+  const { profile, setProfile } = useAuthStore();
 
   const [tempAvatar, setTempAvatar] = useState<File>();
   const [isPictureLarge, setIsPictureLarge] = useState<boolean>(false);
 
-  const { profile } = useAuthStore();
   const { addAvatar } = userAPI;
+
+  const handleUpload = useCallback(async () => {
+    if (!!profile && tempAvatar) {
+      await addAvatar(profile._id, tempAvatar);
+    }
+  }, [addAvatar, profile, tempAvatar]);
 
   useEffect(() => {
     if (!isPictureLarge) handleUpload();
-  }, [tempAvatar]);
+  }, [handleUpload, isPictureLarge, tempAvatar]);
 
   const handleInput = async (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files !== null) {
@@ -39,16 +36,10 @@ const ProfileAvatar: FC<ProfileAvatarProps> = ({ setAvatar, avatar }) => {
         setIsPictureLarge(true);
       } else {
         setTempAvatar(file);
-        setAvatar(undefined);
+        !!profile && setProfile({ ...profile, profilePicture: "" });
         setIsPictureLarge(false);
         handleUpload();
       }
-    }
-  };
-
-  const handleUpload = async () => {
-    if (profile && tempAvatar) {
-      await addAvatar(profile._id, tempAvatar);
     }
   };
 
@@ -65,10 +56,11 @@ const ProfileAvatar: FC<ProfileAvatarProps> = ({ setAvatar, avatar }) => {
       >
         <Image
           src={
-            avatar ||
-            (!!tempAvatar
+            profile?.profilePicture
+              ? `https://api.mooncellar.space/photos/${profile.profilePicture}`
+              : !!tempAvatar
               ? URL.createObjectURL(tempAvatar)
-              : "/images/user.png")
+              : "/images/user.png"
           }
           width={160}
           height={160}
@@ -96,4 +88,4 @@ const ProfileAvatar: FC<ProfileAvatarProps> = ({ setAvatar, avatar }) => {
   );
 };
 
-export default ProfileAvatar;
+export default AvatarSettings;
