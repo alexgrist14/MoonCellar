@@ -9,12 +9,9 @@ import { Loader } from "../Loader";
 import { modal } from "../Modal";
 import { SvgClose } from "../svg";
 import styles from "./AuthModal.module.scss";
-import { authAPI } from "../../api";
-import { IAxiosErrorResponse } from "../../types/common.type";
-import { axiosUtils } from "../../utils/axios";
 
 export const AuthModal: FC = () => {
-  const { login, signup, authUpdate } = useAuth();
+  const { login, signup } = useAuth();
   const [isRegister, setIsRegister] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -35,16 +32,6 @@ export const AuthModal: FC = () => {
       email: data.email,
       password: data.password,
     };
-
-    // authAPI
-    //   .login(loginDto)
-    //   .then((response) => {
-    //     authUpdate(response.data.userId);
-
-    //   })
-    //   .catch((e: IAxiosErrorResponse) => {
-    //     axiosUtils.toastError(e);
-    //   });
 
     login(loginDto);
   };

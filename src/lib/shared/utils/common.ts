@@ -29,7 +29,12 @@ const getHumanDate = (inputDate: Date | string) => {
     numeric: "auto",
   });
 
-  if (Math.abs(differenceInMinutes) < 60) {
+  if (Math.abs(differenceInSeconds) < 60) {
+    return relativeTime.format(
+      getRoundedSeconds(differenceInSeconds),
+      "second"
+    );
+  } else if (Math.abs(differenceInMinutes) < 60) {
     return relativeTime.format(differenceInMinutes, "minute");
   } else if (Math.abs(differenceInHours) < 24) {
     return relativeTime.format(differenceInHours, "hour");
@@ -42,6 +47,23 @@ const getHumanDate = (inputDate: Date | string) => {
   }
 };
 
+const getRoundedSeconds = (value: number) => {
+  const seconds = Math.abs(value);
+
+  if (seconds < 10) {
+    return -1;
+  } else if (seconds < 20) {
+    return -10;
+  } else if (seconds < 30) {
+    return -20;
+  } else if (seconds < 40) {
+    return -30;
+  } else if (seconds < 50) {
+    return -40;
+  } else {
+    return -50;
+  }
+};
 const upFL = (string: string) => {
   return string.slice(0, 1).toUpperCase() + string.slice(1).toLowerCase();
 };
@@ -64,11 +86,11 @@ const getImageData = async (url: string): Promise<IImageData> => {
   return { imageMeta, imageAR, imageBlob, imageBuffer };
 };
 
-const getAvatar = (user: IUser) =>{
+const getAvatar = (user: IUser) => {
   return user.profilePicture
-  ? `https://api.mooncellar.space/photos/${user.profilePicture}`
-  : ""
-}
+    ? `https://api.mooncellar.space/photos/${user.profilePicture}`
+    : "";
+};
 
 export const shuffle = <T>(arr: T[]) => {
   const tempArr = structuredClone(arr);

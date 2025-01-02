@@ -2,11 +2,6 @@
   display: flex;
   color: $whiteTextColor;
   justify-content: center;
-  padding: 50px 20px 50px 20px;
-
-  @include mediaMd {
-    padding: 50px 0 0 0;
-  }
 
   .content {
     padding: 0 20px 20px 20px;
@@ -14,6 +9,12 @@
     background: rgba($bgAlt, 0.7);
     border-radius: 20px;
     height: 100%;
+
+    .tabs{
+      &__button{
+        height: 40px;
+      }
+    }
   }
 
   &__bg {

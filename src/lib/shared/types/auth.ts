@@ -20,4 +20,6 @@ export interface IUser {
   profilePicture: string;
   followings: IFollowings;
   filters: IUserFilter[];
+  updatedAt: Date;
+  description: string;
 }

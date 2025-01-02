@@ -3,14 +3,19 @@ import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import AvatarSettings from "@/src/lib/shared/ui/AvatarSettings/AvatarSettings";
 import { Button } from "@/src/lib/shared/ui/Button";
 import { Input } from "@/src/lib/shared/ui/Input";
-import { FC } from "react";
+import { FC, FormEvent, useState } from "react";
 import styles from "./Settings.module.scss";
+import { userAPI } from "@/src/lib/shared/api";
+import { axiosUtils } from "@/src/lib/shared/utils/axios";
+import { toast } from "@/src/lib/shared/utils/toast";
 
 interface SettingsProps {}
 
 export const Settings: FC<SettingsProps> = ({}) => {
   const { isAuth, profile } = useAuthStore();
   const { logout } = useAuth();
+  const [userName, setUserName] = useState("");
+  const [description, setDescription] = useState("");
 
   const handleLogoutClick = () => {
     if (isAuth && profile) {
@@ -18,8 +23,17 @@ export const Settings: FC<SettingsProps> = ({}) => {
     }
   };
 
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (description && profile)
+      userAPI
+        .updateDescription(profile._id, { description })
+        .then(() => toast.success({ description: "Saved successfully" }))
+        .catch((err) => axiosUtils.toastError(err));
+  };
+
   return (
-    <div className={styles.container}>
+    <form className={styles.container} onSubmit={handleSubmit}>
       <h2 className={styles.title}>Profile Settings</h2>
       <div className={styles.content}>
         <div className={styles.content__top}>
@@ -39,6 +53,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
             id="userName"
             defaultValue={profile?.userName}
             className={styles.input}
+            onChange={(e) => setUserName(e.target.value)}
           />
         </div>
 
@@ -51,10 +66,20 @@ export const Settings: FC<SettingsProps> = ({}) => {
             className={styles.input}
           />
         </div>
-        <Button className={styles.btn} color={"accent"}>
+
+        <div className={styles.field}>
+          <label htmlFor="description">Description</label>
+          <Input
+            id="description"
+            defaultValue={profile?.description}
+            className={styles.input}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </div>
+        <Button type="submit" className={styles.btn} color={"accent"}>
           Save
         </Button>
       </div>
-    </div>
+    </form>
   );
 };

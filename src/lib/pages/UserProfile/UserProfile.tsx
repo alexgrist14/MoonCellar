@@ -14,6 +14,7 @@ import { Settings } from "./Settings";
 import { UserGames } from "./UserGames";
 import UserInfo from "./UserInfo/UserInfo";
 import styles from "./UserProfile.module.scss";
+import cn from "classnames";
 
 interface UserProfileProps {
   user: IUser;
@@ -99,7 +100,7 @@ const UserProfile: FC<UserProfileProps> = ({
   }, [user, authUserFollowings, authUserId, logs, pushTab]);
 
   return (
-    <div className={styles.container}>
+    <div className={cn('container',styles.container)}>
       <div
         className={classNames(styles.container__bg, {
           [styles.container__bg_active]: isImageReady,

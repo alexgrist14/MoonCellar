@@ -1,5 +1,5 @@
-import { useAuth } from "@/src/lib/shared/hooks/auth";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
+import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { AuthModal } from "@/src/lib/shared/ui/AuthModal";
 import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
 import { Button } from "@/src/lib/shared/ui/Button";
@@ -7,21 +7,16 @@ import { modal } from "@/src/lib/shared/ui/Modal";
 import { SearchModal } from "@/src/lib/shared/ui/SearchModal";
 import { Separator } from "@/src/lib/shared/ui/Separator";
 import { SvgSearch } from "@/src/lib/shared/ui/svg";
+import { Icon } from "@iconify/react/dist/iconify.js";
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { FC, MouseEvent, useState } from "react";
+import { FC, MouseEvent } from "react";
 import styles from "./Header.module.scss";
-import { useStatesStore } from "@/src/lib/shared/store/states.store";
 
 export const Header: FC = () => {
-  const router = useRouter();
-
   const { isMobile } = useStatesStore();
 
-  const [isMenuActive, setIsMenuActive] = useState(false);
   const { isAuth, profile } = useAuthStore();
-  const { push } = useRouter();
 
   const handleProfileClick = (e: MouseEvent<HTMLAnchorElement>) => {
     if (!isAuth || !profile) {
@@ -41,7 +36,23 @@ export const Header: FC = () => {
           MoonCellar
         </Link>
         <Separator />
-        <Button color="transparent" onClick={searchClickHandler}>
+        <Link href="/games">
+          <Button className={styles.btn} color="transparent">
+            <Icon className={styles.svg} icon="dashicons:games" />
+            {!isMobile && <span>Games</span>}
+          </Button>
+        </Link>
+        <Link href="/gauntlet">
+          <Button className={styles.btn} color="transparent">
+            <Icon className={styles.svg} icon="ph:spinner-ball-fill" />
+            {!isMobile && <span>Gauntlet</span>}
+          </Button>
+        </Link>
+        <Button
+          className={styles.btn}
+          color="transparent"
+          onClick={searchClickHandler}
+        >
           <SvgSearch className={styles.svg} />
         </Button>
       </div>
@@ -56,12 +67,4 @@ export const Header: FC = () => {
       </div>
     </div>
   );
-};
-
-export const getServerSideProps = async (
-  context: GetServerSidePropsContext
-) => {
-  const cookies = context.req.headers.cookie;
-
-  return { props: { cookies } };
 };

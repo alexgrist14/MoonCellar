@@ -24,6 +24,7 @@ import { Button } from "@/src/lib/shared/ui/Button";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { mergeLogs } from "@/src/lib/shared/utils/logs";
 import { IUser } from "@/src/lib/shared/types/auth";
+import { Input } from "@/src/lib/shared/ui/Input";
 
 interface UserInfoProps {
   user: IUser;
@@ -94,7 +95,15 @@ const UserInfo: FC<UserInfoProps> = ({
 
           <div>
             <div className={styles.profile__name}>{userName}</div>
-            <div className={styles.profile__stats}>
+            <div className={styles.date}>
+              <span>Last seen:</span> {commonUtils.getHumanDate(user.updatedAt)}
+            </div>
+            {user.description && (
+              <div className={styles.profile__description}>
+                {user.description}
+              </div>
+            )}
+            {/* <div className={styles.profile__stats}>
               <div className={styles.profile__stats__list}>
                 {userListCategories.map((category, i) => (
                   <Link
@@ -107,7 +116,7 @@ const UserInfo: FC<UserInfoProps> = ({
                   </Link>
                 ))}
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
         <div className={styles.friends}>

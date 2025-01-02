@@ -6,6 +6,7 @@ import {
   IFollowings,
   ILogs
 } from "@/src/lib/shared/types/user.type";
+import { WrapperTemplate } from "@/src/lib/shared/ui/WrapperTemplate";
 import { mergeLogs } from "@/src/lib/shared/utils/logs";
 import { jwtDecode } from "jwt-decode";
 import { GetServerSidePropsContext } from "next";
@@ -25,9 +26,11 @@ const User: FC<IProps> = ({
   authUserId,
 }) => {
   return (
+
     <UserProfile
       {...{ user, logs: userLogs, authUserFollowings, authUserId }}
     />
+
   );
 };
 

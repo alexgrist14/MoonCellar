@@ -15,13 +15,14 @@
   flex-wrap: wrap;
   @include mediaMd {
     gap: 20px;
+    gap: 20px;
   }
   .friends {
     width: 100%;
-    max-width: 400px;
+    width: 400px;
     border-radius: $radius;
     @include mediaMd {
-      max-width: unset;
+      width: 100%;
     }
     &__title {
       @include profileTitle();
@@ -46,6 +47,14 @@
     &__name {
       font-size: 1.5rem;
     }
+    &__description{
+      margin-top: 10px;
+      max-width: 600px;
+      border-radius: $radius;
+      background-color: $lightBgSecond;
+      padding: 7px;
+      font-style: italic;
+    }
     &__stats {
       margin-top: 20px;
       &__title {
@@ -63,18 +72,6 @@
           &:hover {
             color: $accent;
           }
-          .completed {
-            color: rgb(50, 202, 50);
-          }
-          .playing {
-            color: rgb(0, 153, 255);
-          }
-          .wishlist {
-            color: #fae25e;
-          }
-          .dropped {
-            color: rgb(206, 27, 27);
-          }
         }
       }
     }
@@ -87,15 +84,12 @@
       width: 160px;
       .image {
         object-fit: cover;
-        border-radius: 100%;
+        border-radius: $radius;
       }
       .btn {
         width: 90%;
       }
     }
-  }
-  .error {
-    color: red;
   }
 }
 
@@ -139,10 +133,14 @@
           }
         }
 
-        .date {
-          color: $gray;
-        }
       }
     }
+  }
+}
+.date {
+  color: $gray;
+  span{
+    color: $whiteTextColor;
+
   }
 }

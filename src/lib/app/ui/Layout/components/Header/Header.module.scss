@@ -12,7 +12,15 @@
     display: flex;
     height: 34px;
     align-items: center;
+    flex-wrap: wrap;
     gap: 10px;
+    .btn{
+      @include flexCenter;
+      gap: 5px;
+      &:hover{
+        background-color: $lightBg;
+      }
+    }
   }
 
   &__right {
@@ -23,7 +31,6 @@
     .profile {
       &__link {
         height: 36px;
-
       }
     }
   }
@@ -37,5 +44,6 @@
   .svg{
     color: $whiteTextColor;
     width: 22px;
+    height: 22px;
   }
 }

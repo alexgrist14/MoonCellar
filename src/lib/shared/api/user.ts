@@ -111,6 +111,10 @@ const getFilters = (userId: string) => {
   );
 };
 
+const updateDescription = (userId: string, descriptionDto: {description: string}) =>{
+  return agent.patch<IUser>(`${USER_URL}/description/${userId}`,descriptionDto);
+}
+
 export const userAPI = {
   getById,
   getByName,
@@ -129,4 +133,5 @@ export const userAPI = {
   addFilter,
   removeFilter,
   getFilters,
+  updateDescription
 };
