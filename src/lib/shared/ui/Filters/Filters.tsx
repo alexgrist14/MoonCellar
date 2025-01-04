@@ -31,7 +31,7 @@ export const Filters: FC<{
 }> = ({ callback, isGauntlet }) => {
   const router = useRouter();
   const { asPath } = router;
-  const { profile } = useAuthStore();
+  const { profile, isAuth } = useAuthStore();
 
   const [filters, setFilters] = useState<IGameFilters>();
   const [tab, setTab] = useState<"filters" | "saved">("filters");
@@ -111,7 +111,9 @@ export const Filters: FC<{
 
   const tabs: ITabContent[] = [
     { tabName: "Filters", onTabClick: () => setTab("filters") },
-    { tabName: "Saved", onTabClick: () => setTab("saved") },
+    ...(isAuth
+      ? [{ tabName: "Saved", onTabClick: () => setTab("saved") }]
+      : []),
   ];
 
   useEffect(() => {
@@ -128,12 +130,14 @@ export const Filters: FC<{
 
   return (
     <div className={styles.filters} id="filters">
-      <Tabs
-        defaultTabIndex={tabs.findIndex(
-          ({ tabName }) => tabName.toLowerCase() === tab
-        )}
-        contents={tabs}
-      />
+      {isAuth && (
+        <Tabs
+          defaultTabIndex={tabs.findIndex(
+            ({ tabName }) => tabName.toLowerCase() === tab
+          )}
+          contents={tabs}
+        />
+      )}
       {tab === "filters" && (
         <>
           <div className={styles.filters__top}>

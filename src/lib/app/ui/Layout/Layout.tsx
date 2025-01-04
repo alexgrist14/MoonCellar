@@ -1,8 +1,8 @@
 import { authAPI, userAPI } from "@/src/lib/shared/api";
-import { screenMd } from "@/src/lib/shared/constants";
+import { screenSm } from "@/src/lib/shared/constants";
 import { useWindowResizeAction } from "@/src/lib/shared/hooks";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { FC, ReactNode, useEffect, useState } from "react";
+import { FC, ReactNode, useEffect } from "react";
 import styles from "./Layout.module.scss";
 import { Header } from "./components";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
@@ -33,7 +33,7 @@ export const Layout: FC<ILayoutProps> = ({ children }) => {
   }, [clear, getById, isAuth, refreshToken, setAuth, setProfile]);
 
   useWindowResizeAction(() => {
-    setMobile(window.innerWidth <= screenMd);
+    setMobile(window.innerWidth <= screenSm);
   });
 
   return (
