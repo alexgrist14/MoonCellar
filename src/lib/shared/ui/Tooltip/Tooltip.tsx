@@ -1,7 +1,7 @@
 import styles from "./Tooltip.module.scss";
 import classNames from "classnames";
 import { createPortal } from "react-dom";
-import { FC, ReactNode, RefObject } from "react";
+import { FC, ReactNode, RefObject, useMemo } from "react";
 
 interface ITooltipProps {
   isActive?: boolean;
@@ -22,22 +22,30 @@ export const Tooltip: FC<ITooltipProps> = ({
 }) => {
   const positionRect = positionRef.current?.getBoundingClientRect();
 
-  return isActive && !!positionRect
-    ? createPortal(
+  const tooltip = useMemo(
+    () =>
+      !!positionRect && (
         <div
           style={{
             top: positionRect.top + window.scrollY,
             left: positionRect.x + window.scrollX,
             maxWidth: positionRect.width,
             position: isFixed ? "fixed" : "absolute",
+            transform: `translate(calc(-50% + ${
+              positionRect.width / 2
+            }px), calc(-100% - 5px))`,
           }}
           className={classNames(styles.tooltip, className, {
             [styles.tooltip_active]: isActive,
           })}
         >
           {children}
-        </div>,
-        root || document.body
-      )
+        </div>
+      ),
+    [children, className, isActive, isFixed, positionRect]
+  );
+
+  return isActive && !!positionRect
+    ? createPortal(tooltip, root || document.body)
     : null;
 };
