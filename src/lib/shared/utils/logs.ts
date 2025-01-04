@@ -5,8 +5,7 @@ export const removeDuplicateLogs = (logs: ILogs[]) => {
     if (!!acc.length) {
       const last = acc[acc.length - 1];
 
-      ((last.action === "rating" &&
-        (last.action !== curr.action || last.rating !== curr.rating)) ||
+      ((last.action === "rating" && last.action !== curr.action) ||
         (last.action !== "rating" && last.gameId != curr.gameId)) &&
         acc.push(curr);
     } else {
