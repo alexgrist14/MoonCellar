@@ -2,11 +2,7 @@ import UserProfile from "@/src/lib/pages/UserProfile/UserProfile";
 import { userAPI } from "@/src/lib/shared/api";
 import { ACCESS_TOKEN } from "@/src/lib/shared/constants";
 import { IUser } from "@/src/lib/shared/types/auth";
-import {
-  IFollowings,
-  ILogs
-} from "@/src/lib/shared/types/user.type";
-import { WrapperTemplate } from "@/src/lib/shared/ui/WrapperTemplate";
+import { IFollowings, ILogs } from "@/src/lib/shared/types/user.type";
 import { mergeLogs } from "@/src/lib/shared/utils/logs";
 import { jwtDecode } from "jwt-decode";
 import { GetServerSidePropsContext } from "next";
@@ -26,11 +22,9 @@ const User: FC<IProps> = ({
   authUserId,
 }) => {
   return (
-
     <UserProfile
       {...{ user, logs: userLogs, authUserFollowings, authUserId }}
     />
-
   );
 };
 
