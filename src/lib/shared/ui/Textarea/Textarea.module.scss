@@ -1,0 +1,81 @@
+.textarea {
+  width: 100%;
+  position: relative;
+  display: grid;
+  height: fit-content;
+
+  &__replica {
+    @include font(16px,18px, 400);
+    white-space: pre-wrap;
+    width: 100%;
+    height: 48px;
+    height: fit-content;
+    padding: 14px 12px;
+    position: absolute;
+    visibility: hidden;
+    pointer-events: none;
+    min-height: 48px;
+    max-height: 40vh;
+    overflow: hidden;
+  }
+
+  &__wrapper {
+    @include flexCenter;
+    position: absolute;
+    bottom: 2px;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    cursor: row-resize;
+  }
+
+  &__corner {
+    pointer-events: none;
+  }
+
+  &__field {
+    @include font(16px,18px, 400);
+    width: 100%;
+    height: 48px;
+    min-height: 48px;
+    max-height: 40vh;
+    padding: 14px 12px;
+    outline: none;
+    border-radius: $radius;
+    background: $bgAlt;
+    color: $whiteTextColor;
+    border: 2px solid transparent;
+    transition: border 0.15s ease-out;
+    scrollbar-width: none;
+    resize: none;
+
+    &::-webkit-scrollbar-track,
+    &::-webkit-scrollbar-thumb {
+      display: none;
+    }
+
+    &::placeholder {
+      color: $placeholder;
+    }
+
+    &:hover {
+      border-color: $borderColor;
+    }
+
+    &:focus {
+      border-color: $accent;
+    }
+
+    &_error {
+      border-color: $red;
+    }
+  }
+
+  &__field:focus,
+  &__field:active,
+  &__field:not(:placeholder-shown) {
+    &::placeholder {
+      opacity: 0;
+    }
+  }
+}
