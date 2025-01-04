@@ -43,7 +43,7 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
               tabName: "Gauntlet",
               style: { flexBasis: "33%" },
               onTabClick: () => {
-                setRoyal(false);
+                isRoyal && setRoyal(false);
                 setTabIndex(0);
               },
             },
@@ -61,7 +61,7 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
               tabName: "History",
               style: { flexBasis: "33%" },
               onTabClick: () => {
-                setRoyal(false);
+                isRoyal && setRoyal(false);
                 setTabIndex(2);
               },
             },
