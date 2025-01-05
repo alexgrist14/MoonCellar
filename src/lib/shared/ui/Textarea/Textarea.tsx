@@ -96,7 +96,9 @@ export const Textarea: FC<ITextareaProps> = forwardRef<
 
               setHeight(mousePosition.y - rect.top);
             }}
-            onDragStart={(e) => e.dataTransfer.setDragImage(fakeImage, 0, 0)}
+            onDragStart={(e) =>
+              !!fakeImage && e.dataTransfer.setDragImage(fakeImage, 0, 0)
+            }
             draggable="true"
             className={styles.textarea__wrapper}
           >
