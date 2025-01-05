@@ -32,12 +32,14 @@ export const Textarea: FC<ITextareaProps> = forwardRef<
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
     const fakeImage = useMemo(() => {
-      const image = new Image();
+      if (typeof window !== "undefined") {
+        const image = new Image();
 
-      image.src =
-        "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=";
+        image.src =
+          "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=";
 
-      return image;
+        return image;
+      }
     }, []);
 
     useAutoResizeTextArea({
