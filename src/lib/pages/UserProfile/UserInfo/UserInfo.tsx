@@ -1,30 +1,22 @@
 import { userAPI } from "@/src/lib/shared/api";
+import { getImageLink } from "@/src/lib/shared/constants";
+import { IUser } from "@/src/lib/shared/types/auth";
 import {
-  CategoriesCount,
   IFollowings,
-  ILogs,
-  UserGamesType,
+  ILogs
 } from "@/src/lib/shared/types/user.type";
 import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
+import { Button } from "@/src/lib/shared/ui/Button";
+import { commonUtils } from "@/src/lib/shared/utils/common";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  Dispatch,
   FC,
-  SetStateAction,
-  useEffect,
   useMemo,
-  useState,
+  useState
 } from "react";
 import styles from "./UserInfo.module.scss";
-import { userListCategories } from "@/src/lib/shared/constants/user.const";
-import { API_URL, FRONT_URL, getImageLink } from "@/src/lib/shared/constants";
-import { commonUtils } from "@/src/lib/shared/utils/common";
-import { Button } from "@/src/lib/shared/ui/Button";
-import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { mergeLogs } from "@/src/lib/shared/utils/logs";
-import { IUser } from "@/src/lib/shared/types/auth";
-import { Input } from "@/src/lib/shared/ui/Input";
+import Markdown from 'react-markdown'
 
 interface UserInfoProps {
   user: IUser;
@@ -99,9 +91,9 @@ const UserInfo: FC<UserInfoProps> = ({
               <span>Last seen:</span> {commonUtils.getHumanDate(user.updatedAt)}
             </div>
             {user.description && (
-              <div className={styles.profile__description}>
+              <Markdown className={styles.profile__description}>
                 {user.description}
-              </div>
+              </Markdown>
             )}
             {/* <div className={styles.profile__stats}>
               <div className={styles.profile__stats__list}>

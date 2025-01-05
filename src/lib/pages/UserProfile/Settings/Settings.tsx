@@ -8,6 +8,7 @@ import styles from "./Settings.module.scss";
 import { userAPI } from "@/src/lib/shared/api";
 import { axiosUtils } from "@/src/lib/shared/utils/axios";
 import { toast } from "@/src/lib/shared/utils/toast";
+import { Textarea } from "@/src/lib/shared/ui/Textarea";
 
 interface SettingsProps {}
 
@@ -69,12 +70,13 @@ export const Settings: FC<SettingsProps> = ({}) => {
 
         <div className={styles.field}>
           <label htmlFor="description">Description</label>
-          <Input
+          <Textarea id="description" defaultValue={profile?.description} className={styles.input} onChange={(e) => setDescription(e.target.value)}/>
+          {/* <Input
             id="description"
             defaultValue={profile?.description}
             className={styles.input}
             onChange={(e) => setDescription(e.target.value)}
-          />
+          /> */}
         </div>
         <Button type="submit" className={styles.btn} color={"accent"}>
           Save

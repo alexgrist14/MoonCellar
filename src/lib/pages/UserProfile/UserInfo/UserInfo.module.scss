@@ -52,9 +52,10 @@
     &__description {
       margin-top: 10px;
       max-width: 600px;
+      width: fit-content;
       border-radius: $radius;
       background-color: $lightBgSecond;
-      padding: 7px;
+      padding: 10px;
       font-style: italic;
     }
     &__stats {

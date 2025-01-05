@@ -33,7 +33,8 @@ export const AuthModal: FC = () => {
       password: data.password,
     };
 
-    login(loginDto);
+    login(loginDto).then(()=>{}).catch(()=>{setIsLoading(false)});
+
   };
 
   const handleSignUp: SubmitHandler<IAuth> = (data) => {
@@ -46,7 +47,7 @@ export const AuthModal: FC = () => {
       password: data.password,
     };
 
-    signup(singUpDto);
+    signup(singUpDto).then(()=>{}).catch(()=>{setIsLoading(false)});
   };
 
   return (

@@ -32,27 +32,29 @@ export const useAuth = () => {
     });
   };
 
-  const login = (data: Omit<IAuth, "userName">) => {
-    authAPI
+  const login = async (data: Omit<IAuth, "userName">) => {
+    return authAPI
       .login(data)
       .then((response) => {
         authUpdate(response.data.userId);
       })
       .catch((e: IAxiosErrorResponse) => {
         axiosUtils.toastError(e);
+        throw new Error;
       });
   };
 
-  const signup = (data: IAuth) => {
-    authAPI
+  const signup = async (data: IAuth) => {
+    return authAPI
       .signup(data)
       .then((response) => {
         authUpdate(response.data.userId);
       })
       .catch((e: IAxiosErrorResponse) => {
         axiosUtils.toastError(e);
+        throw new Error;
       });
   };
 
-  return { logout, login, signup,authUpdate };
+  return { logout, login, signup, authUpdate };
 };
