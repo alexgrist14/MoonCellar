@@ -6,6 +6,7 @@ import { FC, ReactNode, useEffect } from "react";
 import styles from "./Layout.module.scss";
 import { Header } from "./components";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
+import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
 
 interface ILayoutProps {
   children: ReactNode;
@@ -37,9 +38,9 @@ export const Layout: FC<ILayoutProps> = ({ children }) => {
   });
 
   return (
-    <div className={styles.layout}>
+    <Scrollbar className={styles.layout} stl={styles} type="absolute">
       <Header />
       {children}
-    </div>
+    </Scrollbar>
   );
 };

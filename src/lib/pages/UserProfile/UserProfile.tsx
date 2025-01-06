@@ -15,6 +15,7 @@ import { UserGames } from "./UserGames";
 import UserInfo from "./UserInfo/UserInfo";
 import styles from "./UserProfile.module.scss";
 import cn from "classnames";
+import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
 
 interface UserProfileProps {
   user: IUser;
@@ -100,7 +101,7 @@ const UserProfile: FC<UserProfileProps> = ({
   }, [user, authUserFollowings, authUserId, logs, pushTab]);
 
   return (
-    <div className={cn('container',styles.container)}>
+    <div className={cn("container", styles.container)}>
       <div
         className={classNames(styles.container__bg, {
           [styles.container__bg_active]: isImageReady,
@@ -114,7 +115,7 @@ const UserProfile: FC<UserProfileProps> = ({
           height={1080}
         />
       </div>
-      <div className={styles.content}>
+      <WrapperTemplate classNameContent={styles.content}>
         <Tabs
           defaultTabIndex={tabs.findIndex(
             (_tab) => _tab.tabName.toLowerCase() === tab
@@ -126,7 +127,7 @@ const UserProfile: FC<UserProfileProps> = ({
           contents={tabs}
         />
         <Scrollbar />
-      </div>
+      </WrapperTemplate>
     </div>
   );
 };

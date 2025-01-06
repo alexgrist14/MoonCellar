@@ -14,9 +14,13 @@ h3 {
 
 body {
   margin: 0;
-  color: white;
+  color: $whiteTextColor;
   background: $background;
   font-family: "General", sans-serif;
+}
+
+* {
+  scrollbar-width: none;
 }
 
 .container {

@@ -52,8 +52,8 @@ export const getServerSideProps = async (
     props: {
       user: { ...user, followings: userFollowings },
       userLogs,
-      authUserFollowings,
-      authUserId: authUserInfo?.id,
+      authUserFollowings: authUserFollowings || null,
+      authUserId: authUserInfo?.id || null,
     },
   };
 };
