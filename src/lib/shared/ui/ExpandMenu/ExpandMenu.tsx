@@ -1,10 +1,9 @@
-import { FC, HTMLAttributes, ReactNode, useRef, useState } from "react";
+import { FC, HTMLAttributes, ReactNode, useRef } from "react";
 import styles from "./ExpandMenu.module.scss";
 import { Scrollbar } from "../Scrollbar";
 import { useCommonStore } from "../../store/common.store";
 import classNames from "classnames";
 import { createPortal } from "react-dom";
-import { useWindowScroll } from "../../hooks/useWindowScroll";
 import { useStatesStore } from "../../store/states.store";
 import { useResizeDetector } from "react-resize-detector";
 
@@ -26,20 +25,14 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
   const { expanded, setExpanded } = useCommonStore();
   const { isMobile } = useStatesStore();
 
-  const [top, setTop] = useState<string>();
-
   const isActive = expanded === "both" || expanded === position;
-
-  useWindowScroll(() =>
-    setTop(`${window.scrollY > 0 ? Math.max(0, 55 - window.scrollY) : 55}px`)
-  );
 
   const { ref } = useResizeDetector({
     refreshMode: "debounce",
     refreshRate: 200,
   });
 
-  if (!top) return null;
+  if (isMobile === undefined) return null;
 
   return createPortal(
     <div
@@ -53,8 +46,6 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
         [styles.menu_active]: isActive,
       })}
       style={{
-        top,
-        height: `calc(100vh - ${top})`,
         gridTemplateColumns: position === "left" ? "1fr 2px" : "2px 1fr",
         gridTemplateAreas:
           position === "left" ? "'content expand'" : "'expand content'",

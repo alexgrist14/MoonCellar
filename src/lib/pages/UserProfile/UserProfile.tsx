@@ -1,4 +1,3 @@
-import classNames from "classnames";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import queryString from "query-string";
@@ -101,9 +100,9 @@ const UserProfile: FC<UserProfileProps> = ({
   }, [user, authUserFollowings, authUserId, logs, pushTab]);
 
   return (
-    <div className={cn("container", styles.container)}>
+    <div className={cn(styles.container)}>
       <div
-        className={classNames(styles.container__bg, {
+        className={cn(styles.container__bg, {
           [styles.container__bg_active]: isImageReady,
         })}
       >

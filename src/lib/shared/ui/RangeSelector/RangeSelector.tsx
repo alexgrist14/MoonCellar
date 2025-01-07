@@ -74,7 +74,6 @@ export const RangeSelector: FC<RangeSelectorProps> = ({
               [styles.slider__pointer_active]: isActive,
             }
           )}
-          onDragEnd={() => console.log(rangeValue)}
           style={{
             left,
           }}

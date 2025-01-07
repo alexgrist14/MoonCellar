@@ -113,7 +113,7 @@ export const GauntletPage: FC = () => {
   }, [setExpanded, isMobile]);
 
   return (
-    <div className={classNames("container", styles.page)}>
+    <div className={classNames(styles.page)}>
       {!isRoyal && (
         <ExpandMenu id="consoles" titleOpen="Filters" position="left">
           <Filters isGauntlet />

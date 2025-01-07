@@ -1,5 +1,5 @@
 import { Dispatch, FC, SetStateAction, useState } from "react";
-// import styles from "./SaveFilterForm.module.scss";
+import styles from "./SaveFilterForm.module.scss";
 import { WrapperTemplate } from "../WrapperTemplate";
 import { Input } from "../Input";
 import { Button } from "../Button";
@@ -34,7 +34,7 @@ export const SaveFilterForm: FC<{
       .catch(axiosUtils.toastError);
 
   return (
-    <WrapperTemplate>
+    <WrapperTemplate classNameContent={styles.form}>
       <Input
         autoFocus
         value={name}

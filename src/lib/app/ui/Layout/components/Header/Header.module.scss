@@ -4,20 +4,33 @@
   align-items: center;
   padding-inline: 20px;
   width: 100%;
-  min-height: 55px;
-  background: rgba($bgAlt, 0.7);
+  height: $headerHeight;
+  background: rgba($bgAlt, 0.9);
   outline: 2px $borderColor solid;
+  z-index: 1;
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  @include mediaSm {
+    padding-inline: 10px;
+  }
 
   &__left {
     display: flex;
-    height: 34px;
+    height: 70%;
     align-items: center;
     flex-wrap: wrap;
     gap: 10px;
-    .btn{
+  }
+
+  &__buttons {
+    & button {
       @include flexCenter;
       gap: 5px;
-      &:hover{
+      padding: 2px 5px;
+
+      &:hover {
         background-color: $lightBg;
       }
     }
@@ -40,8 +53,14 @@
     align-items: center;
     font-family: "Pentagra";
     padding-inline: 14px;
+    margin-top: 2px;
+
+    @include mediaSm {
+      padding-inline: 5px;
+    }
   }
-  .svg{
+
+  .svg {
     color: $whiteTextColor;
     width: 22px;
     height: 22px;

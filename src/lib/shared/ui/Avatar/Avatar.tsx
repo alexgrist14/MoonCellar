@@ -7,9 +7,10 @@ import styles from "./Avatar.module.scss";
 
 interface AvatarProps {
   user?: Pick<IUser, "_id" | "userName" | "profilePicture">;
+  isWithoutTooltip?: boolean;
 }
 
-const Avatar: FC<AvatarProps> = ({ user }) => {
+const Avatar: FC<AvatarProps> = ({ user, isWithoutTooltip }) => {
   const [isTooltipActive, setIsTooltipActive] = useState(false);
   const followingsRef = useRef(null);
 
@@ -18,7 +19,7 @@ const Avatar: FC<AvatarProps> = ({ user }) => {
       className={styles.container}
       ref={followingsRef}
       onMouseOver={() => setIsTooltipActive(true)}
-      onMouseOut={()=>setIsTooltipActive(false)}
+      onMouseOut={() => setIsTooltipActive(false)}
     >
       {user?.profilePicture ? (
         <Image
@@ -33,7 +34,16 @@ const Avatar: FC<AvatarProps> = ({ user }) => {
           <SvgProfile className={styles.placeholder} />
         </div>
       )}
-      <Tooltip className={styles.tooltip} isActive={isTooltipActive} isFixed={false} positionRef={followingsRef}>{user?.userName}</Tooltip>
+      {!isWithoutTooltip && (
+        <Tooltip
+          className={styles.tooltip}
+          isActive={isTooltipActive}
+          isFixed={false}
+          positionRef={followingsRef}
+        >
+          {user?.userName}
+        </Tooltip>
+      )}
     </div>
   );
 };

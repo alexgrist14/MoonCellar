@@ -41,8 +41,8 @@
     transition: opacity 0.2s;
 
     &_absolute {
-      margin-block: 10px;
-      height: calc(100% - 20px);
+      margin-block: 5px;
+      height: calc(100% - 10px);
       position: absolute;
       overflow-y: clip;
       right: 4px;
@@ -57,7 +57,7 @@
     position: absolute;
     top: 0;
     width: 6px;
-    background-color: $bg;
+    background-color: $bgAlt;
     opacity: 0;
 
     &--horizontal {
@@ -76,7 +76,8 @@
     top: 0;
     height: 65px;
     touch-action: none;
-    transition: height 0.2s;
+    transition: height 0.2s, opacity 0.3s;
+    opacity: 0.4;
 
     &::before {
       content: "";
@@ -89,6 +90,7 @@
     }
 
     &:hover {
+      opacity: 1;
       &::before {
         filter: brightness(1.2);
       }

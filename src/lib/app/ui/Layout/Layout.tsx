@@ -2,11 +2,13 @@ import { authAPI, userAPI } from "@/src/lib/shared/api";
 import { screenSm } from "@/src/lib/shared/constants";
 import { useWindowResizeAction } from "@/src/lib/shared/hooks";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { FC, ReactNode, useEffect } from "react";
+import { FC, ReactNode, useEffect, useState } from "react";
 import styles from "./Layout.module.scss";
 import { Header } from "./components";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
+import { useResizeDetector } from "react-resize-detector";
+import { Shadow } from "@/src/lib/shared/ui/Shadow";
 
 interface ILayoutProps {
   children: ReactNode;
@@ -17,6 +19,13 @@ export const Layout: FC<ILayoutProps> = ({ children }) => {
   const { refreshToken } = authAPI;
   const { setAuth, setProfile, clear, isAuth } = useAuthStore();
   const { setMobile } = useStatesStore();
+
+  const [isShadowActive, setIsShadowActive] = useState(false);
+
+  const { ref } = useResizeDetector({
+    refreshMode: "debounce",
+    refreshRate: 200,
+  });
 
   useEffect(() => {
     if (isAuth) {
@@ -38,9 +47,20 @@ export const Layout: FC<ILayoutProps> = ({ children }) => {
   });
 
   return (
-    <Scrollbar className={styles.layout} stl={styles} type="absolute">
+    <>
       <Header />
-      {children}
-    </Scrollbar>
+      <Scrollbar
+        stl={styles}
+        type="absolute"
+        onScrollBottom={(isBottom) => {
+          if (isBottom !== isShadowActive) {
+            setIsShadowActive(isBottom);
+          }
+        }}
+      >
+        <main className="container" ref={ref}>{children}</main>
+        <Shadow isActive={isShadowActive} isFixed />
+      </Scrollbar>
+    </>
   );
 };

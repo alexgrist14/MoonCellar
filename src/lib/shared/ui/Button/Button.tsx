@@ -59,7 +59,6 @@ export const Button = forwardRef(
         !!tooltipRect &&
         !!rect
       ) {
-        console.log(window.screenX)
         const x =
           tooltipAlign === "left"
             ? rect.x

@@ -1,6 +1,7 @@
 div .menu {
   position: fixed;
   left: 50%;
+  top: $headerHeight;
   transform: translateX(-50%);
   height: fit-content;
   padding: 0;

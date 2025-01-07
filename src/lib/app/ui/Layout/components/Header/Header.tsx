@@ -8,10 +8,10 @@ import { SearchModal } from "@/src/lib/shared/ui/SearchModal";
 import { Separator } from "@/src/lib/shared/ui/Separator";
 import { SvgSearch } from "@/src/lib/shared/ui/svg";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { FC, MouseEvent } from "react";
 import styles from "./Header.module.scss";
+import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
 
 export const Header: FC = () => {
   const { isMobile } = useStatesStore();
@@ -36,25 +36,41 @@ export const Header: FC = () => {
           MoonCellar
         </Link>
         <Separator />
-        <Link href="/games">
-          <Button className={styles.btn} color="transparent">
-            <Icon className={styles.svg} icon="dashicons:games" />
-            {!isMobile && <span>Games</span>}
-          </Button>
-        </Link>
-        <Link href="/gauntlet">
-          <Button className={styles.btn} color="transparent">
-            <Icon className={styles.svg} icon="ph:spinner-ball-fill" />
-            {!isMobile && <span>Gauntlet</span>}
-          </Button>
-        </Link>
-        <Button
-          className={styles.btn}
-          color="transparent"
-          onClick={searchClickHandler}
-        >
-          <SvgSearch className={styles.svg} />
-        </Button>
+        <ButtonGroup
+          wrapperClassName={styles.container__buttons}
+          buttons={[
+            {
+              title: (
+                <>
+                  <Icon className={styles.svg} icon="dashicons:games" />
+                  {!isMobile && <span>Games</span>}
+                </>
+              ),
+              link: "/games",
+              color: "transparent",
+            },
+            {
+              title: (
+                <>
+                  <Icon className={styles.svg} icon="ph:spinner-ball-fill" />
+                  {!isMobile && <span>Gauntlet</span>}
+                </>
+              ),
+              link: "/gauntlet",
+              color: "transparent",
+            },
+            {
+              title: (
+                <>
+                  <SvgSearch className={styles.svg} />
+                  {!isMobile && <span>Search</span>}
+                </>
+              ),
+              callback: searchClickHandler,
+              color: "transparent",
+            },
+          ]}
+        />
       </div>
       <div className={styles.container__right}>
         <Link
@@ -62,7 +78,7 @@ export const Header: FC = () => {
           onClick={handleProfileClick}
           className={styles.profile__link}
         >
-          <Avatar user={profile} />
+          <Avatar user={profile} isWithoutTooltip />
         </Link>
       </div>
     </div>

@@ -116,7 +116,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
           />
         </ExpandMenu>
       )}
-      <div className={classNames("container", styles.page)}>
+      <div className={classNames(styles.page)}>
         <div
           className={classNames(styles.page__bg, {
             [styles.page__bg_active]:

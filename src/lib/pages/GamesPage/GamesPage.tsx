@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import styles from "./GamesPage.module.scss";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { Filters } from "../../shared/ui/Filters";
@@ -16,8 +16,6 @@ import { useWindowResizeAction } from "../../shared/hooks";
 import { screenGt, screenLg, screenMd, screenSm } from "../../shared/constants";
 import { useRouter } from "next/router";
 import { parseQueryFilters } from "../../shared/utils/filters.util";
-import { Shadow } from "../../shared/ui/Shadow";
-import { useWindowScroll } from "../../shared/hooks/useWindowScroll";
 import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
 
 export const GamesPage: FC = () => {
@@ -30,8 +28,6 @@ export const GamesPage: FC = () => {
   const [games, setGames] = useState<IGDBGameMinimal[]>([]);
   const [total, setTotal] = useState(0);
   const [take, setTake] = useState(80);
-
-  const [isShadowActive, setIsShadowActive] = useState(false);
 
   const debouncedGamesFetch = useDebouncedCallback(() => {
     setLoading(true);
@@ -77,21 +73,8 @@ export const GamesPage: FC = () => {
     return setTake(14);
   });
 
-  useWindowScroll(() => {
-    const height =
-      document.body.scrollHeight -
-      document.body.scrollTop -
-      document.body.clientHeight -
-      50;
-    const isActive = window.scrollY < height;
-
-    if (isActive !== isShadowActive) {
-      setIsShadowActive(isActive);
-    }
-  });
-
   return (
-    <div className={classNames("container", styles.page)}>
+    <>
       <ExpandMenu position="left" titleOpen="Filters">
         <Filters callback={() => debouncedGamesFetch()} />
       </ExpandMenu>
@@ -116,7 +99,6 @@ export const GamesPage: FC = () => {
           </div>
         )}
       </WrapperTemplate>
-      <Shadow isActive={isShadowActive} isFixed />
-    </div>
+    </>
   );
 };
