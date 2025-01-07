@@ -1,31 +1,29 @@
 import Image from "next/image";
-import { ChangeEvent, FC, useCallback, useEffect, useState } from "react";
-import { userAPI } from "../../api";
+import {
+  ChangeEvent,
+  Dispatch,
+  FC,
+  SetStateAction,
+  useState
+} from "react";
 import { useAuthStore } from "../../store/auth.store";
 import { SvgCamera } from "../svg";
 import styles from "./AvatarSettings.module.scss";
 
-interface AvatarSettingsProps {}
+interface AvatarSettingsProps {
+  tempAvatar?: File;
+  setTempAvatar?: Dispatch<SetStateAction<File | undefined>>;
+}
 
-const AvatarSettings: FC<AvatarSettingsProps> = ({}) => {
+const AvatarSettings: FC<AvatarSettingsProps> = ({
+  tempAvatar,
+  setTempAvatar,
+}) => {
   const [profileHover, setProfileHover] = useState<boolean>(false);
 
   const { profile, setProfile } = useAuthStore();
 
-  const [tempAvatar, setTempAvatar] = useState<File>();
   const [isPictureLarge, setIsPictureLarge] = useState<boolean>(false);
-
-  const { addAvatar } = userAPI;
-
-  const handleUpload = useCallback(async () => {
-    if (!!profile && tempAvatar) {
-      await addAvatar(profile._id, tempAvatar);
-    }
-  }, [addAvatar, profile, tempAvatar]);
-
-  useEffect(() => {
-    if (!isPictureLarge) handleUpload();
-  }, [handleUpload, isPictureLarge, tempAvatar]);
 
   const handleInput = async (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files !== null) {
@@ -34,11 +32,11 @@ const AvatarSettings: FC<AvatarSettingsProps> = ({}) => {
 
       if (fileSize > 2048) {
         setIsPictureLarge(true);
+        setTempAvatar && setTempAvatar(undefined);
       } else {
-        setTempAvatar(file);
+        setTempAvatar && setTempAvatar(file);
         !!profile && setProfile({ ...profile, profilePicture: "" });
         setIsPictureLarge(false);
-        handleUpload();
       }
     }
   };

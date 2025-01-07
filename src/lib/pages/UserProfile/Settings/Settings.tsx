@@ -1,14 +1,14 @@
+import { userAPI } from "@/src/lib/shared/api";
 import { useAuth } from "@/src/lib/shared/hooks/auth";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import AvatarSettings from "@/src/lib/shared/ui/AvatarSettings/AvatarSettings";
 import { Button } from "@/src/lib/shared/ui/Button";
 import { Input } from "@/src/lib/shared/ui/Input";
-import { FC, FormEvent, useState } from "react";
-import styles from "./Settings.module.scss";
-import { userAPI } from "@/src/lib/shared/api";
+import { Textarea } from "@/src/lib/shared/ui/Textarea";
 import { axiosUtils } from "@/src/lib/shared/utils/axios";
 import { toast } from "@/src/lib/shared/utils/toast";
-import { Textarea } from "@/src/lib/shared/ui/Textarea";
+import { FC, FormEvent, useState } from "react";
+import styles from "./Settings.module.scss";
 
 interface SettingsProps {}
 
@@ -16,6 +16,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
   const { isAuth, profile } = useAuthStore();
   const { logout } = useAuth();
   const [userName, setUserName] = useState("");
+  const [tempAvatar, setTempAvatar] = useState<File>();
   const [description, setDescription] = useState("");
 
   const handleLogoutClick = () => {
@@ -31,6 +32,8 @@ export const Settings: FC<SettingsProps> = ({}) => {
         .updateDescription(profile._id, { description })
         .then(() => toast.success({ description: "Saved successfully" }))
         .catch((err) => axiosUtils.toastError(err));
+
+    if (!!profile && tempAvatar) userAPI.addAvatar(profile._id, tempAvatar);
   };
 
   return (
@@ -38,7 +41,10 @@ export const Settings: FC<SettingsProps> = ({}) => {
       <h2 className={styles.title}>Profile Settings</h2>
       <div className={styles.content}>
         <div className={styles.content__top}>
-          <AvatarSettings />
+          <AvatarSettings
+            tempAvatar={tempAvatar}
+            setTempAvatar={setTempAvatar}
+          />
           <Button
             className={styles.btn}
             color={"red"}
@@ -70,13 +76,12 @@ export const Settings: FC<SettingsProps> = ({}) => {
 
         <div className={styles.field}>
           <label htmlFor="description">Description</label>
-          <Textarea id="description" defaultValue={profile?.description} className={styles.input} onChange={(e) => setDescription(e.target.value)}/>
-          {/* <Input
+          <Textarea
             id="description"
             defaultValue={profile?.description}
             className={styles.input}
             onChange={(e) => setDescription(e.target.value)}
-          /> */}
+          />
         </div>
         <Button type="submit" className={styles.btn} color={"accent"}>
           Save
