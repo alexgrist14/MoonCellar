@@ -15,6 +15,7 @@ import { modal } from "../Modal";
 import { useDisableScroll, useWindowResizeAction } from "../../hooks";
 import Link from "next/link";
 import { screenGt, screenLg, screenMd, screenSm } from "../../constants";
+import { keyboardUtils } from "../../utils/keyboard";
 
 export const SearchModal: FC = () => {
   const { setExpanded } = useCommonStore();
@@ -24,31 +25,19 @@ export const SearchModal: FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [take, setTake] = useState(17);
   const [total, setTotal] = useState<number>();
+  const [isSearchActive, setIsSearchActive] = useState(false);
 
-  const isSearchActive = useMemo(
-    () => !!searchQuery && searchQuery.length >= 2,
-    [searchQuery]
-  );
-
-  const debouncedSearch = useDebouncedCallback(() => {
+  const searchHandler = (search: string) => {
     IGDBApi.getGames({
-      search: searchQuery,
+      search,
       take,
     }).then((response) => {
       setGames(response.data.results);
       setTotal(response.data.total);
+      setIsSearchActive(!!search && search.length >= 2);
       setIsLoading(false);
     });
-  }, 300);
-
-  useEffect(() => {
-    if (isSearchActive) {
-      setIsLoading(true);
-      debouncedSearch();
-    } else {
-      setTimeout(() => setGames([]), 400);
-    }
-  }, [searchQuery, debouncedSearch, isSearchActive]);
+  };
 
   useDisableScroll();
 
@@ -69,6 +58,8 @@ export const SearchModal: FC = () => {
           placeholder="Search..."
           autoFocus
           onChange={(e) => setSearchQuery(e.target.value)}
+          onBlur={(e) => searchHandler(e.target.value)}
+          onKeyDown={keyboardUtils.blurOnKey}
         />
         <ButtonGroup
           wrapperClassName={styles.modal__buttons}
