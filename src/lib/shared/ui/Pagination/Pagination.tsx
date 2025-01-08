@@ -56,7 +56,7 @@ export const Pagination: FC<{
       </Button>
       <div className={styles.pagination__center} ref={centerRef}>
         <Input
-          style={{ padding: "4px", width: "75px" }}
+          containerStyles={{ padding: "4px", width: "75px" }}
           className={styles.pagination__input}
           type="number"
           value={value || page}

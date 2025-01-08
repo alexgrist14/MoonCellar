@@ -4,8 +4,9 @@
   align-items: center;
   margin-inline: auto;
   padding: 5px 10px;
-  background-color: $lightBg;
+  background-color: $bgAlt;
   border-radius: $radius;
+  filter: drop-shadow(0 0 0.2rem $blackBorderColor);
 
   &_fixed {
     position: fixed;
@@ -34,7 +35,7 @@
 
   &__center {
     display: flex;
-    gap: 2px;
+    gap: 5px;
     align-items: center;
     white-space: nowrap;
     padding-inline: 10px;

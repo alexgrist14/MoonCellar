@@ -24,12 +24,16 @@ interface InputProps
     | "name"
   > {
   containerStyles?: CSSProperties;
+  containerClassname?: string;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ containerStyles, className, ...props }, ref) => {
+  ({ containerStyles, className, containerClassname, ...props }, ref) => {
     return (
-      <div className={styles.container} style={containerStyles}>
+      <div
+        className={classNames(styles.container, containerClassname)}
+        style={containerStyles}
+      >
         <input
           ref={ref}
           className={classNames(styles.input, className)}

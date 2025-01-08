@@ -58,8 +58,10 @@ export const Layout: FC<ILayoutProps> = ({ children }) => {
           }
         }}
       >
-        <main className="container" ref={ref}>{children}</main>
-        <Shadow isActive={isShadowActive} isFixed />
+        <main className="container" ref={ref}>
+          {children}
+          <Shadow isActive={isShadowActive} isFixed />
+        </main>
       </Scrollbar>
     </>
   );

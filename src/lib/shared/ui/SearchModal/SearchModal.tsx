@@ -12,32 +12,28 @@ import { useCommonStore } from "../../store/common.store";
 import { Loader } from "../Loader";
 import { ButtonGroup } from "../Button/ButtonGroup";
 import { modal } from "../Modal";
-import { useDisableScroll } from "../../hooks";
-import { useStatesStore } from "../../store/states.store";
+import { useDisableScroll, useWindowResizeAction } from "../../hooks";
+import Link from "next/link";
+import { screenGt, screenLg, screenMd, screenSm } from "../../constants";
 
 export const SearchModal: FC = () => {
   const { setExpanded } = useCommonStore();
-  const { isMobile } = useStatesStore();
 
   const [games, setGames] = useState<IGDBGameMinimal[]>([]);
-  const [total, setTotal] = useState(0);
-
-  const [take, setTake] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
-
   const [isLoading, setIsLoading] = useState(false);
+  const [take, setTake] = useState(17);
+  const [total, setTotal] = useState<number>();
 
   const isSearchActive = useMemo(
     () => !!searchQuery && searchQuery.length >= 2,
     [searchQuery]
   );
 
-  const originalTake = 17;
-
   const debouncedSearch = useDebouncedCallback(() => {
     IGDBApi.getGames({
       search: searchQuery,
-      take: take + Math.ceil(take / originalTake - 1),
+      take,
     }).then((response) => {
       setGames(response.data.results);
       setTotal(response.data.total);
@@ -46,21 +42,24 @@ export const SearchModal: FC = () => {
   }, 300);
 
   useEffect(() => {
-    if (!take) return;
-
     if (isSearchActive) {
       setIsLoading(true);
       debouncedSearch();
     } else {
       setTimeout(() => setGames([]), 400);
     }
-  }, [searchQuery, debouncedSearch, take, isSearchActive]);
-
-  useEffect(() => {
-    setTake(originalTake);
-  }, [searchQuery, isMobile, originalTake]);
+  }, [searchQuery, debouncedSearch, isSearchActive]);
 
   useDisableScroll();
+
+  useWindowResizeAction(() => {
+    if (window.innerWidth >= screenGt) return setTake(42);
+    if (window.innerWidth >= screenLg) return setTake(35);
+    if (window.innerWidth >= screenMd) return setTake(28);
+    if (window.innerWidth >= screenSm) return setTake(21);
+
+    return setTake(14);
+  });
 
   return (
     <div className={styles.modal}>
@@ -72,9 +71,10 @@ export const SearchModal: FC = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
         <ButtonGroup
+          wrapperClassName={styles.modal__buttons}
           buttons={[
             {
-              title: "Advanced search",
+              title: "Advanced",
               link: "/games",
               callback: () => {
                 modal.close();
@@ -95,13 +95,14 @@ export const SearchModal: FC = () => {
           {games?.map((game) => (
             <GameCard key={game._id} game={game} />
           ))}
-          {!!games?.length && take < total && (
-            <Button
+          {!!games?.length && !!total && take < total && (
+            <Link
               className={styles.modal__more}
-              onClick={() => setTake(take + originalTake)}
+              href={`/games?search=${encodeURIComponent(searchQuery)}&page=2`}
+              onClick={() => modal.close()}
             >
-              {isLoading ? <Loader /> : "More games"}
-            </Button>
+              <Button>More games</Button>
+            </Link>
           )}
         </Scrollbar>
       )}

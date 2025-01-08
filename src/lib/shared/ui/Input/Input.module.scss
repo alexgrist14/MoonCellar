@@ -1,22 +1,29 @@
 .container {
   width: 100%;
+  height: 100%;
+  background: $bg;
+  border-radius: $radius;
+  border: 2px solid transparent;
+  padding: 8px;
+  transition: 0.3s;
+
+  &:hover {
+    border-color: $borderColor;
+  }
+
+  &:has(input:focus),
+  &:has(input:focus-visible) {
+    border-color: $accent;
+  }
 
   .input {
     width: 100%;
     height: 100%;
-    background: $bg;
-    border-radius: $radius;
-    border: 2px solid $lightBg;
-    padding: 8px;
-    transition: 0.3s;
+    background: transparent;
+    @include textEllipsis;
 
     &::placeholder {
       color: $placeholder;
-    }
-
-    &:focus,
-    &:focus-visible {
-      border-color: $accent;
     }
   }
 }
