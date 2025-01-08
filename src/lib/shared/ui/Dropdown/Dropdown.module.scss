@@ -14,6 +14,7 @@
   width: 100%;
   transition: all 0.15s;
   overflow: hidden;
+  align-items: center;
 
   &_compact {
     height: 30px;
@@ -37,7 +38,6 @@
     align-items: center;
     gap: 5px;
     position: absolute;
-    top: calc(50% - 10px);
     right: 20px;
     z-index: 1;
   }
@@ -133,12 +133,9 @@
   }
 
   &__close {
-    @include flexCenter;
-    width: 20px;
-    aspect-ratio: 1;
-
     & svg {
-      margin-left: -2px;
+      height: fit-content;
+      aspect-ratio: 1;
     }
 
     & path {

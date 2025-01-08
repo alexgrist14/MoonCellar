@@ -1,7 +1,6 @@
-import { useDebouncedCallback } from "use-debounce";
 import { Input } from "../Input";
 import styles from "./SearchModal.module.scss";
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useState } from "react";
 import { IGDBApi } from "../../api";
 import { IGDBGameMinimal } from "../../types/igdb";
 import { Scrollbar } from "../Scrollbar";
@@ -16,6 +15,7 @@ import { useDisableScroll, useWindowResizeAction } from "../../hooks";
 import Link from "next/link";
 import { screenGt, screenLg, screenMd, screenSm } from "../../constants";
 import { keyboardUtils } from "../../utils/keyboard";
+import { SvgSearch } from "../svg";
 
 export const SearchModal: FC = () => {
   const { setExpanded } = useCommonStore();
@@ -64,6 +64,11 @@ export const SearchModal: FC = () => {
         <ButtonGroup
           wrapperClassName={styles.modal__buttons}
           buttons={[
+            {
+              title: <SvgSearch style={{ width: "20px", marginTop: "2px" }} />,
+              style: { padding: "2px 10px", height: "calc(100% - 10px)" },
+              color: "accent",
+            },
             {
               title: "Advanced",
               link: "/games",
