@@ -2,7 +2,6 @@ import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { AuthModal } from "@/src/lib/shared/ui/AuthModal";
 import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
-import { Button } from "@/src/lib/shared/ui/Button";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { SearchModal } from "@/src/lib/shared/ui/SearchModal";
 import { Separator } from "@/src/lib/shared/ui/Separator";

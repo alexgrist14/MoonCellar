@@ -1,4 +1,4 @@
-$fontMain: "General", sans-serif;
+$fontMain: var(--font-general);
 
 @mixin font($fz, $lh, $fw) {
   font-family: $fontMain;

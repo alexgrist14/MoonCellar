@@ -59,7 +59,7 @@
     flex-direction: column;
     gap: 30px;
     object-fit: cover;
-    font-family: "Pentagra", sans-serif;
+    font-family: var(--font-pentagra);
     width: 100%;
     height: 100%;
     border-radius: $radius;
