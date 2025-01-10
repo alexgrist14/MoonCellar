@@ -128,7 +128,7 @@ const UserInfo: FC<UserInfoProps> = ({
         </div>
       </div>
       <div className={styles.content__bottom}>
-        {logs.length > 0 && (
+        {logs?.length > 0 && (
           <div className={styles.activity}>
             <h3 className={styles.activity__title}>Activity</h3>
             <div className={styles.activity__list}>

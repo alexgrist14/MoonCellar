@@ -45,13 +45,12 @@ export const getServerSideProps = async (
   const user = (await userAPI.getByName(query.name as string)).data;
   const userFollowings = (await userAPI.getUserFollowings(user._id)).data;
   const logsResult = (await userAPI.getUserLogs(user._id)).data;
-  const userLogs: ILogs[] =
-    logsResult.length > 0 ? mergeLogs(logsResult[0].logs) : [];
+  const userLogs = logsResult.length > 0 ? mergeLogs(logsResult[0].logs) : [];
 
   return {
     props: {
       user: { ...user, followings: userFollowings },
-      userLogs,
+      userLogs: userLogs || null,
       authUserFollowings: authUserFollowings || null,
       authUserId: authUserInfo?.id || null,
     },

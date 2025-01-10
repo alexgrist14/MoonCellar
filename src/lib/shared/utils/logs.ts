@@ -1,17 +1,30 @@
 import { ILogs } from "../types/user.type";
 
 export const removeDuplicateLogs = (logs: ILogs[]) => {
-  return logs.reverse().reduce<ILogs[]>((acc, curr) => {
-    if (!!acc.length) {
-      const last = acc[acc.length - 1];
-
-      ((last.action === "rating" && last.action !== curr.action) ||
-        (last.action !== "rating" && last.gameId != curr.gameId)) &&
-        acc.push(curr);
-    } else {
+  return logs.reduce<ILogs[]>((acc, curr) => {
+    if (!acc.length) {
       acc.push(curr);
+      return acc;
     }
 
+    const last = acc[0];
+
+    if (last.action === "rating" && curr.action !== "rating") {
+      acc.splice(0, 0, curr);
+      return acc;
+    }
+
+    if (last.action === "rating" && curr.action === "rating") {
+      acc.splice(0, 1, curr);
+      return acc;
+    }
+
+    if (last.action !== "rating" && last.gameId === curr.gameId) {
+      acc.splice(0, 1, curr);
+      return acc;
+    }
+
+    acc.splice(0, 0, curr);
     return acc;
   }, []);
 };
