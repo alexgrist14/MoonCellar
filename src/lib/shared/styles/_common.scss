@@ -30,8 +30,7 @@ body {
   max-width: 1400px;
   margin-inline: auto;
   @include mediaSm{
-    padding-top: 50px;
-    padding-inline: 0;
+    padding-inline: 5px;
   }
 }
 
