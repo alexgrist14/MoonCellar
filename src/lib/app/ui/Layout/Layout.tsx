@@ -19,7 +19,7 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
   const { getById } = userAPI;
   const { refreshToken } = authAPI;
   const { setAuth, setProfile, clear, isAuth } = useAuthStore();
-  const { setMobile } = useStatesStore();
+  const { setMobile, isMobile } = useStatesStore();
 
   const [isShadowActive, setIsShadowActive] = useState(false);
 
@@ -50,20 +50,27 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
   return (
     <div className={className}>
       <Header />
-      <Scrollbar
-        stl={styles}
-        type="absolute"
-        onScrollBottom={(isBottom) => {
-          if (isBottom !== isShadowActive) {
-            setIsShadowActive(isBottom);
-          }
-        }}
-      >
+      {isMobile ? (
         <main className={"container"} ref={ref}>
           {children}
           <Shadow isActive={isShadowActive} isFixed />
         </main>
-      </Scrollbar>
+      ) : (
+        <Scrollbar
+          stl={styles}
+          type="absolute"
+          onScrollBottom={(isBottom) => {
+            if (isBottom !== isShadowActive) {
+              setIsShadowActive(isBottom);
+            }
+          }}
+        >
+          <main className={"container"} ref={ref}>
+            {children}
+            <Shadow isActive={isShadowActive} isFixed />
+          </main>
+        </Scrollbar>
+      )}
     </div>
   );
 };
