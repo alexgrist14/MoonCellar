@@ -10,9 +10,11 @@ import { shuffle } from "@/src/lib/shared/utils/common";
 import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
 import { emptyGames } from "@/src/lib/shared/constants/games.const";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
+import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
 
 export const WheelContainer: FC = () => {
-  const { winner, games, royalGames } = useGamesStore();
+  const { winner, games, royalGames, addRoyalGame, removeRoyalGame } =
+    useGamesStore();
   const { isFinished, isLoading, isRoyal } = useStatesStore();
   const { timer, setTimer } = useCommonStore();
 
@@ -83,7 +85,53 @@ export const WheelContainer: FC = () => {
         }
         size={295}
       />
-      {!!winner && <GameCard className={styles.winner} game={winner} />}
+      {!!winner && (
+        <div className={styles.winner}>
+          <GameCard className={styles.winner__card} game={winner} />
+          <WrapperTemplate contentStyle={{ padding: "10px" }}>
+            <ButtonGroup
+              wrapperClassName={styles.winner__actions}
+              buttons={[
+                {
+                  color: "accent",
+                  title:
+                    (royalGames?.some((royal) => royal._id === winner._id)
+                      ? "Remove from"
+                      : "Add to") + " royal games",
+                  callback: () => {
+                    royalGames?.some((royal) => royal._id === winner._id)
+                      ? removeRoyalGame(winner)
+                      : addRoyalGame(winner);
+                  },
+                },
+                {
+                  title: "Search on Youtube",
+                  link: `https://www.youtube.com/results?search_query=${winner.name}`,
+                  target: "_blank",
+                },
+                {
+                  title: "Search on RetroAchievements",
+                  link: `https://retroachievements.org/searchresults.php?s=${winner.name}&t=1`,
+                  target: "_blank",
+                },
+                {
+                  title: "Search on HowLongToBeat",
+                  link: `https://howlongtobeat.com/?q=${encodeURI(
+                    winner.name
+                  )}`,
+                  target: "_blank",
+                },
+                {
+                  title: "Open in IGDB",
+                  link: winner.url,
+                  isHidden: !winner.url,
+                  target: "_blank",
+                },
+              ]}
+            />
+          </WrapperTemplate>
+        </div>
+      )}
     </div>
   );
 };

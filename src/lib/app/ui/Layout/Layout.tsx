@@ -12,9 +12,10 @@ import { Shadow } from "@/src/lib/shared/ui/Shadow";
 
 interface ILayoutProps {
   children: ReactNode;
+  className?: string;
 }
 
-export const Layout: FC<ILayoutProps> = ({ children }) => {
+export const Layout: FC<ILayoutProps> = ({ children, className }) => {
   const { getById } = userAPI;
   const { refreshToken } = authAPI;
   const { setAuth, setProfile, clear, isAuth } = useAuthStore();
@@ -47,7 +48,7 @@ export const Layout: FC<ILayoutProps> = ({ children }) => {
   });
 
   return (
-    <>
+    <div className={className}>
       <Header />
       <Scrollbar
         stl={styles}
@@ -58,9 +59,11 @@ export const Layout: FC<ILayoutProps> = ({ children }) => {
           }
         }}
       >
-        <main className="container" ref={ref}>{children}</main>
-        <Shadow isActive={isShadowActive} isFixed />
+        <main className={"container"} ref={ref}>
+          {children}
+          <Shadow isActive={isShadowActive} isFixed />
+        </main>
       </Scrollbar>
-    </>
+    </div>
   );
 };

@@ -308,13 +308,13 @@ export const Dropdown: FC<IDropDownListProps> = ({
           {isWithReset && !isDisabled && isWithValue && (
             <Button
               color="red"
-              style={{ padding: "2px" }}
+              style={{ padding: "2px 5px" }}
               className={styles.dropdown__close}
               onClick={() => {
                 clickHandler({ index: -1, value: "" }, { isReset: true });
               }}
             >
-              <SvgClose />
+              Reset
             </Button>
           )}
           {isWithAll && isMulti && (

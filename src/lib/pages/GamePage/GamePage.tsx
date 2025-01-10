@@ -21,8 +21,10 @@ import { axiosUtils } from "../../shared/utils/axios";
 import { IGDBApi } from "../../shared/api";
 import { useStatesStore } from "../../shared/store/states.store";
 import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
+import { useAuthStore } from "../../shared/store/auth.store";
 
 export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
+  const { isAuth } = useAuthStore();
   const { royalGames, addRoyalGame, removeRoyalGame } = useGamesStore();
   const { isMobile } = useStatesStore();
 
@@ -134,7 +136,12 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
         </div>
         <div className={styles.page__left}>
           <WrapperTemplate contentStyle={{ padding: "0", gap: "0" }}>
-            <div className={styles.page__cover}>
+            <div
+              className={classNames(
+                styles.page__cover,
+                isAuth && styles.page__cover_control
+              )}
+            >
               {isLoading && <Loader />}
               {!!game.cover?.url ? (
                 <Image

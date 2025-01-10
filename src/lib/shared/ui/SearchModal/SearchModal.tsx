@@ -1,7 +1,6 @@
-import { useDebouncedCallback } from "use-debounce";
 import { Input } from "../Input";
 import styles from "./SearchModal.module.scss";
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useState } from "react";
 import { IGDBApi } from "../../api";
 import { IGDBGameMinimal } from "../../types/igdb";
 import { Scrollbar } from "../Scrollbar";
@@ -12,55 +11,44 @@ import { useCommonStore } from "../../store/common.store";
 import { Loader } from "../Loader";
 import { ButtonGroup } from "../Button/ButtonGroup";
 import { modal } from "../Modal";
-import { useDisableScroll } from "../../hooks";
-import { useStatesStore } from "../../store/states.store";
+import { useDisableScroll, useWindowResizeAction } from "../../hooks";
+import Link from "next/link";
+import { screenGt, screenLg, screenMd, screenSm } from "../../constants";
+import { keyboardUtils } from "../../utils/keyboard";
+import { SvgSearch } from "../svg";
 
 export const SearchModal: FC = () => {
   const { setExpanded } = useCommonStore();
-  const { isMobile } = useStatesStore();
 
   const [games, setGames] = useState<IGDBGameMinimal[]>([]);
-  const [total, setTotal] = useState(0);
-
-  const [take, setTake] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
-
   const [isLoading, setIsLoading] = useState(false);
+  const [take, setTake] = useState(17);
+  const [total, setTotal] = useState<number>();
+  const [isSearchActive, setIsSearchActive] = useState(false);
 
-  const isSearchActive = useMemo(
-    () => !!searchQuery && searchQuery.length >= 2,
-    [searchQuery]
-  );
-
-  const originalTake = 17;
-
-  const debouncedSearch = useDebouncedCallback(() => {
+  const searchHandler = (search: string) => {
     IGDBApi.getGames({
-      search: searchQuery,
-      take: take + Math.ceil(take / originalTake - 1),
+      search,
+      take,
     }).then((response) => {
       setGames(response.data.results);
       setTotal(response.data.total);
+      setIsSearchActive(!!search && search.length >= 2);
       setIsLoading(false);
     });
-  }, 300);
-
-  useEffect(() => {
-    if (!take) return;
-
-    if (isSearchActive) {
-      setIsLoading(true);
-      debouncedSearch();
-    } else {
-      setTimeout(() => setGames([]), 400);
-    }
-  }, [searchQuery, debouncedSearch, take, isSearchActive]);
-
-  useEffect(() => {
-    setTake(originalTake);
-  }, [searchQuery, isMobile, originalTake]);
+  };
 
   useDisableScroll();
+
+  useWindowResizeAction(() => {
+    if (window.innerWidth >= screenGt) return setTake(42);
+    if (window.innerWidth >= screenLg) return setTake(35);
+    if (window.innerWidth >= screenMd) return setTake(28);
+    if (window.innerWidth >= screenSm) return setTake(21);
+
+    return setTake(14);
+  });
 
   return (
     <div className={styles.modal}>
@@ -70,11 +58,19 @@ export const SearchModal: FC = () => {
           placeholder="Search..."
           autoFocus
           onChange={(e) => setSearchQuery(e.target.value)}
+          onBlur={(e) => searchHandler(e.target.value)}
+          onKeyDown={keyboardUtils.blurOnKey}
         />
         <ButtonGroup
+          wrapperClassName={styles.modal__buttons}
           buttons={[
             {
-              title: "Advanced search",
+              title: <SvgSearch style={{ width: "20px", marginTop: "2px" }} />,
+              style: { padding: "2px 10px", height: "calc(100% - 10px)" },
+              color: "accent",
+            },
+            {
+              title: "Advanced",
               link: "/games",
               callback: () => {
                 modal.close();
@@ -95,13 +91,14 @@ export const SearchModal: FC = () => {
           {games?.map((game) => (
             <GameCard key={game._id} game={game} />
           ))}
-          {!!games?.length && take < total && (
-            <Button
+          {!!games?.length && !!total && take < total && (
+            <Link
               className={styles.modal__more}
-              onClick={() => setTake(take + originalTake)}
+              href={`/games?search=${encodeURIComponent(searchQuery)}&page=2`}
+              onClick={() => modal.close()}
             >
-              {isLoading ? <Loader /> : "More games"}
-            </Button>
+              <Button>More games</Button>
+            </Link>
           )}
         </Scrollbar>
       )}

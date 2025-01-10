@@ -33,6 +33,10 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
   });
 
   if (isMobile === undefined) return null;
+  
+  const connector = document.getElementById("expand-connector");
+
+  if (!connector) return null;
 
   return createPortal(
     <div
@@ -82,6 +86,6 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
         </div>
       </div>
     </div>,
-    document.body
+    connector
   );
 };

@@ -1,14 +1,3 @@
-.display {
-  position: fixed;
-  @include flexCenter;
-  flex-wrap: wrap;
-  gap: 20px;
-  width: 100%;
-  pointer-events: none;
-  z-index: 1001;
-  bottom: 20px;
-}
-
 .toast {
   position: relative;
   border-radius: 8px;
@@ -32,7 +21,7 @@
   }
 
   &__title {
-    text-align: left;
+    text-align: center;
     @include font(18px, 24px, 700);
     color: $toastTitleColor;
 
@@ -42,7 +31,9 @@
   }
 
   &__text {
+    width: 100%;
     color: $toastTextColor;
+    text-align: center;
   }
 
   &__content {
@@ -53,10 +44,10 @@
 
   &__progress {
     position: absolute;
-    height: 3px;
+    height: 2px;
     background-color: $toastProgressColor;
     bottom: 5px;
-    border-radius: $radius;
+    border-radius: 1px;
     width: calc(100% - 32px);
     left: 50%;
     transform: translateX(-50%);
@@ -65,9 +56,10 @@
 
 .connector {
   position: fixed;
-  bottom: 20px;
-  width: 100%;
-  @include flexCenter;
+  bottom: 60px;
+  width: fit-content;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 1001;
 }
 

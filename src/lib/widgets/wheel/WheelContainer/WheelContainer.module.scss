@@ -3,7 +3,7 @@
   display: grid;
   margin-inline: auto;
   justify-items: center;
-  grid-template-rows: 55px 38vh 250px;
+  grid-template-rows: 50px calc(55vh - 155px) calc(45vh - 155px);
   padding-block: 5px;
   gap: 15px;
 }
@@ -17,6 +17,24 @@
 }
 
 .winner {
-  height: 100%;
-  width: auto;
+  display: flex;
+  gap: 20px;
+
+  &__card {
+    height: 100%;
+    width: auto;
+  }
+
+  div &__actions {
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+
+    & button,
+    a {
+      width: 100%;
+      height: 40px;
+      max-height: 40px;
+    }
+  }
 }
