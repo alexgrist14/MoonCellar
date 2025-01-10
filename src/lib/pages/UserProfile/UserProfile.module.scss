@@ -9,6 +9,10 @@
     background: rgba($bgAlt, 0.7);
     border-radius: 20px;
     height: 100%;
+    @include mediaSm{
+      padding: 10px;
+      border-radius: 0;
+    }
 
     .tabs{
       &__button{

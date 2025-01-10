@@ -1,67 +1,74 @@
-.sort {
-  display: flex;
-  width: 70px;
-  justify-content: flex-start;
-  align-items: center;
-  cursor: pointer;
-  &__icon {
+.container{
+  height: 100%;
+  .sort {
+    display: flex;
+    width: 70px;
+    justify-content: flex-start;
+    align-items: center;
     cursor: pointer;
-    width: 32px;
-    height: 32px;
-    margin-inline: auto;
-    transition: transform 0.2s;
-    &_active {
-      transform: rotateX(180deg);
+    &__icon {
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      margin-inline: auto;
+      transition: transform 0.2s;
+      &_active {
+        transform: rotateX(180deg);
+      }
     }
   }
+  .height{
+    min-height: 90vh;
+  }
+  
+  .games {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    height: 100%;
+    margin-inline: auto;
+    margin-top: 20px;
+    gap: 40px;
+  
+    @include mediaLg {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  
+    @include mediaMd {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  
+    @include mediaSm {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  
+    &__game {
+      display: grid;
+      max-width: 240px;
+      gap: 3px;
+    }
+  
+    &__title {
+      @include textEllipsis;
+      padding-inline: 5px;
+    }
+    &__info {
+      display: grid;
+      grid-template-columns: 1fr 20px;
+      border-radius: $radius;
+      gap: 5px;
+      overflow: hidden;
+    }
+    &__rating {
+      width: 20px;
+      height: 20px;
+      background-color: $accent;
+      border-radius: 50%;
+      text-align: center;
+      user-select: none;
+      opacity: 0.9;
+      filter: drop-shadow(0 0 0.6rem $accent);
+    }
+  }
+  
 }
 
-.games {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  // height: 100%;
-  //min-height: 50vh;
-  margin-inline: auto;
-  margin-top: 20px;
-  gap: 40px;
-
-  @include mediaLg {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  @include mediaMd {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  @include mediaSm {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  &__game {
-    display: grid;
-    max-width: 240px;
-    gap: 3px;
-  }
-
-  &__title {
-    @include textEllipsis;
-    padding-inline: 5px;
-  }
-  &__info {
-    display: grid;
-    grid-template-columns: 1fr 20px;
-    border-radius: $radius;
-    gap: 5px;
-    overflow: hidden;
-  }
-  &__rating {
-    width: 20px;
-    height: 20px;
-    background-color: $accent;
-    border-radius: 50%;
-    text-align: center;
-    user-select: none;
-    opacity: 0.9;
-    filter: drop-shadow(0 0 0.6rem $accent);
-  }
-}

@@ -9,6 +9,9 @@
   background: rgba($wrapperBGColor, 0.8);
   box-shadow: $shadowBorder;
   color: $wrapperTextColor;
+  @include mediaSm{
+    max-width: 100%;
+  }
 
   &__title {
     display: flex;

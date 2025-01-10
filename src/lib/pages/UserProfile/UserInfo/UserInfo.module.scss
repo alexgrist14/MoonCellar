@@ -56,7 +56,17 @@
       border-radius: $radius;
       background-color: $lightBgSecond;
       padding: 10px;
-      font-style: italic;
+      white-space: pre-wrap;
+      li{
+        margin-left: 12px;
+        list-style: initial;
+        a{
+          color: $gray;
+          &:hover{
+            text-decoration: underline;
+          }
+        }
+      }
     }
     &__stats {
       margin-top: 20px;

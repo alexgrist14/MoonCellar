@@ -84,7 +84,7 @@ export const UserGames: FC<UserGamesProps> = ({
   };
 
   return (
-    <div>
+    <div className={styles.container}>
       <div className={styles.sort} onClick={toggleSortOrder}>
         <Icon
           className={classNames(styles.sort__icon, {
@@ -95,7 +95,9 @@ export const UserGames: FC<UserGamesProps> = ({
         <p>Date</p>
       </div>
 
-      <div className={styles.games}>
+      <div className={classNames(styles.games,{
+        [styles.height] : !sortedGames
+      })}>
         {sortedGames ? (
           sortedGames.slice((page - 1) * take, page * take).map((game, i) => (
             <div key={gamesCategory + i} className={styles.games__game}>
@@ -118,6 +120,7 @@ export const UserGames: FC<UserGamesProps> = ({
         ) : (
           <Loader type="moon" />
         )}
+
         <Pagination take={take} total={total} isFixed />
         {sortedGames && !sortedGames.length && <p>There is no games</p>}
       </div>
