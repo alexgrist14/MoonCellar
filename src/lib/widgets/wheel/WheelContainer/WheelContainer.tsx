@@ -11,6 +11,7 @@ import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
 import { emptyGames } from "@/src/lib/shared/constants/games.const";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
+import { MobileMenu } from "@/src/lib/shared/ui/MobileMenu";
 
 export const WheelContainer: FC = () => {
   const { winner, games, royalGames, addRoyalGame, removeRoyalGame } =
@@ -88,7 +89,7 @@ export const WheelContainer: FC = () => {
       {!!winner && (
         <div className={styles.winner}>
           <GameCard className={styles.winner__card} game={winner} />
-          <WrapperTemplate contentStyle={{ padding: "10px" }}>
+          <MobileMenu>
             <ButtonGroup
               wrapperClassName={styles.winner__actions}
               buttons={[
@@ -129,7 +130,7 @@ export const WheelContainer: FC = () => {
                 },
               ]}
             />
-          </WrapperTemplate>
+          </MobileMenu>
         </div>
       )}
     </div>

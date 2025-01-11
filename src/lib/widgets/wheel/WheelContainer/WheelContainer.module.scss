@@ -19,6 +19,7 @@
 .winner {
   display: flex;
   gap: 20px;
+  justify-content: center;
 
   &__card {
     height: 100%;

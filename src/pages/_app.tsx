@@ -54,6 +54,8 @@ export default function App({ Component, pageProps }: AppProps) {
         <ToastConnector />
         <ModalsConnector />
         <div id="expand-connector"></div>
+        <div id="mobile-menu-connector"></div>
+        <div id="pagination-connector"></div>
       </Layout>
     </>
   );

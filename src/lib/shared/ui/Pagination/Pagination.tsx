@@ -28,6 +28,10 @@ export const Pagination: FC<{
 
   if (!total || !page) return null;
 
+  const connector = document.getElementById("pagination-connector");
+
+  if (!connector) return null;
+
   return createPortal(
     <div
       className={classNames(styles.pagination, {
@@ -91,6 +95,6 @@ export const Pagination: FC<{
         {">>"}
       </Button>
     </div>,
-    document.body
+    connector
   );
 };
