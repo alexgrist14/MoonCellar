@@ -5,6 +5,7 @@
   left: 0;
   width: 100%;
   pointer-events: none;
+  z-index: 2;
 
   &__wrapper {
     transition: opacity 0.3s, transform 0.3s;
