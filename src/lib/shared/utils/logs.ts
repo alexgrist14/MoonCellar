@@ -2,29 +2,33 @@ import { ILogs } from "../types/user.type";
 
 export const removeDuplicateLogs = (logs: ILogs[]) => {
   return logs.reduce<ILogs[]>((acc, curr) => {
+    const last = acc[0];
+    const lastParent = acc[1];
+
     if (!acc.length) {
       acc.push(curr);
-      return acc;
-    }
-
-    const last = acc[0];
-
-    if (last.action === "rating" && curr.action !== "rating") {
+    } else if (
+      lastParent?.action !== "rating" &&
+      curr.action !== "rating" &&
+      lastParent?.gameId === curr.gameId
+    ) {
+      acc.splice(1, 1, curr);
+    } else if (lastParent?.action === "rating" && curr.action === "rating") {
+      acc.splice(1, 1, curr);
+    } else if (last.action === "rating" && curr.action !== "rating") {
       acc.splice(0, 0, curr);
-      return acc;
-    }
-
-    if (last.action === "rating" && curr.action === "rating") {
+    } else if (last.action === "rating" && curr.action === "rating") {
       acc.splice(0, 1, curr);
-      return acc;
-    }
-
-    if (last.action !== "rating" && last.gameId === curr.gameId) {
+    } else if (
+      last.action !== "rating" &&
+      curr.action !== "rating" &&
+      last.gameId === curr.gameId
+    ) {
       acc.splice(0, 1, curr);
-      return acc;
+    } else {
+      acc.splice(0, 0, curr);
     }
 
-    acc.splice(0, 0, curr);
     return acc;
   }, []);
 };

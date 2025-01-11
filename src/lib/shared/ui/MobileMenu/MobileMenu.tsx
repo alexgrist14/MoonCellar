@@ -9,9 +9,13 @@ import classNames from "classnames";
 
 interface IMobileMenuProps {
   children: ReactNode;
+  title?: string;
 }
 
-export const MobileMenu: FC<IMobileMenuProps> = ({ children }) => {
+export const MobileMenu: FC<IMobileMenuProps> = ({
+  children,
+  title = "Actions",
+}) => {
   const { isMobile } = useStatesStore();
 
   const menuRef = useRef<HTMLDivElement>(null);
@@ -40,7 +44,7 @@ export const MobileMenu: FC<IMobileMenuProps> = ({ children }) => {
           className={styles.menu__button}
           onClick={() => setIsActive(!isActive)}
         >
-          Actions
+          {title}
         </Button>
       </div>,
       connector
