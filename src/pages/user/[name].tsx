@@ -46,7 +46,6 @@ export const getServerSideProps = async (
   const userFollowings = (await userAPI.getUserFollowings(user._id)).data;
   const logsResult = (await userAPI.getUserLogs(user._id)).data;
   const userLogs = logsResult.length > 0 ? mergeLogs(logsResult[0].logs) : [];
-  console.log(userLogs)
 
   return {
     props: {
