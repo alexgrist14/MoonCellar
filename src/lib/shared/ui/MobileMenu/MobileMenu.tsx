@@ -44,7 +44,7 @@ export const MobileMenu: FC<IMobileMenuProps> = ({
           className={styles.menu__button}
           onClick={() => setIsActive(!isActive)}
         >
-          {title}
+          <span>{title}</span>
         </Button>
       </div>,
       connector
