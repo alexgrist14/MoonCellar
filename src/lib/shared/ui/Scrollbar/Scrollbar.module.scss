@@ -21,7 +21,6 @@
     overflow: auto;
     padding: 0 1rem;
     scrollbar-width: none;
-    overscroll-behavior: contain;
 
     &::-webkit-scrollbar {
       display: none;
