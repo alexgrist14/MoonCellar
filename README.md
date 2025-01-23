@@ -1,3 +1,5 @@
+💻 **Check out the live site:** [mooncellar.space](https://mooncellar.space)
+
 # 🌙 MoonCellar.Space
 
 MoonCellar.Space is a sleek, modern gaming database that empowers users to manage their gaming journey. Built with **Next.js** and styled with **SASS**, this platform provides a seamless experience for tracking games, organizing wishlists, and rating titles. 
@@ -93,4 +95,4 @@ This project is licensed under the [GNU](./LICENSE).
 
 ---
 
-💻 **Check out the live site:** [mooncellar.space](https://mooncellar.space)
+
