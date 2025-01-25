@@ -12,11 +12,11 @@ import { emptyGames } from "@/src/lib/shared/constants/games.const";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
 import { MobileMenu } from "@/src/lib/shared/ui/MobileMenu";
+import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 
 export const WheelContainer: FC = () => {
-  const { winner, games, royalGames, addRoyalGame, removeRoyalGame } =
-    useGamesStore();
-  const { isFinished, isLoading, isRoyal } = useStatesStore();
+  const { winner, games, royalGames } = useGamesStore();
+  const { isFinished, isLoading, isRoyal, setRoyal } = useStatesStore();
   const { timer, setTimer } = useCommonStore();
 
   const [colors, setColors] = useState<string[]>([]);
@@ -64,16 +64,57 @@ export const WheelContainer: FC = () => {
 
   return (
     <div className={styles.container}>
-      <WrapperTemplate contentStyle={{ padding: "10px" }}>
-        <RangeSelector
-          min={0.1}
-          max={20}
-          step={0.1}
-          defaultValue={timer}
-          callback={(value) => setTimer(value)}
-          text={`Time: ${timer} seconds`}
-        />
-      </WrapperTemplate>
+      <MobileMenu
+        title="Settings/Links"
+        style={{ gap: "20px", display: "grid" }}
+      >
+        <WrapperTemplate
+          contentStyle={{ padding: "10px", paddingBottom: "15px" }}
+        >
+          <ToggleSwitch
+            clickCallback={(result) => {
+              setRoyal(result === "ON");
+            }}
+            label="Royal mode:"
+          />
+          <RangeSelector
+            min={0.1}
+            max={20}
+            step={0.1}
+            defaultValue={timer}
+            callback={(value) => setTimer(value)}
+            text={`Time: ${timer} seconds`}
+          />
+        </WrapperTemplate>
+        {!!winner && (
+          <ButtonGroup
+            wrapperClassName={styles.links}
+            buttons={[
+              {
+                title: "Search on Youtube",
+                link: `https://www.youtube.com/results?search_query=${winner.name}`,
+                target: "_blank",
+              },
+              {
+                title: "Search on RetroAchievements",
+                link: `https://retroachievements.org/searchresults.php?s=${winner.name}&t=1`,
+                target: "_blank",
+              },
+              {
+                title: "Search on HowLongToBeat",
+                link: `https://howlongtobeat.com/?q=${encodeURI(winner.name)}`,
+                target: "_blank",
+              },
+              {
+                title: "Open in IGDB",
+                link: winner.url,
+                isHidden: !winner.url,
+                target: "_blank",
+              },
+            ]}
+          />
+        )}
+      </MobileMenu>
       <WheelComponent
         wheelGames={wheelGames}
         setWheelGames={setWheelGames}
@@ -86,53 +127,7 @@ export const WheelContainer: FC = () => {
         }
         size={295}
       />
-      {!!winner && (
-        <div className={styles.winner}>
-          <GameCard className={styles.winner__card} game={winner} />
-          <MobileMenu>
-            <ButtonGroup
-              wrapperClassName={styles.winner__actions}
-              buttons={[
-                {
-                  color: "accent",
-                  title:
-                    (royalGames?.some((royal) => royal._id === winner._id)
-                      ? "Remove from"
-                      : "Add to") + " royal games",
-                  callback: () => {
-                    royalGames?.some((royal) => royal._id === winner._id)
-                      ? removeRoyalGame(winner)
-                      : addRoyalGame(winner);
-                  },
-                },
-                {
-                  title: "Search on Youtube",
-                  link: `https://www.youtube.com/results?search_query=${winner.name}`,
-                  target: "_blank",
-                },
-                {
-                  title: "Search on RetroAchievements",
-                  link: `https://retroachievements.org/searchresults.php?s=${winner.name}&t=1`,
-                  target: "_blank",
-                },
-                {
-                  title: "Search on HowLongToBeat",
-                  link: `https://howlongtobeat.com/?q=${encodeURI(
-                    winner.name
-                  )}`,
-                  target: "_blank",
-                },
-                {
-                  title: "Open in IGDB",
-                  link: winner.url,
-                  isHidden: !winner.url,
-                  target: "_blank",
-                },
-              ]}
-            />
-          </MobileMenu>
-        </div>
-      )}
+      {!!winner && <GameCard className={styles.winner} game={winner} />}
     </div>
   );
 };

@@ -22,6 +22,7 @@ export const GauntletPage: FC = () => {
   const [bg, setBg] = useState<IGDBScreenshot & { gameId: number }>();
   const [isImageReady, setIsImageReady] = useState(true);
 
+  const { setGenres, setGameModes, setSystems, setThemes } = useCommonStore();
   const { setGames, historyGames, winner, setWinner } = useGamesStore();
   const {
     isLoading,
@@ -30,9 +31,7 @@ export const GauntletPage: FC = () => {
     setLoading,
     isRoyal,
     isExcludeHistory,
-    isMobile,
   } = useStatesStore();
-  const { setExpanded } = useCommonStore();
 
   const getIGDBGames = useCallback(() => {
     if (isRoyal) return;
@@ -109,8 +108,17 @@ export const GauntletPage: FC = () => {
   }, [winner]);
 
   useEffect(() => {
-    isMobile === false && setExpanded("both");
-  }, [setExpanded, isMobile]);
+    if (isRoyal) return;
+
+    IGDBApi.getGenres().then((response) => setGenres(response.data));
+    IGDBApi.getModes().then((response) => setGameModes(response.data));
+    IGDBApi.getPlatforms().then((response) => setSystems(response.data));
+    IGDBApi.getThemes().then((response) => setThemes(response.data));
+  }, [isRoyal, setGenres, setGameModes, setSystems, setThemes]);
+
+  // useEffect(() => {
+  //   isMobile === false && setExpanded("both");
+  // }, [setExpanded, isMobile]);
 
   return (
     <div className={classNames(styles.page)}>

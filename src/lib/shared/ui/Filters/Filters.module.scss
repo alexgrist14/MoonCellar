@@ -4,9 +4,9 @@
   align-content: flex-start;
 
   &__buttons {
-    display: grid;
+    display: flex;
     gap: 5px;
-    margin-top: 30px;
+    margin-top: 20px;
     width: 100%;
   }
 

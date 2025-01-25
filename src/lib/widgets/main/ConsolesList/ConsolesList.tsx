@@ -1,8 +1,5 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import styles from "./ConsolesList.module.scss";
-import { IGDBApi } from "@/src/lib/shared/api";
-import { useStatesStore } from "@/src/lib/shared/store/states.store";
-import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { useGamesStore } from "@/src/lib/shared/store/games.store";
 import { GamesList } from "@/src/lib/shared/ui/GamesList";
@@ -19,19 +16,8 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
     setHistoryGames,
     removeHistoryGame,
   } = useGamesStore();
-  const { setGenres, setGameModes, setSystems, setThemes } = useCommonStore();
-  const { setRoyal, isRoyal } = useStatesStore();
 
   const [tabIndex, setTabIndex] = useState(initialTabIndex || 0);
-
-  useEffect(() => {
-    if (isRoyal) return;
-
-    IGDBApi.getGenres().then((response) => setGenres(response.data));
-    IGDBApi.getModes().then((response) => setGameModes(response.data));
-    IGDBApi.getPlatforms().then((response) => setSystems(response.data));
-    IGDBApi.getThemes().then((response) => setThemes(response.data));
-  }, [isRoyal, setGenres, setGameModes, setSystems, setThemes]);
 
   return (
     <div className={styles.consoles__list}>
@@ -43,7 +29,6 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
               tabName: "Gauntlet",
               style: { flexBasis: "33%" },
               onTabClick: () => {
-                isRoyal && setRoyal(false);
                 setTabIndex(0);
               },
             },
@@ -53,7 +38,6 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
                 (!!royalGames?.length ? ` (${royalGames.length})` : ""),
               style: { flexBasis: "33%" },
               onTabClick: () => {
-                setRoyal(true);
                 setTabIndex(1);
               },
             },
@@ -61,7 +45,6 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
               tabName: "History",
               style: { flexBasis: "33%" },
               onTabClick: () => {
-                isRoyal && setRoyal(false);
                 setTabIndex(2);
               },
             },

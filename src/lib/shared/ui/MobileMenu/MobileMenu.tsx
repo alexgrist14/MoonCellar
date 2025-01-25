@@ -1,4 +1,4 @@
-import { FC, ReactNode, useRef, useState } from "react";
+import { CSSProperties, FC, ReactNode, useRef, useState } from "react";
 import styles from "./MobileMenu.module.scss";
 import { createPortal } from "react-dom";
 import { WrapperTemplate } from "../WrapperTemplate";
@@ -10,11 +10,15 @@ import classNames from "classnames";
 interface IMobileMenuProps {
   children: ReactNode;
   title?: string;
+  style?: CSSProperties;
+  className?: string;
 }
 
 export const MobileMenu: FC<IMobileMenuProps> = ({
   children,
   title = "Actions",
+  className,
+  style,
 }) => {
   const { isMobile } = useStatesStore();
 
@@ -33,8 +37,10 @@ export const MobileMenu: FC<IMobileMenuProps> = ({
     createPortal(
       <div ref={menuRef} className={styles.menu}>
         <div
+          style={style}
           className={classNames(
             styles.menu__wrapper,
+            className,
             isActive && styles.menu__wrapper_active
           )}
         >

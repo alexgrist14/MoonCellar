@@ -12,6 +12,7 @@ interface ToggleSwitchProps {
   defaultValue?: "left" | "right";
   value?: "left" | "right";
   isDisabled?: boolean;
+  label?: string;
 }
 
 export const ToggleSwitch: FC<ToggleSwitchProps> = ({
@@ -23,6 +24,7 @@ export const ToggleSwitch: FC<ToggleSwitchProps> = ({
   defaultValue,
   value,
   isDisabled,
+  label,
 }) => {
   const [isActive, setIsActive] = useState(false);
   const [toggleValue, setToggleValue] = useState<string>(
@@ -43,26 +45,29 @@ export const ToggleSwitch: FC<ToggleSwitchProps> = ({
   };
 
   return (
-    <div
-      onClick={clickHandler}
-      className={classNames(
-        styles.toggle,
-        className,
-        styles[`toggle_${value || toggleValue}`],
-        {
-          [styles.toggle_active]: isActive || isDisabled,
-        }
-      )}
-      style={{ scale }}
-    >
+    <div className={styles.toggle__wrapper}>
+      {!!label && <p className={styles.toogle__label}>{label}</p>}
       <div
+        onClick={clickHandler}
         className={classNames(
-          styles.toggle__button,
-          styles[`toggle__button_${value || toggleValue}`]
+          styles.toggle,
+          className,
+          styles[`toggle_${value || toggleValue}`],
+          {
+            [styles.toggle_active]: isActive || isDisabled,
+          }
         )}
-      />
-      <span className={styles.toggle__left}>{leftContent}</span>
-      <span className={styles.toggle__right}>{rightContent}</span>
+        style={{ scale }}
+      >
+        <div
+          className={classNames(
+            styles.toggle__button,
+            styles[`toggle__button_${value || toggleValue}`]
+          )}
+        />
+        <span className={styles.toggle__left}>{leftContent}</span>
+        <span className={styles.toggle__right}>{rightContent}</span>
+      </div>
     </div>
   );
 };

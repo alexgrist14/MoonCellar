@@ -24,6 +24,12 @@
     }
   }
 
+  &__wrapper {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
   &_left {
     outline-color: $off;
   }
