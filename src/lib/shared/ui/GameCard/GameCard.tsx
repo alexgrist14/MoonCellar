@@ -60,7 +60,7 @@ export const GameCard: FC<IGameCardProps> = ({
     const rect = cardRef.current?.getBoundingClientRect();
 
     !!rect && debouncedSetRatio(rect);
-  });
+  }, [spreadDirection]);
 
   if (!game) return null;
 
