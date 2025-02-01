@@ -16,7 +16,8 @@ import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 
 export const WheelContainer: FC = () => {
   const { winner, games, royalGames } = useGamesStore();
-  const { isFinished, isLoading, isRoyal, setRoyal } = useStatesStore();
+  const { isFinished, isLoading, isRoyal, setRoyal, isMobile } =
+    useStatesStore();
   const { timer, setTimer } = useCommonStore();
 
   const [colors, setColors] = useState<string[]>([]);
@@ -127,7 +128,13 @@ export const WheelContainer: FC = () => {
         }
         size={295}
       />
-      {!!winner && <GameCard className={styles.winner} game={winner} />}
+      {!!winner && (
+        <GameCard
+          spreadDirection={isMobile ? "height" : "width"}
+          className={styles.winner}
+          game={winner}
+        />
+      )}
     </div>
   );
 };

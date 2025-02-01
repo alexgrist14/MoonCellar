@@ -82,37 +82,14 @@
   }
 
   &__number {
-    position: absolute;
-    width: fit-content;
-    transition: 0.3s;
-    height: 70%;
-
-    & path {
-      transition: 0.3s;
-      opacity: 0;
-      stroke: $whiteTextColor;
-      fill: $whiteTextColor;
-    }
-
-    &_active path {
-      opacity: 1;
-    }
-  }
-
-  &__heart {
     width: inherit;
     height: 100%;
-    transition: 0.3s;
+    background-color: $accent;
     border-radius: 50%;
 
     & path {
-      transition: 0.3s;
-    }
-
-    &_active path {
-      stroke-width: 2;
-      stroke: $accent;
-      fill: $accent;
+      stroke: $whiteTextColor;
+      fill: $whiteTextColor;
     }
   }
 

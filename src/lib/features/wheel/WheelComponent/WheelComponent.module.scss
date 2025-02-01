@@ -7,6 +7,11 @@
   width: 100%;
   filter: drop-shadow(0 0 0.4rem $accent);
 
+  @include mediaMd {
+    height: 100%;
+    width: auto;
+  }
+
   &_disabled {
     pointer-events: none;
   }

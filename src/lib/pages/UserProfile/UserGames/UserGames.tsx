@@ -95,13 +95,10 @@ export const UserGames: FC<UserGamesProps> = ({
         <p>Date</p>
       </div>
 
-      <div className={classNames(styles.games,{
-        [styles.height] : !sortedGames
-      })}>
-        {sortedGames ? (
-          sortedGames.slice((page - 1) * take, page * take).map((game, i) => (
-            <div key={gamesCategory + i} className={styles.games__game}>
-              <GameCard game={game} />
+      <div className={classNames(styles.games)}>
+        {!!sortedGames ? (
+          sortedGames.slice((page - 1) * take, page * take).map((game) => (
+            <GameCard key={game._id} game={game}>
               <div className={styles.games__info}>
                 <p className={styles.games__title}>{game.name}</p>
                 {gamesRating &&
@@ -115,7 +112,7 @@ export const UserGames: FC<UserGamesProps> = ({
                     </span>
                   )}
               </div>
-            </div>
+            </GameCard>
           ))
         ) : (
           <Loader type="moon" />

@@ -5,7 +5,7 @@
   grid-template-columns: 1fr 1.5fr 1fr;
   margin-inline: auto;
   align-items: center;
-  gap: 30px;
+  gap: 40px;
   height: calc(100vh - 180px);
 
   @include mediaMd {
@@ -22,10 +22,10 @@
   border-radius: 30px;
 }
 
-.winner {
-  height: 100%;
-  width: auto;
-}
+// .winner {
+//   height: 100%;
+//   width: auto;
+// }
 
 .links {
   display: flex;

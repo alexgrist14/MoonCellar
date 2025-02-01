@@ -1,5 +1,4 @@
 .container{
-  height: 100%;
   .sort {
     display: flex;
     width: 70px;
@@ -16,9 +15,6 @@
         transform: rotateX(180deg);
       }
     }
-  }
-  .height{
-    min-height: 90vh;
   }
   
   .games {
@@ -39,12 +35,6 @@
   
     @include mediaSm {
       grid-template-columns: repeat(2, 1fr);
-    }
-  
-    &__game {
-      display: grid;
-      max-width: 240px;
-      gap: 3px;
     }
   
     &__title {

@@ -11,7 +11,7 @@ import { axiosUtils } from "../../utils/axios";
 import { toast } from "../../utils/toast";
 import useCloseEvents from "../../hooks/useCloseEvents";
 import { RangeSelector } from "../RangeSelector";
-import { accentColor } from "../../constants";
+import { accentColor, accentColorRGB } from "../../constants";
 import { useGamesStore } from "../../store/games.store";
 
 interface IGameControlsProps {
@@ -19,33 +19,6 @@ interface IGameControlsProps {
   className?: string;
   game: IGDBGameMinimal;
 }
-
-const getMoonPhase = (rating: number) => {
-  switch (rating) {
-    case 1:
-      return "wi:moon-alt-waxing-gibbous-4";
-    case 2:
-      return "wi:moon-alt-waxing-gibbous-3";
-    case 3:
-      return "wi:moon-alt-waxing-gibbous-2";
-    case 4:
-      return "wi:moon-alt-waxing-gibbous-1";
-    case 5:
-      return "wi:moon-alt-first-quarter";
-    case 6:
-      return "wi:moon-alt-waxing-crescent-6";
-    case 7:
-      return "wi:moon-alt-waxing-crescent-4";
-    case 8:
-      return "wi:moon-alt-waxing-crescent-2";
-    case 9:
-      return "wi:moon-alt-waxing-crescent-1";
-    case 10:
-      return "wi:moon-alt-new";
-    default:
-      return "f7:moon-circle";
-  }
-};
 
 export const GameControls: FC<IGameControlsProps> = ({
   game,
@@ -110,7 +83,7 @@ export const GameControls: FC<IGameControlsProps> = ({
 
   const rating = useMemo(
     () => profile?.gamesRating?.find((rating) => rating.game === game._id),
-    [game, profile]
+    [game, profile],
   );
 
   const isRoyal = royalGames?.some((royal) => royal._id === game?._id);
@@ -158,7 +131,7 @@ export const GameControls: FC<IGameControlsProps> = ({
                 : "Add to"}{" "}
               {key}
             </Button>
-          )
+          ),
         )}
       </div>
       <div
@@ -205,7 +178,7 @@ export const GameControls: FC<IGameControlsProps> = ({
               userAPI[!!value ? "addGameRating" : "removeGameRating"](
                 profile._id,
                 game._id,
-                value
+                value,
               )
                 .then((res) => {
                   toast.success({
@@ -326,21 +299,21 @@ export const GameControls: FC<IGameControlsProps> = ({
           [styles.controls__action_active]: !!ratingValue || isRatingActive,
         })}
       >
-        <Icon
-          className={classNames(styles.controls__heart, {
-            [styles.controls__heart_active]: !!ratingValue,
-          })}
-          style={{
-            filter: `drop-shadow(0 0 ${ratingValue * 0.05}rem ${accentColor})`,
-          }}
-          icon={getMoonPhase(ratingValue)}
-        />
-        <Icon
-          className={classNames(styles.controls__number, {
-            [styles.controls__number_active]: !!ratingValue,
-          })}
-          icon={`mdi:numeric-${ratingValue}`}
-        />
+        {!ratingValue ? (
+          <Icon
+            className={classNames(styles.controls__icon)}
+            icon={"tabler:moon-stars"}
+          />
+        ) : (
+          <Icon
+            style={{
+              filter: `drop-shadow(0 0 ${ratingValue * 0.05}rem ${accentColor})`,
+              backgroundColor: `rgba(${accentColorRGB}, ${ratingValue * 0.1})`,
+            }}
+            className={classNames(styles.controls__number)}
+            icon={`mdi:numeric-${ratingValue}`}
+          />
+        )}
       </Button>
     </div>
   );

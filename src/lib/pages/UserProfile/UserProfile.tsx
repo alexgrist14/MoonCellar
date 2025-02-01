@@ -47,10 +47,10 @@ const UserProfile: FC<UserProfileProps> = ({
           }),
         },
         undefined,
-        { shallow: true }
+        { shallow: true },
       );
     },
-    [pathname, push, query]
+    [pathname, push, query],
   );
 
   const tabs = useMemo((): ITabContent[] => {
@@ -114,10 +114,15 @@ const UserProfile: FC<UserProfileProps> = ({
           height={1080}
         />
       </div>
-      <WrapperTemplate classNameContent={styles.content}>
+      <WrapperTemplate
+        classNameContent={styles.content}
+        contentStyle={{
+          minHeight: "calc(100vh - 155px)",
+        }}
+      >
         <Tabs
           defaultTabIndex={tabs.findIndex(
-            (_tab) => _tab.tabName.toLowerCase() === tab
+            (_tab) => _tab.tabName.toLowerCase() === tab,
           )}
           isUseDefaultIndex
           wrapperClassName={styles.tabs}

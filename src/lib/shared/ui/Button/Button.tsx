@@ -10,6 +10,7 @@ import cl from "classnames";
 import styles from "./Button.module.scss";
 import { IButtonColor } from "../../types/buttons";
 import { createPortal } from "react-dom";
+import { useStatesStore } from "../../store/states.store";
 
 interface IButton
   extends Pick<
@@ -40,7 +41,7 @@ export const Button = forwardRef(
       tooltipAlign,
       ...props
     }: IButton,
-    ref
+    ref,
   ) => {
     const buttonRef = useRef<HTMLButtonElement | null>(null);
     const tooltipRef = useRef<HTMLSpanElement>(null);
@@ -52,19 +53,13 @@ export const Button = forwardRef(
       const rect = buttonRef.current?.getBoundingClientRect();
       const tooltipRect = tooltipRef.current?.getBoundingClientRect();
 
-      if (
-        isHover &&
-        !tooltipCoords[0] &&
-        !tooltipCoords[1] &&
-        !!tooltipRect &&
-        !!rect
-      ) {
+      if (isHover && !!tooltipRect && !!rect) {
         const x =
           tooltipAlign === "left"
             ? rect.x
             : tooltipAlign === "right"
-            ? rect.x + rect.width - tooltipRect.width
-            : rect.x + rect.width / 2 - tooltipRect.width / 2;
+              ? rect.x + rect.width - tooltipRect.width
+              : rect.x + rect.width / 2 - tooltipRect.width / 2;
 
         setTooltipCoords([x, window.scrollY + rect.y - 5 - tooltipRect.height]);
       }
@@ -82,8 +77,11 @@ export const Button = forwardRef(
             ref.current = node;
           }
         }}
-        onMouseOver={() => setIsHover(true)}
-        onMouseOut={() => setIsHover(false)}
+        onMouseEnter={() => setIsHover(true)}
+        onMouseLeave={() => setIsHover(false)}
+        onMouseDown={() => setIsHover(false)}
+        onTouchEnd={() => setIsHover(false)}
+        onBlur={() => setIsHover(false)}
         className={cl(
           styles.button,
           styles[`button_${color}Color`],
@@ -92,7 +90,7 @@ export const Button = forwardRef(
             [styles.button_active]: active,
             [styles[`button_${color}Color_active`]]: active,
             [styles.button_disabled]: disabled,
-          }
+          },
         )}
         disabled={disabled}
       >
@@ -114,11 +112,11 @@ export const Button = forwardRef(
             >
               {tooltip}
             </span>,
-            document.body
+            document.body,
           )}
       </button>
     );
-  }
+  },
 );
 
 Button.displayName = "Button";

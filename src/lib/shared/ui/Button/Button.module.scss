@@ -80,7 +80,6 @@
     color: $whiteTextColor;
     border-radius: $radius;
     opacity: 0;
-    transition: 0.3s;
     @include font(14px, 16px, 500);
     margin: 0;
     height: fit-content;

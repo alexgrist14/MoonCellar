@@ -8,6 +8,7 @@ export const ACCESS_TOKEN = "accessMoonToken";
 export const REFRESH_TOKEN = "refreshMoonToken";
 
 export const accentColor = "#6951ee";
+export const accentColorRGB = "105,81,238";
 
 export const links = [
   { name: "Home", link: "/" },
@@ -84,3 +85,5 @@ export const gameCategoryNames: { [key: string]: string } = {
   pack: "Pack",
   update: "Update",
 };
+
+export const coverRatio = 528/704;
