@@ -24,6 +24,7 @@ import { IUserFilter } from "../../types/user.type";
 import { modal } from "../Modal";
 import { SaveFilterForm } from "../SaveFilterForm";
 import { toast } from "../../utils/toast";
+import { ListController } from "../ListController";
 
 export const Filters: FC<{
   callback?: (filters?: IGameFilters) => void;
@@ -37,7 +38,7 @@ export const Filters: FC<{
   const [tab, setTab] = useState<"filters" | "saved">("filters");
   const [savedFilters, setSavedFilters] = useState<IUserFilter[]>();
 
-  const { themes, systems, genres, gameModes } = useCommonStore();
+  const { themes, systems, genres, gameModes, keywords } = useCommonStore();
   const { isLoading, isPlatformsLoading, isExcludeHistory, setExcludeHistory } =
     useStatesStore();
 
@@ -52,21 +53,21 @@ export const Filters: FC<{
   const getSelectedArray = (key: string, array?: { _id: number }[]) =>
     !!array
       ? filters?.selected?.[key]?.map((id) =>
-          array.findIndex((el) => el._id === id)
+          array.findIndex((el) => el._id === id),
         ) || []
       : [];
 
   const getExcludedArray = (key: string, array?: { _id: number }[]) =>
     !!array
       ? filters?.excluded?.[key]?.map((id) =>
-          array.findIndex((el) => el._id === id)
+          array.findIndex((el) => el._id === id),
         ) || []
       : [];
 
   const setSelected = (
     key: string,
     indexes: number[],
-    array?: { _id: number }[]
+    array?: { _id: number }[],
   ) => {
     setFilters((filters) => {
       const temp = {
@@ -89,7 +90,7 @@ export const Filters: FC<{
   const setExcluded = (
     key: string,
     indexes: number[],
-    array?: { _id: number }[]
+    array?: { _id: number }[],
   ) => {
     setFilters((filters) => {
       const temp = {
@@ -133,7 +134,7 @@ export const Filters: FC<{
       {isAuth && (
         <Tabs
           defaultTabIndex={tabs.findIndex(
-            ({ tabName }) => tabName.toLowerCase() === tab
+            ({ tabName }) => tabName.toLowerCase() === tab,
           )}
           contents={tabs}
         />
@@ -182,7 +183,7 @@ export const Filters: FC<{
               overflowRootId="filters"
               isDisabled={isLoading}
               list={Object.keys(gameCategories).map(
-                (item) => gameCategoryNames[item]
+                (item) => gameCategoryNames[item],
               )}
               isMulti
               overwriteValue={
@@ -192,7 +193,7 @@ export const Filters: FC<{
               }
               initialMultiValue={
                 filters?.categories?.map((item) =>
-                  Object.keys(gameCategories).findIndex((key) => key === item)
+                  Object.keys(gameCategories).findIndex((key) => key === item),
                 ) || []
               }
               placeholder="Select categories..."
@@ -401,7 +402,7 @@ export const Filters: FC<{
                     <SaveFilterForm
                       filters={filters}
                       setSavedFilters={setSavedFilters}
-                    />
+                    />,
                   ),
               },
               {

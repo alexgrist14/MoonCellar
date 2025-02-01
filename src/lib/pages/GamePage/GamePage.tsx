@@ -71,7 +71,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
 
   const releaseDate = new Date(game.first_release_date * 1000).getFullYear();
   const category = Object.keys(gameCategories).find(
-    (key) => gameCategories[key] === game.category
+    (key) => gameCategories[key] === game.category,
   );
 
   return (
@@ -139,7 +139,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
             <div
               className={classNames(
                 styles.page__cover,
-                isAuth && styles.page__cover_control
+                isAuth && styles.page__cover_control,
               )}
             >
               {isLoading && <Loader />}
@@ -179,7 +179,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
                   {
                     title: "Search on HowLongToBeat",
                     link: `https://howlongtobeat.com/?q=${encodeURI(
-                      game.name
+                      game.name,
                     )}`,
                     target: "_blank",
                   },
@@ -338,6 +338,21 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
             <div className={styles.page__screenshots}>
               <h4>Artworks:</h4>
               <Slideshow pictures={game.artworks} />
+            </div>
+          )}
+          {!!game.keywords?.length && (
+            <div className={styles.page__info}>
+              <p>
+                <span>Keywords: </span>
+                {game.keywords.map((keyword, i, array) => (
+                  <span key={keyword._id}>
+                    <Link href={`/games?selectedKeywords[]=${keyword._id}`}>
+                      {keyword.name}
+                    </Link>
+                    {i !== array.length - 1 ? ", " : ""}
+                  </span>
+                ))}
+              </p>
             </div>
           )}
           <div className={styles.page__bottom}>

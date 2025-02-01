@@ -46,7 +46,7 @@ const getGames = (params: {
           ? JSON.stringify(params.excluded)
           : undefined,
       },
-    }
+    },
   );
 };
 
@@ -82,6 +82,10 @@ const getThemes = () => {
   return agent.get<IGDBDefault[]>(`${IGDB_URL}/themes`);
 };
 
+const getKeywords = () => {
+  return agent.get<IGDBDefault[]>(`${IGDB_URL}/keywords`);
+};
+
 export const IGDBApi = {
   getGames,
   getGameById,
@@ -92,4 +96,5 @@ export const IGDBApi = {
   getScreenshot,
   getArtwork,
   getThemes,
+  getKeywords,
 };

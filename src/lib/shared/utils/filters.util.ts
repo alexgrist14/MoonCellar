@@ -21,12 +21,14 @@ export const parseQueryFilters = (asPath: string): IGameFilters => {
       modes: filters?.selectedModes,
       platforms: filters?.selectedPlatforms,
       themes: filters?.selectedThemes,
+      keywords: filters?.selectedKeywords,
     },
     excluded: {
       genres: filters?.excludedGenres,
       modes: filters?.excludedModes,
       platforms: filters?.excludedPlatforms,
       themes: filters?.excludedThemes,
+      keywords: filters?.excludedKeywords,
     },
     rating: filters?.rating,
     votes: filters?.votes,
@@ -48,18 +50,20 @@ export const getFiltersForQuery = (filters: IGameFilters) => {
       excludedGenres: filters.excluded?.genres,
       selectedThemes: filters.selected?.themes,
       excludedThemes: filters.excluded?.themes,
+      selectedKeywords: filters.selected?.keywords,
+      excludedKeywords: filters.excluded?.keywords,
       selectedModes: filters.selected?.modes,
       excludedModes: filters.excluded?.modes,
     },
     {
       arrayFormat: "bracket",
-    }
+    },
   );
 };
 
 export const pushFiltersToQuery = (
   filters: IGameFilters,
-  router: NextRouter
+  router: NextRouter,
 ) => {
   const { push, pathname } = router;
 
@@ -69,6 +73,6 @@ export const pushFiltersToQuery = (
       query: getFiltersForQuery(filters),
     },
     undefined,
-    { shallow: true }
+    { shallow: true },
   );
 };
