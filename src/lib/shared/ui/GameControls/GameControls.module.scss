@@ -82,13 +82,12 @@
   }
 
   &__number {
-    width: inherit;
+    width: auto;
     height: 100%;
     background-color: $accent;
     border-radius: 50%;
 
     & path {
-      stroke: $whiteTextColor;
       fill: $whiteTextColor;
     }
   }
