@@ -127,29 +127,4 @@
       flex-direction: column;
     }
   }
-
-  &__bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    transition: 0.4s;
-    opacity: 0;
-    position: fixed;
-    z-index: -1;
-    height: 100%;
-    width: 100%;
-    user-select: none;
-    pointer-events: none;
-
-    & img {
-      object-fit: cover;
-      height: 100%;
-      width: 100%;
-      opacity: 0.2;
-    }
-
-    &_active {
-      opacity: 1;
-    }
-  }
 }

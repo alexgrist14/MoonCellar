@@ -71,7 +71,10 @@ export const SearchModal: FC = () => {
             },
             {
               title: "Advanced",
-              link: "/games",
+              link:
+                searchQuery?.length > 2
+                  ? `/games?search=${encodeURIComponent(searchQuery)}`
+                  : "/games",
               callback: () => {
                 modal.close();
                 setExpanded("left");
@@ -88,9 +91,7 @@ export const SearchModal: FC = () => {
             [styles.modal__results_loading]: isLoading,
           })}
         >
-          {games?.map((game) => (
-            <GameCard key={game._id} game={game} />
-          ))}
+          {games?.map((game) => <GameCard key={game._id} game={game} />)}
           {!!games?.length && !!total && take < total && (
             <Link
               className={styles.modal__more}

@@ -89,8 +89,6 @@ export const GameCard: FC<IGameCardProps> = ({
 
             return setStepIndex(1);
           }
-
-          modal.close();
         }}
         draggable={false}
       >
