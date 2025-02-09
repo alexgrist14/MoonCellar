@@ -18,6 +18,10 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "api.mooncellar.space"
+      },
+      {
+        protocol: "https",
+        hostname: "media.retroachievements.org"
       }
     ],
   },

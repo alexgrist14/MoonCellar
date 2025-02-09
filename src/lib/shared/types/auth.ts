@@ -1,8 +1,9 @@
+import { IRAAward } from "./retroachievements";
 import {
   CategoriesType,
   IFollowings,
   IGamesRating,
-  IUserFilter
+  IUserFilter,
 } from "./user.type";
 
 export interface IAuth {
@@ -22,4 +23,6 @@ export interface IUser {
   filters: IUserFilter[];
   updatedAt: Date;
   description: string;
+  raUsername?: string;
+  raAwards?: IRAAward[];
 }

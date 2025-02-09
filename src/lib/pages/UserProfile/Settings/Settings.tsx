@@ -18,6 +18,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
   const [userName, setUserName] = useState("");
   const [tempAvatar, setTempAvatar] = useState<File>();
   const [description, setDescription] = useState("");
+  const [raUsername, setRaUserName] = useState("");
 
   const handleLogoutClick = () => {
     if (isAuth && profile) {
@@ -27,13 +28,25 @@ export const Settings: FC<SettingsProps> = ({}) => {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (description && profile)
-      userAPI
-        .updateDescription(profile._id, { description })
-        .then(() => toast.success({ description: "Saved successfully" }))
-        .catch((err) => axiosUtils.toastError(err));
 
-    if (!!profile && tempAvatar) userAPI.addAvatar(profile._id, tempAvatar);
+    if (!profile) return;
+
+    const apiCalls = [];
+    if (description) {
+      apiCalls.push(() =>
+        userAPI.updateDescription(profile._id, { description })
+      );
+    }
+    if (tempAvatar)
+      apiCalls.push(() => userAPI.addAvatar(profile._id, tempAvatar));
+    if (raUsername)
+      apiCalls.push(() => userAPI.setRaUserInfo(profile._id, raUsername));
+
+    Promise.all(apiCalls.map((apiCall) => apiCall()))
+      .then(() => {
+        toast.success({ description: "Saved successfully" });
+      })
+      .catch((err) => axiosUtils.toastError(err));
   };
 
   return (
@@ -71,6 +84,17 @@ export const Settings: FC<SettingsProps> = ({}) => {
             id="email"
             defaultValue={profile?.email}
             className={styles.input}
+          />
+        </div>
+
+        <div className={styles.field}>
+          <label htmlFor="ra">RA username</label>
+          <Input
+            type="text"
+            id="ra"
+            defaultValue={profile?.raUsername}
+            className={styles.input}
+            onChange={(e) => setRaUserName(e.target.value)}
           />
         </div>
 

@@ -124,6 +124,13 @@ const updateDescription = (
   );
 };
 
+const setRaUserInfo = (
+  userId: string,
+  raUserName: string
+)=>{
+  return agent.post<IUser>(`${USER_URL}/ra/${userId}/${raUserName}`);
+}
+
 export const userAPI = {
   getById,
   getByName,
@@ -142,4 +149,5 @@ export const userAPI = {
   removeFilter,
   getFilters,
   updateDescription,
+  setRaUserInfo
 };

@@ -46,6 +46,7 @@ export const getServerSideProps = async (
   const userFollowings = (await userAPI.getUserFollowings(user._id)).data;
   const logsResult = (await userAPI.getUserLogs(user._id)).data;
   const userLogs = logsResult.length > 0 ? mergeLogs(logsResult[0].logs) : [];
+  user.raUsername && await userAPI.setRaUserInfo(user._id, user.raUsername)
 
   return {
     props: {

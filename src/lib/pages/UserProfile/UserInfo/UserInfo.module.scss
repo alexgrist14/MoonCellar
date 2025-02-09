@@ -57,12 +57,12 @@
       background-color: $lightBgSecond;
       padding: 10px;
       white-space: pre-wrap;
-      li{
+      li {
         margin-left: 12px;
         list-style: initial;
-        a{
+        a {
           color: $gray;
-          &:hover{
+          &:hover {
             text-decoration: underline;
           }
         }
@@ -108,9 +108,33 @@
 
 .content__bottom {
   @include flexCenter;
+  flex-direction: column;
   margin-top: 20px;
 
+  .ra {
+    margin-top: 20px;
+    width: 100%;
+    &__title {
+      @include profileTitle;
+    }
+    &__list {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      margin-top: 20px;
+      gap: 20px;
+    }
+    &__item {
+      border: 2px solid gold;
+      &_beaten {
+        border: 2px solid silver;
+      }
+    }
+  }
+
   .activity {
+    margin-top: 20px;
     width: 100%;
     &__title {
       @include profileTitle;
