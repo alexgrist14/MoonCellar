@@ -73,20 +73,42 @@ export const GameControls: FC<IGameControlsProps> = ({
       .catch(axiosUtils.toastError);
   };
 
-  const isPlaying = profile?.games?.playing.some((id) => game._id === id);
-  const isPlayed = profile?.games?.played.some((id) => game._id === id);
-  const isMastered = profile?.games?.mastered.some((id) => game._id === id);
-  const isCompleted = profile?.games?.completed.some((id) => game._id === id);
-  const isWishlisted = profile?.games?.wishlist.some((id) => game._id === id);
-  const isBacklogged = profile?.games?.backlog.some((id) => game._id === id);
-  const isDropped = profile?.games?.dropped.some((id) => game._id === id);
+  const {
+    isPlaying,
+    isPlayed,
+    isMastered,
+    isCompleted,
+    isWishlisted,
+    isBacklogged,
+    isDropped,
+  } = useMemo(() => {
+    const isPlaying = profile?.games?.playing.some((id) => game._id === id);
+    const isPlayed = profile?.games?.played.some((id) => game._id === id);
+    const isMastered = profile?.games?.mastered.some((id) => game._id === id);
+    const isCompleted = profile?.games?.completed.some((id) => game._id === id);
+    const isWishlisted = profile?.games?.wishlist.some((id) => game._id === id);
+    const isBacklogged = profile?.games?.backlog.some((id) => game._id === id);
+    const isDropped = profile?.games?.dropped.some((id) => game._id === id);
+    return {
+      isPlaying,
+      isPlayed,
+      isMastered,
+      isCompleted,
+      isWishlisted,
+      isBacklogged,
+      isDropped,
+    };
+  }, [profile, game]);
 
   const rating = useMemo(
     () => profile?.gamesRating?.find((rating) => rating.game === game._id),
     [game, profile],
   );
 
-  const isRoyal = royalGames?.some((royal) => royal._id === game?._id);
+  const isRoyal = useMemo(
+    () => royalGames?.some((royal) => royal._id === game?._id),
+    [game, royalGames],
+  );
 
   useCloseEvents([controlsRef], () => {
     setIsRatingActive(false);

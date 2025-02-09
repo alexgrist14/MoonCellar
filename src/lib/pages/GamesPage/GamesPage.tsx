@@ -60,7 +60,7 @@ export const GamesPage: FC = () => {
     IGDBApi.getPlatforms().then((response) => setSystems(response.data));
     IGDBApi.getThemes().then((response) => setThemes(response.data));
     IGDBApi.getThemes().then((response) => setThemes(response.data));
-    // IGDBApi.getKeywords().then((response) => setKeywords(response.data));
+    IGDBApi.getKeywords().then((response) => setKeywords(response.data));
   }, [isRoyal, setGenres, setGameModes, setSystems, setThemes, setKeywords]);
 
   useEffect(() => {

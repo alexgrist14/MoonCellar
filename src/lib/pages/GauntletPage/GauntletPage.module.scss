@@ -3,39 +3,6 @@
   position: relative;
   height: 100%;
   overflow: hidden;
-
-  &__bg {
-    position: fixed;
-    transition: 0.4s;
-    z-index: -1;
-    height: 100vh;
-    width: 100vw;
-    user-select: none;
-    pointer-events: none;
-    top: 0;
-    left: 0;
-    opacity: 0;
-
-    & img {
-      object-fit: cover;
-      height: 100%;
-      width: 100%;
-      opacity: 0.3;
-    }
-
-    &_default {
-      animation: appearOpacity 0.4s 1 ease;
-      opacity: 1;
-    }
-
-    &_active {
-      opacity: 1;
-    }
-
-    &_hidden {
-      opacity: 0;
-    }
-  }
 }
 
 @include mediaMax($screenGt) {

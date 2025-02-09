@@ -24,7 +24,7 @@ import { IUserFilter } from "../../types/user.type";
 import { modal } from "../Modal";
 import { SaveFilterForm } from "../SaveFilterForm";
 import { toast } from "../../utils/toast";
-import { ListController } from "../ListController";
+import { IGDBDefault } from "../../types/igdb";
 
 export const Filters: FC<{
   callback?: (filters?: IGameFilters) => void;
@@ -37,6 +37,7 @@ export const Filters: FC<{
   const [filters, setFilters] = useState<IGameFilters>();
   const [tab, setTab] = useState<"filters" | "saved">("filters");
   const [savedFilters, setSavedFilters] = useState<IUserFilter[]>();
+  const [keywordsList, setKeywordsList] = useState<IGDBDefault[]>([]);
 
   const { themes, systems, genres, gameModes, keywords } = useCommonStore();
   const { isLoading, isPlatformsLoading, isExcludeHistory, setExcludeHistory } =
@@ -269,6 +270,46 @@ export const Filters: FC<{
               getIndexes={(indexes) => setSelected("themes", indexes, themes)}
               getExcludeIndexes={(indexes) =>
                 setExcluded("themes", indexes, themes)
+              }
+            />
+          </div>
+          <div className={styles.filters__wrapper}>
+            <h4>Keywords</h4>
+            <Dropdown
+              isWithReset
+              isWithAll
+              isMulti
+              isWithExclude
+              isWithSearch
+              overflowRootId="filters"
+              isDisabled={isLoading}
+              getSearchQuery={(query) => {
+                console.log(query);
+                !!keywords &&
+                  setKeywordsList(
+                    query?.length > 2
+                      ? keywords.filter(
+                          (keyword) =>
+                            filters?.selected?.keywords?.includes(
+                              keyword._id,
+                            ) ||
+                            keyword.name
+                              .toLowerCase()
+                              .includes(query.toLowerCase()),
+                        )
+                      : [],
+                  );
+              }}
+              list={keywordsList?.map((item) => item.name) || []}
+              overwriteValue={getValue("keywords")}
+              initialMultiValue={getSelectedArray("keywords", keywords)}
+              initialExcludeValue={getExcludedArray("keywords", keywords)}
+              placeholder="Select keywords..."
+              getIndexes={(indexes) =>
+                setSelected("keywords", indexes, keywords)
+              }
+              getExcludeIndexes={(indexes) =>
+                setExcluded("keywords", indexes, keywords)
               }
             />
           </div>

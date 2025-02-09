@@ -1,7 +1,7 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import styles from "./GamePage.module.scss";
 import Image from "next/image";
-import { IGDBGame, IGDBScreenshot } from "../../shared/types/igdb";
+import { IGDBGame } from "../../shared/types/igdb";
 import {
   dateRegions,
   gameCategories,
@@ -17,11 +17,10 @@ import { Loader } from "../../shared/ui/Loader";
 import { ButtonGroup } from "../../shared/ui/Button/ButtonGroup";
 import { useGamesStore } from "../../shared/store/games.store";
 import classNames from "classnames";
-import { axiosUtils } from "../../shared/utils/axios";
-import { IGDBApi } from "../../shared/api";
 import { useStatesStore } from "../../shared/store/states.store";
 import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
 import { useAuthStore } from "../../shared/store/auth.store";
+import { BGImage } from "../../shared/ui/BGImage";
 
 export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
   const { isAuth } = useAuthStore();
@@ -29,45 +28,23 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
   const { isMobile } = useStatesStore();
 
   const [isLoading, setIsLoading] = useState<boolean>(!!game.cover?.url);
-  const [bg, setBg] = useState<IGDBScreenshot & { gameId: number }>();
-  const [isImageReady, setIsImageReady] = useState(true);
 
-  useEffect(() => {
-    const pictures: number[] = [];
-
-    if (!!game) {
-      if (!!game.artworks?.length) {
-        game.artworks.forEach((art) => pictures.push(art._id));
-      } else {
-        game.screenshots.forEach((screen) => pictures.push(screen._id));
-      }
-
-      const id = pictures[Math.floor(Math.random() * (pictures.length - 1))];
-
-      if (!id) return;
-
-      (!!game.artworks?.length ? IGDBApi.getArtwork : IGDBApi.getScreenshot)(id)
-        .then((res) => {
-          setIsImageReady(false);
-          setBg({ ...res.data, gameId: game._id });
-        })
-        .catch(axiosUtils.toastError);
-    }
-  }, [game]);
+  const minimalGame = useMemo(
+    () => ({
+      ...game,
+      screenshots: game.screenshots.map((item) => item._id),
+      artworks: game.artworks.map((item) => item._id),
+      game_modes: game.game_modes.map((item) => item._id),
+      genres: game.genres.map((item) => item._id),
+      involved_companies: game.involved_companies.map((item) => item._id),
+      keywords: game.keywords.map((item) => item._id),
+      themes: game.themes.map((item) => item._id),
+      websites: game.websites.map((item) => item._id),
+    }),
+    [game],
+  );
 
   if (!game) return null;
-
-  const minimalGame = {
-    ...game,
-    screenshots: game.screenshots.map((item) => item._id),
-    artworks: game.artworks.map((item) => item._id),
-    game_modes: game.game_modes.map((item) => item._id),
-    genres: game.genres.map((item) => item._id),
-    involved_companies: game.involved_companies.map((item) => item._id),
-    keywords: game.keywords.map((item) => item._id),
-    themes: game.themes.map((item) => item._id),
-    websites: game.websites.map((item) => item._id),
-  };
 
   const releaseDate = new Date(game.first_release_date * 1000).getFullYear();
   const category = Object.keys(gameCategories).find(
@@ -119,21 +96,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
         </ExpandMenu>
       )}
       <div className={classNames(styles.page)}>
-        <div
-          className={classNames(styles.page__bg, {
-            [styles.page__bg_active]:
-              !!bg && !!game && game._id === bg.gameId && isImageReady,
-          })}
-        >
-          <Image
-            onLoad={() => setIsImageReady(true)}
-            key={bg?._id}
-            alt="Background"
-            src={!!bg?.url ? getImageLink(bg.url, "1080p") : "/images/moon.jpg"}
-            width={1920}
-            height={1080}
-          />
-        </div>
+        <BGImage game={minimalGame} />
         <div className={styles.page__left}>
           <WrapperTemplate contentStyle={{ padding: "0", gap: "0" }}>
             <div

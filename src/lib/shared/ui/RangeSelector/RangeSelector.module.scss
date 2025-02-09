@@ -1,20 +1,21 @@
+$height: 20px;
+
 .selector {
   display: grid;
-  gap: 10px;
+  gap: 2px;
   align-items: center;
   padding-inline: 8px;
   color: $textColor;
   user-select: none;
   width: 100%;
-  height: calc(100% + 10px);
-  font-size: 12px;
+  grid-template-rows: 15px 20px;
 
   &__text {
     grid-area: text;
     color: $whiteTextColor;
-    font-weight: 500;
     white-space: nowrap;
     text-align: center;
+    @include font(12px, 15px, 500);
   }
 
   &_disabled {
@@ -29,7 +30,7 @@
   position: relative;
   width: 100%;
   background-color: rgba($off, 1);
-  height: 2px;
+  height: fit-content;
   border: 1px solid rgba($off, 1);
   border-radius: 3px;
 
@@ -41,20 +42,20 @@
     width: calc(100% + 15px);
     padding: 0;
     margin: 0;
-    top: 0;
+    top: 50%;
+    transform: translateY(-50%);
     cursor: pointer;
-    height: 5px;
-    margin-top: -2px;
+    height: $height;
+    touch-action: pan-x;
   }
 
   &__pointer {
     position: absolute;
-    height: 15px;
+    height: $height;
     border-radius: 50%;
     top: 50%;
     transform: translateY(-50%);
     aspect-ratio: 1;
-    cursor: pointer;
     transition: opacity 0.4s;
 
     &_accent {

@@ -94,10 +94,10 @@ export const Dropdown: FC<IDropDownListProps> = ({
   const [isActive, setIsActive] = useState(false);
   const [value, setValue] = useState(initialValue);
   const [multiValue, setMultiValue] = useState<number[]>(
-    initialMultiValue || []
+    initialMultiValue || [],
   );
   const [excludeValue, setExcludeValue] = useState<number[]>(
-    initialExcludeValue || []
+    initialExcludeValue || [],
   );
 
   const offset = useRef<number>(0);
@@ -119,7 +119,7 @@ export const Dropdown: FC<IDropDownListProps> = ({
           result.push(element);
         return result;
       },
-      []
+      [],
     );
 
     setSortedList(values);
@@ -132,7 +132,7 @@ export const Dropdown: FC<IDropDownListProps> = ({
       isExcluded?: boolean;
       isReset?: boolean;
       isAll?: boolean;
-    }
+    },
   ) => {
     const { index, value } = item || { index: -1, value: "" };
     const { isChecked, isReset, isAll, isExcluded } = options;
@@ -182,8 +182,8 @@ export const Dropdown: FC<IDropDownListProps> = ({
               values.some((value) => value === item.index)
                 ? [...res, item.value]
                 : res,
-            []
-          )
+            [],
+          ),
         );
 
       if (isWithExclude) {
@@ -195,8 +195,8 @@ export const Dropdown: FC<IDropDownListProps> = ({
                 excludedValues.some((value) => value === item.index)
                   ? [...res, item.value]
                   : res,
-              []
-            )
+              [],
+            ),
           );
       }
     }
@@ -265,13 +265,13 @@ export const Dropdown: FC<IDropDownListProps> = ({
           !isWithInput &&
           !!searchRef.current &&
           searchRef.current.focus(),
-        220
+        220,
       );
   }, [isActive, isWithInput]);
 
   useEffect(() => {
     isActive
-      ? setSortedList((list) => (!!list?.length ? list : indexedList))
+      ? setSortedList(indexedList)
       : setSortedList(() => {
           const first: IIndexedItem[] = [];
           const second: IIndexedItem[] = [];
@@ -281,8 +281,8 @@ export const Dropdown: FC<IDropDownListProps> = ({
             multiValue.includes(item.index)
               ? first.push(item)
               : isWithExclude && excludeValue.includes(item.index)
-              ? second.push(item)
-              : third.push(item);
+                ? second.push(item)
+                : third.push(item);
           });
 
           return [...first, ...second, ...third];
@@ -324,10 +324,10 @@ export const Dropdown: FC<IDropDownListProps> = ({
               onChange={() =>
                 clickHandler(undefined, {
                   isAll: indexedList.some(
-                    (item) => !multiValue.includes(item.index)
+                    (item) => !multiValue.includes(item.index),
                   ),
                   isReset: !indexedList.some(
-                    (item) => !multiValue.includes(item.index)
+                    (item) => !multiValue.includes(item.index),
                   ),
                 })
               }
@@ -417,9 +417,9 @@ export const Dropdown: FC<IDropDownListProps> = ({
 
                   if (!!getSearchQuery) {
                     return getSearchQuery(e.target.value);
+                  } else {
+                    debouncedQueryChange(e.target.value);
                   }
-
-                  debouncedQueryChange(e.target.value);
                 }}
                 placeholder="Search..."
               />

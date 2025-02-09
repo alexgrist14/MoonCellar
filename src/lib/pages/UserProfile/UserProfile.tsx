@@ -15,6 +15,7 @@ import UserInfo from "./UserInfo/UserInfo";
 import styles from "./UserProfile.module.scss";
 import cn from "classnames";
 import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
+import { BGImage } from "../../shared/ui/BGImage";
 
 interface UserProfileProps {
   user: IUser;
@@ -101,19 +102,7 @@ const UserProfile: FC<UserProfileProps> = ({
 
   return (
     <div className={cn(styles.container)}>
-      <div
-        className={cn(styles.container__bg, {
-          [styles.container__bg_active]: isImageReady,
-        })}
-      >
-        <Image
-          onLoad={() => setIsImageReady(true)}
-          alt="Background"
-          src={"/images/moon.jpg"}
-          width={1920}
-          height={1080}
-        />
-      </div>
+      <BGImage />
       <WrapperTemplate
         classNameContent={styles.content}
         contentStyle={{
