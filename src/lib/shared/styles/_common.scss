@@ -29,11 +29,56 @@ body {
   height: fit-content;
   max-width: 1400px;
   margin-inline: auto;
-  @include mediaSm{
+  @include mediaSm {
     padding-inline: 10px;
   }
 }
 
 *::-webkit-scrollbar {
   display: none;
+}
+
+:root {
+  --gray: #afb3b9;
+  --accent: #6951ee;
+  --on: #467d1e;
+  --off: #7d1e46;
+  --red: #bd1e46;
+  --blue: #4951ee;
+  --neutral-10: #0d1011;
+  --neutral-20: #161b1d;
+  --neutral-30: #1f2628;
+  --neutral-40: #2f3537;
+  --neutral-50: #3f4750;
+  --neutral-60: #5e6a6e;
+  --neutral-80: #9192a1;
+  --neutral-90: #d9d9d9;
+  --neutral-100: #ffffff;
+
+  --text-color: #000000;
+  --white-text-color: #ffffff;
+  --placeholder: var(--gray);
+
+  --bg: #191d24;
+  --bg-alt: #212731;
+  --background: var(--bg);
+  --light-bg: #374151;
+  --light-bgSecond: #2c3340;
+  --light-background: var(--light-bg);
+
+  --border-color: var(--light-bg);
+  --dark-border-color: var(--bg);
+  --white-border-color: var(--white-text-color);
+  --black-border-color: var(--text-color);
+
+  --toast-bg: var(--bg);
+  --toast-title-color: var(--white-text-color);
+  --toast-text-color: var(--gray);
+  --toast-error-color: var(--off);
+  --toast-progress-color: var(--gray);
+
+  --wrapper-bg-color: var(--bg-alt);
+  --wrapper-head-bg-color: var(--light-bg);
+  --wrapper-text-color: var(--white-text-color);
+  --wrapper-border-color: var(--bg);
 }

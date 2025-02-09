@@ -121,7 +121,8 @@
 
   &__bottom {
     display: flex;
-    gap: 50px;
+    column-gap: 50px;
+    row-gap: 10px;
 
     @include mediaMax($screenMd) {
       flex-direction: column;

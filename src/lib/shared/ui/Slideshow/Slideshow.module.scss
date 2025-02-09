@@ -28,14 +28,15 @@
   &__wrapper {
     @include flexCenter;
     min-height: 50px;
-    max-height: 70vh;
+    max-height: 90vh;
     aspect-ratio: 1920/1080;
     outline: 2px solid $gray;
     border-radius: $radius;
     position: relative;
     background-color: $bg;
     user-select: none;
-    width: calc(100vw - 180px);
+    max-width: calc(100vw - 20px);
+    overflow: hidden;
 
     & img {
       height: 100%;
@@ -45,19 +46,21 @@
     }
 
     @include mediaSm {
-      width: calc(100vw - 10px);
+      max-width: calc(100vw - 10px);
     }
   }
 
   &__prev,
   &__next {
     position: absolute;
-    width: 70px;
+    width: min(50px, 10%);
     aspect-ratio: 1;
     height: 100%;
-    opacity: 0.6;
+    opacity: 0.7;
     z-index: 1;
     transition: 0.3s;
+    background-color: var(--bg);
+    padding: 0;
 
     & svg {
       width: 100%;
@@ -65,30 +68,26 @@
     }
 
     &:hover {
-      filter: contrast(0.2);
+      background-color: var(--bg-alt);
+    }
+
+    &:disabled {
+      opacity: 0;
     }
 
     @include mediaSm {
-      opacity: 0.3;
+      opacity: 0.5;
     }
   }
 
   &__prev {
-    right: 100%;
-
-    @include mediaSm {
-      left: 0;
-      right: unset;
-    }
+    left: 0;
+    right: unset;
   }
 
   &__next {
-    left: 100%;
-
-    @include mediaSm {
-      right: 0;
-      left: unset;
-    }
+    right: 0;
+    left: unset;
   }
 }
 
