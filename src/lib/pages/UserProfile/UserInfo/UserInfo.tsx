@@ -123,7 +123,7 @@ const UserInfo: FC<UserInfoProps> = ({
         </div>
       </div>
       <div className={styles.content__bottom}>
-        <div className={styles.ra}>
+        {/* <div className={styles.ra}>
           <h3 className={styles.ra__title}>Mastered RA games</h3>
           <div className={styles.ra__list}>
             {user.raAwards?.map((item) => {
@@ -158,7 +158,7 @@ const UserInfo: FC<UserInfoProps> = ({
                 );
             })}
           </div>
-        </div>
+        </div> */}
         {logs?.length > 0 && (
           <div className={styles.activity}>
             <h3 className={styles.activity__title}>Activity</h3>
