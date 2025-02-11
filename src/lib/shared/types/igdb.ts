@@ -30,6 +30,7 @@ export interface IGDBGame extends IGDBDefault {
   involved_companies: IGDBInvolvedCompany[];
   url: string;
   release_dates: IGDBReleaseDate[];
+  raIds: number[];
 }
 
 export interface IGDBGameMinimal

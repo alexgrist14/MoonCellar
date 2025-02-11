@@ -91,6 +91,13 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
                 isHidden: !game.url,
                 target: "_blank",
               },
+              ...(!!game.raIds?.length
+                ? game.raIds.map((id) => ({
+                    title: `Open in RetroAchievements`,
+                    link: `https://retroachievements.org/game/${id}`,
+                    target: "_blank",
+                  }))
+                : []),
             ]}
           />
         </ExpandMenu>
@@ -152,6 +159,13 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
                     isHidden: !game.url,
                     target: "_blank",
                   },
+                  ...(!!game.raIds?.length
+                    ? game.raIds.map((id) => ({
+                        title: `Open in RetroAchievements`,
+                        link: `https://retroachievements.org/game/${id}`,
+                        target: "_blank",
+                      }))
+                    : []),
                 ]}
               />
             </WrapperTemplate>
