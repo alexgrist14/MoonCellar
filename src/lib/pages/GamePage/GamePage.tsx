@@ -15,16 +15,16 @@ import { Cover } from "../../shared/ui/Cover";
 import { GameControls } from "../../shared/ui/GameControls";
 import { Loader } from "../../shared/ui/Loader";
 import { ButtonGroup } from "../../shared/ui/Button/ButtonGroup";
-import { useGamesStore } from "../../shared/store/games.store";
 import classNames from "classnames";
 import { useStatesStore } from "../../shared/store/states.store";
 import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
 import { useAuthStore } from "../../shared/store/auth.store";
 import { BGImage } from "../../shared/ui/BGImage";
+import { GameButtons } from "../../shared/ui/GameButtons";
+import { Icon } from "@iconify/react/dist/iconify.js";
 
 export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
-  const { isAuth } = useAuthStore();
-  const { royalGames, addRoyalGame, removeRoyalGame } = useGamesStore();
+  const { isAuth, profile } = useAuthStore();
   const { isMobile } = useStatesStore();
 
   const [isLoading, setIsLoading] = useState<boolean>(!!game.cover?.url);
@@ -44,6 +44,21 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
     [game],
   );
 
+  const { isMastered, isBeaten } = useMemo(() => {
+    const mastered = profile?.raAwards?.filter(
+      (award) => award.awardType === "Mastery/Completion",
+    );
+    const beaten = profile?.raAwards?.filter(
+      (award) => award.awardType === "Game Beaten",
+    );
+    const raIds = game.raIds?.map((game) => game.id);
+
+    return {
+      isMastered: mastered?.some((award) => raIds?.includes(award.awardData)),
+      isBeaten: beaten?.some((award) => raIds?.includes(award.awardData)),
+    };
+  }, [game, profile]);
+
   if (!game) return null;
 
   const releaseDate = new Date(game.first_release_date * 1000).getFullYear();
@@ -55,63 +70,31 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
     <>
       {isMobile && (
         <ExpandMenu position="left" titleOpen="Actions">
-          <ButtonGroup
-            wrapperClassName={styles.page__actions}
-            buttons={[
-              {
-                color: "accent",
-                title:
-                  (royalGames?.some((royal) => royal._id === game._id)
-                    ? "Remove from"
-                    : "Add to") + " royal games",
-                callback: () => {
-                  royalGames?.some((royal) => royal._id === game._id)
-                    ? removeRoyalGame(minimalGame)
-                    : addRoyalGame(minimalGame);
-                },
-              },
-              {
-                title: "Search on Youtube",
-                link: `https://www.youtube.com/results?search_query=${game.name}`,
-                target: "_blank",
-              },
-              {
-                title: "Search on RetroAchievements",
-                link: `https://retroachievements.org/searchresults.php?s=${game.name}&t=1`,
-                target: "_blank",
-              },
-              {
-                title: "Search on HowLongToBeat",
-                link: `https://howlongtobeat.com/?q=${encodeURI(game.name)}`,
-                target: "_blank",
-              },
-              {
-                title: "Open in IGDB",
-                link: game.url,
-                isHidden: !game.url,
-                target: "_blank",
-              },
-              ...(!!game.raIds?.length
-                ? game.raIds.map((id) => ({
-                    title: `Open in RetroAchievements`,
-                    link: `https://retroachievements.org/game/${id}`,
-                    target: "_blank",
-                  }))
-                : []),
-            ]}
-          />
+          <GameButtons game={minimalGame} />
         </ExpandMenu>
       )}
       <div className={classNames(styles.page)}>
         <BGImage game={minimalGame} />
         <div className={styles.page__left}>
-          <WrapperTemplate contentStyle={{ padding: "0", gap: "0" }}>
+          <WrapperTemplate
+            contentStyle={{ padding: "0", gap: "0" }}
+          >
             <div
               className={classNames(
                 styles.page__cover,
                 isAuth && styles.page__cover_control,
               )}
             >
+              {!!game.raIds?.length && (
+                <div
+                  className={classNames(styles.page__ra, {
+                    [styles.page__ra_beaten]: isBeaten,
+                    [styles.page__ra_mastered]: isMastered,
+                  })}
+                >
+                  <Icon icon={"game-icons:achievement"} />
+                </div>
+              )}
               {isLoading && <Loader />}
               {!!game.cover?.url ? (
                 <Image
@@ -133,41 +116,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
               wrapperStyle={{ marginTop: "40px" }}
               contentStyle={{ padding: "10px" }}
             >
-              <ButtonGroup
-                wrapperClassName={styles.page__actions}
-                buttons={[
-                  {
-                    title: "Search on Youtube",
-                    link: `https://www.youtube.com/results?search_query=${game.name}`,
-                    target: "_blank",
-                  },
-                  {
-                    title: "Search on RetroAchievements",
-                    link: `https://retroachievements.org/searchresults.php?s=${game.name}&t=1`,
-                    target: "_blank",
-                  },
-                  {
-                    title: "Search on HowLongToBeat",
-                    link: `https://howlongtobeat.com/?q=${encodeURI(
-                      game.name,
-                    )}`,
-                    target: "_blank",
-                  },
-                  {
-                    title: "Open in IGDB",
-                    link: game.url,
-                    isHidden: !game.url,
-                    target: "_blank",
-                  },
-                  ...(!!game.raIds?.length
-                    ? game.raIds.map((id) => ({
-                        title: `Open in RetroAchievements`,
-                        link: `https://retroachievements.org/game/${id}`,
-                        target: "_blank",
-                      }))
-                    : []),
-                ]}
-              />
+              <GameButtons game={minimalGame} />
             </WrapperTemplate>
           )}
         </div>

@@ -100,19 +100,6 @@
     }
   }
 
-  div &__actions {
-    flex-direction: column;
-    gap: 5px;
-    width: 100%;
-
-    & button,
-    a {
-      width: 100%;
-      height: 40px;
-      max-height: 40px;
-    }
-  }
-
   &__links {
     display: flex;
     flex-direction: column;
@@ -126,6 +113,47 @@
 
     @include mediaMax($screenMd) {
       flex-direction: column;
+    }
+  }
+
+  &__ra {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: var(--bg);
+    border: 2px solid var(--light-bg);
+    padding: 3px;
+    @include flexCenter;
+
+    & svg {
+      width: 100%;
+      height: 100%;
+      transition: 0.3s;
+      & path {
+        fill: var(--gray);
+      }
+    }
+
+    &_beaten,
+    &_mastered {
+      filter: drop-shadow(0 0 0.2rem var(--accent));
+    }
+
+    &_beaten {
+      & svg path {
+        fill: var(--blue);
+      }
+    }
+
+    &_mastered {
+      & svg {
+        path {
+          fill: #dec616;
+        }
+      }
     }
   }
 }

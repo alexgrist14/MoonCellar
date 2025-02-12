@@ -10,7 +10,6 @@ import cl from "classnames";
 import styles from "./Button.module.scss";
 import { IButtonColor } from "../../types/buttons";
 import { createPortal } from "react-dom";
-import { useStatesStore } from "../../store/states.store";
 
 interface IButton
   extends Pick<
@@ -63,7 +62,7 @@ export const Button = forwardRef(
 
         setTooltipCoords([x, window.scrollY + rect.y - 5 - tooltipRect.height]);
       }
-    }, [tooltipCoords, isHover, tooltipAlign]);
+    }, [isHover, tooltipAlign]);
 
     return (
       <button

@@ -1,0 +1,10 @@
+div .actions {
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+
+  & button,
+  a {
+    width: 100%;
+  }
+}

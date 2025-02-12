@@ -1,10 +1,9 @@
-import { CSSProperties, FC, ReactNode, useRef, useState } from "react";
+import { CSSProperties, FC, ReactNode, useMemo, useRef, useState } from "react";
 import styles from "./GameCard.module.scss";
 import Link from "next/link";
 import { IGDBGameMinimal } from "../../types/igdb";
 import classNames from "classnames";
 import Image from "next/image";
-import { modal } from "../Modal";
 import {
   coverRatio,
   gameCategories,
@@ -18,6 +17,8 @@ import { Loader } from "../Loader";
 import { useStatesStore } from "../../store/states.store";
 import { useWindowResizeAction } from "../../hooks";
 import { useDebouncedCallback } from "use-debounce";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import { useAuthStore } from "../../store/auth.store";
 
 interface IGameCardProps {
   game: IGDBGameMinimal;
@@ -40,6 +41,23 @@ export const GameCard: FC<IGameCardProps> = ({
   const [stepIndex, setStepIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(!!game.cover);
   const [ratio, setRatio] = useState<{ height?: string; width?: string }>();
+
+  const { profile } = useAuthStore();
+
+  const {isMastered, isBeaten} = useMemo(() => {
+    const mastered = profile?.raAwards?.filter(
+      (award) => award.awardType === "Mastery/Completion",
+    );
+    const beaten = profile?.raAwards?.filter(
+      (award) => award.awardType === "Game Beaten",
+    );
+    const raIds = game.raIds?.map((game) => game.id);
+
+    return {
+      isMastered: mastered?.some((award) => raIds?.includes(award.awardData)),
+      isBeaten: beaten?.some((award) => raIds?.includes(award.awardData)),
+    };
+  }, [game, profile]);
 
   const { isMobile } = useStatesStore();
 
@@ -92,6 +110,16 @@ export const GameCard: FC<IGameCardProps> = ({
         }}
         draggable={false}
       >
+        {!!game.raIds?.length && (
+          <div
+            className={classNames(styles.card__ra, {
+              [styles.card__ra_beaten]: isBeaten,
+              [styles.card__ra_mastered]: isMastered,
+            })}
+          >
+            <Icon icon={"game-icons:achievement"} />
+          </div>
+        )}
         <div
           className={classNames(styles.card__info, {
             [styles.card__info_active]:

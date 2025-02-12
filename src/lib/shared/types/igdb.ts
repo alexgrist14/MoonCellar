@@ -1,3 +1,5 @@
+import { IRAGame } from "./retroachievements";
+
 export interface IGDBDefault {
   _id: number;
   slug: string;
@@ -30,7 +32,7 @@ export interface IGDBGame extends IGDBDefault {
   involved_companies: IGDBInvolvedCompany[];
   url: string;
   release_dates: IGDBReleaseDate[];
-  raIds?: number[];
+  raIds?: IRAGame[];
 }
 
 export interface IGDBGameMinimal
