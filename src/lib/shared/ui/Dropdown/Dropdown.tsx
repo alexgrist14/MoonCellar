@@ -2,6 +2,7 @@ import {
   CSSProperties,
   FC,
   RefObject,
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -9,7 +10,7 @@ import {
 import cl from "classnames";
 import styles from "./Dropdown.module.scss";
 import { useDebouncedCallback } from "use-debounce";
-import { SvgChevron, SvgClose } from "../svg";
+import { SvgChevron } from "../svg";
 import { useRouter } from "next/router";
 import { Button } from "../Button";
 import useCloseEvents from "../../hooks/useCloseEvents";
@@ -112,6 +113,24 @@ export const Dropdown: FC<IDropDownListProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
+  const setSorted = useCallback((indexed: IIndexedItem[]) => {
+    return setSortedList(() => {
+      const first: IIndexedItem[] = [];
+      const second: IIndexedItem[] = [];
+      const third: IIndexedItem[] = [];
+
+      indexed.forEach((item) => {
+        multiValue.includes(item.index)
+          ? first.push(item)
+          : isWithExclude && excludeValue.includes(item.index)
+            ? second.push(item)
+            : third.push(item);
+      });
+
+      return [...first, ...second, ...third];
+    });
+  }, [excludeValue, multiValue, isWithExclude]);
+
   const debouncedQueryChange = useDebouncedCallback((value: string) => {
     const values = indexedList.reduce(
       (result: { index: number; value: string }[], element) => {
@@ -122,7 +141,7 @@ export const Dropdown: FC<IDropDownListProps> = ({
       [],
     );
 
-    setSortedList(values);
+    setSorted(values);
   }, 300);
 
   const clickHandler = (
@@ -270,24 +289,8 @@ export const Dropdown: FC<IDropDownListProps> = ({
   }, [isActive, isWithInput]);
 
   useEffect(() => {
-    isActive
-      ? setSortedList(indexedList)
-      : setSortedList(() => {
-          const first: IIndexedItem[] = [];
-          const second: IIndexedItem[] = [];
-          const third: IIndexedItem[] = [];
-
-          indexedList.forEach((item) => {
-            multiValue.includes(item.index)
-              ? first.push(item)
-              : isWithExclude && excludeValue.includes(item.index)
-                ? second.push(item)
-                : third.push(item);
-          });
-
-          return [...first, ...second, ...third];
-        });
-  }, [indexedList, multiValue, excludeValue, isActive, isWithExclude]);
+    setSorted(indexedList);
+  }, [indexedList, setSorted, isActive]);
 
   useEffect(() => {
     !isActive && setQuery("");

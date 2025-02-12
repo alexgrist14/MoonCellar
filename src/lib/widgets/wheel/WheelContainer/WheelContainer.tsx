@@ -13,6 +13,7 @@ import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
 import { MobileMenu } from "@/src/lib/shared/ui/MobileMenu";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
+import { GameButtons } from "@/src/lib/shared/ui/GameButtons";
 
 export const WheelContainer: FC = () => {
   const { winner, games, royalGames } = useGamesStore();
@@ -87,34 +88,7 @@ export const WheelContainer: FC = () => {
             text={`Time: ${timer} seconds`}
           />
         </WrapperTemplate>
-        {!!winner && (
-          <ButtonGroup
-            wrapperClassName={styles.links}
-            buttons={[
-              {
-                title: "Search on Youtube",
-                link: `https://www.youtube.com/results?search_query=${winner.name}`,
-                target: "_blank",
-              },
-              {
-                title: "Search on RetroAchievements",
-                link: `https://retroachievements.org/searchresults.php?s=${winner.name}&t=1`,
-                target: "_blank",
-              },
-              {
-                title: "Search on HowLongToBeat",
-                link: `https://howlongtobeat.com/?q=${encodeURI(winner.name)}`,
-                target: "_blank",
-              },
-              {
-                title: "Open in IGDB",
-                link: winner.url,
-                isHidden: !winner.url,
-                target: "_blank",
-              },
-            ]}
-          />
-        )}
+        {!!winner && <GameButtons game={winner} />}
       </MobileMenu>
       <WheelComponent
         wheelGames={wheelGames}

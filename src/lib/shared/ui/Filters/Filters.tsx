@@ -412,6 +412,21 @@ export const Filters: FC<{
               disabled={!!isLoading}
             />
           </div>
+          <div className={styles.filters__toggle}>
+            <ToggleSwitch
+              value={!!filters?.isOnlyWithAchievements ? "right" : "left"}
+              clickCallback={() => {
+                const temp: IGameFilters = {
+                  ...filters,
+                  isOnlyWithAchievements: !filters?.isOnlyWithAchievements || undefined,
+                };
+
+                setFilters(temp);
+                isGauntlet && pushFiltersToQuery(temp, router);
+              }}
+            />
+            <p>Only with achievements</p>
+          </div>
           {isGauntlet && (
             <div className={styles.filters__toggle}>
               <ToggleSwitch

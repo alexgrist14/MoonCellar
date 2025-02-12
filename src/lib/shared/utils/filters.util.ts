@@ -16,6 +16,7 @@ export const parseQueryFilters = (asPath: string): IGameFilters => {
     company: filters?.company,
     categories: filters?.categories,
     years: filters?.years,
+    isOnlyWithAchievements: filters?.isOnlyWithAchievements,
     selected: {
       genres: filters?.selectedGenres,
       modes: filters?.selectedModes,

@@ -6,6 +6,7 @@ export interface IGameFilters {
   rating?: number;
   votes?: number;
   isRandom?: boolean;
+  isOnlyWithAchievements?: boolean;
   take?: number;
   page?: number;
   selected?: IGDBFilters;
