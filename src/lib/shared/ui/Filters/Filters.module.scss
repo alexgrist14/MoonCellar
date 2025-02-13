@@ -34,11 +34,16 @@
     opacity: 0.7;
   }
 
+  &__toggles {
+    display: grid;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
   &__toggle {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-top: 20px;
 
     & > p {
       margin-top: -2px;

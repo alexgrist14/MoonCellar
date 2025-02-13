@@ -16,7 +16,7 @@ import {
 } from "../../utils/filters.util";
 import { Tabs } from "../Tabs";
 import { ITabContent } from "../../types/tabs";
-import { userAPI } from "../../api";
+import { IGDBApi, userAPI } from "../../api";
 import { useAuthStore } from "../../store/auth.store";
 import { Loader } from "../Loader";
 import { axiosUtils } from "../../utils/axios";
@@ -25,6 +25,7 @@ import { modal } from "../Modal";
 import { SaveFilterForm } from "../SaveFilterForm";
 import { toast } from "../../utils/toast";
 import { IGDBDefault } from "../../types/igdb";
+import { useDebouncedCallback } from "use-debounce";
 
 export const Filters: FC<{
   callback?: (filters?: IGameFilters) => void;
@@ -118,6 +119,25 @@ export const Filters: FC<{
       : []),
   ];
 
+  const debouncedSetKeywords = useDebouncedCallback((query) => {
+    IGDBApi.getKeywordsByIds([
+      ...(filters?.selected?.keywords || []),
+      ...(filters?.excluded?.keywords || []),
+    ]).then(({ data: filterKeywords }) => {
+      query?.length > 2
+        ? IGDBApi.getKeywords(query).then((res) => {
+            setKeywordsList([
+              ...filterKeywords,
+              ...res.data.filter(
+                (keyword) =>
+                  !filterKeywords.some((word) => word._id === keyword._id),
+              ),
+            ]);
+          })
+        : setKeywordsList(filterKeywords);
+    });
+  }, 300);
+
   useEffect(() => {
     setFilters(parseQueryFilters(asPath));
   }, [asPath]);
@@ -180,7 +200,6 @@ export const Filters: FC<{
             <h4>Categories</h4>
             <Dropdown
               isWithReset
-              isWithAll
               overflowRootId="filters"
               isDisabled={isLoading}
               list={Object.keys(gameCategories).map(
@@ -215,7 +234,6 @@ export const Filters: FC<{
             <h4>Platforms</h4>
             <Dropdown
               isWithReset
-              isWithAll
               isMulti
               isWithExclude
               overflowRootId="filters"
@@ -237,7 +255,6 @@ export const Filters: FC<{
             <h4>Genres</h4>
             <Dropdown
               isWithReset
-              isWithAll
               isMulti
               isWithExclude
               overflowRootId="filters"
@@ -257,7 +274,6 @@ export const Filters: FC<{
             <h4>Themes</h4>
             <Dropdown
               isWithReset
-              isWithAll
               isMulti
               isWithExclude
               overflowRootId="filters"
@@ -277,39 +293,39 @@ export const Filters: FC<{
             <h4>Keywords</h4>
             <Dropdown
               isWithReset
-              isWithAll
               isMulti
               isWithExclude
               isWithSearch
               overflowRootId="filters"
               isDisabled={isLoading}
-              getSearchQuery={(query) => {
-                console.log(query);
-                !!keywords &&
-                  setKeywordsList(
-                    query?.length > 2
-                      ? keywords.filter(
-                          (keyword) =>
-                            filters?.selected?.keywords?.includes(
-                              keyword._id,
-                            ) ||
-                            keyword.name
-                              .toLowerCase()
-                              .includes(query.toLowerCase()),
-                        )
-                      : [],
-                  );
+              onLoad={() => {
+                IGDBApi.getKeywordsByIds([
+                  ...(filters?.selected?.keywords || []),
+                  ...(filters?.excluded?.keywords || []),
+                ]).then((res) => {
+                  setKeywordsList(res.data);
+                });
               }}
+              onClose={() => {
+                setKeywordsList((list) =>
+                  list.filter(
+                    (item) =>
+                      filters?.selected?.keywords?.includes(item._id) ||
+                      filters?.excluded?.keywords?.includes(item._id),
+                  ),
+                );
+              }}
+              getSearchQuery={debouncedSetKeywords}
               list={keywordsList?.map((item) => item.name) || []}
               overwriteValue={getValue("keywords")}
-              initialMultiValue={getSelectedArray("keywords", keywords)}
-              initialExcludeValue={getExcludedArray("keywords", keywords)}
+              initialMultiValue={getSelectedArray("keywords", keywordsList)}
+              initialExcludeValue={getExcludedArray("keywords", keywordsList)}
               placeholder="Select keywords..."
               getIndexes={(indexes) =>
-                setSelected("keywords", indexes, keywords)
+                setSelected("keywords", indexes, keywordsList)
               }
               getExcludeIndexes={(indexes) =>
-                setExcluded("keywords", indexes, keywords)
+                setExcluded("keywords", indexes, keywordsList)
               }
             />
           </div>
@@ -317,7 +333,6 @@ export const Filters: FC<{
             <h4>Game Modes</h4>
             <Dropdown
               isWithReset
-              isWithAll
               isMulti
               isWithExclude
               overflowRootId="filters"
@@ -412,30 +427,33 @@ export const Filters: FC<{
               disabled={!!isLoading}
             />
           </div>
-          <div className={styles.filters__toggle}>
-            <ToggleSwitch
-              value={!!filters?.isOnlyWithAchievements ? "right" : "left"}
-              clickCallback={() => {
-                const temp: IGameFilters = {
-                  ...filters,
-                  isOnlyWithAchievements: !filters?.isOnlyWithAchievements || undefined,
-                };
-
-                setFilters(temp);
-                isGauntlet && pushFiltersToQuery(temp, router);
-              }}
-            />
-            <p>Only with achievements</p>
-          </div>
-          {isGauntlet && (
+          <div className={styles.filters__toggles}>
             <div className={styles.filters__toggle}>
               <ToggleSwitch
-                value={isExcludeHistory ? "right" : "left"}
-                clickCallback={() => setExcludeHistory(!isExcludeHistory)}
+                value={!!filters?.isOnlyWithAchievements ? "right" : "left"}
+                clickCallback={() => {
+                  const temp: IGameFilters = {
+                    ...filters,
+                    isOnlyWithAchievements:
+                      !filters?.isOnlyWithAchievements || undefined,
+                  };
+
+                  setFilters(temp);
+                  isGauntlet && pushFiltersToQuery(temp, router);
+                }}
               />
-              <p>Exclude history</p>
+              <p>Only with achievements</p>
             </div>
-          )}
+            {isGauntlet && (
+              <div className={styles.filters__toggle}>
+                <ToggleSwitch
+                  value={isExcludeHistory ? "right" : "left"}
+                  clickCallback={() => setExcludeHistory(!isExcludeHistory)}
+                />
+                <p>Exclude history</p>
+              </div>
+            )}
+          </div>
           <ButtonGroup
             wrapperClassName={styles.filters__buttons}
             wrapperStyle={{ width: "100%" }}

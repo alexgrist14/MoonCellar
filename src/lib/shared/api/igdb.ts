@@ -83,8 +83,16 @@ const getThemes = () => {
   return agent.get<IGDBDefault[]>(`${IGDB_URL}/themes`);
 };
 
-const getKeywords = () => {
-  return agent.get<IGDBDefault[]>(`${IGDB_URL}/keywords`);
+const getKeywords = (query?: string) => {
+  return agent.get<IGDBDefault[]>(`${IGDB_URL}/keywords`, {
+    params: { query },
+  });
+};
+
+const getKeywordsByIds = (ids: number[]) => {
+  return agent.get<IGDBDefault[]>(`${IGDB_URL}/keywords/by-id`, {
+    params: { ids },
+  });
 };
 
 export const IGDBApi = {
@@ -98,4 +106,5 @@ export const IGDBApi = {
   getArtwork,
   getThemes,
   getKeywords,
+  getKeywordsByIds,
 };

@@ -23,7 +23,7 @@ export const GamesPage: FC = () => {
   const { asPath, query } = router;
 
   const { isLoading, setLoading, isRoyal, isMobile } = useStatesStore();
-  const { setGenres, setGameModes, setSystems, setThemes, setKeywords } =
+  const { setGenres, setGameModes, setSystems, setThemes } =
     useCommonStore();
 
   const [games, setGames] = useState<IGDBGameMinimal[]>([]);
@@ -60,8 +60,7 @@ export const GamesPage: FC = () => {
     IGDBApi.getPlatforms().then((response) => setSystems(response.data));
     IGDBApi.getThemes().then((response) => setThemes(response.data));
     IGDBApi.getThemes().then((response) => setThemes(response.data));
-    IGDBApi.getKeywords().then((response) => setKeywords(response.data));
-  }, [isRoyal, setGenres, setGameModes, setSystems, setThemes, setKeywords]);
+  }, [isRoyal, setGenres, setGameModes, setSystems, setThemes]);
 
   useEffect(() => {
     debouncedGamesFetch();

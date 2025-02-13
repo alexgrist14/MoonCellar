@@ -14,7 +14,6 @@ import Link from "next/link";
 import { Cover } from "../../shared/ui/Cover";
 import { GameControls } from "../../shared/ui/GameControls";
 import { Loader } from "../../shared/ui/Loader";
-import { ButtonGroup } from "../../shared/ui/Button/ButtonGroup";
 import classNames from "classnames";
 import { useStatesStore } from "../../shared/store/states.store";
 import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
