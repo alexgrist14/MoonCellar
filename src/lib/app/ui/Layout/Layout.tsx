@@ -1,5 +1,5 @@
 import { authAPI, userAPI } from "@/src/lib/shared/api";
-import { screenMd, screenSm } from "@/src/lib/shared/constants";
+import { screenMd } from "@/src/lib/shared/constants";
 import { useWindowResizeAction } from "@/src/lib/shared/hooks";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { FC, ReactNode, useEffect, useState } from "react";
@@ -29,22 +29,20 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
   });
 
   useEffect(() => {
-    if (isAuth) {
-      refreshToken()
-        .then((res) => {
-          setAuth(true);
-          getById(res.data.userId).then((res) => {
-            setProfile(res.data);
-          });
-        })
-        .catch(() => {
-          clear();
+    refreshToken()
+      .then((res) => {
+        setAuth(true);
+        getById(res.data.userId).then((res) => {
+          setProfile(res.data);
         });
-    }
+      })
+      .catch(() => {
+        clear();
+      });
   }, [clear, getById, isAuth, refreshToken, setAuth, setProfile]);
 
   useWindowResizeAction(() => {
-    setMobile(window.innerWidth <= screenMd)
+    setMobile(window.innerWidth <= screenMd);
   });
 
   return (

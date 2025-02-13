@@ -1,7 +1,6 @@
-import Image from "next/image";
 import { useRouter } from "next/router";
 import queryString from "query-string";
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useCallback, useMemo } from "react";
 import { userListCategories } from "../../shared/constants/user.const";
 import { IUser } from "../../shared/types/auth";
 import { ITabContent } from "../../shared/types/tabs";
@@ -31,8 +30,6 @@ const UserProfile: FC<UserProfileProps> = ({
   authUserId,
 }) => {
   const { query, push, pathname } = useRouter();
-
-  const [isImageReady, setIsImageReady] = useState(false);
 
   const tab = !!query?.list ? (query.list as string) : "profile";
 
