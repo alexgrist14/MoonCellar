@@ -25,7 +25,7 @@ export const GameButtons: FC<{ game: IGDBGameMinimal }> = ({ game }) => {
                       <br />({game.consoleName})
                     </span>
                   ),
-                  link: `https://retroachievements.org/game/${game.id}`,
+                  link: `https://retroachievements.org/game/${game._id}`,
                   target: "_blank",
                 }) as IButtonGroupItem,
             )

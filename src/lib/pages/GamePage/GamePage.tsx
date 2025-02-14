@@ -50,7 +50,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
     const beaten = profile?.raAwards?.filter(
       (award) => award.awardType === "Game Beaten",
     );
-    const raIds = game.raIds?.map((game) => game.id);
+    const raIds = game.raIds?.map((game) => game._id);
 
     return {
       isMastered: mastered?.some((award) => raIds?.includes(award.awardData)),

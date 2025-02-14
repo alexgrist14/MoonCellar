@@ -1,6 +1,6 @@
 export interface IRAGame {
+  _id: number;
   title: string;
-  id: number;
   consoleId: number;
   consoleName: string;
   imageIcon: string;
@@ -10,10 +10,6 @@ export interface IRAGame {
   dateModified: string;
   forumTopicId: number;
   hashes: string[];
-}
-
-export interface IDataBase {
-  game: IRAGame[];
 }
 
 export interface IRAAchievement {
