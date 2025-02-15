@@ -10,6 +10,8 @@ import Link from "next/link";
 import { FC, useMemo, useState } from "react";
 import styles from "./UserInfo.module.scss";
 import Markdown from "react-markdown";
+import { Diagram } from "@/src/lib/shared/ui/Diagram";
+import { userListCategories } from "@/src/lib/shared/constants/user.const";
 
 interface UserInfoProps {
   user: IUser;
@@ -28,8 +30,6 @@ const UserInfo: FC<UserInfoProps> = ({
 
   const [userAuthFollowings, setUserAuthFollowings] =
     useState<IFollowings>(authUserFollowings);
-
-  const RA_STATIC_URL = "https://media.retroachievements.org";
 
   const setActivityType = (action: string, isAdd: boolean, rating?: number) => {
     const actions = action.split(" and ");
@@ -60,6 +60,12 @@ const UserInfo: FC<UserInfoProps> = ({
           .then((res) => setUserAuthFollowings(res.data));
   };
 
+  const diagramData = {} as any;
+
+  userListCategories.map((category,i)=>{
+    diagramData[`${category}`] = games[`${category}`].length;
+  })
+
   return (
     <>
       <div className={styles.content__top}>
@@ -79,7 +85,6 @@ const UserInfo: FC<UserInfoProps> = ({
               </Button>
             )}
           </div>
-
           <div className={styles.profile__info}>
             <div className={styles.profile__name}>{userName}</div>
             <div className={styles.date}>
@@ -90,24 +95,10 @@ const UserInfo: FC<UserInfoProps> = ({
                 {user.description}
               </Markdown>
             )}
-            {/* <div className={styles.profile__stats}>
-              <div className={styles.profile__stats__list}>
-                {userListCategories.map((category, i) => (
-                  <Link
-                    href={`${FRONT_URL}/user/${userName}?list=${category}`}
-                    key={i}
-                  >
-                    <span>{`${commonUtils.upFL(category)}: ${
-                      games[`${category}`].length
-                    }`}</span>
-                  </Link>
-                ))}
-              </div>
-            </div> */}
           </div>
         </div>
         <div className={styles.friends}>
-          <h3 className={styles.friends__title}>Friends</h3>
+          <h3 className={styles.title}>Friends</h3>
           <div className={styles.friends__list}>
             {!!userFollowings &&
               userFollowings.followings.map((item, i) => (
@@ -120,48 +111,15 @@ const UserInfo: FC<UserInfoProps> = ({
                 </Link>
               ))}
           </div>
+          <div className={styles.diagram}>
+          <Diagram data={diagramData}/>
+          </div>
         </div>
       </div>
       <div className={styles.content__bottom}>
-        {/* <div className={styles.ra}>
-          <h3 className={styles.ra__title}>Mastered RA games</h3>
-          <div className={styles.ra__list}>
-            {user.raAwards?.map((item) => {
-              if (item.awardType === "Mastery/Completion")
-                return (
-                  <div className={styles.ra__item} key={item.awardedAt}>
-                    <Image
-                      src={`${RA_STATIC_URL}${item.imageIcon}`}
-                      width={52}
-                      height={52}
-                      alt={"ra"}
-                    ></Image>
-                  </div>
-                );
-            })}
-          </div>
-        </div>
-        <div className={styles.ra}>
-          <h3 className={styles.ra__title}>Beaten RA games</h3>
-          <div className={styles.ra__list}>
-            {user.raAwards?.map((item) => {
-              if (item.awardType === "Game Beaten")
-                return (
-                  <div className={styles.ra__item_beaten} key={item.awardedAt}>
-                    <Image
-                      src={`${RA_STATIC_URL}${item.imageIcon}`}
-                      width={52}
-                      height={52}
-                      alt={"ra"}
-                    ></Image>
-                  </div>
-                );
-            })}
-          </div>
-        </div> */}
         {logs?.length > 0 && (
           <div className={styles.activity}>
-            <h3 className={styles.activity__title}>Activity</h3>
+            <h3 className={styles.title}>Activity</h3>
             <div className={styles.activity__list}>
               {logs.map((log, i) => (
                 <div className={styles.item} key={i}>

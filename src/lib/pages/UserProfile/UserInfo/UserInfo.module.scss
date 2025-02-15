@@ -8,6 +8,9 @@
   padding-top: 3px;
   box-shadow: 0 2px 6px 2px rgba(0, 0, 0, 0.2);
 }
+.title {
+  @include profileTitle();
+}
 
 .content__top {
   display: flex;
@@ -17,15 +20,15 @@
     gap: 20px;
     gap: 20px;
   }
+  .diagram{
+    margin-top: 50px;
+  }
   .friends {
     width: 100%;
     width: 400px;
     border-radius: $radius;
     @include mediaMd {
       width: 100%;
-    }
-    &__title {
-      @include profileTitle();
     }
     &__list {
       display: flex;
@@ -110,28 +113,6 @@
   @include flexCenter;
   flex-direction: column;
   margin-top: 20px;
-
-  .ra {
-    margin-top: 20px;
-    width: 100%;
-    &__title {
-      @include profileTitle;
-    }
-    &__list {
-      width: 100%;
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      margin-top: 20px;
-      gap: 20px;
-    }
-    &__item {
-      border: 2px solid gold;
-      &_beaten {
-        border: 2px solid silver;
-      }
-    }
-  }
 
   .activity {
     margin-top: 20px;

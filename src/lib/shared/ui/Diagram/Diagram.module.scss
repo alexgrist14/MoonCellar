@@ -1,0 +1,28 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 300px;
+  width: 300px;
+  padding: 10px;
+  .bar {
+    height: 20px;
+    background-color: $accent;
+    border-radius: $radius;
+    text-align: right;
+    padding-right: 3px;
+    margin: 0 10px;
+    min-width: 10px;
+    &__container {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+  
+  .label {
+    margin-top: 5px;
+    font-size: 14px;
+  }
+}
+
