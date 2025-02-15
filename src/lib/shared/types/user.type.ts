@@ -51,3 +51,8 @@ export interface IUserFilter {
   filter: string;
 }
 
+export interface IUserPreset {
+  name: string;
+  preset: string;
+}
+

@@ -6,6 +6,7 @@ import {
   IUserFilter,
   IUserGames,
   IUserLogs,
+  IUserPreset,
 } from "../types/user.type";
 import agent from "./agent";
 
@@ -29,7 +30,7 @@ const addAvatar = (id: string, file: File) => {
     formData,
     {
       headers: { "Content-Type": "multipart/form-data" },
-    }
+    },
   );
 };
 
@@ -44,19 +45,19 @@ const getUserGames = (id: string, category: CategoriesType) => {
 const addGameToCategory = (
   userId: string,
   gameId: number,
-  category: CategoriesType
+  category: CategoriesType,
 ) => {
   return agent.patch<IUser>(
     `${USER_URL}/${userId}/games/${gameId}`,
     undefined,
-    { params: { category } }
+    { params: { category } },
   );
 };
 
 const removeGameFromCategory = (
   userId: string,
   gameId: number,
-  category: CategoriesType
+  category: CategoriesType,
 ) => {
   return agent.delete<IUser>(`${USER_URL}/${userId}/games/${gameId}`, {
     params: { category },
@@ -84,52 +85,69 @@ const getUserLogs = (userId: string) => {
 
 const addUserFollowing = (userId: string, followingId: string) => {
   return agent.patch<IFollowings>(
-    `${USER_URL}/followings/${userId}/${followingId}`
+    `${USER_URL}/followings/${userId}/${followingId}`,
   );
 };
 
 const removeUserFollowing = (userId: string, followingId: string) => {
   return agent.delete<IFollowings>(
-    `${USER_URL}/followings/${userId}/${followingId}`
+    `${USER_URL}/followings/${userId}/${followingId}`,
   );
 };
 
 const addFilter = (userId: string, filter: IUserFilter) => {
   return agent.post<Pick<IUser, "_id" | "filters">>(
     `${USER_URL}/filters/${userId}`,
-    filter
+    filter,
   );
 };
 
 const removeFilter = (userId: string, name: string) => {
   return agent.delete<Pick<IUser, "_id" | "filters">>(
     `${USER_URL}/filters/${userId}`,
-    { params: { name } }
+    { params: { name } },
   );
 };
 
 const getFilters = (userId: string) => {
   return agent.get<Pick<IUser, "_id" | "filters">>(
-    `${USER_URL}/filters/${userId}`
+    `${USER_URL}/filters/${userId}`,
+  );
+};
+
+const addPreset = (userId: string, preset: IUserPreset) => {
+  return agent.post<Pick<IUser, "_id" | "presets">>(
+    `${USER_URL}/presets/${userId}`,
+    preset,
+  );
+};
+
+const removePreset = (userId: string, name: string) => {
+  return agent.delete<Pick<IUser, "_id" | "presets">>(
+    `${USER_URL}/presets/${userId}`,
+    { params: { name } },
+  );
+};
+
+const getPresets = (userId: string) => {
+  return agent.get<Pick<IUser, "_id" | "presets">>(
+    `${USER_URL}/presets/${userId}`,
   );
 };
 
 const updateDescription = (
   userId: string,
-  descriptionDto: { description: string }
+  descriptionDto: { description: string },
 ) => {
   return agent.patch<IUser>(
     `${USER_URL}/description/${userId}`,
-    descriptionDto
+    descriptionDto,
   );
 };
 
-const setRaUserInfo = (
-  userId: string,
-  raUserName: string
-)=>{
+const setRaUserInfo = (userId: string, raUserName: string) => {
   return agent.post<IUser>(`${USER_URL}/ra/${userId}/${raUserName}`);
-}
+};
 
 export const userAPI = {
   getById,
@@ -149,5 +167,8 @@ export const userAPI = {
   removeFilter,
   getFilters,
   updateDescription,
-  setRaUserInfo
+  setRaUserInfo,
+  addPreset,
+  removePreset,
+  getPresets,
 };

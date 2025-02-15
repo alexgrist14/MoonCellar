@@ -4,6 +4,7 @@ import {
   IFollowings,
   IGamesRating,
   IUserFilter,
+  IUserPreset,
 } from "./user.type";
 
 export interface IAuth {
@@ -21,6 +22,7 @@ export interface IUser {
   profilePicture: string;
   followings: IFollowings;
   filters: IUserFilter[];
+  presets: IUserPreset[];
   updatedAt: Date;
   description: string;
   raUsername?: string;

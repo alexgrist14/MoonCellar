@@ -110,7 +110,6 @@ export const Dropdown: FC<IDropDownListProps> = ({
   const [query, setQuery] = useState("");
 
   const [indexedList, setIndexedList] = useState<IIndexedItem[]>([]);
-  // const [sortedList, setSortedList] = useState<IIndexedItem[]>([]);
 
   const listRef = useRef<HTMLUListElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
@@ -142,20 +141,11 @@ export const Dropdown: FC<IDropDownListProps> = ({
     [getSearchQuery, excludeValue, multiValue, isWithExclude],
   );
 
-  // const setSorted = useCallback(
-  //   (indexed: IIndexedItem[]) => {
-  //     return setSortedList(() => {
-  //
-  //     });
-  //   },
-  //   [excludeValue, multiValue, isWithExclude],
-  // );
-
   const debouncedQueryChange = useDebouncedCallback((value: string) => {
-    const values = indexedList.reduce(
-      (result: { index: number; value: string }[], element) => {
-        element.value.toLowerCase().includes(value.toLowerCase()) &&
-          result.push(element);
+    const values = list.reduce(
+      (result: { index: number; value: string }[], element, index) => {
+        element.toLowerCase().includes(value.toLowerCase()) &&
+          result.push({ index, value: element });
         return result;
       },
       [],
@@ -269,10 +259,7 @@ export const Dropdown: FC<IDropDownListProps> = ({
     (!isMulti && !!value) ||
     (isMulti && (!!multiValue.length || !!excludeValue.length));
 
-  useEffect(() => {
-    ((!!list.length && !indexedList?.length) || !!getSearchQuery) &&
-      setIndexedList(list.map((item, i) => ({ value: item, index: i })));
-  }, [list]);
+  useEffect(() => {}, [list]);
 
   useEffect(() => {
     if (!!value && !isWithInput && !overwriteValue) {
@@ -305,19 +292,30 @@ export const Dropdown: FC<IDropDownListProps> = ({
   }, [isActive, isWithInput]);
 
   useEffect(() => {
-    if (!isActive) {
-      setQuery("");
-      setIndexedList((list) => sortList(list));
-      onClose?.();
-    }
-  }, [isActive]);
-
-  useEffect(() => {
     if (isActive && firstActive.current === true) {
       onLoad?.();
       firstActive.current = false;
     }
   }, [isActive, onLoad]);
+
+  useEffect(() => {
+    if (!isActive) {
+      setQuery("");
+      onClose?.();
+    } else {
+      setIndexedList(
+        sortList(list.map((item, i) => ({ value: item, index: i }))),
+      );
+    }
+  }, [isActive]);
+
+  useEffect(() => {
+    if ((!indexedList.length && !!list.length) || !!getSearchQuery) {
+      setIndexedList(
+        sortList(list.map((item, i) => ({ value: item, index: i }))),
+      );
+    }
+  }, [getSearchQuery, list]);
 
   useCloseEvents([dropdownRef], () => {
     isActive && (offset.current = 0);
@@ -354,24 +352,18 @@ export const Dropdown: FC<IDropDownListProps> = ({
               colorTheme="on"
               onChange={() =>
                 clickHandler(undefined, {
-                  isAll: indexedList.some(
-                    (item) => !multiValue.includes(item.index),
-                  ),
-                  isReset: !indexedList.some(
-                    (item) => !multiValue.includes(item.index),
-                  ),
+                  isAll: list.some((_, i) => !multiValue.includes(i)),
+                  isReset: !list.some((_, i) => !multiValue.includes(i)),
                 })
               }
-              checked={
-                !indexedList.some((item) => !multiValue.includes(item.index))
-              }
+              checked={!list.some((_, i) => !multiValue.includes(i))}
             />
           )}
           <div
             className={cl(styles.dropdown__icon, {
               [styles.dropdown__icon_active]: isActive,
               [styles.dropdown__icon_disabled]:
-                isDisabled || (!indexedList.length && !isWithSearch),
+                isDisabled || (!list.length && !isWithSearch),
             })}
             onClick={fieldClickHandler}
           >
@@ -391,8 +383,7 @@ export const Dropdown: FC<IDropDownListProps> = ({
             [styles.dropdown__field_compact]: isCompact,
             [styles[`dropdown__field_${borderTheme}`]]: !!borderTheme,
             [styles.dropdown__field_disabled]:
-              isDisabled ||
-              (!indexedList.length && !isWithSearch && !isWithInput),
+              isDisabled || (!list.length && !isWithSearch && !isWithInput),
           })}
           onClick={fieldClickHandler}
         >
@@ -432,9 +423,7 @@ export const Dropdown: FC<IDropDownListProps> = ({
           }}
         >
           {!offset && <div className={styles.dropdown__placeholder}></div>}
-          {(isWithSearch === undefined
-            ? indexedList.length > 10
-            : isWithSearch) && (
+          {(isWithSearch === undefined ? list.length > 10 : isWithSearch) && (
             <div
               className={classNames(styles.dropdown__search, {
                 [styles.dropdown__search_active]: isActive,

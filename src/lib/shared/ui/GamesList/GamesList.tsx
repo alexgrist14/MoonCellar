@@ -1,7 +1,6 @@
 import { FC } from "react";
 import styles from "./GamesList.module.scss";
 import { Button } from "@/src/lib/shared/ui/Button";
-import Link from "next/link";
 import { IGDBGameMinimal } from "../../types/igdb";
 import { ButtonGroup } from "../Button/ButtonGroup";
 
@@ -9,12 +8,14 @@ interface IGamesListProps {
   games: IGDBGameMinimal[];
   getGames?: (games: IGDBGameMinimal[]) => void;
   removeGame?: (game: IGDBGameMinimal) => void;
+  saveCallback?: () => void;
 }
 
 export const GamesList: FC<IGamesListProps> = ({
   games,
   getGames,
   removeGame,
+  saveCallback,
 }) => {
   return (
     <div className={styles.consoles__royal}>
@@ -22,6 +23,11 @@ export const GamesList: FC<IGamesListProps> = ({
         {!!games?.length && <h3>Games:</h3>}
         {!games?.length && (
           <h3 style={{ width: "100%", textAlign: "center" }}>List is empty</h3>
+        )}
+        {!!games?.length && !!saveCallback && (
+          <Button color="accent" onClick={() => saveCallback()}>
+            Save
+          </Button>
         )}
         {!!games?.length && !!getGames && (
           <Button color="red" onClick={() => getGames([])}>
