@@ -24,14 +24,16 @@ export const WrapperTemplateHead: FC<IWrapperTemplateHeadProps> = ({
   )
     return null;
   return (
-    <h2
-      className={classNames(styles.template__title, {
-        [styles.template__title_vertical]: isVerticalActions,
-        [styles.template__title_external]: isExternal,
-      })}
-    >
-      {title}
+    <div>
+      <h2
+        className={classNames(styles.template__title, {
+          [styles.template__title_vertical]: isVerticalActions,
+          [styles.template__title_external]: isExternal,
+        })}
+      >
+        {title}
+      </h2>
       {!!titleAction && titleAction}
-    </h2>
+    </div>
   );
 };

@@ -40,7 +40,7 @@ export const Filters: FC<{
   const [savedFilters, setSavedFilters] = useState<IUserFilter[]>();
   const [keywordsList, setKeywordsList] = useState<IGDBDefault[]>([]);
 
-  const { themes, systems, genres, gameModes, keywords } = useCommonStore();
+  const { themes, systems, genres, gameModes } = useCommonStore();
   const { isLoading, isPlatformsLoading, isExcludeHistory, setExcludeHistory } =
     useStatesStore();
 
@@ -166,7 +166,11 @@ export const Filters: FC<{
             <div className={styles.filters__wrapper}>
               <h4>Game name</h4>
               <Input
-                onKeyDown={(e) => e.key === "Enter" && !!callback && callback()}
+                onKeyDown={(e) =>
+                  e.key === "Enter" &&
+                  !!filters &&
+                  pushFiltersToQuery(filters, router)
+                }
                 containerStyles={{ width: "100%" }}
                 placeholder="Enter name of the game..."
                 disabled={isLoading}
@@ -182,7 +186,11 @@ export const Filters: FC<{
             <div className={styles.filters__wrapper}>
               <h4>Game company</h4>
               <Input
-                onKeyDown={(e) => e.key === "Enter" && !!callback && callback()}
+                onKeyDown={(e) =>
+                  e.key === "Enter" &&
+                  !!filters &&
+                  pushFiltersToQuery(filters, router)
+                }
                 containerStyles={{ width: "100%" }}
                 placeholder="Enter name of the developer..."
                 disabled={isLoading}
@@ -352,7 +360,11 @@ export const Filters: FC<{
             <h4>Years</h4>
             <div className={styles.filters__dates}>
               <Input
-                onKeyDown={(e) => e.key === "Enter" && !!callback && callback()}
+                onKeyDown={(e) =>
+                  e.key === "Enter" &&
+                  !!filters &&
+                  pushFiltersToQuery(filters, router)
+                }
                 containerStyles={{ width: "100%" }}
                 disabled={isLoading}
                 placeholder="Start..."
@@ -370,7 +382,11 @@ export const Filters: FC<{
               />
               <div className={styles.filters__line}></div>
               <Input
-                onKeyDown={(e) => e.key === "Enter" && !!callback && callback()}
+                onKeyDown={(e) =>
+                  e.key === "Enter" &&
+                  !!filters &&
+                  pushFiltersToQuery(filters, router)
+                }
                 containerStyles={{ width: "100%" }}
                 disabled={isLoading}
                 placeholder="End..."
