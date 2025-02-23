@@ -3,7 +3,6 @@ import { userAPI } from "@/src/lib/shared/api";
 import { ACCESS_TOKEN } from "@/src/lib/shared/constants";
 import { IUser } from "@/src/lib/shared/types/auth";
 import { IFollowings, ILogs } from "@/src/lib/shared/types/user.type";
-import { mergeLogs } from "@/src/lib/shared/utils/logs";
 import { jwtDecode } from "jwt-decode";
 import { GetServerSidePropsContext } from "next";
 import { FC } from "react";
@@ -45,13 +44,12 @@ export const getServerSideProps = async (
   const user = (await userAPI.getByName(query.name as string)).data;
   const userFollowings = (await userAPI.getUserFollowings(user._id)).data;
   const logsResult = (await userAPI.getUserLogs(user._id)).data;
-  const userLogs = logsResult.length > 0 ? mergeLogs(logsResult[0].logs) : [];
-  //user.raUsername && await userAPI.setRaUserInfo(user._id, user.raUsername)
+  user.raUsername && await userAPI.setRaUserInfo(user._id, user.raUsername)
 
   return {
     props: {
       user: { ...user, followings: userFollowings },
-      userLogs: userLogs || null,
+      userLogs: logsResult[0].logs || null,
       authUserFollowings: authUserFollowings || null,
       authUserId: authUserInfo?.id || null,
     },
