@@ -1,4 +1,4 @@
-💻 **Check out the live site:** [mooncellar.space](https://mooncellar.space)
+💻 **Check out the live site:** [mooncellar.space](https://mooncellar.space/games)
 
 ![NestJS](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white) 
  **Moncellar server written in NestJS** [Server](https://github.com/alexgrist14/MoonCellar-Server) 
