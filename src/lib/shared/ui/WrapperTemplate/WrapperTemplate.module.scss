@@ -19,7 +19,7 @@
     align-items: flex-end;
     padding: 5px;
     border-bottom: 1px solid $wrapperBorderColor;
-    border-radius: 8px 8px 0 0;
+    border-radius: $radius $radius 0 0;
 
     &:only-child {
       width: fit-content;

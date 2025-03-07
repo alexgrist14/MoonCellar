@@ -11,7 +11,7 @@
   .btn {
     display: flex;
     justify-content: space-between;
-    border-radius: 5px;
+    border-radius: $radius;
     gap: 10px;
     color: $neutral-90;
 

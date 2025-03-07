@@ -97,34 +97,34 @@ $border: 2px solid var(--border-color);
     }
 
     &_left {
-      border-radius: 0 0 8px 0;
+      border-radius: 0 0 $radius 0;
 
       &_active {
-        border-radius: 0 0 0 8px;
+        border-radius: 0 0 0 $radius;
       }
     }
 
     &_right {
-      border-radius: 0 0 0 8px;
+      border-radius: 0 0 0 $radius;
 
       &_active {
-        border-radius: 0 0 8px 0;
+        border-radius: 0 0 $radius 0;
       }
     }
 
     &_bottom-left {
-      border-radius: 0 8px 0 0;
+      border-radius: 0 $radius 0 0;
 
       &_active {
-        border-radius: 8px 0 0 0;
+        border-radius: $radius 0 0 0;
       }
     }
 
     &_bottom-right {
-      border-radius: 8px 0 0 0;
+      border-radius: $radius 0 0 0;
 
       &_active {
-        border-radius: 0 8px 0 0;
+        border-radius: 0 $radius 0 0;
       }
     }
 

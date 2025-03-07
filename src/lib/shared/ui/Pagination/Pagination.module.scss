@@ -5,7 +5,7 @@
   margin-inline: auto;
   padding: 2px;
   background-color: $bgAlt;
-  border-radius: 4px;
+  border-radius: $radius;
   filter: drop-shadow(0 0 0.2rem $blackBorderColor);
 
   &_fixed {
@@ -14,7 +14,7 @@
     transform: translateX(-50%);
     z-index: 2;
     bottom: 0;
-    border-radius: 4px 4px 0 0;
+    border-radius: $radius $radius 0 0;
   }
 
   &__input {
