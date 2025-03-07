@@ -1,14 +1,13 @@
 import { authAPI, userAPI } from "@/src/lib/shared/api";
-import { screenMd } from "@/src/lib/shared/constants";
-import { useWindowResizeAction } from "@/src/lib/shared/hooks";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { FC, ReactNode, useEffect, useState } from "react";
+import { FC, ReactNode, useEffect } from "react";
 import styles from "./Layout.module.scss";
 import { Header } from "./components";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
 import { useResizeDetector } from "react-resize-detector";
-import { Shadow } from "@/src/lib/shared/ui/Shadow";
+import { mediaMax } from "@/src/lib/shared/utils/get-screen-width";
+import { useDebouncedCallback } from "use-debounce";
 
 interface ILayoutProps {
   children: ReactNode;
@@ -20,8 +19,6 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
   const { refreshToken } = authAPI;
   const { setAuth, setProfile, clear, isAuth } = useAuthStore();
   const { setMobile } = useStatesStore();
-
-  const [isShadowActive, setIsShadowActive] = useState(false);
 
   const { ref } = useResizeDetector({
     refreshMode: "debounce",
@@ -41,9 +38,17 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
       });
   }, [clear, getById, isAuth, refreshToken, setAuth, setProfile]);
 
-  useWindowResizeAction(() => {
-    setMobile(window.innerWidth <= screenMd);
-  });
+  const debouncedSetMobile = useDebouncedCallback(() => {
+    setMobile(mediaMax(768));
+  }, 300);
+
+  useEffect(() => {
+    debouncedSetMobile();
+
+    window.addEventListener("resize", debouncedSetMobile);
+
+    return () => window.removeEventListener("resize", debouncedSetMobile);
+  }, []);
 
   return (
     <div className={className}>
@@ -51,15 +56,10 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
       <Scrollbar
         stl={styles}
         type="absolute"
-        onScrollBottom={(isBottom) => {
-          if (isBottom !== isShadowActive) {
-            setIsShadowActive(isBottom);
-          }
-        }}
+        fadeType="bottom"
       >
         <main className={"container"} ref={ref}>
           {children}
-          <Shadow isActive={isShadowActive} isFixed />
         </main>
       </Scrollbar>
     </div>

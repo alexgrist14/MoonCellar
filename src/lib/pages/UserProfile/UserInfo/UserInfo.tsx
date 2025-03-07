@@ -10,8 +10,6 @@ import Link from "next/link";
 import { FC, useMemo, useState } from "react";
 import styles from "./UserInfo.module.scss";
 import Markdown from "react-markdown";
-import { Diagram } from "@/src/lib/shared/ui/Diagram";
-import { userListCategories } from "@/src/lib/shared/constants/user.const";
 
 interface UserInfoProps {
   user: IUser;
@@ -26,7 +24,7 @@ const UserInfo: FC<UserInfoProps> = ({
   authUserId,
   logs,
 }) => {
-  const { _id: id, followings: userFollowings, userName, games } = user;
+  const { _id: id, followings: userFollowings, userName } = user;
 
   const [userAuthFollowings, setUserAuthFollowings] =
     useState<IFollowings>(authUserFollowings);
@@ -60,11 +58,11 @@ const UserInfo: FC<UserInfoProps> = ({
           .then((res) => setUserAuthFollowings(res.data));
   };
 
-  const diagramData = {} as any;
-
-  userListCategories.map((category) => {
-    diagramData[`${category}`] = games[`${category}`].length;
-  });
+  // const diagramData = {} as any;
+  //
+  // userListCategories.map((category) => {
+  //   diagramData[`${category}`] = games[`${category}`].length;
+  // });
 
   return (
     <>

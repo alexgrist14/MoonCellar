@@ -110,9 +110,9 @@
     position: absolute;
     left: 0px;
     right: 0;
-    background: linear-gradient(180deg, rgba($lightBg, 0) 0%, $lightBg 100%);
+    background: linear-gradient(180deg, rgba($bg, 0) 0%, $bg 100%);
     pointer-events: none;
-    transition: 0.1s;
+    transition: 0.4s;
 
     &_top {
       top: 0;
