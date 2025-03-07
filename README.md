@@ -1,5 +1,7 @@
-💻 **Check out the live site:** [mooncellar.space](https://mooncellar.space)
+💻 **Check out the live site:** [mooncellar.space](https://mooncellar.space/games)
 
+![NestJS](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white) 
+ **Moncellar server written in NestJS** [Server](https://github.com/alexgrist14/MoonCellar-Server) 
 # 🌙 MoonCellar.Space
 
 MoonCellar.Space is a sleek, modern gaming database that empowers users to manage their gaming journey. Built with **Next.js** and styled with **SASS**, this platform provides a seamless experience for tracking games, organizing wishlists, and rating titles. 
@@ -13,8 +15,8 @@ MoonCellar.Space is a sleek, modern gaming database that empowers users to manag
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: [Next.js](https://nextjs.org/) - A powerful React framework for building dynamic web applications.
-- **Styling**: [SASS](https://sass-lang.com/) - A CSS preprocessor to make styles more maintainable and organized.
+- **Frontend**: ![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white) [Next.js](https://nextjs.org/) - A powerful React framework for building dynamic web applications.
+- **Styling**: ![SASS](https://img.shields.io/badge/SASS-hotpink.svg?style=for-the-badge&logo=SASS&logoColor=white) [SASS](https://sass-lang.com/) - A CSS preprocessor to make styles more maintainable and organized.
 
 ## 💡 Getting Started
 
