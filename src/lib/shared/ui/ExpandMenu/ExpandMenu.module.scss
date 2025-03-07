@@ -16,10 +16,11 @@ $border: 2px solid var(--border-color);
   animation: appearOpacity 0.4s forwards 1 ease;
   top: $headerHeight;
   height: calc(100vh - $headerHeight);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(6px);
 
   &_active {
     transform: translate3d(100%, 0, 0);
+    z-index: 4;
   }
 
   &_right.menu_active {
@@ -40,7 +41,7 @@ $border: 2px solid var(--border-color);
     rotate: 270deg;
 
     & path {
-      fill: $whiteTextColor;
+      fill: var(--white-text-color);
     }
 
     &_active {
@@ -51,7 +52,6 @@ $border: 2px solid var(--border-color);
   &__title {
     position: absolute;
     top: 0;
-    background-color: var(--bg-alt);
     opacity: 0.9;
     padding: 5px;
     user-select: none;
@@ -61,8 +61,12 @@ $border: 2px solid var(--border-color);
     z-index: 4;
     width: 40vw;
     max-width: 200px;
-    transform: translate3d(0, 0, 0);
     cursor: pointer;
+    background-color: var(--bg);
+
+    &:hover {
+      filter: brightness(1.2);
+    }
 
     @include flexCenter;
     @include textEllipsis;
@@ -79,7 +83,7 @@ $border: 2px solid var(--border-color);
       left: 100%;
 
       &_active {
-        transform: translate3d(-100%, 0, 0);
+        transform: translateX(-100%);
       }
     }
 
@@ -88,59 +92,39 @@ $border: 2px solid var(--border-color);
       right: 100%;
 
       &_active {
-        transform: translate3d(100%, 0, 0);
+        transform: translateX(100%);
       }
     }
 
     &_left {
       border-radius: 0 0 8px 0;
-      border-right: $border;
-      border-bottom: $border;
 
       &_active {
         border-radius: 0 0 0 8px;
-        border: 0;
-        border-left: $border;
-        border-bottom: $border;
       }
     }
 
     &_right {
       border-radius: 0 0 0 8px;
-      border-left: $border;
-      border-bottom: $border;
 
       &_active {
         border-radius: 0 0 8px 0;
-        border: 0;
-        border-right: $border;
-        border-bottom: $border;
       }
     }
 
     &_bottom-left {
       border-radius: 0 8px 0 0;
-      border-right: $border;
-      border-top: $border;
 
       &_active {
         border-radius: 8px 0 0 0;
-        border: 0;
-        border-left: $border;
-        border-top: $border;
       }
     }
 
     &_bottom-right {
       border-radius: 8px 0 0 0;
-      border-left: $border;
-      border-top: $border;
 
       &_active {
         border-radius: 0 8px 0 0;
-        border: 0;
-        border-right: $border;
-        border-top: $border;
       }
     }
 
@@ -148,6 +132,10 @@ $border: 2px solid var(--border-color);
       bottom: 0;
       top: unset;
     }
+  }
+
+  &_disabled {
+    opacity: 0;
   }
 }
 

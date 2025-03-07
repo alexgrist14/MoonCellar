@@ -13,6 +13,7 @@
     justify-content: space-between;
     border-radius: 5px;
     gap: 10px;
+    color: $neutral-90;
 
     & > span:nth-child(2) {
       color: $neutral-80;
@@ -39,16 +40,14 @@
     }
   }
 
-  .list {
-    .last {
-      color: $neutral-80;
-      border-top: 1px solid $lightBg;
-      div {
-        display: flex;
-        width: 100%;
-        justify-content: space-between;
-        align-items: center;
-      }
+  .last {
+    color: $neutral-80;
+    border-top: 1px solid $lightBg;
+    div {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      align-items: center;
     }
   }
 }

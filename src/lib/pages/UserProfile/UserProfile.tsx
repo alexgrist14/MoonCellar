@@ -60,7 +60,6 @@ const UserProfile: FC<UserProfileProps> = ({
             />
           }
           titleStyle={{ width: "fit-content" }}
-          menuStyle={{ height: "fit-content" }}
         >
           <UserNavigation
             games={games}

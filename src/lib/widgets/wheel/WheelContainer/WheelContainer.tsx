@@ -70,7 +70,6 @@ export const WheelContainer: FC = () => {
           <ExpandMenu
             position="bottom-left"
             titleOpen="Settings"
-            menuStyle={{ height: "fit-content" }}
           >
             <WrapperTemplate
               isWithBlur
@@ -98,7 +97,6 @@ export const WheelContainer: FC = () => {
             <ExpandMenu
               position="bottom-right"
               titleOpen="Links"
-              menuStyle={{ height: "fit-content" }}
             >
               <GameButtons game={winner} />
             </ExpandMenu>

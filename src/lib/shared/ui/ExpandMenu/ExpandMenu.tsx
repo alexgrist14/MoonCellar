@@ -52,13 +52,11 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
       key={position}
       className={classNames(styles.menu, {
         [styles.menu_right]: position.includes("right"),
+        [styles.menu_disabled]:
+          isMobile && !isActive,
         [styles.menu_active]: isActive,
       })}
       style={{
-        zIndex:
-          isActive && !!expanded?.length
-            ? 3 + expanded.findIndex((exp) => exp === position) + 1
-            : 3,
         ...(position.includes("bottom") && { top: "unset", bottom: "0" }),
         ...menuStyle,
       }}
