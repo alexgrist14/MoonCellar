@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { devtools } from "zustand/middleware";
+import { devtools, persist } from "zustand/middleware";
 import { IUser } from "../types/auth";
 
 type IState = {
@@ -15,17 +15,19 @@ type IAction = {
 
 export const useAuthStore = create<IState & IAction>()(
   devtools(
-    (set) => ({
-      isAuth: false,
-      setAuth: (isAuth) => set({ isAuth }),
-      setProfile: (profile) => set({ profile }),
-      clear: () => {
-        set({
-          isAuth: false,
-          profile: undefined,
-        });
-      },
-    }),
-    { name: "auth" },
+    persist(
+      (set) => ({
+        isAuth: false,
+        setAuth: (isAuth) => set({ isAuth }),
+        setProfile: (profile) => set({ profile }),
+        clear: () => {
+          set({
+            isAuth: false,
+            profile: undefined,
+          });
+        },
+      }),
+      { name: "auth" },
+    ),
   ),
 );

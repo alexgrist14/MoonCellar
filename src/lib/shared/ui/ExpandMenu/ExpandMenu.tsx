@@ -1,7 +1,7 @@
-import {CSSProperties, FC, HTMLAttributes, ReactNode, useRef } from "react";
+import { CSSProperties, FC, HTMLAttributes, ReactNode, useRef } from "react";
 import styles from "./ExpandMenu.module.scss";
 import { Scrollbar } from "../Scrollbar";
-import { useCommonStore } from "../../store/common.store";
+import { IExpandPosition, useCommonStore } from "../../store/common.store";
 import classNames from "classnames";
 import { createPortal } from "react-dom";
 import { useStatesStore } from "../../store/states.store";
@@ -9,11 +9,12 @@ import { useResizeDetector } from "react-resize-detector";
 
 interface IExpandMenuProps
   extends Pick<HTMLAttributes<HTMLDivElement>, "children" | "id"> {
-  position?: "left" | "right";
+  position?: IExpandPosition;
   titleOpen?: string | ReactNode;
   titleClose?: string | ReactNode;
   titleClassName?: string;
   menuStyle?: CSSProperties;
+  titleStyle?: CSSProperties;
 }
 
 export const ExpandMenu: FC<IExpandMenuProps> = ({
@@ -23,13 +24,15 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
   titleOpen,
   titleClassName,
   menuStyle,
+  titleStyle,
   ...props
 }) => {
   const expandRef = useRef<HTMLDivElement>(null);
+
   const { expanded, setExpanded } = useCommonStore();
   const { isMobile } = useStatesStore();
 
-  const isActive = expanded === "both" || expanded === position;
+  const isActive = expanded?.includes(position);
 
   const { ref } = useResizeDetector({
     refreshMode: "debounce",
@@ -37,7 +40,7 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
   });
 
   if (isMobile === undefined) return null;
-  
+
   const connector = document.getElementById("expand-connector");
 
   if (!connector) return null;
@@ -48,49 +51,56 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
       id={position}
       key={position}
       className={classNames(styles.menu, {
-        [styles.menu_disabled]:
-          isMobile && !isActive && !!expanded && expanded !== "none",
-        [styles.menu_right]: position === "right",
+        [styles.menu_right]: position.includes("right"),
         [styles.menu_active]: isActive,
       })}
       style={{
-        ...(position === "left" ? { gridTemplateColumns: "1fr 2px" } : { gridTemplateColumns: "2px 1fr" }),
-        ...(position === "left" ? { gridTemplateAreas: "'content expand'" } : { gridTemplateAreas: "'expand content'" }),
+        zIndex:
+          isActive && !!expanded?.length
+            ? 3 + expanded.findIndex((exp) => exp === position) + 1
+            : 3,
+        ...(position.includes("bottom") && { top: "unset", bottom: "0" }),
         ...menuStyle,
       }}
       {...props}
     >
-      <Scrollbar type="absolute" stl={styles}>
-        <div ref={ref}>{children}</div>
-      </Scrollbar>
-      <div
-        className={classNames(styles.menu__expand)}
-        onClick={() => {
-          if (expanded === undefined) return setExpanded(position);
-          if (expanded === "both")
-            return setExpanded(position === "left" ? "right" : "left");
-          if (expanded !== "none" && expanded !== position)
-            return setExpanded("both");
-          if (expanded === "none" || expanded !== position)
-            return setExpanded(position);
-
-          setExpanded("none");
+      <Scrollbar
+        type="absolute"
+        stl={styles}
+        contentStyle={{
+          ...(position.includes("bottom")
+            ? { paddingBottom: "55px" }
+            : { paddingTop: "55px" }),
         }}
       >
-        <div
-          className={classNames(
-            styles.menu__title,
-            styles[`menu__title_${position}`],
-            titleClassName,
-            {
-              [styles[`menu__title_${position}_active`]]: isActive,
-            }
-          )}
-        >
-          <span>{isActive ? titleClose || "Close" : titleOpen || "Open"}</span>
+        <div className={styles.menu__content} ref={ref}>
+          {children}
         </div>
+      </Scrollbar>
+      <div
+        onClick={() => {
+          setExpanded(
+            isActive
+              ? expanded?.filter((pos) => pos !== position) || []
+              : !!expanded?.length
+                ? [...expanded, position]
+                : [position],
+          );
+        }}
+        className={classNames(
+          styles.menu__title,
+          styles[`menu__title_${position}`],
+          titleClassName,
+          {
+            [styles[`menu__title_${position}_active`]]: isActive,
+            [styles.menu__title_bottom]: position.includes("bottom"),
+          },
+        )}
+        style={titleStyle}
+      >
+        <span>{isActive ? titleClose || "Close" : titleOpen || "Open"}</span>
       </div>
     </div>,
-    connector
+    connector,
   );
 };

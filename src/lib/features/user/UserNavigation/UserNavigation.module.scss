@@ -1,0 +1,54 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: fit-content;
+  width: 100%;
+  min-width: 200px;
+  position: sticky;
+  top: 70px;
+
+  .btn {
+    display: flex;
+    justify-content: space-between;
+    border-radius: 5px;
+    gap: 10px;
+
+    & > span:nth-child(2) {
+      color: $neutral-80;
+    }
+
+    div {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+
+      .avatar {
+        width: 34px;
+        height: 34px;
+
+        div {
+          img {
+            border-radius: $radius;
+          }
+        }
+      }
+      svg {
+        color: $neutral-80;
+      }
+    }
+  }
+
+  .list {
+    .last {
+      color: $neutral-80;
+      border-top: 1px solid $lightBg;
+      div {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+  }
+}

@@ -6,10 +6,10 @@
   height: fit-content;
   max-width: calc(100vw - 40px);
   margin-inline: auto;
-  background: rgba($wrapperBGColor, 0.8); 
+  background: rgba($wrapperBGColor, 0.8);
   box-shadow: $shadowBorder;
   color: $wrapperTextColor;
-  @include mediaSm{
+  @include mediaSm {
     max-width: 100%;
   }
 
@@ -19,7 +19,6 @@
     align-items: flex-end;
     padding: 5px;
     border-bottom: 1px solid $wrapperBorderColor;
-    background-color: $wrapperBGColor;
     border-radius: 8px 8px 0 0;
 
     &:only-child {
@@ -45,10 +44,10 @@
   }
 
   &__content {
-    padding: 24px 32px;
+    padding: 5px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 3px;
 
     @include mediaSm {
       padding: 12px 16px;

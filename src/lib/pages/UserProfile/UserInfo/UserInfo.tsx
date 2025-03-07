@@ -62,7 +62,7 @@ const UserInfo: FC<UserInfoProps> = ({
 
   const diagramData = {} as any;
 
-  userListCategories.map((category, i) => {
+  userListCategories.map((category) => {
     diagramData[`${category}`] = games[`${category}`].length;
   });
 
@@ -100,7 +100,6 @@ const UserInfo: FC<UserInfoProps> = ({
             </div>
           </div>
           <div className={styles.diagram}>
-            <Diagram data={diagramData} />
             <div className={styles.friends}>
               <h3 className={styles.title}>Friends</h3>
               <div className={styles.friends__list}>

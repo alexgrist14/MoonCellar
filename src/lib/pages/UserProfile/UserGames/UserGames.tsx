@@ -1,17 +1,12 @@
 import { FC, useEffect, useState } from "react";
 import styles from "./UserGames.module.scss";
-import {
-  CategoriesType,
-  IGamesRating,
-  UserGamesType,
-} from "@/src/lib/shared/types/user.type";
+import { CategoriesType, IGamesRating } from "@/src/lib/shared/types/user.type";
 import { GameCard } from "@/src/lib/shared/ui/GameCard";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { Icon } from "@iconify/react";
 import { useRouter } from "next/router";
 import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
 import classNames from "classnames";
-import { Tooltip } from "@/src/lib/shared/ui/Tooltip";
 import { userAPI } from "@/src/lib/shared/api";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 
@@ -84,7 +79,7 @@ export const UserGames: FC<UserGamesProps> = ({
 
   return (
     <div className={styles.container}>
-      <div className={styles.sort} onClick={toggleSortOrder}>
+      {/*<div className={styles.sort} onClick={toggleSortOrder}>
         <Icon
           className={classNames(styles.sort__icon, {
             [styles.sort__icon_active]: sortOrder === "asc",
@@ -92,7 +87,7 @@ export const UserGames: FC<UserGamesProps> = ({
           icon="iconamoon:sorting-left"
         />
         <p>Date</p>
-      </div>
+      </div>*/}
 
       <div className={classNames(styles.games)}>
         {!!sortedGames ? (

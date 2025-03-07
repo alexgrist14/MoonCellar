@@ -22,7 +22,6 @@
     grid-template-columns: repeat(5, 1fr);
     height: 100%;
     margin-inline: auto;
-    margin-top: 20px;
     gap: 40px;
   
     @include mediaLg {

@@ -1,51 +1,38 @@
+$border: 2px solid var(--border-color);
+
 .menu {
   display: grid;
   position: fixed;
   width: max(30vw, 360px);
-  max-width: min(calc(50vw - 2px), 500px);
-  transition: transform 0.4s, filter 0.4s, opacity 0.4s;
+  max-width: min(50vw, 500px);
+  transition:
+    transform 0.4s,
+    filter 0.4s,
+    opacity 0.4s;
   z-index: 3;
-  background: rgba($bgAlt, 0.7);
-  right: calc(100% - 2px);
+  background: rgba($bgAlt, 0.9);
+  right: 100%;
   transform: translate3d(0, 0, 0);
-  filter: drop-shadow(0 0 0.2rem $bg);
   animation: appearOpacity 0.4s forwards 1 ease;
   top: $headerHeight;
   height: calc(100vh - $headerHeight);
+  backdrop-filter: blur(10px);
 
   &_active {
-    transform: translate3d(calc(100% - 2px), 0, 0);
+    transform: translate3d(100%, 0, 0);
   }
 
   &_right.menu_active {
-    transform: translate3d(calc(-100% + 2px), 0, 0);
+    transform: translate3d(-100%, 0, 0);
   }
 
   &_right {
-    left: calc(100% - 2px);
-  }
-
-  &_disabled {
-    filter: unset;
-    pointer-events: none;
-    z-index: -1;
-    opacity: 0;
+    left: 100%;
   }
 
   @include mediaSm {
     width: 100%;
     max-width: 100%;
-  }
-
-  &__expand {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    background-color: $lightBg;
-    cursor: pointer;
-    grid-area: expand;
-    position: relative;
   }
 
   &__chevron {
@@ -62,43 +49,104 @@
   }
 
   &__title {
-    @include flexCenter;
     position: absolute;
     top: 0;
-    background-color: $lightBg;
-    width: fit-content;
-    padding: 10px;
+    background-color: var(--bg-alt);
+    opacity: 0.9;
+    padding: 5px;
     user-select: none;
-    transition: transform 0.3s, border-radius 0.3s;
-    white-space: nowrap;
+    transition:
+      transform 0.3s,
+      border-radius 0.3s;
     z-index: 4;
-    width: 45vw;
-    max-width: 240px;
-    @include textEllipsis;
+    width: 40vw;
+    max-width: 200px;
     transform: translate3d(0, 0, 0);
+    cursor: pointer;
+
+    @include flexCenter;
+    @include textEllipsis;
 
     & > span {
-      margin-top: -2px;
+      display: flex;
+      height: 34px;
+
+      @include flexCenter;
+    }
+
+    &_left,
+    &_bottom-left {
+      left: 100%;
+
+      &_active {
+        transform: translate3d(-100%, 0, 0);
+      }
+    }
+
+    &_right,
+    &_bottom-right {
+      right: 100%;
+
+      &_active {
+        transform: translate3d(100%, 0, 0);
+      }
     }
 
     &_left {
-      left: 100%;
       border-radius: 0 0 8px 0;
+      border-right: $border;
+      border-bottom: $border;
 
       &_active {
-        transform: translate3d(calc(-100% - 1px), 0, 0);
         border-radius: 0 0 0 8px;
+        border: 0;
+        border-left: $border;
+        border-bottom: $border;
       }
     }
 
     &_right {
-      right: 100%;
       border-radius: 0 0 0 8px;
+      border-left: $border;
+      border-bottom: $border;
 
       &_active {
-        transform: translate3d(calc(100% + 1px), 0, 0);
         border-radius: 0 0 8px 0;
+        border: 0;
+        border-right: $border;
+        border-bottom: $border;
       }
+    }
+
+    &_bottom-left {
+      border-radius: 0 8px 0 0;
+      border-right: $border;
+      border-top: $border;
+
+      &_active {
+        border-radius: 8px 0 0 0;
+        border: 0;
+        border-left: $border;
+        border-top: $border;
+      }
+    }
+
+    &_bottom-right {
+      border-radius: 8px 0 0 0;
+      border-left: $border;
+      border-top: $border;
+
+      &_active {
+        border-radius: 0 8px 0 0;
+        border: 0;
+        border-right: $border;
+        border-top: $border;
+      }
+    }
+
+    &_bottom {
+      bottom: 0;
+      top: unset;
     }
   }
 }
@@ -111,16 +159,13 @@
   div &__container {
     max-height: 100%;
     overflow: hidden;
-    grid-area: content;
   }
 
   div &__content {
     display: grid;
     margin: 0;
     padding: 20px;
-    padding-top: 50px;
     max-height: 100%;
-    border-top: 2px solid $borderColor;
   }
 
   div &__scrollbar {

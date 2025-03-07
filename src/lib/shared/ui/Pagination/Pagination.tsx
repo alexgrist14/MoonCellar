@@ -72,7 +72,6 @@ export const Pagination: FC<{
             setPage(value > max ? max : value, router);
           }}
         />
-        {` of ${max}`}
       </div>
       <Button
         color="accent"

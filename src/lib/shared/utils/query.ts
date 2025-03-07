@@ -1,17 +1,19 @@
 import { NextRouter } from "next/router";
 import queryString from "query-string";
 
-// const addQuery = (router: NextRouter) => {
-//   const { query, push, asPath } = router;
-//   return push({ pathname: asPath, query }, undefined, { shallow: true });
-// };
-
-export const setPage = (page: number, router: NextRouter) => {
+export const setQuery = (
+  value: { [key: string]: string | number },
+  router: NextRouter,
+) => {
   const { query, push, pathname } = router;
 
   push(
-    { pathname, query: queryString.stringify({ ...query, page }) },
+    { pathname, query: queryString.stringify({ ...query, ...value }) },
     undefined,
-    { shallow: true }
+    { shallow: true },
   );
+};
+
+export const setPage = (page: number, router: NextRouter) => {
+  setQuery({ page }, router);
 };

@@ -6,7 +6,7 @@
   width: 100%;
   height: $headerHeight;
   background: rgba($bgAlt, 0.9);
-  outline: 2px $borderColor solid;
+  border-bottom: 2px $borderColor solid;
   z-index: 1;
   position: fixed;
   top: 0;

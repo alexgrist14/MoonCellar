@@ -17,6 +17,7 @@ interface IWrapperTemplateProps {
   className?: string;
   classNameContent?: string;
   isWithScrollBar?: boolean;
+  isWithBlur?: boolean;
 }
 
 export const WrapperTemplate: FC<IWrapperTemplateProps> = ({
@@ -27,6 +28,7 @@ export const WrapperTemplate: FC<IWrapperTemplateProps> = ({
   className,
   classNameContent,
   isWithScrollBar,
+  isWithBlur,
   ...headProps
 }) => {
   const { ref } = useResizeDetector({
@@ -37,7 +39,13 @@ export const WrapperTemplate: FC<IWrapperTemplateProps> = ({
   return (
     <div className={cn(styles.wrapper, className)} style={wrapperStyle}>
       <WrapperTemplateHead {...headProps} isExternal />
-      <div style={templateStyle} className={styles.template}>
+      <div
+        style={{
+          backdropFilter: isWithBlur ? "blur(6px)" : undefined,
+          ...templateStyle,
+        }}
+        className={styles.template}
+      >
         <WrapperTemplateHead {...headProps} />
         <div
           ref={ref}

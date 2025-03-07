@@ -14,6 +14,7 @@ import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
 import { MobileMenu } from "@/src/lib/shared/ui/MobileMenu";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import { GameButtons } from "@/src/lib/shared/ui/GameButtons";
+import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
 
 export const WheelContainer: FC = () => {
   const { winner, games, royalGames } = useGamesStore();
@@ -65,50 +66,95 @@ export const WheelContainer: FC = () => {
   }, [wheelGames, isLoading]);
 
   return (
-    <div className={styles.container}>
-      <MobileMenu
-        title="Settings/Links"
-        style={{ gap: "20px", display: "grid" }}
-      >
-        <WrapperTemplate
-          contentStyle={{ padding: "10px", paddingBottom: "15px" }}
-        >
-          <ToggleSwitch
-            clickCallback={(result) => {
-              setRoyal(result === "ON");
-            }}
-            label="Royal mode:"
-          />
-          <RangeSelector
-            min={0.1}
-            max={20}
-            step={0.1}
-            defaultValue={timer}
-            callback={(value) => setTimer(value)}
-            text={`Time: ${timer} seconds`}
-          />
-        </WrapperTemplate>
-        {!!winner && <GameButtons game={winner} />}
-      </MobileMenu>
-      <WheelComponent
-        wheelGames={wheelGames}
-        setWheelGames={setWheelGames}
-        time={timer}
-        segColors={colors}
-        primaryColor="black"
-        contrastColor="white"
-        buttonText={
-          isLoading ? "Loading..." : !isFinished ? "Spinning..." : "Spin"
-        }
-        size={295}
-      />
-      {!!winner && (
-        <GameCard
-          spreadDirection={isMobile ? "height" : "width"}
-          className={styles.winner}
-          game={winner}
-        />
+    <>
+      {isMobile && (
+        <>
+          <ExpandMenu
+            position="bottom-left"
+            titleOpen="Settings"
+            menuStyle={{ height: "fit-content" }}
+          >
+            <WrapperTemplate
+              isWithBlur
+              contentStyle={{
+                gap: "15px",
+              }}
+            >
+              <ToggleSwitch
+                clickCallback={(result) => {
+                  setRoyal(result === "ON");
+                }}
+                label="Royal mode:"
+              />
+              <RangeSelector
+                min={0.1}
+                max={20}
+                step={0.1}
+                defaultValue={timer}
+                callback={(value) => setTimer(value)}
+                text={`Time: ${timer} seconds`}
+              />
+            </WrapperTemplate>
+          </ExpandMenu>
+          {!!winner && (
+            <ExpandMenu
+              position="bottom-right"
+              titleOpen="Links"
+              menuStyle={{ height: "fit-content" }}
+            >
+              <GameButtons game={winner} />
+            </ExpandMenu>
+          )}
+        </>
       )}
-    </div>
+      <div className={styles.container}>
+        {!isMobile && (
+          <WrapperTemplate
+            isWithBlur
+            contentStyle={{
+              padding: "10px",
+              gap: "15px",
+            }}
+          >
+            <WrapperTemplate>
+              <ToggleSwitch
+                clickCallback={(result) => {
+                  setRoyal(result === "ON");
+                }}
+                label="Royal mode:"
+              />
+              <RangeSelector
+                min={0.1}
+                max={20}
+                step={0.1}
+                defaultValue={timer}
+                callback={(value) => setTimer(value)}
+                text={`Time: ${timer} seconds`}
+              />
+            </WrapperTemplate>
+            {!!winner && <GameButtons game={winner} />}
+          </WrapperTemplate>
+        )}
+        <WheelComponent
+          wheelGames={wheelGames}
+          setWheelGames={setWheelGames}
+          time={timer}
+          segColors={colors}
+          primaryColor="black"
+          contrastColor="white"
+          buttonText={
+            isLoading ? "Loading..." : !isFinished ? "Spinning..." : "Spin"
+          }
+          size={295}
+        />
+        {!!winner && (
+          <GameCard
+            spreadDirection={isMobile ? "height" : "width"}
+            className={styles.winner}
+            game={winner}
+          />
+        )}
+      </div>
+    </>
   );
 };

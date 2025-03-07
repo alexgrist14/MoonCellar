@@ -7,6 +7,8 @@ import {
   IGDBPlatform,
 } from "../types/igdb";
 
+export type IExpandPosition = "left" | "right" | "bottom-left" | "bottom-right";
+
 type IState = {
   systems?: IGDBPlatform[];
   families?: IGDBFamily[];
@@ -14,7 +16,7 @@ type IState = {
   gameModes?: IGDBDefault[];
   themes?: IGDBDefault[];
   keywords?: IGDBDefault[];
-  expanded?: "left" | "right" | "both" | "none";
+  expanded?: IExpandPosition[];
   timer: number;
 };
 
@@ -25,7 +27,7 @@ type IAction = {
   setGenres: (genres: IGDBGenre[]) => void;
   setFamilies: (families: IGDBFamily[]) => void;
   setSystems: (platforms: IGDBPlatform[]) => void;
-  setExpanded: (expanded: "left" | "right" | "both" | "none") => void;
+  setExpanded: (expanded: IExpandPosition[]) => void;
   setTimer: (timer: number) => void;
 };
 
@@ -44,6 +46,6 @@ export const useCommonStore = create<IState & IAction>()(
     }),
     {
       name: "common",
-    }
-  )
+    },
+  ),
 );
