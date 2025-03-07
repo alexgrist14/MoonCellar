@@ -1,13 +1,14 @@
 import React from "react";
-import type { SVGProps } from "react";
+import type { FC } from "react";
 
-export const SvgSearch = (props: SVGProps<SVGSVGElement>) => {
+export const SvgArrow: FC<{ className?: string }> = ({ className }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
       viewBox="0 0 24 24"
+      className={className}
     >
       <path
         fill="none"
@@ -15,7 +16,7 @@ export const SvgSearch = (props: SVGProps<SVGSVGElement>) => {
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth="2"
-        d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0m18 11l-6-6"
+        d="M5 12h14M5 12l4-4m-4 4l4 4"
       />
     </svg>
   );

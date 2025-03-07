@@ -2,7 +2,7 @@
   width: 100%;
   height: 30px;
   border-radius: $radius;
-  background: $lightBg;
+  background: $lightBgSecond;
   font-size: 1.2rem;
   padding-left: 10px;
   padding-top: 3px;
@@ -14,18 +14,15 @@
 
 .content__top {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   flex-wrap: wrap;
   @include mediaMd {
+    margin-top: -55px;
     gap: 20px;
-    gap: 20px;
-  }
-  .diagram{
-    margin-top: 50px;
   }
   .friends {
     width: 100%;
-    width: 400px;
+    margin-top: 10px;
     border-radius: $radius;
     @include mediaMd {
       width: 100%;
@@ -44,8 +41,25 @@
   }
   .profile {
     display: flex;
+    justify-content: space-between;
     flex-wrap: wrap;
     gap: 20px;
+
+    .diagram {
+      width: 400px;
+      @include mediaMax(1380px) {
+        width: 100%;
+      }
+    }
+    &__left {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      @include mediaMd {
+        justify-content: center;
+        text-align: center;
+      }
+    }
     &__info {
       margin-bottom: 20px;
     }
@@ -54,12 +68,17 @@
     }
     &__description {
       margin-top: 10px;
-      max-width: 600px;
+      max-width: 450px;
       width: fit-content;
       border-radius: $radius;
       background-color: $lightBgSecond;
       padding: 10px;
       white-space: pre-wrap;
+      text-align: left;
+      *{
+        font-size: 0.8rem;
+
+      }
       li {
         margin-left: 12px;
         list-style: initial;

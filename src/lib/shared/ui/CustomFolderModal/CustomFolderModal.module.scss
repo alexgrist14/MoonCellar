@@ -1,0 +1,32 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  background: $bg;
+  width: 250px;
+  height: fit-content;
+  border-radius: $radius;
+  .img{
+    width: 250px;
+    height: 300px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url("https://png.klev.club/uploads/posts/2024-05/png-klev-club-dqu0-p-dulya-png-3.png");
+  }
+  h2{
+    padding: 10px;
+    color: $neutral-100;
+  }
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: $neutral-80;
+    border-radius: 0 0 $radius $radius;
+    height: 40px;
+  }
+  svg {
+    color: $neutral-90;
+    width: 14px;
+    height: 14px;
+  }
+}

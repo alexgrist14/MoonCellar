@@ -27,4 +27,5 @@ export interface IUser {
   description: string;
   raUsername?: string;
   raAwards?: IRAAward[];
+  background?: string;
 }

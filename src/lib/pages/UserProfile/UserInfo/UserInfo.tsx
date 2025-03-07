@@ -62,57 +62,60 @@ const UserInfo: FC<UserInfoProps> = ({
 
   const diagramData = {} as any;
 
-  userListCategories.map((category,i)=>{
+  userListCategories.map((category, i) => {
     diagramData[`${category}`] = games[`${category}`].length;
-  })
+  });
 
   return (
     <>
       <div className={styles.content__top}>
         <div className={styles.profile}>
-          <div className={styles.profile__image}>
-            <Image
-              key={id}
-              src={commonUtils.getAvatar(user) || "/images/user.png"}
-              width={160}
-              height={160}
-              alt="profile"
-              className={styles.image}
-            />
-            {id !== authUserId && (
-              <Button className={styles.btn} onClick={handleFollowClick}>
-                {isFollow ? "Unfollow" : "Follow"}
-              </Button>
-            )}
-          </div>
-          <div className={styles.profile__info}>
-            <div className={styles.profile__name}>{userName}</div>
-            <div className={styles.date}>
-              <span>Last seen:</span> {commonUtils.getHumanDate(user.updatedAt)}
+          <div className={styles.profile__left}>
+            <div className={styles.profile__image}>
+              <Image
+                key={id}
+                src={commonUtils.getAvatar(user) || "/images/user.png"}
+                width={160}
+                height={160}
+                alt="profile"
+                className={styles.image}
+              />
+              {id !== authUserId && (
+                <Button className={styles.btn} onClick={handleFollowClick}>
+                  {isFollow ? "Unfollow" : "Follow"}
+                </Button>
+              )}
             </div>
-            {user.description && (
-              <Markdown className={styles.profile__description}>
-                {user.description}
-              </Markdown>
-            )}
-          </div>
-        </div>
-        <div className={styles.friends}>
-          <h3 className={styles.title}>Friends</h3>
-          <div className={styles.friends__list}>
-            {!!userFollowings &&
-              userFollowings.followings.map((item, i) => (
-                <Link
-                  href={`/user/${item.userName}`}
-                  className={styles.friends__item}
-                  key={`${id}_${i}`}
-                >
-                  <Avatar user={item} />
-                </Link>
-              ))}
+            <div className={styles.profile__info}>
+              <div className={styles.profile__name}>{userName}</div>
+              <div className={styles.date}>
+                <span>Last seen:</span>{" "}
+                {commonUtils.getHumanDate(user.updatedAt)}
+              </div>
+              {user.description && (
+                <Markdown  className={styles.profile__description}>
+                  {user.description}
+                </Markdown>
+              )}
+            </div>
           </div>
           <div className={styles.diagram}>
-          <Diagram data={diagramData}/>
+            <Diagram data={diagramData} />
+            <div className={styles.friends}>
+              <h3 className={styles.title}>Friends</h3>
+              <div className={styles.friends__list}>
+                {!!userFollowings &&
+                  userFollowings.followings.map((item, i) => (
+                    <Link
+                      href={`/user/${item.userName}`}
+                      className={styles.friends__item}
+                      key={`${id}_${i}`}
+                    >
+                      <Avatar user={item} />
+                    </Link>
+                  ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>

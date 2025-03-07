@@ -6,7 +6,7 @@
   height: fit-content;
   max-width: calc(100vw - 40px);
   margin-inline: auto;
-  background: rgba($wrapperBGColor, 0.8);
+  background: rgba($wrapperBGColor, 0.8); 
   box-shadow: $shadowBorder;
   color: $wrapperTextColor;
   @include mediaSm{

@@ -49,6 +49,9 @@
     background-color: transparent;
     border-color: transparent;
     border-radius: 0;
+    &:hover,&_active{
+      background-color: $lightBg;
+    }
   }
 
   &_disabled {

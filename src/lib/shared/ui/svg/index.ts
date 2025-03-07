@@ -10,3 +10,7 @@ export * from "./SvgCamera";
 export * from "./SvgLogo";
 export * from "./SvgProfile";
 export * from "./SvgResize";
+export * from "./SvgBurger";
+export * from "./SvgSettings";
+export * from "./SvgArrow";
+export * from "./SvgPen";

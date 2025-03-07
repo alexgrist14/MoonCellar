@@ -49,7 +49,6 @@ export const UserGames: FC<UserGamesProps> = ({
   // });
 
   useEffect(() => {
-    console.log("1");
     setSortedGames(undefined);
     setCurrentGames(undefined);
     userAPI.getUserGames(userId, gamesCategory).then((res) => {

@@ -41,7 +41,7 @@ $opacity: 0.7;
     position: absolute;
     top: 0;
     left: 0;
-    background: rgba($bg, $opacity);
+    background: $bg;
     @include spread;
   }
 }

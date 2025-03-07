@@ -29,10 +29,7 @@
       @include flexCenter;
       gap: 5px;
       padding: 2px 5px;
-
-      &:hover {
-        background-color: $lightBg;
-      }
+      border-radius: 5px;
     }
   }
 

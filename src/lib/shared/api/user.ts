@@ -25,17 +25,29 @@ const addAvatar = (id: string, file: File) => {
 
   formData.append("file", file);
 
-  return agent.post<string>(
+  return agent.patch<string>(
     `https://api.mooncellar.space/user/profile-picture/${id}`,
     formData,
     {
       headers: { "Content-Type": "multipart/form-data" },
-    },
+    }
   );
 };
 
 const getAvatar = (id: string) => {
   return agent.get<{ fileName: string }>(`${USER_URL}/profile-picture/${id}`);
+};
+
+const addBackground = (id: string, url: string) => {
+  return agent.patch<IUser>(`${USER_URL}/profile-background/${id}`, {
+    url: url,
+  });
+};
+
+const getBackground = (id: string) => {
+  return agent.get<{ background: string }>(
+    `${USER_URL}/profile-background/${id}`
+  );
 };
 
 const getUserGames = (id: string, category: CategoriesType) => {
@@ -45,19 +57,19 @@ const getUserGames = (id: string, category: CategoriesType) => {
 const addGameToCategory = (
   userId: string,
   gameId: number,
-  category: CategoriesType,
+  category: CategoriesType
 ) => {
   return agent.patch<IUser>(
     `${USER_URL}/${userId}/games/${gameId}`,
     undefined,
-    { params: { category } },
+    { params: { category } }
   );
 };
 
 const removeGameFromCategory = (
   userId: string,
   gameId: number,
-  category: CategoriesType,
+  category: CategoriesType
 ) => {
   return agent.delete<IUser>(`${USER_URL}/${userId}/games/${gameId}`, {
     params: { category },
@@ -85,68 +97,68 @@ const getUserLogs = (userId: string) => {
 
 const addUserFollowing = (userId: string, followingId: string) => {
   return agent.patch<IFollowings>(
-    `${USER_URL}/followings/${userId}/${followingId}`,
+    `${USER_URL}/followings/${userId}/${followingId}`
   );
 };
 
 const removeUserFollowing = (userId: string, followingId: string) => {
   return agent.delete<IFollowings>(
-    `${USER_URL}/followings/${userId}/${followingId}`,
+    `${USER_URL}/followings/${userId}/${followingId}`
   );
 };
 
 const addFilter = (userId: string, filter: IUserFilter) => {
-  return agent.post<Pick<IUser, "_id" | "filters">>(
+  return agent.put<Pick<IUser, "_id" | "filters">>(
     `${USER_URL}/filters/${userId}`,
-    filter,
+    filter
   );
 };
 
 const removeFilter = (userId: string, name: string) => {
   return agent.delete<Pick<IUser, "_id" | "filters">>(
     `${USER_URL}/filters/${userId}`,
-    { params: { name } },
+    { params: { name } }
   );
 };
 
 const getFilters = (userId: string) => {
   return agent.get<Pick<IUser, "_id" | "filters">>(
-    `${USER_URL}/filters/${userId}`,
+    `${USER_URL}/filters/${userId}`
   );
 };
 
 const addPreset = (userId: string, preset: IUserPreset) => {
-  return agent.post<Pick<IUser, "_id" | "presets">>(
+  return agent.put<Pick<IUser, "_id" | "presets">>(
     `${USER_URL}/presets/${userId}`,
-    preset,
+    preset
   );
 };
 
 const removePreset = (userId: string, name: string) => {
   return agent.delete<Pick<IUser, "_id" | "presets">>(
     `${USER_URL}/presets/${userId}`,
-    { params: { name } },
+    { params: { name } }
   );
 };
 
 const getPresets = (userId: string) => {
   return agent.get<Pick<IUser, "_id" | "presets">>(
-    `${USER_URL}/presets/${userId}`,
+    `${USER_URL}/presets/${userId}`
   );
 };
 
 const updateDescription = (
   userId: string,
-  descriptionDto: { description: string },
+  descriptionDto: { description: string }
 ) => {
   return agent.patch<IUser>(
     `${USER_URL}/description/${userId}`,
-    descriptionDto,
+    descriptionDto
   );
 };
 
 const setRaUserInfo = (userId: string, raUserName: string) => {
-  return agent.post<IUser>(`${USER_URL}/ra/${userId}/${raUserName}`);
+  return agent.patch<IUser>(`${USER_URL}/ra/${userId}/${raUserName}`);
 };
 
 export const userAPI = {
@@ -171,4 +183,6 @@ export const userAPI = {
   addPreset,
   removePreset,
   getPresets,
+  addBackground,
+  getBackground
 };

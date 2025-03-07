@@ -7,20 +7,27 @@ import { Input } from "@/src/lib/shared/ui/Input";
 import { Textarea } from "@/src/lib/shared/ui/Textarea";
 import { axiosUtils } from "@/src/lib/shared/utils/axios";
 import { toast } from "@/src/lib/shared/utils/toast";
-import { FC, FormEvent, useState } from "react";
+import { Dispatch, FC, FormEvent, SetStateAction, useState } from "react";
 import styles from "./Settings.module.scss";
+import { RangeSelector } from "@/src/lib/shared/ui/RangeSelector";
+import { useSettingsStore } from "@/src/lib/shared/store/settings.store";
 
-interface SettingsProps {}
+interface SettingsProps {
+}
 
-export const Settings: FC<SettingsProps> = ({}) => {
+export const Settings: FC<SettingsProps> = ({ }) => {
   const { isAuth, profile } = useAuthStore();
+  const {bgOpacity, setBgOpacity} = useSettingsStore();
+  
   const { logout } = useAuth();
   const [userName, setUserName] = useState("");
   const [tempAvatar, setTempAvatar] = useState<File>();
   const [description, setDescription] = useState("");
+  const [background, setBackground] = useState("");
   const [raUsername, setRaUserName] = useState("");
 
-  const handleLogoutClick = () => {
+  const handleLogoutClick = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (isAuth && profile) {
       logout(profile._id);
     }
@@ -41,6 +48,8 @@ export const Settings: FC<SettingsProps> = ({}) => {
       apiCalls.push(() => userAPI.addAvatar(profile._id, tempAvatar));
     if (raUsername)
       apiCalls.push(() => userAPI.setRaUserInfo(profile._id, raUsername));
+    if(background)
+      apiCalls.push(() => userAPI.addBackground(profile._id, background));
 
     Promise.all(apiCalls.map((apiCall) => apiCall()))
       .then(() => {
@@ -61,7 +70,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
           <Button
             className={styles.btn}
             color={"red"}
-            onClick={handleLogoutClick}
+            onClick={()=>handleLogoutClick}
           >
             Logout
           </Button>
@@ -97,6 +106,26 @@ export const Settings: FC<SettingsProps> = ({}) => {
             onChange={(e) => setRaUserName(e.target.value)}
           />
         </div>
+
+        <div className={styles.field}>
+        <label htmlFor="bg">Background URL</label>
+          <Input
+            type="text"
+            id="bg"
+            defaultValue={profile?.background}
+            className={styles.input}
+            onChange={(e) => setBackground(e.target.value)}
+          />
+        </div>
+
+          <RangeSelector
+            defaultValue={bgOpacity || 0}
+            callback={(val) => setBgOpacity(val)}
+            min={0}
+            max={100}
+            text={`Background opacity ${bgOpacity || 0}%`}
+            step={1}
+          />
 
         <div className={styles.field}>
           <label htmlFor="description">Description</label>

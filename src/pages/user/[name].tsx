@@ -49,7 +49,7 @@ export const getServerSideProps = async (
   return {
     props: {
       user: { ...user, followings: userFollowings },
-      userLogs: logsResult[0].logs || null,
+      userLogs: logsResult[0]?.logs || null,
       authUserFollowings: authUserFollowings || null,
       authUserId: authUserInfo?.id || null,
     },

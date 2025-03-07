@@ -7,6 +7,8 @@ import { axiosUtils } from "../../utils/axios";
 import { IGDBGameMinimal, IGDBScreenshot } from "../../types/igdb";
 import { getImageLink } from "../../constants";
 import { useDebouncedCallback } from "use-debounce";
+import { useSettingsStore } from "../../store/settings.store";
+import { useAuthStore } from "../../store/auth.store";
 
 interface IBGImageProps {
   game?: IGDBGameMinimal;
@@ -17,6 +19,9 @@ export const BGImage: FC<IBGImageProps> = ({
   game,
   defaultImage = "/images/moon.jpg",
 }) => {
+    const {bgOpacity} = useSettingsStore();
+  
+  const {profile} = useAuthStore();
   const [bg, setBg] = useState<IGDBScreenshot & { gameId: number }>();
   const [isImageReady, setIsImageReady] = useState(false);
   const [isAnimation, setIsAnimation] = useState(true);
@@ -54,7 +59,7 @@ export const BGImage: FC<IBGImageProps> = ({
 
   return (
     <div className={styles.bg__wrapper}>
-      <div className={styles.bg__overlay} />
+      <div className={styles.bg__overlay} style={{opacity: !!bgOpacity ? bgOpacity/100 : 0}} />
       <div
         className={classNames(styles.bg, {
           [styles.bg_active]: isImageReady && isAnimation,
@@ -69,7 +74,7 @@ export const BGImage: FC<IBGImageProps> = ({
           src={
             !!bg?.url
               ? getImageLink(bg.url, "1080p")
-              : defaultImage
+              : profile?.background || defaultImage
           }
           width={1920}
           height={1080}

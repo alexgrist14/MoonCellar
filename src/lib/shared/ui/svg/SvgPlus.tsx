@@ -3,13 +3,18 @@ import { FC } from "react";
 export const SvgPlus: FC<{ className?: string }> = ({ className }) => {
   return (
     <svg
-      className={className}
       xmlns="http://www.w3.org/2000/svg"
-      height="16"
-      width="14"
-      viewBox="0 0 448 512"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      className={className}
     >
-      <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" />
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="M12 3.25a.75.75 0 0 1 .75.75v7.25H20a.75.75 0 0 1 0 1.5h-7.25V20a.75.75 0 0 1-1.5 0v-7.25H4a.75.75 0 0 1 0-1.5h7.25V4a.75.75 0 0 1 .75-.75"
+        clipRule="evenodd"
+      />
     </svg>
   );
 };

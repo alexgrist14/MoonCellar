@@ -1,4 +1,4 @@
-import { FC, HTMLAttributes, ReactNode, useRef } from "react";
+import {CSSProperties, FC, HTMLAttributes, ReactNode, useRef } from "react";
 import styles from "./ExpandMenu.module.scss";
 import { Scrollbar } from "../Scrollbar";
 import { useCommonStore } from "../../store/common.store";
@@ -12,6 +12,8 @@ interface IExpandMenuProps
   position?: "left" | "right";
   titleOpen?: string | ReactNode;
   titleClose?: string | ReactNode;
+  titleClassName?: string;
+  menuStyle?: CSSProperties;
 }
 
 export const ExpandMenu: FC<IExpandMenuProps> = ({
@@ -19,6 +21,8 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
   position = "left",
   titleClose,
   titleOpen,
+  titleClassName,
+  menuStyle,
   ...props
 }) => {
   const expandRef = useRef<HTMLDivElement>(null);
@@ -50,9 +54,9 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
         [styles.menu_active]: isActive,
       })}
       style={{
-        gridTemplateColumns: position === "left" ? "1fr 2px" : "2px 1fr",
-        gridTemplateAreas:
-          position === "left" ? "'content expand'" : "'expand content'",
+        ...(position === "left" ? { gridTemplateColumns: "1fr 2px" } : { gridTemplateColumns: "2px 1fr" }),
+        ...(position === "left" ? { gridTemplateAreas: "'content expand'" } : { gridTemplateAreas: "'expand content'" }),
+        ...menuStyle,
       }}
       {...props}
     >
@@ -77,6 +81,7 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
           className={classNames(
             styles.menu__title,
             styles[`menu__title_${position}`],
+            titleClassName,
             {
               [styles[`menu__title_${position}_active`]]: isActive,
             }

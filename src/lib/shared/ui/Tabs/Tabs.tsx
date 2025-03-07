@@ -4,6 +4,7 @@ import cl from "classnames";
 import styles from "./Tabs.module.scss";
 import Link from "next/link";
 import { ITabContent } from "../../types/tabs";
+import { IButtonColor } from "../../types/buttons";
 
 interface ITabs {
   contents: ITabContent[];
@@ -13,8 +14,10 @@ interface ITabs {
   tabBodyClassName?: string;
   isUseDefaultIndex?: boolean;
   isStopPropagation?: boolean;
+  buttonColor?: IButtonColor;
   resetCallback?: () => void;
   isAdaptive?: boolean;
+  isHideTabsButtons?: boolean;
 }
 export const Tabs: FC<ITabs> = ({
   contents,
@@ -24,6 +27,8 @@ export const Tabs: FC<ITabs> = ({
   wrapperClassName,
   isUseDefaultIndex,
   isStopPropagation,
+  isHideTabsButtons,
+  buttonColor = "fancy",
   resetCallback,
   isAdaptive,
 }) => {
@@ -46,7 +51,7 @@ export const Tabs: FC<ITabs> = ({
           [styles.tabs__buttons_adaptive]: isAdaptive,
         })}
       >
-        {contents?.map((content, i) => {
+        {!isHideTabsButtons && contents?.map((content, i) => {
           return !!content.tabLink ? (
             <Link
               key={i}
@@ -54,7 +59,7 @@ export const Tabs: FC<ITabs> = ({
               className={cl(styles.tabs__link, content.className)}
             >
               <Button
-                color="fancy"
+                color={buttonColor}
                 style={content.style}
                 className={cl({
                   [styles.tabs__button_adaptive]: isAdaptive,
@@ -67,11 +72,12 @@ export const Tabs: FC<ITabs> = ({
                 }}
               >
                 {content.tabName}
+                {content?.tabNameNode}
               </Button>
             </Link>
           ) : (
             <Button
-              color="fancy"
+            color={buttonColor}
               className={cl(styles.tabs__button, content.className, {
                 [styles.tabs__button_adaptive]: isAdaptive,
               })}
@@ -85,6 +91,7 @@ export const Tabs: FC<ITabs> = ({
               }}
             >
               {content.tabName}
+              {content?.tabNameNode}
             </Button>
           );
         })}
