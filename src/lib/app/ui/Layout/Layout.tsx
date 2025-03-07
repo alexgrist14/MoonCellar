@@ -43,7 +43,7 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
   }, 300);
 
   useEffect(() => {
-    debouncedSetMobile();
+    setMobile(mediaMax(768));
 
     window.addEventListener("resize", debouncedSetMobile);
 
@@ -53,11 +53,7 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
   return (
     <div className={className}>
       <Header />
-      <Scrollbar
-        stl={styles}
-        type="absolute"
-        fadeType="bottom"
-      >
+      <Scrollbar stl={styles} type="absolute" fadeType="bottom">
         <main className={"container"} ref={ref}>
           {children}
         </main>
