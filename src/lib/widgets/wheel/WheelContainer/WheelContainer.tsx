@@ -10,8 +10,6 @@ import { shuffle } from "@/src/lib/shared/utils/common";
 import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
 import { emptyGames } from "@/src/lib/shared/constants/games.const";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
-import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
-import { MobileMenu } from "@/src/lib/shared/ui/MobileMenu";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import { GameButtons } from "@/src/lib/shared/ui/GameButtons";
 import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";

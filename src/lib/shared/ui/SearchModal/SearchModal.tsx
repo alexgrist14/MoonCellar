@@ -77,7 +77,7 @@ export const SearchModal: FC = () => {
                   : "/games",
               callback: () => {
                 modal.close();
-                setExpanded("left");
+                setExpanded(["left"]);
               },
             },
           ]}
