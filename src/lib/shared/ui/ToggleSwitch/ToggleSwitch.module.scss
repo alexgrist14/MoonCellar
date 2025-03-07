@@ -5,7 +5,7 @@
   cursor: pointer;
   width: 60px;
   height: 30px;
-  border-radius: 12px;
+  border-radius: calc($radius * 3);
   border: 2px solid $bgAlt;
   outline: 3px solid transparent;
   position: relative;
@@ -55,7 +55,7 @@
     width: 50%;
     height: 100%;
     transition: 0.3s;
-    border-radius: $radius;
+    border-radius: calc($radius * 2);
 
     &_left {
       transform: translateX(0);

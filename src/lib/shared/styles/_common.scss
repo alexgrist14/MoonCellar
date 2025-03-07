@@ -58,14 +58,13 @@ body {
 
   --text-color: #000000;
   --white-text-color: #ffffff;
+  --gray-text-color: var(--neutral-90);
+  --dark-gray-text-color: var(--neutral-80);
   --placeholder: var(--gray);
 
   --bg: #191d24;
   --bg-alt: #212731;
-  --background: var(--bg);
   --light-bg: #374151;
-  --light-bgSecond: #2c3340;
-  --light-background: var(--light-bg);
 
   --border-color: var(--light-bg);
   --dark-border-color: var(--bg);

@@ -75,9 +75,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
       <div className={classNames(styles.page)}>
         <BGImage game={minimalGame} />
         <div className={styles.page__left}>
-          <WrapperTemplate
-            contentStyle={{ padding: "0", gap: "0" }}
-          >
+          <WrapperTemplate contentStyle={{ padding: "0", gap: "0" }}>
             <div
               className={classNames(
                 styles.page__cover,
@@ -119,7 +117,10 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
             </WrapperTemplate>
           )}
         </div>
-        <WrapperTemplate classNameContent={styles.page__right}>
+        <WrapperTemplate
+          classNameContent={styles.page__right}
+          contentStyle={{ padding: "10px" }}
+        >
           <h2>{game.name}</h2>
           <div className={styles.page__info}>
             {!!game.first_release_date && (

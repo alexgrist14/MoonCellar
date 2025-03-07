@@ -6,7 +6,7 @@ $time: 0.5s;
 }
 
 .bg {
-  position: relative;
+  position: absolute;
   z-index: -1;
   opacity: 0;
   transition: $time;
@@ -24,24 +24,30 @@ $time: 0.5s;
   &_hidden {
     opacity: 0;
   }
+}
 
-  &__wrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: -1;
-    height: 100vh;
-    width: 100vw;
-    pointer-events: none;
-    user-select: none;
-  }
+.wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  height: 100vh;
+  width: 100vw;
+  pointer-events: none;
+  user-select: none;
+}
 
-  &__overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    background: $bg;
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: $bg;
 
-    @include spread;
-  }
+  @include spread;
+}
+
+.place {
+  position: relative;
+  
+  @include spread;
 }

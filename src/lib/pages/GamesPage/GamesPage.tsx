@@ -17,6 +17,7 @@ import { screenGt, screenLg, screenMd, screenSm } from "../../shared/constants";
 import { useRouter } from "next/router";
 import { parseQueryFilters } from "../../shared/utils/filters.util";
 import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
+import { BGImage } from "../../shared/ui/BGImage";
 
 export const GamesPage: FC = () => {
   const router = useRouter();
@@ -77,6 +78,7 @@ export const GamesPage: FC = () => {
 
   return (
     <>
+      <BGImage />
       <ExpandMenu position="left" titleOpen="Filters">
         <Filters callback={() => debouncedGamesFetch()} />
       </ExpandMenu>
