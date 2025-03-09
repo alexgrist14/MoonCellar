@@ -27,8 +27,6 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
   titleStyle,
   ...props
 }) => {
-  const expandRef = useRef<HTMLDivElement>(null);
-
   const { expanded, setExpanded } = useCommonStore();
   const { isMobile } = useStatesStore();
 
@@ -52,7 +50,6 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
       })}
     >
       <div
-        ref={expandRef}
         id={position}
         key={position}
         className={classNames(styles.menu, {
