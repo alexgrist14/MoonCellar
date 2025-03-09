@@ -260,21 +260,6 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
               <Slideshow pictures={game.artworks} />
             </div>
           )}
-          {!!game.keywords?.length && (
-            <div className={styles.page__info}>
-              <p>
-                <span>Keywords: </span>
-                {game.keywords.map((keyword, i, array) => (
-                  <span key={keyword._id}>
-                    <Link href={`/games?selectedKeywords[]=${keyword._id}`}>
-                      {keyword.name}
-                    </Link>
-                    {i !== array.length - 1 ? ", " : ""}
-                  </span>
-                ))}
-              </p>
-            </div>
-          )}
           <div className={styles.page__bottom}>
             {!!game.release_dates?.length && (
               <div className={styles.page__links}>
@@ -298,6 +283,21 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
               </div>
             )}
           </div>
+          {!!game.keywords?.length && (
+            <div className={styles.page__info}>
+              <p>
+                <span>Keywords: </span>
+                {game.keywords.map((keyword, i, array) => (
+                  <span key={keyword._id}>
+                    <Link href={`/games?selectedKeywords[]=${keyword._id}`}>
+                      {keyword.name}
+                    </Link>
+                    {i !== array.length - 1 ? ", " : ""}
+                  </span>
+                ))}
+              </p>
+            </div>
+          )}
         </WrapperTemplate>
       </div>
     </>

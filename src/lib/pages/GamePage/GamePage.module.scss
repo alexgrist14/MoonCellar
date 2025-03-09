@@ -90,6 +90,8 @@
 
   &__info,
   &__developers {
+    margin-top: 10px;
+
     & span:not(.page__keywords) {
       @include font(16px, 20px, 500);
       color: $whiteTextColor;
