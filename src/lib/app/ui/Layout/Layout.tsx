@@ -56,11 +56,9 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
       {isMobile !== undefined && (
         <>
           <Header />
-          <Scrollbar stl={styles} type="absolute" fadeType="bottom">
-            <main className={"container"} ref={ref}>
-              {children}
-            </main>
-          </Scrollbar>
+          <main className={"container"} ref={ref}>
+            {children}
+          </main>
         </>
       )}
       <ToastConnector />
