@@ -17,8 +17,8 @@ import { Loader } from "../Loader";
 import { useStatesStore } from "../../store/states.store";
 import { useWindowResizeAction } from "../../hooks";
 import { useDebouncedCallback } from "use-debounce";
-import { Icon } from "@iconify/react/dist/iconify.js";
 import { useAuthStore } from "../../store/auth.store";
+import { SvgAchievement } from "../svg";
 
 interface IGameCardProps {
   game: IGDBGameMinimal;
@@ -117,7 +117,7 @@ export const GameCard: FC<IGameCardProps> = ({
               [styles.card__ra_mastered]: isMastered,
             })}
           >
-            <Icon icon={"game-icons:achievement"} />
+            <SvgAchievement />
           </div>
         )}
         <div

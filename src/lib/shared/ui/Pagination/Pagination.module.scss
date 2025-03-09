@@ -8,6 +8,12 @@
   border-radius: $radius;
   filter: drop-shadow(0 0 0.2rem $blackBorderColor);
 
+  &_disabled {
+    pointer-events: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
   &_fixed {
     position: fixed;
     left: 50%;

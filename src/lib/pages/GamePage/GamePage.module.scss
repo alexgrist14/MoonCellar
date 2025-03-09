@@ -17,6 +17,7 @@
     height: fit-content;
     width: 240px;
     padding: 0;
+    gap: 20px;
   }
 
   &__cover {
@@ -123,8 +124,8 @@
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    background-color: var(--bg);
-    border: 2px solid var(--light-bg);
+    background-color: $bg;
+    border: 2px solid $lightBg;
     padding: 3px;
     @include flexCenter;
 
@@ -133,18 +134,18 @@
       height: 100%;
       transition: 0.3s;
       & path {
-        fill: var(--gray);
+        fill: $gray;
       }
     }
 
     &_beaten,
     &_mastered {
-      filter: drop-shadow(0 0 0.2rem var(--accent));
+      filter: drop-shadow(0 0 0.2rem $accent);
     }
 
     &_beaten {
       & svg path {
-        fill: var(--blue);
+        fill: $blue;
       }
     }
 

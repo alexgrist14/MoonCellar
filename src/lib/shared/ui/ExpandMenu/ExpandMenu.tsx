@@ -39,8 +39,6 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
     refreshRate: 200,
   });
 
-  if (isMobile === undefined) return null;
-
   const connector = document.getElementById("expand-connector");
 
   if (!connector) return null;
@@ -52,8 +50,7 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
       key={position}
       className={classNames(styles.menu, {
         [styles.menu_right]: position.includes("right"),
-        [styles.menu_disabled]:
-          isMobile && !isActive,
+        [styles.menu_disabled]: isMobile && !isActive,
         [styles.menu_active]: isActive,
       })}
       style={{
@@ -71,7 +68,12 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
             : { paddingTop: "55px" }),
         }}
       >
-        <div className={styles.menu__content} ref={ref}>
+        <div
+          className={classNames(styles.menu__content, {
+            [styles.menu__content_active]: isActive,
+          })}
+          ref={ref}
+        >
           {children}
         </div>
       </Scrollbar>

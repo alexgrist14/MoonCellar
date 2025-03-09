@@ -67,10 +67,7 @@ export const WheelContainer: FC = () => {
     <>
       {isMobile && (
         <>
-          <ExpandMenu
-            position="bottom-left"
-            titleOpen="Settings"
-          >
+          <ExpandMenu position="bottom-left" titleOpen="Settings">
             <WrapperTemplate
               isWithBlur
               contentStyle={{
@@ -94,10 +91,7 @@ export const WheelContainer: FC = () => {
             </WrapperTemplate>
           </ExpandMenu>
           {!!winner && (
-            <ExpandMenu
-              position="bottom-right"
-              titleOpen="Links"
-            >
+            <ExpandMenu position="bottom-right" titleOpen="Links">
               <GameButtons game={winner} />
             </ExpandMenu>
           )}
@@ -105,14 +99,8 @@ export const WheelContainer: FC = () => {
       )}
       <div className={styles.container}>
         {!isMobile && (
-          <WrapperTemplate
-            isWithBlur
-            contentStyle={{
-              padding: "10px",
-              gap: "15px",
-            }}
-          >
-            <WrapperTemplate>
+          <div style={{ display: "grid", gap: "20px" }}>
+            <WrapperTemplate isWithBlur>
               <ToggleSwitch
                 clickCallback={(result) => {
                   setRoyal(result === "ON");
@@ -129,7 +117,7 @@ export const WheelContainer: FC = () => {
               />
             </WrapperTemplate>
             {!!winner && <GameButtons game={winner} />}
-          </WrapperTemplate>
+          </div>
         )}
         <WheelComponent
           wheelGames={wheelGames}

@@ -12,5 +12,7 @@ export * from "./SvgProfile";
 export * from "./SvgResize";
 export * from "./SvgBurger";
 export * from "./SvgSettings";
-export * from "./SvgArrow";
 export * from "./SvgPen";
+export * from "./SvgArrow";
+export * from "./SvgDoubleArrow";
+export * from "./SvgAchievement";

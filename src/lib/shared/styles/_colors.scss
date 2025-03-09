@@ -1,31 +1,10 @@
-//main colors
-$whiteTextColor: #ffffff;
-$textColor: #000000;
-$gray: #afb3b9;
-
-$accent: #6951ee;
-$placeholder: $gray;
-
-$bg: #191d24;
-$bgAlt: #212731;
-$background: $bg;
-$lightBg: #374151;
-$lightBgSecond: #2c3340;
-$lightBackground: $lightBg;
-
 $on: #467d1e;
 $off: #7d1e46;
-
 $red: #bd1e46;
 $blue: #4951ee;
-
-//border colors
-$borderColor: $lightBg;
-$darkBorderColor: $bg;
-$whiteBorderColor: $whiteTextColor;
-$blackBorderColor: $textColor;
-
-// Other
+$gray: #afb3b9;
+$gold: #dec616;
+$accent: #6951ee;
 $neutral-10: #0d1011;
 $neutral-20: #161b1d;
 $neutral-30: #1f2628;
@@ -35,6 +14,22 @@ $neutral-60: #5e6a6e;
 $neutral-80: #9192a1;
 $neutral-90: #d9d9d9;
 $neutral-100: #ffffff;
+
+$textColor: #000000;
+$whiteTextColor: #ffffff;
+$placeholder: $gray;
+
+$bg: #191d24;
+$bgAlt: #212731;
+$background: $bg;
+$lightBg: #374151;
+$lightBgSecond: #2c3340;
+$lightBackground: $lightBg;
+
+$borderColor: $lightBg;
+$darkBorderColor: $bg;
+$whiteBorderColor: $whiteTextColor;
+$blackBorderColor: $textColor;
 
 $toastBG: $bg;
 $toastTitleColor: $whiteTextColor;

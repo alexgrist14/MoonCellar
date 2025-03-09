@@ -51,11 +51,6 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
       <Layout className={classNames(general.variable, pentagra.variable)}>
         <Component {...pageProps} />
-        <ToastConnector />
-        <ModalsConnector />
-        <div id="expand-connector"></div>
-        <div id="mobile-menu-connector"></div>
-        <div id="pagination-connector"></div>
       </Layout>
     </>
   );

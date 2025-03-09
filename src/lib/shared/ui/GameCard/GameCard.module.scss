@@ -40,8 +40,8 @@
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    background-color: var(--bg);
-    border: 2px solid var(--light-bg);
+    background-color: $bg;
+    border: 2px solid $lightBg;
     padding: 3px;
     @include flexCenter;
 
@@ -49,26 +49,27 @@
       width: 100%;
       height: 100%;
       transition: 0.3s;
+
       & path {
-        fill: var(--gray);
+        fill: $gray;
       }
     }
 
     &_beaten,
     &_mastered {
-      filter: drop-shadow(0 0 0.2rem var(--accent));
+      filter: drop-shadow(0 0 0.2rem $accent);
     }
 
     &_beaten {
       & svg path {
-        fill: var(--blue);
+        fill: $blue;
       }
     }
 
     &_mastered {
       & svg {
         path {
-          fill: var(--gold);
+          fill: $gold;
         }
       }
     }

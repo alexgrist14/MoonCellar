@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useMemo, useRef, useState } from "react";
 import styles from "./Pagination.module.scss";
 import { Button } from "../Button";
 import { Input } from "../Input";
@@ -7,24 +7,29 @@ import classNames from "classnames";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/router";
 import { setPage } from "../../utils/query";
+import { SvgDoubleArrow } from "../svg/SvgDoubleArrow";
+import { SvgArrow } from "../svg/SvgArrow";
+import { useCommonStore } from "../../store/common.store";
 
 export const Pagination: FC<{
   total: number;
   take: number;
   isFixed?: boolean;
-}> = ({ take, total, isFixed }) => {
+  isDisabled?: boolean;
+}> = ({ take, total, isFixed, isDisabled }) => {
   const router = useRouter();
-
   const centerRef = useRef<HTMLDivElement>(null);
-  const page = Number(router.query.page || 1);
+
+  const { setScrollPosition } = useCommonStore();
 
   const [value, setValue] = useState("");
 
-  const max = Math.ceil(total / take);
+  const page = useMemo(() => Number(router.query.page || 1), [router]);
+  const max = useMemo(() => Math.ceil(total / take), [take, total]);
 
-  useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-  }, [page]);
+  const changeCallback = () => {
+    setScrollPosition({ left: 0, top: 0 });
+  };
 
   if (!total || !page) return null;
 
@@ -36,27 +41,30 @@ export const Pagination: FC<{
     <div
       className={classNames(styles.pagination, {
         [styles.pagination_fixed]: isFixed,
+        [styles.pagination_disabled]: isDisabled,
       })}
     >
       <Button
-        color="accent"
+        color="transparent"
         className={styles.pagination__button}
         disabled={page === 1}
         onClick={() => {
           setPage(1, router);
+          changeCallback();
         }}
       >
-        {"<<"}
+        <SvgDoubleArrow style={{ rotate: "180deg" }} />
       </Button>
       <Button
-        color="accent"
+        color="transparent"
         className={styles.pagination__button}
         disabled={page === 1}
         onClick={() => {
           setPage(page - 1, router);
+          changeCallback();
         }}
       >
-        {"<"}
+        <SvgArrow style={{ rotate: "180deg" }} />
       </Button>
       <div className={styles.pagination__center} ref={centerRef}>
         <Input
@@ -70,30 +78,33 @@ export const Pagination: FC<{
             const value = Number(e.target.value);
 
             setPage(value > max ? max : value, router);
+            changeCallback();
           }}
         />
       </div>
       <Button
-        color="accent"
+        color="transparent"
         className={styles.pagination__button}
         disabled={page === max}
         onClick={() => {
           setPage(page + 1, router);
+          changeCallback();
         }}
       >
-        {">"}
+        <SvgArrow />
       </Button>
       <Button
-        color="accent"
+        color="transparent"
         className={styles.pagination__button}
         disabled={page === max}
         onClick={() => {
           setPage(max, router);
+          changeCallback();
         }}
       >
-        {">>"}
+        <SvgDoubleArrow />
       </Button>
     </div>,
-    connector
+    connector,
   );
 };

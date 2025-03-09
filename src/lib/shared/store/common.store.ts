@@ -18,6 +18,7 @@ type IState = {
   keywords?: IGDBDefault[];
   expanded?: IExpandPosition[];
   timer: number;
+  scrollPosition?: { top: number; left: number } | undefined;
 };
 
 type IAction = {
@@ -29,6 +30,9 @@ type IAction = {
   setSystems: (platforms: IGDBPlatform[]) => void;
   setExpanded: (expanded: IExpandPosition[]) => void;
   setTimer: (timer: number) => void;
+  setScrollPosition: (
+    scrollPosition: { top: number; left: number } | undefined,
+  ) => void;
 };
 
 export const useCommonStore = create<IState & IAction>()(
@@ -43,6 +47,7 @@ export const useCommonStore = create<IState & IAction>()(
       setThemes: (themes) => set({ themes }),
       setKeywords: (keywords) => set({ keywords }),
       setTimer: (timer) => set({ timer }),
+      setScrollPosition: (scrollPosition) => set({ scrollPosition }),
     }),
     {
       name: "common",

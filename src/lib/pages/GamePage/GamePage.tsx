@@ -108,16 +108,10 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
             </div>
             <GameControls game={minimalGame} />
           </WrapperTemplate>
-          {!isMobile && (
-            <WrapperTemplate
-              wrapperStyle={{ marginTop: "40px" }}
-              contentStyle={{ padding: "10px" }}
-            >
-              <GameButtons game={minimalGame} />
-            </WrapperTemplate>
-          )}
+          {!isMobile && <GameButtons game={minimalGame} />}
         </div>
         <WrapperTemplate
+          isWithBlur
           classNameContent={styles.page__right}
           contentStyle={{ padding: "10px" }}
         >

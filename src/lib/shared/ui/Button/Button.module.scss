@@ -1,5 +1,4 @@
 .button {
-  @include textEllipsis;
   text-align: center;
   border-width: 2px;
   border-style: solid;
@@ -10,6 +9,9 @@
   transition: 0.2s;
   outline: none;
   padding-inline: 12px;
+
+  @include textEllipsis;
+  @include flexCenter;
 
   &:hover:not(&_fancyColor):not(&_transparentColor) {
     filter: brightness(0.8);
