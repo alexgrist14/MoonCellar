@@ -15,6 +15,7 @@ $border: 2px solid $borderColor;
   height: calc(100vh - $headerHeight);
   backdrop-filter: blur(6px);
   outline: $border;
+  will-change: max-width;
 
   &_active {
     z-index: 4;
