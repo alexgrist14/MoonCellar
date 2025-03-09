@@ -6,6 +6,10 @@
   margin-top: 5px;
   gap: 10px;
 
+  @include mediaMd {
+    grid-template-columns: 1fr;
+  }
+
   .content {
     padding: 20px;
     width: 100%;

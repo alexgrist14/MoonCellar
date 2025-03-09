@@ -45,6 +45,10 @@
     flex-wrap: wrap;
     gap: 20px;
 
+    @include mediaMd {
+      justify-content: center;
+    }
+
     .diagram {
       width: 400px;
       @include mediaMax(1380px) {
@@ -52,12 +56,15 @@
       }
     }
     &__left {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 20px;
+
       @include mediaMd {
+        justify-items: center;
         justify-content: center;
         text-align: center;
+        grid-template-columns: 1fr;
       }
     }
     &__info {
