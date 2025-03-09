@@ -8,7 +8,6 @@ $border: 2px solid $borderColor;
   animation: appearOpacity 0.4s forwards 1 ease;
   z-index: 3;
   pointer-events: none;
-  height: calc(100vh - $headerHeight);
 
   &_right {
     right: 0;
@@ -32,7 +31,7 @@ $border: 2px solid $borderColor;
   visibility: hidden;
   width: max(30vw, 360px);
   max-width: min(50vw, 500px);
-  height: 100%;
+  height: calc(100vh - $headerHeight);
   backdrop-filter: blur(6px);
 
   @include mediaSm {
