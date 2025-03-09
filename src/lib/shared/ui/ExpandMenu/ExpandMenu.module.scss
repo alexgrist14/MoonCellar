@@ -7,6 +7,7 @@ $border: 2px solid $borderColor;
   animation: appearOpacity 0.4s forwards 1 ease;
   z-index: 3;
   pointer-events: none;
+  height: calc(100vh - $headerHeight);
 
   &_right {
     right: 0;
@@ -22,15 +23,17 @@ $border: 2px solid $borderColor;
   display: grid;
   transition: 0.4s;
   background: rgba($bgAlt, 0.9);
-  backdrop-filter: blur(6px);
   outline: $border;
   will-change: transform;
-  transform: scaleX(0);
   transform-origin: left;
+  pointer-events: all;
+  transform: scaleX(0);
+  opacity: 0;
+  visibility: hidden;
   width: max(30vw, 360px);
   max-width: min(50vw, 500px);
-  height: calc(100vh - $headerHeight);
-  pointer-events: all;
+  height: 100%;
+  backdrop-filter: blur(6px);
 
   @include mediaSm {
     width: 100vw;
@@ -43,18 +46,8 @@ $border: 2px solid $borderColor;
 
   &_active {
     transform: scaleX(1);
-  }
-
-  &__content {
-    opacity: 0;
-    visibility: hidden;
-    transition: 0.3s;
-
-    &_active {
-      z-index: 4;
-      opacity: 1;
-      visibility: visible;
-    }
+    opacity: 1;
+    visibility: visible;
   }
 
   &_disabled {

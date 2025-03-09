@@ -75,12 +75,7 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
               : { paddingTop: "55px" }),
           }}
         >
-          <div
-            className={classNames(styles.menu__content, {
-              [styles.menu__content_active]: isActive,
-            })}
-            ref={ref}
-          >
+          <div className={classNames(styles.menu__content)} ref={ref}>
             {children}
           </div>
         </Scrollbar>
