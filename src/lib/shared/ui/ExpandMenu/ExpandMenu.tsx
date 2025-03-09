@@ -45,38 +45,46 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
 
   return createPortal(
     <div
-      ref={expandRef}
-      id={position}
-      key={position}
-      className={classNames(styles.menu, {
-        [styles.menu_right]: position.includes("right"),
-        [styles.menu_disabled]: isMobile && !isActive,
-        [styles.menu_active]: isActive,
+      className={classNames(styles.wrapper, {
+        [styles.wrapper_right]: position.includes("right"),
+        [styles.wrapper_disabled]: isMobile && !isActive,
+        [styles.wrapper_active]: isActive,
       })}
-      style={{
-        ...(position.includes("bottom") && { top: "unset", bottom: "0" }),
-        ...menuStyle,
-      }}
-      {...props}
     >
-      <Scrollbar
-        type="absolute"
-        stl={styles}
-        contentStyle={{
-          ...(position.includes("bottom")
-            ? { paddingBottom: "55px" }
-            : { paddingTop: "55px" }),
+      <div
+        ref={expandRef}
+        id={position}
+        key={position}
+        className={classNames(styles.menu, {
+          [styles.menu_right]: position.includes("right"),
+          [styles.menu_disabled]: isMobile && !isActive,
+          [styles.menu_active]: isActive,
+        })}
+        style={{
+          ...(position.includes("bottom") && { top: "unset", bottom: "0" }),
+          ...menuStyle,
         }}
+        {...props}
       >
-        <div
-          className={classNames(styles.menu__content, {
-            [styles.menu__content_active]: isActive,
-          })}
-          ref={ref}
+        <Scrollbar
+          type="absolute"
+          stl={styles}
+          contentStyle={{
+            ...(position.includes("bottom")
+              ? { paddingBottom: "55px" }
+              : { paddingTop: "55px" }),
+          }}
         >
-          {children}
-        </div>
-      </Scrollbar>
+          <div
+            className={classNames(styles.menu__content, {
+              [styles.menu__content_active]: isActive,
+            })}
+            ref={ref}
+          >
+            {children}
+          </div>
+        </Scrollbar>
+      </div>
       <div
         onClick={() => {
           setExpanded(
@@ -88,12 +96,12 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
           );
         }}
         className={classNames(
-          styles.menu__title,
-          styles[`menu__title_${position}`],
+          styles.title,
+          styles[`title_${position}`],
           titleClassName,
           {
-            [styles[`menu__title_${position}_active`]]: isActive,
-            [styles.menu__title_bottom]: position.includes("bottom"),
+            [styles[`title_${position}_active`]]: isActive,
+            [styles.title_bottom]: position.includes("bottom"),
           },
         )}
         style={titleStyle}

@@ -69,7 +69,6 @@ export const WheelContainer: FC = () => {
         <>
           <ExpandMenu position="bottom-left" titleOpen="Settings">
             <WrapperTemplate
-              isWithBlur
               contentStyle={{
                 gap: "15px",
               }}

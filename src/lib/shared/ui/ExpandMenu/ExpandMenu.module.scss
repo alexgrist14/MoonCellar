@@ -1,35 +1,48 @@
 $border: 2px solid $borderColor;
 
-.menu {
-  display: grid;
+.wrapper {
   position: fixed;
-  width: max(30vw, 360px);
-  max-width: 0;
-  transition: 0.4s;
-  z-index: 3;
-  background: rgba($bgAlt, 0.9);
-  left: 0;
-  transform: translate3d(0, 0, 0);
-  animation: appearOpacity 0.4s forwards 1 ease;
   top: $headerHeight;
-  height: calc(100vh - $headerHeight);
-  backdrop-filter: blur(6px);
-  outline: $border;
-  will-change: max-width;
-
-  &_active {
-    z-index: 4;
-    max-width: min(50vw, 500px);
-
-    @include mediaSm {
-      width: 100%;
-      max-width: 100%;
-    }
-  }
+  left: 0;
+  animation: appearOpacity 0.4s forwards 1 ease;
+  z-index: 3;
+  pointer-events: none;
 
   &_right {
     right: 0;
     left: unset;
+  }
+
+  &_active {
+    z-index: 4;
+  }
+}
+
+.menu {
+  display: grid;
+  transition: 0.4s;
+  background: rgba($bgAlt, 0.9);
+  backdrop-filter: blur(6px);
+  outline: $border;
+  will-change: transform;
+  transform: scaleX(0);
+  transform-origin: left;
+  width: max(30vw, 360px);
+  max-width: min(50vw, 500px);
+  height: calc(100vh - $headerHeight);
+  pointer-events: all;
+
+  @include mediaSm {
+    width: 100vw;
+    max-width: 100vw;
+  }
+
+  &_right {
+    transform-origin: right;
+  }
+
+  &_active {
+    transform: scaleX(1);
   }
 
   &__content {
@@ -44,93 +57,68 @@ $border: 2px solid $borderColor;
     }
   }
 
-  &__title {
-    position: absolute;
-    top: 0;
-    opacity: 0.9;
-    padding: 5px;
-    user-select: none;
-    transition: 0.3s;
-    z-index: 4;
-    width: 40vw;
-    max-width: 200px;
-    cursor: pointer;
-    background-color: $lightBg;
-
-    @include flexCenter;
-    @include textEllipsis;
-
-    &:hover {
-      filter: brightness(1.2);
-    }
-
-    & > span {
-      margin-top: -2px;
-      display: flex;
-      height: 34px;
-
-      @include flexCenter;
-    }
-
-    &_left,
-    &_bottom-left {
-      transform: translateX(100%);
-      right: 0;
-
-      &_active {
-        transform: unset;
-      }
-    }
-
-    &_right,
-    &_bottom-right {
-      transform: translateX(-100%);
-
-      &_active {
-        transform: unset;
-      }
-    }
-
-    &_left {
-      border-radius: 0 0 $radius 0;
-
-      &_active {
-        border-radius: 0 0 0 $radius;
-      }
-    }
-
-    &_right {
-      border-radius: 0 0 0 $radius;
-
-      &_active {
-        border-radius: 0 0 $radius 0;
-      }
-    }
-
-    &_bottom-left {
-      border-radius: 0 $radius 0 0;
-
-      &_active {
-        border-radius: $radius 0 0 0;
-      }
-    }
-
-    &_bottom-right {
-      border-radius: $radius 0 0 0;
-
-      &_active {
-        border-radius: 0 $radius 0 0;
-      }
-    }
-
-    &_bottom {
-      bottom: 0;
-      top: unset;
-    }
-  }
-
   &_disabled {
     opacity: 0;
+  }
+}
+
+.title {
+  position: absolute;
+  top: 0;
+  padding: 5px;
+  user-select: none;
+  transition: 0.4s;
+  z-index: 4;
+  width: 40vw;
+  max-width: 200px;
+  cursor: pointer;
+  background-color: rgba($lightBg, 0.9);
+  pointer-events: all;
+
+  @include flexCenter;
+  @include textEllipsis;
+
+  &:hover {
+    filter: brightness(1.2);
+  }
+
+  & > span {
+    margin-top: -2px;
+    display: flex;
+    height: 34px;
+
+    @include flexCenter;
+  }
+
+  &_left,
+  &_bottom-left {
+    left: 0;
+  }
+
+  &_right,
+  &_bottom-right {
+    right: 0;
+  }
+
+  &_left {
+    border-radius: 0 0 $radius 0;
+  }
+
+  &_right {
+    border-radius: 0 0 0 $radius;
+  }
+
+  &_bottom-left {
+    border-radius: 0 $radius 0 0;
+  }
+
+  &_bottom-right {
+    border-radius: $radius 0 0 0;
+  }
+
+  &_bottom {
+    bottom: 0;
+    top: unset;
   }
 }
 
