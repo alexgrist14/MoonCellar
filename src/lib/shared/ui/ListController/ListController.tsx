@@ -70,7 +70,7 @@ export const ListController: FC<IListControllerProps> = ({
                 type="button"
                 className={classNames(
                   styles.controller__button,
-                  styles.controller__button_remove,
+                  styles.controller__button_remove
                 )}
                 color="red"
                 onClick={(e) => {

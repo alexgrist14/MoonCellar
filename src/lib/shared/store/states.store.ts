@@ -46,6 +46,6 @@ export const useStatesStore = create<IState & IAction>()(
           isStarted: false,
         }),
     }),
-    { name: "states" },
-  ),
+    { name: "states" }
+  )
 );

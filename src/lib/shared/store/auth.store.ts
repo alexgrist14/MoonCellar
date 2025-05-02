@@ -27,7 +27,7 @@ export const useAuthStore = create<IState & IAction>()(
           });
         },
       }),
-      { name: "auth" },
-    ),
-  ),
+      { name: "auth" }
+    )
+  )
 );

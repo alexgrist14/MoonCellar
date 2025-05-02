@@ -58,13 +58,13 @@ export const getFiltersForQuery = (filters: IGameFilters) => {
     },
     {
       arrayFormat: "bracket",
-    },
+    }
   );
 };
 
 export const pushFiltersToQuery = (
   filters: IGameFilters,
-  router: NextRouter,
+  router: NextRouter
 ) => {
   const { push, pathname } = router;
 
@@ -74,6 +74,6 @@ export const pushFiltersToQuery = (
       query: getFiltersForQuery(filters),
     },
     undefined,
-    { shallow: true },
+    { shallow: true }
   );
 };

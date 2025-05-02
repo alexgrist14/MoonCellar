@@ -108,12 +108,14 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
                           })
                           .then((res) => {
                             setSavedPresets(res.data.presets);
-                            toast.success({description: "Preset was successfully saved"})
+                            toast.success({
+                              description: "Preset was successfully saved",
+                            });
                             modal.close();
                           })
                           .catch(axiosUtils.toastError);
                     }}
-                  />,
+                  />
                 )
               }
             />

@@ -44,12 +44,12 @@ export const GameCard: FC<IGameCardProps> = ({
 
   const { profile } = useAuthStore();
 
-  const {isMastered, isBeaten} = useMemo(() => {
+  const { isMastered, isBeaten } = useMemo(() => {
     const mastered = profile?.raAwards?.filter(
-      (award) => award.awardType === "Mastery/Completion",
+      (award) => award.awardType === "Mastery/Completion"
     );
     const beaten = profile?.raAwards?.filter(
-      (award) => award.awardType === "Game Beaten",
+      (award) => award.awardType === "Game Beaten"
     );
     const raIds = game.raIds?.map((game) => game._id);
 
@@ -69,7 +69,7 @@ export const GameCard: FC<IGameCardProps> = ({
           }
         : {
             width: `calc(${rect.height}px * ${coverRatio})`,
-          },
+          }
     );
   }, 300);
 
@@ -92,7 +92,7 @@ export const GameCard: FC<IGameCardProps> = ({
         className={classNames(
           styles.card,
           className,
-          spreadDirection === "height" && styles.card_height,
+          spreadDirection === "height" && styles.card_height
         )}
         style={{
           ...ratio,
@@ -136,7 +136,7 @@ export const GameCard: FC<IGameCardProps> = ({
               {`${
                 gameCategoryNames[
                   Object.keys(gameCategories).find(
-                    (key) => gameCategories[key] === game.category,
+                    (key) => gameCategories[key] === game.category
                   ) || ""
                 ]
               }`}

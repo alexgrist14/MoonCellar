@@ -31,7 +31,7 @@ type IAction = {
   setExpanded: (expanded: IExpandPosition[]) => void;
   setTimer: (timer: number) => void;
   setScrollPosition: (
-    scrollPosition: { top: number; left: number } | undefined,
+    scrollPosition: { top: number; left: number } | undefined
   ) => void;
 };
 
@@ -51,6 +51,6 @@ export const useCommonStore = create<IState & IAction>()(
     }),
     {
       name: "common",
-    },
-  ),
+    }
+  )
 );

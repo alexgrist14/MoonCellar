@@ -40,7 +40,7 @@ export const Button = forwardRef(
       tooltipAlign,
       ...props
     }: IButton,
-    ref,
+    ref
   ) => {
     const buttonRef = useRef<HTMLButtonElement | null>(null);
     const tooltipRef = useRef<HTMLSpanElement>(null);
@@ -89,7 +89,7 @@ export const Button = forwardRef(
             [styles.button_active]: active,
             [styles[`button_${color}Color_active`]]: active,
             [styles.button_disabled]: disabled,
-          },
+          }
         )}
         disabled={disabled}
       >
@@ -111,11 +111,11 @@ export const Button = forwardRef(
             >
               {tooltip}
             </span>,
-            document.body,
+            document.body
           )}
       </button>
     );
-  },
+  }
 );
 
 Button.displayName = "Button";

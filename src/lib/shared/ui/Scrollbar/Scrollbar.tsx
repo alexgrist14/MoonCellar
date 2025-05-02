@@ -60,7 +60,7 @@ export const Scrollbar: FC<IScrollBarProps> = ({
   const [thumbWidth, setThumbWidth] = useState(65);
   const [trackSize, setTrackSize] = useState(0);
   const [scrollStartPosition, setScrollStartPosition] = useState<number | null>(
-    null,
+    null
   );
   const [initialScrollTop, setInitialScrollTop] = useState(0);
   const [initialScrollLeft, setInitialScrollLeft] = useState(0);
@@ -82,7 +82,7 @@ export const Scrollbar: FC<IScrollBarProps> = ({
         const clickRatio =
           (clientY - trackTop + thumbOffset) / trackCurrent.clientHeight;
         const scrollAmount = Math.floor(
-          clickRatio * contentCurrent.scrollHeight,
+          clickRatio * contentCurrent.scrollHeight
         );
 
         contentCurrent.scrollTo({
@@ -98,7 +98,7 @@ export const Scrollbar: FC<IScrollBarProps> = ({
         const clickRatio =
           (clientX - trackLeft + thumbOffset) / trackCurrent.clientWidth;
         const scrollAmount = Math.floor(
-          clickRatio * contentCurrent.scrollWidth,
+          clickRatio * contentCurrent.scrollWidth
         );
 
         contentCurrent.scrollTo({
@@ -108,7 +108,7 @@ export const Scrollbar: FC<IScrollBarProps> = ({
         });
       }
     },
-    [thumbHeight, contentRef, thumbWidth, isHorizontal],
+    [thumbHeight, contentRef, thumbWidth, isHorizontal]
   );
 
   const handleThumbMouseDown = useCallback(
@@ -124,13 +124,13 @@ export const Scrollbar: FC<IScrollBarProps> = ({
 
       e.type === "touchstart" &&
         setScrollStartPosition(
-          (e as React.TouchEvent).targetTouches[0][pageDir],
+          (e as React.TouchEvent).targetTouches[0][pageDir]
         );
 
       contentRef.current && initialScrollSetter(contentRef.current[scrollDir]);
       setIsDragging(true);
     },
-    [contentRef, isHorizontal],
+    [contentRef, isHorizontal]
   );
 
   const handleThumbMouseUp = useCallback(() => {
@@ -155,7 +155,7 @@ export const Scrollbar: FC<IScrollBarProps> = ({
 
         const newScrollTop = Math.min(
           initialScrollTop + deltaY,
-          contentScrollHeight - contentOffsetHeight,
+          contentScrollHeight - contentOffsetHeight
         );
 
         contentRef.current.scrollTop = newScrollTop;
@@ -173,7 +173,7 @@ export const Scrollbar: FC<IScrollBarProps> = ({
 
         const newScrollLeft = Math.min(
           initialScrollLeft + deltaX,
-          contentScrollWidth - contentOffsetWidth,
+          contentScrollWidth - contentOffsetWidth
         );
 
         contentRef.current.scrollLeft = newScrollLeft;
@@ -188,7 +188,7 @@ export const Scrollbar: FC<IScrollBarProps> = ({
       initialScrollLeft,
       thumbWidth,
       isHorizontal,
-    ],
+    ]
   );
 
   const positionHandler = useCallback(() => {
@@ -346,7 +346,7 @@ export const Scrollbar: FC<IScrollBarProps> = ({
         isHorizontal && styles["scrollbars__container--horizontal"],
         {
           [styles.scrollbars__container_absolute]: type === "absolute",
-        },
+        }
       )}
     >
       {!!fadeType && (isLine || ["both", "top"].includes(fadeType)) && (
@@ -359,7 +359,7 @@ export const Scrollbar: FC<IScrollBarProps> = ({
             {
               [styles.off]: !isVisible,
               [styles["scrollbars__line_top--horizontal"]]: isHorizontal,
-            },
+            }
           )}
           data-line="top"
         />
@@ -371,7 +371,7 @@ export const Scrollbar: FC<IScrollBarProps> = ({
           className={cl(
             classNameContent,
             styles.scrollbars__content,
-            stl && stl.scrollbars__content,
+            stl && stl.scrollbars__content
           )}
           style={contentStyle}
           ref={contentRef}
@@ -387,14 +387,14 @@ export const Scrollbar: FC<IScrollBarProps> = ({
           {
             [styles.off]: !isVisible,
             [styles.scrollbars__scrollbar_absolute]: type === "absolute",
-          },
+          }
         )}
       >
         <div
           className={cl(
             styles.scrollbars__track,
             stl && stl.scrollbars__track,
-            isHorizontal && styles["scrollbars__track--horizontal"],
+            isHorizontal && styles["scrollbars__track--horizontal"]
           )}
           ref={scrollTrackRef}
           onClick={handleTrackClick}
@@ -404,7 +404,7 @@ export const Scrollbar: FC<IScrollBarProps> = ({
           className={cl(
             styles.scrollbars__thumb,
             stl && stl.scrollbars__thumb,
-            isHorizontal && styles["scrollbars__thumb--horizontal"],
+            isHorizontal && styles["scrollbars__thumb--horizontal"]
           )}
           ref={scrollThumbRef}
           onMouseDown={handleThumbMouseDown}
@@ -426,7 +426,7 @@ export const Scrollbar: FC<IScrollBarProps> = ({
             {
               [styles.off]: !isVisible,
               [styles["scrollbars__line_bottom--horizontal"]]: isHorizontal,
-            },
+            }
           )}
           data-line="bottom"
         />

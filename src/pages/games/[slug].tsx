@@ -53,7 +53,7 @@ const GamePageIndex: FC<{ game: IGDBGame }> = ({ game }) => {
 };
 
 export const getServerSideProps = async (
-  context: GetServerSidePropsContext,
+  context: GetServerSidePropsContext
 ) => {
   const { query } = context;
   const game = (await IGDBApi.getGameBySlug(query.slug as string)).data;

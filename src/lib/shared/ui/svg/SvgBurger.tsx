@@ -6,7 +6,7 @@ export const SvgBurger: FC<{
   topId?: string;
   middleId?: string;
   bottomId?: string;
-}> = ({ className,topId,middleId,bottomId }) => {
+}> = ({ className, topId, middleId, bottomId }) => {
   return (
     <svg id="hamburger" className={className} viewBox="0 0 60 40">
       <g

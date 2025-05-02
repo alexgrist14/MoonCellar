@@ -105,6 +105,6 @@ export const Pagination: FC<{
         <SvgDoubleArrow />
       </Button>
     </div>,
-    connector,
+    connector
   );
 };

@@ -28,11 +28,11 @@ export const ExtendedCheckbox = <T,>({
       <div className={styles.checkbox__list}>
         {list.map((element, i) => {
           const isExcluded = excluded?.some(
-            (excluded) => excluded.id === element.id,
+            (excluded) => excluded.id === element.id
           );
 
           const isSelected = selected?.some(
-            (selected) => selected.id === element.id,
+            (selected) => selected.id === element.id
           );
 
           return (
@@ -53,15 +53,11 @@ export const ExtendedCheckbox = <T,>({
                   if (isSelected) {
                     setExcluded([...(!!excluded ? excluded : []), element]);
                     setSelected(
-                      selected?.filter(
-                        (selected) => selected.id !== element.id,
-                      ),
+                      selected?.filter((selected) => selected.id !== element.id)
                     );
                   } else if (isExcluded) {
                     setExcluded(
-                      excluded?.filter(
-                        (excluded) => excluded.id !== element.id,
-                      ),
+                      excluded?.filter((excluded) => excluded.id !== element.id)
                     );
                   } else {
                     setSelected([...(!!selected ? selected : []), element]);

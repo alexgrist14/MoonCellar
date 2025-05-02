@@ -1,7 +1,7 @@
 export const downloadBlob = async (
   content: any[],
   filename: string,
-  contentType: string,
+  contentType: string
 ) => {
   const blob = new Blob(content, { type: contentType });
   const url = URL.createObjectURL(blob);

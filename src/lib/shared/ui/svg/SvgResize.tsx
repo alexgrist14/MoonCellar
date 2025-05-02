@@ -1,4 +1,4 @@
-import { CSSProperties, FC } from 'react';
+import { CSSProperties, FC } from "react";
 
 interface ISvgArrowProps {
   style?: CSSProperties;

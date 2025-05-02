@@ -2,7 +2,7 @@ import styles from "./ExtendedSelector.module.scss";
 import { Dropdown } from "../Dropdown";
 
 export interface IExtendedSelectorProps<
-  T extends { _id: number; name: string }
+  T extends { _id: number; name: string },
 > {
   title: string;
   list: T[];
