@@ -20,8 +20,30 @@ const GamePageIndex: FC<{ game: IGDBGame }> = ({ game }) => {
         {!!game.summary && (
           <meta property="og:description" content={game.summary} key="title" />
         )}
-        <meta property="og:image" content={getImageLink(game.cover.url, 'cover_small')} />
-        <meta property="og:url" content={`https://mooncellar.space/games/${game.slug}`} />
+        {!!game.cover && (
+          <>
+            <meta
+              property="image"
+              content={getImageLink(game.cover.url, "cover_small")}
+            />
+            <meta
+              property="og:image"
+              content={getImageLink(game.cover.url, "cover_small")}
+            />
+          </>
+        )}
+        {!!game.slug && (
+          <>
+            <meta
+              property="url"
+              content={`https://mooncellar.space/games/${game.slug}`}
+            />
+            <meta
+              property="og:url"
+              content={`https://mooncellar.space/games/${game.slug}`}
+            />
+          </>
+        )}
       </Head>
       <CheckMobile>
         <GamePage game={game} />
