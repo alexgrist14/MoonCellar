@@ -1,4 +1,4 @@
-import { CSSProperties, FC, HTMLAttributes, ReactNode } from "react";
+import { CSSProperties, FC, HTMLAttributes, ReactNode, useMemo } from "react";
 import styles from "./ExpandMenu.module.scss";
 import { Scrollbar } from "../Scrollbar";
 import { IExpandPosition, useCommonStore } from "../../store/common.store";
@@ -6,6 +6,8 @@ import classNames from "classnames";
 import { createPortal } from "react-dom";
 import { useStatesStore } from "../../store/states.store";
 import { useResizeDetector } from "react-resize-detector";
+import { commonUtils } from "../../utils/common";
+import { CheckMobile } from "../CheckMobile";
 
 interface IExpandMenuProps
   extends Pick<HTMLAttributes<HTMLDivElement>, "children" | "id"> {
@@ -37,71 +39,79 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
     refreshRate: 200,
   });
 
-  const connector = document.getElementById("expand-connector");
+  const connector = useMemo(
+    () =>
+      commonUtils.checkWindow(() =>
+        document.getElementById("expand-connector"),
+      ),
+    [],
+  );
 
   if (!connector) return null;
 
   return createPortal(
-    <div
-      id={position}
-      key={position}
-      className={classNames(styles.wrapper, {
-        [styles.wrapper_right]: position.includes("right"),
-        [styles.wrapper_disabled]: isMobile && !isActive,
-        [styles.wrapper_active]: isActive,
-      })}
-      style={{
-        ...(position.includes("bottom") && { top: "unset", bottom: "0" }),
-        ...menuStyle,
-      }}
-    >
+    <CheckMobile>
       <div
-        className={classNames(styles.menu, {
-          [styles.menu_right]: position.includes("right"),
-          [styles.menu_disabled]: isMobile && !isActive,
-          [styles.menu_active]: isActive,
+        id={position}
+        key={position}
+        className={classNames(styles.wrapper, {
+          [styles.wrapper_right]: position.includes("right"),
+          [styles.wrapper_disabled]: isMobile && !isActive,
+          [styles.wrapper_active]: isActive,
         })}
-        style={menuStyle}
-        {...props}
-      >
-        <Scrollbar
-          type="absolute"
-          stl={styles}
-          contentStyle={{
-            ...(position.includes("bottom")
-              ? { paddingBottom: "55px" }
-              : { paddingTop: "55px" }),
-          }}
-        >
-          <div className={classNames(styles.menu__content)} ref={ref}>
-            {children}
-          </div>
-        </Scrollbar>
-      </div>
-      <div
-        onClick={() => {
-          setExpanded(
-            isActive
-              ? expanded?.filter((pos) => pos !== position) || []
-              : !!expanded?.length
-                ? [...expanded, position]
-                : [position],
-          );
+        style={{
+          ...(position.includes("bottom") && { top: "unset", bottom: "0" }),
+          ...menuStyle,
         }}
-        className={classNames(
-          styles.title,
-          styles[`title_${position}`],
-          titleClassName,
-          {
-            [styles[`title_${position}_active`]]: isActive,
-            [styles.title_bottom]: position.includes("bottom"),
-          },
-        )}
-        style={titleStyle}
       >
-        <span>{isActive ? titleClose || "Close" : titleOpen || "Open"}</span>
+        <div
+          className={classNames(styles.menu, {
+            [styles.menu_right]: position.includes("right"),
+            [styles.menu_disabled]: isMobile && !isActive,
+            [styles.menu_active]: isActive,
+          })}
+          style={menuStyle}
+          {...props}
+        >
+          <Scrollbar
+            type="absolute"
+            stl={styles}
+            contentStyle={{
+              ...(position.includes("bottom")
+                ? { paddingBottom: "55px" }
+                : { paddingTop: "55px" }),
+            }}
+          >
+            <div className={classNames(styles.menu__content)} ref={ref}>
+              {children}
+            </div>
+          </Scrollbar>
+        </div>
+        <div
+          onClick={() => {
+            setExpanded(
+              isActive
+                ? expanded?.filter((pos) => pos !== position) || []
+                : !!expanded?.length
+                  ? [...expanded, position]
+                  : [position],
+            );
+          }}
+          className={classNames(
+            styles.title,
+            styles[`title_${position}`],
+            titleClassName,
+            {
+              [styles[`title_${position}_active`]]: isActive,
+              [styles.title_bottom]: position.includes("bottom"),
+            },
+          )}
+          style={titleStyle}
+        >
+          <span>{isActive ? titleClose || "Close" : titleOpen || "Open"}</span>
+        </div>
       </div>
-    </div>,
+    </CheckMobile>,
     connector,
   );
 };

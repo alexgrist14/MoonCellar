@@ -1,6 +1,7 @@
 import { GamePage } from "@/src/lib/pages/GamePage";
 import { IGDBApi } from "@/src/lib/shared/api";
 import { IGDBGame } from "@/src/lib/shared/types/igdb";
+import { CheckMobile } from "@/src/lib/shared/ui/CheckMobile";
 import { GetServerSidePropsContext } from "next";
 import Head from "next/head";
 import { FC } from "react";
@@ -19,13 +20,15 @@ const GamePageIndex: FC<{ game: IGDBGame }> = ({ game }) => {
           <meta property="og:description" content={game.summary} key="title" />
         )}
       </Head>
-      <GamePage game={game} />
+      <CheckMobile>
+        <GamePage game={game} />
+      </CheckMobile>
     </div>
   );
 };
 
 export const getServerSideProps = async (
-  context: GetServerSidePropsContext
+  context: GetServerSidePropsContext,
 ) => {
   const { query } = context;
   const game = (await IGDBApi.getGameBySlug(query.slug as string)).data;

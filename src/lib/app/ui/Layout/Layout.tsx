@@ -3,12 +3,13 @@ import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { FC, ReactNode, useEffect } from "react";
 import styles from "./Layout.module.scss";
 import { Header } from "./components";
-import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
 import { useResizeDetector } from "react-resize-detector";
-import { useThrottledCallback } from "use-debounce";
 import { ModalsConnector } from "@/src/lib/shared/ui/Modal";
 import { ToastConnector } from "@/src/lib/shared/ui/Toast";
+import { useMediaStore } from "@/src/lib/shared/hooks/useMediaStore";
+import { CheckMobile } from "@/src/lib/shared/ui/CheckMobile";
+import { useStatesStore } from "@/src/lib/shared/store/states.store";
 
 interface ILayoutProps {
   children: ReactNode;
@@ -19,12 +20,14 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
   const { getById } = userAPI;
   const { refreshToken } = authAPI;
   const { setAuth, setProfile, clear, isAuth } = useAuthStore();
-  const { setMobile, isMobile } = useStatesStore();
+  const { isMobile } = useStatesStore();
 
   const { ref } = useResizeDetector({
     refreshMode: "debounce",
     refreshRate: 200,
   });
+
+  useMediaStore();
 
   useEffect(() => {
     refreshToken()
@@ -39,24 +42,14 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
       });
   }, [clear, getById, isAuth, refreshToken, setAuth, setProfile]);
 
-  const debouncedSetMobile = useThrottledCallback(() => {
-    setMobile(window.innerWidth <= 768);
-  }, 300);
-
-  useEffect(() => {
-    debouncedSetMobile();
-
-    window.addEventListener("resize", debouncedSetMobile);
-
-    return () => window.removeEventListener("resize", debouncedSetMobile);
-  }, [debouncedSetMobile]);
-
   return (
     <div className={className}>
-      {isMobile !== undefined && <Header />}
+      <CheckMobile>
+        <Header />
+      </CheckMobile>
       <Scrollbar stl={styles} type="absolute" fadeType="bottom">
         <main className={"container"} ref={ref}>
-          {isMobile !== undefined && children}
+          {children}
         </main>
       </Scrollbar>
       <ToastConnector />

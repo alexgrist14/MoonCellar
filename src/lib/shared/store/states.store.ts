@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
+import { screenMd } from "../constants";
+import { commonUtils } from "../utils/common";
 
 type IState = {
   isLoading?: boolean;
@@ -44,6 +46,6 @@ export const useStatesStore = create<IState & IAction>()(
           isStarted: false,
         }),
     }),
-    { name: "states" }
-  )
+    { name: "states" },
+  ),
 );
