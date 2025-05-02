@@ -1,5 +1,6 @@
 import { GamePage } from "@/src/lib/pages/GamePage";
 import { IGDBApi } from "@/src/lib/shared/api";
+import { getImageLink } from "@/src/lib/shared/constants";
 import { IGDBGame } from "@/src/lib/shared/types/igdb";
 import { CheckMobile } from "@/src/lib/shared/ui/CheckMobile";
 import { GetServerSidePropsContext } from "next";
@@ -19,6 +20,8 @@ const GamePageIndex: FC<{ game: IGDBGame }> = ({ game }) => {
         {!!game.summary && (
           <meta property="og:description" content={game.summary} key="title" />
         )}
+        <meta property="og:image" content={getImageLink(game.cover.url, 'cover_small')} />
+        <meta property="og:url" content={`https://mooncellar.space/games/${game.slug}`} />
       </Head>
       <CheckMobile>
         <GamePage game={game} />
