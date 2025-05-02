@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ['@commitlint/config-conventional'],
+//   extends: ['@commitlint/config-conventional'],
   rules: {
     "header-min-length": [2, "always", 5],
     "no-russian-letters": [2, "always"],
