@@ -12,6 +12,7 @@ jobs:
     steps:
       - name: install ssh keys
         run: |
+          mkdir -p ~/.ssh/
           touch ~/.ssh/id_rsa
           touch ~/.ssh/id_rsa.pub
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
