@@ -13,12 +13,16 @@ const GamePageIndex: FC<{ game: IGDBGame }> = ({ game }) => {
       <Head>
         <title>{game.name}</title>
         <meta property="title" content={game.name} key="title" />
-        {!!game.summary && (
-          <meta property="description" content={game.summary} key="title" />
-        )}
         <meta property="og:title" content={game.name} key="title" />
         {!!game.summary && (
-          <meta property="og:description" content={game.summary} key="title" />
+          <>
+            <meta property="description" content={game.summary} key="title" />
+            <meta
+              property="og:description"
+              content={game.summary}
+              key="title"
+            />
+          </>
         )}
         {!!game.cover && (
           <>
@@ -44,6 +48,8 @@ const GamePageIndex: FC<{ game: IGDBGame }> = ({ game }) => {
             />
           </>
         )}
+        <meta property="type" content="website" />
+        <meta property="og:type" content="website" />
       </Head>
       <CheckMobile>
         <GamePage game={game} />
