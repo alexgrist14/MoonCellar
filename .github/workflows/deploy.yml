@@ -13,9 +13,11 @@ jobs:
       - name: install ssh keys
         run: |
           mkdir -p ~/.ssh/
-          ln -s /root/.ssh/id_rsa ~/.ssh/id_rsa
-          ln -s /root/.ssh/id_rsa.pub ~/.ssh/id_rsa.pub
-          ln -s /root/.ssh/known_hosts ~/.ssh/known_hosts
+          touch ~/.ssh/id_rsa
+          touch ~/.ssh/id_rsa.pub
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PUBLIC_KEY }}" > ~/.ssh/id_rsa.pub
+          ssh-keyscan -H 77.222.42.88 > ~/.ssh/known_hosts
       - name: connect and pull
         run: ssh root@77.222.42.88 "cd ${{ secrets.WORK_DIR }} && git checkout ${{ secrets.MAIN_BRANCH }} && git pull && exit"
       - name: cleanup
