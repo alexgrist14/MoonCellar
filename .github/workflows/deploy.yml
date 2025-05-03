@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: install ssh keys
+      - name: SSH keys
         run: |
           mkdir -p ~/.ssh/
           touch ~/.ssh/id_rsa
@@ -18,7 +18,17 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           echo "${{ secrets.SSH_PUBLIC_KEY }}" > ~/.ssh/id_rsa.pub
           ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
-      - name: connect and pull
-        run: sshpass -p '${{ secrets.SSH_PASS }}' ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git checkout ${{ secrets.MAIN_BRANCH }} && git pull && exit"
+      - name: Connect and pull
+        run: sshpass -p '${{ secrets.SSH_PASS }}' ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git checkout ${{ secrets.MAIN_BRANCH }} && git pull"
+      - name:  Build
+        run: mkdir ../temp && cp -r * ../temp && cd ../temp && npm ci && npm run build
+      - name: Stop service
+        run: systemctl stop start.service
+      - name: Copy build
+        run: cd ${{ secrets.WORK_DIR }}
+      - name: Start service
+        run: systemctl start start.service
+      - name: Exit ssh
+        run: exit
       - name: cleanup
         run: rm -rf ~/.ssh
