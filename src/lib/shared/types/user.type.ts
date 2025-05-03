@@ -55,4 +55,3 @@ export interface IUserPreset {
   name: string;
   preset: string;
 }
-

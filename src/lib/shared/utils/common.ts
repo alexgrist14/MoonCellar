@@ -32,7 +32,7 @@ const getHumanDate = (inputDate: Date | string) => {
   if (Math.abs(differenceInSeconds) < 60) {
     return relativeTime.format(
       getRoundedSeconds(differenceInSeconds),
-      "second",
+      "second"
     );
   } else if (Math.abs(differenceInMinutes) < 60) {
     return relativeTime.format(differenceInMinutes, "minute");
@@ -124,7 +124,7 @@ const getMaxLength = (array: Object[]): number => {
       Object.values(item).length > result
         ? (result = Object.values(item).length)
         : result,
-    0,
+    0
   );
 };
 
@@ -134,14 +134,14 @@ const getMaxElement = (array: Object[]) => {
       Object.values(item).length > Object.values(result).length
         ? (result = item)
         : result,
-    {},
+    {}
   );
 };
 
 const getAllKeys = (array: Object[]): string[] => {
   return array.reduce<string[]>((result, item) => {
     Object.keys(item).forEach(
-      (key) => !result.some((item) => item === key) && result.push(key),
+      (key) => !result.some((item) => item === key) && result.push(key)
     );
 
     return result;

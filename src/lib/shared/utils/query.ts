@@ -3,14 +3,14 @@ import queryString from "query-string";
 
 export const setQuery = (
   value: { [key: string]: string | number },
-  router: NextRouter,
+  router: NextRouter
 ) => {
   const { query, push, pathname } = router;
 
   push(
     { pathname, query: queryString.stringify({ ...query, ...value }) },
     undefined,
-    { shallow: true },
+    { shallow: true }
   );
 };
 

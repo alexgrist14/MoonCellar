@@ -2,14 +2,14 @@ import { RefObject, useEffect } from "react";
 
 const useCloseEvents = (
   refs: RefObject<HTMLElement>[],
-  callback: () => void,
+  callback: () => void
 ): void => {
   useEffect(() => {
     const clickHandler = (e: MouseEvent): void => {
       refs.reduce(
         (result, ref) =>
           ref.current?.contains(e.target as Node) ? (result = false) : result,
-        true,
+        true
       ) && callback();
     };
 

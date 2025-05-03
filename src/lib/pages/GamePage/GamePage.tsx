@@ -40,15 +40,15 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
       themes: game.themes.map((item) => item._id),
       websites: game.websites.map((item) => item._id),
     }),
-    [game],
+    [game]
   );
 
   const { isMastered, isBeaten } = useMemo(() => {
     const mastered = profile?.raAwards?.filter(
-      (award) => award.awardType === "Mastery/Completion",
+      (award) => award.awardType === "Mastery/Completion"
     );
     const beaten = profile?.raAwards?.filter(
-      (award) => award.awardType === "Game Beaten",
+      (award) => award.awardType === "Game Beaten"
     );
     const raIds = game.raIds?.map((game) => game._id);
 
@@ -62,7 +62,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
 
   const releaseDate = new Date(game.first_release_date * 1000).getFullYear();
   const category = Object.keys(gameCategories).find(
-    (key) => gameCategories[key] === game.category,
+    (key) => gameCategories[key] === game.category
   );
 
   return (
@@ -79,7 +79,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
             <div
               className={classNames(
                 styles.page__cover,
-                isAuth && styles.page__cover_control,
+                isAuth && styles.page__cover_control
               )}
             >
               {!!game.raIds?.length && (

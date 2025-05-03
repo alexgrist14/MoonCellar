@@ -6,14 +6,22 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.tsx\" \"test/**/*.ts\"",
+    "lint": "eslint src --ext ts,tsx,js,jsx --report-unused-disable-directives --max-warnings 10",
+    "lint:fix": "eslint src --ext js,jsx,ts,tsx --fix",
+    "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,scss,html}'",
     "prepare": "husky",
     "pre-commit": "lint-staged"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm run lint && npm run format"
+    }
+  },
   "lint-staged": {
-    "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
-      "prettier --write"
+    "src/**/*.{ts,tsx,js,jsx}": [
+      "npm run lint",
+      "npm run format"
     ]
   },
   "dependencies": {
@@ -34,14 +42,19 @@
     "zustand": "^5.0.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
     "@iconify/react": "^5.0.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-prettier": "^5.2.6",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.1",
+    "prettier": "^3.5.3",
     "typescript": "^5"
   }
 }

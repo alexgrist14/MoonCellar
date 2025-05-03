@@ -12,13 +12,12 @@ import styles from "./Settings.module.scss";
 import { RangeSelector } from "@/src/lib/shared/ui/RangeSelector";
 import { useSettingsStore } from "@/src/lib/shared/store/settings.store";
 
-interface SettingsProps {
-}
+interface SettingsProps {}
 
-export const Settings: FC<SettingsProps> = ({ }) => {
+export const Settings: FC<SettingsProps> = ({}) => {
   const { isAuth, profile } = useAuthStore();
-  const {bgOpacity, setBgOpacity} = useSettingsStore();
-  
+  const { bgOpacity, setBgOpacity } = useSettingsStore();
+
   const { logout } = useAuth();
   const [userName, setUserName] = useState("");
   const [tempAvatar, setTempAvatar] = useState<File>();
@@ -48,7 +47,7 @@ export const Settings: FC<SettingsProps> = ({ }) => {
       apiCalls.push(() => userAPI.addAvatar(profile._id, tempAvatar));
     if (raUsername)
       apiCalls.push(() => userAPI.setRaUserInfo(profile._id, raUsername));
-    if(background)
+    if (background)
       apiCalls.push(() => userAPI.addBackground(profile._id, background));
 
     Promise.all(apiCalls.map((apiCall) => apiCall()))
@@ -70,7 +69,7 @@ export const Settings: FC<SettingsProps> = ({ }) => {
           <Button
             className={styles.btn}
             color={"red"}
-            onClick={()=>handleLogoutClick}
+            onClick={() => handleLogoutClick}
           >
             Logout
           </Button>
@@ -108,7 +107,7 @@ export const Settings: FC<SettingsProps> = ({ }) => {
         </div>
 
         <div className={styles.field}>
-        <label htmlFor="bg">Background URL</label>
+          <label htmlFor="bg">Background URL</label>
           <Input
             type="text"
             id="bg"
@@ -118,14 +117,14 @@ export const Settings: FC<SettingsProps> = ({ }) => {
           />
         </div>
 
-          <RangeSelector
-            defaultValue={bgOpacity || 0}
-            callback={(val) => setBgOpacity(val)}
-            min={0}
-            max={100}
-            text={`Background opacity ${bgOpacity || 0}%`}
-            step={1}
-          />
+        <RangeSelector
+          defaultValue={bgOpacity || 0}
+          callback={(val) => setBgOpacity(val)}
+          min={0}
+          max={100}
+          text={`Background opacity ${bgOpacity || 0}%`}
+          step={1}
+        />
 
         <div className={styles.field}>
           <label htmlFor="description">Description</label>

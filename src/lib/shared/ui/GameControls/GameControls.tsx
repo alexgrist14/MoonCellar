@@ -102,12 +102,12 @@ export const GameControls: FC<IGameControlsProps> = ({
 
   const rating = useMemo(
     () => profile?.gamesRating?.find((rating) => rating.game === game._id),
-    [game, profile],
+    [game, profile]
   );
 
   const isRoyal = useMemo(
     () => royalGames?.some((royal) => royal._id === game?._id),
-    [game, royalGames],
+    [game, royalGames]
   );
 
   useCloseEvents([controlsRef], () => {
@@ -153,7 +153,7 @@ export const GameControls: FC<IGameControlsProps> = ({
                 : "Add to"}{" "}
               {key}
             </Button>
-          ),
+          )
         )}
       </div>
       <div
@@ -200,7 +200,7 @@ export const GameControls: FC<IGameControlsProps> = ({
               userAPI[!!value ? "addGameRating" : "removeGameRating"](
                 profile._id,
                 game._id,
-                value,
+                value
               )
                 .then((res) => {
                   toast.success({

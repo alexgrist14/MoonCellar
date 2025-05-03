@@ -54,7 +54,7 @@ export const Toast: FC<IToastProps> = ({
 
     if (time > 0) {
       requestAnimationFrame((data) =>
-        getStep(data, !!start ? start : data - timeLeft.current),
+        getStep(data, !!start ? start : data - timeLeft.current)
       );
     }
   }, []);
@@ -131,6 +131,6 @@ export const Toast: FC<IToastProps> = ({
         />
       </div>
     </div>,
-    portal,
+    portal
   );
 };

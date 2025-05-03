@@ -91,7 +91,7 @@ const UserInfo: FC<UserInfoProps> = ({
                 {commonUtils.getHumanDate(user.updatedAt)}
               </div>
               {user.description && (
-                <Markdown  className={styles.profile__description}>
+                <Markdown className={styles.profile__description}>
                   {user.description}
                 </Markdown>
               )}

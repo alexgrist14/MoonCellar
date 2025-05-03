@@ -86,4 +86,4 @@ export const gameCategoryNames: { [key: string]: string } = {
   update: "Update",
 };
 
-export const coverRatio = 528/704;
+export const coverRatio = 528 / 704;

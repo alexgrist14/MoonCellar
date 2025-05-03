@@ -1,4 +1,4 @@
-.container{
+.container {
   .sort {
     display: flex;
     width: 70px;
@@ -16,26 +16,26 @@
       }
     }
   }
-  
+
   .games {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     height: 100%;
     margin-inline: auto;
     gap: 40px;
-  
+
     @include mediaLg {
       grid-template-columns: repeat(4, 1fr);
     }
-  
+
     @include mediaMd {
       grid-template-columns: repeat(3, 1fr);
     }
-  
+
     @include mediaSm {
       grid-template-columns: repeat(2, 1fr);
     }
-  
+
     &__title {
       @include textEllipsis;
       padding-inline: 5px;
@@ -58,6 +58,4 @@
       filter: drop-shadow(0 0 0.6rem $accent);
     }
   }
-  
 }
-

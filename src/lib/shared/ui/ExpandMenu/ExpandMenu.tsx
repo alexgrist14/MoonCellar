@@ -42,9 +42,9 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
   const connector = useMemo(
     () =>
       commonUtils.checkWindow(() =>
-        document.getElementById("expand-connector"),
+        document.getElementById("expand-connector")
       ),
-    [],
+    []
   );
 
   if (!connector) return null;
@@ -94,7 +94,7 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
                 ? expanded?.filter((pos) => pos !== position) || []
                 : !!expanded?.length
                   ? [...expanded, position]
-                  : [position],
+                  : [position]
             );
           }}
           className={classNames(
@@ -104,7 +104,7 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
             {
               [styles[`title_${position}_active`]]: isActive,
               [styles.title_bottom]: position.includes("bottom"),
-            },
+            }
           )}
           style={titleStyle}
         >
@@ -112,6 +112,6 @@ export const ExpandMenu: FC<IExpandMenuProps> = ({
         </div>
       </div>
     </CheckMobile>,
-    connector,
+    connector
   );
 };

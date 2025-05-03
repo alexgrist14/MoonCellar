@@ -184,5 +184,5 @@ export const userAPI = {
   removePreset,
   getPresets,
   addBackground,
-  getBackground
+  getBackground,
 };

@@ -75,7 +75,9 @@
     top: 0;
     height: 65px;
     touch-action: none;
-    transition: height 0.2s, opacity 0.3s;
+    transition:
+      height 0.2s,
+      opacity 0.3s;
     opacity: 0.4;
 
     &::before {

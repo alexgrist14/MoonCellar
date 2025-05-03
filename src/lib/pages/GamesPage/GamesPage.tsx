@@ -24,8 +24,7 @@ export const GamesPage: FC = () => {
   const { asPath, query } = router;
 
   const { isLoading, setLoading, isRoyal, isMobile } = useStatesStore();
-  const { setGenres, setGameModes, setSystems, setThemes } =
-    useCommonStore();
+  const { setGenres, setGameModes, setSystems, setThemes } = useCommonStore();
 
   const [games, setGames] = useState<IGDBGameMinimal[]>([]);
   const [total, setTotal] = useState(0);

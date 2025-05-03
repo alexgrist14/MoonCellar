@@ -1,11 +1,5 @@
 import Image from "next/image";
-import {
-  ChangeEvent,
-  Dispatch,
-  FC,
-  SetStateAction,
-  useState
-} from "react";
+import { ChangeEvent, Dispatch, FC, SetStateAction, useState } from "react";
 import { useAuthStore } from "../../store/auth.store";
 import { SvgCamera } from "../svg";
 import styles from "./AvatarSettings.module.scss";
@@ -57,8 +51,8 @@ const AvatarSettings: FC<AvatarSettingsProps> = ({
             profile?.profilePicture
               ? `https://api.mooncellar.space/photos/${profile.profilePicture}`
               : !!tempAvatar
-              ? URL.createObjectURL(tempAvatar)
-              : "/images/user.png"
+                ? URL.createObjectURL(tempAvatar)
+                : "/images/user.png"
           }
           width={160}
           height={160}

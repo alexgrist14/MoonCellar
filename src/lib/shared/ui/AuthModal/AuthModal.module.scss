@@ -36,9 +36,8 @@
       flex-direction: column;
       align-items: center;
       gap: 10px;
-      p{
+      p {
         font-size: 0.9em;
-
       }
       .link {
         color: $accent;
@@ -46,13 +45,13 @@
           cursor: pointer;
         }
       }
-      .btn{
+      .btn {
         position: relative;
         width: 100%;
         max-width: 185px;
         min-height: 31px;
-        div{
-          @include flexCenter
+        div {
+          @include flexCenter;
         }
       }
     }

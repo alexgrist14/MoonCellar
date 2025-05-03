@@ -1,1 +1,1 @@
-export * from './BGImage';
+export * from "./BGImage";

@@ -87,7 +87,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
       ctx.fillText(
         value?.length > 19 ? value.slice(0, 20) + "..." : value || "",
         size / 2 + 20,
-        0,
+        0
       );
       ctx.restore();
     };
@@ -137,7 +137,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
       setWinnerAngle(
         angle.current +
           (360 - (360 / wheelGames.length) * winner) -
-          Math.floor(Math.random() * (360 / wheelGames.length)),
+          Math.floor(Math.random() * (360 / wheelGames.length))
       );
 
       setStarted(false);
@@ -147,7 +147,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
 
         if (isRoyal) {
           setWheelGames((wheelGames) =>
-            wheelGames.filter((game) => game._id !== wheelGames[winner]._id),
+            wheelGames.filter((game) => game._id !== wheelGames[winner]._id)
           );
         } else {
           addHistoryGame(wheelGames[winner]);
