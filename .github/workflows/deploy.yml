@@ -20,12 +20,10 @@ jobs:
           ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
       - name: Connect and pull
         run: sshpass -p '${{ secrets.SSH_PASS }}' ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git checkout ${{ secrets.MAIN_BRANCH }} && git pull"
-      - name:  Build
-        run: mkdir ../temp && cp -r ../* ../temp/ && cd ../temp && npm ci && npm run build
       - name: Stop service
         run: systemctl stop start.service
-      - name: Copy build
-        run: cd ${{ secrets.WORK_DIR }} && rm -rf ../temp
+      - name:  Build
+        run: npm ci && npm run build
       - name: Start service
         run: systemctl start start.service
       - name: Exit ssh
