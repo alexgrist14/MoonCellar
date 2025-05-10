@@ -58,12 +58,6 @@ const UserInfo: FC<UserInfoProps> = ({
           .then((res) => setUserAuthFollowings(res.data));
   };
 
-  // const diagramData = {} as any;
-  //
-  // userListCategories.map((category) => {
-  //   diagramData[`${category}`] = games[`${category}`].length;
-  // });
-
   return (
     <>
       <div className={styles.content__top}>

@@ -81,6 +81,7 @@ export const AuthModal: FC = () => {
             <Input
               type="email"
               id="email"
+              autoComplete="username"
               {...register("email", { required: true })}
             />
           </div>

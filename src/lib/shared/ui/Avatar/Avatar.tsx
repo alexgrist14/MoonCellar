@@ -4,6 +4,7 @@ import { IUser } from "../../types/auth";
 import { SvgProfile } from "../svg";
 import { Tooltip } from "../Tooltip";
 import styles from "./Avatar.module.scss";
+import { commonUtils } from "../../utils/common";
 
 interface AvatarProps {
   user?: Pick<IUser, "_id" | "userName" | "profilePicture">;
@@ -24,7 +25,7 @@ const Avatar: FC<AvatarProps> = ({ user, isWithoutTooltip }) => {
       {user?.profilePicture ? (
         <Image
           className={styles.image}
-          src={`https://api.mooncellar.space/photos/${user.profilePicture}`}
+          src={commonUtils.getAvatar(user as IUser)}
           width={90}
           height={90}
           alt="profile"
