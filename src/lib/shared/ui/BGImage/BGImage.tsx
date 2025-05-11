@@ -14,7 +14,10 @@ interface IBGImageProps {
   defaultImage?: string;
 }
 
-export const BGImage: FC<IBGImageProps> = ({ game, defaultImage }) => {
+export const BGImage: FC<IBGImageProps> = ({
+  game,
+  defaultImage = "/images/moon.jpg",
+}) => {
   const { bgOpacity } = useSettingsStore();
 
   const [bg, setBg] = useState<IGDBScreenshot & { gameId: number }>();
@@ -86,11 +89,7 @@ export const BGImage: FC<IBGImageProps> = ({ game, defaultImage }) => {
             onLoad={() => setIsDefaultReady(true)}
             key={bg?._id}
             alt="Background"
-            src={
-              defaultImage
-                ? `/api/proxy?url=${encodeURIComponent(defaultImage)}`
-                : "/images/moon.jpg"
-            }
+            src={defaultImage}
             width={1920}
             height={1080}
           />
