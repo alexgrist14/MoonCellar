@@ -7,7 +7,14 @@ import { Input } from "@/src/lib/shared/ui/Input";
 import { Textarea } from "@/src/lib/shared/ui/Textarea";
 import { axiosUtils } from "@/src/lib/shared/utils/axios";
 import { toast } from "@/src/lib/shared/utils/toast";
-import { Dispatch, FC, FormEvent, SetStateAction, useState } from "react";
+import {
+  Dispatch,
+  FC,
+  FormEvent,
+  SetStateAction,
+  useState,
+  MouseEvent,
+} from "react";
 import styles from "./Settings.module.scss";
 import { RangeSelector } from "@/src/lib/shared/ui/RangeSelector";
 import { useSettingsStore } from "@/src/lib/shared/store/settings.store";
@@ -25,7 +32,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
   const [background, setBackground] = useState("");
   const [raUsername, setRaUserName] = useState("");
 
-  const handleLogoutClick = (e: FormEvent<HTMLFormElement>) => {
+  const handleLogout = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (isAuth && profile) {
       logout(profile._id);
@@ -34,7 +41,6 @@ export const Settings: FC<SettingsProps> = ({}) => {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     if (!profile) return;
 
     const apiCalls = [];
@@ -69,7 +75,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
           <Button
             className={styles.btn}
             color={"red"}
-            onClick={() => handleLogoutClick}
+            onClick={(e) => handleLogout(e)}
           >
             Logout
           </Button>

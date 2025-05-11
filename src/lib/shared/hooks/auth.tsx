@@ -40,7 +40,6 @@ export const useAuth = () => {
       })
       .catch((e: IAxiosErrorResponse) => {
         axiosUtils.toastError(e);
-        throw new Error();
       });
   };
 
@@ -52,7 +51,6 @@ export const useAuth = () => {
       })
       .catch((e: IAxiosErrorResponse) => {
         axiosUtils.toastError(e);
-        throw new Error();
       });
   };
 
