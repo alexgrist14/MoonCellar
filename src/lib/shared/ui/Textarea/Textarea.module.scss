@@ -2,13 +2,12 @@
   width: 100%;
   position: relative;
   display: grid;
-  height: fit-content;
+  height: fit-content !important;
 
   &__replica {
     @include font(16px, 18px, 400);
     white-space: pre-wrap;
     width: 100%;
-    height: 48px;
     height: fit-content;
     padding: 14px 12px;
     position: absolute;
@@ -36,7 +35,6 @@
   &__field {
     @include font(16px, 18px, 400);
     width: 100%;
-    height: 48px;
     min-height: 48px;
     max-height: 40vh;
     padding: 14px 12px;

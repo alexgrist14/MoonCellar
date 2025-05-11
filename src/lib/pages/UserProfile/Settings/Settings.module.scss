@@ -18,6 +18,10 @@
 
     .field {
       width: 300px;
+
+      textarea {
+        height: fit-content !important;
+      }
     }
 
     .btn {
