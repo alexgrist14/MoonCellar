@@ -5,7 +5,6 @@ const nextConfig = {
     additionalData: '@import "./src/lib/shared/styles/app.scss"; ',
   },
   images: {
-    domains: ["images7.alphacoders.com"],
     remotePatterns: [
       {
         protocol: "https",
