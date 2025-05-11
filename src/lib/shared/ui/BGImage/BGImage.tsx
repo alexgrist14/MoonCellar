@@ -8,7 +8,6 @@ import { IGDBGameMinimal, IGDBScreenshot } from "../../types/igdb";
 import { getImageLink } from "../../constants";
 import { useDebouncedCallback } from "use-debounce";
 import { useSettingsStore } from "../../store/settings.store";
-import { useAuthStore } from "../../store/auth.store";
 
 interface IBGImageProps {
   game?: IGDBGameMinimal;
@@ -20,14 +19,11 @@ export const BGImage: FC<IBGImageProps> = ({
   defaultImage = "/images/moon.jpg",
 }) => {
   const { bgOpacity } = useSettingsStore();
-  const { profile } = useAuthStore();
 
   const [bg, setBg] = useState<IGDBScreenshot & { gameId: number }>();
   const [isImageReady, setIsImageReady] = useState(false);
   const [isDefaultReady, setIsDefaultReady] = useState(false);
   const [isAnimation, setIsAnimation] = useState(true);
-
-  const [prevImage, setPrevImage] = useState("");
 
   const debouncedSetImageReady = useDebouncedCallback((state: boolean) => {
     setIsImageReady(state);
@@ -35,8 +31,6 @@ export const BGImage: FC<IBGImageProps> = ({
   }, 300);
 
   useEffect(() => {
-    !!bg && setPrevImage(getImageLink(bg.url, "1080p"));
-
     if (!game) return;
 
     const pictures: number[] = [];
@@ -95,7 +89,7 @@ export const BGImage: FC<IBGImageProps> = ({
             onLoad={() => setIsDefaultReady(true)}
             key={bg?._id}
             alt="Background"
-            src={prevImage || profile?.background || defaultImage}
+            src={defaultImage}
             width={1920}
             height={1080}
           />

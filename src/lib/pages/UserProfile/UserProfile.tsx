@@ -44,7 +44,7 @@ const UserProfile: FC<UserProfileProps> = ({
 
   return (
     <>
-      <BGImage />
+      <BGImage defaultImage={user.background || undefined} />
       <div className={cn(styles.container)}>
         {isMobile && (
           <ExpandMenu

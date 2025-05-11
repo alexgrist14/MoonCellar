@@ -82,8 +82,13 @@
       padding: 10px;
       white-space: pre-wrap;
       text-align: left;
+      object-fit: cover;
       * {
         font-size: 0.8rem;
+      }
+      img{
+        width: 100%;
+        border-radius: 5px;
       }
       li {
         margin-left: 12px;
