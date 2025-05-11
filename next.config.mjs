@@ -5,10 +5,15 @@ const nextConfig = {
     additionalData: '@import "./src/lib/shared/styles/app.scss"; ',
   },
   images: {
+    domains: ["images7.alphacoders.com"],
     remotePatterns: [
       {
         protocol: "https",
         hostname: "images.igdb.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images7.alphacoders.com",
       },
       {
         protocol:"http",
