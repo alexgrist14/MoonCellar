@@ -4,19 +4,9 @@
   justify-content: center;
   flex-direction: column;
   gap: 30px;
-  background: $lightBgSecond;
+  background: $darkblueBg;
   object-fit: cover;
   font-family: var(--font-pentagra);
   width: 100%;
   height: 100%;
-
-  div {
-    width: 72px;
-    height: 30%;
-    aspect-ratio: 1;
-    svg {
-      width: 100%;
-      height: 100%;
-    }
-  }
 }

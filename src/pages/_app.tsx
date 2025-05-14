@@ -45,7 +45,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <title>MoonCellar</title>
         <meta name="description" content="Games tracker and database" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/images/favicon.png" />
+        <link rel="icon" href="/images/mooncellar.ico" />
       </Head>
       <Layout className={classNames(general.variable, pentagra.variable)}>
         <Component {...pageProps} />

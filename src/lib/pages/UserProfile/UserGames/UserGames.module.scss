@@ -1,19 +1,28 @@
 .container {
   .sort {
     display: flex;
-    width: 70px;
-    justify-content: flex-start;
+    background-color: $neutral-10;
+    justify-content: center;
+    padding-left: 10px;
     align-items: center;
+    max-width: 200px;
+    user-select: none;
+    margin-bottom: 10px;
+    border-radius: $radius;
+    gap: 10px;
     cursor: pointer;
     &__icon {
-      cursor: pointer;
-      width: 32px;
-      height: 32px;
       margin-inline: auto;
       transition: transform 0.2s;
       &_active {
         transform: rotateX(180deg);
       }
+      &_container{
+        display: flex;
+      }
+    }
+    &__dropdown{
+      transform: translateX(-26%);
     }
   }
 

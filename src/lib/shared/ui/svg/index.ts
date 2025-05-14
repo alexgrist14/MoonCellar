@@ -16,3 +16,4 @@ export * from "./SvgPen";
 export * from "./SvgArrow";
 export * from "./SvgDoubleArrow";
 export * from "./SvgAchievement";
+export * from "./SvgArrowPointer";

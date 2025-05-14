@@ -1,0 +1,13 @@
+.radio {
+  width: 18px;
+  aspect-ratio: 1;
+  background-color: $bg;
+  border: 2px solid $textColor;
+  border-radius: 50%;
+  cursor: pointer;
+  appearance: none;
+  &:checked{
+    background-color: $accent;
+  }
+
+}

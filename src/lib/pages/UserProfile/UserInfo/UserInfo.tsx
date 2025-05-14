@@ -91,21 +91,19 @@ const UserInfo: FC<UserInfoProps> = ({
               )}
             </div>
           </div>
-          <div className={styles.diagram}>
-            <div className={styles.friends}>
-              <h3 className={styles.title}>Friends</h3>
-              <div className={styles.friends__list}>
-                {!!userFollowings &&
-                  userFollowings.followings.map((item, i) => (
-                    <Link
-                      href={`/user/${item.userName}`}
-                      className={styles.friends__item}
-                      key={`${id}_${i}`}
-                    >
-                      <Avatar user={item} />
-                    </Link>
-                  ))}
-              </div>
+          <div className={styles.friends}>
+            <h3 className={styles.title}>Friends</h3>
+            <div className={styles.friends__list}>
+              {!!userFollowings &&
+                userFollowings.followings.map((item, i) => (
+                  <Link
+                    href={`/user/${item.userName}`}
+                    className={styles.friends__item}
+                    key={`${id}_${i}`}
+                  >
+                    <Avatar user={item} />
+                  </Link>
+                ))}
             </div>
           </div>
         </div>
