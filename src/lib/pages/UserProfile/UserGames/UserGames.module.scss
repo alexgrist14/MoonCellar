@@ -17,11 +17,11 @@
       &_active {
         transform: rotateX(180deg);
       }
-      &_container{
+      &_container {
         display: flex;
       }
     }
-    &__dropdown{
+    &__dropdown {
       transform: translateX(-26%);
     }
   }

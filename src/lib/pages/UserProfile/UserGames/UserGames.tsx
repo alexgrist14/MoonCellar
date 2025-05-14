@@ -10,7 +10,7 @@ import { SvgArrowPointer } from "@/src/lib/shared/ui/svg";
 import { Icon } from "@iconify/react";
 import classNames from "classnames";
 import { useRouter } from "next/router";
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
 import styles from "./UserGames.module.scss";
 
 interface UserGamesProps {
@@ -34,6 +34,8 @@ export const UserGames: FC<UserGamesProps> = ({
   ];
 
   const sortOrderOptions = [{ label: "asc" }, { label: "desc" }];
+
+  const sortRef = useRef<HTMLDivElement>(null);
 
   const [total, setTotal] = useState(0);
   const [take, setTake] = useState(30);
@@ -96,6 +98,13 @@ export const UserGames: FC<UserGamesProps> = ({
     }
   }, [sortedGames, selectedSort, sortOrder, applySorting]);
 
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const handleSortChange = (value: SortType) => {
     setSelectedSort(value);
   };
@@ -104,10 +113,17 @@ export const UserGames: FC<UserGamesProps> = ({
     setSortOrder(value);
   };
 
+  const handleClickOutside = (event: MouseEvent) => {
+    if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
+      setIsDropdownOpen(false);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div
         className={styles.sort}
+        ref={sortRef}
         onClick={() => setIsDropdownOpen((prev) => !prev)}
       >
         <div className={styles.sort__icon_container}>

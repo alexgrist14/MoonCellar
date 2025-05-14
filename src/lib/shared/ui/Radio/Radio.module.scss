@@ -6,8 +6,7 @@
   border-radius: 50%;
   cursor: pointer;
   appearance: none;
-  &:checked{
+  &:checked {
     background-color: $accent;
   }
-
 }
