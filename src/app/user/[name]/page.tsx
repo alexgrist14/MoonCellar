@@ -16,7 +16,7 @@ export default async function User({ params }: { params: any }) {
     ? (await userAPI.getUserFollowings(authUserInfo.id)).data
     : undefined;
 
-  const user = (await userAPI.getByName(await params.name)).data;
+  const user = (await userAPI.getByName((await params).name)).data;
   const userFollowings = (await userAPI.getUserFollowings(user._id)).data;
   const logsResult = (await userAPI.getUserLogs(user._id)).data;
   user.raUsername && (await userAPI.setRaUserInfo(user._id, user.raUsername));

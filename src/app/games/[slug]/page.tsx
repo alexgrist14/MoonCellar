@@ -5,7 +5,7 @@ import { CheckMobile } from "@/src/lib/shared/ui/CheckMobile";
 import Head from "next/head";
 
 const GamePageIndex = async ({ params }: { params: any }) => {
-  const game = (await IGDBApi.getGameBySlug(params.slug)).data;
+  const game = (await IGDBApi.getGameBySlug((await params).slug)).data;
 
   return (
     <div>
