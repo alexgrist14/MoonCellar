@@ -1,10 +1,11 @@
-import Head from "next/head";
 import { Layout } from "../lib/app/ui/Layout";
 import localFont from "next/font/local";
 import classNames from "classnames";
 import { ReactNode } from "react";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../lib/shared/constants";
 import { cookies } from "next/headers";
+import "/src/lib/app/styles/reset.scss";
+import "/src/lib/app/styles/common.scss";
 
 const general = localFont({
   variable: "--font-general",

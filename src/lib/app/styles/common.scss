@@ -1,4 +1,4 @@
-@import "app.scss";
+@use "index.scss" as *;
 
 p {
   font-size: max(0.9vw, 14px);
