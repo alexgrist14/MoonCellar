@@ -24,7 +24,7 @@ export const Textarea: FC<ITextareaProps> = forwardRef<
     },
     ref
   ) => {
-    const textRef = useRef<HTMLTextAreaElement | null>(null);
+    const textRef = useRef<HTMLTextAreaElement>(null);
     const replicaRef = useRef<HTMLDivElement>(null);
 
     const [replicaValue, setReplicaValue] = useState("");

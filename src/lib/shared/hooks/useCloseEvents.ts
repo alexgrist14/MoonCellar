@@ -1,7 +1,7 @@
 import { RefObject, useEffect } from "react";
 
 const useCloseEvents = (
-  refs: RefObject<HTMLElement>[],
+  refs: RefObject<HTMLDivElement | null>[],
   callback: () => void
 ): void => {
   useEffect(() => {

@@ -1,8 +1,11 @@
+@use 'colors' as *;
+@use "sass:math";
+
 //main
 $radius: 4px;
 
 //ratio
-$coverRatio: 528/704;
+$coverRatio: math.div(528, 704);
 
 //height
 $headerHeight: 45px;

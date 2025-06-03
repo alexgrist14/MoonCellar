@@ -11,7 +11,6 @@ import cl from "classnames";
 import styles from "./Dropdown.module.scss";
 import { useDebouncedCallback } from "use-debounce";
 import { SvgChevron } from "../svg";
-import { useRouter } from "next/router";
 import { Button } from "../Button";
 import useCloseEvents from "../../hooks/useCloseEvents";
 import { Scrollbar } from "../Scrollbar";
@@ -95,7 +94,6 @@ export const Dropdown: FC<IDropDownListProps> = ({
   borderTheme,
   icons,
 }) => {
-  const router = useRouter();
   const [isActive, setIsActive] = useState(false);
   const [value, setValue] = useState(initialValue);
   const [multiValue, setMultiValue] = useState<number[]>(
@@ -234,8 +232,7 @@ export const Dropdown: FC<IDropDownListProps> = ({
   const fieldClickHandler = () => {
     const rootRect =
       rootRef?.current?.getBoundingClientRect() ||
-      (!!router.isReady &&
-        !!overflowRootId &&
+      (!!overflowRootId &&
         document.getElementById(overflowRootId)?.getBoundingClientRect());
     const listRect = innerRef.current?.getBoundingClientRect();
 

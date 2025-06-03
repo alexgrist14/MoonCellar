@@ -14,8 +14,8 @@ import Markdown from "react-markdown";
 interface UserInfoProps {
   user: IUser;
   logs: ILogs[];
-  authUserFollowings: IFollowings;
-  authUserId: string;
+  authUserFollowings?: IFollowings;
+  authUserId?: string;
 }
 
 const UserInfo: FC<UserInfoProps> = ({
@@ -26,8 +26,9 @@ const UserInfo: FC<UserInfoProps> = ({
 }) => {
   const { _id: id, followings: userFollowings, userName } = user;
 
-  const [userAuthFollowings, setUserAuthFollowings] =
-    useState<IFollowings>(authUserFollowings);
+  const [userAuthFollowings, setUserAuthFollowings] = useState<IFollowings>(
+    authUserFollowings || { followings: [] }
+  );
 
   const setActivityType = (action: string, isAdd: boolean, rating?: number) => {
     const actions = action.split(" and ");
@@ -85,9 +86,9 @@ const UserInfo: FC<UserInfoProps> = ({
                 {commonUtils.getHumanDate(user.updatedAt)}
               </div>
               {user.description && (
-                <Markdown className={styles.profile__description}>
-                  {user.description}
-                </Markdown>
+                <div className={styles.profile__description}>
+                  <Markdown>{user.description}</Markdown>
+                </div>
               )}
             </div>
           </div>

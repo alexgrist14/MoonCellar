@@ -1,5 +1,5 @@
 import { IUser } from "./auth";
-import { IGDBGame, IGDBGameMinimal } from "./igdb";
+import { IGDBGameMinimal } from "./igdb";
 
 export type CategoriesType =
   | "completed"
@@ -7,7 +7,6 @@ export type CategoriesType =
   | "dropped"
   | "playing"
   | "backlog"
-  | "mastered"
   | "played";
 
 export type CategoriesCount = Record<CategoriesType, number>;

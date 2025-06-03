@@ -7,7 +7,7 @@ interface ITooltipProps {
   isActive?: boolean;
   isFixed?: boolean;
   root?: HTMLDivElement | null;
-  positionRef: RefObject<HTMLElement>;
+  positionRef: RefObject<HTMLDivElement | null>;
   children?: ReactNode;
   className?: string;
 }

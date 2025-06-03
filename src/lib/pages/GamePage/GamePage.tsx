@@ -1,3 +1,5 @@
+"use client";
+
 import { FC, useMemo, useState } from "react";
 import styles from "./GamePage.module.scss";
 import Image from "next/image";

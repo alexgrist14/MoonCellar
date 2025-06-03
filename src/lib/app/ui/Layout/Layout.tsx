@@ -1,6 +1,6 @@
-import { authAPI, userAPI } from "@/src/lib/shared/api";
-import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { FC, ReactNode, useEffect } from "react";
+"use client";
+
+import { FC, ReactNode, useState } from "react";
 import styles from "./Layout.module.scss";
 import { Header } from "./components";
 import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
@@ -9,38 +9,31 @@ import { ModalsConnector } from "@/src/lib/shared/ui/Modal";
 import { ToastConnector } from "@/src/lib/shared/ui/Toast";
 import { useMediaStore } from "@/src/lib/shared/hooks/useMediaStore";
 import { CheckMobile } from "@/src/lib/shared/ui/CheckMobile";
-import { useStatesStore } from "@/src/lib/shared/store/states.store";
+import { useAuthRefresh } from "@/src/lib/shared/hooks/useAuthRefresh";
+import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
 interface ILayoutProps {
   children: ReactNode;
   className?: string;
+  accessToken?: RequestCookie;
+  refreshToken?: RequestCookie;
 }
 
-export const Layout: FC<ILayoutProps> = ({ children, className }) => {
-  const { getById } = userAPI;
-  const { refreshToken } = authAPI;
-  const { setAuth, setProfile, clear, isAuth } = useAuthStore();
-  const { isMobile } = useStatesStore();
+export const Layout: FC<ILayoutProps> = ({
+  children,
+  className,
+  refreshToken,
+  accessToken,
+}) => {
+  const [isAccessReady, setIsAccessReady] = useState(false);
 
   const { ref } = useResizeDetector({
     refreshMode: "debounce",
     refreshRate: 200,
   });
 
+  useAuthRefresh({ accessToken, refreshToken }, setIsAccessReady);
   useMediaStore();
-
-  useEffect(() => {
-    refreshToken()
-      .then((res) => {
-        setAuth(true);
-        getById(res.data.userId).then((res) => {
-          setProfile(res.data);
-        });
-      })
-      .catch(() => {
-        clear();
-      });
-  }, [clear, getById, isAuth, refreshToken, setAuth, setProfile]);
 
   return (
     <div className={className}>

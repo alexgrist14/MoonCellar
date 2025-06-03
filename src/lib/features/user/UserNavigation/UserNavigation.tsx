@@ -5,7 +5,6 @@ import { Button } from "@/src/lib/shared/ui/Button";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { CustomFolder } from "@/src/lib/shared/ui/CustomFolderModal";
 import { setQuery } from "@/src/lib/shared/utils/query";
-import { useRouter } from "next/router";
 import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
 import { IUser } from "@/src/lib/shared/types/auth";
 import { userListCategories } from "@/src/lib/shared/constants/user.const";
@@ -15,6 +14,7 @@ import classNames from "classnames";
 import { SvgPen, SvgSettings } from "@/src/lib/shared/ui/svg";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export const UserNavigation: FC<{
   isAuthedUser: boolean;
@@ -22,6 +22,9 @@ export const UserNavigation: FC<{
   games: Record<CategoriesType, number[]>;
 }> = ({ isAuthedUser, user, games }) => {
   const router = useRouter();
+  const query = useSearchParams();
+  const pathname = usePathname();
+
   const { setExpanded } = useCommonStore();
   const { isMobile } = useStatesStore();
 
@@ -37,7 +40,7 @@ export const UserNavigation: FC<{
           color="transparent"
           onClick={() => {
             setExpanded([]);
-            setQuery({ list: "profile" }, router);
+            setQuery({ list: "profile" }, router, pathname, query.toString());
           }}
         >
           <div>
@@ -53,11 +56,16 @@ export const UserNavigation: FC<{
           <Button
             key={category + i}
             className={styles.btn}
-            active={router.query.list === category}
+            active={query.get("list") === category}
             color="transparent"
             onClick={() => {
               setExpanded([]);
-              setQuery({ list: category.toLowerCase(), page: 1 }, router);
+              setQuery(
+                { list: category.toLowerCase(), page: 1 },
+                router,
+                pathname,
+                query.toString()
+              );
             }}
           >
             <span>{commonUtils.upFL(category)}</span>
@@ -81,11 +89,16 @@ export const UserNavigation: FC<{
         <WrapperTemplate isWithBlur={!isMobile}>
           <Button
             className={styles.btn}
-            active={router.query.list === "settings"}
+            active={query.get("list") === "settings"}
             color="transparent"
             onClick={() => {
               setExpanded([]);
-              setQuery({ list: "settings" }, router);
+              setQuery(
+                { list: "settings" },
+                router,
+                pathname,
+                query.toString()
+              );
             }}
           >
             <div>

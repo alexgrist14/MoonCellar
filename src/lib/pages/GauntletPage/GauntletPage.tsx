@@ -1,3 +1,5 @@
+"use client";
+
 import { FC, useCallback, useEffect } from "react";
 import styles from "./GauntletPage.module.scss";
 import { ConsolesList } from "../../widgets/main";
@@ -8,13 +10,13 @@ import { useStatesStore } from "../../shared/store/states.store";
 import classNames from "classnames";
 import { useGamesStore } from "../../shared/store/games.store";
 import { parseQueryFilters } from "../../shared/utils/filters.util";
-import { useRouter } from "next/router";
 import { useCommonStore } from "../../shared/store/common.store";
 import { Filters } from "../../shared/ui/Filters";
 import { BGImage } from "../../shared/ui/BGImage";
+import { useAdvancedRouter } from "../../shared/hooks/useAdvancedRouter";
 
 export const GauntletPage: FC = () => {
-  const { asPath } = useRouter();
+  const { asPath } = useAdvancedRouter();
 
   const { setGenres, setGameModes, setSystems, setThemes } = useCommonStore();
   const { setGames, historyGames, setWinner, winner } = useGamesStore();

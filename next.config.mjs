@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: false,
   sassOptions: {
-    additionalData: '@import "./src/lib/shared/styles/app.scss"; ',
+    additionalData: '@use "./src/lib/app/styles/index.scss" as *;',
   },
   images: {
     remotePatterns: [
@@ -15,24 +15,24 @@ const nextConfig = {
         hostname: "images7.alphacoders.com",
       },
       {
-        protocol:"http",
-        hostname:"localhost",
+        protocol: "http",
+        hostname: "localhost",
         port: "3228",
       },
       {
         protocol: "https",
-        hostname: "api.mooncellar.space"
+        hostname: "api.mooncellar.space",
       },
       {
         protocol: "https",
-        hostname: "media.retroachievements.org"
+        hostname: "media.retroachievements.org",
       },
       {
-        protocol: 'https',
-        hostname: '**',
-        port: '',
-        pathname: '**',
-    },
+        protocol: "https",
+        hostname: "**",
+        port: "",
+        pathname: "**",
+      },
     ],
   },
 };

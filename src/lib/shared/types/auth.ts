@@ -29,3 +29,11 @@ export interface IUser {
   raAwards?: IRAAward[];
   background?: string;
 }
+
+export interface IAuthToken {
+  id: string;
+  username: string;
+  email: string;
+  iat: number;
+  exp: number;
+}

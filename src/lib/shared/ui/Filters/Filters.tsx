@@ -8,7 +8,6 @@ import { gameCategories, gameCategoryNames } from "../../constants";
 import { ButtonGroup } from "../Button/ButtonGroup";
 import { ToggleSwitch } from "../ToggleSwitch";
 import { IGameFilters } from "../../types/filters.type";
-import { useRouter } from "next/router";
 import { RangeSelector } from "../RangeSelector";
 import {
   parseQueryFilters,
@@ -26,17 +25,19 @@ import { SaveFilterForm } from "../SaveFilterForm";
 import { toast } from "../../utils/toast";
 import { IGDBDefault } from "../../types/igdb";
 import { useDebouncedCallback } from "use-debounce";
+import { useAdvancedRouter } from "../../hooks/useAdvancedRouter";
 
 export const Filters: FC<{
   callback?: (filters?: IGameFilters) => void;
   isGauntlet?: boolean;
-}> = ({ callback, isGauntlet }) => {
-  const router = useRouter();
-  const { asPath } = router;
+}> = ({ isGauntlet }) => {
+  const { asPath, router, pathname } = useAdvancedRouter();
+
   const { profile, isAuth } = useAuthStore();
 
   const [filters, setFilters] = useState<IGameFilters>();
   const [tab, setTab] = useState<"filters" | "saved">("filters");
+
   const [savedFilters, setSavedFilters] = useState<IUserFilter[]>();
   const [keywordsList, setKeywordsList] = useState<IGDBDefault[]>([]);
 
@@ -83,7 +84,7 @@ export const Filters: FC<{
         },
       };
 
-      isGauntlet && pushFiltersToQuery(temp, router);
+      isGauntlet && pushFiltersToQuery(temp, router, pathname);
 
       return temp;
     });
@@ -106,7 +107,7 @@ export const Filters: FC<{
         },
       };
 
-      isGauntlet && pushFiltersToQuery(temp, router);
+      isGauntlet && pushFiltersToQuery(temp, router, pathname);
 
       return temp;
     });
@@ -169,7 +170,7 @@ export const Filters: FC<{
                 onKeyDown={(e) =>
                   e.key === "Enter" &&
                   !!filters &&
-                  pushFiltersToQuery(filters, router)
+                  pushFiltersToQuery(filters, router, pathname)
                 }
                 containerStyles={{ width: "100%" }}
                 placeholder="Enter name of the game..."
@@ -179,7 +180,7 @@ export const Filters: FC<{
                   const temp = { ...filters, search: e.target.value };
 
                   setFilters(temp);
-                  isGauntlet && pushFiltersToQuery(temp, router);
+                  isGauntlet && pushFiltersToQuery(temp, router, pathname);
                 }}
               />
             </div>
@@ -189,7 +190,7 @@ export const Filters: FC<{
                 onKeyDown={(e) =>
                   e.key === "Enter" &&
                   !!filters &&
-                  pushFiltersToQuery(filters, router)
+                  pushFiltersToQuery(filters, router, pathname)
                 }
                 containerStyles={{ width: "100%" }}
                 placeholder="Enter name of the developer..."
@@ -199,7 +200,7 @@ export const Filters: FC<{
                   const temp = { ...filters, company: e.target.value };
 
                   setFilters(temp);
-                  isGauntlet && pushFiltersToQuery(temp, router);
+                  isGauntlet && pushFiltersToQuery(temp, router, pathname);
                 }}
               />
             </div>
@@ -234,7 +235,7 @@ export const Filters: FC<{
                 };
 
                 setFilters(temp);
-                isGauntlet && pushFiltersToQuery(temp, router);
+                isGauntlet && pushFiltersToQuery(temp, router, pathname);
               }}
             />
           </div>
@@ -363,7 +364,7 @@ export const Filters: FC<{
                 onKeyDown={(e) =>
                   e.key === "Enter" &&
                   !!filters &&
-                  pushFiltersToQuery(filters, router)
+                  pushFiltersToQuery(filters, router, pathname)
                 }
                 containerStyles={{ width: "100%" }}
                 disabled={isLoading}
@@ -377,7 +378,7 @@ export const Filters: FC<{
                   };
 
                   setFilters(temp);
-                  isGauntlet && pushFiltersToQuery(temp, router);
+                  isGauntlet && pushFiltersToQuery(temp, router, pathname);
                 }}
               />
               <div className={styles.filters__line}></div>
@@ -385,7 +386,7 @@ export const Filters: FC<{
                 onKeyDown={(e) =>
                   e.key === "Enter" &&
                   !!filters &&
-                  pushFiltersToQuery(filters, router)
+                  pushFiltersToQuery(filters, router, pathname)
                 }
                 containerStyles={{ width: "100%" }}
                 disabled={isLoading}
@@ -399,7 +400,7 @@ export const Filters: FC<{
                   };
 
                   setFilters(temp);
-                  isGauntlet && pushFiltersToQuery(temp, router);
+                  isGauntlet && pushFiltersToQuery(temp, router, pathname);
                 }}
               />
             </div>
@@ -417,7 +418,7 @@ export const Filters: FC<{
                 };
 
                 setFilters(temp);
-                isGauntlet && pushFiltersToQuery(temp, router);
+                isGauntlet && pushFiltersToQuery(temp, router, pathname);
               }}
               disabled={!!isLoading}
             />
@@ -438,7 +439,7 @@ export const Filters: FC<{
                 };
 
                 setFilters(temp);
-                isGauntlet && pushFiltersToQuery(temp, router);
+                isGauntlet && pushFiltersToQuery(temp, router, pathname);
               }}
               disabled={!!isLoading}
             />
@@ -455,7 +456,7 @@ export const Filters: FC<{
                   };
 
                   setFilters(temp);
-                  isGauntlet && pushFiltersToQuery(temp, router);
+                  isGauntlet && pushFiltersToQuery(temp, router, pathname);
                 }}
               />
               <p>Only with achievements</p>
@@ -479,7 +480,7 @@ export const Filters: FC<{
                 color: "accent",
                 isDisabled: !filters,
                 callback: () => {
-                  !!filters && pushFiltersToQuery(filters, router);
+                  !!filters && pushFiltersToQuery(filters, router, pathname);
                 },
                 isHidden: isGauntlet,
               },
@@ -499,7 +500,7 @@ export const Filters: FC<{
                 title: "Clear filters",
                 color: "red",
                 callback: () => {
-                  pushFiltersToQuery({}, router);
+                  pushFiltersToQuery({}, router, pathname);
                 },
               },
             ]}
@@ -527,7 +528,7 @@ export const Filters: FC<{
                         color: "fancy",
                         style: { textAlign: "start" },
                         callback: () =>
-                          router.push({ ...router, query: filter.filter }),
+                          router.push(`${pathname}?${filter.filter}`),
                       },
                       {
                         title: "Remove",

@@ -1,4 +1,5 @@
-import { useRouter } from "next/router";
+"use client";
+
 import { FC } from "react";
 import { userListCategories } from "../../shared/constants/user.const";
 import { IUser } from "../../shared/types/auth";
@@ -18,12 +19,13 @@ import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { SvgBurger } from "../../shared/ui/svg";
 import { useStatesStore } from "../../shared/store/states.store";
 import { UserNavigation } from "../../features/user/UserNavigation";
+import { useParams, useSearchParams } from "next/navigation";
 
 interface UserProfileProps {
   user: IUser;
   logs: ILogs[];
-  authUserFollowings: IFollowings;
-  authUserId: string;
+  authUserFollowings?: IFollowings;
+  authUserId?: string;
 }
 
 const UserProfile: FC<UserProfileProps> = ({
@@ -32,15 +34,14 @@ const UserProfile: FC<UserProfileProps> = ({
   authUserFollowings,
   authUserId,
 }) => {
-  const router = useRouter();
-  const { query } = router;
+  const query = useSearchParams();
   const { games } = user;
 
   const isAuthedUser = authUserId === user._id;
 
   const { isMobile } = useStatesStore();
 
-  const tab = !!query?.list ? (query.list as string) : "profile";
+  const tab = !!query?.get("list") ? (query.get("list") as string) : "profile";
 
   return (
     <>
@@ -85,11 +86,7 @@ const UserProfile: FC<UserProfileProps> = ({
             />
           )}
           {userListCategories.some((t) => t === tab) && (
-            <UserGames
-              userId={user._id}
-              gamesCategory={tab as CategoriesType}
-              gamesRating={user.gamesRating}
-            />
+            <UserGames userId={user._id} gamesRating={user.gamesRating} />
           )}
         </WrapperTemplate>
         {!isMobile && (

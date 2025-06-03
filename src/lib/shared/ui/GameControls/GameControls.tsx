@@ -76,7 +76,7 @@ export const GameControls: FC<IGameControlsProps> = ({
   const {
     isPlaying,
     isPlayed,
-    isMastered,
+    // isMastered,
     isCompleted,
     isWishlisted,
     isBacklogged,
@@ -84,7 +84,7 @@ export const GameControls: FC<IGameControlsProps> = ({
   } = useMemo(() => {
     const isPlaying = profile?.games?.playing.some((id) => game._id === id);
     const isPlayed = profile?.games?.played.some((id) => game._id === id);
-    const isMastered = profile?.games?.mastered.some((id) => game._id === id);
+    // const isMastered = profile?.games?.mastered.some((id) => game._id === id);
     const isCompleted = profile?.games?.completed.some((id) => game._id === id);
     const isWishlisted = profile?.games?.wishlist.some((id) => game._id === id);
     const isBacklogged = profile?.games?.backlog.some((id) => game._id === id);
@@ -92,7 +92,7 @@ export const GameControls: FC<IGameControlsProps> = ({
     return {
       isPlaying,
       isPlayed,
-      isMastered,
+      // isMastered,
       isCompleted,
       isWishlisted,
       isBacklogged,
@@ -253,7 +253,7 @@ export const GameControls: FC<IGameControlsProps> = ({
           [styles.controls__action_active]:
             !!profile?.games &&
             [
-              ...profile.games.mastered,
+              // ...profile.games.mastered,
               ...profile.games.played,
               ...profile.games.completed,
             ].some((id) => game._id === id),
@@ -261,8 +261,7 @@ export const GameControls: FC<IGameControlsProps> = ({
       >
         <Icon
           className={classNames(styles.controls__icon, {
-            [styles.controls__icon_active]:
-              isCompleted || isPlayed || isMastered,
+            [styles.controls__icon_active]: isCompleted || isPlayed,
           })}
           icon="iconamoon:check-circle-1"
         />

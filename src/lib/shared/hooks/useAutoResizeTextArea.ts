@@ -6,8 +6,8 @@ export const useAutoResizeTextArea = ({
   value,
   replicaRef,
 }: {
-  textAreaRef: RefObject<HTMLTextAreaElement>;
-  replicaRef?: RefObject<HTMLDivElement>;
+  textAreaRef: RefObject<HTMLTextAreaElement | null>;
+  replicaRef?: RefObject<HTMLDivElement | null>;
   value: string;
   isActive?: boolean;
 }) => {

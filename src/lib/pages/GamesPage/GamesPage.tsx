@@ -1,3 +1,5 @@
+"use client";
+
 import { FC, useEffect, useState } from "react";
 import styles from "./GamesPage.module.scss";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
@@ -14,14 +16,13 @@ import classNames from "classnames";
 import { Pagination } from "../../shared/ui/Pagination";
 import { useWindowResizeAction } from "../../shared/hooks";
 import { screenGt, screenLg, screenMd, screenSm } from "../../shared/constants";
-import { useRouter } from "next/router";
 import { parseQueryFilters } from "../../shared/utils/filters.util";
 import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
 import { BGImage } from "../../shared/ui/BGImage";
+import { useAdvancedRouter } from "../../shared/hooks/useAdvancedRouter";
 
 export const GamesPage: FC = () => {
-  const router = useRouter();
-  const { asPath, query } = router;
+  const { asPath, query } = useAdvancedRouter();
 
   const { isLoading, setLoading, isRoyal, isMobile } = useStatesStore();
   const { setGenres, setGameModes, setSystems, setThemes } = useCommonStore();
@@ -34,7 +35,7 @@ export const GamesPage: FC = () => {
     setLoading(true);
 
     const filters = parseQueryFilters(asPath);
-    const page = Number(query.page || 1);
+    const page = Number(query.get("page") || 1);
 
     !!page &&
       IGDBApi.getGames({

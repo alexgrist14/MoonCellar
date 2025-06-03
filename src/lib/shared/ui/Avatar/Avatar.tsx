@@ -13,7 +13,7 @@ interface AvatarProps {
 
 const Avatar: FC<AvatarProps> = ({ user, isWithoutTooltip }) => {
   const [isTooltipActive, setIsTooltipActive] = useState(false);
-  const followingsRef = useRef(null);
+  const followingsRef = useRef<HTMLDivElement>(null);
 
   return (
     <div

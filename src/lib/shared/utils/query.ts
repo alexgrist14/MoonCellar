@@ -1,19 +1,20 @@
-import { NextRouter } from "next/router";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { ReadonlyURLSearchParams } from "next/navigation";
 import queryString from "query-string";
 
 export const setQuery = (
   value: { [key: string]: string | number },
-  router: NextRouter
+  router: AppRouterInstance,
+  pathname: string,
+  query: string
 ) => {
-  const { query, push, pathname } = router;
+  const { push } = router;
 
   push(
-    { pathname, query: queryString.stringify({ ...query, ...value }) },
-    undefined,
-    { shallow: true }
+    `${pathname}?${queryString.stringify({ ...queryString.parse(query), ...value })}`
   );
 };
 
-export const setPage = (page: number, router: NextRouter) => {
-  setQuery({ page }, router);
-};
+// export const setPage = (page: number, router: NextRouter) => {
+//   setQuery({ page }, router);
+// };

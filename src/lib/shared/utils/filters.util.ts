@@ -1,9 +1,9 @@
 import queryString from "query-string";
 import { IGameFilters, IGameFiltersQuery } from "../types/filters.type";
-import { NextRouter } from "next/router";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
-export const parseQueryFilters = (asPath: string): IGameFilters => {
-  const { query } = queryString.parseUrl(asPath, {
+export const parseQueryFilters = (pathWithQuery: string): IGameFilters => {
+  const { query } = queryString.parseUrl(pathWithQuery, {
     arrayFormat: "bracket",
     parseBooleans: true,
     parseNumbers: true,
@@ -64,16 +64,10 @@ export const getFiltersForQuery = (filters: IGameFilters) => {
 
 export const pushFiltersToQuery = (
   filters: IGameFilters,
-  router: NextRouter
+  router: AppRouterInstance,
+  pathname: string
 ) => {
-  const { push, pathname } = router;
+  const { push } = router;
 
-  push(
-    {
-      pathname,
-      query: getFiltersForQuery(filters),
-    },
-    undefined,
-    { shallow: true }
-  );
+  push(`${pathname}?${getFiltersForQuery(filters)}`);
 };

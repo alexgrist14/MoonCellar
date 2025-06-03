@@ -9,23 +9,22 @@ import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { SvgArrowPointer } from "@/src/lib/shared/ui/svg";
 import { Icon } from "@iconify/react";
 import classNames from "classnames";
-import { useRouter } from "next/router";
-import { FC, useCallback, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import styles from "./UserGames.module.scss";
+import { useSearchParams } from "next/navigation";
+import useCloseEvents from "@/src/lib/shared/hooks/useCloseEvents";
 
 interface UserGamesProps {
   userId: string;
-  gamesCategory: CategoriesType;
   gamesRating: IGamesRating[];
 }
 
-export const UserGames: FC<UserGamesProps> = ({
-  userId,
-  gamesRating,
-  gamesCategory,
-}) => {
-  const { query } = useRouter();
-  const page = Number(query.page);
+const take = 30;
+
+export const UserGames: FC<UserGamesProps> = ({ userId, gamesRating }) => {
+  const query = useSearchParams();
+  const page = Number(query.get("page"));
+  const list = query.get("list") as CategoriesType;
 
   const sortOptions = [
     { label: SortType.DATE_ADDED },
@@ -38,31 +37,28 @@ export const UserGames: FC<UserGamesProps> = ({
   const sortRef = useRef<HTMLDivElement>(null);
 
   const [total, setTotal] = useState(0);
-  const [take, setTake] = useState(30);
   const [sortOrder, setSortOrder] = useState("desc");
   const [selectedSort, setSelectedSort] = useState<SortType>(
     SortType.DATE_ADDED
   );
-  const [sortedGames, setSortedGames] = useState<
-    IGDBGameMinimal[] | undefined
-  >();
+  const [sortedGames, setSortedGames] = useState<IGDBGameMinimal[]>();
   const [currentGames, setCurrentGames] = useState<IGDBGameMinimal[]>();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
-    setSortedGames(undefined);
     setCurrentGames(undefined);
-    userAPI.getUserGames(userId, gamesCategory).then((res) => {
-      setTimeout(() => {
-        setSortedGames(res.data.games[`${gamesCategory}`]);
-      }, 200);
-    });
-  }, [gamesCategory, userId]);
+    setSortedGames(undefined);
 
-  const applySorting = useCallback(() => {
+    userAPI.getUserGames(userId, list).then((res) => {
+      const games = res.data.games[list];
+      setCurrentGames(games);
+    });
+  }, [list, userId, gamesRating, selectedSort, sortOrder]);
+
+  useEffect(() => {
     if (!sortedGames) return;
 
-    let sorted = [...sortedGames];
+    let sorted = structuredClone(sortedGames);
 
     switch (selectedSort) {
       case SortType.RATING:
@@ -89,21 +85,10 @@ export const UserGames: FC<UserGamesProps> = ({
     }
 
     setCurrentGames(sorted);
-  }, [gamesRating, selectedSort, sortOrder, sortedGames]);
+    setTotal(sorted.length);
+  }, [sortedGames, selectedSort, sortOrder, gamesRating]);
 
-  useEffect(() => {
-    if (sortedGames) {
-      setTotal(sortedGames.length);
-      applySorting();
-    }
-  }, [sortedGames, selectedSort, sortOrder, applySorting]);
-
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  useCloseEvents([sortRef], () => setIsDropdownOpen(false));
 
   const handleSortChange = (value: SortType) => {
     setSelectedSort(value);
@@ -111,12 +96,6 @@ export const UserGames: FC<UserGamesProps> = ({
 
   const handleSortOrderChange = (value: string) => {
     setSortOrder(value);
-  };
-
-  const handleClickOutside = (event: MouseEvent) => {
-    if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
-      setIsDropdownOpen(false);
-    }
   };
 
   return (
@@ -172,7 +151,7 @@ export const UserGames: FC<UserGamesProps> = ({
         )}
 
         <Pagination take={take} total={total} isFixed />
-        {currentGames && !currentGames.length && <p>There is no games</p>}
+        {!!currentGames && !currentGames.length && <p>There is no games</p>}
       </div>
     </div>
   );

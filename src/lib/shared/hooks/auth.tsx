@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { authAPI, userAPI } from "../api";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import { useAuthStore } from "../store/auth.store";

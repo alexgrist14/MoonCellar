@@ -5,30 +5,34 @@ import { Input } from "../Input";
 import { keyboardUtils } from "../../utils/keyboard";
 import classNames from "classnames";
 import { createPortal } from "react-dom";
-import { useRouter } from "next/router";
-import { setPage } from "../../utils/query";
 import { SvgDoubleArrow } from "../svg/SvgDoubleArrow";
 import { SvgArrow } from "../svg/SvgArrow";
 import { useCommonStore } from "../../store/common.store";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { setQuery } from "../../utils/query";
 
 export const Pagination: FC<{
   total: number;
   take: number;
   isFixed?: boolean;
   isDisabled?: boolean;
-}> = ({ take, total, isFixed, isDisabled }) => {
+  callback?: () => void;
+}> = ({ take, total, isFixed, isDisabled, callback }) => {
   const router = useRouter();
   const centerRef = useRef<HTMLDivElement>(null);
+  const query = useSearchParams();
+  const pathname = usePathname();
 
   const { setScrollPosition } = useCommonStore();
 
   const [value, setValue] = useState("");
 
-  const page = useMemo(() => Number(router.query.page || 1), [router]);
+  const page = useMemo(() => Number(query.get("page") || 1), [query]);
   const max = useMemo(() => Math.ceil(total / take), [take, total]);
 
   const changeCallback = () => {
     setScrollPosition({ left: 0, top: 0 });
+    callback?.();
   };
 
   if (!total || !page) return null;
@@ -49,7 +53,7 @@ export const Pagination: FC<{
         className={styles.pagination__button}
         disabled={page === 1}
         onClick={() => {
-          setPage(1, router);
+          setQuery({ page: 1 }, router, pathname, query.toString());
           changeCallback();
         }}
       >
@@ -60,7 +64,7 @@ export const Pagination: FC<{
         className={styles.pagination__button}
         disabled={page === 1}
         onClick={() => {
-          setPage(page - 1, router);
+          setQuery({ page: page - 1 }, router, pathname, query.toString());
           changeCallback();
         }}
       >
@@ -77,7 +81,12 @@ export const Pagination: FC<{
           onBlur={(e) => {
             const value = Number(e.target.value);
 
-            setPage(value > max ? max : value, router);
+            setQuery(
+              { page: value > max ? max : value },
+              router,
+              pathname,
+              query.toString()
+            );
             changeCallback();
           }}
         />
@@ -87,7 +96,7 @@ export const Pagination: FC<{
         className={styles.pagination__button}
         disabled={page === max}
         onClick={() => {
-          setPage(page + 1, router);
+          setQuery({ page: page + 1 }, router, pathname, query.toString());
           changeCallback();
         }}
       >
@@ -98,7 +107,7 @@ export const Pagination: FC<{
         className={styles.pagination__button}
         disabled={page === max}
         onClick={() => {
-          setPage(max, router);
+          setQuery({ page: max }, router, pathname, query.toString());
           changeCallback();
         }}
       >

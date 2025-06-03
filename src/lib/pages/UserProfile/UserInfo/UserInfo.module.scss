@@ -18,20 +18,14 @@
   flex-direction: column;
   flex-wrap: wrap;
 
-  @include mediaMd {
-    margin-top: -55px;
-    gap: 20px;
-  }
-
   .friends {
     width: 400px;
+    margin-top: 10px;
+    border-radius: $radius;
 
     @include mediaMax(1380px) {
       width: 100%;
     }
-
-    margin-top: 10px;
-    border-radius: $radius;
 
     &__list {
       display: flex;
@@ -160,12 +154,18 @@
       }
     }
   }
+
+  @include mediaMd {
+    margin-top: -55px;
+    gap: 20px;
+  }
 }
 
 .content__bottom {
-  @include flexCenter;
   flex-direction: column;
   margin-top: 20px;
+
+  @include flexCenter;
 
   .activity {
     margin-top: 20px;

@@ -1,10 +1,10 @@
-import { AppProps } from "next/app";
 import Head from "next/head";
 import { Layout } from "../lib/app/ui/Layout";
-import "../lib/shared/styles/_common.scss";
-import "../lib/shared/styles/_reset.scss";
 import localFont from "next/font/local";
 import classNames from "classnames";
+import { ReactNode } from "react";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "../lib/shared/constants";
+import { cookies } from "next/headers";
 
 const general = localFont({
   variable: "--font-general",
@@ -38,18 +38,29 @@ const pentagra = localFont({
   ],
 });
 
-export default function App({ Component, pageProps }: AppProps) {
+export default async function App({ children }: { children: ReactNode }) {
+  const cookie = await cookies();
+
+  const accessToken = cookie.get(ACCESS_TOKEN);
+  const refreshToken = cookie.get(REFRESH_TOKEN);
+
   return (
-    <>
-      <Head>
+    <html>
+      <head>
         <title>MoonCellar</title>
         <meta name="description" content="Games tracker and database" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/images/mooncellar.ico" />
-      </Head>
-      <Layout className={classNames(general.variable, pentagra.variable)}>
-        <Component {...pageProps} />
-      </Layout>
-    </>
+      </head>
+      <body>
+        <Layout
+          className={classNames(general.variable, pentagra.variable)}
+          accessToken={accessToken}
+          refreshToken={refreshToken}
+        >
+          {children}
+        </Layout>
+      </body>
+    </html>
   );
 }

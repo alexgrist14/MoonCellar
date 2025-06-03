@@ -1,0 +1,11 @@
+.modal {
+  display: grid;
+
+  &__left {
+    display: grid;
+  }
+
+  &__right {
+    display: grid;
+  }
+}
