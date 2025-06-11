@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import { authAPI } from "./auth";
 import { deleteCookie } from "../utils/cookies";
@@ -10,33 +10,27 @@ export const agent = axios.create({
 
 agent.interceptors.response.use(
   (response) => response,
-  (err) => {
-    const requestConfig = err.config;
+  (err: AxiosError) => {
+    const { config } = err;
 
     if (
       err.response &&
       err.response.status === 401 &&
-      !err.config.url.includes("/refresh")
+      !err.config?.url?.includes("/refresh")
     ) {
-      authAPI
-        .refreshToken()
-        .then(() => agent(requestConfig))
-        .catch(() => {
-          deleteCookie(ACCESS_TOKEN);
-          deleteCookie(REFRESH_TOKEN);
+      return (
+        !!config &&
+        authAPI
+          .refreshToken()
+          .then(() => agent(config))
+          .catch(() => {
+            deleteCookie(ACCESS_TOKEN);
+            deleteCookie(REFRESH_TOKEN);
 
-          toast.error({ title: "Error", description: "Not authorized" });
-        });
-    } else if (err.config.url.includes("/refresh")) {
-      return Promise.reject(err);
+            toast.error({ title: "Error", description: "Not authorized" });
+          })
+      );
     } else {
-      const errorMessage = err?.response?.data?.message ?? "unknown";
-      if (err.config.url.includes("/verify") && errorMessage.includes("500")) {
-        toast.error({ title: "Error", description: "Conditions changed" });
-      } else {
-        toast.error({ title: "Error", description: errorMessage });
-      }
-
       return Promise.reject(err);
     }
   }

@@ -2,18 +2,11 @@
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
-  height: 100%;
   align-items: center;
   width: fit-content;
+  height: fit-content;
 
-  &__button {
-    flex: 1 1 auto;
-
-    &_compact {
-      height: 25px;
-      aspect-ratio: 1;
-      padding: 2px;
-      width: 100%;
-    }
+  & button {
+    flex: 0 1 auto;
   }
 }

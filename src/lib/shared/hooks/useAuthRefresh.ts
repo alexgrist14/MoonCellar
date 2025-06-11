@@ -14,7 +14,7 @@ interface ITokens {
 
 export const useAuthRefresh = (
   tokens: ITokens,
-  setIsAccessReady: Dispatch<SetStateAction<boolean>>
+  setIsAccessReady?: Dispatch<SetStateAction<boolean>>
 ) => {
   const { setAuth, clear, setProfile } = useAuthStore();
   const { accessToken, refreshToken } = tokens;
@@ -48,11 +48,11 @@ export const useAuthRefresh = (
           deleteCookie(REFRESH_TOKEN);
         })
         .finally(() => {
-          setIsAccessReady(true);
+          setIsAccessReady?.(true);
         });
     } else {
       setAuth(isValid);
-      setIsAccessReady(true);
+      setIsAccessReady?.(true);
 
       !!access?.id &&
         userAPI.getById(access?.id).then((res) => {

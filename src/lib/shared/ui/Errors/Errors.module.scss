@@ -1,0 +1,12 @@
+.errors {
+  display: grid;
+
+  &__error {
+    @include font(12px, 14px, 400);
+  }
+
+  &__title {
+    font-weight: 500;
+    color: $off;
+  }
+}

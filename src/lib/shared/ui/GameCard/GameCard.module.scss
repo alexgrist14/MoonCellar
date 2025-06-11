@@ -15,6 +15,7 @@
 }
 
 .card {
+  display: grid;
   width: 100%;
   justify-self: center;
   border-radius: $radius;
@@ -69,7 +70,7 @@
     &_mastered {
       & svg {
         path {
-          fill: $gold;
+          fill: $yellow;
         }
       }
     }
@@ -102,15 +103,17 @@
     display: grid;
     grid-template-rows: 1fr auto;
     align-content: space-between;
-    width: 100%;
-    height: 100%;
-    background-color: rgba($bg, 0.9);
+    background-color: rgba($bg, 0.95);
     transition: all 0.3s;
     opacity: 0;
     position: absolute;
     border-radius: $radius;
-    outline: 2px solid $accent;
+    // outline: 2px solid $textColor;
     pointer-events: none;
+    width: 100%;
+    height: calc(100% + 2px);
+    margin-top: -1px;
+    // z-index: 2;
 
     &_active {
       opacity: 1;
@@ -126,10 +129,10 @@
     gap: 30px;
     object-fit: cover;
     font-family: var(--font-pentagra);
-    width: 100%;
-    height: 100%;
+    width: calc(100%);
+    height: calc(100%);
     border-radius: $radius;
-    z-index: 1;
+    // z-index: 1;
     opacity: 0;
     transition: 0.3s;
 
@@ -140,5 +143,54 @@
 
   &__placeholder {
     border-radius: $radius;
+  }
+
+  &_dropped {
+    filter: drop-shadow(0 0 0.2rem $off);
+
+    .card__info {
+      outline-color: $off;
+    }
+  }
+
+  &_playing {
+    filter: drop-shadow(0 0 0.2rem $accent);
+
+    .card__info {
+      outline-color: $accent;
+    }
+  }
+
+  &_wishlist,
+  &_backlog {
+    filter: drop-shadow(0 0 0.2rem $violet);
+
+    .card__info {
+      outline-color: $violet;
+    }
+  }
+
+  &_played {
+    filter: drop-shadow(0 0 0.2rem $blue);
+
+    .card__info {
+      outline-color: $blue;
+    }
+  }
+
+  &_completed {
+    filter: drop-shadow(0 0 0.3rem $on);
+
+    .card__info {
+      outline-color: $on;
+    }
+  }
+
+  &_mastered {
+    filter: drop-shadow(0 0 0.3rem $yellow);
+
+    .card__info {
+      outline-color: $yellow;
+    }
   }
 }

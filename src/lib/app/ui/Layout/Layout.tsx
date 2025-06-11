@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, ReactNode, useState } from "react";
+import { FC, ReactNode } from "react";
 import styles from "./Layout.module.scss";
 import { Header } from "./components";
 import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
@@ -11,6 +11,7 @@ import { useMediaStore } from "@/src/lib/shared/hooks/useMediaStore";
 import { CheckMobile } from "@/src/lib/shared/ui/CheckMobile";
 import { useAuthRefresh } from "@/src/lib/shared/hooks/useAuthRefresh";
 import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
+import { useGetUserInfo } from "@/src/lib/features/user/model/user.hooks";
 
 interface ILayoutProps {
   children: ReactNode;
@@ -25,15 +26,14 @@ export const Layout: FC<ILayoutProps> = ({
   refreshToken,
   accessToken,
 }) => {
-  const [isAccessReady, setIsAccessReady] = useState(false);
-
   const { ref } = useResizeDetector({
     refreshMode: "debounce",
     refreshRate: 200,
   });
 
-  useAuthRefresh({ accessToken, refreshToken }, setIsAccessReady);
+  useAuthRefresh({ accessToken, refreshToken });
   useMediaStore();
+  useGetUserInfo();
 
   return (
     <div className={className}>
@@ -50,6 +50,7 @@ export const Layout: FC<ILayoutProps> = ({
       <div id="expand-connector"></div>
       <div id="mobile-menu-connector"></div>
       <div id="pagination-connector"></div>
+      <div id="tooltip-connector"></div>
     </div>
   );
 };

@@ -128,7 +128,6 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
                     savedPresets.map((preset, i) => (
                       <ButtonGroup
                         key={i}
-                        isCompact
                         wrapperStyle={{
                           padding: "0",
                           display: "grid",
@@ -140,13 +139,15 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
                             title: preset.name,
                             color: "fancy",
                             style: { textAlign: "start" },
-                            callback: () => {
+                            compact: true,
+                            onClick: () => {
                               setRoyalGames(JSON.parse(preset.preset));
                             },
                           },
                           {
                             title: "Remove",
-                            callback: () =>
+                            compact: true,
+                            onClick: () =>
                               !!profile &&
                               userAPI
                                 .removePreset(profile._id, preset.name)

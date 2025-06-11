@@ -1,15 +1,21 @@
 import { IUser } from "../types/auth";
-import { IImageData } from "../types/common.type";
 
-const getDate = (dateString: string, isWithTime?: boolean) => {
-  const date = new Date(dateString);
-  const day = date.getDate();
-  const month = date.getMonth() + 1;
-  const time = `${date.getHours()}:${date.getMinutes()}`;
+const getRoundedSeconds = (value: number) => {
+  const seconds = Math.abs(value);
 
-  return `${day > 9 ? day : `0${day}`}.${
-    month > 9 ? month : `0${month}`
-  }.${date.getFullYear()}${isWithTime ? " " + time : ""}`;
+  if (seconds < 10) {
+    return -1;
+  } else if (seconds < 20) {
+    return -10;
+  } else if (seconds < 30) {
+    return -20;
+  } else if (seconds < 40) {
+    return -30;
+  } else if (seconds < 50) {
+    return -40;
+  } else {
+    return -50;
+  }
 };
 
 const getHumanDate = (inputDate: Date | string) => {
@@ -47,43 +53,10 @@ const getHumanDate = (inputDate: Date | string) => {
   }
 };
 
-const getRoundedSeconds = (value: number) => {
-  const seconds = Math.abs(value);
-
-  if (seconds < 10) {
-    return -1;
-  } else if (seconds < 20) {
-    return -10;
-  } else if (seconds < 30) {
-    return -20;
-  } else if (seconds < 40) {
-    return -30;
-  } else if (seconds < 50) {
-    return -40;
-  } else {
-    return -50;
-  }
-};
 const upFL = (string: string) => {
-  return string.slice(0, 1).toUpperCase() + string.slice(1).toLowerCase();
-};
-
-const getImageMeta = (url: string): Promise<HTMLImageElement> => {
-  return new Promise((resolve, reject) => {
-    let img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => reject();
-    img.src = url;
-  });
-};
-
-const getImageData = async (url: string): Promise<IImageData> => {
-  const imageMeta = await getImageMeta(url);
-  const imageAR = imageMeta.width / imageMeta.height;
-  const imageBlob = await fetch(url).then((r) => r.blob());
-  const imageBuffer = await imageBlob.arrayBuffer();
-
-  return { imageMeta, imageAR, imageBlob, imageBuffer };
+  return !!string?.length
+    ? string.slice(0, 1).toUpperCase() + string.slice(1).toLowerCase()
+    : "";
 };
 
 const getAvatar = (user: IUser) => {
@@ -118,36 +91,6 @@ const getWordEnding = (num: number, words: [string, string, string]) => {
   ];
 };
 
-const getMaxLength = (array: Object[]): number => {
-  return array.reduce<number>(
-    (result, item) =>
-      Object.values(item).length > result
-        ? (result = Object.values(item).length)
-        : result,
-    0
-  );
-};
-
-const getMaxElement = (array: Object[]) => {
-  return array.reduce(
-    (result: Object, item) =>
-      Object.values(item).length > Object.values(result).length
-        ? (result = item)
-        : result,
-    {}
-  );
-};
-
-const getAllKeys = (array: Object[]): string[] => {
-  return array.reduce<string[]>((result, item) => {
-    Object.keys(item).forEach(
-      (key) => !result.some((item) => item === key) && result.push(key)
-    );
-
-    return result;
-  }, []);
-};
-
 const checkWindow = <T>(callback: () => T): T | undefined => {
   if (typeof window !== "undefined") {
     return callback();
@@ -156,17 +99,99 @@ const checkWindow = <T>(callback: () => T): T | undefined => {
   }
 };
 
+const addLeadingZero = (num: number) => {
+  return num <= 9 ? "0" + num.toString() : num.toString();
+};
+
+const addLastS = (string: string, num: number) => {
+  return num > 1 ? string + "s" : string;
+};
+
+const getUTCString = (offset: number) => {
+  return `UTC${offset <= 0 ? "+" : ""}${-Math.round(offset / 60)}`;
+};
+
+const getTimezoneOffset = (timeZone?: string) => {
+  if (!timeZone) return null;
+
+  const dateTimezone = new Date(
+    new Date().toLocaleString(navigator.language, {
+      timeZone,
+    })
+  );
+  const dateUTC = new Date(
+    new Date().toLocaleString(navigator.language, {
+      timeZone: "UTC",
+    })
+  );
+
+  return (dateUTC.getTime() - dateTimezone.getTime()) / 1000 / 60;
+};
+
+const formatDate = (
+  date: string | Date,
+  options?: {
+    delimiter?: string;
+    isWithTime?: boolean;
+    isWithUTC?: boolean;
+    isISO?: boolean;
+    isUTC?: boolean;
+    timeZone?: string;
+  }
+) => {
+  const parsedDate = typeof date === "string" ? new Date(date) : date;
+
+  if (options?.isISO && !options.isUTC) {
+    return (
+      parsedDate.getFullYear() +
+      (options?.delimiter || "-") +
+      addLeadingZero(parsedDate.getMonth() + 1) +
+      (options?.delimiter || "-") +
+      addLeadingZero(parsedDate.getDate()) +
+      (options?.isWithTime
+        ? `T${addLeadingZero(parsedDate.getHours())}:${addLeadingZero(parsedDate.getMinutes())}:${addLeadingZero(parsedDate.getSeconds())}Z`
+        : "")
+    );
+  }
+
+  if (options?.isISO && options?.isUTC) {
+    return (
+      parsedDate.getUTCFullYear() +
+      (options?.delimiter || "-") +
+      addLeadingZero(parsedDate.getUTCMonth() + 1) +
+      (options?.delimiter || "-") +
+      addLeadingZero(parsedDate.getUTCDate()) +
+      (options?.isWithTime
+        ? `T${addLeadingZero(parsedDate.getUTCHours())}:${addLeadingZero(parsedDate.getUTCMinutes())}:${addLeadingZero(parsedDate.getUTCSeconds())}Z`
+        : "")
+    );
+  }
+
+  return (
+    addLeadingZero(parsedDate.getDate()) +
+    (options?.delimiter || ".") +
+    addLeadingZero(parsedDate.getMonth() + 1) +
+    (options?.delimiter || ".") +
+    parsedDate.getFullYear() +
+    (options?.isWithTime
+      ? ` ${addLeadingZero(parsedDate.getHours())}:${addLeadingZero(parsedDate.getMinutes())}`
+      : "") +
+    (options?.isWithUTC
+      ? ` (${getUTCString(getTimezoneOffset(options?.timeZone) || parsedDate.getTimezoneOffset())})`
+      : "")
+  );
+};
+
 export const commonUtils = {
-  getDate,
   upFL,
-  getImageMeta,
-  getImageData,
   shuffle,
   getWordEnding,
-  getMaxLength,
-  getMaxElement,
-  getAllKeys,
-  getHumanDate,
   getAvatar,
   checkWindow,
+  addLeadingZero,
+  addLastS,
+  formatDate,
+  getUTCString,
+  getHumanDate,
+  getRoundedSeconds,
 };

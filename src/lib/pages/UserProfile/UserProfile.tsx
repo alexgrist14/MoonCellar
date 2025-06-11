@@ -18,8 +18,8 @@ import { BGImage } from "../../shared/ui/BGImage";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { SvgBurger } from "../../shared/ui/svg";
 import { useStatesStore } from "../../shared/store/states.store";
-import { UserNavigation } from "../../features/user/UserNavigation";
 import { useParams, useSearchParams } from "next/navigation";
+import { UserNavigation } from "../../features/user/ui/UserNavigation";
 
 interface UserProfileProps {
   user: IUser;

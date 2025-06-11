@@ -65,7 +65,7 @@ export const Header: FC = () => {
                   {!isMobile && <span>Search</span>}
                 </>
               ),
-              callback: searchClickHandler,
+              onClick: searchClickHandler,
               color: "transparent",
             },
           ]}

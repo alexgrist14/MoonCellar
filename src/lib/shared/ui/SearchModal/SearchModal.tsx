@@ -75,7 +75,7 @@ export const SearchModal: FC = () => {
                 searchQuery?.length > 2
                   ? `/games?search=${encodeURIComponent(searchQuery)}`
                   : "/games",
-              callback: () => {
+              onClick: () => {
                 modal.close();
                 setExpanded(["left"]);
               },

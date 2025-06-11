@@ -13,7 +13,7 @@ export const Navigation: FC = () => {
       buttons={links.map((link) => ({
         title: link.name,
         link: link.link,
-        callback: () => setExpanded([]),
+        onClick: () => setExpanded([]),
       }))}
     />
   );

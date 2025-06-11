@@ -31,7 +31,7 @@ export const GameButtons: FC<{ game: IGDBGameMinimal }> = ({ game }) => {
             {
               title: "Open in IGDB",
               link: game.url,
-              isHidden: !game.url,
+              hidden: !game.url,
               target: "_blank",
             },
             {

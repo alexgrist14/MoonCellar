@@ -1,19 +1,30 @@
 import React, {
   ButtonHTMLAttributes,
-  forwardRef,
+  DetailedHTMLProps,
+  FC,
   ReactNode,
-  useEffect,
   useRef,
   useState,
 } from "react";
 import cl from "classnames";
 import styles from "./Button.module.scss";
-import { IButtonColor } from "../../types/buttons";
-import { createPortal } from "react-dom";
+import { Tooltip } from "../Tooltip";
 
-interface IButton
+type IButtonColor =
+  | "default"
+  | "accent"
+  | "red"
+  | "green"
+  | "greenBorder"
+  | "transparent"
+  | "fancy";
+
+export interface IButtonProps
   extends Pick<
-    ButtonHTMLAttributes<HTMLButtonElement>,
+    DetailedHTMLProps<
+      ButtonHTMLAttributes<HTMLButtonElement>,
+      HTMLButtonElement
+    >,
     | "children"
     | "disabled"
     | "type"
@@ -21,101 +32,68 @@ interface IButton
     | "onClick"
     | "form"
     | "style"
+    | "ref"
   > {
   color?: IButtonColor;
   active?: boolean;
   tooltip?: string | ReactNode;
   tooltipAlign?: "left" | "right" | "center";
+  compact?: boolean;
+  hidden?: boolean;
 }
 
-export const Button = forwardRef(
-  (
-    {
-      children,
-      className,
-      disabled,
-      active,
-      tooltip,
-      color = "default",
-      tooltipAlign,
-      ...props
-    }: IButton,
-    ref
-  ) => {
-    const buttonRef = useRef<HTMLButtonElement | null>(null);
-    const tooltipRef = useRef<HTMLSpanElement>(null);
+export const Button: FC<IButtonProps> = ({
+  children,
+  className,
+  disabled,
+  active,
+  tooltip,
+  color = "default",
+  tooltipAlign,
+  compact,
+  hidden,
+  ref,
+  ...props
+}) => {
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
 
-    const [isHover, setIsHover] = useState(false);
-    const [tooltipCoords, setTooltipCoords] = useState([0, 0]);
+  const [isHover, setIsHover] = useState(false);
 
-    useEffect(() => {
-      const rect = buttonRef.current?.getBoundingClientRect();
-      const tooltipRect = tooltipRef.current?.getBoundingClientRect();
+  return (
+    <button
+      {...props}
+      ref={(node) => {
+        buttonRef.current = node;
 
-      if (isHover && !!tooltipRect && !!rect) {
-        const x =
-          tooltipAlign === "left"
-            ? rect.x
-            : tooltipAlign === "right"
-              ? rect.x + rect.width - tooltipRect.width
-              : rect.x + rect.width / 2 - tooltipRect.width / 2;
-
-        setTooltipCoords([x, window.scrollY + rect.y - 5 - tooltipRect.height]);
-      }
-    }, [isHover, tooltipAlign]);
-
-    return (
-      <button
-        {...props}
-        ref={(node) => {
-          buttonRef.current = node;
-
-          if (typeof ref === "function") {
-            ref(node);
-          } else if (ref) {
-            ref.current = node;
-          }
-        }}
-        onMouseEnter={() => setIsHover(true)}
-        onMouseLeave={() => setIsHover(false)}
-        onMouseDown={() => setIsHover(false)}
-        onTouchEnd={() => setIsHover(false)}
-        onBlur={() => setIsHover(false)}
-        className={cl(
-          styles.button,
-          styles[`button_${color}Color`],
-          className,
-          {
-            [styles.button_active]: active,
-            [styles[`button_${color}Color_active`]]: active,
-            [styles.button_disabled]: disabled,
-          }
-        )}
-        disabled={disabled}
-      >
-        {children}
-        {!!tooltip &&
-          isHover &&
-          createPortal(
-            <span
-              ref={tooltipRef}
-              style={
-                !!tooltipCoords[0] && !!tooltipCoords[1]
-                  ? {
-                      top: tooltipCoords[1],
-                      left: tooltipCoords[0],
-                    }
-                  : {}
-              }
-              className={styles.button__tooltip}
-            >
-              {tooltip}
-            </span>,
-            document.body
-          )}
-      </button>
-    );
-  }
-);
-
-Button.displayName = "Button";
+        if (typeof ref === "function") {
+          ref(node);
+        } else if (ref) {
+          ref.current = node;
+        }
+      }}
+      onMouseEnter={() => setIsHover(true)}
+      onMouseLeave={() => setIsHover(false)}
+      onMouseDown={() => setIsHover(false)}
+      onTouchEnd={() => setIsHover(false)}
+      onBlur={() => setIsHover(false)}
+      className={cl(styles.button, styles[`button_${color}Color`], className, {
+        [styles.button_active]: active,
+        [styles[`button_${color}Color_active`]]: active,
+        [styles.button_disabled]: disabled,
+        [styles.button_compact]: compact,
+        [styles.button_hidden]: hidden,
+      })}
+    >
+      {children}
+      {!!tooltip && (
+        <Tooltip
+          positionRef={buttonRef}
+          isActive={isHover}
+          tooltipAlign={tooltipAlign}
+        >
+          {tooltip}
+        </Tooltip>
+      )}
+    </button>
+  );
+};

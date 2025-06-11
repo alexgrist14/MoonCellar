@@ -46,7 +46,7 @@ export const ToggleSwitch: FC<ToggleSwitchProps> = ({
 
   return (
     <div className={styles.toggle__wrapper}>
-      {!!label && <p className={styles.toogle__label}>{label}</p>}
+      {!!label && <p className={styles.toggle__label}>{label}</p>}
       <div
         onClick={clickHandler}
         className={classNames(

@@ -1,15 +1,24 @@
 import styles from "./Tooltip.module.scss";
 import classNames from "classnames";
 import { createPortal } from "react-dom";
-import { FC, ReactNode, RefObject, useMemo } from "react";
+import {
+  FC,
+  ReactNode,
+  RefObject,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 interface ITooltipProps {
   isActive?: boolean;
   isFixed?: boolean;
   root?: HTMLDivElement | null;
-  positionRef: RefObject<HTMLDivElement | null>;
+  positionRef: RefObject<HTMLElement | null>;
   children?: ReactNode;
   className?: string;
+  tooltipAlign?: "left" | "right" | "center";
 }
 
 export const Tooltip: FC<ITooltipProps> = ({
@@ -19,33 +28,51 @@ export const Tooltip: FC<ITooltipProps> = ({
   className,
   root,
   positionRef,
+  tooltipAlign = "center",
 }) => {
-  const positionRect = positionRef.current?.getBoundingClientRect();
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const [tooltipCoords, setTooltipCoords] = useState([0, 0]);
+
+  useEffect(() => {
+    const rect = positionRef.current?.getBoundingClientRect();
+    const tooltipRect = tooltipRef.current?.getBoundingClientRect();
+
+    if (isActive && !!tooltipRect && !!rect) {
+      const x =
+        tooltipAlign === "left"
+          ? rect.x
+          : tooltipAlign === "right"
+            ? rect.x + rect.width - tooltipRect.width
+            : rect.x + rect.width / 2 - tooltipRect.width / 2;
+
+      setTooltipCoords([x, window.scrollY + rect.y - 5 - tooltipRect.height]);
+    }
+  }, [isActive, tooltipAlign, positionRef]);
 
   const tooltip = useMemo(
-    () =>
-      !!positionRect && (
-        <div
-          style={{
-            top: positionRect.top + window.scrollY,
-            left: positionRect.x + window.scrollX,
-            maxWidth: positionRect.width,
-            position: isFixed ? "fixed" : "absolute",
-            transform: `translate(calc(-50% + ${
-              positionRect.width / 2
-            }px), calc(-100% - 5px))`,
-          }}
-          className={classNames(styles.tooltip, className, {
-            [styles.tooltip_active]: isActive,
-          })}
-        >
-          {children}
-        </div>
-      ),
-    [children, className, isActive, isFixed, positionRect]
+    () => (
+      <div
+        ref={tooltipRef}
+        style={{
+          position: isFixed ? "fixed" : "absolute",
+          ...(!!tooltipCoords[0] &&
+            !!tooltipCoords[1] && {
+              top: tooltipCoords[1],
+              left: tooltipCoords[0],
+            }),
+        }}
+        className={classNames(styles.tooltip, className)}
+      >
+        {children}
+      </div>
+    ),
+    [children, tooltipCoords, isFixed, className]
   );
 
-  return isActive && !!positionRect
-    ? createPortal(tooltip, root || document.body)
+  return isActive
+    ? createPortal(
+        tooltip,
+        root || document.getElementById("tooltip-connector") || document.body
+      )
     : null;
 };

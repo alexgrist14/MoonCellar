@@ -1,11 +1,41 @@
 .modal {
   display: grid;
+  width: 100%;
+  max-width: 600px;
+  align-items: center;
+  gap: 40px;
+  min-height: 320px;
+  min-width: 300px;
 
-  &__left {
+  &__bottom {
     display: grid;
+    gap: 20px;
+    transition: opacity 0.3s;
+    opacity: 0;
+    pointer-events: none;
+
+    &_active {
+      opacity: 1;
+      pointer-events: all;
+    }
   }
 
-  &__right {
-    display: grid;
+  &__top {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+
+  &__inputs {
+    display: flex;
+    gap: 10px;
+
+    @include mediaMax($screenMd) {
+      flex-direction: column;
+    }
+  }
+
+  &__add {
+    margin-top: auto;
   }
 }

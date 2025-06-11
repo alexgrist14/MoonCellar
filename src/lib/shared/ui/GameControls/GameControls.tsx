@@ -4,7 +4,6 @@ import { IGDBGameMinimal } from "../../types/igdb";
 import { Icon } from "@iconify/react";
 import classNames from "classnames";
 import { Button } from "../Button";
-import { CategoriesType } from "../../types/user.type";
 import { userAPI } from "../../api";
 import { useAuthStore } from "../../store/auth.store";
 import { axiosUtils } from "../../utils/axios";
@@ -13,6 +12,9 @@ import useCloseEvents from "../../hooks/useCloseEvents";
 import { RangeSelector } from "../RangeSelector";
 import { accentColor, accentColorRGB } from "../../constants";
 import { useGamesStore } from "../../store/games.store";
+import { modal } from "../Modal";
+import { PlaythroughModal } from "../PlaythroughModal";
+import { useUserStore } from "../../store/user.store";
 
 interface IGameControlsProps {
   style?: CSSProperties;
@@ -25,80 +27,18 @@ export const GameControls: FC<IGameControlsProps> = ({
   className,
   style,
 }) => {
+  // const {sync, isLoading} = useAsyncLoader();
   const { profile, setProfile } = useAuthStore();
+  const { playthroughs } = useUserStore();
   const { royalGames, addRoyalGame, removeRoyalGame } = useGamesStore();
 
   const ratingsRef = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<HTMLDivElement>(null);
   const ratingButtonRef = useRef<HTMLButtonElement>(null);
 
-  const [isLoading, setIsLoading] = useState(false);
   const [isRatingActive, setIsRatingActive] = useState(false);
-  const [isPlayedActive, setIsPlayedActive] = useState(false);
-  const [isPauseActive, setIsPauseActive] = useState(false);
 
   const [ratingValue, setRatingValue] = useState(0);
-
-  const addToList = (name: CategoriesType) => {
-    if (!profile) return;
-    setIsLoading(true);
-
-    return userAPI
-      .addGameToCategory(profile._id, game._id, name)
-      .then((res) => {
-        setProfile(res.data);
-
-        setIsLoading(false);
-        toast.success({
-          description: `${game.name} successfully added to ${name}`,
-        });
-      })
-      .catch(axiosUtils.toastError);
-  };
-
-  const removeFromList = (name: CategoriesType) => {
-    if (!profile) return;
-    setIsLoading(true);
-
-    return userAPI
-      .removeGameFromCategory(profile._id, game._id, name)
-      .then((res) => {
-        setProfile(res.data);
-
-        setIsLoading(false);
-        toast.success({
-          description: `${game.name} successfully removed from ${name}`,
-        });
-      })
-      .catch(axiosUtils.toastError);
-  };
-
-  const {
-    isPlaying,
-    isPlayed,
-    // isMastered,
-    isCompleted,
-    isWishlisted,
-    isBacklogged,
-    isDropped,
-  } = useMemo(() => {
-    const isPlaying = profile?.games?.playing.some((id) => game._id === id);
-    const isPlayed = profile?.games?.played.some((id) => game._id === id);
-    // const isMastered = profile?.games?.mastered.some((id) => game._id === id);
-    const isCompleted = profile?.games?.completed.some((id) => game._id === id);
-    const isWishlisted = profile?.games?.wishlist.some((id) => game._id === id);
-    const isBacklogged = profile?.games?.backlog.some((id) => game._id === id);
-    const isDropped = profile?.games?.dropped.some((id) => game._id === id);
-    return {
-      isPlaying,
-      isPlayed,
-      // isMastered,
-      isCompleted,
-      isWishlisted,
-      isBacklogged,
-      isDropped,
-    };
-  }, [profile, game]);
 
   const rating = useMemo(
     () => profile?.gamesRating?.find((rating) => rating.game === game._id),
@@ -110,10 +50,15 @@ export const GameControls: FC<IGameControlsProps> = ({
     [game, royalGames]
   );
 
+  const playthrough = useMemo(
+    () =>
+      !!playthroughs?.length &&
+      playthroughs.findLast((play) => play.gameId === game._id),
+    [playthroughs, game]
+  );
+
   useCloseEvents([controlsRef], () => {
     setIsRatingActive(false);
-    setIsPauseActive(false);
-    setIsPlayedActive(false);
   });
 
   useEffect(() => {
@@ -123,64 +68,12 @@ export const GameControls: FC<IGameControlsProps> = ({
   return (
     <div
       className={classNames(styles.controls, className, {
-        [styles.controls_disabled]: isLoading,
+        // [styles.controls_disabled]: isLoading,
         [styles.controls_hidden]: !profile,
       })}
       style={style}
       ref={controlsRef}
     >
-      <div
-        style={{
-          bottom: `calc(${ratingButtonRef.current?.offsetHeight}px)`,
-        }}
-        className={classNames(styles.controls__list, {
-          [styles.controls__list_active]: isPlayedActive,
-        })}
-      >
-        {(["played", "completed", "mastered"] as CategoriesType[]).map(
-          (key) => (
-            <Button
-              key={key}
-              active={profile?.games?.[key].some((id) => game._id === id)}
-              onClick={() =>
-                profile?.games?.[key].some((id) => game._id === id)
-                  ? removeFromList(key)
-                  : addToList(key)
-              }
-            >
-              {profile?.games?.[key].some((id) => game._id === id)
-                ? "Remove from"
-                : "Add to"}{" "}
-              {key}
-            </Button>
-          )
-        )}
-      </div>
-      <div
-        style={{
-          bottom: `calc(${ratingButtonRef.current?.offsetHeight}px)`,
-        }}
-        className={classNames(styles.controls__list, {
-          [styles.controls__list_active]: isPauseActive,
-        })}
-      >
-        {(["wishlist", "backlog", "dropped"] as CategoriesType[]).map((key) => (
-          <Button
-            key={key}
-            active={profile?.games?.[key].some((id) => game._id === id)}
-            onClick={() =>
-              profile?.games?.[key].some((id) => game._id === id)
-                ? removeFromList(key)
-                : addToList(key)
-            }
-          >
-            {profile?.games?.[key].some((id) => game._id === id)
-              ? "Remove from"
-              : "Add to"}{" "}
-            {key}
-          </Button>
-        ))}
-      </div>
       <div
         ref={ratingsRef}
         style={{
@@ -222,73 +115,22 @@ export const GameControls: FC<IGameControlsProps> = ({
       </div>
       <Button
         onClick={() => {
-          setIsPauseActive(false);
-          setIsPlayedActive(false);
-          setIsRatingActive(false);
-
-          isPlaying ? removeFromList("playing") : addToList("playing");
+          !!game._id &&
+            !!profile?._id &&
+            modal.open(<PlaythroughModal game={game} userId={profile._id} />);
         }}
         color="transparent"
-        tooltip={(isPlaying ? "Remove from" : "Add to") + " playing"}
+        tooltip={"Playthroughs"}
         tooltipAlign="left"
         className={classNames(styles.controls__action, {
-          [styles.controls__action_active]: isPlaying,
+          [styles.controls__action_active]: !!playthrough,
         })}
       >
         <Icon
           className={classNames(styles.controls__icon, {
-            [styles.controls__icon_active]: isPlaying,
+            [styles.controls__icon_active]: !!playthrough,
           })}
           icon="iconamoon:play-circle"
-        />
-      </Button>
-      <Button
-        onClick={() => {
-          setIsPlayedActive(!isPlayedActive);
-          setIsPauseActive(false);
-          setIsRatingActive(false);
-        }}
-        color="transparent"
-        className={classNames(styles.controls__action, {
-          [styles.controls__action_active]:
-            !!profile?.games &&
-            [
-              // ...profile.games.mastered,
-              ...profile.games.played,
-              ...profile.games.completed,
-            ].some((id) => game._id === id),
-        })}
-      >
-        <Icon
-          className={classNames(styles.controls__icon, {
-            [styles.controls__icon_active]: isCompleted || isPlayed,
-          })}
-          icon="iconamoon:check-circle-1"
-        />
-      </Button>
-      <Button
-        onClick={() => {
-          setIsPauseActive(!isPauseActive);
-          setIsPlayedActive(false);
-          setIsRatingActive(false);
-        }}
-        color="transparent"
-        className={classNames(styles.controls__action, {
-          [styles.controls__action_active]:
-            !!profile?.games &&
-            [
-              ...profile.games.wishlist,
-              ...profile.games.backlog,
-              ...profile.games.dropped,
-            ].some((id) => game._id === id),
-        })}
-      >
-        <Icon
-          className={classNames(styles.controls__icon, {
-            [styles.controls__icon_active]:
-              isDropped || isWishlisted || isBacklogged,
-          })}
-          icon="iconamoon:menu-kebab-horizontal-circle"
         />
       </Button>
       <Button
@@ -312,8 +154,6 @@ export const GameControls: FC<IGameControlsProps> = ({
         tooltipAlign="right"
         onClick={() => {
           setIsRatingActive(!isRatingActive);
-          setIsPauseActive(false);
-          setIsPlayedActive(false);
         }}
         color="transparent"
         className={classNames(styles.controls__action, {

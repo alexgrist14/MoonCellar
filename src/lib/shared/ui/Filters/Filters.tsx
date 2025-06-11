@@ -478,16 +478,16 @@ export const Filters: FC<{
               {
                 title: "Filter games",
                 color: "accent",
-                isDisabled: !filters,
-                callback: () => {
+                disabled: !filters,
+                onClick: () => {
                   !!filters && pushFiltersToQuery(filters, router, pathname);
                 },
-                isHidden: isGauntlet,
+                hidden: isGauntlet,
               },
               {
                 title: "Save filters",
-                isHidden: !profile || !filters,
-                callback: () =>
+                hidden: !profile || !filters,
+                onClick: () =>
                   !!filters &&
                   modal.open(
                     <SaveFilterForm
@@ -499,7 +499,7 @@ export const Filters: FC<{
               {
                 title: "Clear filters",
                 color: "red",
-                callback: () => {
+                onClick: () => {
                   pushFiltersToQuery({}, router, pathname);
                 },
               },
@@ -515,7 +515,6 @@ export const Filters: FC<{
                 savedFilters.map((filter, i) => (
                   <ButtonGroup
                     key={i}
-                    isCompact
                     wrapperStyle={{
                       padding: "0",
                       display: "grid",
@@ -526,13 +525,14 @@ export const Filters: FC<{
                       {
                         title: filter.name,
                         color: "fancy",
-                        style: { textAlign: "start" },
-                        callback: () =>
-                          router.push(`${pathname}?${filter.filter}`),
+                        style: { justifyContent: "flex-start" },
+                        compact: true,
+                        link: `${pathname}?${filter.filter}`,
                       },
                       {
                         title: "Remove",
-                        callback: () =>
+                        compact: true,
+                        onClick: () =>
                           !!profile &&
                           userAPI
                             .removeFilter(profile._id, filter.name)

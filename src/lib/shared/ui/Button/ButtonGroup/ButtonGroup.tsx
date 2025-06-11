@@ -8,61 +8,31 @@ import { IButtonGroupItem } from "../../../types/buttons";
 interface IButtonGroupProps {
   buttons: IButtonGroupItem[];
   wrapperStyle?: CSSProperties;
-  isCompact?: boolean;
   wrapperClassName?: string;
 }
 
 export const ButtonGroup: FC<IButtonGroupProps> = ({
   buttons,
-  isCompact,
   wrapperStyle,
   wrapperClassName,
 }) => {
   return (
     <div
       style={wrapperStyle}
-      className={classNames(styles.group, wrapperClassName, {
-        [styles.group_compact]: isCompact,
-      })}
+      className={classNames(styles.group, wrapperClassName)}
     >
-      {buttons.map((button, i) =>
-        !!button.link ? (
-          <Link key={i} href={button.link} target={button.target}>
-            <Button
-              style={{
-                ...button.style,
-                ...(button.isHidden && { display: "none" }),
-              }}
-              onClick={button.callback}
-              active={button.isActive}
-              disabled={button.isDisabled}
-              color={button.color}
-              className={classNames(styles.group__button, {
-                [styles.group__button_compact]: isCompact,
-              })}
-            >
-              {button.title}
-            </Button>
+      {buttons.map((button, i) => {
+        const { title, link, target, ...data } = button;
+        return !!link ? (
+          <Link key={i} href={link} target={target}>
+            <Button {...data}>{title}</Button>
           </Link>
         ) : (
-          <Button
-            key={i}
-            style={{
-              ...button.style,
-              ...(button.isHidden && { display: "none" }),
-            }}
-            onClick={button.callback}
-            active={button.isActive}
-            disabled={button.isDisabled}
-            color={button.color}
-            className={classNames(styles.group__button, {
-              [styles.group__button_compact]: isCompact,
-            })}
-          >
-            {button.title}
+          <Button key={i} {...data}>
+            {title}
           </Button>
-        )
-      )}
+        );
+      })}
     </div>
   );
 };

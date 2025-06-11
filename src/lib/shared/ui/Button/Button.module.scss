@@ -7,7 +7,6 @@
   font-size: 14px;
   padding: 5px 10px;
   transition: 0.2s;
-  outline: none;
   padding-inline: 12px;
 
   @include textEllipsis;
@@ -39,7 +38,7 @@
 
   &_greenColor {
     background-color: $on;
-    color: #fff;
+    color: $textColor;
   }
 
   &_greenBorderColor {
@@ -63,10 +62,8 @@
   }
 
   &_fancyColor {
-    flex-grow: 1;
     background: none;
     transition: 0.2s all;
-    height: 50px;
     text-align: center;
     border: 0;
     border-radius: 0;
@@ -79,22 +76,11 @@
     }
   }
 
-  &__tooltip {
-    position: absolute;
-    padding: 5px 10px;
-    background-color: $bg;
-    color: $whiteTextColor;
-    border-radius: $radius;
-    opacity: 0;
-    @include font(14px, 16px, 500);
-    margin: 0;
-    height: fit-content;
-    display: flex;
-    align-items: center;
-    animation: appearOpacity 0.3s 1 forwards;
-    pointer-events: none;
-    width: fit-content;
-    white-space: nowrap;
-    z-index: 5;
+  &_compact {
+    padding: 2px;
+  }
+
+  &_hidden {
+    display: none;
   }
 }

@@ -1,10 +1,9 @@
 import { FC, useEffect, useState } from "react";
-import { Button } from "../Button";
+import { Button, IButtonProps } from "../Button";
 import cl from "classnames";
 import styles from "./Tabs.module.scss";
 import Link from "next/link";
 import { ITabContent } from "../../types/tabs";
-import { IButtonColor } from "../../types/buttons";
 
 interface ITabs {
   contents: ITabContent[];
@@ -14,7 +13,7 @@ interface ITabs {
   tabBodyClassName?: string;
   isUseDefaultIndex?: boolean;
   isStopPropagation?: boolean;
-  buttonColor?: IButtonColor;
+  buttonColor?: IButtonProps["color"];
   resetCallback?: () => void;
   isAdaptive?: boolean;
   isHideTabsButtons?: boolean;

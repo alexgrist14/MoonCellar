@@ -19,6 +19,7 @@ import { useWindowResizeAction } from "../../hooks";
 import { useDebouncedCallback } from "use-debounce";
 import { useAuthStore } from "../../store/auth.store";
 import { SvgAchievement } from "../svg";
+import { useUserStore } from "../../store/user.store";
 
 interface IGameCardProps {
   game: IGDBGameMinimal;
@@ -43,6 +44,15 @@ export const GameCard: FC<IGameCardProps> = ({
   const [ratio, setRatio] = useState<{ height?: string; width?: string }>();
 
   const { profile } = useAuthStore();
+  const { isMobile } = useStatesStore();
+  const { playthroughs } = useUserStore();
+
+  const playthrough = useMemo(
+    () =>
+      !!playthroughs?.length &&
+      playthroughs.findLast((play) => play.gameId === game._id),
+    [playthroughs, game]
+  );
 
   const { isMastered, isBeaten } = useMemo(() => {
     const mastered = profile?.raAwards?.filter(
@@ -58,8 +68,6 @@ export const GameCard: FC<IGameCardProps> = ({
       isBeaten: beaten?.some((award) => raIds?.includes(award.awardData)),
     };
   }, [game, profile]);
-
-  const { isMobile } = useStatesStore();
 
   const debouncedSetRatio = useDebouncedCallback((rect: DOMRect) => {
     setRatio(
@@ -92,7 +100,11 @@ export const GameCard: FC<IGameCardProps> = ({
         className={classNames(
           styles.card,
           className,
-          spreadDirection === "height" && styles.card_height
+          spreadDirection === "height" && styles.card_height,
+          !!playthrough &&
+            !playthrough.isMastered &&
+            styles[`card_${playthrough.category}`],
+          !!playthrough && playthrough.isMastered && styles.card_mastered
         )}
         style={{
           ...ratio,
@@ -120,6 +132,7 @@ export const GameCard: FC<IGameCardProps> = ({
             <SvgAchievement />
           </div>
         )}
+        {isLoading && <Loader key={game._id + "_loader"} />}
         <div
           className={classNames(styles.card__info, {
             [styles.card__info_active]:
@@ -155,7 +168,6 @@ export const GameCard: FC<IGameCardProps> = ({
           </Link>
           <GameControls className={styles.card__controls} game={game} />
         </div>
-        {isLoading && <Loader key={game._id + "_loader"} />}
         {!!game?.cover ? (
           <Image
             onLoad={() => setIsLoading(false)}

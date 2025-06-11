@@ -41,9 +41,10 @@ export const GamesList: FC<IGamesListProps> = ({
               <ButtonGroup
                 key={`${game._id}_${i}`}
                 wrapperStyle={{
+                  display: "grid",
+                  width: "100%",
                   gridTemplateColumns: !!removeGame ? "1fr 20%" : "1fr",
                 }}
-                isCompact
                 wrapperClassName={styles.consoles__game}
                 buttons={[
                   {
@@ -51,13 +52,15 @@ export const GamesList: FC<IGamesListProps> = ({
                     link: `/games/${game.slug}`,
                     target: "_blank",
                     color: "fancy",
-                    style: { textAlign: "start" },
+                    compact: true,
+                    style: { justifyContent: "flex-start", width: "100%" },
                   },
                   {
                     title: "Remove",
                     color: "red",
-                    isHidden: !removeGame,
-                    callback: () => !!removeGame && removeGame(game),
+                    hidden: !removeGame,
+                    compact: true,
+                    onClick: () => !!removeGame && removeGame(game),
                   },
                 ]}
               />

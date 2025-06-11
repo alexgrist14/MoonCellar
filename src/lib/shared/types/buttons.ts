@@ -1,22 +1,8 @@
-import { CSSProperties, HTMLAttributeAnchorTarget, ReactNode } from "react";
+import { HTMLAttributeAnchorTarget, ReactNode } from "react";
+import { IButtonProps } from "../ui/Button";
 
-export type IButtonColor =
-  | "default"
-  | "accent"
-  | "red"
-  | "green"
-  | "greenBorder"
-  | "transparent"
-  | "fancy";
-
-export interface IButtonGroupItem {
+export interface IButtonGroupItem extends IButtonProps {
   title: string | ReactNode;
-  callback?: () => void;
   link?: string;
-  color?: IButtonColor;
-  isActive?: boolean;
-  isDisabled?: boolean;
-  isHidden?: boolean;
   target?: HTMLAttributeAnchorTarget;
-  style?: CSSProperties;
 }

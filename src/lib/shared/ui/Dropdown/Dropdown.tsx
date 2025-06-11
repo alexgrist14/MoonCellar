@@ -456,7 +456,9 @@ export const Dropdown: FC<IDropDownListProps> = ({
               })}
             >
               {indexedList.map((item, index) => {
-                const isChecked = multiValue.includes(item.index);
+                const isChecked =
+                  multiValue.includes(item.index) ||
+                  (!isMulti && value === item.value);
                 const isExcluded = excludeValue.includes(item.index);
 
                 const key = `${item.value.replace(/[^W+]/g, "_")}-${index}`;
@@ -485,21 +487,22 @@ export const Dropdown: FC<IDropDownListProps> = ({
                       </div>
                     )}
                     <span>{item.value}</span>
-                    {isMulti && (
-                      <div className={styles.dropdown__check}>
-                        <Checkbox
-                          colorTheme={
-                            isWithExclude
-                              ? isExcluded
-                                ? "off"
-                                : "on"
-                              : "accent"
-                          }
-                          checked={isChecked || isExcluded || false}
-                          onChange={() => {}}
-                        />
-                      </div>
-                    )}
+                    {isMulti ||
+                      (isChecked && (
+                        <div className={styles.dropdown__check}>
+                          <Checkbox
+                            colorTheme={
+                              isWithExclude
+                                ? isExcluded
+                                  ? "off"
+                                  : "on"
+                                : "accent"
+                            }
+                            checked={isChecked || isExcluded || false}
+                            onChange={() => {}}
+                          />
+                        </div>
+                      ))}
                   </div>
                 );
               })}

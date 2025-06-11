@@ -23,11 +23,11 @@ type ITextareaType = Pick<
   | "children"
   | "style"
   | "onKeyDown"
+  | "ref"
 >;
 
 export interface ITextareaProps extends ITextareaType {
   error?: FieldError;
-  ref?: any;
   clearErrors?: any;
   resize?: boolean;
   classNameField?: string;

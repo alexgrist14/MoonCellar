@@ -29,7 +29,8 @@
   &__link > button {
     border-radius: 0;
     margin-left: -1px;
-    //width: 100%;
+    // width: 100%;
+    flex: 1;
   }
 
   &__button {

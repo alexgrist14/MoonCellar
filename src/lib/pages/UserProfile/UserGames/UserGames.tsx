@@ -52,6 +52,7 @@ export const UserGames: FC<UserGamesProps> = ({ userId, gamesRating }) => {
     userAPI.getUserGames(userId, list).then((res) => {
       const games = res.data.games[list];
       setCurrentGames(games);
+      setTotal(games.length);
     });
   }, [list, userId, gamesRating, selectedSort, sortOrder]);
 
@@ -85,8 +86,9 @@ export const UserGames: FC<UserGamesProps> = ({ userId, gamesRating }) => {
     }
 
     setCurrentGames(sorted);
-    setTotal(sorted.length);
   }, [sortedGames, selectedSort, sortOrder, gamesRating]);
+
+  console.log(total);
 
   useCloseEvents([sortRef], () => setIsDropdownOpen(false));
 
