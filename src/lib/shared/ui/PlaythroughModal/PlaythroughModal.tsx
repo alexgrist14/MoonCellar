@@ -24,7 +24,6 @@ import { IButtonGroupItem } from "../../types/buttons";
 import { SvgPlus } from "../svg";
 import classNames from "classnames";
 import { useUserStore } from "../../store/user.store";
-import { Scrollbar } from "../Scrollbar";
 import { WrapperTemplate } from "../WrapperTemplate";
 
 interface IPlaythroughModalProps {
@@ -212,10 +211,13 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
           <Dropdown
             placeholder="Select category..."
             getIndex={(index) =>
+              userListCategories[index] !== "mastered" &&
               setValue("category", userListCategories[index])
             }
             overwriteValue={commonUtils.upFL(watch("category") || "")}
-            list={userListCategories.map((item) => commonUtils.upFL(item))}
+            list={userListCategories
+              .filter((category) => category !== "mastered")
+              .map((item) => commonUtils.upFL(item))}
           />
           <Dropdown
             placeholder="Select platform..."
