@@ -88,8 +88,6 @@ export const UserGames: FC<UserGamesProps> = ({ userId, gamesRating }) => {
     setCurrentGames(sorted);
   }, [sortedGames, selectedSort, sortOrder, gamesRating]);
 
-  console.log(total);
-
   useCloseEvents([sortRef], () => setIsDropdownOpen(false));
 
   const handleSortChange = (value: SortType) => {

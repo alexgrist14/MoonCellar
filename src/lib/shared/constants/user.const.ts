@@ -6,5 +6,6 @@ export const userListCategories: CategoriesType[] = [
   "played",
   "wishlist",
   "backlog",
+  "mastered",
   "dropped",
 ];

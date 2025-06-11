@@ -6,6 +6,7 @@ export type CategoriesType =
   | "wishlist"
   | "dropped"
   | "playing"
+  | "mastered"
   | "backlog"
   | "played";
 
