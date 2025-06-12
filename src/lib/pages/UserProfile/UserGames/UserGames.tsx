@@ -13,21 +13,22 @@ import { FC, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./UserGames.module.scss";
 import { useSearchParams } from "next/navigation";
 import useCloseEvents from "@/src/lib/shared/hooks/useCloseEvents";
-import { useUserStore } from "@/src/lib/shared/store/user.store";
 import { IPlaythroughMinimal } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 
 interface UserGamesProps {
   gamesRating: IGamesRating[];
+  playthroughs: IPlaythroughMinimal[];
 }
 
 const take = 30;
 
-export const UserGames: FC<UserGamesProps> = ({ gamesRating }) => {
+export const UserGames: FC<UserGamesProps> = ({
+  gamesRating,
+  playthroughs,
+}) => {
   const query = useSearchParams();
   const page = Number(query.get("page"));
   const list = query.get("list") as CategoriesType;
-
-  const { playthroughs } = useUserStore();
 
   const sortOptions = [
     { label: SortType.DATE_ADDED },

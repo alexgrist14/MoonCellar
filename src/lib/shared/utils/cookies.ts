@@ -1,32 +1,28 @@
-export const getCookie = (name: string) => {
-  const matches =
-    typeof document !== "undefined" &&
-    document.cookie.match(
-      new RegExp(
-        "(?:^|; )" +
-          name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, "\\$1") +
-          "=([^;]*)"
-      )
-    );
+import { ACCESS_TOKEN } from "../constants";
+
+export function getCookie(name: string) {
+  const matches = document.cookie.match(
+    new RegExp(
+      "(?:^|; )" +
+        name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, "\\$1") +
+        "=([^;]*)"
+    )
+  );
   const res = matches ? decodeURIComponent(matches[1]) : undefined;
 
   if (typeof res === "string") return res;
   if (typeof res === "object") return JSON.parse(res);
-};
+}
 
 export function setCookie(
   name: string,
   value: object | string,
-  options: {
-    path?: string;
-    "max-age"?: number;
-    domain?: string;
-    secure?: boolean;
-  } = {}
+  options: any = {}
 ) {
   options = {
     path: "/",
-    "max-age": 86400,
+    "max-age": 24 * 60 * 60,
+    secure: true,
     ...options,
   };
 
@@ -37,24 +33,37 @@ export function setCookie(
 
   for (const optionKey in options) {
     updatedCookie += "; " + optionKey;
-    //@ts-ignore
-    const optionValue: any = options[optionKey] as any;
+
+    const optionValue = options[optionKey];
     if (optionValue !== true) {
       updatedCookie += "=" + optionValue;
     }
   }
-  if (!document) return;
+  if (typeof window === "undefined" || !document) return;
   document.cookie = updatedCookie;
 }
 
-export function deleteCookie(
-  name: string,
-  options: {
-    domain?: string;
-  } = {}
-) {
+export function deleteCookie(name: string) {
   setCookie(name, "", {
     "max-age": -1,
-    ...options,
   });
+}
+
+export function getAccesToken() {
+  if (typeof window === "undefined") return null;
+  const token = getCookie(ACCESS_TOKEN);
+  if (token) return token;
+  else return localStorage.getItem(ACCESS_TOKEN);
+}
+
+export function setAccesToken(token: string) {
+  if (typeof window === "undefined") return;
+  setCookie(ACCESS_TOKEN, token);
+  localStorage.setItem(ACCESS_TOKEN, token);
+}
+
+export function deleteAccesToken() {
+  if (typeof window === "undefined") return;
+  deleteCookie(ACCESS_TOKEN);
+  localStorage.removeItem(ACCESS_TOKEN);
 }

@@ -16,12 +16,14 @@ import { SvgBurger } from "../../shared/ui/svg";
 import { useStatesStore } from "../../shared/store/states.store";
 import { useSearchParams } from "next/navigation";
 import { UserNavigation } from "../../features/user/ui/UserNavigation";
+import { IPlaythroughMinimal } from "../../shared/lib/schemas/playthroughs.schema";
 
 interface UserProfileProps {
   user: IUser;
   logs: ILogs[];
   authUserFollowings?: IFollowings;
   authUserId?: string;
+  playthroughs: IPlaythroughMinimal[];
 }
 
 const UserProfile: FC<UserProfileProps> = ({
@@ -29,6 +31,7 @@ const UserProfile: FC<UserProfileProps> = ({
   logs,
   authUserFollowings,
   authUserId,
+  playthroughs,
 }) => {
   const query = useSearchParams();
   const { isMobile } = useStatesStore();
@@ -67,7 +70,11 @@ const UserProfile: FC<UserProfileProps> = ({
             }
             titleStyle={{ width: "fit-content" }}
           >
-            <UserNavigation user={user} isAuthedUser={isAuthedUser} />
+            <UserNavigation
+              user={user}
+              isAuthedUser={isAuthedUser}
+              playthroughs={playthroughs}
+            />
           </ExpandMenu>
         )}
         <WrapperTemplate classNameContent={styles.content} isWithBlur>
@@ -81,11 +88,18 @@ const UserProfile: FC<UserProfileProps> = ({
             />
           )}
           {userListCategories.some((t) => t === tab) && (
-            <UserGames gamesRating={user.gamesRating} />
+            <UserGames
+              playthroughs={playthroughs}
+              gamesRating={user.gamesRating}
+            />
           )}
         </WrapperTemplate>
         {!isMobile && (
-          <UserNavigation user={user} isAuthedUser={isAuthedUser} />
+          <UserNavigation
+            user={user}
+            isAuthedUser={isAuthedUser}
+            playthroughs={playthroughs}
+          />
         )}
       </div>
     </>

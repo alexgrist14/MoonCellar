@@ -14,19 +14,19 @@ import { SvgPen, SvgSettings } from "@/src/lib/shared/ui/svg";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useUserStore } from "@/src/lib/shared/store/user.store";
+import { IPlaythroughMinimal } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 
 export const UserNavigation: FC<{
   isAuthedUser: boolean;
   user: IUser;
-}> = ({ isAuthedUser, user }) => {
+  playthroughs: IPlaythroughMinimal[];
+}> = ({ isAuthedUser, user, playthroughs }) => {
   const router = useRouter();
   const query = useSearchParams();
   const pathname = usePathname();
 
   const { setExpanded } = useCommonStore();
   const { isMobile } = useStatesStore();
-  const { playthroughs } = useUserStore();
 
   const handleEditListClick = () => {
     modal.open(<CustomFolder />);
