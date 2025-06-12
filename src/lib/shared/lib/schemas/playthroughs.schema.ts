@@ -26,6 +26,14 @@ export const PlaythroughSchema = z.object({
   time: z.coerce.number().describe("Spent time (hours)").optional(),
   comment: z.string().describe("Note after complete").optional(),
   isMastered: z.boolean().describe("Check if mastered").optional(),
+  createdAt: z.string().date(),
+  updatedAt: z.string().date(),
+});
+
+export const PlaythroughEditSchema = PlaythroughSchema.omit({
+  _id: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 export const PlaythoughFullResponseSchema = PlaythroughSchema;
@@ -34,20 +42,14 @@ export const PlaythoughMinimalResponseSchema = PlaythroughSchema.pick({
   category: true,
   gameId: true,
   isMastered: true,
+  updatedAt: true,
 });
 export const PlaythoughsResponseSchema = PlaythoughFullResponseSchema.array();
 export const PlaythoughsMinimalResponseSchema =
   PlaythoughMinimalResponseSchema.array();
-export const GetPlaythroughsRequestSchema = PlaythroughSchema.omit({
-  _id: true,
-})
-  .extend({ page: z.number(), take: z.number() })
-  .partial();
-export const SavePlaythroughRequestSchema = PlaythroughSchema.omit({
-  _id: true,
-});
-export const UpdatePlaythroughRequestSchema = PlaythroughSchema.omit({
-  _id: true,
+export const GetPlaythroughsRequestSchema = PlaythroughEditSchema.partial();
+export const SavePlaythroughRequestSchema = PlaythroughEditSchema.omit({});
+export const UpdatePlaythroughRequestSchema = PlaythroughEditSchema.omit({
   gameId: true,
   userId: true,
 });

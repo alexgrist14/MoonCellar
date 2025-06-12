@@ -1,13 +1,9 @@
 "use client";
 
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import { userListCategories } from "../../shared/constants/user.const";
 import { IUser } from "../../shared/types/auth";
-import {
-  CategoriesType,
-  IFollowings,
-  ILogs,
-} from "../../shared/types/user.type";
+import { IFollowings, ILogs } from "../../shared/types/user.type";
 import { Settings } from "./Settings";
 import { UserGames } from "./UserGames";
 import UserInfo from "./UserInfo/UserInfo";
@@ -18,7 +14,7 @@ import { BGImage } from "../../shared/ui/BGImage";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { SvgBurger } from "../../shared/ui/svg";
 import { useStatesStore } from "../../shared/store/states.store";
-import { useParams, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { UserNavigation } from "../../features/user/ui/UserNavigation";
 
 interface UserProfileProps {
@@ -35,13 +31,16 @@ const UserProfile: FC<UserProfileProps> = ({
   authUserId,
 }) => {
   const query = useSearchParams();
-  const { games } = user;
-
-  const isAuthedUser = authUserId === user._id;
-
   const { isMobile } = useStatesStore();
 
-  const tab = !!query?.get("list") ? (query.get("list") as string) : "profile";
+  const isAuthedUser = useMemo(
+    () => authUserId === user._id,
+    [authUserId, user]
+  );
+  const tab = useMemo(
+    () => (!!query?.get("list") ? (query.get("list") as string) : "profile"),
+    [query]
+  );
 
   return (
     <>
@@ -68,11 +67,7 @@ const UserProfile: FC<UserProfileProps> = ({
             }
             titleStyle={{ width: "fit-content" }}
           >
-            <UserNavigation
-              games={games}
-              user={user}
-              isAuthedUser={isAuthedUser}
-            />
+            <UserNavigation user={user} isAuthedUser={isAuthedUser} />
           </ExpandMenu>
         )}
         <WrapperTemplate classNameContent={styles.content} isWithBlur>
@@ -86,15 +81,11 @@ const UserProfile: FC<UserProfileProps> = ({
             />
           )}
           {userListCategories.some((t) => t === tab) && (
-            <UserGames userId={user._id} gamesRating={user.gamesRating} />
+            <UserGames gamesRating={user.gamesRating} />
           )}
         </WrapperTemplate>
         {!isMobile && (
-          <UserNavigation
-            games={games}
-            user={user}
-            isAuthedUser={isAuthedUser}
-          />
+          <UserNavigation user={user} isAuthedUser={isAuthedUser} />
         )}
       </div>
     </>

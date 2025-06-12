@@ -108,12 +108,12 @@
     opacity: 0;
     position: absolute;
     border-radius: $radius;
-    // outline: 2px solid $textColor;
+    outline: 2px solid $textColor;
     pointer-events: none;
     width: 100%;
     height: calc(100% + 2px);
     margin-top: -1px;
-    // z-index: 2;
+    z-index: 1;
 
     &_active {
       opacity: 1;
@@ -161,12 +161,19 @@
     }
   }
 
-  &_wishlist,
-  &_backlog {
+  &_wishlist {
     filter: drop-shadow(0 0 0.2rem $violet);
 
     .card__info {
       outline-color: $violet;
+    }
+  }
+
+  &_backlog {
+    filter: drop-shadow(0 0 0.2rem $pink);
+
+    .card__info {
+      outline-color: $pink;
     }
   }
 

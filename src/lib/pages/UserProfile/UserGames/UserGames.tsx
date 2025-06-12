@@ -1,4 +1,4 @@
-import { userAPI } from "@/src/lib/shared/api";
+import { IGDBApi } from "@/src/lib/shared/api";
 import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
 import { SortType } from "@/src/lib/shared/types/sort";
 import { CategoriesType, IGamesRating } from "@/src/lib/shared/types/user.type";
@@ -9,22 +9,25 @@ import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { SvgArrowPointer } from "@/src/lib/shared/ui/svg";
 import { Icon } from "@iconify/react";
 import classNames from "classnames";
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./UserGames.module.scss";
 import { useSearchParams } from "next/navigation";
 import useCloseEvents from "@/src/lib/shared/hooks/useCloseEvents";
+import { useUserStore } from "@/src/lib/shared/store/user.store";
+import { IPlaythroughMinimal } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 
 interface UserGamesProps {
-  userId: string;
   gamesRating: IGamesRating[];
 }
 
 const take = 30;
 
-export const UserGames: FC<UserGamesProps> = ({ userId, gamesRating }) => {
+export const UserGames: FC<UserGamesProps> = ({ gamesRating }) => {
   const query = useSearchParams();
   const page = Number(query.get("page"));
   const list = query.get("list") as CategoriesType;
+
+  const { playthroughs } = useUserStore();
 
   const sortOptions = [
     { label: SortType.DATE_ADDED },
@@ -41,38 +44,79 @@ export const UserGames: FC<UserGamesProps> = ({ userId, gamesRating }) => {
   const [selectedSort, setSelectedSort] = useState<SortType>(
     SortType.DATE_ADDED
   );
+  const [games, setGames] = useState<IGDBGameMinimal[]>();
   const [sortedGames, setSortedGames] = useState<IGDBGameMinimal[]>();
-  const [currentGames, setCurrentGames] = useState<IGDBGameMinimal[]>();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  const gamesIds = useMemo(
+    () =>
+      playthroughs
+        ?.filter(
+          (play) =>
+            (play.category === list && !play.isMastered) ||
+            (list === "mastered" && play.isMastered)
+        )
+        .map((play) => play.gameId),
+    [list, playthroughs]
+  );
+
+  const parsedGamesRatings = useMemo(() => {
+    return gamesRating.reduce(
+      (res: { [key: number]: number }, rating) => ({
+        ...res,
+        [rating.game]: rating.rating,
+      }),
+      {}
+    );
+  }, [gamesRating]);
+
+  const parsedPlaythroughs = useMemo(
+    () =>
+      playthroughs?.reduce(
+        (res: { [key: number]: IPlaythroughMinimal }, play) => {
+          const existed =
+            res[play.gameId] && new Date(res[play.gameId].updatedAt)?.getTime();
+          const newPlay = new Date(play.updatedAt)?.getTime();
+
+          (!existed || existed < newPlay) && (res[play.gameId] = play);
+
+          return res;
+        },
+        {}
+      ),
+    [playthroughs]
+  );
+
   useEffect(() => {
-    setCurrentGames(undefined);
+    setGames(undefined);
     setSortedGames(undefined);
-
-    userAPI.getUserGames(userId, list).then((res) => {
-      const games = res.data.games[list];
-      setCurrentGames(games);
-      setTotal(games.length);
-    });
-  }, [list, userId, gamesRating, selectedSort, sortOrder]);
+  }, [list]);
 
   useEffect(() => {
-    if (!sortedGames) return;
+    !!gamesIds?.length &&
+      !games &&
+      IGDBApi.getGamesByIds({ _ids: gamesIds }).then((res) => {
+        setGames(res.data);
+        setTotal(res.data.length);
+      });
+  }, [gamesIds, games]);
 
-    let sorted = structuredClone(sortedGames);
+  useEffect(() => {
+    if (!games?.length) return;
+
+    let sorted = structuredClone(games);
 
     switch (selectedSort) {
       case SortType.RATING:
-        sorted.sort((a, b) => {
-          const ratingA =
-            gamesRating.find((rating) => rating.game === a._id)?.rating || 0;
-          const ratingB =
-            gamesRating.find((rating) => rating.game === b._id)?.rating || 0;
+        sorted?.sort((a, b) => {
+          const ratingA = parsedGamesRatings[a._id];
+          const ratingB = parsedGamesRatings[b._id];
+          if (!ratingB || !ratingA) return 1;
           return sortOrder === "asc" ? ratingA - ratingB : ratingB - ratingA;
         });
         break;
       case SortType.TITLE:
-        sorted.sort((a, b) => {
+        sorted?.sort((a, b) => {
           const nameA = a.name.toLowerCase();
           const nameB = b.name.toLowerCase();
           return sortOrder === "asc"
@@ -81,12 +125,21 @@ export const UserGames: FC<UserGamesProps> = ({ userId, gamesRating }) => {
         });
         break;
       case SortType.DATE_ADDED:
-        sortOrder === "asc" ? (sorted = sorted.reverse()) : sorted;
+        sorted?.sort((a, b) => {
+          const dateA = !!parsedPlaythroughs?.[a._id]
+            ? new Date(parsedPlaythroughs[a._id].updatedAt).getTime()
+            : 0;
+          const dateB = !!parsedPlaythroughs?.[b._id]
+            ? new Date(parsedPlaythroughs[b._id].updatedAt).getTime()
+            : 0;
+
+          return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+        });
         break;
     }
 
-    setCurrentGames(sorted);
-  }, [sortedGames, selectedSort, sortOrder, gamesRating]);
+    setSortedGames(sorted);
+  }, [games, selectedSort, sortOrder, parsedGamesRatings, parsedPlaythroughs]);
 
   useCloseEvents([sortRef], () => setIsDropdownOpen(false));
 
@@ -128,8 +181,8 @@ export const UserGames: FC<UserGamesProps> = ({ userId, gamesRating }) => {
       </div>
 
       <div className={classNames(styles.games)}>
-        {!!currentGames ? (
-          currentGames.slice((page - 1) * take, page * take).map((game) => (
+        {!!sortedGames ? (
+          sortedGames.slice((page - 1) * take, page * take).map((game) => (
             <GameCard key={game._id} game={game}>
               <div className={styles.games__info}>
                 <p className={styles.games__title}>{game.name}</p>
@@ -151,7 +204,7 @@ export const UserGames: FC<UserGamesProps> = ({ userId, gamesRating }) => {
         )}
 
         <Pagination take={take} total={total} isFixed />
-        {!!currentGames && !currentGames.length && <p>There is no games</p>}
+        {!!sortedGames && !sortedGames.length && <p>There is no games</p>}
       </div>
     </div>
   );

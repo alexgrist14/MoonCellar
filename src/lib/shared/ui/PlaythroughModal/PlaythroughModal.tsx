@@ -7,11 +7,11 @@ import { ButtonGroup } from "../Button/ButtonGroup";
 import { Textarea } from "../Textarea";
 import { Input } from "../Input";
 import { ToggleSwitch } from "../ToggleSwitch";
-import { userListCategories } from "../../constants/user.const";
 import { commonUtils } from "../../utils/common";
 import { useAuthStore } from "../../store/auth.store";
 import {
   IPlaythrough,
+  IPlaythroughMinimal,
   ISavePlaythroughRequest,
   SavePlaythroughRequestSchema,
 } from "../../lib/schemas/playthroughs.schema";
@@ -30,6 +30,15 @@ interface IPlaythroughModalProps {
   userId: string;
   game: IGDBGameMinimal;
 }
+
+const playthroughCategories: IPlaythroughMinimal["category"][] = [
+  "wishlist",
+  "playing",
+  "completed",
+  "played",
+  "backlog",
+  "dropped",
+];
 
 export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
   game,
@@ -100,6 +109,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
                         category: res.data.category,
                         isMastered: res.data.isMastered,
                         gameId: res.data.gameId,
+                        updatedAt: res.data.updatedAt,
                       }
                     : play
                 ) || []
@@ -117,6 +127,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
                 category: res.data.category,
                 isMastered: res.data.isMastered,
                 gameId: res.data.gameId,
+                updatedAt: res.data.updatedAt,
               },
             ]);
             selectHandler(res.data);
@@ -211,13 +222,10 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
           <Dropdown
             placeholder="Select category..."
             getIndex={(index) =>
-              userListCategories[index] !== "mastered" &&
-              setValue("category", userListCategories[index])
+              setValue("category", playthroughCategories[index])
             }
             overwriteValue={commonUtils.upFL(watch("category") || "")}
-            list={userListCategories
-              .filter((category) => category !== "mastered")
-              .map((item) => commonUtils.upFL(item))}
+            list={playthroughCategories.map((item) => commonUtils.upFL(item))}
           />
           <Dropdown
             placeholder="Select platform..."

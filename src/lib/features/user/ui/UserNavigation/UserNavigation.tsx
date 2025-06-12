@@ -9,24 +9,24 @@ import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
 import { IUser } from "@/src/lib/shared/types/auth";
 import { userListCategories } from "@/src/lib/shared/constants/user.const";
 import { commonUtils } from "@/src/lib/shared/utils/common";
-import { CategoriesType } from "@/src/lib/shared/types/user.type";
 import classNames from "classnames";
 import { SvgPen, SvgSettings } from "@/src/lib/shared/ui/svg";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useUserStore } from "@/src/lib/shared/store/user.store";
 
 export const UserNavigation: FC<{
   isAuthedUser: boolean;
   user: IUser;
-  games: Record<CategoriesType, number[]>;
-}> = ({ isAuthedUser, user, games }) => {
+}> = ({ isAuthedUser, user }) => {
   const router = useRouter();
   const query = useSearchParams();
   const pathname = usePathname();
 
   const { setExpanded } = useCommonStore();
   const { isMobile } = useStatesStore();
+  const { playthroughs } = useUserStore();
 
   const handleEditListClick = () => {
     modal.open(<CustomFolder />);
@@ -69,7 +69,15 @@ export const UserNavigation: FC<{
             }}
           >
             <span>{commonUtils.upFL(category)}</span>
-            <span>{games[`${category}`].length}</span>
+            <span>
+              {
+                playthroughs?.filter(
+                  (play) =>
+                    (play.category === category && !play.isMastered) ||
+                    (category === "mastered" && play.isMastered)
+                ).length
+              }
+            </span>
           </Button>
         ))}
         {isAuthedUser && (

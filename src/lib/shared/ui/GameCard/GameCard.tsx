@@ -110,8 +110,8 @@ export const GameCard: FC<IGameCardProps> = ({
           ...ratio,
           ...style,
         }}
-        onMouseOver={() => setIsHover(true)}
-        onMouseOut={() => setIsHover(false)}
+        onMouseEnter={() => setIsHover(true)}
+        onMouseLeave={() => setIsHover(false)}
         onClick={(e) => {
           if (!stepIndex && isMobile) {
             e.preventDefault();

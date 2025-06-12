@@ -1,4 +1,5 @@
 import { API_URL, gameCategories } from "../constants";
+import { IGetGamesByIdsRequest } from "../lib/schemas/games.schema";
 import {
   IGDBDefault,
   IGDBGame,
@@ -55,6 +56,10 @@ const getGameById = (id: string) => {
   return agent.get<IGDBGame>(`${IGDB_URL}/by-id/${id}`);
 };
 
+const getGamesByIds = (data: IGetGamesByIdsRequest) => {
+  return agent.post<IGDBGameMinimal[]>(`${IGDB_URL}/by-ids`, data);
+};
+
 const getGameBySlug = (slug: string) => {
   return agent.get<IGDBGame>(`${IGDB_URL}/by-slug/${slug}`);
 };
@@ -98,6 +103,7 @@ const getKeywordsByIds = (ids: number[]) => {
 export const IGDBApi = {
   getGames,
   getGameById,
+  getGamesByIds,
   getGameBySlug,
   getGenres,
   getPlatforms,

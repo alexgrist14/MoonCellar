@@ -1,16 +1,21 @@
 import { gamesAPI } from "@/src/lib/shared/api/games.api";
+import { useEffectOnce } from "@/src/lib/shared/hooks/useEffectOnce";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useUserStore } from "@/src/lib/shared/store/user.store";
-import { useEffect } from "react";
 
 export const useGetUserInfo = () => {
   const { profile } = useAuthStore();
-  const { setPlaythroughs } = useUserStore();
+  const { setPlaythroughs, setRatings } = useUserStore();
 
-  return useEffect(() => {
-    !!profile?._id &&
-      gamesAPI.getPlaythroughsMinimal({ userId: profile._id }).then((res) => {
+  return useEffectOnce(async () => {
+    return gamesAPI
+      .getPlaythroughsMinimal({ userId: profile?._id })
+      .then((res) => {
         setPlaythroughs(res.data);
       });
-  }, [profile, setPlaythroughs]);
+
+    // userAPI.get({ userId: profile._id }).then((res) => {
+    //   setPlaythroughs(res.data);
+    // });
+  }, !!profile?._id);
 };

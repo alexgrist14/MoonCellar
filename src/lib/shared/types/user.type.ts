@@ -3,10 +3,10 @@ import { IGDBGameMinimal } from "./igdb";
 
 export type CategoriesType =
   | "completed"
+  | "mastered"
   | "wishlist"
   | "dropped"
   | "playing"
-  | "mastered"
   | "backlog"
   | "played";
 
