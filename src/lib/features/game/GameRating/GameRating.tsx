@@ -7,7 +7,6 @@ import { userAPI } from "@/src/lib/shared/api";
 import { toast } from "@/src/lib/shared/utils/toast";
 import { WrapperTemplate } from "@/src/lib/shared/ui/WrapperTemplate";
 import { useAsyncLoader } from "@/src/lib/shared/hooks/useAsyncLoader";
-import { Loader } from "@/src/lib/shared/ui/Loader";
 
 interface IGameRatingProps {
   game: IGDBGameMinimal;
@@ -18,10 +17,12 @@ export const GameRating: FC<IGameRatingProps> = ({ game, rating }) => {
   const { sync, isLoading } = useAsyncLoader();
   const { profile, setProfile } = useAuthStore();
 
-  const [ratingValue, setRatingValue] = useState<number>();
+  const [value, setValue] = useState(
+    !!rating ? rating.toString() : "No rating"
+  );
+  const [ratingValue, setRatingValue] = useState<number | undefined>();
 
   const changeHandler = (value: number) => {
-    if (!value) return;
     if (!profile || value === ratingValue) return;
 
     sync(() =>
@@ -43,24 +44,18 @@ export const GameRating: FC<IGameRatingProps> = ({ game, rating }) => {
 
   return (
     <WrapperTemplate classNameContent={styles.rating}>
-      {isLoading ? (
-        <Loader type="propogate" />
-      ) : (
-        <RangeSelector
-          finalCallback={changeHandler}
-          text={
-            !!ratingValue
-              ? ratingValue.toString()
-              : !!rating
-                ? rating.toString()
-                : "No rating"
-          }
-          min={0}
-          max={10}
-          defaultValue={ratingValue || rating}
-          disabled={false}
-        />
-      )}
+      <RangeSelector
+        callback={(value) =>
+          setValue(!!value ? value?.toString() : "No rating")
+        }
+        finalCallback={changeHandler}
+        text={value}
+        min={0}
+        max={10}
+        defaultValue={ratingValue || rating}
+        disabled={false}
+        isLoading={isLoading}
+      />
     </WrapperTemplate>
   );
 };

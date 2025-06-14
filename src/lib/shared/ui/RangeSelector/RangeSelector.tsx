@@ -1,6 +1,7 @@
 import { CSSProperties, FC, useEffect, useState } from "react";
 import styles from "./RangeSelector.module.scss";
 import classNames from "classnames";
+import { Loader } from "../Loader";
 
 interface RangeSelectorProps
   extends Partial<Pick<HTMLInputElement, "disabled">> {
@@ -13,6 +14,7 @@ interface RangeSelectorProps
   defaultValue?: number;
   callback?: (value: number) => void;
   finalCallback?: (value: number) => void;
+  isLoading?: boolean;
 }
 
 export const RangeSelector: FC<RangeSelectorProps> = ({
@@ -25,6 +27,7 @@ export const RangeSelector: FC<RangeSelectorProps> = ({
   callback,
   finalCallback,
   variant = "accent",
+  isLoading,
   ...props
 }) => {
   const [rangeValue, setRangeValue] = useState<string>("0");
@@ -65,50 +68,54 @@ export const RangeSelector: FC<RangeSelectorProps> = ({
       style={getStyles()}
     >
       {!!text && <span className={styles.selector__text}>{text}</span>}
-      <div className={styles.slider}>
-        <div
-          className={classNames(
-            styles.slider__pointer,
-            styles[`slider__pointer_${variant}`],
-            {
-              [styles.slider__pointer_active]: isActive,
-            }
-          )}
-          style={{
-            left,
-          }}
-        ></div>
-        <div
-          className={classNames(
-            styles.slider__bar,
-            styles[`slider__bar_${variant}`]
-          )}
-          style={{
-            width,
-          }}
-        ></div>
-        <input
-          className={styles.slider__input}
-          type="range"
-          value={rangeValue}
-          onMouseOver={() => {
-            setIsActive(true);
-          }}
-          onMouseOut={() => {
-            setIsActive(false);
-          }}
-          onChange={(e) => {
-            setRangeValue(e.target.value);
-            !!callback && callback(+e.target.value);
-          }}
-          onMouseUp={() => !!finalCallback && finalCallback(+rangeValue)}
-          onTouchEnd={() => !!finalCallback && finalCallback(+rangeValue)}
-          min={min || 0}
-          max={max || 100}
-          step={step || 1}
-          {...props}
-        />
-      </div>
+      {isLoading ? (
+        <Loader type="moon" />
+      ) : (
+        <div className={styles.slider}>
+          <div
+            className={classNames(
+              styles.slider__pointer,
+              styles[`slider__pointer_${variant}`],
+              {
+                [styles.slider__pointer_active]: isActive,
+              }
+            )}
+            style={{
+              left,
+            }}
+          ></div>
+          <div
+            className={classNames(
+              styles.slider__bar,
+              styles[`slider__bar_${variant}`]
+            )}
+            style={{
+              width,
+            }}
+          ></div>
+          <input
+            className={styles.slider__input}
+            type="range"
+            value={rangeValue}
+            onMouseOver={() => {
+              setIsActive(true);
+            }}
+            onMouseOut={() => {
+              setIsActive(false);
+            }}
+            onChange={(e) => {
+              setRangeValue(e.target.value);
+              !!callback && callback(+e.target.value);
+            }}
+            onMouseUp={() => !!finalCallback && finalCallback(+rangeValue)}
+            onTouchEnd={() => !!finalCallback && finalCallback(+rangeValue)}
+            min={min || 0}
+            max={max || 100}
+            step={step || 1}
+            {...props}
+          />
+        </div>
+      )}
     </div>
   );
 };
