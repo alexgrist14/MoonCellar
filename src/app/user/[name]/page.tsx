@@ -30,7 +30,7 @@ export default async function User({ params }: { params: any }) {
   return (
     <UserProfile
       user={{ ...user, followings: userFollowings }}
-      logs={logsResult[0]?.logs}
+      logs={logsResult}
       authUserId={authUserInfo?.id}
       authUserFollowings={authUserFollowings}
       playthroughs={playthroughs}

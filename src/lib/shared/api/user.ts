@@ -3,6 +3,7 @@ import { IUser } from "../types/auth";
 import {
   CategoriesType,
   IFollowings,
+  ILogs,
   IUserFilter,
   IUserGames,
   IUserLogs,
@@ -92,7 +93,7 @@ const getUserFollowings = (userId: string) => {
 };
 
 const getUserLogs = (userId: string) => {
-  return agent.get<IUserLogs[]>(`${USER_URL}/logs/${userId}`);
+  return agent.get<ILogs[]>(`${USER_URL}/logs/${userId}`);
 };
 
 const addUserFollowing = (userId: string, followingId: string) => {

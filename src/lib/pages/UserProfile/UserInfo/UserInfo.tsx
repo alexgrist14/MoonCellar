@@ -25,7 +25,6 @@ const UserInfo: FC<UserInfoProps> = ({
   logs,
 }) => {
   const { _id: id, followings: userFollowings, userName } = user;
-
   const [userAuthFollowings, setUserAuthFollowings] = useState<IFollowings>(
     authUserFollowings || { followings: [] }
   );
@@ -117,21 +116,21 @@ const UserInfo: FC<UserInfoProps> = ({
               {logs.map((log, i) => (
                 <div className={styles.item} key={i}>
                   <Link
-                    href={`/games/${log.game.slug}`}
+                    href={`/games/${log.game[0].slug}`}
                     className={styles.item__img}
                     target="_blank"
                   >
                     <Image
                       width={70}
                       height={110}
-                      src={getImageLink(log.game.cover.url, "cover_big")}
+                      src={getImageLink(log.game[0].cover.url, "cover_big")}
                       style={{ width: "80px", height: "120px" }}
                       alt="cover"
                     />
                   </Link>
                   <div className={styles.item__text}>
-                    <p>{log.game.name}</p>
-                    <p>{setActivityType(log.action, log.isAdd, log?.rating)}</p>
+                    <p>{log.game[0].name}</p>
+                    <p>{log.text}</p>
                     <p className={styles.date}>
                       {commonUtils.getHumanDate(log.date)}
                     </p>
