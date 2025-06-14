@@ -7,7 +7,6 @@ import {
   MoonLoader,
 } from "react-spinners";
 import classNames from "classnames";
-import { accentColor } from "../../constants";
 
 export const Loader: FC<{
   type?: "pulse" | "propogate" | "pacman" | "moon";
@@ -19,25 +18,25 @@ export const Loader: FC<{
       {type === "pulse" && (
         <PulseLoader
           speedMultiplier={speedMultiplier}
-          color={color || accentColor}
+          color={color || "#00a0ff"}
         />
       )}
       {type === "propogate" && (
         <PropagateLoader
           speedMultiplier={speedMultiplier}
-          color={color || accentColor}
+          color={color || "#00a0ff"}
         />
       )}
       {type === "pacman" && (
         <PacmanLoader
           speedMultiplier={speedMultiplier}
-          color={color || accentColor}
+          color={color || "#00a0ff"}
         />
       )}
       {type === "moon" && (
         <MoonLoader
           speedMultiplier={speedMultiplier}
-          color={color || accentColor}
+          color={color || "#00a0ff"}
         />
       )}
     </div>

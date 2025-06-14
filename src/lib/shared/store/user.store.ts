@@ -9,7 +9,7 @@ type IState = {
 };
 
 type IAction = {
-  setPlaythroughs: (playthroughs: IPlaythroughMinimal[]) => void;
+  setPlaythroughs: (playthroughs: IPlaythroughMinimal[] | undefined) => void;
   setRatings: (ratings: IGamesRating[]) => void;
 };
 

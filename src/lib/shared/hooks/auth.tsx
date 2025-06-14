@@ -7,9 +7,11 @@ import { IAxiosErrorResponse } from "../types/common.type";
 import { modal } from "../ui/Modal";
 import { axiosUtils } from "../utils/axios";
 import { deleteCookie } from "../utils/cookies";
+import { useUserStore } from "../store/user.store";
 
 export const useAuth = () => {
   const { clear, setProfile, setAuth } = useAuthStore();
+  const { setPlaythroughs } = useUserStore();
   const { push } = useRouter();
 
   const logout = (id: string) => {
@@ -22,6 +24,7 @@ export const useAuth = () => {
         deleteCookie(ACCESS_TOKEN);
         deleteCookie(REFRESH_TOKEN);
         clear();
+        setPlaythroughs(undefined);
       });
   };
   const authUpdate = (userId: string) => {
