@@ -1,11 +1,10 @@
-import { CSSProperties, FC, ReactNode, useMemo, useRef, useState } from "react";
+import { CSSProperties, FC, useMemo, useRef, useState } from "react";
 import styles from "./GameCard.module.scss";
 import Link from "next/link";
 import { IGDBGameMinimal } from "../../types/igdb";
 import classNames from "classnames";
 import Image from "next/image";
 import {
-  coverRatio,
   gameCategories,
   gameCategoryNames,
   getImageLink,
@@ -15,8 +14,6 @@ import { GameControls } from "../GameControls";
 import useCloseEvents from "../../hooks/useCloseEvents";
 import { Loader } from "../Loader";
 import { useStatesStore } from "../../store/states.store";
-import { useWindowResizeAction } from "../../hooks";
-import { useDebouncedCallback } from "use-debounce";
 import { useAuthStore } from "../../store/auth.store";
 import { SvgAchievement } from "../svg";
 import { useUserStore } from "../../store/user.store";
@@ -26,7 +23,6 @@ interface IGameCardProps {
   className?: string;
   style?: CSSProperties;
   spreadDirection?: "width" | "height";
-  children?: ReactNode;
 }
 
 export const GameCard: FC<IGameCardProps> = ({
@@ -34,14 +30,12 @@ export const GameCard: FC<IGameCardProps> = ({
   className,
   style,
   spreadDirection = "width",
-  children,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
   const [isHover, setIsHover] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(!!game.cover);
-  const [ratio, setRatio] = useState<{ height?: string; width?: string }>();
 
   const { profile } = useAuthStore();
   const { isMobile } = useStatesStore();
@@ -69,30 +63,17 @@ export const GameCard: FC<IGameCardProps> = ({
     };
   }, [game, profile]);
 
-  const debouncedSetRatio = useDebouncedCallback((rect: DOMRect) => {
-    setRatio(
-      spreadDirection === "width"
-        ? {
-            height: `calc(${rect.width}px / ${coverRatio})`,
-          }
-        : {
-            width: `calc(${rect.height}px * ${coverRatio})`,
-          }
-    );
-  }, 300);
-
   useCloseEvents([cardRef], () => setStepIndex(0));
-  useWindowResizeAction(() => {
-    const rect = cardRef.current?.getBoundingClientRect();
-
-    !!rect && debouncedSetRatio(rect);
-  }, [spreadDirection]);
 
   if (!game) return null;
 
   return (
     <div
-      className={classNames(styles.wrapper, !!ratio && styles.wrapper_active)}
+      className={classNames(
+        styles.wrapper,
+        styles.wrapper_active,
+        spreadDirection === "height" && styles.wrapper_height
+      )}
     >
       <div
         key={game._id}
@@ -100,16 +81,12 @@ export const GameCard: FC<IGameCardProps> = ({
         className={classNames(
           styles.card,
           className,
-          spreadDirection === "height" && styles.card_height,
           !!playthrough &&
             !playthrough.isMastered &&
             styles[`card_${playthrough.category}`],
           !!playthrough && playthrough.isMastered && styles.card_mastered
         )}
-        style={{
-          ...ratio,
-          ...style,
-        }}
+        style={style}
         onMouseEnter={() => setIsHover(true)}
         onMouseLeave={() => setIsHover(false)}
         onClick={(e) => {
@@ -183,7 +160,6 @@ export const GameCard: FC<IGameCardProps> = ({
           <Cover className={styles.card__placeholder} />
         )}
       </div>
-      {children}
     </div>
   );
 };

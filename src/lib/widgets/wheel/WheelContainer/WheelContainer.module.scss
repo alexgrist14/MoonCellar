@@ -2,7 +2,7 @@
   display: grid;
   padding-block: 15px;
   padding-inline: 20px;
-  grid-template-columns: 1fr 1.5fr 1fr;
+  grid-template-columns: 1.5fr 1fr;
   margin-inline: auto;
   align-items: center;
   gap: 40px;
@@ -11,6 +11,14 @@
   @include mediaMd {
     grid-template-columns: 1fr;
     grid-template-rows: calc(55vh - 130px) calc(45vh - 130px);
+  }
+
+  &__right {
+    display: grid;
+    justify-content: center;
+    align-content: center;
+    gap: 20px;
+    height: 100%;
   }
 }
 

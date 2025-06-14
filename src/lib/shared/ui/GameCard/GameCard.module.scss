@@ -1,37 +1,45 @@
 .wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   width: 100%;
   height: 100%;
   opacity: 0;
   pointer-events: none;
   transition: 0.5s;
-  display: grid;
   gap: 5px;
-  align-items: center;
+  padding: 10px;
+  overflow: hidden;
+  aspect-ratio: $coverRatio;
+  margin-inline: auto;
 
   &_active {
     opacity: 1;
     pointer-events: all;
+  }
+
+  &_height {
+    width: auto;
   }
 }
 
 .card {
   display: grid;
   width: 100%;
+  height: 100%;
   justify-self: center;
   border-radius: $radius;
   position: relative;
   background: $lightBgSecond;
   user-select: none;
   filter: drop-shadow(0 0 0.2rem $textColor);
+  aspect-ratio: $coverRatio;
+  max-height: 325px;
   max-width: 260px;
 
   @include mediaMd {
     cursor: pointer;
-  }
-
-  &_height {
-    width: auto;
-    height: 100%;
   }
 
   &__ra {
@@ -186,7 +194,7 @@
   }
 
   &_completed {
-    filter: drop-shadow(0 0 0.3rem $on);
+    filter: drop-shadow(0 0 0.2rem $on);
 
     .card__info {
       outline-color: $on;
@@ -194,7 +202,7 @@
   }
 
   &_mastered {
-    filter: drop-shadow(0 0 0.3rem $yellow);
+    filter: drop-shadow(0 0 0.2rem $yellow);
 
     .card__info {
       outline-color: $yellow;

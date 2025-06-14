@@ -1,10 +1,18 @@
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import styles from "./GameButtons.module.scss";
 import { ButtonGroup } from "../Button/ButtonGroup";
 import { IGDBGameMinimal } from "../../types/igdb";
 import { WrapperTemplate } from "../WrapperTemplate";
+import { useGamesStore } from "../../store/games.store";
 
 export const GameButtons: FC<{ game: IGDBGameMinimal }> = ({ game }) => {
+  const { royalGames, addRoyalGame, removeRoyalGame } = useGamesStore();
+
+  const isRoyal = useMemo(
+    () => royalGames?.some((royal) => royal._id === game?._id),
+    [game, royalGames]
+  );
+
   return (
     <div className={styles.menu}>
       {!!game.raIds?.length && (
@@ -24,6 +32,18 @@ export const GameButtons: FC<{ game: IGDBGameMinimal }> = ({ game }) => {
           />
         </WrapperTemplate>
       )}
+      <WrapperTemplate contentStyle={{ padding: "5px" }}>
+        <ButtonGroup
+          wrapperClassName={styles.actions}
+          buttons={[
+            {
+              title: (isRoyal ? "Remove from" : "Add to") + " Royal list",
+              onClick: () =>
+                isRoyal ? removeRoyalGame(game) : addRoyalGame(game),
+            },
+          ]}
+        />
+      </WrapperTemplate>
       <WrapperTemplate contentStyle={{ padding: "5px" }}>
         <ButtonGroup
           wrapperClassName={styles.actions}

@@ -16,27 +16,30 @@ import Link from "next/link";
 import { screenGt, screenLg, screenMd, screenSm } from "../../constants";
 import { keyboardUtils } from "../../utils/keyboard";
 import { SvgSearch } from "../svg";
+import { useAsyncLoader } from "../../hooks/useAsyncLoader";
 
 export const SearchModal: FC = () => {
+  const { sync, isLoading } = useAsyncLoader();
   const { setExpanded } = useCommonStore();
 
   const [games, setGames] = useState<IGDBGameMinimal[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
   const [take, setTake] = useState(17);
   const [total, setTotal] = useState<number>();
   const [isSearchActive, setIsSearchActive] = useState(false);
 
   const searchHandler = (search: string) => {
-    IGDBApi.getGames({
-      search,
-      take,
-    }).then((response) => {
-      setGames(response.data.results);
-      setTotal(response.data.total);
-      setIsSearchActive(!!search && search.length >= 2);
-      setIsLoading(false);
-    });
+    setIsSearchActive(!!search && search.length >= 2);
+    sync(() =>
+      IGDBApi.getGames({
+        search,
+        take,
+      }).then((response) => {
+        setGames(response.data.results);
+        setTotal(response.data.total);
+      })
+    );
   };
 
   useDisableScroll();

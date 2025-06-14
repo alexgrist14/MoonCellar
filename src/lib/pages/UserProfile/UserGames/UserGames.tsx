@@ -184,7 +184,8 @@ export const UserGames: FC<UserGamesProps> = ({
       <div className={classNames(styles.games)}>
         {!!sortedGames ? (
           sortedGames.slice((page - 1) * take, page * take).map((game) => (
-            <GameCard key={game._id} game={game}>
+            <div key={game._id} style={{ display: "grid" }}>
+              <GameCard game={game} />
               <div className={styles.games__info}>
                 <p className={styles.games__title}>{game.name}</p>
                 {gamesRating &&
@@ -198,7 +199,7 @@ export const UserGames: FC<UserGamesProps> = ({
                     </span>
                   )}
               </div>
-            </GameCard>
+            </div>
           ))
         ) : (
           <Loader type="moon" />

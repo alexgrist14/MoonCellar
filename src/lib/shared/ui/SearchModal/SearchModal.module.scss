@@ -22,6 +22,7 @@
     display: grid;
     gap: 10px;
     position: relative;
+    align-items: center;
 
     & input {
       max-width: calc(100% - 100px);
@@ -48,6 +49,7 @@
     &_loading {
       pointer-events: none;
       filter: brightness(0.5);
+      height: 100%;
     }
 
     @include mediaGt {

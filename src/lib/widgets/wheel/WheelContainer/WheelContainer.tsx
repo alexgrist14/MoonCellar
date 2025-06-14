@@ -89,35 +89,9 @@ export const WheelContainer: FC = () => {
               />
             </WrapperTemplate>
           </ExpandMenu>
-          {!!winner && (
-            <ExpandMenu position="bottom-right" titleOpen="Links">
-              <GameButtons game={winner} />
-            </ExpandMenu>
-          )}
         </>
       )}
       <div className={styles.container}>
-        {!isMobile && (
-          <div style={{ display: "grid", gap: "20px" }}>
-            <WrapperTemplate isWithBlur>
-              <ToggleSwitch
-                clickCallback={(result) => {
-                  setRoyal(result === "ON");
-                }}
-                label="Royal mode:"
-              />
-              <RangeSelector
-                min={0.1}
-                max={20}
-                step={0.1}
-                defaultValue={timer}
-                callback={(value) => setTimer(value)}
-                text={`Time: ${timer} seconds`}
-              />
-            </WrapperTemplate>
-            {!!winner && <GameButtons game={winner} />}
-          </div>
-        )}
         <WheelComponent
           wheelGames={wheelGames}
           setWheelGames={setWheelGames}
@@ -130,13 +104,35 @@ export const WheelContainer: FC = () => {
           }
           size={295}
         />
-        {!!winner && (
-          <GameCard
-            spreadDirection={isMobile ? "height" : "width"}
-            className={styles.winner}
-            game={winner}
-          />
-        )}
+        <div className={styles.container__right}>
+          {!isMobile && (
+            <div style={{ display: "grid", gap: "20px" }}>
+              <WrapperTemplate isWithBlur>
+                <ToggleSwitch
+                  clickCallback={(result) => {
+                    setRoyal(result === "ON");
+                  }}
+                  label="Royal mode:"
+                />
+                <RangeSelector
+                  min={0.1}
+                  max={20}
+                  step={0.1}
+                  defaultValue={timer}
+                  callback={(value) => setTimer(value)}
+                  text={`Time: ${timer} seconds`}
+                />
+              </WrapperTemplate>
+            </div>
+          )}
+          {!!winner && (
+            <GameCard
+              spreadDirection={isMobile ? "height" : "width"}
+              className={styles.winner}
+              game={winner}
+            />
+          )}
+        </div>
       </div>
     </>
   );
