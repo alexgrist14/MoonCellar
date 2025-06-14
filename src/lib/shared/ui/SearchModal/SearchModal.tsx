@@ -24,7 +24,6 @@ export const SearchModal: FC = () => {
 
   const [games, setGames] = useState<IGDBGameMinimal[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  // const [isLoading, setIsLoading] = useState(false);
   const [take, setTake] = useState(17);
   const [total, setTotal] = useState<number>();
   const [isSearchActive, setIsSearchActive] = useState(false);

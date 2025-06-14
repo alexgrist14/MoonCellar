@@ -110,7 +110,8 @@
     margin: 0;
     padding: 5px;
     border-radius: $radius;
-    height: calc(80vh - 80px);
+    max-height: calc(80vh - 80px);
+    height: fit-content;
   }
 
   div &__scrollbar {
