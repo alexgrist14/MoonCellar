@@ -9,6 +9,7 @@
   background: rgba($wrapperBGColor, 0.8);
   box-shadow: $shadowBorder;
   color: $wrapperTextColor;
+
   @include mediaSm {
     max-width: 100%;
   }
@@ -44,14 +45,10 @@
   }
 
   &__content {
-    padding: 5px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
     gap: 3px;
-
-    @include mediaSm {
-      padding: 12px 16px;
-    }
   }
 }
 

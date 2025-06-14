@@ -45,9 +45,7 @@ export const GameControls: FC<IGameControlsProps> = ({
 
   return (
     <div
-      className={classNames(styles.controls, className, {
-        [styles.controls_hidden]: !profile,
-      })}
+      className={classNames(styles.controls, className)}
       style={style}
       ref={controlsRef}
     >
@@ -57,6 +55,7 @@ export const GameControls: FC<IGameControlsProps> = ({
             !!profile?._id &&
             modal.open(<PlaythroughModal game={game} userId={profile._id} />);
         }}
+        disabled={!profile?._id}
         color="transparent"
         tooltip={"Playthroughs"}
         tooltipAlign="left"
@@ -92,6 +91,7 @@ export const GameControls: FC<IGameControlsProps> = ({
         onClick={() => {
           modal.open(<GameRating rating={rating?.rating} game={game} />);
         }}
+        disabled={!profile?._id}
         color="transparent"
         className={classNames(styles.controls__action, {
           [styles.controls__action_active]: !!rating,

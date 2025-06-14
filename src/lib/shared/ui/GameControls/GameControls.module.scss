@@ -16,10 +16,6 @@
     pointer-events: none;
   }
 
-  &_hidden {
-    display: none;
-  }
-
   div &__action {
     @include flexCenter;
     padding: 2px;

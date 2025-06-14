@@ -69,11 +69,6 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
 
   return (
     <>
-      {isMobile && (
-        <ExpandMenu position="left" titleOpen="Actions">
-          <GameButtons game={minimalGame} />
-        </ExpandMenu>
-      )}
       <div className={classNames(styles.page)}>
         <BGImage game={minimalGame} />
         <div className={styles.page__left}>
@@ -110,7 +105,6 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
             </div>
             <GameControls game={minimalGame} />
           </WrapperTemplate>
-          {!isMobile && <GameButtons game={minimalGame} />}
         </div>
         <WrapperTemplate
           isWithBlur
