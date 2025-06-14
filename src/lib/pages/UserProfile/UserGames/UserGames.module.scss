@@ -31,7 +31,7 @@
     grid-template-columns: repeat(5, 1fr);
     height: 100%;
     margin-inline: auto;
-    gap: 40px;
+    gap: 20px;
 
     @include mediaLg {
       grid-template-columns: repeat(4, 1fr);
