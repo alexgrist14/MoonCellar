@@ -2,11 +2,11 @@
   display: grid;
   padding-block: 15px;
   padding-inline: 20px;
-  grid-template-columns: 1.5fr 1fr;
+  grid-template-columns: 1fr 400px;
   margin-inline: auto;
   align-items: center;
-  gap: 40px;
-  height: calc(100vh - 155px);
+  gap: 100px;
+  height: 80vh;;
 
   @include mediaMd {
     grid-template-columns: 1fr;
@@ -14,11 +14,12 @@
   }
 
   &__right {
-    display: grid;
-    justify-content: center;
-    align-content: center;
+    display: flex;
+    flex-direction: column;
     gap: 20px;
     height: 100%;
+    padding: 10px;
+    overflow: hidden;
   }
 }
 

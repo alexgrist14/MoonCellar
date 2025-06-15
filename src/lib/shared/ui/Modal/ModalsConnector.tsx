@@ -25,10 +25,12 @@ export const ModalsConnector = () => {
 
   const closeModal = useMemo(
     () => (id?: string) => {
-      if (!id) setContent([]);
-      else {
-        setContent((st) => st.filter((prop) => prop.id !== id));
-      }
+      setContent(
+        !id
+          ? []
+          : (content) =>
+              content.filter((item) => item.id !== id && item.props.id !== id)
+      );
     },
     [setContent]
   );
@@ -50,6 +52,7 @@ export const ModalsConnector = () => {
           key={i}
           onClose={() => {
             closeModal(props?.id);
+            console.log(props);
             if (props?.onClose) props.onClose();
           }}
         >

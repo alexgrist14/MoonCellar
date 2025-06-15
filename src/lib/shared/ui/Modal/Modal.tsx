@@ -1,4 +1,4 @@
-import { FC, ReactNode, useEffect, useRef, useState } from "react";
+import { FC, ReactNode, useRef } from "react";
 import { IModalParams } from "./Modal.types";
 import cn from "classnames";
 import styles from "./Modal.module.scss";
@@ -14,14 +14,20 @@ export const Modal: FC<IModalProps> = ({ children, onClose, id }) => {
     if (onClose) onClose();
   };
 
-  useCloseEvents([modalRef], () => closePopup());
+  // useCloseEvents([modalRef], () => closePopup());
 
   return (
     <div className={cn(styles.modal)} id={id} key={id}>
       <div ref={modalRef} className={styles.modal__content}>
         {children}
       </div>
-      <div className={styles.modal__overlay}></div>
+      <div
+        className={styles.modal__overlay}
+        onClick={(e) => {
+          e.stopPropagation();
+          closePopup();
+        }}
+      ></div>
     </div>
   );
 };

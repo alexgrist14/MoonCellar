@@ -53,7 +53,9 @@ export const GameControls: FC<IGameControlsProps> = ({
         onClick={() => {
           !!game._id &&
             !!profile?._id &&
-            modal.open(<PlaythroughModal game={game} userId={profile._id} />);
+            modal.open(<PlaythroughModal game={game} userId={profile._id} />, {
+              id: "game-playthroughs",
+            });
         }}
         disabled={!profile?._id}
         color="transparent"
@@ -75,7 +77,8 @@ export const GameControls: FC<IGameControlsProps> = ({
           modal.open(
             <WrapperTemplate>
               <GameButtons game={game} />
-            </WrapperTemplate>
+            </WrapperTemplate>,
+            { id: "game-menu" }
           )
         }
         tooltip={"Game menu"}
@@ -89,7 +92,9 @@ export const GameControls: FC<IGameControlsProps> = ({
         tooltip={"Set rating"}
         tooltipAlign="right"
         onClick={() => {
-          modal.open(<GameRating rating={rating?.rating} game={game} />);
+          modal.open(<GameRating rating={rating?.rating} game={game} />, {
+            id: "game-rating",
+          });
         }}
         disabled={!profile?._id}
         color="transparent"

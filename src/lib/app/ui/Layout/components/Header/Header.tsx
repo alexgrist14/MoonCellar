@@ -25,7 +25,7 @@ export const Header: FC = () => {
   };
 
   const searchClickHandler = () => {
-    modal.open(<SearchModal />);
+    modal.open(<SearchModal />, { id: "search-games" });
   };
 
   return (
