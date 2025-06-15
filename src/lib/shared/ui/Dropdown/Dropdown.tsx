@@ -487,22 +487,21 @@ export const Dropdown: FC<IDropDownListProps> = ({
                       </div>
                     )}
                     <span>{item.value}</span>
-                    {isMulti ||
-                      (isChecked && (
-                        <div className={styles.dropdown__check}>
-                          <Checkbox
-                            colorTheme={
-                              isWithExclude
-                                ? isExcluded
-                                  ? "off"
-                                  : "on"
-                                : "accent"
-                            }
-                            checked={isChecked || isExcluded || false}
-                            onChange={() => {}}
-                          />
-                        </div>
-                      ))}
+                    {(isMulti || isChecked) && (
+                      <div className={styles.dropdown__check}>
+                        <Checkbox
+                          colorTheme={
+                            isWithExclude
+                              ? isExcluded
+                                ? "off"
+                                : "on"
+                              : "accent"
+                          }
+                          checked={isChecked || isExcluded || false}
+                          onChange={() => {}}
+                        />
+                      </div>
+                    )}
                   </div>
                 );
               })}

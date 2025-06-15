@@ -6,7 +6,7 @@
   margin-inline: auto;
   align-items: center;
   gap: 100px;
-  height: 80vh;;
+  height: 80vh;
 
   @include mediaMd {
     grid-template-columns: 1fr;
