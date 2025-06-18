@@ -40,7 +40,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
 
   const angle = useRef(0);
   const [winnerAngle, setWinnerAngle] = useState(0);
-  const [wheelGames, setWheelGames] = useState<IGDBGameMinimal[]>([]);
+  const [tempGames, setTempGames] = useState<IGDBGameMinimal[]>([]);
 
   const { drawWheel, parseImages } = useWheel({
     contrastColor,
@@ -50,6 +50,8 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   });
 
   useEffect(() => {
+    const wheelGames = isRoyal ? tempGames : games;
+
     if (isStarted && !!wheelGames?.length) {
       const winner = Math.floor(Math.random() * wheelGames.length);
 
@@ -67,10 +69,17 @@ export const WheelComponent: FC<WheelComponentProps> = ({
         setFinished(true);
 
         if (isRoyal) {
-          !!wheelGames?.length &&
-            setWheelGames(
-              wheelGames?.filter((game) => game._id !== wheelGames[winner]._id)
-            );
+          const filtered = tempGames?.filter(
+            (game) => game._id !== tempGames[winner]._id
+          );
+
+          setTempGames(
+            !!filtered?.length
+              ? filtered
+              : !!royalGames?.length
+                ? shuffle(royalGames)
+                : []
+          );
         } else {
           addHistoryGame(wheelGames[winner]);
         }
@@ -87,23 +96,19 @@ export const WheelComponent: FC<WheelComponentProps> = ({
     setWinner,
     addHistoryGame,
     setRoyalGames,
-    wheelGames,
+    games,
+    tempGames,
+    royalGames,
   ]);
 
   useEffect(() => {
-    !wheelGames.length &&
-      setWheelGames(
-        isRoyal
-          ? !!royalGames?.length
-            ? shuffle(royalGames)
-            : []
-          : games || []
-      );
-  }, [games, royalGames, isRoyal, wheelGames]);
+    isRoyal
+      ? setTempGames(!!royalGames?.length ? shuffle(royalGames) : [])
+      : setTempGames([]);
+  }, [games, royalGames, isRoyal]);
 
   useEffect(() => {
     drawWheel([], emptyGames);
-    setWheelGames([]);
   }, [drawWheel, isRoyal]);
 
   return (
@@ -123,9 +128,9 @@ export const WheelComponent: FC<WheelComponentProps> = ({
             setWinner(undefined);
 
             if (isRoyal) {
-              !!wheelGames?.length &&
-                parseImages(wheelGames).then((images) => {
-                  drawWheel(images, wheelGames);
+              !!tempGames?.length &&
+                parseImages(tempGames).then((images) => {
+                  drawWheel(images, tempGames);
                   setStarted(true);
                 });
             } else {
