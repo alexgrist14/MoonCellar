@@ -52,7 +52,6 @@ export const ModalsConnector = () => {
           key={i}
           onClose={() => {
             closeModal(props?.id);
-            console.log(props);
             if (props?.onClose) props.onClose();
           }}
         >

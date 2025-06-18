@@ -81,7 +81,7 @@ export const GameControls: FC<IGameControlsProps> = ({
             { id: "game-menu" }
           )
         }
-        tooltip={"Game menu"}
+        tooltip={"Game meanu"}
         color="transparent"
         className={classNames(styles.controls__action)}
       >

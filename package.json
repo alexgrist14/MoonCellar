@@ -36,6 +36,7 @@
     "react-hook-form": "^7.57.0",
     "react-markdown": "^10.1.0",
     "react-resize-detector": "^12.0.2",
+    "react-scan": "^0.3.4",
     "react-spinners": "^0.17.0",
     "sass": "^1.89.2",
     "scss": "^0.2.4",

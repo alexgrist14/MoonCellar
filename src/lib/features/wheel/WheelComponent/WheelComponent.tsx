@@ -1,43 +1,33 @@
-import {
-  Dispatch,
-  FC,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import styles from "./WheelComponent.module.scss";
 import classNames from "classnames";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { useGamesStore } from "@/src/lib/shared/store/games.store";
-import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
 import { emptyGames } from "@/src/lib/shared/constants/games.const";
+import { Loader } from "@/src/lib/shared/ui/Loader";
+import { useWheel } from "@/src/lib/shared/hooks/useWheel";
+import { shuffle } from "@/src/lib/shared/utils/common";
+import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
 
 interface WheelComponentProps {
-  segColors: string[];
-  primaryColor: string;
-  contrastColor: string;
+  primaryColor?: string;
+  contrastColor?: string;
   buttonText: string;
   size?: number;
   fontFamily?: string;
   time?: number;
-  wheelGames: IGDBGameMinimal[];
-  setWheelGames: Dispatch<SetStateAction<IGDBGameMinimal[]>>;
 }
 
 export const WheelComponent: FC<WheelComponentProps> = ({
   buttonText = "Spin",
   contrastColor = "white",
-  fontFamily = "Roboto",
+  fontFamily = "pentagra",
   primaryColor = "black",
-  segColors,
   size = 290,
   time = 5,
-  wheelGames,
-  setWheelGames,
 }) => {
-  const { addHistoryGame, setWinner } = useGamesStore();
-
+  const { addHistoryGame, setWinner, games, setRoyalGames, royalGames } =
+    useGamesStore();
   const {
     isFinished,
     isLoading,
@@ -48,88 +38,19 @@ export const WheelComponent: FC<WheelComponentProps> = ({
     isRoyal,
   } = useStatesStore();
 
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
   const angle = useRef(0);
-
   const [winnerAngle, setWinnerAngle] = useState(0);
+  const [wheelGames, setWheelGames] = useState<IGDBGameMinimal[]>([]);
+
+  const { drawWheel, parseImages } = useWheel({
+    contrastColor,
+    fontFamily,
+    primaryColor,
+    size,
+  });
 
   useEffect(() => {
-    if (!canvasRef.current) return;
-
-    const centerX = canvasRef.current.width / 2;
-    const centerY = canvasRef.current.height / 2;
-    const ctx = canvasRef.current.getContext("2d");
-
-    if (!ctx) return;
-
-    const drawSegment = (key: number, lastAngle: number, angle: number) => {
-      if (!wheelGames?.length) return;
-
-      const value = wheelGames[key].name;
-
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(centerX, centerY);
-      ctx.arc(centerX, centerY, size, lastAngle, angle, false);
-      ctx.lineTo(centerX, centerY);
-      ctx.closePath();
-      ctx.fillStyle = segColors[key];
-      ctx.fill();
-      ctx.stroke();
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = "black";
-      ctx.save();
-      ctx.translate(centerX, centerY);
-      ctx.rotate((lastAngle + angle) / 2);
-      ctx.fillStyle = contrastColor;
-      ctx.font = "bold 1em " + fontFamily;
-      ctx.fillText(
-        value?.length > 19 ? value.slice(0, 20) + "..." : value || "",
-        size / 2 + 20,
-        0
-      );
-      ctx.restore();
-    };
-
-    const drawWheel = () => {
-      if (!wheelGames?.length) return;
-
-      const len = wheelGames.length;
-      const PI2 = Math.PI * 2;
-
-      let lastAngle = 0;
-
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = "primaryColor";
-      ctx.textBaseline = "middle";
-      ctx.textAlign = "center";
-      ctx.font = "1em " + fontFamily;
-
-      for (let i = 1; i <= len; i++) {
-        const angle = PI2 * (i / len);
-
-        drawSegment(i - 1, lastAngle, angle);
-
-        lastAngle = angle;
-      }
-
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, size, 0, PI2, false);
-      ctx.closePath();
-
-      ctx.lineWidth = 10;
-      ctx.strokeStyle = primaryColor;
-      ctx.stroke();
-    };
-
-    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-
-    drawWheel();
-  }, [contrastColor, fontFamily, primaryColor, segColors, size, wheelGames]);
-
-  useEffect(() => {
-    if (isStarted && !!wheelGames?.length && wheelGames[0]._id !== -1) {
+    if (isStarted && !!wheelGames?.length) {
       const winner = Math.floor(Math.random() * wheelGames.length);
 
       angle.current += 360 * Math.ceil(time);
@@ -146,9 +67,10 @@ export const WheelComponent: FC<WheelComponentProps> = ({
         setFinished(true);
 
         if (isRoyal) {
-          setWheelGames((wheelGames) =>
-            wheelGames.filter((game) => game._id !== wheelGames[winner]._id)
-          );
+          !!wheelGames?.length &&
+            setWheelGames(
+              wheelGames?.filter((game) => game._id !== wheelGames[winner]._id)
+            );
         } else {
           addHistoryGame(wheelGames[winner]);
         }
@@ -157,16 +79,32 @@ export const WheelComponent: FC<WheelComponentProps> = ({
       }, time * 1000);
     }
   }, [
+    isRoyal,
     isStarted,
-    wheelGames,
     time,
     setFinished,
     setStarted,
     setWinner,
-    isRoyal,
     addHistoryGame,
-    setWheelGames,
+    setRoyalGames,
+    wheelGames,
   ]);
+
+  useEffect(() => {
+    !wheelGames.length &&
+      setWheelGames(
+        isRoyal
+          ? !!royalGames?.length
+            ? shuffle(royalGames)
+            : []
+          : games || []
+      );
+  }, [games, royalGames, isRoyal, wheelGames]);
+
+  useEffect(() => {
+    drawWheel([], emptyGames);
+    setWheelGames([]);
+  }, [drawWheel, isRoyal]);
 
   return (
     <div
@@ -176,28 +114,36 @@ export const WheelComponent: FC<WheelComponentProps> = ({
         [styles.wheel_disabled]: isLoading,
       })}
     >
-      <button
-        disabled={isRoyal && !wheelGames.length}
-        onClick={() => {
-          setFinished(false);
-          setWinner(undefined);
+      <div className={styles.wheel__center}>
+        <button
+          disabled={isRoyal && !games?.length}
+          id="spin-button"
+          onClick={() => {
+            setFinished(false);
+            setWinner(undefined);
 
-          if (isRoyal) {
-            return setStarted(true);
-          } else {
-            setWheelGames(emptyGames);
-            setLoading(true);
-          }
-        }}
-      >
-        {buttonText}
-      </button>
+            if (isRoyal) {
+              !!wheelGames?.length &&
+                parseImages(wheelGames).then((images) => {
+                  drawWheel(images, wheelGames);
+                  setStarted(true);
+                });
+            } else {
+              setLoading(true);
+            }
+          }}
+        >
+          {buttonText}
+        </button>
+        {(isLoading || isStarted) && (
+          <Loader type="moon" className={styles.wheel__loader} />
+        )}
+      </div>
       <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
         <polyline points="0,0 50,50 0,100" stroke="white" strokeWidth={4} />
       </svg>
       <canvas
-        ref={canvasRef}
-        id="canvas"
+        id="wheel-canvas"
         className={styles.canvas}
         width="600"
         height="600"

@@ -6,6 +6,7 @@ import { ACCESS_TOKEN, REFRESH_TOKEN } from "../lib/shared/constants";
 import { cookies } from "next/headers";
 import "/src/lib/app/styles/reset.scss";
 import "/src/lib/app/styles/common.scss";
+import { ReactScan } from "../lib/shared/ui/ReactScan";
 
 const general = localFont({
   variable: "--font-general",

@@ -16,8 +16,20 @@
     pointer-events: none;
   }
 
-  & button {
+  &__center {
     z-index: 2;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    position: relative;
+    transform: translate(-50%, -50%);
+  }
+
+  &__loader {
+    z-index: 3;
+  }
+
+  & button {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -31,6 +43,12 @@
     border-radius: 50%;
     user-select: none;
     font-family: var(--font-pentagra);
+
+    @include mediaMax($screenMd) {
+      font-size: 10px;
+      width: 60px;
+      border-width: 2px;
+    }
   }
 
   & canvas {
@@ -44,6 +62,11 @@
     transform: translateY(-50%);
     z-index: 1;
     left: calc(50% + 31px);
+
+    @include mediaMax($screenMd) {
+      height: 45px;
+      left: calc(50% + 18px)
+    }
   }
 
   &_active {

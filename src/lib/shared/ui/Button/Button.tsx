@@ -45,7 +45,6 @@ export interface IButtonProps
 export const Button: FC<IButtonProps> = ({
   children,
   className,
-  disabled,
   active,
   tooltip,
   color = "default",
@@ -79,7 +78,6 @@ export const Button: FC<IButtonProps> = ({
       className={cl(styles.button, styles[`button_${color}Color`], className, {
         [styles.button_active]: active,
         [styles[`button_${color}Color_active`]]: active,
-        [styles.button_disabled]: disabled,
         [styles.button_compact]: compact,
         [styles.button_hidden]: hidden,
       })}

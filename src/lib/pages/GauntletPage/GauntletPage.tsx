@@ -14,12 +14,14 @@ import { useCommonStore } from "../../shared/store/common.store";
 import { Filters } from "../../shared/ui/Filters";
 import { BGImage } from "../../shared/ui/BGImage";
 import { useAdvancedRouter } from "../../shared/hooks/useAdvancedRouter";
+import { useWheel } from "../../shared/hooks/useWheel";
+import { shuffle } from "../../shared/utils/common";
 
 export const GauntletPage: FC = () => {
   const { asPath } = useAdvancedRouter();
 
   const { setGenres, setGameModes, setSystems, setThemes } = useCommonStore();
-  const { setGames, historyGames, setWinner, winner } = useGamesStore();
+  const { setGames, historyGames, winner } = useGamesStore();
   const {
     isLoading,
     setStarted,
@@ -28,6 +30,8 @@ export const GauntletPage: FC = () => {
     isRoyal,
     isExcludeHistory,
   } = useStatesStore();
+
+  const { parseImages, drawWheel } = useWheel({});
 
   const getIGDBGames = useCallback(() => {
     if (isRoyal) return;
@@ -44,27 +48,29 @@ export const GauntletPage: FC = () => {
         }),
     }).then((response) => {
       if (!!response.data.results.length) {
-        setGames(response.data.results);
+        const games = shuffle(response.data.results);
 
-        setStarted(true);
-        setLoading(false);
-        setWinner(undefined);
+        setGames(games);
+        parseImages(games).then((images) => {
+          drawWheel(images, games);
+
+          setLoading(false);
+          setStarted(true);
+        });
       } else {
         setLoading(false);
         setFinished(true);
-        setWinner(undefined);
       }
     });
   }, [
     setLoading,
-    setStarted,
-    setWinner,
     isRoyal,
     historyGames,
     isExcludeHistory,
     asPath,
     setFinished,
     setGames,
+    setStarted,
   ]);
 
   useEffect(() => {

@@ -13,9 +13,10 @@ export const Loader: FC<{
   type?: "pulse" | "propogate" | "pacman" | "moon";
   color?: string;
   speedMultiplier?: number;
-}> = ({ type = "pulse", color, speedMultiplier }) => {
+  className?: string;
+}> = ({ type = "pulse", color, speedMultiplier, className }) => {
   return (
-    <div className={classNames(styles.loader)}>
+    <div className={classNames(styles.loader, className)}>
       {type === "pulse" && (
         <PulseLoader
           speedMultiplier={speedMultiplier}

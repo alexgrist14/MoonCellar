@@ -55,11 +55,6 @@
     }
   }
 
-  &_disabled {
-    opacity: 0.4;
-    cursor: not-allowed !important;
-  }
-
   &_fancyColor {
     background: none;
     transition: 0.2s all;
@@ -73,6 +68,11 @@
       border-bottom: $accent 1px solid;
       transition: 0.2s all;
     }
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed !important;
   }
 
   &_compact {

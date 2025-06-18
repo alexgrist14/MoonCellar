@@ -10,7 +10,9 @@
 
   @include mediaMd {
     grid-template-columns: 1fr;
-    grid-template-rows: calc(55vh - 130px) calc(45vh - 130px);
+    grid-template-rows: 40vh 1fr;
+    padding: 0;
+    gap: 10px;
   }
 
   &__right {
