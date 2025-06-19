@@ -1,9 +1,8 @@
-import { FC, useEffect, useState } from "react";
+import { FC, memo, useEffect, useState } from "react";
 import styles from "./BGImage.module.scss";
 import classNames from "classnames";
 import Image from "next/image";
 import { IGDBApi } from "../../api";
-import { axiosUtils } from "../../utils/axios";
 import { IGDBGameMinimal, IGDBScreenshot } from "../../types/igdb";
 import { getImageLink } from "../../constants";
 import { useDebouncedCallback } from "use-debounce";
@@ -14,87 +13,88 @@ interface IBGImageProps {
   defaultImage?: string;
 }
 
-export const BGImage: FC<IBGImageProps> = ({
-  game,
-  defaultImage = "/images/moon.jpg",
-}) => {
-  const { bgOpacity } = useSettingsStore();
+export const BGImage = memo(
+  ({ game, defaultImage = "/images/moon.jpg" }: IBGImageProps) => {
+    const { bgOpacity } = useSettingsStore();
 
-  const [bg, setBg] = useState<IGDBScreenshot & { gameId: number }>();
-  const [isImageReady, setIsImageReady] = useState(false);
-  const [isDefaultReady, setIsDefaultReady] = useState(false);
-  const [isAnimation, setIsAnimation] = useState(true);
+    const [bg, setBg] = useState<IGDBScreenshot & { gameId: number }>();
+    const [isImageReady, setIsImageReady] = useState(false);
+    const [isDefaultReady, setIsDefaultReady] = useState(false);
+    const [isAnimation, setIsAnimation] = useState(true);
 
-  const debouncedSetImageReady = useDebouncedCallback((state: boolean) => {
-    setIsImageReady(state);
-    setIsAnimation(state);
-  }, 300);
+    const debouncedSetImageReady = useDebouncedCallback((state: boolean) => {
+      setIsImageReady(state);
+      setIsAnimation(state);
+    }, 300);
 
-  useEffect(() => {
-    if (!game) return;
+    useEffect(() => {
+      if (!game) return;
 
-    const pictures: number[] = [];
+      const pictures: number[] = [];
 
-    if (!!game.artworks?.length) {
-      game.artworks.forEach((id) => pictures.push(id));
-    } else {
-      game.screenshots.forEach((id) => pictures.push(id));
-    }
+      if (!!game.artworks?.length) {
+        game.artworks.forEach((id) => pictures.push(id));
+      } else {
+        game.screenshots.forEach((id) => pictures.push(id));
+      }
 
-    const id = pictures[Math.floor(Math.random() * (pictures.length - 1))];
+      const id = pictures[Math.floor(Math.random() * (pictures.length - 1))];
 
-    if (!id) return;
+      if (!id) return;
 
-    (!!game.artworks?.length ? IGDBApi.getArtwork : IGDBApi.getScreenshot)(id)
-      .then((res) => {
+      (!!game.artworks?.length ? IGDBApi.getArtwork : IGDBApi.getScreenshot)(
+        id
+      ).then((res) => {
         setIsAnimation(false);
         setTimeout(() => {
           setBg({ ...res.data, gameId: game._id });
           setIsImageReady(false);
         }, 500);
-      })
-      .catch(axiosUtils.toastError);
-  }, [game]);
+      });
+    }, [game]);
 
-  return (
-    <div className={styles.wrapper}>
-      <div
-        className={styles.overlay}
-        style={{ opacity: bgOpacity !== undefined ? bgOpacity / 100 : 0.7 }}
-      />
-      <div className={styles.place}>
-        {!!bg && (
+    return (
+      <div className={styles.wrapper}>
+        <div
+          className={styles.overlay}
+          style={{ opacity: bgOpacity !== undefined ? bgOpacity / 100 : 0.7 }}
+        />
+        <div className={styles.place}>
+          {!!bg && (
+            <div
+              className={classNames(styles.bg, {
+                [styles.bg_active]: isImageReady && isAnimation,
+              })}
+            >
+              <Image
+                onLoad={() => (!game || !!bg) && debouncedSetImageReady(true)}
+                key={bg?._id}
+                alt="Background"
+                src={!!bg?.url ? getImageLink(bg.url, "1080p") : ""}
+                width={1920}
+                height={1080}
+              />
+            </div>
+          )}
           <div
             className={classNames(styles.bg, {
-              [styles.bg_active]: isImageReady && isAnimation,
+              [styles.bg_active]: isDefaultReady,
             })}
+            style={{ zIndex: "-2" }}
           >
             <Image
-              onLoad={() => (!game || !!bg) && debouncedSetImageReady(true)}
+              onLoad={() => setIsDefaultReady(true)}
               key={bg?._id}
               alt="Background"
-              src={!!bg?.url ? getImageLink(bg.url, "1080p") : ""}
+              src={defaultImage}
               width={1920}
               height={1080}
             />
           </div>
-        )}
-        <div
-          className={classNames(styles.bg, {
-            [styles.bg_active]: isDefaultReady,
-          })}
-          style={{ zIndex: "-2" }}
-        >
-          <Image
-            onLoad={() => setIsDefaultReady(true)}
-            key={bg?._id}
-            alt="Background"
-            src={defaultImage}
-            width={1920}
-            height={1080}
-          />
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+);
+
+BGImage.displayName = "BGImage";

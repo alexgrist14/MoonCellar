@@ -5,7 +5,6 @@ import AvatarSettings from "@/src/lib/shared/ui/AvatarSettings/AvatarSettings";
 import { Button } from "@/src/lib/shared/ui/Button";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { Textarea } from "@/src/lib/shared/ui/Textarea";
-import { axiosUtils } from "@/src/lib/shared/utils/axios";
 import { toast } from "@/src/lib/shared/utils/toast";
 import {
   Dispatch,
@@ -56,11 +55,9 @@ export const Settings: FC<SettingsProps> = ({}) => {
     if (background)
       apiCalls.push(() => userAPI.addBackground(profile._id, background));
 
-    Promise.all(apiCalls.map((apiCall) => apiCall()))
-      .then(() => {
-        toast.success({ description: "Saved successfully" });
-      })
-      .catch((err) => axiosUtils.toastError(err));
+    Promise.all(apiCalls.map((apiCall) => apiCall())).then(() => {
+      toast.success({ description: "Saved successfully" });
+    });
   };
 
   return (

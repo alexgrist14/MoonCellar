@@ -1,11 +1,19 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import queryString from "query-string";
 
 export const useAdvancedRouter = () => {
   const pathname = usePathname();
   const query = useSearchParams();
   const router = useRouter();
-  const queryString = query.toString();
+  const queryStr = query.toString();
   const asPath = pathname + (!!queryString ? `?${queryString}` : "");
+  const setQuery = (value: { [key: string]: string | number }) => {
+    const { push } = router;
 
-  return { pathname, query, router, queryString, asPath };
+    push(
+      `${pathname}?${queryString.stringify({ ...queryString.parse(queryStr), ...value })}`
+    );
+  };
+
+  return { pathname, query, router, queryString: queryStr, asPath, setQuery };
 };

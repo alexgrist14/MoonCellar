@@ -3,9 +3,7 @@ import { authAPI, userAPI } from "../api";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import { useAuthStore } from "../store/auth.store";
 import { IAuth } from "../types/auth";
-import { IAxiosErrorResponse } from "../types/common.type";
 import { modal } from "../ui/Modal";
-import { axiosUtils } from "../utils/axios";
 import { deleteCookie } from "../utils/cookies";
 import { useUserStore } from "../store/user.store";
 
@@ -36,25 +34,15 @@ export const useAuth = () => {
   };
 
   const login = async (data: Omit<IAuth, "userName">) => {
-    return authAPI
-      .login(data)
-      .then((response) => {
-        authUpdate(response.data.userId);
-      })
-      .catch((e: IAxiosErrorResponse) => {
-        axiosUtils.toastError(e);
-      });
+    return authAPI.login(data).then((response) => {
+      authUpdate(response.data.userId);
+    });
   };
 
   const signup = async (data: IAuth) => {
-    return authAPI
-      .signup(data)
-      .then((response) => {
-        authUpdate(response.data.userId);
-      })
-      .catch((e: IAxiosErrorResponse) => {
-        axiosUtils.toastError(e);
-      });
+    return authAPI.signup(data).then((response) => {
+      authUpdate(response.data.userId);
+    });
   };
 
   return { logout, login, signup, authUpdate };

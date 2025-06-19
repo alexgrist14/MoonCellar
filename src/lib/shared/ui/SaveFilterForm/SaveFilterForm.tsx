@@ -6,8 +6,7 @@ import { Button } from "../Button";
 import { useAuthStore } from "../../store/auth.store";
 import { IGameFilters } from "../../types/filters.type";
 import { userAPI } from "../../api";
-import { getFiltersForQuery } from "../../utils/filters.util";
-import { axiosUtils } from "../../utils/axios";
+import { getFiltersForQuery } from "../../utils/filters";
 import { toast } from "../../utils/toast";
 import { modal } from "../Modal";
 import { IUserFilter } from "../../types/user.type";
@@ -30,8 +29,7 @@ export const SaveFilterForm: FC<{
         setSavedFilters(res.data.filters);
         toast.success({ description: "Filter was successfully saved!" });
         modal.close();
-      })
-      .catch(axiosUtils.toastError);
+      });
 
   return (
     <WrapperTemplate classNameContent={styles.form}>

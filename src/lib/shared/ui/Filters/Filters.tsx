@@ -9,16 +9,12 @@ import { ButtonGroup } from "../Button/ButtonGroup";
 import { ToggleSwitch } from "../ToggleSwitch";
 import { IGameFilters } from "../../types/filters.type";
 import { RangeSelector } from "../RangeSelector";
-import {
-  parseQueryFilters,
-  pushFiltersToQuery,
-} from "../../utils/filters.util";
+import { parseQueryFilters, pushFiltersToQuery } from "../../utils/filters";
 import { Tabs } from "../Tabs";
 import { ITabContent } from "../../types/tabs";
 import { IGDBApi, userAPI } from "../../api";
 import { useAuthStore } from "../../store/auth.store";
 import { Loader } from "../Loader";
-import { axiosUtils } from "../../utils/axios";
 import { IUserFilter } from "../../types/user.type";
 import { modal } from "../Modal";
 import { SaveFilterForm } from "../SaveFilterForm";
@@ -147,8 +143,7 @@ export const Filters: FC<{
     !!profile?._id &&
       userAPI
         .getFilters(profile?._id)
-        .then((res) => setSavedFilters(res.data.filters))
-        .catch(axiosUtils.toastError);
+        .then((res) => setSavedFilters(res.data.filters));
   }, [profile]);
 
   return (
@@ -541,8 +536,7 @@ export const Filters: FC<{
                                 description: "Filter was successfully removed!",
                               });
                               setSavedFilters(res.data.filters);
-                            })
-                            .catch(axiosUtils.toastError),
+                            }),
                         color: "red",
                       },
                     ]}

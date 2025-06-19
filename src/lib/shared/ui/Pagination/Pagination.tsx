@@ -1,119 +1,129 @@
-import { FC, useMemo, useRef, useState } from "react";
+import { memo, useMemo, useRef, useState } from "react";
 import styles from "./Pagination.module.scss";
 import { Button } from "../Button";
 import { Input } from "../Input";
 import { keyboardUtils } from "../../utils/keyboard";
 import classNames from "classnames";
-import { createPortal } from "react-dom";
 import { SvgDoubleArrow } from "../svg/SvgDoubleArrow";
 import { SvgArrow } from "../svg/SvgArrow";
 import { useCommonStore } from "../../store/common.store";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { setQuery } from "../../utils/query";
+import { createPortal } from "react-dom";
+import { useAdvancedRouter } from "../../hooks/useAdvancedRouter";
 
-export const Pagination: FC<{
+interface IPaginationProps {
   total: number;
   take: number;
   isFixed?: boolean;
   isDisabled?: boolean;
-  callback?: () => void;
-}> = ({ take, total, isFixed, isDisabled, callback }) => {
-  const router = useRouter();
-  const centerRef = useRef<HTMLDivElement>(null);
-  const query = useSearchParams();
-  const pathname = usePathname();
+  callback?: (page: number) => void;
+}
 
-  const { setScrollPosition } = useCommonStore();
+export const Pagination = memo(
+  ({ take, total, isFixed, isDisabled, callback }: IPaginationProps) => {
+    const { query, pathname, router, setQuery } = useAdvancedRouter();
+    const centerRef = useRef<HTMLDivElement>(null);
 
-  const [value, setValue] = useState("");
+    const { setScrollPosition } = useCommonStore();
 
-  const page = useMemo(() => Number(query.get("page") || 1), [query]);
-  const max = useMemo(() => Math.ceil(total / take), [take, total]);
+    const [value, setValue] = useState("");
 
-  const changeCallback = () => {
-    setScrollPosition({ left: 0, top: 0 });
-    callback?.();
-  };
+    const page = useMemo(() => Number(query.get("page") || 1), [query]);
+    const max = useMemo(() => Math.ceil(total / take), [take, total]);
 
-  if (!total || !page) return null;
+    const changeCallback = (page: number) => {
+      setScrollPosition({ left: 0, top: 0 });
+      setValue(page.toString());
+      callback?.(page);
+    };
 
-  const connector = document.getElementById("pagination-connector");
+    if (!total) return null;
 
-  if (!connector) return null;
+    const connector = document.getElementById("pagination-connector");
 
-  return createPortal(
-    <div
-      className={classNames(styles.pagination, {
-        [styles.pagination_fixed]: isFixed,
-        [styles.pagination_disabled]: isDisabled,
-      })}
-    >
-      <Button
-        color="transparent"
-        className={styles.pagination__button}
-        disabled={page === 1}
-        onClick={() => {
-          setQuery({ page: 1 }, router, pathname, query.toString());
-          changeCallback();
-        }}
-      >
-        <SvgDoubleArrow style={{ rotate: "180deg" }} />
-      </Button>
-      <Button
-        color="transparent"
-        className={styles.pagination__button}
-        disabled={page === 1}
-        onClick={() => {
-          setQuery({ page: page - 1 }, router, pathname, query.toString());
-          changeCallback();
-        }}
-      >
-        <SvgArrow style={{ rotate: "180deg" }} />
-      </Button>
-      <div className={styles.pagination__center} ref={centerRef}>
-        <Input
-          containerStyles={{ padding: "4px", width: "75px" }}
-          className={styles.pagination__input}
-          type="number"
-          value={value || page}
-          onChange={(e) => setValue(e.target.value)}
-          onKeyDown={keyboardUtils.blurOnKey}
-          onBlur={(e) => {
-            const value = Number(e.target.value);
+    if (!connector) return null;
 
-            setQuery(
-              { page: value > max ? max : value },
-              router,
-              pathname,
-              query.toString()
-            );
-            changeCallback();
-          }}
-        />
-      </div>
-      <Button
-        color="transparent"
-        className={styles.pagination__button}
-        disabled={page === max}
-        onClick={() => {
-          setQuery({ page: page + 1 }, router, pathname, query.toString());
-          changeCallback();
-        }}
-      >
-        <SvgArrow />
-      </Button>
-      <Button
-        color="transparent"
-        className={styles.pagination__button}
-        disabled={page === max}
-        onClick={() => {
-          setQuery({ page: max }, router, pathname, query.toString());
-          changeCallback();
-        }}
-      >
-        <SvgDoubleArrow />
-      </Button>
-    </div>,
-    connector
-  );
-};
+    const renderBlock = () => {
+      return (
+        <div
+          className={classNames(styles.pagination, {
+            [styles.pagination_fixed]: isFixed,
+            [styles.pagination_disabled]: isDisabled,
+          })}
+        >
+          <Button
+            color="transparent"
+            className={styles.pagination__button}
+            disabled={value === "1" || page === 1}
+            onClick={() => {
+              const page = 1;
+
+              setQuery({ page });
+              changeCallback(page);
+            }}
+          >
+            <SvgDoubleArrow style={{ rotate: "180deg" }} />
+          </Button>
+          <Button
+            color="transparent"
+            className={styles.pagination__button}
+            disabled={value === "1" || page === 1}
+            onClick={() => {
+              const p = page - 1 || 1;
+
+              setQuery({ page: p });
+              changeCallback(p);
+            }}
+          >
+            <SvgArrow style={{ rotate: "180deg" }} />
+          </Button>
+          <div className={styles.pagination__center} ref={centerRef}>
+            <Input
+              containerStyles={{ padding: "4px", width: "75px" }}
+              className={styles.pagination__input}
+              type="number"
+              value={value || page}
+              onChange={(e) => setValue(e.target.value)}
+              onKeyDown={keyboardUtils.blurOnKey}
+              onBlur={(e) => {
+                const value = Number(e.target.value);
+
+                setQuery({ page: value > max ? max : value });
+                changeCallback(value);
+              }}
+            />
+          </div>
+          <Button
+            color="transparent"
+            className={styles.pagination__button}
+            disabled={value === max.toString() || page === max}
+            onClick={() => {
+              const p = page + 1;
+
+              setQuery({ page: p });
+              changeCallback(p);
+            }}
+          >
+            <SvgArrow />
+          </Button>
+          <Button
+            color="transparent"
+            className={styles.pagination__button}
+            disabled={value === max.toString() || page === max}
+            onClick={() => {
+              const page = max;
+
+              setQuery({ page });
+              changeCallback(page);
+            }}
+          >
+            <SvgDoubleArrow />
+          </Button>
+        </div>
+      );
+    };
+
+    return isFixed ? createPortal(renderBlock(), connector) : renderBlock();
+  }
+);
+
+Pagination.displayName = "Pagination";

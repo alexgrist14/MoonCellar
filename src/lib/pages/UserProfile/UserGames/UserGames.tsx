@@ -9,11 +9,13 @@ import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { SvgArrowPointer } from "@/src/lib/shared/ui/svg";
 import { Icon } from "@iconify/react";
 import classNames from "classnames";
-import { FC, useEffect, useMemo, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./UserGames.module.scss";
 import { useSearchParams } from "next/navigation";
 import useCloseEvents from "@/src/lib/shared/hooks/useCloseEvents";
 import { IPlaythroughMinimal } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
+import { useDebouncedCallback } from "use-debounce";
+import { useAsyncLoader } from "@/src/lib/shared/hooks/useAsyncLoader";
 
 interface UserGamesProps {
   gamesRating: IGamesRating[];
@@ -21,22 +23,22 @@ interface UserGamesProps {
 }
 
 const take = 30;
+const sortOptions = [
+  { label: SortType.DATE_ADDED },
+  { label: SortType.RATING },
+  // { label: SortType.TITLE },
+];
+const sortOrderOptions = [{ label: "asc" }, { label: "desc" }];
 
 export const UserGames: FC<UserGamesProps> = ({
   gamesRating,
   playthroughs,
 }) => {
+  const { sync, isLoading, setIsLoading } = useAsyncLoader();
+
   const query = useSearchParams();
   const page = Number(query.get("page"));
   const list = query.get("list") as CategoriesType;
-
-  const sortOptions = [
-    { label: SortType.DATE_ADDED },
-    { label: SortType.RATING },
-    { label: SortType.TITLE },
-  ];
-
-  const sortOrderOptions = [{ label: "asc" }, { label: "desc" }];
 
   const sortRef = useRef<HTMLDivElement>(null);
 
@@ -46,20 +48,7 @@ export const UserGames: FC<UserGamesProps> = ({
     SortType.DATE_ADDED
   );
   const [games, setGames] = useState<IGDBGameMinimal[]>();
-  const [sortedGames, setSortedGames] = useState<IGDBGameMinimal[]>();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-  const gamesIds = useMemo(
-    () =>
-      playthroughs
-        ?.filter(
-          (play) =>
-            (play.category === list && !play.isMastered) ||
-            (list === "mastered" && play.isMastered)
-        )
-        .map((play) => play.gameId),
-    [list, playthroughs]
-  );
 
   const parsedGamesRatings = useMemo(() => {
     return gamesRating.reduce(
@@ -71,85 +60,85 @@ export const UserGames: FC<UserGamesProps> = ({
     );
   }, [gamesRating]);
 
-  const parsedPlaythroughs = useMemo(
-    () =>
-      playthroughs?.reduce(
-        (res: { [key: number]: IPlaythroughMinimal }, play) => {
-          const existed =
-            res[play.gameId] && new Date(res[play.gameId].updatedAt)?.getTime();
-          const newPlay = new Date(play.updatedAt)?.getTime();
+  const getGamesIds = useCallback(() => {
+    const plays = playthroughs?.filter(
+      (play) =>
+        (play.category === list && !play.isMastered) ||
+        (list === "mastered" && play.isMastered)
+    );
 
-          (!existed || existed < newPlay) && (res[play.gameId] = play);
-
-          return res;
-        },
-        {}
-      ),
-    [playthroughs]
-  );
-
-  useEffect(() => {
-    setGames(undefined);
-    setSortedGames(undefined);
-  }, [list]);
-
-  useEffect(() => {
-    !!gamesIds?.length &&
-      !games &&
-      IGDBApi.getGamesByIds({ _ids: gamesIds }).then((res) => {
-        setGames(res.data);
-        setTotal(res.data.length);
-      });
-  }, [gamesIds, games]);
-
-  useEffect(() => {
-    if (!games?.length) return;
-
-    let sorted = structuredClone(games);
+    setTotal(plays.length);
 
     switch (selectedSort) {
       case SortType.RATING:
-        sorted?.sort((a, b) => {
-          const ratingA = parsedGamesRatings[a._id];
-          const ratingB = parsedGamesRatings[b._id];
-          if (!ratingB || !ratingA) return 1;
+        plays?.sort((a, b) => {
+          const ratingA = parsedGamesRatings[a.gameId] || 0;
+          const ratingB = parsedGamesRatings[b.gameId] || 0;
+
+          if (!ratingB || !ratingA) return ratingA < ratingB ? 1 : -1;
+
           return sortOrder === "asc" ? ratingA - ratingB : ratingB - ratingA;
         });
         break;
-      case SortType.TITLE:
-        sorted?.sort((a, b) => {
-          const nameA = a.name.toLowerCase();
-          const nameB = b.name.toLowerCase();
-          return sortOrder === "asc"
-            ? nameA.localeCompare(nameB)
-            : nameB.localeCompare(nameA);
-        });
-        break;
+      // case SortType.TITLE:
+      //   plays?.sort((a, b) => {
+      //     const nameA = a.name.toLowerCase();
+      //     const nameB = b.name.toLowerCase();
+      //     return sortOrder === "asc"
+      //       ? nameA.localeCompare(nameB)
+      //       : nameB.localeCompare(nameA);
+      //   });
+      //   break;
       case SortType.DATE_ADDED:
-        sorted?.sort((a, b) => {
-          const dateA = !!parsedPlaythroughs?.[a._id]
-            ? new Date(parsedPlaythroughs[a._id].updatedAt).getTime()
-            : 0;
-          const dateB = !!parsedPlaythroughs?.[b._id]
-            ? new Date(parsedPlaythroughs[b._id].updatedAt).getTime()
-            : 0;
+        plays?.sort((a, b) => {
+          const dateA = !!a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+          const dateB = !!b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
 
           return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
         });
         break;
     }
 
-    setSortedGames(sorted);
-  }, [games, selectedSort, sortOrder, parsedGamesRatings, parsedPlaythroughs]);
+    return plays.map((play) => play.gameId);
+  }, [list, playthroughs, parsedGamesRatings, selectedSort, sortOrder]);
+
+  const debouncedGetGames = useDebouncedCallback((page: number = 1) => {
+    const _ids = getGamesIds().slice((page - 1) * take, page * take);
+
+    !!_ids?.length &&
+      sync(() =>
+        IGDBApi.getGamesByIds({
+          _ids,
+        }).then((res) => {
+          setGames(
+            _ids.reduce((result: IGDBGameMinimal[], id) => {
+              const game = res.data.find((game) => game._id === id);
+              !!game && result.push(game);
+              return result;
+            }, [])
+          );
+        })
+      );
+  }, 200);
+
+  useEffect(() => {
+    setGames(undefined);
+  }, [list]);
+
+  useEffect(() => {
+    !games && debouncedGetGames(page);
+  }, [debouncedGetGames, page, games]);
 
   useCloseEvents([sortRef], () => setIsDropdownOpen(false));
 
   const handleSortChange = (value: SortType) => {
     setSelectedSort(value);
+    debouncedGetGames(page);
   };
 
   const handleSortOrderChange = (value: string) => {
     setSortOrder(value);
+    debouncedGetGames(page);
   };
 
   return (
@@ -182,8 +171,10 @@ export const UserGames: FC<UserGamesProps> = ({
       </div>
 
       <div className={classNames(styles.games)}>
-        {!!sortedGames ? (
-          sortedGames.slice((page - 1) * take, page * take).map((game) => (
+        {isLoading ? (
+          <Loader type="moon" />
+        ) : (
+          games?.map((game) => (
             <div key={game._id} style={{ display: "grid" }}>
               <GameCard game={game} />
               <div className={styles.games__info}>
@@ -201,12 +192,18 @@ export const UserGames: FC<UserGamesProps> = ({
               </div>
             </div>
           ))
-        ) : (
-          <Loader type="moon" />
         )}
-
-        <Pagination take={take} total={total} isFixed />
-        {!!sortedGames && !sortedGames.length && <p>There is no games</p>}
+        <Pagination
+          take={take}
+          total={total}
+          isFixed
+          isDisabled={isLoading}
+          callback={(page) => {
+            setIsLoading(true);
+            debouncedGetGames(page);
+          }}
+        />
+        {!isLoading && !!games && !games.length && <p>There is no games</p>}
       </div>
     </div>
   );

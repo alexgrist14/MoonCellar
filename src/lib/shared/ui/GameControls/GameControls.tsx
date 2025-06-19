@@ -11,8 +11,8 @@ import { PlaythroughModal } from "../PlaythroughModal";
 import { useUserStore } from "../../store/user.store";
 import { GameRating } from "@/src/lib/features/game/GameRating";
 import { GameButtons } from "../GameButtons";
-import { SvgBurger } from "../svg";
 import { WrapperTemplate } from "../WrapperTemplate";
+import { SvgCircleMenu, SvgPlay } from "../svg";
 
 interface IGameControlsProps {
   style?: CSSProperties;
@@ -65,11 +65,10 @@ export const GameControls: FC<IGameControlsProps> = ({
           [styles.controls__action_active]: !!playthrough,
         })}
       >
-        <Icon
+        <SvgPlay
           className={classNames(styles.controls__icon, {
             [styles.controls__icon_active]: !!playthrough,
           })}
-          icon="iconamoon:play-circle"
         />
       </Button>
       <Button
@@ -81,11 +80,11 @@ export const GameControls: FC<IGameControlsProps> = ({
             { id: "game-menu" }
           )
         }
-        tooltip={"Game meanu"}
+        tooltip={"Game menu"}
         color="transparent"
         className={classNames(styles.controls__action)}
       >
-        <SvgBurger className={classNames(styles.controls__icon)} />
+        <SvgCircleMenu className={classNames(styles.controls__icon)} />
       </Button>
       <Button
         ref={ratingButtonRef}

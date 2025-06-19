@@ -17,19 +17,19 @@ import { screenGt, screenLg, screenMd, screenSm } from "../../constants";
 import { keyboardUtils } from "../../utils/keyboard";
 import { SvgSearch } from "../svg";
 import { useAsyncLoader } from "../../hooks/useAsyncLoader";
+import { useDebouncedCallback } from "use-debounce";
 
 export const SearchModal: FC = () => {
-  const { sync, isLoading } = useAsyncLoader();
+  const { sync, isLoading, setIsLoading } = useAsyncLoader();
   const { setExpanded } = useCommonStore();
 
-  const [games, setGames] = useState<IGDBGameMinimal[]>([]);
+  const [games, setGames] = useState<IGDBGameMinimal[]>();
   const [searchQuery, setSearchQuery] = useState("");
   const [take, setTake] = useState(17);
   const [total, setTotal] = useState<number>();
   const [isSearchActive, setIsSearchActive] = useState(false);
 
-  const searchHandler = (search: string) => {
-    setIsSearchActive(!!search && search.length >= 2);
+  const debouncedSearch = useDebouncedCallback((search: string) => {
     sync(() =>
       IGDBApi.getGames({
         search,
@@ -39,6 +39,16 @@ export const SearchModal: FC = () => {
         setTotal(response.data.total);
       })
     );
+  }, 300);
+
+  const searchHandler = (search: string) => {
+    setSearchQuery(search);
+
+    if (!search || search.length < 2) return;
+
+    setIsSearchActive(true);
+    setIsLoading(true);
+    debouncedSearch(search);
   };
 
   useDisableScroll();
@@ -59,8 +69,7 @@ export const SearchModal: FC = () => {
           value={searchQuery}
           placeholder="Search..."
           autoFocus
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onBlur={(e) => searchHandler(e.target.value)}
+          onChange={(e) => searchHandler(e.target.value)}
           onKeyDown={keyboardUtils.blurOnKey}
         />
         <ButtonGroup

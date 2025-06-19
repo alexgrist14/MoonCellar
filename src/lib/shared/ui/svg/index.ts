@@ -1,11 +1,7 @@
 export * from "./SvgChevron";
-export * from "./SvgChevronThin";
 export * from "./SvgClose";
-export * from "./SvgCheck";
-export * from "./SvgCheckCircle";
 export * from "./SvgPlus";
 export * from "./SvgSearch";
-export * from "./SvgMenu";
 export * from "./SvgCamera";
 export * from "./SvgLogo";
 export * from "./SvgProfile";
@@ -17,3 +13,5 @@ export * from "./SvgArrow";
 export * from "./SvgDoubleArrow";
 export * from "./SvgAchievement";
 export * from "./SvgArrowPointer";
+export * from "./SvgPlay";
+export * from "./SvgCircleMenu";

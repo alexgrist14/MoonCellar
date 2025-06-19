@@ -4,7 +4,6 @@ import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { useGamesStore } from "@/src/lib/shared/store/games.store";
 import { GamesList } from "@/src/lib/shared/ui/GamesList";
 import { Loader } from "@/src/lib/shared/ui/Loader";
-import { axiosUtils } from "@/src/lib/shared/utils/axios";
 import { IUserPreset } from "@/src/lib/shared/types/user.type";
 import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
 import { userAPI } from "@/src/lib/shared/api";
@@ -35,8 +34,7 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
     !!profile &&
       userAPI
         .getPresets(profile?._id)
-        .then((res) => setSavedPresets(res.data.presets))
-        .catch(axiosUtils.toastError);
+        .then((res) => setSavedPresets(res.data.presets));
   }, [profile]);
 
   return (
@@ -112,8 +110,7 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
                               description: "Preset was successfully saved",
                             });
                             modal.close();
-                          })
-                          .catch(axiosUtils.toastError);
+                          });
                     }}
                   />
                 )
@@ -157,8 +154,7 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
                                       "Preset was successfully removed",
                                   });
                                   setSavedPresets(res.data.presets);
-                                })
-                                .catch(axiosUtils.toastError),
+                                }),
                             color: "red",
                           },
                         ]}

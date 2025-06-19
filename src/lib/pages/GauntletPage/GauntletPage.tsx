@@ -9,7 +9,7 @@ import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { useStatesStore } from "../../shared/store/states.store";
 import classNames from "classnames";
 import { useGamesStore } from "../../shared/store/games.store";
-import { parseQueryFilters } from "../../shared/utils/filters.util";
+import { parseQueryFilters } from "../../shared/utils/filters";
 import { useCommonStore } from "../../shared/store/common.store";
 import { Filters } from "../../shared/ui/Filters";
 import { BGImage } from "../../shared/ui/BGImage";
@@ -71,6 +71,8 @@ export const GauntletPage: FC = () => {
     setFinished,
     setGames,
     setStarted,
+    parseImages,
+    drawWheel,
   ]);
 
   useEffect(() => {
