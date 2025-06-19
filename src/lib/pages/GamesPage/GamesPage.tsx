@@ -36,7 +36,7 @@ export const GamesPage = () => {
     sync(() =>
       IGDBApi.getGames({
         ...filters,
-        page,
+        page: page || 1,
         take,
       }).then((res) => {
         setGames(res.data.results);
