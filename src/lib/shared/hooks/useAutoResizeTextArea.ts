@@ -1,18 +1,20 @@
 import { RefObject, useEffect } from "react";
 
 export const useAutoResizeTextArea = ({
+  isDisabled,
   isActive = true,
   textAreaRef,
   value,
   replicaRef,
 }: {
+  isDisabled?: boolean;
   textAreaRef: RefObject<HTMLTextAreaElement | null>;
   replicaRef?: RefObject<HTMLDivElement | null>;
   value: string;
   isActive?: boolean;
 }) => {
   useEffect(() => {
-    if (!textAreaRef.current) return;
+    if (!textAreaRef.current || isDisabled) return;
 
     const { style, scrollHeight } = textAreaRef.current;
 
@@ -26,5 +28,5 @@ export const useAutoResizeTextArea = ({
       style.height = "auto";
       style.height = scrollHeight + "px";
     }
-  }, [textAreaRef, value, isActive, replicaRef]);
+  }, [textAreaRef, value, isActive, replicaRef, isDisabled]);
 };

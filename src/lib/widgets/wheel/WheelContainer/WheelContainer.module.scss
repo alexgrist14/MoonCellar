@@ -1,16 +1,14 @@
 .container {
   display: grid;
-  padding-block: 15px;
-  padding-inline: 20px;
-  grid-template-columns: 1fr 400px;
-  margin-inline: auto;
+  padding: 15px 20px;
+  grid-template-columns: 1.5fr 1fr;
   align-items: center;
-  gap: 100px;
+  gap: 20px;
   height: 80vh;
 
   @include mediaMd {
     grid-template-columns: 1fr;
-    grid-template-rows: 40vh 1fr;
+    grid-template-rows: 1.2fr 1fr;
     padding: 0;
     gap: 10px;
   }

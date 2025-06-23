@@ -136,6 +136,7 @@ export const Filters: FC<{
   }, 300);
 
   useEffect(() => {
+    console.log(asPath);
     setFilters(parseQueryFilters(asPath));
   }, [asPath]);
 

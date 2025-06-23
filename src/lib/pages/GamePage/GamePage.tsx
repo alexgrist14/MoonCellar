@@ -11,22 +11,18 @@ import {
   getImageLink,
 } from "../../shared/constants";
 import { Slideshow } from "../../shared/ui/Slideshow";
-import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import Link from "next/link";
 import { Cover } from "../../shared/ui/Cover";
 import { GameControls } from "../../shared/ui/GameControls";
 import { Loader } from "../../shared/ui/Loader";
 import classNames from "classnames";
-import { useStatesStore } from "../../shared/store/states.store";
 import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
 import { useAuthStore } from "../../shared/store/auth.store";
 import { BGImage } from "../../shared/ui/BGImage";
-import { GameButtons } from "../../shared/ui/GameButtons";
 import { Icon } from "@iconify/react/dist/iconify.js";
 
 export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
   const { isAuth, profile } = useAuthStore();
-  const { isMobile } = useStatesStore();
 
   const [isLoading, setIsLoading] = useState<boolean>(!!game.cover?.url);
 

@@ -6,7 +6,7 @@ export const useAdvancedRouter = () => {
   const query = useSearchParams();
   const router = useRouter();
   const queryStr = query.toString();
-  const asPath = pathname + (!!queryString ? `?${queryString}` : "");
+  const asPath = pathname + (!!queryStr ? `?${queryStr}` : "");
   const setQuery = (value: { [key: string]: string | number }) => {
     const { push } = router;
 

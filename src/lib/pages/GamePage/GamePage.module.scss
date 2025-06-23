@@ -22,14 +22,13 @@
 
   &__cover {
     aspect-ratio: 528/704;
-    border-radius: $radius;
+    border-radius: $radius $radius 0 0;
     background: $lightBg;
     width: 100%;
     overflow: hidden;
     position: relative;
 
     & > img {
-      border-radius: $radius;
       width: 100%;
       height: 100%;
       object-position: center;
@@ -37,10 +36,10 @@
     }
 
     &_control {
-      border-radius: $radius $radius 0 0;
+      /* border-radius: $radius $radius 0 0; */
 
       & > img {
-        border-radius: $radius $radius 0 0;
+        /* border-radius: $radius $radius 0 0; */
       }
     }
   }

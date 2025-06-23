@@ -31,4 +31,5 @@ export interface ITextareaProps extends ITextareaType {
   clearErrors?: any;
   resize?: boolean;
   classNameField?: string;
+  isDisableAutoResize?: boolean;
 }

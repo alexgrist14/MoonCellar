@@ -45,26 +45,61 @@
       grid-template-columns: repeat(2, 1fr);
     }
 
-    &__title {
-      @include textEllipsis;
-      padding-inline: 5px;
-    }
     &__info {
       display: grid;
-      grid-template-columns: 1fr 20px;
+      grid-template-columns: 1fr 30px;
+      align-items: center;
+      align-content: flex-start;
+      gap: 2px;
+      flex-direction: column;
       border-radius: $radius;
-      gap: 5px;
       overflow: hidden;
+      grid-template-areas: "title rating" "plays rating";
+
+      & > p {
+        @include textEllipsis;
+        padding-inline: 5px;
+        width: 100%;
+      }
     }
-    &__rating {
-      width: 20px;
-      height: 20px;
+
+    &__title {
+      grid-area: title;
+    }
+
+    &__plays {
+      grid-area: plays;
+      @include font(11px, 12px, 400);
+    }
+
+    &__icon {
+      @include flexCenter;
+      padding: 2px;
+      width: 100%;
+      transition: 0.3s;
+      aspect-ratio: 1;
+      flex: 1;
+      cursor: pointer;
+      position: relative;
+      border-radius: 50%;
+      overflow: hidden;
+      grid-area: rating;
+    }
+
+    &__number {
+      width: auto;
+      height: 100%;
       background-color: $accent;
       border-radius: 50%;
-      text-align: center;
-      user-select: none;
-      opacity: 0.9;
-      filter: drop-shadow(0 0 0.6rem $accent);
+
+      & path {
+        fill: $whiteTextColor;
+      }
+    }
+
+    &__game {
+      display: grid;
+      grid-template-rows: 1fr 50px;
     }
   }
 }

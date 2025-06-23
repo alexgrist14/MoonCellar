@@ -16,6 +16,8 @@ import useCloseEvents from "@/src/lib/shared/hooks/useCloseEvents";
 import { IPlaythroughMinimal } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 import { useDebouncedCallback } from "use-debounce";
 import { useAsyncLoader } from "@/src/lib/shared/hooks/useAsyncLoader";
+import { accentColor, accentColorRGB } from "@/src/lib/shared/constants";
+import { commonUtils } from "@/src/lib/shared/utils/common";
 
 interface UserGamesProps {
   gamesRating: IGamesRating[];
@@ -50,6 +52,8 @@ export const UserGames: FC<UserGamesProps> = ({
   const [games, setGames] = useState<IGDBGameMinimal[]>();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  const playthroughsCount = useRef<{ [key: number]: number }>({});
+
   const parsedGamesRatings = useMemo(() => {
     return gamesRating.reduce(
       (res: { [key: number]: number }, rating) => ({
@@ -61,11 +65,27 @@ export const UserGames: FC<UserGamesProps> = ({
   }, [gamesRating]);
 
   const getGamesIds = useCallback(() => {
-    const plays = playthroughs?.filter(
-      (play) =>
-        (play.category === list && !play.isMastered) ||
-        (list === "mastered" && play.isMastered)
-    );
+    const plays = playthroughs
+      ?.filter(
+        (play) =>
+          (play.category === list && !play.isMastered) ||
+          (list === "mastered" && play.isMastered)
+      )
+      .reduce((res: IPlaythroughMinimal[], play) => {
+        let existed = res.find((item) => item.gameId === play.gameId);
+        if (!!existed) {
+          new Date(existed.updatedAt).getTime() <
+            new Date(play.updatedAt).getTime() && (existed = play);
+
+          playthroughsCount.current[play.gameId]++;
+        } else {
+          res.push(play);
+
+          playthroughsCount.current[play.gameId] = 1;
+        }
+
+        return res;
+      }, []);
 
     setTotal(plays.length);
 
@@ -175,20 +195,29 @@ export const UserGames: FC<UserGamesProps> = ({
           <Loader type="moon" />
         ) : (
           games?.map((game) => (
-            <div key={game._id} style={{ display: "grid" }}>
+            <div key={game._id} className={styles.games__game}>
               <GameCard game={game} />
               <div className={styles.games__info}>
                 <p className={styles.games__title}>{game.name}</p>
-                {gamesRating &&
-                  gamesRating.find((rating) => rating.game === game._id)
-                    ?.rating && (
-                    <span className={styles.games__rating}>
-                      {
-                        gamesRating.find((rating) => rating.game === game._id)
-                          ?.rating
-                      }
-                    </span>
+                <p className={styles.games__plays}>
+                  {playthroughsCount.current[game._id]}{" "}
+                  {commonUtils.addLastS(
+                    "Playthrough",
+                    playthroughsCount.current[game._id]
                   )}
+                </p>
+                {parsedGamesRatings[game._id] && (
+                  <div className={classNames(styles.games__icon)}>
+                    <Icon
+                      style={{
+                        filter: `drop-shadow(0 0 ${parsedGamesRatings[game._id] * 0.05}rem ${accentColor})`,
+                        backgroundColor: `rgba(${accentColorRGB}, ${parsedGamesRatings[game._id] * 0.1})`,
+                      }}
+                      className={classNames(styles.games__number)}
+                      icon={`mdi:numeric-${parsedGamesRatings[game._id]}`}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           ))

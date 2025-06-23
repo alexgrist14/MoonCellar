@@ -10,6 +10,7 @@ import Link from "next/link";
 import { FC, useMemo, useState } from "react";
 import styles from "./UserInfo.module.scss";
 import Markdown from "react-markdown";
+import { Interweave } from "interweave";
 
 interface UserInfoProps {
   user: IUser;
@@ -130,7 +131,7 @@ const UserInfo: FC<UserInfoProps> = ({
                   </Link>
                   <div className={styles.item__text}>
                     <p>{log.game[0].name}</p>
-                    <p>{log.text}</p>
+                    <Interweave content={log.text} tagName="p" />
                     <p className={styles.date}>
                       {commonUtils.getHumanDate(log.date)}
                     </p>

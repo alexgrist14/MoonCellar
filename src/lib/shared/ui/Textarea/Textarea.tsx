@@ -16,6 +16,7 @@ export const Textarea: FC<ITextareaProps> = ({
   children,
   onChange,
   ref,
+  isDisableAutoResize,
   ...props
 }) => {
   const textRef = useRef<HTMLTextAreaElement>(null);
@@ -37,6 +38,7 @@ export const Textarea: FC<ITextareaProps> = ({
   }, []);
 
   useAutoResizeTextArea({
+    isDisabled: isDisableAutoResize,
     textAreaRef: textRef,
     replicaRef: replicaRef,
     value: replicaValue || textRef.current?.value || "",
@@ -57,11 +59,10 @@ export const Textarea: FC<ITextareaProps> = ({
       <textarea
         className={cn(classNameField, styles.textarea__field, {
           [styles.textarea__field_error]: !!error?.message,
-          [styles.textarea__field_resize]: resize,
         })}
         style={{
           ...style,
-          ...(!!height && { height: Math.round(height) + "px" }),
+          ...(!!height && resize && { height: Math.round(height) + "px" }),
         }}
         ref={(node) => {
           textRef.current = node;
@@ -80,7 +81,7 @@ export const Textarea: FC<ITextareaProps> = ({
           !!onChange && onChange(e);
         }}
         {...props}
-      />
+      ></textarea>
       {resize && (
         <div
           onDrag={() => {
@@ -100,13 +101,15 @@ export const Textarea: FC<ITextareaProps> = ({
         </div>
       )}
       {children}
-      <div
-        ref={replicaRef}
-        className={classNames(styles.textarea__replica, classNameField)}
-        style={style}
-      >
-        {(replicaValue || textRef.current?.value) + " "}
-      </div>
+      {resize && !isDisableAutoResize && (
+        <div
+          ref={replicaRef}
+          className={classNames(styles.textarea__replica, classNameField)}
+          style={style}
+        >
+          {(replicaValue || textRef.current?.value) + " "}
+        </div>
+      )}
     </div>
   );
 };

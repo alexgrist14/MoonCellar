@@ -1,18 +1,23 @@
 .modal {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  max-width: 600px;
+  width: min(90vw, 600px);
+  height: min(90vw, 500px);
   align-items: center;
   gap: 40px;
   min-height: 320px;
   min-width: 300px;
 
   &__bottom {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 20px;
     transition: opacity 0.3s;
     opacity: 0;
     pointer-events: none;
+    width: 100%;
+    flex: 1;
 
     &_active {
       opacity: 1;
@@ -24,6 +29,7 @@
     display: flex;
     gap: 20px;
     align-items: center;
+    width: 100%;
   }
 
   &__inputs {
@@ -37,5 +43,13 @@
 
   &__add {
     margin-top: auto;
+  }
+
+  &__controls {
+    margin-top: auto;
+  }
+
+  div &__comment {
+    height: 100%;
   }
 }

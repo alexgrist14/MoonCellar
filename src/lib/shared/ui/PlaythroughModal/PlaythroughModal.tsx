@@ -25,6 +25,7 @@ import { SvgPlus } from "../svg";
 import classNames from "classnames";
 import { useUserStore } from "../../store/user.store";
 import { WrapperTemplate } from "../WrapperTemplate";
+import { toast } from "../../utils/toast";
 
 interface IPlaythroughModalProps {
   userId: string;
@@ -115,6 +116,9 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
                 ) || []
               );
               selectHandler(res.data);
+              toast.success({
+                description: "Playthrough successfully updated",
+              });
             })
         )
       : sync(() =>
@@ -131,6 +135,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
               },
             ]);
             selectHandler(res.data);
+            toast.success({ description: "Playthrough successfully created" });
           })
         );
   };
@@ -149,6 +154,8 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
 
         setPlaythroughId(undefined);
         reset({ userId, gameId: game._id, category: "wishlist" });
+
+        toast.success({ description: "Playthrough successfully removed" });
       })
     );
   };
@@ -246,7 +253,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
               <Input
                 placeholder="Game time (hours)"
                 {...register("time")}
-                type="number"
+                value={watch("time") || ""}
               />
               {watch("category") === "completed" && (
                 <ToggleSwitch
@@ -264,6 +271,8 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
           <Textarea
             {...register("comment")}
             placeholder="Comment... (visible only to you)"
+            className={styles.modal__comment}
+            isDisableAutoResize
           />
           <div className={styles.modal__controls}>
             <ButtonGroup

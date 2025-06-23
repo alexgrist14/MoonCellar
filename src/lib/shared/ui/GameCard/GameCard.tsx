@@ -17,6 +17,7 @@ import { useStatesStore } from "../../store/states.store";
 import { useAuthStore } from "../../store/auth.store";
 import { SvgAchievement } from "../svg";
 import { useUserStore } from "../../store/user.store";
+import { commonUtils } from "../../utils/common";
 
 interface IGameCardProps {
   game: IGDBGameMinimal;
@@ -37,12 +38,19 @@ export const GameCard = memo(
     const { isMobile } = useStatesStore();
     const { playthroughs } = useUserStore();
 
-    const playthrough = useMemo(
-      () =>
-        !!playthroughs?.length &&
-        playthroughs.findLast((play) => play.gameId === game._id),
-      [playthroughs, game]
-    );
+    const { playthroughsCount, playthrough } = useMemo(() => {
+      if (!playthroughs?.length)
+        return { playthrough: undefined, playthroughsCount: undefined };
+
+      const playthrough = playthroughs.findLast(
+        (play) => play.gameId === game._id
+      );
+      const playthroughsCount = playthroughs.filter(
+        (play) => play.gameId === game._id
+      ).length;
+
+      return { playthrough, playthroughsCount };
+    }, [playthroughs, game]);
 
     const { isMastered, isBeaten } = useMemo(() => {
       const mastered = profile?.raAwards?.filter(
@@ -117,26 +125,37 @@ export const GameCard = memo(
               className={styles.card__title}
               href={`/games/${game.slug}`}
             >
-              <p>{game.name}</p>
-              <span>
-                {`${
-                  gameCategoryNames[
-                    Object.keys(gameCategories).find(
-                      (key) => gameCategories[key] === game.category
-                    ) || ""
-                  ]
-                }`}
-                {!!game.first_release_date
-                  ? ` - ${new Date(game.first_release_date * 1000).getFullYear()}`
-                  : ""}
-              </span>
-              <span>
-                {!!game.platforms?.length &&
-                  game.platforms.map((platform) => platform.name).join(", ")}
-              </span>
-              {!!game.summary &&
-                (cardRef.current?.getBoundingClientRect().height || 0) >=
-                  240 && <span>{game.summary}</span>}
+              <div className={styles.card__top}>
+                <p>{game.name}</p>
+                {!!playthroughsCount && (
+                  <span>
+                    ( {playthroughsCount}{" "}
+                    {commonUtils.addLastS("Playthrough", playthroughsCount)} )
+                  </span>
+                )}
+                {!!game.summary &&
+                  (cardRef.current?.clientHeight || 0) >= 200 && (
+                    <span>{game.summary}</span>
+                  )}
+              </div>
+              <div className={styles.card__bottom}>
+                <span>
+                  {`${
+                    gameCategoryNames[
+                      Object.keys(gameCategories).find(
+                        (key) => gameCategories[key] === game.category
+                      ) || ""
+                    ]
+                  }`}
+                  {!!game.first_release_date
+                    ? ` - ${new Date(game.first_release_date * 1000).getFullYear()}`
+                    : ""}
+                </span>
+                <span>
+                  {!!game.platforms?.length &&
+                    game.platforms.map((platform) => platform.name).join(", ")}
+                </span>
+              </div>
             </Link>
             <GameControls className={styles.card__controls} game={game} />
           </div>
