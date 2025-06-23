@@ -92,7 +92,7 @@
     justify-content: space-between;
   }
 
-  &__top, &__bottom {
+  &__wrapper {
     display: flex;
     flex-direction: column;
     gap: 10px;

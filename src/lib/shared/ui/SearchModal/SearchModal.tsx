@@ -79,13 +79,18 @@ export const SearchModal: FC = () => {
               title: <SvgSearch style={{ width: "20px", marginTop: "2px" }} />,
               style: { padding: "2px 10px", height: "calc(100% - 10px)" },
               color: "accent",
+              link: !!searchQuery
+                ? `/games?search=${encodeURIComponent(searchQuery)}`
+                : "/games",
+              onClick: () => {
+                modal.close();
+              },
             },
             {
               title: "Advanced",
-              link:
-                searchQuery?.length > 2
-                  ? `/games?search=${encodeURIComponent(searchQuery)}`
-                  : "/games",
+              link: !!searchQuery
+                ? `/games?search=${encodeURIComponent(searchQuery)}`
+                : "/games",
               onClick: () => {
                 modal.close();
                 setExpanded(["left"]);

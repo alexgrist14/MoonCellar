@@ -125,7 +125,7 @@ export const GameCard = memo(
               className={styles.card__title}
               href={`/games/${game.slug}`}
             >
-              <div className={styles.card__top}>
+              <div className={styles.card__wrapper}>
                 <p>{game.name}</p>
                 {!!playthroughsCount && (
                   <span>
@@ -138,7 +138,7 @@ export const GameCard = memo(
                     <span>{game.summary}</span>
                   )}
               </div>
-              <div className={styles.card__bottom}>
+              <div className={styles.card__wrapper}>
                 <span>
                   {`${
                     gameCategoryNames[
@@ -151,6 +151,8 @@ export const GameCard = memo(
                     ? ` - ${new Date(game.first_release_date * 1000).getFullYear()}`
                     : ""}
                 </span>
+              </div>
+              <div className={styles.card__wrapper}>
                 <span>
                   {!!game.platforms?.length &&
                     game.platforms.map((platform) => platform.name).join(", ")}

@@ -54,10 +54,8 @@ export const GamesPage = () => {
   }, [setGenres, setGameModes, setSystems, setThemes]);
 
   useEffect(() => {
-    if (games === undefined) {
-      debouncedGamesFetch(Number(query.get("page") as string));
-    }
-  }, [debouncedGamesFetch, take, query, games]);
+    debouncedGamesFetch(Number(query.get("page") as string));
+  }, [debouncedGamesFetch, take, query]);
 
   useWindowResizeAction(() => {
     if (window.innerWidth >= screenGt) return setTake(42);
@@ -72,17 +70,16 @@ export const GamesPage = () => {
     <>
       <BGImage />
       <ExpandMenu position="left" titleOpen="Filters">
-        <Filters callback={() => debouncedGamesFetch()} />
+        <Filters />
       </ExpandMenu>
       <Pagination
         take={take}
         total={total}
         isFixed
         isDisabled={isLoading}
-        callback={(page) => {
+        callback={() => {
           setGames([]);
           setIsLoading(true);
-          debouncedGamesFetch(page);
         }}
       />
       <WrapperTemplate

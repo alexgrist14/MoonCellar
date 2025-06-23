@@ -26,7 +26,7 @@ import { useAdvancedRouter } from "../../hooks/useAdvancedRouter";
 export const Filters: FC<{
   callback?: (filters?: IGameFilters) => void;
   isGauntlet?: boolean;
-}> = ({ isGauntlet }) => {
+}> = ({ isGauntlet, callback }) => {
   const { asPath, router, pathname } = useAdvancedRouter();
 
   const { profile, isAuth } = useAuthStore();
@@ -136,7 +136,6 @@ export const Filters: FC<{
   }, 300);
 
   useEffect(() => {
-    console.log(asPath);
     setFilters(parseQueryFilters(asPath));
   }, [asPath]);
 
@@ -477,6 +476,7 @@ export const Filters: FC<{
                 disabled: !filters,
                 onClick: () => {
                   !!filters && pushFiltersToQuery(filters, router, pathname);
+                  !!callback && callback();
                 },
                 hidden: isGauntlet,
               },

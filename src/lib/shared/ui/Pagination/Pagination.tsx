@@ -20,7 +20,7 @@ interface IPaginationProps {
 
 export const Pagination = memo(
   ({ take, total, isFixed, isDisabled, callback }: IPaginationProps) => {
-    const { query, pathname, router, setQuery } = useAdvancedRouter();
+    const { query, setQuery } = useAdvancedRouter();
     const centerRef = useRef<HTMLDivElement>(null);
 
     const { setScrollPosition } = useCommonStore();
