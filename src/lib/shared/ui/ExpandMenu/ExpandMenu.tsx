@@ -60,9 +60,10 @@ export const ExpandMenu = memo(
     );
 
     const closeHandler = () =>
+      isActive &&
       setExpanded(expanded?.filter((pos) => pos !== position) || []);
 
-    useCloseEvents([expandRef], closeHandler);
+    useCloseEvents([expandRef], () => closeHandler());
 
     if (!connector) return null;
 
