@@ -1,23 +1,18 @@
-import { CSSProperties, FC, memo, useMemo, useRef, useState } from "react";
+import { CSSProperties, memo, useMemo, useRef, useState } from "react";
 import styles from "./GameCard.module.scss";
-import Link from "next/link";
 import { IGDBGameMinimal } from "../../types/igdb";
 import classNames from "classnames";
 import Image from "next/image";
-import {
-  gameCategories,
-  gameCategoryNames,
-  getImageLink,
-} from "../../constants";
+import { getImageLink } from "../../constants";
 import { Cover } from "../Cover";
 import { GameControls } from "../GameControls";
-import useCloseEvents from "../../hooks/useCloseEvents";
 import { Loader } from "../Loader";
 import { useStatesStore } from "../../store/states.store";
 import { useAuthStore } from "../../store/auth.store";
 import { SvgAchievement } from "../svg";
 import { useUserStore } from "../../store/user.store";
-import { commonUtils } from "../../utils/common";
+import { GameCardInfo } from "@/src/lib/entities/game/ui/GameCardInfo";
+import useCloseEvents from "../../hooks/useCloseEvents";
 
 interface IGameCardProps {
   game: IGDBGameMinimal;
@@ -38,18 +33,8 @@ export const GameCard = memo(
     const { isMobile } = useStatesStore();
     const { playthroughs } = useUserStore();
 
-    const { playthroughsCount, playthrough } = useMemo(() => {
-      if (!playthroughs?.length)
-        return { playthrough: undefined, playthroughsCount: undefined };
-
-      const playthrough = playthroughs.findLast(
-        (play) => play.gameId === game._id
-      );
-      const playthroughsCount = playthroughs.filter(
-        (play) => play.gameId === game._id
-      ).length;
-
-      return { playthrough, playthroughsCount };
+    const playthrough = useMemo(() => {
+      return playthroughs?.findLast((play) => play.gameId === game._id);
     }, [playthroughs, game]);
 
     const { isMastered, isBeaten } = useMemo(() => {
@@ -114,60 +99,21 @@ export const GameCard = memo(
             </div>
           )}
           {isLoading && <Loader key={game._id + "_loader"} />}
-          <div
-            className={classNames(styles.card__info, {
-              [styles.card__info_active]:
-                isHover || (stepIndex === 1 && isMobile),
-            })}
-          >
-            <Link
-              draggable={false}
-              className={styles.card__title}
-              href={`/games/${game.slug}`}
-            >
-              <div className={styles.card__wrapper}>
-                <p>{game.name}</p>
-                {!!playthroughsCount && (
-                  <span>
-                    ( {playthroughsCount}{" "}
-                    {commonUtils.addLastS("Playthrough", playthroughsCount)} )
-                  </span>
-                )}
-                {!!game.summary &&
-                  (cardRef.current?.clientHeight || 0) >= 200 && (
-                    <span>{game.summary}</span>
-                  )}
-              </div>
-              <div className={styles.card__wrapper}>
-                <span>
-                  {`${
-                    gameCategoryNames[
-                      Object.keys(gameCategories).find(
-                        (key) => gameCategories[key] === game.category
-                      ) || ""
-                    ]
-                  }`}
-                  {!!game.first_release_date
-                    ? ` - ${new Date(game.first_release_date * 1000).getFullYear()}`
-                    : ""}
-                </span>
-              </div>
-              <div className={styles.card__wrapper}>
-                <span>
-                  {!!game.platforms?.length &&
-                    game.platforms.map((platform) => platform.name).join(", ")}
-                </span>
-              </div>
-            </Link>
-            <GameControls className={styles.card__controls} game={game} />
-          </div>
+          {isHover && (
+            <GameCardInfo
+              bottomNode={
+                <GameControls className={styles.card__controls} game={game} />
+              }
+              game={game}
+            />
+          )}
           {!!game?.cover ? (
             <Image
               onLoad={() => setIsLoading(false)}
               alt="Game cover"
               src={getImageLink(game?.cover?.url, "720p")}
-              width={400}
-              height={500}
+              width={260}
+              height={325}
               className={classNames(styles.card__cover, {
                 [styles.card__cover_active]: !isLoading,
               })}

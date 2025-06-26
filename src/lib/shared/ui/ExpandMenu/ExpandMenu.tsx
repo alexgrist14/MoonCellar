@@ -1,13 +1,22 @@
-import { CSSProperties, HTMLAttributes, memo, ReactNode, useMemo } from "react";
+import {
+  CSSProperties,
+  HTMLAttributes,
+  memo,
+  ReactNode,
+  useMemo,
+  useRef,
+} from "react";
 import styles from "./ExpandMenu.module.scss";
 import { Scrollbar } from "../Scrollbar";
-import { IExpandPosition, useCommonStore } from "../../store/common.store";
+import { IExpandPosition } from "../../store/common.store";
 import classNames from "classnames";
-import { createPortal } from "react-dom";
 import { useStatesStore } from "../../store/states.store";
 import { useResizeDetector } from "react-resize-detector";
+import { useExpandStore } from "../../store/expand.store";
 import { commonUtils } from "../../utils/common";
 import { CheckMobile } from "../CheckMobile";
+import { createPortal } from "react-dom";
+import useCloseEvents from "../../hooks/useCloseEvents";
 
 interface IExpandMenuProps
   extends Pick<HTMLAttributes<HTMLDivElement>, "children" | "id"> {
@@ -30,8 +39,10 @@ export const ExpandMenu = memo(
     titleStyle,
     ...props
   }: IExpandMenuProps) => {
-    const { expanded, setExpanded } = useCommonStore();
+    const { expanded, setExpanded } = useExpandStore();
     const { isMobile } = useStatesStore();
+
+    const expandRef = useRef<HTMLDivElement>(null);
 
     const isActive = expanded?.includes(position);
 
@@ -48,6 +59,11 @@ export const ExpandMenu = memo(
       []
     );
 
+    const closeHandler = () =>
+      setExpanded(expanded?.filter((pos) => pos !== position) || []);
+
+    useCloseEvents([expandRef], closeHandler);
+
     if (!connector) return null;
 
     return createPortal(
@@ -55,6 +71,7 @@ export const ExpandMenu = memo(
         <div
           id={position}
           key={position}
+          ref={expandRef}
           className={classNames(styles.wrapper, {
             [styles.wrapper_right]: position.includes("right"),
             [styles.wrapper_disabled]: isMobile && !isActive,
@@ -90,13 +107,11 @@ export const ExpandMenu = memo(
           </div>
           <div
             onClick={() => {
-              setExpanded(
-                isActive
-                  ? expanded?.filter((pos) => pos !== position) || []
-                  : !!expanded?.length
-                    ? [...expanded, position]
-                    : [position]
-              );
+              isActive
+                ? closeHandler()
+                : setExpanded(
+                    !!expanded?.length ? [...expanded, position] : [position]
+                  );
             }}
             className={classNames(
               styles.title,

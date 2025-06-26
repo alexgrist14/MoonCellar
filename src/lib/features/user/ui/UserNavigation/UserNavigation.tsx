@@ -10,10 +10,10 @@ import { userListCategories } from "@/src/lib/shared/constants/user.const";
 import { commonUtils } from "@/src/lib/shared/utils/common";
 import classNames from "classnames";
 import { SvgPen, SvgSettings } from "@/src/lib/shared/ui/svg";
-import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { IPlaythroughMinimal } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
+import { useExpandStore } from "@/src/lib/shared/store/expand.store";
 
 export const UserNavigation: FC<{
   isAuthedUser: boolean;
@@ -22,7 +22,7 @@ export const UserNavigation: FC<{
 }> = ({ isAuthedUser, user, playthroughs }) => {
   const { setQuery, query } = useAdvancedRouter();
 
-  const { setExpanded } = useCommonStore();
+  const { setExpanded } = useExpandStore();
   const { isMobile } = useStatesStore();
 
   const handleEditListClick = () => {

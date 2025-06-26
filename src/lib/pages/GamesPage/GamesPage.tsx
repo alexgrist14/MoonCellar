@@ -69,7 +69,7 @@ export const GamesPage = () => {
   return (
     <>
       <BGImage />
-      <ExpandMenu position="left" titleOpen="Filters">
+      <ExpandMenu position="left">
         <Filters />
       </ExpandMenu>
       <Pagination

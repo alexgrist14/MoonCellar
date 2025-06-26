@@ -16,7 +16,6 @@ type IState = {
   gameModes?: IGDBDefault[];
   themes?: IGDBDefault[];
   keywords?: IGDBDefault[];
-  expanded?: IExpandPosition[];
   timer: number;
   scrollPosition?: { top: number; left: number } | undefined;
 };
@@ -28,7 +27,6 @@ type IAction = {
   setGenres: (genres: IGDBGenre[]) => void;
   setFamilies: (families: IGDBFamily[]) => void;
   setSystems: (platforms: IGDBPlatform[]) => void;
-  setExpanded: (expanded: IExpandPosition[]) => void;
   setTimer: (timer: number) => void;
   setScrollPosition: (
     scrollPosition: { top: number; left: number } | undefined
@@ -40,7 +38,6 @@ export const useCommonStore = create<IState & IAction>()(
     (set) => ({
       timer: 3,
       setGenres: (genres) => set({ genres }),
-      setExpanded: (expanded) => set({ expanded }),
       setSystems: (systems) => set({ systems }),
       setFamilies: (families) => set({ families }),
       setGameModes: (modes) => set({ gameModes: modes }),

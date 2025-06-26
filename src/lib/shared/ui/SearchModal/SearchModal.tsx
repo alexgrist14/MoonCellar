@@ -7,7 +7,6 @@ import { Scrollbar } from "../Scrollbar";
 import { Button } from "../Button";
 import { GameCard } from "../GameCard";
 import classNames from "classnames";
-import { useCommonStore } from "../../store/common.store";
 import { Loader } from "../Loader";
 import { ButtonGroup } from "../Button/ButtonGroup";
 import { modal } from "../Modal";
@@ -18,10 +17,11 @@ import { keyboardUtils } from "../../utils/keyboard";
 import { SvgSearch } from "../svg";
 import { useAsyncLoader } from "../../hooks/useAsyncLoader";
 import { useDebouncedCallback } from "use-debounce";
+import { useExpandStore } from "../../store/expand.store";
 
 export const SearchModal: FC = () => {
   const { sync, isLoading, setIsLoading } = useAsyncLoader();
-  const { setExpanded } = useCommonStore();
+  const { setExpanded } = useExpandStore();
 
   const [games, setGames] = useState<IGDBGameMinimal[]>();
   const [searchQuery, setSearchQuery] = useState("");
