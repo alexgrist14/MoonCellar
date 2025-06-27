@@ -10,16 +10,12 @@ const GamePageIndex = async ({ params }: { params: any }) => {
     <div>
       <head>
         <title>{game.name}</title>
-        <meta property="title" content={game.name} key="title" />
-        <meta property="og:title" content={game.name} key="title" />
+        <meta property="title" content={game.name} />
+        <meta property="og:title" content={game.name} />
         {!!game.summary && (
           <>
-            <meta property="description" content={game.summary} key="title" />
-            <meta
-              property="og:description"
-              content={game.summary}
-              key="title"
-            />
+            <meta property="description" content={game.summary} />
+            <meta property="og:description" content={game.summary} />
           </>
         )}
         {!!game.cover && (

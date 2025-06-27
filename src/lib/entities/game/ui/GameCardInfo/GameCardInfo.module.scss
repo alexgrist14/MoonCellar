@@ -42,4 +42,32 @@
       @include lineClamp(2);
     }
   }
+
+  &_dropped {
+    outline-color: $off;
+  }
+
+  &_playing {
+    outline-color: $accent;
+  }
+
+  &_wishlist {
+    outline-color: $violet;
+  }
+
+  &_backlog {
+    outline-color: $pink;
+  }
+
+  &_played {
+    outline-color: $blue;
+  }
+
+  &_completed {
+    outline-color: $on;
+  }
+
+  &_mastered {
+    outline-color: $yellow;
+  }
 }

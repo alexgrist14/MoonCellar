@@ -6,13 +6,19 @@ import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
 import { useUserStore } from "@/src/lib/shared/store/user.store";
 import { commonUtils } from "@/src/lib/shared/utils/common";
 import { gameCategories, gameCategoryNames } from "@/src/lib/shared/constants";
+import { IPlaythroughMinimal } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 
 interface IGameCardInfoProps {
   bottomNode: ReactNode;
   game: IGDBGameMinimal;
+  playthrough?: IPlaythroughMinimal;
 }
 
-export const GameCardInfo: FC<IGameCardInfoProps> = ({ bottomNode, game }) => {
+export const GameCardInfo: FC<IGameCardInfoProps> = ({
+  bottomNode,
+  game,
+  playthrough,
+}) => {
   const infoRef = useRef<HTMLDivElement>(null);
   const { playthroughs } = useUserStore();
 
@@ -21,7 +27,16 @@ export const GameCardInfo: FC<IGameCardInfoProps> = ({ bottomNode, game }) => {
   }, [playthroughs, game]);
 
   return (
-    <div className={classNames(styles.info)}>
+    <div
+      id="game-info"
+      className={classNames(
+        styles.info,
+        !!playthrough &&
+          !playthrough.isMastered &&
+          styles[`info_${playthrough.category}`],
+        !!playthrough && playthrough.isMastered && styles.info_mastered
+      )}
+    >
       <Link
         draggable={false}
         className={styles.info__title}

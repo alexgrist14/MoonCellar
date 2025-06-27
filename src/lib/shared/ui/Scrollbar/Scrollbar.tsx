@@ -1,6 +1,7 @@
 import React, {
   CSSProperties,
   FC,
+  RefObject,
   useCallback,
   useEffect,
   useRef,
@@ -16,7 +17,7 @@ interface IScrollBarProps {
   className?: string;
   classNameLine?: string;
   classNameContent?: string;
-  contentDefRef?: React.MutableRefObject<any>;
+  contentDefRef?: RefObject<any>;
   stl?: any;
   children?: React.ReactNode;
   isLine?: boolean;

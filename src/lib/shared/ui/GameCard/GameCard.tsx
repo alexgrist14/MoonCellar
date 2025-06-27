@@ -105,6 +105,7 @@ export const GameCard = memo(
                 <GameControls className={styles.card__controls} game={game} />
               }
               game={game}
+              playthrough={playthrough}
             />
           )}
           {!!game?.cover ? (

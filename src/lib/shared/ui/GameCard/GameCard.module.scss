@@ -115,57 +115,29 @@
 
   &_dropped {
     filter: drop-shadow(0 0 0.2rem $off);
-
-    .card__info {
-      outline-color: $off;
-    }
   }
 
   &_playing {
     filter: drop-shadow(0 0 0.2rem $accent);
-
-    .card__info {
-      outline-color: $accent;
-    }
   }
 
   &_wishlist {
     filter: drop-shadow(0 0 0.2rem $violet);
-
-    .card__info {
-      outline-color: $violet;
-    }
   }
 
   &_backlog {
     filter: drop-shadow(0 0 0.2rem $pink);
-
-    .card__info {
-      outline-color: $pink;
-    }
   }
 
   &_played {
     filter: drop-shadow(0 0 0.2rem $blue);
-
-    .card__info {
-      outline-color: $blue;
-    }
   }
 
   &_completed {
     filter: drop-shadow(0 0 0.2rem $on);
-
-    .card__info {
-      outline-color: $on;
-    }
   }
 
   &_mastered {
     filter: drop-shadow(0 0 0.2rem $yellow);
-
-    .card__info {
-      outline-color: $yellow;
-    }
   }
 }

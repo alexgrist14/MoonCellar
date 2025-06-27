@@ -37,11 +37,6 @@ export const Layout: FC<ILayoutProps> = ({
 
   return (
     <div className={className}>
-      <ToastConnector />
-      <ModalsConnector />
-      <div id="expand-connector"></div>
-      <div id="pagination-connector"></div>
-      <div id="tooltip-connector"></div>
       <CheckMobile>
         <Header />
       </CheckMobile>
@@ -50,6 +45,11 @@ export const Layout: FC<ILayoutProps> = ({
           {children}
         </main>
       </Scrollbar>
+      <ToastConnector />
+      <ModalsConnector />
+      <div id="expand-connector"></div>
+      <div id="pagination-connector"></div>
+      <div id="tooltip-connector"></div>
     </div>
   );
 };

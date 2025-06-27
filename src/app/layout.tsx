@@ -6,7 +6,6 @@ import { ACCESS_TOKEN, REFRESH_TOKEN } from "../lib/shared/constants";
 import { cookies } from "next/headers";
 import "/src/lib/app/styles/reset.scss";
 import "/src/lib/app/styles/common.scss";
-import { ReactScan } from "../lib/shared/ui/ReactScan";
 
 const general = localFont({
   variable: "--font-general",
@@ -54,7 +53,6 @@ export default async function App({ children }: { children: ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/images/mooncellar.ico" />
       </head>
-      <ReactScan />
       <body>
         <Layout
           className={classNames(general.variable, pentagra.variable)}
