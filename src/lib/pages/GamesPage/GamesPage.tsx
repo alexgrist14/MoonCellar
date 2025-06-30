@@ -95,7 +95,9 @@ export const GamesPage = () => {
               [styles.page__games_loading]: isLoading,
             })}
           >
-            {games?.map((game) => <GameCard key={game._id} game={game} />)}
+            {games?.map((game) => (
+              <GameCard key={game._id} game={game} />
+            ))}
           </div>
         )}
       </WrapperTemplate>

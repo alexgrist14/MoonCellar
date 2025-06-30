@@ -170,6 +170,8 @@
   .activity {
     margin-top: 20px;
     width: 100%;
+    position: relative;
+    min-height: 300px;
 
     &__title {
       @include profileTitle;

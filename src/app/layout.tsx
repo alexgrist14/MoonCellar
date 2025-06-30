@@ -6,6 +6,7 @@ import { ACCESS_TOKEN, REFRESH_TOKEN } from "../lib/shared/constants";
 import { cookies } from "next/headers";
 import "/src/lib/app/styles/reset.scss";
 import "/src/lib/app/styles/common.scss";
+import { polyfill } from "interweave-ssr";
 
 const general = localFont({
   variable: "--font-general",
@@ -38,6 +39,7 @@ const pentagra = localFont({
     },
   ],
 });
+polyfill();
 
 export default async function App({ children }: { children: ReactNode }) {
   const cookie = await cookies();

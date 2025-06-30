@@ -198,14 +198,18 @@ export const UserGames: FC<UserGamesProps> = ({
             <div key={game._id} className={styles.games__game}>
               <GameCard game={game} />
               <div className={styles.games__info}>
-                <p className={styles.games__title}>{game.name}</p>
-                <p className={styles.games__plays}>
-                  {playthroughsCount.current[game._id]}{" "}
-                  {commonUtils.addLastS(
-                    "Playthrough",
-                    playthroughsCount.current[game._id]
+                <div className={styles.games__text}>
+                  <p className={styles.games__title}>{game.name}</p>
+                  {playthroughsCount.current[game._id] > 1 && (
+                    <p className={styles.games__plays}>
+                      {playthroughsCount.current[game._id]}{" "}
+                      {commonUtils.addLastS(
+                        "Playthrough",
+                        playthroughsCount.current[game._id]
+                      )}
+                    </p>
                   )}
-                </p>
+                </div>
                 {parsedGamesRatings[game._id] && (
                   <div className={classNames(styles.games__icon)}>
                     <Icon

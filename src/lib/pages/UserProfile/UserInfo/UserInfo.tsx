@@ -7,14 +7,15 @@ import { Button } from "@/src/lib/shared/ui/Button";
 import { commonUtils } from "@/src/lib/shared/utils/common";
 import Image from "next/image";
 import Link from "next/link";
-import { FC, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import styles from "./UserInfo.module.scss";
 import Markdown from "react-markdown";
 import { Interweave } from "interweave";
+import { useAsyncLoader } from "@/src/lib/shared/hooks/useAsyncLoader";
+import { Loader } from "@/src/lib/shared/ui/Loader";
 
 interface UserInfoProps {
   user: IUser;
-  logs: ILogs[];
   authUserFollowings?: IFollowings;
   authUserId?: string;
 }
@@ -23,24 +24,14 @@ const UserInfo: FC<UserInfoProps> = ({
   user,
   authUserFollowings,
   authUserId,
-  logs,
 }) => {
+  const { sync, isLoading } = useAsyncLoader();
   const { _id: id, followings: userFollowings, userName } = user;
+
+  const [logs, setLogs] = useState<ILogs[]>([]);
   const [userAuthFollowings, setUserAuthFollowings] = useState<IFollowings>(
     authUserFollowings || { followings: [] }
   );
-
-  const setActivityType = (action: string, isAdd: boolean, rating?: number) => {
-    const actions = action.split(" and ");
-    const result = actions.map((act) => {
-      if (act === "rating") {
-        return `${isAdd ? `set rating ${rating}` : `removed rating`}`;
-      } else {
-        return `${isAdd ? `added to ${act}` : `removed from ${act}`}`;
-      }
-    });
-    return commonUtils.upFL(result.join(" and "));
-  };
 
   const isFollow = useMemo(() => {
     return userAuthFollowings?.followings
@@ -58,6 +49,10 @@ const UserInfo: FC<UserInfoProps> = ({
           .addUserFollowing(authUserId, id)
           .then((res) => setUserAuthFollowings(res.data));
   };
+
+  useEffect(() => {
+    sync(() => userAPI.getUserLogs(user._id).then((res) => setLogs(res.data)));
+  }, [user, sync]);
 
   return (
     <>
@@ -110,9 +105,10 @@ const UserInfo: FC<UserInfoProps> = ({
         </div>
       </div>
       <div className={styles.content__bottom}>
-        {logs?.length > 0 && (
-          <div className={styles.activity}>
-            <h3 className={styles.title}>Activity</h3>
+        <div className={styles.activity}>
+          <h3 className={styles.title}>Activity</h3>
+          {isLoading && <Loader type="moon" />}
+          {!isLoading && logs?.length > 0 && (
             <div className={styles.activity__list}>
               {logs.map((log, i) => (
                 <div className={styles.item} key={i}>
@@ -131,7 +127,7 @@ const UserInfo: FC<UserInfoProps> = ({
                   </Link>
                   <div className={styles.item__text}>
                     <p>{log.game[0].name}</p>
-                    <Interweave content={log.text} tagName="p" />
+                    <Interweave content={log.text} />
                     <p className={styles.date}>
                       {commonUtils.getHumanDate(log.date)}
                     </p>
@@ -139,8 +135,8 @@ const UserInfo: FC<UserInfoProps> = ({
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </>
   );

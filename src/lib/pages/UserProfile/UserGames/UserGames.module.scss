@@ -25,81 +25,79 @@
       transform: translateX(-26%);
     }
   }
+}
 
-  .games {
+.games {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  height: 100%;
+  margin-inline: auto;
+  gap: 20px;
+
+  @include mediaGt {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @include mediaLg {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @include mediaMd {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  &__info {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    height: 100%;
-    margin-inline: auto;
-    gap: 20px;
+    grid-template-columns: 1fr 30px;
+    align-items: center;
+    align-content: flex-start;
+    gap: 2px;
+    flex-direction: column;
+    border-radius: $radius;
+    overflow: hidden;
 
-    @include mediaLg {
-      grid-template-columns: repeat(4, 1fr);
-    }
-
-    @include mediaMd {
-      grid-template-columns: repeat(3, 1fr);
-    }
-
-    @include mediaSm {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    &__info {
-      display: grid;
-      grid-template-columns: 1fr 30px;
-      align-items: center;
-      align-content: flex-start;
-      gap: 2px;
-      flex-direction: column;
-      border-radius: $radius;
-      overflow: hidden;
-      grid-template-areas: "title rating" "plays rating";
-
-      & > p {
-        @include textEllipsis;
-        padding-inline: 5px;
-        width: 100%;
-      }
-    }
-
-    &__title {
-      grid-area: title;
-    }
-
-    &__plays {
-      grid-area: plays;
-      @include font(11px, 12px, 400);
-    }
-
-    &__icon {
-      @include flexCenter;
-      padding: 2px;
+    & p {
+      @include textEllipsis;
+      padding-inline: 5px;
       width: 100%;
-      transition: 0.3s;
-      aspect-ratio: 1;
-      flex: 1;
-      cursor: pointer;
-      position: relative;
-      border-radius: 50%;
-      overflow: hidden;
-      grid-area: rating;
     }
+  }
 
-    &__number {
-      width: auto;
-      height: 100%;
-      background-color: $accent;
-      border-radius: 50%;
+  &__text {
+    display: grid;
+    gap: 2px
+  }
 
-      & path {
-        fill: $whiteTextColor;
-      }
+  &__plays {
+    @include font(11px, 12px, 400);
+  }
+
+  &__icon {
+    @include flexCenter;
+    padding: 2px;
+    width: 100%;
+    transition: 0.3s;
+    aspect-ratio: 1;
+    flex: 1;
+    cursor: pointer;
+    position: relative;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  &__number {
+    width: auto;
+    height: 100%;
+    background-color: $accent;
+    border-radius: 50%;
+
+    & path {
+      fill: $whiteTextColor;
     }
+  }
 
-    &__game {
-      display: grid;
-      grid-template-rows: 1fr 50px;
-    }
+  &__game {
+    display: grid;
+    grid-template-rows: 1fr 50px;
   }
 }

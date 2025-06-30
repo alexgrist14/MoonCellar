@@ -3,7 +3,7 @@
 import { FC, useMemo } from "react";
 import { userListCategories } from "../../shared/constants/user.const";
 import { IUser } from "../../shared/types/auth";
-import { IFollowings, ILogs } from "../../shared/types/user.type";
+import { IFollowings } from "../../shared/types/user.type";
 import { Settings } from "./Settings";
 import { UserGames } from "./UserGames";
 import UserInfo from "./UserInfo/UserInfo";
@@ -20,7 +20,6 @@ import { IPlaythroughMinimal } from "../../shared/lib/schemas/playthroughs.schem
 
 interface UserProfileProps {
   user: IUser;
-  logs: ILogs[];
   authUserFollowings?: IFollowings;
   authUserId?: string;
   playthroughs: IPlaythroughMinimal[];
@@ -28,7 +27,6 @@ interface UserProfileProps {
 
 const UserProfile: FC<UserProfileProps> = ({
   user,
-  logs,
   authUserFollowings,
   authUserId,
   playthroughs,
@@ -84,7 +82,6 @@ const UserProfile: FC<UserProfileProps> = ({
               user={user}
               authUserFollowings={authUserFollowings}
               authUserId={authUserId}
-              logs={logs}
             />
           )}
           {userListCategories.some((t) => t === tab) && (

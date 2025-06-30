@@ -3,7 +3,21 @@ import { userAPI } from "@/src/lib/shared/api";
 import { gamesAPI } from "@/src/lib/shared/api/games.api";
 import { ACCESS_TOKEN } from "@/src/lib/shared/constants";
 import { jwtDecode } from "jwt-decode";
+import { Metadata } from "next";
 import { cookies } from "next/headers";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: any;
+}): Promise<Metadata> {
+  const user = (await userAPI.getByName((await params).name)).data;
+
+  return {
+    title: "Profile: " + user.userName,
+    description: user.description,
+  };
+}
 
 export default async function User({ params }: { params: any }) {
   const cookie = await cookies();
@@ -24,13 +38,11 @@ export default async function User({ params }: { params: any }) {
     })
   )?.data;
   const userFollowings = (await userAPI.getUserFollowings(user._id)).data;
-  const logsResult = (await userAPI.getUserLogs(user._id)).data;
   user.raUsername && (await userAPI.setRaUserInfo(user._id, user.raUsername));
 
   return (
     <UserProfile
       user={{ ...user, followings: userFollowings }}
-      logs={logsResult}
       authUserId={authUserInfo?.id}
       authUserFollowings={authUserFollowings}
       playthroughs={playthroughs}

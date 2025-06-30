@@ -13,15 +13,16 @@ import { modal } from "../Modal";
 import { useDisableScroll, useWindowResizeAction } from "../../hooks";
 import Link from "next/link";
 import { screenGt, screenLg, screenMd, screenSm } from "../../constants";
-import { keyboardUtils } from "../../utils/keyboard";
 import { SvgSearch } from "../svg";
 import { useAsyncLoader } from "../../hooks/useAsyncLoader";
 import { useDebouncedCallback } from "use-debounce";
 import { useExpandStore } from "../../store/expand.store";
+import { useAdvancedRouter } from "../../hooks/useAdvancedRouter";
 
 export const SearchModal: FC = () => {
   const { sync, isLoading, setIsLoading } = useAsyncLoader();
   const { setExpanded } = useExpandStore();
+  const { router } = useAdvancedRouter();
 
   const [games, setGames] = useState<IGDBGameMinimal[]>();
   const [searchQuery, setSearchQuery] = useState("");
@@ -70,7 +71,12 @@ export const SearchModal: FC = () => {
           placeholder="Search..."
           autoFocus
           onChange={(e) => searchHandler(e.target.value)}
-          onKeyDown={keyboardUtils.blurOnKey}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              modal.close();
+              router.push(`/games?search=${encodeURIComponent(searchQuery)}`);
+            }
+          }}
         />
         <ButtonGroup
           wrapperClassName={styles.modal__buttons}
@@ -107,7 +113,9 @@ export const SearchModal: FC = () => {
             [styles.modal__results_loading]: isLoading,
           })}
         >
-          {games?.map((game) => <GameCard key={game._id} game={game} />)}
+          {games?.map((game) => (
+            <GameCard key={game._id} game={game} />
+          ))}
           {!!games?.length && !!total && take < total && (
             <Link
               className={styles.modal__more}
