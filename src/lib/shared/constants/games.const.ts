@@ -24,4 +24,5 @@ export const emptyGames: IGDBGameMinimal[] = Array(16)
     total_rating: 0,
     url: "",
     websites: [],
+    game_type: { _id: -1, type: "" },
   }));

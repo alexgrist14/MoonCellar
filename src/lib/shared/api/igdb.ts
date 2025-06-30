@@ -4,6 +4,7 @@ import {
   IGDBDefault,
   IGDBGame,
   IGDBGameMinimal,
+  IGDBGameType,
   IGDBGenre,
   IGDBPlatform,
   IGDBScreenshot,
@@ -90,7 +91,7 @@ const getThemes = () => {
 };
 
 const getGameTypes = () => {
-  return agent.get<IGDBDefault[]>(`${IGDB_URL}/game-types`);
+  return agent.get<IGDBGameType[]>(`${IGDB_URL}/game-types`);
 };
 
 const getKeywords = (query?: string) => {
