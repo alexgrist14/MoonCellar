@@ -58,5 +58,5 @@ export interface IUserFilter {
 
 export interface IUserPreset {
   name: string;
-  preset: string;
+  preset: number[];
 }

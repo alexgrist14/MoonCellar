@@ -5,7 +5,6 @@ import Link from "next/link";
 import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
 import { useUserStore } from "@/src/lib/shared/store/user.store";
 import { commonUtils } from "@/src/lib/shared/utils/common";
-import { gameCategories, gameCategoryNames } from "@/src/lib/shared/constants";
 import { IPlaythroughMinimal } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 
 interface IGameCardInfoProps {
@@ -55,13 +54,7 @@ export const GameCardInfo: FC<IGameCardInfoProps> = ({
           )}
         </div>
         <span className={styles.info__category}>
-          {`${
-            gameCategoryNames[
-              Object.keys(gameCategories).find(
-                (key) => gameCategories[key] === game.category
-              ) || ""
-            ]
-          }`}
+          {game.game_type.type}
           {!!game.first_release_date
             ? ` - ${new Date(game.first_release_date * 1000).getFullYear()}`
             : ""}

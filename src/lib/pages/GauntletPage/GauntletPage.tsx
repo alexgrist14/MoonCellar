@@ -10,7 +10,6 @@ import { useStatesStore } from "../../shared/store/states.store";
 import classNames from "classnames";
 import { useGamesStore } from "../../shared/store/games.store";
 import { parseQueryFilters } from "../../shared/utils/filters";
-import { useCommonStore } from "../../shared/store/common.store";
 import { Filters } from "../../shared/ui/Filters";
 import { BGImage } from "../../shared/ui/BGImage";
 import { useAdvancedRouter } from "../../shared/hooks/useAdvancedRouter";
@@ -20,7 +19,6 @@ import { shuffle } from "../../shared/utils/common";
 export const GauntletPage: FC = () => {
   const { asPath } = useAdvancedRouter();
 
-  const { setGenres, setGameModes, setSystems, setThemes } = useCommonStore();
   const { setGames, historyGames, winner } = useGamesStore();
   const {
     isLoading,
@@ -80,15 +78,6 @@ export const GauntletPage: FC = () => {
       getIGDBGames();
     }
   }, [isLoading, getIGDBGames, isRoyal]);
-
-  useEffect(() => {
-    if (isRoyal) return;
-
-    IGDBApi.getGenres().then((response) => setGenres(response.data));
-    IGDBApi.getModes().then((response) => setGameModes(response.data));
-    IGDBApi.getPlatforms().then((response) => setSystems(response.data));
-    IGDBApi.getThemes().then((response) => setThemes(response.data));
-  }, [isRoyal, setGenres, setGameModes, setSystems, setThemes]);
 
   return (
     <div className={classNames(styles.page)}>

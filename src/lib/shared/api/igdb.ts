@@ -17,6 +17,7 @@ export interface IGDBFilters {
   platforms?: number[];
   themes?: number[];
   keywords?: number[];
+  gameTypes?: number[];
 }
 
 const IGDB_URL = `${API_URL}/igdb`;
@@ -88,6 +89,10 @@ const getThemes = () => {
   return agent.get<IGDBDefault[]>(`${IGDB_URL}/themes`);
 };
 
+const getGameTypes = () => {
+  return agent.get<IGDBDefault[]>(`${IGDB_URL}/game-types`);
+};
+
 const getKeywords = (query?: string) => {
   return agent.get<IGDBDefault[]>(`${IGDB_URL}/keywords`, {
     params: { query },
@@ -113,4 +118,5 @@ export const IGDBApi = {
   getThemes,
   getKeywords,
   getKeywordsByIds,
+  getGameTypes,
 };

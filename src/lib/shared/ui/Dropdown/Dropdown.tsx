@@ -464,7 +464,7 @@ export const Dropdown = memo(
                     (!isMulti && value === item.value);
                   const isExcluded = excludeValue.includes(item.index);
 
-                  const key = `${item.value.replace(/[^W+]/g, "_")}-${index}`;
+                  const key = `${item.value?.replace(/[^W+]/g, "_")}-${index}`;
                   const icon = !!icons?.length ? icons[item.index] : "";
 
                   return (

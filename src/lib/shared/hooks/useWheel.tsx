@@ -19,6 +19,7 @@ export const useWheel = ({
       const canvas = document.getElementById(
         "wheel-canvas"
       ) as HTMLCanvasElement;
+      const wheel = document.getElementById("wheel") as HTMLCanvasElement;
 
       const X = !!canvas ? canvas.width / 2 : undefined;
       const Y = !!canvas ? canvas.height / 2 : undefined;
@@ -72,12 +73,13 @@ export const useWheel = ({
         ctx.stroke();
         ctx.fillStyle = pattern || segColors[key];
         ctx.fill();
-        ctx.lineWidth = 0.5;
+        ctx.lineWidth = 0.4;
         ctx.save();
         ctx.translate(X, Y);
         ctx.rotate((lastAngle + angle) / 2);
         ctx.fillStyle = contrastColor;
         ctx.fillText(text, size / 2 + 20, 0);
+        ctx.strokeStyle = primaryColor;
         ctx.strokeText(text, size / 2 + 20, 0);
         ctx.restore();
       };
@@ -88,12 +90,15 @@ export const useWheel = ({
       const PI2 = Math.PI * 2;
 
       let lastAngle = 0;
+      console.log(canvas.width);
+
+      canvas.width = wheel.getBoundingClientRect().width;
+      canvas.height = wheel.getBoundingClientRect().height;
 
       ctx.lineWidth = 1;
-      ctx.strokeStyle = primaryColor;
       ctx.textBaseline = "middle";
       ctx.textAlign = "center";
-      ctx.font = "bold 1em " + fontFamily;
+      ctx.font = "20px " + fontFamily;
 
       for (let i = 1; i <= len; i++) {
         const angle = PI2 * (i / len);

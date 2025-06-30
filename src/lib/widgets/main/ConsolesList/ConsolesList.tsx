@@ -6,11 +6,12 @@ import { GamesList } from "@/src/lib/shared/ui/GamesList";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { IUserPreset } from "@/src/lib/shared/types/user.type";
 import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
-import { userAPI } from "@/src/lib/shared/api";
+import { IGDBApi, userAPI } from "@/src/lib/shared/api";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { toast } from "@/src/lib/shared/utils/toast";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { SaveForm } from "@/src/lib/shared/ui/SaveForm";
+import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
 
 export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
   initialTabIndex,
@@ -99,10 +100,11 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
                   <SaveForm
                     saveCallback={(name) => {
                       !!profile &&
+                        !!royalGames?.length &&
                         userAPI
                           .addPreset(profile._id, {
                             name,
-                            preset: JSON.stringify(royalGames),
+                            preset: royalGames.map((game) => game._id),
                           })
                           .then((res) => {
                             setSavedPresets(res.data.presets);
@@ -138,7 +140,9 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
                             style: { textAlign: "start" },
                             compact: true,
                             onClick: () => {
-                              setRoyalGames(JSON.parse(preset.preset));
+                              IGDBApi.getGamesByIds({
+                                _ids: preset.preset,
+                              }).then((res) => setRoyalGames(res.data));
                             },
                           },
                           {

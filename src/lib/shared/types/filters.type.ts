@@ -24,9 +24,11 @@ export interface IGameFiltersQuery
   selectedPlatforms?: number[];
   selectedThemes?: number[];
   selectedKeywords?: number[];
+  selectedGameTypes?: number[];
   excludedGenres?: number[];
   excludedModes?: number[];
   excludedPlatforms?: number[];
   excludedThemes?: number[];
   excludedKeywords?: number[];
+  excludedGameTypes?: number[];
 }

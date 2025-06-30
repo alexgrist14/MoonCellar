@@ -23,6 +23,7 @@ export const parseQueryFilters = (pathWithQuery: string): IGameFilters => {
       platforms: filters?.selectedPlatforms,
       themes: filters?.selectedThemes,
       keywords: filters?.selectedKeywords,
+      gameTypes: filters?.selectedGameTypes,
     },
     excluded: {
       genres: filters?.excludedGenres,
@@ -30,6 +31,7 @@ export const parseQueryFilters = (pathWithQuery: string): IGameFilters => {
       platforms: filters?.excludedPlatforms,
       themes: filters?.excludedThemes,
       keywords: filters?.excludedKeywords,
+      gameTypes: filters?.excludedGameTypes,
     },
     rating: filters?.rating,
     votes: filters?.votes,
@@ -55,6 +57,8 @@ export const getFiltersForQuery = (filters: IGameFilters) => {
       excludedKeywords: filters.excluded?.keywords,
       selectedModes: filters.selected?.modes,
       excludedModes: filters.excluded?.modes,
+      selectedGameTypes: filters.selected?.gameTypes,
+      excludedGameTypes: filters.excluded?.gameTypes,
     },
     {
       arrayFormat: "bracket",

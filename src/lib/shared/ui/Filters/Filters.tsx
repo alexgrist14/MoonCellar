@@ -4,7 +4,6 @@ import { useCommonStore } from "../../store/common.store";
 import { useStatesStore } from "../../store/states.store";
 import { Input } from "../Input";
 import { Dropdown } from "../Dropdown";
-import { gameCategories, gameCategoryNames } from "../../constants";
 import { ButtonGroup } from "../Button/ButtonGroup";
 import { ToggleSwitch } from "../ToggleSwitch";
 import { IGameFilters } from "../../types/filters.type";
@@ -37,7 +36,7 @@ export const Filters: FC<{
   const [savedFilters, setSavedFilters] = useState<IUserFilter[]>();
   const [keywordsList, setKeywordsList] = useState<IGDBDefault[]>([]);
 
-  const { themes, systems, genres, gameModes } = useCommonStore();
+  const { themes, systems, genres, gameModes, gameTypes } = useCommonStore();
   const { isLoading, isPlatformsLoading, isExcludeHistory, setExcludeHistory } =
     useStatesStore();
 
@@ -201,37 +200,24 @@ export const Filters: FC<{
             </div>
           </div>
           <div className={styles.filters__wrapper}>
-            <h4>Categories</h4>
+            <h4>Game types</h4>
             <Dropdown
               isWithReset
+              isMulti
+              isWithExclude
               overflowRootId="filters"
               isDisabled={isLoading}
-              list={Object.keys(gameCategories).map(
-                (item) => gameCategoryNames[item]
-              )}
-              isMulti
-              overwriteValue={
-                filters?.categories
-                  ?.map((item) => gameCategoryNames[item])
-                  ?.join(", ") || ""
+              list={gameTypes?.map((item) => item.type) || []}
+              overwriteValue={getValue("gameTypes")}
+              initialMultiValue={getSelectedArray("gameTypes", gameTypes)}
+              initialExcludeValue={getExcludedArray("gameTypes", gameTypes)}
+              placeholder="Select game types..."
+              getIndexes={(indexes) =>
+                setSelected("gameTypes", indexes, gameTypes)
               }
-              initialMultiValue={
-                filters?.categories?.map((item) =>
-                  Object.keys(gameCategories).findIndex((key) => key === item)
-                ) || []
+              getExcludeIndexes={(indexes) =>
+                setExcluded("gameTypes", indexes, gameTypes)
               }
-              placeholder="Select categories..."
-              getIndexes={(indexes) => {
-                const temp = {
-                  ...filters,
-                  categories: !!indexes?.length
-                    ? indexes.map((index) => Object.keys(gameCategories)[index])
-                    : [],
-                };
-
-                setFilters(temp);
-                isGauntlet && pushFiltersToQuery(temp, router, pathname);
-              }}
             />
           </div>
           <div className={styles.filters__wrapper}>

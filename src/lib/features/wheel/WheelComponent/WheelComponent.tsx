@@ -150,8 +150,6 @@ export const WheelComponent: FC<WheelComponentProps> = ({
       <canvas
         id="wheel-canvas"
         className={styles.canvas}
-        width="600"
-        height="600"
         style={{
           rotate: `${winnerAngle}deg`,
           transition: `${time}s`,

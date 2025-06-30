@@ -33,6 +33,7 @@ export interface IGDBGame extends IGDBDefault {
   url: string;
   release_dates: IGDBReleaseDate[];
   raIds?: IRAGame[];
+  game_type: IGDBGameType;
 }
 
 export interface IGDBGameMinimal
@@ -112,4 +113,9 @@ export interface IGDBScreenshot {
   url: string;
   width: number;
   height: number;
+}
+
+export interface IGDBGameType {
+  _id: number;
+  type: string;
 }

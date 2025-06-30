@@ -5,7 +5,6 @@ import styles from "./GamesPage.module.scss";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { Filters } from "../../shared/ui/Filters";
 import { IGDBApi } from "../../shared/api";
-import { useCommonStore } from "../../shared/store/common.store";
 import { IGDBGameMinimal } from "../../shared/types/igdb";
 import { GameCard } from "../../shared/ui/GameCard";
 import { useDebouncedCallback } from "use-debounce";
@@ -23,8 +22,6 @@ import { useAsyncLoader } from "../../shared/hooks/useAsyncLoader";
 export const GamesPage = () => {
   const { sync, isLoading, setIsLoading } = useAsyncLoader();
   const { asPath, query } = useAdvancedRouter();
-
-  const { setGenres, setGameModes, setSystems, setThemes } = useCommonStore();
 
   const [games, setGames] = useState<IGDBGameMinimal[]>();
   const [total, setTotal] = useState(0);
@@ -44,14 +41,6 @@ export const GamesPage = () => {
       })
     );
   }, 200);
-
-  useEffect(() => {
-    IGDBApi.getGenres().then((response) => setGenres(response.data));
-    IGDBApi.getModes().then((response) => setGameModes(response.data));
-    IGDBApi.getPlatforms().then((response) => setSystems(response.data));
-    IGDBApi.getThemes().then((response) => setThemes(response.data));
-    IGDBApi.getThemes().then((response) => setThemes(response.data));
-  }, [setGenres, setGameModes, setSystems, setThemes]);
 
   useEffect(() => {
     debouncedGamesFetch(Number(query.get("page") as string));

@@ -59,9 +59,6 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
   if (!game) return null;
 
   const releaseDate = new Date(game.first_release_date * 1000).getFullYear();
-  const category = Object.keys(gameCategories).find(
-    (key) => gameCategories[key] === game.category
-  );
 
   return (
     <>
@@ -119,14 +116,12 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
                 </Link>
               </p>
             )}
-            {!!category && (
-              <p>
-                <span>Category: </span>
-                <Link href={`/games?categories[]=${category}`}>
-                  {gameCategoryNames[category]}
-                </Link>
-              </p>
-            )}
+            <p>
+              <span>Game type: </span>
+              <Link href={`/games?selectedGameTypes[]=${game.game_type._id}`}>
+                {game.game_type.type}
+              </Link>
+            </p>
           </div>
           <div className={styles.page__developers}>
             {game.involved_companies.some((comp) => comp.developer) && (
