@@ -10,6 +10,7 @@
   overflow: hidden;
   padding: 10px;
   filter: drop-shadow(0 0 0.4rem $accent);
+  border-radius: 50%;
 
   @include mediaMd {
     height: 100%;

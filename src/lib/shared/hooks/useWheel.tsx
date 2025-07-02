@@ -7,12 +7,10 @@ export const useWheel = ({
   contrastColor = "white",
   fontFamily = "pentagra",
   primaryColor = "black",
-  size = 290,
 }: {
   primaryColor?: string;
   contrastColor?: string;
   fontFamily?: string;
-  size?: number;
 }) => {
   const drawWheel = useCallback(
     (images: HTMLImageElement[], wheelGames: IGDBGameMinimal[]) => {
@@ -21,9 +19,17 @@ export const useWheel = ({
       ) as HTMLCanvasElement;
       const wheel = document.getElementById("wheel") as HTMLCanvasElement;
 
-      const X = !!canvas ? canvas.width / 2 : undefined;
-      const Y = !!canvas ? canvas.height / 2 : undefined;
+      const wheelWidth = wheel.getBoundingClientRect().width;
+      const wheelHeight = wheel.getBoundingClientRect().height;
+
+      canvas.width = wheelWidth;
+      canvas.height = wheelHeight;
+
+      const X = !!canvas ? wheelWidth / 2 : undefined;
+      const Y = !!canvas ? wheelHeight / 2 : undefined;
+
       const ctx = !!canvas ? canvas.getContext("2d") : undefined;
+      const size = (wheelWidth - 100) / 2;
 
       if (!wheelGames?.length || !ctx || !X || !Y) return;
 
@@ -72,6 +78,7 @@ export const useWheel = ({
         ctx.lineWidth = 1;
         ctx.stroke();
         ctx.fillStyle = pattern || segColors[key];
+        // !!images[key] && ctx.drawImage(images[key], X, Y, size * 2, size * 2)
         ctx.fill();
         ctx.lineWidth = 0.4;
         ctx.save();
@@ -86,14 +93,11 @@ export const useWheel = ({
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const len = wheelGames.length;
+      const len = wheelGames.length || 16;
       const PI2 = Math.PI * 2;
 
       let lastAngle = 0;
       console.log(canvas.width);
-
-      canvas.width = wheel.getBoundingClientRect().width;
-      canvas.height = wheel.getBoundingClientRect().height;
 
       ctx.lineWidth = 1;
       ctx.textBaseline = "middle";
@@ -109,14 +113,14 @@ export const useWheel = ({
       }
 
       ctx.beginPath();
-      ctx.arc(X, Y, size, 0, PI2, false);
+      ctx.arc(X, Y, size, 0, PI2);
       ctx.closePath();
 
       ctx.lineWidth = 3;
       ctx.strokeStyle = primaryColor;
       ctx.stroke();
     },
-    [contrastColor, primaryColor, fontFamily, size]
+    [contrastColor, primaryColor, fontFamily]
   );
 
   const parseImages = useCallback(async (wheelGames: IGDBGameMinimal[]) => {
