@@ -13,7 +13,6 @@ interface WheelComponentProps {
   primaryColor?: string;
   contrastColor?: string;
   buttonText: string;
-  size?: number;
   fontFamily?: string;
   time?: number;
 }
@@ -23,7 +22,6 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   contrastColor = "white",
   fontFamily = "pentagra",
   primaryColor = "black",
-  size = 290,
   time = 5,
 }) => {
   const { addHistoryGame, setWinner, games, setRoyalGames, royalGames } =
@@ -46,7 +44,6 @@ export const WheelComponent: FC<WheelComponentProps> = ({
     contrastColor,
     fontFamily,
     primaryColor,
-    size,
   });
 
   useEffect(() => {
