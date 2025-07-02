@@ -65,21 +65,28 @@ export const useWheel = ({
         const text =
           value?.length > 19 ? value.slice(0, 20) + "..." : value || "";
 
-        const pattern = !!images[key]
-          ? ctx.createPattern(images[key], "no-repeat")
-          : undefined;
-
-        ctx.save();
         ctx.beginPath();
         ctx.moveTo(X, Y);
         ctx.arc(X, Y, size, lastAngle, angle, false);
         ctx.lineTo(X, Y);
         ctx.closePath();
+
         ctx.lineWidth = 1;
         ctx.stroke();
-        ctx.fillStyle = pattern || segColors[key];
-        // !!images[key] && ctx.drawImage(images[key], X, Y, size * 2, size * 2)
+        ctx.fillStyle = segColors[key];
         ctx.fill();
+
+        ctx.save();
+
+        ctx.beginPath();
+        ctx.moveTo(X, Y);
+        ctx.arc(X, Y, size, lastAngle, angle, false);
+        ctx.closePath();
+        ctx.clip();
+        !!images[key] &&
+          ctx.drawImage(images[key], X - size, Y - size, size * 2, size * 2);
+
+        ctx.restore();
         ctx.lineWidth = 0.4;
         ctx.save();
         ctx.translate(X, Y);
@@ -97,7 +104,6 @@ export const useWheel = ({
       const PI2 = Math.PI * 2;
 
       let lastAngle = 0;
-      console.log(canvas.width);
 
       ctx.lineWidth = 1;
       ctx.textBaseline = "middle";
