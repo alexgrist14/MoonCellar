@@ -19,7 +19,6 @@ export interface ILogs {
   text: string;
   gameId: number;
   userId: string;
-  game: Game[];
 }
 
 interface Game {

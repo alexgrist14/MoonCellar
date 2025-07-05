@@ -201,7 +201,7 @@
       &__img {
         border-radius: $radius;
 
-        img {
+       & > img {
           max-height: calc(240px / $coverRatio);
           max-width: 240px;
           aspect-ratio: $coverRatio;

@@ -1,4 +1,4 @@
-import { userAPI } from "@/src/lib/shared/api";
+import { IGDBApi, userAPI } from "@/src/lib/shared/api";
 import { getImageLink } from "@/src/lib/shared/constants";
 import { IUser } from "@/src/lib/shared/types/auth";
 import { IFollowings, ILogs } from "@/src/lib/shared/types/user.type";
@@ -13,6 +13,8 @@ import Markdown from "react-markdown";
 import { Interweave } from "interweave";
 import { useAsyncLoader } from "@/src/lib/shared/hooks/useAsyncLoader";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
+import { Cover } from "@/src/lib/shared/ui/Cover";
 
 interface UserInfoProps {
   user: IUser;
@@ -28,7 +30,7 @@ const UserInfo: FC<UserInfoProps> = ({
   const { sync, isLoading } = useAsyncLoader();
   const { _id: id, followings: userFollowings, userName } = user;
 
-  const [logs, setLogs] = useState<ILogs[]>([]);
+  const [logs, setLogs] = useState<(ILogs & { game: IGDBGameMinimal })[]>([]);
   const [userAuthFollowings, setUserAuthFollowings] = useState<IFollowings>(
     authUserFollowings || { followings: [] }
   );
@@ -51,7 +53,17 @@ const UserInfo: FC<UserInfoProps> = ({
   };
 
   useEffect(() => {
-    sync(() => userAPI.getUserLogs(user._id).then((res) => setLogs(res.data)));
+    sync(() =>
+      userAPI.getUserLogs(user._id).then((res) => {
+        IGDBApi.getGamesByIds({ _ids: res.data.map((log) => log.gameId) }).then(
+          (gamesRes) => {
+            setLogs(
+              res.data.map((log, i) => ({ ...log, game: gamesRes.data[i] }))
+            );
+          }
+        );
+      })
+    );
   }, [user, sync]);
 
   return (
@@ -110,30 +122,41 @@ const UserInfo: FC<UserInfoProps> = ({
           {isLoading && <Loader type="moon" />}
           {!isLoading && logs?.length > 0 && (
             <div className={styles.activity__list}>
-              {logs.map((log, i) => (
-                <div className={styles.item} key={i}>
-                  <Link
-                    href={`/games/${log.game[0].slug}`}
-                    className={styles.item__img}
-                    target="_blank"
-                  >
-                    <Image
-                      width={70}
-                      height={110}
-                      src={getImageLink(log.game[0].cover.url, "cover_big")}
-                      style={{ width: "80px", height: "120px" }}
-                      alt="cover"
-                    />
-                  </Link>
-                  <div className={styles.item__text}>
-                    <p>{log.game[0].name}</p>
-                    <Interweave content={log.text} />
-                    <p className={styles.date}>
-                      {commonUtils.getHumanDate(log.date)}
-                    </p>
+              {logs.map((log, i) => {
+                if (!log.game) return null;
+
+                return (
+                  <div className={styles.item} key={i}>
+                    <Link
+                      href={`/games/${log.game?.slug}`}
+                      className={styles.item__img}
+                      target="_blank"
+                    >
+                      {!!log.game?.cover?.url ? (
+                        <Image
+                          width={70}
+                          height={110}
+                          src={getImageLink(log.game.cover.url, "cover_big")}
+                          style={{ width: "80px", height: "120px" }}
+                          alt="cover"
+                        />
+                      ) : (
+                        <Cover
+                          isWithoutText
+                          style={{ width: "80px", height: "120px" }}
+                        />
+                      )}
+                    </Link>
+                    <div className={styles.item__text}>
+                      <p>{log.game.name}</p>
+                      <Interweave content={log.text} />
+                      <p className={styles.date}>
+                        {commonUtils.getHumanDate(log.date)}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
