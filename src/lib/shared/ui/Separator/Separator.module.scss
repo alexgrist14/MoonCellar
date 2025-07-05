@@ -3,4 +3,9 @@
   border-radius: $radius;
   height: 100%;
   background-color: $lightBg;
+
+  &_horizontal {
+    height: 2px;
+    width: 100%;
+  }
 }

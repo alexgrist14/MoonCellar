@@ -33,7 +33,7 @@ export default async function User({ params }: { params: any }) {
 
   const user = (await userAPI.getByName((await params).name)).data;
   const playthroughs = (
-    await gamesAPI.getPlaythroughsMinimal({
+    await gamesAPI.getPlaythroughs({
       userId: user._id,
     })
   )?.data;

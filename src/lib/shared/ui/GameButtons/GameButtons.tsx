@@ -20,6 +20,7 @@ export const GameButtons: FC<{ game: IGDBGameMinimal }> = ({ game }) => {
         <WrapperTemplate
           title="RetroAchievements"
           contentStyle={{ padding: "5px" }}
+          isWithoutBorder
         >
           <ButtonGroup
             wrapperClassName={styles.actions}

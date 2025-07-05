@@ -13,20 +13,23 @@ import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./UserGames.module.scss";
 import { useSearchParams } from "next/navigation";
 import useCloseEvents from "@/src/lib/shared/hooks/useCloseEvents";
-import { IPlaythroughMinimal } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
+import { IPlaythrough } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 import { useDebouncedCallback } from "use-debounce";
 import { useAsyncLoader } from "@/src/lib/shared/hooks/useAsyncLoader";
 import { accentColor, accentColorRGB } from "@/src/lib/shared/constants";
 import { commonUtils } from "@/src/lib/shared/utils/common";
+import { modal } from "@/src/lib/shared/ui/Modal";
+import { GamePlaysInfo } from "@/src/lib/entities/game/ui/GamePlaysInfo";
 
 interface UserGamesProps {
   gamesRating: IGamesRating[];
-  playthroughs: IPlaythroughMinimal[];
+  playthroughs: IPlaythrough[];
 }
 
 const take = 30;
 const sortOptions = [
   { label: SortType.DATE_ADDED },
+  // { label: SortType.DATE_COMPLETED },
   { label: SortType.RATING },
   // { label: SortType.TITLE },
 ];
@@ -52,8 +55,6 @@ export const UserGames: FC<UserGamesProps> = ({
   const [games, setGames] = useState<IGDBGameMinimal[]>();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const playthroughsCount = useRef<{ [key: number]: number }>({});
-
   const parsedGamesRatings = useMemo(() => {
     return gamesRating.reduce(
       (res: { [key: number]: number }, rating) => ({
@@ -71,17 +72,13 @@ export const UserGames: FC<UserGamesProps> = ({
           (play.category === list && !play.isMastered) ||
           (list === "mastered" && play.isMastered)
       )
-      .reduce((res: IPlaythroughMinimal[], play) => {
+      .reduce((res: IPlaythrough[], play) => {
         let existed = res.find((item) => item.gameId === play.gameId);
         if (!!existed) {
           new Date(existed.updatedAt).getTime() <
             new Date(play.updatedAt).getTime() && (existed = play);
-
-          playthroughsCount.current[play.gameId]++;
         } else {
           res.push(play);
-
-          playthroughsCount.current[play.gameId] = 1;
         }
 
         return res;
@@ -117,6 +114,14 @@ export const UserGames: FC<UserGamesProps> = ({
           return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
         });
         break;
+      // case SortType.DATE_COMPLETED:
+      //   plays?.sort((a, b) => {
+      //     const dateA = !!a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+      //     const dateB = !!b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+      //
+      //     return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+      //   });
+      //   break;
     }
 
     return plays.map((play) => play.gameId);
@@ -198,14 +203,31 @@ export const UserGames: FC<UserGamesProps> = ({
             <div key={game._id} className={styles.games__game}>
               <GameCard game={game} />
               <div className={styles.games__info}>
-                <div className={styles.games__text}>
+                <div
+                  className={styles.games__text}
+                  onClick={() =>
+                    modal.open(
+                      <GamePlaysInfo
+                        gameName={game.name}
+                        playthroughs={playthroughs.filter(
+                          (play) => play.gameId === game._id
+                        )}
+                      />
+                    )
+                  }
+                >
                   <p className={styles.games__title}>{game.name}</p>
-                  {playthroughsCount.current[game._id] > 1 && (
+                  {playthroughs.filter((play) => play.gameId === game._id)
+                    .length > 1 && (
                     <p className={styles.games__plays}>
-                      {playthroughsCount.current[game._id]}{" "}
+                      {
+                        playthroughs.filter((play) => play.gameId === game._id)
+                          .length
+                      }{" "}
                       {commonUtils.addLastS(
                         "Playthrough",
-                        playthroughsCount.current[game._id]
+                        playthroughs.filter((play) => play.gameId === game._id)
+                          .length
                       )}
                     </p>
                   )}

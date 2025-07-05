@@ -16,13 +16,13 @@ import { SvgBurger } from "../../shared/ui/svg";
 import { useStatesStore } from "../../shared/store/states.store";
 import { useSearchParams } from "next/navigation";
 import { UserNavigation } from "../../features/user/ui/UserNavigation";
-import { IPlaythroughMinimal } from "../../shared/lib/schemas/playthroughs.schema";
+import { IPlaythrough } from "../../shared/lib/schemas/playthroughs.schema";
 
 interface UserProfileProps {
   user: IUser;
   authUserFollowings?: IFollowings;
   authUserId?: string;
-  playthroughs: IPlaythroughMinimal[];
+  playthroughs: IPlaythrough[];
 }
 
 const UserProfile: FC<UserProfileProps> = ({

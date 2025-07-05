@@ -33,8 +33,8 @@ export const GameCard = memo(
     const { isMobile } = useStatesStore();
     const { playthroughs } = useUserStore();
 
-    const playthrough = useMemo(() => {
-      return playthroughs?.findLast((play) => play.gameId === game._id);
+    const filteredPlaythroughs = useMemo(() => {
+      return playthroughs?.filter((play) => play.gameId === game._id);
     }, [playthroughs, game]);
 
     const { isMastered, isBeaten } = useMemo(() => {
@@ -70,10 +70,12 @@ export const GameCard = memo(
           className={classNames(
             styles.card,
             className,
-            !!playthrough &&
-              !playthrough.isMastered &&
-              styles[`card_${playthrough.category}`],
-            !!playthrough && playthrough.isMastered && styles.card_mastered
+            filteredPlaythroughs?.map(
+              (play) => styles[`card_${play.category}`]
+            ),
+            !!filteredPlaythroughs &&
+              filteredPlaythroughs.some((play) => play.isMastered) &&
+              styles.card_mastered
           )}
           style={style}
           onMouseEnter={() => setIsHover(true)}
@@ -105,7 +107,7 @@ export const GameCard = memo(
                 <GameControls className={styles.card__controls} game={game} />
               }
               game={game}
-              playthrough={playthrough}
+              playthroughs={filteredPlaythroughs}
             />
           )}
           {!!game?.cover ? (

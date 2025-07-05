@@ -1,0 +1,17 @@
+.plays {
+  display: grid;
+  gap: 20px;
+  min-width: 250px;
+
+  &__play {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  &__top {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+}

@@ -1,5 +1,6 @@
 import { CSSProperties, FC } from "react";
 import styles from "./Separator.module.scss";
+import classNames from "classnames";
 
 interface ISeparatorProps {
   direction?: "vertical" | "horizontal";
@@ -12,8 +13,11 @@ export const Separator: FC<ISeparatorProps> = ({
 }) => {
   return (
     <div
-      className={styles.separator}
-      style={{ rotate: direction === "vertical" ? "0" : "90deg", ...style }}
+      className={classNames(
+        styles.separator,
+        direction === "horizontal" && styles.separator_horizontal
+      )}
+      style={style}
     ></div>
   );
 };

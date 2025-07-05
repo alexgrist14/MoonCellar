@@ -1,39 +1,33 @@
-import { FC, ReactNode, useMemo, useRef } from "react";
+import { FC, ReactNode, useRef } from "react";
 import styles from "./GameCardInfo.module.scss";
 import classNames from "classnames";
 import Link from "next/link";
 import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
-import { useUserStore } from "@/src/lib/shared/store/user.store";
 import { commonUtils } from "@/src/lib/shared/utils/common";
 import { IPlaythroughMinimal } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 
 interface IGameCardInfoProps {
   bottomNode: ReactNode;
   game: IGDBGameMinimal;
-  playthrough?: IPlaythroughMinimal;
+  playthroughs?: IPlaythroughMinimal[];
 }
 
 export const GameCardInfo: FC<IGameCardInfoProps> = ({
   bottomNode,
   game,
-  playthrough,
+  playthroughs,
 }) => {
   const infoRef = useRef<HTMLDivElement>(null);
-  const { playthroughs } = useUserStore();
-
-  const playthroughsCount = useMemo(() => {
-    return playthroughs?.filter((play) => play.gameId === game._id).length;
-  }, [playthroughs, game]);
 
   return (
     <div
       id="game-info"
       className={classNames(
         styles.info,
-        !!playthrough &&
-          !playthrough.isMastered &&
-          styles[`info_${playthrough.category}`],
-        !!playthrough && playthrough.isMastered && styles.info_mastered
+        playthroughs?.map((play) => styles[`info_${play.category}`]),
+        !!playthroughs &&
+          playthroughs.some((play) => play.isMastered) &&
+          styles.info_mastered
       )}
     >
       <Link
@@ -43,10 +37,10 @@ export const GameCardInfo: FC<IGameCardInfoProps> = ({
       >
         <div className={styles.info__top}>
           <p>{game.name}</p>
-          {!!playthroughsCount && playthroughsCount > 1 && (
+          {!!playthroughs && playthroughs.length > 1 && (
             <span>
-              ( {playthroughsCount}{" "}
-              {commonUtils.addLastS("Playthrough", playthroughsCount)} )
+              ( {playthroughs.length}{" "}
+              {commonUtils.addLastS("Playthrough", playthroughs.length)} )
             </span>
           )}
           {!!game.summary && (infoRef.current?.clientHeight || 0) >= 140 && (

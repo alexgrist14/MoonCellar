@@ -11,14 +11,14 @@ import { commonUtils } from "@/src/lib/shared/utils/common";
 import classNames from "classnames";
 import { SvgPen, SvgSettings } from "@/src/lib/shared/ui/svg";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
-import { IPlaythroughMinimal } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
+import { IPlaythrough } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
 import { useExpandStore } from "@/src/lib/shared/store/expand.store";
 
 export const UserNavigation: FC<{
   isAuthedUser: boolean;
   user: IUser;
-  playthroughs: IPlaythroughMinimal[];
+  playthroughs: IPlaythrough[];
 }> = ({ isAuthedUser, user, playthroughs }) => {
   const { setQuery, query } = useAdvancedRouter();
 
@@ -49,29 +49,34 @@ export const UserNavigation: FC<{
         </Button>
       </WrapperTemplate>
       <WrapperTemplate isWithBlur={!isMobile}>
-        {userListCategories.map((category, i) => (
-          <Button
-            key={category + i}
-            className={styles.btn}
-            active={query.get("list") === category}
-            color="transparent"
-            onClick={() => {
-              setExpanded([]);
-              setQuery({ list: category.toLowerCase(), page: 1 });
-            }}
-          >
-            <span>{commonUtils.upFL(category)}</span>
-            <span>
-              {
-                playthroughs?.filter(
-                  (play) =>
-                    (play.category === category && !play.isMastered) ||
-                    (category === "mastered" && play.isMastered)
-                ).length
-              }
-            </span>
-          </Button>
-        ))}
+        {userListCategories.map((category, i) => {
+          const plays = playthroughs?.reduce((res: IPlaythrough[], play) => {
+            if (
+              ((play.category === category && !play.isMastered) ||
+                (category === "mastered" && play.isMastered)) &&
+              !res.some((p) => p.gameId === play.gameId)
+            ) {
+              res.push(play);
+            }
+            return res;
+          }, []);
+
+          return (
+            <Button
+              key={category + i}
+              className={styles.btn}
+              active={query.get("list") === category}
+              color="transparent"
+              onClick={() => {
+                setExpanded([]);
+                setQuery({ list: category.toLowerCase(), page: 1 });
+              }}
+            >
+              <span>{commonUtils.upFL(category)}</span>
+              <span>{plays.length}</span>
+            </Button>
+          );
+        })}
         {isAuthedUser && (
           <Button
             color="transparent"

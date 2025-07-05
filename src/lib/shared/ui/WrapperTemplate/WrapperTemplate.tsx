@@ -18,6 +18,7 @@ interface IWrapperTemplateProps {
   classNameContent?: string;
   isWithScrollBar?: boolean;
   isWithBlur?: boolean;
+  isWithoutBorder?: boolean;
 }
 
 export const WrapperTemplate: FC<IWrapperTemplateProps> = ({
@@ -29,6 +30,7 @@ export const WrapperTemplate: FC<IWrapperTemplateProps> = ({
   classNameContent,
   isWithScrollBar,
   isWithBlur,
+  isWithoutBorder,
   ...headProps
 }) => {
   const { ref } = useResizeDetector({
@@ -44,7 +46,10 @@ export const WrapperTemplate: FC<IWrapperTemplateProps> = ({
           backdropFilter: isWithBlur ? "blur(6px)" : undefined,
           ...templateStyle,
         }}
-        className={styles.template}
+        className={cn(
+          styles.template,
+          isWithoutBorder && styles.template_borderless
+        )}
       >
         <WrapperTemplateHead {...headProps} />
         <div
