@@ -16,7 +16,9 @@ export async function generateMetadata({
     description: game.summary,
     other: {
       url: `https://mooncellar.space/games/${game.slug}`,
-      image: getImageLink(game.cover.url, "cover_small"),
+      ...(!!game.cover?.url && {
+        image: getImageLink(game.cover.url, "cover_small"),
+      }),
     },
   };
 }
