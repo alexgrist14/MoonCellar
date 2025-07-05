@@ -30,7 +30,7 @@ const UserInfo: FC<UserInfoProps> = ({
   const { sync, isLoading } = useAsyncLoader();
   const { _id: id, followings: userFollowings, userName } = user;
 
-  const [logs, setLogs] = useState<(ILogs & { game: IGDBGameMinimal })[]>([]);
+  const [logs, setLogs] = useState<(ILogs & { game?: IGDBGameMinimal })[]>([]);
   const [userAuthFollowings, setUserAuthFollowings] = useState<IFollowings>(
     authUserFollowings || { followings: [] }
   );
@@ -53,17 +53,20 @@ const UserInfo: FC<UserInfoProps> = ({
   };
 
   useEffect(() => {
-    sync(() =>
-      userAPI.getUserLogs(user._id).then((res) => {
-        IGDBApi.getGamesByIds({ _ids: res.data.map((log) => log.gameId) }).then(
-          (gamesRes) => {
-            setLogs(
-              res.data.map((log, i) => ({ ...log, game: gamesRes.data[i] }))
-            );
-          }
-        );
-      })
-    );
+    sync(async () => {
+      const logsRes = await userAPI.getUserLogs(user._id);
+
+      const _ids = logsRes.data.map((log) => log.gameId);
+
+      const gamesRes = await IGDBApi.getGamesByIds({ _ids });
+
+      return setLogs(
+        logsRes.data.map((log) => ({
+          ...log,
+          game: gamesRes.data.find((game) => log.gameId === game._id),
+        }))
+      );
+    });
   }, [user, sync]);
 
   return (
