@@ -50,7 +50,7 @@ export const GauntletPage: FC = () => {
 
         setGames(games);
         parseImages(games).then((images) => {
-          drawWheel(images, games);
+          drawWheel({ images, wheelGames: games });
 
           setLoading(false);
           setStarted(true);

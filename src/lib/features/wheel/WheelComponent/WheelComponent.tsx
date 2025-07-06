@@ -22,7 +22,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   contrastColor = "white",
   fontFamily = "pentagra",
   primaryColor = "black",
-  time = 5,
+  time = 3,
 }) => {
   const { addHistoryGame, setWinner, games, setRoyalGames, royalGames } =
     useGamesStore();
@@ -52,7 +52,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
     if (isStarted && !!wheelGames?.length) {
       const winner = Math.floor(Math.random() * wheelGames.length);
 
-      angle.current += 360 * Math.ceil(time);
+      angle.current += 360 + 360 * Math.ceil(time);
 
       setWinnerAngle(
         angle.current +
@@ -105,7 +105,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   }, [games, royalGames, isRoyal]);
 
   useEffect(() => {
-    drawWheel([], emptyGames);
+    drawWheel({ wheelGames: emptyGames });
   }, [drawWheel, isRoyal]);
 
   return (
@@ -127,7 +127,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
             if (isRoyal) {
               !!tempGames?.length &&
                 parseImages(tempGames).then((images) => {
-                  drawWheel(images, tempGames);
+                  drawWheel({ images, wheelGames: tempGames });
                   setStarted(true);
                 });
             } else {

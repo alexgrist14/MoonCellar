@@ -3,6 +3,12 @@ import { IGDBGameMinimal } from "../types/igdb";
 import { getImageLink } from "../constants";
 import { createImage } from "../utils/image";
 
+interface IDrawProps {
+  images?: HTMLImageElement[];
+  wheelGames?: IGDBGameMinimal[];
+  winnerId?: number;
+}
+
 export const useWheel = ({
   contrastColor = "white",
   fontFamily = "pentagra",
@@ -13,23 +19,23 @@ export const useWheel = ({
   fontFamily?: string;
 }) => {
   const drawWheel = useCallback(
-    (images: HTMLImageElement[], wheelGames: IGDBGameMinimal[]) => {
+    ({ wheelGames, winnerId, images }: IDrawProps) => {
       const canvas = document.getElementById(
         "wheel-canvas"
       ) as HTMLCanvasElement;
-      const wheel = document.getElementById("wheel") as HTMLCanvasElement;
+      const wheel = document.getElementById("wheel");
 
-      const wheelWidth = wheel.getBoundingClientRect().width;
-      const wheelHeight = wheel.getBoundingClientRect().height;
+      const wheelWidth = wheel?.getBoundingClientRect().width || 0;
+      const wheelHeight = wheel?.getBoundingClientRect().height || 0;
 
-      canvas.width = wheelWidth;
-      canvas.height = wheelHeight;
+      canvas.width = wheelWidth || 0;
+      canvas.height = wheelHeight || 0;
 
-      const X = !!canvas ? wheelWidth / 2 : undefined;
-      const Y = !!canvas ? wheelHeight / 2 : undefined;
+      const X = !!canvas && wheelWidth ? wheelWidth / 2 : undefined;
+      const Y = !!canvas && wheelHeight ? wheelHeight / 2 : undefined;
 
       const ctx = !!canvas ? canvas.getContext("2d") : undefined;
-      const size = (wheelWidth - 100) / 2;
+      const size = !!wheelWidth ? (wheelWidth - 10) / 2 : 0;
 
       if (!wheelGames?.length || !ctx || !X || !Y) return;
 
@@ -78,23 +84,31 @@ export const useWheel = ({
 
         ctx.save();
 
+        console.log(winnerId);
+        winnerId === wheelGames[key]._id
+          ? (ctx.globalAlpha = 1)
+          : (ctx.globalAlpha = 0.5);
         ctx.beginPath();
         ctx.moveTo(X, Y);
         ctx.arc(X, Y, size, lastAngle, angle, false);
         ctx.closePath();
         ctx.clip();
-        !!images[key] &&
+        !!images?.[key] &&
           ctx.drawImage(images[key], X - size, Y - size, size * 2, size * 2);
 
         ctx.restore();
-        ctx.lineWidth = 0.4;
+
+        ctx.lineWidth = 0.5;
+
         ctx.save();
+
         ctx.translate(X, Y);
         ctx.rotate((lastAngle + angle) / 2);
         ctx.fillStyle = contrastColor;
-        ctx.fillText(text, size / 2 + 20, 0);
+        ctx.fillText(text, size / 2, 0, size);
         ctx.strokeStyle = primaryColor;
-        ctx.strokeText(text, size / 2 + 20, 0);
+        ctx.strokeText(text, size / 2, 0, size);
+
         ctx.restore();
       };
 
