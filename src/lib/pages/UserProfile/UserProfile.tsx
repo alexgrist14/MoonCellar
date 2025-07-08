@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useMemo } from "react";
+import { FC, useEffect, useMemo } from "react";
 import { userListCategories } from "../../shared/constants/user.const";
 import { IUser } from "../../shared/types/auth";
 import { IFollowings } from "../../shared/types/user.type";
@@ -17,6 +17,7 @@ import { useStatesStore } from "../../shared/store/states.store";
 import { useSearchParams } from "next/navigation";
 import { UserNavigation } from "../../features/user/ui/UserNavigation";
 import { IPlaythrough } from "../../shared/lib/schemas/playthroughs.schema";
+import { userAPI } from "../../shared/api";
 
 interface UserProfileProps {
   user: IUser;
@@ -38,6 +39,13 @@ const UserProfile: FC<UserProfileProps> = ({
     () => authUserId === user._id,
     [authUserId, user]
   );
+
+  useEffect(() => {
+    if (isAuthedUser) {
+      userAPI.updateUserTime(user._id);
+    }
+  }, [isAuthedUser, user._id]);
+
   const tab = useMemo(
     () => (!!query?.get("list") ? (query.get("list") as string) : "profile"),
     [query]
