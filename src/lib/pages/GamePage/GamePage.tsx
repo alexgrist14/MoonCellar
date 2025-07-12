@@ -4,12 +4,7 @@ import { FC, useMemo, useState } from "react";
 import styles from "./GamePage.module.scss";
 import Image from "next/image";
 import { IGDBGame } from "../../shared/types/igdb";
-import {
-  dateRegions,
-  gameCategories,
-  gameCategoryNames,
-  getImageLink,
-} from "../../shared/constants";
+import { dateRegions, getImageLink } from "../../shared/constants";
 import { Slideshow } from "../../shared/ui/Slideshow";
 import Link from "next/link";
 import { Cover } from "../../shared/ui/Cover";

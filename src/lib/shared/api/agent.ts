@@ -10,7 +10,7 @@ export const agent = axios.create({
 
 agent.interceptors.response.use(
   (response) => response,
-  (err: AxiosError) => {
+  (err: AxiosError<{ message: string }>) => {
     const { config } = err;
 
     if (
@@ -31,6 +31,9 @@ agent.interceptors.response.use(
           })
       );
     } else {
+      const errorMessage = err?.response?.data?.message ?? "unknown";
+
+      toast.error({ title: "Error", description: errorMessage });
       return Promise.reject(err);
     }
   }
