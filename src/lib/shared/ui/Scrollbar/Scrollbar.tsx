@@ -114,6 +114,9 @@ export const Scrollbar: FC<IScrollBarProps> = ({
 
   const handleThumbMouseDown = useCallback(
     (e: React.MouseEvent | React.TouchEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
       const clientDir = isHorizontal ? "clientX" : "clientY";
       const pageDir = isHorizontal ? "pageX" : "pageY";
       const scrollDir = isHorizontal ? "scrollLeft" : "scrollTop";
