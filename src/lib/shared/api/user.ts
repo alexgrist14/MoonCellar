@@ -162,6 +162,10 @@ const setRaUserInfo = (userId: string, raUserName: string) => {
   return agent.patch<IUser>(`${USER_URL}/ra/${userId}/${raUserName}`);
 };
 
+const updateUserTime = (userId: string) => {
+  return agent.patch<IUser>(`${USER_URL}/profile-time/${userId}`);
+};
+
 export const userAPI = {
   getById,
   getByName,
@@ -186,4 +190,5 @@ export const userAPI = {
   getPresets,
   addBackground,
   getBackground,
+  updateUserTime,
 };
