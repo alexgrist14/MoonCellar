@@ -12,8 +12,9 @@ import { CheckMobile } from "@/src/lib/shared/ui/CheckMobile";
 import { useAuthRefresh } from "@/src/lib/shared/hooks/useAuthRefresh";
 import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { useGetUserInfo } from "@/src/lib/features/user/model/user.hooks";
-import { IGDBApi } from "@/src/lib/shared/api";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
+import { gamesApi } from "@/src/lib/shared/api";
+import { platformsAPI } from "@/src/lib/shared/api/platforms.api";
 
 interface ILayoutProps {
   children: ReactNode;
@@ -28,8 +29,15 @@ export const Layout: FC<ILayoutProps> = ({
   refreshToken,
   accessToken,
 }) => {
-  const { setGenres, setGameModes, setSystems, setThemes, setGameTypes } =
-    useCommonStore();
+  const {
+    setGenres,
+    setGameModes,
+    setSystems,
+    setThemes,
+    setGameTypes,
+    setCompanies,
+    setKeywords,
+  } = useCommonStore();
   const { ref } = useResizeDetector({
     refreshMode: "debounce",
     refreshRate: 200,
@@ -40,12 +48,31 @@ export const Layout: FC<ILayoutProps> = ({
   useGetUserInfo();
 
   useEffect(() => {
-    IGDBApi.getGenres().then((response) => setGenres(response.data));
-    IGDBApi.getModes().then((response) => setGameModes(response.data));
-    IGDBApi.getPlatforms().then((response) => setSystems(response.data));
-    IGDBApi.getThemes().then((response) => setThemes(response.data));
-    IGDBApi.getGameTypes().then((response) => setGameTypes(response.data));
-  }, [setGenres, setGameModes, setSystems, setThemes, setGameTypes]);
+    gamesApi.getFilters().then((response) => {
+      if (!response) return;
+
+      const { genres, modes, keywords, companies, themes, type } = response;
+
+      setGenres(genres);
+      setGameModes(modes);
+      setThemes(themes);
+      setGameTypes(type);
+      setCompanies(companies);
+      setKeywords(keywords);
+    });
+
+    platformsAPI.getAll().then((res) => {
+      setSystems(res.data);
+    });
+  }, [
+    setGenres,
+    setGameModes,
+    setSystems,
+    setThemes,
+    setGameTypes,
+    setCompanies,
+    setKeywords,
+  ]);
 
   return (
     <div className={className}>

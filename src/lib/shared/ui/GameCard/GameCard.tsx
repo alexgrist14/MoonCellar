@@ -1,9 +1,7 @@
 import { CSSProperties, memo, useMemo, useRef, useState } from "react";
 import styles from "./GameCard.module.scss";
-import { IGDBGameMinimal } from "../../types/igdb";
 import classNames from "classnames";
 import Image from "next/image";
-import { getImageLink } from "../../constants";
 import { Cover } from "../Cover";
 import { GameControls } from "../GameControls";
 import { Loader } from "../Loader";
@@ -13,9 +11,10 @@ import { SvgAchievement } from "../svg";
 import { useUserStore } from "../../store/user.store";
 import { GameCardInfo } from "@/src/lib/entities/game/ui/GameCardInfo";
 import useCloseEvents from "../../hooks/useCloseEvents";
+import { IGameResponse } from "../../lib/schemas/games.schema";
 
 interface IGameCardProps {
-  game: IGDBGameMinimal;
+  game: IGameResponse;
   className?: string;
   style?: CSSProperties;
   spreadDirection?: "width" | "height";
@@ -44,7 +43,7 @@ export const GameCard = memo(
       const beaten = profile?.raAwards?.filter(
         (award) => award.awardType === "Game Beaten"
       );
-      const raIds = game.raIds?.map((game) => game._id);
+      const raIds = game.retroachievements?.map((item) => item.gameId);
 
       return {
         isMastered: mastered?.some((award) => raIds?.includes(award.awardData)),
@@ -90,7 +89,7 @@ export const GameCard = memo(
           }}
           draggable={false}
         >
-          {!!game.raIds?.length && (
+          {!!game.retroachievements?.length && (
             <div
               className={classNames(styles.card__ra, {
                 [styles.card__ra_beaten]: isBeaten,
@@ -114,7 +113,7 @@ export const GameCard = memo(
             <Image
               onLoad={() => setIsLoading(false)}
               alt="Game cover"
-              src={getImageLink(game?.cover?.url, "720p")}
+              src={game.cover}
               width={260}
               height={325}
               className={classNames(styles.card__cover, {

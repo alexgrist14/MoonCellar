@@ -1,5 +1,4 @@
-import { IGDBApi } from "@/src/lib/shared/api";
-import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
+import { gamesApi } from "@/src/lib/shared/api";
 import { SortType } from "@/src/lib/shared/types/sort";
 import { CategoriesType, IGamesRating } from "@/src/lib/shared/types/user.type";
 import { CustomDropdown } from "@/src/lib/shared/ui/CustomDropdown";
@@ -20,6 +19,7 @@ import { accentColor, accentColorRGB } from "@/src/lib/shared/constants";
 import { commonUtils } from "@/src/lib/shared/utils/common";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { GamePlaysInfo } from "@/src/lib/entities/game/ui/GamePlaysInfo";
+import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
 
 interface UserGamesProps {
   gamesRating: IGamesRating[];
@@ -52,12 +52,12 @@ export const UserGames: FC<UserGamesProps> = ({
   const [selectedSort, setSelectedSort] = useState<SortType>(
     SortType.DATE_ADDED
   );
-  const [games, setGames] = useState<IGDBGameMinimal[]>();
+  const [games, setGames] = useState<IGameResponse[]>();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const parsedGamesRatings = useMemo(() => {
     return gamesRating.reduce(
-      (res: { [key: number]: number }, rating) => ({
+      (res: { [key: string]: number }, rating) => ({
         ...res,
         [rating.game]: rating.rating,
       }),
@@ -132,17 +132,19 @@ export const UserGames: FC<UserGamesProps> = ({
 
     !!_ids?.length &&
       sync(() =>
-        IGDBApi.getGamesByIds({
-          _ids,
-        }).then((res) => {
-          setGames(
-            _ids.reduce((result: IGDBGameMinimal[], id) => {
-              const game = res.data.find((game) => game._id === id);
-              !!game && result.push(game);
-              return result;
-            }, [])
-          );
-        })
+        gamesApi
+          .getByIds({
+            _ids,
+          })
+          .then((res) => {
+            setGames(
+              _ids.reduce((result: IGameResponse[], id) => {
+                const game = res.data.find((game) => game._id === id);
+                !!game && result.push(game);
+                return result;
+              }, [])
+            );
+          })
       );
   }, 200);
 

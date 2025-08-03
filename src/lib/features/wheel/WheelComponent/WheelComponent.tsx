@@ -7,7 +7,7 @@ import { emptyGames } from "@/src/lib/shared/constants/games.const";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { useWheel } from "@/src/lib/shared/hooks/useWheel";
 import { shuffle } from "@/src/lib/shared/utils/common";
-import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
+import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
 
 interface WheelComponentProps {
   primaryColor?: string;
@@ -38,7 +38,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
 
   const angle = useRef(0);
   const [winnerAngle, setWinnerAngle] = useState(0);
-  const [tempGames, setTempGames] = useState<IGDBGameMinimal[]>([]);
+  const [tempGames, setTempGames] = useState<IGameResponse[]>([]);
 
   const { drawWheel, parseImages } = useWheel({
     contrastColor,

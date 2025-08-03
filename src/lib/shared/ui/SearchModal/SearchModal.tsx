@@ -1,8 +1,7 @@
 import { Input } from "../Input";
 import styles from "./SearchModal.module.scss";
 import { FC, useState } from "react";
-import { IGDBApi } from "../../api";
-import { IGDBGameMinimal } from "../../types/igdb";
+import { gamesApi } from "../../api";
 import { Scrollbar } from "../Scrollbar";
 import { Button } from "../Button";
 import { GameCard } from "../GameCard";
@@ -18,13 +17,14 @@ import { useAsyncLoader } from "../../hooks/useAsyncLoader";
 import { useDebouncedCallback } from "use-debounce";
 import { useExpandStore } from "../../store/expand.store";
 import { useAdvancedRouter } from "../../hooks/useAdvancedRouter";
+import { IGameResponse } from "../../lib/schemas/games.schema";
 
 export const SearchModal: FC = () => {
   const { sync, isLoading, setIsLoading } = useAsyncLoader();
   const { setExpanded } = useExpandStore();
   const { router } = useAdvancedRouter();
 
-  const [games, setGames] = useState<IGDBGameMinimal[]>();
+  const [games, setGames] = useState<IGameResponse[]>();
   const [searchQuery, setSearchQuery] = useState("");
   const [take, setTake] = useState(17);
   const [total, setTotal] = useState<number>();
@@ -32,13 +32,15 @@ export const SearchModal: FC = () => {
 
   const debouncedSearch = useDebouncedCallback((search: string) => {
     sync(() =>
-      IGDBApi.getGames({
-        search,
-        take,
-      }).then((response) => {
-        setGames(response.data.results);
-        setTotal(response.data.total);
-      })
+      gamesApi
+        .getAll({
+          search,
+          take,
+        })
+        .then((response) => {
+          setGames(response.data.results);
+          setTotal(response.data.total);
+        })
     );
   }, 300);
 

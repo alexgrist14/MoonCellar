@@ -43,19 +43,21 @@ export const Settings: FC<SettingsProps> = ({}) => {
     if (!profile) return;
 
     const apiCalls = [];
-    if (description) {
-      apiCalls.push(() =>
-        userAPI.updateDescription(profile._id, { description })
-      );
+    // if (description) {
+    //   apiCalls.push(() =>
+    //     userAPI.updateDescription(profile._id, { description })
+    //   );
+    // }
+    if (tempAvatar) {
+      console.log("tempAvatar", tempAvatar);
+      apiCalls.push(userAPI.addAvatar(profile._id, tempAvatar));
     }
-    if (tempAvatar)
-      apiCalls.push(() => userAPI.addAvatar(profile._id, tempAvatar));
-    if (raUsername)
-      apiCalls.push(() => userAPI.setRaUserInfo(profile._id, raUsername));
-    if (background)
-      apiCalls.push(() => userAPI.addBackground(profile._id, background));
-
-    Promise.all(apiCalls.map((apiCall) => apiCall())).then(() => {
+    // if (raUsername)
+    //   apiCalls.push(() => userAPI.setRaUserInfo(profile._id, raUsername));
+    // if (background)
+    //   apiCalls.push(() => userAPI.addBackground(profile._id, background));
+    //
+    Promise.all(apiCalls).then(() => {
       toast.success({ description: "Saved successfully" });
     });
   };

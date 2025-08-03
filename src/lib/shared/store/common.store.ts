@@ -1,36 +1,32 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import {
-  IGDBDefault,
-  IGDBFamily,
-  IGDBGameType,
-  IGDBGenre,
-  IGDBPlatform,
-} from "../types/igdb";
+import { IPlatform } from "../lib/schemas/platforms.schema";
 
 export type IExpandPosition = "left" | "right" | "bottom-left" | "bottom-right";
 
 type IState = {
-  systems?: IGDBPlatform[];
-  families?: IGDBFamily[];
-  genres?: IGDBGenre[];
-  gameModes?: IGDBDefault[];
-  themes?: IGDBDefault[];
-  keywords?: IGDBDefault[];
-  gameTypes?: IGDBGameType[];
+  systems?: IPlatform[];
+  families?: string[];
+  genres?: string[];
+  gameModes?: string[];
+  themes?: string[];
+  keywords?: string[];
+  gameTypes?: string[];
+  companies?: string[];
   timer: number;
   scrollPosition?: { top: number; left: number } | undefined;
 };
 
 type IAction = {
-  setGameModes: (modes: IGDBDefault[]) => void;
-  setThemes: (themes: IGDBDefault[]) => void;
-  setKeywords: (themes: IGDBDefault[]) => void;
-  setGameTypes: (gameTypes: IGDBGameType[]) => void;
-  setGenres: (genres: IGDBGenre[]) => void;
-  setFamilies: (families: IGDBFamily[]) => void;
-  setSystems: (platforms: IGDBPlatform[]) => void;
+  setGameModes: (modes: string[]) => void;
+  setThemes: (themes: string[]) => void;
+  setKeywords: (themes: string[]) => void;
+  setGameTypes: (gameTypes: string[]) => void;
+  setGenres: (genres: string[]) => void;
+  setFamilies: (families: string[]) => void;
+  setSystems: (platforms: IPlatform[]) => void;
   setTimer: (timer: number) => void;
+  setCompanies: (companies: string[]) => void;
   setScrollPosition: (
     scrollPosition: { top: number; left: number } | undefined
   ) => void;
@@ -47,6 +43,7 @@ export const useCommonStore = create<IState & IAction>()(
       setGameTypes: (gameTypes) => set({ gameTypes }),
       setThemes: (themes) => set({ themes }),
       setKeywords: (keywords) => set({ keywords }),
+      setCompanies: (companies) => set({ companies }),
       setTimer: (timer) => set({ timer }),
       setScrollPosition: (scrollPosition) => set({ scrollPosition }),
     }),

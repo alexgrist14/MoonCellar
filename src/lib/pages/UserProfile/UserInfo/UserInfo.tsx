@@ -1,5 +1,4 @@
-import { IGDBApi, userAPI } from "@/src/lib/shared/api";
-import { getImageLink } from "@/src/lib/shared/constants";
+import { gamesApi, userAPI } from "@/src/lib/shared/api";
 import { IUser } from "@/src/lib/shared/types/auth";
 import { IFollowings, ILogs } from "@/src/lib/shared/types/user.type";
 import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
@@ -13,8 +12,8 @@ import Markdown from "react-markdown";
 import { Interweave } from "interweave";
 import { useAsyncLoader } from "@/src/lib/shared/hooks/useAsyncLoader";
 import { Loader } from "@/src/lib/shared/ui/Loader";
-import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
 import { Cover } from "@/src/lib/shared/ui/Cover";
+import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
 
 interface UserInfoProps {
   user: IUser;
@@ -30,7 +29,7 @@ const UserInfo: FC<UserInfoProps> = ({
   const { sync, isLoading } = useAsyncLoader();
   const { _id: id, followings: userFollowings, userName } = user;
 
-  const [logs, setLogs] = useState<(ILogs & { game?: IGDBGameMinimal })[]>([]);
+  const [logs, setLogs] = useState<(ILogs & { game?: IGameResponse })[]>([]);
   const [userAuthFollowings, setUserAuthFollowings] = useState<IFollowings>(
     authUserFollowings || { followings: [] }
   );
@@ -58,7 +57,7 @@ const UserInfo: FC<UserInfoProps> = ({
 
       const _ids = logsRes.data.map((log) => log.gameId);
 
-      const gamesRes = await IGDBApi.getGamesByIds({ _ids });
+      const gamesRes = await gamesApi.getByIds({ _ids });
 
       return setLogs(
         logsRes.data.map((log) => ({
@@ -135,11 +134,11 @@ const UserInfo: FC<UserInfoProps> = ({
                       className={styles.item__img}
                       target="_blank"
                     >
-                      {!!log.game?.cover?.url ? (
+                      {!!log.game?.cover ? (
                         <Image
                           width={70}
                           height={110}
-                          src={getImageLink(log.game.cover.url, "cover_big")}
+                          src={log.game.cover}
                           style={{ width: "80px", height: "120px" }}
                           alt="cover"
                         />

@@ -12,6 +12,7 @@ interface AvatarProps {
 }
 
 const Avatar: FC<AvatarProps> = ({ user, isWithoutTooltip }) => {
+  const [isError, setIsError] = useState(false);
   const [isTooltipActive, setIsTooltipActive] = useState(false);
   const followingsRef = useRef<HTMLDivElement>(null);
 
@@ -22,10 +23,11 @@ const Avatar: FC<AvatarProps> = ({ user, isWithoutTooltip }) => {
       onMouseOver={() => setIsTooltipActive(true)}
       onMouseOut={() => setIsTooltipActive(false)}
     >
-      {user?.profilePicture ? (
+      {!!user && !isError ? (
         <Image
           className={styles.image}
           src={commonUtils.getAvatar(user as IUser)}
+          onError={() => setIsError(true)}
           width={90}
           height={90}
           alt="profile"

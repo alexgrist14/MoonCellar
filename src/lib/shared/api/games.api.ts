@@ -1,54 +1,67 @@
 import { API_URL } from "../constants";
 import {
-  IGetPlaythroughsMinimalResponse,
-  IGetPlaythroughsRequest,
-  IGetPlaythroughsResponse,
-  IPlaythrough,
-  ISavePlaythroughRequest,
-  IUpdatePlaythroughRequest,
-} from "../lib/schemas/playthroughs.schema";
+  IGameResponse,
+  IGetGameByIdRequest,
+  IGetGameBySlugRequest,
+  IGetGamesByIdsRequest,
+  IGetGamesRequest,
+  IUpdateGameRequest,
+} from "../lib/schemas/games.schema";
 import agent from "./agent";
+import { filesAPI } from "./files.api";
 
-const GAMES_API = `${API_URL}/games`;
+const GAMES_URL = `${API_URL}/games`;
 
-const getPlaythroughs = (params: IGetPlaythroughsRequest) => {
-  return agent.get<IGetPlaythroughsResponse>(`${GAMES_API}/playthroughs`, {
-    params,
-  });
-};
+export const gamesApi = {
+  getById: (params: IGetGameByIdRequest) => {
+    return agent.get<IGameResponse>(`${GAMES_URL}/by-id/${params._id}`);
+  },
 
-const getPlaythroughsMinimal = (params: IGetPlaythroughsRequest) => {
-  return agent.get<IGetPlaythroughsMinimalResponse>(
-    `${GAMES_API}/playthroughs/minimal`,
-    { params }
-  );
-};
+  getByIds: (params: IGetGamesByIdsRequest) => {
+    return agent.get<IGameResponse[]>(
+      `${GAMES_URL}/by-ids?_ids=${params._ids.join("&_ids=")}`
+    );
+  },
 
-const createPlaythrough = (data: ISavePlaythroughRequest) => {
-  return agent.post<IPlaythrough>(`${GAMES_API}/save-playthrough`, data);
-};
+  getBySlug: (params: IGetGameBySlugRequest) => {
+    return agent.get<IGameResponse>(`${GAMES_URL}/by-slug/${params.slug}`, {
+      params,
+    });
+  },
 
-const updatePlaythrough = (
-  userId: string,
-  id: string,
-  data: IUpdatePlaythroughRequest
-) => {
-  return agent.put<IPlaythrough>(
-    `${GAMES_API}/update-playthrough/${userId}/${id}`,
-    data
-  );
-};
+  getAll: async (params: IGetGamesRequest) => {
+    return agent.get<{ results: IGameResponse[]; total: number }>(
+      `${GAMES_URL}/`,
+      {
+        params,
+      }
+    );
+  },
 
-const deletePlaythrough = (userId: string, id: string) => {
-  return agent.delete<IPlaythrough>(
-    `${GAMES_API}/delete-playthrough/${userId}/${id}`
-  );
-};
+  add: () => {
+    return agent.post<IGameResponse>(`${GAMES_URL}/add`, {});
+  },
 
-export const gamesAPI = {
-  getPlaythroughs,
-  getPlaythroughsMinimal,
-  createPlaythrough,
-  updatePlaythrough,
-  deletePlaythrough,
+  update: (id: string, dto: IUpdateGameRequest) => {
+    return agent.put<IGameResponse>(`${GAMES_URL}/update/${id}`, dto);
+  },
+
+  remove: async (id: string) => {
+    return agent.delete<IGameResponse>(`${GAMES_URL}/delete/${id}`);
+  },
+
+  getFilters: async (): Promise<
+    | {
+        modes: string[];
+        themes: string[];
+        keywords: string[];
+        genres: string[];
+        companies: string[];
+        type: string[];
+      }
+    | undefined
+  > => {
+    const res = await filesAPI.getFile("filters", "mooncellar-common");
+    return res.data;
+  },
 };

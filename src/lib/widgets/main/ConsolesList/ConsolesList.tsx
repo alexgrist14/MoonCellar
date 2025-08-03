@@ -6,12 +6,11 @@ import { GamesList } from "@/src/lib/shared/ui/GamesList";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { IUserPreset } from "@/src/lib/shared/types/user.type";
 import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
-import { IGDBApi, userAPI } from "@/src/lib/shared/api";
+import { gamesApi, userAPI } from "@/src/lib/shared/api";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { toast } from "@/src/lib/shared/utils/toast";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { SaveForm } from "@/src/lib/shared/ui/SaveForm";
-import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
 
 export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
   initialTabIndex,
@@ -140,9 +139,11 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
                             style: { textAlign: "start" },
                             compact: true,
                             onClick: () => {
-                              IGDBApi.getGamesByIds({
-                                _ids: preset.preset,
-                              }).then((res) => setRoyalGames(res.data));
+                              gamesApi
+                                .getByIds({
+                                  _ids: preset.preset,
+                                })
+                                .then((res) => setRoyalGames(res.data));
                             },
                           },
                           {

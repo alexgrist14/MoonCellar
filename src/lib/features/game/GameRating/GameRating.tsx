@@ -2,14 +2,14 @@ import { FC, useState } from "react";
 import styles from "./GameRating.module.scss";
 import { RangeSelector } from "@/src/lib/shared/ui/RangeSelector";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
 import { userAPI } from "@/src/lib/shared/api";
 import { toast } from "@/src/lib/shared/utils/toast";
 import { WrapperTemplate } from "@/src/lib/shared/ui/WrapperTemplate";
 import { useAsyncLoader } from "@/src/lib/shared/hooks/useAsyncLoader";
+import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
 
 interface IGameRatingProps {
-  game: IGDBGameMinimal;
+  game: IGameResponse;
   rating?: number;
 }
 

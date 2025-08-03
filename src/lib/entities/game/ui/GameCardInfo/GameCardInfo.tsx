@@ -2,13 +2,14 @@ import { FC, ReactNode, useRef } from "react";
 import styles from "./GameCardInfo.module.scss";
 import classNames from "classnames";
 import Link from "next/link";
-import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
 import { commonUtils } from "@/src/lib/shared/utils/common";
 import { IPlaythroughMinimal } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
+import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
+import { useCommonStore } from "@/src/lib/shared/store/common.store";
 
 interface IGameCardInfoProps {
   bottomNode: ReactNode;
-  game: IGDBGameMinimal;
+  game: IGameResponse;
   playthroughs?: IPlaythroughMinimal[];
 }
 
@@ -18,6 +19,7 @@ export const GameCardInfo: FC<IGameCardInfoProps> = ({
   playthroughs,
 }) => {
   const infoRef = useRef<HTMLDivElement>(null);
+  const systems = useCommonStore((s) => s.systems);
 
   return (
     <div
@@ -48,14 +50,18 @@ export const GameCardInfo: FC<IGameCardInfoProps> = ({
           )}
         </div>
         <span className={styles.info__category}>
-          {game.game_type.type}
-          {!!game.first_release_date
-            ? ` - ${new Date(game.first_release_date * 1000).getFullYear()}`
+          {game.type}
+          {!!game.first_release
+            ? ` - ${new Date(game.first_release * 1000).getFullYear()}`
             : ""}
         </span>
         <span className={styles.info__platforms}>
-          {!!game.platforms?.length &&
-            game.platforms.map((platform) => platform.name).join(", ")}
+          {!!game.platformIds?.length &&
+            !!systems &&
+            systems
+              .filter((sys) => game.platformIds.includes(sys._id))
+              .map((platform) => platform.name)
+              .join(", ")}
         </span>
       </Link>
       {bottomNode}

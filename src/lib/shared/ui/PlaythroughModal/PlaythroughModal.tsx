@@ -1,8 +1,6 @@
 import { FC, useCallback, useEffect, useState } from "react";
 import styles from "./PlaythroughModal.module.scss";
-import { gamesAPI } from "../../api/games.api";
 import { Dropdown } from "../Dropdown";
-import { IGDBGameMinimal } from "../../types/igdb";
 import { ButtonGroup } from "../Button/ButtonGroup";
 import { Textarea } from "../Textarea";
 import { Input } from "../Input";
@@ -26,10 +24,12 @@ import classNames from "classnames";
 import { useUserStore } from "../../store/user.store";
 import { WrapperTemplate } from "../WrapperTemplate";
 import { toast } from "../../utils/toast";
+import { IGameResponse } from "../../lib/schemas/games.schema";
+import { playthroughsAPI } from "../../api";
 
 interface IPlaythroughModalProps {
   userId: string;
-  game: IGDBGameMinimal;
+  game: IGameResponse;
 }
 
 const playthroughCategories: IPlaythroughMinimal["category"][] = [
@@ -94,8 +94,8 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
 
     !!playthroughId
       ? sync(() =>
-          gamesAPI
-            .updatePlaythrough(profile._id, playthroughId, data)
+          playthroughsAPI
+            .update(profile._id, playthroughId, data)
             .then((res) => {
               setPlaythroughs(
                 playthroughs.map((play) =>
@@ -122,7 +122,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
             })
         )
       : sync(() =>
-          gamesAPI.createPlaythrough(data).then((res) => {
+          playthroughsAPI.create(data).then((res) => {
             setPlaythroughs([...playthroughs, res.data]);
             setStorePlaythroughs([
               ...(storePlaythroughs || []),
@@ -144,7 +144,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
     if (!profile || !playthroughId) return;
 
     sync(() =>
-      gamesAPI.deletePlaythrough(profile._id, playthroughId).then((res) => {
+      playthroughsAPI.remove(profile._id, playthroughId).then((res) => {
         setPlaythroughs(
           playthroughs.filter((play) => play._id !== res.data._id)
         );
@@ -162,7 +162,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
 
   useEffect(() => {
     sync(() =>
-      gamesAPI.getPlaythroughs({ userId, gameId: game._id }).then((res) => {
+      playthroughsAPI.getAll({ userId, gameId: game._id }).then((res) => {
         setPlaythroughs(res.data);
         !!res.data?.[res.data.length - 1]
           ? selectHandler(res.data[res.data.length - 1])
@@ -234,7 +234,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
             overwriteValue={commonUtils.upFL(watch("category") || "")}
             list={playthroughCategories.map((item) => commonUtils.upFL(item))}
           />
-          <Dropdown
+          {/*<Dropdown
             placeholder="Select platform..."
             getIndex={(index) =>
               setValue("platformId", game.platforms[index]._id)
@@ -244,7 +244,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
                 ?.name || ""
             }
             list={game.platforms.map((item) => item.name)}
-          />
+          />*/}
           {["completed", "played", "dropped"].includes(watch("category")) && (
             <div className={styles.modal__inputs}>
               {watch("category") === "completed" && (

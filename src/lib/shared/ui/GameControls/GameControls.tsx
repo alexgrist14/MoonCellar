@@ -1,6 +1,5 @@
 import { CSSProperties, FC, useMemo, useRef } from "react";
 import styles from "./GameControls.module.scss";
-import { IGDBGameMinimal } from "../../types/igdb";
 import { Icon } from "@iconify/react";
 import classNames from "classnames";
 import { Button } from "../Button";
@@ -13,11 +12,12 @@ import { GameRating } from "@/src/lib/features/game/GameRating";
 import { GameButtons } from "../GameButtons";
 import { WrapperTemplate } from "../WrapperTemplate";
 import { SvgCircleMenu, SvgPlay } from "../svg";
+import { IGameResponse } from "../../lib/schemas/games.schema";
 
 interface IGameControlsProps {
   style?: CSSProperties;
   className?: string;
-  game: IGDBGameMinimal;
+  game: IGameResponse;
 }
 
 export const GameControls: FC<IGameControlsProps> = ({

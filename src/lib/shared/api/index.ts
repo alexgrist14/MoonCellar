@@ -1,4 +1,5 @@
 export * from "./agent";
-export * from "./igdb";
 export * from "./auth";
 export * from "./user";
+export * from "./games.api";
+export * from "./playthroughs.api";

@@ -59,10 +59,8 @@ const upFL = (string: string) => {
     : "";
 };
 
-const getAvatar = (user: IUser) => {
-  return user.profilePicture
-    ? `https://api.mooncellar.space/photos/${user.profilePicture}`
-    : "";
+const getAvatar = (user?: IUser) => {
+  return !!user ? `https://mooncellar-avatars.s3.regru.cloud/${user._id}` : "";
 };
 
 export const shuffle = <T>(arr: T[]) => {

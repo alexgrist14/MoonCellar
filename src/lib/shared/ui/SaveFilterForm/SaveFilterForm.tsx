@@ -4,15 +4,15 @@ import { WrapperTemplate } from "../WrapperTemplate";
 import { Input } from "../Input";
 import { Button } from "../Button";
 import { useAuthStore } from "../../store/auth.store";
-import { IGameFilters } from "../../types/filters.type";
 import { userAPI } from "../../api";
 import { getFiltersForQuery } from "../../utils/filters";
 import { toast } from "../../utils/toast";
 import { modal } from "../Modal";
 import { IUserFilter } from "../../types/user.type";
+import { IGetGamesRequest } from "../../lib/schemas/games.schema";
 
 export const SaveFilterForm: FC<{
-  filters: IGameFilters;
+  filters: IGetGamesRequest;
   setSavedFilters: Dispatch<SetStateAction<IUserFilter[] | undefined>>;
 }> = ({ filters, setSavedFilters }) => {
   const { profile } = useAuthStore();

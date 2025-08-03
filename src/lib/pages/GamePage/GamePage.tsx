@@ -3,8 +3,7 @@
 import { FC, useMemo, useState } from "react";
 import styles from "./GamePage.module.scss";
 import Image from "next/image";
-import { IGDBGame } from "../../shared/types/igdb";
-import { dateRegions, getImageLink } from "../../shared/constants";
+import { dateRegions } from "../../shared/constants";
 import { Slideshow } from "../../shared/ui/Slideshow";
 import Link from "next/link";
 import { Cover } from "../../shared/ui/Cover";
@@ -15,26 +14,14 @@ import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
 import { useAuthStore } from "../../shared/store/auth.store";
 import { BGImage } from "../../shared/ui/BGImage";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { IGameResponse } from "../../shared/lib/schemas/games.schema";
+import { useCommonStore } from "../../shared/store/common.store";
 
-export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
+export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
   const { isAuth, profile } = useAuthStore();
+  const { systems } = useCommonStore();
 
-  const [isLoading, setIsLoading] = useState<boolean>(!!game.cover?.url);
-
-  const minimalGame = useMemo(
-    () => ({
-      ...game,
-      screenshots: game.screenshots.map((item) => item._id),
-      artworks: game.artworks.map((item) => item._id),
-      game_modes: game.game_modes.map((item) => item._id),
-      genres: game.genres.map((item) => item._id),
-      involved_companies: game.involved_companies.map((item) => item._id),
-      keywords: game.keywords.map((item) => item._id),
-      themes: game.themes.map((item) => item._id),
-      websites: game.websites.map((item) => item._id),
-    }),
-    [game]
-  );
+  const [isLoading, setIsLoading] = useState<boolean>(!!game.cover);
 
   const { isMastered, isBeaten } = useMemo(() => {
     const mastered = profile?.raAwards?.filter(
@@ -43,22 +30,27 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
     const beaten = profile?.raAwards?.filter(
       (award) => award.awardType === "Game Beaten"
     );
-    const raIds = game.raIds?.map((game) => game._id);
 
     return {
-      isMastered: mastered?.some((award) => raIds?.includes(award.awardData)),
-      isBeaten: beaten?.some((award) => raIds?.includes(award.awardData)),
+      isMastered: mastered?.some((award) =>
+        game.retroachievements?.some((item) => item.gameId === award.awardData)
+      ),
+      isBeaten: beaten?.some((award) =>
+        game.retroachievements?.some((item) => item.gameId === award.awardData)
+      ),
     };
   }, [game, profile]);
 
   if (!game) return null;
 
-  const releaseDate = new Date(game.first_release_date * 1000).getFullYear();
+  const releaseDate = !!game.first_release
+    ? new Date(game.first_release * 1000).getFullYear()
+    : undefined;
 
   return (
     <>
       <div className={classNames(styles.page)}>
-        <BGImage game={minimalGame} />
+        <BGImage game={game} />
         <div className={styles.page__left}>
           <WrapperTemplate contentStyle={{ padding: "0", gap: "0" }}>
             <div
@@ -67,7 +59,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
                 isAuth && styles.page__cover_control
               )}
             >
-              {!!game.raIds?.length && (
+              {!!game.retroachievements?.length && (
                 <div
                   className={classNames(styles.page__ra, {
                     [styles.page__ra_beaten]: isBeaten,
@@ -78,12 +70,12 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
                 </div>
               )}
               {isLoading && <Loader />}
-              {!!game.cover?.url ? (
+              {!!game.cover ? (
                 <Image
                   onLoad={() => setIsLoading(false)}
-                  key={game.cover._id}
+                  key={game.cover}
                   alt="Cover"
-                  src={getImageLink(game.cover.url, "cover_big", 2)}
+                  src={game.cover}
                   width={700}
                   height={900}
                 />
@@ -91,7 +83,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
                 <Cover />
               )}
             </div>
-            <GameControls game={minimalGame} />
+            <GameControls game={game} />
           </WrapperTemplate>
         </div>
         <WrapperTemplate
@@ -101,7 +93,7 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
         >
           <h2>{game.name}</h2>
           <div className={styles.page__info}>
-            {!!game.first_release_date && (
+            {!!game.first_release && (
               <p>
                 <span>Year: </span>
                 <Link
@@ -113,92 +105,66 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
             )}
             <p>
               <span>Game type: </span>
-              <Link href={`/games?selectedGameTypes[]=${game.game_type._id}`}>
-                {game.game_type.type}
+              <Link href={`/games?selectedGameTypes[]=${game.type}`}>
+                {game.type}
               </Link>
             </p>
           </div>
-          <div className={styles.page__developers}>
-            {game.involved_companies.some((comp) => comp.developer) && (
+          {!!game.companies?.length && (
+            <div className={styles.page__developers}>
               <p>
                 <span>
-                  Developer
-                  {game.involved_companies.filter((comp) => comp.developer)
-                    .length > 1
-                    ? "s"
-                    : ""}
-                  :{" "}
+                  Companies
+                  {game.companies.length > 1 ? "s" : ""}:{" "}
                 </span>
-                {game.involved_companies
-                  .filter((comp) => comp.developer)
-                  ?.map((comp, i, array) => (
-                    <span key={comp._id}>
-                      <Link href={`/games?company=${comp.company.name}`}>
-                        {comp.company.name}
-                      </Link>
-                      {i !== array.length - 1 ? ", " : ""}
-                    </span>
-                  ))}
-              </p>
-            )}
-            {game.involved_companies.some((comp) => comp.publisher) && (
-              <p>
-                <span>
-                  Publisher
-                  {game.involved_companies.filter((comp) => comp.publisher)
-                    .length > 1
-                    ? "s"
-                    : ""}
-                  :{" "}
-                </span>
-                {game.involved_companies
-                  .filter((comp) => comp.publisher)
-                  ?.map((comp, i, array) => (
-                    <span key={comp._id}>
-                      <Link href={`/games?company=${comp.company.name}`}>
-                        {comp.company.name}
-                      </Link>
-                      {i !== array.length - 1 ? ", " : ""}
-                    </span>
-                  ))}
-              </p>
-            )}
-          </div>
-          <div className={styles.page__info}>
-            {!!game.platforms?.length && (
-              <p>
-                <span>Platforms: </span>
-                {game.platforms.map((platform, i, array) => (
-                  <span key={platform._id}>
-                    <Link href={`/games?selectedPlatforms[]=${platform._id}`}>
-                      {platform.name}
-                    </Link>
+                {game.companies.map((comp, i, array) => (
+                  <span key={comp + i}>
+                    <Link href={`/games?company=${comp}`}>{comp}</Link>
                     {i !== array.length - 1 ? ", " : ""}
                   </span>
                 ))}
+              </p>
+            </div>
+          )}
+          <div className={styles.page__info}>
+            {!!game.platformIds?.length && (
+              <p>
+                <span>Platforms: </span>
+                {game.platformIds.map((id, i, array) => {
+                  const platform = systems?.find((sys) => sys._id === id);
+
+                  if (!platform) return null;
+
+                  return (
+                    <span key={id}>
+                      <Link href={`/games?selectedPlatforms[]=${id}`}>
+                        {platform.name}
+                      </Link>
+                      {i !== array.length - 1 ? ", " : ""}
+                    </span>
+                  );
+                })}
               </p>
             )}
             {!!game.genres?.length && (
               <p>
                 <span>Genres: </span>
                 {game.genres.map((genre, i, array) => (
-                  <span key={genre._id}>
-                    <Link href={`/games?selectedGenres[]=${genre._id}`}>
-                      {genre.name}
+                  <span key={genre + i}>
+                    <Link href={`/games?selectedGenres[]=${genre}`}>
+                      {genre}
                     </Link>
                     {i !== array.length - 1 ? ", " : ""}
                   </span>
                 ))}
               </p>
             )}
-            {!!game.game_modes?.length && (
+            {!!game.modes?.length && (
               <p>
                 <span>Game modes: </span>
-                {game.game_modes.map((mode, i, array) => (
-                  <span key={mode._id}>
-                    <Link href={`/games?selectedModes[]=${mode._id}`}>
-                      {mode.name}
-                    </Link>
+                {game.modes.map((mode, i, array) => (
+                  <span key={mode + i}>
+                    <Link href={`/games?selectedModes[]=${mode}`}>{mode}</Link>
                     {i !== array.length - 1 ? ", " : ""}
                   </span>
                 ))}
@@ -208,9 +174,9 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
               <p>
                 <span>Themes: </span>
                 {game.themes.map((theme, i, array) => (
-                  <span key={theme._id}>
-                    <Link href={`/games?selectedThemes[]=${theme._id}`}>
-                      {theme.name}
+                  <span key={theme + i}>
+                    <Link href={`/games?selectedThemes[]=${theme}`}>
+                      {theme}
                     </Link>
                     {i !== array.length - 1 ? ", " : ""}
                   </span>
@@ -246,10 +212,10 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
             {!!game.release_dates?.length && (
               <div className={styles.page__links}>
                 <h4>Release dates:</h4>
-                {game.release_dates.map((date) => (
-                  <p key={date._id}>
-                    {date.human}: {date.platform.name}
-                    <span> ({dateRegions[date.region - 1]})</span>
+                {game.release_dates.map((date, i) => (
+                  <p key={date.date + "_" + i}>
+                    {date.human}: {date.platformId}
+                    <span> ({dateRegions[+date.region - 1]})</span>
                   </p>
                 ))}
               </div>
@@ -257,9 +223,9 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
             {!!game.websites?.length && (
               <div className={styles.page__links}>
                 <h4>Links:</h4>
-                {game.websites.map((link) => (
-                  <Link target="_blank" key={link._id} href={link.url}>
-                    {link.url.split("/")[2]}
+                {game.websites.map((link, i) => (
+                  <Link target="_blank" key={link + i} href={link}>
+                    {link.split("/")[2]}
                   </Link>
                 ))}
               </div>
@@ -270,9 +236,9 @@ export const GamePage: FC<{ game: IGDBGame }> = ({ game }) => {
               <p>
                 <span>Keywords: </span>
                 {game.keywords.map((keyword, i, array) => (
-                  <span key={keyword._id}>
-                    <Link href={`/games?selectedKeywords[]=${keyword._id}`}>
-                      {keyword.name}
+                  <span key={keyword + i}>
+                    <Link href={`/games?selectedKeywords[]=${keyword}`}>
+                      {keyword}
                     </Link>
                     {i !== array.length - 1 ? ", " : ""}
                   </span>

@@ -1,40 +1,55 @@
 import { FC, useMemo } from "react";
 import styles from "./GameButtons.module.scss";
 import { ButtonGroup } from "../Button/ButtonGroup";
-import { IGDBGameMinimal } from "../../types/igdb";
 import { WrapperTemplate } from "../WrapperTemplate";
 import { useGamesStore } from "../../store/games.store";
 import { Separator } from "../Separator";
+import { IGameResponse } from "../../lib/schemas/games.schema";
+import { useCommonStore } from "../../store/common.store";
 
-export const GameButtons: FC<{ game: IGDBGameMinimal }> = ({ game }) => {
+export const GameButtons: FC<{ game: IGameResponse }> = ({ game }) => {
   const { royalGames, addRoyalGame, removeRoyalGame } = useGamesStore();
+  const { systems } = useCommonStore();
 
   const isRoyal = useMemo(
     () => royalGames?.some((royal) => royal._id === game?._id),
     [game, royalGames]
   );
 
+  const raInfo = useMemo(() => {
+    return game.retroachievements?.map((item) => {
+      const platform = systems?.find((sys) => sys.raId === item.consoleId);
+
+      return {
+        platformName: platform?.name,
+        gameId: item.gameId,
+      };
+    });
+  }, [game.retroachievements, systems]);
+
   return (
     <div className={styles.menu}>
-      {!!game.raIds?.length && (
-        <WrapperTemplate
-          title="RetroAchievements"
-          contentStyle={{ padding: "5px" }}
-          isWithoutBorder
-        >
-          <ButtonGroup
-            wrapperClassName={styles.actions}
-            buttons={[
-              ...game.raIds.map((game) => ({
-                title: <span>{game.consoleName}</span>,
-                link: `https://retroachievements.org/game/${game._id}`,
-                target: "_blank",
-              })),
-            ]}
-          />
-        </WrapperTemplate>
+      {!!game.retroachievements?.length && (
+        <>
+          <WrapperTemplate
+            title="RetroAchievements"
+            contentStyle={{ padding: "5px" }}
+            isWithoutBorder
+          >
+            <ButtonGroup
+              wrapperClassName={styles.actions}
+              buttons={[
+                ...(raInfo?.map((item) => ({
+                  title: <span>{item.platformName}</span>,
+                  link: `https://retroachievements.org/game/${item.gameId}`,
+                  target: "_blank",
+                })) || []),
+              ]}
+            />
+          </WrapperTemplate>
+          <Separator direction="horizontal" />
+        </>
       )}
-      <Separator direction="horizontal" />
       <ButtonGroup
         wrapperClassName={styles.actions}
         buttons={[
@@ -51,8 +66,8 @@ export const GameButtons: FC<{ game: IGDBGameMinimal }> = ({ game }) => {
         buttons={[
           {
             title: "Open in IGDB",
-            link: game.url,
-            hidden: !game.url,
+            link: "https://www.igdb.com/games/" + game.slug,
+            hidden: !game.igdbIds?.length,
             target: "_blank",
           },
           {

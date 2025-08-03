@@ -1,13 +1,13 @@
 import { FC } from "react";
 import styles from "./GamesList.module.scss";
 import { Button } from "@/src/lib/shared/ui/Button";
-import { IGDBGameMinimal } from "../../types/igdb";
 import { ButtonGroup } from "../Button/ButtonGroup";
+import { IGameResponse } from "../../lib/schemas/games.schema";
 
 interface IGamesListProps {
-  games: IGDBGameMinimal[];
-  getGames?: (games: IGDBGameMinimal[]) => void;
-  removeGame?: (game: IGDBGameMinimal) => void;
+  games: IGameResponse[];
+  getGames?: (games: IGameResponse[]) => void;
+  removeGame?: (game: IGameResponse) => void;
   saveCallback?: () => void;
 }
 

@@ -3,6 +3,7 @@ import { ChangeEvent, Dispatch, FC, SetStateAction, useState } from "react";
 import { useAuthStore } from "../../store/auth.store";
 import { SvgCamera } from "../svg";
 import styles from "./AvatarSettings.module.scss";
+import { commonUtils } from "../../utils/common";
 
 interface AvatarSettingsProps {
   tempAvatar?: File;
@@ -13,6 +14,7 @@ const AvatarSettings: FC<AvatarSettingsProps> = ({
   tempAvatar,
   setTempAvatar,
 }) => {
+  const [isError, setIsError] = useState(false);
   const [profileHover, setProfileHover] = useState<boolean>(false);
 
   const { profile, setProfile } = useAuthStore();
@@ -35,6 +37,8 @@ const AvatarSettings: FC<AvatarSettingsProps> = ({
     }
   };
 
+  if (!profile) return null;
+
   return (
     <label htmlFor="avatar" className={styles.label}>
       <div
@@ -48,12 +52,13 @@ const AvatarSettings: FC<AvatarSettingsProps> = ({
       >
         <Image
           src={
-            profile?.profilePicture
-              ? `https://api.mooncellar.space/photos/${profile.profilePicture}`
-              : !!tempAvatar
-                ? URL.createObjectURL(tempAvatar)
-                : "/images/user.png"
+            !!tempAvatar
+              ? URL.createObjectURL(tempAvatar)
+              : isError
+                ? "/images/user.png"
+                : commonUtils.getAvatar(profile)
           }
+          onError={() => setIsError(true)}
           width={160}
           height={160}
           alt="profile"
