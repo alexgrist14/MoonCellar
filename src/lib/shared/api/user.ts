@@ -25,41 +25,25 @@ const addAvatar = (id: string, file: File) => {
 
   formData.append("file", file);
 
-  return agent.patch<string>(`${USER_URL}/profile-picture`, formData, {
+  return agent.patch<string>(`${USER_URL}/avatar`, formData, {
     params: { userId: id },
     headers: { "Content-Type": "multipart/form-data" },
   });
 };
 
-const getAvatar = (id: string) => {
-  return agent.get<{ fileName: string }>(`${USER_URL}/profile-picture/${id}`);
-};
+const addBackground = (id: string, file: File) => {
+  const formData = new FormData();
 
-const addBackground = (id: string, url: string) => {
-  return agent.patch<IUser>(`${USER_URL}/profile-background/${id}`, {
-    url: url,
+  formData.append("file", file);
+
+  return agent.patch<string>(`${USER_URL}/background`, formData, {
+    params: { userId: id },
+    headers: { "Content-Type": "multipart/form-data" },
   });
-};
-
-const getBackground = (id: string) => {
-  return agent.get<{ background: string }>(
-    `${USER_URL}/profile-background/${id}`
-  );
 };
 
 const getUserGames = (id: string, category: CategoriesType) => {
   return agent.get<IUserGames>(`${USER_URL}/games/${id}?category=${category}`);
-};
-
-const addGameRating = (userId: string, game: string, rating: number) => {
-  return agent.patch<IUser>(`${USER_URL}/rating/${userId}`, {
-    game,
-    rating,
-  });
-};
-
-const removeGameRating = (userId: string, gameId: string) => {
-  return agent.delete<IUser>(`${USER_URL}/rating/${userId}/${gameId}`);
 };
 
 const getUserFollowings = (userId: string) => {
@@ -144,10 +128,8 @@ export const userAPI = {
   getById,
   getByName,
   addAvatar,
-  getAvatar,
+  addBackground,
   getUserGames,
-  addGameRating,
-  removeGameRating,
   getUserFollowings,
   addUserFollowing,
   removeUserFollowing,
@@ -160,7 +142,5 @@ export const userAPI = {
   addPreset,
   removePreset,
   getPresets,
-  addBackground,
-  getBackground,
   updateUserTime,
 };

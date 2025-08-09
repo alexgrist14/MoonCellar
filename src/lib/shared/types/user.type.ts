@@ -21,33 +21,18 @@ export interface ILogs {
   userId: string;
 }
 
-interface Game {
-  cover: Cover;
-  name: string;
-  slug: string;
-}
-
-interface Cover {
-  url: string;
-}
-
 export interface IUserLogs {
   logs: ILogs[];
 }
 
 export interface IFollowings {
-  followings: Pick<IUser, "_id" | "userName" | "profilePicture">[];
+  followings: Pick<IUser, "_id" | "userName" | "avatar">[];
 }
 
 export type UserGamesType = Record<CategoriesType, IGameResponse[]>;
 
 export interface IUserGames {
   games: UserGamesType;
-}
-
-export interface IGamesRating {
-  game: string;
-  rating: number;
 }
 
 export interface IUserFilter {

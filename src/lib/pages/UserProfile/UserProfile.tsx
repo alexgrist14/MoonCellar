@@ -18,12 +18,14 @@ import { useSearchParams } from "next/navigation";
 import { UserNavigation } from "../../features/user/ui/UserNavigation";
 import { IPlaythrough } from "../../shared/lib/schemas/playthroughs.schema";
 import { userAPI } from "../../shared/api";
+import { IUserRating } from "../../shared/lib/schemas/user-ratings.schema";
 
 interface UserProfileProps {
   user: IUser;
   authUserFollowings?: IFollowings;
   authUserId?: string;
   playthroughs: IPlaythrough[];
+  ratings: IUserRating[];
 }
 
 const UserProfile: FC<UserProfileProps> = ({
@@ -31,6 +33,7 @@ const UserProfile: FC<UserProfileProps> = ({
   authUserFollowings,
   authUserId,
   playthroughs,
+  ratings,
 }) => {
   const query = useSearchParams();
   const { isMobile } = useStatesStore();
@@ -93,10 +96,7 @@ const UserProfile: FC<UserProfileProps> = ({
             />
           )}
           {userListCategories.some((t) => t === tab) && (
-            <UserGames
-              playthroughs={playthroughs}
-              gamesRating={user.gamesRating}
-            />
+            <UserGames playthroughs={playthroughs} ratings={ratings} />
           )}
         </WrapperTemplate>
         {!isMobile && (

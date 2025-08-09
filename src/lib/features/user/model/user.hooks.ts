@@ -1,4 +1,5 @@
 import { playthroughsAPI } from "@/src/lib/shared/api";
+import { ratingsAPI } from "@/src/lib/shared/api/ratings.api";
 import { useEffectOnce } from "@/src/lib/shared/hooks/useEffectOnce";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useUserStore } from "@/src/lib/shared/store/user.store";
@@ -8,14 +9,15 @@ export const useGetUserInfo = () => {
   const { setPlaythroughs, setRatings } = useUserStore();
 
   return useEffectOnce(async () => {
-    return playthroughsAPI
-      .getAllMinimal({ userId: profile?._id })
-      .then((res) => {
-        setPlaythroughs(res.data);
-      });
+    if (!profile?._id) return;
 
-    // userAPI.get({ userId: profile._id }).then((res) => {
-    //   setPlaythroughs(res.data);
-    // });
+    return Promise.all([
+      playthroughsAPI.getAllMinimal({ userId: profile._id }).then((res) => {
+        setPlaythroughs(res.data);
+      }),
+      ratingsAPI.getAll({ userId: profile._id }).then((res) => {
+        setRatings(res.data);
+      }),
+    ]);
   }, !!profile?._id);
 };

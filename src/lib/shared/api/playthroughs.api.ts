@@ -27,7 +27,7 @@ const getAllMinimal = (params: IGetPlaythroughsRequest) => {
 };
 
 const create = (data: ISavePlaythroughRequest) => {
-  return agent.post<IPlaythrough>(`${PLAYTHROUGHS_API}/save-playthrough`, data);
+  return agent.post<IPlaythrough>(`${PLAYTHROUGHS_API}/save`, data);
 };
 
 const update = (
@@ -36,14 +36,14 @@ const update = (
   data: IUpdatePlaythroughRequest
 ) => {
   return agent.put<IPlaythrough>(
-    `${PLAYTHROUGHS_API}/update-playthrough/${userId}/${id}`,
+    `${PLAYTHROUGHS_API}/update/${userId}/${id}`,
     data
   );
 };
 
 const remove = (userId: string, id: string) => {
   return agent.delete<IPlaythrough>(
-    `${PLAYTHROUGHS_API}/delete-playthrough/${userId}/${id}`
+    `${PLAYTHROUGHS_API}/delete/${userId}/${id}`
   );
 };
 

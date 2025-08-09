@@ -43,20 +43,20 @@ export const Settings: FC<SettingsProps> = ({}) => {
     if (!profile) return;
 
     const apiCalls = [];
-    // if (description) {
-    //   apiCalls.push(() =>
-    //     userAPI.updateDescription(profile._id, { description })
-    //   );
-    // }
+    if (description) {
+      apiCalls.push(() =>
+        userAPI.updateDescription(profile._id, { description })
+      );
+    }
     if (tempAvatar) {
       console.log("tempAvatar", tempAvatar);
       apiCalls.push(userAPI.addAvatar(profile._id, tempAvatar));
     }
-    // if (raUsername)
-    //   apiCalls.push(() => userAPI.setRaUserInfo(profile._id, raUsername));
+    if (raUsername)
+      apiCalls.push(() => userAPI.setRaUserInfo(profile._id, raUsername));
     // if (background)
     //   apiCalls.push(() => userAPI.addBackground(profile._id, background));
-    //
+
     Promise.all(apiCalls).then(() => {
       toast.success({ description: "Saved successfully" });
     });
@@ -111,7 +111,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
           />
         </div>
 
-        <div className={styles.field}>
+        {/*<div className={styles.field}>
           <label htmlFor="bg">Background URL</label>
           <Input
             type="text"
@@ -120,7 +120,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
             className={styles.input}
             onChange={(e) => setBackground(e.target.value)}
           />
-        </div>
+        </div>*/}
 
         <RangeSelector
           defaultValue={bgOpacity || 0}

@@ -1,5 +1,6 @@
 import UserProfile from "@/src/lib/pages/UserProfile/UserProfile";
 import { playthroughsAPI, userAPI } from "@/src/lib/shared/api";
+import { ratingsAPI } from "@/src/lib/shared/api/ratings.api";
 import { ACCESS_TOKEN } from "@/src/lib/shared/constants";
 import { jwtDecode } from "jwt-decode";
 import { Metadata } from "next";
@@ -36,6 +37,11 @@ export default async function User({ params }: { params: any }) {
       userId: user._id,
     })
   )?.data;
+  const ratings = (
+    await ratingsAPI.getAll({
+      userId: user._id,
+    })
+  )?.data;
   const userFollowings = (await userAPI.getUserFollowings(user._id)).data;
   // user.raUsername && (await userAPI.setRaUserInfo(user._id, user.raUsername));
 
@@ -45,6 +51,7 @@ export default async function User({ params }: { params: any }) {
       authUserId={authUserInfo?.id}
       authUserFollowings={authUserFollowings}
       playthroughs={playthroughs}
+      ratings={ratings}
     />
   );
 }

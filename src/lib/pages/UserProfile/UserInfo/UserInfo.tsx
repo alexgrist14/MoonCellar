@@ -76,7 +76,7 @@ const UserInfo: FC<UserInfoProps> = ({
             <div className={styles.profile__image}>
               <Image
                 key={id}
-                src={commonUtils.getAvatar(user) || "/images/user.png"}
+                src={user.avatar || "/images/user.png"}
                 width={160}
                 height={160}
                 alt="profile"

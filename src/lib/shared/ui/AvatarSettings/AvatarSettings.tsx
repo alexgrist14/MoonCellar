@@ -14,7 +14,6 @@ const AvatarSettings: FC<AvatarSettingsProps> = ({
   tempAvatar,
   setTempAvatar,
 }) => {
-  const [isError, setIsError] = useState(false);
   const [profileHover, setProfileHover] = useState<boolean>(false);
 
   const { profile, setProfile } = useAuthStore();
@@ -31,7 +30,7 @@ const AvatarSettings: FC<AvatarSettingsProps> = ({
         setTempAvatar && setTempAvatar(undefined);
       } else {
         setTempAvatar && setTempAvatar(file);
-        !!profile && setProfile({ ...profile, profilePicture: "" });
+        !!profile && setProfile({ ...profile, avatar: "" });
         setIsPictureLarge(false);
       }
     }
@@ -54,11 +53,10 @@ const AvatarSettings: FC<AvatarSettingsProps> = ({
           src={
             !!tempAvatar
               ? URL.createObjectURL(tempAvatar)
-              : isError
+              : !profile.avatar
                 ? "/images/user.png"
-                : commonUtils.getAvatar(profile)
+                : profile.avatar
           }
-          onError={() => setIsError(true)}
           width={160}
           height={160}
           alt="profile"
