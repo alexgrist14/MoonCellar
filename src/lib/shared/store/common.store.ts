@@ -6,7 +6,7 @@ import {
   IGDBGameType,
   IGDBGenre,
   IGDBPlatform,
-} from "../types/igdb";
+} from "../types/igdb.type";
 
 export type IExpandPosition = "left" | "right" | "bottom-left" | "bottom-right";
 

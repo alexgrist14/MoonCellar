@@ -1,4 +1,4 @@
-import { IRAGame } from "./retroachievements";
+import { IRAGame } from "./retroachievements.type";
 
 export interface IGDBDefault {
   _id: number;

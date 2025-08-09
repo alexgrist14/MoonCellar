@@ -6,8 +6,8 @@ import { useGamesStore } from "@/src/lib/shared/store/games.store";
 import { emptyGames } from "@/src/lib/shared/constants/games.const";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { useWheel } from "@/src/lib/shared/hooks/useWheel";
-import { shuffle } from "@/src/lib/shared/utils/common";
-import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
+import { shuffle } from "@/src/lib/shared/utils/common.utils";
+import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb.type";
 
 interface WheelComponentProps {
   primaryColor?: string;

@@ -2,8 +2,8 @@ import { FC, ReactNode, useRef } from "react";
 import styles from "./GameCardInfo.module.scss";
 import classNames from "classnames";
 import Link from "next/link";
-import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
-import { commonUtils } from "@/src/lib/shared/utils/common";
+import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb.type";
+import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { IPlaythroughMinimal } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 
 interface IGameCardInfoProps {

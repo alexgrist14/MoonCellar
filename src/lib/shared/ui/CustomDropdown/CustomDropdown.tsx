@@ -1,4 +1,4 @@
-import { SortType } from "@/src/lib/shared/types/sort";
+import { SortType } from "@/src/lib/shared/types/sort.type";
 import classNames from "classnames";
 import { FC } from "react";
 import { Radio } from "../Radio";

@@ -2,7 +2,7 @@
 
 import { FC, useEffect, useMemo } from "react";
 import { userListCategories } from "../../shared/constants/user.const";
-import { IUser } from "../../shared/types/auth";
+import { IUser } from "../../shared/types/auth.type";
 import { IFollowings } from "../../shared/types/user.type";
 import { Settings } from "./Settings";
 import { UserGames } from "./UserGames";

@@ -1,6 +1,6 @@
 import { CSSProperties, memo, useMemo, useRef, useState } from "react";
 import styles from "./GameCard.module.scss";
-import { IGDBGameMinimal } from "../../types/igdb";
+import { IGDBGameMinimal } from "../../types/igdb.type";
 import classNames from "classnames";
 import Image from "next/image";
 import { getImageLink } from "../../constants";

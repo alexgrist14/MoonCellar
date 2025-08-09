@@ -3,7 +3,7 @@ import styles from "./BGImage.module.scss";
 import classNames from "classnames";
 import Image from "next/image";
 import { IGDBApi } from "../../api";
-import { IGDBGameMinimal, IGDBScreenshot } from "../../types/igdb";
+import { IGDBGameMinimal, IGDBScreenshot } from "../../types/igdb.type";
 import { getImageLink } from "../../constants";
 import { useDebouncedCallback } from "use-debounce";
 import { useSettingsStore } from "../../store/settings.store";

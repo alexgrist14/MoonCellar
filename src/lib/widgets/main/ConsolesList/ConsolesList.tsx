@@ -8,10 +8,10 @@ import { IUserPreset } from "@/src/lib/shared/types/user.type";
 import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
 import { IGDBApi, userAPI } from "@/src/lib/shared/api";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { toast } from "@/src/lib/shared/utils/toast";
+import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { SaveForm } from "@/src/lib/shared/ui/SaveForm";
-import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
+import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb.type";
 
 export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
   initialTabIndex,

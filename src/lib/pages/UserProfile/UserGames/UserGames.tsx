@@ -1,6 +1,6 @@
 import { IGDBApi } from "@/src/lib/shared/api";
-import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
-import { SortType } from "@/src/lib/shared/types/sort";
+import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb.type";
+import { SortType } from "@/src/lib/shared/types/sort.type";
 import { CategoriesType, IGamesRating } from "@/src/lib/shared/types/user.type";
 import { CustomDropdown } from "@/src/lib/shared/ui/CustomDropdown";
 import { GameCard } from "@/src/lib/shared/ui/GameCard";
@@ -17,7 +17,7 @@ import { IPlaythrough } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 import { useDebouncedCallback } from "use-debounce";
 import { useAsyncLoader } from "@/src/lib/shared/hooks/useAsyncLoader";
 import { accentColor, accentColorRGB } from "@/src/lib/shared/constants";
-import { commonUtils } from "@/src/lib/shared/utils/common";
+import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { GamePlaysInfo } from "@/src/lib/entities/game/ui/GamePlaysInfo";
 

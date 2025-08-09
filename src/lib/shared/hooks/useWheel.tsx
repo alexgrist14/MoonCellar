@@ -1,7 +1,7 @@
 import { useCallback } from "react";
-import { IGDBGameMinimal } from "../types/igdb";
+import { IGDBGameMinimal } from "../types/igdb.type";
 import { getImageLink } from "../constants";
-import { createImage } from "../utils/image";
+import { createImage } from "../utils/image.utils";
 
 interface IDrawProps {
   images?: HTMLImageElement[];

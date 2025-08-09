@@ -6,8 +6,8 @@ import { Button } from "../Button";
 import { useAuthStore } from "../../store/auth.store";
 import { IGameFilters } from "../../types/filters.type";
 import { userAPI } from "../../api";
-import { getFiltersForQuery } from "../../utils/filters";
-import { toast } from "../../utils/toast";
+import { getFiltersForQuery } from "../../utils/filters.utils";
+import { toast } from "../../utils/toast.utils";
 import { modal } from "../Modal";
 import { IUserFilter } from "../../types/user.type";
 

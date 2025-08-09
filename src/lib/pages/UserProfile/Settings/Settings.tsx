@@ -5,7 +5,7 @@ import AvatarSettings from "@/src/lib/shared/ui/AvatarSettings/AvatarSettings";
 import { Button } from "@/src/lib/shared/ui/Button";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { Textarea } from "@/src/lib/shared/ui/Textarea";
-import { toast } from "@/src/lib/shared/utils/toast";
+import { toast } from "@/src/lib/shared/utils/toast.utils";
 import {
   Dispatch,
   FC,

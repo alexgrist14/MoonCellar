@@ -3,7 +3,7 @@ import { Button } from "../Button";
 import styles from "./ButtonGroup.module.scss";
 import Link from "next/link";
 import classNames from "classnames";
-import { IButtonGroupItem } from "../../../types/buttons";
+import { IButtonGroupItem } from "../../../types/buttons.type";
 
 interface IButtonGroupProps {
   buttons: IButtonGroupItem[];

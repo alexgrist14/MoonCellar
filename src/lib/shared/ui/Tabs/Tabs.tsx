@@ -3,7 +3,7 @@ import { Button, IButtonProps } from "../Button";
 import cl from "classnames";
 import styles from "./Tabs.module.scss";
 import Link from "next/link";
-import { ITabContent } from "../../types/tabs";
+import { ITabContent } from "../../types/tabs.type";
 
 interface ITabs {
   contents: ITabContent[];

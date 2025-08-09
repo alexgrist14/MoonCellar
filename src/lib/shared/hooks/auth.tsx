@@ -2,9 +2,9 @@ import { useRouter } from "next/navigation";
 import { authAPI, userAPI } from "../api";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import { useAuthStore } from "../store/auth.store";
-import { IAuth } from "../types/auth";
+import { IAuth } from "../types/auth.type";
 import { modal } from "../ui/Modal";
-import { deleteCookie } from "../utils/cookies";
+import { deleteCookie } from "../utils/cookies.utils";
 import { useUserStore } from "../store/user.store";
 
 export const useAuth = () => {

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { screenMd } from "../constants";
-import { commonUtils } from "../utils/common";
+import { commonUtils } from "../utils/common.utils";
 
 type IState = {
   isLoading?: boolean;

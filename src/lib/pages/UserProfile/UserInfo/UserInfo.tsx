@@ -1,10 +1,10 @@
 import { IGDBApi, userAPI } from "@/src/lib/shared/api";
 import { getImageLink } from "@/src/lib/shared/constants";
-import { IUser } from "@/src/lib/shared/types/auth";
+import { IUser } from "@/src/lib/shared/types/auth.type";
 import { IFollowings, ILogs } from "@/src/lib/shared/types/user.type";
 import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
 import { Button } from "@/src/lib/shared/ui/Button";
-import { commonUtils } from "@/src/lib/shared/utils/common";
+import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import Image from "next/image";
 import Link from "next/link";
 import { FC, useEffect, useMemo, useState } from "react";
@@ -13,7 +13,7 @@ import Markdown from "react-markdown";
 import { Interweave } from "interweave";
 import { useAsyncLoader } from "@/src/lib/shared/hooks/useAsyncLoader";
 import { Loader } from "@/src/lib/shared/ui/Loader";
-import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb";
+import { IGDBGameMinimal } from "@/src/lib/shared/types/igdb.type";
 import { Cover } from "@/src/lib/shared/ui/Cover";
 
 interface UserInfoProps {

@@ -8,8 +8,8 @@ import {
   IGDBGenre,
   IGDBPlatform,
   IGDBScreenshot,
-} from "../types/igdb";
-import { agent } from "./agent";
+} from "../types/igdb.type";
+import { agent } from "./agent.api";
 
 export interface IGDBFilters {
   [key: string]: number[] | undefined;

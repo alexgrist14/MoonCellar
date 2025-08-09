@@ -37,15 +37,15 @@ export const Layout: FC<ILayoutProps> = ({
 
   useAuthRefresh({ accessToken, refreshToken });
   useMediaStore();
-  useGetUserInfo();
+  //useGetUserInfo();
 
-  useEffect(() => {
-    IGDBApi.getGenres().then((response) => setGenres(response.data));
-    IGDBApi.getModes().then((response) => setGameModes(response.data));
-    IGDBApi.getPlatforms().then((response) => setSystems(response.data));
-    IGDBApi.getThemes().then((response) => setThemes(response.data));
-    IGDBApi.getGameTypes().then((response) => setGameTypes(response.data));
-  }, [setGenres, setGameModes, setSystems, setThemes, setGameTypes]);
+  // useEffect(() => {
+  //   IGDBApi.getGenres().then((response) => setGenres(response.data));
+  //   IGDBApi.getModes().then((response) => setGameModes(response.data));
+  //   IGDBApi.getPlatforms().then((response) => setSystems(response.data));
+  //   IGDBApi.getThemes().then((response) => setThemes(response.data));
+  //   IGDBApi.getGameTypes().then((response) => setGameTypes(response.data));
+  // }, [setGenres, setGameModes, setSystems, setThemes, setGameTypes]);
 
   return (
     <div className={className}>

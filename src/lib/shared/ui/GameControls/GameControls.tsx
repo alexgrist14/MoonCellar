@@ -1,6 +1,6 @@
 import { CSSProperties, FC, useMemo, useRef } from "react";
 import styles from "./GameControls.module.scss";
-import { IGDBGameMinimal } from "../../types/igdb";
+import { IGDBGameMinimal } from "../../types/igdb.type";
 import { Icon } from "@iconify/react";
 import classNames from "classnames";
 import { Button } from "../Button";

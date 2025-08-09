@@ -15,3 +15,4 @@ export * from "./SvgAchievement";
 export * from "./SvgArrowPointer";
 export * from "./SvgPlay";
 export * from "./SvgCircleMenu";
+export * from "./SvgAdmin";

@@ -1,0 +1,91 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  //gap: var(--gap-s);
+  overflow: hidden;
+}
+
+.table {
+  display: flex;
+  //gap: var(--gap-s);
+  //background-color: var(--color-bg-secondary);
+  //padding: var(--padding-s);
+  //border-radius: var(--radius-xs);
+  min-height: 110px;
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  &__column {
+    display: grid;
+    //gap: var(--gap-xs);
+    width: min-content;
+    grid-template-rows: min-content;
+    flex: 1;
+  }
+
+  &__header,
+  &__cell {
+    height: fit-content;
+    overflow: hidden;
+  }
+
+  &__header {
+    display: flex;
+    //gap: var(--gap-s);
+    align-items: center;
+    justify-content: space-between;
+    //border-radius: var(--radius-xxs);
+    //background-color: var(--color-bg-tertiary);
+    user-select: none;
+    position: relative;
+    min-width: max(100%, 60px);
+    resize: horizontal;
+
+    &_active,
+    &:hover {
+      //background-color: var(--color-hover-primary);
+    }
+  }
+
+  &__text {
+    display: flex;
+    //gap: var(--gap-s);
+    //padding: var(--padding-xs);
+    overflow: hidden;
+    justify-content: space-between;
+    width: 100%;
+
+    &_clickable {
+      cursor: pointer;
+    }
+
+    &>p,
+    &>a,
+    &>a>p {
+      //@include overflowText;
+    }
+  }
+
+  &__cell {
+    margin-block: auto;
+    min-width: 60px;
+  }
+
+  &__resize {
+    height: calc(100% - 4px);
+    position: absolute;
+    right: 2px;
+    //border-radius: var(--radius-xxs);
+    cursor: ew-resize;
+    //background-color: var(--color-bg-accent);
+    width: 2px;
+  }
+
+  &__empty {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}

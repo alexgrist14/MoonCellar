@@ -1,7 +1,7 @@
 import { FC, useMemo } from "react";
 import styles from "./GameButtons.module.scss";
 import { ButtonGroup } from "../Button/ButtonGroup";
-import { IGDBGameMinimal } from "../../types/igdb";
+import { IGDBGameMinimal } from "../../types/igdb.type";
 import { WrapperTemplate } from "../WrapperTemplate";
 import { useGamesStore } from "../../store/games.store";
 import { Separator } from "../Separator";

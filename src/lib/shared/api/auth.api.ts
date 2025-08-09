@@ -1,6 +1,6 @@
-import { IAuth } from "../types/auth";
+import { IAuth } from "../types/auth.type";
 import { API_URL } from "../constants";
-import agent from "./agent";
+import agent from "./agent.api";
 
 const AUTH_URL = `${API_URL}/auth`;
 

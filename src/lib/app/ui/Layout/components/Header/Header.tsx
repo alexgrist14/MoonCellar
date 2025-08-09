@@ -5,7 +5,7 @@ import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { SearchModal } from "@/src/lib/shared/ui/SearchModal";
 import { Separator } from "@/src/lib/shared/ui/Separator";
-import { SvgSearch } from "@/src/lib/shared/ui/svg";
+import { SvgAdmin, SvgSearch } from "@/src/lib/shared/ui/svg";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Link from "next/link";
 import { FC, MouseEvent } from "react";
@@ -56,6 +56,16 @@ export const Header: FC = () => {
                 </>
               ),
               link: "/gauntlet",
+              color: "transparent",
+            },
+            {
+              title: (
+                <>
+                  <SvgAdmin className={styles.svg} />
+                  {!isMobile && <span>Admin</span>}
+                </>
+              ),
+              link: "/admin",
               color: "transparent",
             },
             {

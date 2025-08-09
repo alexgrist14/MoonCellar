@@ -13,7 +13,7 @@ import classNames from "classnames";
 import { useStatesStore } from "../../store/states.store";
 import { useResizeDetector } from "react-resize-detector";
 import { useExpandStore } from "../../store/expand.store";
-import { commonUtils } from "../../utils/common";
+import { commonUtils } from "../../utils/common.utils";
 import { CheckMobile } from "../CheckMobile";
 import { createPortal } from "react-dom";
 import useCloseEvents from "../../hooks/useCloseEvents";

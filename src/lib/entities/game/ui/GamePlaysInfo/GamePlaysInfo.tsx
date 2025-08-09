@@ -2,7 +2,7 @@ import { FC, useCallback } from "react";
 import styles from "./GamePlaysInfo.module.scss";
 import { IPlaythrough } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
-import { commonUtils } from "@/src/lib/shared/utils/common";
+import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { WrapperTemplate } from "@/src/lib/shared/ui/WrapperTemplate";
 import { Separator } from "@/src/lib/shared/ui/Separator";
 

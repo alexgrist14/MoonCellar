@@ -2,7 +2,7 @@ import { memo, useMemo, useRef, useState } from "react";
 import styles from "./Pagination.module.scss";
 import { Button } from "../Button";
 import { Input } from "../Input";
-import { keyboardUtils } from "../../utils/keyboard";
+import { keyboardUtils } from "../../utils/keyboard.utils";
 import classNames from "classnames";
 import { SvgDoubleArrow } from "../svg/SvgDoubleArrow";
 import { SvgArrow } from "../svg/SvgArrow";

@@ -2,7 +2,7 @@ import { FC, useEffect, useMemo, useState } from "react";
 import styles from "./Slideshow.module.scss";
 import { Scrollbar } from "../Scrollbar";
 import { modal } from "../Modal";
-import { IGDBScreenshot } from "../../types/igdb";
+import { IGDBScreenshot } from "../../types/igdb.type";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Button } from "../Button";
 import { SlideshowImage } from "./components/SlideshowImage";

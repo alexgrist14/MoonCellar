@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { IGDBGameMinimal } from "../types/igdb";
+import { IGDBGameMinimal } from "../types/igdb.type";
 import { devtools, persist } from "zustand/middleware";
 
 type IState = {

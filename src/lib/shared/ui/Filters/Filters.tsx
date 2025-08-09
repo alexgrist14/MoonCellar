@@ -8,17 +8,20 @@ import { ButtonGroup } from "../Button/ButtonGroup";
 import { ToggleSwitch } from "../ToggleSwitch";
 import { IGameFilters } from "../../types/filters.type";
 import { RangeSelector } from "../RangeSelector";
-import { parseQueryFilters, pushFiltersToQuery } from "../../utils/filters";
+import {
+  parseQueryFilters,
+  pushFiltersToQuery,
+} from "../../utils/filters.utils";
 import { Tabs } from "../Tabs";
-import { ITabContent } from "../../types/tabs";
+import { ITabContent } from "../../types/tabs.type";
 import { IGDBApi, userAPI } from "../../api";
 import { useAuthStore } from "../../store/auth.store";
 import { Loader } from "../Loader";
 import { IUserFilter } from "../../types/user.type";
 import { modal } from "../Modal";
 import { SaveFilterForm } from "../SaveFilterForm";
-import { toast } from "../../utils/toast";
-import { IGDBDefault } from "../../types/igdb";
+import { toast } from "../../utils/toast.utils";
+import { IGDBDefault } from "../../types/igdb.type";
 import { useDebouncedCallback } from "use-debounce";
 import { useAdvancedRouter } from "../../hooks/useAdvancedRouter";
 

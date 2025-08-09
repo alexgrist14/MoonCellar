@@ -3,18 +3,18 @@
 import { FC, useCallback, useEffect } from "react";
 import styles from "./GauntletPage.module.scss";
 import { ConsolesList } from "../../widgets/main";
-import { IGDBApi } from "../../shared/api";
+import { adminUsersApi, IGDBApi } from "../../shared/api";
 import { WheelContainer } from "../../widgets/wheel";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { useStatesStore } from "../../shared/store/states.store";
 import classNames from "classnames";
 import { useGamesStore } from "../../shared/store/games.store";
-import { parseQueryFilters } from "../../shared/utils/filters";
+import { parseQueryFilters } from "../../shared/utils/filters.utils";
 import { Filters } from "../../shared/ui/Filters";
 import { BGImage } from "../../shared/ui/BGImage";
 import { useAdvancedRouter } from "../../shared/hooks/useAdvancedRouter";
 import { useWheel } from "../../shared/hooks/useWheel";
-import { shuffle } from "../../shared/utils/common";
+import { shuffle } from "../../shared/utils/common.utils";
 
 export const GauntletPage: FC = () => {
   const { asPath } = useAdvancedRouter();

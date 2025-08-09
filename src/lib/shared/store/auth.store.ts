@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
-import { IUser } from "../types/auth";
+import { IUser } from "../types/auth.type";
 
 type IState = {
   isAuth?: boolean;

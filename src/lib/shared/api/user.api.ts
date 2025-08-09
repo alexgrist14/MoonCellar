@@ -1,5 +1,5 @@
 import { API_URL } from "../constants";
-import { IUser } from "../types/auth";
+import { IUser } from "../types/auth.type";
 import {
   CategoriesType,
   IFollowings,
@@ -9,7 +9,7 @@ import {
   IUserLogs,
   IUserPreset,
 } from "../types/user.type";
-import agent from "./agent";
+import agent from "./agent.api";
 
 const USER_URL = `${API_URL}/user`;
 

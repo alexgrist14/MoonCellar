@@ -1,7 +1,7 @@
 import { FC } from "react";
 import styles from "./GamesList.module.scss";
 import { Button } from "@/src/lib/shared/ui/Button";
-import { IGDBGameMinimal } from "../../types/igdb";
+import { IGDBGameMinimal } from "../../types/igdb.type";
 import { ButtonGroup } from "../Button/ButtonGroup";
 
 interface IGamesListProps {

@@ -51,15 +51,9 @@
       justify-content: center;
     }
 
-    // .diagram {
-    //   width: 400px;
-    //   @include mediaMax(1380px) {
-    //     width: 100%;
-    //   }
-    // }
     &__left {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr auto;
       gap: 20px;
 
       @include mediaMd {
@@ -201,7 +195,7 @@
       &__img {
         border-radius: $radius;
 
-        & > img {
+        &>img {
           max-height: calc(240px / $coverRatio);
           max-width: 240px;
           aspect-ratio: $coverRatio;

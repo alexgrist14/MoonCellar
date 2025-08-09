@@ -1,5 +1,5 @@
-import { IUser } from "./auth";
-import { IGDBGameMinimal } from "./igdb";
+import { IUser } from "./auth.type";
+import { IGDBGameMinimal } from "./igdb.type";
 
 export type CategoriesType =
   | "completed"

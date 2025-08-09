@@ -1,0 +1,9 @@
+.pagination {
+  display: flex;
+  gap: var(--gap-s);
+
+  & > button:first-of-type {
+    flex-basis: 80%;
+    flex-grow: 1;
+  }
+}

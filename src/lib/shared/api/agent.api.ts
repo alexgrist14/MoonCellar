@@ -1,8 +1,8 @@
 import axios, { AxiosError } from "axios";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
-import { authAPI } from "./auth";
-import { deleteCookie } from "../utils/cookies";
-import { toast } from "../utils/toast";
+import { authAPI } from "./auth.api";
+import { deleteCookie } from "../utils/cookies.utils";
+import { toast } from "../utils/toast.utils";
 
 export const agent = axios.create({
   withCredentials: true,

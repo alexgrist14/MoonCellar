@@ -2,9 +2,9 @@ import { jwtDecode } from "jwt-decode";
 import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { useAuthStore } from "../store/auth.store";
-import { IAuthToken } from "../types/auth";
+import { IAuthToken } from "../types/auth.type";
 import { authAPI, userAPI } from "../api";
-import { deleteCookie } from "../utils/cookies";
+import { deleteCookie } from "../utils/cookies.utils";
 import { REFRESH_TOKEN } from "../constants";
 
 interface ITokens {

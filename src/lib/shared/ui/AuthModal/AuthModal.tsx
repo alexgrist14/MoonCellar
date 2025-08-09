@@ -1,4 +1,4 @@
-import { IAuth } from "@/src/lib/shared/types/auth";
+import { IAuth } from "@/src/lib/shared/types/auth.type";
 import { Button } from "@/src/lib/shared/ui/Button";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { FC, useState } from "react";

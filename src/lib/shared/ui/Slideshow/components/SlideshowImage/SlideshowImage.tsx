@@ -3,7 +3,7 @@ import styles from "./SlideshowImage.module.scss";
 import Image from "next/image";
 import classNames from "classnames";
 import { getImageLink } from "@/src/lib/shared/constants";
-import { IGDBScreenshot } from "@/src/lib/shared/types/igdb";
+import { IGDBScreenshot } from "@/src/lib/shared/types/igdb.type";
 import { Loader } from "../../../Loader";
 
 export const SlideshowImage: FC<{ picture: IGDBScreenshot }> = ({

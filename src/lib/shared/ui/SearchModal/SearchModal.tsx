@@ -2,7 +2,7 @@ import { Input } from "../Input";
 import styles from "./SearchModal.module.scss";
 import { FC, useState } from "react";
 import { IGDBApi } from "../../api";
-import { IGDBGameMinimal } from "../../types/igdb";
+import { IGDBGameMinimal } from "../../types/igdb.type";
 import { Scrollbar } from "../Scrollbar";
 import { Button } from "../Button";
 import { GameCard } from "../GameCard";

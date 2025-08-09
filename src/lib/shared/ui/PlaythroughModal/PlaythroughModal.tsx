@@ -2,12 +2,12 @@ import { FC, useCallback, useEffect, useState } from "react";
 import styles from "./PlaythroughModal.module.scss";
 import { gamesAPI } from "../../api/games.api";
 import { Dropdown } from "../Dropdown";
-import { IGDBGameMinimal } from "../../types/igdb";
+import { IGDBGameMinimal } from "../../types/igdb.type";
 import { ButtonGroup } from "../Button/ButtonGroup";
 import { Textarea } from "../Textarea";
 import { Input } from "../Input";
 import { ToggleSwitch } from "../ToggleSwitch";
-import { commonUtils } from "../../utils/common";
+import { commonUtils } from "../../utils/common.utils";
 import { useAuthStore } from "../../store/auth.store";
 import {
   IPlaythrough,
@@ -20,12 +20,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAsyncLoader } from "../../hooks/useAsyncLoader";
 import { Loader } from "../Loader";
 import { Errors } from "../Errors";
-import { IButtonGroupItem } from "../../types/buttons";
+import { IButtonGroupItem } from "../../types/buttons.type";
 import { SvgPlus } from "../svg";
 import classNames from "classnames";
 import { useUserStore } from "../../store/user.store";
 import { WrapperTemplate } from "../WrapperTemplate";
-import { toast } from "../../utils/toast";
+import { toast } from "../../utils/toast.utils";
 
 interface IPlaythroughModalProps {
   userId: string;

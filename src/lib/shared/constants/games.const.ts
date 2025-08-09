@@ -1,4 +1,4 @@
-import { IGDBGameMinimal } from "../types/igdb";
+import { IGDBGameMinimal } from "../types/igdb.type";
 
 export const emptyGames: IGDBGameMinimal[] = Array(16)
   .fill("")

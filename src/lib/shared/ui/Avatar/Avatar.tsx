@@ -1,10 +1,10 @@
 import Image from "next/image";
 import { FC, useRef, useState } from "react";
-import { IUser } from "../../types/auth";
+import { IUser } from "../../types/auth.type";
 import { SvgProfile } from "../svg";
 import { Tooltip } from "../Tooltip";
 import styles from "./Avatar.module.scss";
-import { commonUtils } from "../../utils/common";
+import { commonUtils } from "../../utils/common.utils";
 
 interface AvatarProps {
   user?: Pick<IUser, "_id" | "userName" | "profilePicture">;

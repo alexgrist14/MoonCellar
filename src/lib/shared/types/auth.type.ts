@@ -1,4 +1,4 @@
-import { IRAAward } from "./retroachievements";
+import { IRAAward } from "./retroachievements.type";
 import {
   CategoriesType,
   IFollowings,
@@ -24,9 +24,11 @@ export interface IUser {
   filters: IUserFilter[];
   presets: IUserPreset[];
   updatedAt: Date;
+  createdAt: Date;
   description: string;
   raUsername?: string;
   raAwards?: IRAAward[];
+  roles?: string[];
   background?: string;
 }
 
