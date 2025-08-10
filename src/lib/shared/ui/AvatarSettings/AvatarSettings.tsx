@@ -3,6 +3,7 @@ import { ChangeEvent, Dispatch, FC, SetStateAction, useState } from "react";
 import { useAuthStore } from "../../store/auth.store";
 import { SvgCamera } from "../svg";
 import styles from "./AvatarSettings.module.scss";
+import { commonUtils } from "../../utils/common";
 
 interface AvatarSettingsProps {
   tempAvatar?: File;
@@ -29,11 +30,13 @@ const AvatarSettings: FC<AvatarSettingsProps> = ({
         setTempAvatar && setTempAvatar(undefined);
       } else {
         setTempAvatar && setTempAvatar(file);
-        !!profile && setProfile({ ...profile, profilePicture: "" });
+        !!profile && setProfile({ ...profile, avatar: "" });
         setIsPictureLarge(false);
       }
     }
   };
+
+  if (!profile) return null;
 
   return (
     <label htmlFor="avatar" className={styles.label}>
@@ -48,11 +51,11 @@ const AvatarSettings: FC<AvatarSettingsProps> = ({
       >
         <Image
           src={
-            profile?.profilePicture
-              ? `https://api.mooncellar.space/photos/${profile.profilePicture}`
-              : !!tempAvatar
-                ? URL.createObjectURL(tempAvatar)
-                : "/images/user.png"
+            !!tempAvatar
+              ? URL.createObjectURL(tempAvatar)
+              : !profile.avatar
+                ? "/images/user.png"
+                : profile.avatar
           }
           width={160}
           height={160}

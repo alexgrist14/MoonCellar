@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import styles from "./GamesPage.module.scss";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { Filters } from "../../shared/ui/Filters";
-import { IGDBApi } from "../../shared/api";
-import { IGDBGameMinimal } from "../../shared/types/igdb.type";
+import { gamesApi } from "../../shared/api";
 import { GameCard } from "../../shared/ui/GameCard";
 import { useDebouncedCallback } from "use-debounce";
 import { Loader } from "../../shared/ui/Loader";
@@ -18,12 +17,13 @@ import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
 import { BGImage } from "../../shared/ui/BGImage";
 import { useAdvancedRouter } from "../../shared/hooks/useAdvancedRouter";
 import { useAsyncLoader } from "../../shared/hooks/useAsyncLoader";
+import { IGameResponse } from "../../shared/lib/schemas/games.schema";
 
 export const GamesPage = () => {
   const { sync, isLoading, setIsLoading } = useAsyncLoader();
   const { asPath, query } = useAdvancedRouter();
 
-  const [games, setGames] = useState<IGDBGameMinimal[]>();
+  const [games, setGames] = useState<IGameResponse[]>();
   const [total, setTotal] = useState(0);
   const [take, setTake] = useState(80);
 
@@ -31,14 +31,16 @@ export const GamesPage = () => {
     const filters = parseQueryFilters(asPath);
 
     sync(() =>
-      IGDBApi.getGames({
-        ...filters,
-        page: page || 1,
-        take,
-      }).then((res) => {
-        setGames(res.data.results);
-        setTotal(res.data.total);
-      })
+      gamesApi
+        .getAll({
+          ...filters,
+          page: page || 1,
+          take,
+        })
+        .then((res) => {
+          setGames(res.data.results);
+          setTotal(res.data.total);
+        })
     );
   }, 200);
 

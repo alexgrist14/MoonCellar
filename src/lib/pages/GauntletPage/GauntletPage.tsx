@@ -3,7 +3,6 @@
 import { FC, useCallback, useEffect } from "react";
 import styles from "./GauntletPage.module.scss";
 import { ConsolesList } from "../../widgets/main";
-import { adminUsersApi, IGDBApi } from "../../shared/api";
 import { WheelContainer } from "../../widgets/wheel";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { useStatesStore } from "../../shared/store/states.store";
@@ -14,7 +13,8 @@ import { Filters } from "../../shared/ui/Filters";
 import { BGImage } from "../../shared/ui/BGImage";
 import { useAdvancedRouter } from "../../shared/hooks/useAdvancedRouter";
 import { useWheel } from "../../shared/hooks/useWheel";
-import { shuffle } from "../../shared/utils/common.utils";
+import { shuffle } from "../../shared/utils/common";
+import { gamesApi } from "../../shared/api";
 
 export const GauntletPage: FC = () => {
   const { asPath } = useAdvancedRouter();
@@ -36,30 +36,32 @@ export const GauntletPage: FC = () => {
 
     const filters = parseQueryFilters(asPath);
 
-    IGDBApi.getGames({
-      ...filters,
-      isRandom: true,
-      take: 16,
-      ...(isExcludeHistory &&
-        !!historyGames?.length && {
-          excludeGames: historyGames.map((game) => game._id),
-        }),
-    }).then((response) => {
-      if (!!response.data.results.length) {
-        const games = shuffle(response.data.results);
+    gamesApi
+      .getAll({
+        ...filters,
+        isRandom: true,
+        take: 16,
+        ...(isExcludeHistory &&
+          !!historyGames?.length && {
+            excludeGames: historyGames.map((game) => game._id),
+          }),
+      })
+      .then((response) => {
+        if (!!response.data.results.length) {
+          const games = shuffle(response.data.results);
 
-        setGames(games);
-        parseImages(games).then((images) => {
-          drawWheel({ images, wheelGames: games });
+          setGames(games);
+          parseImages(games).then((images) => {
+            drawWheel({ images, wheelGames: games });
 
+            setLoading(false);
+            setStarted(true);
+          });
+        } else {
           setLoading(false);
-          setStarted(true);
-        });
-      } else {
-        setLoading(false);
-        setFinished(true);
-      }
-    });
+          setFinished(true);
+        }
+      });
   }, [
     setLoading,
     isRoyal,

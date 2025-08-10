@@ -1,6 +1,5 @@
 import { CSSProperties, FC, useMemo, useRef } from "react";
 import styles from "./GameControls.module.scss";
-import { IGDBGameMinimal } from "../../types/igdb.type";
 import { Icon } from "@iconify/react";
 import classNames from "classnames";
 import { Button } from "../Button";
@@ -13,11 +12,12 @@ import { GameRating } from "@/src/lib/features/game/GameRating";
 import { GameButtons } from "../GameButtons";
 import { WrapperTemplate } from "../WrapperTemplate";
 import { SvgCircleMenu, SvgPlay } from "../svg";
+import { IGameResponse } from "../../lib/schemas/games.schema";
 
 interface IGameControlsProps {
   style?: CSSProperties;
   className?: string;
-  game: IGDBGameMinimal;
+  game: IGameResponse;
 }
 
 export const GameControls: FC<IGameControlsProps> = ({
@@ -27,13 +27,14 @@ export const GameControls: FC<IGameControlsProps> = ({
 }) => {
   const { profile } = useAuthStore();
   const { playthroughs } = useUserStore();
+  const { ratings } = useUserStore();
 
   const controlsRef = useRef<HTMLDivElement>(null);
   const ratingButtonRef = useRef<HTMLButtonElement>(null);
 
   const rating = useMemo(
-    () => profile?.gamesRating?.find((rating) => rating.game === game._id),
-    [game, profile]
+    () => ratings?.find((rating) => rating.gameId === game._id),
+    [game, ratings]
   );
 
   const playthrough = useMemo(
@@ -91,7 +92,7 @@ export const GameControls: FC<IGameControlsProps> = ({
         tooltip={"Set rating"}
         tooltipAlign="right"
         onClick={() => {
-          modal.open(<GameRating rating={rating?.rating} game={game} />, {
+          modal.open(<GameRating game={game} />, {
             id: "game-rating",
           });
         }}

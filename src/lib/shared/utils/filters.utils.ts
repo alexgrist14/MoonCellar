@@ -1,8 +1,9 @@
 import queryString from "query-string";
-import { IGameFilters, IGameFiltersQuery } from "../types/filters.type";
+import { IGameFiltersQuery } from "../types/filters.type";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { IGetGamesRequest } from "../lib/schemas/games.schema";
 
-export const parseQueryFilters = (pathWithQuery: string): IGameFilters => {
+export const parseQueryFilters = (pathWithQuery: string): IGetGamesRequest => {
   const { query } = queryString.parseUrl(pathWithQuery, {
     arrayFormat: "bracket",
     parseBooleans: true,
@@ -14,7 +15,6 @@ export const parseQueryFilters = (pathWithQuery: string): IGameFilters => {
   return {
     search: filters?.search,
     company: filters?.company,
-    categories: filters?.categories,
     years: filters?.years,
     isOnlyWithAchievements: filters?.isOnlyWithAchievements,
     selected: {
@@ -23,7 +23,7 @@ export const parseQueryFilters = (pathWithQuery: string): IGameFilters => {
       platforms: filters?.selectedPlatforms,
       themes: filters?.selectedThemes,
       keywords: filters?.selectedKeywords,
-      gameTypes: filters?.selectedGameTypes,
+      types: filters?.selectedGameTypes,
     },
     excluded: {
       genres: filters?.excludedGenres,
@@ -31,21 +31,17 @@ export const parseQueryFilters = (pathWithQuery: string): IGameFilters => {
       platforms: filters?.excludedPlatforms,
       themes: filters?.excludedThemes,
       keywords: filters?.excludedKeywords,
-      gameTypes: filters?.excludedGameTypes,
+      types: filters?.excludedGameTypes,
     },
-    rating: filters?.rating,
-    votes: filters?.votes,
   };
 };
 
-export const getFiltersForQuery = (filters: IGameFilters) => {
+export const getFiltersForQuery = (filters: IGetGamesRequest) => {
   return queryString.stringify(
     {
       ...filters,
       selected: undefined,
       excluded: undefined,
-      rating: filters.rating || undefined,
-      votes: filters.votes || undefined,
       years: [filters.years?.[0] || undefined, filters.years?.[1] || undefined],
       selectedPlatforms: filters.selected?.platforms,
       excludedPlatforms: filters.excluded?.platforms,
@@ -57,8 +53,8 @@ export const getFiltersForQuery = (filters: IGameFilters) => {
       excludedKeywords: filters.excluded?.keywords,
       selectedModes: filters.selected?.modes,
       excludedModes: filters.excluded?.modes,
-      selectedGameTypes: filters.selected?.gameTypes,
-      excludedGameTypes: filters.excluded?.gameTypes,
+      selectedGameTypes: filters.selected?.types,
+      excludedGameTypes: filters.excluded?.types,
     },
     {
       arrayFormat: "bracket",
@@ -67,7 +63,7 @@ export const getFiltersForQuery = (filters: IGameFilters) => {
 };
 
 export const pushFiltersToQuery = (
-  filters: IGameFilters,
+  filters: IGetGamesRequest,
   router: AppRouterInstance,
   pathname: string
 ) => {

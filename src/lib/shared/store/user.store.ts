@@ -1,16 +1,16 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { IPlaythroughMinimal } from "../lib/schemas/playthroughs.schema";
-import { IGamesRating } from "../types/user.type";
+import { IUserRating } from "../lib/schemas/user-ratings.schema";
 
 type IState = {
   playthroughs?: IPlaythroughMinimal[];
-  ratings?: IGamesRating[];
+  ratings?: IUserRating[];
 };
 
 type IAction = {
   setPlaythroughs: (playthroughs: IPlaythroughMinimal[] | undefined) => void;
-  setRatings: (ratings: IGamesRating[]) => void;
+  setRatings: (ratings: IUserRating[]) => void;
 };
 
 export const useUserStore = create<IState & IAction>()(

@@ -4,10 +4,9 @@ import { IUser } from "../../types/auth.type";
 import { SvgProfile } from "../svg";
 import { Tooltip } from "../Tooltip";
 import styles from "./Avatar.module.scss";
-import { commonUtils } from "../../utils/common.utils";
 
 interface AvatarProps {
-  user?: Pick<IUser, "_id" | "userName" | "profilePicture">;
+  user?: Pick<IUser, "_id" | "userName" | "avatar">;
   isWithoutTooltip?: boolean;
 }
 
@@ -22,10 +21,10 @@ const Avatar: FC<AvatarProps> = ({ user, isWithoutTooltip }) => {
       onMouseOver={() => setIsTooltipActive(true)}
       onMouseOut={() => setIsTooltipActive(false)}
     >
-      {user?.profilePicture ? (
+      {!!user?.avatar ? (
         <Image
           className={styles.image}
-          src={commonUtils.getAvatar(user as IUser)}
+          src={user.avatar}
           width={90}
           height={90}
           alt="profile"

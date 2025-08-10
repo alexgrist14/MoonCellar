@@ -1,11 +1,5 @@
-import { IRAAward } from "./retroachievements.type";
-import {
-  CategoriesType,
-  IFollowings,
-  IGamesRating,
-  IUserFilter,
-  IUserPreset,
-} from "./user.type";
+import { IRAAward } from "./retroachievements";
+import { IFollowings, IUserFilter, IUserPreset } from "./user.type";
 
 export interface IAuth {
   userName: string;
@@ -17,9 +11,6 @@ export interface IUser {
   _id: string;
   userName: string;
   email: string;
-  games: Record<CategoriesType, number[]>;
-  gamesRating: IGamesRating[];
-  profilePicture: string;
   followings: IFollowings;
   filters: IUserFilter[];
   presets: IUserPreset[];
@@ -29,6 +20,7 @@ export interface IUser {
   raUsername?: string;
   raAwards?: IRAAward[];
   roles?: string[];
+  avatar: string;
   background?: string;
 }
 

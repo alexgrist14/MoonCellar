@@ -1,34 +1,17 @@
-import { IGDBFilters } from "../api";
-import { gameCategories } from "../constants";
-
-export interface IGameFilters {
-  search?: string;
-  rating?: number;
-  votes?: number;
-  isRandom?: boolean;
-  isOnlyWithAchievements?: boolean;
-  take?: number;
-  page?: number;
-  selected?: IGDBFilters;
-  excluded?: IGDBFilters;
-  company?: string;
-  years?: [number, number];
-  excludeGames?: number[];
-  categories?: (keyof typeof gameCategories)[];
-}
+import { IGetGamesRequest } from "../lib/schemas/games.schema";
 
 export interface IGameFiltersQuery
-  extends Omit<IGameFilters, "selected" | "excluded"> {
-  selectedGenres?: number[];
-  selectedModes?: number[];
-  selectedPlatforms?: number[];
-  selectedThemes?: number[];
-  selectedKeywords?: number[];
-  selectedGameTypes?: number[];
-  excludedGenres?: number[];
-  excludedModes?: number[];
-  excludedPlatforms?: number[];
-  excludedThemes?: number[];
-  excludedKeywords?: number[];
-  excludedGameTypes?: number[];
+  extends Omit<IGetGamesRequest, "selected" | "excluded"> {
+  selectedGenres?: string[];
+  selectedModes?: string[];
+  selectedPlatforms?: string[];
+  selectedThemes?: string[];
+  selectedKeywords?: string[];
+  selectedGameTypes?: string[];
+  excludedGenres?: string[];
+  excludedModes?: string[];
+  excludedPlatforms?: string[];
+  excludedThemes?: string[];
+  excludedKeywords?: string[];
+  excludedGameTypes?: string[];
 }

@@ -2,14 +2,10 @@ import { FC, useState } from "react";
 import styles from "./SlideshowImage.module.scss";
 import Image from "next/image";
 import classNames from "classnames";
-import { getImageLink } from "@/src/lib/shared/constants";
-import { IGDBScreenshot } from "@/src/lib/shared/types/igdb.type";
 import { Loader } from "../../../Loader";
 
-export const SlideshowImage: FC<{ picture: IGDBScreenshot }> = ({
-  picture,
-}) => {
-  const [isLoading, setIsLoading] = useState(!!picture.url);
+export const SlideshowImage: FC<{ picture: string }> = ({ picture }) => {
+  const [isLoading, setIsLoading] = useState(!!picture);
 
   return (
     <>
@@ -23,7 +19,7 @@ export const SlideshowImage: FC<{ picture: IGDBScreenshot }> = ({
         alt="screenshot"
         width={1920}
         height={1080}
-        src={getImageLink(picture.url, "1080p")}
+        src={picture}
       />
     </>
   );

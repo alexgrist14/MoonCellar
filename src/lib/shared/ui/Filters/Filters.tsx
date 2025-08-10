@@ -6,44 +6,39 @@ import { Input } from "../Input";
 import { Dropdown } from "../Dropdown";
 import { ButtonGroup } from "../Button/ButtonGroup";
 import { ToggleSwitch } from "../ToggleSwitch";
-import { IGameFilters } from "../../types/filters.type";
-import { RangeSelector } from "../RangeSelector";
-import {
-  parseQueryFilters,
-  pushFiltersToQuery,
-} from "../../utils/filters.utils";
+import { parseQueryFilters, pushFiltersToQuery } from "../../utils/filters";
 import { Tabs } from "../Tabs";
-import { ITabContent } from "../../types/tabs.type";
-import { IGDBApi, userAPI } from "../../api";
+import { ITabContent } from "../../types/tabs";
+import { userAPI } from "../../api";
 import { useAuthStore } from "../../store/auth.store";
 import { Loader } from "../Loader";
 import { IUserFilter } from "../../types/user.type";
 import { modal } from "../Modal";
 import { SaveFilterForm } from "../SaveFilterForm";
-import { toast } from "../../utils/toast.utils";
-import { IGDBDefault } from "../../types/igdb.type";
+import { toast } from "../../utils/toast";
 import { useDebouncedCallback } from "use-debounce";
 import { useAdvancedRouter } from "../../hooks/useAdvancedRouter";
+import { IGameFilters, IGetGamesRequest } from "../../lib/schemas/games.schema";
 
 export const Filters: FC<{
   callback?: (filters?: IGameFilters) => void;
   isGauntlet?: boolean;
 }> = ({ isGauntlet, callback }) => {
   const { asPath, router, pathname } = useAdvancedRouter();
-
   const { profile, isAuth } = useAuthStore();
 
-  const [filters, setFilters] = useState<IGameFilters>();
+  const [filters, setFilters] = useState<IGetGamesRequest>();
   const [tab, setTab] = useState<"filters" | "saved">("filters");
 
   const [savedFilters, setSavedFilters] = useState<IUserFilter[]>();
-  const [keywordsList, setKeywordsList] = useState<IGDBDefault[]>([]);
+  const [keywordsList, setKeywordsList] = useState<string[]>([]);
 
-  const { themes, systems, genres, gameModes, gameTypes } = useCommonStore();
+  const { themes, systems, genres, gameModes, gameTypes, keywords } =
+    useCommonStore();
   const { isLoading, isPlatformsLoading, isExcludeHistory, setExcludeHistory } =
     useStatesStore();
 
-  const getValue = (key: string) =>
+  const getValue = (key: keyof IGameFilters) =>
     (!!filters?.selected?.[key]?.length
       ? filters?.selected?.[key]?.length + " selected"
       : "All") +
@@ -51,25 +46,21 @@ export const Filters: FC<{
       ? ", " + filters?.excluded?.[key]?.length + " excluded"
       : "");
 
-  const getSelectedArray = (key: string, array?: { _id: number }[]) =>
-    !!array
-      ? filters?.selected?.[key]?.map((id) =>
-          array.findIndex((el) => el._id === id)
+  const getSelectedArray = (key: keyof IGameFilters, array?: string[]) =>
+    !!array && Array.isArray(filters?.selected?.[key])
+      ? filters?.selected?.[key]?.map((value) =>
+          array.findIndex((el) => el === value)
         ) || []
       : [];
 
-  const getExcludedArray = (key: string, array?: { _id: number }[]) =>
-    !!array
-      ? filters?.excluded?.[key]?.map((id) =>
-          array.findIndex((el) => el._id === id)
+  const getExcludedArray = (key: keyof IGameFilters, array?: string[]) =>
+    !!array && Array.isArray(filters?.excluded?.[key])
+      ? filters?.excluded?.[key]?.map((value) =>
+          array.findIndex((el) => el === value)
         ) || []
       : [];
 
-  const setSelected = (
-    key: string,
-    indexes: number[],
-    array?: { _id: number }[]
-  ) => {
+  const setSelected = (key: string, indexes: number[], array?: string[]) => {
     setFilters((filters) => {
       const temp = {
         ...filters,
@@ -77,7 +68,7 @@ export const Filters: FC<{
           ...filters?.selected,
           [key]:
             !!array && !!indexes?.length
-              ? indexes.map((index) => array[index]._id)
+              ? indexes.map((index) => array[index])
               : [],
         },
       };
@@ -88,11 +79,7 @@ export const Filters: FC<{
     });
   };
 
-  const setExcluded = (
-    key: string,
-    indexes: number[],
-    array?: { _id: number }[]
-  ) => {
+  const setExcluded = (key: string, indexes: number[], array?: string[]) => {
     setFilters((filters) => {
       const temp = {
         ...filters,
@@ -100,7 +87,7 @@ export const Filters: FC<{
           ...filters?.excluded,
           [key]:
             !!array && !!indexes?.length
-              ? indexes.map((index) => array[index]._id)
+              ? indexes.map((index) => array[index])
               : [],
         },
       };
@@ -119,22 +106,13 @@ export const Filters: FC<{
   ];
 
   const debouncedSetKeywords = useDebouncedCallback((query) => {
-    IGDBApi.getKeywordsByIds([
-      ...(filters?.selected?.keywords || []),
-      ...(filters?.excluded?.keywords || []),
-    ]).then(({ data: filterKeywords }) => {
-      query?.length > 2
-        ? IGDBApi.getKeywords(query).then((res) => {
-            setKeywordsList([
-              ...filterKeywords,
-              ...res.data.filter(
-                (keyword) =>
-                  !filterKeywords.some((word) => word._id === keyword._id)
-              ),
-            ]);
-          })
-        : setKeywordsList(filterKeywords);
-    });
+    query?.length > 2 && !!keywords?.length
+      ? setKeywordsList(
+          keywords.filter((item) =>
+            item.toLowerCase().includes(query.toLowerCase())
+          )
+        )
+      : setKeywordsList(keywordsList);
   }, 300);
 
   useEffect(() => {
@@ -210,10 +188,10 @@ export const Filters: FC<{
               isWithExclude
               overflowRootId="filters"
               isDisabled={isLoading}
-              list={gameTypes?.map((item) => item.type) || []}
-              overwriteValue={getValue("gameTypes")}
-              initialMultiValue={getSelectedArray("gameTypes", gameTypes)}
-              initialExcludeValue={getExcludedArray("gameTypes", gameTypes)}
+              list={gameTypes || []}
+              overwriteValue={getValue("types")}
+              initialMultiValue={getSelectedArray("types", gameTypes)}
+              initialExcludeValue={getExcludedArray("types", gameTypes)}
               placeholder="Select game types..."
               getIndexes={(indexes) =>
                 setSelected("gameTypes", indexes, gameTypes)
@@ -233,14 +211,28 @@ export const Filters: FC<{
               isDisabled={isLoading || isPlatformsLoading}
               list={systems?.map((item) => item.name) || []}
               overwriteValue={getValue("platforms")}
-              initialMultiValue={getSelectedArray("platforms", systems)}
-              initialExcludeValue={getExcludedArray("platforms", systems)}
+              initialMultiValue={getSelectedArray(
+                "platforms",
+                systems?.map((item) => item._id)
+              )}
+              initialExcludeValue={getExcludedArray(
+                "platforms",
+                systems?.map((item) => item._id)
+              )}
               placeholder="Select platforms..."
               getIndexes={(indexes) =>
-                setSelected("platforms", indexes, systems)
+                setSelected(
+                  "platforms",
+                  indexes,
+                  systems?.map((item) => item._id)
+                )
               }
               getExcludeIndexes={(indexes) =>
-                setExcluded("platforms", indexes, systems)
+                setExcluded(
+                  "platforms",
+                  indexes,
+                  systems?.map((item) => item._id)
+                )
               }
             />
           </div>
@@ -252,7 +244,7 @@ export const Filters: FC<{
               isWithExclude
               overflowRootId="filters"
               isDisabled={isLoading}
-              list={genres?.map((item) => item.name) || []}
+              list={genres || []}
               overwriteValue={getValue("genres")}
               initialMultiValue={getSelectedArray("genres", genres)}
               initialExcludeValue={getExcludedArray("genres", genres)}
@@ -271,7 +263,7 @@ export const Filters: FC<{
               isWithExclude
               overflowRootId="filters"
               isDisabled={isLoading}
-              list={themes?.map((item) => item.name) || []}
+              list={themes || []}
               overwriteValue={getValue("themes")}
               initialMultiValue={getSelectedArray("themes", themes)}
               initialExcludeValue={getExcludedArray("themes", themes)}
@@ -291,25 +283,17 @@ export const Filters: FC<{
               isWithSearch
               overflowRootId="filters"
               isDisabled={isLoading}
-              onLoad={() => {
-                IGDBApi.getKeywordsByIds([
-                  ...(filters?.selected?.keywords || []),
-                  ...(filters?.excluded?.keywords || []),
-                ]).then((res) => {
-                  setKeywordsList(res.data);
-                });
-              }}
               onClose={() => {
                 setKeywordsList((list) =>
                   list.filter(
                     (item) =>
-                      filters?.selected?.keywords?.includes(item._id) ||
-                      filters?.excluded?.keywords?.includes(item._id)
+                      filters?.selected?.keywords?.includes(item) ||
+                      filters?.excluded?.keywords?.includes(item)
                   )
                 );
               }}
               getSearchQuery={debouncedSetKeywords}
-              list={keywordsList?.map((item) => item.name) || []}
+              list={keywordsList || []}
               overwriteValue={getValue("keywords")}
               initialMultiValue={getSelectedArray("keywords", keywordsList)}
               initialExcludeValue={getExcludedArray("keywords", keywordsList)}
@@ -330,7 +314,7 @@ export const Filters: FC<{
               isWithExclude
               overflowRootId="filters"
               isDisabled={isLoading}
-              list={gameModes?.map((item) => item.name) || []}
+              list={gameModes || []}
               overwriteValue={getValue("modes")}
               initialMultiValue={getSelectedArray("modes", gameModes)}
               initialExcludeValue={getExcludedArray("modes", gameModes)}
@@ -356,7 +340,7 @@ export const Filters: FC<{
                 type="number"
                 value={!!filters?.years?.[0] ? filters.years[0].toString() : ""}
                 onChange={(e) => {
-                  const temp: IGameFilters = {
+                  const temp: IGetGamesRequest = {
                     ...filters,
                     years: [Number(e.target.value), filters?.years?.[1] || 0],
                   };
@@ -378,7 +362,7 @@ export const Filters: FC<{
                 type="number"
                 value={!!filters?.years?.[1] ? filters.years[1].toString() : ""}
                 onChange={(e) => {
-                  const temp: IGameFilters = {
+                  const temp: IGetGamesRequest = {
                     ...filters,
                     years: [filters?.years?.[0] || 0, Number(e.target.value)],
                   };
@@ -389,7 +373,7 @@ export const Filters: FC<{
               />
             </div>
           </div>
-          <div className={styles.range__wrapper}>
+          {/*<div className={styles.range__wrapper}>
             <RangeSelector
               text={!!filters?.rating ? "From " + filters.rating : "Any rating"}
               defaultValue={filters?.rating}
@@ -407,33 +391,33 @@ export const Filters: FC<{
               disabled={!!isLoading}
             />
           </div>
-          <div className={styles.range__wrapper}>
-            <RangeSelector
-              text={
-                !!filters?.votes ? "From " + filters.votes : "Any votes count"
-              }
-              defaultValue={filters?.votes}
-              min={0}
-              max={1000}
-              step={10}
-              callback={(votes) => {
-                const temp: IGameFilters = {
-                  ...filters,
-                  votes,
-                };
+            <div className={styles.range__wrapper}>
+              <RangeSelector
+                text={
+                  !!filters?.votes ? "From " + filters.votes : "Any votes count"
+                }
+                defaultValue={filters?.votes}
+                min={0}
+                max={1000}
+                step={10}
+                callback={(votes) => {
+                  const temp: IGameFilters = {
+                    ...filters,
+                    votes,
+                  };
 
-                setFilters(temp);
-                isGauntlet && pushFiltersToQuery(temp, router, pathname);
-              }}
-              disabled={!!isLoading}
-            />
-          </div>
+                  setFilters(temp);
+                  isGauntlet && pushFiltersToQuery(temp, router, pathname);
+                }}
+                disabled={!!isLoading}
+              />
+                </div>*/}
           <div className={styles.filters__toggles}>
             <div className={styles.filters__toggle}>
               <ToggleSwitch
                 value={!!filters?.isOnlyWithAchievements ? "right" : "left"}
                 clickCallback={() => {
-                  const temp: IGameFilters = {
+                  const temp: IGetGamesRequest = {
                     ...filters,
                     isOnlyWithAchievements:
                       !filters?.isOnlyWithAchievements || undefined,

@@ -17,10 +17,8 @@ export const GamePlaysInfo: FC<IGamePlaysInfoProps> = ({
 }) => {
   const { systems } = useCommonStore();
 
-  console.log(playthroughs, systems);
-
   const getPlatform = useCallback(
-    (platformId: number) =>
+    (platformId: string) =>
       systems?.find((platform) => platform._id === platformId),
     [systems]
   );

@@ -1,12 +1,11 @@
 import { useCallback } from "react";
-import { IGDBGameMinimal } from "../types/igdb.type";
-import { getImageLink } from "../constants";
-import { createImage } from "../utils/image.utils";
+import { createImage } from "../utils/image";
+import { IGameResponse } from "../lib/schemas/games.schema";
 
 interface IDrawProps {
   images?: HTMLImageElement[];
-  wheelGames?: IGDBGameMinimal[];
-  winnerId?: number;
+  wheelGames?: IGameResponse[];
+  winnerId?: string;
 }
 
 export const useWheel = ({
@@ -143,13 +142,11 @@ export const useWheel = ({
     [contrastColor, primaryColor, fontFamily]
   );
 
-  const parseImages = useCallback(async (wheelGames: IGDBGameMinimal[]) => {
+  const parseImages = useCallback(async (wheelGames: IGameResponse[]) => {
     const queries: Promise<HTMLImageElement>[] = [];
 
     wheelGames.forEach((game) => {
-      const cover = !!game?.cover?.url
-        ? getImageLink(game.cover.url, "720p")
-        : "";
+      const cover = !!game?.cover ? game.cover : "";
 
       queries.push(createImage(cover));
     });

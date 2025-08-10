@@ -1,24 +1,24 @@
 import { create } from "zustand";
-import { IGDBGameMinimal } from "../types/igdb.type";
 import { devtools, persist } from "zustand/middleware";
+import { IGameResponse } from "../lib/schemas/games.schema";
 
 type IState = {
-  winner?: IGDBGameMinimal;
-  games?: IGDBGameMinimal[];
-  royalGames?: IGDBGameMinimal[];
-  historyGames?: IGDBGameMinimal[];
+  winner?: IGameResponse;
+  games?: IGameResponse[];
+  royalGames?: IGameResponse[];
+  historyGames?: IGameResponse[];
   segments?: string[];
 };
 
 type IAction = {
-  setWinner: (game: IGDBGameMinimal | undefined) => void;
-  setGames: (games: IGDBGameMinimal[]) => void;
-  setRoyalGames: (royalGames: IGDBGameMinimal[]) => void;
-  addRoyalGame: (game: IGDBGameMinimal) => void;
-  removeRoyalGame: (game: IGDBGameMinimal) => void;
-  setHistoryGames: (historyGames: IGDBGameMinimal[]) => void;
-  addHistoryGame: (game: IGDBGameMinimal) => void;
-  removeHistoryGame: (game: IGDBGameMinimal) => void;
+  setWinner: (game: IGameResponse | undefined) => void;
+  setGames: (games: IGameResponse[]) => void;
+  setRoyalGames: (royalGames: IGameResponse[]) => void;
+  addRoyalGame: (game: IGameResponse) => void;
+  removeRoyalGame: (game: IGameResponse) => void;
+  setHistoryGames: (historyGames: IGameResponse[]) => void;
+  addHistoryGame: (game: IGameResponse) => void;
+  removeHistoryGame: (game: IGameResponse) => void;
   setSegments: (segments: string[]) => void;
 };
 

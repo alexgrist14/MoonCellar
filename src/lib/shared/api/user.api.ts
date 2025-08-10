@@ -6,7 +6,6 @@ import {
   ILogs,
   IUserFilter,
   IUserGames,
-  IUserLogs,
   IUserPreset,
 } from "../types/user.type";
 import agent from "./agent.api";
@@ -26,66 +25,25 @@ const addAvatar = (id: string, file: File) => {
 
   formData.append("file", file);
 
-  return agent.patch<string>(
-    `https://api.mooncellar.space/user/profile-picture/${id}`,
-    formData,
-    {
-      headers: { "Content-Type": "multipart/form-data" },
-    }
-  );
-};
-
-const getAvatar = (id: string) => {
-  return agent.get<{ fileName: string }>(`${USER_URL}/profile-picture/${id}`);
-};
-
-const addBackground = (id: string, url: string) => {
-  return agent.patch<IUser>(`${USER_URL}/profile-background/${id}`, {
-    url: url,
+  return agent.patch<string>(`${USER_URL}/avatar`, formData, {
+    params: { userId: id },
+    headers: { "Content-Type": "multipart/form-data" },
   });
 };
 
-const getBackground = (id: string) => {
-  return agent.get<{ background: string }>(
-    `${USER_URL}/profile-background/${id}`
-  );
+const addBackground = (id: string, file: File) => {
+  const formData = new FormData();
+
+  formData.append("file", file);
+
+  return agent.patch<string>(`${USER_URL}/background`, formData, {
+    params: { userId: id },
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 };
 
 const getUserGames = (id: string, category: CategoriesType) => {
   return agent.get<IUserGames>(`${USER_URL}/games/${id}?category=${category}`);
-};
-
-const addGameToCategory = (
-  userId: string,
-  gameId: number,
-  category: CategoriesType
-) => {
-  return agent.patch<IUser>(
-    `${USER_URL}/${userId}/games/${gameId}`,
-    undefined,
-    { params: { category } }
-  );
-};
-
-const removeGameFromCategory = (
-  userId: string,
-  gameId: number,
-  category: CategoriesType
-) => {
-  return agent.delete<IUser>(`${USER_URL}/${userId}/games/${gameId}`, {
-    params: { category },
-  });
-};
-
-const addGameRating = (userId: string, game: number, rating: number) => {
-  return agent.patch<IUser>(`${USER_URL}/rating/${userId}`, {
-    game,
-    rating,
-  });
-};
-
-const removeGameRating = (userId: string, gameId: number) => {
-  return agent.delete<IUser>(`${USER_URL}/rating/${userId}/${gameId}`);
 };
 
 const getUserFollowings = (userId: string) => {
@@ -170,12 +128,8 @@ export const userAPI = {
   getById,
   getByName,
   addAvatar,
-  getAvatar,
-  addGameToCategory,
-  removeGameFromCategory,
+  addBackground,
   getUserGames,
-  addGameRating,
-  removeGameRating,
   getUserFollowings,
   addUserFollowing,
   removeUserFollowing,
@@ -188,7 +142,5 @@ export const userAPI = {
   addPreset,
   removePreset,
   getPresets,
-  addBackground,
-  getBackground,
   updateUserTime,
 };

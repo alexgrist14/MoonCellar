@@ -1,5 +1,5 @@
-import { IUser } from "./auth.type";
-import { IGDBGameMinimal } from "./igdb.type";
+import { IGameResponse } from "../lib/schemas/games.schema";
+import { IUser } from "./auth";
 
 export type CategoriesType =
   | "completed"
@@ -17,18 +17,8 @@ export interface ILogs {
   date: string;
   type: string;
   text: string;
-  gameId: number;
+  gameId: string;
   userId: string;
-}
-
-interface Game {
-  cover: Cover;
-  name: string;
-  slug: string;
-}
-
-interface Cover {
-  url: string;
 }
 
 export interface IUserLogs {
@@ -36,18 +26,13 @@ export interface IUserLogs {
 }
 
 export interface IFollowings {
-  followings: Pick<IUser, "_id" | "userName" | "profilePicture">[];
+  followings: Pick<IUser, "_id" | "userName" | "avatar">[];
 }
 
-export type UserGamesType = Record<CategoriesType, IGDBGameMinimal[]>;
+export type UserGamesType = Record<CategoriesType, IGameResponse[]>;
 
 export interface IUserGames {
   games: UserGamesType;
-}
-
-export interface IGamesRating {
-  game: number;
-  rating: number;
 }
 
 export interface IUserFilter {
@@ -57,5 +42,5 @@ export interface IUserFilter {
 
 export interface IUserPreset {
   name: string;
-  preset: number[];
+  preset: string[];
 }

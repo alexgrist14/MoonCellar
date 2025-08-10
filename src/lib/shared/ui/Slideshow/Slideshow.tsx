@@ -2,13 +2,12 @@ import { FC, useEffect, useMemo, useState } from "react";
 import styles from "./Slideshow.module.scss";
 import { Scrollbar } from "../Scrollbar";
 import { modal } from "../Modal";
-import { IGDBScreenshot } from "../../types/igdb.type";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Button } from "../Button";
 import { SlideshowImage } from "./components/SlideshowImage";
 
 interface ISlideshowProps {
-  pictures: IGDBScreenshot[];
+  pictures: string[];
 }
 
 export const Slideshow: FC<ISlideshowProps> = ({ pictures }) => {
@@ -16,8 +15,8 @@ export const Slideshow: FC<ISlideshowProps> = ({ pictures }) => {
 
   const screenshots = useMemo(
     () =>
-      pictures.map((picture) => (
-        <SlideshowImage key={picture._id} picture={picture} />
+      pictures.map((picture, i) => (
+        <SlideshowImage key={picture + i} picture={picture} />
       )),
     [pictures]
   );
@@ -66,7 +65,7 @@ export const Slideshow: FC<ISlideshowProps> = ({ pictures }) => {
     <Scrollbar stl={styles} isHorizontal>
       {pictures.map(
         (picture, i) =>
-          !!picture.url && (
+          !!picture && (
             <div
               key={i}
               className={styles.slideshow__screenshot}

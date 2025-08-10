@@ -1,18 +1,17 @@
-import { IGDBGameMinimal } from "../types/igdb.type";
+import { IGameResponse } from "../lib/schemas/games.schema";
 
-export const emptyGames: IGDBGameMinimal[] = Array(16)
+export const emptyGames: IGameResponse[] = Array(16)
   .fill("")
   .map(() => ({
     name: "",
-    _id: -1,
-    aggregated_rating: 0,
+    _id: "-1",
     artworks: [],
-    category: 0,
-    cover: { _id: -1, height: 0, url: "", width: 0 },
-    first_release_date: 0,
-    game_modes: [],
+    type: "",
+    cover: "",
+    first_release: 0,
+    modes: [],
     genres: [],
-    involved_companies: [],
+    companies: [],
     keywords: [],
     platforms: [],
     release_dates: [],
@@ -21,8 +20,10 @@ export const emptyGames: IGDBGameMinimal[] = Array(16)
     storyline: "",
     summary: "",
     themes: [],
-    total_rating: 0,
-    url: "",
     websites: [],
-    game_type: { _id: -1, type: "" },
+    createdAt: "",
+    updatedAt: "",
+    platformIds: [],
+    igdbIds: [],
+    retroachievements: [],
   }));

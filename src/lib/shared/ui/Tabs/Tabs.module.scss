@@ -1,9 +1,4 @@
 .tabs {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  gap: 20px;
-
   &__buttons {
     display: flex;
     max-width: calc(100vw - 160px);
@@ -15,6 +10,14 @@
 
     &_adaptive {
       justify-content: center;
+    }
+
+    &_vertical {
+      flex-direction: column;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      overflow: hidden;
     }
   }
 
