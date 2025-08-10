@@ -1,5 +1,5 @@
 import { IGameResponse } from "../lib/schemas/games.schema";
-import { IUser } from "./auth";
+import { IUser } from "./auth.type";
 
 export type CategoriesType =
   | "completed"

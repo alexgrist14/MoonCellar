@@ -1,5 +1,5 @@
 import { API_URL } from "../constants";
-import agent from "./agent";
+import agent from "./agent.api";
 
 const FILES_API = `${API_URL}/file`;
 

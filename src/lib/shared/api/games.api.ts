@@ -7,7 +7,7 @@ import {
   IGetGamesRequest,
   IUpdateGameRequest,
 } from "../lib/schemas/games.schema";
-import agent from "./agent";
+import agent from "./agent.api";
 import { filesAPI } from "./files.api";
 
 const GAMES_URL = `${API_URL}/games`;

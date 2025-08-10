@@ -2,7 +2,7 @@ import { FC, ReactNode, useRef } from "react";
 import styles from "./GameCardInfo.module.scss";
 import classNames from "classnames";
 import Link from "next/link";
-import { commonUtils } from "@/src/lib/shared/utils/common";
+import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { IPlaythroughMinimal } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";

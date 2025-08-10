@@ -7,7 +7,7 @@ import {
   IUpdateUserRatingRequest,
   IUserRating,
 } from "../lib/schemas/user-ratings.schema";
-import agent from "./agent";
+import agent from "./agent.api";
 
 const RATINGS_API = `${API_URL}/ratings`;
 

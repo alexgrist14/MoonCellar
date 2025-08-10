@@ -6,19 +6,22 @@ import { Input } from "../Input";
 import { Dropdown } from "../Dropdown";
 import { ButtonGroup } from "../Button/ButtonGroup";
 import { ToggleSwitch } from "../ToggleSwitch";
-import { parseQueryFilters, pushFiltersToQuery } from "../../utils/filters";
 import { Tabs } from "../Tabs";
-import { ITabContent } from "../../types/tabs";
+import { ITabContent } from "../../types/tabs.type";
 import { userAPI } from "../../api";
 import { useAuthStore } from "../../store/auth.store";
 import { Loader } from "../Loader";
 import { IUserFilter } from "../../types/user.type";
 import { modal } from "../Modal";
 import { SaveFilterForm } from "../SaveFilterForm";
-import { toast } from "../../utils/toast";
 import { useDebouncedCallback } from "use-debounce";
 import { useAdvancedRouter } from "../../hooks/useAdvancedRouter";
 import { IGameFilters, IGetGamesRequest } from "../../lib/schemas/games.schema";
+import { toast } from "../../utils/toast.utils";
+import {
+  parseQueryFilters,
+  pushFiltersToQuery,
+} from "../../utils/filters.utils";
 
 export const Filters: FC<{
   callback?: (filters?: IGameFilters) => void;

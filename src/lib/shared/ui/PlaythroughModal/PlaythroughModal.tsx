@@ -23,7 +23,7 @@ import { SvgPlus } from "../svg";
 import classNames from "classnames";
 import { useUserStore } from "../../store/user.store";
 import { WrapperTemplate } from "../WrapperTemplate";
-import { toast } from "../../utils/toast";
+import { toast } from "../../utils/toast.utils";
 import { IGameResponse } from "../../lib/schemas/games.schema";
 import { playthroughsAPI } from "../../api";
 

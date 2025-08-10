@@ -1,5 +1,5 @@
 import { gamesApi } from "@/src/lib/shared/api";
-import { SortType } from "@/src/lib/shared/types/sort";
+import { SortType } from "@/src/lib/shared/types/sort.type";
 import { CategoriesType } from "@/src/lib/shared/types/user.type";
 import { CustomDropdown } from "@/src/lib/shared/ui/CustomDropdown";
 import { GameCard } from "@/src/lib/shared/ui/GameCard";

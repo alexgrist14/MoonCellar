@@ -7,7 +7,7 @@ import {
   ISavePlaythroughRequest,
   IUpdatePlaythroughRequest,
 } from "../lib/schemas/playthroughs.schema";
-import agent from "./agent";
+import agent from "./agent.api";
 
 const PLAYTHROUGHS_API = `${API_URL}/playthroughs`;
 

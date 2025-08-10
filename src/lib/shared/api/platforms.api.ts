@@ -1,6 +1,6 @@
 import { API_URL } from "../constants";
 import { IPlatform } from "../lib/schemas/platforms.schema";
-import agent from "./agent";
+import agent from "./agent.api";
 
 const PLATFORM_API = `${API_URL}/platforms`;
 

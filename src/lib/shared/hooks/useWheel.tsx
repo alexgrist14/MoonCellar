@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { createImage } from "../utils/image";
+import { createImage } from "../utils/image.utils";
 import { IGameResponse } from "../lib/schemas/games.schema";
 
 interface IDrawProps {

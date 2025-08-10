@@ -13,8 +13,8 @@ import { Filters } from "../../shared/ui/Filters";
 import { BGImage } from "../../shared/ui/BGImage";
 import { useAdvancedRouter } from "../../shared/hooks/useAdvancedRouter";
 import { useWheel } from "../../shared/hooks/useWheel";
-import { shuffle } from "../../shared/utils/common";
 import { gamesApi } from "../../shared/api";
+import { shuffle } from "../../shared/utils/common.utils";
 
 export const GauntletPage: FC = () => {
   const { asPath } = useAdvancedRouter();

@@ -37,7 +37,7 @@ const Admin = () => {
                     alt="profile"
                     className={styles.image}
                   /> */}
-                  {user?.profilePicture ? (
+                  {user?.avatar ? (
                     <Image
                       className={styles.image}
                       src={commonUtils.getAvatar(user)}

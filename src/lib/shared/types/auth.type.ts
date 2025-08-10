@@ -1,4 +1,4 @@
-import { IRAAward } from "./retroachievements";
+import { IRAAward } from "./retroachievements.type";
 import { IFollowings, IUserFilter, IUserPreset } from "./user.type";
 
 export interface IAuth {
