@@ -27,7 +27,7 @@ export const Filters: FC<{
   callback?: (filters?: IGameFilters) => void;
   isGauntlet?: boolean;
 }> = ({ isGauntlet, callback }) => {
-  const { asPath, router, pathname } = useAdvancedRouter();
+  const { asPath, pathname } = useAdvancedRouter();
   const { profile, isAuth } = useAuthStore();
 
   const [filters, setFilters] = useState<IGetGamesRequest>();
@@ -76,8 +76,6 @@ export const Filters: FC<{
         },
       };
 
-      isGauntlet && pushFiltersToQuery(temp, router, pathname);
-
       return temp;
     });
   };
@@ -94,8 +92,6 @@ export const Filters: FC<{
               : [],
         },
       };
-
-      isGauntlet && pushFiltersToQuery(temp, router, pathname);
 
       return temp;
     });
@@ -119,8 +115,12 @@ export const Filters: FC<{
   }, 300);
 
   useEffect(() => {
-    setFilters(parseQueryFilters(asPath));
-  }, [asPath]);
+    !filters && setFilters(parseQueryFilters(asPath));
+  }, [asPath, filters]);
+
+  useEffect(() => {
+    isGauntlet && !!filters && pushFiltersToQuery(filters);
+  }, [filters, isGauntlet]);
 
   useEffect(() => {
     !!profile?._id &&
@@ -146,19 +146,20 @@ export const Filters: FC<{
               <h4>Game name</h4>
               <Input
                 onKeyDown={(e) =>
-                  e.key === "Enter" &&
-                  !!filters &&
-                  pushFiltersToQuery(filters, router, pathname)
+                  e.key === "Enter" && !!filters && pushFiltersToQuery(filters)
                 }
                 containerStyles={{ width: "100%" }}
                 placeholder="Enter name of the game..."
                 disabled={isLoading}
                 value={filters?.search || ""}
                 onChange={(e) => {
-                  const temp = { ...filters, search: e.target.value };
+                  const temp = {
+                    ...filters,
+                    search: e.target.value || undefined,
+                  };
 
                   setFilters(temp);
-                  isGauntlet && pushFiltersToQuery(temp, router, pathname);
+                  isGauntlet && pushFiltersToQuery(temp);
                 }}
               />
             </div>
@@ -166,19 +167,20 @@ export const Filters: FC<{
               <h4>Game company</h4>
               <Input
                 onKeyDown={(e) =>
-                  e.key === "Enter" &&
-                  !!filters &&
-                  pushFiltersToQuery(filters, router, pathname)
+                  e.key === "Enter" && !!filters && pushFiltersToQuery(filters)
                 }
                 containerStyles={{ width: "100%" }}
                 placeholder="Enter name of the developer..."
                 disabled={isLoading}
                 value={filters?.company || ""}
                 onChange={(e) => {
-                  const temp = { ...filters, company: e.target.value };
+                  const temp = {
+                    ...filters,
+                    company: e.target.value || undefined,
+                  };
 
                   setFilters(temp);
-                  isGauntlet && pushFiltersToQuery(temp, router, pathname);
+                  isGauntlet && pushFiltersToQuery(temp);
                 }}
               />
             </div>
@@ -333,9 +335,7 @@ export const Filters: FC<{
             <div className={styles.filters__dates}>
               <Input
                 onKeyDown={(e) =>
-                  e.key === "Enter" &&
-                  !!filters &&
-                  pushFiltersToQuery(filters, router, pathname)
+                  e.key === "Enter" && !!filters && pushFiltersToQuery(filters)
                 }
                 containerStyles={{ width: "100%" }}
                 disabled={isLoading}
@@ -349,15 +349,13 @@ export const Filters: FC<{
                   };
 
                   setFilters(temp);
-                  isGauntlet && pushFiltersToQuery(temp, router, pathname);
+                  isGauntlet && pushFiltersToQuery(temp);
                 }}
               />
               <div className={styles.filters__line}></div>
               <Input
                 onKeyDown={(e) =>
-                  e.key === "Enter" &&
-                  !!filters &&
-                  pushFiltersToQuery(filters, router, pathname)
+                  e.key === "Enter" && !!filters && pushFiltersToQuery(filters)
                 }
                 containerStyles={{ width: "100%" }}
                 disabled={isLoading}
@@ -371,7 +369,7 @@ export const Filters: FC<{
                   };
 
                   setFilters(temp);
-                  isGauntlet && pushFiltersToQuery(temp, router, pathname);
+                  isGauntlet && pushFiltersToQuery(temp);
                 }}
               />
             </div>
@@ -427,7 +425,7 @@ export const Filters: FC<{
                   };
 
                   setFilters(temp);
-                  isGauntlet && pushFiltersToQuery(temp, router, pathname);
+                  isGauntlet && pushFiltersToQuery(temp);
                 }}
               />
               <p>Only with achievements</p>
@@ -451,7 +449,7 @@ export const Filters: FC<{
                 color: "accent",
                 disabled: !filters,
                 onClick: () => {
-                  !!filters && pushFiltersToQuery(filters, router, pathname);
+                  !!filters && pushFiltersToQuery(filters);
                   !!callback && callback();
                 },
                 hidden: isGauntlet,
@@ -472,7 +470,7 @@ export const Filters: FC<{
                 title: "Clear filters",
                 color: "red",
                 onClick: () => {
-                  pushFiltersToQuery({}, router, pathname);
+                  pushFiltersToQuery({});
                 },
               },
             ]}

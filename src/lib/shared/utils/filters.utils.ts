@@ -1,6 +1,5 @@
 import queryString from "query-string";
 import { IGameFiltersQuery } from "../types/filters.type";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { IGetGamesRequest } from "../lib/schemas/games.schema";
 
 export const parseQueryFilters = (pathWithQuery: string): IGetGamesRequest => {
@@ -62,12 +61,6 @@ export const getFiltersForQuery = (filters: IGetGamesRequest) => {
   );
 };
 
-export const pushFiltersToQuery = (
-  filters: IGetGamesRequest,
-  router: AppRouterInstance,
-  pathname: string
-) => {
-  const { push } = router;
-
-  push(`${pathname}?${getFiltersForQuery(filters)}`);
+export const pushFiltersToQuery = (filters: IGetGamesRequest) => {
+  window.history.pushState(null, "", `?${getFiltersForQuery(filters)}`);
 };

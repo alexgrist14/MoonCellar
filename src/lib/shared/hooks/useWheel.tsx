@@ -24,11 +24,11 @@ export const useWheel = ({
       ) as HTMLCanvasElement;
       const wheel = document.getElementById("wheel");
 
-      const wheelWidth = wheel?.getBoundingClientRect().width || 0;
-      const wheelHeight = wheel?.getBoundingClientRect().height || 0;
+      const wheelHeight = wheel?.getBoundingClientRect().height;
+      const wheelWidth = wheelHeight;
 
-      canvas.width = wheelWidth || 0;
-      canvas.height = wheelHeight || 0;
+      canvas.width = wheelWidth ? wheelWidth  : 0;
+      canvas.height = wheelHeight ? wheelHeight  : 0;
 
       const X = !!canvas && wheelWidth ? wheelWidth / 2 : undefined;
       const Y = !!canvas && wheelHeight ? wheelHeight / 2 : undefined;
@@ -83,7 +83,6 @@ export const useWheel = ({
 
         ctx.save();
 
-        console.log(winnerId);
         winnerId === wheelGames[key]._id
           ? (ctx.globalAlpha = 1)
           : (ctx.globalAlpha = 0.5);

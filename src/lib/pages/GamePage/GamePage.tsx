@@ -212,12 +212,18 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
             {!!game.release_dates?.length && (
               <div className={styles.page__links}>
                 <h4>Release dates:</h4>
-                {game.release_dates.map((date, i) => (
-                  <p key={date.date + "_" + i}>
-                    {date.human}: {date.platformId}
-                    <span> ({dateRegions[+date.region - 1]})</span>
-                  </p>
-                ))}
+                {game.release_dates.map((date, i) => {
+                  const platform = systems?.find(
+                    (sys) => sys._id === date.platformId
+                  );
+
+                  return (
+                    <p key={date.date + "_" + i}>
+                      {date.human}: {platform?.name || "Unknown platform"}
+                      <span> ({dateRegions[+date.region - 1]})</span>
+                    </p>
+                  );
+                })}
               </div>
             )}
             {!!game.websites?.length && (

@@ -19,7 +19,7 @@ export const gamesApi = {
 
   getByIds: (params: IGetGamesByIdsRequest) => {
     return agent.get<IGameResponse[]>(
-      `${GAMES_URL}/by-ids?_ids=${params._ids.join("&_ids=")}`
+      `${GAMES_URL}/by-ids?_ids=${Array.isArray(params._ids) ? params._ids.join("&_ids=") : params._ids}`
     );
   },
 

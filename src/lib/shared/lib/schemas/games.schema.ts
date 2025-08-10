@@ -57,7 +57,7 @@ export const GetGameByIdSchema = z.object({
 });
 
 export const GetGamesByIdsSchema = z.object({
-  _ids: z.string().array(),
+  _ids: z.string().array().or(z.string()),
 });
 
 export const GetGamesRequestShema = z.object({

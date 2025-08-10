@@ -4,17 +4,23 @@
   justify-content: center;
   justify-self: center;
   aspect-ratio: 1;
-  height: auto;
+  /* height: 100%; */
   max-height: 100%;
+  max-width: 100%;
   width: 100%;
-  overflow: hidden;
   padding: 10px;
+  overflow: hidden;
   filter: drop-shadow(0 0 0.4rem $accent);
   border-radius: 50%;
 
+  @include mediaLg {
+    height: unset;
+    width: 100%;
+  }
+
   @include mediaMd {
     height: 100%;
-    width: auto;
+    width: unset;
   }
 
   &_disabled {
@@ -26,7 +32,6 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    position: relative;
     transform: translate(-50%, -50%);
   }
 
@@ -54,10 +59,6 @@
       width: 60px;
       border-width: 2px;
     }
-  }
-
-  & canvas {
-    width: 100%;
   }
 
   & svg {

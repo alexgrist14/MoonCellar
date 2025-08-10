@@ -45,7 +45,7 @@ export const Layout: FC<ILayoutProps> = ({
 
   useAuthRefresh({ accessToken, refreshToken });
   useMediaStore();
-  //useGetUserInfo();
+  useGetUserInfo();
 
   useEffect(() => {
     gamesApi.getFilters().then((response) => {
