@@ -3,7 +3,6 @@ import { ChangeEvent, Dispatch, FC, SetStateAction, useState } from "react";
 import { useAuthStore } from "../../store/auth.store";
 import { SvgCamera } from "../svg";
 import styles from "./AvatarSettings.module.scss";
-import { commonUtils } from "../../utils/common";
 
 interface AvatarSettingsProps {
   tempAvatar?: File;

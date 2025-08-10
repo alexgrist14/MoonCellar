@@ -1,5 +1,5 @@
 import { gamesApi, userAPI } from "@/src/lib/shared/api";
-import { IUser } from "@/src/lib/shared/types/auth";
+import { IUser } from "@/src/lib/shared/types/auth.type";
 import { IFollowings, ILogs } from "@/src/lib/shared/types/user.type";
 import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
 import { Button } from "@/src/lib/shared/ui/Button";

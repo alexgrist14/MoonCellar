@@ -6,7 +6,7 @@ import { useGamesStore } from "@/src/lib/shared/store/games.store";
 import { emptyGames } from "@/src/lib/shared/constants/games.const";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { useWheel } from "@/src/lib/shared/hooks/useWheel";
-import { shuffle } from "@/src/lib/shared/utils/common";
+import { shuffle } from "@/src/lib/shared/utils/common.utils";
 import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
 
 interface WheelComponentProps {
