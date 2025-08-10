@@ -74,7 +74,6 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
       userId,
       gameId: game._id,
       category: "wishlist",
-      date: commonUtils.formatDate(new Date(), { isISO: true }),
     });
   }, [game, reset, userId]);
 
