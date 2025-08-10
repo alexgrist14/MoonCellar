@@ -29,12 +29,10 @@ export const gamesApi = {
     });
   },
 
-  getAll: async (params: IGetGamesRequest) => {
-    return agent.get<{ results: IGameResponse[]; total: number }>(
-      `${GAMES_URL}/`,
-      {
-        params,
-      }
+  getAll: async (data: IGetGamesRequest) => {
+    return agent.post<{ results: IGameResponse[]; total: number }>(
+      `${GAMES_URL}`,
+      data
     );
   },
 

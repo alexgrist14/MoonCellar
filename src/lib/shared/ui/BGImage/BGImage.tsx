@@ -1,8 +1,7 @@
-import { FC, memo, useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import styles from "./BGImage.module.scss";
 import classNames from "classnames";
 import Image from "next/image";
-import { getImageLink } from "../../constants";
 import { useDebouncedCallback } from "use-debounce";
 import { useSettingsStore } from "../../store/settings.store";
 import { IGameResponse } from "../../lib/schemas/games.schema";
@@ -16,7 +15,8 @@ export const BGImage = memo(
   ({ game, defaultImage = "/images/moon.jpg" }: IBGImageProps) => {
     const { bgOpacity } = useSettingsStore();
 
-    // const [bg, setBg] = useState<IGDBScreenshot & { gameId: number }>();
+    const [bg, setBg] = useState<string>(defaultImage);
+    const [prev, setPrev] = useState<string>(defaultImage);
     const [isImageReady, setIsImageReady] = useState(false);
     const [isDefaultReady, setIsDefaultReady] = useState(false);
     const [isAnimation, setIsAnimation] = useState(true);
@@ -26,71 +26,69 @@ export const BGImage = memo(
       setIsAnimation(state);
     }, 300);
 
-    // useEffect(() => {
-    //   if (!game) return;
-    //
-    //   const pictures: number[] = [];
-    //
-    //   if (!!game.artworks?.length) {
-    //     game.artworks.forEach((id) => pictures.push(id));
-    //   } else {
-    //     game.screenshots.forEach((id) => pictures.push(id));
-    //   }
-    //
-    //   const id = pictures[Math.floor(Math.random() * (pictures.length - 1))];
-    //
-    //   if (!id) return;
-    //
-    //   (!!game.artworks?.length ? IGDBApi.getArtwork : IGDBApi.getScreenshot)(
-    //     id
-    //   ).then((res) => {
-    //     setIsAnimation(false);
-    //     setTimeout(() => {
-    //       setBg({ ...res.data, gameId: game._id });
-    //       setIsImageReady(false);
-    //     }, 500);
-    //   });
-    // }, [game]);
+    useEffect(() => {
+      if (!game) return;
+
+      const pictures: string[] = [];
+
+      if (!!game.artworks?.length) {
+        game.artworks.forEach((url) => pictures.push(url));
+      } else {
+        game.screenshots?.forEach((url) => pictures.push(url));
+      }
+
+      const url = pictures[Math.floor(Math.random() * (pictures.length - 1))];
+
+      if (!url) return;
+
+      setPrev(bg);
+      setIsAnimation(false);
+      setTimeout(() => {
+        setBg(url);
+        setIsImageReady(false);
+      }, 500);
+      //eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [game]);
 
     return (
       <div className={styles.wrapper}>
-        {/*<div
+        <div
           className={styles.overlay}
           style={{ opacity: bgOpacity !== undefined ? bgOpacity / 100 : 0.7 }}
         />
-          <div className={styles.place}>
-            {!!bg && (
-              <div
-                className={classNames(styles.bg, {
-                  [styles.bg_active]: isImageReady && isAnimation,
-                })}
-              >
-                <Image
-                  onLoad={() => (!game || !!bg) && debouncedSetImageReady(true)}
-                  key={bg?._id}
-                  alt="Background"
-                  src={!!bg?.url ? getImageLink(bg.url, "1080p") : ""}
-                  width={1920}
-                  height={1080}
-                />
-              </div>
-            )}
-        <div
-          className={classNames(styles.bg, {
-            [styles.bg_active]: isDefaultReady,
-          })}
-          style={{ zIndex: "-2" }}
-        >
-          <Image
-            onLoad={() => setIsDefaultReady(true)}
-            key={bg?._id}
-            alt="Background"
-            src={defaultImage}
-            width={1920}
-            height={1080}
-          />
+        <div className={styles.place}>
+          {!!bg && (
+            <div
+              className={classNames(styles.bg, {
+                [styles.bg_active]: isImageReady && isAnimation,
+              })}
+            >
+              <Image
+                onLoad={() => (!game || !!bg) && debouncedSetImageReady(true)}
+                key={bg}
+                alt="Background"
+                src={bg}
+                width={1920}
+                height={1080}
+              />
+            </div>
+          )}
+          <div
+            className={classNames(styles.bg, {
+              [styles.bg_active]: isDefaultReady,
+            })}
+            style={{ zIndex: "-2" }}
+          >
+            <Image
+              onLoad={() => setIsDefaultReady(true)}
+              key={bg}
+              alt="Background"
+              src={prev}
+              width={1920}
+              height={1080}
+            />
+          </div>
         </div>
-      </div>*/}
       </div>
     );
   }
