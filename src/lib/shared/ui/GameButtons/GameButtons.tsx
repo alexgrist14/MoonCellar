@@ -67,7 +67,7 @@ export const GameButtons: FC<{ game: IGameResponse }> = ({ game }) => {
           {
             title: "Open in IGDB",
             link: "https://www.igdb.com/games/" + game.slug,
-            hidden: !game.igdbIds?.length,
+            hidden: !game.igdbId,
             target: "_blank",
           },
           {

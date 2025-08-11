@@ -24,6 +24,6 @@ export const emptyGames: IGameResponse[] = Array(16)
     createdAt: "",
     updatedAt: "",
     platformIds: [],
-    igdbIds: [],
+    igdbId: 0,
     retroachievements: [],
   }));

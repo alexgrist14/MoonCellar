@@ -43,7 +43,7 @@ export const GameSchema = z.object({
   release_dates: ReleaseDateSchema.array().optional(),
   platformIds: z.string().array(),
   retroachievements: RetroachievementsSchema.array().optional(),
-  igdbIds: z.number().array().optional(),
+  igdbId: z.number().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
