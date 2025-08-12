@@ -26,6 +26,7 @@ import { WrapperTemplate } from "../WrapperTemplate";
 import { toast } from "../../utils/toast.utils";
 import { IGameResponse } from "../../lib/schemas/games.schema";
 import { playthroughsAPI } from "../../api";
+import { useCommonStore } from "../../store/common.store";
 
 interface IPlaythroughModalProps {
   userId: string;
@@ -46,6 +47,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
   userId,
 }) => {
   const { profile } = useAuthStore();
+  const { systems } = useCommonStore();
   const {
     setPlaythroughs: setStorePlaythroughs,
     playthroughs: storePlaythroughs,
@@ -233,17 +235,21 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
             overwriteValue={commonUtils.upFL(watch("category") || "")}
             list={playthroughCategories.map((item) => commonUtils.upFL(item))}
           />
-          {/*<Dropdown
+          <Dropdown
             placeholder="Select platform..."
             getIndex={(index) =>
-              setValue("platformId", game.platforms[index]._id)
+              setValue("platformId", game.platformIds[index])
             }
             overwriteValue={
-              game.platforms.find((item) => item._id === watch("platformId"))
-                ?.name || ""
+              systems?.find((item) => item._id === watch("platformId"))?.name ||
+              ""
             }
-            list={game.platforms.map((item) => item.name)}
-          />*/}
+            list={
+              systems
+                ?.filter((sys) => game.platformIds.includes(sys._id))
+                .map((item) => item.name) || []
+            }
+          />
           {["completed", "played", "dropped"].includes(watch("category")) && (
             <div className={styles.modal__inputs}>
               {watch("category") === "completed" && (
