@@ -4,7 +4,6 @@ import React, { useEffect } from "react";
 import { adminUsersApi } from "../../shared/api";
 import { IUser } from "../../shared/types/auth.type";
 import { SvgProfile } from "../../shared/ui/svg";
-import { commonUtils } from "../../shared/utils/common.utils";
 import styles from "./Admin.module.scss";
 import { Table } from "./ui/Table";
 
@@ -29,18 +28,10 @@ const Admin = () => {
             content: (
               <div className={styles.container}>
                 <div className={styles.avatar}>
-                  {/* <Image
-                    key={user._id}
-                    src={commonUtils.getAvatar(user) || "/images/user.png"}
-                    width={48}
-                    height={48}
-                    alt="profile"
-                    className={styles.image}
-                  /> */}
                   {user?.avatar ? (
                     <Image
                       className={styles.image}
-                      src={commonUtils.getAvatar(user)}
+                      src={user.avatar}
                       width={48}
                       height={48}
                       alt="profile"
@@ -50,7 +41,6 @@ const Admin = () => {
                       <SvgProfile className={styles.placeholder} />
                     </div>
                   )}
-                  {/* <Avatar user={user} isWithoutTooltip /> */}
                 </div>
                 <div className={styles.description}>
                   <h3>{user.userName}</h3>

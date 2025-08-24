@@ -16,8 +16,8 @@ const getById = (id: string) => {
   return agent.get<IUser>(`${USER_URL}/${id}`);
 };
 
-const getByName = (name: string) => {
-  return agent.get<IUser>(`${USER_URL}/name?name=${name}`);
+const getByString = (searchString: string) => {
+  return agent.get<IUser>(`${USER_URL}/search?searchString=${searchString}`);
 };
 
 const addAvatar = (id: string, file: File) => {
@@ -126,7 +126,7 @@ const updateUserTime = (userId: string) => {
 
 export const userAPI = {
   getById,
-  getByName,
+  getByString,
   addAvatar,
   addBackground,
   getUserGames,

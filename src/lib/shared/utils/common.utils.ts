@@ -59,10 +59,6 @@ const upFL = (string: string) => {
     : "";
 };
 
-const getAvatar = (user?: IUser) => {
-  return !!user ? `https://mooncellar-avatars.s3.regru.cloud/${user._id}` : "";
-};
-
 export const shuffle = <T>(arr: T[]) => {
   const tempArr = structuredClone(arr);
 
@@ -184,7 +180,6 @@ export const commonUtils = {
   upFL,
   shuffle,
   getWordEnding,
-  getAvatar,
   checkWindow,
   addLeadingZero,
   addLastS,

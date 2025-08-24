@@ -11,7 +11,7 @@ export async function generateMetadata({
 }: {
   params: any;
 }): Promise<Metadata> {
-  const user = (await userAPI.getByName((await params).name)).data;
+  const user = (await userAPI.getByString((await params).name)).data;
 
   return {
     title: "Profile: " + user.userName,
@@ -31,7 +31,7 @@ export default async function User({ params }: { params: any }) {
     ? (await userAPI.getUserFollowings(authUserInfo.id)).data
     : undefined;
 
-  const user = (await userAPI.getByName((await params).name)).data;
+  const user = (await userAPI.getByString((await params).name)).data;
   const playthroughs = (
     await playthroughsAPI.getAll({
       userId: user._id,
