@@ -1,3 +1,4 @@
+import { IRole } from "../lib/schemas/role.schema";
 import { IRAAward } from "./retroachievements.type";
 import { IFollowings, IUserFilter, IUserPreset } from "./user.type";
 
@@ -27,6 +28,7 @@ export interface IUser {
 export interface IAuthToken {
   id: string;
   username: string;
+  roles: IRole[];
   email: string;
   iat: number;
   exp: number;

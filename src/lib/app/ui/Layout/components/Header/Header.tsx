@@ -11,6 +11,7 @@ import Link from "next/link";
 import { FC, MouseEvent } from "react";
 import styles from "./Header.module.scss";
 import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
+import { IButtonGroupItem } from "@/src/lib/shared/types/buttons.type";
 
 export const Header: FC = () => {
   const { isMobile } = useStatesStore();
@@ -28,6 +29,49 @@ export const Header: FC = () => {
     modal.open(<SearchModal />, { id: "search-games" });
   };
 
+  const buttons = [
+    {
+      title: (
+        <>
+          <Icon className={styles.svg} icon="dashicons:games" />
+          {!isMobile && <span>Games</span>}
+        </>
+      ),
+      link: "/games",
+      color: "transparent",
+    },
+    {
+      title: (
+        <>
+          <Icon className={styles.svg} icon="ph:spinner-ball-fill" />
+          {!isMobile && <span>Gauntlet</span>}
+        </>
+      ),
+      link: "/gauntlet",
+      color: "transparent",
+    },
+    profile?.roles?.includes("admin") && {
+      title: (
+        <>
+          <SvgAdmin className={styles.svg} />
+          {!isMobile && <span>Admin</span>}
+        </>
+      ),
+      link: "/admin",
+      color: "transparent",
+    },
+    {
+      title: (
+        <>
+          <SvgSearch className={styles.svg} />
+          {!isMobile && <span>Search</span>}
+        </>
+      ),
+      onClick: searchClickHandler,
+      color: "transparent",
+    },
+  ].filter(Boolean) as IButtonGroupItem[];
+
   return (
     <div className={styles.container}>
       <div className={styles.container__left}>
@@ -37,48 +81,7 @@ export const Header: FC = () => {
         <Separator />
         <ButtonGroup
           wrapperClassName={styles.container__buttons}
-          buttons={[
-            {
-              title: (
-                <>
-                  <Icon className={styles.svg} icon="dashicons:games" />
-                  {!isMobile && <span>Games</span>}
-                </>
-              ),
-              link: "/games",
-              color: "transparent",
-            },
-            {
-              title: (
-                <>
-                  <Icon className={styles.svg} icon="ph:spinner-ball-fill" />
-                  {!isMobile && <span>Gauntlet</span>}
-                </>
-              ),
-              link: "/gauntlet",
-              color: "transparent",
-            },
-            {
-              title: (
-                <>
-                  <SvgAdmin className={styles.svg} />
-                  {!isMobile && <span>Admin</span>}
-                </>
-              ),
-              link: "/admin",
-              color: "transparent",
-            },
-            {
-              title: (
-                <>
-                  <SvgSearch className={styles.svg} />
-                  {!isMobile && <span>Search</span>}
-                </>
-              ),
-              onClick: searchClickHandler,
-              color: "transparent",
-            },
-          ]}
+          buttons={buttons}
         />
       </div>
       <div className={styles.container__right}>

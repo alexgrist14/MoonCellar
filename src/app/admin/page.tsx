@@ -1,5 +1,6 @@
-import Admin from "@/src/lib/pages/Admin/Admin";
-import { FC } from "react";
+import { FC, lazy } from "react";
+
+const Admin = lazy(() => import("@/src/lib/pages/Admin/Admin"));
 
 const AdminPage: FC = async () => {
   return <Admin />;

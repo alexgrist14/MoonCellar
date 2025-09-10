@@ -54,7 +54,7 @@ export const BGImage = memo(
       <div className={styles.wrapper}>
         <div
           className={styles.overlay}
-          style={{ opacity: bgOpacity !== undefined ? bgOpacity / 100 : 1 }}
+          style={{ opacity: bgOpacity !== undefined ? bgOpacity / 100 : 0 }}
         />
         <div className={styles.place}>
           {!!bg && (
