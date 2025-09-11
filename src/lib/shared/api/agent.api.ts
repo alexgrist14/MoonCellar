@@ -3,6 +3,7 @@ import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import { authAPI } from "./auth.api";
 import { deleteCookie } from "../utils/cookies.utils";
 import { toast } from "../utils/toast.utils";
+import { useAuthStore } from "../store/auth.store";
 
 export const agent = axios.create({
   withCredentials: true,
@@ -38,5 +39,13 @@ agent.interceptors.response.use(
     }
   }
 );
+
+agent.interceptors.request.use((config) => {
+  const state = useAuthStore.getState();
+  if (state.profile?._id) {
+    config.headers["x-user-id"] = state.profile._id;
+  }
+  return config;
+});
 
 export default agent;
