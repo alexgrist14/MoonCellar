@@ -8,7 +8,7 @@ import { Separator } from "@/src/lib/shared/ui/Separator";
 import { SvgAdmin, SvgSearch } from "@/src/lib/shared/ui/svg";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Link from "next/link";
-import { FC, MouseEvent } from "react";
+import { FC, MouseEvent, useMemo } from "react";
 import styles from "./Header.module.scss";
 import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
 import { IButtonGroupItem } from "@/src/lib/shared/types/buttons.type";
@@ -29,48 +29,52 @@ export const Header: FC = () => {
     modal.open(<SearchModal />, { id: "search-games" });
   };
 
-  const buttons = [
-    {
-      title: (
-        <>
-          <Icon className={styles.svg} icon="dashicons:games" />
-          {!isMobile && <span>Games</span>}
-        </>
-      ),
-      link: "/games",
-      color: "transparent",
-    },
-    {
-      title: (
-        <>
-          <Icon className={styles.svg} icon="ph:spinner-ball-fill" />
-          {!isMobile && <span>Gauntlet</span>}
-        </>
-      ),
-      link: "/gauntlet",
-      color: "transparent",
-    },
-    profile?.roles?.includes("admin") && {
-      title: (
-        <>
-          <SvgAdmin className={styles.svg} />
-          {!isMobile && <span>Admin</span>}
-        </>
-      ),
-      link: "/admin",
-      color: "transparent",
-    },
-    {
-      title: (
-        <>
-          <SvgSearch className={styles.svg} />
-          {!isMobile && <span>Search</span>}
-        </>
-      ),
-      onClick: searchClickHandler,
-      color: "transparent",
-    },
-  ].filter(Boolean) as IButtonGroupItem[];
+  const buttons = useMemo(
+    () =>
+      [
+        {
+          title: (
+            <>
+              <Icon className={styles.svg} icon="dashicons:games" />
+              {!isMobile && <span>Games</span>}
+            </>
+          ),
+          link: "/games",
+          color: "transparent",
+        },
+        {
+          title: (
+            <>
+              <Icon className={styles.svg} icon="ph:spinner-ball-fill" />
+              {!isMobile && <span>Gauntlet</span>}
+            </>
+          ),
+          link: "/gauntlet",
+          color: "transparent",
+        },
+        profile?.roles?.includes("admin") && {
+          title: (
+            <>
+              <SvgAdmin className={styles.svg} />
+              {!isMobile && <span>Admin</span>}
+            </>
+          ),
+          link: "/admin",
+          color: "transparent",
+        },
+        {
+          title: (
+            <>
+              <SvgSearch className={styles.svg} />
+              {!isMobile && <span>Search</span>}
+            </>
+          ),
+          onClick: searchClickHandler,
+          color: "transparent",
+        },
+      ].filter(Boolean) as IButtonGroupItem[],
+    [isMobile, profile?.roles]
+  );
 
   return (
     <div className={styles.container}>
