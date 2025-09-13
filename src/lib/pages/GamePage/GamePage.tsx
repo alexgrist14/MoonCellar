@@ -113,7 +113,7 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
           {!!game.companies?.length && (
             <div className={styles.page__developers}>
               <p>
-                <span>Companies</span>
+                <span>Companies: </span>
                 {game.companies.map((comp, i, array) => (
                   <span key={comp.name + i}>
                     <Link href={`/games?company=${comp.name}`}>
