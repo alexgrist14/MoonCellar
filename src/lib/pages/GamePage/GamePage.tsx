@@ -118,8 +118,10 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
                   {game.companies.length > 1 ? "s" : ""}:{" "}
                 </span>
                 {game.companies.map((comp, i, array) => (
-                  <span key={comp + i}>
-                    <Link href={`/games?company=${comp}`}>{comp}</Link>
+                  <span key={comp.name + i}>
+                    <Link href={`/games?company=${comp.name}`}>
+                      {comp.name}
+                    </Link>
                     {i !== array.length - 1 ? ", " : ""}
                   </span>
                 ))}
