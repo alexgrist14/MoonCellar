@@ -22,6 +22,7 @@ import {
   parseQueryFilters,
   pushFiltersToQuery,
 } from "../../utils/filters.utils";
+import { RangeSelector } from "../RangeSelector";
 
 export const Filters: FC<{
   callback?: (filters?: IGameFilters) => void;
@@ -374,45 +375,45 @@ export const Filters: FC<{
               />
             </div>
           </div>
-          {/*<div className={styles.range__wrapper}>
+          <div className={styles.range__wrapper}>
             <RangeSelector
               text={!!filters?.rating ? "From " + filters.rating : "Any rating"}
               defaultValue={filters?.rating}
               min={0}
               max={99}
               callback={(rating) => {
-                const temp: IGameFilters = {
+                const temp: IGetGamesRequest = {
                   ...filters,
                   rating,
                 };
 
                 setFilters(temp);
-                isGauntlet && pushFiltersToQuery(temp, router, pathname);
+                isGauntlet && pushFiltersToQuery(temp);
               }}
               disabled={!!isLoading}
             />
           </div>
-            <div className={styles.range__wrapper}>
-              <RangeSelector
-                text={
-                  !!filters?.votes ? "From " + filters.votes : "Any votes count"
-                }
-                defaultValue={filters?.votes}
-                min={0}
-                max={1000}
-                step={10}
-                callback={(votes) => {
-                  const temp: IGameFilters = {
-                    ...filters,
-                    votes,
-                  };
+          <div className={styles.range__wrapper}>
+            <RangeSelector
+              text={
+                !!filters?.votes ? "From " + filters.votes : "Any votes count"
+              }
+              defaultValue={filters?.votes}
+              min={0}
+              max={1000}
+              step={10}
+              callback={(votes) => {
+                const temp: IGetGamesRequest = {
+                  ...filters,
+                  votes,
+                };
 
-                  setFilters(temp);
-                  isGauntlet && pushFiltersToQuery(temp, router, pathname);
-                }}
-                disabled={!!isLoading}
-              />
-                </div>*/}
+                setFilters(temp);
+                isGauntlet && pushFiltersToQuery(temp);
+              }}
+              disabled={!!isLoading}
+            />
+          </div>
           <div className={styles.filters__toggles}>
             <div className={styles.filters__toggle}>
               <ToggleSwitch

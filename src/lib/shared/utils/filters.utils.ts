@@ -16,6 +16,8 @@ export const parseQueryFilters = (pathWithQuery: string): IGetGamesRequest => {
     company: filters?.company,
     years: filters?.years,
     isOnlyWithAchievements: filters?.isOnlyWithAchievements,
+    rating: filters?.rating,
+    votes: filters?.votes,
     selected: {
       genres: filters?.selectedGenres,
       modes: filters?.selectedModes,

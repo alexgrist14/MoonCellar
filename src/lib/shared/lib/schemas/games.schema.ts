@@ -103,6 +103,8 @@ export const GetGamesRequestSchema = z.object({
   excluded: GameFiltersSchema.optional(),
   search: z.string().optional(),
   company: z.string().optional(),
+  rating: z.number().min(0).max(100).optional(),
+  votes: z.number().min(0).optional(),
   years: z
     .tuple([
       z.coerce.number().min(1900).max(2100),
