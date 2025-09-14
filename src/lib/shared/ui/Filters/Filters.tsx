@@ -200,10 +200,10 @@ export const Filters: FC<{
               initialExcludeValue={getExcludedArray("types", gameTypes)}
               placeholder="Select game types..."
               getIndexes={(indexes) =>
-                setSelected("gameTypes", indexes, gameTypes)
+                setSelected("types", indexes, gameTypes)
               }
               getExcludeIndexes={(indexes) =>
-                setExcluded("gameTypes", indexes, gameTypes)
+                setExcluded("types", indexes, gameTypes)
               }
             />
           </div>
