@@ -122,15 +122,8 @@ export const UserGames: FC<UserGamesProps> = ({ playthroughs, ratings }) => {
       //   break;
     }
 
-    return plays.map((play) => play.gameId);
-  }, [
-    list,
-    playthroughs,
-    parsedGamesRatings,
-    selectedSort,
-    sortOrder,
-    ratings,
-  ]);
+    return plays.filter((play) => !!play.gameId).map((play) => play.gameId);
+  }, [list, playthroughs, parsedGamesRatings, selectedSort, sortOrder]);
 
   const debouncedGetGames = useDebouncedCallback((page: number = 1) => {
     const _ids = getGamesIds().slice((page - 1) * take, page * take);

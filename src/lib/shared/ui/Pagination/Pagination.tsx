@@ -1,4 +1,4 @@
-import { memo, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./Pagination.module.scss";
 import { Button } from "../Button";
 import { Input } from "../Input";
@@ -35,6 +35,10 @@ export const Pagination = memo(
       setValue(page.toString());
       callback?.(page);
     };
+
+    useEffect(() => {
+      setValue(page.toString());
+    }, [page]);
 
     if (!total) return null;
 
