@@ -75,7 +75,7 @@ export const SearchModal: FC = () => {
           onChange={(e) => searchHandler(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              modal.close();
+              modal.close('search-games');
               router.push(`/games?search=${encodeURIComponent(searchQuery)}`);
             }
           }}
@@ -91,7 +91,7 @@ export const SearchModal: FC = () => {
                 ? `/games?search=${encodeURIComponent(searchQuery)}`
                 : "/games",
               onClick: () => {
-                modal.close();
+                modal.close('search-games');
               },
             },
             {
@@ -100,7 +100,7 @@ export const SearchModal: FC = () => {
                 ? `/games?search=${encodeURIComponent(searchQuery)}`
                 : "/games",
               onClick: () => {
-                modal.close();
+                modal.close('search-games');
                 setExpanded(["left"]);
               },
             },

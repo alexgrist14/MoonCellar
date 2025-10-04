@@ -33,4 +33,9 @@
     border-radius: $radius;
     position: relative;
   }
+
+  &__empty {
+    text-align: center;
+    margin-block: auto;
+  }
 }

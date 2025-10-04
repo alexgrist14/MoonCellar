@@ -80,6 +80,8 @@ export const GamesPage = () => {
       >
         {isLoading ? (
           <Loader type="pacman" />
+        ) : !games?.length ? (
+          <h2 className={styles.page__empty}>Games not found</h2>
         ) : (
           <div
             className={classNames(styles.page__games, {

@@ -54,7 +54,11 @@ export const GameButtons: FC<{ game: IGameResponse }> = ({ game }) => {
         wrapperClassName={styles.actions}
         buttons={[
           {
-            title: (isRoyal ? "Remove from" : "Add to") + " Royal list",
+            color: isRoyal ? "red" : "green",
+            title:
+              (isRoyal ? "Remove from" : "Add to") +
+              " Royal list" +
+              (!!royalGames?.length ? ` (${royalGames.length})` : ""),
             onClick: () =>
               isRoyal ? removeRoyalGame(game) : addRoyalGame(game),
           },

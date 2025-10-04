@@ -29,22 +29,20 @@
     }
   }
 
-  &__result {
-    aspect-ratio: 2/3;
-    border-radius: $radius;
-    overflow: hidden;
-    transition: all 0.3s;
-    position: relative;
-  }
-
   &__results {
     align-content: flex-start;
     padding: 5px;
-    display: grid;
+    display: flex;
+    flex-wrap: wrap;
     grid-template-columns: repeat(6, 1fr);
     gap: 20px;
     opacity: 0;
     animation: appearOpacity 0.4s ease forwards 1;
+    justify-content: space-between;
+
+    & > * {
+      flex-basis: calc(100% / 6 - 20px);
+    }
 
     &_loading {
       pointer-events: none;
@@ -53,29 +51,34 @@
     }
 
     @include mediaGt {
-      grid-template-columns: repeat(5, 1fr);
+      & > * {
+        flex-basis: calc(100% / 5 - 20px);
+      }
     }
 
     @include mediaLg {
-      grid-template-columns: repeat(4, 1fr);
+      & > * {
+        flex-basis: calc(100% / 4 - 20px);
+      }
     }
 
     @include mediaMd {
-      grid-template-columns: repeat(3, 1fr);
+      & > * {
+        flex-basis: calc(100% / 3 - 20px);
+      }
     }
 
     @include mediaSm {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    @include mediaMax($screenSm) {
-      grid-template-columns: 1fr 1fr;
+      & > * {
+        flex-basis: calc(100% / 2 - 20px);
+      }
     }
   }
 
   &__more {
     width: 100%;
     grid-column: 1 / -1;
+    flex-basis: 100%;
 
     & button {
       width: 100%;
