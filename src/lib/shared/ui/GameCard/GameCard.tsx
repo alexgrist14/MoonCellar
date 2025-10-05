@@ -62,6 +62,7 @@ export const GameCard = memo(
           styles.wrapper_active,
           spreadDirection === "height" && styles.wrapper_height
         )}
+        style={style}
       >
         <div
           key={game._id}
@@ -76,7 +77,6 @@ export const GameCard = memo(
               filteredPlaythroughs.some((play) => play.isMastered) &&
               styles.card_mastered
           )}
-          style={style}
           onMouseEnter={() => setIsHover(true)}
           onMouseLeave={() => setIsHover(false)}
           onClick={(e) => {

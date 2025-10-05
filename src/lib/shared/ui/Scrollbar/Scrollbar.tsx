@@ -27,6 +27,7 @@ interface IScrollBarProps {
   isResetScrollPosition?: boolean;
   isHorizontal?: boolean;
   contentStyle?: CSSProperties;
+  containerStyle?: CSSProperties;
   onScrollBottom?: (isBottom: boolean) => void;
 }
 
@@ -44,6 +45,7 @@ export const Scrollbar: FC<IScrollBarProps> = ({
   isResetScrollPosition,
   isHorizontal,
   contentStyle,
+  containerStyle,
   onScrollBottom,
 }) => {
   const { scrollPosition, setScrollPosition } = useCommonStore();
@@ -343,6 +345,7 @@ export const Scrollbar: FC<IScrollBarProps> = ({
 
   return (
     <div
+      style={containerStyle}
       className={cl(
         className,
         styles.scrollbars__container,

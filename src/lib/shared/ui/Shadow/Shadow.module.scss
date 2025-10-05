@@ -1,9 +1,9 @@
 .shadow {
-  background: linear-gradient(to top, $bg, transparent);
+  background: linear-gradient(to top, $bgAlt, transparent);
   opacity: 0;
   bottom: 0;
   width: 100%;
-  height: 10vh;
+  height: 10%;
   user-select: none;
   pointer-events: none;
   z-index: 1;

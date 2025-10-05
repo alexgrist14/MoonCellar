@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
+    "@types/react-virtualized": "^9.22.3",
     "axios": "^1.10.0",
     "classnames": "^2.5.1",
     "interweave": "^13.1.1",
@@ -38,6 +39,7 @@
     "react-resize-detector": "^12.1.0",
     "react-scan": "^0.3.4",
     "react-spinners": "^0.17.0",
+    "react-virtualized": "^9.22.6",
     "sass": "^1.89.2",
     "scss": "^0.2.4",
     "typescript-eslint": "^8.35.0",

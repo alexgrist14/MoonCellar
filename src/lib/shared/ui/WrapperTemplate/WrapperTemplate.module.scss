@@ -9,6 +9,7 @@
   background: rgba($wrapperBGColor, 0.8);
   box-shadow: $shadowBorder;
   color: $wrapperTextColor;
+  overflow: hidden;
 
   @include mediaSm {
     max-width: 100%;

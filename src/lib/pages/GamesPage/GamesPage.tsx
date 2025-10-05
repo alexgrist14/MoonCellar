@@ -1,23 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./GamesPage.module.scss";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { Filters } from "../../shared/ui/Filters";
 import { gamesApi } from "../../shared/api";
-import { GameCard } from "../../shared/ui/GameCard";
 import { useDebouncedCallback } from "use-debounce";
 import { Loader } from "../../shared/ui/Loader";
-import classNames from "classnames";
 import { Pagination } from "../../shared/ui/Pagination";
-import { useWindowResizeAction } from "../../shared/hooks";
-import { screenGt, screenLg, screenMd, screenSm } from "../../shared/constants";
 import { parseQueryFilters } from "../../shared/utils/filters.utils";
 import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
 import { BGImage } from "../../shared/ui/BGImage";
 import { useAdvancedRouter } from "../../shared/hooks/useAdvancedRouter";
 import { useAsyncLoader } from "../../shared/hooks/useAsyncLoader";
 import { IGameResponse } from "../../shared/lib/schemas/games.schema";
+import { GamesCards } from "../../shared/ui/GamesCards";
+import { takeGames } from "../../shared/constants/games.const";
 
 export const GamesPage = () => {
   const { sync, isLoading, setIsLoading } = useAsyncLoader();
@@ -25,7 +23,8 @@ export const GamesPage = () => {
 
   const [games, setGames] = useState<IGameResponse[]>();
   const [total, setTotal] = useState(0);
-  const [take, setTake] = useState(80);
+
+  const firstRender = useRef(true);
 
   const debouncedGamesFetch = useDebouncedCallback((page: number = 1) => {
     const filters = parseQueryFilters(asPath);
@@ -35,27 +34,20 @@ export const GamesPage = () => {
         .getAll({
           ...filters,
           page: page || 1,
-          take,
+          take: takeGames,
         })
         .then((res) => {
           setGames(res.data.results);
           setTotal(res.data.total);
+
+          firstRender.current && (firstRender.current = false);
         })
     );
   }, 200);
 
   useEffect(() => {
     debouncedGamesFetch(Number(query.get("page") as string));
-  }, [debouncedGamesFetch, take, query]);
-
-  useWindowResizeAction(() => {
-    if (window.innerWidth >= screenGt) return setTake(42);
-    if (window.innerWidth >= screenLg) return setTake(35);
-    if (window.innerWidth >= screenMd) return setTake(28);
-    if (window.innerWidth >= screenSm) return setTake(21);
-
-    return setTake(14);
-  });
+  }, [debouncedGamesFetch, query]);
 
   return (
     <>
@@ -64,7 +56,7 @@ export const GamesPage = () => {
         <Filters />
       </ExpandMenu>
       <Pagination
-        take={take}
+        take={60}
         total={total}
         isFixed
         isDisabled={isLoading}
@@ -75,23 +67,16 @@ export const GamesPage = () => {
       />
       <WrapperTemplate
         contentStyle={{
+          padding: "0",
           minHeight: "calc(100vh - 155px)",
         }}
       >
-        {isLoading ? (
+        {isLoading || firstRender.current ? (
           <Loader type="pacman" />
         ) : !games?.length ? (
           <h2 className={styles.page__empty}>Games not found</h2>
         ) : (
-          <div
-            className={classNames(styles.page__games, {
-              [styles.page__games_loading]: isLoading,
-            })}
-          >
-            {games?.map((game) => (
-              <GameCard key={game._id} game={game} />
-            ))}
-          </div>
+          <GamesCards games={games} />
         )}
       </WrapperTemplate>
     </>

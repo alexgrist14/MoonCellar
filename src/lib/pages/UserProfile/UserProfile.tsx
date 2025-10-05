@@ -86,7 +86,11 @@ const UserProfile: FC<UserProfileProps> = ({
             />
           </ExpandMenu>
         )}
-        <WrapperTemplate classNameContent={styles.content} isWithBlur>
+        <WrapperTemplate
+          contentStyle={{ padding: "0" }}
+          classNameContent={styles.content}
+          isWithBlur
+        >
           {tab === "settings" && authUserId === user._id && <Settings />}
           {tab === "profile" && (
             <UserInfo

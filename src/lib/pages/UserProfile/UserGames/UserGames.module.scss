@@ -1,4 +1,8 @@
 .container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+
   .sort {
     display: flex;
     background-color: $neutral-10;
@@ -7,7 +11,7 @@
     align-items: center;
     max-width: 200px;
     user-select: none;
-    margin-bottom: 10px;
+    margin: 10px;
     border-radius: $radius;
     gap: 10px;
     cursor: pointer;
@@ -28,24 +32,6 @@
 }
 
 .games {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  height: 100%;
-  margin-inline: auto;
-  gap: 20px;
-
-  @include mediaGt {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  @include mediaLg {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  @include mediaMd {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
   &__info {
     display: grid;
     grid-template-columns: 1fr 30px;
@@ -55,6 +41,7 @@
     flex-direction: column;
     border-radius: $radius;
     overflow: hidden;
+    align-content: center;
 
     & p {
       @include textEllipsis;
@@ -105,5 +92,6 @@
   &__game {
     display: grid;
     grid-template-rows: 1fr 50px;
+    padding: 5px;
   }
 }

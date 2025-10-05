@@ -1,5 +1,6 @@
 .modal {
-  display: flex;
+  display: grid;
+  grid-template-rows: auto 1fr min-content;
   flex-direction: column;
   padding: 20px;
   background-color: $bgAlt;
@@ -8,6 +9,7 @@
   position: fixed;
   top: 10%;
   left: 50%;
+  height: 80vh;
   transform: translateX(-50%);
 
   @include mediaMax($screenMd) {
@@ -26,52 +28,6 @@
 
     & input {
       max-width: calc(100% - 100px);
-    }
-  }
-
-  &__results {
-    align-content: flex-start;
-    padding: 5px;
-    display: flex;
-    flex-wrap: wrap;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 20px;
-    opacity: 0;
-    animation: appearOpacity 0.4s ease forwards 1;
-    justify-content: space-between;
-
-    & > * {
-      flex-basis: calc(100% / 6 - 20px);
-    }
-
-    &_loading {
-      pointer-events: none;
-      filter: brightness(0.5);
-      height: 100%;
-    }
-
-    @include mediaGt {
-      & > * {
-        flex-basis: calc(100% / 5 - 20px);
-      }
-    }
-
-    @include mediaLg {
-      & > * {
-        flex-basis: calc(100% / 4 - 20px);
-      }
-    }
-
-    @include mediaMd {
-      & > * {
-        flex-basis: calc(100% / 3 - 20px);
-      }
-    }
-
-    @include mediaSm {
-      & > * {
-        flex-basis: calc(100% / 2 - 20px);
-      }
     }
   }
 
@@ -101,24 +57,5 @@
     & button {
       border-radius: $radius;
     }
-  }
-}
-
-.scrollbars {
-  div &__container {
-    margin-top: 20px;
-  }
-
-  div &__content {
-    margin: 0;
-    padding: 5px;
-    border-radius: $radius;
-    max-height: calc(80vh - 80px);
-    min-height: calc(80vh - 80px);
-    height: fit-content;
-  }
-
-  div &__scrollbar {
-    margin-right: -12px;
   }
 }

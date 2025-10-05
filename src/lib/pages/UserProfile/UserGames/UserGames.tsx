@@ -21,13 +21,14 @@ import { modal } from "@/src/lib/shared/ui/Modal";
 import { GamePlaysInfo } from "@/src/lib/entities/game/ui/GamePlaysInfo";
 import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
 import { IUserRating } from "@/src/lib/shared/lib/schemas/user-ratings.schema";
+import { GamesCards } from "@/src/lib/shared/ui/GamesCards";
+import { takeGames } from "@/src/lib/shared/constants/games.const";
 
 interface UserGamesProps {
   playthroughs: IPlaythrough[];
   ratings: IUserRating[];
 }
 
-const take = 30;
 const sortOptions = [
   { label: SortType.DATE_ADDED },
   // { label: SortType.DATE_COMPLETED },
@@ -126,7 +127,7 @@ export const UserGames: FC<UserGamesProps> = ({ playthroughs, ratings }) => {
   }, [list, playthroughs, parsedGamesRatings, selectedSort, sortOrder]);
 
   const debouncedGetGames = useDebouncedCallback((page: number = 1) => {
-    const _ids = getGamesIds().slice((page - 1) * take, page * take);
+    const _ids = getGamesIds().slice((page - 1) * takeGames, page * takeGames);
 
     !!_ids?.length &&
       sync(() =>
@@ -194,78 +195,75 @@ export const UserGames: FC<UserGamesProps> = ({ playthroughs, ratings }) => {
           className={styles.sort__dropdown}
         />
       </div>
-
-      <div className={classNames(styles.games)}>
-        {isLoading ? (
-          <Loader type="moon" />
-        ) : (
-          games?.map((game) => {
+      {isLoading ? (
+        <Loader type="moon" />
+      ) : (
+        <GamesCards
+          games={games}
+          gameClassName={styles.games__game}
+          additionalHeight={35}
+          additionalGameNode={(game) => {
             const rating = parsedGamesRatings?.[game._id];
 
             return (
-              <div key={game._id} className={styles.games__game}>
-                <GameCard game={game} />
-                <div className={styles.games__info}>
-                  <div
-                    className={styles.games__text}
-                    onClick={() =>
-                      modal.open(
-                        <GamePlaysInfo
-                          gameName={game.name}
-                          playthroughs={playthroughs.filter(
-                            (play) => play.gameId === game._id
-                          )}
-                        />
-                      )
-                    }
-                  >
-                    <p className={styles.games__title}>{game.name}</p>
-                    {playthroughs.filter((play) => play.gameId === game._id)
-                      .length > 1 && (
-                      <p className={styles.games__plays}>
-                        {
-                          playthroughs.filter(
-                            (play) => play.gameId === game._id
-                          ).length
-                        }{" "}
-                        {commonUtils.addLastS(
-                          "Playthrough",
-                          playthroughs.filter(
-                            (play) => play.gameId === game._id
-                          ).length
+              <div className={styles.games__info}>
+                <div
+                  className={styles.games__text}
+                  onClick={() =>
+                    modal.open(
+                      <GamePlaysInfo
+                        gameName={game.name}
+                        playthroughs={playthroughs.filter(
+                          (play) => play.gameId === game._id
                         )}
-                      </p>
-                    )}
-                  </div>
-                  {!!rating && (
-                    <div className={classNames(styles.games__icon)}>
-                      <Icon
-                        style={{
-                          filter: `drop-shadow(0 0 ${rating * 0.05}rem ${accentColor})`,
-                          backgroundColor: `rgba(${accentColorRGB}, ${rating * 0.1})`,
-                        }}
-                        className={classNames(styles.games__number)}
-                        icon={`mdi:numeric-${parsedGamesRatings[game._id]}`}
                       />
-                    </div>
+                    )
+                  }
+                >
+                  <p className={styles.games__title}>{game.name}</p>
+                  {playthroughs.filter((play) => play.gameId === game._id)
+                    .length > 1 && (
+                    <p className={styles.games__plays}>
+                      {
+                        playthroughs.filter((play) => play.gameId === game._id)
+                          .length
+                      }{" "}
+                      {commonUtils.addLastS(
+                        "Playthrough",
+                        playthroughs.filter((play) => play.gameId === game._id)
+                          .length
+                      )}
+                    </p>
                   )}
                 </div>
+                {!!rating && (
+                  <div className={classNames(styles.games__icon)}>
+                    <Icon
+                      style={{
+                        filter: `drop-shadow(0 0 ${rating * 0.05}rem ${accentColor})`,
+                        backgroundColor: `rgba(${accentColorRGB}, ${rating * 0.1})`,
+                      }}
+                      className={classNames(styles.games__number)}
+                      icon={`mdi:numeric-${parsedGamesRatings[game._id]}`}
+                    />
+                  </div>
+                )}
               </div>
             );
-          })
-        )}
-        <Pagination
-          take={take}
-          total={total}
-          isFixed
-          isDisabled={isLoading}
-          callback={(page) => {
-            setIsLoading(true);
-            debouncedGetGames(page);
           }}
         />
-        {!isLoading && !!games && !games.length && <p>There is no games</p>}
-      </div>
+      )}
+      <Pagination
+        take={takeGames}
+        total={total}
+        isFixed
+        isDisabled={isLoading}
+        callback={(page) => {
+          setIsLoading(true);
+          debouncedGetGames(page);
+        }}
+      />
+      {!isLoading && !!games && !games.length && <p>There is no games</p>}
     </div>
   );
 };
