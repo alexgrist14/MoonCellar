@@ -94,7 +94,9 @@ export const ExpandMenu = memo(
           >
             <Scrollbar
               type="absolute"
-              stl={styles}
+              classNameContainer={styles.scrollbars__container}
+              classNameContent={styles.scrollbars__content}
+              classNameScrollbar={styles.scrollbars__scrollbar}
               contentStyle={{
                 ...(position.includes("bottom")
                   ? { paddingBottom: "55px" }

@@ -6,7 +6,6 @@ import { keyboardUtils } from "../../utils/keyboard.utils";
 import classNames from "classnames";
 import { SvgDoubleArrow } from "../svg/SvgDoubleArrow";
 import { SvgArrow } from "../svg/SvgArrow";
-import { useCommonStore } from "../../store/common.store";
 import { createPortal } from "react-dom";
 import { useAdvancedRouter } from "../../hooks/useAdvancedRouter";
 
@@ -23,15 +22,13 @@ export const Pagination = memo(
     const { query, setQuery } = useAdvancedRouter();
     const centerRef = useRef<HTMLDivElement>(null);
 
-    const { setScrollPosition } = useCommonStore();
-
     const [value, setValue] = useState("");
 
     const page = useMemo(() => Number(query.get("page") || 1), [query]);
     const max = useMemo(() => Math.ceil(total / take), [take, total]);
 
     const changeCallback = (page: number) => {
-      setScrollPosition({ left: 0, top: 0 });
+      window.scrollTo({ top: 0, behavior: "smooth" });
       setValue(page.toString());
       callback?.(page);
     };

@@ -29,11 +29,11 @@ body {
   }
 }
 
-/* * { */
-/*   scrollbar-width: none; */
-/*   font-family: var(--font-general); */
-/* } */
+* {
+  scrollbar-width: none;
+  font-family: var(--font-general);
 
-/* *::-webkit-scrollbar { */
-/*   display: none; */
-/* } */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

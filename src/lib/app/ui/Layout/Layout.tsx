@@ -79,7 +79,12 @@ export const Layout: FC<ILayoutProps> = ({
       <CheckMobile>
         <Header />
       </CheckMobile>
-      <Scrollbar stl={styles} type="absolute" fadeType="bottom">
+      <Scrollbar
+        classNameContent={styles.scrollbars__content}
+        classNameScrollbar={styles.scrollbars__scrollbar}
+        type="absolute"
+        fadeType="bottom"
+      >
         <main className={"container"} ref={ref}>
           {children}
         </main>

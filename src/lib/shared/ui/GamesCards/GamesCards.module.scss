@@ -3,24 +3,19 @@
   flex-direction: column;
   flex: 1;
   height: 100%;
-  padding: 10px;
-}
 
-.scrollbars {
   div &__container {
-    margin-top: 20px;
+    width: fit-content;
   }
 
   div &__content {
     margin: 0;
-    padding: 5px;
-    border-radius: $radius;
-    max-height: calc(80vh - 80px);
-    min-height: calc(80vh - 80px);
+    padding: 0;
     height: fit-content;
+    width: fit-content;
   }
 
   div &__scrollbar {
-    margin-right: -12px;
+    margin-right: -6px;
   }
 }

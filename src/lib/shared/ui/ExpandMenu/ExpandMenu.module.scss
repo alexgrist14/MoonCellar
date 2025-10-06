@@ -115,10 +115,6 @@ $border: 2px solid $borderColor;
 }
 
 .scrollbars {
-  &__scrollbar {
-    margin-right: 5px;
-  }
-
   div &__container {
     max-height: 100%;
     overflow: hidden;
@@ -132,6 +128,7 @@ $border: 2px solid $borderColor;
   }
 
   div &__scrollbar {
+    margin-right: 5px;
     margin-block: 60px;
     height: calc(100% - 80px);
   }

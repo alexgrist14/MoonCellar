@@ -446,10 +446,12 @@ export const Dropdown = memo(
               </div>
             )}
             <Scrollbar
-              contentDefRef={innerRef}
+              initialContentRef={innerRef}
               fadeType="both"
               type="absolute"
-              stl={styles}
+              classNameContent={styles.scrollbars__content}
+              classNameThumb={styles.scrollbars__thumb}
+              classNameScrollbar={styles.scrollbars__scrollbar}
               contentStyle={{ maxHeight: maxHeight || "300px" }}
             >
               <ul

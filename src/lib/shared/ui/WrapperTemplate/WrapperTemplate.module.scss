@@ -9,7 +9,6 @@
   background: rgba($wrapperBGColor, 0.8);
   box-shadow: $shadowBorder;
   color: $wrapperTextColor;
-  overflow: hidden;
 
   @include mediaSm {
     max-width: 100%;
@@ -67,11 +66,11 @@
 }
 
 .scrollbars {
-  &__scrollbar {
+  div &__scrollbar {
     right: -8px;
   }
 
-  &__content {
+  div &__content {
     max-height: 90vh;
     padding: 0;
   }

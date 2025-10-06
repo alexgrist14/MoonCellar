@@ -62,7 +62,7 @@ export const Slideshow: FC<ISlideshowProps> = ({ pictures }) => {
   }, [screenshotIndex, screenshots]);
 
   return (
-    <Scrollbar stl={styles} isHorizontal>
+    <Scrollbar classNameContent={styles.slideshow__content} isHorizontal>
       {pictures.map(
         (picture, i) =>
           !!picture && (

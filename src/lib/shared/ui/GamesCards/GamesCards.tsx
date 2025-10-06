@@ -4,7 +4,7 @@ import { IGameResponse } from "../../lib/schemas/games.schema";
 import { Grid, AutoSizer } from "react-virtualized";
 import { GameCard } from "../GameCard";
 import { coverRatio } from "../../constants";
-import { Shadow } from "../Shadow";
+import { Scrollbar } from "../Scrollbar";
 
 interface IGamesCardsProps {
   children?: ReactNode;
@@ -21,8 +21,7 @@ export const GamesCards: FC<IGamesCardsProps> = ({
   additionalHeight,
   additionalGameNode,
 }) => {
-  const [isShadowActive, setIsShadowActive] = useState(true);
-
+  const [scrollTop, setScrollTop] = useState(0);
   if (!games?.length) return null;
 
   return (
@@ -50,43 +49,49 @@ export const GamesCards: FC<IGamesCardsProps> = ({
 
           const columnWidth = width / columnCount;
           const rowCount = Math.ceil(games.length / columnCount) || 1;
+          const rowHeight = columnWidth / coverRatio + (additionalHeight || 0);
 
           return (
-            <Grid
-              width={width}
-              height={height}
-              columnCount={columnCount}
-              rowCount={rowCount}
-              rowHeight={columnWidth / coverRatio + (additionalHeight || 0)}
-              columnWidth={columnWidth}
-              overscanRowCount={2}
-              className={styles.block__grid}
-              onScrollbarPresenceChange={({ vertical }) => {
-                setIsShadowActive(vertical);
+            <Scrollbar
+              type="absolute"
+              classNameContainer={styles.block__container}
+              classNameContent={styles.block__content}
+              classNameScrollbar={styles.block__scrollbar}
+              contentStyle={{ maxHeight: height }}
+              fadeType="both"
+              isWithRadius
+              onScroll={({ scrollTop }) => {
+                setScrollTop(scrollTop || 0);
               }}
-              onScroll={({ scrollHeight, clientHeight, scrollTop }) => {
-                !!clientHeight &&
-                  setIsShadowActive(
-                    scrollHeight - 30 > clientHeight + scrollTop
+            >
+              <Grid
+                autoHeight
+                width={width}
+                height={height}
+                columnCount={columnCount}
+                rowCount={rowCount}
+                rowHeight={rowHeight}
+                columnWidth={columnWidth}
+                overscanRowCount={1}
+                scrollTop={scrollTop}
+                className={styles.block__grid}
+                cellRenderer={({ key, style, rowIndex, columnIndex }) => {
+                  const game = games[rowIndex * columnCount + columnIndex];
+
+                  if (!game) return null;
+
+                  return (
+                    <div key={key} className={gameClassName} style={style}>
+                      <GameCard game={game} />
+                      {additionalGameNode?.(game)}
+                    </div>
                   );
-              }}
-              cellRenderer={({ key, style, rowIndex, columnIndex }) => {
-                const game = games[rowIndex * columnCount + columnIndex];
-
-                if (!game) return null;
-
-                return (
-                  <div key={key} className={gameClassName} style={style}>
-                    <GameCard game={game} />
-                    {additionalGameNode?.(game)}
-                  </div>
-                );
-              }}
-            />
+                }}
+              />
+            </Scrollbar>
           );
         }}
       </AutoSizer>
-      <Shadow isActive={isShadowActive} />
       {children}
     </div>
   );

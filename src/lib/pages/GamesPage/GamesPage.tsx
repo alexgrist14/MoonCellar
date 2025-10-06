@@ -56,7 +56,7 @@ export const GamesPage = () => {
         <Filters />
       </ExpandMenu>
       <Pagination
-        take={60}
+        take={takeGames}
         total={total}
         isFixed
         isDisabled={isLoading}
@@ -67,7 +67,6 @@ export const GamesPage = () => {
       />
       <WrapperTemplate
         contentStyle={{
-          padding: "0",
           minHeight: "calc(100vh - 155px)",
         }}
       >

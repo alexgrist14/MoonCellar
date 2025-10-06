@@ -58,7 +58,11 @@ export const WrapperTemplate: FC<IWrapperTemplateProps> = ({
           className={cn(classNameContent, styles.template__content)}
         >
           {isWithScrollBar ? (
-            <Scrollbar type="absolute" stl={styles}>
+            <Scrollbar
+              type="absolute"
+              classNameContent={styles.scrollbars__content}
+              classNameScrollbar={styles.scrollbars__scrollbar}
+            >
               {children}
             </Scrollbar>
           ) : (

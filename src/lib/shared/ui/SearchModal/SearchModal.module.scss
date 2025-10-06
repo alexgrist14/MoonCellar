@@ -1,16 +1,17 @@
 .modal {
   display: grid;
   grid-template-rows: auto 1fr min-content;
+  gap: 8px;
   flex-direction: column;
   padding: 20px;
   background-color: $bgAlt;
   width: 85vw;
   border-radius: $radius;
   position: fixed;
-  top: 10%;
+  top: 50%;
   left: 50%;
-  height: 80vh;
-  transform: translateX(-50%);
+  height: 90vh;
+  transform: translate(-50%, -50%);
 
   @include mediaMax($screenMd) {
     width: 90vw;
