@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, ReactNode, useEffect } from "react";
+import { FC, ReactNode, Suspense, useEffect } from "react";
 import styles from "./Layout.module.scss";
 import { Header } from "./components";
 import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
@@ -15,6 +15,7 @@ import { useGetUserInfo } from "@/src/lib/features/user/model/user.hooks";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { gamesApi } from "@/src/lib/shared/api";
 import { platformsAPI } from "@/src/lib/shared/api/platforms.api";
+import { YandexMetrikaContainer } from "@/src/lib/shared/ui/YandexMetrika";
 
 interface ILayoutProps {
   children: ReactNode;
@@ -94,6 +95,9 @@ export const Layout: FC<ILayoutProps> = ({
       <div id="expand-connector"></div>
       <div id="pagination-connector"></div>
       <div id="tooltip-connector"></div>
+      <Suspense fallback='<></>'>
+        <YandexMetrikaContainer />
+      </Suspense>
     </div>
   );
 };
