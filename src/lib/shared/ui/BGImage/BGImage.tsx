@@ -31,11 +31,11 @@ export const BGImage = memo(
 
       const pictures: string[] = [];
 
-      if (!!game.artworks?.length) {
-        game.artworks.forEach((url) => pictures.push(url));
-      } else {
-        game.screenshots?.forEach((url) => pictures.push(url));
-      }
+      // if (!!game.artworks?.length) {
+      //   game.artworks.forEach((url) => pictures.push(url));
+      // } else {
+      //   game.screenshots?.forEach((url) => pictures.push(url));
+      // }
 
       const url = pictures[Math.floor(Math.random() * (pictures.length - 1))];
 

@@ -49,8 +49,8 @@ export const GameSchema = z.object({
   genres: z.string().array().optional(),
   keywords: z.string().array().optional(),
   themes: z.string().array().optional(),
-  screenshots: z.string().array().optional(),
-  artworks: z.string().array().optional(),
+  // screenshots: z.string().array().optional(),
+  // artworks: z.string().array().optional(),
   companies: CompanySchema.array().optional(),
   websites: z.string().array().optional(),
   first_release: z.number().optional(),
@@ -77,7 +77,7 @@ export const GetGamesByIdsSchema = z.object({
 });
 
 export const GetGamesRequestSchema = z.object({
-  take: z.coerce.number().min(1).max(100).default(50).optional(),
+  take: z.coerce.number().min(1).max(1000).default(50).optional(),
   isRandom: z
     .union([z.string(), z.boolean()])
     .transform((val) =>

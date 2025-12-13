@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import styles from "./GamePage.module.scss";
 import Image from "next/image";
 import { dateRegions } from "../../shared/constants";
@@ -16,12 +16,15 @@ import { BGImage } from "../../shared/ui/BGImage";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { IGameResponse } from "../../shared/lib/schemas/games.schema";
 import { useCommonStore } from "../../shared/store/common.store";
+import { filesAPI } from "../../shared/api/files.api";
 
 export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
   const { isAuth, profile } = useAuthStore();
   const { systems } = useCommonStore();
 
   const [isLoading, setIsLoading] = useState<boolean>(!!game.cover);
+  const [screenshots, setScreenshots] = useState<string[]>([]);
+  const [artworks, setArtworks] = useState<string[]>([]);
 
   const { isMastered, isBeaten } = useMemo(() => {
     const mastered = profile?.raAwards?.filter(
@@ -40,6 +43,26 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
       ),
     };
   }, [game, profile]);
+
+  useEffect(() => {
+    filesAPI
+      .getBucketKeys("mooncellar-screenshots", game.slug + "/")
+      .then((res) => {
+        const urls = res.data.map(
+          (key) => `https://mooncellar-screenshots.s3.regru.cloud/${key}`
+        );
+        setScreenshots(urls);
+      });
+
+    filesAPI
+      .getBucketKeys("mooncellar-artworks", game.slug + "/")
+      .then((res) => {
+        const urls = res.data.map(
+          (key) => `https://mooncellar-artworks.s3.regru.cloud/${key}`
+        );
+        setArtworks(urls);
+      });
+  }, [game.slug]);
 
   if (!game) return null;
 
@@ -195,16 +218,16 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
               <p>{game.storyline}</p>
             </div>
           )}
-          {!!game.screenshots?.length && (
+          {!!screenshots?.length && (
             <div className={styles.page__screenshots}>
               <h4>Screenshots:</h4>
-              <Slideshow pictures={game.screenshots} />
+              <Slideshow pictures={screenshots} />
             </div>
           )}
-          {!!game.artworks?.length && (
+          {!!artworks?.length && (
             <div className={styles.page__screenshots}>
               <h4>Artworks:</h4>
-              <Slideshow pictures={game.artworks} />
+              <Slideshow pictures={artworks} />
             </div>
           )}
           <div className={styles.page__bottom}>

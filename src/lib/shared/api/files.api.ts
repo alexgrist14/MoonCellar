@@ -43,9 +43,9 @@ const getBuckets = () => {
   return agent.get<string[]>(`${FILES_API}/buckets`);
 };
 
-const getBucketKeys = (bucketName: string) => {
+const getBucketKeys = (bucketName: string, prefix?: string) => {
   return agent.get<string[]>(`${FILES_API}/bucket-keys`, {
-    params: { bucketName },
+    params: { bucketName, prefix },
   });
 };
 

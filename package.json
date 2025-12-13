@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3111",
     "lint": "eslint src --ext ts,tsx,js,jsx --report-unused-disable-directives --max-warnings 10",
     "lint:fix": "eslint src --ext js,jsx,ts,tsx --fix",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,scss,html}'",
@@ -30,7 +30,7 @@
     "classnames": "^2.5.1",
     "interweave": "^13.1.1",
     "jwt-decode": "^4.0.0",
-    "next": "^15.3.4",
+    "next": "^15.5.7",
     "query-string": "^9.2.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
