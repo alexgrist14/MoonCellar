@@ -74,7 +74,6 @@ export const GameRating: FC<IGameRatingProps> = ({ game, isDisabled }) => {
       );
     }
   };
-  console.log(isDisabled);
 
   return (
     <div
@@ -88,7 +87,7 @@ export const GameRating: FC<IGameRatingProps> = ({ game, isDisabled }) => {
       {Array(10)
         .fill("")
         .map((_, index) => (
-          <div
+          <Icon
             key={index}
             className={classNames(styles.rating__number, {
               [styles.rating__number_active]:
@@ -103,9 +102,8 @@ export const GameRating: FC<IGameRatingProps> = ({ game, isDisabled }) => {
             })}
             onClick={() => changeHandler(index + 1)}
             onMouseOver={() => setHoverIndex(index)}
-          >
-            <Icon key={index} icon={`mdi:numeric-${index + 1}`} />
-          </div>
+            icon={`mdi:numeric-${index + 1}`}
+          />
         ))}
     </div>
   );
