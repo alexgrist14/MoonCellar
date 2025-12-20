@@ -180,7 +180,12 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
       contentStyle={{ padding: "20px" }}
       classNameContent={styles.wrapper}
     >
-      <GameRating game={game} />
+      <GameRating
+        game={game}
+        isDisabled={!playthroughs.some(
+          (play) => ["completed", "played", "dropped"].includes(play.category)
+        )}
+      />
       <div className={styles.modal}>
         {!!playthroughs?.length && (
           <div className={styles.modal__top}>

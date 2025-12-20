@@ -15,9 +15,10 @@ import { Loader } from "@/src/lib/shared/ui/Loader";
 
 interface IGameRatingProps {
   game: IGameResponse;
+  isDisabled?: boolean;
 }
 
-export const GameRating: FC<IGameRatingProps> = ({ game }) => {
+export const GameRating: FC<IGameRatingProps> = ({ game, isDisabled }) => {
   const { sync, isLoading } = useAsyncLoader();
   const { profile } = useAuthStore();
   const { setRatings, ratings } = useUserStore();
@@ -30,9 +31,9 @@ export const GameRating: FC<IGameRatingProps> = ({ game }) => {
   const [hoverIndex, setHoverIndex] = useState<number | undefined>();
 
   const changeHandler = (value: number) => {
-    if (!profile || value === ratingValue || !ratings) return;
+    if (!profile || !ratings) return;
 
-    if (!value && !!rating) {
+    if (value === rating?.rating && !!rating) {
       sync(() =>
         ratingsAPI.remove({ _id: rating._id, userId: profile._id }).then(() => {
           toast.success({
@@ -40,7 +41,7 @@ export const GameRating: FC<IGameRatingProps> = ({ game }) => {
           });
 
           setRatings(ratings.filter((r) => r._id !== rating._id));
-          setRatingValue(value);
+          setRatingValue(undefined);
         })
       );
     } else if (!!value && !rating) {
@@ -73,13 +74,15 @@ export const GameRating: FC<IGameRatingProps> = ({ game }) => {
       );
     }
   };
+  console.log(isDisabled);
 
   return (
     <div
       className={classNames(styles.rating, {
-        [styles.rating_loading]: isLoading,
+        [styles.rating_loading]: isLoading || isDisabled,
       })}
       onMouseLeave={() => setHoverIndex(undefined)}
+      inert={isDisabled}
     >
       {isLoading && <Loader className={styles.rating__loader} type="pulse" />}
       {Array(10)
@@ -96,15 +99,12 @@ export const GameRating: FC<IGameRatingProps> = ({ game }) => {
                   rating &&
                   rating.rating !== null &&
                   rating.rating >= index + 1) ||
-                (rating && hoverIndex !== undefined && hoverIndex >= index),
+                (hoverIndex !== undefined && hoverIndex >= index),
             })}
+            onClick={() => changeHandler(index + 1)}
+            onMouseOver={() => setHoverIndex(index)}
           >
-            <Icon
-              onClick={() => changeHandler(index + 1)}
-              onMouseOver={() => setHoverIndex(index)}
-              key={index}
-              icon={`mdi:numeric-${index + 1}`}
-            />
+            <Icon key={index} icon={`mdi:numeric-${index + 1}`} />
           </div>
         ))}
     </div>
