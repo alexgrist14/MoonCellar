@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: false,
   sassOptions: {
-    additionalData: '@use "@/src/lib/app/styles/index.scss" as *;',
+    additionalData: '@use "./src/lib/app/styles/index.scss" as *;',
   },
   images: {
     remotePatterns: [

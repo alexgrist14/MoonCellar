@@ -1,14 +1,11 @@
 import { CSSProperties, FC, useMemo, useRef } from "react";
 import styles from "./GameControls.module.scss";
-import { Icon } from "@iconify/react";
 import classNames from "classnames";
 import { Button } from "../Button";
 import { useAuthStore } from "../../store/auth.store";
-import { accentColor, accentColorRGB } from "../../constants";
 import { modal } from "../Modal";
 import { PlaythroughModal } from "../PlaythroughModal";
 import { useUserStore } from "../../store/user.store";
-import { GameRating } from "@/src/lib/features/game/GameRating";
 import { GameButtons } from "../GameButtons";
 import { WrapperTemplate } from "../WrapperTemplate";
 import { SvgCircleMenu, SvgPlay } from "../svg";
@@ -30,12 +27,6 @@ export const GameControls: FC<IGameControlsProps> = ({
   const { ratings } = useUserStore();
 
   const controlsRef = useRef<HTMLDivElement>(null);
-  const ratingButtonRef = useRef<HTMLButtonElement>(null);
-
-  const rating = useMemo(
-    () => ratings?.find((rating) => rating.gameId === game._id),
-    [game, ratings]
-  );
 
   const playthrough = useMemo(
     () =>
@@ -86,37 +77,6 @@ export const GameControls: FC<IGameControlsProps> = ({
         className={classNames(styles.controls__action)}
       >
         <SvgCircleMenu className={classNames(styles.controls__icon)} />
-      </Button>
-      <Button
-        ref={ratingButtonRef}
-        tooltip={"Set rating"}
-        tooltipAlign="right"
-        onClick={() => {
-          modal.open(<GameRating game={game} />, {
-            id: "game-rating",
-          });
-        }}
-        disabled={!profile?._id}
-        color="transparent"
-        className={classNames(styles.controls__action, {
-          [styles.controls__action_active]: !!rating,
-        })}
-      >
-        {!rating?.rating ? (
-          <Icon
-            className={classNames(styles.controls__icon)}
-            icon={"tabler:moon-stars"}
-          />
-        ) : (
-          <Icon
-            style={{
-              filter: `drop-shadow(0 0 ${rating.rating * 0.05}rem ${accentColor})`,
-              backgroundColor: `rgba(${accentColorRGB}, ${rating.rating * 0.1})`,
-            }}
-            className={classNames(styles.controls__number)}
-            icon={`mdi:numeric-${rating.rating}`}
-          />
-        )}
       </Button>
     </div>
   );

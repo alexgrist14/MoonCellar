@@ -8,6 +8,10 @@ import { useAsyncLoader } from "@/src/lib/shared/hooks/useAsyncLoader";
 import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
 import { ratingsAPI } from "@/src/lib/shared/api/ratings.api";
 import { useUserStore } from "@/src/lib/shared/store/user.store";
+import { Icon } from "@iconify/react";
+import { accentColorRGB } from "@/src/lib/shared/constants";
+import classNames from "classnames";
+import { Loader } from "@/src/lib/shared/ui/Loader";
 
 interface IGameRatingProps {
   game: IGameResponse;
@@ -22,11 +26,8 @@ export const GameRating: FC<IGameRatingProps> = ({ game }) => {
     () => ratings?.find((rating) => rating.gameId === game._id),
     [game, ratings]
   );
-
-  const [value, setValue] = useState(
-    !!rating?.rating ? rating.rating.toString() : "No rating"
-  );
   const [ratingValue, setRatingValue] = useState<number | undefined>();
+  const [hoverIndex, setHoverIndex] = useState<number | undefined>();
 
   const changeHandler = (value: number) => {
     if (!profile || value === ratingValue || !ratings) return;
@@ -74,19 +75,38 @@ export const GameRating: FC<IGameRatingProps> = ({ game }) => {
   };
 
   return (
-    <WrapperTemplate classNameContent={styles.rating}>
-      <RangeSelector
-        callback={(value) =>
-          setValue(!!value ? value?.toString() : "No rating")
-        }
-        finalCallback={changeHandler}
-        text={value}
-        min={0}
-        max={10}
-        defaultValue={ratingValue || rating?.rating || 0}
-        disabled={false}
-        isLoading={isLoading}
-      />
-    </WrapperTemplate>
+    <div
+      className={classNames(styles.rating, {
+        [styles.rating_loading]: isLoading,
+      })}
+      onMouseLeave={() => setHoverIndex(undefined)}
+    >
+      {isLoading && <Loader className={styles.rating__loader} type="pulse" />}
+      {Array(10)
+        .fill("")
+        .map((_, index) => (
+          <div
+            key={index}
+            className={classNames(styles.rating__number, {
+              [styles.rating__number_active]:
+                (hoverIndex === undefined &&
+                  ratingValue !== undefined &&
+                  ratingValue >= index + 1) ||
+                (hoverIndex === undefined &&
+                  rating &&
+                  rating.rating !== null &&
+                  rating.rating >= index + 1) ||
+                (rating && hoverIndex !== undefined && hoverIndex >= index),
+            })}
+          >
+            <Icon
+              onClick={() => changeHandler(index + 1)}
+              onMouseOver={() => setHoverIndex(index)}
+              key={index}
+              icon={`mdi:numeric-${index + 1}`}
+            />
+          </div>
+        ))}
+    </div>
   );
 };

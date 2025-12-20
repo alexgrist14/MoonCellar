@@ -1,11 +1,12 @@
 import { API_URL } from "../constants";
+import { IGetFileRequest, IGetFileResponse } from "../lib/schemas/files.schema";
 import agent from "./agent.api";
 
 const FILES_API = `${API_URL}/file`;
 
-const getFile = (key: string, bucketName: string) => {
-  return agent.get<any>(`${FILES_API}/`, {
-    params: { key, bucketName },
+const getFile = (params: IGetFileRequest) => {
+  return agent.get<IGetFileResponse>(`${FILES_API}/`, {
+    params,
   });
 };
 

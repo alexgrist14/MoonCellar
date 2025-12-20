@@ -8,7 +8,7 @@
   border-radius: 0 0 $radius $radius;
   display: flex;
   z-index: 2;
-  max-height: 30px;
+  max-height: 35px;
   position: relative;
 
   &_disabled {
@@ -37,7 +37,7 @@
 
     &:hover:not(:disabled),
     &_active {
-      background-color: $bgAlt;
+      background-color: $bg;
     }
 
     &:disabled {
@@ -56,17 +56,6 @@
         transition: 0.3s;
         stroke: $accent;
       }
-    }
-  }
-
-  &__number {
-    width: auto;
-    height: 100%;
-    background-color: $accent;
-    border-radius: 50%;
-
-    & path {
-      fill: $whiteTextColor;
     }
   }
 }

@@ -4,6 +4,7 @@ import cn from "classnames";
 import styles from "./WrapperTemplate.module.scss";
 import { Scrollbar } from "../Scrollbar";
 import { useResizeDetector } from "react-resize-detector";
+import classNames from "classnames";
 
 interface IWrapperTemplateProps {
   children: ReactNode;
@@ -60,7 +61,10 @@ export const WrapperTemplate: FC<IWrapperTemplateProps> = ({
           {isWithScrollBar ? (
             <Scrollbar
               type="absolute"
-              classNameContent={styles.scrollbars__content}
+              classNameContent={classNames(
+                styles.scrollbars__content,
+                classNameContent
+              )}
               classNameScrollbar={styles.scrollbars__scrollbar}
             >
               {children}

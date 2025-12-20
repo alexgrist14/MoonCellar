@@ -1,4 +1,4 @@
-import { FC, ReactNode, useRef } from "react";
+import { FC, ReactNode } from "react";
 import styles from "./GameCardInfo.module.scss";
 import classNames from "classnames";
 import Link from "next/link";
@@ -18,7 +18,6 @@ export const GameCardInfo: FC<IGameCardInfoProps> = ({
   game,
   playthroughs,
 }) => {
-  const infoRef = useRef<HTMLDivElement>(null);
   const systems = useCommonStore((s) => s.systems);
 
   return (
@@ -32,11 +31,7 @@ export const GameCardInfo: FC<IGameCardInfoProps> = ({
           styles.info_mastered
       )}
     >
-      <Link
-        draggable={false}
-        className={styles.info__title}
-        href={`/games/${game.slug}`}
-      >
+      <Link className={styles.info__content} href={`/games/${game.slug}`}>
         <div className={styles.info__top}>
           <p>{game.name}</p>
           {!!playthroughs && playthroughs.length > 1 && (
@@ -45,24 +40,23 @@ export const GameCardInfo: FC<IGameCardInfoProps> = ({
               {commonUtils.addLastS("Playthrough", playthroughs.length)} )
             </span>
           )}
-          {!!game.summary && (infoRef.current?.clientHeight || 0) >= 140 && (
-            <span>{game.summary}</span>
-          )}
         </div>
-        <span className={styles.info__category}>
-          {game.type}
-          {!!game.first_release
-            ? ` - ${new Date(game.first_release * 1000).getFullYear()}`
-            : ""}
-        </span>
-        <span className={styles.info__platforms}>
-          {!!game.platformIds?.length &&
-            !!systems &&
-            systems
-              .filter((sys) => game.platformIds.includes(sys._id))
-              .map((platform) => platform.name)
-              .join(", ")}
-        </span>
+        <div className={styles.info__bottom}>
+          <span className={styles.info__category}>
+            {game.type}
+            {!!game.first_release
+              ? ` - ${new Date(game.first_release * 1000).getFullYear()}`
+              : ""}
+          </span>
+          <span className={styles.info__platforms}>
+            {!!game.platformIds?.length &&
+              !!systems &&
+              systems
+                .filter((sys) => game.platformIds.includes(sys._id))
+                .map((platform) => platform.name)
+                .join(", ")}
+          </span>
+        </div>
       </Link>
       {bottomNode}
     </div>

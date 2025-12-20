@@ -1,11 +1,17 @@
+.wrapper {
+  display: grid;
+  // grid-template-columns: 1fr 40px;
+  gap: 20px;
+}
+
 .modal {
   display: flex;
   flex-direction: column;
   width: 100%;
-  width: min(80vw, 600px);
+  width: min(80vw, 400px);
   height: min(70vh, 500px);
   align-items: center;
-  gap: 40px;
+  gap: 20px;
   min-height: 320px;
   min-width: 300px;
 

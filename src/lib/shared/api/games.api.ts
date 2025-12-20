@@ -59,7 +59,10 @@ export const gamesApi = {
       }
     | undefined
   > => {
-    const res = await filesAPI.getFile("filters", "mooncellar-common");
-    return res.data;
+    const res = await filesAPI.getFile({
+      key: "filters",
+      bucketName: "mooncellar-common",
+    });
+    return JSON.parse(res.data.content as string);
   },
 };

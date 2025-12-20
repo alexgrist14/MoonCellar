@@ -10,8 +10,8 @@ import { useAuthStore } from "../../store/auth.store";
 import { SvgAchievement } from "../svg";
 import { useUserStore } from "../../store/user.store";
 import { GameCardInfo } from "@/src/lib/entities/game/ui/GameCardInfo";
-import useCloseEvents from "../../hooks/useCloseEvents";
 import { IGameResponse } from "../../lib/schemas/games.schema";
+import useCloseEvents from "../../hooks/useCloseEvents";
 
 interface IGameCardProps {
   game: IGameResponse;
@@ -24,13 +24,12 @@ export const GameCard = memo(
   ({ game, className, style, spreadDirection = "width" }: IGameCardProps) => {
     const cardRef = useRef<HTMLDivElement>(null);
 
-    const [isHover, setIsHover] = useState(false);
-    const [stepIndex, setStepIndex] = useState(0);
     const [isLoading, setIsLoading] = useState(!!game.cover);
+    const [isHover, setIsHover] = useState(false);
 
-    const { profile } = useAuthStore();
-    const { isMobile } = useStatesStore();
-    const { playthroughs } = useUserStore();
+    const profile = useAuthStore((s) => s.profile);
+    const isMobile = useStatesStore((s) => s.isMobile);
+    const playthroughs = useUserStore((s) => s.playthroughs);
 
     const filteredPlaythroughs = useMemo(() => {
       return playthroughs?.filter((play) => play.gameId === game._id);
@@ -51,7 +50,7 @@ export const GameCard = memo(
       };
     }, [game, profile]);
 
-    useCloseEvents([cardRef], () => setStepIndex(0));
+    useCloseEvents([cardRef], () => setIsHover(false));
 
     if (!game) return null;
 
@@ -77,16 +76,9 @@ export const GameCard = memo(
               filteredPlaythroughs.some((play) => play.isMastered) &&
               styles.card_mastered
           )}
-          onMouseEnter={() => setIsHover(true)}
-          onMouseLeave={() => setIsHover(false)}
-          onClick={(e) => {
-            if (!stepIndex && isMobile) {
-              e.preventDefault();
-              e.stopPropagation();
-
-              return setStepIndex(1);
-            }
-          }}
+          onClick={() => isMobile && setIsHover(true)}
+          onMouseEnter={() => !isMobile && setIsHover(true)}
+          onMouseLeave={() => !isMobile && setIsHover(false)}
           draggable={false}
         >
           {!!game.retroachievements?.length && (

@@ -1,8 +1,7 @@
 .info {
   display: grid;
   grid-template-rows: 1fr auto;
-  align-content: space-between;
-  background-color: rgba($bg, 0.95);
+  background-color: rgba($bg, 0.90);
   position: absolute;
   border-radius: $radius;
   outline: 2px solid $textColor;
@@ -12,16 +11,15 @@
   z-index: 1;
   animation: appearOpacity 0.2s ease 1 forwards;
 
-  &__title {
+  &__content {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 10px;
-    justify-content: space-between;
+    gap: 20px;
+    padding: 5px;
     text-align: center;
 
     & p {
-      @include font(12px, 13px, 400);
+      @include font(13px, 14px, 400);
       @include lineClamp(2);
     }
 
@@ -37,10 +35,10 @@
     gap: 10px;
   }
 
-  div &__platforms {
-    & span {
-      @include lineClamp(2);
-    }
+  &__bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
 
   &_dropped {

@@ -16,6 +16,12 @@
   }
 
   div &__scrollbar {
-    margin-right: -6px;
+    margin-right: -12px;
+    margin-block: 12px;
+    height: calc(100% - 24px);
+
+    @include mediaMd {
+      margin-right: -1px;
+    }
   }
 }

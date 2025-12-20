@@ -27,6 +27,8 @@ import { toast } from "../../utils/toast.utils";
 import { IGameResponse } from "../../lib/schemas/games.schema";
 import { playthroughsAPI } from "../../api";
 import { useCommonStore } from "../../store/common.store";
+import { GameRating } from "@/src/lib/features/game/GameRating";
+import { Scrollbar } from "../Scrollbar";
 
 interface IPlaythroughModalProps {
   userId: string;
@@ -173,7 +175,12 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
   }, [game, userId, selectHandler, addHandler, sync]);
 
   return (
-    <WrapperTemplate isWithScrollBar contentStyle={{ padding: "20px" }}>
+    <WrapperTemplate
+      isWithScrollBar
+      contentStyle={{ padding: "20px" }}
+      classNameContent={styles.wrapper}
+    >
+      <GameRating game={game} />
       <div className={styles.modal}>
         {!!playthroughs?.length && (
           <div className={styles.modal__top}>

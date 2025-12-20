@@ -308,7 +308,7 @@ export const Dropdown = memo(
     }, [isActive]);
 
     useEffect(() => {
-      if ((!indexedList.length && !!list.length) || !!getSearchQuery) {
+      if (!indexedList.length && !!list.length) {
         setIndexedList(
           sortList(list.map((item, i) => ({ value: item, index: i })))
         );

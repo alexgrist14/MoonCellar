@@ -60,6 +60,10 @@
     background-color: $bgAlt;
     opacity: 0;
 
+    @include mediaMd {
+      width: 4px;
+    }
+
     &--horizontal {
       width: 100%;
       left: 0;
@@ -89,6 +93,10 @@
       background: $lightBg;
       border-radius: 7px;
       transition: opacity 0.2s;
+
+      @include mediaMd {
+        width: 4px;
+      }
     }
 
     &:hover {
