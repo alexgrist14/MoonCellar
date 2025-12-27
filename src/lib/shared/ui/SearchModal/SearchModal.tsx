@@ -21,7 +21,7 @@ import classNames from "classnames";
 export const SearchModal: FC = () => {
   const { sync, isLoading, setIsLoading } = useAsyncLoader();
   const { setExpanded } = useExpandStore();
-  const { router, asPath } = useAdvancedRouter();
+  const { asPath } = useAdvancedRouter();
 
   const [games, setGames] = useState<IGameResponse[]>();
   const [total, setTotal] = useState(0);

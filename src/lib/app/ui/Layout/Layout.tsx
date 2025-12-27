@@ -15,7 +15,6 @@ import { useGetUserInfo } from "@/src/lib/features/user/model/user.hooks";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { gamesApi } from "@/src/lib/shared/api";
 import { platformsAPI } from "@/src/lib/shared/api/platforms.api";
-import { YandexMetrikaContainer } from "@/src/lib/shared/ui/YandexMetrika";
 import { ErrorHandler } from "@/src/lib/shared/ui/ErrorHandler";
 import classNames from "classnames";
 
@@ -98,9 +97,6 @@ export const Layout: FC<ILayoutProps> = ({
       <div id="expand-connector"></div>
       <div id="pagination-connector"></div>
       <div id="tooltip-connector"></div>
-      <Suspense fallback="<></>">
-        <YandexMetrikaContainer />
-      </Suspense>
     </div>
   );
 };
