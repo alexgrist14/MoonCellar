@@ -10,8 +10,13 @@
   position: fixed;
   top: 50%;
   left: 50%;
-  height: 90vh;
+  height: 82px;
   transform: translate(-50%, -50%);
+  transition: height 0.3s ease;
+
+  &_active {
+    height: 90vh;
+  }
 
   @include mediaMax($screenMd) {
     width: 90vw;

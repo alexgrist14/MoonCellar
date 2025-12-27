@@ -1,6 +1,6 @@
 import { Input } from "../Input";
 import styles from "./SearchModal.module.scss";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { gamesApi } from "../../api";
 import { Button } from "../Button";
 import { Loader } from "../Loader";
@@ -16,11 +16,12 @@ import { useAdvancedRouter } from "../../hooks/useAdvancedRouter";
 import { IGameResponse } from "../../lib/schemas/games.schema";
 import { GamesCards } from "../GamesCards";
 import { takeGames } from "../../constants/games.const";
+import classNames from "classnames";
 
 export const SearchModal: FC = () => {
   const { sync, isLoading, setIsLoading } = useAsyncLoader();
   const { setExpanded } = useExpandStore();
-  const { router } = useAdvancedRouter();
+  const { router, asPath } = useAdvancedRouter();
 
   const [games, setGames] = useState<IGameResponse[]>();
   const [total, setTotal] = useState(0);
@@ -53,18 +54,25 @@ export const SearchModal: FC = () => {
 
   useDisableScroll();
 
+  useEffect(() => {
+    isSearchActive && modal.close("search-games");
+  }, [asPath]);
+
   return (
-    <div className={styles.modal}>
+    <div
+      className={classNames(styles.modal, {
+        [styles.modal_active]: isSearchActive,
+      })}
+    >
       <div className={styles.modal__search}>
         <Input
           value={searchQuery}
           placeholder="Search..."
           autoFocus
-          onChange={(e) => searchHandler(e.target.value)}
+          onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              modal.close("search-games");
-              router.push(`/games?search=${encodeURIComponent(searchQuery)}`);
+              searchHandler(searchQuery);
             }
           }}
         />
@@ -75,12 +83,6 @@ export const SearchModal: FC = () => {
               title: <SvgSearch style={{ width: "20px", marginTop: "2px" }} />,
               style: { padding: "2px 10px", height: "calc(100% - 10px)" },
               color: "accent",
-              link: !!searchQuery
-                ? `/games?search=${encodeURIComponent(searchQuery)}`
-                : "/games",
-              onClick: () => {
-                modal.close("search-games");
-              },
             },
             {
               title: "Advanced",
