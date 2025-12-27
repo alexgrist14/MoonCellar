@@ -4,6 +4,7 @@ import { authAPI } from "./auth.api";
 import { deleteCookie } from "../utils/cookies.utils";
 import { toast } from "../utils/toast.utils";
 import { useAuthStore } from "../store/auth.store";
+import { logger } from "../utils/logger.utils";
 
 export const agent = axios.create({
   withCredentials: true,
@@ -24,15 +25,31 @@ agent.interceptors.response.use(
         authAPI
           .refreshToken()
           .then(() => agent(config))
-          .catch(() => {
+          .catch((refreshError) => {
             deleteCookie(ACCESS_TOKEN);
             deleteCookie(REFRESH_TOKEN);
+
+            // Логируем ошибку обновления токена
+            logger.error("Token refresh failed", refreshError, {
+              originalUrl: config?.url,
+              originalMethod: config?.method,
+            });
 
             toast.error({ title: "Error", description: "Not authorized" });
           })
       );
     } else {
       const errorMessage = err?.response?.data?.message ?? "unknown";
+
+      // Логируем ошибку API в Grafana
+      logger.error("API request error", err, {
+        url: err.config?.url,
+        method: err.config?.method,
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        responseData: err.response?.data,
+        errorMessage,
+      });
 
       toast.error({ title: "Error", description: errorMessage });
       return Promise.reject(err);

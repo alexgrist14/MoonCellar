@@ -16,6 +16,7 @@ import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { gamesApi } from "@/src/lib/shared/api";
 import { platformsAPI } from "@/src/lib/shared/api/platforms.api";
 import { YandexMetrikaContainer } from "@/src/lib/shared/ui/YandexMetrika";
+import { ErrorHandler } from "@/src/lib/shared/ui/ErrorHandler";
 import classNames from "classnames";
 
 interface ILayoutProps {
@@ -78,6 +79,7 @@ export const Layout: FC<ILayoutProps> = ({
 
   return (
     <div className={classNames(className, styles.layout)}>
+      <ErrorHandler />
       <CheckMobile>
         <Header />
       </CheckMobile>
