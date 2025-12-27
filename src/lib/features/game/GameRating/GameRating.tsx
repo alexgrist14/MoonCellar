@@ -18,7 +18,7 @@ interface IGameRatingProps {
   isDisabled?: boolean;
 }
 
-export const GameRating: FC<IGameRatingProps> = ({ game, isDisabled }) => {
+export const GameRating: FC<IGameRatingProps> = ({ game }) => {
   const { sync, isLoading } = useAsyncLoader();
   const { profile } = useAuthStore();
   const { setRatings, ratings } = useUserStore();
@@ -78,10 +78,10 @@ export const GameRating: FC<IGameRatingProps> = ({ game, isDisabled }) => {
   return (
     <div
       className={classNames(styles.rating, {
-        [styles.rating_loading]: isLoading || isDisabled,
+        [styles.rating_loading]: isLoading,
       })}
       onMouseLeave={() => setHoverIndex(undefined)}
-      inert={isDisabled}
+      // inert={isDisabled}
     >
       {isLoading && <Loader className={styles.rating__loader} type="pulse" />}
       {Array(10)

@@ -6,7 +6,7 @@
   border-radius: $radius;
   overflow: hidden;
   position: relative;
-  transition: 0.3s;
+  transition: opacity 0.3s;
 
   &_loading {
     opacity: 0.5;
