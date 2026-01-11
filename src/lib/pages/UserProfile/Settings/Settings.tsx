@@ -1,22 +1,15 @@
 import { userAPI } from "@/src/lib/shared/api";
 import { useAuth } from "@/src/lib/shared/hooks/auth";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
+import { useSettingsStore } from "@/src/lib/shared/store/settings.store";
 import AvatarSettings from "@/src/lib/shared/ui/AvatarSettings/AvatarSettings";
-import { Button } from "@/src/lib/shared/ui/Button";
+import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Input } from "@/src/lib/shared/ui/Input";
+import { RangeSelector } from "@/src/lib/shared/ui/RangeSelector";
 import { Textarea } from "@/src/lib/shared/ui/Textarea";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
-import {
-  Dispatch,
-  FC,
-  FormEvent,
-  SetStateAction,
-  useState,
-  MouseEvent,
-} from "react";
+import { FC, FormEvent, MouseEvent, useState } from "react";
 import styles from "./Settings.module.scss";
-import { RangeSelector } from "@/src/lib/shared/ui/RangeSelector";
-import { useSettingsStore } from "@/src/lib/shared/store/settings.store";
 
 interface SettingsProps {}
 
@@ -28,7 +21,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
   const [userName, setUserName] = useState("");
   const [tempAvatar, setTempAvatar] = useState<File>();
   const [description, setDescription] = useState("");
-  const [background, setBackground] = useState("");
+  const [background, setBackground] = useState<File>();
   const [raUsername, setRaUserName] = useState("");
 
   const handleLogout = (e: MouseEvent<HTMLButtonElement>) => {
@@ -44,24 +37,21 @@ export const Settings: FC<SettingsProps> = ({}) => {
 
     const apiCalls = [];
     if (description) {
-      apiCalls.push(() =>
-        userAPI.updateDescription(profile._id, { description })
-      );
+      apiCalls.push(userAPI.updateDescription(profile._id, { description }));
     }
     if (tempAvatar) {
-      console.log("tempAvatar", tempAvatar);
       apiCalls.push(userAPI.addAvatar(profile._id, tempAvatar));
     }
     if (raUsername)
-      apiCalls.push(() => userAPI.setRaUserInfo(profile._id, raUsername));
-    // if (background)
-    //   apiCalls.push(() => userAPI.addBackground(profile._id, background));
+      apiCalls.push(userAPI.setRaUserInfo(profile._id, raUsername));
+    if (background)
+      apiCalls.push(userAPI.addBackground(profile._id, background));
 
     Promise.all(apiCalls).then(() => {
       toast.success({ description: "Saved successfully" });
     });
   };
-
+  console.log(profile?.background);
   return (
     <form className={styles.container} onSubmit={handleSubmit}>
       <h2 className={styles.title}>Profile Settings</h2>
@@ -73,7 +63,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
           />
           <Button
             className={styles.btn}
-            color={"red"}
+            color={ButtonColor.RED}
             onClick={(e) => handleLogout(e)}
           >
             Logout
@@ -111,16 +101,15 @@ export const Settings: FC<SettingsProps> = ({}) => {
           />
         </div>
 
-        {/*<div className={styles.field}>
-          <label htmlFor="bg">Background URL</label>
-          <Input
-            type="text"
-            id="bg"
+        <div className={styles.field}>
+          <label htmlFor="bg">Background</label>
+          <input
+            type="file"
             defaultValue={profile?.background}
-            className={styles.input}
-            onChange={(e) => setBackground(e.target.value)}
+            id="bg"
+            onChange={(e) => setBackground(e.target.files?.[0])}
           />
-        </div>*/}
+        </div>
 
         <RangeSelector
           defaultValue={bgOpacity || 0}

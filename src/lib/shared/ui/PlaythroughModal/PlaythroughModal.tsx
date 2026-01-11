@@ -2,6 +2,7 @@ import { FC, useCallback, useEffect, useState } from "react";
 import styles from "./PlaythroughModal.module.scss";
 import { Dropdown } from "../Dropdown";
 import { ButtonGroup } from "../Button/ButtonGroup";
+import { ButtonColor } from "../Button";
 import { Textarea } from "../Textarea";
 import { Input } from "../Input";
 import { ToggleSwitch } from "../ToggleSwitch";
@@ -182,9 +183,11 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
     >
       <GameRating
         game={game}
-        isDisabled={!playthroughs.some(
-          (play) => ["completed", "played", "dropped"].includes(play.category)
-        )}
+        isDisabled={
+          !playthroughs.some((play) =>
+            ["completed", "played", "dropped"].includes(play.category)
+          )
+        }
       />
       <div className={styles.modal}>
         {!!playthroughs?.length && (
@@ -196,13 +199,13 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
                     ({
                       title: commonUtils.upFL(play?.category),
                       onClick: () => selectHandler(play),
-                      color: "fancy",
+                      color: ButtonColor.FANCY,
                       active: play._id === playthroughId,
                     }) as IButtonGroupItem
                 ),
                 {
                   title: "New",
-                  color: "fancy",
+                  color: ButtonColor.FANCY,
                   active: !!watch("category") && !playthroughId,
                   hidden: !watch("category") || !!playthroughId,
                 },
@@ -213,7 +216,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
                 {
                   title: <SvgPlus />,
                   onClick: addHandler,
-                  color: "accent",
+                  color: ButtonColor.ACCENT,
                   hidden: !playthroughId,
                   compact: true,
                 },
@@ -296,13 +299,13 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
               buttons={[
                 {
                   title: "Save",
-                  color: "green",
+                  color: ButtonColor.GREEN,
                   type: "submit",
                   disabled: !isValid,
                 },
                 {
                   title: "Delete",
-                  color: "red",
+                  color: ButtonColor.RED,
                   onClick: deleteHandler,
                   type: "button",
                   hidden: !playthroughId,

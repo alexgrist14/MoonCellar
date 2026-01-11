@@ -36,7 +36,7 @@ const addBackground = (id: string, file: File) => {
 
   formData.append("file", file);
 
-  return agent.patch<string>(`${USER_URL}/background`, formData, {
+  return agent.patch<IUser>(`${USER_URL}/background`, formData, {
     params: { userId: id },
     headers: { "Content-Type": "multipart/form-data" },
   });

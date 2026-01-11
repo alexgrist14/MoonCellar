@@ -2,7 +2,7 @@ import { Dispatch, FC, SetStateAction, useState } from "react";
 import styles from "./SaveFilterForm.module.scss";
 import { WrapperTemplate } from "../WrapperTemplate";
 import { Input } from "../Input";
-import { Button } from "../Button";
+import { Button, ButtonColor } from "../Button";
 import { useAuthStore } from "../../store/auth.store";
 import { userAPI } from "../../api";
 import { getFiltersForQuery } from "../../utils/filters.utils";
@@ -40,7 +40,11 @@ export const SaveFilterForm: FC<{
         onKeyDown={(e) => e.key === "Enter" && submitHandler()}
         placeholder="Enter filter name..."
       />
-      <Button color="accent" disabled={!name} onClick={() => submitHandler()}>
+      <Button
+        color={ButtonColor.ACCENT}
+        disabled={!name}
+        onClick={() => submitHandler()}
+      >
         Save
       </Button>
     </WrapperTemplate>

@@ -1,6 +1,6 @@
 import { FC } from "react";
 import styles from "./GamesList.module.scss";
-import { Button } from "@/src/lib/shared/ui/Button";
+import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { ButtonGroup } from "../Button/ButtonGroup";
 import { IGameResponse } from "../../lib/schemas/games.schema";
 
@@ -25,12 +25,12 @@ export const GamesList: FC<IGamesListProps> = ({
           <h3 style={{ width: "100%", textAlign: "center" }}>List is empty</h3>
         )}
         {!!games?.length && !!saveCallback && (
-          <Button color="accent" onClick={() => saveCallback()}>
+          <Button color={ButtonColor.ACCENT} onClick={() => saveCallback()}>
             Save
           </Button>
         )}
         {!!games?.length && !!getGames && (
-          <Button color="red" onClick={() => getGames([])}>
+          <Button color={ButtonColor.RED} onClick={() => getGames([])}>
             Remove all
           </Button>
         )}
@@ -51,13 +51,13 @@ export const GamesList: FC<IGamesListProps> = ({
                     title: game.name,
                     link: `/games/${game.slug}`,
                     target: "_blank",
-                    color: "fancy",
+                    color: ButtonColor.FANCY,
                     compact: true,
                     style: { justifyContent: "flex-start", width: "100%" },
                   },
                   {
                     title: "Remove",
-                    color: "red",
+                    color: ButtonColor.RED,
                     hidden: !removeGame,
                     compact: true,
                     onClick: () => !!removeGame && removeGame(game),

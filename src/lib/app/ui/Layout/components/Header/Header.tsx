@@ -12,6 +12,7 @@ import { FC, MouseEvent, useMemo } from "react";
 import styles from "./Header.module.scss";
 import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
 import { IButtonGroupItem } from "@/src/lib/shared/types/buttons.type";
+import { ButtonColor } from "@/src/lib/shared/ui/Button";
 
 export const Header: FC = () => {
   const { isMobile } = useStatesStore();
@@ -40,7 +41,7 @@ export const Header: FC = () => {
             </>
           ),
           link: "/games",
-          color: "transparent",
+          color: ButtonColor.TRANSPARENT,
         },
         {
           title: (
@@ -50,7 +51,7 @@ export const Header: FC = () => {
             </>
           ),
           link: "/gauntlet",
-          color: "transparent",
+          color: ButtonColor.TRANSPARENT,
         },
         profile?.roles?.includes("admin") && {
           title: (
@@ -60,7 +61,7 @@ export const Header: FC = () => {
             </>
           ),
           link: "/admin",
-          color: "transparent",
+          color: ButtonColor.TRANSPARENT,
         },
         {
           title: (
@@ -70,7 +71,7 @@ export const Header: FC = () => {
             </>
           ),
           onClick: searchClickHandler,
-          color: "transparent",
+          color: ButtonColor.TRANSPARENT,
         },
       ].filter(Boolean) as IButtonGroupItem[],
     [isMobile, profile?.roles]

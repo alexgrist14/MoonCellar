@@ -1,7 +1,7 @@
 import { CSSProperties, FC, useMemo, useRef } from "react";
 import styles from "./GameControls.module.scss";
 import classNames from "classnames";
-import { Button } from "../Button";
+import { Button, ButtonColor } from "../Button";
 import { useAuthStore } from "../../store/auth.store";
 import { modal } from "../Modal";
 import { PlaythroughModal } from "../PlaythroughModal";
@@ -50,7 +50,7 @@ export const GameControls: FC<IGameControlsProps> = ({
             });
         }}
         disabled={!profile?._id}
-        color="transparent"
+        color={ButtonColor.TRANSPARENT}
         tooltip={"Playthroughs"}
         tooltipAlign="left"
         className={classNames(styles.controls__action, {
@@ -73,7 +73,7 @@ export const GameControls: FC<IGameControlsProps> = ({
           )
         }
         tooltip={"Game menu"}
-        color="transparent"
+        color={ButtonColor.TRANSPARENT}
         className={classNames(styles.controls__action)}
       >
         <SvgCircleMenu className={classNames(styles.controls__icon)} />

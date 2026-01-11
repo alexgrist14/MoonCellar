@@ -11,7 +11,7 @@ import cl from "classnames";
 import styles from "./Dropdown.module.scss";
 import { useDebouncedCallback } from "use-debounce";
 import { SvgChevron } from "../svg";
-import { Button } from "../Button";
+import { Button, ButtonColor } from "../Button";
 import useCloseEvents from "../../hooks/useCloseEvents";
 import { Scrollbar } from "../Scrollbar";
 import { Checkbox } from "../Checkbox";
@@ -334,7 +334,7 @@ export const Dropdown = memo(
           <div className={styles.dropdown__controls}>
             {isWithReset && !isDisabled && isWithValue && (
               <Button
-                color="red"
+                color={ButtonColor.RED}
                 style={{ padding: "2px 5px" }}
                 className={styles.dropdown__close}
                 onClick={() => {

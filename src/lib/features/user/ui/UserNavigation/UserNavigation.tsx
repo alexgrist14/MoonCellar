@@ -1,7 +1,7 @@
 import { FC } from "react";
 import styles from "./UserNavigation.module.scss";
 import { WrapperTemplate } from "@/src/lib/shared/ui/WrapperTemplate";
-import { Button } from "@/src/lib/shared/ui/Button";
+import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { CustomFolder } from "@/src/lib/shared/ui/CustomFolderModal";
 import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
@@ -34,7 +34,7 @@ export const UserNavigation: FC<{
       <WrapperTemplate isWithBlur={!isMobile}>
         <Button
           className={styles.btn}
-          color="transparent"
+          color={ButtonColor.TRANSPARENT}
           onClick={() => {
             setExpanded([]);
             setQuery({ list: "profile" });
@@ -66,7 +66,7 @@ export const UserNavigation: FC<{
               key={category + i}
               className={styles.btn}
               active={query.get("list") === category}
-              color="transparent"
+              color={ButtonColor.TRANSPARENT}
               onClick={() => {
                 setExpanded([]);
                 setQuery({ list: category.toLowerCase(), page: 1 });
@@ -79,7 +79,7 @@ export const UserNavigation: FC<{
         })}
         {isAuthedUser && (
           <Button
-            color="transparent"
+            color={ButtonColor.TRANSPARENT}
             className={classNames(styles.btn, styles.last)}
             onClick={handleEditListClick}
           >
@@ -95,7 +95,7 @@ export const UserNavigation: FC<{
           <Button
             className={styles.btn}
             active={query.get("list") === "settings"}
-            color="transparent"
+            color={ButtonColor.TRANSPARENT}
             onClick={() => {
               setExpanded([]);
               setQuery({ list: "settings" });

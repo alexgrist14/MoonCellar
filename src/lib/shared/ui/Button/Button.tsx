@@ -11,30 +11,29 @@ import cl from "classnames";
 import styles from "./Button.module.scss";
 import { Tooltip } from "../Tooltip";
 
-type IButtonColor =
-  | "default"
-  | "accent"
-  | "red"
-  | "green"
-  | "greenBorder"
-  | "transparent"
-  | "fancy";
+export enum ButtonColor {
+  DEFAULT = "default",
+  ACCENT = "accent",
+  RED = "red",
+  GREEN = "green",
+  GREEN_BORDER = "greenBorder",
+  TRANSPARENT = "transparent",
+  FANCY = "fancy",
+}
 
-export interface IButtonProps
-  extends Pick<
-    DetailedHTMLProps<
-      ButtonHTMLAttributes<HTMLButtonElement>,
-      HTMLButtonElement
-    >,
-    | "children"
-    | "disabled"
-    | "type"
-    | "className"
-    | "onClick"
-    | "form"
-    | "style"
-    | "ref"
-  > {
+type IButtonColor = ButtonColor | `${ButtonColor}`;
+
+export interface IButtonProps extends Pick<
+  DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>,
+  | "children"
+  | "disabled"
+  | "type"
+  | "className"
+  | "onClick"
+  | "form"
+  | "style"
+  | "ref"
+> {
   color?: IButtonColor;
   active?: boolean;
   tooltip?: string | ReactNode;
@@ -49,7 +48,7 @@ export const Button = memo(
     className,
     active,
     tooltip,
-    color = "default",
+    color = ButtonColor.DEFAULT,
     tooltipAlign,
     compact,
     hidden,

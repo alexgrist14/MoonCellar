@@ -5,6 +5,7 @@ import { useStatesStore } from "../../store/states.store";
 import { Input } from "../Input";
 import { Dropdown } from "../Dropdown";
 import { ButtonGroup } from "../Button/ButtonGroup";
+import { ButtonColor } from "../Button";
 import { ToggleSwitch } from "../ToggleSwitch";
 import { Tabs } from "../Tabs";
 import { ITabContent } from "../../types/tabs.type";
@@ -199,9 +200,7 @@ export const Filters: FC<{
               initialMultiValue={getSelectedArray("types", gameTypes)}
               initialExcludeValue={getExcludedArray("types", gameTypes)}
               placeholder="Select game types..."
-              getIndexes={(indexes) =>
-                setSelected("types", indexes, gameTypes)
-              }
+              getIndexes={(indexes) => setSelected("types", indexes, gameTypes)}
               getExcludeIndexes={(indexes) =>
                 setExcluded("types", indexes, gameTypes)
               }
@@ -447,7 +446,7 @@ export const Filters: FC<{
             buttons={[
               {
                 title: "Filter games",
-                color: "accent",
+                color: ButtonColor.ACCENT,
                 disabled: !filters,
                 onClick: () => {
                   !!filters && pushFiltersToQuery(filters);
@@ -469,7 +468,7 @@ export const Filters: FC<{
               },
               {
                 title: "Clear filters",
-                color: "red",
+                color: ButtonColor.RED,
                 onClick: () => {
                   pushFiltersToQuery({});
                 },
@@ -495,7 +494,7 @@ export const Filters: FC<{
                     buttons={[
                       {
                         title: filter.name,
-                        color: "fancy",
+                        color: ButtonColor.FANCY,
                         style: { justifyContent: "flex-start" },
                         compact: true,
                         link: `${pathname}?${filter.filter}`,
@@ -513,7 +512,7 @@ export const Filters: FC<{
                               });
                               setSavedFilters(res.data.filters);
                             }),
-                        color: "red",
+                        color: ButtonColor.RED,
                       },
                     ]}
                   />
