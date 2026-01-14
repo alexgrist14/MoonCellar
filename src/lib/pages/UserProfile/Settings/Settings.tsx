@@ -8,7 +8,14 @@ import { Input } from "@/src/lib/shared/ui/Input";
 import { RangeSelector } from "@/src/lib/shared/ui/RangeSelector";
 import { Textarea } from "@/src/lib/shared/ui/Textarea";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
-import { FC, FormEvent, MouseEvent, useState } from "react";
+import {
+  ChangeEvent,
+  FC,
+  FormEvent,
+  MouseEvent,
+  useRef,
+  useState,
+} from "react";
 import styles from "./Settings.module.scss";
 
 interface SettingsProps {}
@@ -23,12 +30,18 @@ export const Settings: FC<SettingsProps> = ({}) => {
   const [description, setDescription] = useState("");
   const [background, setBackground] = useState<File>();
   const [raUsername, setRaUserName] = useState("");
+  const bgInputRef = useRef<HTMLInputElement>(null);
 
   const handleLogout = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (isAuth && profile) {
       logout(profile._id);
     }
+  };
+
+  const handleBackgroundChange = (e: any) => {
+    e.preventDefault();
+    bgInputRef.current?.click();
   };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -51,7 +64,6 @@ export const Settings: FC<SettingsProps> = ({}) => {
       toast.success({ description: "Saved successfully" });
     });
   };
-  console.log(profile?.background);
   return (
     <form className={styles.container} onSubmit={handleSubmit}>
       <h2 className={styles.title}>Profile Settings</h2>
@@ -103,12 +115,36 @@ export const Settings: FC<SettingsProps> = ({}) => {
 
         <div className={styles.field}>
           <label htmlFor="bg">Background</label>
+          <br />
+          <br />
           <input
             type="file"
-            defaultValue={profile?.background}
             id="bg"
+            ref={bgInputRef}
+            hidden
             onChange={(e) => setBackground(e.target.files?.[0])}
           />
+          {profile?.background && (
+            <span className={styles.currentFile}>
+              Current:{" "}
+              {profile.background.split("cloud/")[1]?.split(/\.\w+\./)[0] +
+                profile.background.match(/\.\w+(?=\.)/)?.[0]}
+            </span>
+          )}
+          {background && (
+            <>
+              <br />
+              <br />
+              <span className={styles.currentFile}>New: {background.name}</span>
+            </>
+          )}
+          <Button
+            color={ButtonColor.ACCENT}
+            className={styles.background}
+            onClick={handleBackgroundChange}
+          >
+            Choose background
+          </Button>
         </div>
 
         <RangeSelector

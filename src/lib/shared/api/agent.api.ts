@@ -39,7 +39,8 @@ agent.interceptors.response.use(
           })
       );
     } else {
-      const errorMessage = err?.response?.data?.message ?? "unknown";
+      const errorMessage =
+        err?.response?.data?.message ?? "Something went wrong";
 
       // Логируем ошибку API в Grafana
       logger.error("API request error", err, {
