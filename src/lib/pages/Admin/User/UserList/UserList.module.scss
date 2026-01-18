@@ -1,49 +1,76 @@
 .container {
-    display: flex;
-    gap: 20px;
+  display: flex;
+  gap: 20px;
 
-    .avatar {
-        .image {
-            object-fit: cover;
-            border-radius: 50%;
-        }
-
+  .avatar {
+    .image {
+      object-fit: cover;
+      border-radius: 50%;
     }
+  }
 
-    .description {
-        p {
-            color: $neutral-85;
-        }
+  .description {
+    p {
+      color: $neutral-85;
     }
+  }
 }
 
 .role {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 6px;
-    font-size: 0.95em;
-    margin-right: 6px;
-    background: $neutral-10;
-    color: $neutral-85;
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.95em;
+  margin-right: 6px;
+  background: $neutral-10;
+  color: $neutral-85;
 }
 
 .role_admin {
-    background: #ffeaea;
-    color: #d32f2f;
+  background: #ffeaea;
+  color: #d32f2f;
 }
 
 .role_user {
-    background: #eaf7ff;
-    color: #1976d2;
+  background: #eaf7ff;
+  color: #1976d2;
 }
 
 .role_moderator {
-    background: #90f1b8;
-    color: #074d0b;
+  background: #90f1b8;
+  color: #074d0b;
 }
 
-
 .placeholder {
-    width: 48px;
-    height: 48px;
+  width: 48px;
+  height: 48px;
+}
+
+.confirmModal {
+  display: flex;
+  flex-direction: column;
+  background-color: $bgAlt;
+  padding: 20px;
+  border-radius: $radius;
+  max-width: 400px;
+
+  h3 {
+    margin: 0;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  &__warning {
+    color: #d32f2f;
+    font-size: 0.9em;
+  }
+
+  &__buttons {
+    display: flex;
+    gap: var(--gap-s);
+    justify-content: flex-end;
+    margin-top: var(--gap-s);
+  }
 }

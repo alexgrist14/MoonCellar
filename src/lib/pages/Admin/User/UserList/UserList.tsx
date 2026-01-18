@@ -8,12 +8,16 @@ import { IUser } from "@/src/lib/shared/types/auth.type";
 import Link from "next/link";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 import { IRole } from "@/src/lib/shared/lib/schemas/role.schema";
+import { useAuthStore } from "@/src/lib/shared/store/auth.store";
+import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
+import { modal } from "@/src/lib/shared/ui/Modal";
 
 const ALL_ROLES: IRole[] = ["user", "admin", "moderator"];
 
 const UserList: FC = () => {
   const tableId = useId();
   const [users, setUsers] = useState<IUser[]>([]);
+  const currentUser = useAuthStore((state) => state.profile);
 
   useEffect(() => {
     adminUsersApi.getUsers().then((response) => {
@@ -24,6 +28,16 @@ const UserList: FC = () => {
   const handleRolesChange = useCallback(
     async (userId: string, currentRoles: IRole[], newIndexes: number[]) => {
       const newRoles = newIndexes.map((i) => ALL_ROLES[i]);
+
+      const isCurrentUser = userId === currentUser?._id;
+      if (
+        isCurrentUser &&
+        currentRoles.includes("admin") &&
+        !newRoles.includes("admin")
+      ) {
+        return;
+      }
+
       const addedRoles = newRoles.filter((r) => !currentRoles.includes(r));
       const removedRoles = currentRoles.filter((r) => !newRoles.includes(r));
 
@@ -38,6 +52,45 @@ const UserList: FC = () => {
         prev.map((u) => (u._id === userId ? { ...u, roles: newRoles } : u))
       );
     },
+    [currentUser?._id]
+  );
+
+  const handleDeleteUser = useCallback(
+    async (userId: string, userName: string) => {
+      const modalId = `delete-user-${userId}`;
+
+      modal.open(
+        <div className={styles.confirmModal}>
+          <h3>Delete User</h3>
+          <p>
+            Are you sure you want to delete user <strong>{userName}</strong>?
+          </p>
+          <p className={styles.confirmModal__warning}>
+            This will permanently delete the user and all related data (logs,
+            ratings, playthroughs).
+          </p>
+          <div className={styles.confirmModal__buttons}>
+            <Button
+              color={ButtonColor.DEFAULT}
+              onClick={() => modal.close(modalId)}
+            >
+              Cancel
+            </Button>
+            <Button
+              color={ButtonColor.RED}
+              onClick={async () => {
+                await adminUsersApi.deleteUser(userId);
+                setUsers((prev) => prev.filter((u) => u._id !== userId));
+                modal.close(modalId);
+              }}
+            >
+              Delete
+            </Button>
+          </div>
+        </div>,
+        { id: modalId }
+      );
+    },
     []
   );
 
@@ -50,6 +103,7 @@ const UserList: FC = () => {
           roles: { content: "Roles" },
           rolesEdit: { content: "Edit Roles" },
           created: { content: "Created" },
+          actions: { content: "Actions" },
         }}
         rows={users?.map((user) => ({
           userName: {
@@ -137,6 +191,22 @@ const UserList: FC = () => {
               minute: "numeric",
               second: "numeric",
             }).format(new Date(user.createdAt)),
+          },
+          actions: {
+            content: (
+              <Button
+                color={ButtonColor.RED}
+                onClick={() => handleDeleteUser(user._id, user.userName)}
+                disabled={user._id === currentUser?._id}
+                tooltip={
+                  user._id === currentUser?._id
+                    ? "You cannot delete yourself"
+                    : undefined
+                }
+              >
+                Delete
+              </Button>
+            ),
           },
         }))}
       />

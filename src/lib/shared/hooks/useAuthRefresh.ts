@@ -54,10 +54,11 @@ export const useAuthRefresh = (
       setAuth(isValid);
       setIsAccessReady?.(true);
 
-      !!access?.id &&
-        userAPI.getById(access?.id).then((res) => {
+      if (access?.id) {
+        userAPI.getById(access.id).then((res) => {
           setProfile(res.data);
         });
+      }
     }
   }, [accessToken, refreshToken, clear, setAuth, setIsAccessReady, setProfile]);
 };
