@@ -38,6 +38,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
+
     .profile {
       &__link {
         height: 36px;
@@ -51,6 +52,11 @@
     font-family: var(--font-pentagra);
     padding-inline: 14px;
     margin-top: 2px;
+    background: linear-gradient(30deg,
+        $textSecondary 0%,
+        $accentCyan 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 
     @include mediaSm {
       padding-inline: 5px;

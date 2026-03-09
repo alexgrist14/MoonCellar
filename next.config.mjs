@@ -6,19 +6,23 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
-      // {
-      //   protocol: "https",
-      //   hostname: "images.igdb.com",
-      // },
-      // {
-      //   protocol: "https",
-      //   hostname: "images7.alphacoders.com",
-      // },
-      // {
-      //   protocol: "http",
-      //   hostname: "localhost",
-      //   port: "3228",
-      // },
+      {
+        protocol: "https",
+        hostname: "images.igdb.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images7.alphacoders.com",
+      },
+      {
+        protocol: "https",
+        hostname: "static.retroachievements.org",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "3228",
+      },
       {
         protocol: "https",
         hostname: "api.mooncellar.space",
