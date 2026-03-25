@@ -34,17 +34,19 @@ export const GameControls: FC<IGameControlsProps> = ({
   const controlsRef = useRef<HTMLDivElement>(null);
 
   const { isMastered, isBeaten } = useMemo(() => {
-    const mastered = profile?.raAwards?.filter(
-      (award) => award.awardType === "Mastery/Completion"
-    );
-    const beaten = profile?.raAwards?.filter(
-      (award) => award.awardType === "Game Beaten"
-    );
-    const raIds = game.retroachievements?.map((item) => item.gameId);
+    if (!profile?.raAwards?.length || !game.retroachievements?.length) {
+      return { isMastered: false, isBeaten: false };
+    }
+
+    const raIds = new Set(game.retroachievements.map((item) => item.gameId));
 
     return {
-      isMastered: mastered?.some((award) => raIds?.includes(award.awardData)),
-      isBeaten: beaten?.some((award) => raIds?.includes(award.awardData)),
+      isMastered: profile.raAwards.some(
+        (award) => award.awardType === "Mastery/Completion" && raIds.has(award.awardData)
+      ),
+      isBeaten: profile.raAwards.some(
+        (award) => award.awardType === "Game Beaten" && raIds.has(award.awardData)
+      ),
     };
   }, [game, profile]);
 

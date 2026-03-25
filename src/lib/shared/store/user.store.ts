@@ -20,6 +20,7 @@ export const useUserStore = create<IState & IAction>()(
     (set) => ({
       setPlaythroughs: (playthroughs) => {
         set({
+          playthroughs,
           parsedPlaythroughs: playthroughs?.reduce(
             (acc: Record<string, IPlaythroughMinimal[]>, play) => {
               acc[play.gameId] = acc[play.gameId] || [];
@@ -30,10 +31,10 @@ export const useUserStore = create<IState & IAction>()(
             {}
           ),
         });
-        set({ playthroughs });
       },
       setRatings: (ratings) => {
         set({
+          ratings,
           parsedRatings: ratings.reduce(
             (acc: Record<string, number>, rating: IUserRating) => {
               acc[rating.gameId] = rating.rating || 0;
@@ -43,7 +44,6 @@ export const useUserStore = create<IState & IAction>()(
             {}
           ),
         });
-        set({ ratings });
       },
     }),
     { name: "user" }

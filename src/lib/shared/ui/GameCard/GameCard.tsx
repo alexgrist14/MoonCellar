@@ -1,4 +1,4 @@
-import { CSSProperties, memo, useMemo, useRef, useState } from "react";
+import { CSSProperties, memo, useRef, useState } from "react";
 import styles from "./GameCard.module.scss";
 import classNames from "classnames";
 import Image from "next/image";
@@ -27,11 +27,9 @@ export const GameCard = memo(
     const [isHover, setIsHover] = useState(false);
 
     const isMobile = useStatesStore((s) => s.isMobile);
-    const { playthroughs, parsedRatings } = useUserStore();
+    const { parsedPlaythroughs, parsedRatings } = useUserStore();
 
-    const filteredPlaythroughs = useMemo(() => {
-      return playthroughs?.filter((play) => play.gameId === game._id);
-    }, [playthroughs, game]);
+    const filteredPlaythroughs = parsedPlaythroughs?.[game._id];
 
     const rating = parsedRatings?.[game._id];
 

@@ -27,12 +27,6 @@ const nextConfig = {
         protocol: "https",
         hostname: "media.retroachievements.org",
       },
-      {
-        protocol: "https",
-        hostname: "**",
-        port: "",
-        pathname: "**",
-      },
     ],
   },
 };
