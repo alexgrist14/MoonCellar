@@ -2,7 +2,7 @@ import { Dispatch, FC, SetStateAction } from "react";
 import styles from "./PaginationClient.module.scss";
 import { usePathname, useRouter } from "next/navigation";
 import queryString from "query-string";
-import { Button } from "@/src/lib/shared/ui/Button";
+import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 
 interface IPaginationClientProps {
   take: number;
@@ -44,7 +44,7 @@ export const PaginationClient: FC<IPaginationClientProps> = ({
     <div className={styles.pagination}>
       {page * take < length && <Button onClick={nextPage}>Show more</Button>}
       {page > 1 && (
-        <Button color="fancy" onClick={resetPage}>
+        <Button color={ButtonColor.FANCY} onClick={resetPage}>
           Collapse
         </Button>
       )}

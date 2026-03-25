@@ -3,7 +3,7 @@ import styles from "./Slideshow.module.scss";
 import { Scrollbar } from "../Scrollbar";
 import { modal } from "../Modal";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { Button } from "../Button";
+import { Button, ButtonColor } from "../Button";
 import { SlideshowImage } from "./components/SlideshowImage";
 
 interface ISlideshowProps {
@@ -34,7 +34,7 @@ export const Slideshow: FC<ISlideshowProps> = ({ pictures }) => {
           }}
         >
           <Button
-            color="transparent"
+            color={ButtonColor.TRANSPARENT}
             className={styles.slideshow__prev}
             disabled={screenshotIndex === 0}
             onClick={(e) => {
@@ -46,7 +46,7 @@ export const Slideshow: FC<ISlideshowProps> = ({ pictures }) => {
           </Button>
           {screenshots[screenshotIndex]}
           <Button
-            color="transparent"
+            color={ButtonColor.TRANSPARENT}
             className={styles.slideshow__next}
             disabled={screenshotIndex === screenshots.length - 1}
             onClick={(e) => {

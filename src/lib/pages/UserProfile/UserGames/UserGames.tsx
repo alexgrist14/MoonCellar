@@ -53,6 +53,7 @@ export const UserGames: FC<UserGamesProps> = ({ playthroughs, ratings }) => {
   );
   const [games, setGames] = useState<IGameResponse[]>();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
 
   const parsedGamesRatings = useMemo(() => {
     return ratings?.reduce(
@@ -129,26 +130,33 @@ export const UserGames: FC<UserGamesProps> = ({ playthroughs, ratings }) => {
   const debouncedGetGames = useDebouncedCallback((page: number = 1) => {
     const _ids = getGamesIds().slice((page - 1) * takeGames, page * takeGames);
 
-    !!_ids?.length &&
-      sync(() =>
-        gamesApi
-          .getByIds({
-            _ids,
-          })
-          .then((res) => {
-            setGames(
-              _ids.reduce((result: IGameResponse[], id) => {
-                const game = res.data.find((game) => game._id === id);
-                !!game && result.push(game);
-                return result;
-              }, [])
-            );
-          })
-      );
+    if (!_ids?.length) {
+      setGames([]);
+      setHasInitiallyLoaded(true);
+      return;
+    }
+
+    sync(() =>
+      gamesApi
+        .getByIds({
+          _ids,
+        })
+        .then((res) => {
+          setGames(
+            _ids.reduce((result: IGameResponse[], id) => {
+              const game = res.data.find((game) => game._id === id);
+              !!game && result.push(game);
+              return result;
+            }, [])
+          );
+          setHasInitiallyLoaded(true);
+        })
+    );
   }, 200);
 
   useEffect(() => {
     setGames(undefined);
+    setHasInitiallyLoaded(false);
   }, [list]);
 
   useEffect(() => {
@@ -156,7 +164,6 @@ export const UserGames: FC<UserGamesProps> = ({ playthroughs, ratings }) => {
   }, [debouncedGetGames, page, games]);
 
   useCloseEvents([sortRef], () => setIsDropdownOpen(false));
-
   const handleSortChange = (value: SortType) => {
     setSelectedSort(value);
     debouncedGetGames(page);
@@ -166,6 +173,9 @@ export const UserGames: FC<UserGamesProps> = ({ playthroughs, ratings }) => {
     setSortOrder(value);
     debouncedGetGames(page);
   };
+
+  if (isLoading || !hasInitiallyLoaded) return <Loader type="moon" />;
+  if (!games || games.length === 0) return <p>There is no games</p>;
 
   return (
     <div className={styles.container}>
@@ -195,64 +205,60 @@ export const UserGames: FC<UserGamesProps> = ({ playthroughs, ratings }) => {
           className={styles.sort__dropdown}
         />
       </div>
-      {isLoading ? (
-        <Loader type="moon" />
-      ) : (
-        <GamesCards
-          games={games}
-          gameClassName={styles.games__game}
-          additionalHeight={35}
-          additionalGameNode={(game) => {
-            const rating = parsedGamesRatings?.[game._id];
+      <GamesCards
+        games={games}
+        gameClassName={styles.games__game}
+        additionalHeight={35}
+        additionalGameNode={(game) => {
+          const rating = parsedGamesRatings?.[game._id];
 
-            return (
-              <div className={styles.games__info}>
-                <div
-                  className={styles.games__text}
-                  onClick={() =>
-                    modal.open(
-                      <GamePlaysInfo
-                        gameName={game.name}
-                        playthroughs={playthroughs.filter(
-                          (play) => play.gameId === game._id
-                        )}
-                      />
-                    )
-                  }
-                >
-                  <p className={styles.games__title}>{game.name}</p>
-                  {playthroughs.filter((play) => play.gameId === game._id)
-                    .length > 1 && (
-                    <p className={styles.games__plays}>
-                      {
-                        playthroughs.filter((play) => play.gameId === game._id)
-                          .length
-                      }{" "}
-                      {commonUtils.addLastS(
-                        "Playthrough",
-                        playthroughs.filter((play) => play.gameId === game._id)
-                          .length
+          return (
+            <div className={styles.games__info}>
+              <div
+                className={styles.games__text}
+                onClick={() =>
+                  modal.open(
+                    <GamePlaysInfo
+                      gameName={game.name}
+                      playthroughs={playthroughs.filter(
+                        (play) => play.gameId === game._id
                       )}
-                    </p>
-                  )}
-                </div>
-                {!!rating && (
-                  <div className={classNames(styles.games__icon)}>
-                    <Icon
-                      style={{
-                        filter: `drop-shadow(0 0 ${rating * 0.05}rem ${accentColor})`,
-                        backgroundColor: `rgba(${accentColorRGB}, ${rating * 0.1})`,
-                      }}
-                      className={classNames(styles.games__number)}
-                      icon={`mdi:numeric-${parsedGamesRatings[game._id]}`}
                     />
-                  </div>
+                  )
+                }
+              >
+                <p className={styles.games__title}>{game.name}</p>
+                {playthroughs.filter((play) => play.gameId === game._id)
+                  .length > 1 && (
+                  <p className={styles.games__plays}>
+                    {
+                      playthroughs.filter((play) => play.gameId === game._id)
+                        .length
+                    }{" "}
+                    {commonUtils.addLastS(
+                      "Playthrough",
+                      playthroughs.filter((play) => play.gameId === game._id)
+                        .length
+                    )}
+                  </p>
                 )}
               </div>
-            );
-          }}
-        />
-      )}
+              {!!rating && (
+                <div className={classNames(styles.games__icon)}>
+                  <Icon
+                    style={{
+                      filter: `drop-shadow(0 0 ${rating * 0.05}rem ${accentColor})`,
+                      backgroundColor: `rgba(${accentColorRGB}, ${rating * 0.1})`,
+                    }}
+                    className={classNames(styles.games__number)}
+                    icon={`mdi:numeric-${parsedGamesRatings[game._id]}`}
+                  />
+                </div>
+              )}
+            </div>
+          );
+        }}
+      />
       <Pagination
         take={takeGames}
         total={total}
@@ -263,7 +269,6 @@ export const UserGames: FC<UserGamesProps> = ({ playthroughs, ratings }) => {
           debouncedGetGames(page);
         }}
       />
-      {!isLoading && !!games && !games.length && <p>There is no games</p>}
     </div>
   );
 };

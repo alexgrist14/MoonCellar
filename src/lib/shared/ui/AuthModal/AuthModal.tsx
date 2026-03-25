@@ -1,5 +1,5 @@
 import { IAuth } from "@/src/lib/shared/types/auth.type";
-import { Button } from "@/src/lib/shared/ui/Button";
+import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { FC, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -100,7 +100,7 @@ export const AuthModal: FC = () => {
           {isRegister ? (
             <>
               <Button
-                color="accent"
+                color={ButtonColor.ACCENT}
                 className={styles.btn}
                 type="submit"
                 disabled={!isValid}
@@ -120,7 +120,7 @@ export const AuthModal: FC = () => {
           ) : (
             <>
               <Button
-                color="accent"
+                color={ButtonColor.ACCENT}
                 className={styles.btn}
                 type="submit"
                 disabled={!isValid}

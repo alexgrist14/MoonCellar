@@ -3,6 +3,7 @@
     font-size: 2rem;
     margin-bottom: 20px;
   }
+
   .content {
     display: flex;
     flex-direction: column;
@@ -28,6 +29,10 @@
       font-size: 1rem;
       width: 100px;
       height: 40px;
+      color: $whiteTextColor;
+    }
+
+    .background {
       color: $whiteTextColor;
     }
   }

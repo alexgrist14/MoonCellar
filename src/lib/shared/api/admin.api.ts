@@ -12,12 +12,22 @@ const getUserById = (id: string) => {
   return agent.get(`${ADMIN_URL}/users/${id}`);
 };
 
-const setUserRole = (userId: string, role: IRole) => {
-  return agent.patch(`${ADMIN_URL}/users/${userId}/role`, { role });
+const addUserRole = (userId: string, role: IRole) => {
+  return agent.patch(`${ADMIN_URL}/users/${userId}/role/${role}`);
+};
+
+const removeUserRole = (userId: string, role: IRole) => {
+  return agent.delete(`${ADMIN_URL}/users/${userId}/role/${role}`);
+};
+
+const deleteUser = (userId: string) => {
+  return agent.delete(`${ADMIN_URL}/users/${userId}`);
 };
 
 export const adminUsersApi = {
   getUsers,
   getUserById,
-  setUserRole,
+  addUserRole,
+  removeUserRole,
+  deleteUser,
 };

@@ -1,7 +1,7 @@
 import { CSSProperties, FC, useMemo, useRef } from "react";
 import styles from "./GameControls.module.scss";
 import classNames from "classnames";
-import { Button } from "../Button";
+import { Button, ButtonColor } from "../Button";
 import { useAuthStore } from "../../store/auth.store";
 import { modal } from "../Modal";
 import { PlaythroughModal } from "../PlaythroughModal";
@@ -42,10 +42,12 @@ export const GameControls: FC<IGameControlsProps> = ({
 
     return {
       isMastered: profile.raAwards.some(
-        (award) => award.awardType === "Mastery/Completion" && raIds.has(award.awardData)
+        (award) =>
+          award.awardType === "Mastery/Completion" && raIds.has(award.awardData)
       ),
       isBeaten: profile.raAwards.some(
-        (award) => award.awardType === "Game Beaten" && raIds.has(award.awardData)
+        (award) =>
+          award.awardType === "Game Beaten" && raIds.has(award.awardData)
       ),
     };
   }, [game, profile]);
@@ -67,7 +69,8 @@ export const GameControls: FC<IGameControlsProps> = ({
             });
         }}
         disabled={!profile?._id}
-        color="transparent"
+        color={ButtonColor.TRANSPARENT}
+        tooltip={"Playthroughs"}
         tooltipAlign="left"
         className={classNames(styles.controls__action, {
           [styles.controls__action_active]: isPlaythroughExist,
@@ -88,7 +91,8 @@ export const GameControls: FC<IGameControlsProps> = ({
             { id: "game-menu" }
           )
         }
-        color="transparent"
+        tooltip={"Game menu"}
+        color={ButtonColor.TRANSPARENT}
         className={classNames(styles.controls__action)}
       >
         <SvgCircleMenu className={classNames(styles.controls__icon)} />

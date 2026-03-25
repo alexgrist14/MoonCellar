@@ -2,7 +2,7 @@ import { Input } from "../Input";
 import styles from "./SearchModal.module.scss";
 import { FC, useEffect, useState } from "react";
 import { gamesApi } from "../../api";
-import { Button } from "../Button";
+import { Button, ButtonColor } from "../Button";
 import { Loader } from "../Loader";
 import { ButtonGroup } from "../Button/ButtonGroup";
 import { modal } from "../Modal";
@@ -82,7 +82,7 @@ export const SearchModal: FC = () => {
             {
               title: <SvgSearch style={{ width: "20px", marginTop: "2px" }} />,
               style: { padding: "2px 10px", height: "calc(100% - 10px)" },
-              color: "accent",
+              color: ButtonColor.ACCENT,
             },
             {
               title: "Advanced",

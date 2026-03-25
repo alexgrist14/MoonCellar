@@ -2,7 +2,7 @@ import { FC, useState } from "react";
 import styles from "./SaveForm.module.scss";
 import { WrapperTemplate } from "../WrapperTemplate";
 import { Input } from "../Input";
-import { Button } from "../Button";
+import { Button, ButtonColor } from "../Button";
 
 export const SaveForm: FC<{
   placeholder?: string;
@@ -20,7 +20,7 @@ export const SaveForm: FC<{
         placeholder={placeholder || "Enter name..."}
       />
       <Button
-        color="accent"
+        color={ButtonColor.ACCENT}
         disabled={!name}
         onClick={() => saveCallback(name)}
       >

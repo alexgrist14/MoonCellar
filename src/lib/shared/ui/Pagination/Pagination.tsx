@@ -1,6 +1,6 @@
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./Pagination.module.scss";
-import { Button } from "../Button";
+import { Button, ButtonColor } from "../Button";
 import { Input } from "../Input";
 import { keyboardUtils } from "../../utils/keyboard.utils";
 import classNames from "classnames";
@@ -52,7 +52,7 @@ export const Pagination = memo(
           })}
         >
           <Button
-            color="transparent"
+            color={ButtonColor.TRANSPARENT}
             className={styles.pagination__button}
             disabled={value === "1" || page === 1}
             onClick={() => {
@@ -65,7 +65,7 @@ export const Pagination = memo(
             <SvgDoubleArrow style={{ rotate: "180deg" }} />
           </Button>
           <Button
-            color="transparent"
+            color={ButtonColor.TRANSPARENT}
             className={styles.pagination__button}
             disabled={value === "1" || page === 1}
             onClick={() => {
@@ -94,7 +94,7 @@ export const Pagination = memo(
             />
           </div>
           <Button
-            color="transparent"
+            color={ButtonColor.TRANSPARENT}
             className={styles.pagination__button}
             disabled={value === max.toString() || page === max}
             onClick={() => {
@@ -107,7 +107,7 @@ export const Pagination = memo(
             <SvgArrow />
           </Button>
           <Button
-            color="transparent"
+            color={ButtonColor.TRANSPARENT}
             className={styles.pagination__button}
             disabled={value === max.toString() || page === max}
             onClick={() => {

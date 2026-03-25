@@ -1,22 +1,22 @@
 import { userAPI } from "@/src/lib/shared/api";
 import { useAuth } from "@/src/lib/shared/hooks/auth";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
+import { useSettingsStore } from "@/src/lib/shared/store/settings.store";
 import AvatarSettings from "@/src/lib/shared/ui/AvatarSettings/AvatarSettings";
-import { Button } from "@/src/lib/shared/ui/Button";
+import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Input } from "@/src/lib/shared/ui/Input";
+import { RangeSelector } from "@/src/lib/shared/ui/RangeSelector";
 import { Textarea } from "@/src/lib/shared/ui/Textarea";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import {
-  Dispatch,
+  ChangeEvent,
   FC,
   FormEvent,
-  SetStateAction,
-  useState,
   MouseEvent,
+  useRef,
+  useState,
 } from "react";
 import styles from "./Settings.module.scss";
-import { RangeSelector } from "@/src/lib/shared/ui/RangeSelector";
-import { useSettingsStore } from "@/src/lib/shared/store/settings.store";
 
 interface SettingsProps {}
 
@@ -28,8 +28,9 @@ export const Settings: FC<SettingsProps> = ({}) => {
   const [userName, setUserName] = useState("");
   const [tempAvatar, setTempAvatar] = useState<File>();
   const [description, setDescription] = useState("");
-  const [background, setBackground] = useState("");
+  const [background, setBackground] = useState<File>();
   const [raUsername, setRaUserName] = useState("");
+  const bgInputRef = useRef<HTMLInputElement>(null);
 
   const handleLogout = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -38,30 +39,31 @@ export const Settings: FC<SettingsProps> = ({}) => {
     }
   };
 
+  const handleBackgroundChange = (e: any) => {
+    e.preventDefault();
+    bgInputRef.current?.click();
+  };
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!profile) return;
 
     const apiCalls = [];
     if (description) {
-      apiCalls.push(() =>
-        userAPI.updateDescription(profile._id, { description })
-      );
+      apiCalls.push(userAPI.updateDescription(profile._id, { description }));
     }
     if (tempAvatar) {
-      console.log("tempAvatar", tempAvatar);
       apiCalls.push(userAPI.addAvatar(profile._id, tempAvatar));
     }
     if (raUsername)
-      apiCalls.push(() => userAPI.setRaUserInfo(profile._id, raUsername));
-    // if (background)
-    //   apiCalls.push(() => userAPI.addBackground(profile._id, background));
+      apiCalls.push(userAPI.setRaUserInfo(profile._id, raUsername));
+    if (background)
+      apiCalls.push(userAPI.addBackground(profile._id, background));
 
     Promise.all(apiCalls).then(() => {
       toast.success({ description: "Saved successfully" });
     });
   };
-
   return (
     <form className={styles.container} onSubmit={handleSubmit}>
       <h2 className={styles.title}>Profile Settings</h2>
@@ -73,7 +75,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
           />
           <Button
             className={styles.btn}
-            color={"red"}
+            color={ButtonColor.RED}
             onClick={(e) => handleLogout(e)}
           >
             Logout
@@ -111,16 +113,39 @@ export const Settings: FC<SettingsProps> = ({}) => {
           />
         </div>
 
-        {/*<div className={styles.field}>
-          <label htmlFor="bg">Background URL</label>
-          <Input
-            type="text"
+        <div className={styles.field}>
+          <label htmlFor="bg">Background</label>
+          <br />
+          <br />
+          <input
+            type="file"
             id="bg"
-            defaultValue={profile?.background}
-            className={styles.input}
-            onChange={(e) => setBackground(e.target.value)}
+            ref={bgInputRef}
+            hidden
+            onChange={(e) => setBackground(e.target.files?.[0])}
           />
-        </div>*/}
+          {profile?.background && (
+            <span className={styles.currentFile}>
+              Current:{" "}
+              {profile.background.split("cloud/")[1]?.split(/\.\w+\./)[0] +
+                profile.background.match(/\.\w+(?=\.)/)?.[0]}
+            </span>
+          )}
+          {background && (
+            <>
+              <br />
+              <br />
+              <span className={styles.currentFile}>New: {background.name}</span>
+            </>
+          )}
+          <Button
+            color={ButtonColor.ACCENT}
+            className={styles.background}
+            onClick={handleBackgroundChange}
+          >
+            Choose background
+          </Button>
+        </div>
 
         <RangeSelector
           defaultValue={bgOpacity || 0}
