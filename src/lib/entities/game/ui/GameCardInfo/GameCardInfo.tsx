@@ -1,4 +1,4 @@
-import { FC, ReactNode } from "react";
+import { FC } from "react";
 import styles from "./GameCardInfo.module.scss";
 import classNames from "classnames";
 import Link from "next/link";
@@ -8,21 +8,20 @@ import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 
 interface IGameCardInfoProps {
-  bottomNode: ReactNode;
   game: IGameResponse;
   playthroughs?: IPlaythroughMinimal[];
 }
 
 export const GameCardInfo: FC<IGameCardInfoProps> = ({
-  bottomNode,
   game,
   playthroughs,
 }) => {
   const systems = useCommonStore((s) => s.systems);
 
   return (
-    <div
+    <Link
       id="game-info"
+      href={`/games/${game.slug}`}
       className={classNames(
         styles.info,
         playthroughs?.map((play) => styles[`info_${play.category}`]),
@@ -31,34 +30,36 @@ export const GameCardInfo: FC<IGameCardInfoProps> = ({
           styles.info_mastered
       )}
     >
-      <Link className={styles.info__content} href={`/games/${game.slug}`}>
-        <div className={styles.info__top}>
-          <p>{game.name}</p>
-          {!!playthroughs && playthroughs.length > 1 && (
-            <span>
-              ( {playthroughs.length}{" "}
-              {commonUtils.addLastS("Playthrough", playthroughs.length)} )
-            </span>
-          )}
-        </div>
-        <div className={styles.info__bottom}>
-          <span className={styles.info__category}>
-            {game.type}
-            {!!game.first_release
-              ? ` - ${new Date(game.first_release * 1000).getFullYear()}`
-              : ""}
+      <div className={styles.info__block}>
+        <p>{game.name}</p>
+        {!!playthroughs && playthroughs.length > 1 && (
+          <span>
+            ( {playthroughs.length}{" "}
+            {commonUtils.addLastS("Playthrough", playthroughs.length)} )
           </span>
-          <span className={styles.info__platforms}>
-            {!!game.platformIds?.length &&
-              !!systems &&
-              systems
-                .filter((sys) => game.platformIds.includes(sys._id))
-                .map((platform) => platform.name)
-                .join(", ")}
-          </span>
+        )}
+      </div>
+      <div className={styles.info__block}>
+        <span className={styles.info__category}>
+          {game.type}
+          {!!game.first_release
+            ? ` - ${new Date(game.first_release * 1000).getFullYear()}`
+            : ""}
+        </span>
+        <span className={styles.info__platforms}>
+          {!!game.platformIds?.length &&
+            !!systems &&
+            systems
+              .filter((sys) => game.platformIds.includes(sys._id))
+              .map((platform) => platform.name)
+              .join(", ")}
+        </span>
+      </div>
+      {!!game.summary && (
+        <div className={styles.info__block}>
+          <span className={styles.info__description}>{game.summary}</span>
         </div>
-      </Link>
-      {bottomNode}
-    </div>
+      )}
+    </Link>
   );
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, ReactNode, Suspense, useEffect } from "react";
+import { FC, ReactNode, useEffect } from "react";
 import styles from "./Layout.module.scss";
 import { Header } from "./components";
 import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";

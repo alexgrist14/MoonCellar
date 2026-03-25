@@ -1,4 +1,5 @@
 import { AxiosError } from "axios";
+import { CSSProperties, FC } from "react";
 
 export interface INavigationLink {
   title: string;
@@ -21,3 +22,23 @@ export interface IImageData {
   imageBlob: Blob;
   imageBuffer: ArrayBuffer;
 }
+
+export type ISvgColors =
+  | "primary"
+  | "secondary"
+  | "accent"
+  | "positive"
+  | "negative"
+  | "attention";
+export interface ICommonProps {
+  className?: string;
+  style?: CSSProperties;
+}
+
+export type FCCLS = FC<ICommonProps>;
+
+export type FCCLSC = FC<
+  ICommonProps & {
+    color?: ISvgColors;
+  }
+>;

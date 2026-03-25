@@ -8,36 +8,51 @@ import { PlaythroughModal } from "../PlaythroughModal";
 import { useUserStore } from "../../store/user.store";
 import { GameButtons } from "../GameButtons";
 import { WrapperTemplate } from "../WrapperTemplate";
-import { SvgCircleMenu, SvgPlay } from "../svg";
+import { SvgAchievement, SvgCircleMenu, SvgPlay } from "../svg";
 import { IGameResponse } from "../../lib/schemas/games.schema";
 
 interface IGameControlsProps {
   style?: CSSProperties;
   className?: string;
   game: IGameResponse;
+  isRelative?: boolean;
 }
 
 export const GameControls: FC<IGameControlsProps> = ({
   game,
   className,
   style,
+  isRelative,
 }) => {
-  const { profile } = useAuthStore();
-  const { playthroughs } = useUserStore();
-  const { ratings } = useUserStore();
+  const profile = useAuthStore((s) => s.profile);
+  const parsedPlaythroughs = useUserStore((s) => s.parsedPlaythroughs);
+
+  const isPlaythroughExist = useMemo(() => {
+    return !!parsedPlaythroughs?.[game._id]?.length;
+  }, [parsedPlaythroughs, game]);
 
   const controlsRef = useRef<HTMLDivElement>(null);
 
-  const playthrough = useMemo(
-    () =>
-      !!playthroughs?.length &&
-      playthroughs.findLast((play) => play.gameId === game._id),
-    [playthroughs, game]
-  );
+  const { isMastered, isBeaten } = useMemo(() => {
+    const mastered = profile?.raAwards?.filter(
+      (award) => award.awardType === "Mastery/Completion"
+    );
+    const beaten = profile?.raAwards?.filter(
+      (award) => award.awardType === "Game Beaten"
+    );
+    const raIds = game.retroachievements?.map((item) => item.gameId);
+
+    return {
+      isMastered: mastered?.some((award) => raIds?.includes(award.awardData)),
+      isBeaten: beaten?.some((award) => raIds?.includes(award.awardData)),
+    };
+  }, [game, profile]);
 
   return (
     <div
-      className={classNames(styles.controls, className)}
+      className={classNames(styles.controls, className, {
+        [styles.controls_relative]: isRelative,
+      })}
       style={style}
       ref={controlsRef}
     >
@@ -51,15 +66,14 @@ export const GameControls: FC<IGameControlsProps> = ({
         }}
         disabled={!profile?._id}
         color="transparent"
-        tooltip={"Playthroughs"}
         tooltipAlign="left"
         className={classNames(styles.controls__action, {
-          [styles.controls__action_active]: !!playthrough,
+          [styles.controls__action_active]: isPlaythroughExist,
         })}
       >
         <SvgPlay
           className={classNames(styles.controls__icon, {
-            [styles.controls__icon_active]: !!playthrough,
+            [styles.controls__icon_active]: isPlaythroughExist,
           })}
         />
       </Button>
@@ -72,12 +86,25 @@ export const GameControls: FC<IGameControlsProps> = ({
             { id: "game-menu" }
           )
         }
-        tooltip={"Game menu"}
         color="transparent"
         className={classNames(styles.controls__action)}
       >
         <SvgCircleMenu className={classNames(styles.controls__icon)} />
       </Button>
+      {!!game.retroachievements?.length && (
+        <Button
+          onClick={() => {}}
+          color="transparent"
+          className={classNames(styles.controls__action)}
+        >
+          <SvgAchievement
+            className={classNames(styles.controls__icon, {
+              [styles.controls__icon_beaten]: isBeaten,
+              [styles.controls__icon_mastered]: isMastered,
+            })}
+          />
+        </Button>
+      )}
     </div>
   );
 };

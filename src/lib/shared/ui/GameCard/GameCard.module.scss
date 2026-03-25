@@ -1,20 +1,21 @@
 .wrapper {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   width: 100%;
   height: auto;
+  flex-direction: column;
   opacity: 0;
-  pointer-events: none;
-  transition: 0.5s;
-  gap: 5px;
-  padding: 10px;
-  overflow: hidden;
-  aspect-ratio: $coverRatio;
+  transition:
+    opacity 0.3s,
+    height 0.3s;
+  gap: var(--gap-x1);
+  padding: var(--padding-x2);
+  aspect-ratio: var(--cover-ratio);
   margin-inline: auto;
   flex: 1;
   min-width: 140px;
+  pointer-events: none;
+  position: relative;
+
+  @include flexCenter;
 
   &_active {
     opacity: 1;
@@ -32,64 +33,13 @@
   width: 100%;
   height: 100%;
   justify-self: center;
-  border-radius: $radius;
-  position: relative;
-  background: $lightBgSecond;
+  border-radius: var(--radius-x2);
+  background: var(--color-bg-secondary);
   user-select: none;
-  filter: drop-shadow(0 0 0.2rem $textColor);
-  aspect-ratio: $coverRatio;
-  max-height: 325px;
-  max-width: 260px;
+  filter: drop-shadow(0 0 0.2rem var(--color-neutral-10));
 
   @include mediaMd {
     cursor: pointer;
-  }
-
-  &__ra {
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background-color: $bg;
-    border: 2px solid $lightBg;
-    padding: 3px;
-    @include flexCenter;
-
-    & svg {
-      width: 100%;
-      height: 100%;
-      transition: 0.3s;
-
-      & path {
-        fill: $gray;
-      }
-    }
-
-    &_beaten,
-    &_mastered {
-      filter: drop-shadow(0 0 0.2rem $accent);
-    }
-
-    &_beaten {
-      & svg path {
-        fill: $blue;
-      }
-    }
-
-    &_mastered {
-      & svg {
-        path {
-          fill: $yellow;
-        }
-      }
-    }
-  }
-
-  &__controls {
-    position: absolute;
-    bottom: 0;
   }
 
   &__cover {
@@ -97,15 +47,14 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    gap: 30px;
     object-fit: cover;
-    font-family: var(--font-pentagra);
-    width: calc(100%);
-    height: calc(100%);
-    border-radius: $radius;
-    // z-index: 1;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--radius-x2);
     opacity: 0;
-    transition: 0.3s;
+    transition: opacity 0.3s;
+    overflow: hidden;
+    padding: var(--padding-x05);
 
     &_active {
       opacity: 1;
@@ -113,34 +62,22 @@
   }
 
   &__placeholder {
-    border-radius: $radius;
+    border-radius: var(--radius-x2);
   }
 
-  &_dropped {
-    filter: drop-shadow(0 0 0.2rem $off);
+  &__rating {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 30px;
+    height: 30px;
+    font-weight: 700;
+    padding: var(--padding-x2);
+    border-radius: 0 var(--radius-x2) 0 var(--radius-x2);
+    background-color: var(--color-bg-accent-tint);
+
+    @include flexCenter;
   }
 
-  &_playing {
-    filter: drop-shadow(0 0 0.2rem $accent);
-  }
-
-  &_wishlist {
-    filter: drop-shadow(0 0 0.2rem $violet);
-  }
-
-  &_backlog {
-    filter: drop-shadow(0 0 0.2rem $pink);
-  }
-
-  &_played {
-    filter: drop-shadow(0 0 0.2rem $blue);
-  }
-
-  &_completed {
-    filter: drop-shadow(0 0 0.2rem $on);
-  }
-
-  &_mastered {
-    filter: drop-shadow(0 0 0.2rem $yellow);
-  }
+  @include gameGlow;
 }

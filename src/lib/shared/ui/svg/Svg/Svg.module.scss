@@ -1,0 +1,9 @@
+.icon {
+  transform-origin: 50% 50%;
+
+  &,
+  & path,
+  & rect {
+    transition: .15s;
+  }
+}

@@ -6,6 +6,7 @@ import { ACCESS_TOKEN, REFRESH_TOKEN } from "../lib/shared/constants";
 import { cookies } from "next/headers";
 import { polyfill } from "interweave-ssr";
 import "@/src/lib/app/styles/reset.scss";
+import "@/src/lib/app/styles/root.scss";
 
 const general = localFont({
   variable: "--font-general",

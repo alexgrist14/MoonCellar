@@ -1,71 +1,41 @@
 .info {
-  display: grid;
-  grid-template-rows: 1fr auto;
-  background-color: rgba($bg, 0.90);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--gap-x6);
+  padding: var(--padding-x2);
+  text-align: center;
   position: absolute;
-  border-radius: $radius;
-  outline: 2px solid $textColor;
+  background-color: var(--color-bg-primary-tint);
+  border-radius: var(--radius-x2);
+  border: 2px solid var(--color-border-primary);
   width: 100%;
-  height: calc(100% + 2px);
-  margin-top: -1px;
+  height: 100%;
   z-index: 1;
   animation: appearOpacity 0.2s ease 1 forwards;
 
-  &__content {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding: 5px;
-    text-align: center;
-
-    & p {
-      @include font(13px, 14px, 400);
-      @include lineClamp(2);
-    }
-
-    & span {
-      @include font(11px, 12px, 400);
-      @include lineClamp(3);
-    }
+  & p {
+    @include font(13px, 14px, 400);
+    @include lineClamp(3);
   }
 
-  &__top {
+  & span {
+    @include font(11px, 12px, 400);
+  }
+
+  &__block {
     display: flex;
     flex-direction: column;
     gap: 10px;
   }
 
-  &__bottom {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  &__platforms {
+    @include lineClamp(2);
   }
 
-  &_dropped {
-    outline-color: $off;
+  &__description {
+    @include lineClamp(5);
   }
 
-  &_playing {
-    outline-color: $accent;
-  }
-
-  &_wishlist {
-    outline-color: $violet;
-  }
-
-  &_backlog {
-    outline-color: $pink;
-  }
-
-  &_played {
-    outline-color: $blue;
-  }
-
-  &_completed {
-    outline-color: $on;
-  }
-
-  &_mastered {
-    outline-color: $yellow;
-  }
+  @include gameGlowOutline;
 }

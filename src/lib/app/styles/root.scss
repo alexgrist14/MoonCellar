@@ -1,0 +1,40 @@
+@forward "./vars/colors";
+@forward "./vars/common";
+@forward "./vars/components";
+
+p {
+  font-size: 14px;
+}
+
+h1 {
+  font-size: 24px;
+}
+
+h2 {
+  font-size: 20px;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+.container {
+  padding: 100px 20px 50px 20px;
+  width: 100%;
+  height: fit-content;
+  max-width: 1400px;
+  margin-inline: auto;
+
+  @media (max-width: 768px) {
+    padding-inline: 5px;
+  }
+}
+
+* {
+  scrollbar-width: none;
+  font-family: var(--font-general);
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

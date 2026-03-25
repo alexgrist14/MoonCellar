@@ -1,43 +1,44 @@
 .controls {
-  width: 100%;
-  transition:
-    filter 0.3s,
-    opacity 0.3s,
-    transform 0.3s;
-  background-color: $lightBg;
-  border-radius: 0 0 $radius $radius;
   display: flex;
-  z-index: 2;
-  max-height: 35px;
-  position: relative;
+  gap: var(--gap-x1);
+  width: 90%;
+  height: 40px;
+  background-color: var(--color-bg-primary);
+  border-radius: var(--radius-x3);
+  z-index: 1;
+  position: absolute;
+  top: 100%;
+  padding: var(--padding-x1);
+  animation: appearOpacity 0.25s 1 ease forwards;
+  box-shadow: var(--shadow-basic);
+
+  &_relative {
+    position: relative;
+    top: unset;
+  }
 
   &_disabled {
     filter: brightness(0.8);
     pointer-events: none;
   }
 
-  div &__action {
-    @include flexCenter;
-    padding: 2px;
+  &__action {
+    height: 100%;
     width: 100%;
-    transition: 0.3s;
-    aspect-ratio: 1;
-    flex: 1;
+    transition: background-color 0.2s;
     cursor: pointer;
     position: relative;
-    border-radius: 0;
+    border-radius: var(--radius-x2);
+    padding: var(--padding-x05);
 
-    &:first-of-type {
-      border-radius: 0 0 0 $radius;
+    @include flexCenter;
+
+    &:hover:not(:disabled):not(&_active) {
+      background-color: var(--color-bg-hover);
     }
 
-    &:last-of-type {
-      border-radius: 0 0 $radius 0;
-    }
-
-    &:hover:not(:disabled),
     &_active {
-      background-color: $bg;
+      background-color: var(--color-bg-accent);
     }
 
     &:disabled {
@@ -47,14 +48,30 @@
   }
 
   &__icon {
-    width: auto;
     height: 100%;
+    width: auto;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    outline: 2px solid var(--color-border-secondary);
+    padding: var(--padding-x05);
+    @include flexCenter;
 
-    &_active {
-      & path,
-      & g {
-        transition: 0.3s;
-        stroke: $accent;
+    &_beaten,
+    &_mastered {
+      filter: drop-shadow(0 0 0.2rem var(--color-accent));
+    }
+
+    &_beaten {
+      & svg path {
+        fill: var(--game-completed-color);
+      }
+    }
+
+    &_mastered {
+      & svg {
+        path {
+          fill: var(--game-mastered-color);
+        }
       }
     }
   }

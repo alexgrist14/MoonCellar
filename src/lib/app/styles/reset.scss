@@ -46,8 +46,6 @@ button,
 input,
 select,
 textarea {
-  font-family: sans-serif;
-
   &:focus,
   &:focus-visible {
     outline: none;
@@ -58,14 +56,14 @@ body {
   margin: 0;
 }
 
-a:focus {
-  outline: thin dotted transparent;
-}
-
-a:active,
-a:hover {
-  outline: 0;
-}
+// a:focus {
+//   outline: thin dotted transparent;
+// }
+//
+// a:active,
+// a:hover {
+//   outline: 0;
+// }
 
 h1,
 h2,
@@ -333,37 +331,4 @@ select {
   color: inherit;
   box-shadow: none;
   border: none;
-}
-
-p {
-  font-size: 14px;
-}
-
-h2 {
-  font-size: 20px;
-}
-
-h3 {
-  font-size: 18px;
-}
-
-.container {
-  padding: 100px 20px 50px 20px;
-  width: 100%;
-  height: fit-content;
-  max-width: 1400px;
-  margin-inline: auto;
-
-  @media (max-width: 768px) {
-    padding-inline: 5px;
-  }
-}
-
-* {
-  scrollbar-width: none;
-  font-family: var(--font-general);
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
 }

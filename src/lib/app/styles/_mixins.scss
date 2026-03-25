@@ -116,3 +116,70 @@ $fontMain: var(--font-general);
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+@mixin gameGlow {
+  &_dropped {
+    filter: drop-shadow(0 0 0.2rem var(--game-dropped-color));
+  }
+
+  &_playing {
+    filter: drop-shadow(0 0 0.2rem var(--game-playing-color));
+  }
+
+  &_wishlist {
+    filter: drop-shadow(0 0 0.2rem var(--game-wishlist-color));
+  }
+
+  &_backlog {
+    filter: drop-shadow(0 0 0.2rem var(--game-backlog-color));
+  }
+
+  &_played {
+    filter: drop-shadow(0 0 0.2rem var(--game-played-color));
+  }
+
+  &_completed {
+    filter: drop-shadow(0 0 0.2rem var(--game-completed-color));
+  }
+
+  &_mastered {
+    filter: drop-shadow(0 0 0.2rem var(--game-mastered-color));
+  }
+}
+
+@mixin gameGlowOutline {
+  &_dropped {
+    outline-color: var(--game-dropped-color);
+    border-color: var(--game-dropped-color);
+  }
+
+  &_playing {
+    outline-color: var(--game-playing-color);
+    border-color: var(--game-playing-color);
+  }
+
+  &_wishlist {
+    outline-color: var(--game-wishlist-color);
+    border-color: var(--game-wishlist-color);
+  }
+
+  &_backlog {
+    outline-color: var(--game-backlog-color);
+    border-color: var(--game-backlog-color);
+  }
+
+  &_played {
+    outline-color: var(--game-played-color);
+    border-color: var(--game-played-color);
+  }
+
+  &_completed {
+    outline-color: var(--game-completed-color);
+    border-color: var(--game-completed-color);
+  }
+
+  &_mastered {
+    outline-color: var(--game-mastered-color);
+    border-color: var(--game-mastered-color);
+  }
+}

@@ -1,32 +1,10 @@
-import { FC } from "react";
+import { Path, Svg } from "./Svg/Svg";
+import { FCCLSC } from "../../types/common.type";
 
-export const SvgCircleMenu: FC<{ className?: string; size?: number }> = ({
-  className,
-  size,
-}) => {
+export const SvgCircleMenu: FCCLSC = (props) => {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-      viewBox="0 0 21 21"
-      className={className}
-    >
-      <g fill="none" fillRule="evenodd" transform="translate(2 2)">
-        <circle
-          cx="8.5"
-          cy="8.5"
-          r="8"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="1"
-        />
-        <path
-          fill="currentColor"
-          d="M8.5 9.5c.5 0 1-.5 1-1s-.5-1-1-1s-.999.5-.999 1s.499 1 .999 1m-4 0c.5 0 1-.5 1-1s-.5-1-1-1s-.999.5-.999 1s.499 1 .999 1m8 0c.5 0 1-.5 1-1s-.5-1-1-1s-.999.5-.999 1s.499 1 .999 1"
-        />
-      </g>
-    </svg>
+    <Svg {...props} viewBox="0 0 24 24">
+      <Path d="M2 8a1 1 0 0 1 1-1h18a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1m0 4a1 1 0 0 1 1-1h18a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1m1 3a1 1 0 1 0 0 2h12a1 1 0 1 0 0-2z" />
+    </Svg>
   );
 };

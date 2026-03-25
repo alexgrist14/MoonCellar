@@ -1,0 +1,13 @@
+:root {
+  --game-completed-color: var(--color-positive);
+  --game-dropped-color: var(--color-negative);
+  --game-playing-color: var(--color-accent);
+  --game-wishlist-color: var(--color-violet);
+  --game-backlog-color: var(--color-pink);
+  --game-played-color: var(--color-blue);
+  --game-mastered-color: var(--color-yellow);
+
+  --cover-ratio: math.div(528, 704);
+
+  --shadow-basic: 0px 4px 4px var(--color-neutral-5);
+}

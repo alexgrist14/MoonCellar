@@ -7,7 +7,6 @@ import { GameControls } from "../GameControls";
 import { Loader } from "../Loader";
 import { useStatesStore } from "../../store/states.store";
 import { useAuthStore } from "../../store/auth.store";
-import { SvgAchievement } from "../svg";
 import { useUserStore } from "../../store/user.store";
 import { GameCardInfo } from "@/src/lib/entities/game/ui/GameCardInfo";
 import { IGameResponse } from "../../lib/schemas/games.schema";
@@ -27,28 +26,14 @@ export const GameCard = memo(
     const [isLoading, setIsLoading] = useState(!!game.cover);
     const [isHover, setIsHover] = useState(false);
 
-    const profile = useAuthStore((s) => s.profile);
     const isMobile = useStatesStore((s) => s.isMobile);
-    const playthroughs = useUserStore((s) => s.playthroughs);
+    const { playthroughs, parsedRatings } = useUserStore();
 
     const filteredPlaythroughs = useMemo(() => {
       return playthroughs?.filter((play) => play.gameId === game._id);
     }, [playthroughs, game]);
 
-    const { isMastered, isBeaten } = useMemo(() => {
-      const mastered = profile?.raAwards?.filter(
-        (award) => award.awardType === "Mastery/Completion"
-      );
-      const beaten = profile?.raAwards?.filter(
-        (award) => award.awardType === "Game Beaten"
-      );
-      const raIds = game.retroachievements?.map((item) => item.gameId);
-
-      return {
-        isMastered: mastered?.some((award) => raIds?.includes(award.awardData)),
-        isBeaten: beaten?.some((award) => raIds?.includes(award.awardData)),
-      };
-    }, [game, profile]);
+    const rating = parsedRatings?.[game._id];
 
     useCloseEvents([cardRef], () => setIsHover(false));
 
@@ -62,6 +47,9 @@ export const GameCard = memo(
           spreadDirection === "height" && styles.wrapper_height
         )}
         style={style}
+        onMouseEnter={() => !isMobile && setIsHover(true)}
+        onMouseLeave={() => !isMobile && setIsHover(false)}
+        onClick={() => isMobile && setIsHover(true)}
       >
         <div
           key={game._id}
@@ -76,30 +64,16 @@ export const GameCard = memo(
               filteredPlaythroughs.some((play) => play.isMastered) &&
               styles.card_mastered
           )}
-          onClick={() => isMobile && setIsHover(true)}
-          onMouseEnter={() => !isMobile && setIsHover(true)}
-          onMouseLeave={() => !isMobile && setIsHover(false)}
           draggable={false}
         >
-          {!!game.retroachievements?.length && (
-            <div
-              className={classNames(styles.card__ra, {
-                [styles.card__ra_beaten]: isBeaten,
-                [styles.card__ra_mastered]: isMastered,
-              })}
-            >
-              <SvgAchievement />
+          {!!rating && (
+            <div className={styles.card__rating}>
+              <p>{rating}</p>
             </div>
           )}
           {isLoading && <Loader key={game._id + "_loader"} />}
           {isHover && (
-            <GameCardInfo
-              bottomNode={
-                <GameControls className={styles.card__controls} game={game} />
-              }
-              game={game}
-              playthroughs={filteredPlaythroughs}
-            />
+            <GameCardInfo game={game} playthroughs={filteredPlaythroughs} />
           )}
           {!!game?.cover ? (
             <Image
@@ -116,6 +90,7 @@ export const GameCard = memo(
             <Cover className={styles.card__placeholder} />
           )}
         </div>
+        {isHover && <GameControls game={game} />}
       </div>
     );
   }

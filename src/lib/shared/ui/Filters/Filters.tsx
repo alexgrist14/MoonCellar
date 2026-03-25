@@ -125,6 +125,7 @@ export const Filters: FC<{
 
   useEffect(() => {
     !!profile?._id &&
+      isAuth &&
       userAPI
         .getFilters(profile?._id)
         .then((res) => setSavedFilters(res.data.filters));
@@ -199,9 +200,7 @@ export const Filters: FC<{
               initialMultiValue={getSelectedArray("types", gameTypes)}
               initialExcludeValue={getExcludedArray("types", gameTypes)}
               placeholder="Select game types..."
-              getIndexes={(indexes) =>
-                setSelected("types", indexes, gameTypes)
-              }
+              getIndexes={(indexes) => setSelected("types", indexes, gameTypes)}
               getExcludeIndexes={(indexes) =>
                 setExcluded("types", indexes, gameTypes)
               }
