@@ -7,12 +7,12 @@ import type {
 } from "react";
 import cn from "classnames";
 import styles from "./Svg.module.scss";
-import { ISvgColors } from "../../../types/common.type";
+import { ISvgColors, ISvgSizes } from "../../../types/common.type";
 
 export interface ISvgBaseProps {
   className?: string;
   style?: CSSProperties;
-  size?: "12" | "16" | "20" | "24" | "32";
+  size?: ISvgSizes;
   color?: ISvgColors;
   ref?: Ref<SVGSVGElement>;
 
@@ -28,9 +28,9 @@ interface ISvgProps extends ISvgBaseProps, PropsWithChildren {
 }
 
 export const Svg: FC<ISvgProps> = ({
-  size = "20",
+  size = "16",
   children,
-  color = "secondary",
+  color = "contrast",
   className,
   style,
   transform,
@@ -44,12 +44,14 @@ export const Svg: FC<ISvgProps> = ({
       ref={ref}
       width={size}
       height={size}
-      viewBox={viewBox || "0 0 16 16"}
+      viewBox={viewBox || `0 0 ${size} ${size}`}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       style={{
         transform,
         color: `var(--color-${color})`,
+        minWidth: size,
+        minHeight: size,
         ...style,
       }}
       style-default={defaultStyle ? "true" : undefined}

@@ -1,7 +1,6 @@
 import React, {
   ButtonHTMLAttributes,
   DetailedHTMLProps,
-  FC,
   memo,
   ReactNode,
   useRef,

@@ -1,21 +1,11 @@
 .controls {
   display: flex;
   gap: var(--gap-x1);
-  width: 90%;
-  height: 40px;
+  width: 100%;
   background-color: var(--color-bg-primary);
   border-radius: var(--radius-x3);
   z-index: 1;
-  position: absolute;
-  top: 100%;
   padding: var(--padding-x1);
-  animation: appearOpacity 0.25s 1 ease forwards;
-  box-shadow: var(--shadow-basic);
-
-  &_relative {
-    position: relative;
-    top: unset;
-  }
 
   &_disabled {
     filter: brightness(0.8);
@@ -54,25 +44,7 @@
     border-radius: 50%;
     outline: 2px solid var(--color-border-secondary);
     padding: var(--padding-x05);
+
     @include flexCenter;
-
-    &_beaten,
-    &_mastered {
-      filter: drop-shadow(0 0 0.2rem var(--color-accent));
-    }
-
-    &_beaten {
-      & svg path {
-        fill: var(--game-completed-color);
-      }
-    }
-
-    &_mastered {
-      & svg {
-        path {
-          fill: var(--game-mastered-color);
-        }
-      }
-    }
   }
 }

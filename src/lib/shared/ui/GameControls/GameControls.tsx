@@ -10,22 +10,29 @@ import { GameButtons } from "../GameButtons";
 import { WrapperTemplate } from "../WrapperTemplate";
 import { SvgAchievement, SvgCircleMenu, SvgPlay } from "../svg";
 import { IGameResponse } from "../../lib/schemas/games.schema";
+import { SvgCrown } from "../svg/SvgCrown";
+import { useGamesStore } from "../../store/games.store";
 
 interface IGameControlsProps {
   style?: CSSProperties;
   className?: string;
   game: IGameResponse;
-  isRelative?: boolean;
 }
 
 export const GameControls: FC<IGameControlsProps> = ({
   game,
   className,
   style,
-  isRelative,
 }) => {
   const profile = useAuthStore((s) => s.profile);
   const parsedPlaythroughs = useUserStore((s) => s.parsedPlaythroughs);
+
+  const { royalGames, addRoyalGame, removeRoyalGame } = useGamesStore();
+
+  const isRoyal = useMemo(
+    () => royalGames?.some((royal) => royal._id === game?._id),
+    [game, royalGames]
+  );
 
   const isPlaythroughExist = useMemo(() => {
     return !!parsedPlaythroughs?.[game._id]?.length;
@@ -54,14 +61,15 @@ export const GameControls: FC<IGameControlsProps> = ({
 
   return (
     <div
-      className={classNames(styles.controls, className, {
-        [styles.controls_relative]: isRelative,
-      })}
+      className={classNames(styles.controls, className)}
       style={style}
       ref={controlsRef}
     >
       <Button
-        onClick={() => {
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+
           !!game._id &&
             !!profile?._id &&
             modal.open(<PlaythroughModal game={game} userId={profile._id} />, {
@@ -70,40 +78,63 @@ export const GameControls: FC<IGameControlsProps> = ({
         }}
         disabled={!profile?._id}
         color={ButtonColor.TRANSPARENT}
-        tooltip={"Playthroughs"}
-        tooltipAlign="left"
         className={classNames(styles.controls__action, {
           [styles.controls__action_active]: isPlaythroughExist,
         })}
       >
         <SvgPlay
+          size="20"
           className={classNames(styles.controls__icon, {
             [styles.controls__icon_active]: isPlaythroughExist,
           })}
         />
       </Button>
       <Button
-        onClick={() =>
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+
           modal.open(
             <WrapperTemplate>
               <GameButtons game={game} />
             </WrapperTemplate>,
             { id: "game-menu" }
-          )
-        }
-        tooltip={"Game menu"}
+          );
+        }}
         color={ButtonColor.TRANSPARENT}
         className={classNames(styles.controls__action)}
       >
-        <SvgCircleMenu className={classNames(styles.controls__icon)} />
+        <SvgCircleMenu
+          size="20"
+          className={classNames(styles.controls__icon)}
+        />
+      </Button>
+      <Button
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+
+          isRoyal ? removeRoyalGame(game) : addRoyalGame(game);
+        }}
+        color={"transparent"}
+        className={classNames(styles.controls__action, {
+          [styles.controls__action_active]: isRoyal,
+        })}
+      >
+        <SvgCrown size="20" className={classNames(styles.controls__icon)} />
       </Button>
       {!!game.retroachievements?.length && (
         <Button
-          onClick={() => {}}
+          disabled
+          style={{ cursor: "default" }}
           color="transparent"
           className={classNames(styles.controls__action)}
         >
           <SvgAchievement
+            size="20"
+            color={
+              isMastered ? "attention" : isBeaten ? "positive" : "secondary"
+            }
             className={classNames(styles.controls__icon, {
               [styles.controls__icon_beaten]: isBeaten,
               [styles.controls__icon_mastered]: isMastered,

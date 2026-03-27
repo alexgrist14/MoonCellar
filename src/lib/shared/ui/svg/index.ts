@@ -16,3 +16,4 @@ export * from "./SvgArrowPointer";
 export * from "./SvgPlay";
 export * from "./SvgCircleMenu";
 export * from "./SvgAdmin";
+export * from "./SvgMore";

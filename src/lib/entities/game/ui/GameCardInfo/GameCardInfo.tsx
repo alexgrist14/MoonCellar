@@ -1,11 +1,11 @@
 import { FC } from "react";
 import styles from "./GameCardInfo.module.scss";
 import classNames from "classnames";
-import Link from "next/link";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { IPlaythroughMinimal } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
+import { GameControls } from "@/src/lib/shared/ui/GameControls";
 
 interface IGameCardInfoProps {
   game: IGameResponse;
@@ -19,9 +19,8 @@ export const GameCardInfo: FC<IGameCardInfoProps> = ({
   const systems = useCommonStore((s) => s.systems);
 
   return (
-    <Link
+    <div
       id="game-info"
-      href={`/games/${game.slug}`}
       className={classNames(
         styles.info,
         playthroughs?.map((play) => styles[`info_${play.category}`]),
@@ -30,6 +29,7 @@ export const GameCardInfo: FC<IGameCardInfoProps> = ({
           styles.info_mastered
       )}
     >
+      <GameControls game={game} />
       <div className={styles.info__block}>
         <p>{game.name}</p>
         {!!playthroughs && playthroughs.length > 1 && (
@@ -60,6 +60,6 @@ export const GameCardInfo: FC<IGameCardInfoProps> = ({
           <span className={styles.info__description}>{game.summary}</span>
         </div>
       )}
-    </Link>
+    </div>
   );
 };

@@ -1,16 +1,18 @@
-import { CSSProperties, memo, useRef, useState } from "react";
+import { CSSProperties, memo, useMemo, useRef, useState } from "react";
 import styles from "./GameCard.module.scss";
 import classNames from "classnames";
 import Image from "next/image";
 import { Cover } from "../Cover";
-import { GameControls } from "../GameControls";
 import { Loader } from "../Loader";
-import { useStatesStore } from "../../store/states.store";
-import { useAuthStore } from "../../store/auth.store";
 import { useUserStore } from "../../store/user.store";
 import { GameCardInfo } from "@/src/lib/entities/game/ui/GameCardInfo";
 import { IGameResponse } from "../../lib/schemas/games.schema";
 import useCloseEvents from "../../hooks/useCloseEvents";
+import { Button } from "../Button";
+import { SvgMore } from "../svg";
+import Link from "next/link";
+import { useGamesStore } from "../../store/games.store";
+import { SvgCrown } from "../svg/SvgCrown";
 
 interface IGameCardProps {
   game: IGameResponse;
@@ -24,16 +26,21 @@ export const GameCard = memo(
     const cardRef = useRef<HTMLDivElement>(null);
 
     const [isLoading, setIsLoading] = useState(!!game.cover);
-    const [isHover, setIsHover] = useState(false);
+    const [isActive, setIsActive] = useState(false);
 
-    const isMobile = useStatesStore((s) => s.isMobile);
     const { parsedPlaythroughs, parsedRatings } = useUserStore();
+    const royalGames = useGamesStore((s) => s.royalGames);
 
     const filteredPlaythroughs = parsedPlaythroughs?.[game._id];
 
     const rating = parsedRatings?.[game._id];
 
-    useCloseEvents([cardRef], () => setIsHover(false));
+    const isRoyal = useMemo(
+      () => royalGames?.some((royal) => royal._id === game?._id),
+      [game, royalGames]
+    );
+
+    useCloseEvents([cardRef], () => setIsActive(false));
 
     if (!game) return null;
 
@@ -45,13 +52,11 @@ export const GameCard = memo(
           spreadDirection === "height" && styles.wrapper_height
         )}
         style={style}
-        onMouseEnter={() => !isMobile && setIsHover(true)}
-        onMouseLeave={() => !isMobile && setIsHover(false)}
-        onClick={() => isMobile && setIsHover(true)}
+        ref={cardRef}
       >
-        <div
+        <Link
+          href={`/games/${game.slug}`}
           key={game._id}
-          ref={cardRef}
           className={classNames(
             styles.card,
             className,
@@ -64,13 +69,30 @@ export const GameCard = memo(
           )}
           draggable={false}
         >
+          {!!isRoyal && (
+            <div className={styles.card__royal}>
+              <SvgCrown size="20" color="contrast-reverse" />
+            </div>
+          )}
           {!!rating && (
             <div className={styles.card__rating}>
               <p>{rating}</p>
             </div>
           )}
+          <Button
+            color="transparent"
+            className={styles.card__more}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+
+              setIsActive(true);
+            }}
+          >
+            <SvgMore />
+          </Button>
           {isLoading && <Loader key={game._id + "_loader"} />}
-          {isHover && (
+          {isActive && (
             <GameCardInfo game={game} playthroughs={filteredPlaythroughs} />
           )}
           {!!game?.cover ? (
@@ -87,8 +109,7 @@ export const GameCard = memo(
           ) : (
             <Cover className={styles.card__placeholder} />
           )}
-        </div>
-        {isHover && <GameControls game={game} />}
+        </Link>
       </div>
     );
   }

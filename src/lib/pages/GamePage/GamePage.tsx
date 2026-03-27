@@ -106,8 +106,8 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
                 <Cover />
               )}
             </div>
-            <GameControls game={game} />
           </WrapperTemplate>
+          <GameControls game={game} />
         </div>
         <WrapperTemplate
           isWithBlur
@@ -242,7 +242,9 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
                   return (
                     <p key={date.date + "_" + i}>
                       {date.human}: {platform?.name || "Unknown platform"}
-                      <span> ({dateRegions[+date.region - 1]})</span>
+                      {!!dateRegions[+date.region - 1] && (
+                        <span> ({dateRegions[+date.region - 1]})</span>
+                      )}
                     </p>
                   );
                 })}

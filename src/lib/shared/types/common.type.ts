@@ -29,16 +29,21 @@ export type ISvgColors =
   | "accent"
   | "positive"
   | "negative"
+  | "contrast"
+  | "contrast-reverse"
   | "attention";
 export interface ICommonProps {
   className?: string;
   style?: CSSProperties;
 }
 
+export type ISvgSizes = "16" | "20" | "24";
+
 export type FCCLS = FC<ICommonProps>;
 
 export type FCCLSC = FC<
   ICommonProps & {
     color?: ISvgColors;
+    size?: ISvgSizes;
   }
 >;

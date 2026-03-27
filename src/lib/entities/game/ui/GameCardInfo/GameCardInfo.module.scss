@@ -1,22 +1,23 @@
 .info {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: var(--gap-x6);
-  padding: var(--padding-x2);
+  gap: var(--gap-x5);
+  padding: var(--padding-x1);
   text-align: center;
   position: absolute;
   background-color: var(--color-bg-primary-tint);
-  border-radius: var(--radius-x2);
+  border-radius: var(--radius-x4);
   border: 2px solid var(--color-border-primary);
   width: 100%;
   height: 100%;
   z-index: 1;
   animation: appearOpacity 0.2s ease 1 forwards;
+  overflow: hidden;
+  container-type: inline-size;
 
   & p {
     @include font(13px, 14px, 400);
-    @include lineClamp(3);
+    @include lineClamp(2);
   }
 
   & span {
@@ -34,7 +35,21 @@
   }
 
   &__description {
-    @include lineClamp(5);
+    @include lineClamp(3);
+  }
+
+  @container (width < 180px) {
+    & p {
+      @include font(12px, 14px, 400);
+    }
+
+    &__platforms {
+      @include lineClamp(1);
+    }
+
+    &__description {
+      @include lineClamp(2);
+    }
   }
 
   @include gameGlowOutline;

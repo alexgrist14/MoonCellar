@@ -2,19 +2,12 @@ import { FC, useMemo } from "react";
 import styles from "./GameButtons.module.scss";
 import { ButtonGroup } from "../Button/ButtonGroup";
 import { WrapperTemplate } from "../WrapperTemplate";
-import { useGamesStore } from "../../store/games.store";
 import { Separator } from "../Separator";
 import { IGameResponse } from "../../lib/schemas/games.schema";
 import { useCommonStore } from "../../store/common.store";
 
 export const GameButtons: FC<{ game: IGameResponse }> = ({ game }) => {
-  const { royalGames, addRoyalGame, removeRoyalGame } = useGamesStore();
   const { systems } = useCommonStore();
-
-  const isRoyal = useMemo(
-    () => royalGames?.some((royal) => royal._id === game?._id),
-    [game, royalGames]
-  );
 
   const raInfo = useMemo(() => {
     return game.retroachievements?.map((item) => {
@@ -50,21 +43,6 @@ export const GameButtons: FC<{ game: IGameResponse }> = ({ game }) => {
           <Separator direction="horizontal" />
         </>
       )}
-      <ButtonGroup
-        wrapperClassName={styles.actions}
-        buttons={[
-          {
-            color: isRoyal ? "red" : "green",
-            title:
-              (isRoyal ? "Remove from" : "Add to") +
-              " Royal list" +
-              (!!royalGames?.length ? ` (${royalGames.length})` : ""),
-            onClick: () =>
-              isRoyal ? removeRoyalGame(game) : addRoyalGame(game),
-          },
-        ]}
-      />
-      <Separator direction="horizontal" />
       <ButtonGroup
         wrapperClassName={styles.actions}
         buttons={[
