@@ -16,7 +16,6 @@ interface MainPageProps {
 }
 
 export const MainPage: FC<MainPageProps> = ({ games }) => {
-  console.log(games.genre);
   return (
     <div className={styles.container}>
       <div className="bg-effects">
@@ -64,8 +63,8 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
                       x2="100%"
                       y2="100%"
                     >
-                      <stop offset="0%" stop-color="#1e3a5f" />
-                      <stop offset="100%" stop-color="#2d4a6f" />
+                      <stop offset="0%" stopColor="#1e3a5f" />
+                      <stop offset="100%" stopColor="#2d4a6f" />
                     </linearGradient>
                     <linearGradient
                       id="slice2"
@@ -74,8 +73,8 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
                       x2="100%"
                       y2="100%"
                     >
-                      <stop offset="0%" stop-color="#234567" />
-                      <stop offset="100%" stop-color="#345678" />
+                      <stop offset="0%" stopColor="#234567" />
+                      <stop offset="100%" stopColor="#345678" />
                     </linearGradient>
                     <linearGradient
                       id="wheelGlow"
@@ -84,8 +83,8 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
                       x2="100%"
                       y2="100%"
                     >
-                      <stop offset="0%" stop-color="var(--accent-purple)" />
-                      <stop offset="100%" stop-color="var(--accent-cyan)" />
+                      <stop offset="0%" stopColor="var(--accent-purple)" />
+                      <stop offset="100%" stopColor="var(--accent-cyan)" />
                     </linearGradient>
                   </defs>
                   <circle
@@ -94,7 +93,7 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
                     r="98"
                     fill="none"
                     stroke="url(#wheelGlow)"
-                    stroke-width="2"
+                    strokeWidth="2"
                     opacity="0.5"
                   />
                   <path
@@ -127,7 +126,7 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
                     x2="100"
                     y2="2"
                     stroke="rgba(255,255,255,0.1)"
-                    stroke-width="1"
+                    strokeWidth="1"
                   />
                   <line
                     x1="100"
@@ -135,7 +134,7 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
                     x2="184.5"
                     y2="50"
                     stroke="rgba(255,255,255,0.1)"
-                    stroke-width="1"
+                    strokeWidth="1"
                   />
                   <line
                     x1="100"
@@ -143,7 +142,7 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
                     x2="184.5"
                     y2="150"
                     stroke="rgba(255,255,255,0.1)"
-                    stroke-width="1"
+                    strokeWidth="1"
                   />
                   <line
                     x1="100"
@@ -151,7 +150,7 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
                     x2="100"
                     y2="198"
                     stroke="rgba(255,255,255,0.1)"
-                    stroke-width="1"
+                    strokeWidth="1"
                   />
                   <line
                     x1="100"
@@ -159,7 +158,7 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
                     x2="15.5"
                     y2="150"
                     stroke="rgba(255,255,255,0.1)"
-                    stroke-width="1"
+                    strokeWidth="1"
                   />
                   <line
                     x1="100"
@@ -167,7 +166,7 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
                     x2="15.5"
                     y2="50"
                     stroke="rgba(255,255,255,0.1)"
-                    stroke-width="1"
+                    strokeWidth="1"
                   />
                   <circle
                     cx="100"
@@ -175,16 +174,16 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
                     r="28"
                     fill="#0d1117"
                     stroke="#fff"
-                    stroke-width="3"
+                    strokeWidth="3"
                   />
                   <text
                     x="100"
                     y="105"
-                    text-anchor="middle"
+                    textAnchor="middle"
                     fill="#fff"
-                    font-family="Rajdhani"
-                    font-size="14"
-                    font-weight="600"
+                    fontFamily="Rajdhani"
+                    fontSize="14"
+                    fontWeight="600"
                   >
                     Spin
                   </text>
@@ -194,7 +193,7 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
                     viewBox="0 0 24 24"
                     fill="var(--bg-primary)"
                     stroke="#fff"
-                    stroke-width="2"
+                    strokeWidth="2"
                   >
                     <polygon points="12,2 22,12 12,8" />
                   </svg>
