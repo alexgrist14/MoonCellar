@@ -176,6 +176,15 @@ const formatDate = (
   );
 };
 
+const roundToFirstDigit = (num: number): number => {
+  if (num === 0) return 0;
+
+  const power = Math.floor(Math.log10(Math.abs(num)));
+  const base = 10 ** power;
+
+  return Math.floor(num / base) * base;
+};
+
 export const commonUtils = {
   upFL,
   shuffle,
@@ -187,4 +196,5 @@ export const commonUtils = {
   getUTCString,
   getHumanDate,
   getRoundedSeconds,
+  roundToFirstDigit,
 };

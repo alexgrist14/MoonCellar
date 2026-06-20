@@ -1,6 +1,7 @@
 import { API_URL } from "../constants";
 import {
   IGameResponse,
+  IGenreResponse,
   IGetGameByIdRequest,
   IGetGameBySlugRequest,
   IGetGamesByIdsRequest,
@@ -46,6 +47,14 @@ export const gamesApi = {
 
   remove: async (id: string) => {
     return agent.delete<IGameResponse>(`${GAMES_URL}/delete/${id}`);
+  },
+
+  getTopRatedRandom: async () => {
+    return agent.get<IGameResponse[]>(`${GAMES_URL}/top-rated-random`);
+  },
+
+  getTotalGamesByCount: async () => {
+    return agent.get<IGenreResponse[]>(`${GAMES_URL}/count-by-genre`);
   },
 
   getFilters: async (): Promise<

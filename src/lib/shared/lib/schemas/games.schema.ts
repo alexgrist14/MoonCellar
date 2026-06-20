@@ -143,3 +143,5 @@ export type IGetGameBySlugRequest = z.infer<typeof GetGameBySlugSchema>;
 export type IGetGamesByIdsRequest = z.infer<typeof GetGamesByIdsSchema>;
 
 export type IGameResponse = z.infer<typeof GameSchema>;
+
+export type IGenreResponse = { genre: string; count: number };
