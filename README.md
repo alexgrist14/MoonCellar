@@ -24,7 +24,7 @@ Follow these steps to set up the project locally:
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (v16+)
-- [Yarn](https://yarnpkg.com/) or [npm](https://www.npmjs.com/)
+- [Bun](https://bun.sh/) (v1.3.12+)
 
 ### Installation
 
@@ -36,22 +36,24 @@ Follow these steps to set up the project locally:
 
 2. Install dependencies:
    ```bash
-   yarn install
-   # or
-   npm install
+   bun install
    ```
 
 3. Run the development server:
    ```bash
-   yarn dev
-   # or
-   npm run dev
+   bun run dev
    ```
 
 4. Open your browser and navigate to:
    ```
    http://localhost:3000
    ```
+
+### Package Manager
+
+Bun is the primary package manager for local development and CI. The
+`package-lock.json` file is kept temporarily so the current remote deployment
+script can keep using npm until the server-side `build.sh` is migrated to Bun.
 
 ## 📂 Project Structure
 

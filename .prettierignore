@@ -3,3 +3,4 @@
 
 # Ignore specific files:
 package-lock.json
+bun.lock
