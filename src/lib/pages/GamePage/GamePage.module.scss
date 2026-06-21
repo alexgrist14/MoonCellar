@@ -20,6 +20,27 @@
     gap: 20px;
   }
 
+  &__hltb {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    & h4 {
+      @include font(14px, 18px, 500);
+      color: $whiteTextColor;
+    }
+
+    & p {
+      @include font(13px, 17px, 400);
+      color: $gray;
+    }
+
+    & span {
+      @include font(13px, 17px, 500);
+      color: $whiteTextColor;
+    }
+  }
+
   &__cover {
     aspect-ratio: 528/704;
     border-radius: var(--radius-x3);

@@ -17,6 +17,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { IGameResponse } from "../../shared/lib/schemas/games.schema";
 import { useCommonStore } from "../../shared/store/common.store";
 import { filesAPI } from "../../shared/api/files.api";
+import { formatHltbHours } from "../../shared/utils/hltb.utils";
 
 export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
   const { isAuth, profile } = useAuthStore();
@@ -43,6 +44,23 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
       ),
     };
   }, [game, profile]);
+
+  const hltbRows = useMemo(() => {
+    if (!game.hltb) {
+      return null;
+    }
+
+    const rows = [
+      { label: "Main Story", value: formatHltbHours(game.hltb.mainStory) },
+      { label: "Main + Extra", value: formatHltbHours(game.hltb.mainExtra) },
+      {
+        label: "Completionist",
+        value: formatHltbHours(game.hltb.completionist),
+      },
+    ].filter((row) => row.value);
+
+    return rows.length ? rows : null;
+  }, [game.hltb]);
 
   useEffect(() => {
     filesAPI
@@ -108,6 +126,19 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
             </div>
           </WrapperTemplate>
           <GameControls game={game} />
+          {!!hltbRows && (
+            <WrapperTemplate contentStyle={{ padding: "12px" }}>
+              <div className={styles.page__hltb}>
+                <h4>HowLongToBeat</h4>
+                {hltbRows.map((row) => (
+                  <p key={row.label}>
+                    <span>{row.label}: </span>
+                    {row.value}
+                  </p>
+                ))}
+              </div>
+            </WrapperTemplate>
+          )}
         </div>
         <WrapperTemplate
           isWithBlur

@@ -11,6 +11,15 @@ export const IGDBSchema = z.object({
   total_rating_count: z.number().optional(),
 });
 
+export const HltbSchema = z.object({
+  hltbId: z.string(),
+  mainStory: z.number().nullable().optional(),
+  mainExtra: z.number().nullable().optional(),
+  completionist: z.number().nullable().optional(),
+  sourceName: z.string().optional(),
+  updatedAt: z.string(),
+});
+
 export const CompanySchema = z.object({
   name: z.string(),
   developer: z.boolean().default(false),
@@ -60,6 +69,7 @@ export const GameSchema = z.object({
   ratingCount: z.number().optional(),
   retroachievements: RetroachievementsSchema.array().optional(),
   igdb: IGDBSchema.optional(),
+  hltb: HltbSchema.optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -131,6 +141,7 @@ export const GetCustomGameResponseSchema = GameSchema.array();
 
 export type IRetroachievementsField = z.infer<typeof RetroachievementsSchema>;
 export type IGDBField = z.infer<typeof IGDBSchema>;
+export type IHltbField = z.infer<typeof HltbSchema>;
 export type ICompanyField = z.infer<typeof CompanySchema>;
 export type IGameFilters = z.infer<typeof GameFiltersSchema>;
 export type IReleaseDate = z.infer<typeof ReleaseDateSchema>;

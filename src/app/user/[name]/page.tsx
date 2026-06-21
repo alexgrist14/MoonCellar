@@ -44,7 +44,6 @@ export default async function User({ params }: { params: any }) {
     })
   )?.data;
   const userFollowings = (await userAPI.getUserFollowings(user._id)).data;
-  // user.raUsername && (await userAPI.setRaUserInfo(user._id, user.raUsername));
 
   return (
     <UserProfile
