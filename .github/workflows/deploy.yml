@@ -1,26 +1,80 @@
-name: Build and deploy
-
+# name: Build and deploy
+#
+# on:
+#   push:
+#     branches:
+#       - main
+#   workflow_dispatch:
+#
+# jobs:
+#   deploy:
+#     name: Deploy
+#     runs-on: ubuntu-latest
+#
+#     steps:
+#       - name: SSH keys
+#         run: |
+#           mkdir -p ~/.ssh/
+#           touch ~/.ssh/id_rsa
+#           touch ~/.ssh/id_rsa.pub
+#           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+#           echo "${{ secrets.SSH_PUBLIC_KEY }}" > ~/.ssh/id_rsa.pub
+#           ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+#       - name: Connect and build
+#         run: sshpass -p '${{ secrets.SSH_PASS }}' ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git checkout ${{ secrets.MAIN_BRANCH }} && git pull && cd .. && ./build.sh && systemctl restart --user Mooncellar-Frontend.service && exit"
+#       - name: cleanup
+#         run: rm -rf ~/.ssh
+# name: Build & Deploy with Podman
+#
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
+    branches: [main]
+
+env:
+  IMAGE_NAME: mooncellar-frontend
+  IMAGE_TAG: ${{ github.sha }}
 
 jobs:
-  deploy:
-    name: Deploy
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: SSH keys
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build image
         run: |
-          mkdir -p ~/.ssh/
-          touch ~/.ssh/id_rsa
-          touch ~/.ssh/id_rsa.pub
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          echo "${{ secrets.SSH_PUBLIC_KEY }}" > ~/.ssh/id_rsa.pub
-          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
-      - name: Connect and build
-        run: sshpass -p '${{ secrets.SSH_PASS }}' ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git checkout ${{ secrets.MAIN_BRANCH }} && git pull && cd .. && ./build.sh && systemctl restart --user Mooncellar-Frontend.service && exit"
-      - name: cleanup
-        run: rm -rf ~/.ssh
+          podman build \
+            -t $IMAGE_NAME:$IMAGE_TAG \
+            -t $IMAGE_NAME:latest \
+            .
+
+      - name: Save image as tar
+        run: |
+          podman save $IMAGE_NAME:$IMAGE_TAG | gzip > image.tar.gz
+
+      - name: Copy image to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "image.tar.gz"
+          target: "/tmp/"
+
+      - name: Deploy on server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            podman load < /tmp/image.tar.gz
+
+            cd ${{ secrets.WORK_DIR }}
+            ./run.sh
+            systemctl restart --user Mooncellar-Frontend.service
+
+            podman image prune -f
+            rm /tmp/image.tar.gz
+
