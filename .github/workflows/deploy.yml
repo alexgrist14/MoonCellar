@@ -44,6 +44,7 @@ jobs:
 
       - name: Build image
         run: |
+          echo "${{ secrets.HOST_ENV }}" > .env;
           podman build \
             -t $IMAGE_NAME:$IMAGE_TAG \
             -t $IMAGE_NAME:latest \
