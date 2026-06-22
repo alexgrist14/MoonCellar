@@ -54,13 +54,12 @@ jobs:
         run: |
           echo "${{ secrets.HOST_ENV }}" > .env;
           podman build \
-            -t $IMAGE_NAME:$IMAGE_TAG \
             -t $IMAGE_NAME:latest \
             .
 
       - name: Save image as tar
         run: |
-          podman save $IMAGE_NAME:$IMAGE_TAG | gzip > image.tar.gz
+          podman save $IMAGE_NAME:latest | gzip > image.tar.gz
 
       - name: Copy image to server
         uses: appleboy/scp-action@v0.1.7
@@ -81,7 +80,7 @@ jobs:
             podman load < /tmp/image.tar.gz
 
             cd ${{ secrets.WORK_DIR }}
-            ./run.sh
+            ../run.sh
             systemctl restart --user Mooncellar-Frontend.service
 
             podman image prune -f
