@@ -2,7 +2,7 @@ FROM oven/bun:latest
 WORKDIR /app
 
 COPY ./package*.json ./
-COPY ./bun.lock*.json ./
+COPY ./bun.lock ./
 RUN bun ci
 
 COPY . .
