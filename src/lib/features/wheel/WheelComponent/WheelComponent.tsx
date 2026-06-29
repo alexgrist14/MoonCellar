@@ -127,7 +127,11 @@ export const WheelComponent: FC<WheelComponentProps> = ({
             if (isRoyal) {
               !!tempGames?.length &&
                 parseImages(tempGames).then((images) => {
-                  drawWheel({ images, wheelGames: tempGames });
+                  drawWheel({
+                    images: images
+                      .filter((i) => i.status === "fulfilled")
+                      .map((i) => i.value),
+                  });
                   setStarted(true);
                 });
             } else {

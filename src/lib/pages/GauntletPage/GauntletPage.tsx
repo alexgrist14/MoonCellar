@@ -52,7 +52,12 @@ export const GauntletPage: FC = () => {
 
           setGames(games);
           parseImages(games).then((images) => {
-            drawWheel({ images, wheelGames: games });
+            drawWheel({
+              images: images
+                .filter((i) => i.status === "fulfilled")
+                .map((i) => i.value),
+              wheelGames: games,
+            });
 
             setLoading(false);
             setStarted(true);

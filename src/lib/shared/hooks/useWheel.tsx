@@ -150,7 +150,7 @@ export const useWheel = ({
       queries.push(createImage(cover));
     });
 
-    return Promise.all(queries);
+    return Promise.allSettled(queries);
   }, []);
 
   return { drawWheel, parseImages };
