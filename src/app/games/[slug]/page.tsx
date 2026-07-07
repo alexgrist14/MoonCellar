@@ -18,7 +18,13 @@ export async function generateMetadata({
       description: game.summary,
       url: `https://mooncellar.net/games/${game.slug}`,
       ...(!!game.cover && {
-        images: [game.cover],
+        images: [{
+          url: game.cover,
+          width: 528,
+          height: 704,
+          alt: game.name,
+          type: "image/jpeg",
+        }],
       }),
     },
   };
