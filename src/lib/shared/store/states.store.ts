@@ -1,7 +1,5 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { screenMd } from "../constants";
-import { commonUtils } from "../utils/common.utils";
 
 type IState = {
   isLoading?: boolean;
@@ -10,7 +8,6 @@ type IState = {
   isFinished: boolean;
   isRoyal?: boolean;
   isHistory?: boolean;
-  isExcludeHistory: boolean;
   isMobile?: boolean;
 };
 
@@ -21,7 +18,6 @@ type IAction = {
   setFinished: (isFinished: boolean) => void;
   setRoyal: (royal: boolean) => void;
   setHistory: (isHistory: boolean) => void;
-  setExcludeHistory: (isExcludeHistory: boolean) => void;
   setMobile: (isMobile: boolean | undefined) => void;
 };
 
@@ -36,7 +32,6 @@ export const useStatesStore = create<IState & IAction>()(
       setStarted: (isStarted) => set({ isStarted }),
       setRoyal: (isRoyal) => set({ isRoyal }),
       setHistory: (isHistory) => set({ isHistory }),
-      setExcludeHistory: (isExcludeHistory) => set({ isExcludeHistory }),
       setMobile: (isMobile) => set({ isMobile }),
       clear: () =>
         set({

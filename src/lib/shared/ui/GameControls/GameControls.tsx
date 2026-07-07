@@ -83,7 +83,6 @@ export const GameControls: FC<IGameControlsProps> = ({
         })}
       >
         <SvgPlay
-          size="20"
           className={classNames(styles.controls__icon, {
             [styles.controls__icon_active]: isPlaythroughExist,
           })}
@@ -104,10 +103,7 @@ export const GameControls: FC<IGameControlsProps> = ({
         color={ButtonColor.TRANSPARENT}
         className={classNames(styles.controls__action)}
       >
-        <SvgCircleMenu
-          size="20"
-          className={classNames(styles.controls__icon)}
-        />
+        <SvgCircleMenu className={classNames(styles.controls__icon)} />
       </Button>
       <Button
         onClick={(e) => {
@@ -121,7 +117,7 @@ export const GameControls: FC<IGameControlsProps> = ({
           [styles.controls__action_active]: isRoyal,
         })}
       >
-        <SvgCrown size="20" className={classNames(styles.controls__icon)} />
+        <SvgCrown className={classNames(styles.controls__icon)} />
       </Button>
       {!!game.retroachievements?.length && (
         <Button
@@ -131,7 +127,6 @@ export const GameControls: FC<IGameControlsProps> = ({
           className={classNames(styles.controls__action)}
         >
           <SvgAchievement
-            size="20"
             color={
               isMastered ? "attention" : isBeaten ? "positive" : "secondary"
             }

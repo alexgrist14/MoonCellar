@@ -80,9 +80,14 @@ export const SearchModal: FC = () => {
           wrapperClassName={styles.modal__buttons}
           buttons={[
             {
-              title: <SvgSearch style={{ width: "20px", marginTop: "2px" }} />,
+              title: (
+                <SvgSearch
+                  style={{ width: "20px", marginTop: "2px" }}
+                />
+              ),
               style: { padding: "2px 10px", height: "calc(100% - 10px)" },
               color: ButtonColor.ACCENT,
+              onClick: () => searchHandler(searchQuery),
             },
             {
               title: "Advanced",

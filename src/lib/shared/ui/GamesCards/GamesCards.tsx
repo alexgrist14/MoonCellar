@@ -72,7 +72,7 @@ export const GamesCards: FC<IGamesCardsProps> = ({
                 rowCount={rowCount}
                 rowHeight={rowHeight}
                 columnWidth={columnWidth}
-                overscanRowCount={1}
+                overscanRowCount={2}
                 scrollTop={scrollTop}
                 className={styles.block__grid}
                 cellRenderer={({ key, style, rowIndex, columnIndex }) => {

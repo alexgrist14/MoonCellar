@@ -13,10 +13,12 @@ export async function generateMetadata({
   return {
     title: game.name,
     description: game.summary,
-    other: {
-      url: `https://mooncellar.space/games/${game.slug}`,
+    openGraph: {
+      title: game.name,
+      description: game.summary,
+      url: `https://mooncellar.net/games/${game.slug}`,
       ...(!!game.cover && {
-        image: game.cover,
+        images: [game.cover],
       }),
     },
   };

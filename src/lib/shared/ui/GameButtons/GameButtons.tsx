@@ -1,48 +1,45 @@
-import { FC, useMemo } from "react";
+import { FC } from "react";
 import styles from "./GameButtons.module.scss";
 import { ButtonGroup } from "../Button/ButtonGroup";
-import { WrapperTemplate } from "../WrapperTemplate";
-import { Separator } from "../Separator";
 import { IGameResponse } from "../../lib/schemas/games.schema";
-import { useCommonStore } from "../../store/common.store";
 
 export const GameButtons: FC<{ game: IGameResponse }> = ({ game }) => {
-  const { systems } = useCommonStore();
+  // const { systems } = useCommonStore();
 
-  const raInfo = useMemo(() => {
-    return game.retroachievements?.map((item) => {
-      const platform = systems?.find((sys) => sys.raId === item.consoleId);
-
-      return {
-        platformName: platform?.name,
-        gameId: item.gameId,
-      };
-    });
-  }, [game.retroachievements, systems]);
+  // const raInfo = useMemo(() => {
+  //   return game.retroachievements?.map((item) => {
+  //     const platform = systems?.find((sys) => sys.raId === item.consoleId);
+  //
+  //     return {
+  //       platformName: platform?.name,
+  //       gameId: item.gameId,
+  //     };
+  //   });
+  // }, [game.retroachievements, systems]);
 
   return (
     <div className={styles.menu}>
-      {!!game.retroachievements?.length && (
-        <>
-          <WrapperTemplate
-            title="RetroAchievements"
-            contentStyle={{ padding: "5px" }}
-            isWithoutBorder
-          >
-            <ButtonGroup
-              wrapperClassName={styles.actions}
-              buttons={[
-                ...(raInfo?.map((item) => ({
-                  title: <span>{item.platformName}</span>,
-                  link: `https://retroachievements.org/game/${item.gameId}`,
-                  target: "_blank",
-                })) || []),
-              ]}
-            />
-          </WrapperTemplate>
-          <Separator direction="horizontal" />
-        </>
-      )}
+      {/* {!!game.retroachievements?.length && ( */}
+      {/*   <> */}
+      {/*     <WrapperTemplate */}
+      {/*       title="RetroAchievements" */}
+      {/*       contentStyle={{ padding: "5px" }} */}
+      {/*       isWithoutBorder */}
+      {/*     > */}
+      {/*       <ButtonGroup */}
+      {/*         wrapperClassName={styles.actions} */}
+      {/*         buttons={[ */}
+      {/*           ...(raInfo?.map((item) => ({ */}
+      {/*             title: <span>{item.platformName}</span>, */}
+      {/*             link: `https://retroachievements.org/game/${item.gameId}`, */}
+      {/*             target: "_blank", */}
+      {/*           })) || []), */}
+      {/*         ]} */}
+      {/*       /> */}
+      {/*     </WrapperTemplate> */}
+      {/*     <Separator direction="horizontal" /> */}
+      {/*   </> */}
+      {/* )} */}
       <ButtonGroup
         wrapperClassName={styles.actions}
         buttons={[

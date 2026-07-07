@@ -48,7 +48,6 @@ export const GameCard = memo(
       <div
         className={classNames(
           styles.wrapper,
-          styles.wrapper_active,
           spreadDirection === "height" && styles.wrapper_height
         )}
         style={style}
@@ -60,9 +59,9 @@ export const GameCard = memo(
           className={classNames(
             styles.card,
             className,
-            filteredPlaythroughs?.map(
-              (play) => styles[`card_${play.category}`]
-            ),
+            filteredPlaythroughs
+              ?.map((play) => styles[`card_${play.category}`])
+              .at(-1),
             !!filteredPlaythroughs &&
               filteredPlaythroughs.some((play) => play.isMastered) &&
               styles.card_mastered

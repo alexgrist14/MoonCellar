@@ -67,7 +67,11 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
       .getBucketKeys("mooncellar-screenshots", game.slug + "/")
       .then((res) => {
         const urls = res.data.map(
-          (key) => `https://mooncellar-screenshots.s3.regru.cloud/${key}`
+          (key) =>
+            process.env.NEXT_PUBLIC_S3_HOST?.replace(
+              "%bucket",
+              "mooncellar-screenshots"
+            ) + key
         );
         setScreenshots(urls);
       });
@@ -76,7 +80,8 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
       .getBucketKeys("mooncellar-artworks", game.slug + "/")
       .then((res) => {
         const urls = res.data.map(
-          (key) => `https://mooncellar-artworks.s3.regru.cloud/${key}`
+          (key) =>
+            process.env.S3_HOST?.replace("%bucket", "mooncellar-artworks") + key
         );
         setArtworks(urls);
       });
@@ -265,20 +270,22 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
             {!!game.release_dates?.length && (
               <div className={styles.page__links}>
                 <h4>Release dates:</h4>
-                {game.release_dates.map((date, i) => {
-                  const platform = systems?.find(
-                    (sys) => sys._id === date.platformId
-                  );
+                {game.release_dates
+                  .sort((a, b) => a.date - b.date)
+                  .map((date, i) => {
+                    const platform = systems?.find(
+                      (sys) => sys._id === date.platformId
+                    );
 
-                  return (
-                    <p key={date.date + "_" + i}>
-                      {date.human}: {platform?.name || "Unknown platform"}
-                      {!!dateRegions[+date.region - 1] && (
-                        <span> ({dateRegions[+date.region - 1]})</span>
-                      )}
-                    </p>
-                  );
-                })}
+                    return (
+                      <p key={date.date + "_" + i}>
+                        {date.human}: {platform?.name || "Unknown platform"}
+                        {!!dateRegions[+date.region - 1] && (
+                          <span> ({dateRegions[+date.region - 1]})</span>
+                        )}
+                      </p>
+                    );
+                  })}
               </div>
             )}
             {!!game.websites?.length && (

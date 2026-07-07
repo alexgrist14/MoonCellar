@@ -2,16 +2,17 @@ import { FC } from "react";
 import styles from "./WheelContainer.module.scss";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { GameCard } from "@/src/lib/shared/ui/GameCard";
-import { useGamesStore } from "@/src/lib/shared/store/games.store";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
 import { WheelComponent } from "@/src/lib/features/wheel/WheelComponent";
 import { WheelOptions } from "@/src/lib/features/wheel/WheelOptions";
+import { useWheelStore } from "@/src/lib/shared/store/wheel.store";
 
 export const WheelContainer: FC = () => {
-  const { winner } = useGamesStore();
+  const winner = useWheelStore((state) => state.winner);
+  const timer = useCommonStore((state) => state.timer);
+
   const { isFinished, isLoading, isMobile } = useStatesStore();
-  const { timer } = useCommonStore();
 
   return (
     <>

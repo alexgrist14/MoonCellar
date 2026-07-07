@@ -11,80 +11,11 @@ import { useGamesStore } from "../../shared/store/games.store";
 import { parseQueryFilters } from "../../shared/utils/filters.utils";
 import { Filters } from "../../shared/ui/Filters";
 import { BGImage } from "../../shared/ui/BGImage";
-import { useAdvancedRouter } from "../../shared/hooks/useAdvancedRouter";
-import { useWheel } from "../../shared/hooks/useWheel";
-import { gamesApi } from "../../shared/api";
-import { shuffle } from "../../shared/utils/common.utils";
+import { useWheelStore } from "../../shared/store/wheel.store";
 
 export const GauntletPage: FC = () => {
-  const { asPath } = useAdvancedRouter();
-
-  const { setGames, historyGames, winner } = useGamesStore();
-  const {
-    isLoading,
-    setStarted,
-    setFinished,
-    setLoading,
-    isRoyal,
-    isExcludeHistory,
-  } = useStatesStore();
-
-  const { parseImages, drawWheel } = useWheel({});
-
-  const getIGDBGames = useCallback(() => {
-    if (isRoyal) return;
-
-    const filters = parseQueryFilters(asPath);
-
-    gamesApi
-      .getAll({
-        ...filters,
-        isRandom: true,
-        take: 16,
-        ...(isExcludeHistory &&
-          !!historyGames?.length && {
-            excludeGames: historyGames.map((game) => game._id),
-          }),
-      })
-      .then((response) => {
-        if (!!response.data.results.length) {
-          const games = shuffle(response.data.results);
-
-          setGames(games);
-          parseImages(games).then((images) => {
-            drawWheel({
-              images: images
-                .filter((i) => i.status === "fulfilled")
-                .map((i) => i.value),
-              wheelGames: games,
-            });
-
-            setLoading(false);
-            setStarted(true);
-          });
-        } else {
-          setLoading(false);
-          setFinished(true);
-        }
-      });
-  }, [
-    setLoading,
-    isRoyal,
-    historyGames,
-    isExcludeHistory,
-    asPath,
-    setFinished,
-    setGames,
-    setStarted,
-    parseImages,
-    drawWheel,
-  ]);
-
-  useEffect(() => {
-    if (isLoading && !isRoyal) {
-      getIGDBGames();
-    }
-  }, [isLoading, getIGDBGames, isRoyal]);
+  const winner = useWheelStore((state) => state.winner);
+  const isRoyal = useStatesStore((state) => state.isRoyal);
 
   return (
     <div className={classNames(styles.page)}>

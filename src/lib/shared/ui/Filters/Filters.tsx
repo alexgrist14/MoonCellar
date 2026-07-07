@@ -24,6 +24,7 @@ import {
   pushFiltersToQuery,
 } from "../../utils/filters.utils";
 import { RangeSelector } from "../RangeSelector";
+import { useFiltersStore } from "../../store/filters.store";
 
 export const Filters: FC<{
   callback?: (filters?: IGameFilters) => void;
@@ -40,8 +41,8 @@ export const Filters: FC<{
 
   const { themes, systems, genres, gameModes, gameTypes, keywords } =
     useCommonStore();
-  const { isLoading, isPlatformsLoading, isExcludeHistory, setExcludeHistory } =
-    useStatesStore();
+  const { isLoading, isPlatformsLoading } = useStatesStore();
+  const { isExcludeHistory, setExcludeHistory } = useFiltersStore();
 
   const getValue = (key: keyof IGameFilters) =>
     (!!filters?.selected?.[key]?.length
@@ -130,7 +131,7 @@ export const Filters: FC<{
       userAPI
         .getFilters(profile?._id)
         .then((res) => setSavedFilters(res.data.filters));
-  }, [profile]);
+  }, [profile, isAuth]);
 
   return (
     <div className={styles.filters} id="filters">

@@ -41,6 +41,14 @@ const nextConfig = {
         protocol: "https",
         hostname: "mooncellar-*.s3.regru.cloud",
       },
+      {
+        protocol: "https",
+        hostname: "*.sfo3.cdn.digitaloceanspaces.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.sfo3.digitaloceanspaces.com",
+      },
     ],
   },
 };

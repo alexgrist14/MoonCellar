@@ -1,5 +1,4 @@
 import { CSSProperties, FC } from "react";
-import { SvgLogo } from "../svg";
 import styles from "./Cover.module.scss";
 import Image from "next/image";
 
@@ -11,14 +10,9 @@ interface CoverProps {
 export const Cover: FC<CoverProps> = ({ className, isWithoutText, style }) => {
   return (
     <div className={`${styles.cover} ${className}`} style={style}>
-      <Image
-        alt="cover"
-        width={100}
-        height={100}
-        src={"/images/mooncellar.ico"}
-      />
-      {/* <SvgLogo /> */}
-
+      <div className={styles.cover__image}>
+        <Image alt="cover" src={"/images/mooncellar.ico"} fill />
+      </div>
       {!isWithoutText && <span>Cover Missing</span>}
     </div>
   );

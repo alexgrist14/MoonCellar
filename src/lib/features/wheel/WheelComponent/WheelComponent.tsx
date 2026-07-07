@@ -8,6 +8,7 @@ import { Loader } from "@/src/lib/shared/ui/Loader";
 import { useWheel } from "@/src/lib/shared/hooks/useWheel";
 import { shuffle } from "@/src/lib/shared/utils/common.utils";
 import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
+import { useWheelStore } from "@/src/lib/shared/store/wheel.store";
 
 interface WheelComponentProps {
   primaryColor?: string;
@@ -24,23 +25,17 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   primaryColor = "black",
   time = 3,
 }) => {
-  const { addHistoryGame, setWinner, games, setRoyalGames, royalGames } =
-    useGamesStore();
-  const {
-    isFinished,
-    isLoading,
-    isStarted,
-    setFinished,
-    setStarted,
-    setLoading,
-    isRoyal,
-  } = useStatesStore();
+  const setWinner = useWheelStore((state) => state.setWinner);
+
+  const { addHistoryGame, games, setRoyalGames, royalGames } = useGamesStore();
+  const { isFinished, isLoading, isStarted, setFinished, setStarted, isRoyal } =
+    useStatesStore();
 
   const angle = useRef(0);
   const [winnerAngle, setWinnerAngle] = useState(0);
   const [tempGames, setTempGames] = useState<IGameResponse[]>([]);
 
-  const { drawWheel, parseImages } = useWheel({
+  const { drawWheel, parseImages, spinHandler } = useWheel({
     contrastColor,
     fontFamily,
     primaryColor,
@@ -105,8 +100,21 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   }, [games, royalGames, isRoyal]);
 
   useEffect(() => {
-    drawWheel({ wheelGames: emptyGames });
-  }, [drawWheel, isRoyal]);
+    if (isRoyal) {
+      parseImages(tempGames).then((images) => {
+        drawWheel({
+          wheelGames: tempGames,
+          images: images
+            .filter((i) => i.status === "fulfilled")
+            .map((i) => i.value),
+        });
+      });
+    } else {
+      drawWheel({
+        wheelGames: emptyGames,
+      });
+    }
+  }, [drawWheel, parseImages, isRoyal, tempGames]);
 
   return (
     <div
@@ -120,24 +128,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
         <button
           disabled={isRoyal && !games?.length}
           id="spin-button"
-          onClick={() => {
-            setFinished(false);
-            setWinner(undefined);
-
-            if (isRoyal) {
-              !!tempGames?.length &&
-                parseImages(tempGames).then((images) => {
-                  drawWheel({
-                    images: images
-                      .filter((i) => i.status === "fulfilled")
-                      .map((i) => i.value),
-                  });
-                  setStarted(true);
-                });
-            } else {
-              setLoading(true);
-            }
-          }}
+          onClick={() => spinHandler(tempGames)}
         >
           {buttonText}
         </button>

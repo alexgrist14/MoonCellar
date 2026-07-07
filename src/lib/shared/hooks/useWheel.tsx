@@ -1,6 +1,9 @@
 import { useCallback } from "react";
 import { createImage } from "../utils/image.utils";
 import { IGameResponse } from "../lib/schemas/games.schema";
+import { useStatesStore } from "../store/states.store";
+import { useWheelStore } from "../store/wheel.store";
+import { useGames } from "./useGames";
 
 interface IDrawProps {
   images?: HTMLImageElement[];
@@ -17,6 +20,10 @@ export const useWheel = ({
   contrastColor?: string;
   fontFamily?: string;
 }) => {
+  const { setWinner } = useWheelStore();
+  const { setFinished, setLoading, setStarted, isRoyal } = useStatesStore();
+  const { getIGDBGames } = useGames();
+
   const drawWheel = useCallback(
     ({ wheelGames, winnerId, images }: IDrawProps) => {
       const canvas = document.getElementById(
@@ -27,8 +34,8 @@ export const useWheel = ({
       const wheelHeight = wheel?.getBoundingClientRect().height;
       const wheelWidth = wheelHeight;
 
-      canvas.width = wheelWidth ? wheelWidth  : 0;
-      canvas.height = wheelHeight ? wheelHeight  : 0;
+      canvas.width = wheelWidth ? wheelWidth : 0;
+      canvas.height = wheelHeight ? wheelHeight : 0;
 
       const X = !!canvas && wheelWidth ? wheelWidth / 2 : undefined;
       const Y = !!canvas && wheelHeight ? wheelHeight / 2 : undefined;
@@ -153,5 +160,65 @@ export const useWheel = ({
     return Promise.allSettled(queries);
   }, []);
 
-  return { drawWheel, parseImages };
+  const spinHandler = useCallback(
+    (games: IGameResponse[]) => {
+      setFinished(false);
+      setWinner(undefined);
+
+      if (isRoyal) {
+        !!games?.length &&
+          parseImages(games)
+            .then((images) => {
+              drawWheel({
+                wheelGames: games,
+                images: images
+                  .filter((i) => i.status === "fulfilled")
+                  .map((i) => i.value),
+              });
+
+              setStarted(true);
+            })
+            .catch(() => {
+              setFinished(true);
+            });
+      } else {
+        setLoading(true);
+
+        getIGDBGames().then((games) => {
+          if (!!games?.length) {
+            parseImages(games)
+              .then((images) => {
+                drawWheel({
+                  wheelGames: games,
+                  images: images
+                    .filter((i) => i.status === "fulfilled")
+                    .map((i) => i.value),
+                });
+
+                setStarted(true);
+              })
+              .finally(() => {
+                setLoading(false);
+                setFinished(true);
+              });
+          } else {
+            setLoading(false);
+            setFinished(true);
+          }
+        });
+      }
+    },
+    [
+      drawWheel,
+      parseImages,
+      isRoyal,
+      setFinished,
+      setWinner,
+      setStarted,
+      setLoading,
+      getIGDBGames,
+    ]
+  );
+
+  return { drawWheel, parseImages, spinHandler };
 };

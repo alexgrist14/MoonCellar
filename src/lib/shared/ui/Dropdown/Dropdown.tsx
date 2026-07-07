@@ -248,7 +248,6 @@ export const Dropdown = memo(
         (!!indexedList.length || isWithSearch) &&
         setIsActive(!isActive);
     };
-    console.log(overflowRootId);
     const defaultPlaceholder = isWithInput
       ? "Enter/Select value..."
       : "Select...";

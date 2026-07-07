@@ -173,7 +173,6 @@
     height: fit-content;
     opacity: 0;
     transition: 0.2s;
-    overscroll-behavior: contain;
     overflow: hidden;
     transform-origin: top;
     pointer-events: none;
@@ -202,17 +201,10 @@
 
   &__list {
     display: grid;
-    overflow-y: scroll;
-    scrollbar-width: none;
-    overscroll-behavior: contain;
     pointer-events: none;
     height: fit-content;
     visibility: hidden;
     background-color: $lightBg;
-
-    &::-webkit-scrollbar {
-      width: 0;
-    }
 
     &_active {
       pointer-events: all;

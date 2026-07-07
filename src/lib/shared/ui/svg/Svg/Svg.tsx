@@ -28,7 +28,7 @@ interface ISvgProps extends ISvgBaseProps, PropsWithChildren {
 }
 
 export const Svg: FC<ISvgProps> = ({
-  size = "16",
+  size = "20",
   children,
   color = "contrast",
   className,
