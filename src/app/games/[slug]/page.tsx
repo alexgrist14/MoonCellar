@@ -16,7 +16,7 @@ export async function generateMetadata({
     openGraph: {
       title: game.name,
       description: game.summary,
-      url: `https://mooncellar.net/games/${game.slug}`,
+      url: `https://mooncellar.space/games/${game.slug}`,
       ...(!!game.cover && {
         images: [{
           url: game.cover,
