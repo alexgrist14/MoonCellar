@@ -81,7 +81,7 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
       .then((res) => {
         const urls = res.data.map(
           (key) =>
-            process.env.S3_HOST?.replace("%bucket", "mooncellar-artworks") + key
+            process.env.NEXT_PUBLIC_S3_HOST?.replace("%bucket", "mooncellar-artworks") + key
         );
         setArtworks(urls);
       });
