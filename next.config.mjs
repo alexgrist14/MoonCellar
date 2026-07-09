@@ -43,6 +43,10 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "s3.regru.cloud",
+      },
+      {
+        protocol: "https",
         hostname: "*.sfo3.cdn.digitaloceanspaces.com",
       },
       {
