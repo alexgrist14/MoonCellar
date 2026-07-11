@@ -5,7 +5,7 @@
 
   .banner {
     position: relative;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    background: $darkblueBg;
     border-radius: $radius;
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -20,10 +20,7 @@
     }
 
     .title {
-      background: linear-gradient(30deg, $textSecondary 0%, $accentCyan 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: $textSecondary;
       font-size: clamp(2.25rem, 4vw, 3.5rem);
       font-weight: 800;
       font-family: var(--font-pentagra);
@@ -41,8 +38,7 @@
       align-items: center;
       justify-content: center;
 
-      &__stack {
-      }
+      &__stack {}
     }
 
     .games__stack {
@@ -102,6 +98,24 @@
     }
   }
 
+  .releases {
+    width: 100%;
+    z-index: 1;
+
+    &__groups {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    &__quarter {
+      font-size: clamp(1.05rem, 2vw, 1.3rem);
+      font-weight: 600;
+      color: $neutral-90;
+      margin-bottom: 14px;
+    }
+  }
+
   .gauntlet {
     position: relative;
     z-index: 1;
@@ -153,10 +167,10 @@
           width: 100%;
           height: 100%;
           animation: wheelHover 8s ease-in-out infinite;
-          filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.3));
         }
 
         @keyframes wheelHover {
+
           0%,
           100% {
             transform: rotate(0deg);
@@ -164,20 +178,6 @@
 
           50% {
             transform: rotate(15deg);
-          }
-        }
-
-        &__pointer {
-          position: absolute;
-          right: -8px;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 24px;
-          height: 24px;
-
-          svg {
-            width: 100%;
-            height: 100%;
           }
         }
       }
@@ -327,6 +327,7 @@
 
       .games__stack:hover {
         .game {
+
           &:nth-child(1),
           &:nth-child(3) {
             transform: none;

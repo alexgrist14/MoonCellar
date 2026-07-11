@@ -6,6 +6,7 @@ import {
   IGetGameBySlugRequest,
   IGetGamesByIdsRequest,
   IGetGamesRequest,
+  IUpcomingReleaseGroup,
   IUpdateGameRequest,
 } from "../lib/schemas/games.schema";
 import agent from "./agent.api";
@@ -55,6 +56,14 @@ export const gamesApi = {
 
   getTotalGamesByCount: async () => {
     return agent.get<IGenreResponse[]>(`${GAMES_URL}/count-by-genre`);
+  },
+
+  getUpcomingReleases: async () => {
+    return agent.get<IUpcomingReleaseGroup[]>(`${GAMES_URL}/upcoming`);
+  },
+
+  getRecentReleases: async () => {
+    return agent.get<IGameResponse[]>(`${GAMES_URL}/recent`);
   },
 
   getFilters: async (): Promise<

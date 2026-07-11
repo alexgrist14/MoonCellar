@@ -5,14 +5,21 @@ import { FC } from "react";
 import {
   IGameResponse,
   IGenreResponse,
+  IUpcomingReleaseGroup,
 } from "../../shared/lib/schemas/games.schema";
 import styles from "./MainPage.module.scss";
 import { Button } from "../../shared/ui/Button";
 import Link from "next/link";
 import { commonUtils } from "../../shared/utils/common.utils";
+import { ReleaseRail } from "./ReleaseRail";
 
 interface MainPageProps {
-  games: { topRated: IGameResponse[]; genre: IGenreResponse[] };
+  games: {
+    topRated: IGameResponse[];
+    genre: IGenreResponse[];
+    upcoming: IUpcomingReleaseGroup[];
+    recent: IGameResponse[];
+  };
 }
 
 export const MainPage: FC<MainPageProps> = ({ games }) => {
@@ -44,6 +51,28 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
           </div>
         </div>
       </div>
+      {!!games.upcoming?.length && (
+        <div className={styles.releases}>
+          <h2 className={styles.title__section}>Upcoming Releases</h2>
+          <div className={styles.releases__groups}>
+            {games.upcoming.map((group) => (
+              <div
+                className={styles.releases__group}
+                key={`${group.year}-${group.quarter}`}
+              >
+                <h3 className={styles.releases__quarter}>{group.label}</h3>
+                <ReleaseRail games={group.games} withDate />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {!!games.recent?.length && (
+        <div className={styles.releases}>
+          <h2 className={styles.title__section}>Recently Released</h2>
+          <ReleaseRail games={games.recent} withDate />
+        </div>
+      )}
       <div className={styles.gauntlet}>
         <h2 className={styles.title__section}>Gauntlet</h2>
         <div className={styles.gauntlet__content}>
@@ -51,70 +80,37 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
             <div className={styles.wheel__preview}>
               <div className={styles.wheel__container}>
                 <svg className={styles.wheel__svg} viewBox="0 0 200 200">
-                  <defs>
-                    <linearGradient
-                      id="slice1"
-                      x1="0%"
-                      y1="0%"
-                      x2="100%"
-                      y2="100%"
-                    >
-                      <stop offset="0%" stopColor="#1e3a5f" />
-                      <stop offset="100%" stopColor="#2d4a6f" />
-                    </linearGradient>
-                    <linearGradient
-                      id="slice2"
-                      x1="0%"
-                      y1="0%"
-                      x2="100%"
-                      y2="100%"
-                    >
-                      <stop offset="0%" stopColor="#234567" />
-                      <stop offset="100%" stopColor="#345678" />
-                    </linearGradient>
-                    <linearGradient
-                      id="wheelGlow"
-                      x1="0%"
-                      y1="0%"
-                      x2="100%"
-                      y2="100%"
-                    >
-                      <stop offset="0%" stopColor="var(--accent-purple)" />
-                      <stop offset="100%" stopColor="var(--accent-cyan)" />
-                    </linearGradient>
-                  </defs>
                   <circle
                     cx="100"
                     cy="100"
                     r="98"
                     fill="none"
-                    stroke="url(#wheelGlow)"
+                    stroke="#374151"
                     strokeWidth="2"
-                    opacity="0.5"
                   />
                   <path
                     d="M100,100 L100,2 A98,98 0 0,1 184.5,50 Z"
-                    fill="url(#slice1)"
+                    fill="#242e41"
                   />
                   <path
                     d="M100,100 L184.5,50 A98,98 0 0,1 184.5,150 Z"
-                    fill="url(#slice2)"
+                    fill="#2c3340"
                   />
                   <path
                     d="M100,100 L184.5,150 A98,98 0 0,1 100,198 Z"
-                    fill="url(#slice1)"
+                    fill="#242e41"
                   />
                   <path
                     d="M100,100 L100,198 A98,98 0 0,1 15.5,150 Z"
-                    fill="url(#slice2)"
+                    fill="#2c3340"
                   />
                   <path
                     d="M100,100 L15.5,150 A98,98 0 0,1 15.5,50 Z"
-                    fill="url(#slice1)"
+                    fill="#242e41"
                   />
                   <path
                     d="M100,100 L15.5,50 A98,98 0 0,1 100,2 Z"
-                    fill="url(#slice2)"
+                    fill="#2c3340"
                   />
                   <line
                     x1="100"
@@ -184,16 +180,6 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
                     Spin
                   </text>
                 </svg>
-                <div className={styles.wheel__pointer}>
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="var(--bg-primary)"
-                    stroke="#fff"
-                    strokeWidth="2"
-                  >
-                    <polygon points="12,2 22,12 12,8" />
-                  </svg>
-                </div>
               </div>
             </div>
           </div>
