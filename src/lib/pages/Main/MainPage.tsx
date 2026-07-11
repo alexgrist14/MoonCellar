@@ -18,10 +18,6 @@ interface MainPageProps {
 export const MainPage: FC<MainPageProps> = ({ games }) => {
   return (
     <div className={styles.container}>
-      <div className="bg-effects">
-        <div className="bg-gradient"></div>
-        <div className="grid-overlay"></div>
-      </div>
       <div className={styles.banner}>
         <div className={styles.banner__text}>
           <h2 className={styles.title}>Your Gaming Universe Awaits</h2>
