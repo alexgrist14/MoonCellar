@@ -5,6 +5,7 @@ import { ReactNode } from "react";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../lib/shared/constants";
 import { cookies } from "next/headers";
 import { polyfill } from "interweave-ssr";
+import { FaroInit } from "../lib/shared/ui/FaroInit";
 import "@/src/lib/app/styles/reset.scss";
 import "@/src/lib/app/styles/root.scss";
 
@@ -56,6 +57,7 @@ export default async function App({ children }: { children: ReactNode }) {
         <link rel="icon" href="/images/mooncellar.ico" />
       </head>
       <body style={{ color: "white", background: "#191d24" }}>
+        <FaroInit />
         <Layout
           className={classNames(general.variable, pentagra.variable)}
           accessToken={accessToken}

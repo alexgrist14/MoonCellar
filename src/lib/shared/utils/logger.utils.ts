@@ -12,7 +12,7 @@ interface LogEntry {
 }
 
 class Logger {
-  private lokiHost: string;
+  private lokiEndpoint: string;
   private appName: string;
   private batch: LogEntry[] = [];
   private batchTimeout: NodeJS.Timeout | null = null;
@@ -20,8 +20,10 @@ class Logger {
   private readonly BATCH_TIMEOUT = 5000; // 5 seconds
 
   constructor() {
-    this.lokiHost =
-      process.env.NEXT_PUBLIC_LOKI_HOST || "http://localhost:3100";
+    this.lokiEndpoint =
+      typeof window === "undefined"
+        ? `${process.env.LOKI_HOST || "http://host.containers.internal:3100"}/loki/api/v1/push`
+        : "/api/logs";
     this.appName = "mooncellar-frontend";
 
     // Отправляем накопленные логи при разгрузке страницы
@@ -140,7 +142,7 @@ class Logger {
         }
       );
 
-      await fetch(`${this.lokiHost}/loki/api/v1/push`, {
+      await fetch(this.lokiEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
