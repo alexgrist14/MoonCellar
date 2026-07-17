@@ -6,6 +6,8 @@ import {
 } from "../lib/shared/lib/schemas/games.schema";
 import { gamesApi } from "../lib/shared/api";
 
+export const dynamic = "force-dynamic";
+
 async function getGames(): Promise<{
   topRated: IGameResponse[];
   genre: IGenreResponse[];
