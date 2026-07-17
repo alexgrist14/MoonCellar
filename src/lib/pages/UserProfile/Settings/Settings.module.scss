@@ -1,7 +1,7 @@
 .container {
   .title {
     font-size: 2rem;
-    margin-bottom: 20px;
+    margin-bottom: var(--padding-x5);
   }
 
   .content {
@@ -29,11 +29,11 @@
       font-size: 1rem;
       width: 100px;
       height: 40px;
-      color: $whiteTextColor;
+      color: var(--color-neutral-100);
     }
 
     .background {
-      color: $whiteTextColor;
+      color: var(--color-neutral-100);
     }
   }
 }

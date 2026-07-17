@@ -5,7 +5,7 @@
   &__wrapper {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: var(--gap-x5);
 
     & > span {
       white-space: nowrap;

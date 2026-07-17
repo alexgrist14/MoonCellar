@@ -6,16 +6,16 @@
     height: auto;
     display: flex;
     cursor: pointer;
-    border-radius: $radius;
+    border-radius: var(--radius-x2);
     overflow: hidden;
     transition: all 0.3s;
     border: 2px solid transparent;
-    background-color: $bgAlt;
+    background-color: var(--color-bg-secondary);
     position: relative;
 
     &:hover {
       filter: brightness(0.6);
-      border-color: $accent;
+      border-color: var(--color-accent);
     }
 
     & img {
@@ -30,10 +30,10 @@
     min-height: 50px;
     max-height: 90vh;
     aspect-ratio: 1920/1080;
-    outline: 2px solid $gray;
-    border-radius: $radius;
+    outline: 2px solid var(--color-gray);
+    border-radius: var(--radius-x2);
     position: relative;
-    background-color: $bg;
+    background-color: var(--color-bg-primary);
     user-select: none;
     max-width: calc(100vw - 20px);
     overflow: hidden;
@@ -42,7 +42,7 @@
       height: 100%;
       object-fit: contain;
       overflow: hidden;
-      border-radius: $radius;
+      border-radius: var(--radius-x2);
     }
 
     @include mediaSm {
@@ -59,7 +59,7 @@
     opacity: 0.7;
     z-index: 1;
     transition: 0.3s;
-    background-color: $bg;
+    background-color: var(--color-bg-primary);
     padding: 0;
 
     & svg {
@@ -68,7 +68,7 @@
     }
 
     &:hover {
-      background-color: $bgAlt;
+      background-color: var(--color-bg-secondary);
     }
 
     &:disabled {
@@ -94,7 +94,7 @@
     display: flex;
     gap: 5px;
     padding: 0;
-    border-radius: $radius;
+    border-radius: var(--radius-x2);
     user-select: none;
   }
 }

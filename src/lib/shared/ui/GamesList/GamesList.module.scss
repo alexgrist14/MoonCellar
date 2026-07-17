@@ -2,7 +2,7 @@
   &__royal {
     display: grid;
     justify-items: flex-start;
-    gap: 20px;
+    gap: var(--gap-x5);
   }
 
   &__games {
@@ -19,7 +19,7 @@
     padding: 0px;
 
     & > a {
-      color: $whiteTextColor;
+      color: var(--color-neutral-100);
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;

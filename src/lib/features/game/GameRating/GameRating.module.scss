@@ -3,7 +3,7 @@
   height: fit-content;
   width: 80%;
   margin-inline: auto;
-  border-radius: $radius;
+  border-radius: var(--radius-x2);
   overflow: hidden;
   position: relative;
   transition: opacity 0.3s;
@@ -14,7 +14,7 @@
   }
 
   &__number {
-    background-color: $lightBg;
+    background-color: var(--color-bg-hover);
     cursor: pointer;
     width: 100%;
     height: auto;
@@ -22,7 +22,7 @@
     transition: 0.3s;
 
     &_active {
-      background-color: $accent;
+      background-color: var(--color-accent);
     }
   }
 }

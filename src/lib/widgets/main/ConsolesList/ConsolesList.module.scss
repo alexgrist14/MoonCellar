@@ -2,14 +2,14 @@
   &__list {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: var(--gap-x5);
   }
 
   &__groups {
     display: flex;
     flex-direction: column;
     width: fit-content;
-    gap: 20px;
+    gap: var(--gap-x5);
     width: 100%;
 
     @include mediaMax($screenGt) {

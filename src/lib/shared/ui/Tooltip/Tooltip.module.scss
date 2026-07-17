@@ -1,9 +1,9 @@
 .tooltip {
   @include font(13px, 16px, 600);
-  background-color: $bg;
-  border-radius: $radius;
+  background-color: var(--color-bg-primary);
+  border-radius: var(--radius-x2);
   padding: 10px;
-  color: $whiteTextColor;
+  color: var(--color-neutral-100);
   z-index: 1000;
   pointer-events: none;
   min-width: fit-content;

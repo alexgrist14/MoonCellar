@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import styles from "./GamePage.module.scss";
 import Image from "next/image";
 import { dateRegions } from "../../shared/constants";
@@ -16,7 +16,6 @@ import { BGImage } from "../../shared/ui/BGImage";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { IGameResponse } from "../../shared/lib/schemas/games.schema";
 import { useCommonStore } from "../../shared/store/common.store";
-import { filesAPI } from "../../shared/api/files.api";
 import { formatHltbHours } from "../../shared/utils/hltb.utils";
 
 export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
@@ -24,8 +23,6 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
   const { systems } = useCommonStore();
 
   const [isLoading, setIsLoading] = useState<boolean>(!!game.cover);
-  const [screenshots, setScreenshots] = useState<string[]>([]);
-  const [artworks, setArtworks] = useState<string[]>([]);
 
   const { isMastered, isBeaten } = useMemo(() => {
     const mastered = profile?.raAwards?.filter(
@@ -61,31 +58,6 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
 
     return rows.length ? rows : null;
   }, [game.hltb]);
-
-  useEffect(() => {
-    filesAPI
-      .getBucketKeys("mooncellar-screenshots", game.slug + "/")
-      .then((res) => {
-        const urls = res.data.map(
-          (key) =>
-            process.env.NEXT_PUBLIC_S3_HOST?.replace(
-              "%bucket",
-              "mooncellar-screenshots"
-            ) + key
-        );
-        setScreenshots(urls);
-      });
-
-    filesAPI
-      .getBucketKeys("mooncellar-artworks", game.slug + "/")
-      .then((res) => {
-        const urls = res.data.map(
-          (key) =>
-            process.env.NEXT_PUBLIC_S3_HOST?.replace("%bucket", "mooncellar-artworks") + key
-        );
-        setArtworks(urls);
-      });
-  }, [game.slug]);
 
   if (!game) return null;
 
@@ -254,16 +226,16 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
               <p>{game.storyline}</p>
             </div>
           )}
-          {!!screenshots?.length && (
+          {!!game.screenshots?.length && (
             <div className={styles.page__screenshots}>
               <h4>Screenshots:</h4>
-              <Slideshow pictures={screenshots} />
+              <Slideshow pictures={game.screenshots} />
             </div>
           )}
-          {!!artworks?.length && (
+          {!!game.artworks?.length && (
             <div className={styles.page__screenshots}>
               <h4>Artworks:</h4>
-              <Slideshow pictures={artworks} />
+              <Slideshow pictures={game.artworks} />
             </div>
           )}
           <div className={styles.page__bottom}>

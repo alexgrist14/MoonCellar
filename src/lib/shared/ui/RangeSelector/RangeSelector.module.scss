@@ -4,7 +4,7 @@ $height: 20px;
   display: grid;
   gap: 2px;
   align-items: center;
-  padding-inline: 8px;
+  padding-inline: var(--padding-x2);
   color: $textColor;
   user-select: none;
   width: 100%;
@@ -12,7 +12,7 @@ $height: 20px;
 
   &__text {
     grid-area: text;
-    color: $whiteTextColor;
+    color: var(--color-neutral-100);
     white-space: nowrap;
     text-align: center;
     @include font(12px, 15px, 500);
@@ -29,9 +29,9 @@ $height: 20px;
   display: flex;
   position: relative;
   width: 100%;
-  background-color: rgba($off, 1);
+  background-color: var(--color-negative);
   height: fit-content;
-  border: 1px solid rgba($off, 1);
+  border: 1px solid var(--color-negative);
   border-radius: 3px;
 
   &__input {
@@ -59,11 +59,11 @@ $height: 20px;
     transition: opacity 0.4s;
 
     &_accent {
-      background-color: $accent;
+      background-color: var(--color-accent);
     }
 
     &_green {
-      background-color: $on;
+      background-color: var(--color-positive);
     }
 
     &:hover,
@@ -80,13 +80,13 @@ $height: 20px;
     pointer-events: none;
 
     &_accent {
-      background-color: rgba($accent, 1);
-      outline: 1px solid rgba($accent, 1);
+      background-color: var(--color-accent);
+      outline: 1px solid var(--color-accent);
     }
 
     &_green {
-      background-color: rgba($on, 1);
-      outline: 1px solid rgba($on, 1);
+      background-color: var(--color-positive);
+      outline: 1px solid var(--color-positive);
     }
   }
 }

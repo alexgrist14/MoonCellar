@@ -10,7 +10,6 @@ import { ToastConnector } from "@/src/lib/shared/ui/Toast";
 import { useMediaStore } from "@/src/lib/shared/hooks/useMediaStore";
 import { CheckMobile } from "@/src/lib/shared/ui/CheckMobile";
 import { useAuthRefresh } from "@/src/lib/shared/hooks/useAuthRefresh";
-import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { useGetUserInfo } from "@/src/lib/features/user/model/user.hooks";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { gamesApi, userAPI } from "@/src/lib/shared/api";
@@ -23,8 +22,6 @@ import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 interface ILayoutProps {
   children: ReactNode;
   className?: string;
-  accessToken?: RequestCookie;
-  refreshToken?: RequestCookie;
 }
 
 const LAST_ONLINE_UPDATE_INTERVAL = 5 * 60 * 1000;
@@ -32,8 +29,6 @@ const LAST_ONLINE_UPDATE_INTERVAL = 5 * 60 * 1000;
 export const Layout: FC<ILayoutProps> = ({
   children,
   className,
-  refreshToken,
-  accessToken,
 }) => {
   const {
     setGenres,
@@ -52,7 +47,7 @@ export const Layout: FC<ILayoutProps> = ({
   const profile = useAuthStore((state) => state.profile);
   const lastUpdateRef = useRef<number>(0);
 
-  useAuthRefresh({ accessToken, refreshToken });
+  useAuthRefresh();
   useMediaStore();
   useGetUserInfo();
 

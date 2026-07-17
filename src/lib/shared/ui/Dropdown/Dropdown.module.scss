@@ -8,7 +8,7 @@
 .dropdown {
   display: flex;
   position: relative;
-  border-radius: $radius;
+  border-radius: var(--radius-x2);
   height: 40px;
   user-select: none;
   width: 100%;
@@ -29,7 +29,7 @@
   }
 
   &_active {
-    border-radius: $radius $radius 0 0;
+    border-radius: var(--radius-x2) var(--radius-x2) 0 0;
     overflow: visible;
   }
 
@@ -45,7 +45,7 @@
   &__search {
     @include flexCenter;
     padding: 10px 5px;
-    background-color: $lightBg;
+    background-color: var(--color-bg-hover);
 
     &_active {
       pointer-events: all;
@@ -57,15 +57,15 @@
       font-size: 14px;
       line-height: 16px;
       padding: 5px;
-      background-color: $bg;
+      background-color: var(--color-bg-primary);
       width: calc(100% - 10px);
-      border-radius: $radius;
+      border-radius: var(--radius-x2);
       border: 2px solid $blackBorderColor;
-      color: $whiteTextColor;
+      color: var(--color-neutral-100);
     }
 
     &::placeholder {
-      color: $whiteTextColor;
+      color: var(--color-neutral-100);
     }
   }
 
@@ -75,14 +75,14 @@
     overflow: hidden;
     border: none;
     outline: none;
-    color: $whiteTextColor;
+    color: var(--color-neutral-100);
   }
 
   &__field {
     display: grid;
     align-items: center;
     width: 100%;
-    border-radius: $radius;
+    border-radius: var(--radius-x2);
     border-bottom: 2px solid $blackBorderColor;
     padding-left: 10px;
     font-size: 15px;
@@ -92,12 +92,12 @@
     transition: 0.2s;
     height: inherit;
     max-height: inherit;
-    color: $whiteTextColor;
-    background-color: $bg;
+    color: var(--color-neutral-100);
+    background-color: var(--color-bg-primary);
     text-align: left;
 
     &_exists {
-      border-color: $accent;
+      border-color: var(--color-accent);
     }
 
     &_compact {
@@ -105,19 +105,19 @@
     }
 
     &_red {
-      border-color: rgba($off, 1);
+      border-color: var(--color-negative);
     }
 
     &_green {
-      border-color: rgba($on, 1);
+      border-color: var(--color-positive);
     }
 
     &_active {
-      // border-radius: $radius $radius 0 0;
+      // border-radius: var(--radius-x2) var(--radius-x2) 0 0;
     }
 
     &_overflow {
-      border-radius: $radius;
+      border-radius: var(--radius-x2);
       z-index: unset;
     }
 
@@ -139,7 +139,7 @@
     }
 
     & path {
-      fill: $whiteTextColor;
+      fill: var(--color-neutral-100);
     }
   }
 
@@ -153,7 +153,7 @@
     cursor: pointer;
 
     & path {
-      fill: $whiteTextColor;
+      fill: var(--color-neutral-100);
     }
 
     &_active {
@@ -176,21 +176,21 @@
     overflow: hidden;
     transform-origin: top;
     pointer-events: none;
-    border-radius: $radius;
+    border-radius: var(--radius-x2);
     z-index: 2;
-    border: 2px solid $accent;
+    border: 2px solid var(--color-accent);
 
     &_red {
-      border-color: $off;
+      border-color: var(--color-negative);
     }
 
     &_green {
-      border-color: $on;
+      border-color: var(--color-positive);
     }
 
     &_overflow {
       border-width: 2px;
-      border-radius: $radius;
+      border-radius: var(--radius-x2);
     }
 
     &_active {
@@ -204,7 +204,7 @@
     pointer-events: none;
     height: fit-content;
     visibility: hidden;
-    background-color: $lightBg;
+    background-color: var(--color-bg-hover);
 
     &_active {
       pointer-events: all;
@@ -222,11 +222,11 @@
     font-size: 13px;
     line-height: 15px;
     letter-spacing: 0.04em;
-    color: $whiteTextColor;
+    color: var(--color-neutral-100);
     height: fit-content;
     white-space: normal;
     word-break: break-word;
-    background-color: $lightBg;
+    background-color: var(--color-bg-hover);
     gap: 10px;
 
     & > span {
@@ -249,8 +249,8 @@
   }
 
   &__image {
-    border: 2px solid $accent;
-    border-radius: $radius;
+    border: 2px solid var(--color-accent);
+    border-radius: var(--radius-x2);
     overflow: hidden;
     aspect-ratio: 1;
     width: 100%;

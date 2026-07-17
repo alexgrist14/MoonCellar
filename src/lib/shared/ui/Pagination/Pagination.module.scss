@@ -3,9 +3,9 @@
   gap: 3px;
   align-items: center;
   margin-inline: auto;
-  padding: 2px;
-  background-color: $bgAlt;
-  border-radius: $radius;
+  padding: var(--padding-x05);
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--radius-x2);
   filter: drop-shadow(0 0 0.2rem $blackBorderColor);
 
   &_disabled {
@@ -20,7 +20,7 @@
     transform: translateX(-50%);
     z-index: 2;
     bottom: 0;
-    border-radius: $radius $radius 0 0;
+    border-radius: var(--radius-x2) var(--radius-x2) 0 0;
   }
 
   &__input {

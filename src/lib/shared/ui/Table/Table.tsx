@@ -1,10 +1,12 @@
+import { SvgArrow, SvgResize } from "@/src/lib/shared/ui/svg";
 import styles from "./Table.module.scss";
+import { ITableHeaders, ITableRows } from "@/src/lib/shared/types/table.type";
 import classNames from "classnames";
 import { CSSProperties, useEffect, useMemo, useRef, useState } from "react";
-import { SvgArrow } from "@/src/lib/shared/ui/svg";
 import { Loader } from "@/src/lib/shared/ui/Loader";
-import { ITableHeaders, ITableRows } from "@/src/lib/shared/types/table.type";
-import { PaginationClient } from "../PaginationClient";
+import { useStatesStore } from "@/src/lib/shared/store/states.store";
+import { MobileTable } from "@/src/lib/shared/ui/MobileTable";
+import { PaginationClient } from "@/src/lib/shared/ui/PaginationClient";
 
 interface ITableProps<T> {
   id?: string;
@@ -14,6 +16,8 @@ interface ITableProps<T> {
   initialSortingKey?: keyof T;
   initialSortingOrder?: "asc" | "desc";
   isLoading?: boolean;
+  mobileHeadField?: keyof T;
+  isWithoutMobileSorting?: boolean;
   limit?: number;
   sortingCallback?: (key: keyof T, order: "asc" | "desc") => void;
 }
@@ -26,9 +30,13 @@ export const Table = <T extends object>({
   initialSortingKey,
   initialSortingOrder,
   isLoading,
+  mobileHeadField,
+  isWithoutMobileSorting,
   limit,
   sortingCallback,
 }: ITableProps<T>) => {
+  const { isMobile } = useStatesStore();
+
   const [sortingKey, setSortingKey] = useState<keyof T | undefined>(
     initialSortingKey
   );
@@ -45,6 +53,7 @@ export const Table = <T extends object>({
 
   const keys = useMemo(() => {
     const keys = Object.keys(headers) as (keyof T)[];
+
     return keys;
   }, [headers]);
 
@@ -108,6 +117,25 @@ export const Table = <T extends object>({
     };
   });
 
+  if (isMobile && !!mobileHeadField) {
+    return (
+      <MobileTable
+        isLoading={isLoading}
+        isWithoutMobileSorting={isWithoutMobileSorting}
+        limit={limit}
+        initialSortingKey={initialSortingKey}
+        mobileHeadField={mobileHeadField}
+        rows={rows?.map((row) => ({
+          ...keys.reduce((res, key) => {
+            res[key].title = headers[key].content;
+
+            return res;
+          }, row),
+        }))}
+      />
+    );
+  }
+
   return (
     <div key={Object.keys(headers).join("_")} className={styles.wrapper}>
       {isInactive ? (
@@ -145,7 +173,7 @@ export const Table = <T extends object>({
 
                     return (
                       <div
-                        key={j}
+                        key={j + (cell.id || "")}
                         id={cell.id}
                         className={classNames(
                           j !== 0 &&
@@ -157,7 +185,9 @@ export const Table = <T extends object>({
                             styles.table__header_active,
                           dragIndex.current !== undefined &&
                             styles.table__header_drag,
-                          cell.className
+                          cell.className,
+                          !!cell.onClick ||
+                            (j === 0 && styles.table__header_clickable)
                         )}
                         style={{
                           ...cell.style,
@@ -167,32 +197,27 @@ export const Table = <T extends object>({
                           setHoveredRowIndex(j)
                         }
                         onMouseLeave={() => setHoveredRowIndex(undefined)}
-                      >
-                        <div
-                          className={classNames(styles.table__text, {
-                            [styles.table__text_clickable]:
-                              !!cell.onClick || j === 0,
-                          })}
-                          onClick={() => {
-                            if (j === 0) {
-                              if (sortingKey !== key) {
-                                setSortingKey(key);
-                                setSortingOrder("desc");
-                                sortingCallback?.(key, "desc");
-                              } else {
-                                setSortingOrder(
-                                  sortingOrder === "asc" ? "desc" : "asc"
-                                );
-                                sortingCallback?.(
-                                  sortingKey,
-                                  sortingOrder === "asc" ? "desc" : "asc"
-                                );
-                              }
+                        onClick={() => {
+                          if (j === 0) {
+                            if (sortingKey !== key) {
+                              setSortingKey(key);
+                              setSortingOrder("desc");
+                              sortingCallback?.(key, "desc");
+                            } else {
+                              setSortingOrder(
+                                sortingOrder === "asc" ? "desc" : "asc"
+                              );
+                              sortingCallback?.(
+                                sortingKey,
+                                sortingOrder === "asc" ? "desc" : "asc"
+                              );
                             }
+                          }
 
-                            !!cell.onClick && cell.onClick();
-                          }}
-                        >
+                          !!cell.onClick && cell.onClick();
+                        }}
+                      >
+                        <div className={classNames(styles.table__text)}>
                           {["string", "number"].includes(
                             typeof cell.content
                           ) ? (
@@ -218,6 +243,23 @@ export const Table = <T extends object>({
                             />
                           </div>
                         )}
+                        {!cell.isNotResizable && j === 0 && (
+                          <div
+                            className={styles.table__resizer}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                            }}
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+
+                              dragIndex.current = i;
+                            }}
+                          >
+                            <SvgResize />
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -226,12 +268,14 @@ export const Table = <T extends object>({
           )}
         </div>
       )}
-      <PaginationClient
-        page={page}
-        setPage={setPage}
-        take={take.current}
-        length={sortedRows?.length}
-      />
+      {!isLoading && (
+        <PaginationClient
+          page={page}
+          setPage={setPage}
+          take={take.current}
+          length={sortedRows?.length}
+        />
+      )}
     </div>
   );
 };

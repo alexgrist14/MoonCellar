@@ -41,9 +41,9 @@
     max-height: 40vh;
     padding: 14px 12px;
     outline: none;
-    border-radius: $radius;
-    background: $bg;
-    color: $whiteTextColor;
+    border-radius: var(--radius-x2);
+    background: var(--color-bg-primary);
+    color: var(--color-neutral-100);
     border: 2px solid transparent;
     transition: border 0.15s ease-out;
     scrollbar-width: none;
@@ -55,19 +55,19 @@
     }
 
     &::placeholder {
-      color: $placeholder;
+      color: var(--color-gray);
     }
 
     &:hover {
-      border-color: $borderColor;
+      border-color: var(--color-bg-hover);
     }
 
     &:focus {
-      border-color: $accent;
+      border-color: var(--color-accent);
     }
 
     &_error {
-      border-color: $off;
+      border-color: var(--color-negative);
     }
   }
 

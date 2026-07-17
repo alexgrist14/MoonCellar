@@ -6,16 +6,16 @@
   .banner {
     position: relative;
     background: $darkblueBg;
-    border-radius: $radius;
+    border-radius: var(--radius-x2);
     display: grid;
     grid-template-columns: 1fr 1fr;
-    padding: 48px;
+    padding: var(--padding-x12);
     width: 100%;
     overflow: hidden;
 
     &__text {
       @include flexColumnCenter;
-      gap: 20px;
+      gap: var(--gap-x5);
       align-items: flex-start;
     }
 
@@ -27,7 +27,7 @@
     }
 
     .text {
-      color: $neutral-70;
+      color: var(--color-neutral-70);
       font-size: clamp(1rem, 1.4vw, 1.2rem);
       line-height: 1.5;
     }
@@ -52,7 +52,7 @@
       position: absolute;
       width: clamp(150px, 17vw, 200px);
       height: clamp(210px, 24vw, 280px);
-      border-radius: 16px;
+      border-radius: var(--radius-x4);
       overflow: hidden;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
       transition: all 0.4s ease;
@@ -105,13 +105,13 @@
     &__groups {
       display: flex;
       flex-direction: column;
-      gap: 32px;
+      gap: var(--gap-x8);
     }
 
     &__quarter {
       font-size: clamp(1.05rem, 2vw, 1.3rem);
       font-weight: 600;
-      color: $neutral-90;
+      color: var(--color-neutral-90);
       margin-bottom: 14px;
     }
   }
@@ -123,15 +123,15 @@
 
     &__content {
       @include flexCenter;
-      gap: 20px;
+      gap: var(--gap-x5);
       justify-content: space-evenly;
       background: $darkblueBg;
-      border-radius: $radius;
-      padding: 20px;
+      border-radius: var(--radius-x2);
+      padding: var(--padding-x5);
       overflow: hidden;
 
       .text {
-        color: $neutral-100;
+        color: var(--color-neutral-100);
         font-size: clamp(1.125rem, 2.1vw, 26px);
         line-height: 1.5;
 
@@ -147,7 +147,7 @@
 
       .btn {
         width: 150px;
-        margin-top: 20px;
+        margin-top: var(--padding-x5);
         height: 35px;
       }
 
@@ -192,16 +192,16 @@
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
       width: 100%;
-      gap: 16px;
+      gap: var(--gap-x4);
     }
 
     &__card {
       @include flexColumnCenter;
-      border-radius: $radius;
+      border-radius: var(--radius-x2);
       width: 100%;
       min-width: 0;
       height: 150px;
-      padding: 32px 24px;
+      padding: var(--padding-x8) var(--padding-x6);
       background: $darkblueBg;
       transition: transform 0.3s ease;
 
@@ -237,15 +237,15 @@
     }
 
     &__count {
-      color: $neutral-80;
+      color: var(--color-neutral-80);
     }
   }
 
   @media (max-width: 1100px) {
-    gap: 40px;
+    gap: var(--gap-x10);
 
     .banner {
-      padding: 40px 32px;
+      padding: var(--padding-x10) var(--padding-x8);
     }
 
     .genre {
@@ -258,7 +258,7 @@
   @media (max-width: 900px) {
     .banner {
       grid-template-columns: 1fr;
-      gap: 28px;
+      gap: var(--gap-x7);
 
       &__text {
         align-items: center;
@@ -279,10 +279,10 @@
   }
 
   @media (max-width: 640px) {
-    gap: 32px;
+    gap: var(--gap-x8);
 
     .banner {
-      padding: 32px 20px;
+      padding: var(--padding-x8) var(--padding-x5);
     }
 
     .genre {
@@ -293,14 +293,14 @@
       &__card {
         height: auto;
         min-height: 120px;
-        padding: 24px 16px;
+        padding: var(--padding-x6) var(--padding-x4);
       }
     }
   }
 
   @media (max-width: 420px) {
     .banner {
-      padding: 28px 16px;
+      padding: var(--padding-x7) var(--padding-x4);
 
       .games__stack {
         width: 190px;
@@ -354,14 +354,14 @@
     align-items: center;
     gap: 10px;
     font-size: clamp(1.5rem, 3vw, 2rem);
-    margin-bottom: 20px;
+    margin-bottom: var(--padding-x5);
 
     &:before {
       content: " ";
       width: 4px;
       height: 24px;
-      background: $accent;
-      border-radius: $radius;
+      background: var(--color-accent);
+      border-radius: var(--radius-x2);
     }
   }
 }

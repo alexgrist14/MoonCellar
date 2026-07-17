@@ -1,7 +1,7 @@
 .wrapper {
   display: grid;
   // grid-template-columns: 1fr 40px;
-  gap: 20px;
+  gap: var(--gap-x5);
 }
 
 .modal {
@@ -11,14 +11,14 @@
   width: min(80vw, 400px);
   height: min(70vh, 500px);
   align-items: center;
-  gap: 20px;
+  gap: var(--gap-x5);
   min-height: 320px;
   min-width: 300px;
 
   &__bottom {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: var(--gap-x5);
     transition: opacity 0.3s;
     opacity: 0;
     pointer-events: none;
@@ -33,7 +33,7 @@
 
   &__top {
     display: flex;
-    gap: 20px;
+    gap: var(--gap-x5);
     align-items: center;
     width: 100%;
   }

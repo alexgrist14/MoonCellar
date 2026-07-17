@@ -1,6 +1,6 @@
 .plays {
   display: grid;
-  gap: 20px;
+  gap: var(--gap-x5);
   min-width: 250px;
 
   &__play {

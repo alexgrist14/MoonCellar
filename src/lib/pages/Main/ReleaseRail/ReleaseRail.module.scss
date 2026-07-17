@@ -1,12 +1,12 @@
 .rail {
   display: flex;
-  gap: 16px;
+  gap: var(--gap-x4);
   width: 100%;
-  padding-bottom: 12px;
+  padding-bottom: var(--padding-x3);
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: thin;
-  scrollbar-color: $neutral-55 transparent;
+  scrollbar-color: var(--color-neutral-55) transparent;
 
   &::-webkit-scrollbar {
     height: 8px;
@@ -17,11 +17,11 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: $neutral-55;
-    border-radius: 24px;
+    background-color: var(--color-neutral-55);
+    border-radius: var(--radius-x6);
 
     &:hover {
-      background-color: $neutral-60;
+      background-color: var(--color-neutral-60);
     }
   }
 
@@ -30,12 +30,12 @@
     width: clamp(140px, 22vw, 172px);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--gap-x2);
     align-items: center;
   }
 
   &__date {
-    color: $neutral-80;
+    color: var(--color-neutral-80);
     font-size: 0.85rem;
     text-align: center;
   }

@@ -22,7 +22,7 @@
   animation: popup-appearance 0.3s;
 
   @include mediaMax($screenSm) {
-    padding: 8px;
+    padding: var(--padding-x2);
   }
 
   &__content {

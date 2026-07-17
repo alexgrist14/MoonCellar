@@ -1,10 +1,10 @@
 .container {
   display: flex;
   flex-direction: column;
-  background: $bg;
+  background: var(--color-bg-primary);
   width: 250px;
   height: fit-content;
-  border-radius: $radius;
+  border-radius: var(--radius-x2);
   .img {
     width: 250px;
     height: 300px;
@@ -14,18 +14,18 @@
   }
   h2 {
     padding: 10px;
-    color: $whiteTextColor;
+    color: var(--color-neutral-100);
   }
   button {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    color: $neutral-80;
-    border-radius: 0 0 $radius $radius;
+    color: var(--color-neutral-80);
+    border-radius: 0 0 var(--radius-x2) var(--radius-x2);
     height: 40px;
   }
   svg {
-    color: $neutral-90;
+    color: var(--color-neutral-90);
     width: 14px;
     height: 14px;
   }

@@ -1,8 +1,8 @@
 @mixin profileTitle {
   width: 100%;
   height: 30px;
-  border-radius: $radius;
-  background: $lightBgSecond;
+  border-radius: var(--radius-x2);
+  background: var(--color-bg-tertiary);
   font-size: 1.2rem;
   padding-left: 10px;
   padding-top: 3px;
@@ -21,7 +21,7 @@
   .friends {
     width: 400px;
     margin-top: 10px;
-    border-radius: $radius;
+    border-radius: var(--radius-x2);
 
     @include mediaMax(1380px) {
       width: 100%;
@@ -45,7 +45,7 @@
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: var(--gap-x5);
 
     @include mediaMd {
       justify-content: center;
@@ -54,7 +54,7 @@
     &__left {
       display: grid;
       grid-template-columns: 1fr auto;
-      gap: 20px;
+      gap: var(--gap-x5);
 
       @include mediaMd {
         justify-items: center;
@@ -65,7 +65,7 @@
     }
 
     &__info {
-      margin-bottom: 20px;
+      margin-bottom: var(--padding-x5);
     }
 
     &__name {
@@ -76,8 +76,8 @@
       margin-top: 10px;
       max-width: 450px;
       width: fit-content;
-      border-radius: $radius;
-      background-color: $lightBgSecond;
+      border-radius: var(--radius-x2);
+      background-color: var(--color-bg-tertiary);
       padding: 10px;
       white-space: pre-wrap;
       text-align: left;
@@ -93,11 +93,11 @@
       }
 
       li {
-        margin-left: 12px;
+        margin-left: var(--padding-x3);
         list-style: initial;
 
         a {
-          color: $gray;
+          color: var(--color-gray);
 
           &:hover {
             text-decoration: underline;
@@ -107,10 +107,10 @@
     }
 
     &__stats {
-      margin-top: 20px;
+      margin-top: var(--padding-x5);
 
       &__title {
-        border-bottom: 1px solid $lightBg;
+        border-bottom: 1px solid var(--color-bg-hover);
       }
 
       &__list {
@@ -125,7 +125,7 @@
           transition: 0.2s all;
 
           &:hover {
-            color: $accent;
+            color: var(--color-accent);
           }
         }
       }
@@ -140,7 +140,7 @@
 
       .image {
         object-fit: cover;
-        border-radius: $radius;
+        border-radius: var(--radius-x2);
       }
 
       .btn {
@@ -151,18 +151,18 @@
 
   @include mediaMd {
     margin-top: -55px;
-    gap: 20px;
+    gap: var(--gap-x5);
   }
 }
 
 .content__bottom {
   flex-direction: column;
-  margin-top: 20px;
+  margin-top: var(--padding-x5);
 
   @include flexCenter;
 
   .activity {
-    margin-top: 20px;
+    margin-top: var(--padding-x5);
     width: 100%;
     position: relative;
     min-height: 300px;
@@ -175,8 +175,8 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       justify-content: space-between;
-      margin-top: 20px;
-      gap: 20px;
+      margin-top: var(--padding-x5);
+      gap: var(--gap-x5);
       flex-wrap: wrap;
 
       @include mediaGt {
@@ -193,7 +193,7 @@
       gap: 30px;
 
       &__img {
-        border-radius: $radius;
+        border-radius: var(--radius-x2);
 
         &>img {
           max-height: calc(240px / $coverRatio);
@@ -215,7 +215,7 @@
           }
 
           &:nth-child(2) {
-            color: $neutral-90;
+            color: var(--color-neutral-90);
           }
         }
       }
@@ -224,9 +224,9 @@
 }
 
 .date {
-  color: $gray;
+  color: var(--color-gray);
 
   span {
-    color: $whiteTextColor;
+    color: var(--color-neutral-100);
   }
 }

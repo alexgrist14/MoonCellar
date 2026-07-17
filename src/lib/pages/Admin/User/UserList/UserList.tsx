@@ -1,6 +1,6 @@
 import { adminUsersApi } from "@/src/lib/shared/api";
 import { FC, useCallback, useEffect, useId, useState } from "react";
-import { Table } from "../../ui/Table";
+import { Table } from "@/src/lib/shared/ui/Table";
 import { SvgProfile } from "@/src/lib/shared/ui/svg";
 import Image from "next/image";
 import styles from "./UserList.module.scss";

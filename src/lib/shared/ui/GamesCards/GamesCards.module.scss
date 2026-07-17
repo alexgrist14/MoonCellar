@@ -17,7 +17,7 @@
 
   div &__scrollbar {
     margin-right: -12px;
-    margin-block: 12px;
+    margin-block: var(--padding-x3);
     height: calc(100% - 24px);
 
     @include mediaMd {

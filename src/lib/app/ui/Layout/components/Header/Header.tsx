@@ -17,7 +17,7 @@ import { ButtonColor } from "@/src/lib/shared/ui/Button";
 export const Header: FC = () => {
   const { isMobile } = useStatesStore();
 
-  const { isAuth, profile } = useAuthStore();
+  const { isAuth, isAdmin, profile } = useAuthStore();
 
   const handleProfileClick = (e: MouseEvent<HTMLAnchorElement>) => {
     if (!isAuth || !profile) {
@@ -53,7 +53,7 @@ export const Header: FC = () => {
           link: "/gauntlet",
           color: ButtonColor.TRANSPARENT,
         },
-        profile?.roles?.includes("admin") && {
+        isAdmin && {
           title: (
             <>
               <SvgAdmin className={styles.svg} />
@@ -74,7 +74,7 @@ export const Header: FC = () => {
           color: ButtonColor.TRANSPARENT,
         },
       ].filter(Boolean) as IButtonGroupItem[],
-    [isMobile, profile?.roles]
+    [isMobile, isAdmin]
   );
 
   return (

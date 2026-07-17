@@ -1,7 +1,7 @@
 .container {
   display: grid;
   grid-template-columns: 1fr min-content;
-  color: $whiteTextColor;
+  color: var(--color-neutral-100);
   justify-content: center;
   margin-top: 5px;
   gap: 10px;
@@ -11,10 +11,10 @@
   }
 
   .content {
-    padding: 20px;
+    padding: var(--padding-x5);
     width: 100%;
     min-height: calc(100vh - 155px);
-    border-radius: $radius;
+    border-radius: var(--radius-x2);
 
     @include mediaMd {
       padding: 10px;

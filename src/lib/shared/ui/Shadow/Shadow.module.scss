@@ -1,5 +1,5 @@
 .shadow {
-  background: linear-gradient(to top, $bgAlt, transparent);
+  background: linear-gradient(to top, var(--color-bg-secondary), transparent);
   opacity: 0;
   bottom: 0;
   width: 100%;

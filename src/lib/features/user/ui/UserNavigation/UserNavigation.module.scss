@@ -11,18 +11,18 @@
   .btn {
     display: flex;
     justify-content: space-between;
-    border-radius: $radius;
+    border-radius: var(--radius-x2);
     gap: 10px;
-    color: $neutral-90;
+    color: var(--color-neutral-90);
 
     & > span:nth-child(2) {
-      color: $neutral-80;
+      color: var(--color-neutral-80);
     }
 
     div {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: var(--gap-x5);
 
       .avatar {
         width: 34px;
@@ -30,19 +30,19 @@
 
         div {
           img {
-            border-radius: $radius;
+            border-radius: var(--radius-x2);
           }
         }
       }
       svg {
-        color: $neutral-80;
+        color: var(--color-neutral-80);
       }
     }
   }
 
   .last {
-    color: $neutral-80;
-    border-top: 1px solid $lightBg;
+    color: var(--color-neutral-80);
+    border-top: 1px solid var(--color-bg-hover);
     div {
       display: flex;
       width: 100%;

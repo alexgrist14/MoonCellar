@@ -1,7 +1,7 @@
 .checkbox {
   width: 18px;
   aspect-ratio: 1;
-  background-color: $bg;
+  background-color: var(--color-bg-primary);
   border: 2px solid $textColor;
   border-radius: 50%;
   cursor: pointer;
@@ -10,25 +10,25 @@
 
   &__border {
     &_on {
-      border-color: $on;
+      border-color: var(--color-positive);
     }
 
     &_off {
-      border-color: $off;
+      border-color: var(--color-negative);
     }
   }
 
   &_accent {
-    background-color: $accent;
+    background-color: var(--color-accent);
   }
 
   &_on {
-    background-color: $on;
+    background-color: var(--color-positive);
     border-color: $textColor;
   }
 
   &_off {
-    background-color: $off;
+    background-color: var(--color-negative);
     border-color: $textColor;
   }
 

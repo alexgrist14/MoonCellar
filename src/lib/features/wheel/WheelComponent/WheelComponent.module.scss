@@ -10,7 +10,7 @@
   width: 100%;
   padding: 10px;
   overflow: hidden;
-  filter: drop-shadow(0 0 0.4rem $accent);
+  filter: drop-shadow(0 0 0.4rem var(--color-accent));
   border-radius: 50%;
 
   @include mediaLg {

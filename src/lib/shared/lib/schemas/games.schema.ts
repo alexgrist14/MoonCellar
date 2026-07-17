@@ -9,6 +9,21 @@ export const IGDBSchema = z.object({
   gameId: z.number(),
   total_rating: z.number().optional(),
   total_rating_count: z.number().optional(),
+  hypes: z.number().optional(),
+  screenshotsCount: z.number().optional(),
+  artworksCount: z.number().optional(),
+  genres: z.number().array().optional(),
+  keywords: z.number().array().optional(),
+  themes: z.number().array().optional(),
+  modes: z.number().array().optional(),
+  websites: z.number().array().optional(),
+  release_dates: z.number().array().optional(),
+  platforms: z.number().array().optional(),
+  involved_companies: z.number().array().optional(),
+  game_type: z.number().optional(),
+  cover: z.number().array().optional(),
+  screenshots: z.number().array().optional(),
+  artworks: z.number().array().optional(),
 });
 
 export const HltbSchema = z.object({
@@ -16,6 +31,22 @@ export const HltbSchema = z.object({
   mainStory: z.number().nullable().optional(),
   mainExtra: z.number().nullable().optional(),
   completionist: z.number().nullable().optional(),
+  allStyles: z.number().nullable().optional(),
+  coop: z.number().nullable().optional(),
+  multiplayer: z.number().nullable().optional(),
+  mainStoryCount: z.number().nullable().optional(),
+  mainExtraCount: z.number().nullable().optional(),
+  completionistCount: z.number().nullable().optional(),
+  allStylesCount: z.number().nullable().optional(),
+  coopCount: z.number().nullable().optional(),
+  multiplayerCount: z.number().nullable().optional(),
+  reviewScore: z.number().nullable().optional(),
+  imageUrl: z.string().nullable().optional(),
+  platforms: z.string().array().optional(),
+  releaseYear: z.number().nullable().optional(),
+  similarity: z.number().nullable().optional(),
+  alias: z.string().nullable().optional(),
+  type: z.string().nullable().optional(),
   sourceName: z.string().optional(),
   updatedAt: z.string(),
 });
@@ -58,8 +89,8 @@ export const GameSchema = z.object({
   genres: z.string().array().optional(),
   keywords: z.string().array().optional(),
   themes: z.string().array().optional(),
-  // screenshots: z.string().array().optional(),
-  // artworks: z.string().array().optional(),
+  screenshots: z.string().array().optional(),
+  artworks: z.string().array().optional(),
   companies: CompanySchema.array().optional(),
   websites: z.string().array().optional(),
   first_release: z.number().optional(),
@@ -67,6 +98,9 @@ export const GameSchema = z.object({
   platformIds: z.string().array(),
   rating: z.number().optional(),
   ratingCount: z.number().optional(),
+  averageRating: z.number().nullable().optional(),
+  isStopParsingPictures: z.boolean().default(false),
+  isCustom: z.boolean().default(false),
   retroachievements: RetroachievementsSchema.array().optional(),
   igdb: IGDBSchema.optional(),
   hltb: HltbSchema.optional(),
@@ -129,22 +163,19 @@ export const AddGameRequestSchema = GameSchema.omit({
   _id: true,
   updatedAt: true,
   createdAt: true,
+  averageRating: true,
+  isCustom: true,
 });
 
 export const UpdateGameRequestSchema = GameSchema.omit({
   _id: true,
   updatedAt: true,
   createdAt: true,
-});
+  averageRating: true,
+  isCustom: true,
+}).partial();
 
 export const GetCustomGameResponseSchema = GameSchema.array();
-
-export const UpcomingReleaseGroupSchema = z.object({
-  label: z.string(),
-  year: z.number(),
-  quarter: z.number(),
-  games: GameSchema.array(),
-});
 
 export type IRetroachievementsField = z.infer<typeof RetroachievementsSchema>;
 export type IGDBField = z.infer<typeof IGDBSchema>;
@@ -161,7 +192,3 @@ export type IGetGameBySlugRequest = z.infer<typeof GetGameBySlugSchema>;
 export type IGetGamesByIdsRequest = z.infer<typeof GetGamesByIdsSchema>;
 
 export type IGameResponse = z.infer<typeof GameSchema>;
-
-export type IUpcomingReleaseGroup = z.infer<typeof UpcomingReleaseGroupSchema>;
-
-export type IGenreResponse = { genre: string; count: number };

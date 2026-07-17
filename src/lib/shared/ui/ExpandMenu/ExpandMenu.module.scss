@@ -1,4 +1,4 @@
-$border: 2px solid $borderColor;
+$border: 2px solid var(--color-bg-hover);
 
 .wrapper {
   display: grid;
@@ -93,19 +93,19 @@ $border: 2px solid $borderColor;
   }
 
   &_left {
-    border-radius: 0 0 $radius 0;
+    border-radius: 0 0 var(--radius-x2) 0;
   }
 
   &_right {
-    border-radius: 0 0 0 $radius;
+    border-radius: 0 0 0 var(--radius-x2);
   }
 
   &_bottom-left {
-    border-radius: 0 $radius 0 0;
+    border-radius: 0 var(--radius-x2) 0 0;
   }
 
   &_bottom-right {
-    border-radius: $radius 0 0 0;
+    border-radius: var(--radius-x2) 0 0 0;
   }
 
   &_bottom {
@@ -123,13 +123,13 @@ $border: 2px solid $borderColor;
   div &__content {
     display: grid;
     margin: 0;
-    padding: 20px;
+    padding: var(--padding-x5);
     max-height: 100%;
   }
 
   div &__scrollbar {
     margin-right: 5px;
-    margin-block: 60px;
+    margin-block: var(--padding-x15);
     height: calc(100% - 80px);
   }
 }

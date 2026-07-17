@@ -8,7 +8,7 @@
   background-repeat: no-repeat;
   z-index: 0;
   opacity: 1;
-  border-radius: $radius;
+  border-radius: var(--radius-x2);
   animation: moving 60s linear infinite;
   @keyframes moving {
     0% {

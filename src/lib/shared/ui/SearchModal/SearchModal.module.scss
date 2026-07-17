@@ -1,12 +1,12 @@
 .modal {
   display: grid;
   grid-template-rows: auto 1fr min-content;
-  gap: 8px;
+  gap: var(--gap-x2);
   flex-direction: column;
-  padding: 20px;
-  background-color: $bgAlt;
+  padding: var(--padding-x5);
+  background-color: var(--color-bg-secondary);
   width: 85vw;
-  border-radius: $radius;
+  border-radius: var(--radius-x2);
   position: fixed;
   top: 50%;
   left: 50%;
@@ -45,7 +45,7 @@
 
     & button {
       width: 100%;
-      border-radius: $radius;
+      border-radius: var(--radius-x2);
     }
   }
 
@@ -53,7 +53,7 @@
     @include flexCenter;
     position: absolute;
     @include positionCenter;
-    padding-top: 20px;
+    padding-top: var(--padding-x5);
     animation: appearOpacity 0.4s ease forwards 1;
   }
 
@@ -62,7 +62,7 @@
     right: 5px;
 
     & button {
-      border-radius: $radius;
+      border-radius: var(--radius-x2);
     }
   }
 }

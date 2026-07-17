@@ -5,14 +5,14 @@
 
   .sort {
     display: flex;
-    background-color: $neutral-10;
+    background-color: var(--color-neutral-10);
     justify-content: center;
     padding-left: 10px;
     align-items: center;
     max-width: 200px;
     user-select: none;
     margin-bottom: 10px;
-    border-radius: $radius;
+    border-radius: var(--radius-x2);
     gap: 10px;
     cursor: pointer;
     &__icon {
@@ -39,7 +39,7 @@
     align-content: flex-start;
     gap: 2px;
     flex-direction: column;
-    border-radius: $radius;
+    border-radius: var(--radius-x2);
     overflow: hidden;
     align-content: center;
 
@@ -57,7 +57,7 @@
     transition: 0.3s;
 
     &:hover {
-      color: $blue;
+      color: var(--color-blue);
     }
   }
 
@@ -67,7 +67,7 @@
 
   &__icon {
     @include flexCenter;
-    padding: 2px;
+    padding: var(--padding-x05);
     width: 100%;
     transition: 0.3s;
     aspect-ratio: 1;
@@ -81,11 +81,11 @@
   &__number {
     width: auto;
     height: 100%;
-    background-color: $accent;
+    background-color: var(--color-accent);
     border-radius: 50%;
 
     & path {
-      fill: $whiteTextColor;
+      fill: var(--color-neutral-100);
     }
   }
 

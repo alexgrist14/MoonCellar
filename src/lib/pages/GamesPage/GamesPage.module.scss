@@ -1,6 +1,6 @@
 .page {
   &__more {
-    border-radius: $radius;
+    border-radius: var(--radius-x2);
     position: relative;
   }
 

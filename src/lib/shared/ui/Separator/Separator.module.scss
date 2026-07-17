@@ -1,8 +1,8 @@
 .separator {
   width: 2px;
-  border-radius: $radius;
+  border-radius: var(--radius-x2);
   height: 100%;
-  background-color: $lightBg;
+  background-color: var(--color-bg-hover);
 
   &_horizontal {
     height: 2px;

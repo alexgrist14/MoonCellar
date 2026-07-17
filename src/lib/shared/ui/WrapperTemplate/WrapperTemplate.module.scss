@@ -1,14 +1,14 @@
 .template {
   display: flex;
   flex-direction: column;
-  border-radius: $radius;
+  border-radius: var(--radius-x2);
   width: 100%;
   height: fit-content;
   max-width: calc(100vw - 40px);
   margin-inline: auto;
   background: rgba($wrapperBGColor, 0.8);
   box-shadow: $shadowBorder;
-  color: $wrapperTextColor;
+  color: var(--color-neutral-100);
 
   @include mediaSm {
     max-width: 100%;
@@ -22,11 +22,11 @@
 
   &__title {
     display: flex;
-    gap: 20px;
+    gap: var(--gap-x5);
     align-items: flex-end;
     padding: 5px;
-    border-bottom: 1px solid $wrapperBorderColor;
-    border-radius: $radius $radius 0 0;
+    border-bottom: 1px solid var(--color-bg-primary);
+    border-radius: var(--radius-x2) var(--radius-x2) 0 0;
 
     &:only-child {
       width: fit-content;
@@ -34,13 +34,13 @@
     }
 
     @include mediaMax($screenSm) {
-      padding-inline: 16px;
+      padding-inline: var(--padding-x4);
     }
 
     &_external {
       padding: 0;
       border: none;
-      color: $wrapperTextColor;
+      color: var(--color-neutral-100);
       background-color: transparent;
     }
 
@@ -60,7 +60,7 @@
 
 .wrapper {
   display: grid;
-  gap: 8px;
+  gap: var(--gap-x2);
   width: 100%;
   height: fit-content;
 }

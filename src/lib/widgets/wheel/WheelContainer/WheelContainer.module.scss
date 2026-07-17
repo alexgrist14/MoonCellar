@@ -3,7 +3,7 @@
   padding: 15px 20px;
   grid-template-columns: 1.5fr 1fr;
   align-items: center;
-  gap: 20px;
+  gap: var(--gap-x5);
   height: 80vh;
 
   @include mediaMd {
@@ -16,7 +16,7 @@
   &__right {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: var(--gap-x5);
     height: 100%;
     padding: 10px;
     overflow: hidden;

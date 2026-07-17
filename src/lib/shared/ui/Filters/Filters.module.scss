@@ -1,10 +1,10 @@
 .filters {
   display: grid;
-  gap: 20px;
+  gap: var(--gap-x5);
   align-content: flex-start;
 
   &__buttons {
-    margin-top: 20px;
+    margin-top: var(--padding-x5);
   }
 
   &__button {
@@ -26,15 +26,15 @@
   &__line {
     height: 2px;
     width: 100%;
-    background-color: $whiteTextColor;
-    border-radius: $radius;
+    background-color: var(--color-neutral-100);
+    border-radius: var(--radius-x2);
     opacity: 0.7;
   }
 
   &__toggles {
     display: grid;
     gap: 10px;
-    margin-top: 20px;
+    margin-top: var(--padding-x5);
   }
 
   &__toggle {

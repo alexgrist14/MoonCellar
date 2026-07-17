@@ -17,7 +17,7 @@
     height: fit-content;
     width: 240px;
     padding: 0;
-    gap: 20px;
+    gap: var(--gap-x5);
   }
 
   &__hltb {
@@ -27,24 +27,24 @@
 
     & h4 {
       @include font(14px, 18px, 500);
-      color: $whiteTextColor;
+      color: var(--color-neutral-100);
     }
 
     & p {
       @include font(13px, 17px, 400);
-      color: $gray;
+      color: var(--color-gray);
     }
 
     & span {
       @include font(13px, 17px, 500);
-      color: $whiteTextColor;
+      color: var(--color-neutral-100);
     }
   }
 
   &__cover {
     aspect-ratio: 528/704;
     border-radius: var(--radius-x3);
-    background: $lightBg;
+    background: var(--color-bg-hover);
     width: 100%;
     overflow: hidden;
     position: relative;
@@ -66,7 +66,7 @@
 
     & a {
       @include font(14px, 18px, 400);
-      color: $gray;
+      color: var(--color-gray);
       width: fit-content;
 
       &:hover {
@@ -92,7 +92,7 @@
 
     & p {
       @include font(14px, 18px, 400);
-      color: $gray;
+      color: var(--color-gray);
     }
 
     & span {
@@ -106,12 +106,12 @@
 
     & span:not(.page__keywords) {
       @include font(16px, 20px, 500);
-      color: $whiteTextColor;
+      color: var(--color-neutral-100);
     }
 
     & p {
       @include font(14px, 18px, 400);
-      color: $gray;
+      color: var(--color-gray);
     }
   }
 
@@ -138,8 +138,8 @@
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    background-color: $bg;
-    border: 2px solid $lightBg;
+    background-color: var(--color-bg-primary);
+    border: 2px solid var(--color-bg-hover);
     padding: 3px;
     @include flexCenter;
 
@@ -148,18 +148,18 @@
       height: 100%;
       transition: 0.3s;
       & path {
-        fill: $gray;
+        fill: var(--color-gray);
       }
     }
 
     &_beaten,
     &_mastered {
-      filter: drop-shadow(0 0 0.2rem $accent);
+      filter: drop-shadow(0 0 0.2rem var(--color-accent));
     }
 
     &_beaten {
       & svg path {
-        fill: $blue;
+        fill: var(--color-blue);
       }
     }
 

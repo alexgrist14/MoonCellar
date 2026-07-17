@@ -1,18 +1,18 @@
 .container {
   width: 100%;
-  background: $bg;
-  border-radius: $radius;
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-x2);
   border: 2px solid transparent;
-  padding: 8px;
+  padding: var(--padding-x2);
   transition: 0.3s;
 
   &:hover {
-    border-color: $borderColor;
+    border-color: var(--color-bg-hover);
   }
 
   &:has(input:focus),
   &:has(input:focus-visible) {
-    border-color: $accent;
+    border-color: var(--color-accent);
   }
 
   .input {
@@ -22,7 +22,7 @@
     @include textEllipsis;
 
     &::placeholder {
-      color: $placeholder;
+      color: var(--color-gray);
     }
   }
 }

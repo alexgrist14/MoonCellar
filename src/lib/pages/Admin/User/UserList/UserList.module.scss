@@ -1,6 +1,6 @@
 .container {
   display: flex;
-  gap: 20px;
+  gap: var(--gap-x5);
 
   .avatar {
     .image {
@@ -11,19 +11,19 @@
 
   .description {
     p {
-      color: $neutral-85;
+      color: var(--color-neutral-85);
     }
   }
 }
 
 .role {
   display: inline-block;
-  padding: 2px 8px;
+  padding: var(--padding-x05) var(--padding-x2);
   border-radius: 6px;
   font-size: 0.95em;
   margin-right: 6px;
-  background: $neutral-10;
-  color: $neutral-85;
+  background: var(--color-neutral-10);
+  color: var(--color-neutral-85);
 }
 
 .role_admin {
@@ -49,9 +49,9 @@
 .confirmModal {
   display: flex;
   flex-direction: column;
-  background-color: $bgAlt;
-  padding: 20px;
-  border-radius: $radius;
+  background-color: var(--color-bg-secondary);
+  padding: var(--padding-x5);
+  border-radius: var(--radius-x2);
   max-width: 400px;
 
   h3 {
