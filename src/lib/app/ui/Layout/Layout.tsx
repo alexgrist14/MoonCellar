@@ -98,11 +98,9 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
         type="absolute"
         fadeType="bottom"
       >
-        <Suspense fallback={<Loader type="moon" />}>
-          <main className={"container"} ref={ref}>
-            {children}
-          </main>
-        </Suspense>
+        <main className={"container"} ref={ref}>
+          {children}
+        </main>
       </Scrollbar>
       <ToastConnector />
       <ModalsConnector />

@@ -1,5 +1,7 @@
 import { GauntletPage } from "@/src/lib/pages/GauntletPage/GauntletPage";
 import { Metadata } from "next";
+import { Suspense } from "react";
+import { Loader } from "@/src/lib/shared/ui/Loader";
 
 export const metadata: Metadata = {
   title: "Gauntlet",
@@ -7,7 +9,11 @@ export const metadata: Metadata = {
 };
 
 const GauntletPageIndex = () => {
-  return <GauntletPage />;
+  return (
+    <Suspense fallback={<Loader type="moon" />}>
+      <GauntletPage />
+    </Suspense>
+  );
 };
 
 export default GauntletPageIndex;
