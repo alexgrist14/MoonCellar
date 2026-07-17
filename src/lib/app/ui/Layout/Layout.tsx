@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, ReactNode, useEffect, useRef } from "react";
+import { FC, ReactNode, Suspense, useEffect, useRef } from "react";
 import styles from "./Layout.module.scss";
 import { Header } from "./components";
 import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
@@ -18,6 +18,7 @@ import { ErrorHandler } from "@/src/lib/shared/ui/ErrorHandler";
 import classNames from "classnames";
 import { usePathname } from "next/navigation";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
+import { Loader } from "@/src/lib/shared/ui/Loader";
 
 interface ILayoutProps {
   children: ReactNode;
@@ -26,10 +27,7 @@ interface ILayoutProps {
 
 const LAST_ONLINE_UPDATE_INTERVAL = 5 * 60 * 1000;
 
-export const Layout: FC<ILayoutProps> = ({
-  children,
-  className,
-}) => {
+export const Layout: FC<ILayoutProps> = ({ children, className }) => {
   const {
     setGenres,
     setGameModes,
@@ -100,9 +98,11 @@ export const Layout: FC<ILayoutProps> = ({
         type="absolute"
         fadeType="bottom"
       >
-        <main className={"container"} ref={ref}>
-          {children}
-        </main>
+        <Suspense fallback={<Loader type="moon" />}>
+          <main className={"container"} ref={ref}>
+            {children}
+          </main>
+        </Suspense>
       </Scrollbar>
       <ToastConnector />
       <ModalsConnector />

@@ -99,8 +99,8 @@ export const GameSchema = z.object({
   rating: z.number().optional(),
   ratingCount: z.number().optional(),
   averageRating: z.number().nullable().optional(),
-  isStopParsingPictures: z.boolean().default(false),
-  isCustom: z.boolean().default(false),
+  isStopParsingPictures: z.boolean().optional(),
+  isCustom: z.boolean().optional(),
   retroachievements: RetroachievementsSchema.array().optional(),
   igdb: IGDBSchema.optional(),
   hltb: HltbSchema.optional(),
@@ -177,6 +177,13 @@ export const UpdateGameRequestSchema = GameSchema.omit({
 
 export const GetCustomGameResponseSchema = GameSchema.array();
 
+export const UpcomingReleaseGroupSchema = z.object({
+  label: z.string(),
+  year: z.number(),
+  quarter: z.number(),
+  games: GameSchema.array(),
+});
+
 export type IRetroachievementsField = z.infer<typeof RetroachievementsSchema>;
 export type IGDBField = z.infer<typeof IGDBSchema>;
 export type IHltbField = z.infer<typeof HltbSchema>;
@@ -192,3 +199,7 @@ export type IGetGameBySlugRequest = z.infer<typeof GetGameBySlugSchema>;
 export type IGetGamesByIdsRequest = z.infer<typeof GetGamesByIdsSchema>;
 
 export type IGameResponse = z.infer<typeof GameSchema>;
+
+export type IUpcomingReleaseGroup = z.infer<typeof UpcomingReleaseGroupSchema>;
+
+export type IGenreResponse = { genre: string; count: number };

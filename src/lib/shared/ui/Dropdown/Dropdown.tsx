@@ -304,6 +304,7 @@ export const Dropdown = memo(
           sortList(list.map((item, i) => ({ value: item, index: i })))
         );
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isActive]);
 
     useEffect(() => {
@@ -312,6 +313,7 @@ export const Dropdown = memo(
           sortList(list.map((item, i) => ({ value: item, index: i })))
         );
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [getSearchQuery, list]);
 
     useCloseEvents([dropdownRef], () => {

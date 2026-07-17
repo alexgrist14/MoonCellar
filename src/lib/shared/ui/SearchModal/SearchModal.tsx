@@ -56,6 +56,7 @@ export const SearchModal: FC = () => {
 
   useEffect(() => {
     isSearchActive && modal.close("search-games");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [asPath]);
 
   return (

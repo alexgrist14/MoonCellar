@@ -2,13 +2,21 @@ import { GamePage } from "@/src/lib/pages/GamePage";
 import { gamesApi } from "@/src/lib/shared/api";
 import { CheckMobile } from "@/src/lib/shared/ui/CheckMobile";
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
+
+const isValidSlug = (slug: string) => !slug.includes(".");
 
 export async function generateMetadata({
   params,
 }: {
   params: any;
 }): Promise<Metadata> {
-  const game = (await gamesApi.getBySlug({ slug: (await params).slug })).data;
+  const { slug } = await params;
+  if (!isValidSlug(slug)) {
+    notFound();
+  }
+
+  const game = (await gamesApi.getBySlug({ slug })).data;
 
   return {
     title: game.name,
@@ -31,7 +39,12 @@ export async function generateMetadata({
 }
 
 const GamePageIndex = async ({ params }: { params: any }) => {
-  const game = (await gamesApi.getBySlug({ slug: (await params).slug })).data;
+  const { slug } = await params;
+  if (!isValidSlug(slug)) {
+    notFound();
+  }
+
+  const game = (await gamesApi.getBySlug({ slug })).data;
 
   return (
     <CheckMobile>
