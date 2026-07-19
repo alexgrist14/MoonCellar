@@ -116,6 +116,13 @@ const updateDescription = (
   );
 };
 
+const updateSettings = (
+  userId: string,
+  settingsDto: { hideAdultContent: boolean }
+) => {
+  return agent.patch<IUser>(`${USER_URL}/settings/${userId}`, settingsDto);
+};
+
 const setRaUserInfo = (userId: string, raUserName: string) => {
   return agent.patch<IUser>(`${USER_URL}/ra/${userId}/${raUserName}`);
 };
@@ -143,4 +150,5 @@ export const userAPI = {
   removePreset,
   getPresets,
   updateUserTime,
+  updateSettings,
 };

@@ -17,12 +17,18 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { IGameResponse } from "../../shared/lib/schemas/games.schema";
 import { useCommonStore } from "../../shared/store/common.store";
 import { formatHltbHours } from "../../shared/utils/hltb.utils";
+import { useHideAdult } from "../../shared/hooks/useHideAdult";
+import { isAdultGame } from "../../shared/utils/adult.utils";
 
 export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
   const { isAuth, profile } = useAuthStore();
   const { systems } = useCommonStore();
 
-  const [isLoading, setIsLoading] = useState<boolean>(!!game.cover);
+  const hideMedia = useHideAdult() && isAdultGame(game);
+
+  const [isLoading, setIsLoading] = useState<boolean>(
+    !!game.cover && !hideMedia
+  );
 
   const { isMastered, isBeaten } = useMemo(() => {
     const mastered = profile?.raAwards?.filter(
@@ -88,7 +94,7 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
                 </div>
               )}
               {isLoading && <Loader />}
-              {!!game.cover ? (
+              {!!game.cover && !hideMedia ? (
                 <Image
                   onLoad={() => setIsLoading(false)}
                   key={game.cover}
@@ -226,13 +232,13 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
               <p>{game.storyline}</p>
             </div>
           )}
-          {!!game.screenshots?.length && (
+          {!hideMedia && !!game.screenshots?.length && (
             <div className={styles.page__screenshots}>
               <h4>Screenshots:</h4>
               <Slideshow pictures={game.screenshots} />
             </div>
           )}
-          {!!game.artworks?.length && (
+          {!hideMedia && !!game.artworks?.length && (
             <div className={styles.page__screenshots}>
               <h4>Artworks:</h4>
               <Slideshow pictures={game.artworks} />

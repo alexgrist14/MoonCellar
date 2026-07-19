@@ -12,6 +12,8 @@ import { Button } from "../../shared/ui/Button";
 import Link from "next/link";
 import { commonUtils } from "../../shared/utils/common.utils";
 import { ReleaseRail } from "./ReleaseRail";
+import { useHideAdult } from "../../shared/hooks/useHideAdult";
+import { isAdultGame } from "../../shared/utils/adult.utils";
 
 interface MainPageProps {
   games: {
@@ -23,6 +25,8 @@ interface MainPageProps {
 }
 
 export const MainPage: FC<MainPageProps> = ({ games }) => {
+  const hideAdult = useHideAdult();
+
   return (
     <div className={styles.container}>
       <div className={styles.banner}>
@@ -37,7 +41,7 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
           <div className={styles.games__stack}>
             {games.topRated.slice(0, 3).map((game) => (
               <div key={game._id} className={styles.game}>
-                {game.cover ? (
+                {game.cover && !(hideAdult && isAdultGame(game)) ? (
                   <Image
                     className={styles.game__image}
                     src={game.cover}

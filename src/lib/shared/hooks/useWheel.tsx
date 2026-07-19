@@ -4,6 +4,8 @@ import { IGameResponse } from "../lib/schemas/games.schema";
 import { useStatesStore } from "../store/states.store";
 import { useWheelStore } from "../store/wheel.store";
 import { useGames } from "./useGames";
+import { useHideAdult } from "./useHideAdult";
+import { isAdultGame } from "../utils/adult.utils";
 
 interface IDrawProps {
   images?: HTMLImageElement[];
@@ -23,6 +25,7 @@ export const useWheel = ({
   const { setWinner } = useWheelStore();
   const { setFinished, setLoading, setStarted, isRoyal } = useStatesStore();
   const { getIGDBGames } = useGames();
+  const hideAdult = useHideAdult();
 
   const drawWheel = useCallback(
     ({ wheelGames, winnerId, images }: IDrawProps) => {
@@ -148,17 +151,23 @@ export const useWheel = ({
     [contrastColor, primaryColor, fontFamily]
   );
 
-  const parseImages = useCallback(async (wheelGames: IGameResponse[]) => {
-    const queries: Promise<HTMLImageElement>[] = [];
+  const parseImages = useCallback(
+    async (wheelGames: IGameResponse[]) => {
+      const queries: Promise<HTMLImageElement>[] = [];
 
-    wheelGames.forEach((game) => {
-      const cover = !!game?.cover ? game.cover : "";
+      wheelGames.forEach((game) => {
+        const cover =
+          !!game?.cover && !(hideAdult && isAdultGame(game))
+            ? game.cover
+            : "";
 
-      queries.push(createImage(cover));
-    });
+        queries.push(createImage(cover));
+      });
 
-    return Promise.allSettled(queries);
-  }, []);
+      return Promise.allSettled(queries);
+    },
+    [hideAdult]
+  );
 
   const spinHandler = useCallback(
     (games: IGameResponse[]) => {

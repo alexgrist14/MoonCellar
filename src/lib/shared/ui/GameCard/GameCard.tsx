@@ -13,6 +13,8 @@ import { SvgMore } from "../svg";
 import Link from "next/link";
 import { useGamesStore } from "../../store/games.store";
 import { SvgCrown } from "../svg/SvgCrown";
+import { useHideAdult } from "../../hooks/useHideAdult";
+import { isAdultGame } from "../../utils/adult.utils";
 
 interface IGameCardProps {
   game: IGameResponse;
@@ -25,7 +27,9 @@ export const GameCard = memo(
   ({ game, className, style, spreadDirection = "width" }: IGameCardProps) => {
     const cardRef = useRef<HTMLDivElement>(null);
 
-    const [isLoading, setIsLoading] = useState(!!game.cover);
+    const hideMedia = useHideAdult() && isAdultGame(game);
+
+    const [isLoading, setIsLoading] = useState(!!game.cover && !hideMedia);
     const [isActive, setIsActive] = useState(false);
 
     const { parsedPlaythroughs, parsedRatings } = useUserStore();
@@ -94,7 +98,7 @@ export const GameCard = memo(
           {isActive && (
             <GameCardInfo game={game} playthroughs={filteredPlaythroughs} />
           )}
-          {!!game?.cover ? (
+          {!!game?.cover && !hideMedia ? (
             <Image
               onLoad={() => setIsLoading(false)}
               alt="Game cover"

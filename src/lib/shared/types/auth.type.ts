@@ -23,6 +23,7 @@ export interface IUser {
   roles?: string[];
   avatar: string;
   background?: string;
+  settings?: { hideAdultContent?: boolean };
 }
 
 export interface IAuthToken {

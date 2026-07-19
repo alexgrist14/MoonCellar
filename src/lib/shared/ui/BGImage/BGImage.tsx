@@ -5,6 +5,8 @@ import Image from "next/image";
 import { useDebouncedCallback } from "use-debounce";
 import { useSettingsStore } from "../../store/settings.store";
 import { IGameResponse } from "../../lib/schemas/games.schema";
+import { useHideAdult } from "../../hooks/useHideAdult";
+import { isAdultGame } from "../../utils/adult.utils";
 
 interface IBGImageProps {
   game?: IGameResponse;
@@ -14,6 +16,8 @@ interface IBGImageProps {
 export const BGImage = memo(
   ({ game, defaultImage = "/images/moon.jpg" }: IBGImageProps) => {
     const { bgOpacity } = useSettingsStore();
+
+    const hideMedia = useHideAdult() && isAdultGame(game);
 
     const [bg, setBg] = useState<string>(defaultImage);
     const [prev, setPrev] = useState<string>(defaultImage);
@@ -27,7 +31,7 @@ export const BGImage = memo(
     }, 300);
 
     useEffect(() => {
-      if (!game) return;
+      if (!game || hideMedia) return;
 
       const pictures: string[] = [];
 
@@ -48,7 +52,7 @@ export const BGImage = memo(
         setIsImageReady(false);
       }, 500);
       //eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [game]);
+    }, [game, hideMedia]);
 
     return (
       <div className={styles.wrapper}>

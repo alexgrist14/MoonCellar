@@ -5,6 +5,7 @@ import { ReactNode } from "react";
 import { polyfill } from "interweave-ssr";
 import { FaroInit } from "../lib/shared/ui/FaroInit";
 import { FaroRouteTracker } from "../lib/shared/ui/FaroRouteTracker";
+import { GeoInit } from "../lib/shared/ui/GeoInit";
 import "@/src/lib/app/styles/reset.scss";
 import "@/src/lib/app/styles/root.scss";
 
@@ -41,7 +42,7 @@ const pentagra = localFont({
 });
 polyfill();
 
-export default async function App({ children }: { children: ReactNode }) {
+export default function App({ children }: { children: ReactNode }) {
   return (
     <html>
       <head>
@@ -52,6 +53,7 @@ export default async function App({ children }: { children: ReactNode }) {
       </head>
       <body style={{ color: "white", background: "#191d24" }}>
         <FaroInit />
+        <GeoInit />
         <FaroRouteTracker />
         <Layout className={classNames(general.variable, pentagra.variable)}>
           {children}

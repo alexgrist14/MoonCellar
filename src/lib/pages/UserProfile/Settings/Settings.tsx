@@ -1,6 +1,7 @@
 import { userAPI } from "@/src/lib/shared/api";
 import { useAuth } from "@/src/lib/shared/hooks/auth";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
+import { useGeoStore } from "@/src/lib/shared/store/geo.store";
 import { useSettingsStore } from "@/src/lib/shared/store/settings.store";
 import AvatarSettings from "@/src/lib/shared/ui/AvatarSettings/AvatarSettings";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
@@ -21,8 +22,9 @@ import styles from "./Settings.module.scss";
 interface SettingsProps {}
 
 export const Settings: FC<SettingsProps> = ({}) => {
-  const { isAuth, profile } = useAuthStore();
+  const { isAuth, profile, setProfile } = useAuthStore();
   const { bgOpacity, setBgOpacity } = useSettingsStore();
+  const blockedCountry = useGeoStore((s) => s.blockedCountry);
 
   const { logout } = useAuth();
   const [userName, setUserName] = useState("");
@@ -30,6 +32,9 @@ export const Settings: FC<SettingsProps> = ({}) => {
   const [description, setDescription] = useState("");
   const [background, setBackground] = useState<File>();
   const [raUsername, setRaUserName] = useState("");
+  const [hideAdultContent, setHideAdultContent] = useState<boolean>(
+    !!profile?.settings?.hideAdultContent
+  );
   const bgInputRef = useRef<HTMLInputElement>(null);
 
   const handleLogout = (e: MouseEvent<HTMLButtonElement>) => {
@@ -59,9 +64,17 @@ export const Settings: FC<SettingsProps> = ({}) => {
       apiCalls.push(userAPI.setRaUserInfo(profile._id, raUsername));
     if (background)
       apiCalls.push(userAPI.addBackground(profile._id, background));
+    if (
+      !blockedCountry &&
+      hideAdultContent !== !!profile?.settings?.hideAdultContent
+    )
+      apiCalls.push(
+        userAPI.updateSettings(profile._id, { hideAdultContent })
+      );
 
     Promise.all(apiCalls).then(() => {
       toast.success({ description: "Saved successfully" });
+      userAPI.getById(profile._id).then((res) => setProfile(res.data));
     });
   };
   return (
@@ -155,6 +168,22 @@ export const Settings: FC<SettingsProps> = ({}) => {
           text={`Background opacity ${bgOpacity || 0}%`}
           step={1}
         />
+
+        <div className={styles.field}>
+          <label htmlFor="hideAdult">Hide 18+ content</label>
+          <input
+            id="hideAdult"
+            type="checkbox"
+            checked={blockedCountry ? true : hideAdultContent}
+            disabled={blockedCountry}
+            onChange={(e) => setHideAdultContent(e.target.checked)}
+          />
+          {blockedCountry && (
+            <span className={styles.currentFile}>
+              Enforced in your region
+            </span>
+          )}
+        </div>
 
         <div className={styles.field}>
           <label htmlFor="description">Description</label>

@@ -14,6 +14,8 @@ import { useAsyncLoader } from "@/src/lib/shared/hooks/useAsyncLoader";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { Cover } from "@/src/lib/shared/ui/Cover";
 import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
+import { useHideAdult } from "@/src/lib/shared/hooks/useHideAdult";
+import { isAdultGame } from "@/src/lib/shared/utils/adult.utils";
 
 interface UserInfoProps {
   user: IUser;
@@ -28,6 +30,8 @@ const UserInfo: FC<UserInfoProps> = ({
 }) => {
   const { sync, isLoading } = useAsyncLoader();
   const { _id: id, followings: userFollowings, userName } = user;
+
+  const hideAdult = useHideAdult();
 
   const [logs, setLogs] = useState<(ILogs & { game?: IGameResponse })[]>([]);
   const [userAuthFollowings, setUserAuthFollowings] = useState<IFollowings>(
@@ -134,7 +138,8 @@ const UserInfo: FC<UserInfoProps> = ({
                       className={styles.item__img}
                       target="_blank"
                     >
-                      {!!log.game?.cover ? (
+                      {!!log.game?.cover &&
+                      !(hideAdult && isAdultGame(log.game)) ? (
                         <Image
                           width={70}
                           height={110}
