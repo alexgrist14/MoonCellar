@@ -1,19 +1,21 @@
-import { FlatCompat } from '@eslint/eslintrc'
- 
-const compat = new FlatCompat({
-  // import.meta.dirname is available after Node.js v20.11.0
-  baseDirectory: import.meta.dirname,
-})
- 
+import nextConfig from "eslint-config-next";
+
 const eslintConfig = [
-  ...compat.config({
-    extends: ['next'],
+  ...nextConfig,
+  {
     settings: {
       next: {
-        rootDir: 'src/',
+        rootDir: "src/",
       },
     },
-  }),
-]
- 
-export default eslintConfig
+    rules: {
+      "react-hooks/refs": "off",
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/preserve-manual-memoization": "off",
+      "react-hooks/incompatible-library": "off",
+      "react-hooks/immutability": "off",
+    },
+  },
+];
+
+export default eslintConfig;

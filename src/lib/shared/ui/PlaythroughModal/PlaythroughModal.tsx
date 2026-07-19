@@ -272,7 +272,10 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
               )}
               <Input
                 placeholder="Game time (hours)"
-                {...register("time")}
+                {...register("time", {
+                  setValueAs: (value) =>
+                    value === "" || value == null ? undefined : Number(value),
+                })}
                 value={watch("time") || ""}
               />
               {watch("category") === "completed" && (

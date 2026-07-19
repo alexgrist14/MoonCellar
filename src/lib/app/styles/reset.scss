@@ -22,8 +22,6 @@ audio,
 canvas,
 video {
   display: inline-block;
-  *display: inline;
-  *zoom: 1;
 }
 
 audio:not([controls]) {
@@ -107,7 +105,6 @@ kbd,
 pre,
 samp {
   font-family: monospace, serif;
-  _font-family: "courier new", monospace;
   font-size: 1em;
 }
 
@@ -196,7 +193,6 @@ legend {
   border: 0;
   padding: 0;
   white-space: normal;
-  *margin-left: -7px;
 }
 
 button,
@@ -206,7 +202,6 @@ textarea {
   font-size: 100%;
   margin: 0;
   vertical-align: baseline;
-  *vertical-align: middle;
 }
 
 button,
@@ -221,7 +216,6 @@ input[type="submit"] {
   -webkit-appearance: button;
   appearance: button;
   cursor: pointer;
-  *overflow: visible;
 }
 
 button[disabled],
@@ -233,8 +227,6 @@ input[type="checkbox"],
 input[type="radio"] {
   box-sizing: border-box;
   padding: 0;
-  *height: 13px;
-  *width: 13px;
 }
 
 input[type="search"] {
