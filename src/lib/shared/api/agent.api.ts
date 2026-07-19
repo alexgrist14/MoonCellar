@@ -14,47 +14,44 @@ agent.interceptors.response.use(
   (response) => response,
   (err: AxiosError<{ message: string }>) => {
     const { config } = err;
+    const isRefreshRequest = !!err.config?.url?.includes("/refresh");
 
-    if (
-      err.response &&
-      err.response.status === 401 &&
-      !err.config?.url?.includes("/refresh")
-    ) {
-      return (
-        !!config &&
-        authAPI
-          .refreshToken()
-          .then(() => agent(config))
-          .catch((refreshError) => {
-            deleteCookie(ACCESS_TOKEN);
-            deleteCookie(REFRESH_TOKEN);
-
-            // Логируем ошибку обновления токена
-            logger.error("Token refresh failed", refreshError, {
-              originalUrl: config?.url,
-              originalMethod: config?.method,
-            });
-
-            toast.error({ title: "Error", description: "Not authorized" });
-          })
-      );
-    } else {
-      const errorMessage =
-        err?.response?.data?.message ?? "Something went wrong";
-
-      // Логируем ошибку API в Grafana
-      logger.error("API request error", err, {
-        url: err.config?.url,
-        method: err.config?.method,
-        status: err.response?.status,
-        statusText: err.response?.statusText,
-        responseData: err.response?.data,
-        errorMessage,
-      });
-
-      toast.error({ title: "Error", description: errorMessage });
+    if (err.response?.status === 401 && isRefreshRequest) {
       return Promise.reject(err);
     }
+
+    if (err.response?.status === 401 && config) {
+      return authAPI
+        .refreshToken()
+        .then(() => agent(config))
+        .catch((refreshError) => {
+          deleteCookie(ACCESS_TOKEN);
+          deleteCookie(REFRESH_TOKEN);
+
+          logger.error("Token refresh failed", refreshError, {
+            originalUrl: config?.url,
+            originalMethod: config?.method,
+          });
+
+          toast.error({ title: "Error", description: "Not authorized" });
+          return Promise.reject(refreshError);
+        });
+    }
+
+    const errorMessage =
+      err?.response?.data?.message ?? "Something went wrong";
+
+    logger.error("API request error", err, {
+      url: err.config?.url,
+      method: err.config?.method,
+      status: err.response?.status,
+      statusText: err.response?.statusText,
+      responseData: err.response?.data,
+      errorMessage,
+    });
+
+    toast.error({ title: "Error", description: errorMessage });
+    return Promise.reject(err);
   }
 );
 

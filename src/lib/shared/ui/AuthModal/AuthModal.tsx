@@ -1,14 +1,15 @@
-import { IAuth } from "@/src/lib/shared/types/auth.type";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Input } from "@/src/lib/shared/ui/Input";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { FC, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { Resolver, SubmitHandler, useForm } from "react-hook-form";
 import { useAuth } from "../../hooks/auth";
 import Background from "../Background/Background";
 import { Loader } from "../Loader";
 import { modal } from "../Modal";
 import { SvgClose } from "../svg";
 import styles from "./AuthModal.module.scss";
+import { AuthSchema, createAuthSchema } from "./auth.schema";
 
 export const AuthModal: FC = () => {
   const { login, signup } = useAuth();
@@ -19,38 +20,52 @@ export const AuthModal: FC = () => {
   const {
     register,
     handleSubmit,
-    formState: { isValid },
-  } = useForm<IAuth>({
-    mode: "onChange",
+    formState: { errors },
+    reset,
+    clearErrors,
+  } = useForm<AuthSchema>({
+    resolver: (async (values, context, options) => {
+      return zodResolver(createAuthSchema(isRegister))(
+        values,
+        context,
+        options
+      );
+    }) as Resolver<AuthSchema>,
+    mode: "onBlur",
   });
 
-  const handleLogin: SubmitHandler<IAuth> = (data) => {
+  const switchMode = (registerMode: boolean) => {
+    setIsRegister(registerMode);
+    setError(null);
+    clearErrors();
+    reset();
+  };
+
+  const handleLogin: SubmitHandler<AuthSchema> = (data) => {
     setError(null);
     setIsLoading(true);
 
-    const loginDto: Omit<IAuth, "userName"> = {
+    login({
       email: data.email,
       password: data.password,
-    };
-
-    login(loginDto)
+    })
       .then(() => {})
       .catch(() => {
         setIsLoading(false);
       });
   };
 
-  const handleSignUp: SubmitHandler<IAuth> = (data) => {
+  const handleSignUp: SubmitHandler<AuthSchema> = (data) => {
+    if (!data.userName) return;
+
     setError(null);
     setIsLoading(true);
 
-    const singUpDto: IAuth = {
+    signup({
       userName: data.userName,
       email: data.email,
       password: data.password,
-    };
-
-    signup(singUpDto)
+    })
       .then(() => {})
       .catch(() => {
         setIsLoading(false);
@@ -72,7 +87,8 @@ export const AuthModal: FC = () => {
               <label>User Name</label>
               <Input
                 type="text"
-                {...register("userName", { required: true })}
+                {...register("userName")}
+                error={errors.userName}
               />
             </div>
           )}
@@ -82,7 +98,8 @@ export const AuthModal: FC = () => {
               type="email"
               id="email"
               autoComplete="username"
-              {...register("email", { required: true })}
+              {...register("email")}
+              error={errors.email}
             />
           </div>
           <div>
@@ -90,8 +107,9 @@ export const AuthModal: FC = () => {
             <Input
               type="password"
               id="password"
-              {...register("password", { required: true, minLength: 6 })}
               autoComplete="current-password"
+              {...register("password")}
+              error={errors.password}
             />
           </div>
         </div>
@@ -103,14 +121,14 @@ export const AuthModal: FC = () => {
                 color={ButtonColor.ACCENT}
                 className={styles.btn}
                 type="submit"
-                disabled={!isValid}
+                disabled={isLoading}
               >
                 {isLoading ? <Loader type="pulse" /> : "Sign up"}
               </Button>
               <p>
                 Already have an account?{" "}
                 <span
-                  onClick={() => setIsRegister(false)}
+                  onClick={() => switchMode(false)}
                   className={styles.link}
                 >
                   Sign in
@@ -123,14 +141,14 @@ export const AuthModal: FC = () => {
                 color={ButtonColor.ACCENT}
                 className={styles.btn}
                 type="submit"
-                disabled={!isValid}
+                disabled={isLoading}
               >
                 {isLoading ? <Loader type="pulse" /> : "Sign in"}
               </Button>
               <p>
                 Don&apos;t have an account?{" "}
                 <span
-                  onClick={() => setIsRegister(true)}
+                  onClick={() => switchMode(true)}
                   className={styles.link}
                 >
                   Sign up

@@ -118,7 +118,7 @@ const updateDescription = (
 
 const updateSettings = (
   userId: string,
-  settingsDto: { hideAdultContent: boolean }
+  settingsDto: { showAdultContent: boolean }
 ) => {
   return agent.patch<IUser>(`${USER_URL}/settings/${userId}`, settingsDto);
 };
