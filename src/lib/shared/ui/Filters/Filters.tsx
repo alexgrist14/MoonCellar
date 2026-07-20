@@ -39,8 +39,15 @@ export const Filters: FC<{
   const [savedFilters, setSavedFilters] = useState<IUserFilter[]>();
   const [keywordsList, setKeywordsList] = useState<string[]>([]);
 
-  const { themes, systems, genres, gameModes, gameTypes, keywords } =
-    useCommonStore();
+  const {
+    themes,
+    systems,
+    genres,
+    gameModes,
+    gameTypes,
+    keywords,
+    franchises,
+  } = useCommonStore();
   const { isLoading, isPlatformsLoading } = useStatesStore();
   const { isExcludeHistory, setExcludeHistory } = useFiltersStore();
 
@@ -329,6 +336,27 @@ export const Filters: FC<{
               getIndexes={(indexes) => setSelected("modes", indexes, gameModes)}
               getExcludeIndexes={(indexes) =>
                 setExcluded("modes", indexes, gameModes)
+              }
+            />
+          </div>
+          <div className={styles.filters__wrapper}>
+            <h4>Franchises</h4>
+            <Dropdown
+              isWithReset
+              isMulti
+              isWithExclude
+              overflowRootId="filters"
+              isDisabled={isLoading}
+              list={franchises || []}
+              overwriteValue={getValue("franchises")}
+              initialMultiValue={getSelectedArray("franchises", franchises)}
+              initialExcludeValue={getExcludedArray("franchises", franchises)}
+              placeholder="Select franchises..."
+              getIndexes={(indexes) =>
+                setSelected("franchises", indexes, franchises)
+              }
+              getExcludeIndexes={(indexes) =>
+                setExcluded("franchises", indexes, franchises)
               }
             />
           </div>

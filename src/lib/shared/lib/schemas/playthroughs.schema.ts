@@ -15,17 +15,18 @@ export const PlaythroughSchema = z.object({
   gameId: z.string().min(0).describe("Game id"),
   platformId: z.string().describe("Platform id").optional(),
   category: categoriesZod.describe(`Category}`),
-  date: z.iso
+  date: z
+    .string()
     .date()
     .nullish()
     .or(z.string().max(0))
     .describe("Finish date")
     .optional(),
-  time: z.number().describe("Spent time (hours)").optional(),
+  time: z.coerce.number().describe("Spent time (hours)").optional(),
   comment: z.string().describe("Note after complete").optional(),
   isMastered: z.boolean().describe("Check if mastered").optional(),
-  createdAt: z.iso.date(),
-  updatedAt: z.iso.date(),
+  createdAt: z.coerce.string().date(),
+  updatedAt: z.coerce.string().date(),
 });
 
 export const PlaythroughEditSchema = PlaythroughSchema.omit({

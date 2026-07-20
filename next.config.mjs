@@ -55,6 +55,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "*.sfo3.digitaloceanspaces.com",
       },
+      {
+        protocol: "https",
+        hostname: "img.youtube.com",
+      },
     ],
   },
 };

@@ -74,6 +74,7 @@ export const gamesApi = {
         genres: string[];
         companies: string[];
         type: string[];
+        franchises?: string[];
       }
     | undefined
   > => {

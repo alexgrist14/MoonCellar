@@ -8,10 +8,12 @@ export interface IGameFiltersQuery
   selectedThemes?: string[];
   selectedKeywords?: string[];
   selectedGameTypes?: string[];
+  selectedFranchises?: string[];
   excludedGenres?: string[];
   excludedModes?: string[];
   excludedPlatforms?: string[];
   excludedThemes?: string[];
   excludedKeywords?: string[];
   excludedGameTypes?: string[];
+  excludedFranchises?: string[];
 }

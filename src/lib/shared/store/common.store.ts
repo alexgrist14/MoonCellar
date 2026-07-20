@@ -8,6 +8,7 @@ export type IScrollPosition ={[key: string]: { top: number; left: number }} | un
 type IState = {
   systems?: IPlatform[];
   families?: string[];
+  franchises?: string[];
   genres?: string[];
   gameModes?: string[];
   themes?: string[];
@@ -25,6 +26,7 @@ type IAction = {
   setGameTypes: (gameTypes: string[]) => void;
   setGenres: (genres: string[]) => void;
   setFamilies: (families: string[]) => void;
+  setFranchises: (franchises: string[]) => void;
   setSystems: (platforms: IPlatform[]) => void;
   setTimer: (timer: number) => void;
   setCompanies: (companies: string[]) => void;
@@ -40,6 +42,7 @@ export const useCommonStore = create<IState & IAction>()(
       setGenres: (genres) => set({ genres }),
       setSystems: (systems) => set({ systems }),
       setFamilies: (families) => set({ families }),
+      setFranchises: (franchises) => set({ franchises }),
       setGameModes: (modes) => set({ gameModes: modes }),
       setGameTypes: (gameTypes) => set({ gameTypes }),
       setThemes: (themes) => set({ themes }),

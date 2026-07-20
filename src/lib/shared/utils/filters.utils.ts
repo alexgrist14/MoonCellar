@@ -25,6 +25,7 @@ export const parseQueryFilters = (pathWithQuery: string): IGetGamesRequest => {
       themes: filters?.selectedThemes,
       keywords: filters?.selectedKeywords,
       types: filters?.selectedGameTypes,
+      franchises: filters?.selectedFranchises,
     },
     excluded: {
       genres: filters?.excludedGenres,
@@ -33,6 +34,7 @@ export const parseQueryFilters = (pathWithQuery: string): IGetGamesRequest => {
       themes: filters?.excludedThemes,
       keywords: filters?.excludedKeywords,
       types: filters?.excludedGameTypes,
+      franchises: filters?.excludedFranchises,
     },
   };
 };
@@ -56,6 +58,8 @@ export const getFiltersForQuery = (filters: IGetGamesRequest) => {
       excludedModes: filters.excluded?.modes,
       selectedGameTypes: filters.selected?.types,
       excludedGameTypes: filters.excluded?.types,
+      selectedFranchises: filters.selected?.franchises,
+      excludedFranchises: filters.excluded?.franchises,
     },
     {
       arrayFormat: "bracket",

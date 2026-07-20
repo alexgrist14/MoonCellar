@@ -5,6 +5,7 @@ import styles from "./GamePage.module.scss";
 import Image from "next/image";
 import { dateRegions } from "../../shared/constants";
 import { Slideshow } from "../../shared/ui/Slideshow";
+import { VideosRow } from "../../shared/ui/VideosRow";
 import Link from "next/link";
 import { Cover } from "../../shared/ui/Cover";
 import { GameControls } from "../../shared/ui/GameControls";
@@ -162,6 +163,21 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
               </p>
             </div>
           )}
+          {!!game.franchises?.length && (
+            <div className={styles.page__developers}>
+              <p>
+                <span>Franchises: </span>
+                {game.franchises.map((franchise, i, array) => (
+                  <span key={franchise + i}>
+                    <Link href={`/games?selectedFranchises[]=${franchise}`}>
+                      {franchise}
+                    </Link>
+                    {i !== array.length - 1 ? ", " : ""}
+                  </span>
+                ))}
+              </p>
+            </div>
+          )}
           <div className={styles.page__info}>
             {!!game.platformIds?.length && (
               <p>
@@ -242,6 +258,12 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
             <div className={styles.page__screenshots}>
               <h4>Artworks:</h4>
               <Slideshow pictures={game.artworks} />
+            </div>
+          )}
+          {!hideMedia && !!game.videos?.length && (
+            <div className={styles.page__screenshots}>
+              <h4>Videos:</h4>
+              <VideosRow videos={game.videos} />
             </div>
           )}
           <div className={styles.page__bottom}>

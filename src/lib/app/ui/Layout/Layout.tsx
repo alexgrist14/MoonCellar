@@ -18,7 +18,7 @@ import { ErrorHandler } from "@/src/lib/shared/ui/ErrorHandler";
 import classNames from "classnames";
 import { usePathname } from "next/navigation";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { Loader } from "@/src/lib/shared/ui/Loader";
+import { PageLoader } from "@/src/lib/shared/ui/PageLoader";
 
 interface ILayoutProps {
   children: ReactNode;
@@ -36,6 +36,7 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
     setGameTypes,
     setCompanies,
     setKeywords,
+    setFranchises,
   } = useCommonStore();
   const { ref } = useResizeDetector({
     refreshMode: "debounce",
@@ -63,7 +64,8 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
     gamesApi.getFilters().then((response) => {
       if (!response) return;
 
-      const { genres, modes, keywords, companies, themes, type } = response;
+      const { genres, modes, keywords, companies, themes, type, franchises } =
+        response;
 
       setGenres(genres);
       setGameModes(modes);
@@ -71,6 +73,7 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
       setGameTypes(type);
       setCompanies(companies);
       setKeywords(keywords);
+      setFranchises(franchises || []);
     });
 
     platformsAPI.getAll().then((res) => {
@@ -84,6 +87,7 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
     setGameTypes,
     setCompanies,
     setKeywords,
+    setFranchises,
   ]);
 
   return (
@@ -98,7 +102,7 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
         type="absolute"
         fadeType="bottom"
       >
-        <Suspense fallback={<Loader type="moon" />}>
+        <Suspense fallback={<PageLoader />}>
           <main className={"container"} ref={ref}>
             {children}
           </main>
