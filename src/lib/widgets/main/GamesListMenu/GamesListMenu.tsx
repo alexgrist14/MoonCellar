@@ -55,7 +55,7 @@ export const GamesListMenu: FC<IGamesListMenuProps> = ({ games }) => {
               });
             }}
           >
-            Add page to Royal
+            Add games to Royal
           </Button>
         </div>
       )}
