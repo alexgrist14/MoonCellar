@@ -12,6 +12,7 @@ import {
   IPlaythrough,
   IPlaythroughMinimal,
   ISavePlaythroughRequest,
+  ISavePlaythroughRequestInput,
   SavePlaythroughRequestSchema,
 } from "../../lib/schemas/playthroughs.schema";
 import { useForm } from "react-hook-form";
@@ -67,7 +68,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
     watch,
     handleSubmit,
     formState: { errors, isValid },
-  } = useForm<ISavePlaythroughRequest>({
+  } = useForm<ISavePlaythroughRequestInput, unknown, ISavePlaythroughRequest>({
     mode: "all",
     resolver: zodResolver(SavePlaythroughRequestSchema),
   });
@@ -276,7 +277,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
                   setValueAs: (value) =>
                     value === "" || value == null ? undefined : Number(value),
                 })}
-                value={watch("time") || ""}
+                value={(watch("time") as number | string | undefined) || ""}
               />
               {watch("category") === "completed" && (
                 <ToggleSwitch

@@ -12,7 +12,7 @@ export const GetFileRequestSchema = z.object({
 export const GetFileResponseSchema = z.object({
   etag: z.string(),
   checksum: z.string().optional(),
-  metadata: z.record(z.string()).optional(),
+  metadata: z.record(z.string(), z.string()).optional(),
   modifiedAt: z.string().optional(),
   type: z.string().optional(),
   content: z

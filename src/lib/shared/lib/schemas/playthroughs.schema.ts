@@ -15,8 +15,7 @@ export const PlaythroughSchema = z.object({
   gameId: z.string().min(0).describe("Game id"),
   platformId: z.string().describe("Platform id").optional(),
   category: categoriesZod.describe(`Category}`),
-  date: z
-    .string()
+  date: z.iso
     .date()
     .nullish()
     .or(z.string().max(0))
@@ -25,8 +24,8 @@ export const PlaythroughSchema = z.object({
   time: z.coerce.number().describe("Spent time (hours)").optional(),
   comment: z.string().describe("Note after complete").optional(),
   isMastered: z.boolean().describe("Check if mastered").optional(),
-  createdAt: z.coerce.string().date(),
-  updatedAt: z.coerce.string().date(),
+  createdAt: z.coerce.string().pipe(z.iso.date()),
+  updatedAt: z.coerce.string().pipe(z.iso.date()),
 });
 
 export const PlaythroughEditSchema = PlaythroughSchema.omit({
@@ -68,6 +67,9 @@ export type IGetPlaythroughsRequest = z.infer<
   typeof GetPlaythroughsRequestSchema
 >;
 export type ISavePlaythroughRequest = z.infer<
+  typeof SavePlaythroughRequestSchema
+>;
+export type ISavePlaythroughRequestInput = z.input<
   typeof SavePlaythroughRequestSchema
 >;
 export type IUpdatePlaythroughRequest = z.infer<
