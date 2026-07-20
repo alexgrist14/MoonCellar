@@ -23,7 +23,7 @@ export const VideoThumbnail: FC<{ video: string }> = ({ video }) => {
         height={1080}
         src={getYoutubeThumbnailUrl(video)}
       />
-      <Icon icon="mdi:youtube" className={styles.play} />
+      {!isLoading && <Icon icon="mdi:youtube" className={styles.play} />}
     </>
   );
 };

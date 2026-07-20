@@ -9,22 +9,31 @@ import { GameCardInfo } from "@/src/lib/entities/game/ui/GameCardInfo";
 import { IGameResponse } from "../../lib/schemas/games.schema";
 import useCloseEvents from "../../hooks/useCloseEvents";
 import { Button } from "../Button";
-import { SvgMore } from "../svg";
+import { SvgAchievement, SvgMore } from "../svg";
 import Link from "next/link";
 import { useGamesStore } from "../../store/games.store";
 import { SvgCrown } from "../svg/SvgCrown";
 import { useHideAdult } from "../../hooks/useHideAdult";
 import { isAdultGame } from "../../utils/adult.utils";
+import { GameControls } from "../GameControls";
+import { useAuthStore } from "../../store/auth.store";
 
 interface IGameCardProps {
   game: IGameResponse;
   className?: string;
   style?: CSSProperties;
   spreadDirection?: "width" | "height";
+  isInfoDisabled?: boolean;
 }
 
 export const GameCard = memo(
-  ({ game, className, style, spreadDirection = "width" }: IGameCardProps) => {
+  ({
+    game,
+    className,
+    style,
+    spreadDirection = "width",
+    isInfoDisabled,
+  }: IGameCardProps) => {
     const cardRef = useRef<HTMLDivElement>(null);
 
     const hideMedia = useHideAdult() && isAdultGame(game);
@@ -34,6 +43,7 @@ export const GameCard = memo(
 
     const { parsedPlaythroughs, parsedRatings } = useUserStore();
     const royalGames = useGamesStore((s) => s.royalGames);
+    const profile = useAuthStore((s) => s.profile);
 
     const filteredPlaythroughs = parsedPlaythroughs?.[game._id];
 
@@ -44,6 +54,25 @@ export const GameCard = memo(
       [game, royalGames]
     );
 
+    const { isMastered, isBeaten } = useMemo(() => {
+      if (!profile?.raAwards?.length || !game.retroachievements?.length) {
+        return { isMastered: false, isBeaten: false };
+      }
+
+      const raIds = new Set(game.retroachievements.map((item) => item.gameId));
+
+      return {
+        isMastered: profile.raAwards.some(
+          (award) =>
+            award.awardType === "Mastery/Completion" && raIds.has(award.awardData)
+        ),
+        isBeaten: profile.raAwards.some(
+          (award) =>
+            award.awardType === "Game Beaten" && raIds.has(award.awardData)
+        ),
+      };
+    }, [game, profile]);
+
     useCloseEvents([cardRef], () => setIsActive(false));
 
     if (!game) return null;
@@ -52,7 +81,8 @@ export const GameCard = memo(
       <div
         className={classNames(
           styles.wrapper,
-          spreadDirection === "height" && styles.wrapper_height
+          spreadDirection === "height" && styles.wrapper_height,
+          isInfoDisabled && styles.wrapper_stacked
         )}
         style={style}
         ref={cardRef}
@@ -68,7 +98,8 @@ export const GameCard = memo(
               .at(-1),
             !!filteredPlaythroughs &&
               filteredPlaythroughs.some((play) => play.isMastered) &&
-              styles.card_mastered
+              styles.card_mastered,
+            isInfoDisabled && styles.card_stacked
           )}
           draggable={false}
         >
@@ -82,18 +113,29 @@ export const GameCard = memo(
               <p>{rating}</p>
             </div>
           )}
-          <Button
-            color="transparent"
-            className={styles.card__more}
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
+          {!!game.retroachievements?.length && (
+            <div className={styles.card__achievement}>
+              <SvgAchievement
+                color={
+                  isMastered ? "attention" : isBeaten ? "positive" : "secondary"
+                }
+              />
+            </div>
+          )}
+          {!isInfoDisabled && (
+            <Button
+              color="transparent"
+              className={styles.card__more}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
 
-              setIsActive(true);
-            }}
-          >
-            <SvgMore />
-          </Button>
+                setIsActive(true);
+              }}
+            >
+              <SvgMore />
+            </Button>
+          )}
           {isLoading && <Loader key={game._id + "_loader"} />}
           {isActive && (
             <GameCardInfo game={game} playthroughs={filteredPlaythroughs} />
@@ -113,6 +155,9 @@ export const GameCard = memo(
             <Cover className={styles.card__placeholder} />
           )}
         </Link>
+        {isInfoDisabled && (
+          <GameControls game={game} className={styles.card__controls} />
+        )}
       </div>
     );
   }

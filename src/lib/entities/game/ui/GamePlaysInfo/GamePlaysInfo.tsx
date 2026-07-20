@@ -34,7 +34,7 @@ export const GamePlaysInfo: FC<IGamePlaysInfoProps> = ({
   }, []);
 
   return (
-    <WrapperTemplate isWithScrollBar isWithBlur>
+    <WrapperTemplate isWithScrollBar>
       <div className={styles.plays}>
         <h2>{gameName}</h2>
         {playthroughs.map((play) => {

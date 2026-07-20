@@ -18,6 +18,21 @@
     width: 240px;
     padding: 0;
     gap: var(--gap-x5);
+
+    @include mediaMax($screenMd) {
+      width: 100%;
+    }
+  }
+
+  &__leftTop {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x5);
+
+    @include mediaMax($screenMd) {
+      width: 240px;
+      margin-inline: auto;
+    }
   }
 
   &__hltb {
@@ -38,22 +53,6 @@
     & span {
       @include font(13px, 17px, 500);
       color: var(--color-neutral-100);
-    }
-  }
-
-  &__cover {
-    aspect-ratio: 528/704;
-    border-radius: var(--radius-x3);
-    background: var(--color-bg-hover);
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-
-    & > img {
-      width: 100%;
-      height: 100%;
-      object-position: center;
-      object-fit: cover;
     }
   }
 
@@ -131,44 +130,4 @@
     }
   }
 
-  &__ra {
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background-color: var(--color-bg-primary);
-    border: 2px solid var(--color-bg-hover);
-    padding: 3px;
-    @include flexCenter;
-
-    & svg {
-      width: 100%;
-      height: 100%;
-      transition: 0.3s;
-      & path {
-        fill: var(--color-gray);
-      }
-    }
-
-    &_beaten,
-    &_mastered {
-      filter: drop-shadow(0 0 0.2rem var(--color-accent));
-    }
-
-    &_beaten {
-      & svg path {
-        fill: var(--color-blue);
-      }
-    }
-
-    &_mastered {
-      & svg {
-        path {
-          fill: #dec616;
-        }
-      }
-    }
-  }
 }

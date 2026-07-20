@@ -6,7 +6,7 @@
   height: fit-content;
   max-width: calc(100vw - 40px);
   margin-inline: auto;
-  background: rgba($wrapperBGColor, 0.8);
+  background: rgba($wrapperBGColor, 0.9);
   box-shadow: $shadowBorder;
   color: var(--color-neutral-100);
 
@@ -18,6 +18,10 @@
     box-shadow: unset;
     border-radius: 0;
     background: transparent;
+  }
+
+  &_blur {
+    backdrop-filter: blur(var(--blur-x1));
   }
 
   &__title {

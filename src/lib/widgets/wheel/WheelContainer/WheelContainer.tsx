@@ -33,7 +33,7 @@ export const WheelContainer: FC = () => {
         <div className={styles.container__right}>
           {!isMobile && (
             <div style={{ display: "grid", gap: "20px", width: "100%" }}>
-              <WheelOptions isWithBlur />
+              <WheelOptions />
             </div>
           )}
           {!!winner && (

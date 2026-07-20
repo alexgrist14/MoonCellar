@@ -6,6 +6,7 @@ import { IPlaythroughMinimal } from "@/src/lib/shared/lib/schemas/playthroughs.s
 import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { GameControls } from "@/src/lib/shared/ui/GameControls";
+import { getAverageRating } from "@/src/lib/shared/utils/rating.utils";
 
 interface IGameCardInfoProps {
   game: IGameResponse;
@@ -17,6 +18,7 @@ export const GameCardInfo: FC<IGameCardInfoProps> = ({
   playthroughs,
 }) => {
   const systems = useCommonStore((s) => s.systems);
+  const averageRating = getAverageRating(game);
 
   return (
     <div
@@ -32,6 +34,7 @@ export const GameCardInfo: FC<IGameCardInfoProps> = ({
       <GameControls game={game} />
       <div className={styles.info__block}>
         <p>{game.name}</p>
+        {averageRating != null && <span>Rating: {averageRating}</span>}
         {!!playthroughs && playthroughs.length > 1 && (
           <span>
             ( {playthroughs.length}{" "}

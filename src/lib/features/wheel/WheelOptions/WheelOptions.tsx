@@ -5,17 +5,12 @@ import { RangeSelector } from "@/src/lib/shared/ui/RangeSelector";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 
-interface IWheelOptionsProps {
-  isWithBlur?: boolean;
-}
-
-export const WheelOptions: FC<IWheelOptionsProps> = ({ isWithBlur }) => {
+export const WheelOptions: FC = () => {
   const { isRoyal, setRoyal } = useStatesStore();
   const { timer, setTimer } = useCommonStore();
 
   return (
     <WrapperTemplate
-      isWithBlur={isWithBlur}
       contentStyle={{
         gap: "15px",
       }}

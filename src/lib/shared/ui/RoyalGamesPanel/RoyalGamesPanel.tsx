@@ -78,7 +78,7 @@ export const RoyalGamesPanel: FC = () => {
         />
       )}
       {tabIndex === 1 && (
-        <div>
+        <>
           {!!savedPresets ? (
             <div className={styles.royal__saved}>
               {!!savedPresets?.length ? (
@@ -114,8 +114,7 @@ export const RoyalGamesPanel: FC = () => {
                             .removePreset(profile._id, preset.name)
                             .then((res) => {
                               toast.success({
-                                description:
-                                  "Preset was successfully removed",
+                                description: "Preset was successfully removed",
                               });
                               setSavedPresets(res.data.presets);
                             }),
@@ -131,7 +130,7 @@ export const RoyalGamesPanel: FC = () => {
           ) : (
             <Loader type="propogate" />
           )}
-        </div>
+        </>
       )}
     </div>
   );

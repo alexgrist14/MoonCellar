@@ -1,53 +1,26 @@
 "use client";
 
-import { FC, useMemo, useState } from "react";
+import { FC, useMemo } from "react";
 import styles from "./GamePage.module.scss";
-import Image from "next/image";
 import { dateRegions } from "../../shared/constants";
 import { Slideshow } from "../../shared/ui/Slideshow";
 import { VideosRow } from "../../shared/ui/VideosRow";
 import Link from "next/link";
-import { Cover } from "../../shared/ui/Cover";
-import { GameControls } from "../../shared/ui/GameControls";
-import { Loader } from "../../shared/ui/Loader";
+import { GameCard } from "../../shared/ui/GameCard";
 import classNames from "classnames";
 import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
-import { useAuthStore } from "../../shared/store/auth.store";
 import { BGImage } from "../../shared/ui/BGImage";
-import { Icon } from "@iconify/react/dist/iconify.js";
 import { IGameResponse } from "../../shared/lib/schemas/games.schema";
 import { useCommonStore } from "../../shared/store/common.store";
 import { formatHltbHours } from "../../shared/utils/hltb.utils";
+import { formatRating } from "../../shared/utils/rating.utils";
 import { useHideAdult } from "../../shared/hooks/useHideAdult";
 import { isAdultGame } from "../../shared/utils/adult.utils";
 
 export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
-  const { isAuth, profile } = useAuthStore();
   const { systems } = useCommonStore();
 
   const hideMedia = useHideAdult() && isAdultGame(game);
-
-  const [isLoading, setIsLoading] = useState<boolean>(
-    !!game.cover && !hideMedia
-  );
-
-  const { isMastered, isBeaten } = useMemo(() => {
-    const mastered = profile?.raAwards?.filter(
-      (award) => award.awardType === "Mastery/Completion"
-    );
-    const beaten = profile?.raAwards?.filter(
-      (award) => award.awardType === "Game Beaten"
-    );
-
-    return {
-      isMastered: mastered?.some((award) =>
-        game.retroachievements?.some((item) => item.gameId === award.awardData)
-      ),
-      isBeaten: beaten?.some((award) =>
-        game.retroachievements?.some((item) => item.gameId === award.awardData)
-      ),
-    };
-  }, [game, profile]);
 
   const hltbRows = useMemo(() => {
     if (!game.hltb) {
@@ -66,6 +39,19 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
     return rows.length ? rows : null;
   }, [game.hltb]);
 
+  const ratingRows = useMemo(() => {
+    const rows = [
+      { label: "Users", value: formatRating(game.averageRating) },
+      { label: "IGDB", value: formatRating(game.igdb?.total_rating, 100) },
+      {
+        label: "HowLongToBeat",
+        value: formatRating(game.hltb?.reviewScore, 100),
+      },
+    ].filter((row) => row.value);
+
+    return rows.length ? rows : null;
+  }, [game.averageRating, game.igdb, game.hltb]);
+
   if (!game) return null;
 
   const releaseDate = !!game.first_release
@@ -77,39 +63,9 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
       <div className={classNames(styles.page)}>
         <BGImage game={game} />
         <div className={styles.page__left}>
-          <WrapperTemplate contentStyle={{ padding: "0", gap: "0" }}>
-            <div
-              className={classNames(
-                styles.page__cover,
-                isAuth && styles.page__cover_control
-              )}
-            >
-              {!!game.retroachievements?.length && (
-                <div
-                  className={classNames(styles.page__ra, {
-                    [styles.page__ra_beaten]: isBeaten,
-                    [styles.page__ra_mastered]: isMastered,
-                  })}
-                >
-                  <Icon icon={"game-icons:achievement"} />
-                </div>
-              )}
-              {isLoading && <Loader />}
-              {!!game.cover && !hideMedia ? (
-                <Image
-                  onLoad={() => setIsLoading(false)}
-                  key={game.cover}
-                  alt="Cover"
-                  src={game.cover}
-                  width={700}
-                  height={900}
-                />
-              ) : (
-                <Cover />
-              )}
-            </div>
-          </WrapperTemplate>
-          <GameControls game={game} />
+          <div className={styles.page__leftTop}>
+            <GameCard game={game} isInfoDisabled />
+          </div>
           {!!hltbRows && (
             <WrapperTemplate contentStyle={{ padding: "12px" }}>
               <div className={styles.page__hltb}>
@@ -123,9 +79,21 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
               </div>
             </WrapperTemplate>
           )}
+          {!!ratingRows && (
+            <WrapperTemplate contentStyle={{ padding: "12px" }}>
+              <div className={styles.page__hltb}>
+                <h4>Ratings</h4>
+                {ratingRows.map((row) => (
+                  <p key={row.label}>
+                    <span>{row.label}: </span>
+                    {row.value}
+                  </p>
+                ))}
+              </div>
+            </WrapperTemplate>
+          )}
         </div>
         <WrapperTemplate
-          isWithBlur
           classNameContent={styles.page__right}
           contentStyle={{ padding: "10px" }}
         >

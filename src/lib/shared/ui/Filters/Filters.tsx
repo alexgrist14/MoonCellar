@@ -7,6 +7,7 @@ import { Dropdown } from "../Dropdown";
 import { ButtonGroup } from "../Button/ButtonGroup";
 import { ButtonColor } from "../Button";
 import { ToggleSwitch } from "../ToggleSwitch";
+import { SvgChevron } from "../svg";
 import { Tabs } from "../Tabs";
 import { ITabContent } from "../../types/tabs.type";
 import { userAPI } from "../../api";
@@ -24,6 +25,18 @@ import {
 } from "../../utils/filters.utils";
 import { RangeSelector } from "../RangeSelector";
 import { useFiltersStore } from "../../store/filters.store";
+
+const sortOptions: {
+  value: NonNullable<IGetGamesRequest["sortBy"]>;
+  label: string;
+}[] = [
+  { value: "name", label: "Name" },
+  { value: "first_release", label: "Release date" },
+  { value: "rating", label: "MoonCellar rating" },
+  { value: "total_rating", label: "IGDB rating" },
+  { value: "total_rating_count", label: "IGDB rating count" },
+  { value: "createdAt", label: "Date added" },
+];
 
 export const Filters: FC<{
   callback?: (filters?: IGameFilters) => void;
@@ -140,6 +153,46 @@ export const Filters: FC<{
       )}
       {tab === "filters" && (
         <>
+          <div className={styles.filters__wrapper}>
+            <h4>Sort by</h4>
+            <div className={styles.filters__sort}>
+              <Dropdown
+                isWithReset
+                overflowRootId="filters"
+                isDisabled={isLoading}
+                list={sortOptions.map((option) => option.label)}
+                overwriteValue={
+                  sortOptions.find((option) => option.value === filters?.sortBy)
+                    ?.label || "Default"
+                }
+                placeholder="Default"
+                getIndex={(index) => {
+                  const temp: IGetGamesRequest = {
+                    ...filters,
+                    sortBy: index >= 0 ? sortOptions[index]?.value : undefined,
+                  };
+
+                  setFilters(temp);
+                  isGauntlet && pushFiltersToQuery(temp);
+                }}
+              />
+              <ToggleSwitch
+                leftContent={<SvgChevron style={{ transform: "rotate(180deg)" }} />}
+                rightContent={<SvgChevron />}
+                isDisabled={isLoading || !filters?.sortBy}
+                value={filters?.sortOrder === "asc" ? "left" : "right"}
+                clickCallback={() => {
+                  const temp: IGetGamesRequest = {
+                    ...filters,
+                    sortOrder: filters?.sortOrder === "asc" ? "desc" : "asc",
+                  };
+
+                  setFilters(temp);
+                  isGauntlet && pushFiltersToQuery(temp);
+                }}
+              />
+            </div>
+          </div>
           <div className={styles.filters__top}>
             <div className={styles.filters__wrapper}>
               <h4>Game name</h4>
@@ -184,24 +237,49 @@ export const Filters: FC<{
               />
             </div>
           </div>
-          <div className={styles.filters__wrapper}>
-            <h4>Game types</h4>
-            <Dropdown
-              isWithReset
-              isMulti
-              isWithExclude
-              overflowRootId="filters"
-              isDisabled={isLoading}
-              list={gameTypes || []}
-              overwriteValue={getValue("types")}
-              initialMultiValue={getSelectedArray("types", gameTypes)}
-              initialExcludeValue={getExcludedArray("types", gameTypes)}
-              placeholder="Select game types..."
-              getIndexes={(indexes) => setSelected("types", indexes, gameTypes)}
-              getExcludeIndexes={(indexes) =>
-                setExcluded("types", indexes, gameTypes)
-              }
-            />
+          <div className={styles.filters__row}>
+            <div className={styles.filters__wrapper}>
+              <h4>Game types</h4>
+              <Dropdown
+                isWithReset
+                isMulti
+                isWithExclude
+                overflowRootId="filters"
+                isDisabled={isLoading}
+                list={gameTypes || []}
+                overwriteValue={getValue("types")}
+                initialMultiValue={getSelectedArray("types", gameTypes)}
+                initialExcludeValue={getExcludedArray("types", gameTypes)}
+                placeholder="Select game types..."
+                getIndexes={(indexes) =>
+                  setSelected("types", indexes, gameTypes)
+                }
+                getExcludeIndexes={(indexes) =>
+                  setExcluded("types", indexes, gameTypes)
+                }
+              />
+            </div>
+            <div className={styles.filters__wrapper}>
+              <h4>Game Modes</h4>
+              <Dropdown
+                isWithReset
+                isMulti
+                isWithExclude
+                overflowRootId="filters"
+                isDisabled={isLoading}
+                list={gameModes || []}
+                overwriteValue={getValue("modes")}
+                initialMultiValue={getSelectedArray("modes", gameModes)}
+                initialExcludeValue={getExcludedArray("modes", gameModes)}
+                placeholder="Select modes..."
+                getIndexes={(indexes) =>
+                  setSelected("modes", indexes, gameModes)
+                }
+                getExcludeIndexes={(indexes) =>
+                  setExcluded("modes", indexes, gameModes)
+                }
+              />
+            </div>
           </div>
           <div className={styles.filters__wrapper}>
             <h4>Platforms</h4>
@@ -298,25 +376,6 @@ export const Filters: FC<{
             />
           </div>
           <div className={styles.filters__wrapper}>
-            <h4>Game Modes</h4>
-            <Dropdown
-              isWithReset
-              isMulti
-              isWithExclude
-              overflowRootId="filters"
-              isDisabled={isLoading}
-              list={gameModes || []}
-              overwriteValue={getValue("modes")}
-              initialMultiValue={getSelectedArray("modes", gameModes)}
-              initialExcludeValue={getExcludedArray("modes", gameModes)}
-              placeholder="Select modes..."
-              getIndexes={(indexes) => setSelected("modes", indexes, gameModes)}
-              getExcludeIndexes={(indexes) =>
-                setExcluded("modes", indexes, gameModes)
-              }
-            />
-          </div>
-          <div className={styles.filters__wrapper}>
             <h4>Franchises</h4>
             <Dropdown
               isWithReset
@@ -348,11 +407,14 @@ export const Filters: FC<{
                 disabled={isLoading}
                 placeholder="Start..."
                 type="number"
-                value={!!filters?.years?.[0] ? filters.years[0].toString() : ""}
+                value={filters?.years?.[0] != null ? String(filters.years[0]) : ""}
                 onChange={(e) => {
+                  const start = e.target.value ? Number(e.target.value) : null;
+                  const end = filters?.years?.[1] ?? null;
+
                   const temp: IGetGamesRequest = {
                     ...filters,
-                    years: [Number(e.target.value), filters?.years?.[1] || 0],
+                    years: start == null && end == null ? undefined : [start, end],
                   };
 
                   setFilters(temp);
@@ -368,11 +430,14 @@ export const Filters: FC<{
                 disabled={isLoading}
                 placeholder="End..."
                 type="number"
-                value={!!filters?.years?.[1] ? filters.years[1].toString() : ""}
+                value={filters?.years?.[1] != null ? String(filters.years[1]) : ""}
                 onChange={(e) => {
+                  const start = filters?.years?.[0] ?? null;
+                  const end = e.target.value ? Number(e.target.value) : null;
+
                   const temp: IGetGamesRequest = {
                     ...filters,
-                    years: [filters?.years?.[0] || 0, Number(e.target.value)],
+                    years: start == null && end == null ? undefined : [start, end],
                   };
 
                   setFilters(temp);

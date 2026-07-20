@@ -10,7 +10,6 @@ import { userListCategories } from "@/src/lib/shared/constants/user.const";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import classNames from "classnames";
 import { SvgPen, SvgSettings } from "@/src/lib/shared/ui/svg";
-import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { IPlaythrough } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
 import { useExpandStore } from "@/src/lib/shared/store/expand.store";
@@ -23,7 +22,6 @@ export const UserNavigation: FC<{
   const { setQuery, query } = useAdvancedRouter();
 
   const { setExpanded } = useExpandStore();
-  const { isMobile } = useStatesStore();
 
   const handleEditListClick = () => {
     modal.open(<CustomFolder />);
@@ -31,7 +29,7 @@ export const UserNavigation: FC<{
 
   return (
     <div className={styles.panel}>
-      <WrapperTemplate isWithBlur={!isMobile}>
+      <WrapperTemplate>
         <Button
           className={styles.btn}
           color={ButtonColor.TRANSPARENT}
@@ -48,7 +46,7 @@ export const UserNavigation: FC<{
           </div>
         </Button>
       </WrapperTemplate>
-      <WrapperTemplate isWithBlur={!isMobile}>
+      <WrapperTemplate>
         {userListCategories.map((category, i) => {
           const plays = playthroughs?.reduce((res: IPlaythrough[], play) => {
             if (
@@ -91,7 +89,7 @@ export const UserNavigation: FC<{
         )}
       </WrapperTemplate>
       {isAuthedUser && (
-        <WrapperTemplate isWithBlur={!isMobile}>
+        <WrapperTemplate>
           <Button
             className={styles.btn}
             active={query.get("list") === "settings"}

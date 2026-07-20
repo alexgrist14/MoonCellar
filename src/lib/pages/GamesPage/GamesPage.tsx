@@ -53,7 +53,7 @@ export const GamesPage = () => {
   return (
     <>
       <BGImage />
-      <ExpandMenu position="left">
+      <ExpandMenu position="left" titleOpen="Filters">
         <Filters />
       </ExpandMenu>
       <ExpandMenu position="right" titleOpen="Manage">

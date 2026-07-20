@@ -62,13 +62,48 @@ export const CompanySchema = z.object({
 });
 
 export const GameFiltersSchema = z.object({
-  genres: z.string().array().or(z.string().nullish()).optional(),
-  platforms: z.string().array().or(z.string().nullish()).optional(),
-  modes: z.string().array().or(z.string().nullish()).optional(),
-  keywords: z.string().array().or(z.string().nullish()).optional(),
-  themes: z.string().array().or(z.string().nullish()).optional(),
-  types: z.string().array().or(z.string().nullish()).optional(),
-  franchises: z.string().array().or(z.string().nullish()).optional(),
+  genres: z
+    .string()
+    .array()
+    .or(z.string().nullish())
+    .describe("Genre name(s)")
+    .optional(),
+  platforms: z
+    .string()
+    .array()
+    .or(z.string().nullish())
+    .describe("Platform id(s)")
+    .optional(),
+  modes: z
+    .string()
+    .array()
+    .or(z.string().nullish())
+    .describe("Game mode name(s)")
+    .optional(),
+  keywords: z
+    .string()
+    .array()
+    .or(z.string().nullish())
+    .describe("Keyword name(s)")
+    .optional(),
+  themes: z
+    .string()
+    .array()
+    .or(z.string().nullish())
+    .describe("Theme name(s)")
+    .optional(),
+  types: z
+    .string()
+    .array()
+    .or(z.string().nullish())
+    .describe("Game type name(s)")
+    .optional(),
+  franchises: z
+    .string()
+    .array()
+    .or(z.string().nullish())
+    .describe("Franchise name(s)")
+    .optional(),
 });
 
 export const ReleaseDateSchema = z.object({
@@ -126,7 +161,13 @@ export const GetGamesByIdsSchema = z.object({
 });
 
 export const GetGamesRequestSchema = z.object({
-  take: z.coerce.number().min(1).max(1000).default(50).optional(),
+  take: z.coerce
+    .number()
+    .min(1)
+    .max(1000)
+    .describe("Amount of games to return")
+    .default(50)
+    .optional(),
   isRandom: z
     .union([z.string(), z.boolean()])
     .transform((val) =>
@@ -136,6 +177,7 @@ export const GetGamesRequestSchema = z.object({
           ? false
           : Boolean(val)
     )
+    .describe("Return games in random order")
     .optional(),
   isOnlyWithAchievements: z
     .union([z.string(), z.boolean()])
@@ -146,22 +188,67 @@ export const GetGamesRequestSchema = z.object({
           ? false
           : Boolean(val)
     )
+    .describe("Return only games that have retroachievements")
     .optional(),
-  page: z.coerce.number().min(1).default(1).optional(),
-  selected: GameFiltersSchema.optional(),
-  excluded: GameFiltersSchema.optional(),
-  search: z.string().optional(),
-  company: z.string().optional(),
-  rating: z.number().min(0).max(100).optional(),
-  votes: z.number().min(0).optional(),
+  page: z.coerce.number().min(1).describe("Page number").default(1).optional(),
+  selected: GameFiltersSchema.describe(
+    "Filters to include games by"
+  ).optional(),
+  excluded: GameFiltersSchema.describe(
+    "Filters to exclude games by"
+  ).optional(),
+  search: z.string().describe("Search query for game name").optional(),
+  company: z.string().describe("Company name").optional(),
+  rating: z
+    .number()
+    .min(0)
+    .max(100)
+    .describe("Minimum IGDB total rating")
+    .optional(),
+  votes: z
+    .number()
+    .min(0)
+    .describe("Minimum IGDB total rating votes count")
+    .optional(),
   years: z
-    .tuple([
-      z.coerce.number().min(1900).max(2100),
-      z.coerce.number().min(1900).max(2100),
+    .union([
+      z
+        .tuple([z.coerce.number().min(1900).max(2100)])
+        .describe("Exact release year"),
+      z
+        .tuple([
+          z.coerce.number().min(1900).max(2100).nullable(),
+          z.coerce.number().min(1900).max(2100).nullable(),
+        ])
+        .describe(
+          "Release year range [start, end]. Pass null for an open end: " +
+            "[year, null] means released in or after year, [null, year] means released in or before year"
+        ),
     ])
+    .describe("Filter by release year")
     .optional(),
-  mode: z.enum(["any", "all"]).default("any").optional(),
-  excludeGames: z.string().array().optional(),
+  mode: z
+    .enum(["any", "all"])
+    .describe("Whether selected filters should match any or all values")
+    .default("any")
+    .optional(),
+  excludeGames: z.string().array().describe("Game ids to exclude").optional(),
+  sortBy: z
+    .enum([
+      "total_rating",
+      "total_rating_count",
+      "first_release",
+      "name",
+      "rating",
+      "createdAt",
+    ])
+    .describe("Field to sort games by")
+    .optional(),
+  sortOrder: z
+    .enum(["asc", "desc"])
+    .describe("Sort order")
+    .default("desc")
+    .optional(),
 });
 
 export const AddGameRequestSchema = GameSchema.omit({

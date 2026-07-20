@@ -11,13 +11,20 @@ export const parseQueryFilters = (pathWithQuery: string): IGetGamesRequest => {
 
   const filters = query as IGameFiltersQuery;
 
+  const normalizeYear = (value: unknown): number | null =>
+    value === "" || value == null ? null : Number(value);
+
   return {
     search: filters?.search,
     company: filters?.company,
-    years: filters?.years,
+    years: filters?.years
+      ? [normalizeYear(filters.years[0]), normalizeYear(filters.years[1])]
+      : undefined,
     isOnlyWithAchievements: filters?.isOnlyWithAchievements,
     rating: filters?.rating,
     votes: filters?.votes,
+    sortBy: filters?.sortBy,
+    sortOrder: filters?.sortOrder,
     selected: {
       genres: filters?.selectedGenres,
       modes: filters?.selectedModes,
@@ -45,7 +52,6 @@ export const getFiltersForQuery = (filters: IGetGamesRequest) => {
       ...filters,
       selected: undefined,
       excluded: undefined,
-      years: [filters.years?.[0] || undefined, filters.years?.[1] || undefined],
       selectedPlatforms: filters.selected?.platforms,
       excludedPlatforms: filters.excluded?.platforms,
       selectedGenres: filters.selected?.genres,

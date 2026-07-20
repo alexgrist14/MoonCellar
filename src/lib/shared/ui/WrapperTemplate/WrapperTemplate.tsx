@@ -43,14 +43,11 @@ export const WrapperTemplate: FC<IWrapperTemplateProps> = ({
     <div className={cn(styles.wrapper, className)} style={wrapperStyle}>
       <WrapperTemplateHead {...headProps} isExternal />
       <div
-        style={{
-          backdropFilter: isWithBlur ? "blur(6px)" : undefined,
-          ...templateStyle,
-        }}
-        className={cn(
-          styles.template,
-          isWithoutBorder && styles.template_borderless
-        )}
+        style={templateStyle}
+        className={cn(styles.template, {
+          [styles.template_borderless]: isWithoutBorder,
+          [styles.template_blur]: isWithBlur,
+        })}
       >
         <WrapperTemplateHead {...headProps} />
         <div

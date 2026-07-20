@@ -5,6 +5,7 @@ import { Button, ButtonColor } from "../Button";
 import { useAuthStore } from "../../store/auth.store";
 import { modal } from "../Modal";
 import { PlaythroughModal } from "../PlaythroughModal";
+import { AchievementsModal } from "../AchievementsModal";
 import { useUserStore } from "../../store/user.store";
 import { GameButtons } from "../GameButtons";
 import { WrapperTemplate } from "../WrapperTemplate";
@@ -121,8 +122,14 @@ export const GameControls: FC<IGameControlsProps> = ({
       </Button>
       {!!game.retroachievements?.length && (
         <Button
-          disabled
-          style={{ cursor: "default" }}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+
+            modal.open(<AchievementsModal game={game} />, {
+              id: "game-achievements",
+            });
+          }}
           color="transparent"
           className={classNames(styles.controls__action)}
         >

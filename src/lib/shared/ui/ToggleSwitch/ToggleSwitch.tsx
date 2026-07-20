@@ -1,13 +1,13 @@
-import { FC, useState } from "react";
+import { FC, ReactNode, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import styles from "./ToggleSwitch.module.scss";
 import classNames from "classnames";
 
 interface ToggleSwitchProps {
   className?: string;
-  leftContent?: string;
-  rightContent?: string;
-  clickCallback: (result: string) => void;
+  leftContent?: ReactNode;
+  rightContent?: ReactNode;
+  clickCallback: (result: ReactNode) => void;
   scale?: string;
   defaultValue?: "left" | "right";
   value?: "left" | "right";

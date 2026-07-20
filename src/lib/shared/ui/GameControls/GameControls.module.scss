@@ -28,7 +28,7 @@
     }
 
     &_active {
-      background-color: var(--color-bg-accent);
+      background-color: var(--color-bg-accent) !important;
     }
 
     &:disabled {

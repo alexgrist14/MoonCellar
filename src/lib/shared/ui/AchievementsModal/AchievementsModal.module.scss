@@ -1,0 +1,44 @@
+.modal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x3);
+  width: 100%;
+  min-width: 320px;
+  max-width: 420px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-x3);
+  padding: var(--padding-x3);
+  background-color: var(--color-bg-hover);
+  border-radius: var(--radius-x2);
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  &__title {
+    @include font(14px, 18px, 500);
+    color: var(--color-neutral-100);
+    @include textEllipsis;
+  }
+
+  &__meta {
+    @include font(12px, 16px, 400);
+    color: var(--color-gray);
+  }
+}
+
+.fullButtonLink {
+  width: 100%;
+}
+
+.fullButton {
+  width: 100%;
+}
