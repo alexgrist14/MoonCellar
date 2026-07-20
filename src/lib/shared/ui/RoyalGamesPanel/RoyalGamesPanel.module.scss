@@ -1,0 +1,13 @@
+.royal {
+  display: grid;
+  justify-items: flex-start;
+  gap: var(--gap-x5);
+  width: 100%;
+
+  &__saved {
+    display: grid;
+    justify-items: flex-start;
+    gap: var(--gap-x3);
+    width: 100%;
+  }
+}

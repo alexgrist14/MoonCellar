@@ -16,6 +16,7 @@ import { useAsyncLoader } from "../../shared/hooks/useAsyncLoader";
 import { IGameResponse } from "../../shared/lib/schemas/games.schema";
 import { GamesCards } from "../../shared/ui/GamesCards";
 import { takeGames } from "../../shared/constants/games.const";
+import { GamesListMenu } from "../../widgets/main";
 
 export const GamesPage = () => {
   const { sync, isLoading, setIsLoading } = useAsyncLoader();
@@ -54,6 +55,9 @@ export const GamesPage = () => {
       <BGImage />
       <ExpandMenu position="left">
         <Filters />
+      </ExpandMenu>
+      <ExpandMenu position="right" titleOpen="Manage">
+        <GamesListMenu games={games} />
       </ExpandMenu>
       <Pagination
         take={takeGames}

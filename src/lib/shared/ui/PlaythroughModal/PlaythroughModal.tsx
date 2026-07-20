@@ -277,7 +277,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
                   setValueAs: (value) =>
                     value === "" || value == null ? undefined : Number(value),
                 })}
-                value={(watch("time") as number | string | undefined) || ""}
+                value={watch("time") || ""}
               />
               {watch("category") === "completed" && (
                 <ToggleSwitch

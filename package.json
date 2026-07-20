@@ -33,7 +33,7 @@
     "interweave": "^13.1.1",
     "jwt-decode": "^4.0.0",
     "maxmind": "^5.0.6",
-    "next": "^16.2.10",
+    "next": "^16.3.0-preview.6",
     "query-string": "^9.4.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",

@@ -15,7 +15,6 @@ import { Loader } from "../Loader";
 import { IUserFilter } from "../../types/user.type";
 import { modal } from "../Modal";
 import { SaveFilterForm } from "../SaveFilterForm";
-import { useDebouncedCallback } from "use-debounce";
 import { useAdvancedRouter } from "../../hooks/useAdvancedRouter";
 import { IGameFilters, IGetGamesRequest } from "../../lib/schemas/games.schema";
 import { toast } from "../../utils/toast.utils";
@@ -37,7 +36,6 @@ export const Filters: FC<{
   const [tab, setTab] = useState<"filters" | "saved">("filters");
 
   const [savedFilters, setSavedFilters] = useState<IUserFilter[]>();
-  const [keywordsList, setKeywordsList] = useState<string[]>([]);
 
   const {
     themes,
@@ -113,16 +111,6 @@ export const Filters: FC<{
       ? [{ tabName: "Saved", onTabClick: () => setTab("saved") }]
       : []),
   ];
-
-  const debouncedSetKeywords = useDebouncedCallback((query) => {
-    query?.length > 2 && !!keywords?.length
-      ? setKeywordsList(
-          keywords.filter((item) =>
-            item.toLowerCase().includes(query.toLowerCase())
-          )
-        )
-      : setKeywordsList(keywordsList);
-  }, 300);
 
   useEffect(() => {
     !filters && setFilters(parseQueryFilters(asPath));
@@ -294,29 +282,18 @@ export const Filters: FC<{
               isWithReset
               isMulti
               isWithExclude
-              isWithSearch
               overflowRootId="filters"
               isDisabled={isLoading}
-              onClose={() => {
-                setKeywordsList((list) =>
-                  list.filter(
-                    (item) =>
-                      filters?.selected?.keywords?.includes(item) ||
-                      filters?.excluded?.keywords?.includes(item)
-                  )
-                );
-              }}
-              getSearchQuery={debouncedSetKeywords}
-              list={keywordsList || []}
+              list={keywords || []}
               overwriteValue={getValue("keywords")}
-              initialMultiValue={getSelectedArray("keywords", keywordsList)}
-              initialExcludeValue={getExcludedArray("keywords", keywordsList)}
+              initialMultiValue={getSelectedArray("keywords", keywords)}
+              initialExcludeValue={getExcludedArray("keywords", keywords)}
               placeholder="Select keywords..."
               getIndexes={(indexes) =>
-                setSelected("keywords", indexes, keywordsList)
+                setSelected("keywords", indexes, keywords)
               }
               getExcludeIndexes={(indexes) =>
-                setExcluded("keywords", indexes, keywordsList)
+                setExcluded("keywords", indexes, keywords)
               }
             />
           </div>

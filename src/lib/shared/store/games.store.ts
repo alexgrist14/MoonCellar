@@ -13,6 +13,7 @@ type IAction = {
   setRoyalGames: (royalGames: IGameResponse[]) => void;
   setHistoryGames: (historyGames: IGameResponse[]) => void;
   addRoyalGame: (game: IGameResponse) => void;
+  addRoyalGames: (games: IGameResponse[]) => void;
   removeRoyalGame: (game: IGameResponse) => void;
   addHistoryGame: (game: IGameResponse) => void;
   removeHistoryGame: (game: IGameResponse) => void;
@@ -28,6 +29,17 @@ const getActions = (set: any): IAction => ({
         ...(!!state.royalGames?.length ? state.royalGames : []),
       ],
     })),
+  addRoyalGames: (games) =>
+    set((state: IState) => {
+      const existingIds = new Set(
+        (state.royalGames || []).map((royal) => royal._id)
+      );
+      const newGames = games.filter((game) => !existingIds.has(game._id));
+
+      return {
+        royalGames: [...(state.royalGames || []), ...newGames],
+      };
+    }),
   removeRoyalGame: (game) =>
     set((state: IState) => ({
       royalGames: !!state.royalGames?.length

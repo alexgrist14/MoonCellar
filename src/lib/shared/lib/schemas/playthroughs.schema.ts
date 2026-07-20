@@ -21,7 +21,7 @@ export const PlaythroughSchema = z.object({
     .or(z.string().max(0))
     .describe("Finish date")
     .optional(),
-  time: z.coerce.number().describe("Spent time (hours)").optional(),
+  time: z.number().describe("Spent time (hours)").optional(),
   comment: z.string().describe("Note after complete").optional(),
   isMastered: z.boolean().describe("Check if mastered").optional(),
   createdAt: z.coerce.string().pipe(z.iso.date()),
