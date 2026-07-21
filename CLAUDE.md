@@ -18,6 +18,11 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
 - Only use the global CSS variables defined in `:root` (see `src/lib/app/styles/vars/`) for colors, borders, padding, radius, gap, etc. — never hardcode raw values (hex colors, px, etc.) for anything already covered by a `:root` variable.
 - If a new value is needed that isn't covered by an existing `:root` variable, add it as a new CSS variable in `:root` (in the relevant file under `src/lib/app/styles/vars/`) instead of hardcoding it inline.
 
+## Layout
+
+- Any large block/section (a page section, a card, a panel, etc.) must be wrapped in the shared `Box` component from `src/lib/shared/ui/Box`.
+- If a `Box` instance needs a different visual appearance, do it through `Box`'s own props (`className`, `classNameContent`, `wrapperStyle`, `templateStyle`, `contentStyle`, `isWithoutBorder`, `isWithBlur`, etc.) — never by overriding `Box`'s internal styles from outside or duplicating its markup/styles in a custom wrapper.
+
 ## Icons
 
 - Do not use the `Icon` component from `@iconify/react` (or any other icon library component).

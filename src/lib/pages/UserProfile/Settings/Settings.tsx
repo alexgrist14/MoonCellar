@@ -67,13 +67,23 @@ export const Settings: FC<SettingsProps> = ({}) => {
       );
     }
     if (tempAvatar) {
-      apiCalls.push(userAPI.addAvatar(profile._id, tempAvatar));
+      apiCalls.push(
+        userAPI.addAvatar(profile._id, tempAvatar).then((res) => {
+          setProfile({ ...useAuthStore.getState().profile!, avatar: res.data });
+          setTempAvatar(undefined);
+        })
+      );
     }
     if (data.raUsername && data.raUsername !== profile.raUsername) {
       apiCalls.push(userAPI.setRaUserInfo(profile._id, data.raUsername));
     }
     if (background) {
-      apiCalls.push(userAPI.addBackground(profile._id, background));
+      apiCalls.push(
+        userAPI.addBackground(profile._id, background).then((res) => {
+          setProfile(res.data);
+          setBackground(undefined);
+        })
+      );
     }
     if (
       !blockedCountry &&
@@ -109,8 +119,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
   };
 
   const backgroundFileName = profile?.background
-    ? profile.background.split("cloud/")[1]?.split(/\.\w+\./)[0] +
-      profile.background.match(/\.\w+(?=\.)/)?.[0]
+    ? profile.background.split("/").pop()
     : null;
 
   return (

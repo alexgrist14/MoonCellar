@@ -1,6 +1,6 @@
 import { Dispatch, FC, SetStateAction, useState } from "react";
 import styles from "./SaveFilterForm.module.scss";
-import { WrapperTemplate } from "../WrapperTemplate";
+import { Box } from "../Box";
 import { Input } from "../Input";
 import { Button, ButtonColor } from "../Button";
 import { useAuthStore } from "../../store/auth.store";
@@ -32,7 +32,7 @@ export const SaveFilterForm: FC<{
       });
 
   return (
-    <WrapperTemplate classNameContent={styles.form}>
+    <Box classNameContent={styles.form}>
       <Input
         autoFocus
         value={name}
@@ -47,6 +47,6 @@ export const SaveFilterForm: FC<{
       >
         Save
       </Button>
-    </WrapperTemplate>
+    </Box>
   );
 };

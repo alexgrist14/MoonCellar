@@ -21,7 +21,7 @@ export const GameButtons: FC<{ game: IGameResponse }> = ({ game }) => {
     <div className={styles.menu}>
       {/* {!!game.retroachievements?.length && ( */}
       {/*   <> */}
-      {/*     <WrapperTemplate */}
+      {/*     <Box */}
       {/*       title="RetroAchievements" */}
       {/*       contentStyle={{ padding: "5px" }} */}
       {/*       isWithoutBorder */}
@@ -36,7 +36,7 @@ export const GameButtons: FC<{ game: IGameResponse }> = ({ game }) => {
       {/*           })) || []), */}
       {/*         ]} */}
       {/*       /> */}
-      {/*     </WrapperTemplate> */}
+      {/*     </Box> */}
       {/*     <Separator direction="horizontal" /> */}
       {/*   </> */}
       {/* )} */}

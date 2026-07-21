@@ -4,7 +4,7 @@
   color: var(--color-neutral-100);
   justify-content: center;
   margin-top: 5px;
-  gap: 10px;
+  gap: var(--gap-x4);
 
   @include mediaMd {
     grid-template-columns: 1fr;
@@ -15,6 +15,7 @@
     width: 100%;
     min-height: calc(100vh - 155px);
     border-radius: var(--radius-x2);
+    position: relative;
 
     @include mediaMd {
       padding: 10px;

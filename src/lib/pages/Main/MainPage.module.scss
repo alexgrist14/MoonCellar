@@ -5,7 +5,6 @@
 
   .banner {
     position: relative;
-    background: $darkblueBg;
     border-radius: var(--radius-x2);
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -37,8 +36,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-
-      &__stack {}
     }
 
     .games__stack {
@@ -125,7 +122,6 @@
       @include flexCenter;
       gap: var(--gap-x5);
       justify-content: space-evenly;
-      background: $darkblueBg;
       border-radius: var(--radius-x2);
       padding: var(--padding-x5);
       overflow: hidden;
@@ -149,37 +145,6 @@
         width: 150px;
         margin-top: var(--padding-x5);
         height: 35px;
-      }
-
-      .wheel {
-        &__preview {
-          position: relative;
-          flex-shrink: 0;
-        }
-
-        &__container {
-          position: relative;
-          width: clamp(240px, 34vw, 380px);
-          height: clamp(240px, 34vw, 380px);
-        }
-
-        &__svg {
-          width: 100%;
-          height: 100%;
-          animation: wheelHover 8s ease-in-out infinite;
-        }
-
-        @keyframes wheelHover {
-
-          0%,
-          100% {
-            transform: rotate(0deg);
-          }
-
-          50% {
-            transform: rotate(15deg);
-          }
-        }
       }
     }
   }

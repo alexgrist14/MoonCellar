@@ -1,12 +1,12 @@
 import { CSSProperties, FC, ReactNode } from "react";
-import { WrapperTemplateHead } from "./WrapperTemplateHead";
+import { BoxHead } from "./BoxHead";
 import cn from "classnames";
-import styles from "./WrapperTemplate.module.scss";
+import styles from "./Box.module.scss";
 import { Scrollbar } from "../Scrollbar";
 import { useResizeDetector } from "react-resize-detector";
 import classNames from "classnames";
 
-interface IWrapperTemplateProps {
+interface IBoxProps {
   children: ReactNode;
   title?: string;
   titleAction?: ReactNode;
@@ -22,7 +22,7 @@ interface IWrapperTemplateProps {
   isWithoutBorder?: boolean;
 }
 
-export const WrapperTemplate: FC<IWrapperTemplateProps> = ({
+export const Box: FC<IBoxProps> = ({
   children,
   contentStyle,
   templateStyle,
@@ -41,7 +41,7 @@ export const WrapperTemplate: FC<IWrapperTemplateProps> = ({
 
   return (
     <div className={cn(styles.wrapper, className)} style={wrapperStyle}>
-      <WrapperTemplateHead {...headProps} isExternal />
+      <BoxHead {...headProps} isExternal />
       <div
         style={templateStyle}
         className={cn(styles.template, {
@@ -49,7 +49,7 @@ export const WrapperTemplate: FC<IWrapperTemplateProps> = ({
           [styles.template_blur]: isWithBlur,
         })}
       >
-        <WrapperTemplateHead {...headProps} />
+        <BoxHead {...headProps} />
         <div
           ref={ref}
           style={contentStyle}

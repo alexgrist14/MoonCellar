@@ -1,36 +1,3 @@
-.container {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-
-  .sort {
-    display: flex;
-    background-color: var(--color-neutral-10);
-    justify-content: center;
-    padding-left: 10px;
-    align-items: center;
-    max-width: 200px;
-    user-select: none;
-    margin-bottom: 10px;
-    border-radius: var(--radius-x2);
-    gap: 10px;
-    cursor: pointer;
-    &__icon {
-      margin-inline: auto;
-      transition: transform 0.2s;
-      &_active {
-        transform: rotateX(180deg);
-      }
-      &_container {
-        display: flex;
-      }
-    }
-    &__dropdown {
-      transform: translateX(-26%);
-    }
-  }
-}
-
 .games {
   &__info {
     display: grid;

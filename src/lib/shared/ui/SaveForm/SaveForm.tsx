@@ -1,6 +1,6 @@
 import { FC, useState } from "react";
 import styles from "./SaveForm.module.scss";
-import { WrapperTemplate } from "../WrapperTemplate";
+import { Box } from "../Box";
 import { Input } from "../Input";
 import { Button, ButtonColor } from "../Button";
 
@@ -11,7 +11,7 @@ export const SaveForm: FC<{
   const [name, setName] = useState("");
 
   return (
-    <WrapperTemplate classNameContent={styles.form}>
+    <Box classNameContent={styles.form}>
       <Input
         autoFocus
         value={name}
@@ -26,6 +26,6 @@ export const SaveForm: FC<{
       >
         Save
       </Button>
-    </WrapperTemplate>
+    </Box>
   );
 };

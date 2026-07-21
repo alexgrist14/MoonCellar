@@ -3,7 +3,7 @@ import styles from "./GamePlaysInfo.module.scss";
 import { IPlaythrough } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
-import { WrapperTemplate } from "@/src/lib/shared/ui/WrapperTemplate";
+import { Box } from "@/src/lib/shared/ui/Box";
 import { Separator } from "@/src/lib/shared/ui/Separator";
 
 interface IGamePlaysInfoProps {
@@ -34,7 +34,7 @@ export const GamePlaysInfo: FC<IGamePlaysInfoProps> = ({
   }, []);
 
   return (
-    <WrapperTemplate isWithScrollBar>
+    <Box isWithScrollBar>
       <div className={styles.plays}>
         <h2>{gameName}</h2>
         {playthroughs.map((play) => {
@@ -63,6 +63,6 @@ export const GamePlaysInfo: FC<IGamePlaysInfoProps> = ({
           );
         })}
       </div>
-    </WrapperTemplate>
+    </Box>
   );
 };

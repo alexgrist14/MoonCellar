@@ -1,17 +1,14 @@
 import { gamesApi } from "@/src/lib/shared/api";
 import { SortType } from "@/src/lib/shared/types/sort.type";
 import { CategoriesType } from "@/src/lib/shared/types/user.type";
-import { CustomDropdown } from "@/src/lib/shared/ui/CustomDropdown";
 import { GameCard } from "@/src/lib/shared/ui/GameCard";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
-import { SvgArrowPointer } from "@/src/lib/shared/ui/svg";
 import { Icon } from "@iconify/react";
 import classNames from "classnames";
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./UserGames.module.scss";
 import { useSearchParams } from "next/navigation";
-import useCloseEvents from "@/src/lib/shared/hooks/useCloseEvents";
 import { IPlaythrough } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 import { useDebouncedCallback } from "use-debounce";
 import { useAsyncLoader } from "@/src/lib/shared/hooks/useAsyncLoader";
@@ -27,32 +24,24 @@ import { takeGames } from "@/src/lib/shared/constants/games.const";
 interface UserGamesProps {
   playthroughs: IPlaythrough[];
   ratings: IUserRating[];
+  selectedSort: SortType;
+  sortOrder: string;
 }
 
-const sortOptions = [
-  { label: SortType.DATE_ADDED },
-  // { label: SortType.DATE_COMPLETED },
-  { label: SortType.RATING },
-  // { label: SortType.TITLE },
-];
-const sortOrderOptions = [{ label: "asc" }, { label: "desc" }];
-
-export const UserGames: FC<UserGamesProps> = ({ playthroughs, ratings }) => {
+export const UserGames: FC<UserGamesProps> = ({
+  playthroughs,
+  ratings,
+  selectedSort,
+  sortOrder,
+}) => {
   const { sync, isLoading, setIsLoading } = useAsyncLoader();
 
   const query = useSearchParams();
   const page = Number(query.get("page"));
   const list = query.get("list") as CategoriesType;
 
-  const sortRef = useRef<HTMLDivElement>(null);
-
   const [total, setTotal] = useState(0);
-  const [sortOrder, setSortOrder] = useState("desc");
-  const [selectedSort, setSelectedSort] = useState<SortType>(
-    SortType.DATE_ADDED
-  );
   const [games, setGames] = useState<IGameResponse[]>();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
 
   const parsedGamesRatings = useMemo(() => {
@@ -163,48 +152,16 @@ export const UserGames: FC<UserGamesProps> = ({ playthroughs, ratings }) => {
     !games && debouncedGetGames(page);
   }, [debouncedGetGames, page, games]);
 
-  useCloseEvents([sortRef], () => setIsDropdownOpen(false));
-  const handleSortChange = (value: SortType) => {
-    setSelectedSort(value);
+  useEffect(() => {
     debouncedGetGames(page);
-  };
-
-  const handleSortOrderChange = (value: string) => {
-    setSortOrder(value);
-    debouncedGetGames(page);
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedSort, sortOrder]);
 
   if (isLoading || !hasInitiallyLoaded) return <Loader type="moon" />;
   if (!games || games.length === 0) return <p>There is no games</p>;
 
   return (
-    <div className={styles.container}>
-      <div
-        className={styles.sort}
-        ref={sortRef}
-        onClick={() => setIsDropdownOpen((prev) => !prev)}
-      >
-        <div className={styles.sort__icon_container}>
-          <SvgArrowPointer className={styles.sort__icon} />
-          <Icon
-            className={classNames(styles.sort__icon, {
-              [styles.sort__icon_active]: sortOrder === "asc",
-            })}
-            icon="iconamoon:sorting-left"
-          />
-        </div>
-        <CustomDropdown
-          isOpen={isDropdownOpen}
-          setIsOpen={setIsDropdownOpen}
-          onSelect={handleSortChange}
-          onExtendedSelect={handleSortOrderChange}
-          extendedSelected={sortOrder}
-          options={sortOptions}
-          selected={selectedSort}
-          extendedOptions={sortOrderOptions}
-          className={styles.sort__dropdown}
-        />
-      </div>
+    <>
       <GamesCards
         games={games}
         gameClassName={styles.games__game}
@@ -269,6 +226,6 @@ export const UserGames: FC<UserGamesProps> = ({ playthroughs, ratings }) => {
           debouncedGetGames(page);
         }}
       />
-    </div>
+    </>
   );
 };

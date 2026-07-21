@@ -1,6 +1,6 @@
 import { SortType } from "@/src/lib/shared/types/sort.type";
 import classNames from "classnames";
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import { Radio } from "../Radio";
 import styles from "./CustomDropdown.module.scss";
 
@@ -14,6 +14,7 @@ interface CustomDropdownProps {
   onExtendedSelect?: (value: string) => void;
   extendedSelected?: string;
   className?: string;
+  icon?: ReactNode;
 }
 export const CustomDropdown: FC<CustomDropdownProps> = ({
   options,
@@ -25,6 +26,7 @@ export const CustomDropdown: FC<CustomDropdownProps> = ({
   extendedSelected,
   onSelect,
   className,
+  icon,
 }) => {
   const handleSelect = (value: SortType) => {
     onSelect(value);
@@ -40,8 +42,14 @@ export const CustomDropdown: FC<CustomDropdownProps> = ({
 
   return (
     <div className={styles.dropdown}>
-      <div className={styles.dropdown__header}>
-        <p>{selected}</p>
+      <div
+        className={styles.dropdown__header}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <div className={styles.dropdown__label}>
+          {icon}
+          <span>{selected}</span>
+        </div>
         <span
           className={classNames(styles.dropdown__icon, {
             [styles.dropdown__icon_open]: isOpen,

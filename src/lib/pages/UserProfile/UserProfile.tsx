@@ -1,7 +1,8 @@
 "use client";
 
-import { FC, useEffect, useMemo } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { userListCategories } from "../../shared/constants/user.const";
+import { SortType } from "../../shared/types/sort.type";
 import { IUser } from "../../shared/types/auth.type";
 import { IFollowings } from "../../shared/types/user.type";
 import { Settings } from "./Settings";
@@ -9,7 +10,7 @@ import { UserGames } from "./UserGames";
 import UserInfo from "./UserInfo/UserInfo";
 import styles from "./UserProfile.module.scss";
 import cn from "classnames";
-import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
+import { Box } from "../../shared/ui/Box";
 import { BGImage } from "../../shared/ui/BGImage";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { SvgBurger } from "../../shared/ui/svg";
@@ -19,6 +20,7 @@ import { UserNavigation } from "../../features/user/ui/UserNavigation";
 import { IPlaythrough } from "../../shared/lib/schemas/playthroughs.schema";
 import { userAPI } from "../../shared/api";
 import { IUserRating } from "../../shared/lib/schemas/user-ratings.schema";
+import { useAuthStore } from "../../shared/store/auth.store";
 
 interface UserProfileProps {
   user: IUser;
@@ -43,6 +45,20 @@ const UserProfile: FC<UserProfileProps> = ({
     [authUserId, user]
   );
 
+  const authProfile = useAuthStore((s) => s.profile);
+
+  const displayUser = useMemo(
+    () =>
+      isAuthedUser && authProfile
+        ? {
+            ...user,
+            avatar: authProfile.avatar,
+            background: authProfile.background,
+          }
+        : user,
+    [isAuthedUser, authProfile, user]
+  );
+
   useEffect(() => {
     if (isAuthedUser) {
       userAPI.updateUserTime(user._id);
@@ -54,9 +70,16 @@ const UserProfile: FC<UserProfileProps> = ({
     [query]
   );
 
+  const isGamesTab = userListCategories.some((t) => t === tab);
+
+  const [selectedSort, setSelectedSort] = useState<SortType>(
+    SortType.DATE_ADDED
+  );
+  const [sortOrder, setSortOrder] = useState("desc");
+
   return (
     <>
-      <BGImage defaultImage={user.background} />
+      <BGImage userImage={displayUser.background} />
       <div className={cn(styles.container)}>
         {isMobile && (
           <ExpandMenu
@@ -80,30 +103,46 @@ const UserProfile: FC<UserProfileProps> = ({
             titleStyle={{ width: "fit-content" }}
           >
             <UserNavigation
-              user={user}
+              user={displayUser}
               isAuthedUser={isAuthedUser}
               playthroughs={playthroughs}
+              selectedSort={selectedSort}
+              sortOrder={sortOrder}
+              onSortChange={setSelectedSort}
+              onSortOrderChange={setSortOrder}
             />
           </ExpandMenu>
         )}
-        <WrapperTemplate classNameContent={styles.content}>
+        <Box
+          classNameContent={styles.content}
+          contentStyle={isGamesTab ? { padding: 0 } : undefined}
+        >
           {tab === "settings" && authUserId === user._id && <Settings />}
           {tab === "profile" && (
             <UserInfo
-              user={user}
+              user={displayUser}
               authUserFollowings={authUserFollowings}
               authUserId={authUserId}
             />
           )}
-          {userListCategories.some((t) => t === tab) && (
-            <UserGames playthroughs={playthroughs} ratings={ratings} />
+          {isGamesTab && (
+            <UserGames
+              playthroughs={playthroughs}
+              ratings={ratings}
+              selectedSort={selectedSort}
+              sortOrder={sortOrder}
+            />
           )}
-        </WrapperTemplate>
+        </Box>
         {!isMobile && (
           <UserNavigation
-            user={user}
+            user={displayUser}
             isAuthedUser={isAuthedUser}
             playthroughs={playthroughs}
+            selectedSort={selectedSort}
+            sortOrder={sortOrder}
+            onSortChange={setSelectedSort}
+            onSortOrderChange={setSortOrder}
           />
         )}
       </div>

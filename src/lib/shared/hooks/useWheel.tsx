@@ -6,6 +6,7 @@ import { useWheelStore } from "../store/wheel.store";
 import { useGames } from "./useGames";
 import { useHideAdult } from "./useHideAdult";
 import { isAdultGame } from "../utils/adult.utils";
+import { generateWheelColors } from "../utils/wheel.utils";
 
 interface IDrawProps {
   images?: HTMLImageElement[];
@@ -48,24 +49,7 @@ export const useWheel = ({
 
       if (!wheelGames?.length || !ctx || !X || !Y) return;
 
-      const generateRandomColors = (hue: number): string[] => {
-        return (
-          wheelGames?.map((_, i) => {
-            const min = 10;
-            const percent =
-              i <= wheelGames.length / 2
-                ? (70 / wheelGames.length) * i
-                : (70 / wheelGames.length) * (wheelGames.length - i + 1);
-
-            const lightness = (percent > min ? percent : min) + "%";
-            const saturation = "60%";
-
-            return `hsl(${hue}, ${saturation}, ${lightness})`;
-          }) || []
-        );
-      };
-
-      const segColors = generateRandomColors((200 + Math.random() * 30) ^ 0);
+      const segColors = generateWheelColors(wheelGames.length);
 
       const drawSegment = ({
         key,

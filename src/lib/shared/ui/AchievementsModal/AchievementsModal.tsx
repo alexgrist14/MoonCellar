@@ -2,7 +2,7 @@ import { FC, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import styles from "./AchievementsModal.module.scss";
-import { WrapperTemplate } from "../WrapperTemplate";
+import { Box } from "../Box";
 import { Button, ButtonColor } from "../Button";
 import { useAuthStore } from "../../store/auth.store";
 import { useCommonStore } from "../../store/common.store";
@@ -63,7 +63,7 @@ export const AchievementsModal: FC<IAchievementsModalProps> = ({ game }) => {
     : `https://retroachievements.org/searchresults.php?s=${game.name}&t=1`;
 
   return (
-    <WrapperTemplate
+    <Box
       title="RetroAchievements"
       isWithScrollBar
       contentStyle={{ padding: "15px" }}
@@ -107,6 +107,6 @@ export const AchievementsModal: FC<IAchievementsModalProps> = ({ game }) => {
           </Button>
         </Link>
       )}
-    </WrapperTemplate>
+    </Box>
   );
 };

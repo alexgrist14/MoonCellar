@@ -8,7 +8,7 @@ import { VideosRow } from "../../shared/ui/VideosRow";
 import Link from "next/link";
 import { GameCard } from "../../shared/ui/GameCard";
 import classNames from "classnames";
-import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
+import { Box } from "../../shared/ui/Box";
 import { BGImage } from "../../shared/ui/BGImage";
 import { IGameResponse } from "../../shared/lib/schemas/games.schema";
 import { useCommonStore } from "../../shared/store/common.store";
@@ -67,7 +67,7 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
             <GameCard game={game} isInfoDisabled />
           </div>
           {!!hltbRows && (
-            <WrapperTemplate contentStyle={{ padding: "12px" }}>
+            <Box contentStyle={{ padding: "12px" }}>
               <div className={styles.page__hltb}>
                 <h4>HowLongToBeat</h4>
                 {hltbRows.map((row) => (
@@ -77,10 +77,10 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
                   </p>
                 ))}
               </div>
-            </WrapperTemplate>
+            </Box>
           )}
           {!!ratingRows && (
-            <WrapperTemplate contentStyle={{ padding: "12px" }}>
+            <Box contentStyle={{ padding: "12px" }}>
               <div className={styles.page__hltb}>
                 <h4>Ratings</h4>
                 {ratingRows.map((row) => (
@@ -90,10 +90,10 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
                   </p>
                 ))}
               </div>
-            </WrapperTemplate>
+            </Box>
           )}
         </div>
-        <WrapperTemplate
+        <Box
           classNameContent={styles.page__right}
           contentStyle={{ padding: "10px" }}
         >
@@ -282,7 +282,7 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
               </p>
             </div>
           )}
-        </WrapperTemplate>
+        </Box>
       </div>
     </>
   );

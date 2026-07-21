@@ -17,3 +17,4 @@ export * from "./SvgPlay";
 export * from "./SvgCircleMenu";
 export * from "./SvgAdmin";
 export * from "./SvgMore";
+export * from "./SvgSort";

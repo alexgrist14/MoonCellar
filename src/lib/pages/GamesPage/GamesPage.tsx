@@ -9,7 +9,7 @@ import { useDebouncedCallback } from "use-debounce";
 import { Loader } from "../../shared/ui/Loader";
 import { Pagination } from "../../shared/ui/Pagination";
 import { parseQueryFilters } from "../../shared/utils/filters.utils";
-import { WrapperTemplate } from "../../shared/ui/WrapperTemplate";
+import { Box } from "../../shared/ui/Box";
 import { BGImage } from "../../shared/ui/BGImage";
 import { useAdvancedRouter } from "../../shared/hooks/useAdvancedRouter";
 import { useAsyncLoader } from "../../shared/hooks/useAsyncLoader";
@@ -69,7 +69,7 @@ export const GamesPage = () => {
           setIsLoading(true);
         }}
       />
-      <WrapperTemplate
+      <Box
         contentStyle={{
           minHeight: "calc(100vh - 155px)",
           padding: "0",
@@ -82,7 +82,7 @@ export const GamesPage = () => {
         ) : (
           <GamesCards games={games} />
         )}
-      </WrapperTemplate>
+      </Box>
     </>
   );
 };

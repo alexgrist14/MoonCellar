@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { WrapperTemplate } from "@/src/lib/shared/ui/WrapperTemplate";
+import { Box } from "@/src/lib/shared/ui/Box";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import { RangeSelector } from "@/src/lib/shared/ui/RangeSelector";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
@@ -10,7 +10,7 @@ export const WheelOptions: FC = () => {
   const { timer, setTimer } = useCommonStore();
 
   return (
-    <WrapperTemplate
+    <Box
       contentStyle={{
         gap: "15px",
       }}
@@ -30,6 +30,6 @@ export const WheelOptions: FC = () => {
         callback={(value) => setTimer(value)}
         text={`Time: ${timer} seconds`}
       />
-    </WrapperTemplate>
+    </Box>
   );
 };

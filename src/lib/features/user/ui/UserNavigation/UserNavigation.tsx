@@ -1,6 +1,6 @@
-import { FC } from "react";
+import { FC, useRef, useState } from "react";
 import styles from "./UserNavigation.module.scss";
-import { WrapperTemplate } from "@/src/lib/shared/ui/WrapperTemplate";
+import { Box } from "@/src/lib/shared/ui/Box";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { CustomFolder } from "@/src/lib/shared/ui/CustomFolderModal";
@@ -9,19 +9,49 @@ import { IUser } from "@/src/lib/shared/types/auth.type";
 import { userListCategories } from "@/src/lib/shared/constants/user.const";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import classNames from "classnames";
-import { SvgPen, SvgSettings } from "@/src/lib/shared/ui/svg";
+import { SvgPen, SvgSettings, SvgSort } from "@/src/lib/shared/ui/svg";
 import { IPlaythrough } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
 import { useExpandStore } from "@/src/lib/shared/store/expand.store";
+import { SortType } from "@/src/lib/shared/types/sort.type";
+import { CustomDropdown } from "@/src/lib/shared/ui/CustomDropdown";
+import useCloseEvents from "@/src/lib/shared/hooks/useCloseEvents";
+
+const sortOptions = [
+  { label: SortType.DATE_ADDED },
+  { label: SortType.RATING },
+];
+const sortOrderOptions = [{ label: "asc" }, { label: "desc" }];
 
 export const UserNavigation: FC<{
   isAuthedUser: boolean;
   user: IUser;
   playthroughs: IPlaythrough[];
-}> = ({ isAuthedUser, user, playthroughs }) => {
+  selectedSort: SortType;
+  sortOrder: string;
+  onSortChange: (value: SortType) => void;
+  onSortOrderChange: (value: string) => void;
+}> = ({
+  isAuthedUser,
+  user,
+  playthroughs,
+  selectedSort,
+  sortOrder,
+  onSortChange,
+  onSortOrderChange,
+}) => {
   const { setQuery, query } = useAdvancedRouter();
 
   const { setExpanded } = useExpandStore();
+
+  const sortRef = useRef<HTMLDivElement>(null);
+  const [isSortOpen, setIsSortOpen] = useState(false);
+
+  useCloseEvents([sortRef], () => setIsSortOpen(false));
+
+  const isGamesTab = userListCategories.some(
+    (category) => category === query.get("list")
+  );
 
   const handleEditListClick = () => {
     modal.open(<CustomFolder />);
@@ -29,7 +59,7 @@ export const UserNavigation: FC<{
 
   return (
     <div className={styles.panel}>
-      <WrapperTemplate>
+      <Box>
         <Button
           className={styles.btn}
           color={ButtonColor.TRANSPARENT}
@@ -45,8 +75,8 @@ export const UserNavigation: FC<{
             <span>Profile</span>
           </div>
         </Button>
-      </WrapperTemplate>
-      <WrapperTemplate>
+      </Box>
+      <Box>
         {userListCategories.map((category, i) => {
           const plays = playthroughs?.reduce((res: IPlaythrough[], play) => {
             if (
@@ -87,9 +117,9 @@ export const UserNavigation: FC<{
             </div>
           </Button>
         )}
-      </WrapperTemplate>
+      </Box>
       {isAuthedUser && (
-        <WrapperTemplate>
+        <Box>
           <Button
             className={styles.btn}
             active={query.get("list") === "settings"}
@@ -104,7 +134,30 @@ export const UserNavigation: FC<{
               <span>Settings</span>
             </div>
           </Button>
-        </WrapperTemplate>
+        </Box>
+      )}
+      {isGamesTab && (
+        <Box>
+          <div className={styles.sort} ref={sortRef}>
+            <CustomDropdown
+              isOpen={isSortOpen}
+              setIsOpen={setIsSortOpen}
+              onSelect={onSortChange}
+              onExtendedSelect={onSortOrderChange}
+              extendedSelected={sortOrder}
+              options={sortOptions}
+              selected={selectedSort}
+              extendedOptions={sortOrderOptions}
+              icon={
+                <SvgSort
+                  className={classNames(styles.sort__icon, {
+                    [styles.sort__icon_active]: sortOrder === "asc",
+                  })}
+                />
+              }
+            />
+          </div>
+        </Box>
       )}
     </div>
   );

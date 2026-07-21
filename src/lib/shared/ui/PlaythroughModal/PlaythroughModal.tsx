@@ -24,7 +24,7 @@ import { IButtonGroupItem } from "../../types/buttons.type";
 import { SvgPlus } from "../svg";
 import classNames from "classnames";
 import { useUserStore } from "../../store/user.store";
-import { WrapperTemplate } from "../WrapperTemplate";
+import { Box } from "../Box";
 import { toast } from "../../utils/toast.utils";
 import { IGameResponse } from "../../lib/schemas/games.schema";
 import { playthroughsAPI } from "../../api";
@@ -177,7 +177,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
   }, [game, userId, selectHandler, addHandler, sync]);
 
   return (
-    <WrapperTemplate
+    <Box
       isWithScrollBar
       contentStyle={{ padding: "20px" }}
       classNameContent={styles.wrapper}
@@ -319,6 +319,6 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
           </div>
         </form>
       </div>
-    </WrapperTemplate>
+    </Box>
   );
 };

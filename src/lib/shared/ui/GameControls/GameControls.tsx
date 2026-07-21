@@ -8,7 +8,7 @@ import { PlaythroughModal } from "../PlaythroughModal";
 import { AchievementsModal } from "../AchievementsModal";
 import { useUserStore } from "../../store/user.store";
 import { GameButtons } from "../GameButtons";
-import { WrapperTemplate } from "../WrapperTemplate";
+import { Box } from "../Box";
 import { SvgAchievement, SvgCircleMenu, SvgPlay } from "../svg";
 import { IGameResponse } from "../../lib/schemas/games.schema";
 import { SvgCrown } from "../svg/SvgCrown";
@@ -95,9 +95,9 @@ export const GameControls: FC<IGameControlsProps> = ({
           e.preventDefault();
 
           modal.open(
-            <WrapperTemplate>
+            <Box>
               <GameButtons game={game} />
-            </WrapperTemplate>,
+            </Box>,
             { id: "game-menu" }
           );
         }}

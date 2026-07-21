@@ -50,4 +50,16 @@
       align-items: center;
     }
   }
+
+  .sort {
+    width: 100%;
+
+    &__icon {
+      transition: transform 0.2s;
+
+      &_active {
+        transform: rotateX(180deg);
+      }
+    }
+  }
 }

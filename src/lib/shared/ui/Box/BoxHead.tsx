@@ -1,8 +1,8 @@
 import { FC, ReactNode } from "react";
 import classNames from "classnames";
-import styles from "./WrapperTemplate.module.scss";
+import styles from "./Box.module.scss";
 
-interface IWrapperTemplateHeadProps {
+interface IBoxHeadProps {
   title?: string;
   titleAction?: ReactNode;
   isHeaderWithoutStyles?: boolean;
@@ -10,7 +10,7 @@ interface IWrapperTemplateHeadProps {
   isExternal?: boolean;
 }
 
-export const WrapperTemplateHead: FC<IWrapperTemplateHeadProps> = ({
+export const BoxHead: FC<IBoxHeadProps> = ({
   isHeaderWithoutStyles,
   isVerticalActions,
   title,

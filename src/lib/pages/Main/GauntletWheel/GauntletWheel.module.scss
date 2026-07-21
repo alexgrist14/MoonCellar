@@ -1,0 +1,29 @@
+.wheel {
+  &__preview {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  &__container {
+    position: relative;
+    width: clamp(240px, 34vw, 380px);
+    height: clamp(240px, 34vw, 380px);
+  }
+
+  &__svg {
+    width: 100%;
+    height: 100%;
+    animation: wheelHover 8s ease-in-out infinite;
+  }
+
+  @keyframes wheelHover {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+
+    50% {
+      transform: rotate(15deg);
+    }
+  }
+}
