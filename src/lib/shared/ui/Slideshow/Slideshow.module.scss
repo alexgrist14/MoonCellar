@@ -92,7 +92,7 @@
 
   &__content {
     display: flex;
-    gap: 5px;
+    gap: var(--gap-x1);
     padding: 0;
     border-radius: var(--radius-x2);
     user-select: none;

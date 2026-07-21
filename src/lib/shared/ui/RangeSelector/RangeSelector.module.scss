@@ -2,7 +2,7 @@ $height: 20px;
 
 .selector {
   display: grid;
-  gap: 2px;
+  gap: var(--gap-x1);
   align-items: center;
   padding-inline: var(--padding-x2);
   color: $textColor;
@@ -32,7 +32,7 @@ $height: 20px;
   background-color: var(--color-negative);
   height: fit-content;
   border: 1px solid var(--color-negative);
-  border-radius: 3px;
+  border-radius: var(--radius-x1);
 
   &__input {
     position: absolute;
@@ -74,7 +74,7 @@ $height: 20px;
 
   &__bar {
     position: absolute;
-    border-radius: 3px;
+    border-radius: var(--radius-x1);
     top: 0;
     height: 100%;
     pointer-events: none;

@@ -27,7 +27,7 @@
   &__block {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--gap-x2);
     padding-inline: var(--padding-x1);
   }
 

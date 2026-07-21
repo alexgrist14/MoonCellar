@@ -76,6 +76,7 @@ export const GamesCards: FC<IGamesCardsProps> = ({
               classNameContainer={styles.block__container}
               classNameContent={styles.block__content}
               classNameScrollbar={styles.block__scrollbar}
+              classNameLine={styles.block__line}
               contentStyle={{ maxHeight: size.height }}
               fadeType="both"
               isWithRadius

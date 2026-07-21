@@ -113,10 +113,7 @@ const UserProfile: FC<UserProfileProps> = ({
             />
           </ExpandMenu>
         )}
-        <Box
-          classNameContent={styles.content}
-          contentStyle={isGamesTab ? { padding: 0 } : undefined}
-        >
+        <Box classNameContent={styles.content}>
           {tab === "settings" && authUserId === user._id && <Settings />}
           {tab === "profile" && (
             <UserInfo

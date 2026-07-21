@@ -6,12 +6,12 @@
   &__play {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: var(--gap-x1);
   }
 
   &__top {
     display: flex;
-    gap: 10px;
+    gap: var(--gap-x2);
     flex-wrap: wrap;
   }
 }

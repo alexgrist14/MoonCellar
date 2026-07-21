@@ -9,7 +9,7 @@
   &__games {
     display: grid;
     justify-items: flex-start;
-    gap: 10px;
+    gap: var(--gap-x2);
     width: 100%;
   }
 
@@ -17,7 +17,7 @@
     display: grid;
     width: 100%;
     align-items: center;
-    padding: 0px;
+    padding: 0;
 
     & > a {
       color: var(--color-neutral-100);
@@ -31,7 +31,7 @@
   &__title {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--gap-x2);
     width: 100%;
   }
 }

@@ -86,7 +86,10 @@ export const SearchModal: FC = () => {
                   style={{ width: "20px", marginTop: "2px" }}
                 />
               ),
-              style: { padding: "2px 10px", height: "calc(100% - 10px)" },
+              style: {
+                padding: "var(--padding-x05) var(--padding-x3)",
+                height: "calc(100% - 10px)",
+              },
               color: ButtonColor.ACCENT,
               onClick: () => searchHandler(searchQuery),
             },

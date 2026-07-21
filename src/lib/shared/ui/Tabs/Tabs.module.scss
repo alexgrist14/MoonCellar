@@ -5,8 +5,8 @@
     min-width: 100%;
     overflow: auto;
     flex-wrap: wrap;
-    row-gap: 5px;
-    padding: 1px;
+    row-gap: var(--gap-x1);
+    padding: var(--padding-x05);
 
     &_adaptive {
       justify-content: center;

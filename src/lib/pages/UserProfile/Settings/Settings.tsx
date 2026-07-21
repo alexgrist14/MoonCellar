@@ -141,6 +141,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
               <Input
                 id="userName"
                 className={styles.input}
+                containerClassname={styles.input}
                 {...register("userName")}
                 error={errors.userName}
               />
@@ -151,6 +152,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
                 type="email"
                 id="email"
                 className={styles.input}
+                containerClassname={styles.input}
                 {...register("email")}
                 error={errors.email}
               />
@@ -161,6 +163,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
                 type="text"
                 id="ra"
                 className={styles.input}
+                containerClassname={styles.input}
                 {...register("raUsername")}
                 error={errors.raUsername}
               />
@@ -172,6 +175,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
           <Textarea
             id="description"
             className={styles.input}
+            classNameField={styles.input}
             {...register("description")}
           />
         </div>

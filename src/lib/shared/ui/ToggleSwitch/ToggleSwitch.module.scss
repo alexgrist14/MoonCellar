@@ -5,7 +5,7 @@
   cursor: pointer;
   width: 60px;
   height: 30px;
-  border-radius: calc(var(--radius-x2) * 3);
+  border-radius: var(--radius-x6);
   border: 4px solid transparent;
   outline: 3px solid transparent;
   position: relative;
@@ -27,7 +27,7 @@
   &__wrapper {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: var(--gap-x1);
   }
 
   &_left {
@@ -59,7 +59,7 @@
     width: 50%;
     height: 100%;
     transition: 0.3s;
-    border-radius: calc(var(--radius-x2) * 2);
+    border-radius: var(--radius-x4);
 
     &_left {
       transform: translateX(0);

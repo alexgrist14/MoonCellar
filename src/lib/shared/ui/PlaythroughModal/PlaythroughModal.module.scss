@@ -40,7 +40,7 @@
 
   &__inputs {
     display: flex;
-    gap: 10px;
+    gap: var(--gap-x2);
 
     @include mediaMax($screenMd) {
       flex-direction: column;

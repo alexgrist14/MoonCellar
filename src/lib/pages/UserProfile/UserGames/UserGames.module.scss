@@ -4,7 +4,7 @@
     grid-template-columns: 1fr 30px;
     align-items: center;
     align-content: flex-start;
-    gap: 2px;
+    gap: var(--gap-x1);
     flex-direction: column;
     border-radius: var(--radius-x2);
     overflow: hidden;
@@ -12,14 +12,14 @@
 
     & p {
       @include textEllipsis;
-      padding-inline: 5px;
+      padding-inline: var(--padding-x1);
       width: 100%;
     }
   }
 
   &__text {
     display: grid;
-    gap: 2px;
+    gap: var(--gap-x1);
     cursor: pointer;
     transition: 0.3s;
 
@@ -59,6 +59,6 @@
   &__game {
     display: grid;
     grid-template-rows: 1fr 50px;
-    padding: 5px;
+    padding: var(--padding-x1);
   }
 }

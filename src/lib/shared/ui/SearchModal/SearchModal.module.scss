@@ -24,12 +24,12 @@
   }
 
   @include mediaSm {
-    padding: 10px;
+    padding: var(--padding-x3);
   }
 
   &__search {
     display: grid;
-    gap: 10px;
+    gap: var(--gap-x2);
     position: relative;
     align-items: center;
 

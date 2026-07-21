@@ -26,7 +26,7 @@ $fontMain: var(--font-general);
 
   &::-webkit-scrollbar-track {
     width: 8px;
-    border-radius: 24px !important;
+    border-radius: var(--radius-x6) !important;
 
     &:hover {
       transition: all 0.2s;
@@ -36,7 +36,7 @@ $fontMain: var(--font-general);
 
   &::-webkit-scrollbar-thumb {
     background-color: #5e636e;
-    border-radius: 24px !important;
+    border-radius: var(--radius-x6) !important;
     width: 8px;
   }
 }
@@ -60,7 +60,7 @@ $fontMain: var(--font-general);
 
   &::-webkit-scrollbar-thumb {
     background-color: #5e636e;
-    border-radius: 24px !important;
+    border-radius: var(--radius-x6) !important;
     border: 16px solid $borderColor;
     cursor: grab;
 

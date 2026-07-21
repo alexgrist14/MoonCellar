@@ -47,7 +47,7 @@
     height: 2px;
     background-color: var(--color-gray);
     bottom: 5px;
-    border-radius: 1px;
+    border-radius: var(--radius-x1);
     width: calc(100% - 32px);
     left: 50%;
     transform: translateX(-50%);

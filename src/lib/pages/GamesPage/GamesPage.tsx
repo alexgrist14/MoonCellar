@@ -72,7 +72,6 @@ export const GamesPage = () => {
       <Box
         contentStyle={{
           minHeight: "calc(100vh - 155px)",
-          padding: "0",
         }}
       >
         {isLoading || firstRender.current ? (

@@ -3,14 +3,14 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  gap: 30px;
+  gap: var(--gap-x7);
   background: var(--color-bg-tertiary);
   object-fit: cover;
   width: 100%;
   height: 100%;
   aspect-ratio: var(--cover-ratio);
   border-radius: var(--radius-x4);
-  padding: 10px;
+  padding: var(--padding-x3);
 
   &__image {
     height: 60px;

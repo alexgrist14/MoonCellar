@@ -66,7 +66,7 @@ export const AchievementsModal: FC<IAchievementsModalProps> = ({ game }) => {
     <Box
       title="RetroAchievements"
       isWithScrollBar
-      contentStyle={{ padding: "15px" }}
+      contentStyle={{ padding: "var(--padding-x4)" }}
       classNameContent={styles.modal}
     >
       {gameAwards.length ? (

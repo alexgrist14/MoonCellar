@@ -10,6 +10,7 @@ import { userListCategories } from "@/src/lib/shared/constants/user.const";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import classNames from "classnames";
 import { SvgPen, SvgSettings, SvgSort } from "@/src/lib/shared/ui/svg";
+import { Separator } from "@/src/lib/shared/ui/Separator";
 import { IPlaythrough } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
 import { useExpandStore } from "@/src/lib/shared/store/expand.store";
@@ -61,7 +62,7 @@ export const UserNavigation: FC<{
     <div className={styles.panel}>
       <Box>
         <Button
-          className={styles.btn}
+          className={classNames(styles.btn, styles.tall)}
           color={ButtonColor.TRANSPARENT}
           onClick={() => {
             setExpanded([]);
@@ -106,22 +107,25 @@ export const UserNavigation: FC<{
           );
         })}
         {isAuthedUser && (
-          <Button
-            color={ButtonColor.TRANSPARENT}
-            className={classNames(styles.btn, styles.last)}
-            onClick={handleEditListClick}
-          >
-            <div className={styles.edit}>
-              <span>Edit</span>
-              <SvgPen />
-            </div>
-          </Button>
+          <>
+            <Separator direction="horizontal" />
+            <Button
+              color={ButtonColor.TRANSPARENT}
+              className={classNames(styles.btn, styles.last)}
+              onClick={handleEditListClick}
+            >
+              <div className={styles.edit}>
+                <span>Edit</span>
+                <SvgPen />
+              </div>
+            </Button>
+          </>
         )}
       </Box>
       {isAuthedUser && (
         <Box>
           <Button
-            className={styles.btn}
+            className={classNames(styles.btn, styles.tall)}
             active={query.get("list") === "settings"}
             color={ButtonColor.TRANSPARENT}
             onClick={() => {
@@ -148,8 +152,12 @@ export const UserNavigation: FC<{
               options={sortOptions}
               selected={selectedSort}
               extendedOptions={sortOrderOptions}
+              headerClassName={styles.sort__header}
+              className={styles.sort__dropdown}
               icon={
                 <SvgSort
+                  size="24"
+                  style={{ color: "var(--color-neutral-80)" }}
                   className={classNames(styles.sort__icon, {
                     [styles.sort__icon_active]: sortOrder === "asc",
                   })}

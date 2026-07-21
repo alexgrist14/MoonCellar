@@ -57,7 +57,7 @@ $border: 2px solid var(--color-bg-hover);
 .title {
   position: absolute;
   top: 0;
-  padding: 5px;
+  padding: var(--padding-x1);
   user-select: none;
   transition: 0.4s;
   z-index: 4;

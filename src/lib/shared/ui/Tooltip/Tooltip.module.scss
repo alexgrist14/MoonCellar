@@ -2,7 +2,7 @@
   @include font(13px, 16px, 600);
   background-color: var(--color-bg-primary);
   border-radius: var(--radius-x2);
-  padding: 10px;
+  padding: var(--padding-x3);
   color: var(--color-neutral-100);
   z-index: 1000;
   pointer-events: none;

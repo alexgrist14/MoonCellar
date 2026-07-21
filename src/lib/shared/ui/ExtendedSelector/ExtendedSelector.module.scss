@@ -1,11 +1,11 @@
 .option {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: var(--gap-x1);
 
   &__selector {
     display: flex;
-    gap: 10px;
+    gap: var(--gap-x2);
     align-items: center;
     max-width: 100%;
   }

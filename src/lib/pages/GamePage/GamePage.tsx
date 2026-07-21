@@ -67,7 +67,7 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
             <GameCard game={game} isInfoDisabled />
           </div>
           {!!hltbRows && (
-            <Box contentStyle={{ padding: "12px" }}>
+            <Box contentStyle={{ padding: "var(--padding-x3)" }}>
               <div className={styles.page__hltb}>
                 <h4>HowLongToBeat</h4>
                 {hltbRows.map((row) => (
@@ -80,7 +80,7 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
             </Box>
           )}
           {!!ratingRows && (
-            <Box contentStyle={{ padding: "12px" }}>
+            <Box contentStyle={{ padding: "var(--padding-x3)" }}>
               <div className={styles.page__hltb}>
                 <h4>Ratings</h4>
                 {ratingRows.map((row) => (
@@ -95,7 +95,7 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
         </div>
         <Box
           classNameContent={styles.page__right}
-          contentStyle={{ padding: "10px" }}
+          contentStyle={{ padding: "var(--padding-x3)" }}
         >
           <h2>{game.name}</h2>
           <div className={styles.page__info}>

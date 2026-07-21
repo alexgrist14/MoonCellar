@@ -179,7 +179,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
   return (
     <Box
       isWithScrollBar
-      contentStyle={{ padding: "20px" }}
+      contentStyle={{ padding: "var(--padding-x5)" }}
       classNameContent={styles.wrapper}
     >
       <GameRating

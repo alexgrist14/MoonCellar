@@ -79,7 +79,7 @@ export const Pagination = memo(
           </Button>
           <div className={styles.pagination__center} ref={centerRef}>
             <Input
-              containerStyles={{ padding: "4px", width: "75px" }}
+              containerStyles={{ padding: "var(--padding-x1)", width: "75px" }}
               className={styles.pagination__input}
               type="number"
               value={value || page}

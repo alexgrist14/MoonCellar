@@ -13,13 +13,13 @@
 
   &__wrapper {
     display: grid;
-    gap: 5px;
+    gap: var(--gap-x1);
   }
 
   &__row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: var(--gap-x2);
 
     @include mediaMax($screenMd) {
       grid-template-columns: 1fr;
@@ -30,7 +30,7 @@
     display: grid;
     grid-template-columns: 3fr 1fr 3fr;
     align-items: center;
-    gap: 10px;
+    gap: var(--gap-x2);
   }
 
   &__line {
@@ -44,7 +44,7 @@
   &__sort {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--gap-x2);
 
     & > div:first-child {
       flex: 1;
@@ -54,14 +54,14 @@
 
   &__toggles {
     display: grid;
-    gap: 10px;
+    gap: var(--gap-x2);
     margin-top: var(--padding-x5);
   }
 
   &__toggle {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--gap-x2);
 
     & > p {
       margin-top: -2px;
@@ -70,12 +70,12 @@
 
   &__top {
     display: grid;
-    gap: 10px;
+    gap: var(--gap-x2);
   }
 
   &__saved {
     display: grid;
-    gap: 5px;
+    gap: var(--gap-x1);
 
     & button {
       width: 100%;

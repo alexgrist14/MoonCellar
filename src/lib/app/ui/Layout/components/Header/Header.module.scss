@@ -13,7 +13,7 @@
   left: 0;
 
   @include mediaSm {
-    padding-inline: 10px;
+    padding-inline: var(--padding-x3);
   }
 
   &__left {
@@ -21,14 +21,14 @@
     height: 70%;
     align-items: center;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: var(--gap-x2);
   }
 
   &__buttons {
     & button {
       @include flexCenter;
-      gap: 5px;
-      padding: 2px 5px;
+      gap: var(--gap-x1);
+      padding: var(--padding-x05) var(--padding-x1);
       border-radius: var(--radius-x2);
     }
   }
@@ -37,7 +37,7 @@
     position: relative;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--gap-x2);
 
     .profile {
       &__link {
@@ -50,7 +50,7 @@
     display: flex;
     align-items: center;
     font-family: var(--font-pentagra);
-    padding-inline: 14px;
+    padding-inline: var(--padding-x4);
     margin-top: var(--padding-x05);
     background: linear-gradient(30deg,
         $textSecondary 0%,
@@ -59,7 +59,7 @@
     -webkit-text-fill-color: transparent;
 
     @include mediaSm {
-      padding-inline: 5px;
+      padding-inline: var(--padding-x1);
     }
   }
 

@@ -1,13 +1,13 @@
 .checkbox {
   display: grid;
-  gap: 15px;
+  gap: var(--gap-x3);
 
   &__list {
     display: grid;
     grid-template-columns: 1fr 1fr;
 
     & label {
-      gap: 15px;
+      gap: var(--gap-x3);
     }
 
     & span {

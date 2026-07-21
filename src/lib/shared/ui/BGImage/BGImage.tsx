@@ -4,6 +4,7 @@ import classNames from "classnames";
 import Image from "next/image";
 import { useDebouncedCallback } from "use-debounce";
 import { useSettingsStore } from "../../store/settings.store";
+import { useAuthStore } from "../../store/auth.store";
 import { IGameResponse } from "../../lib/schemas/games.schema";
 import { useHideAdult } from "../../hooks/useHideAdult";
 import { isAdultGame } from "../../utils/adult.utils";
@@ -17,6 +18,7 @@ interface IBGImageProps {
 
 export const BGImage = memo(({ game, userImage }: IBGImageProps) => {
   const { bgOpacity } = useSettingsStore();
+  const authUserImage = useAuthStore((s) => s.profile?.background);
 
   const hideMedia = useHideAdult() && isAdultGame(game);
 
@@ -30,7 +32,7 @@ export const BGImage = memo(({ game, userImage }: IBGImageProps) => {
     return pictures[Math.floor(Math.random() * pictures.length)];
   }, [game, hideMedia]);
 
-  const source = gameImage || userImage || DEFAULT_IMAGE;
+  const source = gameImage || userImage || authUserImage || DEFAULT_IMAGE;
 
   const [bg, setBg] = useState<string>(source);
   const [prev, setPrev] = useState<string>(source);

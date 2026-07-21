@@ -1,6 +1,6 @@
 .range {
   display: grid;
-  gap: 5px;
+  gap: var(--gap-x1);
 
   &__wrapper {
     display: flex;

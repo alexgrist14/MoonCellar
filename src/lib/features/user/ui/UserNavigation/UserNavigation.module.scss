@@ -1,18 +1,18 @@
 .panel {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--gap-x2);
   height: fit-content;
   width: 100%;
-  min-width: 200px;
+  min-width: 240px;
   position: sticky;
   top: 70px;
 
   .btn {
     display: flex;
     justify-content: space-between;
-    border-radius: var(--radius-x2);
-    gap: 10px;
+    border-radius: var(--radius-x4);
+    gap: var(--gap-x2);
     color: var(--color-neutral-90);
 
     & > span:nth-child(2) {
@@ -40,9 +40,12 @@
     }
   }
 
+  .tall {
+    height: 48px;
+  }
+
   .last {
     color: var(--color-neutral-80);
-    border-top: 1px solid var(--color-bg-hover);
     div {
       display: flex;
       width: 100%;
@@ -60,6 +63,15 @@
       &_active {
         transform: rotateX(180deg);
       }
+    }
+
+    &__header {
+      height: 48px;
+      border-radius: var(--radius-x4);
+    }
+
+    &__dropdown {
+      border-radius: var(--radius-x4);
     }
   }
 }

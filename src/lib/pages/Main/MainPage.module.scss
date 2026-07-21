@@ -1,6 +1,6 @@
 .container {
   @include flexColumnCenter;
-  gap: 50px;
+  gap: var(--gap-x12);
   width: 100%;
 
   .banner {
@@ -303,7 +303,7 @@
 
     .gauntlet {
       &__content {
-        padding: 18px 14px;
+        padding: var(--padding-x5) var(--padding-x4);
       }
     }
 
@@ -317,7 +317,7 @@
   .title__section {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--gap-x2);
     font-size: clamp(1.5rem, 3vw, 2rem);
     margin-bottom: var(--padding-x5);
 

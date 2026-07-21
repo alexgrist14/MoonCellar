@@ -1,7 +1,7 @@
 .page {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 30px;
+  gap: var(--gap-x7);
   height: 100%;
   position: relative;
 
@@ -38,7 +38,7 @@
   &__hltb {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: var(--gap-x2);
 
     & h4 {
       @include font(14px, 18px, 500);
@@ -59,8 +59,8 @@
   &__right {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 10px 15px;
+    gap: var(--gap-x2);
+    padding: var(--padding-x3) var(--padding-x4);
     height: fit-content;
 
     & a {
@@ -76,7 +76,7 @@
 
   &__screenshots {
     display: grid;
-    gap: 5px;
+    gap: var(--gap-x1);
 
     & h4 {
       @include font(16px, 20px, 500);
@@ -117,13 +117,13 @@
   &__links {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: var(--gap-x1);
   }
 
   &__bottom {
     display: flex;
-    column-gap: 50px;
-    row-gap: 10px;
+    column-gap: var(--gap-x12);
+    row-gap: var(--gap-x2);
 
     @include mediaMax($screenMd) {
       flex-direction: column;

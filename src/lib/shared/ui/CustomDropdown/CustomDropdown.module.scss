@@ -9,7 +9,7 @@
     justify-content: space-between;
     align-items: center;
     gap: var(--gap-x5);
-    padding: 5px 10px;
+    padding: var(--padding-x1) var(--padding-x3);
     padding-inline: var(--padding-x3);
     border-radius: var(--radius-x2);
     font-size: 14px;
@@ -60,7 +60,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px var(--padding-x3);
+    padding: var(--padding-x3);
     cursor: pointer;
     transition: background-color 0.2s;
 

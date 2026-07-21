@@ -19,14 +19,14 @@ h3 {
 }
 
 .container {
-  padding: 100px 20px 50px 20px;
+  padding: var(--padding-x25) var(--padding-x5) var(--padding-x13) var(--padding-x5);
   width: 100%;
   height: fit-content;
   max-width: 1400px;
   margin-inline: auto;
 
   @media (max-width: 768px) {
-    padding-inline: 5px;
+    padding-inline: var(--padding-x1);
   }
 }
 

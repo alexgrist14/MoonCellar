@@ -19,7 +19,7 @@
 .role {
   display: inline-block;
   padding: var(--padding-x05) var(--padding-x2);
-  border-radius: 6px;
+  border-radius: var(--radius-x1);
   font-size: 0.95em;
   margin-right: 6px;
   background: var(--color-neutral-10);

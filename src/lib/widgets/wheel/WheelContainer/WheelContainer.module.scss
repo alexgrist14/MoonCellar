@@ -1,6 +1,6 @@
 .container {
   display: grid;
-  padding: 15px 20px;
+  padding: var(--padding-x4) var(--padding-x5);
   grid-template-columns: 1.5fr 1fr;
   align-items: center;
   gap: var(--gap-x5);
@@ -10,7 +10,7 @@
     grid-template-columns: 1fr;
     grid-template-rows: 1.2fr 1fr;
     padding: 0;
-    gap: 10px;
+    gap: var(--gap-x2);
   }
 
   &__right {
@@ -18,7 +18,7 @@
     flex-direction: column;
     gap: var(--gap-x5);
     height: 100%;
-    padding: 10px;
+    padding: var(--padding-x3);
     overflow: hidden;
   }
 }
@@ -28,7 +28,7 @@
   left: 0;
   width: 96px;
   height: 96px;
-  border-radius: 30px;
+  border-radius: var(--radius-x7);
 }
 
 .links {

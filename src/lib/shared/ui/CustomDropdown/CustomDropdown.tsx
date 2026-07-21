@@ -14,6 +14,7 @@ interface CustomDropdownProps {
   onExtendedSelect?: (value: string) => void;
   extendedSelected?: string;
   className?: string;
+  headerClassName?: string;
   icon?: ReactNode;
 }
 export const CustomDropdown: FC<CustomDropdownProps> = ({
@@ -26,6 +27,7 @@ export const CustomDropdown: FC<CustomDropdownProps> = ({
   extendedSelected,
   onSelect,
   className,
+  headerClassName,
   icon,
 }) => {
   const handleSelect = (value: SortType) => {
@@ -43,7 +45,7 @@ export const CustomDropdown: FC<CustomDropdownProps> = ({
   return (
     <div className={styles.dropdown}>
       <div
-        className={styles.dropdown__header}
+        className={classNames(styles.dropdown__header, headerClassName)}
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className={styles.dropdown__label}>

@@ -3,27 +3,6 @@
   gap: var(--gap-x4);
   width: 100%;
   padding-bottom: var(--padding-x3);
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-neutral-55) transparent;
-
-  &::-webkit-scrollbar {
-    height: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: var(--color-neutral-55);
-    border-radius: var(--radius-x6);
-
-    &:hover {
-      background-color: var(--color-neutral-60);
-    }
-  }
 
   &__item {
     flex: 0 0 auto;

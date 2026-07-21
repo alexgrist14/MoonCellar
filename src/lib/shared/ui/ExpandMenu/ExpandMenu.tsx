@@ -99,8 +99,8 @@ export const ExpandMenu = memo(
               classNameScrollbar={styles.scrollbars__scrollbar}
               contentStyle={{
                 ...(position.includes("bottom")
-                  ? { paddingBottom: "55px" }
-                  : { paddingTop: "55px" }),
+                  ? { paddingBottom: "var(--padding-x14)" }
+                  : { paddingTop: "var(--padding-x14)" }),
               }}
             >
               <div className={classNames(styles.menu__content)} ref={ref}>

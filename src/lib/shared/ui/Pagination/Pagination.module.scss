@@ -1,6 +1,6 @@
 .pagination {
   display: flex;
-  gap: 3px;
+  gap: var(--gap-x1);
   align-items: center;
   margin-inline: auto;
   padding: var(--padding-x05);
@@ -41,9 +41,9 @@
 
   &__center {
     display: flex;
-    gap: 5px;
+    gap: var(--gap-x1);
     align-items: center;
     white-space: nowrap;
-    padding-inline: 5px;
+    padding-inline: var(--padding-x1);
   }
 }

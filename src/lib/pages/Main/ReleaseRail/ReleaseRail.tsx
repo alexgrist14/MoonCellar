@@ -4,6 +4,7 @@ import { FC } from "react";
 import styles from "./ReleaseRail.module.scss";
 import { IGameResponse } from "../../../shared/lib/schemas/games.schema";
 import { GameCard } from "../../../shared/ui/GameCard";
+import { Scrollbar } from "../../../shared/ui/Scrollbar";
 
 const formatReleaseDate = (game: IGameResponse): string | null => {
   if (game.release_dates?.length) {
@@ -37,7 +38,7 @@ export const ReleaseRail: FC<ReleaseRailProps> = ({ games, withDate }) => {
   if (!games?.length) return null;
 
   return (
-    <div className={styles.rail}>
+    <Scrollbar classNameContent={styles.rail} isHorizontal>
       {games.map((game) => {
         const date = withDate ? formatReleaseDate(game) : null;
 
@@ -48,6 +49,6 @@ export const ReleaseRail: FC<ReleaseRailProps> = ({ games, withDate }) => {
           </div>
         );
       })}
-    </div>
+    </Scrollbar>
   );
 };

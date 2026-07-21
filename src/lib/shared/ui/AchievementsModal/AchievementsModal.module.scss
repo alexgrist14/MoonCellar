@@ -24,7 +24,7 @@
   &__info {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: var(--gap-x1);
     min-width: 0;
   }
 

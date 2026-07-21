@@ -1,7 +1,7 @@
 .wrapper {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: var(--gap-x1);
   width: 100%;
   min-width: 170px;
 }
@@ -42,7 +42,7 @@
   &__controls {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: var(--gap-x1);
     position: absolute;
     right: 20px;
     z-index: 1;
@@ -50,7 +50,7 @@
 
   &__search {
     @include flexCenter;
-    padding: 10px 5px;
+    padding: var(--padding-x3) var(--padding-x1);
     background-color: var(--color-bg-hover);
 
     &_active {
@@ -62,7 +62,7 @@
       font-weight: 400;
       font-size: 14px;
       line-height: 16px;
-      padding: 5px;
+      padding: var(--padding-x1);
       background-color: var(--color-bg-primary);
       width: calc(100% - 10px);
       border-radius: var(--radius-x2);
@@ -90,7 +90,7 @@
     width: 100%;
     border-radius: var(--radius-x2);
     border-bottom: 2px solid $blackBorderColor;
-    padding-left: 10px;
+    padding-left: var(--padding-x3);
     font-size: 15px;
     line-height: 24px;
     transition: all 0.15s;
@@ -221,8 +221,8 @@
   &__item {
     display: grid;
     align-items: center;
-    padding-block: 10px;
-    padding-inline: 15px 20px;
+    padding-block: var(--padding-x3);
+    padding-inline: var(--padding-x4) var(--padding-x5);
     font-style: normal;
     font-weight: 400;
     font-size: 13px;
@@ -233,7 +233,7 @@
     white-space: normal;
     word-break: break-word;
     background-color: var(--color-bg-hover);
-    gap: 10px;
+    gap: var(--gap-x2);
 
     & > span {
       @include lineClamp(2);
@@ -270,7 +270,7 @@
 
   &__check {
     display: flex;
-    gap: 5px;
+    gap: var(--gap-x1);
     margin-left: auto;
   }
 }
@@ -286,6 +286,6 @@
   }
 
   div &__thumb {
-    padding-inline: 5px;
+    padding-inline: var(--padding-x1);
   }
 }

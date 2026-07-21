@@ -37,7 +37,7 @@ export const DropdownControls: FC<IDropdownControlsProps> = ({
       {isWithReset && !isDisabled && isWithValue && (
         <Button
           color={ButtonColor.RED}
-          style={{ padding: "2px 5px" }}
+          style={{ padding: "var(--padding-x05) var(--padding-x1)" }}
           className={styles.dropdown__close}
           onClick={onReset}
         >

@@ -3,9 +3,14 @@
   flex-direction: column;
   flex: 1;
   height: 100%;
+  border-radius: var(--radius-x5);
 
   div &__container {
     width: max-content;
+  }
+
+  &__line {
+    border-radius: 0 0 var(--radius-x4) var(--radius-x4);
   }
 
   div &__content {
@@ -13,6 +18,7 @@
     padding: 0;
     height: fit-content;
     width: fit-content;
+    border-radius: var(--radius-x5);
   }
 
   div &__scrollbar {
