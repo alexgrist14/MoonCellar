@@ -179,6 +179,7 @@ const UserList: FC = () => {
                   )
                 }
                 isWithReset
+                isThroughPortal
               />
             ),
           },

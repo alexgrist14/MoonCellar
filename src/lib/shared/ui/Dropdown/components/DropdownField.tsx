@@ -61,7 +61,7 @@ export const DropdownField: FC<IDropdownFieldProps> = ({
           style={{
             width:
               isWithReset && !!value
-                ? "calc(100% - 50px)"
+                ? "calc(100% - 100px)"
                 : "calc(100% - 20px)",
           }}
         >

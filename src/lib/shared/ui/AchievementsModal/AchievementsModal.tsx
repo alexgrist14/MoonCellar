@@ -1,17 +1,23 @@
 import { FC, useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import styles from "./AchievementsModal.module.scss";
 import { WrapperTemplate } from "../WrapperTemplate";
 import { Button, ButtonColor } from "../Button";
 import { useAuthStore } from "../../store/auth.store";
 import { useCommonStore } from "../../store/common.store";
 import { IGameResponse } from "../../lib/schemas/games.schema";
+import { commonUtils } from "../../utils/common.utils";
 
 interface IAchievementsModalProps {
   game: IGameResponse;
 }
 
 const AWARD_PRIORITY = ["Mastery/Completion", "Game Beaten"];
+const RA_MEDIA_URL = "https://media.retroachievements.org";
+
+const getAwardIconSrc = (imageIcon: string) =>
+  imageIcon.startsWith("http") ? imageIcon : `${RA_MEDIA_URL}${imageIcon}`;
 
 export const AchievementsModal: FC<IAchievementsModalProps> = ({ game }) => {
   const profile = useAuthStore((s) => s.profile);
@@ -66,9 +72,18 @@ export const AchievementsModal: FC<IAchievementsModalProps> = ({ game }) => {
       {gameAwards.length ? (
         gameAwards.map((award, i) => (
           <div key={award.title + award.awardType + i} className={styles.row}>
+            <Image
+              alt={award.title}
+              src={getAwardIconSrc(award.imageIcon)}
+              width={40}
+              height={40}
+              className={styles.row__icon}
+            />
             <div className={styles.row__info}>
               <p className={styles.row__title}>{award.title}</p>
-              <p className={styles.row__meta}>{award.consoleName}</p>
+              <p className={styles.row__meta}>
+                {commonUtils.formatDate(award.awardedAt)}
+              </p>
               <p className={styles.row__meta}>{award.awardType}</p>
             </div>
             <Link

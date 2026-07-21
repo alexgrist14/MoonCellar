@@ -3,6 +3,7 @@
   flex-direction: column;
   gap: 5px;
   width: 100%;
+  min-width: 170px;
 }
 
 .dropdown {
@@ -31,6 +32,11 @@
   &_active {
     border-radius: var(--radius-x2) var(--radius-x2) 0 0;
     overflow: visible;
+  }
+
+  &_portal {
+    position: fixed;
+    z-index: 1000;
   }
 
   &__controls {

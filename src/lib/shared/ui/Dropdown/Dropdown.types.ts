@@ -37,8 +37,15 @@ export interface IDropDownListProps {
   isWithInput?: boolean;
   isWithAll?: boolean;
   isWithExclude?: boolean;
+  isThroughPortal?: boolean;
   borderTheme?: "default" | "green" | "red";
   icons?: string[];
+}
+
+export interface IDropdownPortalCoords {
+  top: number;
+  left: number;
+  width: number;
 }
 
 export interface IDropdownClickOptions {

@@ -1,8 +1,10 @@
 import { memo } from "react";
+import { createPortal } from "react-dom";
 import cl from "classnames";
 import styles from "./Dropdown.module.scss";
 import { IDropDownListProps } from "./Dropdown.types";
 import { useDropdown } from "./useDropdown";
+import { commonUtils } from "../../utils/common.utils";
 import { DropdownControls } from "./components/DropdownControls";
 import { DropdownField } from "./components/DropdownField";
 import { DropdownList } from "./components/DropdownList";
@@ -23,6 +25,7 @@ export const Dropdown = memo((props: IDropDownListProps) => {
     isWithInput,
     isWithAll,
     isWithExclude,
+    isThroughPortal,
     borderTheme,
     icons,
   } = props;
@@ -36,6 +39,8 @@ export const Dropdown = memo((props: IDropDownListProps) => {
     indexedList,
     offset,
     dropdownRef,
+    portalRef,
+    portalCoords,
     innerRef,
     searchRef,
     defaultPlaceholder,
@@ -50,6 +55,32 @@ export const Dropdown = memo((props: IDropDownListProps) => {
     handleValueChange,
     handleValueBlur,
   } = useDropdown(props);
+
+  const dropdownConnector = commonUtils.checkWindow(() =>
+    document.getElementById("dropdown-connector")
+  );
+
+  const dropdownList = (
+    <DropdownList
+      innerRef={innerRef}
+      offset={offset}
+      isActive={isActive}
+      borderTheme={borderTheme}
+      shouldShowSearch={shouldShowSearch}
+      query={query}
+      searchRef={searchRef}
+      onQueryChange={handleQueryChange}
+      maxHeight={maxHeight}
+      indexedList={indexedList}
+      multiValue={multiValue}
+      excludeValue={excludeValue}
+      value={value}
+      isMulti={isMulti}
+      isWithExclude={isWithExclude}
+      icons={icons}
+      onItemClick={clickHandler}
+    />
+  );
 
   return (
     <div className={styles.wrapper} style={wrapperStyle}>
@@ -100,26 +131,25 @@ export const Dropdown = memo((props: IDropDownListProps) => {
           onChange={handleValueChange}
           onBlur={handleValueBlur}
         />
-        <DropdownList
-          innerRef={innerRef}
-          offset={offset}
-          isActive={isActive}
-          borderTheme={borderTheme}
-          shouldShowSearch={shouldShowSearch}
-          query={query}
-          searchRef={searchRef}
-          onQueryChange={handleQueryChange}
-          maxHeight={maxHeight}
-          indexedList={indexedList}
-          multiValue={multiValue}
-          excludeValue={excludeValue}
-          value={value}
-          isMulti={isMulti}
-          isWithExclude={isWithExclude}
-          icons={icons}
-          onItemClick={clickHandler}
-        />
+        {!isThroughPortal && dropdownList}
       </div>
+      {isThroughPortal &&
+        !!portalCoords &&
+        !!dropdownConnector &&
+        createPortal(
+          <div
+            ref={portalRef}
+            className={styles.dropdown_portal}
+            style={{
+              top: portalCoords.top,
+              left: portalCoords.left,
+              width: portalCoords.width,
+            }}
+          >
+            {dropdownList}
+          </div>,
+          dropdownConnector
+        )}
     </div>
   );
 });

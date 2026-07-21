@@ -113,6 +113,7 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
       <div id="expand-connector"></div>
       <div id="pagination-connector"></div>
       <div id="tooltip-connector"></div>
+      <div id="dropdown-connector"></div>
     </div>
   );
 };

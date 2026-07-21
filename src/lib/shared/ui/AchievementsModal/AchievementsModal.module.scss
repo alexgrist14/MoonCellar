@@ -16,6 +16,11 @@
   background-color: var(--color-bg-hover);
   border-radius: var(--radius-x2);
 
+  &__icon {
+    flex-shrink: 0;
+    border-radius: var(--radius-x2);
+  }
+
   &__info {
     display: flex;
     flex-direction: column;

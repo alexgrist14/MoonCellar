@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useLayoutEffect, useRef, useState } from "react";
 import styles from "./GameCardInfo.module.scss";
 import classNames from "classnames";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
@@ -19,10 +19,22 @@ export const GameCardInfo: FC<IGameCardInfoProps> = ({
 }) => {
   const systems = useCommonStore((s) => s.systems);
   const averageRating = getAverageRating(game);
+  const infoRef = useRef<HTMLDivElement>(null);
+  const [showSummary, setShowSummary] = useState(true);
+
+  useLayoutEffect(() => {
+    const el = infoRef.current;
+    if (!el || !game.summary) return;
+
+    if (el.scrollHeight > el.clientHeight) {
+      setShowSummary(false);
+    }
+  }, [game.summary]);
 
   return (
     <div
       id="game-info"
+      ref={infoRef}
       className={classNames(
         styles.info,
         playthroughs?.map((play) => styles[`info_${play.category}`]),
@@ -58,7 +70,7 @@ export const GameCardInfo: FC<IGameCardInfoProps> = ({
               .join(", ")}
         </span>
       </div>
-      {!!game.summary && (
+      {!!game.summary && showSummary && (
         <div className={styles.info__block}>
           <span className={styles.info__description}>{game.summary}</span>
         </div>

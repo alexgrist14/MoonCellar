@@ -4,6 +4,7 @@ import useCloseEvents from "../../hooks/useCloseEvents";
 import {
   IDropDownListProps,
   IDropdownClickOptions,
+  IDropdownPortalCoords,
   IIndexedItem,
 } from "./Dropdown.types";
 
@@ -29,6 +30,7 @@ export const useDropdown = ({
   isWithSearch,
   isWithInput,
   isWithExclude,
+  isThroughPortal,
 }: IDropDownListProps) => {
   const [isActive, setIsActive] = useState(false);
   const [value, setValue] = useState(initialValue);
@@ -45,8 +47,12 @@ export const useDropdown = ({
 
   const [indexedList, setIndexedList] = useState<IIndexedItem[]>([]);
 
+  const [portalCoords, setPortalCoords] =
+    useState<IDropdownPortalCoords | null>(null);
+
   const innerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const portalRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
   const firstActive = useRef(true);
@@ -273,7 +279,20 @@ export const useDropdown = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getSearchQuery, list]);
 
-  useCloseEvents([dropdownRef], () => {
+  useEffect(() => {
+    if (!isThroughPortal || !isActive) return;
+
+    const rect = dropdownRef.current?.getBoundingClientRect();
+
+    !!rect &&
+      setPortalCoords({
+        top: rect.top,
+        left: rect.left,
+        width: rect.width,
+      });
+  }, [isActive, isThroughPortal]);
+
+  useCloseEvents([dropdownRef, portalRef], () => {
     isActive && (offset.current = 0);
     setIsActive(false);
   });
@@ -287,6 +306,8 @@ export const useDropdown = ({
     indexedList,
     offset: offset.current,
     dropdownRef,
+    portalRef,
+    portalCoords,
     innerRef,
     searchRef,
     defaultPlaceholder,
