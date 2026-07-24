@@ -1,6 +1,7 @@
-export const API_URL = typeof window === 'undefined'
-  ? process.env.INTERNAL_API_URL || "http://host.containers.internal:3228"
-  : process.env.NEXT_PUBLIC_API_URL || "https://api.mooncellar.space";
+export const API_URL =
+  typeof window === "undefined"
+    ? process.env.INTERNAL_API_URL || "http://host.containers.internal:3228"
+    : process.env.NEXT_PUBLIC_API_URL || "https://api.mooncellar.space";
 
 export const FRONT_URL =
   process.env.NEXT_PUBLIC_FRONT_URL || "https://mooncellar.space";

@@ -19,9 +19,13 @@ function getReader(): Promise<Reader<CountryResponse>> {
   return readerPromise;
 }
 
-function extractClientIp(xRealIp: string | null, xForwardedFor: string | null): string | null {
+function extractClientIp(
+  xRealIp: string | null,
+  xForwardedFor: string | null
+): string | null {
   if (xRealIp && xRealIp.trim()) return xRealIp.trim();
-  if (xForwardedFor && xForwardedFor.trim()) return xForwardedFor.split(",")[0].trim();
+  if (xForwardedFor && xForwardedFor.trim())
+    return xForwardedFor.split(",")[0].trim();
   return null;
 }
 

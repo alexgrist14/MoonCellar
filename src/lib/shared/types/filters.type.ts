@@ -1,7 +1,9 @@
 import { IGetGamesRequest } from "../lib/schemas/games.schema";
 
-export interface IGameFiltersQuery
-  extends Omit<IGetGamesRequest, "selected" | "excluded"> {
+export interface IGameFiltersQuery extends Omit<
+  IGetGamesRequest,
+  "selected" | "excluded"
+> {
   selectedGenres?: string[];
   selectedModes?: string[];
   selectedPlatforms?: string[];

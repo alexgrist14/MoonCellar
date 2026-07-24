@@ -1,13 +1,13 @@
-import { ITableRows } from '@/src/lib/shared/types/table.type';
-import styles from './MobileTable.module.scss';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { Button } from '@/src/lib/shared/ui/Button';
-import { SvgChevron } from '@/src/lib/shared/ui/svg';
-import classNames from 'classnames';
-import { Loader } from '@/src/lib/shared/ui/Loader';
-import { Dropdown } from '@/src/lib/shared/ui/Dropdown';
-import { commonUtils } from '@/src/lib/shared/utils/common.utils';
-import { PaginationClient } from '@/src/lib/shared/ui/PaginationClient';
+import { ITableRows } from "@/src/lib/shared/types/table.type";
+import styles from "./MobileTable.module.scss";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Button } from "@/src/lib/shared/ui/Button";
+import { SvgChevron } from "@/src/lib/shared/ui/svg";
+import classNames from "classnames";
+import { Loader } from "@/src/lib/shared/ui/Loader";
+import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
+import { commonUtils } from "@/src/lib/shared/utils/common.utils";
+import { PaginationClient } from "@/src/lib/shared/ui/PaginationClient";
 
 interface ITableProps<T> {
   rows?: ITableRows<T>;
@@ -39,8 +39,7 @@ export const MobileTable = <T extends object>({
 
           return {
             key,
-            label:
-              typeof title === 'string' ? title : commonUtils.upFL(key),
+            label: typeof title === "string" ? title : commonUtils.upFL(key),
           };
         })
       : [];
@@ -49,9 +48,9 @@ export const MobileTable = <T extends object>({
   }, [rows]);
 
   const [sortingKey, setSortingKey] = useState<keyof T | undefined>(
-    initialSortingKey,
+    initialSortingKey
   );
-  const [sortingOrder, setSortingOrder] = useState<'asc' | 'desc'>('desc');
+  const [sortingOrder, setSortingOrder] = useState<"asc" | "desc">("desc");
   const [sortedRows, setSortedRows] = useState<ITableRows<T>>();
 
   const [page, setPage] = useState(1);
@@ -61,7 +60,7 @@ export const MobileTable = <T extends object>({
 
   const isInactive = useMemo(
     () => isLoading || sortedRows === undefined,
-    [sortedRows, isLoading],
+    [sortedRows, isLoading]
   );
 
   useEffect(() => {
@@ -74,13 +73,13 @@ export const MobileTable = <T extends object>({
           const secondValue = second.sortingValue || second.content || 0;
 
           return firstValue > secondValue
-            ? sortingOrder === 'asc'
+            ? sortingOrder === "asc"
               ? 1
               : -1
-            : sortingOrder === 'asc'
+            : sortingOrder === "asc"
               ? -1
               : 1;
-        }),
+        })
       );
     } else {
       setSortedRows(rows);
@@ -107,10 +106,10 @@ export const MobileTable = <T extends object>({
               />
               <Dropdown
                 title="Sort order"
-                list={['Asc', 'Desc']}
-                overwriteValue={sortingOrder === 'asc' ? 'Asc' : 'Desc'}
+                list={["Asc", "Desc"]}
+                overwriteValue={sortingOrder === "asc" ? "Asc" : "Desc"}
                 getIndex={(index) =>
-                  setSortingOrder(index === 0 ? 'asc' : 'desc')
+                  setSortingOrder(index === 0 ? "asc" : "desc")
                 }
               />
             </div>
@@ -127,7 +126,7 @@ export const MobileTable = <T extends object>({
               return (
                 <div key={i} className={styles.table__row}>
                   <div className={styles.table__header}>
-                    {['string', 'number'].includes(typeof header.content) ? (
+                    {["string", "number"].includes(typeof header.content) ? (
                       <p>{header.content}</p>
                     ) : (
                       header.content
@@ -138,13 +137,13 @@ export const MobileTable = <T extends object>({
                         setActiveIndexes(
                           isActive
                             ? activeIndexes.filter((index) => index !== i)
-                            : [i, ...activeIndexes],
+                            : [i, ...activeIndexes]
                         )
                       }
                     >
                       <SvgChevron
                         style={{
-                          transform: isActive ? 'rotate(180deg)' : 'none',
+                          transform: isActive ? "rotate(180deg)" : "none",
                         }}
                       />
                     </Button>
@@ -158,22 +157,22 @@ export const MobileTable = <T extends object>({
 
                         return (
                           <div
-                            key={j + (rowField.id || '')}
+                            key={j + (rowField.id || "")}
                             id={rowField.id}
                             className={styles.table__item}
                           >
                             {rowField.title &&
-                              (['string', 'number'].includes(
-                                typeof rowField.title,
+                              (["string", "number"].includes(
+                                typeof rowField.title
                               ) ? (
-                                <p style={{ whiteSpace: 'nowrap' }}>
+                                <p style={{ whiteSpace: "nowrap" }}>
                                   {rowField.title}:
                                 </p>
                               ) : (
                                 rowField.title
                               ))}
-                            {['string', 'number'].includes(
-                              typeof rowField.content,
+                            {["string", "number"].includes(
+                              typeof rowField.content
                             ) ? (
                               <p>{rowField.content}</p>
                             ) : (

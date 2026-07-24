@@ -52,9 +52,11 @@
     font-family: var(--font-pentagra);
     padding-inline: var(--padding-x4);
     margin-top: var(--padding-x05);
-    background: linear-gradient(30deg,
-        $textSecondary 0%,
-        var(--color-accent) 100%);
+    background: linear-gradient(
+      30deg,
+      $textSecondary 0%,
+      var(--color-accent) 100%
+    );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 

@@ -1,0 +1,75 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x1);
+  margin-bottom: var(--gap-x3);
+}
+
+.label {
+  color: var(--color-neutral-85);
+  font-size: 14px;
+}
+
+.row {
+  display: flex;
+  gap: var(--gap-x2);
+  align-items: center;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-x1);
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-x1);
+  padding: var(--padding-x1) var(--padding-x2);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-x4);
+  background: var(--color-bg-tertiary);
+}
+
+.objectRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-x2);
+  align-items: flex-end;
+  padding: var(--padding-x2);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-x4);
+  margin-bottom: var(--gap-x2);
+}
+
+.section {
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-x4);
+  margin-bottom: var(--gap-x3);
+  overflow: hidden;
+
+  &_error {
+    border-color: var(--color-negative);
+  }
+}
+
+.sectionHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: var(--padding-x3);
+  background: var(--color-bg-secondary);
+  cursor: pointer;
+}
+
+.sectionBody {
+  padding: var(--padding-x3);
+}
+
+.note {
+  color: var(--color-attention);
+  font-size: 12px;
+  margin-bottom: var(--gap-x2);
+}

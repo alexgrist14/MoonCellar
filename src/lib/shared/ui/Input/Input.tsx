@@ -3,27 +3,27 @@ import styles from "./Input.module.scss";
 import classNames from "classnames";
 import type { FieldError } from "react-hook-form";
 
-interface InputProps
-  extends Pick<
-    InputHTMLAttributes<HTMLInputElement>,
-    | "placeholder"
-    | "required"
-    | "type"
-    | "value"
-    | "className"
-    | "style"
-    | "onChange"
-    | "disabled"
-    | "defaultValue"
-    | "autoFocus"
-    | "autoComplete"
-    | "onKeyDown"
-    | "onBlur"
-    | "onMouseOver"
-    | "onMouseOut"
-    | "id"
-    | "name"
-  > {
+interface InputProps extends Pick<
+  InputHTMLAttributes<HTMLInputElement>,
+  | "placeholder"
+  | "required"
+  | "type"
+  | "value"
+  | "className"
+  | "style"
+  | "onChange"
+  | "disabled"
+  | "readOnly"
+  | "defaultValue"
+  | "autoFocus"
+  | "autoComplete"
+  | "onKeyDown"
+  | "onBlur"
+  | "onMouseOver"
+  | "onMouseOut"
+  | "id"
+  | "name"
+> {
   containerStyles?: CSSProperties;
   containerClassname?: string;
   error?: FieldError;

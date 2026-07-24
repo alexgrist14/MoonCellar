@@ -38,8 +38,7 @@ agent.interceptors.response.use(
         });
     }
 
-    const errorMessage =
-      err?.response?.data?.message ?? "Something went wrong";
+    const errorMessage = err?.response?.data?.message ?? "Something went wrong";
 
     logger.error("API request error", err, {
       url: err.config?.url,

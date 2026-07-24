@@ -1,5 +1,6 @@
 import { API_URL } from "../constants";
 import {
+  IAddGameRequest,
   IGameResponse,
   IGenreResponse,
   IGetGameByIdRequest,
@@ -38,12 +39,27 @@ export const gamesApi = {
     );
   },
 
-  add: () => {
-    return agent.post<IGameResponse>(`${GAMES_URL}/add`, {});
+  add: (dto: IAddGameRequest) => {
+    return agent.post<IGameResponse>(`${GAMES_URL}/add`, dto);
   },
 
   update: (id: string, dto: IUpdateGameRequest) => {
     return agent.put<IGameResponse>(`${GAMES_URL}/update/${id}`, dto);
+  },
+
+  uploadImage: (
+    gameId: string,
+    type: "cover" | "screenshot" | "artwork",
+    file: File
+  ) => {
+    const formData = new FormData();
+
+    formData.append("file", file);
+
+    return agent.post<string>(`${GAMES_URL}/upload-image/${gameId}`, formData, {
+      params: { gameId, type },
+      headers: { "Content-Type": "multipart/form-data" },
+    });
   },
 
   remove: async (id: string) => {

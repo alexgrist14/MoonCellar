@@ -3,7 +3,8 @@ import { devtools } from "zustand/middleware";
 import { IPlatform } from "../lib/schemas/platforms.schema";
 
 export type IExpandPosition = "left" | "right" | "bottom-left" | "bottom-right";
-export type IScrollPosition ={[key: string]: { top: number; left: number }} | undefined;
+export type IScrollPosition =
+  { [key: string]: { top: number; left: number } } | undefined;
 
 type IState = {
   systems?: IPlatform[];
@@ -16,7 +17,7 @@ type IState = {
   gameTypes?: string[];
   companies?: string[];
   timer: number;
-  scrollPosition?:  IScrollPosition| undefined;
+  scrollPosition?: IScrollPosition | undefined;
 };
 
 type IAction = {
@@ -30,9 +31,7 @@ type IAction = {
   setSystems: (platforms: IPlatform[]) => void;
   setTimer: (timer: number) => void;
   setCompanies: (companies: string[]) => void;
-  setScrollPosition: (
-    scrollPosition: IScrollPosition | undefined
-  ) => void;
+  setScrollPosition: (scrollPosition: IScrollPosition | undefined) => void;
 };
 
 export const useCommonStore = create<IState & IAction>()(

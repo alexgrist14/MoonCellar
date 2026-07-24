@@ -3,8 +3,9 @@ import styles from "./RangeSelector.module.scss";
 import classNames from "classnames";
 import { Loader } from "../Loader";
 
-interface RangeSelectorProps
-  extends Partial<Pick<HTMLInputElement, "disabled">> {
+interface RangeSelectorProps extends Partial<
+  Pick<HTMLInputElement, "disabled">
+> {
   text?: string;
   textPosition?: "above" | "left" | "right";
   variant?: "accent" | "green";

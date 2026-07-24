@@ -1,4 +1,5 @@
 import { API_URL } from "../constants";
+import { IGameResponse } from "../lib/schemas/games.schema";
 import { IRole } from "../lib/schemas/role.schema";
 import agent from "./agent.api";
 
@@ -30,4 +31,9 @@ export const adminUsersApi = {
   addUserRole,
   removeUserRole,
   deleteUser,
+};
+
+export const adminGamesApi = {
+  getGameById: (id: string) =>
+    agent.get<IGameResponse>(`${ADMIN_URL}/games/${id}`),
 };

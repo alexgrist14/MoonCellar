@@ -64,7 +64,8 @@ export const GameCard = memo(
       return {
         isMastered: profile.raAwards.some(
           (award) =>
-            award.awardType === "Mastery/Completion" && raIds.has(award.awardData)
+            award.awardType === "Mastery/Completion" &&
+            raIds.has(award.awardData)
         ),
         isBeaten: profile.raAwards.some(
           (award) =>

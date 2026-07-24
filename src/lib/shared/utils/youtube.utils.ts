@@ -11,7 +11,9 @@ export const getYoutubeVideoId = (video: string): string => {
     }
 
     return (
-      url.searchParams.get("v") || url.pathname.split("/").filter(Boolean).pop() || video
+      url.searchParams.get("v") ||
+      url.pathname.split("/").filter(Boolean).pop() ||
+      video
     );
   } catch {
     return video;

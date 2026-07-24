@@ -177,7 +177,9 @@ export const Filters: FC<{
                 }}
               />
               <ToggleSwitch
-                leftContent={<SvgChevron style={{ transform: "rotate(180deg)" }} />}
+                leftContent={
+                  <SvgChevron style={{ transform: "rotate(180deg)" }} />
+                }
                 rightContent={<SvgChevron />}
                 isDisabled={isLoading || !filters?.sortBy}
                 value={filters?.sortOrder === "asc" ? "left" : "right"}
@@ -407,14 +409,17 @@ export const Filters: FC<{
                 disabled={isLoading}
                 placeholder="Start..."
                 type="number"
-                value={filters?.years?.[0] != null ? String(filters.years[0]) : ""}
+                value={
+                  filters?.years?.[0] != null ? String(filters.years[0]) : ""
+                }
                 onChange={(e) => {
                   const start = e.target.value ? Number(e.target.value) : null;
                   const end = filters?.years?.[1] ?? null;
 
                   const temp: IGetGamesRequest = {
                     ...filters,
-                    years: start == null && end == null ? undefined : [start, end],
+                    years:
+                      start == null && end == null ? undefined : [start, end],
                   };
 
                   setFilters(temp);
@@ -430,14 +435,17 @@ export const Filters: FC<{
                 disabled={isLoading}
                 placeholder="End..."
                 type="number"
-                value={filters?.years?.[1] != null ? String(filters.years[1]) : ""}
+                value={
+                  filters?.years?.[1] != null ? String(filters.years[1]) : ""
+                }
                 onChange={(e) => {
                   const start = filters?.years?.[0] ?? null;
                   const end = e.target.value ? Number(e.target.value) : null;
 
                   const temp: IGetGamesRequest = {
                     ...filters,
-                    years: start == null && end == null ? undefined : [start, end],
+                    years:
+                      start == null && end == null ? undefined : [start, end],
                   };
 
                   setFilters(temp);

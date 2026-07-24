@@ -2,11 +2,10 @@ import { FC, InputHTMLAttributes } from "react";
 import styles from "./Checkbox.module.scss";
 import classNames from "classnames";
 
-interface ICheckboxProps
-  extends Pick<
-    InputHTMLAttributes<HTMLInputElement>,
-    "required" | "disabled" | "onChange" | "id" | "checked" | "className"
-  > {
+interface ICheckboxProps extends Pick<
+  InputHTMLAttributes<HTMLInputElement>,
+  "required" | "disabled" | "onChange" | "id" | "checked" | "className"
+> {
   colorTheme?: "accent" | "on" | "off";
   borderColor?: string;
   isBorderFromTheme?: boolean;

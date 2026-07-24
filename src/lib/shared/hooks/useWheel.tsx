@@ -141,9 +141,7 @@ export const useWheel = ({
 
       wheelGames.forEach((game) => {
         const cover =
-          !!game?.cover && !(hideAdult && isAdultGame(game))
-            ? game.cover
-            : "";
+          !!game?.cover && !(hideAdult && isAdultGame(game)) ? game.cover : "";
 
         queries.push(createImage(cover));
       });

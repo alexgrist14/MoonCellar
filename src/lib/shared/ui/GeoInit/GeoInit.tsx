@@ -11,7 +11,11 @@ export const GeoInit = () => {
     fetch("/api/geo")
       .then((r) => r.json())
       .then((geo) => {
-        if (active) setGeo({ country: geo.country ?? null, blockedCountry: !!geo.blockedCountry });
+        if (active)
+          setGeo({
+            country: geo.country ?? null,
+            blockedCountry: !!geo.blockedCountry,
+          });
       })
       .catch(() => {
         if (active) setGeo({ country: null, blockedCountry: false });

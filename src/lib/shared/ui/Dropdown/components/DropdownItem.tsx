@@ -44,7 +44,9 @@ export const DropdownItem = memo(
         {(isMulti || isChecked) && (
           <div className={styles.dropdown__check}>
             <Checkbox
-              colorTheme={isWithExclude ? (isExcluded ? "off" : "on") : "accent"}
+              colorTheme={
+                isWithExclude ? (isExcluded ? "off" : "on") : "accent"
+              }
               checked={isChecked || isExcluded || false}
               onChange={() => {}}
             />

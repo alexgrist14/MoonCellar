@@ -1,0 +1,49 @@
+.toolbar {
+  display: flex;
+  gap: var(--gap-x2);
+  align-items: center;
+  margin-bottom: var(--gap-x3);
+}
+
+.search {
+  flex: 1;
+}
+
+.cover {
+  width: 48px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: var(--radius-x3);
+}
+
+.name {
+  display: flex;
+  flex-direction: column;
+}
+
+.slug {
+  color: var(--color-neutral-70);
+  font-size: 12px;
+}
+
+.actions {
+  display: flex;
+  gap: var(--gap-x2);
+}
+
+.confirmModal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x3);
+  max-width: 420px;
+}
+
+.confirmModal__warning {
+  color: var(--color-negative);
+}
+
+.confirmModal__buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--gap-x2);
+}

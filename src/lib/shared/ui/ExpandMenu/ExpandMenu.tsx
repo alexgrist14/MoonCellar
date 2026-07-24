@@ -18,8 +18,10 @@ import { CheckMobile } from "../CheckMobile";
 import { createPortal } from "react-dom";
 import useCloseEvents from "../../hooks/useCloseEvents";
 
-interface IExpandMenuProps
-  extends Pick<HTMLAttributes<HTMLDivElement>, "children" | "id"> {
+interface IExpandMenuProps extends Pick<
+  HTMLAttributes<HTMLDivElement>,
+  "children" | "id"
+> {
   position?: IExpandPosition;
   titleOpen?: string | ReactNode;
   titleClose?: string | ReactNode;

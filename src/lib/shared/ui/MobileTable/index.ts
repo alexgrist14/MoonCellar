@@ -1,1 +1,1 @@
-export * from './MobileTable';
+export * from "./MobileTable";

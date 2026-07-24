@@ -127,10 +127,7 @@ export const AuthModal: FC = () => {
               </Button>
               <p>
                 Already have an account?{" "}
-                <span
-                  onClick={() => switchMode(false)}
-                  className={styles.link}
-                >
+                <span onClick={() => switchMode(false)} className={styles.link}>
                   Sign in
                 </span>{" "}
               </p>
@@ -147,10 +144,7 @@ export const AuthModal: FC = () => {
               </Button>
               <p>
                 Don&apos;t have an account?{" "}
-                <span
-                  onClick={() => switchMode(true)}
-                  className={styles.link}
-                >
+                <span onClick={() => switchMode(true)} className={styles.link}>
                   Sign up
                 </span>{" "}
               </p>

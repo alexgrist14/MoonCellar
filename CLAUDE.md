@@ -37,3 +37,12 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
 ## Language
 
 - This CLAUDE.md file must be written in English only.
+
+## Zod schemas
+
+- The zod schema files in `MoonCellar-Server/src/shared/zod/schemas/` and
+  `MoonCellar/src/lib/shared/lib/schemas/` are byte-identical copies. The server copy is
+  canonical — `createZodDto` generates the NestJS DTOs from it.
+- Any change to a schema must be applied to both copies in the same change, byte for byte.
+- Verify with `bun run check:schemas`.
+- `igdb.schema.ts` is client-only and exempt.

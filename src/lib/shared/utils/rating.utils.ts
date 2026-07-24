@@ -31,7 +31,8 @@ export const getAverageRating = (game: IGameResponse): number | null => {
     return null;
   }
 
-  const average = ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length;
+  const average =
+    ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length;
 
   return Math.round(average * 10) / 10;
 };
