@@ -215,7 +215,7 @@ const GameList: FC = () => {
           name: {
             content: (
               <Link
-                href={`/game/${game.slug}`}
+                href={`/games/${game.slug}`}
                 target="_blank"
                 className={styles.name}
               >

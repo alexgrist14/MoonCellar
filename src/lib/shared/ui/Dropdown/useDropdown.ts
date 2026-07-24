@@ -282,14 +282,26 @@ export const useDropdown = ({
   useEffect(() => {
     if (!isThroughPortal || !isActive) return;
 
-    const rect = dropdownRef.current?.getBoundingClientRect();
+    const updateCoords = () => {
+      const rect = dropdownRef.current?.getBoundingClientRect();
 
-    !!rect &&
-      setPortalCoords({
-        top: rect.top,
-        left: rect.left,
-        width: rect.width,
-      });
+      !!rect &&
+        setPortalCoords({
+          top: rect.top,
+          left: rect.left,
+          width: rect.width,
+        });
+    };
+
+    updateCoords();
+
+    window.addEventListener("scroll", updateCoords, true);
+    window.addEventListener("resize", updateCoords);
+
+    return () => {
+      window.removeEventListener("scroll", updateCoords, true);
+      window.removeEventListener("resize", updateCoords);
+    };
   }, [isActive, isThroughPortal]);
 
   useCloseEvents([dropdownRef, portalRef], () => {

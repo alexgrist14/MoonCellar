@@ -1,5 +1,12 @@
 import { IObjectFieldDescriptor } from "../fields/ObjectListField";
 
+export type IOptionsKey =
+  | "modes"
+  | "genres"
+  | "themes"
+  | "type"
+  | "companies";
+
 export type IFieldKind =
   | "text"
   | "number"
@@ -10,7 +17,9 @@ export type IFieldKind =
   | "objectList"
   | "platforms"
   | "imageList"
-  | "coverUpload";
+  | "coverUpload"
+  | "enum"
+  | "enumList";
 
 export interface IFieldDescriptor {
   path: string;
@@ -18,6 +27,7 @@ export interface IFieldDescriptor {
   kind: IFieldKind;
   fields?: IObjectFieldDescriptor[];
   uploadType?: "cover" | "screenshot" | "artwork";
+  optionsKey?: IOptionsKey;
 }
 
 export interface ISectionDescriptor {
@@ -31,7 +41,7 @@ const SYNC_NOTE =
   "Filled by a sync. Changes here may be overwritten unless isStopParsing is enabled.";
 
 const COMPANY_FIELDS: IObjectFieldDescriptor[] = [
-  { key: "name", label: "Name", kind: "text" },
+  { key: "name", label: "Name", kind: "text", optionsKey: "companies" },
   { key: "developer", label: "Developer", kind: "boolean" },
   { key: "publisher", label: "Publisher", kind: "boolean", defaultValue: true },
   { key: "porting", label: "Porting", kind: "boolean" },
@@ -59,7 +69,7 @@ export const GAME_SECTIONS: ISectionDescriptor[] = [
     fields: [
       { path: "name", label: "Name", kind: "text" },
       { path: "slug", label: "Slug", kind: "text" },
-      { path: "type", label: "Type", kind: "text" },
+      { path: "type", label: "Type", kind: "enum", optionsKey: "type" },
       { path: "summary", label: "Summary", kind: "textarea" },
       { path: "storyline", label: "Storyline", kind: "textarea" },
       { path: "first_release", label: "First release (unix)", kind: "number" },
@@ -92,10 +102,10 @@ export const GAME_SECTIONS: ISectionDescriptor[] = [
   {
     title: "Taxonomy",
     fields: [
-      { path: "modes", label: "Modes", kind: "stringList" },
-      { path: "genres", label: "Genres", kind: "stringList" },
+      { path: "modes", label: "Modes", kind: "enumList", optionsKey: "modes" },
+      { path: "genres", label: "Genres", kind: "enumList", optionsKey: "genres" },
       { path: "keywords", label: "Keywords", kind: "stringList" },
-      { path: "themes", label: "Themes", kind: "stringList" },
+      { path: "themes", label: "Themes", kind: "enumList", optionsKey: "themes" },
       { path: "franchises", label: "Franchises", kind: "stringList" },
     ],
   },

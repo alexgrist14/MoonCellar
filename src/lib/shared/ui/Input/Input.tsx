@@ -23,6 +23,7 @@ interface InputProps extends Pick<
   | "onMouseOut"
   | "id"
   | "name"
+  | "list"
 > {
   containerStyles?: CSSProperties;
   containerClassname?: string;

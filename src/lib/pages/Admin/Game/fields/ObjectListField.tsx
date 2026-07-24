@@ -1,4 +1,4 @@
-import { FC, useRef } from "react";
+import { FC, useId, useMemo, useRef } from "react";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { Checkbox } from "@/src/lib/shared/ui/Checkbox";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
@@ -9,6 +9,8 @@ export interface IObjectFieldDescriptor {
   label: string;
   kind: "text" | "number" | "boolean";
   defaultValue?: unknown;
+  optionsKey?: string;
+  options?: string[];
 }
 
 interface IObjectListFieldProps {
@@ -30,6 +32,7 @@ export const ObjectListField: FC<IObjectListFieldProps> = ({
   disabled,
 }) => {
   const items = value ?? [];
+  const datalistPrefix = useId();
 
   const rowIdsRef = useRef<string[]>([]);
 
@@ -66,9 +69,24 @@ export const ObjectListField: FC<IObjectListFieldProps> = ({
     rowIdsRef.current = keys.filter((_, i) => i !== index);
   };
 
+  const datalists = useMemo(
+    () =>
+      fields
+        .filter((field) => field.options?.length)
+        .map((field) => (
+          <datalist key={field.key} id={`${datalistPrefix}-${field.key}`}>
+            {field.options!.map((option, optionIndex) => (
+              <option key={`${optionIndex}-${option}`} value={option} />
+            ))}
+          </datalist>
+        )),
+    [fields, datalistPrefix]
+  );
+
   return (
     <div className={styles.field}>
       <span className={styles.label}>{label}</span>
+      {datalists}
       {items.map((item, index) => (
         <div key={keys[index]} className={styles.objectRow}>
           {fields.map((field) => (
@@ -83,7 +101,14 @@ export const ObjectListField: FC<IObjectListFieldProps> = ({
               ) : (
                 <Input
                   type={field.kind === "number" ? "number" : "text"}
-                  value={(item[field.key] as string | number | undefined) ?? ""}
+                  list={
+                    field.options?.length
+                      ? `${datalistPrefix}-${field.key}`
+                      : undefined
+                  }
+                  value={
+                    (item[field.key] as string | number | undefined) ?? ""
+                  }
                   disabled={disabled}
                   onChange={(e) =>
                     patch(

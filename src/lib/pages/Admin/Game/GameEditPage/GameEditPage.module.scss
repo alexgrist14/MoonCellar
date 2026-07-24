@@ -1,17 +1,32 @@
 .page {
-  max-width: 1000px;
-  margin-inline: auto;
+  padding: 20px;
 }
 
 .content {
   display: flex;
   flex-direction: column;
+
   gap: var(--gap-x3);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-x3);
+  padding-bottom: var(--padding-x3);
+  border-bottom: 1px solid var(--color-border-primary);
+}
+
+.title {
+  font-size: 20px;
+  color: var(--color-neutral-100);
 }
 
 .form {
   display: flex;
   flex-direction: column;
+
   gap: var(--gap-x3);
 }
 
@@ -48,4 +63,9 @@
   color: var(--color-negative);
   font-size: 12px;
   line-height: 14px;
+}
+
+.uploadHint {
+  color: var(--color-neutral-70);
+  font-size: 12px;
 }

@@ -1,5 +1,5 @@
 "use client";
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,6 +28,8 @@ import { Loader } from "@/src/lib/shared/ui/Loader";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import {
   CollapsibleSection,
+  EnumField,
+  EnumListField,
   IObjectFieldDescriptor,
   NumberField,
   NumberListField,
@@ -36,9 +38,12 @@ import {
   TextField,
   TextareaField,
   ToggleField,
+  UploadButton,
 } from "../fields";
-import { GAME_SECTIONS, IFieldDescriptor } from "./sections";
+import { GAME_SECTIONS, IFieldDescriptor, IOptionsKey } from "./sections";
 import styles from "./GameEditPage.module.scss";
+
+type IGameFilters = Partial<Record<IOptionsKey, string[]>>;
 
 type IGameFormValues = IUpdateGameRequest;
 type IFormPath = Path<IGameFormValues>;
@@ -122,6 +127,7 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
   const isCreate = !gameId;
   const [original, setOriginal] = useState<Record<string, unknown>>({});
   const [platforms, setPlatforms] = useState<IPlatform[]>([]);
+  const [filters, setFilters] = useState<IGameFilters | null>(null);
   const [isLoading, setIsLoading] = useState(!isCreate);
 
   const resolver = useMemo(
@@ -147,7 +153,37 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
 
   useEffect(() => {
     platformsAPI.getAll().then((res) => setPlatforms(res.data));
+    gamesApi
+      .getFilters()
+      .then((res) => setFilters(res ?? {}))
+      .catch(() => setFilters({}));
   }, []);
+
+  const optionsFor = useCallback(
+    (key?: IOptionsKey): string[] => (key && filters ? filters[key] ?? [] : []),
+    [filters]
+  );
+
+  const resolvedObjectFields = useMemo(() => {
+    const map: Record<string, IObjectFieldDescriptor[]> = {};
+
+    GAME_SECTIONS.forEach((section) =>
+      section.fields.forEach((field) => {
+        if (field.kind !== "objectList" || !field.fields) return;
+
+        map[field.path] = field.fields.map((column) =>
+          column.optionsKey
+            ? {
+                ...column,
+                options: optionsFor(column.optionsKey as IOptionsKey),
+              }
+            : column
+        );
+      })
+    );
+
+    return map;
+  }, [optionsFor]);
 
   useEffect(() => {
     if (!gameId) {
@@ -346,6 +382,39 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
             )}
           />
         );
+      case "enum":
+        return (
+          <Controller
+            key={field.path}
+            control={control}
+            name={formPath}
+            render={({ field: rhf }) => (
+              <EnumField
+                label={field.label}
+                value={rhf.value as string}
+                options={optionsFor(field.optionsKey)}
+                error={error}
+                onChange={rhf.onChange}
+              />
+            )}
+          />
+        );
+      case "enumList":
+        return (
+          <Controller
+            key={field.path}
+            control={control}
+            name={formPath}
+            render={({ field: rhf }) => (
+              <EnumListField
+                label={field.label}
+                value={rhf.value as string[]}
+                options={optionsFor(field.optionsKey)}
+                onChange={rhf.onChange}
+              />
+            )}
+          />
+        );
       case "objectList":
         return (
           <Controller
@@ -357,7 +426,7 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
                 <ObjectListField
                   label={field.label}
                   value={rhf.value as Record<string, unknown>[]}
-                  fields={field.fields || []}
+                  fields={resolvedObjectFields[field.path] || field.fields || []}
                   onChange={rhf.onChange}
                 />
                 {!!error && <span className={styles.fieldError}>{error}</span>}
@@ -421,23 +490,19 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
                     height={224}
                   />
                 )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  disabled={isCreate}
-                  title={
-                    isCreate
-                      ? "Save the game first to enable uploads"
-                      : undefined
-                  }
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file)
+                {isCreate ? (
+                  <span className={styles.uploadHint}>
+                    Save the game first to upload images
+                  </span>
+                ) : (
+                  <UploadButton
+                    onFile={(file) =>
                       handleUpload(field.path, "cover", file).catch(
                         () => undefined
-                      );
-                  }}
-                />
+                      )
+                    }
+                  />
+                )}
               </div>
             )}
           />
@@ -455,23 +520,20 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
                 onChange={rhf.onChange}
                 isAddDisabled
                 action={
-                  <input
-                    type="file"
-                    accept="image/*"
-                    disabled={isCreate}
-                    title={
-                      isCreate
-                        ? "Save the game first to enable uploads"
-                        : undefined
-                    }
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file && field.uploadType)
+                  isCreate ? (
+                    <span className={styles.uploadHint}>
+                      Save the game first to upload
+                    </span>
+                  ) : (
+                    <UploadButton
+                      onFile={(file) =>
+                        field.uploadType &&
                         handleUpload(field.path, field.uploadType, file).catch(
                           () => undefined
-                        );
-                    }}
-                  />
+                        )
+                      }
+                    />
+                  )
                 }
               />
             )}
@@ -484,7 +546,7 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
 
   if (!isAdmin) return;
 
-  if (isLoading) {
+  if (isLoading || !filters) {
     return (
       <Box classNameContent={styles.loading}>
         <Loader />
@@ -493,19 +555,19 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
   }
 
   return (
-    <Box
-      className={styles.page}
-      classNameContent={styles.content}
-      title={isCreate ? "Create game" : `Edit: ${original.name as string}`}
-      titleAction={
+    <Box className={styles.page} classNameContent={styles.content}>
+      <div className={styles.header}>
+        <h2 className={styles.title}>
+          {isCreate ? "Create game" : `Edit: ${original.name as string}`}
+        </h2>
         <Button
           color={ButtonColor.DEFAULT}
           onClick={() => router.push("/admin")}
         >
           Back to list
         </Button>
-      }
-    >
+      </div>
+
       <form className={styles.form} onSubmit={handleSubmit(onValid, onInvalid)}>
         {!isCreate && (
           <div className={styles.readonly}>

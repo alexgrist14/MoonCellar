@@ -10,6 +10,25 @@
   font-size: 14px;
 }
 
+.fieldError {
+  display: block;
+  margin-top: var(--padding-x1);
+  color: var(--color-negative);
+  font-size: 12px;
+  line-height: 14px;
+}
+
+.uploadRow {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-x2);
+}
+
+.fileName {
+  color: var(--color-neutral-70);
+  font-size: 12px;
+}
+
 .row {
   display: flex;
   gap: var(--gap-x2);
