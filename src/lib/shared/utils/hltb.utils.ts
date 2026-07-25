@@ -10,7 +10,7 @@ export const formatHltbHours = (hours?: number | null): string | null => {
     return whole > 0 ? `${whole}½ Hours` : "½ Hour";
   }
 
-  const rounded = Math.round(hours * 10) / 10;
+  const rounded = Math.round(hours);
   const label = rounded === 1 ? "Hour" : "Hours";
 
   return `${rounded} ${label}`;

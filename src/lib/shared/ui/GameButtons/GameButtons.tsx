@@ -50,6 +50,12 @@ export const GameButtons: FC<{ game: IGameResponse }> = ({ game }) => {
             target: "_blank",
           },
           {
+            title: "Open in HLTB",
+            link: `https://howlongtobeat.com/game/${game.hltb?.hltbId}`,
+            hidden: !game.hltb?.hltbId,
+            target: "_blank",
+          },
+          {
             title: "Search on Youtube",
             link: `https://www.youtube.com/results?search_query=${game.name}`,
             target: "_blank",

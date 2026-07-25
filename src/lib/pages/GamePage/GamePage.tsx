@@ -16,6 +16,7 @@ import { formatHltbHours } from "../../shared/utils/hltb.utils";
 import { formatRating } from "../../shared/utils/rating.utils";
 import { useHideAdult } from "../../shared/hooks/useHideAdult";
 import { isAdultGame } from "../../shared/utils/adult.utils";
+import { GameFriendsStatus } from "../../features/game/GameFriendsStatus";
 
 export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
   const { systems } = useCommonStore();
@@ -92,6 +93,7 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
               </div>
             </Box>
           )}
+          <GameFriendsStatus gameId={game._id} />
         </div>
         <Box
           classNameContent={styles.page__right}

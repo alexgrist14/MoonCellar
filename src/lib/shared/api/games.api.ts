@@ -10,6 +10,7 @@ import {
   IUpcomingReleaseGroup,
   IUpdateGameRequest,
 } from "../lib/schemas/games.schema";
+import { IGetGameFollowingsStatusResponse } from "../lib/schemas/game-followings-status.schema";
 import agent from "./agent.api";
 import { filesAPI } from "./files.api";
 
@@ -18,6 +19,13 @@ const GAMES_URL = `${API_URL}/games`;
 export const gamesApi = {
   getById: (params: IGetGameByIdRequest) => {
     return agent.get<IGameResponse>(`${GAMES_URL}/by-id/${params._id}`);
+  },
+
+  getFollowingsStatus: (gameId: string, userId: string) => {
+    return agent.get<IGetGameFollowingsStatusResponse>(
+      `${GAMES_URL}/${gameId}/followings-status`,
+      { params: { userId } }
+    );
   },
 
   getByIds: (params: IGetGamesByIdsRequest) => {
