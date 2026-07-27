@@ -10,7 +10,6 @@
 .row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--gap-x3);
   padding: var(--padding-x3);
   background-color: var(--color-bg-hover);
@@ -23,20 +22,39 @@
 
   &__info {
     display: flex;
+    flex: 1;
     flex-direction: column;
+    align-items: center;
     gap: var(--gap-x1);
     min-width: 0;
+    text-align: center;
   }
 
   &__title {
     @include font(14px, 18px, 500);
     color: var(--color-neutral-100);
     @include textEllipsis;
+    max-width: 100%;
   }
 
   &__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x2);
     @include font(12px, 16px, 400);
     color: var(--color-gray);
+  }
+
+  &__dot {
+    flex-shrink: 0;
+    width: var(--padding-x1);
+    height: var(--padding-x1);
+    border-radius: 50%;
+    background-color: var(--color-gray);
+  }
+
+  &__link {
+    margin-top: var(--gap-x1);
   }
 }
 

@@ -13,10 +13,12 @@ import { BGImage } from "../../shared/ui/BGImage";
 import { IGameResponse } from "../../shared/lib/schemas/games.schema";
 import { useCommonStore } from "../../shared/store/common.store";
 import { formatHltbHours } from "../../shared/utils/hltb.utils";
-import { formatRating } from "../../shared/utils/rating.utils";
+import { formatRating, normalizeRating } from "../../shared/utils/rating.utils";
 import { useHideAdult } from "../../shared/hooks/useHideAdult";
 import { isAdultGame } from "../../shared/utils/adult.utils";
 import { GameFriendsStatus } from "../../features/game/GameFriendsStatus";
+import { ExpandableBlock } from "../../shared/ui/ExpandableBlock";
+import { RatingStars } from "../../shared/ui/RatingStars";
 
 export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
   const { systems } = useCommonStore();
@@ -42,11 +44,20 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
 
   const ratingRows = useMemo(() => {
     const rows = [
-      { label: "Users", value: formatRating(game.averageRating) },
-      { label: "IGDB", value: formatRating(game.igdb?.total_rating, 100) },
+      {
+        label: "Users",
+        value: formatRating(game.averageRating),
+        rating: normalizeRating(game.averageRating),
+      },
+      {
+        label: "IGDB",
+        value: formatRating(game.igdb?.total_rating, 100),
+        rating: normalizeRating(game.igdb?.total_rating, 100),
+      },
       {
         label: "HowLongToBeat",
         value: formatRating(game.hltb?.reviewScore, 100),
+        rating: normalizeRating(game.hltb?.reviewScore, 100),
       },
     ].filter((row) => row.value);
 
@@ -85,10 +96,13 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
               <div className={styles.page__hltb}>
                 <h4>Ratings</h4>
                 {ratingRows.map((row) => (
-                  <p key={row.label}>
-                    <span>{row.label}: </span>
-                    {row.value}
-                  </p>
+                  <div key={row.label} className={styles.page__rating}>
+                    <p>
+                      <span>{row.label}: </span>
+                      {row.value}
+                    </p>
+                    {row.rating != null && <RatingStars rating={row.rating} />}
+                  </div>
                 ))}
               </div>
             </Box>
@@ -209,13 +223,17 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
           {!!game.summary && (
             <div className={styles.page__text}>
               <h4>Summary:</h4>
-              <p>{game.summary}</p>
+              <ExpandableBlock>
+                <p>{game.summary}</p>
+              </ExpandableBlock>
             </div>
           )}
           {!!game.storyline && (
             <div className={styles.page__text}>
               <h4>Storyline:</h4>
-              <p>{game.storyline}</p>
+              <ExpandableBlock>
+                <p>{game.storyline}</p>
+              </ExpandableBlock>
             </div>
           )}
           {!hideMedia && !!game.screenshots?.length && (
@@ -271,17 +289,19 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
           </div>
           {!!game.keywords?.length && (
             <div className={styles.page__info}>
-              <p>
-                <span>Keywords: </span>
-                {game.keywords.map((keyword, i, array) => (
-                  <span key={keyword + i}>
-                    <Link href={`/games?selectedKeywords[]=${keyword}`}>
-                      {keyword}
-                    </Link>
-                    {i !== array.length - 1 ? ", " : ""}
-                  </span>
-                ))}
-              </p>
+              <ExpandableBlock>
+                <p>
+                  <span>Keywords: </span>
+                  {game.keywords.map((keyword, i, array) => (
+                    <span key={keyword + i}>
+                      <Link href={`/games?selectedKeywords[]=${keyword}`}>
+                        {keyword}
+                      </Link>
+                      {i !== array.length - 1 ? ", " : ""}
+                    </span>
+                  ))}
+                </p>
+              </ExpandableBlock>
             </div>
           )}
         </Box>

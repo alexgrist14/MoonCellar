@@ -43,6 +43,15 @@ export const parseQueryFilters = (pathWithQuery: string): IGetGamesRequest => {
       types: filters?.excludedGameTypes,
       franchises: filters?.excludedFranchises,
     },
+    mode: {
+      genres: filters?.modeGenres,
+      modes: filters?.modeModes,
+      platforms: filters?.modePlatforms,
+      themes: filters?.modeThemes,
+      keywords: filters?.modeKeywords,
+      types: filters?.modeGameTypes,
+      franchises: filters?.modeFranchises,
+    },
   };
 };
 
@@ -52,6 +61,7 @@ export const getFiltersForQuery = (filters: IGetGamesRequest) => {
       ...filters,
       selected: undefined,
       excluded: undefined,
+      mode: undefined,
       selectedPlatforms: filters.selected?.platforms,
       excludedPlatforms: filters.excluded?.platforms,
       selectedGenres: filters.selected?.genres,
@@ -66,6 +76,13 @@ export const getFiltersForQuery = (filters: IGetGamesRequest) => {
       excludedGameTypes: filters.excluded?.types,
       selectedFranchises: filters.selected?.franchises,
       excludedFranchises: filters.excluded?.franchises,
+      modePlatforms: filters.mode?.platforms,
+      modeGenres: filters.mode?.genres,
+      modeThemes: filters.mode?.themes,
+      modeKeywords: filters.mode?.keywords,
+      modeModes: filters.mode?.modes,
+      modeGameTypes: filters.mode?.types,
+      modeFranchises: filters.mode?.franchises,
     },
     {
       arrayFormat: "bracket",

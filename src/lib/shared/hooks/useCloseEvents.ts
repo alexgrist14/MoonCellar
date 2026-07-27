@@ -6,7 +6,16 @@ const useCloseEvents = (
 ): void => {
   useEffect(() => {
     const clickHandler = (e: MouseEvent): void => {
-      if ((e.target as HTMLElement | null)?.closest("#modals")) return;
+      const isOwnedByModal = refs.some((ref) =>
+        ref.current?.closest("#modals")
+      );
+
+      if (
+        !isOwnedByModal &&
+        (e.target as HTMLElement | null)?.closest("#modals")
+      ) {
+        return;
+      }
 
       refs.reduce(
         (result, ref) =>

@@ -32,7 +32,6 @@ export async function generateMetadata({
             width: 528,
             height: 704,
             alt: game.name,
-            type: "image/jpeg",
           },
         ],
       }),

@@ -71,4 +71,16 @@
       background-color: var(--color-positive);
     }
   }
+
+  &_colorless {
+    &.toggle_left,
+    &.toggle_right {
+      outline-color: transparent;
+    }
+
+    & .toggle__button_left,
+    & .toggle__button_right {
+      background-color: var(--color-bg-tertiary);
+    }
+  }
 }

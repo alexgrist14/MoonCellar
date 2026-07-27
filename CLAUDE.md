@@ -24,6 +24,10 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
 - If a `Box` instance needs a different visual appearance, do it through `Box`'s own props (`className`, `classNameContent`, `wrapperStyle`, `templateStyle`, `contentStyle`, `isWithoutBorder`, `isWithBlur`, etc.) — never by overriding `Box`'s internal styles from outside or duplicating its markup/styles in a custom wrapper.
 - `Box`'s own radius is `var(--radius-x5)`. For structural UI wrapper components rendered directly inside a `Box` (`Button`, `Input`, `Textarea`, `CustomDropdown`, and similar reusable "chrome" primitives — not decorative elements like game covers/posters), the `border-radius` must be exactly one step below its structural parent's on the `--radius-x*` scale (parent `x5` → child `x4` → grandchild `x3`, etc.). This rule applies to structural wrapper nesting only, not to decorative/illustrative radii (e.g. card art, covers), which are a deliberate style choice independent of nesting depth.
 
+## Text truncation
+
+- Never write raw `-webkit-line-clamp`/`-webkit-box-orient`/`line-clamp` rules. Use the shared `lineClamp($count)` mixin from `src/lib/app/styles/_mixins.scss` (available globally, no import needed) for any multi-line text truncation, passing the desired line count.
+
 ## Scrolling
 
 - Never rely on the browser's default/native scrollbar for a scrollable area. Use the shared `Scrollbar` component from `src/lib/shared/ui/Scrollbar` for any element that needs to scroll (vertically or horizontally via the `isHorizontal` prop).
@@ -40,9 +44,13 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
 
 ## Zod schemas
 
-- The zod schema files in `MoonCellar-Server/src/shared/zod/schemas/` and
+- The zod schema files in the server repo's `src/shared/zod/schemas/` and
   `MoonCellar/src/lib/shared/lib/schemas/` are byte-identical copies. The server copy is
   canonical — `createZodDto` generates the NestJS DTOs from it.
+- The server repo is a sibling directory to `MoonCellar`, but its local folder name is not
+  guaranteed to be `MoonCellar-Server` — it may be checked out under a different name (e.g.
+  `Game-Gauntlet-Server`). Do not assume the name; check the actual sibling directories
+  (`ls ..`) before referencing the server path.
 - Any change to a schema must be applied to both copies in the same change, byte for byte.
 - Verify with `bun run check:schemas`.
 - `igdb.schema.ts` is client-only and exempt.

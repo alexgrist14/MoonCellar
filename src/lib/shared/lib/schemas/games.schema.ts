@@ -106,6 +106,16 @@ export const GameFiltersSchema = z.object({
     .optional(),
 });
 
+export const FilterModeSchema = z.object({
+  genres: z.enum(["any", "all"]).optional(),
+  platforms: z.enum(["any", "all"]).optional(),
+  modes: z.enum(["any", "all"]).optional(),
+  keywords: z.enum(["any", "all"]).optional(),
+  themes: z.enum(["any", "all"]).optional(),
+  types: z.enum(["any", "all"]).optional(),
+  franchises: z.enum(["any", "all"]).optional(),
+});
+
 export const ReleaseDateSchema = z.object({
   date: z.number(),
   human: z.string(),
@@ -228,11 +238,9 @@ export const GetGamesRequestSchema = z.object({
     ])
     .describe("Filter by release year")
     .optional(),
-  mode: z
-    .enum(["any", "all"])
-    .describe("Whether selected filters should match any or all values")
-    .default("any")
-    .optional(),
+  mode: FilterModeSchema.describe(
+    "Per-filter match mode: whether each selected filter should match any or all of its values"
+  ).optional(),
   excludeGames: z.string().array().describe("Game ids to exclude").optional(),
   sortBy: z
     .enum([
@@ -282,6 +290,7 @@ export type IGDBField = z.infer<typeof IGDBSchema>;
 export type IHltbField = z.infer<typeof HltbSchema>;
 export type ICompanyField = z.infer<typeof CompanySchema>;
 export type IGameFilters = z.infer<typeof GameFiltersSchema>;
+export type IFilterMode = z.infer<typeof FilterModeSchema>;
 export type IReleaseDate = z.infer<typeof ReleaseDateSchema>;
 
 export type IAddGameRequest = z.infer<typeof AddGameRequestSchema>;

@@ -294,7 +294,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
           )}
           <Textarea
             {...register("comment")}
-            placeholder="Comment... (visible only to you)"
+            placeholder="Enter comment..."
             className={styles.modal__comment}
             isDisableAutoResize
           />

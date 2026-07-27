@@ -81,19 +81,21 @@ export const AchievementsModal: FC<IAchievementsModalProps> = ({ game }) => {
             />
             <div className={styles.row__info}>
               <p className={styles.row__title}>{award.title}</p>
-              <p className={styles.row__meta}>
-                {commonUtils.formatDate(award.awardedAt)}
-              </p>
-              <p className={styles.row__meta}>{award.awardType}</p>
+              <div className={styles.row__meta}>
+                <span>{commonUtils.formatDate(award.awardedAt)}</span>
+                <span className={styles.row__dot} />
+                <span>{award.awardType}</span>
+              </div>
+              <Link
+                href={`https://retroachievements.org/game/${award.awardData}`}
+                target="_blank"
+                className={styles.row__link}
+              >
+                <Button color={ButtonColor.DEFAULT}>
+                  {award.consoleName || "Open"}
+                </Button>
+              </Link>
             </div>
-            <Link
-              href={`https://retroachievements.org/game/${award.awardData}`}
-              target="_blank"
-            >
-              <Button color={ButtonColor.DEFAULT}>
-                {award.consoleName || "Open"}
-              </Button>
-            </Link>
           </div>
         ))
       ) : (

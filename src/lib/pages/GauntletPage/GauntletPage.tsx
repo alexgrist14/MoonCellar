@@ -1,14 +1,12 @@
 "use client";
 
-import { FC, useCallback, useEffect } from "react";
+import { FC } from "react";
 import styles from "./GauntletPage.module.scss";
 import { ConsolesList } from "../../widgets/main";
 import { WheelContainer } from "../../widgets/wheel";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { useStatesStore } from "../../shared/store/states.store";
 import classNames from "classnames";
-import { useGamesStore } from "../../shared/store/games.store";
-import { parseQueryFilters } from "../../shared/utils/filters.utils";
 import { Filters } from "../../shared/ui/Filters";
 import { BGImage } from "../../shared/ui/BGImage";
 import { useWheelStore } from "../../shared/store/wheel.store";

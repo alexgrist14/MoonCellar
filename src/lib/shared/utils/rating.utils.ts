@@ -1,6 +1,6 @@
 import { IGameResponse } from "../lib/schemas/games.schema";
 
-const normalizeRating = (
+export const normalizeRating = (
   value?: number | null,
   maxScale: number = 10
 ): number | null => {
@@ -17,7 +17,7 @@ export const formatRating = (
 ): string | null => {
   const normalized = normalizeRating(value, maxScale);
 
-  return normalized == null ? null : `${normalized}/10`;
+  return normalized == null ? null : `${normalized}`;
 };
 
 export const getAverageRating = (game: IGameResponse): number | null => {

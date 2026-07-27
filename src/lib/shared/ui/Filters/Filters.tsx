@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, ReactNode, useEffect, useState } from "react";
 import styles from "./Filters.module.scss";
 import { useCommonStore } from "../../store/common.store";
 import { useStatesStore } from "../../store/states.store";
@@ -118,6 +118,33 @@ export const Filters: FC<{
     });
   };
 
+  const getMode = (key: keyof NonNullable<IGetGamesRequest["mode"]>) =>
+    filters?.mode?.[key] === "all" ? "right" : "left";
+
+  const setMode = (
+    key: keyof NonNullable<IGetGamesRequest["mode"]>,
+    result: ReactNode
+  ) => {
+    setFilters((filters) => ({
+      ...filters,
+      mode: {
+        ...filters?.mode,
+        [key]: result === "All" ? "all" : "any",
+      },
+    }));
+  };
+
+  const renderModeToggle = (key: keyof NonNullable<IGetGamesRequest["mode"]>) => (
+    <ToggleSwitch
+      isColorless
+      isDisabled={isLoading}
+      leftContent="Any"
+      rightContent="All"
+      value={getMode(key)}
+      clickCallback={(result) => setMode(key, result)}
+    />
+  );
+
   const tabs: ITabContent[] = [
     { tabName: "Filters", onTabClick: () => setTab("filters") },
     ...(isAuth
@@ -153,48 +180,52 @@ export const Filters: FC<{
       )}
       {tab === "filters" && (
         <>
-          <div className={styles.filters__wrapper}>
-            <h4>Sort by</h4>
-            <div className={styles.filters__sort}>
-              <Dropdown
-                isWithReset
-                overflowRootId="filters"
-                isDisabled={isLoading}
-                list={sortOptions.map((option) => option.label)}
-                overwriteValue={
-                  sortOptions.find((option) => option.value === filters?.sortBy)
-                    ?.label || "Default"
-                }
-                placeholder="Default"
-                getIndex={(index) => {
-                  const temp: IGetGamesRequest = {
-                    ...filters,
-                    sortBy: index >= 0 ? sortOptions[index]?.value : undefined,
-                  };
+          {!isGauntlet && (
+            <div className={styles.filters__wrapper}>
+              <h4>Sort by</h4>
+              <div className={styles.filters__sort}>
+                <Dropdown
+                  isWithReset
+                  overflowRootId="filters"
+                  isDisabled={isLoading}
+                  list={sortOptions.map((option) => option.label)}
+                  overwriteValue={
+                    sortOptions.find(
+                      (option) => option.value === filters?.sortBy
+                    )?.label
+                  }
+                  placeholder="Default"
+                  getIndex={(index) => {
+                    const temp: IGetGamesRequest = {
+                      ...filters,
+                      sortBy: index >= 0 ? sortOptions[index]?.value : undefined,
+                    };
 
-                  setFilters(temp);
-                  isGauntlet && pushFiltersToQuery(temp);
-                }}
-              />
-              <ToggleSwitch
-                leftContent={
-                  <SvgChevron style={{ transform: "rotate(180deg)" }} />
-                }
-                rightContent={<SvgChevron />}
-                isDisabled={isLoading || !filters?.sortBy}
-                value={filters?.sortOrder === "asc" ? "left" : "right"}
-                clickCallback={() => {
-                  const temp: IGetGamesRequest = {
-                    ...filters,
-                    sortOrder: filters?.sortOrder === "asc" ? "desc" : "asc",
-                  };
+                    setFilters(temp);
+                    isGauntlet && pushFiltersToQuery(temp);
+                  }}
+                />
+                <ToggleSwitch
+                  isColorless
+                  leftContent={
+                    <SvgChevron style={{ transform: "rotate(180deg)" }} />
+                  }
+                  rightContent={<SvgChevron />}
+                  isDisabled={isLoading || !filters?.sortBy}
+                  value={filters?.sortOrder === "asc" ? "left" : "right"}
+                  clickCallback={() => {
+                    const temp: IGetGamesRequest = {
+                      ...filters,
+                      sortOrder: filters?.sortOrder === "asc" ? "desc" : "asc",
+                    };
 
-                  setFilters(temp);
-                  isGauntlet && pushFiltersToQuery(temp);
-                }}
-              />
+                    setFilters(temp);
+                    isGauntlet && pushFiltersToQuery(temp);
+                  }}
+                />
+              </div>
             </div>
-          </div>
+          )}
           <div className={styles.filters__top}>
             <div className={styles.filters__wrapper}>
               <h4>Game name</h4>
@@ -241,7 +272,10 @@ export const Filters: FC<{
           </div>
           <div className={styles.filters__row}>
             <div className={styles.filters__wrapper}>
-              <h4>Game types</h4>
+              <div className={styles.filters__header}>
+                <h4>Game types</h4>
+                {renderModeToggle("types")}
+              </div>
               <Dropdown
                 isWithReset
                 isMulti
@@ -262,7 +296,10 @@ export const Filters: FC<{
               />
             </div>
             <div className={styles.filters__wrapper}>
-              <h4>Game Modes</h4>
+              <div className={styles.filters__header}>
+                <h4>Game Modes</h4>
+                {renderModeToggle("modes")}
+              </div>
               <Dropdown
                 isWithReset
                 isMulti
@@ -284,7 +321,10 @@ export const Filters: FC<{
             </div>
           </div>
           <div className={styles.filters__wrapper}>
-            <h4>Platforms</h4>
+            <div className={styles.filters__header}>
+              <h4>Platforms</h4>
+              {renderModeToggle("platforms")}
+            </div>
             <Dropdown
               isWithReset
               isMulti
@@ -319,7 +359,10 @@ export const Filters: FC<{
             />
           </div>
           <div className={styles.filters__wrapper}>
-            <h4>Genres</h4>
+            <div className={styles.filters__header}>
+              <h4>Genres</h4>
+              {renderModeToggle("genres")}
+            </div>
             <Dropdown
               isWithReset
               isMulti
@@ -338,7 +381,10 @@ export const Filters: FC<{
             />
           </div>
           <div className={styles.filters__wrapper}>
-            <h4>Themes</h4>
+            <div className={styles.filters__header}>
+              <h4>Themes</h4>
+              {renderModeToggle("themes")}
+            </div>
             <Dropdown
               isWithReset
               isMulti
@@ -357,7 +403,10 @@ export const Filters: FC<{
             />
           </div>
           <div className={styles.filters__wrapper}>
-            <h4>Keywords</h4>
+            <div className={styles.filters__header}>
+              <h4>Keywords</h4>
+              {renderModeToggle("keywords")}
+            </div>
             <Dropdown
               isWithReset
               isMulti
@@ -378,7 +427,10 @@ export const Filters: FC<{
             />
           </div>
           <div className={styles.filters__wrapper}>
-            <h4>Franchises</h4>
+            <div className={styles.filters__header}>
+              <h4>Franchises</h4>
+              {renderModeToggle("franchises")}
+            </div>
             <Dropdown
               isWithReset
               isMulti

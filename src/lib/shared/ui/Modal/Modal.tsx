@@ -14,7 +14,7 @@ export const Modal: FC<IModalProps> = ({ children, onClose, id }) => {
     if (onClose) onClose();
   };
 
-  // useCloseEvents([modalRef], () => closePopup());
+  useCloseEvents([modalRef], () => closePopup());
 
   return (
     <div className={cn(styles.modal)} id={id} key={id}>

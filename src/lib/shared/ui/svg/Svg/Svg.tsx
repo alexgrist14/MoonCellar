@@ -65,7 +65,7 @@ export const Svg: FC<ISvgProps> = ({
 
 interface IPathProps extends Pick<
   SVGAttributes<SVGPathElement>,
-  "d" | "strokeLinejoin" | "strokeLinecap"
+  "d" | "strokeLinejoin" | "strokeLinecap" | "clipPath"
 > {
   type?: "fill" | "stroke";
   defaultFillRule?: boolean;
@@ -83,6 +83,7 @@ export const Path: FC<IPathProps> = ({
   strokeLinecap,
   strokeWidth,
   color,
+  clipPath,
 }) => (
   <path
     strokeWidth={strokeWidth}
@@ -92,5 +93,6 @@ export const Path: FC<IPathProps> = ({
     {...{ [type]: color ?? "currentColor" }}
     strokeLinejoin={strokeLinejoin}
     strokeLinecap={strokeLinecap}
+    clipPath={clipPath}
   />
 );

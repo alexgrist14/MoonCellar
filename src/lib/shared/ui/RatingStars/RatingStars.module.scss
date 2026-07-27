@@ -1,0 +1,9 @@
+.stars {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-x1);
+
+  &__star {
+    filter: drop-shadow(var(--glow-accent-sm));
+  }
+}

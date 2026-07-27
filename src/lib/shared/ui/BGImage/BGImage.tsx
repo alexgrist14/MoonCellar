@@ -32,7 +32,16 @@ export const BGImage = memo(({ game, userImage }: IBGImageProps) => {
     return pictures[Math.floor(Math.random() * pictures.length)];
   }, [game, hideMedia]);
 
-  const source = gameImage || userImage || authUserImage || DEFAULT_IMAGE;
+  const [lastGameImage, setLastGameImage] = useState<string | undefined>(
+    gameImage
+  );
+
+  useEffect(() => {
+    if (gameImage) setLastGameImage(gameImage);
+  }, [gameImage]);
+
+  const source =
+    gameImage || lastGameImage || userImage || authUserImage || DEFAULT_IMAGE;
 
   const [bg, setBg] = useState<string>(source);
   const [prev, setPrev] = useState<string>(source);

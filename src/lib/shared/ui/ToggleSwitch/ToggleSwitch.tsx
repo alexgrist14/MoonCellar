@@ -12,6 +12,7 @@ interface ToggleSwitchProps {
   defaultValue?: "left" | "right";
   value?: "left" | "right";
   isDisabled?: boolean;
+  isColorless?: boolean;
   label?: string;
 }
 
@@ -24,6 +25,7 @@ export const ToggleSwitch: FC<ToggleSwitchProps> = ({
   defaultValue,
   value,
   isDisabled,
+  isColorless,
   label,
 }) => {
   const [isActive, setIsActive] = useState(false);
@@ -55,6 +57,7 @@ export const ToggleSwitch: FC<ToggleSwitchProps> = ({
           styles[`toggle_${value || toggleValue}`],
           {
             [styles.toggle_active]: isActive || isDisabled,
+            [styles.toggle_colorless]: isColorless,
           }
         )}
         style={{ scale }}

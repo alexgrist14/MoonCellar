@@ -190,7 +190,6 @@ export const useWheel = ({
               })
               .finally(() => {
                 setLoading(false);
-                setFinished(true);
               });
           } else {
             setLoading(false);

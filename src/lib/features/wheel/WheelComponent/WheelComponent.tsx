@@ -9,6 +9,7 @@ import { useWheel } from "@/src/lib/shared/hooks/useWheel";
 import { shuffle } from "@/src/lib/shared/utils/common.utils";
 import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
 import { useWheelStore } from "@/src/lib/shared/store/wheel.store";
+import { useSettingsStore } from "@/src/lib/shared/store/settings.store";
 
 interface WheelComponentProps {
   primaryColor?: string;
@@ -17,6 +18,35 @@ interface WheelComponentProps {
   fontFamily?: string;
   time?: number;
 }
+
+const SPIN_EASING = "cubic-bezier(0.23, 1, 0.32, 1)";
+const BOUNCE_EASING = "cubic-bezier(0.45, 0, 0.55, 1)";
+const BOUNCE_BACK_DEG_MIN = 30;
+const BOUNCE_BACK_DEG_MAX = 70;
+const BOUNCE_DURATION = 0.7;
+const WINNER_REVEAL_DELAY = 300;
+const MUSIC_FADE_OUT_DURATION = 600;
+
+const MUSIC_TRACKS = [
+  "/music/theme3.mp3",
+  "/music/theme4.mp3",
+  "/music/theme6.mp3",
+];
+
+const fadeOutAndPause = (audio: HTMLAudioElement, duration: number) => {
+  const steps = 20;
+  const stepTime = duration / steps;
+  const volumeStep = audio.volume / steps;
+
+  const interval = setInterval(() => {
+    audio.volume = Math.max(0, audio.volume - volumeStep);
+
+    if (audio.volume <= 0) {
+      clearInterval(interval);
+      audio.pause();
+    }
+  }, stepTime);
+};
 
 export const WheelComponent: FC<WheelComponentProps> = ({
   buttonText = "Spin",
@@ -30,9 +60,15 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   const { addHistoryGame, games, setRoyalGames, royalGames } = useGamesStore();
   const { isFinished, isLoading, isStarted, setFinished, setStarted, isRoyal } =
     useStatesStore();
+  const isMusicEnabled = useSettingsStore((state) => state.isMusicEnabled);
+  const musicVolume = useSettingsStore((state) => state.musicVolume ?? 1);
 
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const angle = useRef(0);
   const [winnerAngle, setWinnerAngle] = useState(0);
+  const [rotateTransition, setRotateTransition] = useState(
+    `rotate ${time}s ${SPIN_EASING}`
+  );
   const [tempGames, setTempGames] = useState<IGameResponse[]>([]);
 
   const { drawWheel, parseImages, spinHandler } = useWheel({
@@ -49,34 +85,45 @@ export const WheelComponent: FC<WheelComponentProps> = ({
 
       angle.current += 360 + 360 * Math.ceil(time);
 
-      setWinnerAngle(
+      const finalAngle =
         angle.current +
-          (360 - (360 / wheelGames.length) * winner) -
-          Math.floor(Math.random() * (360 / wheelGames.length))
-      );
+        (360 - (360 / wheelGames.length) * winner) -
+        Math.floor(Math.random() * (360 / wheelGames.length));
 
       setStarted(false);
 
+      const bounceBackDeg =
+        BOUNCE_BACK_DEG_MIN +
+        Math.random() * (BOUNCE_BACK_DEG_MAX - BOUNCE_BACK_DEG_MIN);
+
+      setRotateTransition(`rotate ${time}s ${SPIN_EASING}`);
+      setWinnerAngle(finalAngle + bounceBackDeg);
+
       setTimeout(() => {
-        setFinished(true);
+        setRotateTransition(`rotate ${BOUNCE_DURATION}s ${BOUNCE_EASING}`);
+        setWinnerAngle(finalAngle);
 
-        if (isRoyal) {
-          const filtered = tempGames?.filter(
-            (game) => game._id !== tempGames[winner]._id
-          );
+        setTimeout(() => {
+          setFinished(true);
 
-          setTempGames(
-            !!filtered?.length
-              ? filtered
-              : !!royalGames?.length
-                ? shuffle(royalGames)
-                : []
-          );
-        } else {
-          addHistoryGame(wheelGames[winner]);
-        }
+          if (isRoyal) {
+            const filtered = tempGames?.filter(
+              (game) => game._id !== tempGames[winner]._id
+            );
 
-        setWinner(wheelGames[winner]);
+            setTempGames(
+              !!filtered?.length
+                ? filtered
+                : !!royalGames?.length
+                  ? shuffle(royalGames)
+                  : []
+            );
+          } else {
+            addHistoryGame(wheelGames[winner]);
+          }
+
+          setWinner(wheelGames[winner]);
+        }, BOUNCE_DURATION * 1000);
       }, time * 1000);
     }
   }, [
@@ -94,10 +141,39 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   ]);
 
   useEffect(() => {
+    if (!isMusicEnabled || isFinished) return;
+
+    const track = MUSIC_TRACKS[Math.floor(Math.random() * MUSIC_TRACKS.length)];
+    const audio = new Audio(track);
+
+    audio.loop = true;
+    audio.volume = musicVolume;
+    audio.play().catch(() => {});
+
+    audioRef.current = audio;
+
+    return () => {
+      audioRef.current = null;
+
+      // matches GameCard's cover fade-in duration so music covers the winner reveal
+      setTimeout(
+        () => fadeOutAndPause(audio, MUSIC_FADE_OUT_DURATION),
+        WINNER_REVEAL_DELAY
+      );
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFinished, isMusicEnabled]);
+
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.volume = musicVolume;
+  }, [musicVolume]);
+
+  useEffect(() => {
     isRoyal
       ? setTempGames(!!royalGames?.length ? shuffle(royalGames) : [])
       : setTempGames([]);
-  }, [games, royalGames, isRoyal]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRoyal]);
 
   useEffect(() => {
     if (isRoyal) {
@@ -144,7 +220,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
         className={styles.canvas}
         style={{
           rotate: `${winnerAngle}deg`,
-          transition: `${time}s`,
+          transition: rotateTransition,
         }}
       />
     </div>

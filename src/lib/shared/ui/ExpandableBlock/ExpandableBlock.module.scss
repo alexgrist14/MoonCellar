@@ -1,0 +1,21 @@
+.content {
+  &_clamped {
+    @include lineClamp(4);
+  }
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-x1);
+  width: fit-content;
+  margin-top: var(--gap-x1);
+
+  &__icon {
+    transition: transform 0.2s;
+
+    &_active {
+      transform: rotate(180deg);
+    }
+  }
+}

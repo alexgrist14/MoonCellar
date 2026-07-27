@@ -56,6 +56,12 @@
     }
   }
 
+  &__rating {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x1);
+  }
+
   &__right {
     display: flex;
     flex-direction: column;
