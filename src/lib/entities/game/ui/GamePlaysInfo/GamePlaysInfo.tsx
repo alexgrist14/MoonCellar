@@ -1,10 +1,9 @@
-import { FC, useCallback } from "react";
+import { FC, Fragment, useCallback } from "react";
 import styles from "./GamePlaysInfo.module.scss";
 import { IPlaythrough } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { Box } from "@/src/lib/shared/ui/Box";
-import { Separator } from "@/src/lib/shared/ui/Separator";
 
 interface IGamePlaysInfoProps {
   gameName: string;
@@ -23,46 +22,40 @@ export const GamePlaysInfo: FC<IGamePlaysInfoProps> = ({
     [systems]
   );
 
-  const isActive = useCallback((play: IPlaythrough) => {
-    return (
-      !!play.isMastered ||
-      play.platformId !== undefined ||
-      !!play.date ||
-      !!play.time ||
-      !!play.comment
-    );
-  }, []);
-
   return (
-    <Box isWithScrollBar>
-      <div className={styles.plays}>
-        <h2>{gameName}</h2>
-        {playthroughs.map((play) => {
-          if (!isActive(play)) return <p key={play._id}>Info not available</p>;
+    <Box
+      title={gameName}
+      isWithScrollBar
+      contentStyle={{ padding: "var(--padding-x4)" }}
+      classNameContent={styles.plays}
+    >
+      {playthroughs.map((play) => {
+        const segments = [
+          commonUtils.upFL(play.category),
+          !!play.date && commonUtils.formatDate(play.date),
+          play.platformId !== undefined
+            ? getPlatform(play.platformId)?.name
+            : undefined,
+          !!play.time && `${play.time} hours`,
+          !!play.isMastered && "Mastered",
+        ].filter((segment): segment is string => !!segment);
 
-          return (
-            <div key={play._id} className={styles.plays__play}>
-              <div className={styles.plays__top}>
-                -
-                {play.platformId !== undefined && (
-                  <p>{getPlatform(play.platformId)?.name}</p>
-                )}
-                {!!play.date && <p>{commonUtils.formatDate(play.date)}</p>}
-                {!!play.time && <p>{play.time} hours</p>}
-                {!!play.isMastered && <p>Mastered</p>}
-              </div>
-              {!!play.comment && (
-                <>
-                  <Separator direction="horizontal" />
-                  <div className={styles.plays__bottom}>
-                    {<p>{play.comment}</p>}
-                  </div>
-                </>
-              )}
+        return (
+          <div key={play._id} className={styles.plays__play}>
+            <div className={styles.plays__meta}>
+              {segments.map((segment, i) => (
+                <Fragment key={i}>
+                  {i > 0 && <span className={styles.plays__dot} />}
+                  <span>{segment}</span>
+                </Fragment>
+              ))}
             </div>
-          );
-        })}
-      </div>
+            {!!play.comment && (
+              <p className={styles.plays__comment}>{play.comment}</p>
+            )}
+          </div>
+        );
+      })}
     </Box>
   );
 };

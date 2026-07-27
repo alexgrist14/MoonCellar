@@ -3,7 +3,6 @@
   grid-template-columns: 1fr min-content;
   color: var(--color-neutral-100);
   justify-content: center;
-  margin-top: 5px;
   gap: var(--gap-x4);
 
   @include mediaMd {

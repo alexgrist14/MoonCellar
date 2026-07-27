@@ -70,7 +70,8 @@ const UserProfile: FC<UserProfileProps> = ({
     [query]
   );
 
-  const isGamesTab = userListCategories.some((t) => t === tab);
+  const isGamesTab =
+    userListCategories.some((t) => t === tab) || tab === "all";
 
   const [selectedSort, setSelectedSort] = useState<SortType>(
     SortType.DATE_ADDED

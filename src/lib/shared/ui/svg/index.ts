@@ -20,3 +20,4 @@ export * from "./SvgMore";
 export * from "./SvgSort";
 export * from "./SvgStar";
 export * from "./SvgMoon";
+export * from "./SvgComment";

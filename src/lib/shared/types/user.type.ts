@@ -10,6 +10,8 @@ export type CategoriesType =
   | "backlog"
   | "played";
 
+export type CategoriesFilterType = CategoriesType | "all";
+
 export type CategoriesCount = Record<CategoriesType, number>;
 
 export interface ILogs {

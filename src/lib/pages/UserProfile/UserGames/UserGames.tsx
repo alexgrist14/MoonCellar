@@ -1,18 +1,15 @@
 import { gamesApi } from "@/src/lib/shared/api";
 import { SortType } from "@/src/lib/shared/types/sort.type";
-import { CategoriesType } from "@/src/lib/shared/types/user.type";
+import { CategoriesFilterType } from "@/src/lib/shared/types/user.type";
 import { GameCard } from "@/src/lib/shared/ui/GameCard";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
-import { Icon } from "@iconify/react";
-import classNames from "classnames";
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./UserGames.module.scss";
 import { useSearchParams } from "next/navigation";
 import { IPlaythrough } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 import { useDebouncedCallback } from "use-debounce";
 import { useAsyncLoader } from "@/src/lib/shared/hooks/useAsyncLoader";
-import { accentColor, accentColorRGB } from "@/src/lib/shared/constants";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { GamePlaysInfo } from "@/src/lib/entities/game/ui/GamePlaysInfo";
@@ -20,6 +17,10 @@ import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
 import { IUserRating } from "@/src/lib/shared/lib/schemas/user-ratings.schema";
 import { GamesCards } from "@/src/lib/shared/ui/GamesCards";
 import { takeGames } from "@/src/lib/shared/constants/games.const";
+import { Box } from "@/src/lib/shared/ui/Box";
+import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
+import { RatingStars } from "@/src/lib/shared/ui/RatingStars";
+import { SvgComment } from "@/src/lib/shared/ui/svg";
 
 interface UserGamesProps {
   playthroughs: IPlaythrough[];
@@ -38,7 +39,7 @@ export const UserGames: FC<UserGamesProps> = ({
 
   const query = useSearchParams();
   const page = Number(query.get("page"));
-  const list = query.get("list") as CategoriesType;
+  const list = query.get("list") as CategoriesFilterType;
 
   const [total, setTotal] = useState(0);
   const [games, setGames] = useState<IGameResponse[]>();
@@ -58,6 +59,7 @@ export const UserGames: FC<UserGamesProps> = ({
     const plays = playthroughs
       ?.filter(
         (play) =>
+          list === "all" ||
           (play.category === list && !play.isMastered) ||
           (list === "mastered" && play.isMastered)
       )
@@ -165,54 +167,61 @@ export const UserGames: FC<UserGamesProps> = ({
       <GamesCards
         games={games}
         gameClassName={styles.games__game}
-        additionalHeight={35}
+        additionalHeight={132}
         additionalGameNode={(game) => {
           const rating = parsedGamesRatings?.[game._id];
+          const gamePlaythroughs = playthroughs.filter(
+            (play) => play.gameId === game._id
+          );
+          const hasComment = gamePlaythroughs.some((play) => !!play.comment);
 
           return (
-            <div className={styles.games__info}>
-              <div
-                className={styles.games__text}
+            <Box
+              wrapperStyle={{
+                height: "90%",
+                width: "90%",
+                justifySelf: "center",
+              }}
+              templateStyle={{ height: "100%" }}
+              classNameContent={styles.games__info}
+              contentStyle={{ padding: "var(--padding-x2)", height: "100%" }}
+            >
+              {!!rating && (
+                <RatingStars
+                  rating={rating}
+                  size="12"
+                  className={styles.games__stars}
+                />
+              )}
+              <p className={styles.games__title}>{game.name}</p>
+              <div className={styles.games__plays}>
+                <p>
+                  {gamePlaythroughs.length}{" "}
+                  {commonUtils.addLastS(
+                    "Playthrough",
+                    gamePlaythroughs.length
+                  )}
+                </p>
+                {hasComment && (
+                  <SvgComment size="12" className={styles.games__comment} />
+                )}
+              </div>
+              <Button
+                compact
+                color={ButtonColor.DEFAULT}
+                className={styles.games__button}
                 onClick={() =>
                   modal.open(
                     <GamePlaysInfo
                       gameName={game.name}
-                      playthroughs={playthroughs.filter(
-                        (play) => play.gameId === game._id
-                      )}
+                      playthroughs={gamePlaythroughs}
                     />
                   )
                 }
               >
-                <p className={styles.games__title}>{game.name}</p>
-                {playthroughs.filter((play) => play.gameId === game._id)
-                  .length > 1 && (
-                  <p className={styles.games__plays}>
-                    {
-                      playthroughs.filter((play) => play.gameId === game._id)
-                        .length
-                    }{" "}
-                    {commonUtils.addLastS(
-                      "Playthrough",
-                      playthroughs.filter((play) => play.gameId === game._id)
-                        .length
-                    )}
-                  </p>
-                )}
-              </div>
-              {!!rating && (
-                <div className={classNames(styles.games__icon)}>
-                  <Icon
-                    style={{
-                      filter: `drop-shadow(0 0 ${rating * 0.05}rem ${accentColor})`,
-                      backgroundColor: `rgba(${accentColorRGB}, ${rating * 0.1})`,
-                    }}
-                    className={classNames(styles.games__number)}
-                    icon={`mdi:numeric-${parsedGamesRatings[game._id]}`}
-                  />
-                </div>
-              )}
-            </div>
+                Playthroughs
+              </Button>
+            </Box>
           );
         }}
       />

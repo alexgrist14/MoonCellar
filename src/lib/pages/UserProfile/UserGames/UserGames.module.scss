@@ -1,64 +1,52 @@
 .games {
   &__info {
-    display: grid;
-    grid-template-columns: 1fr 30px;
-    align-items: center;
-    align-content: flex-start;
-    gap: var(--gap-x1);
+    display: flex;
     flex-direction: column;
-    border-radius: var(--radius-x2);
+    align-items: flex-start;
+    gap: var(--gap-x1);
+    min-width: 0;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
-    align-content: center;
-
-    & p {
-      @include textEllipsis;
-      padding-inline: var(--padding-x1);
-      width: 100%;
-    }
   }
 
-  &__text {
-    display: grid;
-    gap: var(--gap-x1);
-    cursor: pointer;
-    transition: 0.3s;
+  &__stars {
+    max-width: 100%;
+    overflow: hidden;
+  }
 
-    &:hover {
-      color: var(--color-blue);
-    }
+  &__title {
+    @include textEllipsis;
+    width: 100%;
+    @include font(13px, 17px, 500);
   }
 
   &__plays {
-    @include font(11px, 12px, 400);
-  }
-
-  &__icon {
-    @include flexCenter;
-    padding: var(--padding-x05);
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x1);
     width: 100%;
-    transition: 0.3s;
-    aspect-ratio: 1;
-    flex: 1;
-    cursor: pointer;
-    position: relative;
-    border-radius: 50%;
-    overflow: hidden;
+
+    & p {
+      @include textEllipsis;
+      @include font(11px, 14px, 400);
+      color: var(--color-gray);
+    }
   }
 
-  &__number {
-    width: auto;
-    height: 100%;
-    background-color: var(--color-accent);
-    border-radius: 50%;
+  &__comment {
+    flex-shrink: 0;
+  }
 
-    & path {
-      fill: var(--color-neutral-100);
-    }
+  &__button {
+    width: 100%;
+    margin-top: auto;
   }
 
   &__game {
     display: grid;
-    grid-template-rows: 1fr 50px;
+    grid-template-rows: 1fr 132px;
+    gap: var(--gap-x2);
     padding: var(--padding-x1);
   }
 }

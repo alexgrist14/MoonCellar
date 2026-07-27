@@ -50,9 +50,16 @@ export const UserNavigation: FC<{
 
   useCloseEvents([sortRef], () => setIsSortOpen(false));
 
-  const isGamesTab = userListCategories.some(
-    (category) => category === query.get("list")
-  );
+  const isGamesTab =
+    userListCategories.some((category) => category === query.get("list")) ||
+    query.get("list") === "all";
+
+  const allPlays = playthroughs?.reduce((res: IPlaythrough[], play) => {
+    if (!res.some((p) => p.gameId === play.gameId)) {
+      res.push(play);
+    }
+    return res;
+  }, []);
 
   const handleEditListClick = () => {
     modal.open(<CustomFolder />);
@@ -78,6 +85,18 @@ export const UserNavigation: FC<{
         </Button>
       </Box>
       <Box>
+        <Button
+          className={styles.btn}
+          active={query.get("list") === "all"}
+          color={ButtonColor.TRANSPARENT}
+          onClick={() => {
+            setExpanded([]);
+            setQuery({ list: "all", page: 1 });
+          }}
+        >
+          <span>All</span>
+          <span>{allPlays.length}</span>
+        </Button>
         {userListCategories.map((category, i) => {
           const plays = playthroughs?.reduce((res: IPlaythrough[], play) => {
             if (

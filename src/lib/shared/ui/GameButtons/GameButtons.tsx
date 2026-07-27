@@ -70,6 +70,11 @@ export const GameButtons: FC<{ game: IGameResponse }> = ({ game }) => {
             link: `https://howlongtobeat.com/?q=${encodeURI(game.name)}`,
             target: "_blank",
           },
+          {
+            title: "Search on vndb",
+            link: `https://vndb.org/v?sq=${encodeURI(game.name)}`,
+            target: "_blank",
+          },
         ]}
       />
     </div>
