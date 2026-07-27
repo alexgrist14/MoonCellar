@@ -174,17 +174,20 @@ export const UserGames: FC<UserGamesProps> = ({
             (play) => play.gameId === game._id
           );
           const hasComment = gamePlaythroughs.some((play) => !!play.comment);
+          const hideGamePlaysInfo =
+            gamePlaythroughs.length === 1 &&
+            (gamePlaythroughs[0].category === "wishlist" ||
+              gamePlaythroughs[0].category === "playing");
 
           return (
             <Box
               wrapperStyle={{
-                height: "80%",
+                height: "fit-content",
                 width: "90%",
                 justifySelf: "center",
               }}
-              templateStyle={{ height: "100%" }}
               classNameContent={styles.games__info}
-              contentStyle={{ padding: "var(--padding-x2)", height: "100%" }}
+              contentStyle={{ padding: "var(--padding-x2)" }}
             >
               {!!rating && (
                 <RatingStars
@@ -195,32 +198,36 @@ export const UserGames: FC<UserGamesProps> = ({
               )}
               <p className={styles.games__title}>{game.name}</p>
               <div className={styles.games__plays}>
-                <p>
-                  {gamePlaythroughs.length}{" "}
-                  {commonUtils.addLastS(
-                    "Playthrough",
-                    gamePlaythroughs.length
-                  )}
-                </p>
+                {!hideGamePlaysInfo && (
+                  <p>
+                    {gamePlaythroughs.length}{" "}
+                    {commonUtils.addLastS(
+                      "Playthrough",
+                      gamePlaythroughs.length
+                    )}
+                  </p>
+                )}
                 {hasComment && (
                   <SvgComment size="12" className={styles.games__comment} />
                 )}
               </div>
-              <Button
-                compact
-                color={ButtonColor.DEFAULT}
-                className={styles.games__button}
-                onClick={() =>
-                  modal.open(
-                    <GamePlaysInfo
-                      gameName={game.name}
-                      playthroughs={gamePlaythroughs}
-                    />
-                  )
-                }
-              >
-                Playthroughs
-              </Button>
+              {!hideGamePlaysInfo && (
+                <Button
+                  compact
+                  color={ButtonColor.DEFAULT}
+                  className={styles.games__button}
+                  onClick={() =>
+                    modal.open(
+                      <GamePlaysInfo
+                        gameName={game.name}
+                        playthroughs={gamePlaythroughs}
+                      />
+                    )
+                  }
+                >
+                  Playthroughs
+                </Button>
+              )}
             </Box>
           );
         }}
