@@ -278,6 +278,8 @@ export const UpdateGameRequestSchema = GameSchema.omit({
 
 export const GetCustomGameResponseSchema = GameSchema.array();
 
+export const GetGameSlugsResponseSchema = z.string().array();
+
 export const UpcomingReleaseGroupSchema = z.object({
   label: z.string(),
   year: z.number(),
@@ -303,5 +305,7 @@ export type IGetGamesByIdsRequest = z.infer<typeof GetGamesByIdsSchema>;
 export type IGameResponse = z.infer<typeof GameSchema>;
 
 export type IUpcomingReleaseGroup = z.infer<typeof UpcomingReleaseGroupSchema>;
+
+export type IGetGameSlugsResponse = z.infer<typeof GetGameSlugsResponseSchema>;
 
 export type IGenreResponse = { genre: string; count: number };

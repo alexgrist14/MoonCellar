@@ -17,6 +17,10 @@ import { filesAPI } from "./files.api";
 const GAMES_URL = `${API_URL}/games`;
 
 export const gamesApi = {
+  getSlugs: () => {
+    return agent.get<string[]>(`${GAMES_URL}/slugs`);
+  },
+
   getById: (params: IGetGameByIdRequest) => {
     return agent.get<IGameResponse>(`${GAMES_URL}/by-id/${params._id}`);
   },
