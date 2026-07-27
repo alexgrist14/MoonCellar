@@ -6,6 +6,14 @@ import { notFound } from "next/navigation";
 
 const isValidSlug = (slug: string) => !slug.includes(".");
 
+const extToMimeType: Record<string, string> = {
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  gif: "image/gif",
+  webp: "image/webp",
+};
+
 export async function generateMetadata({
   params,
 }: {
@@ -32,7 +40,7 @@ export async function generateMetadata({
             width: 528,
             height: 704,
             alt: game.name,
-            type: `image/${game.cover.split(".").pop()}`,
+            type: extToMimeType[game.cover.split(".").pop()!.toLowerCase()],
           },
         ],
       }),
