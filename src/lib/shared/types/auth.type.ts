@@ -1,6 +1,6 @@
 import { IRole } from "../lib/schemas/role.schema";
 import { IRAAward } from "./retroachievements.type";
-import { IFollowings, IUserFilter, IUserPreset } from "./user.type";
+import { IFollowers, IFollowings, IUserFilter, IUserPreset } from "./user.type";
 
 export interface IAuth {
   userName: string;
@@ -13,6 +13,7 @@ export interface IUser {
   userName: string;
   email: string;
   followings: IFollowings;
+  followers: IFollowers;
   filters: IUserFilter[];
   presets: IUserPreset[];
   updatedAt: Date;

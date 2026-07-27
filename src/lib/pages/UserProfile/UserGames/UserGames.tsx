@@ -178,7 +178,7 @@ export const UserGames: FC<UserGamesProps> = ({
           return (
             <Box
               wrapperStyle={{
-                height: "90%",
+                height: "80%",
                 width: "90%",
                 justifySelf: "center",
               }}

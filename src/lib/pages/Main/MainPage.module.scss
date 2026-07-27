@@ -312,20 +312,4 @@
       }
     }
   }
-
-  .title__section {
-    display: flex;
-    align-items: center;
-    gap: var(--gap-x2);
-    font-size: clamp(1.5rem, 3vw, 2rem);
-    margin-bottom: var(--padding-x5);
-
-    &:before {
-      content: " ";
-      width: 4px;
-      height: 24px;
-      background: var(--color-accent);
-      border-radius: var(--radius-x2);
-    }
-  }
 }

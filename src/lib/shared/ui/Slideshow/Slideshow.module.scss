@@ -83,11 +83,13 @@
   &__prev {
     left: 0;
     right: unset;
+    border-radius: var(--radius-x2) 0 0 var(--radius-x2);
   }
 
   &__next {
     right: 0;
     left: unset;
+    border-radius: 0 var(--radius-x2) var(--radius-x2) 0;
   }
 
   &__content {

@@ -1,6 +1,7 @@
 import { FC, useMemo } from "react";
 import styles from "./GauntletWheel.module.scss";
 import { generateWheelColors } from "../../../shared/utils/wheel.utils";
+import { Path, Svg } from "../../../shared/ui/svg/Svg/Svg";
 
 const SEGMENT_PATHS = [
   "M100,100 L100,2 A98,98 0 0,1 184.5,50 Z",
@@ -21,7 +22,7 @@ export const GauntletWheel: FC = () => {
     <div className={styles.wheel}>
       <div className={styles.wheel__preview}>
         <div className={styles.wheel__container}>
-          <svg className={styles.wheel__svg} viewBox="0 0 200 200">
+          <Svg className={styles.wheel__svg} viewBox="0 0 200 200">
             <circle
               cx="100"
               cy="100"
@@ -31,7 +32,7 @@ export const GauntletWheel: FC = () => {
               strokeWidth="2"
             />
             {SEGMENT_PATHS.map((d, i) => (
-              <path key={d} d={d} fill={segColors[i]} />
+              <Path key={d} d={d} color={segColors[i]} />
             ))}
             <line
               x1="100"
@@ -100,7 +101,7 @@ export const GauntletWheel: FC = () => {
             >
               Spin
             </text>
-          </svg>
+          </Svg>
         </div>
       </div>
     </div>

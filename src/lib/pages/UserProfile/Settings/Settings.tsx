@@ -10,6 +10,7 @@ import { RangeSelector } from "@/src/lib/shared/ui/RangeSelector";
 import { Textarea } from "@/src/lib/shared/ui/Textarea";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
+import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FC, MouseEvent, useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -127,7 +128,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
       <h2 className={styles.pageTitle}>Profile Settings</h2>
 
       <section className={styles.section}>
-        <h3 className={styles.sectionTitle}>Account</h3>
+        <SectionTitle as="h3">Account</SectionTitle>
         <div className={styles.identity}>
           <div className={styles.identity__avatar}>
             <AvatarSettings
@@ -182,7 +183,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
       </section>
 
       <section className={styles.section}>
-        <h3 className={styles.sectionTitle}>Appearance</h3>
+        <SectionTitle as="h3">Appearance</SectionTitle>
         <div className={styles.field}>
           <label htmlFor="bg">Background</label>
           <input
@@ -221,7 +222,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
       </section>
 
       <section className={styles.section}>
-        <h3 className={styles.sectionTitle}>Preferences</h3>
+        <SectionTitle as="h3">Preferences</SectionTitle>
         <div className={styles.prefRow}>
           <div className={styles.prefRow__text}>
             <label>Show 18+ content</label>

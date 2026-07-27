@@ -2,7 +2,7 @@ import { FC, useEffect, useMemo, useState } from "react";
 import styles from "./Slideshow.module.scss";
 import { Scrollbar } from "../Scrollbar";
 import { modal } from "../Modal";
-import { Icon } from "@iconify/react/dist/iconify.js";
+import { SvgChevron } from "../svg";
 import { Button, ButtonColor } from "../Button";
 import { SlideshowImage } from "./components/SlideshowImage";
 
@@ -42,7 +42,7 @@ export const Slideshow: FC<ISlideshowProps> = ({ pictures }) => {
               setScreenshotIndex(screenshotIndex - 1);
             }}
           >
-            <Icon icon={"ooui:previous-ltr"} />
+            <SvgChevron style={{ transform: "rotate(90deg)" }} />
           </Button>
           {screenshots[screenshotIndex]}
           <Button
@@ -54,7 +54,7 @@ export const Slideshow: FC<ISlideshowProps> = ({ pictures }) => {
               setScreenshotIndex(screenshotIndex + 1);
             }}
           >
-            <Icon icon={"ooui:previous-rtl"} />
+            <SvgChevron style={{ transform: "rotate(-90deg)" }} />
           </Button>
         </div>,
         { onClose: () => setScreenshotIndex(undefined) }

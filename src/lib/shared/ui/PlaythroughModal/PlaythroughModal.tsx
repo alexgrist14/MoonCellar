@@ -24,6 +24,7 @@ import { IButtonGroupItem } from "../../types/buttons.type";
 import { SvgPlus } from "../svg";
 import classNames from "classnames";
 import { useUserStore } from "../../store/user.store";
+import { usePlaythroughsStore } from "../../store/playthroughs.store";
 import { Box } from "../Box";
 import { toast } from "../../utils/toast.utils";
 import { IGameResponse } from "../../lib/schemas/games.schema";
@@ -56,6 +57,10 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
     setPlaythroughs: setStorePlaythroughs,
     playthroughs: storePlaythroughs,
   } = useUserStore();
+  const {
+    setPlaythroughs: setFullStorePlaythroughs,
+    playthroughs: fullStorePlaythroughs,
+  } = usePlaythroughsStore();
   const { sync, isLoading } = useAsyncLoader();
 
   const [playthroughs, setPlaythroughs] = useState<IPlaythrough[]>([]);
@@ -120,6 +125,11 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
                     : play
                 ) || []
               );
+              setFullStorePlaythroughs(
+                fullStorePlaythroughs?.map((play) =>
+                  play._id === playthroughId ? res.data : play
+                ) || []
+              );
               selectHandler(res.data);
               toast.success({
                 description: "Playthrough successfully updated",
@@ -139,6 +149,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
                 updatedAt: res.data.updatedAt,
               },
             ]);
+            setFullStorePlaythroughs([...(fullStorePlaythroughs || []), res.data]);
             selectHandler(res.data);
             toast.success({ description: "Playthrough successfully created" });
           })
@@ -155,6 +166,10 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
         );
         setStorePlaythroughs(
           storePlaythroughs?.filter((play) => play._id !== res.data._id) || []
+        );
+        setFullStorePlaythroughs(
+          fullStorePlaythroughs?.filter((play) => play._id !== res.data._id) ||
+            []
         );
 
         setPlaythroughId(undefined);

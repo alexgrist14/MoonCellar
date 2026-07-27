@@ -12,10 +12,10 @@ import Markdown from "react-markdown";
 import { Interweave } from "interweave";
 import { useAsyncLoader } from "@/src/lib/shared/hooks/useAsyncLoader";
 import { Loader } from "@/src/lib/shared/ui/Loader";
-import { Cover } from "@/src/lib/shared/ui/Cover";
 import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
-import { useHideAdult } from "@/src/lib/shared/hooks/useHideAdult";
-import { isAdultGame } from "@/src/lib/shared/utils/adult.utils";
+import { GameCard } from "@/src/lib/shared/ui/GameCard";
+import { Box } from "@/src/lib/shared/ui/Box";
+import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 
 interface UserInfoProps {
   user: IUser;
@@ -29,9 +29,12 @@ const UserInfo: FC<UserInfoProps> = ({
   authUserId,
 }) => {
   const { sync, isLoading } = useAsyncLoader();
-  const { _id: id, followings: userFollowings, userName } = user;
-
-  const hideAdult = useHideAdult();
+  const {
+    _id: id,
+    followings: userFollowings,
+    followers: userFollowers,
+    userName,
+  } = user;
 
   const [logs, setLogs] = useState<(ILogs & { game?: IGameResponse })[]>([]);
   const [userAuthFollowings, setUserAuthFollowings] = useState<IFollowings>(
@@ -105,26 +108,43 @@ const UserInfo: FC<UserInfoProps> = ({
               )}
             </div>
           </div>
-          <div className={styles.friends}>
-            <h3 className={styles.title}>Friends</h3>
-            <div className={styles.friends__list}>
-              {!!userFollowings &&
-                userFollowings.followings.map((item, i) => (
-                  <Link
-                    href={`/user/${item.userName}`}
-                    className={styles.friends__item}
-                    key={`${id}_${i}`}
-                  >
-                    <Avatar user={item} />
-                  </Link>
-                ))}
+          <div className={styles.friendsGroup}>
+            <div className={styles.friends}>
+              <SectionTitle as="h3">Following</SectionTitle>
+              <div className={styles.friends__list}>
+                {!!userFollowings &&
+                  userFollowings.followings.map((item, i) => (
+                    <Link
+                      href={`/user/${item.userName}`}
+                      className={styles.friends__item}
+                      key={`${id}_${i}`}
+                    >
+                      <Avatar user={item} />
+                    </Link>
+                  ))}
+              </div>
+            </div>
+            <div className={styles.friends}>
+              <SectionTitle as="h3">Followers</SectionTitle>
+              <div className={styles.friends__list}>
+                {!!userFollowers &&
+                  userFollowers.followers.map((item, i) => (
+                    <Link
+                      href={`/user/${item.userName}`}
+                      className={styles.friends__item}
+                      key={`${id}_${i}`}
+                    >
+                      <Avatar user={item} />
+                    </Link>
+                  ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
       <div className={styles.content__bottom}>
         <div className={styles.activity}>
-          <h3 className={styles.title}>Activity</h3>
+          <SectionTitle as="h3">Activity</SectionTitle>
           {isLoading && <Loader type="moon" />}
           {!isLoading && logs?.length > 0 && (
             <div className={styles.activity__list}>
@@ -132,28 +152,8 @@ const UserInfo: FC<UserInfoProps> = ({
                 if (!log.game) return null;
 
                 return (
-                  <div className={styles.item} key={i}>
-                    <Link
-                      href={`/games/${log.game?.slug}`}
-                      className={styles.item__img}
-                      target="_blank"
-                    >
-                      {!!log.game?.cover &&
-                      !(hideAdult && isAdultGame(log.game)) ? (
-                        <Image
-                          width={70}
-                          height={110}
-                          src={log.game.cover}
-                          style={{ width: "80px", height: "120px" }}
-                          alt="cover"
-                        />
-                      ) : (
-                        <Cover
-                          isWithoutText
-                          style={{ width: "80px", height: "120px" }}
-                        />
-                      )}
-                    </Link>
+                  <Box key={i} classNameContent={styles.item}>
+                    <GameCard game={log.game} className={styles.item__card} />
                     <div className={styles.item__text}>
                       <p>{log.game.name}</p>
                       <Interweave content={log.text} />
@@ -161,7 +161,7 @@ const UserInfo: FC<UserInfoProps> = ({
                         {commonUtils.getHumanDate(log.date)}
                       </p>
                     </div>
-                  </div>
+                  </Box>
                 );
               })}
             </div>

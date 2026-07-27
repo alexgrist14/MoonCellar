@@ -5,8 +5,18 @@ import {
   IUpcomingReleaseGroup,
 } from "../lib/shared/lib/schemas/games.schema";
 import { gamesApi } from "../lib/shared/api";
+import { Metadata } from "next";
+import {
+  MAIN_PAGE_DESCRIPTION,
+  MAIN_PAGE_TITLE,
+} from "../lib/pages/Main/MainPage.constants";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: MAIN_PAGE_TITLE,
+  description: MAIN_PAGE_DESCRIPTION,
+};
 
 async function getGames(): Promise<{
   topRated: IGameResponse[];

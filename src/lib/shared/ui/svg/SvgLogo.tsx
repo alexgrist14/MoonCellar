@@ -1,14 +1,10 @@
 import { FC } from "react";
+import { Svg } from "./Svg/Svg";
+import { ICommonProps } from "../../types/common.type";
 
-export const SvgLogo: FC<{ className?: string }> = ({ className }) => {
+export const SvgLogo: FC<ICommonProps> = (props) => {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="1em"
-      height="1em"
-      viewBox="0 0 256 256"
-      className={className}
-    >
+    <Svg {...props} viewBox="0 0 256 256">
       <defs>
         <radialGradient
           id="logosMoon0"
@@ -54,6 +50,6 @@ export const SvgLogo: FC<{ className?: string }> = ({ className }) => {
         fill="url(#logosMoon1)"
         mask="url(#logosMoon3)"
       ></circle>
-    </svg>
+    </Svg>
   );
 };

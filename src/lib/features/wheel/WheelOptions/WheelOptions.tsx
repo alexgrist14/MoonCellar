@@ -30,7 +30,7 @@ export const WheelOptions: FC = () => {
           clickCallback={(result) => {
             setMusicEnabled(result === "ON");
           }}
-          defaultValue={isMusicEnabled ? "right" : "left"}
+          value={isMusicEnabled ? "right" : "left"}
           label="Music:"
         />
       </div>

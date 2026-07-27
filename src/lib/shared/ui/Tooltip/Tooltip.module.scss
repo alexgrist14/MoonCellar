@@ -9,7 +9,7 @@
   min-width: fit-content;
   height: fit-content;
   opacity: 0;
-  transition: 0.3s;
+  transition: opacity 0.3s;
   animation: appearOpacity 0.3s ease-out 1 forwards;
 
   @include mediaMax($screenSm) {

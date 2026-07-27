@@ -21,3 +21,8 @@ export * from "./SvgSort";
 export * from "./SvgStar";
 export * from "./SvgMoon";
 export * from "./SvgComment";
+export * from "./SvgWheelPointer";
+export * from "./SvgNumber";
+export * from "./SvgGames";
+export * from "./SvgGauntlet";
+export * from "./SvgVideoPlay";

@@ -8,8 +8,7 @@ import { useAsyncLoader } from "@/src/lib/shared/hooks/useAsyncLoader";
 import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
 import { ratingsAPI } from "@/src/lib/shared/api/ratings.api";
 import { useUserStore } from "@/src/lib/shared/store/user.store";
-import { Icon } from "@iconify/react";
-import { accentColorRGB } from "@/src/lib/shared/constants";
+import { SvgNumber } from "@/src/lib/shared/ui/svg";
 import classNames from "classnames";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 
@@ -87,8 +86,9 @@ export const GameRating: FC<IGameRatingProps> = ({ game }) => {
       {Array(10)
         .fill("")
         .map((_, index) => (
-          <Icon
+          <SvgNumber
             key={index}
+            value={index + 1}
             className={classNames(styles.rating__number, {
               [styles.rating__number_active]:
                 (hoverIndex === undefined &&
@@ -102,7 +102,6 @@ export const GameRating: FC<IGameRatingProps> = ({ game }) => {
             })}
             onClick={() => changeHandler(index + 1)}
             onMouseOver={() => setHoverIndex(index)}
-            icon={`mdi:numeric-${index + 1}`}
           />
         ))}
     </div>

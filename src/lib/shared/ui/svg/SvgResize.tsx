@@ -1,21 +1,10 @@
-import { CSSProperties, FC } from "react";
+import { FC } from "react";
+import { Svg } from "./Svg/Svg";
+import { ICommonProps } from "../../types/common.type";
 
-interface ISvgArrowProps {
-  style?: CSSProperties;
-  className?: string;
-}
-
-export const SvgResize: FC<ISvgArrowProps> = ({ style, className }) => {
+export const SvgResize: FC<ICommonProps> = (props) => {
   return (
-    <svg
-      style={style}
-      className={className}
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <Svg {...props} size="24" viewBox="0 0 24 24">
       <rect
         x="15.9497"
         y="5.63599"
@@ -34,6 +23,6 @@ export const SvgResize: FC<ISvgArrowProps> = ({ style, className }) => {
         transform="rotate(45 16.4595 11.1262)"
         fill="white"
       />
-    </svg>
+    </Svg>
   );
 };

@@ -31,6 +31,10 @@ export interface IFollowings {
   followings: Pick<IUser, "_id" | "userName" | "avatar">[];
 }
 
+export interface IFollowers {
+  followers: Pick<IUser, "_id" | "userName" | "avatar">[];
+}
+
 export type UserGamesType = Record<CategoriesType, IGameResponse[]>;
 
 export interface IUserGames {

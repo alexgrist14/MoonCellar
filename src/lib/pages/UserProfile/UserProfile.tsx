@@ -21,6 +21,7 @@ import { IPlaythrough } from "../../shared/lib/schemas/playthroughs.schema";
 import { userAPI } from "../../shared/api";
 import { IUserRating } from "../../shared/lib/schemas/user-ratings.schema";
 import { useAuthStore } from "../../shared/store/auth.store";
+import { usePlaythroughsStore } from "../../shared/store/playthroughs.store";
 
 interface UserProfileProps {
   user: IUser;
@@ -65,6 +66,18 @@ const UserProfile: FC<UserProfileProps> = ({
     }
   }, [isAuthedUser, user._id]);
 
+  const setPlaythroughsStore = usePlaythroughsStore((s) => s.setPlaythroughs);
+
+  useEffect(() => {
+    if (isAuthedUser) {
+      setPlaythroughsStore(playthroughs);
+    }
+  }, [isAuthedUser, playthroughs, setPlaythroughsStore]);
+
+  const storePlaythroughs = usePlaythroughsStore((s) => s.playthroughs);
+  const effectivePlaythroughs =
+    isAuthedUser && storePlaythroughs ? storePlaythroughs : playthroughs;
+
   const tab = useMemo(
     () => (!!query?.get("list") ? (query.get("list") as string) : "profile"),
     [query]
@@ -106,7 +119,7 @@ const UserProfile: FC<UserProfileProps> = ({
             <UserNavigation
               user={displayUser}
               isAuthedUser={isAuthedUser}
-              playthroughs={playthroughs}
+              playthroughs={effectivePlaythroughs}
               selectedSort={selectedSort}
               sortOrder={sortOrder}
               onSortChange={setSelectedSort}
@@ -125,7 +138,7 @@ const UserProfile: FC<UserProfileProps> = ({
           )}
           {isGamesTab && (
             <UserGames
-              playthroughs={playthroughs}
+              playthroughs={effectivePlaythroughs}
               ratings={ratings}
               selectedSort={selectedSort}
               sortOrder={sortOrder}
@@ -136,7 +149,7 @@ const UserProfile: FC<UserProfileProps> = ({
           <UserNavigation
             user={displayUser}
             isAuthedUser={isAuthedUser}
-            playthroughs={playthroughs}
+            playthroughs={effectivePlaythroughs}
             selectedSort={selectedSort}
             sortOrder={sortOrder}
             onSortChange={setSelectedSort}

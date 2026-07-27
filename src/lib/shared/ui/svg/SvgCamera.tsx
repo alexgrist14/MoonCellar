@@ -1,19 +1,19 @@
-import React from "react";
-import type { FC } from "react";
+import { FC } from "react";
+import { Path, Svg } from "./Svg/Svg";
+import { ICommonProps, ISvgSizes } from "../../types/common.type";
 
-export const SvgCamera: FC<{ className?: string }> = ({ className }) => {
+interface ISvgCameraProps extends ICommonProps {
+  size?: ISvgSizes;
+}
+
+export const SvgCamera: FC<ISvgCameraProps> = ({ size = "24", ...props }) => {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="1em"
-      height="1em"
-      viewBox="0 0 24 24"
-      className={className}
-    >
-      <path
-        fill="currentColor"
+    <Svg {...props} size={size} viewBox="0 0 24 24">
+      <Path
+        defaultFillRule
+        defaultClipRule
         d="M17 12c0 1.7-1.3 3-3 3s-3-1.3-3-3s1.3-3 3-3s3 1.3 3 3m5-5v11c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2V4h4v1h2l1-2h6l1 2h2c1.1 0 2 .9 2 2M7.5 9c0-.8-.7-1.5-1.5-1.5S4.5 8.2 4.5 9s.7 1.5 1.5 1.5S7.5 9.8 7.5 9M19 12c0-2.8-2.2-5-5-5s-5 2.2-5 5s2.2 5 5 5s5-2.2 5-5"
-      ></path>
-    </svg>
+      />
+    </Svg>
   );
 };

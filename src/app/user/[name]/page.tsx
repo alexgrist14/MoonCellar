@@ -44,10 +44,11 @@ export default async function User({ params }: { params: any }) {
     })
   )?.data;
   const userFollowings = (await userAPI.getUserFollowings(user._id)).data;
+  const userFollowers = (await userAPI.getUserFollowers(user._id)).data;
 
   return (
     <UserProfile
-      user={{ ...user, followings: userFollowings }}
+      user={{ ...user, followings: userFollowings, followers: userFollowers }}
       authUserId={authUserInfo?.id}
       authUserFollowings={authUserFollowings}
       playthroughs={playthroughs}

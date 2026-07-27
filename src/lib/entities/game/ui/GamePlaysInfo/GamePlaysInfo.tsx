@@ -3,7 +3,7 @@ import styles from "./GamePlaysInfo.module.scss";
 import { IPlaythrough } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
-import { Box } from "@/src/lib/shared/ui/Box";
+import { RowsModal } from "@/src/lib/shared/ui/RowsModal";
 
 interface IGamePlaysInfoProps {
   gameName: string;
@@ -23,13 +23,9 @@ export const GamePlaysInfo: FC<IGamePlaysInfoProps> = ({
   );
 
   return (
-    <Box
+    <RowsModal
       title={gameName}
-      isWithScrollBar
-      contentStyle={{ padding: "var(--padding-x4)" }}
-      classNameContent={styles.plays}
-    >
-      {playthroughs.map((play) => {
+      rows={playthroughs.map((play) => {
         const segments = [
           commonUtils.upFL(play.category),
           !!play.date && commonUtils.formatDate(play.date),
@@ -41,7 +37,7 @@ export const GamePlaysInfo: FC<IGamePlaysInfoProps> = ({
         ].filter((segment): segment is string => !!segment);
 
         return (
-          <div key={play._id} className={styles.plays__play}>
+          <div key={play._id} className={styles.plays__info}>
             <div className={styles.plays__meta}>
               {segments.map((segment, i) => (
                 <Fragment key={i}>
@@ -56,6 +52,6 @@ export const GamePlaysInfo: FC<IGamePlaysInfoProps> = ({
           </div>
         );
       })}
-    </Box>
+    />
   );
 };

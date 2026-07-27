@@ -2,6 +2,7 @@ import { API_URL } from "../constants";
 import { IUser } from "../types/auth.type";
 import {
   CategoriesType,
+  IFollowers,
   IFollowings,
   ILogs,
   IUserFilter,
@@ -48,6 +49,10 @@ const getUserGames = (id: string, category: CategoriesType) => {
 
 const getUserFollowings = (userId: string) => {
   return agent.get<IFollowings>(`${USER_URL}/followings/${userId}`);
+};
+
+const getUserFollowers = (userId: string) => {
+  return agent.get<IFollowers>(`${USER_URL}/followers/${userId}`);
 };
 
 const getUserLogs = (userId: string) => {
@@ -138,6 +143,7 @@ export const userAPI = {
   addBackground,
   getUserGames,
   getUserFollowings,
+  getUserFollowers,
   addUserFollowing,
   removeUserFollowing,
   getUserLogs,

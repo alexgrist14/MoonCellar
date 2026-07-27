@@ -17,6 +17,8 @@ import { useHideAdult } from "../../shared/hooks/useHideAdult";
 import { isAdultGame } from "../../shared/utils/adult.utils";
 import { Box } from "../../shared/ui/Box";
 import { BGImage } from "../../shared/ui/BGImage";
+import { SectionTitle } from "../../shared/ui/SectionTitle";
+import { MAIN_PAGE_DESCRIPTION, MAIN_PAGE_TITLE } from "./MainPage.constants";
 
 interface MainPageProps {
   games: {
@@ -36,11 +38,8 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
       <div className={styles.container}>
         <Box classNameContent={styles.banner}>
           <div className={styles.banner__text}>
-            <h2 className={styles.title}>Your Gaming Universe Awaits</h2>
-            <p className={styles.text}>
-              Manage your collection of thousands games across all platforms.
-              Track progress, discover new titles, and challenge the Gauntlet.
-            </p>
+            <h2 className={styles.title}>{MAIN_PAGE_TITLE}</h2>
+            <p className={styles.text}>{MAIN_PAGE_DESCRIPTION}</p>
           </div>
           <div className={styles.games}>
             <div className={styles.games__stack}>
@@ -62,7 +61,7 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
         </Box>
         {!!games.upcoming?.length && (
           <Box classNameContent={styles.releases}>
-            <h2 className={styles.title__section}>Upcoming Releases</h2>
+            <SectionTitle isWithMarginBottom>Upcoming Releases</SectionTitle>
             <div className={styles.releases__groups}>
               {games.upcoming.map((group) => (
                 <div
@@ -78,12 +77,12 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
         )}
         {!!games.recent?.length && (
           <Box classNameContent={styles.releases}>
-            <h2 className={styles.title__section}>Recently Released</h2>
+            <SectionTitle isWithMarginBottom>Recently Released</SectionTitle>
             <ReleaseRail games={games.recent} withDate />
           </Box>
         )}
         <Box classNameContent={styles.gauntlet}>
-          <h2 className={styles.title__section}>Gauntlet</h2>
+          <SectionTitle isWithMarginBottom>Gauntlet</SectionTitle>
           <div className={styles.gauntlet__content}>
             <GauntletWheel />
             <div>
@@ -116,7 +115,7 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
           </div>
         </Box>
         <Box classNameContent={styles.genre}>
-          <h2 className={styles.title__section}>Browse By Genre</h2>
+          <SectionTitle isWithMarginBottom>Browse By Genre</SectionTitle>
           <div className={styles.genre__content}>
             {games.genre.slice(1, 6).map((item) => (
               <div className={styles.genre__card} key={item.genre}>

@@ -9,22 +9,24 @@
   box-shadow: 0 2px 6px 2px rgba(0, 0, 0, 0.2);
 }
 
-.title {
-  @include profileTitle();
-}
-
 .content__top {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
 
-  .friends {
+  .friendsGroup {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x5);
     width: 400px;
-    margin-top: 10px;
 
     @include mediaMax(1380px) {
       width: 100%;
     }
+  }
+
+  .friends {
+    margin-top: 10px;
 
     &__list {
       display: flex;
@@ -172,15 +174,9 @@
 
     &__list {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      justify-content: space-between;
+      grid-template-columns: repeat(2, 1fr);
       margin-top: var(--padding-x5);
       gap: var(--gap-x5);
-      flex-wrap: wrap;
-
-      @include mediaGt {
-        grid-template-columns: repeat(2, 1fr);
-      }
 
       @include mediaMd {
         grid-template-columns: repeat(1, 1fr);
@@ -188,25 +184,21 @@
     }
 
     .item {
-      display: flex;
+      display: grid;
+      grid-template-columns: 170px 1fr;
+      align-items: start;
       gap: var(--gap-x7);
 
-      &__img {
-        border-radius: var(--radius-x2);
-
-        & > img {
-          max-height: calc(240px / $coverRatio);
-          max-width: 240px;
-          aspect-ratio: $coverRatio;
-          object-fit: cover;
-          border-radius: inherit;
-        }
+      &__card {
+        width: 170px;
+        height: auto;
       }
 
       &__text {
         display: flex;
         flex-direction: column;
         gap: var(--gap-x2);
+        min-width: 0;
 
         p {
           &:first-child {

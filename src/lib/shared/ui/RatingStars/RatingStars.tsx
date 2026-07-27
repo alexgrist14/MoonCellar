@@ -1,7 +1,7 @@
 import { FC, useRef, useState } from "react";
 import classNames from "classnames";
 import styles from "./RatingStars.module.scss";
-import { SvgMoon } from "../svg";
+import { SvgStar } from "../svg";
 import { ISvgSizes } from "../../types/common.type";
 import { Tooltip } from "../Tooltip";
 
@@ -29,7 +29,7 @@ export const RatingStars: FC<IRatingStarsProps> = ({
       onMouseLeave={() => setIsHover(false)}
     >
       {Array.from({ length: STARS_COUNT }, (_, i) => (
-        <SvgMoon
+        <SvgStar
           key={i}
           size={size}
           className={styles.stars__star}

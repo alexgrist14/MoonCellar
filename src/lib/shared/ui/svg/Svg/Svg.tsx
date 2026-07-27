@@ -10,6 +10,7 @@ import styles from "./Svg.module.scss";
 import { ISvgColors, ISvgSizes } from "../../../types/common.type";
 
 export interface ISvgBaseProps {
+  id?: string;
   className?: string;
   style?: CSSProperties;
   size?: ISvgSizes;
@@ -65,7 +66,7 @@ export const Svg: FC<ISvgProps> = ({
 
 interface IPathProps extends Pick<
   SVGAttributes<SVGPathElement>,
-  "d" | "strokeLinejoin" | "strokeLinecap" | "clipPath"
+  "d" | "strokeLinejoin" | "strokeLinecap" | "clipPath" | "className"
 > {
   type?: "fill" | "stroke";
   defaultFillRule?: boolean;
@@ -84,6 +85,7 @@ export const Path: FC<IPathProps> = ({
   strokeWidth,
   color,
   clipPath,
+  className,
 }) => (
   <path
     strokeWidth={strokeWidth}
@@ -94,5 +96,6 @@ export const Path: FC<IPathProps> = ({
     strokeLinejoin={strokeLinejoin}
     strokeLinecap={strokeLinecap}
     clipPath={clipPath}
+    className={className}
   />
 );

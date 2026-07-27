@@ -1,8 +1,8 @@
-import { FC, useMemo } from "react";
+import { FC, Fragment, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import styles from "./AchievementsModal.module.scss";
-import { Box } from "../Box";
+import { RowsModal } from "../RowsModal";
 import { Button, ButtonColor } from "../Button";
 import { useAuthStore } from "../../store/auth.store";
 import { useCommonStore } from "../../store/common.store";
@@ -63,42 +63,37 @@ export const AchievementsModal: FC<IAchievementsModalProps> = ({ game }) => {
     : `https://retroachievements.org/searchresults.php?s=${game.name}&t=1`;
 
   return (
-    <Box
+    <RowsModal
       title="RetroAchievements"
-      isWithScrollBar
-      contentStyle={{ padding: "var(--padding-x4)" }}
-      classNameContent={styles.modal}
-    >
-      {gameAwards.length ? (
-        gameAwards.map((award, i) => (
-          <div key={award.title + award.awardType + i} className={styles.row}>
-            <Image
-              alt={award.title}
-              src={getAwardIconSrc(award.imageIcon)}
-              width={40}
-              height={40}
-              className={styles.row__icon}
-            />
-            <div className={styles.row__info}>
-              <p className={styles.row__title}>{award.title}</p>
-              <div className={styles.row__meta}>
-                <span>{commonUtils.formatDate(award.awardedAt)}</span>
-                <span className={styles.row__dot} />
-                <span>{award.awardType}</span>
-              </div>
-              <Link
-                href={`https://retroachievements.org/game/${award.awardData}`}
-                target="_blank"
-                className={styles.row__link}
-              >
-                <Button color={ButtonColor.DEFAULT}>
-                  {award.consoleName || "Open"}
-                </Button>
-              </Link>
+      rows={gameAwards.map((award) => (
+        <Fragment key={award.title + award.awardType}>
+          <Image
+            alt={award.title}
+            src={getAwardIconSrc(award.imageIcon)}
+            width={40}
+            height={40}
+            className={styles.row__icon}
+          />
+          <div className={styles.row__info}>
+            <p className={styles.row__title}>{award.title}</p>
+            <div className={styles.row__meta}>
+              <span>{commonUtils.formatDate(award.awardedAt)}</span>
+              <span className={styles.row__dot} />
+              <span>{award.awardType}</span>
             </div>
+            <Link
+              href={`https://retroachievements.org/game/${award.awardData}`}
+              target="_blank"
+              className={styles.row__link}
+            >
+              <Button color={ButtonColor.DEFAULT}>
+                {award.consoleName || "Open"}
+              </Button>
+            </Link>
           </div>
-        ))
-      ) : (
+        </Fragment>
+      ))}
+      emptyState={
         <Link
           href={fallbackLink}
           target="_blank"
@@ -108,7 +103,7 @@ export const AchievementsModal: FC<IAchievementsModalProps> = ({ game }) => {
             {fallbackConsoleName || "Open on RetroAchievements"}
           </Button>
         </Link>
-      )}
-    </Box>
+      }
+    />
   );
 };

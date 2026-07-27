@@ -5,8 +5,12 @@ import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { SearchModal } from "@/src/lib/shared/ui/SearchModal";
 import { Separator } from "@/src/lib/shared/ui/Separator";
-import { SvgAdmin, SvgSearch } from "@/src/lib/shared/ui/svg";
-import { Icon } from "@iconify/react/dist/iconify.js";
+import {
+  SvgAdmin,
+  SvgSearch,
+  SvgGames,
+  SvgGauntlet,
+} from "@/src/lib/shared/ui/svg";
 import Link from "next/link";
 import { FC, MouseEvent, useMemo } from "react";
 import styles from "./Header.module.scss";
@@ -36,7 +40,7 @@ export const Header: FC = () => {
         {
           title: (
             <>
-              <Icon className={styles.svg} icon="dashicons:games" />
+              <SvgGames className={styles.svg} />
               {!isMobile && <span>Games</span>}
             </>
           ),
@@ -46,7 +50,7 @@ export const Header: FC = () => {
         {
           title: (
             <>
-              <Icon className={styles.svg} icon="ph:spinner-ball-fill" />
+              <SvgGauntlet className={styles.svg} />
               {!isMobile && <span>Gauntlet</span>}
             </>
           ),

@@ -10,6 +10,7 @@ import { shuffle } from "@/src/lib/shared/utils/common.utils";
 import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
 import { useWheelStore } from "@/src/lib/shared/store/wheel.store";
 import { useSettingsStore } from "@/src/lib/shared/store/settings.store";
+import { SvgWheelPointer } from "@/src/lib/shared/ui/svg";
 
 interface WheelComponentProps {
   primaryColor?: string;
@@ -212,9 +213,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
           <Loader type="moon" className={styles.wheel__loader} />
         )}
       </div>
-      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <polyline points="0,0 50,50 0,100" stroke="white" strokeWidth={4} />
-      </svg>
+      <SvgWheelPointer />
       <canvas
         id="wheel-canvas"
         className={styles.canvas}

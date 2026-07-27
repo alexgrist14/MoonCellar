@@ -13,6 +13,7 @@ export const UserSchemaZod = z.object({
   password: z.string().min(8).max(100),
   refreshToken: z.string().jwt().nullable(),
   followings: z.array(z.string()),
+  followers: z.array(z.string()),
   filters: z.array(z.object({ name: z.string(), filter: z.string() })),
   presets: z.array(z.object({ name: z.string(), preset: z.string() })),
   description: z.string().max(450).nullable(),
