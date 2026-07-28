@@ -60,10 +60,7 @@ export const GameFriendsStatus: FC<IGameFriendsStatusProps> = ({ gameId }) => {
     <div className={styles.block__list}>
       {items.map((item) => (
         <div key={item.userId} className={styles.block__row}>
-          <Link
-            href={`/user/${item.userName}`}
-            className={styles.block__user}
-          >
+          <Link href={`/user/${item.userName}`} className={styles.block__user}>
             <div className={styles.block__avatar}>
               <Avatar
                 user={{
@@ -85,7 +82,7 @@ export const GameFriendsStatus: FC<IGameFriendsStatusProps> = ({ gameId }) => {
   return (
     <Box contentStyle={{ padding: "var(--padding-x3)" }}>
       <div className={styles.block}>
-        <h4 className={styles.block__title}>Among Friends</h4>
+        <h4 className={styles.block__title}>Among Followings</h4>
         {items.length > 8 ? (
           <Scrollbar
             classNameContent={styles.block__scroll}

@@ -1,6 +1,7 @@
 "use client";
 
 import { FC, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import styles from "./GamePage.module.scss";
 import { dateRegions } from "../../shared/constants";
 import { Slideshow } from "../../shared/ui/Slideshow";
@@ -11,6 +12,8 @@ import classNames from "classnames";
 import { Box } from "../../shared/ui/Box";
 import { BGImage } from "../../shared/ui/BGImage";
 import { IGameResponse } from "../../shared/lib/schemas/games.schema";
+import { Button, ButtonColor } from "../../shared/ui/Button";
+import { useAuthStore } from "../../shared/store/auth.store";
 import { useCommonStore } from "../../shared/store/common.store";
 import { formatHltbHours } from "../../shared/utils/hltb.utils";
 import { formatRating, normalizeRating } from "../../shared/utils/rating.utils";
@@ -21,6 +24,8 @@ import { ExpandableBlock } from "../../shared/ui/ExpandableBlock";
 import { RatingStars } from "../../shared/ui/RatingStars";
 
 export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
+  const router = useRouter();
+  const isAdmin = useAuthStore((state) => state.isAdmin);
   const { systems } = useCommonStore();
 
   const hideMedia = useHideAdult() && isAdultGame(game);
@@ -113,7 +118,17 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
           classNameContent={styles.page__right}
           contentStyle={{ padding: "var(--padding-x3)" }}
         >
-          <h2>{game.name}</h2>
+          <div className={styles.page__header}>
+            <h2>{game.name}</h2>
+            {isAdmin && (
+              <Button
+                color={ButtonColor.DEFAULT}
+                onClick={() => router.push(`/admin/games/${game._id}`)}
+              >
+                Edit
+              </Button>
+            )}
+          </div>
           <div className={styles.page__info}>
             {!!game.first_release && (
               <p>

@@ -632,12 +632,22 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
         <h2 className={styles.title}>
           {isCreate ? "Create game" : `Edit: ${original.name as string}`}
         </h2>
-        <Button
-          color={ButtonColor.DEFAULT}
-          onClick={() => router.push("/admin")}
-        >
-          Back to list
-        </Button>
+        <div className={styles.actions}>
+          {!isCreate && (
+            <Button
+              color={ButtonColor.DEFAULT}
+              onClick={() => router.push(`/games/${original.slug as string}`)}
+            >
+              View game
+            </Button>
+          )}
+          <Button
+            color={ButtonColor.DEFAULT}
+            onClick={() => router.push("/admin")}
+          >
+            Back to list
+          </Button>
+        </div>
       </div>
 
       <form className={styles.form} onSubmit={handleSubmit(onValid, onInvalid)}>
