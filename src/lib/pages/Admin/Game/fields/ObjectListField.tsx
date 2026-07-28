@@ -19,6 +19,7 @@ interface IObjectListFieldProps {
   onChange: (value: Record<string, unknown>[]) => void;
   fields: IObjectFieldDescriptor[];
   disabled?: boolean;
+  isLabelHidden?: boolean;
 }
 
 let rowIdCounter = 0;
@@ -30,6 +31,7 @@ export const ObjectListField: FC<IObjectListFieldProps> = ({
   onChange,
   fields,
   disabled,
+  isLabelHidden,
 }) => {
   const items = value ?? [];
   const datalistPrefix = useId();
@@ -85,7 +87,7 @@ export const ObjectListField: FC<IObjectListFieldProps> = ({
 
   return (
     <div className={styles.field}>
-      <span className={styles.label}>{label}</span>
+      {!isLabelHidden && <span className={styles.label}>{label}</span>}
       {datalists}
       {items.map((item, index) => (
         <div key={keys[index]} className={styles.objectRow}>
