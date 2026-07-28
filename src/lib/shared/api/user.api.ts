@@ -21,6 +21,10 @@ const getByString = (searchString: string) => {
   return agent.get<IUser>(`${USER_URL}/search?searchString=${searchString}`);
 };
 
+const getLogins = () => {
+  return agent.get<string[]>(`${USER_URL}/logins`);
+};
+
 const addAvatar = (id: string, file: File) => {
   const formData = new FormData();
 
@@ -139,6 +143,7 @@ const updateUserTime = (userId: string) => {
 export const userAPI = {
   getById,
   getByString,
+  getLogins,
   addAvatar,
   addBackground,
   getUserGames,
