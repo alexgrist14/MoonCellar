@@ -1,22 +1,31 @@
 import { MetadataRoute } from "next";
+import { unstable_cache } from "next/cache";
 import { gamesApi, userAPI } from "../lib/shared/api";
 import { IGetGameSlugsResponse } from "../lib/shared/lib/schemas/games.schema";
 import { IGetUserLoginsResponse } from "../lib/shared/lib/schemas/user.schema";
 import { FRONT_URL, links } from "../lib/shared/constants";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
-async function getAllGameSlugs(): Promise<IGetGameSlugsResponse> {
-  const { data } = await gamesApi.getSlugs();
+const getAllGameSlugs = unstable_cache(
+  async (): Promise<IGetGameSlugsResponse> => {
+    const { data } = await gamesApi.getSlugs();
 
-  return data;
-}
+    return data;
+  },
+  ["sitemap-game-slugs"],
+  { revalidate: 3600 }
+);
 
-async function getAllUserLogins(): Promise<IGetUserLoginsResponse> {
-  const { data } = await userAPI.getLogins();
+const getAllUserLogins = unstable_cache(
+  async (): Promise<IGetUserLoginsResponse> => {
+    const { data } = await userAPI.getLogins();
 
-  return data;
-}
+    return data;
+  },
+  ["sitemap-user-logins"],
+  { revalidate: 3600 }
+);
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const gameSlugs = await getAllGameSlugs().catch(() => []);
