@@ -36,9 +36,9 @@ export async function generateMetadata({
       ...(!!game.cover && {
         images: [
           {
-            url: game.cover,
-            width: 528,
-            height: 704,
+            url: `https://mooncellar.space/api/image-proxy?url=${encodeURIComponent(game.cover)}`,
+            width: 200,
+            height: 266,
             alt: game.name,
             type: extToMimeType[game.cover.split(".").pop()!.toLowerCase()],
           },
