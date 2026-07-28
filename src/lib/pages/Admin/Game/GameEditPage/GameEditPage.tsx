@@ -104,6 +104,27 @@ const nullifyUndefined = (value: unknown): unknown => {
   return value;
 };
 
+const findErrorMessage = (
+  node: unknown,
+  visited = new WeakSet<object>()
+): string | undefined => {
+  if (!node || typeof node !== "object") return;
+  if (visited.has(node)) return;
+
+  visited.add(node);
+
+  const record = node as Record<string, unknown>;
+
+  if (typeof record.message === "string") return record.message;
+
+  for (const [key, value] of Object.entries(record)) {
+    if (key === "ref") continue;
+
+    const message = findErrorMessage(value, visited);
+    if (message) return message;
+  }
+};
+
 const getErrorMessage = (
   errors: FieldErrors<IGameFormValues>,
   path: string
@@ -111,10 +132,15 @@ const getErrorMessage = (
   let node: unknown = errors;
 
   for (const part of path.split(".")) {
+    const directMessage = (node as Record<string, unknown> | undefined)
+      ?.message;
+    if (typeof directMessage === "string") return directMessage;
+
     node = (node as Record<string, unknown> | undefined)?.[part];
+    if (!node) return;
   }
 
-  return (node as { message?: string } | undefined)?.message;
+  return findErrorMessage(node);
 };
 
 interface IGameEditPageProps {
@@ -129,6 +155,10 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
   const [platforms, setPlatforms] = useState<IPlatform[]>([]);
   const [filters, setFilters] = useState<IGameFilters | null>(null);
   const [isLoading, setIsLoading] = useState(!isCreate);
+  const [invalidField, setInvalidField] = useState<{
+    path: string;
+    submission: number;
+  } | null>(null);
 
   const resolver = useMemo(
     () =>
@@ -205,6 +235,27 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
       .finally(() => setIsLoading(false));
   }, [gameId, reset, router]);
 
+  useEffect(() => {
+    if (!invalidField) return;
+
+    const frame = requestAnimationFrame(() => {
+      const element = document.querySelector<HTMLElement>(
+        `[data-game-field="${CSS.escape(invalidField.path)}"]`
+      );
+
+      if (!element) return;
+
+      element.scrollIntoView({ behavior: "smooth", block: "center" });
+      element
+        .querySelector<HTMLElement>(
+          "input, textarea, button, [tabindex]:not([tabindex='-1'])"
+        )
+        ?.focus({ preventScroll: true });
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [invalidField]);
+
   const platformNames = useMemo(
     () => platforms.map((platform) => platform.name),
     [platforms]
@@ -254,6 +305,9 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
 
   const onInvalid = (formErrors: FieldErrors<IGameFormValues>) => {
     const labels: string[] = [];
+    const invalidPath = Object.keys(FIELD_LABELS).find((path) =>
+      getErrorMessage(formErrors, path)
+    );
 
     Object.keys(FIELD_LABELS).forEach((path) => {
       if (!getErrorMessage(formErrors, path)) return;
@@ -264,6 +318,13 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
     toast.error({
       description: `Required fields are missing or invalid: ${labels.join(", ") || "check the form"}`,
     });
+
+    if (invalidPath) {
+      setInvalidField((current) => ({
+        path: invalidPath,
+        submission: (current?.submission ?? 0) + 1,
+      }));
+    }
   };
 
   const handleUpload = async (
@@ -285,7 +346,10 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
     setValue(formPath, [...current, res.data], { shouldDirty: true });
   };
 
-  const renderField = (field: IFieldDescriptor) => {
+  const renderField = (
+    field: IFieldDescriptor,
+    isLabelHidden: boolean = false
+  ) => {
     const formPath = field.path as IFormPath;
     const error = getErrorMessage(errors, field.path);
 
@@ -301,6 +365,7 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
                 label={field.label}
                 value={rhf.value as string}
                 error={error}
+                isLabelHidden={isLabelHidden}
                 onChange={rhf.onChange}
               />
             )}
@@ -427,6 +492,7 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
                   label={field.label}
                   value={rhf.value as Record<string, unknown>[]}
                   fields={resolvedObjectFields[field.path] || field.fields || []}
+                  isLabelHidden={isLabelHidden}
                   onChange={rhf.onChange}
                 />
                 {!!error && <span className={styles.fieldError}>{error}</span>}
@@ -444,8 +510,13 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
               <div>
                 <Dropdown
                   list={platformNames}
-                  title={field.label}
+                  title={isLabelHidden ? undefined : field.label}
                   placeholder="Select platforms"
+                  overwriteValue={
+                    (rhf.value as string[])?.length
+                      ? `Selected ${(rhf.value as string[]).length}`
+                      : undefined
+                  }
                   isMulti
                   isWithSearch
                   isWithReset
@@ -479,6 +550,7 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
                   value={rhf.value as string}
                   error={error}
                   readOnly
+                  isLabelHidden={isLabelHidden}
                   onChange={rhf.onChange}
                 />
                 {!!rhf.value && (
@@ -549,7 +621,7 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
   if (isLoading || !filters) {
     return (
       <Box classNameContent={styles.loading}>
-        <Loader />
+        <Loader className={styles.loader} />
       </Box>
     );
   }
@@ -590,7 +662,16 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
                 (field) => !!getErrorMessage(errors, field.path)
               )}
             >
-              {section.fields.map(renderField)}
+              {section.fields.map((field) => {
+                const isLabelHidden =
+                  section.fields.length === 1 && field.label === section.title;
+
+                return (
+                  <div key={field.path} data-game-field={field.path}>
+                    {renderField(field, isLabelHidden)}
+                  </div>
+                );
+              })}
             </CollapsibleSection>
           ))}
         </div>

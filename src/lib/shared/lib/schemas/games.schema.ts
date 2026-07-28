@@ -122,7 +122,7 @@ export const ReleaseDateSchema = z.object({
   month: z.number(),
   year: z.number(),
   platformId: z.string(),
-  region: z.string(),
+  region: z.coerce.number(),
 });
 
 export const GameSchema = z.object({

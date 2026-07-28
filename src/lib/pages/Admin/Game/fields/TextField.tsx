@@ -9,6 +9,7 @@ interface ITextFieldProps {
   error?: string;
   disabled?: boolean;
   readOnly?: boolean;
+  isLabelHidden?: boolean;
 }
 
 export const TextField: FC<ITextFieldProps> = ({
@@ -18,9 +19,10 @@ export const TextField: FC<ITextFieldProps> = ({
   error,
   disabled,
   readOnly,
+  isLabelHidden,
 }) => (
   <div className={styles.field}>
-    <span className={styles.label}>{label}</span>
+    {!isLabelHidden && <span className={styles.label}>{label}</span>}
     <Input
       value={value ?? ""}
       disabled={disabled}

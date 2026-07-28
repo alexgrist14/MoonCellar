@@ -54,7 +54,7 @@ const RELEASE_DATE_FIELDS: IObjectFieldDescriptor[] = [
   { key: "month", label: "Month", kind: "number" },
   { key: "year", label: "Year", kind: "number" },
   { key: "platformId", label: "Platform id", kind: "text" },
-  { key: "region", label: "Region", kind: "text" },
+  { key: "region", label: "Region", kind: "number" },
 ];
 
 const RETROACHIEVEMENTS_FIELDS: IObjectFieldDescriptor[] = [

@@ -37,6 +37,11 @@
   padding: var(--padding-x5);
 }
 
+.loader {
+  position: static;
+  transform: none;
+}
+
 .footer {
   display: flex;
   justify-content: flex-end;
