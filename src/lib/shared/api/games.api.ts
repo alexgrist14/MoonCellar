@@ -7,6 +7,7 @@ import {
   IGetGameBySlugRequest,
   IGetGamesByIdsRequest,
   IGetGamesRequest,
+  IGetGameSlugsResponse,
   IUpcomingReleaseGroup,
   IUpdateGameRequest,
 } from "../lib/schemas/games.schema";
@@ -18,7 +19,7 @@ const GAMES_URL = `${API_URL}/games`;
 
 export const gamesApi = {
   getSlugs: () => {
-    return agent.get<string[]>(`${GAMES_URL}/slugs`);
+    return agent.get<IGetGameSlugsResponse>(`${GAMES_URL}/slugs`);
   },
 
   getById: (params: IGetGameByIdRequest) => {

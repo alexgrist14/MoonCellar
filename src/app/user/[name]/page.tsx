@@ -16,7 +16,9 @@ export async function generateMetadata({
 
   return {
     title: "Profile: " + user.userName,
-    description: user.description,
+    description:
+      user.description ||
+      `${user.userName}'s game library, ratings and achievements on MoonCellar`,
   };
 }
 

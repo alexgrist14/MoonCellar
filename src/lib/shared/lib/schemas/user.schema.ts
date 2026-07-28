@@ -49,6 +49,10 @@ export const UpdateDescriptionSchema = UserSchemaZod.pick({
 });
 export const UpdateSettingsSchema = z.object({ showAdultContent: z.boolean() });
 
+export const GetUserLoginsResponseSchema = z
+  .object({ userName: z.string(), updatedAt: z.string() })
+  .array();
+
 export type IUser = z.infer<typeof UserSchemaZod>;
 export type IGetUserByStringRequest = z.infer<typeof GetUserByStringSchema>;
 export type IGetUserByIdRequest = z.infer<typeof GetUserByIdSchema>;
@@ -60,3 +64,6 @@ export type IUpdateUserDescriptionRequest = z.infer<
   typeof UpdateDescriptionSchema
 >;
 export type IUpdateUserSettingsRequest = z.infer<typeof UpdateSettingsSchema>;
+export type IGetUserLoginsResponse = z.infer<
+  typeof GetUserLoginsResponseSchema
+>;

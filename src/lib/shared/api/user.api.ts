@@ -1,5 +1,6 @@
 import { API_URL } from "../constants";
 import { IUser } from "../types/auth.type";
+import { IGetUserLoginsResponse } from "../lib/schemas/user.schema";
 import {
   CategoriesType,
   IFollowers,
@@ -22,7 +23,7 @@ const getByString = (searchString: string) => {
 };
 
 const getLogins = () => {
-  return agent.get<string[]>(`${USER_URL}/logins`);
+  return agent.get<IGetUserLoginsResponse>(`${USER_URL}/logins`);
 };
 
 const addAvatar = (id: string, file: File) => {

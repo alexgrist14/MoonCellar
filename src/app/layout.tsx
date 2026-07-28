@@ -3,11 +3,25 @@ import localFont from "next/font/local";
 import classNames from "classnames";
 import { ReactNode } from "react";
 import { polyfill } from "interweave-ssr";
+import { Metadata } from "next";
 import { FaroInit } from "../lib/shared/ui/FaroInit";
 import { FaroRouteTracker } from "../lib/shared/ui/FaroRouteTracker";
 import { GeoInit } from "../lib/shared/ui/GeoInit";
 import "@/src/lib/app/styles/reset.scss";
 import "@/src/lib/app/styles/root.scss";
+
+export const metadata: Metadata = {
+  title: {
+    default: "MoonCellar — Game Tracker & Database",
+    template: "%s | MoonCellar",
+  },
+  description:
+    "Track your game library, rate and review titles, unlock achievements, and find your next game with the Gauntlet — all in one place on MoonCellar.",
+  openGraph: {
+    siteName: "MoonCellar",
+    type: "website",
+  },
+};
 
 const general = localFont({
   variable: "--font-general",
@@ -46,8 +60,6 @@ export default function App({ children }: { children: ReactNode }) {
   return (
     <html>
       <head>
-        <title>MoonCellar</title>
-        <meta name="description" content="Games tracker and database" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/images/mooncellar.ico" />
       </head>

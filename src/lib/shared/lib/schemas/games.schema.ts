@@ -122,7 +122,7 @@ export const ReleaseDateSchema = z.object({
   month: z.number(),
   year: z.number(),
   platformId: z.string(),
-  region: z.string(),
+  region: z.coerce.number(),
 });
 
 export const GameSchema = z.object({
@@ -278,7 +278,13 @@ export const UpdateGameRequestSchema = GameSchema.omit({
 
 export const GetCustomGameResponseSchema = GameSchema.array();
 
-export const GetGameSlugsResponseSchema = z.string().array();
+export const GetGameSlugsResponseSchema = z
+  .object({
+    slug: z.string(),
+    updatedAt: z.string(),
+    cover: z.string().nullable(),
+  })
+  .array();
 
 export const UpcomingReleaseGroupSchema = z.object({
   label: z.string(),

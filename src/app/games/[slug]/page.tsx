@@ -25,13 +25,15 @@ export async function generateMetadata({
   }
 
   const game = (await gamesApi.getBySlug({ slug })).data;
+  const description =
+    game.summary || `${game.name} on MoonCellar — ratings, achievements and playthrough tracking`;
 
   return {
     title: game.name,
-    description: game.summary,
+    description,
     openGraph: {
       title: game.name,
-      description: game.summary,
+      description,
       url: `https://mooncellar.space/games/${game.slug}`,
       ...(!!game.cover && {
         images: [
