@@ -2,6 +2,8 @@ import { MetadataRoute } from "next";
 import { gamesApi } from "../lib/shared/api";
 import { FRONT_URL, links } from "../lib/shared/constants";
 
+export const dynamic = "force-dynamic";
+
 async function getAllGameSlugs(): Promise<string[]> {
   const { data: slugs } = await gamesApi.getSlugs();
 
