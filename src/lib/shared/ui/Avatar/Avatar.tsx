@@ -1,4 +1,5 @@
 import Image from "next/image";
+import classNames from "classnames";
 import { FC, useRef, useState } from "react";
 import { IUser } from "../../types/auth.type";
 import { SvgProfile } from "../svg";
@@ -8,10 +9,16 @@ import styles from "./Avatar.module.scss";
 interface AvatarProps {
   user?: Pick<IUser, "_id" | "userName" | "avatar">;
   isWithoutTooltip?: boolean;
+  isWithoutHover?: boolean;
   priority?: boolean;
 }
 
-const Avatar: FC<AvatarProps> = ({ user, isWithoutTooltip, priority }) => {
+const Avatar: FC<AvatarProps> = ({
+  user,
+  isWithoutTooltip,
+  isWithoutHover,
+  priority,
+}) => {
   const [isTooltipActive, setIsTooltipActive] = useState(false);
   const followingsRef = useRef<HTMLDivElement>(null);
 
@@ -24,7 +31,9 @@ const Avatar: FC<AvatarProps> = ({ user, isWithoutTooltip, priority }) => {
     >
       {!!user?.avatar ? (
         <Image
-          className={styles.image}
+          className={classNames(styles.image, {
+            [styles.image_static]: isWithoutHover,
+          })}
           src={user.avatar}
           width={90}
           height={90}

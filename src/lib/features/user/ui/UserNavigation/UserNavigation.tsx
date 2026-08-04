@@ -56,6 +56,8 @@ export const UserNavigation: FC<{
     userListCategories.some((category) => category === query.get("list")) ||
     query.get("list") === "all";
 
+  const isProfileTab = !query.get("list") || query.get("list") === "profile";
+
   const allPlays = playthroughs?.reduce((res: IPlaythrough[], play) => {
     if (!res.some((p) => p.gameId === play.gameId)) {
       res.push(play);
@@ -69,6 +71,29 @@ export const UserNavigation: FC<{
 
   return (
     <div className={styles.panel}>
+      {!isProfileTab && (
+        <Box>
+          <Button
+            className={classNames(styles.btn, styles.tall)}
+            color={ButtonColor.TRANSPARENT}
+            onClick={() => {
+              setExpanded([]);
+              setQuery({ list: "profile" });
+            }}
+          >
+            <div>
+              <div className={styles.avatar}>
+                <Avatar
+                  user={user}
+                  isWithoutTooltip={true}
+                  isWithoutHover={true}
+                />
+              </div>
+              <span>Profile</span>
+            </div>
+          </Button>
+        </Box>
+      )}
       <Box>
         <Button
           className={styles.btn}

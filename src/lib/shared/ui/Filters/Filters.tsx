@@ -25,6 +25,7 @@ import {
 } from "../../utils/filters.utils";
 import { RangeSelector } from "../RangeSelector";
 import { useFiltersStore } from "../../store/filters.store";
+import { useExpandStore } from "../../store/expand.store";
 
 const sortOptions: {
   value: NonNullable<IGetGamesRequest["sortBy"]>;
@@ -32,7 +33,8 @@ const sortOptions: {
 }[] = [
   { value: "name", label: "Name" },
   { value: "first_release", label: "Release date" },
-  { value: "rating", label: "MoonCellar rating" },
+  { value: "rating", label: "Average Rating" },
+  { value: "ratingsCount", label: "Ratings count" },
   { value: "total_rating", label: "IGDB rating" },
   { value: "total_rating_count", label: "IGDB rating count" },
   { value: "createdAt", label: "Date added" },
@@ -61,6 +63,7 @@ export const Filters: FC<{
   } = useCommonStore();
   const { isLoading, isPlatformsLoading } = useStatesStore();
   const { isExcludeHistory, setExcludeHistory } = useFiltersStore();
+  const { expanded, setExpanded } = useExpandStore();
 
   const getValue = (key: keyof IGameFilters) =>
     (!!filters?.selected?.[key]?.length
@@ -157,10 +160,6 @@ export const Filters: FC<{
   }, [asPath, filters]);
 
   useEffect(() => {
-    isGauntlet && !!filters && pushFiltersToQuery(filters);
-  }, [filters, isGauntlet]);
-
-  useEffect(() => {
     !!profile?._id &&
       isAuth &&
       userAPI
@@ -202,7 +201,6 @@ export const Filters: FC<{
                     };
 
                     setFilters(temp);
-                    isGauntlet && pushFiltersToQuery(temp);
                   }}
                 />
                 <ToggleSwitch
@@ -220,7 +218,6 @@ export const Filters: FC<{
                     };
 
                     setFilters(temp);
-                    isGauntlet && pushFiltersToQuery(temp);
                   }}
                 />
               </div>
@@ -244,7 +241,6 @@ export const Filters: FC<{
                   };
 
                   setFilters(temp);
-                  isGauntlet && pushFiltersToQuery(temp);
                 }}
               />
             </div>
@@ -265,7 +261,6 @@ export const Filters: FC<{
                   };
 
                   setFilters(temp);
-                  isGauntlet && pushFiltersToQuery(temp);
                 }}
               />
             </div>
@@ -475,7 +470,6 @@ export const Filters: FC<{
                   };
 
                   setFilters(temp);
-                  isGauntlet && pushFiltersToQuery(temp);
                 }}
               />
               <div className={styles.filters__line}></div>
@@ -501,7 +495,6 @@ export const Filters: FC<{
                   };
 
                   setFilters(temp);
-                  isGauntlet && pushFiltersToQuery(temp);
                 }}
               />
             </div>
@@ -519,7 +512,6 @@ export const Filters: FC<{
                 };
 
                 setFilters(temp);
-                isGauntlet && pushFiltersToQuery(temp);
               }}
               disabled={!!isLoading}
             />
@@ -540,7 +532,6 @@ export const Filters: FC<{
                 };
 
                 setFilters(temp);
-                isGauntlet && pushFiltersToQuery(temp);
               }}
               disabled={!!isLoading}
             />
@@ -557,7 +548,6 @@ export const Filters: FC<{
                   };
 
                   setFilters(temp);
-                  isGauntlet && pushFiltersToQuery(temp);
                 }}
               />
               <p>Only with achievements</p>
@@ -587,6 +577,17 @@ export const Filters: FC<{
                 hidden: isGauntlet,
               },
               {
+                title: "Apply filters",
+                color: ButtonColor.ACCENT,
+                disabled: !filters,
+                onClick: () => {
+                  !!filters && pushFiltersToQuery(filters);
+                  setExpanded(expanded?.filter((pos) => pos !== "left") || []);
+                  !!callback && callback();
+                },
+                hidden: !isGauntlet,
+              },
+              {
                 title: "Save filters",
                 hidden: !profile || !filters,
                 onClick: () =>
@@ -601,10 +602,7 @@ export const Filters: FC<{
               {
                 title: "Clear filters",
                 color: ButtonColor.RED,
-                onClick: () => {
-                  setFilters({});
-                  isGauntlet && pushFiltersToQuery({});
-                },
+                onClick: () => setFilters({}),
               },
             ]}
           />

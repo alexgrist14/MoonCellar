@@ -29,9 +29,10 @@ const WINNER_REVEAL_DELAY = 300;
 const MUSIC_FADE_OUT_DURATION = 600;
 
 const MUSIC_TRACKS = [
-  "/music/theme3.mp3",
-  "/music/theme4.mp3",
-  "/music/theme6.mp3",
+  "/music/music_1.mp3",
+  "/music/music_2.mp3",
+  "/music/music_3.mp3",
+  "/music/music_4.mp3",
 ];
 
 const fadeOutAndPause = (audio: HTMLAudioElement, duration: number) => {

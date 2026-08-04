@@ -13,6 +13,10 @@
     &:hover {
       outline: 2px solid var(--color-accent);
     }
+
+    &_static:hover {
+      outline: 2px solid transparent;
+    }
   }
 }
 

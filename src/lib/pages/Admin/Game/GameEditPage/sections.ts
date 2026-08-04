@@ -155,14 +155,6 @@ export const GAME_SECTIONS: ISectionDescriptor[] = [
     ],
   },
   {
-    title: "Ratings",
-    note: SYNC_NOTE,
-    fields: [
-      { path: "rating", label: "Rating", kind: "number" },
-      { path: "ratingCount", label: "Rating count", kind: "number" },
-    ],
-  },
-  {
     title: "RetroAchievements",
     note: SYNC_NOTE,
     fields: [

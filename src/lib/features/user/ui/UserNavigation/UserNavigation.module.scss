@@ -26,12 +26,12 @@
       gap: var(--gap-x5);
 
       .avatar {
-        width: 34px;
-        height: 34px;
+        width: 24px;
+        height: 24px;
 
         div {
           img {
-            border-radius: var(--radius-x2);
+            border-radius: var(--radius-x3);
           }
         }
       }

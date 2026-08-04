@@ -146,9 +146,8 @@ export const GameSchema = z.object({
   first_release: z.number().nullable().optional(),
   release_dates: ReleaseDateSchema.array().optional(),
   platformIds: z.string().array(),
-  rating: z.number().nullable().optional(),
-  ratingCount: z.number().nullable().optional(),
   averageRating: z.number().nullable().optional(),
+  ratingsCount: z.number().nullable().optional(),
   isStopParsingPictures: z.boolean().optional(),
   isStopParsing: z.boolean().optional(),
   isCustom: z.boolean().optional(),
@@ -214,12 +213,16 @@ export const GetGamesRequestSchema = z.object({
     .number()
     .min(0)
     .max(100)
-    .describe("Minimum IGDB total rating")
+    .describe(
+      "Minimum combined rating (average of IGDB, HLTB and user ratings, normalized to 0-100)"
+    )
     .optional(),
   votes: z
     .number()
     .min(0)
-    .describe("Minimum IGDB total rating votes count")
+    .describe(
+      "Minimum combined ratings count (average of IGDB and user ratings count)"
+    )
     .optional(),
   years: z
     .union([
@@ -249,6 +252,7 @@ export const GetGamesRequestSchema = z.object({
       "first_release",
       "name",
       "rating",
+      "ratingsCount",
       "createdAt",
     ])
     .describe("Field to sort games by")
@@ -265,6 +269,7 @@ export const AddGameRequestSchema = GameSchema.omit({
   updatedAt: true,
   createdAt: true,
   averageRating: true,
+  ratingsCount: true,
   isCustom: true,
 });
 
@@ -273,6 +278,7 @@ export const UpdateGameRequestSchema = GameSchema.omit({
   updatedAt: true,
   createdAt: true,
   averageRating: true,
+  ratingsCount: true,
   isCustom: true,
 }).partial();
 
