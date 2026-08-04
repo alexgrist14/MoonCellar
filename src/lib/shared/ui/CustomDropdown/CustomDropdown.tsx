@@ -1,6 +1,6 @@
 import { SortType } from "@/src/lib/shared/types/sort.type";
 import classNames from "classnames";
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, useRef, useState } from "react";
 import { Radio } from "../Radio";
 import styles from "./CustomDropdown.module.scss";
 
@@ -30,6 +30,10 @@ export const CustomDropdown: FC<CustomDropdownProps> = ({
   headerClassName,
   icon,
 }) => {
+  const headerRef = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const [openUpward, setOpenUpward] = useState(false);
+
   const handleSelect = (value: SortType) => {
     onSelect(value);
     setIsOpen(false);
@@ -42,25 +46,40 @@ export const CustomDropdown: FC<CustomDropdownProps> = ({
     }
   };
 
+  const handleToggle = () => {
+    if (!isOpen && headerRef.current && bodyRef.current) {
+      const { bottom: headerBottom } =
+        headerRef.current.getBoundingClientRect();
+      const bodyStyle = getComputedStyle(bodyRef.current);
+      const gap = Math.max(
+        parseFloat(bodyStyle.marginTop) || 0,
+        parseFloat(bodyStyle.marginBottom) || 0
+      );
+      const dropHeight = bodyRef.current.scrollHeight;
+
+      setOpenUpward(headerBottom + gap + dropHeight > window.innerHeight);
+    }
+
+    setIsOpen(!isOpen);
+  };
+
   return (
     <div className={styles.dropdown}>
       <div
+        ref={headerRef}
         className={classNames(styles.dropdown__header, headerClassName)}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleToggle}
       >
         <div className={styles.dropdown__label}>
           {icon}
           <span>{selected}</span>
         </div>
-        <span
-          className={classNames(styles.dropdown__icon, {
-            [styles.dropdown__icon_open]: isOpen,
-          })}
-        ></span>
       </div>
       <div
+        ref={bodyRef}
         className={classNames(styles.dropdown__body, className, {
           [styles.dropdown__body_open]: isOpen,
+          [styles.dropdown__body_top]: openUpward,
         })}
       >
         {options.map((option) => (

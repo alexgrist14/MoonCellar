@@ -7,6 +7,7 @@
   background-color: var(--color-bg-secondary);
   border-radius: var(--radius-x2);
   filter: drop-shadow(0 0 0.2rem $blackBorderColor);
+  width: fit-content;
 
   &_disabled {
     pointer-events: none;

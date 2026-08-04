@@ -64,15 +64,16 @@
   & svg {
     position: absolute;
     top: 50%;
+    aspect-ratio: 1;
+    width: auto;
     height: 75px;
-    width: 75px;
     transform: translateY(-50%);
     z-index: 1;
-    left: calc(50% + 31px);
+    // left: calc(100% - 90px);
+    right: 0;
 
     @include mediaMax($screenMd) {
       height: 45px;
-      left: calc(50% + 18px);
     }
   }
 

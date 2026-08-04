@@ -56,7 +56,7 @@ export const GamesCards: FC<IGamesCardsProps> = ({
 
       return (
         <div key={key} className={gameClassName} style={style}>
-          <GameCard game={game} />
+          <GameCard game={game} priority={rowIndex === 0} />
           {additionalGameNode?.(game)}
         </div>
       );

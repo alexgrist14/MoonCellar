@@ -12,6 +12,7 @@
     display: flex;
     justify-content: space-between;
     border-radius: var(--radius-x4);
+    padding: var(--padding-x1) var(--padding-x2);
     gap: var(--gap-x2);
     color: var(--color-neutral-90);
 
@@ -41,7 +42,7 @@
   }
 
   .tall {
-    height: 48px;
+    height: 36px;
   }
 
   .last {
@@ -61,12 +62,12 @@
       transition: transform 0.2s;
 
       &_active {
-        transform: rotateX(180deg);
+        transform: rotateY(180deg);
       }
     }
 
     &__header {
-      height: 48px;
+      height: 36px;
       border-radius: var(--radius-x4);
     }
 

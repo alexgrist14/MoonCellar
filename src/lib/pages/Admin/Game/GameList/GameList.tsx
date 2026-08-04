@@ -187,6 +187,7 @@ const GameList: FC = () => {
       </div>
 
       <Table
+        mobileHeadField="name"
         isLoading={isLoading}
         limit={TAKE}
         sortingCallback={handleSort}

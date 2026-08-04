@@ -1,12 +1,10 @@
 import { FC, useId } from "react";
-import { Path, Svg } from "./Svg/Svg";
-import { ICommonProps, ISvgSizes } from "../../types/common.type";
+import { ISvgBaseProps, Path, Svg } from "./Svg/Svg";
 
 const STAR_PATH =
   "M10.92 2.868a1.25 1.25 0 0 1 2.16 0l2.795 4.798l5.428 1.176a1.25 1.25 0 0 1 .667 2.054l-3.7 4.141l.56 5.525a1.25 1.25 0 0 1-1.748 1.27L12 19.592l-5.082 2.24a1.25 1.25 0 0 1-1.748-1.27l.56-5.525l-3.7-4.14a1.25 1.25 0 0 1 .667-2.055l5.428-1.176zM12 4.987L9.687 8.959a1.25 1.25 0 0 1-.816.592l-4.492.973l3.062 3.427c.234.262.347.61.312.959l-.463 4.573l4.206-1.854a1.25 1.25 0 0 1 1.008 0l4.206 1.854l-.463-4.573a1.25 1.25 0 0 1 .311-.959l3.063-3.427l-4.492-.973a1.25 1.25 0 0 1-.816-.592z";
 
-interface ISvgStarProps extends ICommonProps {
-  size?: ISvgSizes;
+interface ISvgStarProps extends ISvgBaseProps {
   fillPercent?: number;
 }
 

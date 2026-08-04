@@ -55,6 +55,20 @@ export const UserGames: FC<UserGamesProps> = ({
     );
   }, [ratings]);
 
+  const playthroughsCountByGame = useMemo(() => {
+    return playthroughs?.reduce((res: { [key: string]: number }, play) => {
+      res[play.gameId] = (res[play.gameId] || 0) + 1;
+      return res;
+    }, {});
+  }, [playthroughs]);
+
+  const commentsCountByGame = useMemo(() => {
+    return playthroughs?.reduce((res: { [key: string]: number }, play) => {
+      if (!!play.comment) res[play.gameId] = (res[play.gameId] || 0) + 1;
+      return res;
+    }, {});
+  }, [playthroughs]);
+
   const getGamesIds = useCallback(() => {
     const plays = playthroughs
       ?.filter(
@@ -113,10 +127,34 @@ export const UserGames: FC<UserGamesProps> = ({
       //     return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
       //   });
       //   break;
+      case SortType.PLAYTHROUGHS:
+        plays?.sort((a, b) => {
+          const countA = playthroughsCountByGame[a.gameId] || 0;
+          const countB = playthroughsCountByGame[b.gameId] || 0;
+
+          return sortOrder === "asc" ? countA - countB : countB - countA;
+        });
+        break;
+      case SortType.COMMENTS:
+        plays?.sort((a, b) => {
+          const countA = commentsCountByGame[a.gameId] || 0;
+          const countB = commentsCountByGame[b.gameId] || 0;
+
+          return sortOrder === "asc" ? countA - countB : countB - countA;
+        });
+        break;
     }
 
     return plays.filter((play) => !!play.gameId).map((play) => play.gameId);
-  }, [list, playthroughs, parsedGamesRatings, selectedSort, sortOrder]);
+  }, [
+    list,
+    playthroughs,
+    parsedGamesRatings,
+    playthroughsCountByGame,
+    commentsCountByGame,
+    selectedSort,
+    sortOrder,
+  ]);
 
   const debouncedGetGames = useDebouncedCallback((page: number = 1) => {
     const _ids = getGamesIds().slice((page - 1) * takeGames, page * takeGames);
@@ -196,37 +234,42 @@ export const UserGames: FC<UserGamesProps> = ({
                   className={styles.games__stars}
                 />
               )}
-              <p className={styles.games__title}>{game.name}</p>
-              <div className={styles.games__plays}>
-                {!hideGamePlaysInfo && (
-                  <p>
-                    {gamePlaythroughs.length}{" "}
-                    {commonUtils.addLastS(
-                      "Playthrough",
-                      gamePlaythroughs.length
-                    )}
-                  </p>
-                )}
-                {hasComment && (
-                  <SvgComment size="12" className={styles.games__comment} />
-                )}
-              </div>
+              <p
+                className={styles.games__title}
+                style={{ textAlign: hideGamePlaysInfo ? "center" : "left" }}
+              >
+                {game.name}
+              </p>
               {!hideGamePlaysInfo && (
-                <Button
-                  compact
-                  color={ButtonColor.DEFAULT}
-                  className={styles.games__button}
-                  onClick={() =>
-                    modal.open(
-                      <GamePlaysInfo
-                        gameName={game.name}
-                        playthroughs={gamePlaythroughs}
-                      />
-                    )
-                  }
-                >
-                  Playthroughs
-                </Button>
+                <>
+                  <div className={styles.games__plays}>
+                    <p>
+                      {gamePlaythroughs.length}{" "}
+                      {commonUtils.addLastS(
+                        "Playthrough",
+                        gamePlaythroughs.length
+                      )}
+                    </p>
+                    {hasComment && (
+                      <SvgComment size="12" className={styles.games__comment} />
+                    )}
+                  </div>
+                  <Button
+                    compact
+                    color={ButtonColor.DEFAULT}
+                    className={styles.games__button}
+                    onClick={() =>
+                      modal.open(
+                        <GamePlaysInfo
+                          gameName={game.name}
+                          playthroughs={gamePlaythroughs}
+                        />
+                      )
+                    }
+                  >
+                    Playthroughs
+                  </Button>
+                </>
               )}
             </Box>
           );

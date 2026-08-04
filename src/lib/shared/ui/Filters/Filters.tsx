@@ -192,7 +192,7 @@ export const Filters: FC<{
                   overwriteValue={
                     sortOptions.find(
                       (option) => option.value === filters?.sortBy
-                    )?.label
+                    )?.label || ""
                   }
                   placeholder="Default"
                   getIndex={(index) => {
@@ -602,7 +602,8 @@ export const Filters: FC<{
                 title: "Clear filters",
                 color: ButtonColor.RED,
                 onClick: () => {
-                  pushFiltersToQuery({});
+                  setFilters({});
+                  isGauntlet && pushFiltersToQuery({});
                 },
               },
             ]}

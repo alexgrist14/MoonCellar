@@ -99,7 +99,7 @@ export const Header: FC = () => {
           onClick={handleProfileClick}
           className={styles.profile__link}
         >
-          <Avatar user={profile} isWithoutTooltip />
+          <Avatar user={profile} isWithoutTooltip priority />
         </Link>
       </div>
     </div>

@@ -9,8 +9,7 @@
     justify-content: space-between;
     align-items: center;
     gap: var(--gap-x5);
-    padding: var(--padding-x1) var(--padding-x3);
-    padding-inline: var(--padding-x3);
+    padding: var(--padding-x1) var(--padding-x2);
     border-radius: var(--radius-x2);
     font-size: 14px;
     cursor: pointer;
@@ -38,7 +37,7 @@
   &__body {
     position: absolute;
     top: 100%;
-    background: rgba($wrapperBGColor, 0.9);
+    background: var(--color-bg-secondary);
     box-shadow: $shadowBorder;
     left: 0;
     width: 100%;
@@ -46,6 +45,7 @@
     margin-top: var(--gap-x4);
     overflow: hidden;
     opacity: 0;
+    max-height: 0;
     transition: opacity 0.3s ease;
     z-index: 10;
     pointer-events: none;
@@ -53,6 +53,14 @@
     &_open {
       pointer-events: initial;
       opacity: 1;
+      max-height: none;
+    }
+
+    &_top {
+      top: auto;
+      bottom: 100%;
+      margin-top: 0;
+      margin-bottom: var(--gap-x4);
     }
   }
 

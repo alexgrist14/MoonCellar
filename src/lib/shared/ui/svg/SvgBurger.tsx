@@ -1,8 +1,7 @@
 import { FC } from "react";
-import { Path, Svg } from "./Svg/Svg";
-import { ICommonProps } from "../../types/common.type";
+import { ISvgBaseProps, Path, Svg } from "./Svg/Svg";
 
-interface ISvgBurgerProps extends ICommonProps {
+interface ISvgBurgerProps extends ISvgBaseProps {
   topId?: string;
   middleId?: string;
   bottomId?: string;

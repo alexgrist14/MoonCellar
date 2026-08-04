@@ -1,51 +1,11 @@
 import { FC } from "react";
-import { Svg } from "./Svg/Svg";
-import { ICommonProps } from "../../types/common.type";
+import { ISvgBaseProps, Path, Svg } from "./Svg/Svg";
 
-export const SvgGauntlet: FC<ICommonProps> = (props) => {
+export const SvgGauntlet: FC<ISvgBaseProps> = (props) => {
   return (
-    <Svg {...props} viewBox="0 0 24 24">
-      <circle
-        cx="12"
-        cy="12"
-        r="9"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <line
-        x1="12"
-        y1="3"
-        x2="12"
-        y2="21"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <line
-        x1="3"
-        y1="12"
-        x2="21"
-        y2="12"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <line
-        x1="5.636"
-        y1="5.636"
-        x2="18.364"
-        y2="18.364"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <line
-        x1="18.364"
-        y1="5.636"
-        x2="5.636"
-        y2="18.364"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <circle cx="12" cy="12" r="2.5" fill="currentColor" />
+    <Svg {...props} viewBox="0 0 256 256">
+      <Path d="M0 0h256v256H0z" color="none" />
+      <Path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m39.11 25.19C170.24 83.71 155 99.44 135 113.61c-2.25-24.48-8.44-49.8-38.37-67.82a87.9 87.9 0 0 1 70.5 3.4ZM40.18 133.54c28.34-20 49.57-14.68 71.87-4.39c-20.05 14.19-38.86 32.21-39.53 67.11a87.92 87.92 0 0 1-32.34-62.72m136.5 67.73c-31.45-14.55-37.47-35.58-39.71-60c12.72 5.86 26.31 10.75 41.3 10.75c11.33 0 23.46-2.8 36.63-10.08a88.2 88.2 0 0 1-38.22 59.33" />
     </Svg>
   );
 };

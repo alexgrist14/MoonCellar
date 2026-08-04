@@ -1,5 +1,6 @@
 $screenSm: 500px;
 $screenMd: 768px;
+$screenHeightSm: 720px;
 $screen960: 960px;
 $screenLg: 996px;
 $screenGt: 1200px;
@@ -20,6 +21,12 @@ $screenXx: 1724px;
 
 @mixin mediaMax($max) {
   @media (max-width: $max) {
+    @content;
+  }
+}
+
+@mixin mediaMaxHeight($max) {
+  @media (max-height: $max) {
     @content;
   }
 }

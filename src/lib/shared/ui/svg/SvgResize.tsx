@@ -1,8 +1,7 @@
 import { FC } from "react";
-import { Svg } from "./Svg/Svg";
-import { ICommonProps } from "../../types/common.type";
+import { ISvgBaseProps, Svg } from "./Svg/Svg";
 
-export const SvgResize: FC<ICommonProps> = (props) => {
+export const SvgResize: FC<ISvgBaseProps> = (props) => {
   return (
     <Svg {...props} size="24" viewBox="0 0 24 24">
       <rect

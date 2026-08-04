@@ -1,14 +1,13 @@
 import { Input } from "../Input";
 import styles from "./SearchModal.module.scss";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { gamesApi } from "../../api";
-import { Button, ButtonColor } from "../Button";
+import { Button } from "../Button";
 import { Loader } from "../Loader";
 import { ButtonGroup } from "../Button/ButtonGroup";
 import { modal } from "../Modal";
 import { useDisableScroll } from "../../hooks";
 import Link from "next/link";
-import { SvgSearch } from "../svg";
 import { useAsyncLoader } from "../../hooks/useAsyncLoader";
 import { useDebouncedCallback } from "use-debounce";
 import { useExpandStore } from "../../store/expand.store";
@@ -27,8 +26,11 @@ export const SearchModal: FC = () => {
   const [total, setTotal] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchActive, setIsSearchActive] = useState(false);
+  const latestSearchRef = useRef("");
 
   const debouncedSearch = useDebouncedCallback((search: string) => {
+    latestSearchRef.current = search;
+
     sync(() =>
       gamesApi
         .getAll({
@@ -36,6 +38,8 @@ export const SearchModal: FC = () => {
           take: takeGames,
         })
         .then((response) => {
+          if (latestSearchRef.current !== search) return;
+
           setGames(response.data.results);
           setTotal(response.data.total);
         })
@@ -70,25 +74,11 @@ export const SearchModal: FC = () => {
           value={searchQuery}
           placeholder="Search..."
           autoFocus
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              searchHandler(searchQuery);
-            }
-          }}
+          onChange={(e) => searchHandler(e.target.value)}
         />
         <ButtonGroup
           wrapperClassName={styles.modal__buttons}
           buttons={[
-            {
-              title: <SvgSearch style={{ width: "20px", marginTop: "2px" }} />,
-              style: {
-                padding: "var(--padding-x05) var(--padding-x3)",
-                height: "calc(100% - 10px)",
-              },
-              color: ButtonColor.ACCENT,
-              onClick: () => searchHandler(searchQuery),
-            },
             {
               title: "Advanced",
               link: !!searchQuery

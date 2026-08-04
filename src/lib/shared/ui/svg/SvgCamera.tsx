@@ -1,12 +1,7 @@
 import { FC } from "react";
-import { Path, Svg } from "./Svg/Svg";
-import { ICommonProps, ISvgSizes } from "../../types/common.type";
+import { ISvgBaseProps, Path, Svg } from "./Svg/Svg";
 
-interface ISvgCameraProps extends ICommonProps {
-  size?: ISvgSizes;
-}
-
-export const SvgCamera: FC<ISvgCameraProps> = ({ size = "24", ...props }) => {
+export const SvgCamera: FC<ISvgBaseProps> = ({ size = "24", ...props }) => {
   return (
     <Svg {...props} size={size} viewBox="0 0 24 24">
       <Path

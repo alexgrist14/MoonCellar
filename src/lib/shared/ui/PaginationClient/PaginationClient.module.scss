@@ -1,6 +1,7 @@
 .pagination {
   display: flex;
   gap: var(--gap-x2);
+  width: fit-content;
 
   & > button:first-of-type {
     flex-basis: 80%;

@@ -1,14 +1,19 @@
 import { FC } from "react";
-import { Path, Svg } from "./Svg/Svg";
-import { ICommonProps } from "../../types/common.type";
+import { ISvgBaseProps, Path, Svg } from "./Svg/Svg";
 
-const POINTER_PATH = "M0,0 L50,50 L0,100 Z";
+const POINTER_PATH = "M100,25 L50,50 L100,75 A100,100 0 0 0 100,25 Z";
 
-export const SvgWheelPointer: FC<ICommonProps> = (props) => {
+export const SvgWheelPointer: FC<ISvgBaseProps> = (props) => {
   return (
-    <Svg {...props} viewBox="0 0 100 100" color="contrast">
-      <Path d={POINTER_PATH} color="var(--color-neutral-5)" />
-      <Path d={POINTER_PATH} type="stroke" strokeWidth={4} />
+    <Svg {...props} viewBox="-6 -6 112 112" color="contrast">
+      <Path d={POINTER_PATH} color="var(--color-contrast)" />
+      <Path
+        d={POINTER_PATH}
+        type="stroke"
+        strokeWidth={4}
+        strokeLinejoin="round"
+        color="var(--color-contrast-reverse)"
+      />
     </Svg>
   );
 };

@@ -97,6 +97,7 @@ const UserList: FC = () => {
   return (
     <div id={tableId}>
       <Table
+        mobileHeadField="userName"
         headers={{
           userName: { content: "User" },
           raUsername: { content: "RA Username" },

@@ -1,9 +1,7 @@
 import { FC } from "react";
-import { Svg } from "./Svg/Svg";
-import { ICommonProps, ISvgSizes } from "../../types/common.type";
+import { ISvgBaseProps, Svg } from "./Svg/Svg";
 
-interface ISvgNumberProps extends ICommonProps {
-  size?: ISvgSizes;
+interface ISvgNumberProps extends ISvgBaseProps {
   value: number;
   onClick?: () => void;
   onMouseOver?: () => void;

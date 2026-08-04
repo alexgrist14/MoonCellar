@@ -24,6 +24,7 @@ interface IGameCardProps {
   style?: CSSProperties;
   spreadDirection?: "width" | "height";
   isInfoDisabled?: boolean;
+  priority?: boolean;
 }
 
 export const GameCard = memo(
@@ -33,6 +34,7 @@ export const GameCard = memo(
     style,
     spreadDirection = "width",
     isInfoDisabled,
+    priority,
   }: IGameCardProps) => {
     const cardRef = useRef<HTMLDivElement>(null);
 
@@ -148,6 +150,7 @@ export const GameCard = memo(
               src={game.cover}
               width={260}
               height={325}
+              priority={priority}
               className={classNames(styles.card__cover, {
                 [styles.card__cover_active]: !isLoading,
               })}

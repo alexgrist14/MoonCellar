@@ -21,6 +21,8 @@ import useCloseEvents from "@/src/lib/shared/hooks/useCloseEvents";
 const sortOptions = [
   { label: SortType.DATE_ADDED },
   { label: SortType.RATING },
+  { label: SortType.PLAYTHROUGHS },
+  { label: SortType.COMMENTS },
 ];
 const sortOrderOptions = [{ label: "asc" }, { label: "desc" }];
 
@@ -67,23 +69,6 @@ export const UserNavigation: FC<{
 
   return (
     <div className={styles.panel}>
-      <Box>
-        <Button
-          className={classNames(styles.btn, styles.tall)}
-          color={ButtonColor.TRANSPARENT}
-          onClick={() => {
-            setExpanded([]);
-            setQuery({ list: "profile" });
-          }}
-        >
-          <div>
-            <div className={styles.avatar}>
-              <Avatar user={user} isWithoutTooltip={true} />
-            </div>
-            <span>Profile</span>
-          </div>
-        </Button>
-      </Box>
       <Box>
         <Button
           className={styles.btn}
@@ -153,7 +138,7 @@ export const UserNavigation: FC<{
             }}
           >
             <div>
-              <SvgSettings />
+              <SvgSettings size="24" />
               <span>Settings</span>
             </div>
           </Button>
@@ -176,9 +161,8 @@ export const UserNavigation: FC<{
               icon={
                 <SvgSort
                   size="24"
-                  style={{ color: "var(--color-neutral-80)" }}
                   className={classNames(styles.sort__icon, {
-                    [styles.sort__icon_active]: sortOrder === "asc",
+                    [styles.sort__icon_active]: sortOrder === "desc",
                   })}
                 />
               }

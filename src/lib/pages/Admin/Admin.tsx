@@ -13,7 +13,7 @@ const Admin = () => {
   if (!isAdmin) return;
 
   return (
-    <Box>
+    <Box wrapperStyle={{maxHeight: 'calc(100vh - 38 * var(--padding-x1)'}} templateStyle={{borderRadius: 'var(--radius-x5) var(--radius-x5) 0 0'}}>
       <Tabs
         defaultTabIndex={tabIndex}
         contents={[

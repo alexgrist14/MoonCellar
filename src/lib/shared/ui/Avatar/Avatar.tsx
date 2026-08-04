@@ -8,9 +8,10 @@ import styles from "./Avatar.module.scss";
 interface AvatarProps {
   user?: Pick<IUser, "_id" | "userName" | "avatar">;
   isWithoutTooltip?: boolean;
+  priority?: boolean;
 }
 
-const Avatar: FC<AvatarProps> = ({ user, isWithoutTooltip }) => {
+const Avatar: FC<AvatarProps> = ({ user, isWithoutTooltip, priority }) => {
   const [isTooltipActive, setIsTooltipActive] = useState(false);
   const followingsRef = useRef<HTMLDivElement>(null);
 
@@ -28,6 +29,7 @@ const Avatar: FC<AvatarProps> = ({ user, isWithoutTooltip }) => {
           width={90}
           height={90}
           alt="profile"
+          priority={priority}
         />
       ) : (
         <div className={styles.placeholder__container}>
