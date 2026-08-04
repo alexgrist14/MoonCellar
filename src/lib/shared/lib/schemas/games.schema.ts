@@ -284,6 +284,15 @@ export const UpdateGameRequestSchema = GameSchema.omit({
 
 export const GetCustomGameResponseSchema = GameSchema.array();
 
+export const GetGameSlugsRequestSchema = z.object({
+  count: z.coerce
+    .number()
+    .min(1)
+    .describe("Amount of game slugs to return")
+    .default(10000)
+    .optional(),
+});
+
 export const GetGameSlugsResponseSchema = z
   .object({
     slug: z.string(),
@@ -312,6 +321,7 @@ export type IUpdateGameRequest = z.infer<typeof UpdateGameRequestSchema>;
 export type IGetGamesRequest = z.infer<typeof GetGamesRequestSchema>;
 export type IGetGameByIdRequest = z.infer<typeof GetGameByIdSchema>;
 export type IGetGameBySlugRequest = z.infer<typeof GetGameBySlugSchema>;
+export type IGetGameSlugsRequest = z.infer<typeof GetGameSlugsRequestSchema>;
 export type IGetGamesByIdsRequest = z.infer<typeof GetGamesByIdsSchema>;
 
 export type IGameResponse = z.infer<typeof GameSchema>;

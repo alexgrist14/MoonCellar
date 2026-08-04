@@ -61,7 +61,7 @@ export default function App({ children }: { children: ReactNode }) {
     <html data-scroll-behavior="smooth">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/images/mooncellar.ico" />
+        <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
       </head>
       <body style={{ color: "white", background: "#191d24" }}>
         <FaroInit />

@@ -11,6 +11,8 @@
 
   &__stars {
     max-width: 100%;
+    align-self: center;
+    margin-bottom: var(--gap-x1);
     overflow: hidden;
   }
 
