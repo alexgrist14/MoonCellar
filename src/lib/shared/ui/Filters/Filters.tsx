@@ -44,7 +44,7 @@ export const Filters: FC<{
   callback?: (filters?: IGameFilters) => void;
   isGauntlet?: boolean;
 }> = ({ isGauntlet, callback }) => {
-  const { asPath, pathname } = useAdvancedRouter();
+  const { asPath } = useAdvancedRouter();
   const { profile, isAuth } = useAuthStore();
 
   const [filters, setFilters] = useState<IGetGamesRequest>();
@@ -171,6 +171,7 @@ export const Filters: FC<{
     <div className={styles.filters} id="filters">
       {isAuth && (
         <Tabs
+          isUseDefaultIndex
           defaultTabIndex={tabs.findIndex(
             ({ tabName }) => tabName.toLowerCase() === tab
           )}
@@ -628,7 +629,10 @@ export const Filters: FC<{
                         color: ButtonColor.FANCY,
                         style: { justifyContent: "flex-start" },
                         compact: true,
-                        link: `${pathname}?${filter.filter}`,
+                        onClick: () => {
+                          setFilters(parseQueryFilters(`?${filter.filter}`));
+                          setTab("filters");
+                        },
                       },
                       {
                         title: "Remove",
