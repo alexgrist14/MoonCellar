@@ -15,17 +15,34 @@ interface IPaginationProps {
   isFixed?: boolean;
   isDisabled?: boolean;
   callback?: (page: number) => void;
+  page?: number;
+  onPageChange?: (page: number) => void;
 }
 
 export const Pagination = memo(
-  ({ take, total, isFixed, isDisabled, callback }: IPaginationProps) => {
+  ({
+    take,
+    total,
+    isFixed,
+    isDisabled,
+    callback,
+    page: controlledPage,
+    onPageChange,
+  }: IPaginationProps) => {
     const { query, setQuery } = useAdvancedRouter();
     const centerRef = useRef<HTMLDivElement>(null);
 
     const [value, setValue] = useState("");
 
-    const page = useMemo(() => Number(query.get("page") || 1), [query]);
+    const isControlled = controlledPage !== undefined;
+
+    const queryPage = useMemo(() => Number(query.get("page") || 1), [query]);
+    const page = isControlled ? controlledPage : queryPage;
     const max = useMemo(() => Math.ceil(total / take), [take, total]);
+
+    const setPage = (page: number) => {
+      isControlled ? onPageChange?.(page) : setQuery({ page });
+    };
 
     const changeCallback = (page: number) => {
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -58,7 +75,7 @@ export const Pagination = memo(
             onClick={() => {
               const page = 1;
 
-              setQuery({ page });
+              setPage(page);
               changeCallback(page);
             }}
           >
@@ -71,7 +88,7 @@ export const Pagination = memo(
             onClick={() => {
               const p = page - 1 || 1;
 
-              setQuery({ page: p });
+              setPage(p);
               changeCallback(p);
             }}
           >
@@ -87,9 +104,10 @@ export const Pagination = memo(
               onKeyDown={keyboardUtils.blurOnKey}
               onBlur={(e) => {
                 const value = Number(e.target.value);
+                const nextPage = value > max ? max : value;
 
-                setQuery({ page: value > max ? max : value });
-                changeCallback(value);
+                setPage(nextPage);
+                changeCallback(nextPage);
               }}
             />
           </div>
@@ -100,7 +118,7 @@ export const Pagination = memo(
             onClick={() => {
               const p = page + 1;
 
-              setQuery({ page: p });
+              setPage(p);
               changeCallback(p);
             }}
           >
@@ -113,7 +131,7 @@ export const Pagination = memo(
             onClick={() => {
               const page = max;
 
-              setQuery({ page });
+              setPage(page);
               changeCallback(page);
             }}
           >

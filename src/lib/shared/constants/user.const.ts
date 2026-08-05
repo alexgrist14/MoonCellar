@@ -9,3 +9,5 @@ export const userListCategories: CategoriesType[] = [
   "backlog",
   "dropped",
 ];
+
+export const takeLogs = 10;

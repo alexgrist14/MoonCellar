@@ -60,8 +60,14 @@ const getUserFollowers = (userId: string) => {
   return agent.get<IFollowers>(`${USER_URL}/followers/${userId}`);
 };
 
-const getUserLogs = (userId: string) => {
-  return agent.get<ILogs[]>(`${USER_URL}/logs/${userId}`);
+const getUserLogs = (
+  userId: string,
+  params: { page?: number; take?: number }
+) => {
+  return agent.get<{ results: ILogs[]; total: number }>(
+    `${USER_URL}/logs/${userId}`,
+    { params }
+  );
 };
 
 const addUserFollowing = (userId: string, followingId: string) => {

@@ -16,6 +16,8 @@ import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
 import { GameCard } from "@/src/lib/shared/ui/GameCard";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
+import { Pagination } from "@/src/lib/shared/ui/Pagination";
+import { takeLogs } from "@/src/lib/shared/constants/user.const";
 
 interface UserInfoProps {
   user: IUser;
@@ -36,7 +38,10 @@ const UserInfo: FC<UserInfoProps> = ({
     userName,
   } = user;
 
+  const [page, setPage] = useState(1);
+
   const [logs, setLogs] = useState<(ILogs & { game?: IGameResponse })[]>([]);
+  const [totalLogs, setTotalLogs] = useState(0);
   const [userAuthFollowings, setUserAuthFollowings] = useState<IFollowings>(
     authUserFollowings || { followings: [] }
   );
@@ -60,20 +65,25 @@ const UserInfo: FC<UserInfoProps> = ({
 
   useEffect(() => {
     sync(async () => {
-      const logsRes = await userAPI.getUserLogs(user._id);
+      const logsRes = await userAPI.getUserLogs(user._id, {
+        page,
+        take: takeLogs,
+      });
 
-      const _ids = logsRes.data.map((log) => log.gameId);
+      setTotalLogs(logsRes.data.total);
+
+      const _ids = logsRes.data.results.map((log) => log.gameId);
 
       const gamesRes = await gamesApi.getByIds({ _ids });
 
       return setLogs(
-        logsRes.data.map((log) => ({
+        logsRes.data.results.map((log) => ({
           ...log,
           game: gamesRes.data.find((game) => log.gameId === game._id),
         }))
       );
     });
-  }, [user, sync]);
+  }, [user, page, sync]);
 
   return (
     <>
@@ -147,23 +157,35 @@ const UserInfo: FC<UserInfoProps> = ({
           <SectionTitle as="h3">Activity</SectionTitle>
           {isLoading && <Loader type="moon" />}
           {!isLoading && logs?.length > 0 && (
-            <div className={styles.activity__list}>
-              {logs.map((log, i) => {
-                if (!log.game) return null;
+            <div className={styles.activity__wrapper}>
+              <div className={styles.activity__list}>
+                {logs.map((log, i) => {
+                  if (!log.game) return null;
 
-                return (
-                  <Box key={i} classNameContent={styles.item}>
-                    <GameCard game={log.game} className={styles.item__card} />
-                    <div className={styles.item__text}>
-                      <p>{log.game.name}</p>
-                      <Interweave content={log.text} />
-                      <p className={styles.date}>
-                        {commonUtils.getHumanDate(log.date)}
-                      </p>
+                  return (
+                    <div key={i} className={styles.item}>
+                      <GameCard game={log.game} className={styles.item__card} />
+                      <Box
+                        classNameContent={styles.item__text}
+                        wrapperStyle={{ marginBlock: "var(--padding-x2)" }}
+                      >
+                        <p>{log.game.name}</p>
+                        <Interweave content={log.text} />
+                        <p className={styles.date}>
+                          {commonUtils.getHumanDate(log.date)}
+                        </p>
+                      </Box>
                     </div>
-                  </Box>
-                );
-              })}
+                  );
+                })}
+              </div>
+              <Pagination
+                take={takeLogs}
+                total={totalLogs}
+                isDisabled={isLoading}
+                page={page}
+                onPageChange={setPage}
+              />
             </div>
           )}
         </div>
