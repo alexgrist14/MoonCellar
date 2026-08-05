@@ -107,6 +107,7 @@ const UserProfile: FC<UserProfileProps> = ({
             }
             titleOpen={
               <SvgBurger
+                size="24"
                 className={styles.svg}
                 topId={cn(styles.top)}
                 middleId={cn(styles.middle)}

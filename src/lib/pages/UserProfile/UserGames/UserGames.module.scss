@@ -17,8 +17,9 @@
   }
 
   &__title {
-    @include textEllipsis;
     width: 100%;
+    text-align: center;
+    @include textEllipsis;
     @include font(13px, 17px, 500);
   }
 
@@ -27,11 +28,11 @@
     align-items: center;
     gap: var(--gap-x1);
     width: 100%;
+    justify-content: center;
 
     & p {
       @include textEllipsis;
-      @include font(11px, 14px, 400);
-      color: var(--color-gray);
+      @include font(12px, 14px, 400);
     }
   }
 

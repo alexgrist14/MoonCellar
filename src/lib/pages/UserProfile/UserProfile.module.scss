@@ -44,9 +44,8 @@
 }
 
 .svg {
-  height: 25px;
-  aspect-ratio: 1;
-  width: auto;
+  min-width: 36px;
+  padding-inline: var(--padding-x1);
 
   .top,
   .middle,

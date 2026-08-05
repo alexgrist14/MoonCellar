@@ -234,15 +234,20 @@ export const UserGames: FC<UserGamesProps> = ({
                   className={styles.games__stars}
                 />
               )}
-              <p
-                className={styles.games__title}
-                style={{ textAlign: hideGamePlaysInfo ? "center" : "left" }}
-              >
-                {game.name}
-              </p>
+              <p className={styles.games__title}>{game.name}</p>
               {!hideGamePlaysInfo && (
                 <>
-                  <div className={styles.games__plays}>
+                  <Button
+                    className={styles.games__plays}
+                    onClick={() =>
+                      modal.open(
+                        <GamePlaysInfo
+                          gameName={game.name}
+                          playthroughs={gamePlaythroughs}
+                        />
+                      )
+                    }
+                  >
                     <p>
                       {gamePlaythroughs.length}{" "}
                       {commonUtils.addLastS(
@@ -253,21 +258,6 @@ export const UserGames: FC<UserGamesProps> = ({
                     {hasComment && (
                       <SvgComment size="12" className={styles.games__comment} />
                     )}
-                  </div>
-                  <Button
-                    compact
-                    color={ButtonColor.DEFAULT}
-                    className={styles.games__button}
-                    onClick={() =>
-                      modal.open(
-                        <GamePlaysInfo
-                          gameName={game.name}
-                          playthroughs={gamePlaythroughs}
-                        />
-                      )
-                    }
-                  >
-                    Playthroughs
                   </Button>
                 </>
               )}
