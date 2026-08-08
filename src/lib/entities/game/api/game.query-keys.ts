@@ -1,0 +1,11 @@
+import { IGetGamesRequest } from "../../../shared/lib/schemas/games.schema";
+
+export const gameQueryKeys = {
+  all: ["games"] as const,
+  list: (params: IGetGamesRequest) =>
+    [...gameQueryKeys.all, "list", params] as const,
+  detail: (slug: string) => [...gameQueryKeys.all, "detail", slug] as const,
+  byIds: (ids: string[]) => [...gameQueryKeys.all, "by-ids", ids] as const,
+  followingsStatus: (gameId: string, profileId: string) =>
+    [...gameQueryKeys.all, "followings-status", gameId, profileId] as const,
+};

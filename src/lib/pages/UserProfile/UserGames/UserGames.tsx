@@ -1,19 +1,14 @@
-import { gamesApi } from "@/src/lib/shared/api";
 import { SortType } from "@/src/lib/shared/types/sort.type";
 import { CategoriesFilterType } from "@/src/lib/shared/types/user.type";
-import { GameCard } from "@/src/lib/shared/ui/GameCard";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { FC, useMemo } from "react";
 import styles from "./UserGames.module.scss";
 import { useSearchParams } from "next/navigation";
 import { IPlaythrough } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
-import { useDebouncedCallback } from "use-debounce";
-import { useAsyncLoader } from "@/src/lib/shared/hooks/useAsyncLoader";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { GamePlaysInfo } from "@/src/lib/entities/game/ui/GamePlaysInfo";
-import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
 import { IUserRating } from "@/src/lib/shared/lib/schemas/user-ratings.schema";
 import { GamesCards } from "@/src/lib/shared/ui/GamesCards";
 import { takeGames } from "@/src/lib/shared/constants/games.const";
@@ -21,6 +16,7 @@ import { Box } from "@/src/lib/shared/ui/Box";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { RatingStars } from "@/src/lib/shared/ui/RatingStars";
 import { SvgComment } from "@/src/lib/shared/ui/svg";
+import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
 
 interface UserGamesProps {
   playthroughs: IPlaythrough[];
@@ -35,15 +31,9 @@ export const UserGames: FC<UserGamesProps> = ({
   selectedSort,
   sortOrder,
 }) => {
-  const { sync, isLoading, setIsLoading } = useAsyncLoader();
-
   const query = useSearchParams();
   const page = Number(query.get("page"));
   const list = query.get("list") as CategoriesFilterType;
-
-  const [total, setTotal] = useState(0);
-  const [games, setGames] = useState<IGameResponse[]>();
-  const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
 
   const parsedGamesRatings = useMemo(() => {
     return ratings?.reduce(
@@ -69,7 +59,7 @@ export const UserGames: FC<UserGamesProps> = ({
     }, {});
   }, [playthroughs]);
 
-  const getGamesIds = useCallback(() => {
+  const gameIds = useMemo(() => {
     const plays = playthroughs
       ?.filter(
         (play) =>
@@ -88,8 +78,6 @@ export const UserGames: FC<UserGamesProps> = ({
 
         return res;
       }, []);
-
-    setTotal(plays.length);
 
     switch (selectedSort) {
       case SortType.RATING:
@@ -144,61 +132,34 @@ export const UserGames: FC<UserGamesProps> = ({
         });
         break;
     }
-
     return plays.filter((play) => !!play.gameId).map((play) => play.gameId);
   }, [
-    list,
-    playthroughs,
-    parsedGamesRatings,
-    playthroughsCountByGame,
     commentsCountByGame,
+    list,
+    parsedGamesRatings,
+    playthroughs,
+    playthroughsCountByGame,
     selectedSort,
     sortOrder,
   ]);
 
-  const debouncedGetGames = useDebouncedCallback((page: number = 1) => {
-    const _ids = getGamesIds().slice((page - 1) * takeGames, page * takeGames);
+  const currentPage = page || 1;
 
-    if (!_ids?.length) {
-      setGames([]);
-      setHasInitiallyLoaded(true);
-      return;
-    }
+  const pageGameIds = useMemo(
+    () => gameIds.slice((currentPage - 1) * takeGames, currentPage * takeGames),
+    [gameIds, currentPage]
+  );
 
-    sync(() =>
-      gamesApi
-        .getByIds({
-          _ids,
-        })
-        .then((res) => {
-          setGames(
-            _ids.reduce((result: IGameResponse[], id) => {
-              const game = res.data.find((game) => game._id === id);
-              !!game && result.push(game);
-              return result;
-            }, [])
-          );
-          setHasInitiallyLoaded(true);
-        })
-    );
-  }, 200);
+  const {
+    data: games = [],
+    isPending,
+    isFetching,
+  } = useGamesByIdsQuery(pageGameIds);
 
-  useEffect(() => {
-    setGames(undefined);
-    setHasInitiallyLoaded(false);
-  }, [list]);
+  const total = gameIds.length;
 
-  useEffect(() => {
-    !games && debouncedGetGames(page);
-  }, [debouncedGetGames, page, games]);
-
-  useEffect(() => {
-    debouncedGetGames(page);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedSort, sortOrder]);
-
-  if (isLoading || !hasInitiallyLoaded) return <Loader type="moon" />;
-  if (!games || games.length === 0) return <p>There is no games</p>;
+  if (isPending || isFetching) return <Loader type="moon" />;
+  if (!pageGameIds.length) return <p>There is no games</p>;
 
   return (
     <>
@@ -269,11 +230,7 @@ export const UserGames: FC<UserGamesProps> = ({
         take={takeGames}
         total={total}
         isFixed
-        isDisabled={isLoading}
-        callback={(page) => {
-          setIsLoading(true);
-          debouncedGetGames(page);
-        }}
+        isDisabled={isFetching}
       />
     </>
   );

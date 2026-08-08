@@ -9,6 +9,7 @@ import { FaroRouteTracker } from "../lib/shared/ui/FaroRouteTracker";
 import { GeoInit } from "../lib/shared/ui/GeoInit";
 import "@/src/lib/app/styles/reset.scss";
 import "@/src/lib/app/styles/root.scss";
+import { QueryProvider } from "../lib/app/providers/QueryProvider";
 
 export const metadata: Metadata = {
   title: {
@@ -64,12 +65,14 @@ export default function App({ children }: { children: ReactNode }) {
         <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
       </head>
       <body style={{ color: "white", background: "#191d24" }}>
-        <FaroInit />
-        <GeoInit />
-        <FaroRouteTracker />
-        <Layout className={classNames(general.variable, pentagra.variable)}>
-          {children}
-        </Layout>
+        <QueryProvider>
+          <FaroInit />
+          <GeoInit />
+          <FaroRouteTracker />
+          <Layout className={classNames(general.variable, pentagra.variable)}>
+            {children}
+          </Layout>
+        </QueryProvider>
       </body>
     </html>
   );

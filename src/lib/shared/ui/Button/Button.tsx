@@ -5,6 +5,7 @@ import React, {
   ReactNode,
   useRef,
   useState,
+  ComponentPropsWithRef,
 } from "react";
 import cl from "classnames";
 import styles from "./Button.module.scss";
@@ -23,7 +24,7 @@ export enum ButtonColor {
 type IButtonColor = ButtonColor | `${ButtonColor}`;
 
 export interface IButtonProps extends Pick<
-  DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>,
+  ComponentPropsWithRef<"button">,
   | "children"
   | "disabled"
   | "type"

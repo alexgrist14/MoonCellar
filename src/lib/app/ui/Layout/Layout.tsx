@@ -61,20 +61,27 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
   }, [pathname, profile?._id]);
 
   useEffect(() => {
-    gamesApi.getFilters().then((response) => {
-      if (!response) return;
+    const loadFilters = async () => {
+      try {
+        const response = await gamesApi.getFilters();
 
-      const { genres, modes, keywords, companies, themes, type, franchises } =
-        response;
+        if (!response) return;
 
-      setGenres(genres);
-      setGameModes(modes);
-      setThemes(themes);
-      setGameTypes(type);
-      setCompanies(companies);
-      setKeywords(keywords);
-      setFranchises(franchises || []);
-    });
+        const { genres, modes, keywords, companies, themes, type, franchises } =
+          response;
+
+        setGenres(genres);
+        setGameModes(modes);
+        setThemes(themes);
+        setGameTypes(type);
+        setCompanies(companies);
+        setKeywords(keywords);
+        setFranchises(franchises || []);
+      } catch {
+        return;
+      }
+    };
+    void loadFilters();
 
     platformsAPI.getAll().then((res) => {
       setSystems(res.data);

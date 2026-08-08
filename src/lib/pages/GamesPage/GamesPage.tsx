@@ -1,54 +1,36 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useMemo } from "react";
 import styles from "./GamesPage.module.scss";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { Filters } from "../../shared/ui/Filters";
-import { gamesApi } from "../../shared/api";
-import { useDebouncedCallback } from "use-debounce";
 import { Loader } from "../../shared/ui/Loader";
 import { Pagination } from "../../shared/ui/Pagination";
 import { parseQueryFilters } from "../../shared/utils/filters.utils";
 import { Box } from "../../shared/ui/Box";
 import { BGImage } from "../../shared/ui/BGImage";
 import { useAdvancedRouter } from "../../shared/hooks/useAdvancedRouter";
-import { useAsyncLoader } from "../../shared/hooks/useAsyncLoader";
-import { IGameResponse } from "../../shared/lib/schemas/games.schema";
 import { GamesCards } from "../../shared/ui/GamesCards";
 import { takeGames } from "../../shared/constants/games.const";
 import { GamesListMenu } from "../../widgets/main";
+import { useGamesQuery } from "../../entities/game/api/game.queries";
 
 export const GamesPage = () => {
-  const { sync, isLoading, setIsLoading } = useAsyncLoader();
   const { asPath, query } = useAdvancedRouter();
 
-  const [games, setGames] = useState<IGameResponse[]>();
-  const [total, setTotal] = useState(0);
+  const params = useMemo(
+    () => ({
+      ...parseQueryFilters(asPath),
+      page: Number(query.get("page")) || 1,
+      take: takeGames,
+    }),
+    [asPath, query]
+  );
 
-  const firstRender = useRef(true);
+  const { data, isPending, isFetching } = useGamesQuery(params);
 
-  const debouncedGamesFetch = useDebouncedCallback((page: number = 1) => {
-    const filters = parseQueryFilters(asPath);
-
-    sync(() =>
-      gamesApi
-        .getAll({
-          ...filters,
-          page: page || 1,
-          take: takeGames,
-        })
-        .then((res) => {
-          setGames(res.data.results);
-          setTotal(res.data.total);
-
-          firstRender.current && (firstRender.current = false);
-        })
-    );
-  }, 200);
-
-  useEffect(() => {
-    debouncedGamesFetch(Number(query.get("page") as string));
-  }, [debouncedGamesFetch, query]);
+  const games = data?.results;
+  const total = data?.total ?? 0;
 
   return (
     <>
@@ -63,18 +45,15 @@ export const GamesPage = () => {
         take={takeGames}
         total={total}
         isFixed
-        isDisabled={isLoading}
-        callback={() => {
-          setGames([]);
-          setIsLoading(true);
-        }}
+        isDisabled={isFetching}
       />
       <Box
         contentStyle={{
           minHeight: "calc(100vh - 155px)",
+          position: "relative",
         }}
       >
-        {isLoading || firstRender.current ? (
+        {isPending || isFetching ? (
           <Loader type="pacman" />
         ) : !games?.length ? (
           <h2 className={styles.page__empty}>Games not found</h2>

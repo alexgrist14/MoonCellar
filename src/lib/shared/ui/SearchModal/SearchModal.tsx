@@ -1,61 +1,45 @@
 import { Input } from "../Input";
 import styles from "./SearchModal.module.scss";
-import { FC, useEffect, useRef, useState } from "react";
-import { gamesApi } from "../../api";
+import { FC, useEffect, useState } from "react";
 import { Button } from "../Button";
 import { Loader } from "../Loader";
 import { ButtonGroup } from "../Button/ButtonGroup";
 import { modal } from "../Modal";
 import { useDisableScroll } from "../../hooks";
 import Link from "next/link";
-import { useAsyncLoader } from "../../hooks/useAsyncLoader";
-import { useDebouncedCallback } from "use-debounce";
+import { useDebounce } from "use-debounce";
 import { useExpandStore } from "../../store/expand.store";
 import { useAdvancedRouter } from "../../hooks/useAdvancedRouter";
-import { IGameResponse } from "../../lib/schemas/games.schema";
 import { GamesCards } from "../GamesCards";
 import { takeGames } from "../../constants/games.const";
 import classNames from "classnames";
+import { useGamesQuery } from "@/src/lib/entities/game/api/game.queries";
 
 export const SearchModal: FC = () => {
-  const { sync, isLoading, setIsLoading } = useAsyncLoader();
   const { setExpanded } = useExpandStore();
   const { asPath } = useAdvancedRouter();
 
-  const [games, setGames] = useState<IGameResponse[]>();
-  const [total, setTotal] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isSearchActive, setIsSearchActive] = useState(false);
-  const latestSearchRef = useRef("");
+  const normalizedSearch = searchQuery.trim();
+  const [debouncedSearch] = useDebounce(normalizedSearch, 500);
 
-  const debouncedSearch = useDebouncedCallback((search: string) => {
-    latestSearchRef.current = search;
+  const isSearchActive = normalizedSearch.length >= 2;
+  const isDebouncing = normalizedSearch !== debouncedSearch;
 
-    sync(() =>
-      gamesApi
-        .getAll({
-          search,
-          take: takeGames,
-        })
-        .then((response) => {
-          if (latestSearchRef.current !== search) return;
+  const { data, isFetching } = useGamesQuery(
+    { search: debouncedSearch, take: takeGames },
+    debouncedSearch.length >= 2
+  );
 
-          setGames(response.data.results);
-          setTotal(response.data.total);
-        })
-    );
-  }, 300);
-
-  const searchHandler = (search: string) => {
-    setSearchQuery(search);
-
-    if (!search || search.length < 2) return;
-
-    setIsSearchActive(true);
-    setIsLoading(true);
-    debouncedSearch(search);
-  };
-
+  const games = data?.results;
+  const total = data?.total ?? 0;
+  const isSearching = isDebouncing || isFetching;
+  const showMoreGamesButton =
+    !!games?.length &&
+    !!total &&
+    takeGames < total &&
+    !isFetching &&
+    !isDebouncing;
   useDisableScroll();
 
   useEffect(() => {
@@ -74,7 +58,7 @@ export const SearchModal: FC = () => {
           value={searchQuery}
           placeholder="Search..."
           autoFocus
-          onChange={(e) => searchHandler(e.target.value)}
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
         <ButtonGroup
           wrapperClassName={styles.modal__buttons}
@@ -92,20 +76,24 @@ export const SearchModal: FC = () => {
           ]}
         />
       </div>
-      {isSearchActive && <GamesCards games={games} />}
-      {!!games?.length && !!total && takeGames < total && (
+      {isSearchActive &&
+        (isSearching ? (
+          <div className={styles.modal__empty}>
+            <Loader type="pacman" />
+          </div>
+        ) : games?.length ? (
+          <GamesCards games={games} />
+        ) : (
+          <div className={styles.modal__empty}>Games not found</div>
+        ))}{" "}
+      {showMoreGamesButton && (
         <Link
           className={styles.modal__more}
-          href={`/games?search=${encodeURIComponent(searchQuery)}&page=2`}
+          href={`/games?search=${encodeURIComponent(debouncedSearch)}`}
           onClick={() => modal.close()}
         >
           <Button>More games</Button>
         </Link>
-      )}
-      {!games?.length && isSearchActive && (
-        <div className={styles.modal__empty}>
-          {isLoading ? <Loader type="pacman" /> : "Games not found"}
-        </div>
       )}
     </div>
   );

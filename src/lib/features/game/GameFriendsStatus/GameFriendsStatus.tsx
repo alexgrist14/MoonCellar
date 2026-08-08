@@ -13,6 +13,7 @@ import {
 } from "@/src/lib/shared/lib/schemas/game-followings-status.schema";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import styles from "./GameFriendsStatus.module.scss";
+import { useGameFollowingsStatusQuery } from "@/src/lib/entities/game/api/game.queries";
 
 interface IGameFriendsStatusProps {
   gameId: string;
@@ -27,32 +28,11 @@ const formatStatus = (item: IGameFollowingsStatusItem) => {
 
 export const GameFriendsStatus: FC<IGameFriendsStatusProps> = ({ gameId }) => {
   const profile = useAuthStore((s) => s.profile);
-  const [items, setItems] = useState<IGetGameFollowingsStatusResponse | null>(
-    null
+
+  const { data: items } = useGameFollowingsStatusQuery(
+    gameId,
+    profile?._id ?? ""
   );
-
-  useEffect(() => {
-    if (!profile?._id) {
-      setItems(null);
-      return;
-    }
-
-    let cancelled = false;
-    setItems(null);
-
-    gamesApi
-      .getFollowingsStatus(gameId, profile._id)
-      .then((res) => {
-        if (!cancelled) setItems(res.data);
-      })
-      .catch(() => {
-        if (!cancelled) setItems(null);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [gameId, profile?._id]);
 
   if (!profile?._id || !items?.length) return null;
 
