@@ -11,19 +11,24 @@ import { IRole } from "@/src/lib/shared/lib/schemas/role.schema";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { modal } from "@/src/lib/shared/ui/Modal";
+import { useAdminUsersQuery } from "@/src/lib/entities/user/api/admin-user.queries";
+import {
+  useDeleteAdminUserMutation,
+  useUpdateAdminUserRolesMutation,
+} from "@/src/lib/entities/user/api/admin-user.mutations";
+import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal/ConfirmModal";
+import { toast } from "@/src/lib/shared/utils/toast.utils";
 
 const ALL_ROLES: IRole[] = ["user", "admin", "moderator"];
 
 const UserList: FC = () => {
   const tableId = useId();
-  const [users, setUsers] = useState<IUser[]>([]);
+  const { data: users = [], isPending } = useAdminUsersQuery();
   const currentUser = useAuthStore((state) => state.profile);
-
-  useEffect(() => {
-    adminUsersApi.getUsers().then((response) => {
-      setUsers(response.data);
-    });
-  }, []);
+  const { mutate: updateUserRoles, isPending: isUpdatingRoles } =
+    useUpdateAdminUserRolesMutation();
+  const { mutate: deleteUser, isPending: isDeletingUser } =
+    useDeleteAdminUserMutation();
 
   const handleRolesChange = useCallback(
     async (userId: string, currentRoles: IRole[], newIndexes: number[]) => {
@@ -41,18 +46,9 @@ const UserList: FC = () => {
       const addedRoles = newRoles.filter((r) => !currentRoles.includes(r));
       const removedRoles = currentRoles.filter((r) => !newRoles.includes(r));
 
-      for (const role of addedRoles) {
-        await adminUsersApi.addUserRole(userId, role);
-      }
-      for (const role of removedRoles) {
-        await adminUsersApi.removeUserRole(userId, role);
-      }
-
-      setUsers((prev) =>
-        prev.map((u) => (u._id === userId ? { ...u, roles: newRoles } : u))
-      );
+      updateUserRoles({ userId, currentRoles, newRoles });
     },
-    [currentUser?._id]
+    [currentUser?._id, updateUserRoles]
   );
 
   const handleDeleteUser = useCallback(
@@ -60,38 +56,31 @@ const UserList: FC = () => {
       const modalId = `delete-user-${userId}`;
 
       modal.open(
-        <div className={styles.confirmModal}>
-          <h3>Delete User</h3>
-          <p>
-            Are you sure you want to delete user <strong>{userName}</strong>?
-          </p>
-          <p className={styles.confirmModal__warning}>
-            This will permanently delete the user and all related data (logs,
-            ratings, playthroughs).
-          </p>
-          <div className={styles.confirmModal__buttons}>
-            <Button
-              color={ButtonColor.DEFAULT}
-              onClick={() => modal.close(modalId)}
-            >
-              Cancel
-            </Button>
-            <Button
-              color={ButtonColor.RED}
-              onClick={async () => {
-                await adminUsersApi.deleteUser(userId);
-                setUsers((prev) => prev.filter((u) => u._id !== userId));
+        <ConfirmModal
+          title="Delete User"
+          message={
+            <p>
+              Are you sure you want to delete user <strong>{userName}</strong>?
+            </p>
+          }
+          warning="This will permanently delete the user and all related data (logs, ratings, playthroughs)."
+          onConfirm={() =>
+            deleteUser(userId, {
+              onSuccess: () => {
                 modal.close(modalId);
-              }}
-            >
-              Delete
-            </Button>
-          </div>
-        </div>,
+                toast.success({
+                  title: "User deleted successfully",
+                  description: `User ${userName} deleted successfully`,
+                });
+              },
+            })
+          }
+          onCancel={() => modal.close(modalId)}
+        />,
         { id: modalId }
       );
     },
-    []
+    [deleteUser]
   );
 
   return (

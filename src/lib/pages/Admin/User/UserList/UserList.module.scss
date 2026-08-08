@@ -45,32 +45,3 @@
   width: 48px;
   height: 48px;
 }
-
-.confirmModal {
-  display: flex;
-  flex-direction: column;
-  background-color: var(--color-bg-secondary);
-  padding: var(--padding-x5);
-  border-radius: var(--radius-x2);
-  max-width: 400px;
-
-  h3 {
-    margin: 0;
-  }
-
-  p {
-    margin: 0;
-  }
-
-  &__warning {
-    color: #d32f2f;
-    font-size: 0.9em;
-  }
-
-  &__buttons {
-    display: flex;
-    gap: var(--gap-s);
-    justify-content: flex-end;
-    margin-top: var(--gap-s);
-  }
-}

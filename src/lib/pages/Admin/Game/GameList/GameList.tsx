@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -16,6 +16,12 @@ import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import styles from "./GameList.module.scss";
+import { useGamesQuery } from "@/src/lib/entities/game/api/game.queries";
+import {
+  useDeleteGameMutation,
+  useUpdateGameMutation,
+} from "@/src/lib/entities/game/api/game.mutations";
+import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal/ConfirmModal";
 
 const TAKE = 50;
 const ON = "ON";
@@ -31,58 +37,33 @@ const GameList: FC = () => {
   const { query, setQuery } = useAdvancedRouter();
   const page = Number(query.get("page")) || 1;
 
-  const [games, setGames] = useState<IGameResponse[]>([]);
-  const [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
   const [inputValue, setInputValue] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [sortBy, setSortBy] = useState<IGetGamesRequest["sortBy"]>("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  const requestIdRef = useRef(0);
-
-  const fetchGames = useCallback(
-    (
-      nextPage: number,
-      nextSearch: string,
-      nextSortBy: IGetGamesRequest["sortBy"],
-      nextSortOrder: "asc" | "desc"
-    ) => {
-      const requestId = ++requestIdRef.current;
-
-      setIsLoading(true);
-
-      gamesApi
-        .getAll({
-          page: nextPage,
-          take: TAKE,
-          search: nextSearch || undefined,
-          sortBy: nextSortBy,
-          sortOrder: nextSortOrder,
-        })
-        .then((res) => {
-          if (requestId !== requestIdRef.current) return;
-
-          setGames(res.data.results);
-          setTotal(res.data.total);
-        })
-        .finally(() => {
-          if (requestId !== requestIdRef.current) return;
-
-          setIsLoading(false);
-        });
-    },
-    []
+  const params = useMemo<IGetGamesRequest>(
+    () => ({
+      page,
+      take: TAKE,
+      search: search || undefined,
+      sortBy,
+      sortOrder,
+    }),
+    [page, search, sortBy, sortOrder]
   );
+
+  const { data, isPending, isFetching } = useGamesQuery(params);
+  const { mutate: updateGame } = useUpdateGameMutation();
+  const { mutate: deleteGame } = useDeleteGameMutation();
+
+  const games = data?.results ?? [];
+  const total = data?.total ?? 0;
 
   const debouncedSearch = useDebouncedCallback((value: string) => {
     setSearch(value);
     setQuery({ page: 1 });
   }, 300);
-
-  useEffect(() => {
-    fetchGames(page, search, sortBy, sortOrder);
-  }, [fetchGames, page, search, sortBy, sortOrder]);
 
   const handleSort = useCallback(
     (key: string, order: "asc" | "desc") => {
@@ -104,69 +85,60 @@ const GameList: FC = () => {
     [router]
   );
 
-  const handleStopParsing = useCallback(
-    async (game: IGameResponse, next: boolean) => {
-      const previous = game.isStopParsing;
+  const handleStopParsing = (game: IGameResponse, isStopParsing: boolean) => {
+    updateGame({
+      gameId: game._id,
+      patch: { isStopParsing },
+    });
+  };
 
-      setGames((prev) =>
-        prev.map((item) =>
-          item._id === game._id ? { ...item, isStopParsing: next } : item
-        )
+  const handleDelete = useCallback(
+    (game: IGameResponse) => {
+      const modalId = `delete-game-${game._id}`;
+
+      modal.open(
+        <ConfirmModal
+          title="Delete Game"
+          message={
+            <p>
+              Are you sure you want to delete <strong>{game.name}</strong>?
+            </p>
+          }
+          onConfirm={() =>
+            deleteGame(game._id, { onSuccess: () => modal.close(modalId) })
+          }
+          onCancel={() => modal.close(modalId)}
+        />,
+        // <div className={styles.confirmModal}>
+        //   <h3>Delete Game</h3>
+        //   <p>
+        //     Are you sure you want to delete <strong>{game.name}</strong>?
+        //   </p>
+        //   <p className={styles.confirmModal__warning}>
+        //     This permanently deletes the game.
+        //   </p>
+        //   <div className={styles.confirmModal__buttons}>
+        //     <Button
+        //       color={ButtonColor.DEFAULT}
+        //       onClick={() => modal.close(modalId)}
+        //     >
+        //       Cancel
+        //     </Button>
+        //     <Button
+        //       color={ButtonColor.RED}
+        //       onClick={() =>
+        //         deleteGame(game._id, { onSuccess: () => modal.close(modalId) })
+        //       }
+        //     >
+        //       Delete
+        //     </Button>
+        //   </div>
+        // </div>,
+        { id: modalId }
       );
-
-      try {
-        await gamesApi.update(game._id, { isStopParsing: next });
-      } catch {
-        setGames((prev) =>
-          prev.map((item) =>
-            item._id === game._id ? { ...item, isStopParsing: previous } : item
-          )
-        );
-      }
     },
-    []
+    [deleteGame]
   );
-
-  const handleDelete = useCallback((game: IGameResponse) => {
-    const modalId = `delete-game-${game._id}`;
-
-    modal.open(
-      <div className={styles.confirmModal}>
-        <h3>Delete Game</h3>
-        <p>
-          Are you sure you want to delete <strong>{game.name}</strong>?
-        </p>
-        <p className={styles.confirmModal__warning}>
-          This permanently deletes the game.
-        </p>
-        <div className={styles.confirmModal__buttons}>
-          <Button
-            color={ButtonColor.DEFAULT}
-            onClick={() => modal.close(modalId)}
-          >
-            Cancel
-          </Button>
-          <Button
-            color={ButtonColor.RED}
-            onClick={async () => {
-              try {
-                await gamesApi.remove(game._id);
-                setGames((prev) =>
-                  prev.filter((item) => item._id !== game._id)
-                );
-                modal.close(modalId);
-              } catch {
-                return;
-              }
-            }}
-          >
-            Delete
-          </Button>
-        </div>
-      </div>,
-      { id: modalId }
-    );
-  }, []);
 
   return (
     <div>
@@ -188,7 +160,7 @@ const GameList: FC = () => {
 
       <Table
         mobileHeadField="name"
-        isLoading={isLoading}
+        isLoading={isPending || isFetching}
         limit={TAKE}
         sortingCallback={handleSort}
         headers={{
@@ -264,12 +236,7 @@ const GameList: FC = () => {
         }))}
       />
 
-      <Pagination
-        total={total}
-        take={TAKE}
-        isDisabled={isLoading}
-        callback={() => setIsLoading(true)}
-      />
+      <Pagination total={total} take={TAKE} isDisabled={isFetching} />
     </div>
   );
 };

@@ -1,0 +1,28 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-bg-secondary);
+    padding: var(--padding-x5);
+    border-radius: var(--radius-x2);
+    max-width: 400px;
+
+    h3 {
+        margin: 0;
+    }
+
+    p {
+        margin: 0;
+    }
+
+    .warning {
+        color: #d32f2f;
+        font-size: 0.9em;
+    }
+
+    .buttons {
+        display: flex;
+        gap: var(--gap-s);
+        justify-content: flex-end;
+        margin-top: var(--gap-x4);
+    }
+}

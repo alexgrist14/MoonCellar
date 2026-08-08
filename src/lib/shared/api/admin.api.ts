@@ -1,12 +1,13 @@
 import { API_URL } from "../constants";
 import { IGameResponse } from "../lib/schemas/games.schema";
 import { IRole } from "../lib/schemas/role.schema";
+import { IUser } from "../types/auth.type";
 import agent from "./agent.api";
 
 const ADMIN_URL = `${API_URL}/admin`;
 
 const getUsers = () => {
-  return agent.get(`${ADMIN_URL}/users`);
+  return agent.get<IUser[]>(`${ADMIN_URL}/users`);
 };
 
 const getUserById = (id: string) => {

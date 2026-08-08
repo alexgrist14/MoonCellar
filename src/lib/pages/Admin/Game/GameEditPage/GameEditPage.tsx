@@ -1,5 +1,5 @@
 "use client";
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,15 +11,22 @@ import {
   SubmitHandler,
   useForm,
 } from "react-hook-form";
-import { adminGamesApi, gamesApi } from "@/src/lib/shared/api";
-import { platformsAPI } from "@/src/lib/shared/api/platforms.api";
+import {
+  useAdminGameQuery,
+  useGameFiltersQuery,
+} from "@/src/lib/entities/game/api/game.queries";
+import {
+  useCreateGameMutation,
+  useUpdateGameMutation,
+  useUploadGameImageMutation,
+} from "@/src/lib/entities/game/api/game.mutations";
+import { usePlatformsQuery } from "@/src/lib/entities/platform/api/platform.queries";
 import {
   AddGameRequestSchema,
   IAddGameRequest,
   IUpdateGameRequest,
   UpdateGameRequestSchema,
 } from "@/src/lib/shared/lib/schemas/games.schema";
-import { IPlatform } from "@/src/lib/shared/lib/schemas/platforms.schema";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
@@ -42,8 +49,6 @@ import {
 } from "../fields";
 import { GAME_SECTIONS, IFieldDescriptor, IOptionsKey } from "./sections";
 import styles from "./GameEditPage.module.scss";
-
-type IGameFilters = Partial<Record<IOptionsKey, string[]>>;
 
 type IGameFormValues = IUpdateGameRequest;
 type IFormPath = Path<IGameFormValues>;
@@ -152,13 +157,25 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
   const isAdmin = useAuthStore((s) => s.isAdmin);
   const isCreate = !gameId;
   const [original, setOriginal] = useState<Record<string, unknown>>({});
-  const [platforms, setPlatforms] = useState<IPlatform[]>([]);
-  const [filters, setFilters] = useState<IGameFilters | null>(null);
-  const [isLoading, setIsLoading] = useState(!isCreate);
   const [invalidField, setInvalidField] = useState<{
     path: string;
     submission: number;
   } | null>(null);
+
+  const {
+    data: game,
+    isPending: isGamePending,
+    isError: isGameError,
+  } = useAdminGameQuery(gameId);
+
+  const { data: filters, isPending: isFiltersPending } = useGameFiltersQuery();
+  const { data: platforms = [], isPending: isPlatformsPending } =
+    usePlatformsQuery();
+
+  const { mutate: createGame, isPending: isCreating } = useCreateGameMutation();
+  const { mutate: updateGame, isPending: isUpdating } = useUpdateGameMutation();
+  const { mutateAsync: uploadGameImage, isPending: isUploading } =
+    useUploadGameImageMutation();
 
   const resolver = useMemo(
     () =>
@@ -181,16 +198,31 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
     defaultValues: isCreate ? CREATE_DEFAULTS : {},
   });
 
+  const hydratedGameIdRef = useRef<string | undefined>(undefined);
+
   useEffect(() => {
-    platformsAPI.getAll().then((res) => setPlatforms(res.data));
-    gamesApi
-      .getFilters()
-      .then((res) => setFilters(res ?? {}))
-      .catch(() => setFilters({}));
-  }, []);
+    if (!gameId || !game) return;
+    if (hydratedGameIdRef.current === gameId) return;
+    hydratedGameIdRef.current = gameId;
+    setOriginal(game as unknown as Record<string, unknown>);
+    reset(game as unknown as IGameFormValues);
+  }, [gameId, game, reset]);
+
+  useEffect(() => {
+    if (gameId) return;
+    hydratedGameIdRef.current = undefined;
+    setOriginal({});
+    reset(CREATE_DEFAULTS);
+  }, [gameId, reset]);
+
+  useEffect(() => {
+    if (!gameId || !isGameError) return;
+    router.push("/admin");
+  }, [gameId, isGameError, router]);
 
   const optionsFor = useCallback(
-    (key?: IOptionsKey): string[] => (key && filters ? filters[key] ?? [] : []),
+    (key?: IOptionsKey): string[] =>
+      key && filters ? (filters[key] ?? []) : [],
     [filters]
   );
 
@@ -214,26 +246,6 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
 
     return map;
   }, [optionsFor]);
-
-  useEffect(() => {
-    if (!gameId) {
-      setOriginal({});
-      reset(CREATE_DEFAULTS);
-      setIsLoading(false);
-      return;
-    }
-
-    setIsLoading(true);
-
-    adminGamesApi
-      .getGameById(gameId)
-      .then((res) => {
-        setOriginal(res.data as unknown as Record<string, unknown>);
-        reset(res.data as unknown as IGameFormValues);
-      })
-      .catch(() => router.push("/admin"))
-      .finally(() => setIsLoading(false));
-  }, [gameId, reset, router]);
 
   useEffect(() => {
     if (!invalidField) return;
@@ -262,45 +274,52 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
   );
 
   const onValid: SubmitHandler<IGameFormValues> = async (data) => {
-    try {
-      if (isCreate) {
-        const res = await gamesApi.add(data as IAddGameRequest);
-        toast.success({ description: "Game created" });
-        router.push(`/admin/games/${res.data._id}`);
-        return;
-      }
-
-      const sanitized: Record<string, unknown> = {
-        ...(data as Record<string, unknown>),
-      };
-      Object.entries(OBJECT_LIST_FIELDS).forEach(([path, fields]) => {
-        const rows = sanitized[path];
-        if (!Array.isArray(rows)) return;
-
-        sanitized[path] = rows.filter(
-          (row) => !isBlankObjectListRow(row as Record<string, unknown>, fields)
-        );
+    if (isCreate) {
+      createGame(data as IAddGameRequest, {
+        onSuccess: (game) => {
+          toast.success({ description: "Game created" });
+          router.push(`/admin/games/${game._id}`);
+        },
       });
-
-      const patch: Record<string, unknown> = {};
-      Object.keys(sanitized).forEach((key) => {
-        if (JSON.stringify(sanitized[key]) === JSON.stringify(original[key]))
-          return;
-        patch[key] = nullifyUndefined(sanitized[key]);
-      });
-
-      if (!Object.keys(patch).length) {
-        toast.success({ description: "Nothing to save" });
-        return;
-      }
-
-      const res = await gamesApi.update(gameId, patch as IUpdateGameRequest);
-      toast.success({ description: "Game updated" });
-      setOriginal(res.data as unknown as Record<string, unknown>);
-      reset(res.data as unknown as IGameFormValues);
-    } catch {
       return;
     }
+
+    const sanitized: Record<string, unknown> = {
+      ...(data as Record<string, unknown>),
+    };
+    Object.entries(OBJECT_LIST_FIELDS).forEach(([path, fields]) => {
+      const rows = sanitized[path];
+      if (!Array.isArray(rows)) return;
+
+      sanitized[path] = rows.filter(
+        (row) => !isBlankObjectListRow(row as Record<string, unknown>, fields)
+      );
+    });
+
+    const patch: Record<string, unknown> = {};
+    Object.keys(sanitized).forEach((key) => {
+      if (JSON.stringify(sanitized[key]) === JSON.stringify(original[key]))
+        return;
+      patch[key] = nullifyUndefined(sanitized[key]);
+    });
+
+    if (!Object.keys(patch).length) {
+      toast.success({ description: "Nothing to save" });
+      return;
+    }
+
+    if (!gameId) return;
+
+    updateGame(
+      { gameId, patch: patch as IUpdateGameRequest },
+      {
+        onSuccess: (game) => {
+          toast.success({ description: "Game updated" });
+          setOriginal(game as unknown as Record<string, unknown>);
+          reset(game as unknown as IGameFormValues);
+        },
+      }
+    );
   };
 
   const onInvalid = (formErrors: FieldErrors<IGameFormValues>) => {
@@ -334,16 +353,20 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
   ) => {
     if (!gameId) return;
 
-    const res = await gamesApi.uploadImage(gameId, uploadType, file);
+    const url = await uploadGameImage({
+      gameId,
+      type: uploadType,
+      file,
+    });
     const formPath = path as IFormPath;
 
     if (uploadType === "cover") {
-      setValue(formPath, res.data, { shouldDirty: true });
+      setValue(formPath, url, { shouldDirty: true });
       return;
     }
 
     const current = (getValues(formPath) as string[] | undefined) || [];
-    setValue(formPath, [...current, res.data], { shouldDirty: true });
+    setValue(formPath, [...current, url], { shouldDirty: true });
   };
 
   const renderField = (
@@ -491,7 +514,9 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
                 <ObjectListField
                   label={field.label}
                   value={rhf.value as Record<string, unknown>[]}
-                  fields={resolvedObjectFields[field.path] || field.fields || []}
+                  fields={
+                    resolvedObjectFields[field.path] || field.fields || []
+                  }
                   isLabelHidden={isLabelHidden}
                   onChange={rhf.onChange}
                 />
@@ -618,7 +643,12 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
 
   if (!isAdmin) return;
 
-  if (isLoading || !filters) {
+  const isPageLoading =
+    isFiltersPending ||
+    isPlatformsPending ||
+    Boolean(gameId && isGamePending);
+
+  if (isPageLoading || !filters) {
     return (
       <Box classNameContent={styles.loading}>
         <Loader className={styles.loader} />
@@ -690,7 +720,7 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
           <Button
             type="submit"
             color={ButtonColor.GREEN}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isCreating || isUpdating || isUploading}
           >
             {isCreate ? "Create" : "Save"}
           </Button>
