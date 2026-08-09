@@ -1,33 +1,33 @@
 "use client";
 
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import styles from "./RoyalGamesPanel.module.scss";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { GamesList } from "@/src/lib/shared/ui/GamesList";
 import { Loader } from "@/src/lib/shared/ui/Loader";
-import { IUserPreset } from "@/src/lib/shared/types/user.type";
 import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
 import { ButtonColor } from "@/src/lib/shared/ui/Button";
-import { gamesApi, userAPI } from "@/src/lib/shared/api";
+import { gamesApi } from "@/src/lib/shared/api";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useGamesStore } from "@/src/lib/shared/store/games.store";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { SaveForm } from "@/src/lib/shared/ui/SaveForm";
+import { useUserPresetsQuery } from "@/src/lib/entities/user/api/user.queries";
+import {
+  useAddUserPresetMutation,
+  useRemoveUserPresetMutation,
+} from "@/src/lib/entities/user/api/user.mutations";
 
 export const RoyalGamesPanel: FC = () => {
   const { royalGames, setRoyalGames, removeRoyalGame } = useGamesStore();
   const { profile } = useAuthStore();
 
   const [tabIndex, setTabIndex] = useState(0);
-  const [savedPresets, setSavedPresets] = useState<IUserPreset[]>();
 
-  useEffect(() => {
-    !!profile &&
-      userAPI
-        .getPresets(profile?._id)
-        .then((res) => setSavedPresets(res.data.presets));
-  }, [profile]);
+  const { data: savedPresets } = useUserPresetsQuery(profile?._id ?? "");
+  const { mutate: addPreset } = useAddUserPresetMutation();
+  const { mutate: removePreset } = useRemoveUserPresetMutation();
 
   return (
     <div className={styles.royal}>
@@ -59,18 +59,23 @@ export const RoyalGamesPanel: FC = () => {
                 saveCallback={(name) => {
                   !!profile &&
                     !!royalGames?.length &&
-                    userAPI
-                      .addPreset(profile._id, {
-                        name,
-                        preset: royalGames.map((game) => game._id),
-                      })
-                      .then((res) => {
-                        setSavedPresets(res.data.presets);
-                        toast.success({
-                          description: "Preset was successfully saved",
-                        });
-                        modal.close();
-                      });
+                    addPreset(
+                      {
+                        userId: profile._id,
+                        preset: {
+                          name,
+                          preset: royalGames.map((game) => game._id),
+                        },
+                      },
+                      {
+                        onSuccess: () => {
+                          toast.success({
+                            description: "Preset was successfully saved",
+                          });
+                          modal.close();
+                        },
+                      }
+                    );
                 }}
               />
             )
@@ -110,14 +115,16 @@ export const RoyalGamesPanel: FC = () => {
                         compact: true,
                         onClick: () =>
                           !!profile &&
-                          userAPI
-                            .removePreset(profile._id, preset.name)
-                            .then((res) => {
-                              toast.success({
-                                description: "Preset was successfully removed",
-                              });
-                              setSavedPresets(res.data.presets);
-                            }),
+                          removePreset(
+                            { userId: profile._id, name: preset.name },
+                            {
+                              onSuccess: () =>
+                                toast.success({
+                                  description:
+                                    "Preset was successfully removed",
+                                }),
+                            }
+                          ),
                         color: ButtonColor.RED,
                       },
                     ]}

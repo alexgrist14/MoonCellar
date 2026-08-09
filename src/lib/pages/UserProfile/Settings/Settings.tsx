@@ -1,4 +1,4 @@
-import { userAPI } from "@/src/lib/shared/api";
+import { useUpdateProfileMutation } from "@/src/lib/entities/user/api/user.mutations";
 import { useAuth } from "@/src/lib/shared/hooks/auth";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useGeoStore } from "@/src/lib/shared/store/geo.store";
@@ -20,7 +20,8 @@ import { settingsSchema, SettingsSchema } from "./settings.schema";
 interface SettingsProps {}
 
 export const Settings: FC<SettingsProps> = ({}) => {
-  const { isAuth, profile, setProfile } = useAuthStore();
+  const { isAuth, profile } = useAuthStore();
+  const { mutate: updateProfile, isPending } = useUpdateProfileMutation();
   const { bgOpacity, setBgOpacity } = useSettingsStore();
   const blockedCountry = useGeoStore((s) => s.blockedCountry);
 
@@ -59,47 +60,31 @@ export const Settings: FC<SettingsProps> = ({}) => {
   const onSubmit: SubmitHandler<SettingsSchema> = (data) => {
     if (!profile) return;
 
-    const apiCalls = [];
-    if (data.description !== profile.description) {
-      apiCalls.push(
-        userAPI.updateDescription(profile._id, {
+    updateProfile(
+      {
+        userId: profile._id,
+        ...(data.description !== profile.description && {
           description: data.description ?? "",
-        })
-      );
-    }
-    if (tempAvatar) {
-      apiCalls.push(
-        userAPI.addAvatar(profile._id, tempAvatar).then((res) => {
-          setProfile({ ...useAuthStore.getState().profile!, avatar: res.data });
+        }),
+        ...(tempAvatar && { avatar: tempAvatar }),
+        ...(data.raUsername &&
+          data.raUsername !== profile.raUsername && {
+            raUsername: data.raUsername,
+          }),
+        ...(background && { background }),
+        ...(!blockedCountry &&
+          data.showAdultContent !== !!profile.settings?.showAdultContent && {
+            settings: { showAdultContent: !!data.showAdultContent },
+          }),
+      },
+      {
+        onSuccess: () => {
+          toast.success({ description: "Saved successfully" });
           setTempAvatar(undefined);
-        })
-      );
-    }
-    if (data.raUsername && data.raUsername !== profile.raUsername) {
-      apiCalls.push(userAPI.setRaUserInfo(profile._id, data.raUsername));
-    }
-    if (background) {
-      apiCalls.push(
-        userAPI.addBackground(profile._id, background).then((res) => {
-          setProfile(res.data);
           setBackground(undefined);
-        })
-      );
-    }
-    if (
-      !blockedCountry &&
-      data.showAdultContent !== !!profile.settings?.showAdultContent
-    ) {
-      apiCalls.push(
-        userAPI.updateSettings(profile._id, {
-          showAdultContent: !!data.showAdultContent,
-        })
-      );
-    }
-    Promise.all(apiCalls).then(() => {
-      toast.success({ description: "Saved successfully" });
-      userAPI.getById(profile._id).then((res) => setProfile(res.data));
-    });
+        },
+      }
+    );
   };
 
   const { logout } = useAuth();
@@ -247,7 +232,12 @@ export const Settings: FC<SettingsProps> = ({}) => {
         >
           Logout
         </Button>
-        <Button type="submit" className={styles.btn} color={ButtonColor.ACCENT}>
+        <Button
+          type="submit"
+          className={styles.btn}
+          color={ButtonColor.ACCENT}
+          disabled={isPending}
+        >
           Save
         </Button>
       </div>

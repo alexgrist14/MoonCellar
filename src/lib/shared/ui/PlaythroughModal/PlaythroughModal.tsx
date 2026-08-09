@@ -17,21 +17,22 @@ import {
 } from "../../lib/schemas/playthroughs.schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAsyncLoader } from "../../hooks/useAsyncLoader";
 import { Loader } from "../Loader";
 import { Errors } from "../Errors";
 import { IButtonGroupItem } from "../../types/buttons.type";
 import { SvgPlus } from "../svg";
 import classNames from "classnames";
-import { useUserStore } from "../../store/user.store";
-import { usePlaythroughsStore } from "../../store/playthroughs.store";
 import { Box } from "../Box";
 import { toast } from "../../utils/toast.utils";
 import { IGameResponse } from "../../lib/schemas/games.schema";
-import { playthroughsAPI } from "../../api";
 import { useCommonStore } from "../../store/common.store";
 import { GameRating } from "@/src/lib/features/game/GameRating";
-import { Scrollbar } from "../Scrollbar";
+import { usePlaythroughsQuery } from "@/src/lib/entities/playthrough/api/playthrough.queries";
+import {
+  useCreatePlaythroughMutation,
+  useUpdatePlaythroughMutation,
+  useDeletePlaythroughMutation,
+} from "@/src/lib/entities/playthrough/api/playthrough.mutations";
 
 interface IPlaythroughModalProps {
   userId: string;
@@ -53,17 +54,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
 }) => {
   const { profile } = useAuthStore();
   const { systems } = useCommonStore();
-  const {
-    setPlaythroughs: setStorePlaythroughs,
-    playthroughs: storePlaythroughs,
-  } = useUserStore();
-  const {
-    setPlaythroughs: setFullStorePlaythroughs,
-    playthroughs: fullStorePlaythroughs,
-  } = usePlaythroughsStore();
-  const { sync, isLoading } = useAsyncLoader();
 
-  const [playthroughs, setPlaythroughs] = useState<IPlaythrough[]>([]);
   const [playthroughId, setPlaythroughId] = useState<string>();
 
   const {
@@ -77,6 +68,17 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
     mode: "all",
     resolver: zodResolver(SavePlaythroughRequestSchema),
   });
+
+  const { data: playthroughs = [], isPending } = usePlaythroughsQuery(
+    userId,
+    game._id
+  );
+  const { mutate: createPlaythrough, isPending: isCreating } =
+    useCreatePlaythroughMutation();
+  const { mutate: updatePlaythrough, isPending: isUpdating } =
+    useUpdatePlaythroughMutation();
+  const { mutate: deletePlaythrough, isPending: isDeleting } =
+    useDeletePlaythroughMutation();
 
   const addHandler = useCallback(() => {
     setPlaythroughId(undefined);
@@ -101,95 +103,50 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
 
   const saveHandler = (data: ISavePlaythroughRequest) => {
     if (!profile) return;
-
-    !!playthroughId
-      ? sync(() =>
-          playthroughsAPI
-            .update(profile._id, playthroughId, data)
-            .then((res) => {
-              setPlaythroughs(
-                playthroughs.map((play) =>
-                  play._id === playthroughId ? res.data : play
-                )
-              );
-              setStorePlaythroughs(
-                storePlaythroughs?.map((play) =>
-                  play._id === playthroughId
-                    ? {
-                        _id: res.data._id,
-                        category: res.data.category,
-                        isMastered: res.data.isMastered,
-                        gameId: res.data.gameId,
-                        updatedAt: res.data.updatedAt,
-                      }
-                    : play
-                ) || []
-              );
-              setFullStorePlaythroughs(
-                fullStorePlaythroughs?.map((play) =>
-                  play._id === playthroughId ? res.data : play
-                ) || []
-              );
-              selectHandler(res.data);
-              toast.success({
-                description: "Playthrough successfully updated",
-              });
-            })
-        )
-      : sync(() =>
-          playthroughsAPI.create(data).then((res) => {
-            setPlaythroughs([...playthroughs, res.data]);
-            setStorePlaythroughs([
-              ...(storePlaythroughs || []),
-              {
-                _id: res.data._id,
-                category: res.data.category,
-                isMastered: res.data.isMastered,
-                gameId: res.data.gameId,
-                updatedAt: res.data.updatedAt,
-              },
-            ]);
-            setFullStorePlaythroughs([...(fullStorePlaythroughs || []), res.data]);
-            selectHandler(res.data);
-            toast.success({ description: "Playthrough successfully created" });
-          })
-        );
+    if (playthroughId) {
+      updatePlaythrough(
+        { userId: profile._id, playthroughId, playthrough: data },
+        {
+          onSuccess: (playthrough) => {
+            selectHandler(playthrough);
+            toast.success({ description: "Playthrough successfully updated" });
+          },
+        }
+      );
+      return;
+    }
+    createPlaythrough(data, {
+      onSuccess: (playthrough) => {
+        selectHandler(playthrough);
+        toast.success({ description: "Playthrough successfully created" });
+      },
+    });
   };
 
   const deleteHandler = () => {
     if (!profile || !playthroughId) return;
 
-    sync(() =>
-      playthroughsAPI.remove(profile._id, playthroughId).then((res) => {
-        setPlaythroughs(
-          playthroughs.filter((play) => play._id !== res.data._id)
-        );
-        setStorePlaythroughs(
-          storePlaythroughs?.filter((play) => play._id !== res.data._id) || []
-        );
-        setFullStorePlaythroughs(
-          fullStorePlaythroughs?.filter((play) => play._id !== res.data._id) ||
-            []
-        );
-
-        setPlaythroughId(undefined);
-        reset({ userId, gameId: game._id, category: "wishlist" });
-
-        toast.success({ description: "Playthrough successfully removed" });
-      })
+    deletePlaythrough(
+      { userId: profile._id, playthroughId },
+      {
+        onSuccess: () => {
+          setPlaythroughId(undefined);
+          reset({ userId, gameId: game._id, category: "wishlist" });
+          toast.success({ description: "Playthrough successfully removed" });
+        },
+      }
     );
   };
 
   useEffect(() => {
-    sync(() =>
-      playthroughsAPI.getAll({ userId, gameId: game._id }).then((res) => {
-        setPlaythroughs(res.data);
-        !!res.data?.[res.data.length - 1]
-          ? selectHandler(res.data[res.data.length - 1])
-          : addHandler();
-      })
-    );
-  }, [game, userId, selectHandler, addHandler, sync]);
+    if (isPending) return;
+
+    const last = playthroughs.at(-1);
+    last ? selectHandler(last) : addHandler();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, game._id, isPending]);
+
+  const isLoading = isPending || isCreating || isUpdating || isDeleting;
 
   return (
     <Box

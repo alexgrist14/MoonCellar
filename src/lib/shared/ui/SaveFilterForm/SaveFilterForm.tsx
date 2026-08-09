@@ -1,35 +1,36 @@
-import { Dispatch, FC, SetStateAction, useState } from "react";
+import { FC, useState } from "react";
 import styles from "./SaveFilterForm.module.scss";
 import { Box } from "../Box";
 import { Input } from "../Input";
 import { Button, ButtonColor } from "../Button";
 import { useAuthStore } from "../../store/auth.store";
-import { userAPI } from "../../api";
+import { useAddUserFilterMutation } from "@/src/lib/entities/user/api/user.mutations";
 import { getFiltersForQuery } from "../../utils/filters.utils";
 import { toast } from "../../utils/toast.utils";
 import { modal } from "../Modal";
-import { IUserFilter } from "../../types/user.type";
 import { IGetGamesRequest } from "../../lib/schemas/games.schema";
 
 export const SaveFilterForm: FC<{
   filters: IGetGamesRequest;
-  setSavedFilters: Dispatch<SetStateAction<IUserFilter[] | undefined>>;
-}> = ({ filters, setSavedFilters }) => {
+}> = ({ filters }) => {
   const { profile } = useAuthStore();
   const [name, setName] = useState("");
+  const { mutate: addFilter, isPending } = useAddUserFilterMutation();
 
   const submitHandler = () =>
     !!profile &&
-    userAPI
-      .addFilter(profile._id, {
-        name,
-        filter: getFiltersForQuery(filters),
-      })
-      .then((res) => {
-        setSavedFilters(res.data.filters);
-        toast.success({ description: "Filter was successfully saved!" });
-        modal.close();
-      });
+    addFilter(
+      {
+        userId: profile._id,
+        filter: { name, filter: getFiltersForQuery(filters) },
+      },
+      {
+        onSuccess: () => {
+          toast.success({ description: "Filter was successfully saved!" });
+          modal.close();
+        },
+      }
+    );
 
   return (
     <Box classNameContent={styles.form}>
@@ -42,7 +43,7 @@ export const SaveFilterForm: FC<{
       />
       <Button
         color={ButtonColor.ACCENT}
-        disabled={!name}
+        disabled={!name || isPending}
         onClick={() => submitHandler()}
       >
         Save

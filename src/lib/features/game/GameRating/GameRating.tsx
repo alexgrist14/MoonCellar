@@ -11,6 +11,12 @@ import { useUserStore } from "@/src/lib/shared/store/user.store";
 import { SvgNumber } from "@/src/lib/shared/ui/svg";
 import classNames from "classnames";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { useRatingsQuery } from "@/src/lib/entities/rating/api/rating.queries";
+import {
+  useCreateRatingMutation,
+  useDeleteRatingMutation,
+  useUpdateRatingMutation,
+} from "@/src/lib/entities/rating/api/rating.mutations";
 
 interface IGameRatingProps {
   game: IGameResponse;
@@ -18,61 +24,62 @@ interface IGameRatingProps {
 }
 
 export const GameRating: FC<IGameRatingProps> = ({ game }) => {
-  const { sync, isLoading } = useAsyncLoader();
   const { profile } = useAuthStore();
-  const { setRatings, ratings } = useUserStore();
+
+  const { data: ratings, isPending } = useRatingsQuery(profile?._id ?? "");
+  const { mutate: createRating, isPending: isCreating } =
+    useCreateRatingMutation();
+  const { mutate: updateRating, isPending: isUpdating } =
+    useUpdateRatingMutation();
+  const { mutate: deleteRating, isPending: isDeleting } =
+    useDeleteRatingMutation();
 
   const rating = useMemo(
     () => ratings?.find((rating) => rating.gameId === game._id),
     [game, ratings]
   );
-  const [ratingValue, setRatingValue] = useState<number | undefined>();
   const [hoverIndex, setHoverIndex] = useState<number | undefined>();
 
   const changeHandler = (value: number) => {
     if (!profile || !ratings) return;
 
     if (value === rating?.rating && !!rating) {
-      sync(() =>
-        ratingsAPI.remove({ _id: rating._id, userId: profile._id }).then(() => {
-          toast.success({
-            description: `${"Rating removed"} for ${game.name}`,
-          });
-
-          setRatings(ratings.filter((r) => r._id !== rating._id));
-          setRatingValue(undefined);
-        })
+      deleteRating(
+        { ratingId: rating._id, userId: profile._id },
+        {
+          onSuccess: () => {
+            toast.success({
+              description: `${`Removed rating`} for ${game.name}`,
+            });
+          },
+        }
       );
     } else if (!!value && !rating) {
-      sync(() =>
-        ratingsAPI
-          .add({ gameId: game._id, rating: value, userId: profile._id })
-          .then((res) => {
+      createRating(
+        { gameId: game._id, rating: value, userId: profile._id },
+        {
+          onSuccess: () => {
             toast.success({
               description: `${`Set rating - ${value}`} for ${game.name}`,
             });
-
-            setRatings([...ratings, res.data]);
-            setRatingValue(value);
-          })
+          },
+        }
       );
     } else if (!!value && rating) {
-      sync(() =>
-        ratingsAPI
-          .update({ _id: rating._id, userId: profile._id, rating: value })
-          .then((res) => {
+      updateRating(
+        { _id: rating._id, userId: profile._id, rating: value },
+        {
+          onSuccess: () => {
             toast.success({
-              description: `${`Update rating to ${value}`} for ${game.name}`,
+              description: `${`Updated rating to ${value}`} for ${game.name}`,
             });
-
-            setRatings(
-              ratings.map((r) => (r._id === rating._id ? res.data : r))
-            );
-            setRatingValue(value);
-          })
+          },
+        }
       );
     }
   };
+  const isLoading =
+    (!!profile && isPending) || isCreating || isUpdating || isDeleting;
 
   return (
     <div
@@ -80,7 +87,6 @@ export const GameRating: FC<IGameRatingProps> = ({ game }) => {
         [styles.rating_loading]: isLoading,
       })}
       onMouseLeave={() => setHoverIndex(undefined)}
-      // inert={isDisabled}
     >
       {isLoading && <Loader className={styles.rating__loader} type="pulse" />}
       {Array(10)
@@ -91,9 +97,6 @@ export const GameRating: FC<IGameRatingProps> = ({ game }) => {
             value={index + 1}
             className={classNames(styles.rating__number, {
               [styles.rating__number_active]:
-                (hoverIndex === undefined &&
-                  ratingValue !== undefined &&
-                  ratingValue >= index + 1) ||
                 (hoverIndex === undefined &&
                   rating &&
                   rating.rating !== null &&

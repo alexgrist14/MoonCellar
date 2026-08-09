@@ -1,6 +1,6 @@
-import { playthroughsAPI } from "@/src/lib/shared/api";
-import { ratingsAPI } from "@/src/lib/shared/api/ratings.api";
-import { useEffectOnce } from "@/src/lib/shared/hooks/useEffectOnce";
+import { useEffect } from "react";
+import { usePlaythroughsMinimalQuery } from "@/src/lib/entities/playthrough/api/playthrough.queries";
+import { useRatingsQuery } from "@/src/lib/entities/rating/api/rating.queries";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useUserStore } from "@/src/lib/shared/store/user.store";
 
@@ -8,16 +8,20 @@ export const useGetUserInfo = () => {
   const { profile } = useAuthStore();
   const { setPlaythroughs, setRatings } = useUserStore();
 
-  return useEffectOnce(async () => {
-    if (!profile?._id) return;
+  const { data: playthroughs } = usePlaythroughsMinimalQuery(
+    profile?._id ?? ""
+  );
+  const { data: ratings } = useRatingsQuery(profile?._id ?? "");
 
-    return Promise.all([
-      playthroughsAPI.getAllMinimal({ userId: profile._id }).then((res) => {
-        setPlaythroughs(res.data);
-      }),
-      ratingsAPI.getAll({ userId: profile._id }).then((res) => {
-        setRatings(res.data);
-      }),
-    ]);
-  }, !!profile?._id);
+  useEffect(() => {
+    if (playthroughs) {
+      setPlaythroughs(playthroughs);
+    }
+  }, [playthroughs, setPlaythroughs]);
+
+  useEffect(() => {
+    if (ratings) {
+      setRatings(ratings);
+    }
+  }, [ratings, setRatings]);
 };

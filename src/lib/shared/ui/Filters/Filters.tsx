@@ -10,10 +10,10 @@ import { ToggleSwitch } from "../ToggleSwitch";
 import { SvgChevron } from "../svg";
 import { Tabs } from "../Tabs";
 import { ITabContent } from "../../types/tabs.type";
-import { userAPI } from "../../api";
 import { useAuthStore } from "../../store/auth.store";
 import { Loader } from "../Loader";
-import { IUserFilter } from "../../types/user.type";
+import { useUserFiltersQuery } from "@/src/lib/entities/user/api/user.queries";
+import { useRemoveUserFilterMutation } from "@/src/lib/entities/user/api/user.mutations";
 import { modal } from "../Modal";
 import { SaveFilterForm } from "../SaveFilterForm";
 import { useAdvancedRouter } from "../../hooks/useAdvancedRouter";
@@ -50,7 +50,10 @@ export const Filters: FC<{
   const [filters, setFilters] = useState<IGetGamesRequest>();
   const [tab, setTab] = useState<"filters" | "saved">("filters");
 
-  const [savedFilters, setSavedFilters] = useState<IUserFilter[]>();
+  const { data: savedFilters } = useUserFiltersQuery(
+    isAuth ? profile?._id ?? "" : ""
+  );
+  const { mutate: removeFilter } = useRemoveUserFilterMutation();
 
   const {
     themes,
@@ -158,14 +161,6 @@ export const Filters: FC<{
   useEffect(() => {
     !filters && setFilters(parseQueryFilters(asPath));
   }, [asPath, filters]);
-
-  useEffect(() => {
-    !!profile?._id &&
-      isAuth &&
-      userAPI
-        .getFilters(profile?._id)
-        .then((res) => setSavedFilters(res.data.filters));
-  }, [profile, isAuth]);
 
   return (
     <div className={styles.filters} id="filters">
@@ -592,13 +587,7 @@ export const Filters: FC<{
                 title: "Save filters",
                 hidden: !profile || !filters,
                 onClick: () =>
-                  !!filters &&
-                  modal.open(
-                    <SaveFilterForm
-                      filters={filters}
-                      setSavedFilters={setSavedFilters}
-                    />
-                  ),
+                  !!filters && modal.open(<SaveFilterForm filters={filters} />),
               },
               {
                 title: "Clear filters",
@@ -639,14 +628,16 @@ export const Filters: FC<{
                         compact: true,
                         onClick: () =>
                           !!profile &&
-                          userAPI
-                            .removeFilter(profile._id, filter.name)
-                            .then((res) => {
-                              toast.success({
-                                description: "Filter was successfully removed!",
-                              });
-                              setSavedFilters(res.data.filters);
-                            }),
+                          removeFilter(
+                            { userId: profile._id, name: filter.name },
+                            {
+                              onSuccess: () =>
+                                toast.success({
+                                  description:
+                                    "Filter was successfully removed!",
+                                }),
+                            }
+                          ),
                         color: ButtonColor.RED,
                       },
                     ]}

@@ -19,6 +19,8 @@ import classNames from "classnames";
 import { usePathname } from "next/navigation";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { PageLoader } from "@/src/lib/shared/ui/PageLoader";
+import { useGameFiltersQuery } from "@/src/lib/entities/game/api/game.queries";
+import { usePlatformsQuery } from "@/src/lib/entities/platform/api/platform.queries";
 
 interface ILayoutProps {
   children: ReactNode;
@@ -60,32 +62,19 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
     }
   }, [pathname, profile?._id]);
 
+  const { data: filters } = useGameFiltersQuery();
+  const { data: platforms } = usePlatformsQuery();
+
   useEffect(() => {
-    const loadFilters = async () => {
-      try {
-        const response = await gamesApi.getFilters();
+    if (!filters) return;
 
-        if (!response) return;
-
-        const { genres, modes, keywords, companies, themes, type, franchises } =
-          response;
-
-        setGenres(genres);
-        setGameModes(modes);
-        setThemes(themes);
-        setGameTypes(type);
-        setCompanies(companies);
-        setKeywords(keywords);
-        setFranchises(franchises || []);
-      } catch {
-        return;
-      }
-    };
-    void loadFilters();
-
-    platformsAPI.getAll().then((res) => {
-      setSystems(res.data);
-    });
+    setGenres(filters.genres ?? []);
+    setGameModes(filters.modes ?? []);
+    setThemes(filters.themes ?? []);
+    setGameTypes(filters.type ?? []);
+    setCompanies(filters.companies ?? []);
+    setKeywords(filters.keywords ?? []);
+    setFranchises(filters.franchises ?? []);
   }, [
     setGenres,
     setGameModes,
@@ -95,7 +84,13 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
     setCompanies,
     setKeywords,
     setFranchises,
+    filters,
   ]);
+
+  useEffect(() => {
+    if (!platforms) return;
+    setSystems(platforms);
+  }, [platforms, setSystems]);
 
   return (
     <div className={classNames(className, styles.layout)}>

@@ -1,18 +1,20 @@
-import { gamesApi, userAPI } from "@/src/lib/shared/api";
+import { useUserLogsQuery } from "@/src/lib/entities/user/api/user.queries";
+import {
+  useAddUserFollowingMutation,
+  useRemoveUserFollowingMutation,
+} from "@/src/lib/entities/user/api/user.mutations";
 import { IUser } from "@/src/lib/shared/types/auth.type";
-import { IFollowings, ILogs } from "@/src/lib/shared/types/user.type";
+import { IFollowings } from "@/src/lib/shared/types/user.type";
 import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
 import { Button } from "@/src/lib/shared/ui/Button";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import Image from "next/image";
 import Link from "next/link";
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import styles from "./UserInfo.module.scss";
 import Markdown from "react-markdown";
 import { Interweave } from "interweave";
-import { useAsyncLoader } from "@/src/lib/shared/hooks/useAsyncLoader";
 import { Loader } from "@/src/lib/shared/ui/Loader";
-import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
 import { GameCard } from "@/src/lib/shared/ui/GameCard";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
@@ -30,7 +32,6 @@ const UserInfo: FC<UserInfoProps> = ({
   authUserFollowings,
   authUserId,
 }) => {
-  const { sync, isLoading } = useAsyncLoader();
   const {
     _id: id,
     followings: userFollowings,
@@ -40,11 +41,21 @@ const UserInfo: FC<UserInfoProps> = ({
 
   const [page, setPage] = useState(1);
 
-  const [logs, setLogs] = useState<(ILogs & { game?: IGameResponse })[]>([]);
-  const [totalLogs, setTotalLogs] = useState(0);
   const [userAuthFollowings, setUserAuthFollowings] = useState<IFollowings>(
     authUserFollowings || { followings: [] }
   );
+
+  const { data: logsData, isPending, isFetching } = useUserLogsQuery(
+    user._id,
+    page,
+    takeLogs
+  );
+
+  const logs = logsData?.results ?? [];
+  const totalLogs = logsData?.total ?? 0;
+
+  const { mutate: addFollowing } = useAddUserFollowingMutation();
+  const { mutate: removeFollowing } = useRemoveUserFollowingMutation();
 
   const isFollow = useMemo(() => {
     return userAuthFollowings?.followings
@@ -54,36 +65,12 @@ const UserInfo: FC<UserInfoProps> = ({
 
   const handleFollowClick = () => {
     if (!authUserId) return;
-    isFollow
-      ? userAPI
-          .removeUserFollowing(authUserId, id)
-          .then((res) => setUserAuthFollowings(res.data))
-      : userAPI
-          .addUserFollowing(authUserId, id)
-          .then((res) => setUserAuthFollowings(res.data));
+    const mutate = isFollow ? removeFollowing : addFollowing;
+    mutate(
+      { userId: authUserId, followingId: id },
+      { onSuccess: (data) => setUserAuthFollowings(data) }
+    );
   };
-
-  useEffect(() => {
-    sync(async () => {
-      const logsRes = await userAPI.getUserLogs(user._id, {
-        page,
-        take: takeLogs,
-      });
-
-      setTotalLogs(logsRes.data.total);
-
-      const _ids = logsRes.data.results.map((log) => log.gameId);
-
-      const gamesRes = await gamesApi.getByIds({ _ids });
-
-      return setLogs(
-        logsRes.data.results.map((log) => ({
-          ...log,
-          game: gamesRes.data.find((game) => log.gameId === game._id),
-        }))
-      );
-    });
-  }, [user, page, sync]);
 
   return (
     <>
@@ -155,8 +142,8 @@ const UserInfo: FC<UserInfoProps> = ({
       <div className={styles.content__bottom}>
         <div className={styles.activity}>
           <SectionTitle as="h3">Activity</SectionTitle>
-          {isLoading && <Loader type="moon" />}
-          {!isLoading && logs?.length > 0 && (
+          {isPending && <Loader type="moon" />}
+          {!isPending && logs.length > 0 && (
             <div className={styles.activity__wrapper}>
               <div className={styles.activity__list}>
                 {logs.map((log, i) => {
@@ -182,7 +169,7 @@ const UserInfo: FC<UserInfoProps> = ({
               <Pagination
                 take={takeLogs}
                 total={totalLogs}
-                isDisabled={isLoading}
+                isDisabled={isFetching}
                 page={page}
                 onPageChange={setPage}
               />
