@@ -1,4 +1,5 @@
 import { IObjectFieldDescriptor } from "../fields/ObjectListField";
+import { deriveReleaseDateFields } from "../fields/DateField";
 
 export type IOptionsKey =
   | "modes"
@@ -10,6 +11,7 @@ export type IOptionsKey =
 export type IFieldKind =
   | "text"
   | "number"
+  | "date"
   | "textarea"
   | "toggle"
   | "stringList"
@@ -49,10 +51,12 @@ const COMPANY_FIELDS: IObjectFieldDescriptor[] = [
 ];
 
 const RELEASE_DATE_FIELDS: IObjectFieldDescriptor[] = [
-  { key: "date", label: "Date (unix)", kind: "number" },
-  { key: "human", label: "Human", kind: "text" },
-  { key: "month", label: "Month", kind: "number" },
-  { key: "year", label: "Year", kind: "number" },
+  {
+    key: "date",
+    label: "Date",
+    kind: "date",
+    derive: deriveReleaseDateFields,
+  },
   { key: "platformId", label: "Platform id", kind: "text" },
   { key: "region", label: "Region", kind: "number" },
 ];
@@ -72,7 +76,7 @@ export const GAME_SECTIONS: ISectionDescriptor[] = [
       { path: "type", label: "Type", kind: "enum", optionsKey: "type" },
       { path: "summary", label: "Summary", kind: "textarea" },
       { path: "storyline", label: "Storyline", kind: "textarea" },
-      { path: "first_release", label: "First release (unix)", kind: "number" },
+      { path: "first_release", label: "First release", kind: "date" },
     ],
   },
   {

@@ -35,6 +35,7 @@ import { Loader } from "@/src/lib/shared/ui/Loader";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import {
   CollapsibleSection,
+  DateField,
   EnumField,
   EnumListField,
   IObjectFieldDescriptor,
@@ -405,6 +406,23 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
                 label={field.label}
                 value={rhf.value as number}
                 error={error}
+                onChange={rhf.onChange}
+              />
+            )}
+          />
+        );
+      case "date":
+        return (
+          <Controller
+            key={field.path}
+            control={control}
+            name={formPath}
+            render={({ field: rhf }) => (
+              <DateField
+                label={field.label}
+                value={rhf.value as number | null | undefined}
+                error={error}
+                isLabelHidden={isLabelHidden}
                 onChange={rhf.onChange}
               />
             )}

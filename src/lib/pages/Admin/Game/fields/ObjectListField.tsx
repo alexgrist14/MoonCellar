@@ -1,16 +1,18 @@
 import { FC, useId, useMemo, useRef } from "react";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { Checkbox } from "@/src/lib/shared/ui/Checkbox";
+import { dateInputToUnix, unixToDateInput } from "./DateField";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import styles from "./fields.module.scss";
 
 export interface IObjectFieldDescriptor {
   key: string;
   label: string;
-  kind: "text" | "number" | "boolean";
+  kind: "text" | "number" | "boolean" | "date";
   defaultValue?: unknown;
   optionsKey?: string;
   options?: string[];
+  derive?: (value: unknown) => Record<string, unknown>;
 }
 
 interface IObjectListFieldProps {
@@ -44,9 +46,17 @@ export const ObjectListField: FC<IObjectListFieldProps> = ({
 
   const keys = rowIdsRef.current;
 
-  const patch = (index: number, key: string, next: unknown) =>
+  const patch = (
+    index: number,
+    field: IObjectFieldDescriptor,
+    next: unknown
+  ) =>
     onChange(
-      items.map((item, i) => (i === index ? { ...item, [key]: next } : item))
+      items.map((item, i) =>
+        i === index
+          ? { ...item, [field.key]: next, ...(field.derive?.(next) ?? {}) }
+          : item
+      )
     );
 
   const addRow = () => {
@@ -98,7 +108,18 @@ export const ObjectListField: FC<IObjectListFieldProps> = ({
                 <Checkbox
                   checked={Boolean(item[field.key])}
                   disabled={disabled}
-                  onChange={(e) => patch(index, field.key, e.target.checked)}
+                  onChange={(e) => patch(index, field, e.target.checked)}
+                />
+              ) : field.kind === "date" ? (
+                <Input
+                  type="date"
+                  value={unixToDateInput(
+                    item[field.key] as number | undefined
+                  )}
+                  disabled={disabled}
+                  onChange={(e) =>
+                    patch(index, field, dateInputToUnix(e.target.value))
+                  }
                 />
               ) : (
                 <Input
@@ -115,7 +136,7 @@ export const ObjectListField: FC<IObjectListFieldProps> = ({
                   onChange={(e) =>
                     patch(
                       index,
-                      field.key,
+                      field,
                       field.kind === "number"
                         ? e.target.value === ""
                           ? undefined
