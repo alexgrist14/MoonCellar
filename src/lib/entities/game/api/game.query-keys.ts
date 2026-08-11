@@ -8,7 +8,7 @@ export const gameQueryKeys = {
   detail: (slug: string) => [...gameQueryKeys.all, "detail", slug] as const,
   adminDetail: (gameId: string) =>
     [...gameQueryKeys.all, "admin", "detail", gameId] as const,
-  byIds: (ids: string[]) => [...gameQueryKeys.all, "by-ids", ids] as const,
+  byIds: (ids: string[]) => [...gameQueryKeys.all, "by-ids", ids.join('')] as const,
   followingsStatus: (gameId: string, profileId: string) =>
     [...gameQueryKeys.all, "followings-status", gameId, profileId] as const,
   filters: () => [...gameQueryKeys.all, "filters"] as const,

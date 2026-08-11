@@ -13,7 +13,7 @@ import { IUserRating } from "@/src/lib/shared/lib/schemas/user-ratings.schema";
 import { GamesCards } from "@/src/lib/shared/ui/GamesCards";
 import { takeGames } from "@/src/lib/shared/constants/games.const";
 import { Box } from "@/src/lib/shared/ui/Box";
-import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
+import { Button } from "@/src/lib/shared/ui/Button";
 import { RatingStars } from "@/src/lib/shared/ui/RatingStars";
 import { SvgComment } from "@/src/lib/shared/ui/svg";
 import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";

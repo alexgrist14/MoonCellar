@@ -28,4 +28,4 @@ export const emptyGames: IGameResponse[] = Array(16)
     retroachievements: [],
   }));
 
-export const takeGames = 120;
+export const takeGames = 60;

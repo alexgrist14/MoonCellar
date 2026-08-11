@@ -14,5 +14,4 @@ export interface IModal {
 export interface IModalPropsState {
   component: ReactNode;
   props: IModalParams;
-  id: string;
 }

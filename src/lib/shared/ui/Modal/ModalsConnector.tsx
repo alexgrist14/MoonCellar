@@ -18,8 +18,8 @@ export const ModalsConnector = () => {
   const [content, setContent] = useState<IModalPropsState[]>([]);
 
   const openModal = useMemo(() => {
-    return ({ component, props, id }: IModalPropsState) => {
-      setContent((st) => [...st, { component, props, id }]);
+    return ({ component, props }: IModalPropsState) => {
+      setContent((st) => [...st, { component, props }]);
     };
   }, []);
 
@@ -29,7 +29,9 @@ export const ModalsConnector = () => {
         !id
           ? []
           : (content) =>
-              content.filter((item) => item.id !== id && item.props.id !== id)
+              content.filter((item) => {
+                return item.props.id !== id;
+              })
       );
     },
     [setContent]
@@ -48,13 +50,7 @@ export const ModalsConnector = () => {
   return (
     <div id="modals">
       {content.map(({ component, props }, i) => (
-        <Modal
-          key={i}
-          onClose={() => {
-            closeModal(props?.id);
-            if (props?.onClose) props.onClose();
-          }}
-        >
+        <Modal key={i} {...props}>
           {component}
         </Modal>
       ))}
