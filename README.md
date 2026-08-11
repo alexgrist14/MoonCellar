@@ -185,7 +185,6 @@ bun run dev                  # http://localhost:3000
 | `NEXT_PUBLIC_APP_VERSION` | Version tag attached to Faro telemetry |
 | `NEXT_PUBLIC_FARO_APP_NAME` | App name in Grafana Faro |
 | `LOKI_HOST` | Loki endpoint for the `/api/logs` handler |
-| `GEOIP_DB_PATH` | Path to the MaxMind GeoLite2 database |
 | `GEO_BLOCK_COUNTRIES` | Comma-separated country codes to block |
 
 ### Scripts

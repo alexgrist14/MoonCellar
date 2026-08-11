@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { open, type Reader, type CountryResponse } from "maxmind";
 
-const DB_PATH = process.env.GEOIP_DB_PATH || "/app/geo/GeoLite2-Country.mmdb";
+const DB_PATH = "/app/geo/GeoLite2-Country.mmdb";
 
 const BLOCKED = new Set(
   (process.env.GEO_BLOCK_COUNTRIES || "RU")
