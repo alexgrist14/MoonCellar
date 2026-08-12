@@ -17,6 +17,18 @@ export const modal: IModal = {
 export const ModalsConnector = () => {
   const [content, setContent] = useState<IModalPropsState[]>([]);
 
+  const closeLastModal = useMemo(() => {
+    return () => {
+      setContent((st) => {
+        const last = st.at(-1);
+        if (last) {
+          return st.filter((item) => item.props.id !== last.props.id);
+        }
+        return st;
+      });
+    };
+  }, [setContent]);
+
   const openModal = useMemo(() => {
     return ({ component, props }: IModalPropsState) => {
       setContent((st) => [...st, { component, props }]);
@@ -48,7 +60,14 @@ export const ModalsConnector = () => {
   }, [openModal, closeModal]);
 
   return (
-    <div id="modals">
+    <div
+      id="modals"
+      onKeyDown={(e) => {
+        if (e.key === "Escape") {
+          closeLastModal();
+        }
+      }}
+    >
       {content.map(({ component, props }, i) => (
         <Modal key={i} {...props}>
           {component}

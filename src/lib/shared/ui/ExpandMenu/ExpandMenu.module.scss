@@ -29,14 +29,14 @@ $border: 2px solid var(--color-bg-hover);
   transform: scaleX(0);
   opacity: 0;
   visibility: hidden;
-  min-width: max(30vw, 360px);
-  max-width: min(50vw, 500px);
+  width: max(30vw, 460px);
+  // max-width: min(50vw, 500px);
   height: calc(100vh - $headerHeight);
   backdrop-filter: blur(6px);
 
   @include mediaSm {
     width: 100vw;
-    max-width: 100vw;
+    // max-width: 100vw;
   }
 
   &_right {
