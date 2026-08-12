@@ -90,15 +90,6 @@ export const UserGames: FC<UserGamesProps> = ({
           return sortOrder === "asc" ? ratingA - ratingB : ratingB - ratingA;
         });
         break;
-      // case SortType.TITLE:
-      //   plays?.sort((a, b) => {
-      //     const nameA = a.name.toLowerCase();
-      //     const nameB = b.name.toLowerCase();
-      //     return sortOrder === "asc"
-      //       ? nameA.localeCompare(nameB)
-      //       : nameB.localeCompare(nameA);
-      //   });
-      //   break;
       case SortType.DATE_ADDED:
         plays?.sort((a, b) => {
           const dateA = !!a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
@@ -107,14 +98,6 @@ export const UserGames: FC<UserGamesProps> = ({
           return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
         });
         break;
-      // case SortType.DATE_COMPLETED:
-      //   plays?.sort((a, b) => {
-      //     const dateA = !!a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
-      //     const dateB = !!b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
-      //
-      //     return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
-      //   });
-      //   break;
       case SortType.PLAYTHROUGHS:
         plays?.sort((a, b) => {
           const countA = playthroughsCountByGame[a.gameId] || 0;
@@ -166,7 +149,7 @@ export const UserGames: FC<UserGamesProps> = ({
       <GamesCards
         games={games}
         gameClassName={styles.games__game}
-        additionalHeight={132}
+        additionalHeight={100}
         additionalGameNode={(game) => {
           const rating = parsedGamesRatings?.[game._id];
           const gamePlaythroughs = playthroughs.filter(

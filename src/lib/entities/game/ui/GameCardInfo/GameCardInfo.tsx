@@ -43,7 +43,6 @@ export const GameCardInfo: FC<IGameCardInfoProps> = ({
           styles.info_mastered
       )}
     >
-      <GameControls game={game} />
       <div className={styles.info__block}>
         <p>{game.name}</p>
         {averageRating != null && <span>Rating: {averageRating}</span>}
@@ -75,6 +74,7 @@ export const GameCardInfo: FC<IGameCardInfoProps> = ({
           <span className={styles.info__description}>{game.summary}</span>
         </div>
       )}
+      <GameControls game={game} />
     </div>
   );
 };

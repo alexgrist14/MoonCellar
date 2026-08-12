@@ -28,9 +28,17 @@ export async function generateMetadata({
   const description =
     game.summary || `${game.name} on MoonCellar — ratings, achievements and playthrough tracking`;
 
+  const keywords = [
+    game.name,
+    ...(game.genres ?? []),
+    ...(game.themes ?? []),
+    ...(game.keywords ?? []),
+  ];
+
   return {
     title: game.name,
     description,
+    keywords,
     openGraph: {
       title: game.name,
       description,

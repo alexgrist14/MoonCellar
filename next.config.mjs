@@ -12,6 +12,14 @@ const nextConfig = {
   sassOptions: {
     additionalData: '@use "@/src/lib/app/styles/index.scss" as *;',
   },
+  async headers() {
+    return [
+      {
+        source: "/_next/static/media/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex" }],
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {

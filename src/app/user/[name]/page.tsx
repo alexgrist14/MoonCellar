@@ -19,6 +19,15 @@ export async function generateMetadata({
     description:
       user.description ||
       `${user.userName}'s game library, ratings and achievements on MoonCellar`,
+    keywords: [
+      user.userName,
+      "game library",
+      "games library",
+      "game profile",
+      "games profile",
+      "achievements",
+      "ratings",
+    ],
   };
 }
 

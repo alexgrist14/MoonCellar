@@ -110,6 +110,10 @@
     padding: var(--padding-x1);
     background-color: var(--color-bg-primary-tint);
     border-radius: 0 var(--radius-x4) 0 var(--radius-x4);
+    z-index: 2;
+    transition: 0.3s;
+
+    @include gameGlowOutline;
   }
 
   div &__achievement {

@@ -16,6 +16,16 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: MAIN_PAGE_TITLE,
   description: MAIN_PAGE_DESCRIPTION,
+  keywords: [
+    "game collection",
+    "games collection",
+    "game library",
+    "games library",
+    "game tracker",
+    "games tracker",
+    "top rated games",
+    "upcoming games",
+  ],
 };
 
 async function getGames(): Promise<{

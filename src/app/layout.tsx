@@ -18,6 +18,17 @@ export const metadata: Metadata = {
   },
   description:
     "Track your game library, rate and review titles, unlock achievements, and find your next game with the Gauntlet — all in one place on MoonCellar.",
+  keywords: [
+    "game tracker",
+    "games tracker",
+    "game database",
+    "games database",
+    "game backlog",
+    "games backlog",
+    "game reviews",
+    "games reviews",
+    "achievements",
+  ],
   openGraph: {
     siteName: "MoonCellar",
     type: "website",

@@ -568,6 +568,7 @@ export const Filters: FC<{
                 disabled: !filters,
                 onClick: () => {
                   !!filters && pushFiltersToQuery(filters);
+                  setExpanded(expanded?.filter((pos) => pos !== "left") || []);
                   !!callback && callback();
                 },
                 hidden: isGauntlet,

@@ -9,7 +9,7 @@ import { GameCardInfo } from "@/src/lib/entities/game/ui/GameCardInfo";
 import { IGameResponse } from "../../lib/schemas/games.schema";
 import useCloseEvents from "../../hooks/useCloseEvents";
 import { Button } from "../Button";
-import { SvgAchievement, SvgMore } from "../svg";
+import { SvgAchievement, SvgClose, SvgMore } from "../svg";
 import Link from "next/link";
 import { useGamesStore } from "../../store/games.store";
 import { SvgCrown } from "../svg/SvgCrown";
@@ -47,7 +47,15 @@ export const GameCard = memo(
     const royalGames = useGamesStore((s) => s.royalGames);
     const profile = useAuthStore((s) => s.profile);
 
-    const filteredPlaythroughs = parsedPlaythroughs?.[game._id];
+    const filteredPlaythroughs = useMemo(
+      () => parsedPlaythroughs?.[game._id],
+      [game._id, parsedPlaythroughs]
+    );
+
+    const lastPlaythrough = useMemo(
+      () => filteredPlaythroughs?.at(-1),
+      [filteredPlaythroughs]
+    );
 
     const rating = parsedRatings?.[game._id];
 
@@ -76,7 +84,7 @@ export const GameCard = memo(
       };
     }, [game, profile]);
 
-    useCloseEvents([cardRef], () => setIsActive(false));
+    // useCloseEvents([cardRef], () => setIsActive(false));
 
     if (!game) return null;
 
@@ -96,9 +104,7 @@ export const GameCard = memo(
           className={classNames(
             styles.card,
             className,
-            filteredPlaythroughs
-              ?.map((play) => styles[`card_${play.category}`])
-              .at(-1),
+            styles[`card_${lastPlaythrough?.category}`],
             !!filteredPlaythroughs &&
               filteredPlaythroughs.some((play) => play.isMastered) &&
               styles.card_mastered,
@@ -128,15 +134,18 @@ export const GameCard = memo(
           {!isInfoDisabled && (
             <Button
               color="transparent"
-              className={styles.card__more}
+              className={classNames(
+                styles.card__more,
+                isActive && styles[`card__more_${lastPlaythrough?.category}`]
+              )}
               onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
 
-                setIsActive(true);
+                setIsActive(!isActive);
               }}
             >
-              <SvgMore />
+              {isActive ? <SvgClose size="16" /> : <SvgMore size="24" />}
             </Button>
           )}
           {isLoading && <Loader key={game._id + "_loader"} />}
