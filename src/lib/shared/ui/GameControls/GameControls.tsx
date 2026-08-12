@@ -68,6 +68,7 @@ export const GameControls: FC<IGameControlsProps> = ({
     >
       <Button
         onClick={(e) => {
+          if (!profile?._id) return;
           e.stopPropagation();
           e.preventDefault();
 
@@ -77,9 +78,15 @@ export const GameControls: FC<IGameControlsProps> = ({
               id: "game-playthroughs",
             });
         }}
-        disabled={!profile?._id}
+        tooltip={
+          !profile?._id
+            ? "You must be logged in to view playthroughs"
+            : undefined
+        }
+        tooltipAlign="left"
         color={ButtonColor.TRANSPARENT}
         className={classNames(styles.controls__action, {
+          [styles.controls__action_disabled]: !profile?._id,
           [styles.controls__action_active]: isPlaythroughExist,
         })}
       >

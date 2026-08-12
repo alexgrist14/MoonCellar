@@ -185,7 +185,7 @@ const UserInfo: FC<UserInfoProps> = ({
                       <Box
                         classNameContent={styles.item__text}
                         wrapperStyle={{ marginBlock: "var(--padding-x2)" }}
-                        contentStyle={{paddingRight: "var(--padding-x5)"}}
+                        contentStyle={{paddingRight: "var(--padding-x8)"}}
                       >
                         {id === authUserId && (
                           <Button

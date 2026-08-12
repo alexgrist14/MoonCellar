@@ -26,6 +26,7 @@ export const useAuthStore = create<IState & IAction>()(
         clear: () => {
           set({
             isAuth: false,
+            isAdmin: false,
             profile: undefined,
           });
         },

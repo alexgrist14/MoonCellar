@@ -21,7 +21,7 @@ import {
 
 export const RoyalGamesPanel: FC = () => {
   const { royalGames, setRoyalGames, removeRoyalGame } = useGamesStore();
-  const { profile } = useAuthStore();
+  const { profile, isAuth } = useAuthStore();
 
   const [tabIndex, setTabIndex] = useState(0);
 
@@ -40,12 +40,16 @@ export const RoyalGamesPanel: FC = () => {
               setTabIndex(0);
             },
           },
-          {
-            tabName: "Saved",
-            onTabClick: () => {
-              setTabIndex(1);
-            },
-          },
+          ...(isAuth
+            ? [
+                {
+                  tabName: "Saved",
+                  onTabClick: () => {
+                    setTabIndex(1);
+                  },
+                },
+              ]
+            : []),
         ]}
       />
       {tabIndex === 0 && (
@@ -53,36 +57,39 @@ export const RoyalGamesPanel: FC = () => {
           games={royalGames || []}
           getGames={(games) => setRoyalGames(games)}
           removeGame={(game) => removeRoyalGame(game)}
-          saveCallback={() =>
-            modal.open(
-              <SaveForm
-                saveCallback={(name) => {
-                  !!profile &&
-                    !!royalGames?.length &&
-                    addPreset(
-                      {
-                        userId: profile._id,
-                        preset: {
-                          name,
-                          preset: royalGames.map((game) => game._id),
-                        },
-                      },
-                      {
-                        onSuccess: () => {
-                          toast.success({
-                            description: "Preset was successfully saved",
-                          });
-                          modal.close();
-                        },
-                      }
-                    );
-                }}
-              />
-            )
+          saveCallback={
+            isAuth
+              ? () =>
+                  modal.open(
+                    <SaveForm
+                      saveCallback={(name) => {
+                        !!profile &&
+                          !!royalGames?.length &&
+                          addPreset(
+                            {
+                              userId: profile._id,
+                              preset: {
+                                name,
+                                preset: royalGames.map((game) => game._id),
+                              },
+                            },
+                            {
+                              onSuccess: () => {
+                                toast.success({
+                                  description: "Preset was successfully saved",
+                                });
+                                modal.close();
+                              },
+                            }
+                          );
+                      }}
+                    />
+                  )
+              : undefined
           }
         />
       )}
-      {tabIndex === 1 && (
+      {isAuth && tabIndex === 1 && (
         <>
           {!!savedPresets ? (
             <div className={styles.royal__saved}>
