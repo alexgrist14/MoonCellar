@@ -29,7 +29,7 @@ $border: 2px solid var(--color-bg-hover);
   transform: scaleX(0);
   opacity: 0;
   visibility: hidden;
-  // width: max(30vw, 360px);
+  min-width: max(30vw, 360px);
   max-width: min(50vw, 500px);
   height: calc(100vh - $headerHeight);
   backdrop-filter: blur(6px);
