@@ -73,6 +73,19 @@ export const useRemoveUserFollowingMutation = () =>
       userAPI.removeUserFollowing(userId, followingId).then(({ data }) => data),
   });
 
+export const useRemoveUserLogMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, _id }: { userId: string; _id: string }) =>
+      userAPI.removeUserLog(userId, _id),
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({
+        queryKey: [...userQueryKeys.all, "logs", userId],
+      });
+    },
+  });
+};
+
 export const useAddUserFilterMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({

@@ -2,6 +2,7 @@ import { useUserLogsQuery } from "@/src/lib/entities/user/api/user.queries";
 import {
   useAddUserFollowingMutation,
   useRemoveUserFollowingMutation,
+  useRemoveUserLogMutation,
 } from "@/src/lib/entities/user/api/user.mutations";
 import { IUser } from "@/src/lib/shared/types/auth.type";
 import { IFollowings } from "@/src/lib/shared/types/user.type";
@@ -20,6 +21,10 @@ import { Box } from "@/src/lib/shared/ui/Box";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { takeLogs } from "@/src/lib/shared/constants/user.const";
+import { SvgClose } from "@/src/lib/shared/ui/svg";
+import { modal } from "@/src/lib/shared/ui/Modal";
+import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal/ConfirmModal";
+import { toast } from "@/src/lib/shared/utils/toast.utils";
 
 interface UserInfoProps {
   user: IUser;
@@ -56,6 +61,7 @@ const UserInfo: FC<UserInfoProps> = ({
 
   const { mutate: addFollowing } = useAddUserFollowingMutation();
   const { mutate: removeFollowing } = useRemoveUserFollowingMutation();
+  const { mutate: removeLog } = useRemoveUserLogMutation();
 
   const isFollow = useMemo(() => {
     return userAuthFollowings?.followings
@@ -69,6 +75,30 @@ const UserInfo: FC<UserInfoProps> = ({
     mutate(
       { userId: authUserId, followingId: id },
       { onSuccess: (data) => setUserAuthFollowings(data) }
+    );
+  };
+
+  const handleDeleteLog = (logId: string) => {
+    const modalId = `delete-log-${logId}`;
+
+    modal.open(
+      <ConfirmModal
+        title="Delete Log"
+        message="Are you sure you want to delete this log entry?"
+        onConfirm={() =>
+          removeLog(
+            { userId: id, _id: logId },
+            {
+              onSuccess: () => {
+                modal.close(modalId);
+                toast.success({ description: "Log deleted successfully" });
+              },
+            }
+          )
+        }
+        onCancel={() => modal.close(modalId)}
+      />,
+      { id: modalId }
     );
   };
 
@@ -156,6 +186,14 @@ const UserInfo: FC<UserInfoProps> = ({
                         classNameContent={styles.item__text}
                         wrapperStyle={{ marginBlock: "var(--padding-x2)" }}
                       >
+                        {id === authUserId && (
+                          <Button
+                            className={styles.item__delete}
+                            onClick={() => handleDeleteLog(log._id)}
+                          >
+                            <SvgClose size="16" color="negative" />
+                          </Button>
+                        )}
                         <p>{log.game.name}</p>
                         <Interweave content={log.text} />
                         <p className={styles.date}>

@@ -70,6 +70,10 @@ const getUserLogs = (
   );
 };
 
+const removeUserLog = (userId: string, _id: string) => {
+  return agent.delete(`${USER_URL}/logs`, { params: { userId, _id } });
+};
+
 const addUserFollowing = (userId: string, followingId: string) => {
   return agent.patch<IFollowings>(
     `${USER_URL}/followings/${userId}/${followingId}`
@@ -159,6 +163,7 @@ export const userAPI = {
   addUserFollowing,
   removeUserFollowing,
   getUserLogs,
+  removeUserLog,
   addFilter,
   removeFilter,
   getFilters,

@@ -205,6 +205,7 @@
       }
 
       &__text {
+        position: relative;
         display: flex;
         flex-direction: column;
         gap: var(--gap-x2);
@@ -219,6 +220,19 @@
             color: var(--color-neutral-90);
           }
         }
+      }
+
+      &__delete {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 30px;
+        height: 30px;
+        padding: var(--padding-x1);
+        background-color: var(--color-bg-primary-tint);
+        border-radius: 0 var(--radius-x4) 0 var(--radius-x4);
+
+        @include flexCenter;
       }
     }
   }

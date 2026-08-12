@@ -1,6 +1,4 @@
-import React, {
-  ButtonHTMLAttributes,
-  DetailedHTMLProps,
+import {
   memo,
   ReactNode,
   useRef,
