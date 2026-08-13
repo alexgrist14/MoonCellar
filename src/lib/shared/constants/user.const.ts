@@ -10,4 +10,14 @@ export const userListCategories: CategoriesType[] = [
   "dropped",
 ];
 
+export const playthroughPriorityOrder: CategoriesType[] = [
+  "wishlist",
+  "backlog",
+  "dropped",
+  "playing",
+  "played",
+  "completed",
+  "mastered",
+];
+
 export const takeLogs = 10;

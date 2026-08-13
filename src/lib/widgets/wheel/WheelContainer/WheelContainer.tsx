@@ -16,13 +16,9 @@ export const WheelContainer: FC = () => {
 
   return (
     <>
-      {isMobile && (
-        <>
-          <ExpandMenu position="bottom-left" titleOpen="Settings">
-            <WheelOptions />
-          </ExpandMenu>
-        </>
-      )}
+      <ExpandMenu position="bottom-right" titleOpen="Settings">
+        <WheelOptions />
+      </ExpandMenu>
       <div className={styles.container}>
         <WheelComponent
           time={timer}
@@ -31,11 +27,6 @@ export const WheelContainer: FC = () => {
           }
         />
         <div className={styles.container__right}>
-          {!isMobile && (
-            <div style={{ display: "grid", gap: "20px", width: "100%" }}>
-              <WheelOptions />
-            </div>
-          )}
           {!!winner && (
             <GameCard
               spreadDirection={isMobile ? "height" : "width"}

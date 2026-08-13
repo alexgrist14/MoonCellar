@@ -17,6 +17,7 @@ import { useHideAdult } from "../../hooks/useHideAdult";
 import { isAdultGame } from "../../utils/adult.utils";
 import { GameControls } from "../GameControls";
 import { useAuthStore } from "../../store/auth.store";
+import { playthroughPriorityOrder } from "../../constants/user.const";
 
 interface IGameCardProps {
   game: IGameResponse;
@@ -53,7 +54,20 @@ export const GameCard = memo(
     );
 
     const lastPlaythrough = useMemo(
-      () => filteredPlaythroughs?.at(-1),
+      () =>
+        filteredPlaythroughs?.length
+          ? [...filteredPlaythroughs]
+              .sort(
+                (a, b) =>
+                  playthroughPriorityOrder.indexOf(
+                    a.isMastered ? "mastered" : a.category
+                  ) -
+                  playthroughPriorityOrder.indexOf(
+                    b.isMastered ? "mastered" : b.category
+                  )
+              )
+              .at(-1)
+          : undefined,
       [filteredPlaythroughs]
     );
 
@@ -104,10 +118,7 @@ export const GameCard = memo(
           className={classNames(
             styles.card,
             className,
-            styles[`card_${lastPlaythrough?.category}`],
-            !!filteredPlaythroughs &&
-              filteredPlaythroughs.some((play) => play.isMastered) &&
-              styles.card_mastered,
+            styles[`card_${lastPlaythrough?.isMastered ? "mastered" : lastPlaythrough?.category}`],
             isInfoDisabled && styles.card_stacked
           )}
           draggable={false}
@@ -136,7 +147,10 @@ export const GameCard = memo(
               color="transparent"
               className={classNames(
                 styles.card__more,
-                isActive && styles[`card__more_${lastPlaythrough?.category}`]
+                isActive &&
+                  styles[
+                    `card__more_${lastPlaythrough?.isMastered ? "mastered" : lastPlaythrough?.category}`
+                  ]
               )}
               onClick={(e) => {
                 e.stopPropagation();

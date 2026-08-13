@@ -1,10 +1,10 @@
 import { FC } from "react";
-import { Box } from "@/src/lib/shared/ui/Box";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import { RangeSelector } from "@/src/lib/shared/ui/RangeSelector";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { useSettingsStore } from "@/src/lib/shared/store/settings.store";
+import styles from "./WheelOptions.module.scss";
 
 export const WheelOptions: FC = () => {
   const { isRoyal, setRoyal } = useStatesStore();
@@ -13,11 +13,7 @@ export const WheelOptions: FC = () => {
     useSettingsStore();
 
   return (
-    <Box
-      contentStyle={{
-        gap: "15px",
-      }}
-    >
+    <div className={styles.wrapper}>
       <div style={{ display: "flex", gap: "var(--gap-x5)" }}>
         <ToggleSwitch
           clickCallback={(result) => {
@@ -51,6 +47,6 @@ export const WheelOptions: FC = () => {
         callback={(value) => setTimer(value)}
         text={`Time: ${timer} seconds`}
       />
-    </Box>
+    </div>
   );
 };
