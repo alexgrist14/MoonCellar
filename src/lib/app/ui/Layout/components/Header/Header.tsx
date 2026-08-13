@@ -10,18 +10,23 @@ import {
   SvgSearch,
   SvgGames,
   SvgGauntlet,
+  SvgRandom,
 } from "@/src/lib/shared/ui/svg";
 import Link from "next/link";
-import { FC, MouseEvent, useMemo } from "react";
+import { FC, MouseEvent, useCallback, useMemo } from "react";
 import styles from "./Header.module.scss";
 import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
 import { IButtonGroupItem } from "@/src/lib/shared/types/buttons.type";
 import { ButtonColor } from "@/src/lib/shared/ui/Button";
+import { gamesApi } from "@/src/lib/shared/api";
+import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
 
 export const Header: FC = () => {
   const { isMobile } = useStatesStore();
 
   const { isAuth, isAdmin, profile } = useAuthStore();
+
+  const { router } = useAdvancedRouter();
 
   const handleProfileClick = (e: MouseEvent<HTMLAnchorElement>) => {
     if (!isAuth || !profile) {
@@ -33,6 +38,12 @@ export const Header: FC = () => {
   const searchClickHandler = () => {
     modal.open(<SearchModal />, { id: "search-games" });
   };
+
+  const randomClickHandler = useCallback(async () => {
+    const res = await gamesApi.getRandomSlug();
+
+    router.push(`/games/${res.data.slug}`);
+  }, [router]);
 
   const buttons = useMemo(
     () =>
@@ -57,6 +68,16 @@ export const Header: FC = () => {
           link: "/gauntlet",
           color: ButtonColor.TRANSPARENT,
         },
+        {
+          title: (
+            <>
+              <SvgRandom className={styles.svg} />
+              {!isMobile && <span>Random</span>}
+            </>
+          ),
+          onClick: randomClickHandler,
+          color: ButtonColor.TRANSPARENT,
+        },
         isAdmin && {
           title: (
             <>
@@ -78,7 +99,7 @@ export const Header: FC = () => {
           color: ButtonColor.TRANSPARENT,
         },
       ].filter(Boolean) as IButtonGroupItem[],
-    [isMobile, isAdmin]
+    [isMobile, isAdmin, randomClickHandler]
   );
 
   return (

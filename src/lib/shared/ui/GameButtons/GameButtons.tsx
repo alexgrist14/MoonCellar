@@ -2,81 +2,59 @@ import { FC } from "react";
 import styles from "./GameButtons.module.scss";
 import { ButtonGroup } from "../Button/ButtonGroup";
 import { IGameResponse } from "../../lib/schemas/games.schema";
+import { Box } from "../Box";
 
 export const GameButtons: FC<{ game: IGameResponse }> = ({ game }) => {
-  // const { systems } = useCommonStore();
-
-  // const raInfo = useMemo(() => {
-  //   return game.retroachievements?.map((item) => {
-  //     const platform = systems?.find((sys) => sys.raId === item.consoleId);
-  //
-  //     return {
-  //       platformName: platform?.name,
-  //       gameId: item.gameId,
-  //     };
-  //   });
-  // }, [game.retroachievements, systems]);
+  const commonOptions = {
+    style: { borderRadius: "var(--radius-x4)" },
+    target: "_blank",
+  };
 
   return (
-    <div className={styles.menu}>
-      {/* {!!game.retroachievements?.length && ( */}
-      {/*   <> */}
-      {/*     <Box */}
-      {/*       title="RetroAchievements" */}
-      {/*       contentStyle={{ padding: "5px" }} */}
-      {/*       isWithoutBorder */}
-      {/*     > */}
-      {/*       <ButtonGroup */}
-      {/*         wrapperClassName={styles.actions} */}
-      {/*         buttons={[ */}
-      {/*           ...(raInfo?.map((item) => ({ */}
-      {/*             title: <span>{item.platformName}</span>, */}
-      {/*             link: `https://retroachievements.org/game/${item.gameId}`, */}
-      {/*             target: "_blank", */}
-      {/*           })) || []), */}
-      {/*         ]} */}
-      {/*       /> */}
-      {/*     </Box> */}
-      {/*     <Separator direction="horizontal" /> */}
-      {/*   </> */}
-      {/* )} */}
+    <Box className={styles.menu}>
       <ButtonGroup
         wrapperClassName={styles.actions}
         buttons={[
           {
+            title: "Open in Steam",
+            link: `https://store.steampowered.com/app/${game.steam?.gameId}`,
+            hidden: !game.steam?.gameId,
+            ...commonOptions,
+          },
+          {
             title: "Open in IGDB",
             link: "https://www.igdb.com/games/" + game.slug,
             hidden: !game.igdb?.gameId,
-            target: "_blank",
+            ...commonOptions,
           },
           {
             title: "Open in HLTB",
             link: `https://howlongtobeat.com/game/${game.hltb?.hltbId}`,
             hidden: !game.hltb?.hltbId,
-            target: "_blank",
+            ...commonOptions,
           },
           {
             title: "Search on Youtube",
             link: `https://www.youtube.com/results?search_query=${game.name}`,
-            target: "_blank",
+            ...commonOptions,
           },
           {
             title: "Search on RetroAchievements",
             link: `https://retroachievements.org/searchresults.php?s=${game.name}&t=1`,
-            target: "_blank",
+            ...commonOptions,
           },
           {
             title: "Search on HowLongToBeat",
             link: `https://howlongtobeat.com/?q=${encodeURI(game.name)}`,
-            target: "_blank",
+            ...commonOptions,
           },
           {
             title: "Search on vndb",
             link: `https://vndb.org/v?sq=${encodeURI(game.name)}`,
-            target: "_blank",
+            ...commonOptions,
           },
         ]}
       />
-    </div>
+    </Box>
   );
 };

@@ -26,3 +26,4 @@ export * from "./SvgNumber";
 export * from "./SvgGames";
 export * from "./SvgGauntlet";
 export * from "./SvgVideoPlay";
+export * from "./SvgRandom";

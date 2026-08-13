@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./Slideshow.module.scss";
 import { Scrollbar } from "../Scrollbar";
 import { modal } from "../Modal";
@@ -10,8 +10,12 @@ interface ISlideshowProps {
   pictures: string[];
 }
 
+const SWIPE_THRESHOLD = 50;
+
 export const Slideshow: FC<ISlideshowProps> = ({ pictures }) => {
   const [screenshotIndex, setScreenshotIndex] = useState<number>();
+  const touchStartX = useRef<number | null>(null);
+  const isSwipe = useRef(false);
 
   const screenshots = useMemo(
     () =>
@@ -29,8 +33,41 @@ export const Slideshow: FC<ISlideshowProps> = ({ pictures }) => {
         <div
           className={styles.slideshow__wrapper}
           onClick={() => {
+            if (isSwipe.current) {
+              isSwipe.current = false;
+              return;
+            }
+
             modal.close();
             setScreenshotIndex(undefined);
+          }}
+          onTouchStart={(e) => {
+            touchStartX.current = e.touches[0].clientX;
+            isSwipe.current = false;
+          }}
+          onTouchMove={(e) => {
+            if (
+              touchStartX.current !== null &&
+              Math.abs(e.touches[0].clientX - touchStartX.current) > 10
+            ) {
+              isSwipe.current = true;
+            }
+          }}
+          onTouchEnd={(e) => {
+            if (touchStartX.current === null) return;
+
+            const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+
+            touchStartX.current = null;
+
+            if (deltaX > SWIPE_THRESHOLD && screenshotIndex > 0) {
+              setScreenshotIndex(screenshotIndex - 1);
+            } else if (
+              deltaX < -SWIPE_THRESHOLD &&
+              screenshotIndex < screenshots.length - 1
+            ) {
+              setScreenshotIndex(screenshotIndex + 1);
+            }
           }}
         >
           <Button

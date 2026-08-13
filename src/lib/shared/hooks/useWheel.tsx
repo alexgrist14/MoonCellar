@@ -1,8 +1,7 @@
-import { useCallback } from "react";
-import { createImage } from "../utils/image.utils";
+import { useCallback, useRef } from "react";
+import { createImage, drawCoverImage } from "../utils/image.utils";
 import { IGameResponse } from "../lib/schemas/games.schema";
 import { useStatesStore } from "../store/states.store";
-import { useWheelStore } from "../store/wheel.store";
 import { useGames } from "./useGames";
 import { useHideAdult } from "./useHideAdult";
 import { isAdultGame } from "../utils/adult.utils";
@@ -23,13 +22,21 @@ export const useWheel = ({
   contrastColor?: string;
   fontFamily?: string;
 }) => {
-  const { setWinner } = useWheelStore();
   const { setFinished, setLoading, setStarted, isRoyal } = useStatesStore();
   const { getIGDBGames } = useGames();
   const hideAdult = useHideAdult();
 
+  const lastDrawRef = useRef<{
+    wheelGames?: IGameResponse[];
+    images?: HTMLImageElement[];
+  }>({});
+
   const drawWheel = useCallback(
     ({ wheelGames, winnerId, images }: IDrawProps) => {
+      if (wheelGames) {
+        lastDrawRef.current = { wheelGames, images };
+      }
+
       const canvas = document.getElementById(
         "wheel-canvas"
       ) as HTMLCanvasElement;
@@ -60,7 +67,10 @@ export const useWheel = ({
         lastAngle: number;
         angle: number;
       }) => {
-        const value = wheelGames[key].name;
+        const game = wheelGames[key];
+        const hasCover = !!game?.cover && !(hideAdult && isAdultGame(game));
+
+        const value = game.name;
         const text =
           value?.length > 19 ? value.slice(0, 20) + "..." : value || "";
 
@@ -77,31 +87,56 @@ export const useWheel = ({
 
         ctx.save();
 
-        winnerId === wheelGames[key]._id
-          ? (ctx.globalAlpha = 1)
-          : (ctx.globalAlpha = 0.5);
+        ctx.globalAlpha = 0.9;
         ctx.beginPath();
         ctx.moveTo(X, Y);
         ctx.arc(X, Y, size, lastAngle, angle, false);
         ctx.closePath();
         ctx.clip();
-        !!images?.[key] &&
-          ctx.drawImage(images[key], X - size, Y - size, size * 2, size * 2);
+
+        if (hasCover && !!images?.[key]) {
+          const halfAngle = (angle - lastAngle) / 2;
+          const segmentWidth = 2 * size * Math.sin(halfAngle) * 1.03;
+
+          ctx.translate(X, Y);
+          ctx.rotate((lastAngle + angle) / 2);
+          drawCoverImage(
+            ctx,
+            images[key],
+            0,
+            -segmentWidth / 2,
+            size,
+            segmentWidth
+          );
+        }
 
         ctx.restore();
 
-        ctx.lineWidth = 0.5;
+        if (!hasCover) {
+          ctx.lineWidth = 0.5;
 
-        ctx.save();
+          ctx.save();
 
-        ctx.translate(X, Y);
-        ctx.rotate((lastAngle + angle) / 2);
-        ctx.fillStyle = contrastColor;
-        ctx.fillText(text, size / 2, 0, size);
-        ctx.strokeStyle = primaryColor;
-        ctx.strokeText(text, size / 2, 0, size);
+          ctx.translate(X, Y);
+          ctx.rotate((lastAngle + angle) / 2);
+          ctx.fillStyle = contrastColor;
+          ctx.fillText(text, size / 2, 0, size);
+          ctx.strokeStyle = primaryColor;
+          ctx.strokeText(text, size / 2, 0, size);
 
-        ctx.restore();
+          ctx.restore();
+        }
+
+        if (!!winnerId && winnerId !== game._id) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(X, Y);
+          ctx.arc(X, Y, size, lastAngle, angle, false);
+          ctx.closePath();
+          ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
+          ctx.fill();
+          ctx.restore();
+        }
       };
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -132,7 +167,18 @@ export const useWheel = ({
       ctx.strokeStyle = primaryColor;
       ctx.stroke();
     },
-    [contrastColor, primaryColor, fontFamily]
+    [contrastColor, primaryColor, fontFamily, hideAdult]
+  );
+
+  const highlightWinner = useCallback(
+    (winnerId: string) => {
+      const { wheelGames, images } = lastDrawRef.current;
+
+      if (!wheelGames?.length) return;
+
+      drawWheel({ wheelGames, images, winnerId });
+    },
+    [drawWheel]
   );
 
   const parseImages = useCallback(
@@ -154,7 +200,6 @@ export const useWheel = ({
   const spinHandler = useCallback(
     (games: IGameResponse[]) => {
       setFinished(false);
-      setWinner(undefined);
 
       if (isRoyal) {
         !!games?.length &&
@@ -175,27 +220,32 @@ export const useWheel = ({
       } else {
         setLoading(true);
 
-        getIGDBGames().then((games) => {
-          if (!!games?.length) {
-            parseImages(games)
-              .then((images) => {
-                drawWheel({
-                  wheelGames: games,
-                  images: images
-                    .filter((i) => i.status === "fulfilled")
-                    .map((i) => i.value),
-                });
+        getIGDBGames()
+          .then((games) => {
+            if (!!games?.length) {
+              parseImages(games)
+                .then((images) => {
+                  drawWheel({
+                    wheelGames: games,
+                    images: images
+                      .filter((i) => i.status === "fulfilled")
+                      .map((i) => i.value),
+                  });
 
-                setStarted(true);
-              })
-              .finally(() => {
-                setLoading(false);
-              });
-          } else {
+                  setStarted(true);
+                })
+                .finally(() => {
+                  setLoading(false);
+                });
+            } else {
+              setLoading(false);
+              setFinished(true);
+            }
+          })
+          .catch(() => {
             setLoading(false);
             setFinished(true);
-          }
-        });
+          });
       }
     },
     [
@@ -203,12 +253,11 @@ export const useWheel = ({
       parseImages,
       isRoyal,
       setFinished,
-      setWinner,
       setStarted,
       setLoading,
       getIGDBGames,
     ]
   );
 
-  return { drawWheel, parseImages, spinHandler };
+  return { drawWheel, parseImages, spinHandler, highlightWinner };
 };

@@ -8,7 +8,6 @@ import { PlaythroughModal } from "../PlaythroughModal";
 import { AchievementsModal } from "../AchievementsModal";
 import { useUserStore } from "../../store/user.store";
 import { GameButtons } from "../GameButtons";
-import { Box } from "../Box";
 import { SvgAchievement, SvgCircleMenu, SvgPlay } from "../svg";
 import { IGameResponse } from "../../lib/schemas/games.schema";
 import { SvgCrown } from "../svg/SvgCrown";
@@ -101,12 +100,7 @@ export const GameControls: FC<IGameControlsProps> = ({
           e.stopPropagation();
           e.preventDefault();
 
-          modal.open(
-            <Box>
-              <GameButtons game={game} />
-            </Box>,
-            { id: "game-menu" }
-          );
+          modal.open(<GameButtons game={game} />, { id: "game-menu" });
         }}
         color={ButtonColor.TRANSPARENT}
         className={classNames(styles.controls__action)}

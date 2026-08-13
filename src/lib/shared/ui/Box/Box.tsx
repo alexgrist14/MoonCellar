@@ -20,6 +20,7 @@ interface IBoxProps {
   isWithScrollBar?: boolean;
   isWithBlur?: boolean;
   isWithoutBorder?: boolean;
+  scrollFadeType?: "both" | "top" | "bottom";
 }
 
 export const Box: FC<IBoxProps> = ({
@@ -32,6 +33,7 @@ export const Box: FC<IBoxProps> = ({
   isWithScrollBar,
   isWithBlur,
   isWithoutBorder,
+  scrollFadeType,
   ...headProps
 }) => {
   const { ref } = useResizeDetector({
@@ -50,11 +52,7 @@ export const Box: FC<IBoxProps> = ({
         })}
       >
         <BoxHead {...headProps} />
-        <div
-          ref={ref}
-          style={contentStyle}
-          className={cn(classNameContent, styles.template__content)}
-        >
+        <div ref={ref}>
           {isWithScrollBar ? (
             <Scrollbar
               type="absolute"
@@ -62,12 +60,17 @@ export const Box: FC<IBoxProps> = ({
                 styles.scrollbars__content,
                 classNameContent
               )}
+              fadeType={scrollFadeType}
+              contentStyle={contentStyle}
+              classNameLine={styles.scrollbars__line}
               classNameScrollbar={styles.scrollbars__scrollbar}
             >
               {children}
             </Scrollbar>
           ) : (
-            children
+            <div className={cn(classNameContent, styles.template__content)}>
+              {children}
+            </div>
           )}
         </div>
       </div>

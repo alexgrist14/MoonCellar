@@ -29,7 +29,7 @@
     display: flex;
     gap: var(--gap-x5);
     align-items: flex-end;
-    padding: var(--padding-x1);
+    padding: var(--padding-x2) var(--padding-x3);
     border-bottom: 1px solid var(--color-bg-primary);
     border-radius: var(--radius-x5) var(--radius-x5) 0 0;
 
@@ -81,8 +81,21 @@
     right: -8px;
   }
 
+  div &__line {
+    border-radius: var(--radius-x5);
+  }
+
   div &__content {
     max-height: 90vh;
-    padding: 0;
+    padding: var(--padding-x3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x1);
+    min-width: 0;
+    border-radius: var(--radius-x6);
+
+    @include mediaMaxHeight($screenHeightSm) {
+      padding: var(--padding-x2);
+    }
   }
 }

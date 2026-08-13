@@ -28,6 +28,11 @@ export const IGDBSchema = z.object({
   videos: z.number().array().optional(),
 });
 
+export const SteamSchema = z.object({
+  gameId: z.number(),
+  slug: z.string().optional(),
+});
+
 export const HltbSchema = z.object({
   hltbId: z.string(),
   mainStory: z.number().nullable().optional(),
@@ -154,6 +159,7 @@ export const GameSchema = z.object({
   retroachievements: RetroachievementsSchema.array().optional(),
   igdb: IGDBSchema.optional(),
   hltb: HltbSchema.optional(),
+  steam: SteamSchema.optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -301,6 +307,10 @@ export const GetGameSlugsResponseSchema = z
   })
   .array();
 
+export const GetRandomGameSlugResponseSchema = z.object({
+  slug: z.string(),
+});
+
 export const UpcomingReleaseGroupSchema = z.object({
   label: z.string(),
   year: z.number(),
@@ -311,6 +321,7 @@ export const UpcomingReleaseGroupSchema = z.object({
 export type IRetroachievementsField = z.infer<typeof RetroachievementsSchema>;
 export type IGDBField = z.infer<typeof IGDBSchema>;
 export type IHltbField = z.infer<typeof HltbSchema>;
+export type ISteamField = z.infer<typeof SteamSchema>;
 export type ICompanyField = z.infer<typeof CompanySchema>;
 export type IGameFilters = z.infer<typeof GameFiltersSchema>;
 export type IFilterMode = z.infer<typeof FilterModeSchema>;
@@ -329,5 +340,9 @@ export type IGameResponse = z.infer<typeof GameSchema>;
 export type IUpcomingReleaseGroup = z.infer<typeof UpcomingReleaseGroupSchema>;
 
 export type IGetGameSlugsResponse = z.infer<typeof GetGameSlugsResponseSchema>;
+
+export type IGetRandomGameSlugResponse = z.infer<
+  typeof GetRandomGameSlugResponseSchema
+>;
 
 export type IGenreResponse = { genre: string; count: number };

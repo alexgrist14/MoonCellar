@@ -47,4 +47,8 @@
   --gap-x12: calc(var(--gap-x1) * 12);
 
   --blur-x1: 6px;
+
+  --page-height-padding: calc(
+    100vh - var(--padding-x13) - var(--padding-x25)
+  );
 }

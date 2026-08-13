@@ -1,7 +1,7 @@
 import { FC } from "react";
 import styles from "./GamesList.module.scss";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
-import { ButtonGroup } from "../Button/ButtonGroup";
+import { GameCard } from "@/src/lib/shared/ui/GameCard";
 import { IGameResponse } from "../../lib/schemas/games.schema";
 
 interface IGamesListProps {
@@ -19,51 +19,41 @@ export const GamesList: FC<IGamesListProps> = ({
 }) => {
   return (
     <div className={styles.consoles__royal}>
-      <div className={styles.consoles__title}>
-        {!!games?.length && <h3>Games:</h3>}
-        {!games?.length && (
-          <h3 style={{ width: "100%", textAlign: "center" }}>List is empty</h3>
-        )}
-        {!!games?.length && !!saveCallback && (
-          <Button color={ButtonColor.ACCENT} onClick={() => saveCallback()}>
-            Save
-          </Button>
-        )}
-        {!!games?.length && !!getGames && (
-          <Button color={ButtonColor.RED} onClick={() => getGames([])}>
-            Remove all
-          </Button>
-        )}
-      </div>
+      {(!games?.length || !!saveCallback || !!getGames) && (
+        <div className={styles.consoles__title}>
+          {!games?.length && (
+            <h3 style={{ width: "100%", textAlign: "center" }}>
+              List is empty
+            </h3>
+          )}
+          {!!games?.length && !!saveCallback && (
+            <Button color={ButtonColor.ACCENT} onClick={() => saveCallback()}>
+              Save
+            </Button>
+          )}
+          {!!games?.length && !!getGames && (
+            <Button color={ButtonColor.RED} onClick={() => getGames([])}>
+              Remove all
+            </Button>
+          )}
+        </div>
+      )}
       <div className={styles.consoles__games}>
         {!!games?.length
           ? games.map((game, i) => (
-              <ButtonGroup
-                key={`${game._id}_${i}`}
-                wrapperStyle={{
-                  display: "grid",
-                  width: "100%",
-                  gridTemplateColumns: !!removeGame ? "1fr 20%" : "1fr",
-                }}
-                wrapperClassName={styles.consoles__game}
-                buttons={[
-                  {
-                    title: game.name,
-                    link: `/games/${game.slug}`,
-                    target: "_blank",
-                    color: ButtonColor.FANCY,
-                    compact: true,
-                    style: { justifyContent: "flex-start", width: "100%" },
-                  },
-                  {
-                    title: "Remove",
-                    color: ButtonColor.RED,
-                    hidden: !removeGame,
-                    compact: true,
-                    onClick: () => !!removeGame && removeGame(game),
-                  },
-                ]}
-              />
+              <div key={`${game._id}_${i}`} className={styles.consoles__game}>
+                <GameCard game={game} />
+                {!!removeGame && (
+                  <Button
+                    color={ButtonColor.RED}
+                    compact
+                    className={styles.consoles__remove}
+                    onClick={() => removeGame(game)}
+                  >
+                    Remove
+                  </Button>
+                )}
+              </div>
             ))
           : null}
       </div>

@@ -1,7 +1,6 @@
 .wrapper {
   display: grid;
-  // grid-template-columns: 1fr 40px;
-  gap: var(--gap-x5);
+  gap: var(--gap-x5) !important;
 }
 
 .modal {

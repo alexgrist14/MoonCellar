@@ -1,12 +1,9 @@
 .page {
   display: grid;
   position: relative;
-  height: 100%;
-  overflow: hidden;
-}
+  height: var(--page-height-padding);
 
-@include mediaMax($screenGt) {
-  .page {
-    flex-direction: column;
+  @include mediaMd {
+    height: fit-content;
   }
 }

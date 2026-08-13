@@ -1,0 +1,26 @@
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x2);
+
+  & h4 {
+    @include font(16px, 20px, 500);
+    color: var(--color-neutral-100);
+  }
+
+  & p {
+    @include font(13px, 17px, 400);
+    color: var(--color-gray);
+  }
+
+  & span {
+    @include font(13px, 17px, 500);
+    color: var(--color-neutral-100);
+  }
+
+  &__rating {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x1);
+  }
+}

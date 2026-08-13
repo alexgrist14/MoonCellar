@@ -22,8 +22,8 @@ interface WheelComponentProps {
 
 const SPIN_EASING = "cubic-bezier(0.23, 1, 0.32, 1)";
 const BOUNCE_EASING = "cubic-bezier(0.45, 0, 0.55, 1)";
-const BOUNCE_BACK_DEG_MIN = 30;
-const BOUNCE_BACK_DEG_MAX = 70;
+const BOUNCE_BACK_DEG_MIN = 60;
+const BOUNCE_BACK_DEG_MAX = 180;
 const BOUNCE_DURATION = 0.7;
 const WINNER_REVEAL_DELAY = 300;
 const MUSIC_FADE_OUT_DURATION = 600;
@@ -67,13 +67,14 @@ export const WheelComponent: FC<WheelComponentProps> = ({
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const angle = useRef(0);
+  const skipNextRoyalRedrawRef = useRef(false);
   const [winnerAngle, setWinnerAngle] = useState(0);
   const [rotateTransition, setRotateTransition] = useState(
     `rotate ${time}s ${SPIN_EASING}`
   );
   const [tempGames, setTempGames] = useState<IGameResponse[]>([]);
 
-  const { drawWheel, parseImages, spinHandler } = useWheel({
+  const { drawWheel, parseImages, spinHandler, highlightWinner } = useWheel({
     contrastColor,
     fontFamily,
     primaryColor,
@@ -113,6 +114,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
               (game) => game._id !== tempGames[winner]._id
             );
 
+            skipNextRoyalRedrawRef.current = true;
             setTempGames(
               !!filtered?.length
                 ? filtered
@@ -125,6 +127,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
           }
 
           setWinner(wheelGames[winner]);
+          highlightWinner(wheelGames[winner]._id);
         }, BOUNCE_DURATION * 1000);
       }, time * 1000);
     }
@@ -140,6 +143,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
     games,
     tempGames,
     royalGames,
+    highlightWinner,
   ]);
 
   useEffect(() => {
@@ -178,6 +182,11 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   }, [isRoyal]);
 
   useEffect(() => {
+    if (skipNextRoyalRedrawRef.current) {
+      skipNextRoyalRedrawRef.current = false;
+      return;
+    }
+
     if (isRoyal) {
       parseImages(tempGames).then((images) => {
         drawWheel({

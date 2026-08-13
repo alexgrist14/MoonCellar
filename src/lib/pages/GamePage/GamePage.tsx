@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useMemo } from "react";
+import { FC } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./GamePage.module.scss";
 import { dateRegions } from "../../shared/constants";
@@ -15,13 +15,11 @@ import { IGameResponse } from "../../shared/lib/schemas/games.schema";
 import { Button, ButtonColor } from "../../shared/ui/Button";
 import { useAuthStore } from "../../shared/store/auth.store";
 import { useCommonStore } from "../../shared/store/common.store";
-import { formatHltbHours } from "../../shared/utils/hltb.utils";
-import { formatRating, normalizeRating } from "../../shared/utils/rating.utils";
 import { useHideAdult } from "../../shared/hooks/useHideAdult";
 import { isAdultGame } from "../../shared/utils/adult.utils";
 import { GameFriendsStatus } from "../../features/game/GameFriendsStatus";
 import { ExpandableBlock } from "../../shared/ui/ExpandableBlock";
-import { RatingStars } from "../../shared/ui/RatingStars";
+import { GameStatsBoxes } from "@/src/lib/entities/game/ui/GameStatsBoxes";
 
 export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
   const router = useRouter();
@@ -29,45 +27,6 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
   const { systems } = useCommonStore();
 
   const hideMedia = useHideAdult() && isAdultGame(game);
-
-  const hltbRows = useMemo(() => {
-    if (!game.hltb) {
-      return null;
-    }
-
-    const rows = [
-      { label: "Main Story", value: formatHltbHours(game.hltb.mainStory) },
-      { label: "Main + Extra", value: formatHltbHours(game.hltb.mainExtra) },
-      {
-        label: "Completionist",
-        value: formatHltbHours(game.hltb.completionist),
-      },
-    ].filter((row) => row.value);
-
-    return rows.length ? rows : null;
-  }, [game.hltb]);
-
-  const ratingRows = useMemo(() => {
-    const rows = [
-      {
-        label: "Users",
-        value: formatRating(game.averageRating),
-        rating: normalizeRating(game.averageRating),
-      },
-      {
-        label: "IGDB",
-        value: formatRating(game.igdb?.total_rating, 100),
-        rating: normalizeRating(game.igdb?.total_rating, 100),
-      },
-      {
-        label: "HowLongToBeat",
-        value: formatRating(game.hltb?.reviewScore, 100),
-        rating: normalizeRating(game.hltb?.reviewScore, 100),
-      },
-    ].filter((row) => row.value);
-
-    return rows.length ? rows : null;
-  }, [game.averageRating, game.igdb, game.hltb]);
 
   if (!game) return null;
 
@@ -83,35 +42,7 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
           <div className={styles.page__leftTop}>
             <GameCard game={game} isInfoDisabled />
           </div>
-          {!!hltbRows && (
-            <Box contentStyle={{ padding: "var(--padding-x3)" }}>
-              <div className={styles.page__hltb}>
-                <h4>HowLongToBeat</h4>
-                {hltbRows.map((row) => (
-                  <p key={row.label}>
-                    <span>{row.label}: </span>
-                    {row.value}
-                  </p>
-                ))}
-              </div>
-            </Box>
-          )}
-          {!!ratingRows && (
-            <Box contentStyle={{ padding: "var(--padding-x3)" }}>
-              <div className={styles.page__hltb}>
-                <h4>Ratings</h4>
-                {ratingRows.map((row) => (
-                  <div key={row.label} className={styles.page__rating}>
-                    <p>
-                      <span>{row.label}: </span>
-                      {row.value}
-                    </p>
-                    {row.rating != null && <RatingStars rating={row.rating} />}
-                  </div>
-                ))}
-              </div>
-            </Box>
-          )}
+          <GameStatsBoxes game={game} />
           <GameFriendsStatus gameId={game._id} />
         </div>
         <Box
