@@ -68,7 +68,10 @@ export const Box: FC<IBoxProps> = ({
               {children}
             </Scrollbar>
           ) : (
-            <div className={cn(classNameContent, styles.template__content)}>
+            <div
+              className={cn(classNameContent, styles.template__content)}
+              style={contentStyle}
+            >
               {children}
             </div>
           )}

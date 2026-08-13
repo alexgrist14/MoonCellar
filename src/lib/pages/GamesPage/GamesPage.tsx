@@ -49,7 +49,7 @@ export const GamesPage = () => {
       />
       <Box
         contentStyle={{
-          minHeight: "calc(100vh - 155px)",
+          minHeight: "var(--page-height-padding)",
           position: "relative",
         }}
       >
