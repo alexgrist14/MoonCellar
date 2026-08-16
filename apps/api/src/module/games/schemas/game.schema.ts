@@ -13,6 +13,7 @@ import {
 } from "@mooncellar/schemas";
 import { Platform } from "./platform.schema";
 import { Character } from "./character.schema";
+import { normalizeTitle } from "../utils/title-match.utils";
 
 export type GameDocument = HydratedDocument<Game>;
 
@@ -117,3 +118,44 @@ GameDatabaseSchema.index({ first_release: -1 });
 GameDatabaseSchema.index({ name: 1 });
 GameDatabaseSchema.index({ nameNormalized: 1 });
 GameDatabaseSchema.index({ characters: 1 });
+
+GameDatabaseSchema.pre("save", function (next) {
+  if (this.isModified("name")) {
+    const normalized = normalizeTitle(this.name);
+
+    normalized
+      ? (this.nameNormalized = normalized)
+      : (this.nameNormalized = undefined);
+  }
+
+  next();
+});
+
+GameDatabaseSchema.pre(
+  ["findOneAndUpdate", "updateOne", "updateMany"],
+  function (next) {
+    const update = this.getUpdate();
+
+    if (!update || Array.isArray(update)) return next();
+
+    const name = update.$set?.name ?? (update as Record<string, unknown>).name;
+
+    if (typeof name !== "string") return next();
+
+    const normalized = normalizeTitle(name);
+
+    if (normalized) {
+      if (update.$set) {
+        update.$set.nameNormalized = normalized;
+      } else {
+        (update as Record<string, unknown>).nameNormalized = normalized;
+      }
+    } else {
+      update.$unset = { ...update.$unset, nameNormalized: "" };
+    }
+
+    this.setUpdate(update);
+
+    next();
+  }
+);
