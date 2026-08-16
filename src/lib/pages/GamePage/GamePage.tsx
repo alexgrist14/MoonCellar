@@ -232,6 +232,14 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
                 ))}
               </div>
             )}
+            {game.alternative_names?.length && (
+              <div className={styles.page__links}>
+                <h4>Alternative names:</h4>
+                {game.alternative_names.map((name, i) => (
+                  <p key={name + i}>{name}</p>
+                ))}
+              </div>
+            )}
           </div>
           {!!game.keywords?.length && (
             <div className={styles.page__info}>
