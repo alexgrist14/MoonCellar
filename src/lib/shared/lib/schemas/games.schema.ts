@@ -26,6 +26,7 @@ export const IGDBSchema = z.object({
   artworks: z.number().array().optional(),
   franchises: z.number().array().optional(),
   videos: z.number().array().optional(),
+  alternative_names: z.number().array().optional(),
 });
 
 export const SteamSchema = z.object({
@@ -146,6 +147,7 @@ export const GameSchema = z.object({
   artworks: z.string().array().optional(),
   franchises: z.string().array().optional(),
   videos: z.string().array().optional(),
+  alternative_names: z.string().array().optional(),
   companies: CompanySchema.array().optional(),
   websites: z.string().array().optional(),
   first_release: z.number().nullable().optional(),
