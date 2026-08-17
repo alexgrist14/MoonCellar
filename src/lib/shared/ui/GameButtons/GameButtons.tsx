@@ -10,7 +10,7 @@ export const GameButtons: FC<{ game: IGameResponse }> = ({ game }) => {
     target: "_blank",
   };
 
-  const steamStore = game.externalStores?.find(
+  const steamStore = game.externalPages?.find(
     (store) => store.name === "Steam"
   );
 

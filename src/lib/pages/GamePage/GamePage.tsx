@@ -20,6 +20,7 @@ import { isAdultGame } from "../../shared/utils/adult.utils";
 import { GameFriendsStatus } from "../../features/game/GameFriendsStatus";
 import { ExpandableBlock } from "../../shared/ui/ExpandableBlock";
 import { GameStatsBoxes } from "@/src/lib/entities/game/ui/GameStatsBoxes";
+import { formatMultiplayerMode } from "../../shared/utils/multiplayer.utils";
 
 export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
   const router = useRouter();
@@ -50,7 +51,14 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
           contentStyle={{ padding: "var(--padding-x3)" }}
         >
           <div className={styles.page__header}>
-            <h2>{game.name}</h2>
+            <div className={styles.page__titleGroup}>
+              <h2>{game.name}</h2>
+              {!!game.alternative_names?.length && (
+                <p className={styles.page__altNames}>
+                  {game.alternative_names.join(", ")}
+                </p>
+              )}
+            </div>
             {isAdmin && (
               <Button
                 color={ButtonColor.DEFAULT}
@@ -77,6 +85,20 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
                 {game.type}
               </Link>
             </p>
+            {!!game.status && (
+              <p>
+                <span>Status: </span>
+                <Link href={`/games?selectedStatus[]=${game.status}`}>
+                  {game.status}
+                </Link>
+              </p>
+            )}
+            {!!game.versionTitle && (
+              <p>
+                <span>Version: </span>
+                {game.versionTitle}
+              </p>
+            )}
           </div>
           {!!game.companies?.length && (
             <div className={styles.page__developers}>
@@ -84,7 +106,7 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
                 <span>Companies: </span>
                 {game.companies.map((comp, i, array) => (
                   <span key={comp.name + i}>
-                    <Link href={`/games?company=${comp.name}`}>
+                    <Link href={`/games?selectedCompanies[]=${comp.name}`}>
                       {comp.name}
                     </Link>
                     {i !== array.length - 1 ? ", " : ""}
@@ -165,6 +187,47 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
                 ))}
               </p>
             )}
+            {!!game.game_engines?.length && (
+              <p>
+                <span>Game engines: </span>
+                {game.game_engines.map((engine, i, array) => (
+                  <span key={engine + i}>
+                    <Link href={`/games?selectedGameEngines[]=${engine}`}>
+                      {engine}
+                    </Link>
+                    {i !== array.length - 1 ? ", " : ""}
+                  </span>
+                ))}
+              </p>
+            )}
+            {!!game.player_perspectives?.length && (
+              <p>
+                <span>Player perspectives: </span>
+                {game.player_perspectives.map((perspective, i, array) => (
+                  <span key={perspective + i}>
+                    <Link
+                      href={`/games?selectedPlayerPerspectives[]=${perspective}`}
+                    >
+                      {perspective}
+                    </Link>
+                    {i !== array.length - 1 ? ", " : ""}
+                  </span>
+                ))}
+              </p>
+            )}
+            {!!game.languages?.length && (
+              <p>
+                <span>Languages: </span>
+                {game.languages.map((language, i, array) => (
+                  <span key={language + i}>
+                    <Link href={`/games?selectedLanguages[]=${language}`}>
+                      {language}
+                    </Link>
+                    {i !== array.length - 1 ? ", " : ""}
+                  </span>
+                ))}
+              </p>
+            )}
           </div>
           {!!game.summary && (
             <div className={styles.page__text}>
@@ -232,12 +295,42 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
                 ))}
               </div>
             )}
-            {!!game.alternative_names?.length && (
+            {!!game.ageRatings?.length && (
               <div className={styles.page__links}>
-                <h4>Alternative names:</h4>
-                {game.alternative_names.map((name, i) => (
-                  <p key={name + i}>{name}</p>
+                <h4>Age ratings:</h4>
+                {game.ageRatings.map((ageRating, i) => (
+                  <p
+                    key={ageRating.organization + ageRating.rating + i}
+                    title={ageRating.synopsis}
+                  >
+                    <Link
+                      href={`/games?selectedAgeRatings[]=${ageRating.organization}|${ageRating.rating}`}
+                    >
+                      {ageRating.organization}: {ageRating.rating}
+                    </Link>
+                  </p>
                 ))}
+              </div>
+            )}
+            {!!game.multiplayer_modes?.length && (
+              <div className={styles.page__links}>
+                <h4>Multiplayer:</h4>
+                {game.multiplayer_modes.map((mode, i) => {
+                  const labels = formatMultiplayerMode(mode);
+
+                  if (!labels.length) return null;
+
+                  const platform = systems?.find(
+                    (sys) => sys._id === mode.platformId
+                  );
+
+                  return (
+                    <p key={(mode.platformId || "") + i}>
+                      {!!platform && <span>{platform.name}: </span>}
+                      {labels.join(", ")}
+                    </p>
+                  );
+                })}
               </div>
             )}
           </div>

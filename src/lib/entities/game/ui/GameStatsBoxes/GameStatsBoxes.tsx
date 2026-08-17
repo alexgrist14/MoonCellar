@@ -8,6 +8,29 @@ import {
   formatRating,
   normalizeRating,
 } from "@/src/lib/shared/utils/rating.utils";
+import {
+  SvgAmazon,
+  SvgEpicGames,
+  SvgGog,
+  SvgPlaystation,
+  SvgSteam,
+  SvgStore,
+  SvgTwitch,
+  SvgXbox,
+  SvgYoutube,
+} from "@/src/lib/shared/ui/svg";
+import { ISvgBaseProps } from "@/src/lib/shared/ui/svg/Svg/Svg";
+
+const storeIcons: Record<string, FC<ISvgBaseProps>> = {
+  Steam: SvgSteam,
+  GOG: SvgGog,
+  "Epic Games": SvgEpicGames,
+  "PlayStation Store": SvgPlaystation,
+  YouTube: SvgYoutube,
+  Twitch: SvgTwitch,
+  Amazon: SvgAmazon,
+  Xbox: SvgXbox,
+};
 
 interface IGameStatsBoxesProps {
   game: IGameResponse;
@@ -57,7 +80,13 @@ export const GameStatsBoxes: FC<IGameStatsBoxesProps> = ({
     return rows.length ? rows : null;
   }, [game.averageRating, game.igdb, game.hltb]);
 
-  if (!hltbRows && !ratingRows) return null;
+  const storeItems = useMemo(() => {
+    const items = (game.externalPages || []).filter((store) => !!store.url);
+
+    return items.length ? items : null;
+  }, [game.externalPages]);
+
+  if (!hltbRows && !ratingRows && !storeItems) return null;
 
   const hltbBlock = !!hltbRows && (
     <div className={styles.stats}>
@@ -86,11 +115,36 @@ export const GameStatsBoxes: FC<IGameStatsBoxesProps> = ({
     </div>
   );
 
+  const storesBlock = !!storeItems && (
+    <div className={styles.stats}>
+      <h4>External pages:</h4>
+      <div className={styles.stats__stores}>
+        {storeItems.map((store, i) => {
+          const StoreIcon = (store.name && storeIcons[store.name]) || SvgStore;
+
+          return (
+            <a
+              key={store.uid + i}
+              href={store.url!}
+              target="_blank"
+              rel="noreferrer"
+              className={styles.stats__store}
+            >
+              <StoreIcon size="20" />
+              <span>{store.name || store.url}</span>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  );
+
   if (!isBoxed) {
     return (
       <>
         {hltbBlock}
         {ratingBlock}
+        {storesBlock}
       </>
     );
   }
@@ -103,6 +157,11 @@ export const GameStatsBoxes: FC<IGameStatsBoxesProps> = ({
       {!!ratingBlock && (
         <Box contentStyle={{ padding: "var(--padding-x3)" }}>
           {ratingBlock}
+        </Box>
+      )}
+      {!!storesBlock && (
+        <Box contentStyle={{ padding: "var(--padding-x3)" }}>
+          {storesBlock}
         </Box>
       )}
     </>

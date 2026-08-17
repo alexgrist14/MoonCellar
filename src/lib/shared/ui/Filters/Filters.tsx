@@ -63,6 +63,12 @@ export const Filters: FC<{
     gameTypes,
     keywords,
     franchises,
+    companies,
+    gameEngines,
+    playerPerspectives,
+    languages,
+    statuses,
+    ageRatings,
   } = useCommonStore();
   const { isLoading, isPlatformsLoading } = useStatesStore();
   const { isExcludeHistory, setExcludeHistory } = useFiltersStore();
@@ -219,47 +225,25 @@ export const Filters: FC<{
               </div>
             </div>
           )}
-          <div className={styles.filters__top}>
-            <div className={styles.filters__wrapper}>
-              <h4>Game name</h4>
-              <Input
-                onKeyDown={(e) =>
-                  e.key === "Enter" && !!filters && pushFiltersToQuery(filters)
-                }
-                containerStyles={{ width: "100%" }}
-                placeholder="Enter name of the game..."
-                disabled={isLoading}
-                value={filters?.search || ""}
-                onChange={(e) => {
-                  const temp = {
-                    ...filters,
-                    search: e.target.value || undefined,
-                  };
+          <div className={styles.filters__wrapper}>
+            <h4>Game name</h4>
+            <Input
+              onKeyDown={(e) =>
+                e.key === "Enter" && !!filters && pushFiltersToQuery(filters)
+              }
+              containerStyles={{ width: "100%" }}
+              placeholder="Enter name of the game..."
+              disabled={isLoading}
+              value={filters?.search || ""}
+              onChange={(e) => {
+                const temp = {
+                  ...filters,
+                  search: e.target.value || undefined,
+                };
 
-                  setFilters(temp);
-                }}
-              />
-            </div>
-            <div className={styles.filters__wrapper}>
-              <h4>Game company</h4>
-              <Input
-                onKeyDown={(e) =>
-                  e.key === "Enter" && !!filters && pushFiltersToQuery(filters)
-                }
-                containerStyles={{ width: "100%" }}
-                placeholder="Enter name of the developer..."
-                disabled={isLoading}
-                value={filters?.company || ""}
-                onChange={(e) => {
-                  const temp = {
-                    ...filters,
-                    company: e.target.value || undefined,
-                  };
-
-                  setFilters(temp);
-                }}
-              />
-            </div>
+                setFilters(temp);
+              }}
+            />
           </div>
           <div className={styles.filters__row}>
             <div className={styles.filters__wrapper}>
@@ -438,6 +422,157 @@ export const Filters: FC<{
               }
               getExcludeIndexes={(indexes) =>
                 setExcluded("franchises", indexes, franchises)
+              }
+            />
+          </div>
+          <div className={styles.filters__wrapper}>
+            <div className={styles.filters__header}>
+              <h4>Companies</h4>
+              {renderModeToggle("companies")}
+            </div>
+            <Dropdown
+              isWithReset
+              isMulti
+              isWithExclude
+              overflowRootId="filters"
+              isDisabled={isLoading}
+              list={companies || []}
+              overwriteValue={getValue("companies")}
+              initialMultiValue={getSelectedArray("companies", companies)}
+              initialExcludeValue={getExcludedArray("companies", companies)}
+              placeholder="Select companies..."
+              getIndexes={(indexes) =>
+                setSelected("companies", indexes, companies)
+              }
+              getExcludeIndexes={(indexes) =>
+                setExcluded("companies", indexes, companies)
+              }
+            />
+          </div>
+          <div className={styles.filters__wrapper}>
+            <div className={styles.filters__header}>
+              <h4>Game Engines</h4>
+              {renderModeToggle("game_engines")}
+            </div>
+            <Dropdown
+              isWithReset
+              isMulti
+              isWithExclude
+              overflowRootId="filters"
+              isDisabled={isLoading}
+              list={gameEngines || []}
+              overwriteValue={getValue("game_engines")}
+              initialMultiValue={getSelectedArray("game_engines", gameEngines)}
+              initialExcludeValue={getExcludedArray(
+                "game_engines",
+                gameEngines
+              )}
+              placeholder="Select game engines..."
+              getIndexes={(indexes) =>
+                setSelected("game_engines", indexes, gameEngines)
+              }
+              getExcludeIndexes={(indexes) =>
+                setExcluded("game_engines", indexes, gameEngines)
+              }
+            />
+          </div>
+          <div className={styles.filters__wrapper}>
+            <div className={styles.filters__header}>
+              <h4>Player Perspectives</h4>
+              {renderModeToggle("player_perspectives")}
+            </div>
+            <Dropdown
+              isWithReset
+              isMulti
+              isWithExclude
+              overflowRootId="filters"
+              isDisabled={isLoading}
+              list={playerPerspectives || []}
+              overwriteValue={getValue("player_perspectives")}
+              initialMultiValue={getSelectedArray(
+                "player_perspectives",
+                playerPerspectives
+              )}
+              initialExcludeValue={getExcludedArray(
+                "player_perspectives",
+                playerPerspectives
+              )}
+              placeholder="Select player perspectives..."
+              getIndexes={(indexes) =>
+                setSelected("player_perspectives", indexes, playerPerspectives)
+              }
+              getExcludeIndexes={(indexes) =>
+                setExcluded("player_perspectives", indexes, playerPerspectives)
+              }
+            />
+          </div>
+          <div className={styles.filters__wrapper}>
+            <div className={styles.filters__header}>
+              <h4>Languages</h4>
+              {renderModeToggle("languages")}
+            </div>
+            <Dropdown
+              isWithReset
+              isMulti
+              isWithExclude
+              overflowRootId="filters"
+              isDisabled={isLoading}
+              list={languages || []}
+              overwriteValue={getValue("languages")}
+              initialMultiValue={getSelectedArray("languages", languages)}
+              initialExcludeValue={getExcludedArray("languages", languages)}
+              placeholder="Select languages..."
+              getIndexes={(indexes) =>
+                setSelected("languages", indexes, languages)
+              }
+              getExcludeIndexes={(indexes) =>
+                setExcluded("languages", indexes, languages)
+              }
+            />
+          </div>
+          <div className={styles.filters__wrapper}>
+            <div className={styles.filters__header}>
+              <h4>Status</h4>
+              {renderModeToggle("status")}
+            </div>
+            <Dropdown
+              isWithReset
+              isMulti
+              isWithExclude
+              overflowRootId="filters"
+              isDisabled={isLoading}
+              list={statuses || []}
+              overwriteValue={getValue("status")}
+              initialMultiValue={getSelectedArray("status", statuses)}
+              initialExcludeValue={getExcludedArray("status", statuses)}
+              placeholder="Select status..."
+              getIndexes={(indexes) => setSelected("status", indexes, statuses)}
+              getExcludeIndexes={(indexes) =>
+                setExcluded("status", indexes, statuses)
+              }
+            />
+          </div>
+          <div className={styles.filters__wrapper}>
+            <div className={styles.filters__header}>
+              <h4>Age Ratings</h4>
+              {renderModeToggle("ageRatings")}
+            </div>
+            <Dropdown
+              isWithReset
+              isMulti
+              isWithExclude
+              overflowRootId="filters"
+              isDisabled={isLoading}
+              list={ageRatings || []}
+              overwriteValue={getValue("ageRatings")}
+              initialMultiValue={getSelectedArray("ageRatings", ageRatings)}
+              initialExcludeValue={getExcludedArray("ageRatings", ageRatings)}
+              placeholder="Select age ratings..."
+              getIndexes={(indexes) =>
+                setSelected("ageRatings", indexes, ageRatings)
+              }
+              getExcludeIndexes={(indexes) =>
+                setExcluded("ageRatings", indexes, ageRatings)
               }
             />
           </div>

@@ -109,6 +109,11 @@ export const gamesApi = {
         companies: string[];
         type: string[];
         franchises?: string[];
+        game_engines: string[];
+        player_perspectives: string[];
+        languages: string[];
+        status: string[];
+        ageRatings: string[];
       }
     | undefined
   > => {

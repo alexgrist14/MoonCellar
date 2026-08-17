@@ -61,6 +61,18 @@
     width: 100%;
   }
 
+  &__titleGroup {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x1);
+    min-width: 0;
+  }
+
+  &__altNames {
+    @include font(13px, 17px, 400);
+    color: var(--color-gray);
+  }
+
   &__screenshots {
     display: grid;
     gap: var(--gap-x1);

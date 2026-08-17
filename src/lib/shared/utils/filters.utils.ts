@@ -16,7 +16,6 @@ export const parseQueryFilters = (pathWithQuery: string): IGetGamesRequest => {
 
   return {
     search: filters?.search,
-    company: filters?.company,
     years: filters?.years
       ? [normalizeYear(filters.years[0]), normalizeYear(filters.years[1])]
       : undefined,
@@ -33,6 +32,12 @@ export const parseQueryFilters = (pathWithQuery: string): IGetGamesRequest => {
       keywords: filters?.selectedKeywords,
       types: filters?.selectedGameTypes,
       franchises: filters?.selectedFranchises,
+      companies: filters?.selectedCompanies,
+      game_engines: filters?.selectedGameEngines,
+      player_perspectives: filters?.selectedPlayerPerspectives,
+      languages: filters?.selectedLanguages,
+      status: filters?.selectedStatus,
+      ageRatings: filters?.selectedAgeRatings,
     },
     excluded: {
       genres: filters?.excludedGenres,
@@ -42,6 +47,12 @@ export const parseQueryFilters = (pathWithQuery: string): IGetGamesRequest => {
       keywords: filters?.excludedKeywords,
       types: filters?.excludedGameTypes,
       franchises: filters?.excludedFranchises,
+      companies: filters?.excludedCompanies,
+      game_engines: filters?.excludedGameEngines,
+      player_perspectives: filters?.excludedPlayerPerspectives,
+      languages: filters?.excludedLanguages,
+      status: filters?.excludedStatus,
+      ageRatings: filters?.excludedAgeRatings,
     },
     mode: {
       genres: filters?.modeGenres,
@@ -51,6 +62,12 @@ export const parseQueryFilters = (pathWithQuery: string): IGetGamesRequest => {
       keywords: filters?.modeKeywords,
       types: filters?.modeGameTypes,
       franchises: filters?.modeFranchises,
+      companies: filters?.modeCompanies,
+      game_engines: filters?.modeGameEngines,
+      player_perspectives: filters?.modePlayerPerspectives,
+      languages: filters?.modeLanguages,
+      status: filters?.modeStatus,
+      ageRatings: filters?.modeAgeRatings,
     },
   };
 };
@@ -76,6 +93,18 @@ export const getFiltersForQuery = (filters: IGetGamesRequest) => {
       excludedGameTypes: filters.excluded?.types,
       selectedFranchises: filters.selected?.franchises,
       excludedFranchises: filters.excluded?.franchises,
+      selectedCompanies: filters.selected?.companies,
+      excludedCompanies: filters.excluded?.companies,
+      selectedGameEngines: filters.selected?.game_engines,
+      excludedGameEngines: filters.excluded?.game_engines,
+      selectedPlayerPerspectives: filters.selected?.player_perspectives,
+      excludedPlayerPerspectives: filters.excluded?.player_perspectives,
+      selectedLanguages: filters.selected?.languages,
+      excludedLanguages: filters.excluded?.languages,
+      selectedStatus: filters.selected?.status,
+      excludedStatus: filters.excluded?.status,
+      selectedAgeRatings: filters.selected?.ageRatings,
+      excludedAgeRatings: filters.excluded?.ageRatings,
       modePlatforms: filters.mode?.platforms,
       modeGenres: filters.mode?.genres,
       modeThemes: filters.mode?.themes,
@@ -83,6 +112,12 @@ export const getFiltersForQuery = (filters: IGetGamesRequest) => {
       modeModes: filters.mode?.modes,
       modeGameTypes: filters.mode?.types,
       modeFranchises: filters.mode?.franchises,
+      modeCompanies: filters.mode?.companies,
+      modeGameEngines: filters.mode?.game_engines,
+      modePlayerPerspectives: filters.mode?.player_perspectives,
+      modeLanguages: filters.mode?.languages,
+      modeStatus: filters.mode?.status,
+      modeAgeRatings: filters.mode?.ageRatings,
     },
     {
       arrayFormat: "bracket",

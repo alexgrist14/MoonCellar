@@ -16,6 +16,11 @@ type IState = {
   keywords?: string[];
   gameTypes?: string[];
   companies?: string[];
+  gameEngines?: string[];
+  playerPerspectives?: string[];
+  languages?: string[];
+  statuses?: string[];
+  ageRatings?: string[];
   timer: number;
   scrollPosition?: IScrollPosition | undefined;
 };
@@ -31,6 +36,11 @@ type IAction = {
   setSystems: (platforms: IPlatform[]) => void;
   setTimer: (timer: number) => void;
   setCompanies: (companies: string[]) => void;
+  setGameEngines: (gameEngines: string[]) => void;
+  setPlayerPerspectives: (playerPerspectives: string[]) => void;
+  setLanguages: (languages: string[]) => void;
+  setStatuses: (statuses: string[]) => void;
+  setAgeRatings: (ageRatings: string[]) => void;
   setScrollPosition: (scrollPosition: IScrollPosition | undefined) => void;
 };
 
@@ -47,6 +57,12 @@ export const useCommonStore = create<IState & IAction>()(
       setThemes: (themes) => set({ themes }),
       setKeywords: (keywords) => set({ keywords }),
       setCompanies: (companies) => set({ companies }),
+      setGameEngines: (gameEngines) => set({ gameEngines }),
+      setPlayerPerspectives: (playerPerspectives) =>
+        set({ playerPerspectives }),
+      setLanguages: (languages) => set({ languages }),
+      setStatuses: (statuses) => set({ statuses }),
+      setAgeRatings: (ageRatings) => set({ ageRatings }),
       setTimer: (timer) => set({ timer }),
       setScrollPosition: (scrollPosition) => set({ scrollPosition }),
     }),

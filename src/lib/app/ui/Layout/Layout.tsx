@@ -39,6 +39,11 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
     setCompanies,
     setKeywords,
     setFranchises,
+    setGameEngines,
+    setPlayerPerspectives,
+    setLanguages,
+    setStatuses,
+    setAgeRatings,
   } = useCommonStore();
   const { ref } = useResizeDetector({
     refreshMode: "debounce",
@@ -75,6 +80,11 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
     setCompanies(filters.companies ?? []);
     setKeywords(filters.keywords ?? []);
     setFranchises(filters.franchises ?? []);
+    setGameEngines(filters.game_engines ?? []);
+    setPlayerPerspectives(filters.player_perspectives ?? []);
+    setLanguages(filters.languages ?? []);
+    setStatuses(filters.status ?? []);
+    setAgeRatings(filters.ageRatings ?? []);
   }, [
     setGenres,
     setGameModes,
@@ -84,6 +94,11 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
     setCompanies,
     setKeywords,
     setFranchises,
+    setGameEngines,
+    setPlayerPerspectives,
+    setLanguages,
+    setStatuses,
+    setAgeRatings,
     filters,
   ]);
 

@@ -70,7 +70,7 @@ export const AgeRatingSchema = z.object({
   synopsis: z.string().optional(),
 });
 
-export const ExternalStoreSchema = z.object({
+export const ExternalPageSchema = z.object({
   name: z.string().optional(),
   uid: z.string(),
   url: z.string().nullable().optional(),
@@ -166,6 +166,42 @@ export const GameFiltersSchema = z.object({
     .or(z.string().nullish())
     .describe("Franchise name(s)")
     .optional(),
+  companies: z
+    .string()
+    .array()
+    .or(z.string().nullish())
+    .describe("Company name(s)")
+    .optional(),
+  game_engines: z
+    .string()
+    .array()
+    .or(z.string().nullish())
+    .describe("Game engine name(s)")
+    .optional(),
+  player_perspectives: z
+    .string()
+    .array()
+    .or(z.string().nullish())
+    .describe("Player perspective name(s)")
+    .optional(),
+  languages: z
+    .string()
+    .array()
+    .or(z.string().nullish())
+    .describe("Language name(s)")
+    .optional(),
+  status: z
+    .string()
+    .array()
+    .or(z.string().nullish())
+    .describe("Game status value(s)")
+    .optional(),
+  ageRatings: z
+    .string()
+    .array()
+    .or(z.string().nullish())
+    .describe('Age rating(s) as "Organization | Rating" (e.g. "ESRB | Mature")')
+    .optional(),
 });
 
 export const FilterModeSchema = z.object({
@@ -176,6 +212,12 @@ export const FilterModeSchema = z.object({
   themes: z.enum(["any", "all"]).optional(),
   types: z.enum(["any", "all"]).optional(),
   franchises: z.enum(["any", "all"]).optional(),
+  companies: z.enum(["any", "all"]).optional(),
+  game_engines: z.enum(["any", "all"]).optional(),
+  player_perspectives: z.enum(["any", "all"]).optional(),
+  languages: z.enum(["any", "all"]).optional(),
+  status: z.enum(["any", "all"]).optional(),
+  ageRatings: z.enum(["any", "all"]).optional(),
 });
 
 export const ReleaseDateSchema = z.object({
@@ -216,7 +258,7 @@ export const GameSchema = z.object({
   multiplayer_modes: MultiplayerModeSchema.array().optional(),
   ageRatings: AgeRatingSchema.array().optional(),
   languages: z.string().array().optional(),
-  externalStores: ExternalStoreSchema.array().optional(),
+  externalPages: ExternalPageSchema.array().optional(),
   relatedGames: RelatedGamesSchema.optional(),
   averageRating: z.number().nullable().optional(),
   ratingsCount: z.number().nullable().optional(),
@@ -280,7 +322,6 @@ export const GetGamesRequestSchema = z.object({
     "Filters to exclude games by"
   ).optional(),
   search: z.string().describe("Search query for game name").optional(),
-  company: z.string().describe("Company name").optional(),
   rating: z
     .number()
     .min(0)
@@ -393,7 +434,7 @@ export type IFilterMode = z.infer<typeof FilterModeSchema>;
 export type IReleaseDate = z.infer<typeof ReleaseDateSchema>;
 export type IMultiplayerModeField = z.infer<typeof MultiplayerModeSchema>;
 export type IAgeRatingField = z.infer<typeof AgeRatingSchema>;
-export type IExternalStoreField = z.infer<typeof ExternalStoreSchema>;
+export type IExternalPageField = z.infer<typeof ExternalPageSchema>;
 export type IRelatedGamesField = z.infer<typeof RelatedGamesSchema>;
 
 export type IAddGameRequest = z.infer<typeof AddGameRequestSchema>;

@@ -13,6 +13,12 @@ export interface IGameFiltersQuery extends Omit<
   selectedKeywords?: string[];
   selectedGameTypes?: string[];
   selectedFranchises?: string[];
+  selectedCompanies?: string[];
+  selectedGameEngines?: string[];
+  selectedPlayerPerspectives?: string[];
+  selectedLanguages?: string[];
+  selectedStatus?: string[];
+  selectedAgeRatings?: string[];
   excludedGenres?: string[];
   excludedModes?: string[];
   excludedPlatforms?: string[];
@@ -20,6 +26,12 @@ export interface IGameFiltersQuery extends Omit<
   excludedKeywords?: string[];
   excludedGameTypes?: string[];
   excludedFranchises?: string[];
+  excludedCompanies?: string[];
+  excludedGameEngines?: string[];
+  excludedPlayerPerspectives?: string[];
+  excludedLanguages?: string[];
+  excludedStatus?: string[];
+  excludedAgeRatings?: string[];
   modeGenres?: IFilterModeValue;
   modeModes?: IFilterModeValue;
   modePlatforms?: IFilterModeValue;
@@ -27,4 +39,10 @@ export interface IGameFiltersQuery extends Omit<
   modeKeywords?: IFilterModeValue;
   modeGameTypes?: IFilterModeValue;
   modeFranchises?: IFilterModeValue;
+  modeCompanies?: IFilterModeValue;
+  modeGameEngines?: IFilterModeValue;
+  modePlayerPerspectives?: IFilterModeValue;
+  modeLanguages?: IFilterModeValue;
+  modeStatus?: IFilterModeValue;
+  modeAgeRatings?: IFilterModeValue;
 }
