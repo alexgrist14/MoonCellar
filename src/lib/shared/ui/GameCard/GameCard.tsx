@@ -74,7 +74,7 @@ export const GameCard = memo(
     const rating = parsedRatings?.[game._id];
 
     const isRoyal = useMemo(
-      () => royalGames?.some((royal) => royal._id === game?._id),
+      () => royalGames?.includes(game?._id),
       [game, royalGames]
     );
 

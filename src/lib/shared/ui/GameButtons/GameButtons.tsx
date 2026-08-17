@@ -10,6 +10,10 @@ export const GameButtons: FC<{ game: IGameResponse }> = ({ game }) => {
     target: "_blank",
   };
 
+  const steamStore = game.externalStores?.find(
+    (store) => store.name === "Steam"
+  );
+
   return (
     <Box className={styles.menu}>
       <ButtonGroup
@@ -17,8 +21,8 @@ export const GameButtons: FC<{ game: IGameResponse }> = ({ game }) => {
         buttons={[
           {
             title: "Open in Steam",
-            link: `https://store.steampowered.com/app/${game.steam?.gameId}`,
-            hidden: !game.steam?.gameId,
+            link: steamStore?.url ?? "",
+            hidden: !steamStore?.url,
             ...commonOptions,
           },
           {

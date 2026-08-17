@@ -4,6 +4,7 @@ import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { useGamesStore } from "@/src/lib/shared/store/games.store";
 import { GamesList } from "@/src/lib/shared/ui/GamesList";
 import { RoyalGamesPanel } from "@/src/lib/shared/ui/RoyalGamesPanel";
+import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
 
 export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
   initialTabIndex,
@@ -17,6 +18,8 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
   } = useGamesStore();
 
   const [tabIndex, setTabIndex] = useState(initialTabIndex || 0);
+
+  const { data: royalGamesData } = useGamesByIdsQuery(royalGames || []);
 
   return (
     <div className={styles.consoles__list}>
@@ -50,7 +53,7 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
           ]}
         />
       </div>
-      {tabIndex === 0 && <GamesList games={games || royalGames || []} />}
+      {tabIndex === 0 && <GamesList games={games || royalGamesData || []} />}
       {tabIndex === 1 && <RoyalGamesPanel />}
       {tabIndex === 2 && (
         <GamesList

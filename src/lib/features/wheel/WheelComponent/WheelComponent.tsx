@@ -11,6 +11,7 @@ import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
 import { useWheelStore } from "@/src/lib/shared/store/wheel.store";
 import { useSettingsStore } from "@/src/lib/shared/store/settings.store";
 import { SvgWheelPointer } from "@/src/lib/shared/ui/svg";
+import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
 
 interface WheelComponentProps {
   primaryColor?: string;
@@ -59,11 +60,13 @@ export const WheelComponent: FC<WheelComponentProps> = ({
 }) => {
   const setWinner = useWheelStore((state) => state.setWinner);
 
-  const { addHistoryGame, games, setRoyalGames, royalGames } = useGamesStore();
+  const { addHistoryGame, games, royalGames } = useGamesStore();
   const { isFinished, isLoading, isStarted, setFinished, setStarted, isRoyal } =
     useStatesStore();
   const isMusicEnabled = useSettingsStore((state) => state.isMusicEnabled);
   const musicVolume = useSettingsStore((state) => state.musicVolume ?? 1);
+
+  const { data: royalGamesData } = useGamesByIdsQuery(royalGames || []);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const angle = useRef(0);
@@ -118,8 +121,8 @@ export const WheelComponent: FC<WheelComponentProps> = ({
             setTempGames(
               !!filtered?.length
                 ? filtered
-                : !!royalGames?.length
-                  ? shuffle(royalGames)
+                : !!royalGamesData?.length
+                  ? shuffle(royalGamesData)
                   : []
             );
           } else {
@@ -139,10 +142,9 @@ export const WheelComponent: FC<WheelComponentProps> = ({
     setStarted,
     setWinner,
     addHistoryGame,
-    setRoyalGames,
     games,
     tempGames,
-    royalGames,
+    royalGamesData,
     highlightWinner,
   ]);
 
@@ -176,10 +178,9 @@ export const WheelComponent: FC<WheelComponentProps> = ({
 
   useEffect(() => {
     isRoyal
-      ? setTempGames(!!royalGames?.length ? shuffle(royalGames) : [])
+      ? setTempGames(!!royalGamesData?.length ? shuffle(royalGamesData) : [])
       : setTempGames([]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isRoyal]);
+  }, [isRoyal, royalGamesData]);
 
   useEffect(() => {
     if (skipNextRoyalRedrawRef.current) {

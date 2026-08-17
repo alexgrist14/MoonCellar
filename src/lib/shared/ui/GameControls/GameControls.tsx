@@ -30,7 +30,7 @@ export const GameControls: FC<IGameControlsProps> = ({
   const { royalGames, addRoyalGame, removeRoyalGame } = useGamesStore();
 
   const isRoyal = useMemo(
-    () => royalGames?.some((royal) => royal._id === game?._id),
+    () => royalGames?.includes(game?._id),
     [game, royalGames]
   );
 
@@ -112,7 +112,7 @@ export const GameControls: FC<IGameControlsProps> = ({
           e.stopPropagation();
           e.preventDefault();
 
-          isRoyal ? removeRoyalGame(game) : addRoyalGame(game);
+          isRoyal ? removeRoyalGame(game._id) : addRoyalGame(game._id);
         }}
         color={"transparent"}
         className={classNames(styles.controls__action, {

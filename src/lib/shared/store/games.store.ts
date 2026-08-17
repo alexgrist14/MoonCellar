@@ -4,17 +4,17 @@ import { IGameResponse } from "../lib/schemas/games.schema";
 
 type IState = {
   games?: IGameResponse[];
-  royalGames?: IGameResponse[];
+  royalGames?: string[];
   historyGames?: IGameResponse[];
 };
 
 type IAction = {
   setGames: (games: IGameResponse[]) => void;
-  setRoyalGames: (royalGames: IGameResponse[]) => void;
+  setRoyalGames: (royalGames: string[]) => void;
   setHistoryGames: (historyGames: IGameResponse[]) => void;
-  addRoyalGame: (game: IGameResponse) => void;
-  addRoyalGames: (games: IGameResponse[]) => void;
-  removeRoyalGame: (game: IGameResponse) => void;
+  addRoyalGame: (gameId: string) => void;
+  addRoyalGames: (gameIds: string[]) => void;
+  removeRoyalGame: (gameId: string) => void;
   addHistoryGame: (game: IGameResponse) => void;
   removeHistoryGame: (game: IGameResponse) => void;
 };
@@ -22,28 +22,26 @@ type IAction = {
 const getActions = (set: any): IAction => ({
   setGames: (games) => set({ games }),
   setRoyalGames: (royalGames) => set({ royalGames }),
-  addRoyalGame: (game) =>
+  addRoyalGame: (gameId) =>
     set((state: IState) => ({
       royalGames: [
-        game,
+        gameId,
         ...(!!state.royalGames?.length ? state.royalGames : []),
       ],
     })),
-  addRoyalGames: (games) =>
+  addRoyalGames: (gameIds) =>
     set((state: IState) => {
-      const existingIds = new Set(
-        (state.royalGames || []).map((royal) => royal._id)
-      );
-      const newGames = games.filter((game) => !existingIds.has(game._id));
+      const existingIds = new Set(state.royalGames || []);
+      const newIds = gameIds.filter((id) => !existingIds.has(id));
 
       return {
-        royalGames: [...(state.royalGames || []), ...newGames],
+        royalGames: [...(state.royalGames || []), ...newIds],
       };
     }),
-  removeRoyalGame: (game) =>
+  removeRoyalGame: (gameId) =>
     set((state: IState) => ({
       royalGames: !!state.royalGames?.length
-        ? state.royalGames.filter((royal) => royal._id !== game._id)
+        ? state.royalGames.filter((id) => id !== gameId)
         : undefined,
     })),
   setHistoryGames: (historyGames) => set({ historyGames }),
@@ -66,6 +64,16 @@ export const useGamesStore = create<IState & IAction>()(
   devtools(
     persist((set) => getActions(set), {
       name: "games",
+      version: 1,
+      migrate: (persistedState: any) => {
+        if (persistedState?.royalGames?.length) {
+          persistedState.royalGames = persistedState.royalGames.map(
+            (royal: any) => (typeof royal === "string" ? royal : royal._id)
+          );
+        }
+
+        return persistedState;
+      },
     })
   )
 );

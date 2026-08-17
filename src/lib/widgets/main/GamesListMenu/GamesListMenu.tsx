@@ -49,7 +49,7 @@ export const GamesListMenu: FC<IGamesListMenuProps> = ({ games }) => {
             onClick={() => {
               if (!games?.length) return;
 
-              addRoyalGames(games);
+              addRoyalGames(games.map((game) => game._id));
               toast.success({
                 description: "Page games were added to Royal",
               });

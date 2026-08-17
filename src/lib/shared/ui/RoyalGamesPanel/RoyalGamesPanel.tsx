@@ -7,13 +7,13 @@ import { GamesList } from "@/src/lib/shared/ui/GamesList";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
 import { ButtonColor } from "@/src/lib/shared/ui/Button";
-import { gamesApi } from "@/src/lib/shared/api";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useGamesStore } from "@/src/lib/shared/store/games.store";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { SaveForm } from "@/src/lib/shared/ui/SaveForm";
 import { useUserPresetsQuery } from "@/src/lib/entities/user/api/user.queries";
+import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
 import {
   useAddUserPresetMutation,
   useRemoveUserPresetMutation,
@@ -25,6 +25,8 @@ export const RoyalGamesPanel: FC = () => {
 
   const [tabIndex, setTabIndex] = useState(0);
 
+  const { data: royalGamesData, isLoading: isRoyalGamesLoading } =
+    useGamesByIdsQuery(royalGames || []);
   const { data: savedPresets } = useUserPresetsQuery(profile?._id ?? "");
   const { mutate: addPreset } = useAddUserPresetMutation();
   const { mutate: removePreset } = useRemoveUserPresetMutation();
@@ -52,43 +54,49 @@ export const RoyalGamesPanel: FC = () => {
             : []),
         ]}
       />
-      {tabIndex === 0 && (
-        <GamesList
-          games={royalGames || []}
-          getGames={(games) => setRoyalGames(games)}
-          removeGame={(game) => removeRoyalGame(game)}
-          saveCallback={
-            isAuth
-              ? () =>
-                  modal.open(
-                    <SaveForm
-                      saveCallback={(name) => {
-                        !!profile &&
-                          !!royalGames?.length &&
-                          addPreset(
-                            {
-                              userId: profile._id,
-                              preset: {
-                                name,
-                                preset: royalGames.map((game) => game._id),
+      {tabIndex === 0 &&
+        (!!royalGames?.length && isRoyalGamesLoading ? (
+          <Loader type="propogate" />
+        ) : (
+          <GamesList
+            games={royalGamesData || []}
+            getGames={(games) =>
+              setRoyalGames(games.map((game) => game._id))
+            }
+            removeGame={(game) => removeRoyalGame(game._id)}
+            saveCallback={
+              isAuth
+                ? () =>
+                    modal.open(
+                      <SaveForm
+                        saveCallback={(name) => {
+                          !!profile &&
+                            !!royalGames?.length &&
+                            addPreset(
+                              {
+                                userId: profile._id,
+                                preset: {
+                                  name,
+                                  preset: royalGames,
+                                },
                               },
-                            },
-                            {
-                              onSuccess: () => {
-                                toast.success({
-                                  description: "Preset was successfully saved",
-                                });
-                                modal.close();
-                              },
-                            }
-                          );
-                      }}
-                    />
-                  )
-              : undefined
-          }
-        />
-      )}
+                              {
+                                onSuccess: () => {
+                                  toast.success({
+                                    description:
+                                      "Preset was successfully saved",
+                                  });
+                                  modal.close();
+                                },
+                              }
+                            );
+                        }}
+                      />
+                    )
+                : undefined
+            }
+          />
+        ))}
       {isAuth && tabIndex === 1 && (
         <>
           {!!savedPresets ? (
@@ -110,11 +118,7 @@ export const RoyalGamesPanel: FC = () => {
                         style: { textAlign: "start" },
                         compact: true,
                         onClick: () => {
-                          gamesApi
-                            .getByIds({
-                              _ids: preset.preset,
-                            })
-                            .then((res) => setRoyalGames(res.data));
+                          setRoyalGames(preset.preset);
                         },
                       },
                       {

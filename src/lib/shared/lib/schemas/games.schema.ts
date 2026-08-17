@@ -9,9 +9,17 @@ export const IGDBSchema = z.object({
   gameId: z.number(),
   total_rating: z.number().nullable().optional(),
   total_rating_count: z.number().nullable().optional(),
+  aggregated_rating: z.number().nullable().optional(),
+  aggregated_rating_count: z.number().nullable().optional(),
+  rating: z.number().nullable().optional(),
+  rating_count: z.number().nullable().optional(),
   hypes: z.number().nullable().optional(),
   screenshotsCount: z.number().nullable().optional(),
   artworksCount: z.number().nullable().optional(),
+  status: z.number().nullable().optional(),
+  version_parent: z.number().nullable().optional(),
+  parent_game: z.number().nullable().optional(),
+  url: z.string().nullable().optional(),
   genres: z.number().array().optional(),
   keywords: z.number().array().optional(),
   themes: z.number().array().optional(),
@@ -27,11 +35,59 @@ export const IGDBSchema = z.object({
   franchises: z.number().array().optional(),
   videos: z.number().array().optional(),
   alternative_names: z.number().array().optional(),
+  game_engines: z.number().array().optional(),
+  player_perspectives: z.number().array().optional(),
+  dlcs: z.number().array().optional(),
+  expansions: z.number().array().optional(),
+  standalone_expansions: z.number().array().optional(),
+  bundles: z.number().array().optional(),
+  expanded_games: z.number().array().optional(),
+  forks: z.number().array().optional(),
+  ports: z.number().array().optional(),
+  remakes: z.number().array().optional(),
+  remasters: z.number().array().optional(),
+  similar_games: z.number().array().optional(),
 });
 
-export const SteamSchema = z.object({
-  gameId: z.number(),
-  slug: z.string().optional(),
+export const MultiplayerModeSchema = z.object({
+  platformId: z.string().nullable().optional(),
+  campaignCoop: z.boolean().optional(),
+  dropIn: z.boolean().optional(),
+  lanCoop: z.boolean().optional(),
+  offlineCoop: z.boolean().optional(),
+  offlineCoopMax: z.number().nullable().optional(),
+  offlineMax: z.number().nullable().optional(),
+  onlineCoop: z.boolean().optional(),
+  onlineCoopMax: z.number().nullable().optional(),
+  onlineMax: z.number().nullable().optional(),
+  splitscreen: z.boolean().optional(),
+  splitscreenOnline: z.boolean().optional(),
+});
+
+export const AgeRatingSchema = z.object({
+  organization: z.string(),
+  rating: z.string(),
+  synopsis: z.string().optional(),
+});
+
+export const ExternalStoreSchema = z.object({
+  name: z.string().optional(),
+  uid: z.string(),
+  url: z.string().nullable().optional(),
+});
+
+export const RelatedGamesSchema = z.object({
+  parent_game: z.string().nullable().optional(),
+  dlcs: z.string().array().optional(),
+  expansions: z.string().array().optional(),
+  standalone_expansions: z.string().array().optional(),
+  bundles: z.string().array().optional(),
+  expanded_games: z.string().array().optional(),
+  forks: z.string().array().optional(),
+  ports: z.string().array().optional(),
+  remakes: z.string().array().optional(),
+  remasters: z.string().array().optional(),
+  similar_games: z.string().array().optional(),
 });
 
 export const HltbSchema = z.object({
@@ -153,6 +209,15 @@ export const GameSchema = z.object({
   first_release: z.number().nullable().optional(),
   release_dates: ReleaseDateSchema.array().optional(),
   platformIds: z.string().array(),
+  status: z.string().nullable().optional(),
+  versionTitle: z.string().nullable().optional(),
+  game_engines: z.string().array().optional(),
+  player_perspectives: z.string().array().optional(),
+  multiplayer_modes: MultiplayerModeSchema.array().optional(),
+  ageRatings: AgeRatingSchema.array().optional(),
+  languages: z.string().array().optional(),
+  externalStores: ExternalStoreSchema.array().optional(),
+  relatedGames: RelatedGamesSchema.optional(),
   averageRating: z.number().nullable().optional(),
   ratingsCount: z.number().nullable().optional(),
   isStopParsingPictures: z.boolean().optional(),
@@ -161,7 +226,6 @@ export const GameSchema = z.object({
   retroachievements: RetroachievementsSchema.array().optional(),
   igdb: IGDBSchema.optional(),
   hltb: HltbSchema.optional(),
-  steam: SteamSchema.optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -323,11 +387,14 @@ export const UpcomingReleaseGroupSchema = z.object({
 export type IRetroachievementsField = z.infer<typeof RetroachievementsSchema>;
 export type IGDBField = z.infer<typeof IGDBSchema>;
 export type IHltbField = z.infer<typeof HltbSchema>;
-export type ISteamField = z.infer<typeof SteamSchema>;
 export type ICompanyField = z.infer<typeof CompanySchema>;
 export type IGameFilters = z.infer<typeof GameFiltersSchema>;
 export type IFilterMode = z.infer<typeof FilterModeSchema>;
 export type IReleaseDate = z.infer<typeof ReleaseDateSchema>;
+export type IMultiplayerModeField = z.infer<typeof MultiplayerModeSchema>;
+export type IAgeRatingField = z.infer<typeof AgeRatingSchema>;
+export type IExternalStoreField = z.infer<typeof ExternalStoreSchema>;
+export type IRelatedGamesField = z.infer<typeof RelatedGamesSchema>;
 
 export type IAddGameRequest = z.infer<typeof AddGameRequestSchema>;
 export type IUpdateGameRequest = z.infer<typeof UpdateGameRequestSchema>;
