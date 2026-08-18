@@ -59,6 +59,11 @@
     justify-content: space-between;
     gap: var(--gap-x3);
     width: 100%;
+
+    @include mediaMax($screenMd) {
+      flex-direction: column-reverse;
+      align-items: flex-start;
+    }
   }
 
   &__titleGroup {
@@ -69,7 +74,7 @@
   }
 
   &__altNames {
-    @include font(13px, 17px, 400);
+    @include font(12px, 14px, 400);
     color: var(--color-gray);
   }
 

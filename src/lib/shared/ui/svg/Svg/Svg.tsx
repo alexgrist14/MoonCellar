@@ -16,9 +16,7 @@ export interface ISvgBaseProps {
   size?: ISvgSizes;
   color?: ISvgColors;
   ref?: Ref<SVGSVGElement>;
-
-  /** Флаг. Отключает изменение цвета в кнопках */
-  defaultStyle?: boolean;
+  isDisableStyle?: boolean;
 }
 
 export type ISvgColorsProps = Omit<ISvgBaseProps, "color">;
@@ -37,7 +35,7 @@ export const Svg: FC<ISvgProps> = ({
   transform,
   ref,
   viewBox,
-  defaultStyle,
+  isDisableStyle,
   ...props
 }) => {
   return (
@@ -55,7 +53,7 @@ export const Svg: FC<ISvgProps> = ({
         minHeight: size,
         ...style,
       }}
-      style-default={defaultStyle ? "true" : undefined}
+      style-default={isDisableStyle ? "true" : undefined}
       className={cn(styles.icon, className)}
       {...props}
     >

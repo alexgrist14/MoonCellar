@@ -43,19 +43,21 @@
   animation: up-rotate 0.6s ease-out both;
 }
 
-.svg {
-  min-width: 36px;
-  aspect-ratio: 1;
-  height: auto;
-  padding-inline: var(--padding-x1);
-
-  .top,
-  .middle,
-  .bottom {
-    transform-box: fill-box;
-    transform-origin: center;
-  }
+.top,
+.middle,
+.bottom {
+  transform-box: fill-box;
+  transform-origin: center;
 }
+
 .expand__title {
   width: 50px !important;
+}
+
+.button__title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-x1);
+  width: 100px;
 }

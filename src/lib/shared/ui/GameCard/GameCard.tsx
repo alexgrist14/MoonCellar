@@ -159,7 +159,7 @@ export const GameCard = memo(
                 setIsActive(!isActive);
               }}
             >
-              {isActive ? <SvgClose size="16" /> : <SvgMore size="24" />}
+              {isActive ? <SvgClose size="16" /> : <SvgMore />}
             </Button>
           )}
           {isLoading && <Loader key={game._id + "_loader"} />}

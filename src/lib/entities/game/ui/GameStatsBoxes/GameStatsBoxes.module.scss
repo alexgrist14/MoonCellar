@@ -33,15 +33,9 @@
   &__store {
     display: flex;
     align-items: center;
-    gap: var(--gap-x2);
-    padding: var(--padding-x2) var(--padding-x3);
-    border-radius: var(--radius-x4);
-    background: var(--color-bg-tertiary);
-    color: var(--color-neutral-100);
-    transition: background 0.2s ease;
-
-    &:hover {
-      background: var(--color-bg-hover);
-    }
+    gap: var(--gap-x4);
+    width: 100%;
+    justify-content: flex-start;
+    animation: appearOpacity 0.3s 1 ease forwards;
   }
 }

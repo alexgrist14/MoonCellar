@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react";
+import { FC, useMemo, useState } from "react";
 import styles from "./GameStatsBoxes.module.scss";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { RatingStars } from "@/src/lib/shared/ui/RatingStars";
@@ -20,6 +20,7 @@ import {
   SvgYoutube,
 } from "@/src/lib/shared/ui/svg";
 import { ISvgBaseProps } from "@/src/lib/shared/ui/svg/Svg/Svg";
+import { Button } from "@/src/lib/shared/ui/Button";
 
 const storeIcons: Record<string, FC<ISvgBaseProps>> = {
   Steam: SvgSteam,
@@ -41,6 +42,7 @@ export const GameStatsBoxes: FC<IGameStatsBoxesProps> = ({
   game,
   isBoxed = true,
 }) => {
+  const [isPagesActive, setIsPagesActive] = useState(false);
   const hltbRows = useMemo(() => {
     if (!game.hltb) {
       return null;
@@ -115,11 +117,13 @@ export const GameStatsBoxes: FC<IGameStatsBoxesProps> = ({
     </div>
   );
 
+  const isLong = !!storeItems?.length && storeItems.length > 5;
+
   const storesBlock = !!storeItems && (
     <div className={styles.stats}>
       <h4>External pages:</h4>
       <div className={styles.stats__stores}>
-        {storeItems.map((store, i) => {
+        {storeItems.slice(0, !isPagesActive && isLong ? 5 : storeItems.length).map((store, i) => {
           const StoreIcon = (store.name && storeIcons[store.name]) || SvgStore;
 
           return (
@@ -128,13 +132,22 @@ export const GameStatsBoxes: FC<IGameStatsBoxesProps> = ({
               href={store.url!}
               target="_blank"
               rel="noreferrer"
-              className={styles.stats__store}
             >
-              <StoreIcon size="20" />
-              <span>{store.name || store.url}</span>
+              <Button className={styles.stats__store}>
+                <StoreIcon size="20" />
+                <span>{store.name || store.url}</span>
+              </Button>
             </a>
           );
         })}
+        {storeItems.length > 5 && (
+          <Button
+            compact
+            onClick={() => setIsPagesActive(!isPagesActive)}
+          >
+            {isPagesActive ? "Hide" : "Show more"}
+          </Button>
+        )}
       </div>
     </div>
   );
@@ -155,14 +168,10 @@ export const GameStatsBoxes: FC<IGameStatsBoxesProps> = ({
         <Box contentStyle={{ padding: "var(--padding-x3)" }}>{hltbBlock}</Box>
       )}
       {!!ratingBlock && (
-        <Box contentStyle={{ padding: "var(--padding-x3)" }}>
-          {ratingBlock}
-        </Box>
+        <Box contentStyle={{ padding: "var(--padding-x3)" }}>{ratingBlock}</Box>
       )}
       {!!storesBlock && (
-        <Box contentStyle={{ padding: "var(--padding-x3)" }}>
-          {storesBlock}
-        </Box>
+        <Box contentStyle={{ padding: "var(--padding-x3)" }}>{storesBlock}</Box>
       )}
     </>
   );

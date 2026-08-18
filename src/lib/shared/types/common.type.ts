@@ -37,7 +37,7 @@ export interface ICommonProps {
   style?: CSSProperties;
 }
 
-export type ISvgSizes = "12" | "16" | "20" | "24";
+export type ISvgSizes = "12" | "16" | "20" | "24" | "28" | "32" | "36" | "40";
 
 export type FCCLS = FC<ICommonProps>;
 

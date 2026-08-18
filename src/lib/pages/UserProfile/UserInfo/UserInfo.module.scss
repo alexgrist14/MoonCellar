@@ -16,12 +16,16 @@
 
   .friendsGroup {
     display: flex;
-    flex-direction: column;
-    gap: var(--gap-x5);
-    width: 400px;
+    gap: var(--gap-x10);
+    width: 100%;
+    justify-content: space-evenly;
 
-    @include mediaMax(1380px) {
-      width: 100%;
+    @include mediaMd {
+      flex-direction: column;
+    }
+
+    @include mediaLg {
+      justify-content: flex-start;
     }
   }
 
@@ -43,25 +47,23 @@
   }
 
   .profile {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr;
     justify-content: space-between;
-    flex-wrap: wrap;
-    gap: var(--gap-x5);
+    gap: var(--gap-x10);
 
-    @include mediaMd {
-      justify-content: center;
+    @include mediaLg {
+      grid-template-columns: 1fr;
     }
 
     &__left {
-      display: grid;
-      grid-template-columns: 1fr auto;
+      display: flex;
       gap: var(--gap-x5);
 
       @include mediaMd {
-        justify-items: center;
-        justify-content: center;
+        flex-direction: column;
         text-align: center;
-        grid-template-columns: 1fr;
+        align-items: center;
       }
     }
 
@@ -195,12 +197,7 @@
       align-items: start;
       gap: var(--gap-x3);
 
-      // &__card {
-      //   width: 170px;
-      //   height: auto;
-      // }
-
-      @include mediaMax($screenMd) {
+      @include mediaLg {
         grid-template-columns: 1fr;
       }
 

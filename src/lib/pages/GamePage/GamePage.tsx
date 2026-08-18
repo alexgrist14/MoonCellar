@@ -229,6 +229,29 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
               </p>
             )}
           </div>
+          <div className={styles.page__bottom}>
+            {!!game.multiplayer_modes?.length && (
+              <div className={styles.page__links}>
+                <h4>Multiplayer:</h4>
+                {game.multiplayer_modes.map((mode, i) => {
+                  const labels = formatMultiplayerMode(mode);
+
+                  if (!labels.length) return null;
+
+                  const platform = systems?.find(
+                    (sys) => sys._id === mode.platformId
+                  );
+
+                  return (
+                    <p key={(mode.platformId || "") + i}>
+                      {!!platform && <span>{platform.name}: </span>}
+                      {labels.join(", ")}
+                    </p>
+                  );
+                })}
+              </div>
+            )}
+          </div>
           {!!game.summary && (
             <div className={styles.page__text}>
               <h4>Summary:</h4>
@@ -310,27 +333,6 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
                     </Link>
                   </p>
                 ))}
-              </div>
-            )}
-            {!!game.multiplayer_modes?.length && (
-              <div className={styles.page__links}>
-                <h4>Multiplayer:</h4>
-                {game.multiplayer_modes.map((mode, i) => {
-                  const labels = formatMultiplayerMode(mode);
-
-                  if (!labels.length) return null;
-
-                  const platform = systems?.find(
-                    (sys) => sys._id === mode.platformId
-                  );
-
-                  return (
-                    <p key={(mode.platformId || "") + i}>
-                      {!!platform && <span>{platform.name}: </span>}
-                      {labels.join(", ")}
-                    </p>
-                  );
-                })}
               </div>
             )}
           </div>

@@ -98,22 +98,26 @@ const UserProfile: FC<UserProfileProps> = ({
           <ExpandMenu
             position="bottom-right"
             titleClose={
-              <SvgBurger
-                size="24"
-                className={styles.svg}
-                topId={cn(styles.top, styles.top_active)}
-                middleId={cn(styles.middle, styles.middle_active)}
-                bottomId={cn(styles.bottom, styles.bottom_active)}
-              />
+              <span className={styles.button__title}>
+                <SvgBurger
+                  size="32"
+                  topId={cn(styles.top, styles.top_active)}
+                  middleId={cn(styles.middle, styles.middle_active)}
+                  bottomId={cn(styles.bottom, styles.bottom_active)}
+                />
+                Close
+              </span>
             }
             titleOpen={
-              <SvgBurger
-                size="24"
-                className={styles.svg}
-                topId={cn(styles.top)}
-                middleId={cn(styles.middle)}
-                bottomId={cn(styles.bottom)}
-              />
+              <span className={styles.button__title}>
+                <SvgBurger
+                  size="32"
+                  topId={cn(styles.top)}
+                  middleId={cn(styles.middle)}
+                  bottomId={cn(styles.bottom)}
+                />
+                Menu
+              </span>
             }
             titleStyle={{ width: "fit-content" }}
           >
