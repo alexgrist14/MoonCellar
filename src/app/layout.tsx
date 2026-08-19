@@ -32,6 +32,7 @@ export const metadata: Metadata = {
   openGraph: {
     siteName: "MoonCellar",
     type: "website",
+    locale: "en_US",
   },
 };
 
@@ -70,7 +71,7 @@ polyfill();
 
 export default function App({ children }: { children: ReactNode }) {
   return (
-    <html data-scroll-behavior="smooth">
+    <html lang="en" data-scroll-behavior="smooth">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
