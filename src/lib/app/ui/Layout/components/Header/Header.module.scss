@@ -38,7 +38,8 @@
 
     &__toggle {
       @include flexCenter;
-      padding: var(--padding-x05) var(--padding-x1);
+      aspect-ratio: 1;
+      height: 32px;
       border-radius: var(--radius-x2);
     }
 
@@ -106,8 +107,6 @@
 
   .svg {
     color: var(--color-neutral-100);
-    width: 22px;
-    height: 22px;
 
     .burgerTop,
     .burgerMiddle,

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import classNames from "classnames";
-import { FC, useRef, useState } from "react";
+import { FC } from "react";
 import { IUser } from "../../types/auth.type";
 import { SvgProfile } from "../svg";
 import { Tooltip } from "../Tooltip";
@@ -19,16 +19,8 @@ const Avatar: FC<AvatarProps> = ({
   isWithoutHover,
   priority,
 }) => {
-  const [isTooltipActive, setIsTooltipActive] = useState(false);
-  const followingsRef = useRef<HTMLDivElement>(null);
-
-  return (
-    <div
-      className={styles.container}
-      ref={followingsRef}
-      onMouseOver={() => setIsTooltipActive(true)}
-      onMouseOut={() => setIsTooltipActive(false)}
-    >
+  const avatar = (
+    <div className={styles.container}>
       {!!user?.avatar ? (
         <Image
           className={classNames(styles.image, {
@@ -45,17 +37,15 @@ const Avatar: FC<AvatarProps> = ({
           <SvgProfile className={styles.placeholder} />
         </div>
       )}
-      {!isWithoutTooltip && (
-        <Tooltip
-          className={styles.tooltip}
-          isActive={isTooltipActive}
-          isFixed={false}
-          positionRef={followingsRef}
-        >
-          {user?.userName}
-        </Tooltip>
-      )}
     </div>
+  );
+
+  if (isWithoutTooltip) return avatar;
+
+  return (
+    <Tooltip className={styles.tooltip} content={user?.userName}>
+      {avatar}
+    </Tooltip>
   );
 };
 

@@ -65,6 +65,9 @@ export const WheelComponent: FC<WheelComponentProps> = ({
     useStatesStore();
   const isMusicEnabled = useSettingsStore((state) => state.isMusicEnabled);
   const musicVolume = useSettingsStore((state) => state.musicVolume ?? 1);
+  const isBounceBackEnabled = useSettingsStore(
+    (state) => state.isBounceBackEnabled
+  );
 
   const { data: royalGamesData } = useGamesByIdsQuery(royalGames || []);
 
@@ -98,46 +101,56 @@ export const WheelComponent: FC<WheelComponentProps> = ({
 
       setStarted(false);
 
-      const bounceBackDeg =
-        BOUNCE_BACK_DEG_MIN +
-        Math.random() * (BOUNCE_BACK_DEG_MAX - BOUNCE_BACK_DEG_MIN);
+      const finishSpin = () => {
+        setFinished(true);
+
+        if (isRoyal) {
+          const filtered = tempGames?.filter(
+            (game) => game._id !== tempGames[winner]._id
+          );
+
+          skipNextRoyalRedrawRef.current = true;
+          setTempGames(
+            !!filtered?.length
+              ? filtered
+              : !!royalGamesData?.length
+                ? shuffle(royalGamesData)
+                : []
+          );
+        } else {
+          addHistoryGame(wheelGames[winner]);
+        }
+
+        setWinner(wheelGames[winner]);
+        highlightWinner(wheelGames[winner]._id);
+      };
 
       setRotateTransition(`rotate ${time}s ${SPIN_EASING}`);
-      setWinnerAngle(finalAngle + bounceBackDeg);
 
-      setTimeout(() => {
-        setRotateTransition(`rotate ${BOUNCE_DURATION}s ${BOUNCE_EASING}`);
-        setWinnerAngle(finalAngle);
+      if (isBounceBackEnabled) {
+        const bounceBackDeg =
+          BOUNCE_BACK_DEG_MIN +
+          Math.random() * (BOUNCE_BACK_DEG_MAX - BOUNCE_BACK_DEG_MIN);
+
+        setWinnerAngle(finalAngle + bounceBackDeg);
 
         setTimeout(() => {
-          setFinished(true);
+          setRotateTransition(`rotate ${BOUNCE_DURATION}s ${BOUNCE_EASING}`);
+          setWinnerAngle(finalAngle);
 
-          if (isRoyal) {
-            const filtered = tempGames?.filter(
-              (game) => game._id !== tempGames[winner]._id
-            );
+          setTimeout(finishSpin, BOUNCE_DURATION * 1000);
+        }, time * 1000);
+      } else {
+        setWinnerAngle(finalAngle);
 
-            skipNextRoyalRedrawRef.current = true;
-            setTempGames(
-              !!filtered?.length
-                ? filtered
-                : !!royalGamesData?.length
-                  ? shuffle(royalGamesData)
-                  : []
-            );
-          } else {
-            addHistoryGame(wheelGames[winner]);
-          }
-
-          setWinner(wheelGames[winner]);
-          highlightWinner(wheelGames[winner]._id);
-        }, BOUNCE_DURATION * 1000);
-      }, time * 1000);
+        setTimeout(finishSpin, time * 1000);
+      }
     }
   }, [
     isRoyal,
     isStarted,
     time,
+    isBounceBackEnabled,
     setFinished,
     setStarted,
     setWinner,

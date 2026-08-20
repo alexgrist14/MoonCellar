@@ -3,7 +3,7 @@ import { ISvgBaseProps, Path, Svg } from "./Svg/Svg";
 
 export const SvgSearch: FC<ISvgBaseProps> = (props) => {
   return (
-    <Svg {...props} size="24" viewBox="0 0 24 24">
+    <Svg {...props} viewBox="0 0 24 24">
       <Path
         type="stroke"
         strokeLinecap="round"

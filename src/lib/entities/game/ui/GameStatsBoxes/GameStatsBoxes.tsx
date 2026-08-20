@@ -10,8 +10,10 @@ import {
 } from "@/src/lib/shared/utils/rating.utils";
 import {
   SvgAmazon,
+  SvgClose,
   SvgEpicGames,
   SvgGog,
+  SvgMore,
   SvgPlaystation,
   SvgSteam,
   SvgStore,
@@ -21,6 +23,8 @@ import {
 } from "@/src/lib/shared/ui/svg";
 import { ISvgBaseProps } from "@/src/lib/shared/ui/svg/Svg/Svg";
 import { Button } from "@/src/lib/shared/ui/Button";
+import { Tooltip } from "@/src/lib/shared/ui/Tooltip";
+import classNames from "classnames";
 
 const storeIcons: Record<string, FC<ISvgBaseProps>> = {
   Steam: SvgSteam,
@@ -117,38 +121,42 @@ export const GameStatsBoxes: FC<IGameStatsBoxesProps> = ({
     </div>
   );
 
-  const isLong = !!storeItems?.length && storeItems.length > 5;
+  const limit = 5;
 
   const storesBlock = !!storeItems && (
     <div className={styles.stats}>
-      <h4>External pages:</h4>
-      <div className={styles.stats__stores}>
-        {storeItems.slice(0, !isPagesActive && isLong ? 5 : storeItems.length).map((store, i) => {
+      <div
+        className={classNames(
+          styles.stats__stores,
+          isPagesActive && styles.stats__stores_active
+        )}
+      >
+        {storeItems.map((store, i) => {
           const StoreIcon = (store.name && storeIcons[store.name]) || SvgStore;
 
           return (
-            <a
-              key={store.uid + i}
-              href={store.url!}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Button className={styles.stats__store}>
-                <StoreIcon size="20" />
-                <span>{store.name || store.url}</span>
-              </Button>
-            </a>
+            <Tooltip key={store.uid + i} content={store.name || store.url}>
+              <a
+                href={store.url!}
+                target="_blank"
+                rel="noreferrer"
+                className={styles.stats__store}
+              >
+                <StoreIcon size="20" color="contrast" />
+              </a>
+            </Tooltip>
           );
         })}
-        {storeItems.length > 5 && (
-          <Button
-            compact
-            onClick={() => setIsPagesActive(!isPagesActive)}
-          >
-            {isPagesActive ? "Hide" : "Show more"}
-          </Button>
-        )}
       </div>
+      {storeItems.length > limit && (
+        <Button
+          color="transparent"
+          className={styles.stats__more}
+          onClick={() => setIsPagesActive(!isPagesActive)}
+        >
+          {isPagesActive ? <SvgClose /> : <SvgMore />}
+        </Button>
+      )}
     </div>
   );
 

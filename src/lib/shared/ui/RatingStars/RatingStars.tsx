@@ -1,4 +1,4 @@
-import { FC, useRef, useState } from "react";
+import { FC } from "react";
 import classNames from "classnames";
 import styles from "./RatingStars.module.scss";
 import { SvgStar } from "../svg";
@@ -18,27 +18,18 @@ export const RatingStars: FC<IRatingStarsProps> = ({
   className,
   size = "16",
 }) => {
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const [isHover, setIsHover] = useState(false);
-
   return (
-    <div
-      ref={wrapperRef}
-      className={classNames(styles.stars, className)}
-      onMouseEnter={() => setIsHover(true)}
-      onMouseLeave={() => setIsHover(false)}
-    >
-      {Array.from({ length: STARS_COUNT }, (_, i) => (
-        <SvgStar
-          key={i}
-          size={size}
-          className={styles.stars__star}
-          fillPercent={(rating - i) * 100}
-        />
-      ))}
-      <Tooltip positionRef={wrapperRef} isActive={isHover}>
-        {rating}
-      </Tooltip>
-    </div>
+    <Tooltip content={rating}>
+      <div className={classNames(styles.stars, className)}>
+        {Array.from({ length: STARS_COUNT }, (_, i) => (
+          <SvgStar
+            key={i}
+            size={size}
+            className={styles.stars__star}
+            fillPercent={(rating - i) * 100}
+          />
+        ))}
+      </div>
+    </Tooltip>
   );
 };

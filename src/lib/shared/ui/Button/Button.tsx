@@ -1,10 +1,4 @@
-import {
-  memo,
-  ReactNode,
-  useRef,
-  useState,
-  ComponentPropsWithRef,
-} from "react";
+import { memo, ReactNode, ComponentPropsWithRef } from "react";
 import cl from "classnames";
 import styles from "./Button.module.scss";
 import { Tooltip } from "../Tooltip";
@@ -53,27 +47,10 @@ export const Button = memo(
     ref,
     ...props
   }: IButtonProps) => {
-    const buttonRef = useRef<HTMLButtonElement | null>(null);
-
-    const [isHover, setIsHover] = useState(false);
-
-    return (
+    const button = (
       <button
         {...props}
-        ref={(node) => {
-          buttonRef.current = node;
-
-          if (typeof ref === "function") {
-            ref(node);
-          } else if (ref) {
-            ref.current = node;
-          }
-        }}
-        onMouseEnter={() => setIsHover(true)}
-        onMouseLeave={() => setIsHover(false)}
-        onMouseDown={() => setIsHover(false)}
-        onTouchEnd={() => setIsHover(false)}
-        onBlur={() => setIsHover(false)}
+        ref={ref}
         className={cl(
           styles.button,
           styles[`button_${color}Color`],
@@ -87,16 +64,24 @@ export const Button = memo(
         )}
       >
         {children}
-        {!!tooltip && (
-          <Tooltip
-            positionRef={buttonRef}
-            isActive={isHover}
-            tooltipAlign={tooltipAlign}
-          >
-            {tooltip}
-          </Tooltip>
-        )}
       </button>
+    );
+
+    if (!tooltip) return button;
+
+    return (
+      <Tooltip
+        content={tooltip}
+        align={
+          tooltipAlign === "left"
+            ? "start"
+            : tooltipAlign === "right"
+              ? "end"
+              : "center"
+        }
+      >
+        {button}
+      </Tooltip>
     );
   }
 );

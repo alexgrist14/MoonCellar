@@ -9,8 +9,14 @@ import styles from "./WheelOptions.module.scss";
 export const WheelOptions: FC = () => {
   const { isRoyal, setRoyal } = useStatesStore();
   const { timer, setTimer } = useCommonStore();
-  const { isMusicEnabled, setMusicEnabled, musicVolume, setMusicVolume } =
-    useSettingsStore();
+  const {
+    isMusicEnabled,
+    setMusicEnabled,
+    musicVolume,
+    setMusicVolume,
+    isBounceBackEnabled,
+    setBounceBackEnabled,
+  } = useSettingsStore();
 
   return (
     <div className={styles.wrapper}>
@@ -28,6 +34,13 @@ export const WheelOptions: FC = () => {
           }}
           value={isMusicEnabled ? "right" : "left"}
           label="Music:"
+        />
+        <ToggleSwitch
+          clickCallback={(result) => {
+            setBounceBackEnabled(result === "ON");
+          }}
+          value={isBounceBackEnabled ? "right" : "left"}
+          label="Bounce back:"
         />
       </div>
       <RangeSelector

@@ -26,16 +26,36 @@
 
   &__stores {
     display: flex;
-    flex-direction: column;
-    gap: var(--gap-x1);
+    flex-wrap: wrap;
+    gap: var(--gap-x2);
+    max-height: 40px;
+    overflow: hidden;
+    transition: 0.3s ease;
+
+    &_active {
+      overflow: auto;
+      max-height: 500px;
+    }
   }
 
   &__store {
-    display: flex;
-    align-items: center;
-    gap: var(--gap-x4);
-    width: 100%;
-    justify-content: flex-start;
-    animation: appearOpacity 0.3s 1 ease forwards;
+    background-color: var(--color-bg-primary);
+    border-radius: var(--radius-x10);
+    aspect-ratio: 1;
+    transition: 0.2s ease;
+    border: 2px solid transparent;
+    padding: var(--padding-x1);
+    max-width: 40px;
+    @include flexCenter;
+
+    &:hover {
+      background-color: var(--color-bg-secondary);
+      border: 2px solid var(--color-accent);
+    }
+  }
+
+  &__more {
+    padding: var(--padding-x1);
+    border-radius: var(--radius-x5);
   }
 }

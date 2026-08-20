@@ -24,7 +24,6 @@ import { gamesApi } from "@/src/lib/shared/api";
 import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
 import useCloseEvents from "@/src/lib/shared/hooks/useCloseEvents";
 import classNames from "classnames";
-import { CustomDropdown } from "@/src/lib/shared/ui/CustomDropdown";
 
 export const Header: FC = () => {
   const { isMobile } = useStatesStore();
@@ -59,7 +58,7 @@ export const Header: FC = () => {
     router.push(`/games/${res.data.slug}`);
   }, [router, closeMenu]);
 
-  const buttons = useMemo(
+  const menuButtons = useMemo(
     () =>
       [
         {
@@ -105,6 +104,14 @@ export const Header: FC = () => {
           color: ButtonColor.TRANSPARENT,
           onClick: closeMenu,
         },
+      ].filter(Boolean) as IButtonGroupItem[],
+    [isAdmin, randomClickHandler, closeMenu]
+  );
+
+  const buttons = useMemo(
+    () =>
+      [
+        ...menuButtons,
         {
           title: (
             <>
@@ -115,8 +122,8 @@ export const Header: FC = () => {
           onClick: searchClickHandler,
           color: ButtonColor.TRANSPARENT,
         },
-      ].filter(Boolean) as IButtonGroupItem[],
-    [isAdmin, randomClickHandler, searchClickHandler, closeMenu]
+      ] as IButtonGroupItem[],
+    [menuButtons, searchClickHandler]
   );
 
   return (
@@ -127,37 +134,46 @@ export const Header: FC = () => {
         </Link>
         <Separator />
         {isMobile ? (
-          <div className={styles.burger} ref={menuRef}>
+          <>
+            <div className={styles.burger} ref={menuRef}>
+              <Button
+                className={styles.burger__toggle}
+                color={ButtonColor.TRANSPARENT}
+                onClick={() => setIsMenuOpen((prev) => !prev)}
+              >
+                <SvgBurger
+                  size="24"
+                  className={styles.svg}
+                  topId={classNames(styles.burgerTop, {
+                    [styles.burgerTop_active]: isMenuOpen,
+                  })}
+                  middleId={classNames(styles.burgerMiddle, {
+                    [styles.burgerMiddle_active]: isMenuOpen,
+                  })}
+                  bottomId={classNames(styles.burgerBottom, {
+                    [styles.burgerBottom_active]: isMenuOpen,
+                  })}
+                />
+              </Button>
+              {isMenuOpen && (
+                <div className={styles.burger__dropdown}>
+                  <Box isWithBlur classNameContent={styles.burger__content}>
+                    <ButtonGroup
+                      wrapperClassName={styles.burger__buttons}
+                      buttons={menuButtons}
+                    />
+                  </Box>
+                </div>
+              )}
+            </div>
             <Button
               className={styles.burger__toggle}
               color={ButtonColor.TRANSPARENT}
-              onClick={() => setIsMenuOpen((prev) => !prev)}
+              onClick={searchClickHandler}
             >
-              <SvgBurger
-                size="24"
-                className={styles.svg}
-                topId={classNames(styles.burgerTop, {
-                  [styles.burgerTop_active]: isMenuOpen,
-                })}
-                middleId={classNames(styles.burgerMiddle, {
-                  [styles.burgerMiddle_active]: isMenuOpen,
-                })}
-                bottomId={classNames(styles.burgerBottom, {
-                  [styles.burgerBottom_active]: isMenuOpen,
-                })}
-              />
+              <SvgSearch size="20" className={styles.svg} />
             </Button>
-            {isMenuOpen && (
-              <div className={styles.burger__dropdown}>
-                <Box isWithBlur classNameContent={styles.burger__content}>
-                  <ButtonGroup
-                    wrapperClassName={styles.burger__buttons}
-                    buttons={buttons}
-                  />
-                </Box>
-              </div>
-            )}
-          </div>
+          </>
         ) : (
           <ButtonGroup
             wrapperClassName={styles.container__buttons}
