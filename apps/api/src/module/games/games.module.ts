@@ -31,6 +31,10 @@ import { IndexNowModule } from "../indexnow/indexnow.module";
 import { VndbService } from "./services/vndb.service";
 import { VndbController } from "./controllers/vndb.controller";
 import { HttpModule } from "@nestjs/axios";
+import {
+  VndbCandidate,
+  VndbCandidateSchema,
+} from "./schemas/vndb-candidates.schema";
 
 @Module({
   controllers: [
@@ -60,6 +64,7 @@ import { HttpModule } from "@nestjs/axios";
       { name: UserLogs.name, schema: UserLogsSchema },
       { name: User.name, schema: UserSchema },
       { name: Rating.name, schema: UserRatingsDatabaseSchema },
+      { name: VndbCandidate.name, schema: VndbCandidateSchema },
     ]),
     MetricsModule,
     IndexNowModule,

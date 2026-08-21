@@ -7,7 +7,13 @@ export type TVndbFilter = [field: string, operator: "=" | "!=", value: string];
 export type TVndbFilters = ["or" | "and", ...TVndbFilter[]];
 export type TVndbCandidate = Pick<
   Game,
-  "name" | "nameNormalized" | "type" | "genres" | "first_release"
+  | "name"
+  | "nameNormalized"
+  | "type"
+  | "genres"
+  | "first_release"
+  | "alternative_names"
+  | "companies"
 > & { _id: mongoose.Types.ObjectId };
 
 export type TDateSignal = "confirms" | "contradicts" | "unknown";
