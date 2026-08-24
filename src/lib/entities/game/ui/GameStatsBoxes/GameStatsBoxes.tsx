@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./GameStatsBoxes.module.scss";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { RatingStars } from "@/src/lib/shared/ui/RatingStars";
@@ -46,6 +46,8 @@ export const GameStatsBoxes: FC<IGameStatsBoxesProps> = ({
   game,
   isBoxed = true,
 }) => {
+  const storeBoxRef = useRef<HTMLDivElement>(null);
+  const [isMore, setIsMore] = useState(false);
   const [isPagesActive, setIsPagesActive] = useState(false);
   const hltbRows = useMemo(() => {
     if (!game.hltb) {
@@ -92,6 +94,13 @@ export const GameStatsBoxes: FC<IGameStatsBoxesProps> = ({
     return items.length ? items : null;
   }, [game.externalPages]);
 
+  useEffect(() => {
+    const height = storeBoxRef.current?.scrollHeight;
+    console.log(height);
+
+    setIsMore(!!height && height > 40);
+  }, [storeItems]);
+
   if (!hltbRows && !ratingRows && !storeItems) return null;
 
   const hltbBlock = !!hltbRows && (
@@ -121,34 +130,51 @@ export const GameStatsBoxes: FC<IGameStatsBoxesProps> = ({
     </div>
   );
 
-  const limit = 5;
-
   const storesBlock = !!storeItems && (
     <div className={styles.stats}>
       <div
+        ref={storeBoxRef}
         className={classNames(
           styles.stats__stores,
           isPagesActive && styles.stats__stores_active
         )}
       >
-        {storeItems.map((store, i) => {
-          const StoreIcon = (store.name && storeIcons[store.name]) || SvgStore;
+        {storeItems
+          .toSorted((a, b) =>
+            !!a.name && !!b.name
+              ? a.name === "Steam"
+                ? -1
+                : a.name.localeCompare(b.name)
+              : 0
+          )
+          .map((store, i) => {
+            const StoreIcon =
+              (store.name && storeIcons[store.name]) || SvgStore;
 
-          return (
-            <Tooltip key={store.uid + i} content={store.name || store.url}>
-              <a
-                href={store.url!}
-                target="_blank"
-                rel="noreferrer"
-                className={styles.stats__store}
+            return (
+              <Tooltip
+                key={store.uid + i}
+                content={
+                  <div className={styles.stats__info}>
+                    {store.name}
+                    <br />
+                    {store.url}
+                  </div>
+                }
               >
-                <StoreIcon size="20" color="contrast" />
-              </a>
-            </Tooltip>
-          );
-        })}
+                <a
+                  href={store.url!}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={styles.stats__store}
+                >
+                  <StoreIcon size="20" color="contrast" />
+                </a>
+              </Tooltip>
+            );
+          })}
       </div>
-      {storeItems.length > limit && (
+      {isMore && (
         <Button
           color="transparent"
           className={styles.stats__more}

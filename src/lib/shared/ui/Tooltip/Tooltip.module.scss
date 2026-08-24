@@ -6,13 +6,10 @@
   color: var(--color-neutral-100);
   z-index: 1000;
   pointer-events: none;
-  min-width: fit-content;
+  max-width: calc(100vw - 32px);
   height: fit-content;
+  overflow-wrap: anywhere;
   opacity: 0;
   transition: opacity 0.3s;
   animation: appearOpacity 0.3s ease-out 1 forwards;
-
-  @include mediaMax($screenSm) {
-    max-width: calc(100vw - 32px);
-  }
 }

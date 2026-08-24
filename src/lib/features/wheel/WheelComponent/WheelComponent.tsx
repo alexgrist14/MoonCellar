@@ -105,24 +105,31 @@ export const WheelComponent: FC<WheelComponentProps> = ({
         setFinished(true);
 
         if (isRoyal) {
-          const filtered = tempGames?.filter(
-            (game) => game._id !== tempGames[winner]._id
+          const picked = tempGames[winner];
+          const remaining = tempGames.filter(
+            (game) => game._id !== picked._id
           );
+          const isRoundOver = remaining.length <= 1;
 
           skipNextRoyalRedrawRef.current = true;
           setTempGames(
-            !!filtered?.length
-              ? filtered
-              : !!royalGamesData?.length
+            isRoundOver
+              ? !!royalGamesData?.length
                 ? shuffle(royalGamesData)
                 : []
+              : remaining
           );
+
+          if (isRoundOver) {
+            setWinner(remaining[0] ?? picked);
+          }
+
+          highlightWinner(picked._id);
         } else {
           addHistoryGame(wheelGames[winner]);
+          setWinner(wheelGames[winner]);
+          highlightWinner(wheelGames[winner]._id);
         }
-
-        setWinner(wheelGames[winner]);
-        highlightWinner(wheelGames[winner]._id);
       };
 
       setRotateTransition(`rotate ${time}s ${SPIN_EASING}`);
@@ -204,7 +211,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
     if (isRoyal) {
       parseImages(tempGames).then((images) => {
         drawWheel({
-          wheelGames: tempGames,
+          wheelGames: !!tempGames.length ? tempGames : emptyGames,
           images: images
             .filter((i) => i.status === "fulfilled")
             .map((i) => i.value),

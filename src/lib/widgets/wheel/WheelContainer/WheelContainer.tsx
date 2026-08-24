@@ -14,6 +14,7 @@ import { VideosRow } from "@/src/lib/shared/ui/VideosRow";
 import { GameStatsBoxes } from "@/src/lib/entities/game/ui/GameStatsBoxes";
 import { useHideAdult } from "@/src/lib/shared/hooks/useHideAdult";
 import { isAdultGame } from "@/src/lib/shared/utils/adult.utils";
+import { dateRegions } from "@/src/lib/shared/constants";
 
 export const WheelContainer: FC = () => {
   const winner = useWheelStore((state) => state.winner);
@@ -104,6 +105,12 @@ export const WheelContainer: FC = () => {
                       {winner.themes.join(", ")}
                     </p>
                   )}
+                  {!!winner.languages?.length && (
+                    <p>
+                      <span>Languages: </span>
+                      {winner.languages.join(", ")}
+                    </p>
+                  )}
                 </div>
                 <GameStatsBoxes game={winner} isBoxed={false} />
                 {!!winner.summary && (
@@ -132,6 +139,27 @@ export const WheelContainer: FC = () => {
                   <div className={styles.info__text}>
                     <h4>Videos:</h4>
                     <VideosRow videos={winner.videos} />
+                  </div>
+                )}
+                {!!winner.release_dates?.length && (
+                  <div className={styles.info__text}>
+                    <h4>Release dates:</h4>
+                    {winner.release_dates
+                      .sort((a, b) => a.date - b.date)
+                      .map((date, i) => {
+                        const platform = systems?.find(
+                          (sys) => sys._id === date.platformId
+                        );
+
+                        return (
+                          <p key={date.date + "_" + i}>
+                            {date.human}: {platform?.name || "Unknown platform"}
+                            {!!dateRegions[+date.region - 1] && (
+                              <span> ({dateRegions[+date.region - 1]})</span>
+                            )}
+                          </p>
+                        );
+                      })}
                   </div>
                 )}
               </div>

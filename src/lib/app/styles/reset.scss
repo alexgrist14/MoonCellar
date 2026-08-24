@@ -41,6 +41,7 @@ html {
 }
 
 html,
+a,
 button,
 input,
 select,
@@ -54,15 +55,6 @@ textarea {
 body {
   margin: 0;
 }
-
-// a:focus {
-//   outline: thin dotted transparent;
-// }
-//
-// a:active,
-// a:hover {
-//   outline: 0;
-// }
 
 h1,
 h2,

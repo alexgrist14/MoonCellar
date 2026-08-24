@@ -46,6 +46,7 @@
     border: 2px solid transparent;
     padding: var(--padding-x1);
     max-width: 40px;
+    flex: 1;
     @include flexCenter;
 
     &:hover {
