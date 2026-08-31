@@ -30,6 +30,9 @@ interface IParsedLogSegment {
 }
 
 const SEGMENT_MARKER_REGEX = /<!--segment:([a-z]+)-->/g;
+const DETAILS_REGEX =
+  /(?:<br\/>)*<span style="font-size: 12px">[\s\S]*?<\/span>/g;
+const DETAILS_SEGMENTS_PRIORITY = ["removed", "updated", "added"];
 
 function buildSegmentMarker(segment: string) {
   return `<!--segment:${segment}-->`;
@@ -71,6 +74,30 @@ function parseLogSegments(text: string): IParsedLogSegment[] {
 function buildLogText(segments: IParsedLogSegment[]): string {
   return segments
     .map(({ segment, content }) => `${buildSegmentMarker(segment)}${content}`)
+    .join("<br/><br/>");
+}
+
+function stripDuplicatedDetails(
+  segments: IParsedLogSegment[]
+): IParsedLogSegment[] {
+  const present = DETAILS_SEGMENTS_PRIORITY.filter((segment) =>
+    segments.some((s) => s.segment === segment)
+  );
+
+  if (present.length < 2) return segments;
+
+  const [kept] = present;
+
+  return segments.map((s) =>
+    s.segment !== kept && present.includes(s.segment)
+      ? { ...s, content: s.content.replace(DETAILS_REGEX, "") }
+      : s
+  );
+}
+
+function renderLogText(text: string): string {
+  return stripDuplicatedDetails(parseLogSegments(text))
+    .map(({ content }) => content)
     .join("<br/><br/>");
 }
 
@@ -225,7 +252,7 @@ export class UserLogsService {
       return {
         results: logs.map((log) => ({
           ...log,
-          text: log.text.replace(SEGMENT_MARKER_REGEX, ""),
+          text: renderLogText(log.text),
         })),
         total,
       };

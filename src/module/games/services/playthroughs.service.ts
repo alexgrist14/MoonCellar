@@ -64,17 +64,6 @@ export class PlaythroughsService {
     return details ? `${boldHeader}<br/>${details}` : boldHeader;
   }
 
-  private async getRemovalLogText(play: IPlaythroughDocument) {
-    const platform = !!play.platformId
-      ? await this.Platforms.findById(play.platformId).orFail()
-      : undefined;
-
-    return (
-      `Removed from ${play.isMastered ? "mastered" : play.category}` +
-      (!!platform ? `<br/><i>${platform.name}</i>` : "")
-    );
-  }
-
   async getPlaythroughs(data: IGetPlaythroughsRequest) {
     return await this.GamesPlaythrouhgs.find({
       ...data,
@@ -160,7 +149,8 @@ export class PlaythroughsService {
         }
       );
 
-      const text = await this.getRemovalLogText(play);
+      const { details } = await this.getPlaythroughDetailsText(play);
+      const text = this.buildLogText("Removed playthrough", details);
 
       await this.logsService.createUserLog({
         userId: play.userId.toString(),
