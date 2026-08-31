@@ -17,11 +17,16 @@ export const useNavigationPending = () => {
   const endNavigation = useNavigationStore((s) => s.endNavigation);
 
   useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
+    let isCandidate = false;
+
+    const handleClickCapture = (e: MouseEvent) => {
+      isCandidate = false;
+
       if (!isPlainLeftClick(e)) return;
 
       const target = e.target;
       if (!(target instanceof Element)) return;
+      if (target.closest("button")) return;
 
       const anchor = target.closest("a");
       if (!anchor || !anchor.getAttribute("href")) return;
@@ -36,16 +41,25 @@ export const useNavigationPending = () => {
       )
         return;
 
+      isCandidate = true;
+    };
+
+    const handleClickBubble = () => {
+      if (!isCandidate) return;
+
+      isCandidate = false;
       startNavigation();
     };
 
     const handlePopState = () => startNavigation();
 
-    document.addEventListener("click", handleClick, true);
+    document.addEventListener("click", handleClickCapture, true);
+    window.addEventListener("click", handleClickBubble);
     window.addEventListener("popstate", handlePopState);
 
     return () => {
-      document.removeEventListener("click", handleClick, true);
+      document.removeEventListener("click", handleClickCapture, true);
+      window.removeEventListener("click", handleClickBubble);
       window.removeEventListener("popstate", handlePopState);
     };
   }, [startNavigation]);

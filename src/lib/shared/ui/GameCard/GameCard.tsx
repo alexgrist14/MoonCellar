@@ -118,7 +118,9 @@ export const GameCard = memo(
           className={classNames(
             styles.card,
             className,
-            styles[`card_${lastPlaythrough?.isMastered ? "mastered" : lastPlaythrough?.category}`],
+            styles[
+              `card_${lastPlaythrough?.isMastered ? "mastered" : lastPlaythrough?.category}`
+            ],
             isInfoDisabled && styles.card_stacked
           )}
           draggable={false}
