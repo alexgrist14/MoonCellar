@@ -71,6 +71,10 @@
     }
   }
 
+  &__error {
+    @include fieldError;
+  }
+
   &__field:focus,
   &__field:active,
   &__field:not(:placeholder-shown) {

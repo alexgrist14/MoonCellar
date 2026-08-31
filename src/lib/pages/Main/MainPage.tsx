@@ -118,12 +118,16 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
           <SectionTitle isWithMarginBottom>Browse By Genre</SectionTitle>
           <div className={styles.genre__content}>
             {games.genre.slice(1, 6).map((item) => (
-              <div className={styles.genre__card} key={item.genre}>
+              <Link
+                href={`/games?selectedGenres[]=${item.genre}`}
+                className={styles.genre__card}
+                key={item.genre}
+              >
                 <h4 className={styles.genre__title}>{item.genre}</h4>
                 <div className={styles.genre__count}>
                   {">"} {commonUtils.roundToFirstDigit(item.count)}
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </Box>

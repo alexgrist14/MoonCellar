@@ -111,6 +111,13 @@ $fontMain: var(--font-general);
   height: fit-content;
 }
 
+@mixin fieldError {
+  display: block;
+  margin-top: var(--padding-x1);
+  color: var(--color-negative);
+  @include font(12px, 14px, 400);
+}
+
 @mixin textEllipsis {
   white-space: nowrap;
   overflow: hidden;

@@ -42,9 +42,5 @@
 }
 
 .error {
-  display: block;
-  margin-top: var(--padding-x1);
-  color: var(--color-negative);
-  font-size: 12px;
-  line-height: 14px;
+  @include fieldError;
 }

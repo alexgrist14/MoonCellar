@@ -162,6 +162,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
             id="description"
             className={styles.input}
             classNameField={styles.input}
+            error={errors.description}
             {...register("description")}
           />
         </div>

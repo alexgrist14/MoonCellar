@@ -1,12 +1,13 @@
 import { Layout } from "../lib/app/ui/Layout";
 import localFont from "next/font/local";
 import classNames from "classnames";
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 import { polyfill } from "interweave-ssr";
 import { Metadata } from "next";
 import { FaroInit } from "../lib/shared/ui/FaroInit";
 import { FaroRouteTracker } from "../lib/shared/ui/FaroRouteTracker";
 import { GeoInit } from "../lib/shared/ui/GeoInit";
+import { NavigationProgress } from "../lib/shared/ui/NavigationProgress";
 import "@/src/lib/app/styles/reset.scss";
 import "@/src/lib/app/styles/root.scss";
 import { QueryProvider } from "../lib/app/providers/QueryProvider";
@@ -81,6 +82,9 @@ export default function App({ children }: { children: ReactNode }) {
           <FaroInit />
           <GeoInit />
           <FaroRouteTracker />
+          <Suspense fallback={null}>
+            <NavigationProgress />
+          </Suspense>
           <Layout className={classNames(general.variable, pentagra.variable)}>
             {children}
           </Layout>

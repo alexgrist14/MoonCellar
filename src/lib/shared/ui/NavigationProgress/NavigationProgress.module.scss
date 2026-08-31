@@ -1,0 +1,35 @@
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--navigation-progress-height);
+  background: var(--color-accent);
+  box-shadow: var(--glow-accent);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+  z-index: var(--navigation-progress-z-index);
+
+  &_start {
+    opacity: 1;
+    transform: scaleX(0);
+    transition: none;
+  }
+
+  &_loading {
+    opacity: 1;
+    transform: scaleX(0.9);
+    transition: transform 12s cubic-bezier(0, 0.6, 0.2, 1);
+  }
+
+  &_done {
+    opacity: 0;
+    transform: scaleX(1);
+    transition:
+      transform 0.2s ease-out,
+      opacity 0.3s ease-out 0.15s;
+  }
+}

@@ -101,6 +101,9 @@ export const Textarea: FC<ITextareaProps> = ({
         </div>
       )}
       {children}
+      {error?.message && (
+        <span className={styles.textarea__error}>{error.message}</span>
+      )}
       {resize && !isDisableAutoResize && (
         <div
           ref={replicaRef}
