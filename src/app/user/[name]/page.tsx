@@ -6,13 +6,14 @@ import { IAuthToken } from "@/src/lib/shared/types/auth.type";
 import { jwtDecode } from "jwt-decode";
 import { Metadata } from "next";
 import { cookies } from "next/headers";
+import { fetchOrNotFound } from "@/src/lib/shared/utils/not-found.utils";
 
 export async function generateMetadata({
   params,
 }: {
   params: any;
 }): Promise<Metadata> {
-  const user = (await userAPI.getByString((await params).name)).data;
+  const user = await fetchOrNotFound(userAPI.getByString((await params).name));
 
   return {
     title: "Profile: " + user.userName,
@@ -43,7 +44,7 @@ export default async function User({ params }: { params: any }) {
     ? (await userAPI.getUserFollowings(authUserInfo.id)).data
     : undefined;
 
-  const user = (await userAPI.getByString((await params).name)).data;
+  const user = await fetchOrNotFound(userAPI.getByString((await params).name));
   const playthroughs = (
     await playthroughsAPI.getAll({
       userId: user._id,

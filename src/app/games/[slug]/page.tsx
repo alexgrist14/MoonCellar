@@ -3,6 +3,7 @@ import { gamesApi } from "@/src/lib/shared/api";
 import { CheckMobile } from "@/src/lib/shared/ui/CheckMobile";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { fetchOrNotFound } from "@/src/lib/shared/utils/not-found.utils";
 
 const isValidSlug = (slug: string) => !slug.includes(".");
 
@@ -24,9 +25,10 @@ export async function generateMetadata({
     notFound();
   }
 
-  const game = (await gamesApi.getBySlug({ slug })).data;
+  const game = await fetchOrNotFound(gamesApi.getBySlug({ slug }));
   const description =
-    game.summary || `${game.name} on MoonCellar — ratings, achievements and playthrough tracking`;
+    game.summary ||
+    `${game.name} on MoonCellar — ratings, achievements and playthrough tracking`;
 
   const keywords = [
     game.name,
@@ -64,7 +66,7 @@ const GamePageIndex = async ({ params }: { params: any }) => {
     notFound();
   }
 
-  const game = (await gamesApi.getBySlug({ slug })).data;
+  const game = await fetchOrNotFound(gamesApi.getBySlug({ slug }));
 
   return (
     <CheckMobile>

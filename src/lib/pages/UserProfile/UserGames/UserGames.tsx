@@ -16,6 +16,7 @@ import { Box } from "@/src/lib/shared/ui/Box";
 import { Button } from "@/src/lib/shared/ui/Button";
 import { RatingStars } from "@/src/lib/shared/ui/RatingStars";
 import { SvgComment } from "@/src/lib/shared/ui/svg";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
 
 interface UserGamesProps {
@@ -141,8 +142,14 @@ export const UserGames: FC<UserGamesProps> = ({
 
   const total = gameIds.length;
 
+  if (!pageGameIds.length)
+    return (
+      <EmptyState
+        title="List is empty"
+        description="There are no games in this list yet"
+      />
+    );
   if (isPending || isFetching) return <Loader type="moon" />;
-  if (!pageGameIds.length) return <p>There is no games</p>;
 
   return (
     <>

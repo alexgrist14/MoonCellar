@@ -36,3 +36,5 @@ export * from "./SvgTwitch";
 export * from "./SvgAmazon";
 export * from "./SvgXbox";
 export * from "./SvgStore";
+export * from "./SvgEmptyList";
+export * from "./SvgMoonBackdrop";

@@ -117,7 +117,6 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
         classNameContent={styles.scrollbars__content}
         classNameScrollbar={styles.scrollbars__scrollbar}
         type="absolute"
-        fadeType="bottom"
       >
         <Suspense fallback={<PageLoader />}>
           <main className={"container"} ref={ref}>

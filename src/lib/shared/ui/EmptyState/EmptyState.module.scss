@@ -1,0 +1,23 @@
+.empty {
+  @include flexColumnCenter;
+  gap: var(--gap-x1);
+  padding: var(--padding-x10) var(--padding-x4);
+  text-align: center;
+
+  &__image {
+    width: var(--empty-state-image-size);
+    height: var(--empty-state-image-size);
+    margin-bottom: var(--gap-x3);
+  }
+
+  &__title {
+    @include font(18px, 24px, 600);
+    color: var(--color-contrast);
+  }
+
+  &__description {
+    @include font(14px, 20px, 400);
+    color: var(--color-secondary);
+    opacity: 0.6;
+  }
+}
