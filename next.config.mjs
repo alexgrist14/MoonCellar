@@ -19,6 +19,15 @@ const nextConfig = {
         source: "/_next/static/media/:path*",
         headers: [{ key: "X-Robots-Tag", value: "noindex" }],
       },
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
+        ],
+      },
     ];
   },
   images: {

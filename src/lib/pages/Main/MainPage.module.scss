@@ -149,7 +149,7 @@
     }
   }
 
-  .genre {
+  .browse {
     width: 100%;
     z-index: 1;
 
@@ -213,7 +213,7 @@
       padding: var(--padding-x10) var(--padding-x8);
     }
 
-    .genre {
+    .browse {
       &__content {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
@@ -250,7 +250,7 @@
       padding: var(--padding-x8) var(--padding-x5);
     }
 
-    .genre {
+    .browse {
       &__content {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
@@ -306,7 +306,7 @@
       }
     }
 
-    .genre {
+    .browse {
       &__content {
         grid-template-columns: 1fr;
       }

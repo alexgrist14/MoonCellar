@@ -1,0 +1,22 @@
+.crumbs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--color-text-muted);
+
+  &__item {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &__separator {
+    margin-inline: var(--padding-x2);
+    color: var(--color-text-muted);
+  }
+
+  &__current {
+    color: var(--color-text-secondary);
+  }
+}

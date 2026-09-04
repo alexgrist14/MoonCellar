@@ -600,7 +600,7 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
                   <Image
                     className={styles.preview}
                     src={rhf.value as string}
-                    alt="cover"
+                    alt="Game cover"
                     width={160}
                     height={224}
                   />

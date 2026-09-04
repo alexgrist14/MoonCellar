@@ -15,6 +15,8 @@ import { ReleaseRail } from "./ReleaseRail";
 import { GauntletWheel } from "./GauntletWheel";
 import { useHideAdult } from "../../shared/hooks/useHideAdult";
 import { isAdultGame } from "../../shared/utils/adult.utils";
+import { toSlug } from "../../shared/utils/slug.utils";
+import { IPlatformCount } from "../../shared/types/games.type";
 import { Box } from "../../shared/ui/Box";
 import { BGImage } from "../../shared/ui/BGImage";
 import { SectionTitle } from "../../shared/ui/SectionTitle";
@@ -27,9 +29,10 @@ interface MainPageProps {
     upcoming: IUpcomingReleaseGroup[];
     recent: IGameResponse[];
   };
+  platforms: IPlatformCount[];
 }
 
-export const MainPage: FC<MainPageProps> = ({ games }) => {
+export const MainPage: FC<MainPageProps> = ({ games, platforms }) => {
   const hideAdult = useHideAdult();
 
   return (
@@ -38,7 +41,7 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
       <div className={styles.container}>
         <Box classNameContent={styles.banner}>
           <div className={styles.banner__text}>
-            <h2 className={styles.title}>{MAIN_PAGE_TITLE}</h2>
+            <h1 className={styles.title}>{MAIN_PAGE_TITLE}</h1>
             <p className={styles.text}>{MAIN_PAGE_DESCRIPTION}</p>
           </div>
           <div className={styles.games}>
@@ -52,6 +55,7 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
                       alt={game.name}
                       width={200}
                       height={280}
+                      priority
                     />
                   ) : null}
                 </div>
@@ -103,7 +107,7 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
                   }
                   width={76}
                   height={42}
-                  alt="ra"
+                  alt="RetroAchievements"
                 />
               </p>
               <Link href={"/gauntlet"}>
@@ -114,23 +118,42 @@ export const MainPage: FC<MainPageProps> = ({ games }) => {
             </div>
           </div>
         </Box>
-        <Box classNameContent={styles.genre}>
+        <Box classNameContent={styles.browse}>
           <SectionTitle isWithMarginBottom>Browse By Genre</SectionTitle>
-          <div className={styles.genre__content}>
-            {games.genre.slice(1, 6).map((item) => (
+          <div className={styles.browse__content}>
+            {games.genre.slice(1, 11).map((item) => (
               <Link
-                href={`/games?selectedGenres[]=${item.genre}`}
-                className={styles.genre__card}
+                href={`/games/genre/${toSlug(item.genre)}`}
+                className={styles.browse__card}
                 key={item.genre}
               >
-                <h4 className={styles.genre__title}>{item.genre}</h4>
-                <div className={styles.genre__count}>
+                <h4 className={styles.browse__title}>{item.genre}</h4>
+                <div className={styles.browse__count}>
                   {">"} {commonUtils.roundToFirstDigit(item.count)}
                 </div>
               </Link>
             ))}
           </div>
         </Box>
+        {!!platforms.length && (
+          <Box classNameContent={styles.browse}>
+            <SectionTitle isWithMarginBottom>Browse By Platform</SectionTitle>
+            <div className={styles.browse__content}>
+              {platforms.map((platform) => (
+                <Link
+                  href={`/games/platform/${platform.slug}`}
+                  className={styles.browse__card}
+                  key={platform.slug}
+                >
+                  <h4 className={styles.browse__title}>{platform.name}</h4>
+                  <div className={styles.browse__count}>
+                    {">"} {commonUtils.roundToFirstDigit(platform.count)}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </Box>
+        )}
       </div>
     </>
   );

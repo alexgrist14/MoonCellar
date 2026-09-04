@@ -1,8 +1,13 @@
 import Admin from "@/src/lib/pages/Admin/Admin";
-import { FC } from "react";
+import { FC, Suspense } from "react";
+import { PageLoader } from "@/src/lib/shared/ui/PageLoader";
 
 const AdminPage: FC = () => {
-  return <Admin />;
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <Admin />
+    </Suspense>
+  );
 };
 
 export default AdminPage;

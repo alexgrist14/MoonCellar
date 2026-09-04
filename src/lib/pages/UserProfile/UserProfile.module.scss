@@ -1,3 +1,7 @@
+.crumbs {
+  margin-bottom: var(--padding-x4);
+}
+
 .container {
   display: grid;
   grid-template-columns: 1fr min-content;
@@ -7,6 +11,14 @@
 
   @include mediaMd {
     grid-template-columns: 1fr;
+  }
+
+  .navigation {
+    display: contents;
+
+    @include mediaMd {
+      display: none;
+    }
   }
 
   .content {

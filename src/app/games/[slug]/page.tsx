@@ -1,9 +1,21 @@
 import { GamePage } from "@/src/lib/pages/GamePage";
 import { gamesApi } from "@/src/lib/shared/api";
-import { CheckMobile } from "@/src/lib/shared/ui/CheckMobile";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { fetchOrNotFound } from "@/src/lib/shared/utils/not-found.utils";
+import { cache } from "react";
+import { fetchOrNull } from "@/src/lib/shared/utils/not-found.utils";
+import { FRONT_URL } from "@/src/lib/shared/constants";
+import { JsonLd } from "@/src/lib/shared/ui/JsonLd";
+import {
+  getBreadcrumbJsonLd,
+  getVideoGameJsonLd,
+} from "@/src/lib/shared/utils/json-ld.utils";
+
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  return [];
+}
 
 const isValidSlug = (slug: string) => !slug.includes(".");
 
@@ -15,17 +27,25 @@ const extToMimeType: Record<string, string> = {
   webp: "image/webp",
 };
 
+const getGame = cache(async (slug: string) =>
+  isValidSlug(slug) ? fetchOrNull(gamesApi.getBySlug({ slug })) : null
+);
+
 export async function generateMetadata({
   params,
 }: {
   params: any;
 }): Promise<Metadata> {
   const { slug } = await params;
-  if (!isValidSlug(slug)) {
-    notFound();
+  const game = await getGame(slug);
+
+  if (!game) {
+    return {
+      title: "Page not found",
+      robots: { index: false, follow: false },
+    };
   }
 
-  const game = await fetchOrNotFound(gamesApi.getBySlug({ slug }));
   const description =
     game.summary ||
     `${game.name} on MoonCellar — ratings, achievements and playthrough tracking`;
@@ -41,14 +61,20 @@ export async function generateMetadata({
     title: game.name,
     description,
     keywords,
+    alternates: {
+      canonical: `/games/${game.slug}`,
+    },
     openGraph: {
       title: game.name,
       description,
-      url: `https://mooncellar.space/games/${game.slug}`,
+      siteName: "MoonCellar",
+      type: "website",
+      locale: "en_US",
+      url: `${FRONT_URL}/games/${game.slug}`,
       ...(!!game.cover && {
         images: [
           {
-            url: `https://mooncellar.space/api/image-proxy?url=${encodeURIComponent(game.cover)}`,
+            url: `${FRONT_URL}/img/image-proxy?url=${encodeURIComponent(game.cover)}`,
             width: 200,
             height: 266,
             alt: game.name,
@@ -62,16 +88,24 @@ export async function generateMetadata({
 
 const GamePageIndex = async ({ params }: { params: any }) => {
   const { slug } = await params;
-  if (!isValidSlug(slug)) {
+  const game = await getGame(slug);
+
+  if (!game) {
     notFound();
   }
 
-  const game = await fetchOrNotFound(gamesApi.getBySlug({ slug }));
-
   return (
-    <CheckMobile>
+    <>
+      <JsonLd data={getVideoGameJsonLd(game)} />
+      <JsonLd
+        data={getBreadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Games", path: "/games" },
+          { name: game.name, path: `/games/${game.slug}` },
+        ])}
+      />
       <GamePage game={game} />
-    </CheckMobile>
+    </>
   );
 };
 

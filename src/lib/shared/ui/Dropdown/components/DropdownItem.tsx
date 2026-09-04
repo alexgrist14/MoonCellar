@@ -37,7 +37,7 @@ export const DropdownItem = memo(
       >
         {!!icon && (
           <div className={styles.dropdown__image}>
-            <Image alt="Icon" src={icon} width={200} height={90} priority />
+            <Image alt="" src={icon} width={200} height={90} priority />
           </div>
         )}
         <span>{item.value}</span>

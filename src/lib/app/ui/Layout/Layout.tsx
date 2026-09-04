@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, ReactNode, Suspense, useEffect, useRef } from "react";
+import { FC, ReactNode, useEffect, useRef } from "react";
 import styles from "./Layout.module.scss";
 import { Header } from "./components";
 import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
@@ -8,7 +8,6 @@ import { useResizeDetector } from "react-resize-detector";
 import { ModalsConnector } from "@/src/lib/shared/ui/Modal";
 import { ToastConnector } from "@/src/lib/shared/ui/Toast";
 import { useMediaStore } from "@/src/lib/shared/hooks/useMediaStore";
-import { CheckMobile } from "@/src/lib/shared/ui/CheckMobile";
 import { useAuthRefresh } from "@/src/lib/shared/hooks/useAuthRefresh";
 import { useGetUserInfo } from "@/src/lib/features/user/model/user.hooks";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
@@ -18,7 +17,6 @@ import { ErrorHandler } from "@/src/lib/shared/ui/ErrorHandler";
 import classNames from "classnames";
 import { usePathname } from "next/navigation";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { PageLoader } from "@/src/lib/shared/ui/PageLoader";
 import { useGameFiltersQuery } from "@/src/lib/entities/game/api/game.queries";
 import { usePlatformsQuery } from "@/src/lib/entities/platform/api/platform.queries";
 
@@ -28,6 +26,16 @@ interface ILayoutProps {
 }
 
 const LAST_ONLINE_UPDATE_INTERVAL = 5 * 60 * 1000;
+
+const TOP_MENU_ROUTES = ["/games", "/gauntlet"];
+const BOTTOM_BAR_ROUTES = ["/games", "/gauntlet"];
+const BOTTOM_BAR_PREFIXES = ["/user/"];
+
+const hasTopMenu = (pathname: string) => TOP_MENU_ROUTES.includes(pathname);
+
+const hasBottomBar = (pathname: string) =>
+  BOTTOM_BAR_ROUTES.includes(pathname) ||
+  BOTTOM_BAR_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 
 export const Layout: FC<ILayoutProps> = ({ children, className }) => {
   const {
@@ -110,19 +118,21 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
   return (
     <div className={classNames(className, styles.layout)}>
       <ErrorHandler />
-      <CheckMobile>
-        <Header />
-      </CheckMobile>
+      <Header />
       <Scrollbar
         classNameContent={styles.scrollbars__content}
         classNameScrollbar={styles.scrollbars__scrollbar}
         type="absolute"
       >
-        <Suspense fallback={<PageLoader />}>
-          <main className={"container"} ref={ref}>
-            {children}
-          </main>
-        </Suspense>
+        <main
+          className={classNames("container", {
+            container_topMenu: hasTopMenu(pathname),
+            container_bottomBar: hasBottomBar(pathname),
+          })}
+          ref={ref}
+        >
+          {children}
+        </main>
       </Scrollbar>
       <ToastConnector />
       <ModalsConnector />

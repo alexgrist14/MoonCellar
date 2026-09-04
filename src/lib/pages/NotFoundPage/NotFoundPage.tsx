@@ -9,7 +9,7 @@ import styles from "./NotFoundPage.module.scss";
 
 export const NotFoundPage = () => {
   return (
-    <Box contentStyle={{ minHeight: "var(--page-height-padding)" }}>
+    <Box contentStyle={{ minHeight: "var(--page-height-available)" }}>
       <div className={styles.page}>
         <div className={styles.page__figure}>
           <SvgMoonBackdrop

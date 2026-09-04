@@ -1,9 +1,28 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x4);
+  height: var(--page-height-available);
+
+  @include mediaMd {
+    height: fit-content;
+  }
+}
+
+.description {
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
 .page {
   display: grid;
   position: relative;
-  height: var(--page-height-padding);
+  flex: 1;
+  min-height: 0;
 
   @include mediaMd {
+    flex: none;
     height: fit-content;
   }
 }

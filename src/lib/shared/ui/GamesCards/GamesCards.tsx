@@ -1,27 +1,18 @@
-import { FC, ReactNode, useCallback, useMemo, useState } from "react";
+import { CSSProperties, FC, ReactNode } from "react";
 import styles from "./GamesCards.module.scss";
 import { IGameResponse } from "../../lib/schemas/games.schema";
-import { Grid, AutoSizer, GridCellProps, Size } from "react-virtualized";
 import { GameCard } from "../GameCard";
-import { coverRatio } from "../../constants";
 import { Scrollbar } from "../Scrollbar";
 
-const MIN_COLUMN_WIDTH = 180;
-const MIN_COLUMN_COUNT = 2;
-const MAX_COLUMN_COUNT = 6;
-const OVERSCAN_ROW_COUNT = 2;
-
-const getColumnCount = (width: number) =>
-  Math.min(
-    MAX_COLUMN_COUNT,
-    Math.max(MIN_COLUMN_COUNT, Math.floor(width / MIN_COLUMN_WIDTH))
-  );
+const PRIORITY_COUNT = 6;
 
 interface IGamesCardsProps {
   children?: ReactNode;
   games?: IGameResponse[];
   gameClassName?: string;
-  additionalHeight?: number;
+  isWithCombinedRating?: boolean;
+  isWithoutScroll?: boolean;
+  columns?: number;
   additionalGameNode?: (game: IGameResponse) => ReactNode;
 }
 
@@ -29,76 +20,56 @@ export const GamesCards: FC<IGamesCardsProps> = ({
   children,
   games,
   gameClassName,
-  additionalHeight,
+  isWithCombinedRating,
+  isWithoutScroll,
+  columns,
   additionalGameNode,
 }) => {
-  const [scrollTop, setScrollTop] = useState(0);
-  const [size, setSize] = useState<Size>({ width: 0, height: 0 });
+  if (!games?.length) return null;
 
-  const onScroll = useCallback(({ scrollTop }: { scrollTop?: number }) => {
-    setScrollTop(scrollTop || 0);
-  }, []);
-
-  const { columnCount, columnWidth, rowCount, rowHeight } = useMemo(() => {
-    const columnCount = getColumnCount(size.width);
-    const columnWidth = size.width / columnCount;
-    const rowCount = Math.ceil((games?.length || 0) / columnCount) || 1;
-    const rowHeight = columnWidth / coverRatio + (additionalHeight || 0);
-
-    return { columnCount, columnWidth, rowCount, rowHeight };
-  }, [size.width, games?.length, additionalHeight]);
-
-  const cellRenderer = useCallback(
-    ({ key, style, rowIndex, columnIndex }: GridCellProps) => {
-      const game = games?.[rowIndex * columnCount + columnIndex];
-
-      if (!game) return null;
-
-      return (
-        <div key={key} className={gameClassName} style={style}>
-          <GameCard key={game._id} game={game} priority={rowIndex === 0} />
+  const grid = (
+    <div
+      className={styles.block__grid}
+      style={
+        columns ? ({ "--games-columns": columns } as CSSProperties) : undefined
+      }
+    >
+      {games.map((game, index) => (
+        <div key={game._id} className={gameClassName}>
+          <GameCard
+            game={game}
+            priority={index < PRIORITY_COUNT}
+            isWithCombinedRating={isWithCombinedRating}
+          />
           {additionalGameNode?.(game)}
         </div>
-      );
-    },
-    [games, gameClassName, additionalGameNode, columnCount]
+      ))}
+    </div>
   );
 
-  if (!games?.length) return null;
+  if (isWithoutScroll) {
+    return (
+      <div className={styles.block}>
+        {grid}
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div className={styles.block}>
-      <AutoSizer onResize={setSize}>
-        {() =>
-          !size.width || !size.height ? null : (
-            <Scrollbar
-              type="absolute"
-              classNameContainer={styles.block__container}
-              classNameContent={styles.block__content}
-              classNameScrollbar={styles.block__scrollbar}
-              classNameLine={styles.block__line}
-              contentStyle={{ maxHeight: size.height }}
-              fadeType="both"
-              isWithRadius
-              onScroll={onScroll}
-            >
-              <Grid
-                autoHeight
-                width={size.width}
-                height={size.height}
-                columnCount={columnCount}
-                rowCount={rowCount}
-                rowHeight={rowHeight}
-                columnWidth={columnWidth}
-                overscanRowCount={OVERSCAN_ROW_COUNT}
-                scrollTop={scrollTop}
-                className={styles.block__grid}
-                cellRenderer={cellRenderer}
-              />
-            </Scrollbar>
-          )
-        }
-      </AutoSizer>
+      <Scrollbar
+        type="absolute"
+        classNameContainer={styles.block__container}
+        classNameContent={styles.block__content}
+        classNameScrollbar={styles.block__scrollbar}
+        classNameLine={styles.block__line}
+        contentStyle={{ maxHeight: "var(--page-height-available)" }}
+        fadeType="both"
+        isWithRadius
+      >
+        {grid}
+      </Scrollbar>
       {children}
     </div>
   );

@@ -11,6 +11,10 @@
     align-content: flex-start;
   }
 
+  &__crumbs {
+    margin-bottom: var(--padding-x2);
+  }
+
   &__left {
     display: flex;
     flex-direction: column;

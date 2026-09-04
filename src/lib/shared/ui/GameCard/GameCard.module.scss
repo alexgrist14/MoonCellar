@@ -73,13 +73,80 @@
     width: 100%;
   }
 
+  &__rail {
+    position: absolute;
+    display: flex;
+    z-index: 2;
+
+    &_topLeft {
+      top: 0;
+      left: 0;
+    }
+
+    &_bottomLeft {
+      bottom: 0;
+      left: 0;
+    }
+
+    &_topRight {
+      top: 0;
+      right: 0;
+      z-index: 4;
+      flex-direction: row-reverse;
+    }
+
+    &_bottomRight {
+      bottom: 0;
+      right: 0;
+      flex-direction: row-reverse;
+    }
+
+    & > * {
+      border-radius: 0;
+    }
+
+    &_topLeft > *:first-child {
+      border-top-left-radius: var(--radius-x4);
+    }
+
+    &_topLeft > *:last-child {
+      border-bottom-right-radius: var(--radius-x4);
+    }
+
+    &_bottomLeft > *:first-child {
+      border-bottom-left-radius: var(--radius-x4);
+    }
+
+    &_bottomLeft > *:last-child {
+      border-top-right-radius: var(--radius-x4);
+    }
+
+    &_topRight > *:first-child {
+      border-top-right-radius: var(--radius-x4);
+    }
+
+    &_topRight > *:last-child {
+      border-bottom-left-radius: var(--radius-x4);
+    }
+
+    &_bottomRight > *:first-child {
+      border-bottom-right-radius: var(--radius-x4);
+    }
+
+    &_bottomRight > *:last-child {
+      border-top-left-radius: var(--radius-x4);
+    }
+  }
+
   div &__rating,
   div &__more,
   div &__royal,
-  div &__achievement {
-    position: absolute;
+  div &__achievement,
+  div &__rank,
+  div &__combined {
     width: 30px;
     height: 30px;
+    flex-shrink: 0;
     border: var(--padding-x05) solid var(--color-bg-secondary);
     animation: appearOpacity 0.2s ease;
 
@@ -87,41 +154,49 @@
   }
 
   div &__rating {
-    bottom: 0;
-    left: 0;
     font-weight: 700;
     padding: var(--padding-x2);
-    border-radius: 0 var(--radius-x4) 0 var(--radius-x4);
     background-color: var(--color-bg-accent-tint);
   }
 
   div &__royal {
-    top: 0;
-    left: 0;
     font-weight: 700;
     padding: var(--padding-x05);
-    border-radius: var(--radius-x4) 0 var(--radius-x4) 0;
     background-color: var(--color-bg-positive-tint);
   }
 
+  div &__rank {
+    font-weight: 700;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    padding: var(--padding-x05);
+    color: var(--color-text-secondary);
+    background-color: var(--color-bg-primary-tint);
+  }
+
+  div &__combined {
+    width: auto;
+    min-width: 30px;
+    gap: var(--gap-x1);
+    font-weight: 700;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    padding-inline: var(--padding-x2);
+    color: var(--color-text-secondary);
+    background-color: var(--color-bg-primary-tint);
+  }
+
   div &__more {
-    top: 0;
-    right: 0;
     padding: var(--padding-x1);
     background-color: var(--color-bg-primary-tint);
-    border-radius: 0 var(--radius-x4) 0 var(--radius-x4);
-    z-index: 2;
     transition: 0.3s;
 
     @include gameGlowOutline;
   }
 
   div &__achievement {
-    bottom: 0;
-    right: 0;
     padding: var(--padding-x1);
     background-color: var(--color-bg-primary-tint);
-    border-radius: var(--radius-x4) 0 var(--radius-x4) 0;
   }
 
   @include gameGlow;

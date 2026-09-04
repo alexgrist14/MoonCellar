@@ -1,7 +1,6 @@
 "use client";
 
 import { FC } from "react";
-import { useRouter } from "next/navigation";
 import styles from "./GamePage.module.scss";
 import { dateRegions } from "../../shared/constants";
 import { Slideshow } from "../../shared/ui/Slideshow";
@@ -11,20 +10,19 @@ import { GameCard } from "../../shared/ui/GameCard";
 import classNames from "classnames";
 import { Box } from "../../shared/ui/Box";
 import { BGImage } from "../../shared/ui/BGImage";
+import { Breadcrumbs } from "../../shared/ui/Breadcrumbs";
 import { IGameResponse } from "../../shared/lib/schemas/games.schema";
-import { Button, ButtonColor } from "../../shared/ui/Button";
-import { useAuthStore } from "../../shared/store/auth.store";
 import { useCommonStore } from "../../shared/store/common.store";
 import { useHideAdult } from "../../shared/hooks/useHideAdult";
 import { isAdultGame } from "../../shared/utils/adult.utils";
 import { GameFriendsStatus } from "../../features/game/GameFriendsStatus";
+import { GameAdminControls } from "../../features/game/GameAdminControls";
 import { ExpandableBlock } from "../../shared/ui/ExpandableBlock";
 import { GameStatsBoxes } from "@/src/lib/entities/game/ui/GameStatsBoxes";
 import { formatMultiplayerMode } from "../../shared/utils/multiplayer.utils";
+import { toSlug } from "../../shared/utils/slug.utils";
 
 export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
-  const router = useRouter();
-  const isAdmin = useAuthStore((state) => state.isAdmin);
   const { systems } = useCommonStore();
 
   const hideMedia = useHideAdult() && isAdultGame(game);
@@ -45,28 +43,29 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
           </div>
           <GameStatsBoxes game={game} />
           <GameFriendsStatus gameId={game._id} />
+          <GameAdminControls game={game} />
         </div>
         <Box
           classNameContent={styles.page__right}
           contentStyle={{ padding: "var(--padding-x3)" }}
         >
+          <Breadcrumbs
+            className={styles.page__crumbs}
+            items={[
+              { name: "Home", href: "/" },
+              { name: "Games", href: "/games" },
+              { name: game.name, href: `/games/${game.slug}` },
+            ]}
+          />
           <div className={styles.page__header}>
             <div className={styles.page__titleGroup}>
-              <h2>{game.name}</h2>
+              <h1>{game.name}</h1>
               {!!game.alternative_names?.length && (
                 <p className={styles.page__altNames}>
                   {game.alternative_names.join(", ")}
                 </p>
               )}
             </div>
-            {isAdmin && (
-              <Button
-                color={ButtonColor.DEFAULT}
-                onClick={() => router.push(`/admin/games/${game._id}`)}
-              >
-                Edit
-              </Button>
-            )}
           </div>
           <div className={styles.page__info}>
             {!!game.first_release && (
@@ -141,7 +140,7 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
 
                   return (
                     <span key={id}>
-                      <Link href={`/games?selectedPlatforms[]=${id}`}>
+                      <Link href={`/games/platform/${platform.slug}`}>
                         {platform.name}
                       </Link>
                       {i !== array.length - 1 ? ", " : ""}
@@ -155,9 +154,7 @@ export const GamePage: FC<{ game: IGameResponse }> = ({ game }) => {
                 <span>Genres: </span>
                 {game.genres.map((genre, i, array) => (
                   <span key={genre + i}>
-                    <Link href={`/games?selectedGenres[]=${genre}`}>
-                      {genre}
-                    </Link>
+                    <Link href={`/games/genre/${toSlug(genre)}`}>{genre}</Link>
                     {i !== array.length - 1 ? ", " : ""}
                   </span>
                 ))}

@@ -8,6 +8,7 @@ import { SvgDoubleArrow } from "../svg/SvgDoubleArrow";
 import { SvgArrow } from "../svg/SvgArrow";
 import { createPortal } from "react-dom";
 import { useAdvancedRouter } from "../../hooks/useAdvancedRouter";
+import { commonUtils } from "../../utils/common.utils";
 
 interface IPaginationProps {
   total: number;
@@ -55,10 +56,6 @@ export const Pagination = memo(
     }, [page]);
 
     if (!total) return null;
-
-    const connector = document.getElementById("pagination-connector");
-
-    if (!connector) return null;
 
     const renderBlock = () => {
       return (
@@ -141,7 +138,13 @@ export const Pagination = memo(
       );
     };
 
-    return isFixed ? createPortal(renderBlock(), connector) : renderBlock();
+    if (!isFixed) return renderBlock();
+
+    const connector = commonUtils.checkWindow(() =>
+      document.getElementById("pagination-connector")
+    );
+
+    return connector ? createPortal(renderBlock(), connector) : null;
   }
 );
 

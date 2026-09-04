@@ -1,5 +1,7 @@
 .container {
   display: grid;
+  height: 100%;
+  min-height: 0;
   // padding: var(--padding-x4) var(--padding-x5);
   grid-template-columns: 1fr max(300px, min(600px,40vw)) 1fr;
   grid-template-areas: "left wheel right";
@@ -19,9 +21,16 @@
   &__wheel {
     grid-area: wheel;
     display: flex;
+    align-items: center;
+    align-self: stretch;
     justify-content: center;
     width: 100%;
+    min-height: 0;
     overflow: hidden;
+
+    @include mediaMd {
+      align-self: auto;
+    }
   }
 
   &__left {
@@ -30,6 +39,7 @@
 
   &__right {
     grid-area: right;
+    min-height: 0;
   }
 }
 

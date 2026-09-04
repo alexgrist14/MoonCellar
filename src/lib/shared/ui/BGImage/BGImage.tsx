@@ -82,7 +82,7 @@ export const BGImage = memo(({ game, userImage }: IBGImageProps) => {
             <Image
               onLoad={() => debouncedSetImageReady(true)}
               key={bg}
-              alt="Background"
+              alt=""
               src={bg}
               width={1920}
               height={1080}
@@ -98,7 +98,7 @@ export const BGImage = memo(({ game, userImage }: IBGImageProps) => {
           <Image
             onLoad={() => setIsDefaultReady(true)}
             key={prev}
-            alt="Background"
+            alt=""
             src={prev}
             width={1920}
             height={1080}

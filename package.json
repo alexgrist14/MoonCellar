@@ -12,7 +12,8 @@
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,scss,html}'",
     "check:schemas": "bun run ${MOONCELLAR_SERVER_PATH:-../MoonCellar-Server}/scripts/check-schema-parity.ts",
     "prepare": "husky",
-    "pre-commit": "lint-staged"
+    "pre-commit": "lint-staged",
+    "check:layout": "node scripts/check-layout.mjs"
   },
   "husky": {
     "hooks": {
@@ -67,6 +68,7 @@
     "husky": "^9.1.7",
     "interweave-ssr": "^2.0.0",
     "lint-staged": "^17.1.0",
+    "playwright-core": "^1.62.1",
     "prettier": "^3.9.5",
     "typescript": "5.9.3"
   }

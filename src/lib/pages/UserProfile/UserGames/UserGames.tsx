@@ -2,7 +2,8 @@ import { SortType } from "@/src/lib/shared/types/sort.type";
 import { CategoriesFilterType } from "@/src/lib/shared/types/user.type";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
-import { FC, useMemo } from "react";
+import { FC, useMemo, useState } from "react";
+import { useDebounce } from "use-debounce";
 import styles from "./UserGames.module.scss";
 import { useSearchParams } from "next/navigation";
 import { IPlaythrough } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
@@ -11,13 +12,16 @@ import { modal } from "@/src/lib/shared/ui/Modal";
 import { GamePlaysInfo } from "@/src/lib/entities/game/ui/GamePlaysInfo";
 import { IUserRating } from "@/src/lib/shared/lib/schemas/user-ratings.schema";
 import { GamesCards } from "@/src/lib/shared/ui/GamesCards";
-import { takeGames } from "@/src/lib/shared/constants/games.const";
+import { takeUserGames } from "@/src/lib/shared/constants/games.const";
 import { Box } from "@/src/lib/shared/ui/Box";
+import { Input } from "@/src/lib/shared/ui/Input";
 import { Button } from "@/src/lib/shared/ui/Button";
 import { RatingStars } from "@/src/lib/shared/ui/RatingStars";
 import { SvgComment } from "@/src/lib/shared/ui/svg";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
+
+const MIN_SEARCH_LENGTH = 2;
 
 interface UserGamesProps {
   playthroughs: IPlaythrough[];
@@ -129,34 +133,91 @@ export const UserGames: FC<UserGamesProps> = ({
 
   const currentPage = page || 1;
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const normalizedSearch = searchQuery.trim();
+  const [debouncedSearch] = useDebounce(normalizedSearch, 500);
+  const isSearchActive = debouncedSearch.length >= MIN_SEARCH_LENGTH;
+
+  const { data: searchedGames = [], isFetching: isSearching } =
+    useGamesByIdsQuery(gameIds, debouncedSearch, isSearchActive);
+
+  const visibleIds = useMemo(
+    () => (isSearchActive ? searchedGames.map((game) => game._id) : gameIds),
+    [isSearchActive, searchedGames, gameIds]
+  );
+
   const pageGameIds = useMemo(
-    () => gameIds.slice((currentPage - 1) * takeGames, currentPage * takeGames),
-    [gameIds, currentPage]
+    () =>
+      visibleIds.slice(
+        (currentPage - 1) * takeUserGames,
+        currentPage * takeUserGames
+      ),
+    [visibleIds, currentPage]
   );
 
   const {
-    data: games = [],
-    isPending,
-    isFetching,
-  } = useGamesByIdsQuery(pageGameIds);
+    data: pageGames = [],
+    isPending: isPagePending,
+    isFetching: isPageFetching,
+  } = useGamesByIdsQuery(pageGameIds, undefined, !isSearchActive);
 
-  const total = gameIds.length;
+  const games = useMemo(
+    () =>
+      isSearchActive
+        ? searchedGames.slice(
+            (currentPage - 1) * takeUserGames,
+            currentPage * takeUserGames
+          )
+        : pageGames,
+    [isSearchActive, searchedGames, pageGames, currentPage]
+  );
+
+  const isPending = isSearchActive ? isSearching : isPagePending;
+  const isFetching = isSearchActive ? isSearching : isPageFetching;
+
+  const total = visibleIds.length;
+
+  const searchField = (
+    <Input
+      containerClassname={styles.games__search}
+      placeholder="Search by name"
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+    />
+  );
+
+  if (isPending || isFetching)
+    return (
+      <>
+        {searchField}
+        <Loader type="moon" />
+      </>
+    );
 
   if (!pageGameIds.length)
     return (
-      <EmptyState
-        title="List is empty"
-        description="There are no games in this list yet"
-      />
+      <>
+        {searchField}
+        <EmptyState
+          title={isSearchActive ? "Nothing found" : "List is empty"}
+          description={
+            isSearchActive
+              ? `No games match "${debouncedSearch}"`
+              : "There are no games in this list yet"
+          }
+        />
+      </>
     );
-  if (isPending || isFetching) return <Loader type="moon" />;
 
   return (
     <>
+      {searchField}
       <GamesCards
         games={games}
         gameClassName={styles.games__game}
-        additionalHeight={100}
+        isWithCombinedRating
+        isWithoutScroll
+        columns={5}
         additionalGameNode={(game) => {
           const rating = parsedGamesRatings?.[game._id];
           const gamePlaythroughs = playthroughs.filter(
@@ -217,7 +278,7 @@ export const UserGames: FC<UserGamesProps> = ({
         }}
       />
       <Pagination
-        take={takeGames}
+        take={takeUserGames}
         total={total}
         isFixed
         isDisabled={isFetching}

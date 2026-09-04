@@ -4,7 +4,7 @@ import styles from "./SectionTitle.module.scss";
 
 interface ISectionTitleProps {
   children: ReactNode;
-  as?: "h2" | "h3" | "h4";
+  as?: "h1" | "h2" | "h3" | "h4";
   variant?: "bar" | "pill";
   isWithMarginBottom?: boolean;
   className?: string;

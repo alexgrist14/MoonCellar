@@ -14,7 +14,6 @@ import { useStatesStore } from "../../store/states.store";
 import { useResizeDetector } from "react-resize-detector";
 import { useExpandStore } from "../../store/expand.store";
 import { commonUtils } from "../../utils/common.utils";
-import { CheckMobile } from "../CheckMobile";
 import { createPortal } from "react-dom";
 import useCloseEvents from "../../hooks/useCloseEvents";
 
@@ -70,71 +69,66 @@ export const ExpandMenu = memo(
     if (!connector) return null;
 
     return createPortal(
-      <CheckMobile>
+      <div
+        id={position}
+        key={position}
+        ref={expandRef}
+        className={classNames(styles.wrapper, {
+          [styles.wrapper_right]: position.includes("right"),
+          [styles.wrapper_active]: isActive,
+        })}
+        style={{
+          ...(position.includes("bottom") && { top: "unset", bottom: "0" }),
+          ...menuStyle,
+        }}
+      >
         <div
-          id={position}
-          key={position}
-          ref={expandRef}
-          className={classNames(styles.wrapper, {
-            [styles.wrapper_right]: position.includes("right"),
-            [styles.wrapper_disabled]: isMobile && !isActive,
-            [styles.wrapper_active]: isActive,
+          className={classNames(styles.menu, {
+            [styles.menu_right]: position.includes("right"),
+            [styles.menu_disabled]: isMobile && !isActive,
+            [styles.menu_active]: isActive,
           })}
-          style={{
-            ...(position.includes("bottom") && { top: "unset", bottom: "0" }),
-            ...menuStyle,
-          }}
+          style={menuStyle}
+          {...props}
         >
-          <div
-            className={classNames(styles.menu, {
-              [styles.menu_right]: position.includes("right"),
-              [styles.menu_disabled]: isMobile && !isActive,
-              [styles.menu_active]: isActive,
-            })}
-            style={menuStyle}
-            {...props}
-          >
-            <Scrollbar
-              type="absolute"
-              classNameContainer={styles.scrollbars__container}
-              classNameContent={styles.scrollbars__content}
-              classNameScrollbar={styles.scrollbars__scrollbar}
-              contentStyle={{
-                ...(position.includes("bottom")
-                  ? { paddingBottom: "var(--padding-x14)" }
-                  : { paddingTop: "var(--padding-x14)" }),
-              }}
-            >
-              <div className={classNames(styles.menu__content)} ref={ref}>
-                {children}
-              </div>
-            </Scrollbar>
-          </div>
-          <div
-            onClick={() => {
-              isActive
-                ? closeHandler()
-                : setExpanded(
-                    !!expanded?.length ? [...expanded, position] : [position]
-                  );
+          <Scrollbar
+            type="absolute"
+            classNameContainer={styles.scrollbars__container}
+            classNameContent={styles.scrollbars__content}
+            classNameScrollbar={styles.scrollbars__scrollbar}
+            contentStyle={{
+              ...(position.includes("bottom")
+                ? { paddingBottom: "var(--padding-x14)" }
+                : { paddingTop: "var(--padding-x14)" }),
             }}
-            className={classNames(
-              styles.title,
-              styles[`title_${position}`],
-              titleClassName,
-              {
-                [styles[`title_${position}_active`]]: isActive,
-                [styles.title_bottom]: position.includes("bottom"),
-              }
-            )}
-            style={titleStyle}
           >
-            <span>
-              {isActive ? titleClose || "Close" : titleOpen || "Open"}
-            </span>
-          </div>
+            <div className={classNames(styles.menu__content)} ref={ref}>
+              {children}
+            </div>
+          </Scrollbar>
         </div>
-      </CheckMobile>,
+        <div
+          onClick={() => {
+            isActive
+              ? closeHandler()
+              : setExpanded(
+                  !!expanded?.length ? [...expanded, position] : [position]
+                );
+          }}
+          className={classNames(
+            styles.title,
+            styles[`title_${position}`],
+            titleClassName,
+            {
+              [styles[`title_${position}_active`]]: isActive,
+              [styles.title_bottom]: position.includes("bottom"),
+            }
+          )}
+          style={titleStyle}
+        >
+          <span>{isActive ? titleClose || "Close" : titleOpen || "Open"}</span>
+        </div>
+      </div>,
       connector
     );
   }

@@ -6,7 +6,7 @@
   border-radius: var(--radius-x5);
 
   div &__container {
-    width: max-content;
+    width: 100%;
   }
 
   &__line {
@@ -17,8 +17,23 @@
     margin: 0;
     padding: 0;
     height: fit-content;
-    width: fit-content;
+    width: 100%;
     border-radius: var(--radius-x5);
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--gap-x2);
+    width: 100%;
+
+    @include mediaMin($screenGt) {
+      grid-template-columns: repeat(var(--games-columns, 6), minmax(0, 1fr));
+    }
+
+    @include mediaSm {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
   div &__scrollbar {

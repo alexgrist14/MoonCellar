@@ -5,15 +5,29 @@ import { ACCESS_TOKEN } from "@/src/lib/shared/constants";
 import { IAuthToken } from "@/src/lib/shared/types/auth.type";
 import { jwtDecode } from "jwt-decode";
 import { Metadata } from "next";
+import { PageLoader } from "@/src/lib/shared/ui/PageLoader";
 import { cookies } from "next/headers";
-import { fetchOrNotFound } from "@/src/lib/shared/utils/not-found.utils";
+import { fetchOrNull } from "@/src/lib/shared/utils/not-found.utils";
+import { notFound } from "next/navigation";
+import { cache, Suspense } from "react";
+
+const getUser = cache(async (name: string) =>
+  fetchOrNull(userAPI.getByString(name))
+);
 
 export async function generateMetadata({
   params,
 }: {
   params: any;
 }): Promise<Metadata> {
-  const user = await fetchOrNotFound(userAPI.getByString((await params).name));
+  const user = await getUser((await params).name);
+
+  if (!user) {
+    return {
+      title: "Page not found",
+      robots: { index: false, follow: false },
+    };
+  }
 
   return {
     title: "Profile: " + user.userName,
@@ -29,6 +43,9 @@ export async function generateMetadata({
       "achievements",
       "ratings",
     ],
+    alternates: {
+      canonical: `/user/${user.userName}`,
+    },
   };
 }
 
@@ -44,7 +61,11 @@ export default async function User({ params }: { params: any }) {
     ? (await userAPI.getUserFollowings(authUserInfo.id)).data
     : undefined;
 
-  const user = await fetchOrNotFound(userAPI.getByString((await params).name));
+  const user = await getUser((await params).name);
+
+  if (!user) {
+    notFound();
+  }
   const playthroughs = (
     await playthroughsAPI.getAll({
       userId: user._id,
@@ -59,12 +80,14 @@ export default async function User({ params }: { params: any }) {
   const userFollowers = (await userAPI.getUserFollowers(user._id)).data;
 
   return (
-    <UserProfile
-      user={{ ...user, followings: userFollowings, followers: userFollowers }}
-      authUserId={authUserInfo?.id}
-      authUserFollowings={authUserFollowings}
-      playthroughs={playthroughs}
-      ratings={ratings}
-    />
+    <Suspense fallback={<PageLoader />}>
+      <UserProfile
+        user={{ ...user, followings: userFollowings, followers: userFollowers }}
+        authUserId={authUserInfo?.id}
+        authUserFollowings={authUserFollowings}
+        playthroughs={playthroughs}
+        ratings={ratings}
+      />
+    </Suspense>
   );
 }

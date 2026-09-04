@@ -5,16 +5,19 @@ import {
   IUpcomingReleaseGroup,
 } from "../lib/shared/lib/schemas/games.schema";
 import { gamesApi } from "../lib/shared/api";
+import { platformsAPI } from "../lib/shared/api/platforms.api";
+import { unstable_cache } from "next/cache";
+import { IPlatformCount } from "../lib/shared/types/games.type";
 import { Metadata } from "next";
 import {
   MAIN_PAGE_DESCRIPTION,
-  MAIN_PAGE_TITLE,
+  MAIN_PAGE_META_TITLE,
 } from "../lib/pages/Main/MainPage.constants";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: MAIN_PAGE_TITLE,
+  title: { absolute: MAIN_PAGE_META_TITLE },
   description: MAIN_PAGE_DESCRIPTION,
   keywords: [
     "game collection",
@@ -26,7 +29,49 @@ export const metadata: Metadata = {
     "top rated games",
     "upcoming games",
   ],
+  alternates: {
+    canonical: "/",
+  },
 };
+
+const FEATURED_PLATFORM_SLUGS = [
+  "win",
+  "ps5",
+  "ps4--1",
+  "switch",
+  "series-x-s",
+  "ps2",
+  "xbox360",
+  "snes",
+  "nes",
+  "genesis-slash-megadrive",
+];
+
+const getFeaturedPlatforms = unstable_cache(
+  async (): Promise<IPlatformCount[]> => {
+    const platforms = await platformsAPI
+      .getAll()
+      .then(({ data }) => data)
+      .catch(() => []);
+
+    const featured = FEATURED_PLATFORM_SLUGS.map((slug) =>
+      platforms.find((platform) => platform.slug === slug)
+    ).filter((platform) => !!platform);
+
+    return Promise.all(
+      featured.map(async (platform) => {
+        const { total } = await gamesApi
+          .getAll({ selected: { platforms: [platform._id] }, take: 1, page: 1 })
+          .then(({ data }) => data)
+          .catch(() => ({ total: 0 }));
+
+        return { name: platform.name, slug: platform.slug, count: total };
+      })
+    );
+  },
+  ["main-featured-platforms"],
+  { revalidate: 3600 }
+);
 
 async function getGames(): Promise<{
   topRated: IGameResponse[];
@@ -69,7 +114,10 @@ async function getGames(): Promise<{
 }
 
 export default async function Home() {
-  const games = await getGames();
+  const [games, platforms] = await Promise.all([
+    getGames(),
+    getFeaturedPlatforms().catch(() => [] as IPlatformCount[]),
+  ]);
 
-  return <MainPage games={games} />;
+  return <MainPage games={games} platforms={platforms} />;
 }

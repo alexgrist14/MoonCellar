@@ -12,6 +12,7 @@ import styles from "./UserProfile.module.scss";
 import cn from "classnames";
 import { Box } from "../../shared/ui/Box";
 import { BGImage } from "../../shared/ui/BGImage";
+import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
 import { SvgBurger } from "../../shared/ui/svg";
 import { useStatesStore } from "../../shared/store/states.store";
@@ -133,6 +134,16 @@ const UserProfile: FC<UserProfileProps> = ({
           </ExpandMenu>
         )}
         <Box classNameContent={styles.content}>
+          <Breadcrumbs
+            className={styles.crumbs}
+            items={[
+              { name: "Home", href: "/" },
+              {
+                name: displayUser.userName,
+                href: `/user/${displayUser.userName}`,
+              },
+            ]}
+          />
           {tab === "settings" && authUserId === user._id && <Settings />}
           {tab === "profile" && (
             <UserInfo
@@ -150,7 +161,7 @@ const UserProfile: FC<UserProfileProps> = ({
             />
           )}
         </Box>
-        {!isMobile && (
+        <div className={styles.navigation}>
           <UserNavigation
             user={displayUser}
             isAuthedUser={isAuthedUser}
@@ -160,7 +171,7 @@ const UserProfile: FC<UserProfileProps> = ({
             onSortChange={setSelectedSort}
             onSortOrderChange={setSortOrder}
           />
-        )}
+        </div>
       </div>
     </>
   );

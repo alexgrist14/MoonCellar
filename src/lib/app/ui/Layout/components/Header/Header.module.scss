@@ -33,6 +33,25 @@
     }
   }
 
+  .nav_desktop {
+    display: flex;
+    align-items: center;
+
+    @include mediaMd {
+      display: none;
+    }
+  }
+
+  .nav_mobile {
+    display: none;
+    align-items: center;
+    gap: var(--gap-x2);
+
+    @include mediaMd {
+      display: flex;
+    }
+  }
+
   .burger {
     position: relative;
 

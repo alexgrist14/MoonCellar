@@ -6,6 +6,9 @@ $screenLg: 996px;
 $screenGt: 1200px;
 $screenEx: 1440px;
 $screenXx: 1724px;
+// ExpandMenu toggles are 200px wide and pinned to the viewport edges;
+// below this width they overlap the 1400px content column
+$screenExpandOverlap: 1759px;
 
 @mixin media($min, $max) {
   @media (min-width: $min) and (max-width: $max) {

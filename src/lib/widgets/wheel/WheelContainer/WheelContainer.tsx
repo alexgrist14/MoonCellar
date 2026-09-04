@@ -55,9 +55,7 @@ export const WheelContainer: FC = () => {
             <Box
               isWithScrollBar={!isMobile}
               contentStyle={{
-                maxHeight: isMobile
-                  ? "fit-content"
-                  : "var(--page-height-padding)",
+                maxHeight: isMobile ? "fit-content" : "100%",
               }}
               scrollFadeType="both"
             >

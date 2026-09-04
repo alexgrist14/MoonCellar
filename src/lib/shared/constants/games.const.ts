@@ -29,3 +29,5 @@ export const emptyGames: IGameResponse[] = Array(16)
   }));
 
 export const takeGames = 60;
+
+export const takeUserGames = 30;

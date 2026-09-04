@@ -1,28 +1,38 @@
 import { useQuery } from "@tanstack/react-query";
 import { IGetGamesRequest } from "../../../shared/lib/schemas/games.schema";
+import { IGamesListResponse } from "@/src/lib/shared/types/games.type";
 import { gameQueryKeys } from "./game.query-keys";
 import { adminGamesApi, gamesApi } from "@/src/lib/shared/api";
 
-export const useGamesQuery = (params: IGetGamesRequest, enabled = true) =>
+export const useGamesQuery = (
+  params: IGetGamesRequest,
+  enabled = true,
+  initialData?: IGamesListResponse
+) =>
   useQuery({
     queryKey: gameQueryKeys.list(params),
     queryFn: () => gamesApi.getAll(params).then(({ data }) => data),
     enabled,
     staleTime: 60000,
+    initialData,
   });
 
-export const useGamesByIdsQuery = (ids: string[]) =>
+export const useGamesByIdsQuery = (
+  ids: string[],
+  search?: string,
+  enabled = true
+) =>
   useQuery({
-    queryKey: gameQueryKeys.byIds(ids),
+    queryKey: gameQueryKeys.byIds(ids, search),
     queryFn: async () => {
-      const { data } = await gamesApi.getByIds({ _ids: ids });
+      const { data } = await gamesApi.getByIds({ _ids: ids, search });
 
       return ids.flatMap((id) => {
         const game = data.find((item) => item._id === id);
         return game ? [game] : [];
       });
     },
-    enabled: ids.length > 0,
+    enabled: enabled && ids.length > 0,
     staleTime: 60000,
   });
 

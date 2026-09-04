@@ -9,7 +9,7 @@ import { GameCardInfo } from "@/src/lib/entities/game/ui/GameCardInfo";
 import { IGameResponse } from "../../lib/schemas/games.schema";
 import useCloseEvents from "../../hooks/useCloseEvents";
 import { Button } from "../Button";
-import { SvgAchievement, SvgClose, SvgMore } from "../svg";
+import { SvgAchievement, SvgClose, SvgMore, SvgStar } from "../svg";
 import Link from "next/link";
 import { useGamesStore } from "../../store/games.store";
 import { SvgCrown } from "../svg/SvgCrown";
@@ -18,6 +18,7 @@ import { isAdultGame } from "../../utils/adult.utils";
 import { GameControls } from "../GameControls";
 import { useAuthStore } from "../../store/auth.store";
 import { playthroughPriorityOrder } from "../../constants/user.const";
+import { getAverageRating } from "../../utils/rating.utils";
 
 interface IGameCardProps {
   game: IGameResponse;
@@ -26,6 +27,8 @@ interface IGameCardProps {
   spreadDirection?: "width" | "height";
   isInfoDisabled?: boolean;
   priority?: boolean;
+  rank?: number;
+  isWithCombinedRating?: boolean;
 }
 
 export const GameCard = memo(
@@ -36,10 +39,17 @@ export const GameCard = memo(
     spreadDirection = "width",
     isInfoDisabled,
     priority,
+    rank,
+    isWithCombinedRating,
   }: IGameCardProps) => {
     const cardRef = useRef<HTMLDivElement>(null);
 
     const hideMedia = useHideAdult() && isAdultGame(game);
+
+    const combinedRating = useMemo(
+      () => (isWithCombinedRating ? getAverageRating(game) : null),
+      [game, isWithCombinedRating]
+    );
 
     const [isLoading, setIsLoading] = useState(!!game.cover && !hideMedia);
     const [isActive, setIsActive] = useState(false);
@@ -125,44 +135,87 @@ export const GameCard = memo(
           )}
           draggable={false}
         >
-          {!!isRoyal && (
-            <div className={styles.card__royal}>
-              <SvgCrown size="20" color="contrast-reverse" />
+          {(!!rank || !!isRoyal) && (
+            <div
+              className={classNames(
+                styles.card__rail,
+                styles.card__rail_topLeft
+              )}
+            >
+              {!!rank && <div className={styles.card__rank}>{rank}</div>}
+              {!!isRoyal && (
+                <div className={styles.card__royal}>
+                  <SvgCrown size="20" color="contrast-reverse" />
+                </div>
+              )}
             </div>
           )}
           {!!rating && (
-            <div className={styles.card__rating}>
-              <p>{rating}</p>
+            <div
+              className={classNames(
+                styles.card__rail,
+                styles.card__rail_bottomLeft
+              )}
+            >
+              <div className={styles.card__rating}>
+                <p>{rating}</p>
+              </div>
             </div>
           )}
-          {!!game.retroachievements?.length && (
-            <div className={styles.card__achievement}>
-              <SvgAchievement
-                color={
-                  isMastered ? "attention" : isBeaten ? "positive" : "secondary"
-                }
-              />
+          {(!!game.retroachievements?.length || !!combinedRating) && (
+            <div
+              className={classNames(
+                styles.card__rail,
+                styles.card__rail_bottomRight
+              )}
+            >
+              {!!game.retroachievements?.length && (
+                <div className={styles.card__achievement}>
+                  <SvgAchievement
+                    color={
+                      isMastered
+                        ? "attention"
+                        : isBeaten
+                          ? "positive"
+                          : "secondary"
+                    }
+                  />
+                </div>
+              )}
+              {!!combinedRating && (
+                <div className={styles.card__combined}>
+                  <SvgStar size="12" fillPercent={100} />
+                  <span>{combinedRating}</span>
+                </div>
+              )}
             </div>
           )}
           {!isInfoDisabled && (
-            <Button
-              color="transparent"
+            <div
               className={classNames(
-                styles.card__more,
-                isActive &&
-                  styles[
-                    `card__more_${lastPlaythrough?.isMastered ? "mastered" : lastPlaythrough?.category}`
-                  ]
+                styles.card__rail,
+                styles.card__rail_topRight
               )}
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-
-                setIsActive(!isActive);
-              }}
             >
-              {isActive ? <SvgClose size="16" /> : <SvgMore />}
-            </Button>
+              <Button
+                color="transparent"
+                className={classNames(
+                  styles.card__more,
+                  isActive &&
+                    styles[
+                      `card__more_${lastPlaythrough?.isMastered ? "mastered" : lastPlaythrough?.category}`
+                    ]
+                )}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+
+                  setIsActive(!isActive);
+                }}
+              >
+                {isActive ? <SvgClose size="16" /> : <SvgMore />}
+              </Button>
+            </div>
           )}
           {isLoading && <Loader key={game._id + "_loader"} />}
           {isActive && (
@@ -171,7 +224,7 @@ export const GameCard = memo(
           {!!game?.cover && !hideMedia ? (
             <Image
               onLoad={() => setIsLoading(false)}
-              alt="Game cover"
+              alt={`${game.name} cover`}
               src={game.cover}
               width={260}
               height={325}

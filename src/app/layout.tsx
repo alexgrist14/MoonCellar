@@ -11,8 +11,12 @@ import { NavigationProgress } from "../lib/shared/ui/NavigationProgress";
 import "@/src/lib/app/styles/reset.scss";
 import "@/src/lib/app/styles/root.scss";
 import { QueryProvider } from "../lib/app/providers/QueryProvider";
+import { FRONT_URL } from "../lib/shared/constants";
+import { JsonLd } from "../lib/shared/ui/JsonLd";
+import { getWebSiteJsonLd } from "../lib/shared/utils/json-ld.utils";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(FRONT_URL),
   title: {
     default: "MoonCellar — Game Tracker & Database",
     template: "%s | MoonCellar",
@@ -34,6 +38,19 @@ export const metadata: Metadata = {
     siteName: "MoonCellar",
     type: "website",
     locale: "en_US",
+    images: [
+      {
+        url: "/images/og-default.png",
+        width: 1200,
+        height: 630,
+        alt: "MoonCellar — game tracker and backlog database",
+        type: "image/png",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/images/og-default.png"],
   },
 };
 
@@ -76,6 +93,7 @@ export default function App({ children }: { children: ReactNode }) {
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+        <JsonLd data={getWebSiteJsonLd()} />
       </head>
       <body style={{ color: "white", background: "#191d24" }}>
         <QueryProvider>
