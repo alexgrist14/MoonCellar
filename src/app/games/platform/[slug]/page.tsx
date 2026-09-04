@@ -18,6 +18,7 @@ export async function generateStaticParams() {
   return [];
 }
 
+const DEFAULT_OG_IMAGE = "/images/og-default.png";
 const MIN_GAMES_FOR_INDEX = 100;
 const TOP_COUNT = 5;
 const RECENT_COUNT = 6;
@@ -73,6 +74,7 @@ export async function generateMetadata({
       siteName: "MoonCellar",
       type: "website",
       locale: "en_US",
+      images: [DEFAULT_OG_IMAGE],
     },
   };
 }

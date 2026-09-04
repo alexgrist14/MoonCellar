@@ -185,6 +185,20 @@ const roundToFirstDigit = (num: number): number => {
   return Math.floor(num / base) * base;
 };
 
+export const PAGE_SCROLL_ID = "page-scroll";
+
+export const scrollPageToTop = (behavior: ScrollBehavior = "auto") => {
+  const container = checkWindow(() => document.getElementById(PAGE_SCROLL_ID));
+
+  if (container) {
+    container.scrollTo({ top: 0, behavior });
+
+    return;
+  }
+
+  checkWindow(() => window.scrollTo({ top: 0, behavior }));
+};
+
 export const commonUtils = {
   upFL,
   shuffle,

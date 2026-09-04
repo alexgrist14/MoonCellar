@@ -97,6 +97,7 @@ export const Scrollbar: FC<IScrollBarProps> = ({
         children
       ) : (
         <div
+          id={id}
           className={cl(classNameContent, styles.scrollbars__content)}
           style={contentStyle}
           ref={contentRef}

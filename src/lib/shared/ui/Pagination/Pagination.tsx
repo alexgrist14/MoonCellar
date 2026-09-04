@@ -8,7 +8,7 @@ import { SvgDoubleArrow } from "../svg/SvgDoubleArrow";
 import { SvgArrow } from "../svg/SvgArrow";
 import { createPortal } from "react-dom";
 import { useAdvancedRouter } from "../../hooks/useAdvancedRouter";
-import { commonUtils } from "../../utils/common.utils";
+import { commonUtils, scrollPageToTop } from "../../utils/common.utils";
 
 interface IPaginationProps {
   total: number;
@@ -46,7 +46,7 @@ export const Pagination = memo(
     };
 
     const changeCallback = (page: number) => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollPageToTop("smooth");
       setValue(page.toString());
       callback?.(page);
     };

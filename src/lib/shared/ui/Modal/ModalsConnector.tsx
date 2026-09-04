@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import EventEmitter from "events";
 import { IModal, IModalPropsState } from "./Modal.types";
 import { Modal } from "./Modal";
@@ -17,37 +17,21 @@ export const modal: IModal = {
 export const ModalsConnector = () => {
   const [content, setContent] = useState<IModalPropsState[]>([]);
 
-  const closeLastModal = useMemo(() => {
-    return () => {
-      setContent((st) => {
-        const last = st.at(-1);
-        if (last) {
-          return st.filter((item) => item.props.id !== last.props.id);
-        }
-        return st;
-      });
-    };
-  }, [setContent]);
-
-  const openModal = useMemo(() => {
-    return ({ component, props }: IModalPropsState) => {
-      setContent((st) => [...st, { component, props }]);
-    };
+  const closeLastModal = useCallback(() => {
+    setContent((st) => st.slice(0, -1));
   }, []);
 
-  const closeModal = useMemo(
-    () => (id?: string) => {
-      setContent(
-        !id
-          ? []
-          : (content) =>
-              content.filter((item) => {
-                return item.props.id !== id;
-              })
-      );
-    },
-    [setContent]
-  );
+  const closeAllModals = useCallback(() => {
+    setContent((st) => (st.length ? [] : st));
+  }, []);
+
+  const openModal = useCallback(({ component, props }: IModalPropsState) => {
+    setContent((st) => [...st, { component, props }]);
+  }, []);
+
+  const closeModal = useCallback((id?: string) => {
+    setContent((st) => (!id ? [] : st.filter((item) => item.props.id !== id)));
+  }, []);
 
   useEffect(() => {
     ev.on("open", openModal);
@@ -58,6 +42,12 @@ export const ModalsConnector = () => {
       ev.off("close", closeModal);
     };
   }, [openModal, closeModal]);
+
+  useEffect(() => {
+    window.addEventListener("popstate", closeAllModals);
+
+    return () => window.removeEventListener("popstate", closeAllModals);
+  }, [closeAllModals]);
 
   return (
     <div

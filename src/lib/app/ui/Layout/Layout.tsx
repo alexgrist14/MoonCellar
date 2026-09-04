@@ -18,6 +18,10 @@ import classNames from "classnames";
 import { usePathname } from "next/navigation";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useGameFiltersQuery } from "@/src/lib/entities/game/api/game.queries";
+import {
+  PAGE_SCROLL_ID,
+  scrollPageToTop,
+} from "@/src/lib/shared/utils/common.utils";
 import { usePlatformsQuery } from "@/src/lib/entities/platform/api/platform.queries";
 
 interface ILayoutProps {
@@ -58,8 +62,13 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
     refreshRate: 200,
   });
   const pathname = usePathname();
+  const scrollContentRef = useRef<HTMLDivElement>(null);
   const profile = useAuthStore((state) => state.profile);
   const lastUpdateRef = useRef<number>(0);
+
+  useEffect(() => {
+    scrollPageToTop();
+  }, [pathname]);
 
   useAuthRefresh();
   useMediaStore();
@@ -120,6 +129,8 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
       <ErrorHandler />
       <Header />
       <Scrollbar
+        id={PAGE_SCROLL_ID}
+        initialContentRef={scrollContentRef}
         classNameContent={styles.scrollbars__content}
         classNameScrollbar={styles.scrollbars__scrollbar}
         type="absolute"

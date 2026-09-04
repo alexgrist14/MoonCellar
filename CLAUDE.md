@@ -68,6 +68,11 @@ before:
   nothing on a dynamic segment without `generateStaticParams` — the hub and game routes export
   `generateStaticParams() { return []; }` so nothing is prerendered at build time (the build must
   not depend on the API) while the route still opts into caching.
+- **A page-level `openGraph` or `twitter` object replaces the parent's wholesale — it does not
+  merge.** A route that declares `openGraph` must restate `siteName`, `type`, `locale` and
+  `images`, or it loses them. Do not put `twitter.images` in the root layout: every page without
+  its own `twitter` block inherits that image, and `twitter:image` stops following the page's
+  own `og:image` (game pages shipped the site banner instead of the cover).
 - **Never serve image URLs from under `/api`** — `robots.ts` disallows it, so crawlers cannot
   fetch them. The cover proxy lives at `/img/image-proxy` for exactly this reason.
 
@@ -94,6 +99,12 @@ component needs to build the value itself (a `basePath` string, not a `getHref` 
   IGDB / HowLongToBeat / user rating) already existed in `src/lib/shared/utils/rating.utils.ts`.
 
 ## Modals
+
+- **Modals must not push history entries.** `ModalsConnector` closes every open modal on
+  `popstate`, so Back and Forward dismiss the modal *and* still navigate. Pushing an entry per
+  modal (so Back only closes it) was tried and rejected: it swallows the Back press, and keeping
+  the pushed depth in sync with programmatic closes needs bookkeeping that breaks as soon as
+  anything else touches history.
 
 - Before building a new modal that shows a title plus a list of "row" blocks (an icon/content on one side, text on the other — e.g. `AchievementsModal`, `GamePlaysInfo`), ask the user whether the shared `RowsModal` component (`src/lib/shared/ui/RowsModal`) should be used instead of a bespoke layout. Do not silently assume either way.
 
