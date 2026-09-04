@@ -3,36 +3,87 @@ import { Game } from "../schemas/game.schema";
 
 export type TFieldStatus = 0 | 1 | 2;
 
-export type TVndbFilter = [field: string, operator: "=" | "!=", value: string];
+export type TVndbFilterValue = string | number | TVndbFilter | TVndbFilters;
+export type TVndbFilter = [
+  field: string,
+  operator: "=" | "!=",
+  value: TVndbFilterValue,
+];
 export type TVndbFilters = ["or" | "and", ...TVndbFilter[]];
 export type TVndbCandidate = Pick<
   Game,
   | "name"
+  | "slug"
   | "nameNormalized"
   | "type"
   | "genres"
   | "first_release"
+  | "release_dates"
   | "alternative_names"
   | "companies"
+  | "platformIds"
+  | "summary"
 > & { _id: mongoose.Types.ObjectId };
 
 export type TDateSignal = "confirms" | "contradicts" | "unknown";
+export type TDescriptionSignal = "match" | "mismatch" | "unknown";
+
+export type TMatchReason =
+  | "below-threshold"
+  | "competing-candidates"
+  | "weak-title"
+  | "date-contradicts"
+  | "description-mismatch"
+  | "no-company-evidence"
+  | "company-mismatch"
+  | "unverified-title";
 export type TMatchVerdict = "matched" | "ambiguous" | "absent";
+
+export interface IScoreBreakdown {
+  date: number;
+  genre: number;
+  type: number;
+  title: number;
+  companies: number;
+  platforms: number;
+}
 
 export interface IScoredCandidate {
   game: TVndbCandidate;
   score: number;
   dateSignal: TDateSignal;
+  breakdown: IScoreBreakdown;
+  isDistinctiveTitle: boolean;
+  isMainTitleMatch: boolean;
+  isCorroborated: boolean;
+  isContradicted: boolean;
+  hasCompanyMismatch: boolean;
+  descriptionSignal: TDescriptionSignal;
+}
+
+export interface IScoreContext {
+  platformSlugById: Map<string, string>;
+  sharedTitles: Set<string>;
 }
 
 export interface IVnMatch {
   vnId: string;
+  vnName: string;
   verdict: TMatchVerdict;
+  reason: TMatchReason | null;
   winner: TVndbCandidate | null;
   candidates: IScoredCandidate[];
 }
 
 export type TCandidatesByVn = Map<string, TVndbCandidate[]>;
+
+export interface IVnReleaseSignals {
+  publishers: string[];
+  releaseDates: string[];
+  platforms: string[];
+}
+
+export type TReleaseSignalsByVn = Map<string, IVnReleaseSignals>;
 
 export type TStaffRole =
   | "Scenario"
@@ -170,4 +221,23 @@ export interface IVndbNovel {
 export interface IVndbGameResponse {
   more: boolean;
   results: IVndbNovel[];
+}
+
+export interface IVndbReleaseProducer extends IVndbProducer {
+  developer: boolean;
+  publisher: boolean;
+}
+
+export interface IVndbRelease {
+  id: string;
+  official: boolean;
+  released: string | null;
+  platforms: string[] | null;
+  vns: { id: string }[] | null;
+  producers: IVndbReleaseProducer[] | null;
+}
+
+export interface IVndbReleaseResponse {
+  more: boolean;
+  results: IVndbRelease[];
 }

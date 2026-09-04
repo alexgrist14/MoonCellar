@@ -9,6 +9,244 @@ export const normalizeTitle = (value: string): string =>
     .trim()
     .replace(/\s+/g, " ");
 
+const COMPANY_SUFFIX_PATTERN =
+  /\b(?:co|company|corp|corporation|inc|incorporated|ltd|limited|llc|kk|gmbh|plc|sa|srl|bv|ab|oy|pte|pty)\b/g;
+
+const MIN_TITLE_KEY_LENGTH = 3;
+const MIN_TITLE_KEY_RATIO = 0.75;
+const MIN_COMPANY_KEY_LENGTH = 5;
+
+export const normalizeCompanyName = (value: string): string =>
+  normalizeTitle(value)
+    .replace(COMPANY_SUFFIX_PATTERN, " ")
+    .replace(/\s+/g, "");
+
+export const companySearchPrefix = (value: string): string =>
+  normalizeTitle(value)
+    .replace(COMPANY_SUFFIX_PATTERN, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const sortedCompanyTokens = (value: string): string =>
+  normalizeTitle(value)
+    .replace(COMPANY_SUFFIX_PATTERN, " ")
+    .split(" ")
+    .filter(Boolean)
+    .sort()
+    .join("");
+
+export const isSameCompanyName = (a: string, b: string): boolean => {
+  const [compactA, compactB] = [
+    normalizeCompanyName(a),
+    normalizeCompanyName(b),
+  ];
+  if (!compactA || !compactB) return false;
+  if (compactA === compactB) return true;
+
+  if (sortedCompanyTokens(a) === sortedCompanyTokens(b)) return true;
+
+  return (
+    compactA.length >= MIN_COMPANY_KEY_LENGTH &&
+    compactB.length >= MIN_COMPANY_KEY_LENGTH &&
+    (compactA.includes(compactB) || compactB.includes(compactA))
+  );
+};
+
+const isReliableTitleKey = (raw: string, normalized: string): boolean => {
+  if (!normalized) return false;
+
+  const rawLength = (raw.match(/[\p{L}\p{N}]/gu) ?? []).length;
+  const keyLength = normalized.replace(/ /g, "").length;
+
+  return (
+    keyLength >= MIN_TITLE_KEY_LENGTH &&
+    keyLength >= rawLength * MIN_TITLE_KEY_RATIO
+  );
+};
+
+export const titleKey = (raw: string): string => {
+  const value = raw ?? "";
+  const normalized = normalizeTitle(value);
+
+  return isReliableTitleKey(value, normalized)
+    ? normalized
+    : value.normalize("NFKC").toLowerCase().replace(/\s+/g, "");
+};
+
+const PARTICLE_REPLACEMENTS: [RegExp, string][] = [
+  [/\bwo\b/g, "o"],
+  [/\bhe\b/g, "e"],
+  [/\bha\b/g, "wa"],
+  [/\bdu\b/g, "zu"],
+];
+
+const sortTokens = (value: string): string =>
+  value.split(" ").filter(Boolean).sort().join(" ");
+
+const canonicalRomaji = (normalized: string): string => {
+  let value = normalized;
+
+  for (const [pattern, replacement] of PARTICLE_REPLACEMENTS) {
+    value = value.replace(pattern, replacement);
+  }
+
+  return value
+    .replace(/ou/g, "o")
+    .replace(/([aeiou])\1+/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+export const titleKeyVariants = (raw: string): string[] => {
+  const value = raw ?? "";
+  const normalized = normalizeTitle(value);
+  if (!isReliableTitleKey(value, normalized)) return [];
+
+  const romaji = canonicalRomaji(normalized);
+
+  return [
+    ...new Set([
+      normalized.replace(/ /g, ""),
+      sortTokens(normalized),
+      romaji,
+      romaji.replace(/ /g, ""),
+      sortTokens(romaji),
+    ]),
+  ].filter((key) => key !== normalized && key.length >= MIN_TITLE_KEY_LENGTH);
+};
+
+const DESCRIPTION_STOP_WORDS = new Set([
+  "about",
+  "after",
+  "again",
+  "against",
+  "also",
+  "another",
+  "around",
+  "because",
+  "been",
+  "before",
+  "being",
+  "between",
+  "both",
+  "came",
+  "come",
+  "could",
+  "days",
+  "does",
+  "down",
+  "during",
+  "each",
+  "even",
+  "ever",
+  "every",
+  "from",
+  "game",
+  "games",
+  "girl",
+  "girls",
+  "goes",
+  "going",
+  "gone",
+  "have",
+  "having",
+  "here",
+  "himself",
+  "however",
+  "into",
+  "just",
+  "know",
+  "life",
+  "like",
+  "long",
+  "made",
+  "make",
+  "many",
+  "more",
+  "most",
+  "much",
+  "must",
+  "never",
+  "next",
+  "novel",
+  "novels",
+  "once",
+  "only",
+  "other",
+  "over",
+  "own",
+  "player",
+  "players",
+  "same",
+  "she",
+  "should",
+  "since",
+  "some",
+  "something",
+  "story",
+  "such",
+  "than",
+  "that",
+  "their",
+  "them",
+  "then",
+  "there",
+  "these",
+  "they",
+  "thing",
+  "things",
+  "this",
+  "those",
+  "through",
+  "time",
+  "under",
+  "until",
+  "upon",
+  "very",
+  "visual",
+  "want",
+  "well",
+  "were",
+  "what",
+  "when",
+  "where",
+  "which",
+  "while",
+  "who",
+  "will",
+  "with",
+  "without",
+  "world",
+  "would",
+  "your",
+]);
+
+const stripMarkup = (value: string): string =>
+  (value ?? "")
+    .replace(/\[url=[^\]]*\]/gi, " ")
+    .replace(/\[\/?[a-z]+[^\]]*\]/gi, " ")
+    .replace(/<[^>]+>/g, " ");
+
+export const descriptionTokens = (value: string): Set<string> =>
+  new Set(
+    normalizeTitle(stripMarkup(value))
+      .split(" ")
+      .filter(
+        (token) => token.length >= 4 && !DESCRIPTION_STOP_WORDS.has(token)
+      )
+  );
+
+export const descriptionOverlap = (a: Set<string>, b: Set<string>): number => {
+  if (!a.size || !b.size) return 0;
+
+  let intersection = 0;
+  for (const token of a) {
+    if (b.has(token)) intersection += 1;
+  }
+
+  return intersection / Math.min(a.size, b.size);
+};
+
 export const normalizeCoreTitle = (value: string): string => {
   const normalized = normalizeTitle(value);
   let core = normalized;
