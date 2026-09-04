@@ -80,6 +80,16 @@ export class GamesController {
     return this.games.getGamesByIds(dto);
   }
 
+  @Post("/by-ids")
+  @ApiOperation({
+    summary:
+      "Get games by ids, optionally fuzzy-filtered by name within those ids. Use this instead of the GET variant when the id list is too long for a query string",
+  })
+  @ApiCreatedResponse({ type: GetGamesResponseDto })
+  async getGameByIdsPost(@Body() dto: GetGamesByIdsDto) {
+    return this.games.getGamesByIds(dto);
+  }
+
   @Get("/by-slug/:slug")
   @ApiOperation({ summary: "Get games" })
   @ApiCreatedResponse({ type: GetGameResponseDto })

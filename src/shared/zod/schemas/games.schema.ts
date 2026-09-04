@@ -282,6 +282,10 @@ export const GetGameByIdSchema = z.object({
 
 export const GetGamesByIdsSchema = z.object({
   _ids: z.string().array().or(z.string()),
+  search: z
+    .string()
+    .describe("Fuzzy search by game name within the given ids")
+    .optional(),
 });
 
 export const GetGamesRequestSchema = z.object({

@@ -78,6 +78,24 @@ const COMBINED_RATINGS_COUNT_STAGE = {
   },
 };
 
+const SEARCH_PROJECTION_STAGE = {
+  $project: {
+    _id: 1,
+    slug: 1,
+    name: 1,
+    cover: 1,
+    first_release: 1,
+    platformIds: 1,
+    themes: 1,
+    averageRating: 1,
+    ratingsCount: 1,
+    retroachievements: 1,
+    "igdb.gameId": 1,
+    "igdb.total_rating": 1,
+    "hltb.reviewScore": 1,
+  },
+};
+
 const TRIM_IGDB_STAGE = {
   $addFields: {
     igdb: {
@@ -222,17 +240,40 @@ export class GamesService implements OnModuleInit {
     }
 
     try {
-      return await this.Games.aggregate([
-        {
-          $match: {
-            _id: {
-              $in: Array.isArray(dto._ids)
-                ? dto._ids.map((id) => new mongoose.Types.ObjectId(id))
-                : [new mongoose.Types.ObjectId(dto._ids)],
+      const ids = Array.isArray(dto._ids) ? dto._ids : [dto._ids];
+      const search = dto.search?.trim();
+
+      if (!search) {
+        return await this.Games.aggregate([
+          {
+            $match: {
+              _id: { $in: ids.map((id) => new mongoose.Types.ObjectId(id)) },
             },
           },
-        },
-        TRIM_IGDB_STAGE,
+          TRIM_IGDB_STAGE,
+        ]);
+      }
+
+      const idSet = new Set(ids);
+      const candidates = (await this.getSearchIndex()).filter((entry) =>
+        idSet.has(entry._id.toString())
+      );
+
+      const matches = fuzzysort.go(normalizeGameName(search), candidates, {
+        key: "nameNormalized",
+        limit: SEARCH_CANDIDATES_LIMIT,
+        threshold: SEARCH_SCORE_THRESHOLD,
+      });
+
+      if (!matches.length) {
+        return [];
+      }
+
+      const matchedIds = matches.map((match) => match.obj._id);
+
+      return await this.Games.aggregate([
+        { $match: { _id: { $in: matchedIds } } },
+        SEARCH_PROJECTION_STAGE,
       ]);
     } catch (err) {
       this.logger.error(err, `Failed to get games by ids: ${dto._ids}`);
