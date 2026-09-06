@@ -54,6 +54,12 @@ export const WheelContainer: FC = () => {
           {!!winner && (
             <Box
               isWithScrollBar={!isMobile}
+              wrapperStyle={
+                isMobile ? undefined : { minHeight: 0, maxHeight: "100%" }
+              }
+              templateStyle={
+                isMobile ? undefined : { minHeight: 0, maxHeight: "100%" }
+              }
               contentStyle={{
                 maxHeight: isMobile ? "fit-content" : "100%",
               }}

@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import styles from "./GameAdminControls.module.scss";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
+import { Input } from "@/src/lib/shared/ui/Input";
 import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal/ConfirmModal";
 import { modal } from "@/src/lib/shared/ui/Modal";
-import { gamesApi, igdbApi } from "@/src/lib/shared/api";
+import { gamesApi, hltbApi, igdbApi } from "@/src/lib/shared/api";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
@@ -21,6 +22,8 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
   const isAdmin = useAuthStore((state) => state.isAdmin);
 
   const [isParsing, setIsParsing] = useState(false);
+  const [isParsingHltb, setIsParsingHltb] = useState(false);
+  const [hltbId, setHltbId] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
 
   if (!isAdmin) return null;
@@ -43,6 +46,32 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
       });
     } finally {
       setIsParsing(false);
+    }
+  };
+
+  const handleParseHltb = async () => {
+    setIsParsingHltb(true);
+
+    try {
+      const { data } = await hltbApi.parseGame({
+        gameId: game._id,
+        hltbId: hltbId.trim() || undefined,
+      });
+
+      if (data.status === "not_found") {
+        toast.error({ title: "No HLTB match", description: data.message });
+        return;
+      }
+
+      toast.success({ title: "Parsed from HLTB", description: data.message });
+      router.refresh();
+    } catch {
+      toast.error({
+        title: "Failed to parse from HLTB",
+        description: game.name,
+      });
+    } finally {
+      setIsParsingHltb(false);
     }
   };
 
@@ -98,6 +127,28 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
           {isParsing ? "Parsing…" : "Parse from IGDB"}
         </Button>
       )}
+      <Input
+        containerClassname={styles.input}
+        value={hltbId}
+        placeholder={
+          game.hltb?.hltbId
+            ? `HLTB id (current: ${game.hltb.hltbId})`
+            : "HLTB id (optional)"
+        }
+        disabled={isParsingHltb}
+        onChange={(event) => setHltbId(event.target.value)}
+      />
+      <Button
+        color={ButtonColor.DEFAULT}
+        disabled={isParsingHltb}
+        onClick={handleParseHltb}
+      >
+        {isParsingHltb
+          ? "Parsing…"
+          : hltbId.trim()
+            ? "Parse HLTB by id"
+            : "Parse from HLTB"}
+      </Button>
       <Button
         color={ButtonColor.RED}
         disabled={isDeleting}

@@ -39,7 +39,14 @@
 
   &__right {
     grid-area: right;
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
     min-height: 0;
+
+    @include mediaMd {
+      align-self: auto;
+    }
   }
 }
 

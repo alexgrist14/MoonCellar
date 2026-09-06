@@ -55,6 +55,12 @@
     }
   }
 
+  &__resizer {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
   &__content {
     padding: var(--padding-x3);
     display: flex;
@@ -77,6 +83,10 @@
 }
 
 .scrollbars {
+  div &__container {
+    min-height: 0;
+  }
+
   div &__scrollbar {
     right: -8px;
   }

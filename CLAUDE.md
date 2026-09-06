@@ -43,6 +43,21 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
 - **Every content block on a page must sit inside the shared `Box` component from `src/lib/shared/ui/Box`** — not only large sections and cards, but small ones too: breadcrumbs, page headings, intro paragraphs, link rows. Nothing renders directly on the page background.
 - The reason is `BGImage`: pages render a full-bleed background image behind their content, and only `Box`'s semi-transparent panel keeps text legible over it. Text placed straight on the page background gets washed out by whatever artwork happens to be showing, and the result differs per game/user. If a block feels too small to deserve a panel, group it with the neighbouring block into one `Box` rather than leaving it outside.
 - If a `Box` instance needs a different visual appearance, do it through `Box`'s own props (`className`, `classNameContent`, `wrapperStyle`, `templateStyle`, `contentStyle`, `isWithoutBorder`, `isWithBlur`, etc.) — never by overriding `Box`'s internal styles from outside or duplicating its markup/styles in a custom wrapper.
+- **A percentage `max-height` only works if every ancestor up the chain has a definite height.**
+  A grid item under `align-items: center` is content-sized, and `Box` is `height: fit-content`
+  at both its wrapper and template level, so `contentStyle={{ maxHeight: "100%" }}` silently
+  does nothing and the panel overflows the screen. Give the cell `align-self: stretch` plus
+  `min-height: 0`, and pass `wrapperStyle`/`templateStyle` with `minHeight: 0; maxHeight: 100%`
+  so the constraint reaches the scrollable content.
+- **Clamping `Box`'s height is not the same as clamping its content.** `.template` is a column
+  flex container; its child is the resize-observer wrapper (`.template__resizer`), which carries
+  `min-height: 0` so it can shrink below its content, and `Scrollbar`'s container gets
+  `min-height: 0` too. Without both, `max-height` on `.template` shrinks only the panel's own
+  background while the text keeps flowing past the rounded border — the symptom is release
+  dates spilling out of the gauntlet winner panel and down the page. Do not remove those two
+  `min-height: 0` declarations; the scroll area's height comes from flex shrinking, not from
+  the `max-height: 100%` on the content (that percentage resolves against an indefinite box and
+  is ignored).
 - `Box`'s own radius is `var(--radius-x5)`. For structural UI wrapper components rendered directly inside a `Box` (`Button`, `Input`, `Textarea`, `CustomDropdown`, and similar reusable "chrome" primitives — not decorative elements like game covers/posters), the `border-radius` must be exactly one step below its structural parent's on the `--radius-x*` scale (parent `x5` → child `x4` → grandchild `x3`, etc.). This rule applies to structural wrapper nesting only, not to decorative/illustrative radii (e.g. card art, covers), which are a deliberate style choice independent of nesting depth.
 
 ## Server rendering and SEO

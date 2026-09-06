@@ -52,10 +52,11 @@ export const Box: FC<IBoxProps> = ({
         })}
       >
         <BoxHead {...headProps} />
-        <div ref={ref}>
+        <div ref={ref} className={styles.template__resizer}>
           {isWithScrollBar ? (
             <Scrollbar
               type="absolute"
+              classNameContainer={styles.scrollbars__container}
               classNameContent={classNames(
                 styles.scrollbars__content,
                 classNameContent

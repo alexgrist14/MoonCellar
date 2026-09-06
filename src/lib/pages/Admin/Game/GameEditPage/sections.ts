@@ -42,6 +42,8 @@ export interface ISectionDescriptor {
 const SYNC_NOTE =
   "Filled by a sync. Changes here may be overwritten unless isStopParsing is enabled.";
 
+const HLTB_NOTE = `${SYNC_NOTE} Fill "HLTB id" and press "Parse HLTB by id" in the header to link the game to that exact entry; leave it empty to search by name.`;
+
 const COMPANY_FIELDS: IObjectFieldDescriptor[] = [
   { key: "name", label: "Name", kind: "text", optionsKey: "companies" },
   { key: "developer", label: "Developer", kind: "boolean" },
@@ -214,7 +216,7 @@ export const GAME_SECTIONS: ISectionDescriptor[] = [
   },
   {
     title: "HLTB",
-    note: SYNC_NOTE,
+    note: HLTB_NOTE,
     fields: [
       { path: "hltb.hltbId", label: "HLTB id", kind: "text" },
       { path: "hltb.mainStory", label: "Main story", kind: "number" },

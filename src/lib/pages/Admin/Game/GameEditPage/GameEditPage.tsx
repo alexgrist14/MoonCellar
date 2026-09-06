@@ -21,6 +21,7 @@ import {
   useUploadGameImageMutation,
 } from "@/src/lib/entities/game/api/game.mutations";
 import { usePlatformsQuery } from "@/src/lib/entities/platform/api/platform.queries";
+import { hltbApi } from "@/src/lib/shared/api";
 import {
   AddGameRequestSchema,
   IAddGameRequest,
@@ -162,6 +163,7 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
     path: string;
     submission: number;
   } | null>(null);
+  const [isParsingHltb, setIsParsingHltb] = useState(false);
 
   const {
     data: game,
@@ -192,12 +194,15 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
     reset,
     setValue,
     getValues,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<IGameFormValues>({
     resolver,
     mode: "onBlur",
     defaultValues: isCreate ? CREATE_DEFAULTS : {},
   });
+
+  const hltbId = watch("hltb.hltbId");
 
   const hydratedGameIdRef = useRef<string | undefined>(undefined);
 
@@ -344,6 +349,34 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
         path: invalidPath,
         submission: (current?.submission ?? 0) + 1,
       }));
+    }
+  };
+
+  const handleParseHltb = async () => {
+    if (!gameId) return;
+
+    setIsParsingHltb(true);
+
+    try {
+      const { data } = await hltbApi.parseGame({
+        gameId,
+        hltbId: hltbId?.trim() || undefined,
+      });
+
+      if (data.status === "not_found") {
+        toast.error({ description: data.message });
+      } else {
+        toast.success({ description: data.message });
+      }
+
+      const hltb = data.hltb ?? undefined;
+
+      setOriginal((current) => ({ ...current, hltb }));
+      setValue("hltb", hltb);
+    } catch {
+      toast.error({ description: "Failed to parse from HLTB" });
+    } finally {
+      setIsParsingHltb(false);
     }
   };
 
@@ -687,6 +720,19 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
               onClick={() => router.push(`/games/${original.slug as string}`)}
             >
               View game
+            </Button>
+          )}
+          {!isCreate && (
+            <Button
+              color={ButtonColor.DEFAULT}
+              disabled={isParsingHltb}
+              onClick={handleParseHltb}
+            >
+              {isParsingHltb
+                ? "Parsing…"
+                : hltbId?.trim()
+                  ? "Parse HLTB by id"
+                  : "Parse from HLTB"}
             </Button>
           )}
           <Button
