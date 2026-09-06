@@ -1,13 +1,18 @@
-import { Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { InjectModel } from "@nestjs/mongoose";
-import { HowLongToBeatService } from "howlongtobeat-ts";
-import { FilterQuery, Model } from "mongoose";
+import { HowLongToBeatEntry, HowLongToBeatService } from "howlongtobeat-ts";
+import mongoose, { FilterQuery, Model } from "mongoose";
 import { PinoLogger } from "nestjs-pino";
 import { sleep } from "src/shared/utils";
 import { runInCronLogContext } from "src/shared/cron-logging";
 import { runCronExclusive } from "src/shared/cron-mutex";
 import { BusinessMetricsService } from "src/module/metrics/business-metrics.service";
+import { IHltbField } from "src/shared/zod/schemas/games.schema";
 import { Game, GameDocument } from "../schemas/game.schema";
 import { Platform, PlatformDocument } from "../schemas/platform.schema";
 import {
@@ -37,6 +42,21 @@ export type HltbSyncOptions = {
   delayMs?: number;
   onlyMissing?: boolean;
   staleDays?: number;
+};
+
+export type HltbGameTarget = {
+  gameId?: string;
+  slug?: string;
+  hltbId?: string;
+};
+
+export type HltbGameSyncResult = {
+  status: "updated" | "not_found";
+  message: string;
+  gameId: string;
+  slug: string;
+  name: string;
+  hltb: IHltbField | null;
 };
 
 export type HltbSyncResult = {
@@ -308,6 +328,156 @@ export class HltbService {
     };
   }
 
+  /** Fetches HLTB times for a single game addressed by its MoonCellar id or
+   * slug. Uses the same matching rules as the bulk sync, so a manual re-parse
+   * cannot store a match the cron would have rejected. */
+  async syncGame(target: HltbGameTarget): Promise<HltbGameSyncResult> {
+    const filter = this.buildGameFilter(target);
+
+    const game = await this.gamesModel
+      .findOne(filter)
+      .select("_id slug name hltb platformIds release_dates first_release")
+      .lean();
+
+    if (!game) {
+      throw new NotFoundException(
+        `Game not found: ${target.gameId ?? target.slug}`
+      );
+    }
+
+    if (target.hltbId) {
+      return this.applyHltbEntryById(game, target.hltbId);
+    }
+
+    const platformNames = await this.loadPlatformNames();
+    const ctx = this.buildMatchContext(game, platformNames);
+    const hltb = await this.fetchHltbForGame(ctx);
+    const now = new Date().toISOString();
+
+    if (!hltb || !hasHltbTimes(hltb)) {
+      const update: Record<string, unknown> = {
+        $set: { hltbNotFoundAt: now, updatedAt: now },
+      };
+
+      if (game.hltb) {
+        update.$unset = { hltb: "" };
+      }
+
+      await this.gamesModel.updateOne({ _id: game._id }, update);
+
+      const message = game.hltb
+        ? `Cleared stale HLTB for "${game.name}" — no verified match`
+        : `No verified HLTB match for "${game.name}"`;
+
+      this.logger.warn(message);
+
+      return {
+        status: "not_found",
+        message,
+        gameId: String(game._id),
+        slug: game.slug,
+        name: game.name,
+        hltb: null,
+      };
+    }
+
+    await this.gamesModel.updateOne(
+      { _id: game._id },
+      {
+        $set: { hltb, updatedAt: now },
+        $unset: { hltbNotFoundAt: "" },
+      }
+    );
+
+    this.metrics.recordGames("hltb", "updated", 1);
+
+    const message = `Updated "${game.name}" — main=${hltb.mainStory ?? "-"}h, main+extra=${hltb.mainExtra ?? "-"}h, completionist=${hltb.completionist ?? "-"}h`;
+
+    this.logger.info(message);
+
+    return {
+      status: "updated",
+      message,
+      gameId: String(game._id),
+      slug: game.slug,
+      name: game.name,
+      hltb,
+    };
+  }
+
+  /** Stores the HLTB entry an admin picked by hand. The automatic matching
+   * rules are deliberately skipped — an explicit id is a human decision — but a
+   * miss must not touch the stored record, so a wrong id fails loudly instead
+   * of wiping good times the way an unmatched search does. */
+  private async applyHltbEntryById(
+    game: Pick<
+      Game,
+      "name" | "slug" | "platformIds" | "release_dates" | "first_release"
+    > & { _id: unknown; hltb?: IHltbField | null },
+    rawHltbId: string
+  ): Promise<HltbGameSyncResult> {
+    const hltbId = Number(rawHltbId);
+
+    if (!Number.isInteger(hltbId) || hltbId <= 0) {
+      throw new BadRequestException(`Invalid HLTB id: ${rawHltbId}`);
+    }
+
+    const response = await this.hltbClient.getById(hltbId);
+
+    if (!response.success || !response.data) {
+      throw new NotFoundException(`HLTB entry not found: ${hltbId}`);
+    }
+
+    const hltb = mapHltbEntryToField(this.toSearchEntry(response.data));
+
+    if (!hasHltbTimes(hltb)) {
+      throw new BadRequestException(
+        `HLTB entry ${hltbId} has no completion times`
+      );
+    }
+
+    const now = new Date().toISOString();
+
+    await this.gamesModel.updateOne(
+      { _id: game._id },
+      {
+        $set: { hltb, updatedAt: now },
+        $unset: { hltbNotFoundAt: "" },
+      }
+    );
+
+    this.metrics.recordGames("hltb", "updated", 1);
+
+    const message = `Linked "${game.name}" to HLTB #${hltbId} ("${hltb.sourceName}") — main=${hltb.mainStory ?? "-"}h, main+extra=${hltb.mainExtra ?? "-"}h, completionist=${hltb.completionist ?? "-"}h`;
+
+    this.logger.info(message);
+
+    return {
+      status: "updated",
+      message,
+      gameId: String(game._id),
+      slug: game.slug,
+      name: game.name,
+      hltb,
+    };
+  }
+
+  private buildGameFilter(target: HltbGameTarget): FilterQuery<GameDocument> {
+    if (target.gameId) {
+      if (!mongoose.Types.ObjectId.isValid(target.gameId)) {
+        throw new BadRequestException(`Invalid game id: ${target.gameId}`);
+      }
+
+      return { _id: new mongoose.Types.ObjectId(target.gameId) };
+    }
+
+    if (target.slug) {
+      return { slug: target.slug };
+    }
+
+    throw new BadRequestException("Either gameId or slug must be provided");
+  }
+
   private describeSyncMode(options?: HltbSyncOptions): string {
     if (options?.onlyMissing) {
       return "missing only";
@@ -499,7 +669,11 @@ export class HltbService {
       return [];
     }
 
-    return response.data.map((entry) => ({
+    return response.data.map((entry) => this.toSearchEntry(entry));
+  }
+
+  private toSearchEntry(entry: HowLongToBeatEntry): HltbSearchEntry {
+    return {
       id: entry.id,
       name: entry.name,
       alias: entry.alias,
@@ -521,6 +695,6 @@ export class HltbService {
       similarity: entry.similarity,
       platforms: entry.platforms,
       releaseYear: entry.releaseYear,
-    }));
+    };
   }
 }
