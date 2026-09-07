@@ -155,11 +155,8 @@ export const UserGames: FC<UserGamesProps> = ({
     [visibleIds, currentPage]
   );
 
-  const {
-    data: pageGames = [],
-    isPending: isPagePending,
-    isFetching: isPageFetching,
-  } = useGamesByIdsQuery(pageGameIds, undefined, !isSearchActive);
+  const { data: pageGames = [], isFetching: isPageFetching } =
+    useGamesByIdsQuery(pageGameIds, undefined, !isSearchActive);
 
   const games = useMemo(
     () =>
@@ -172,7 +169,6 @@ export const UserGames: FC<UserGamesProps> = ({
     [isSearchActive, searchedGames, pageGames, currentPage]
   );
 
-  const isPending = isSearchActive ? isSearching : isPagePending;
   const isFetching = isSearchActive ? isSearching : isPageFetching;
 
   const total = visibleIds.length;
@@ -186,7 +182,7 @@ export const UserGames: FC<UserGamesProps> = ({
     />
   );
 
-  if (isPending || isFetching)
+  if (isFetching)
     return (
       <>
         {searchField}

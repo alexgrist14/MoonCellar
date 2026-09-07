@@ -102,6 +102,16 @@ component instead of adding the directive to the shared primitive.
 Functions cannot be passed from a server component to a client one. Pass the data a client
 component needs to build the value itself (a `basePath` string, not a `getHref` callback).
 
+## Data fetching
+
+- **Never gate a loader on React Query's `isPending`.** A disabled query
+  (`enabled: false`, e.g. `useGamesByIdsQuery`'s `ids.length > 0`) never leaves `status:
+  "pending"`, so `if (isPending) return <Loader />` renders forever and the empty-state branch
+  below it is unreachable — that is how the profile's "List is empty" placeholder disappeared
+  behind an endless spinner. Use `isFetching` (or `isLoading`, which is `isPending &&
+  isFetching`): both are `false` while a query is disabled and `true` on the first render of an
+  enabled one, so nothing flashes before the loader appears.
+
 ## Verification
 
 - **Do not reason about pixels — measure them.** `bun run check:layout` drives the installed

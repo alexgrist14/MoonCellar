@@ -236,7 +236,10 @@ export const WheelComponent: FC<WheelComponentProps> = ({
         <button
           disabled={isRoyal && !games?.length}
           id="spin-button"
-          onClick={() => spinHandler(tempGames)}
+          onClick={() => {
+            setWinner(undefined);
+            spinHandler(tempGames);
+          }}
         >
           {buttonText}
         </button>
