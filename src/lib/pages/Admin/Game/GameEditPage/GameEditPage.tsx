@@ -22,6 +22,7 @@ import {
 } from "@/src/lib/entities/game/api/game.mutations";
 import { usePlatformsQuery } from "@/src/lib/entities/platform/api/platform.queries";
 import { hltbApi } from "@/src/lib/shared/api";
+import { revalidateGamePage } from "@/src/lib/entities/game/api/game.actions";
 import {
   AddGameRequestSchema,
   IAddGameRequest,
@@ -373,6 +374,8 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
 
       setOriginal((current) => ({ ...current, hltb }));
       setValue("hltb", hltb);
+
+      await revalidateGamePage(data.slug);
     } catch {
       toast.error({ description: "Failed to parse from HLTB" });
     } finally {

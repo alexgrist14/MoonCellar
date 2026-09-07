@@ -83,6 +83,13 @@ before:
   nothing on a dynamic segment without `generateStaticParams` — the hub and game routes export
   `generateStaticParams() { return []; }` so nothing is prerendered at build time (the build must
   not depend on the API) while the route still opts into caching.
+- **`router.refresh()` does not clear the ISR cache.** Game pages are cached for an hour
+  (`revalidate = 3600`), and a refresh only drops the client Router Cache — the server answers
+  from the same cached entry, so a game edited from the browser keeps showing the old data until
+  the hour is up. Any admin mutation made in the browser must call the `revalidateGamePage`
+  server action (`entities/game/api/game.actions.ts`) *before* `router.refresh()`, or the refresh
+  refills the cache with the stale render. Background jobs on the server deliberately do not
+  revalidate: a mass parse would turn every touched page into a cold render.
 - **A page-level `openGraph` or `twitter` object replaces the parent's wholesale — it does not
   merge.** A route that declares `openGraph` must restate `siteName`, `type`, `locale` and
   `images`, or it loses them. Do not put `twitter.images` in the root layout: every page without

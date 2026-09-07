@@ -12,6 +12,7 @@ import { gamesApi, hltbApi, igdbApi } from "@/src/lib/shared/api";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
+import { revalidateGamePage } from "@/src/lib/entities/game/api/game.actions";
 
 interface IGameAdminControlsProps {
   game: IGameResponse;
@@ -36,8 +37,11 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
     setIsParsing(true);
 
     try {
-      await igdbApi.parseGame(igdbId);
+      const { data } = await igdbApi.parseGame(igdbId);
+
       toast.success({ title: "Parsed from IGDB", description: game.name });
+
+      await revalidateGamePage(game.slug, data?.slug);
       router.refresh();
     } catch {
       toast.error({
@@ -64,6 +68,8 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
       }
 
       toast.success({ title: "Parsed from HLTB", description: data.message });
+
+      await revalidateGamePage(game.slug, data.slug);
       router.refresh();
     } catch {
       toast.error({
