@@ -1,4 +1,5 @@
 import { FC } from "react";
+import classNames from "classnames";
 import styles from "./WheelContainer.module.scss";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { GameCard } from "@/src/lib/shared/ui/GameCard";
@@ -15,6 +16,7 @@ import { GameStatsBoxes } from "@/src/lib/entities/game/ui/GameStatsBoxes";
 import { useHideAdult } from "@/src/lib/shared/hooks/useHideAdult";
 import { isAdultGame } from "@/src/lib/shared/utils/adult.utils";
 import { dateRegions } from "@/src/lib/shared/constants";
+import { useDelayedUnmount } from "@/src/lib/shared/hooks/useDelayedUnmount";
 
 export const WheelContainer: FC = () => {
   const winner = useWheelStore((state) => state.winner);
@@ -23,10 +25,16 @@ export const WheelContainer: FC = () => {
 
   const { isFinished, isLoading, isMobile } = useStatesStore();
 
-  const hideMedia = useHideAdult() && !!winner && isAdultGame(winner);
+  const {
+    rendered: shownWinner,
+    isExiting,
+    onExitEnd,
+  } = useDelayedUnmount(winner);
 
-  const releaseDate = winner?.first_release
-    ? new Date(winner.first_release * 1000).getFullYear()
+  const hideMedia = useHideAdult() && !!shownWinner && isAdultGame(shownWinner);
+
+  const releaseDate = shownWinner?.first_release
+    ? new Date(shownWinner.first_release * 1000).getFullYear()
     : undefined;
 
   return (
@@ -35,10 +43,16 @@ export const WheelContainer: FC = () => {
         <WheelOptions />
       </ExpandMenu>
       <div className={styles.container}>
-        <div className={styles.container__left}>
-          {!!winner && (
+        <div
+          className={classNames(styles.container__left, {
+            [styles.container_cardReveal]: !!shownWinner && !isExiting,
+            [styles.container_conceal]: isExiting,
+          })}
+          onAnimationEnd={onExitEnd}
+        >
+          {!!shownWinner && (
             <div className={styles.stack}>
-              <GameCard game={winner} isInfoDisabled />
+              <GameCard game={shownWinner} isInfoDisabled />
             </div>
           )}
         </div>
@@ -50,8 +64,14 @@ export const WheelContainer: FC = () => {
             }
           />
         </div>
-        <div className={styles.container__right}>
-          {!!winner && (
+        <div
+          className={classNames(styles.container__right, {
+            [styles.container_panelReveal]: !!shownWinner && !isExiting,
+            [styles.container_conceal]: isExiting,
+          })}
+          onAnimationEnd={onExitEnd}
+        >
+          {!!shownWinner && (
             <Box
               isWithScrollBar={!isMobile}
               wrapperStyle={
@@ -66,7 +86,7 @@ export const WheelContainer: FC = () => {
               scrollFadeType="both"
             >
               <div className={styles.info}>
-                <h2>{winner.name}</h2>
+                <h2>{shownWinner.name}</h2>
                 <div className={styles.info__row}>
                   {!!releaseDate && (
                     <p>
@@ -76,14 +96,14 @@ export const WheelContainer: FC = () => {
                   )}
                   <p>
                     <span>Game type: </span>
-                    {winner.type}
+                    {shownWinner.type}
                   </p>
                 </div>
                 <div className={styles.info__row}>
-                  {!!winner.platformIds?.length && (
+                  {!!shownWinner.platformIds?.length && (
                     <p>
                       <span>Platforms: </span>
-                      {winner.platformIds
+                      {shownWinner.platformIds
                         .map(
                           (id) => systems?.find((sys) => sys._id === id)?.name
                         )
@@ -91,64 +111,64 @@ export const WheelContainer: FC = () => {
                         .join(", ")}
                     </p>
                   )}
-                  {!!winner.genres?.length && (
+                  {!!shownWinner.genres?.length && (
                     <p>
                       <span>Genres: </span>
-                      {winner.genres.join(", ")}
+                      {shownWinner.genres.join(", ")}
                     </p>
                   )}
-                  {!!winner.modes?.length && (
+                  {!!shownWinner.modes?.length && (
                     <p>
                       <span>Game modes: </span>
-                      {winner.modes.join(", ")}
+                      {shownWinner.modes.join(", ")}
                     </p>
                   )}
-                  {!!winner.themes?.length && (
+                  {!!shownWinner.themes?.length && (
                     <p>
                       <span>Themes: </span>
-                      {winner.themes.join(", ")}
+                      {shownWinner.themes.join(", ")}
                     </p>
                   )}
-                  {!!winner.languages?.length && (
+                  {!!shownWinner.languages?.length && (
                     <p>
                       <span>Languages: </span>
-                      {winner.languages.join(", ")}
+                      {shownWinner.languages.join(", ")}
                     </p>
                   )}
                 </div>
-                <GameStatsBoxes game={winner} isBoxed={false} />
-                {!!winner.summary && (
+                <GameStatsBoxes game={shownWinner} isBoxed={false} />
+                {!!shownWinner.summary && (
                   <div className={styles.info__text}>
                     <h4>Summary:</h4>
                     <ExpandableBlock>
-                      <p>{winner.summary}</p>
+                      <p>{shownWinner.summary}</p>
                     </ExpandableBlock>
                   </div>
                 )}
-                {!!winner.storyline && (
+                {!!shownWinner.storyline && (
                   <div className={styles.info__text}>
                     <h4>Storyline:</h4>
                     <ExpandableBlock>
-                      <p>{winner.storyline}</p>
+                      <p>{shownWinner.storyline}</p>
                     </ExpandableBlock>
                   </div>
                 )}
-                {!hideMedia && !!winner.screenshots?.length && (
+                {!hideMedia && !!shownWinner.screenshots?.length && (
                   <div className={styles.info__text}>
                     <h4>Screenshots:</h4>
-                    <Slideshow pictures={winner.screenshots} />
+                    <Slideshow pictures={shownWinner.screenshots} />
                   </div>
                 )}
-                {!hideMedia && !!winner.videos?.length && (
+                {!hideMedia && !!shownWinner.videos?.length && (
                   <div className={styles.info__text}>
                     <h4>Videos:</h4>
-                    <VideosRow videos={winner.videos} />
+                    <VideosRow videos={shownWinner.videos} />
                   </div>
                 )}
-                {!!winner.release_dates?.length && (
+                {!!shownWinner.release_dates?.length && (
                   <div className={styles.info__text}>
                     <h4>Release dates:</h4>
-                    {winner.release_dates
+                    {shownWinner.release_dates
                       .sort((a, b) => a.date - b.date)
                       .map((date, i) => {
                         const platform = systems?.find(

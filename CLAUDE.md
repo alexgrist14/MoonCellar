@@ -102,6 +102,22 @@ component instead of adding the directive to the shared primitive.
 Functions cannot be passed from a server component to a client one. Pass the data a client
 component needs to build the value itself (a `basePath` string, not a `getHref` callback).
 
+## Animations
+
+- **Keyframes added to `_animations.scss` are copied into every CSS module.** `next.config.mjs`
+  injects `styles/index.scss` into each module through sass `additionalData`, and CSS Modules hash
+  `@keyframes` names per file, so every shared keyframe is emitted once per module in the built
+  CSS. Keep keyframes used by one component in that component's own `.module.scss`; move them to
+  `_animations.scss` only when a second component needs them.
+- **An exit animation whose end unmounts the node must never be switched off with `animation:
+  none`.** `useDelayedUnmount` drops the node on `animationend`; with no animation the event never
+  fires and the block stays on screen forever. Inside the `reducedMotion` mixin set
+  `animation-duration: var(--duration-instant)` (1ms) instead of removing the animation.
+- Put the animation on the grid cell that already holds the block, never on a new wrapper around
+  `Box` — an extra element between the cell and `Box` breaks the definite-height chain that the
+  panel's `max-height: 100%` depends on. Animate only `opacity` and `transform`: animating height
+  makes `Box`'s `useResizeDetector` fire on every frame.
+
 ## Data fetching
 
 - **Never gate a loader on React Query's `isPending`.** A disabled query

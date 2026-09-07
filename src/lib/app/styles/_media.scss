@@ -71,3 +71,9 @@ $screenExpandOverlap: 1759px;
     @content;
   }
 }
+
+@mixin reducedMotion {
+  @media (prefers-reduced-motion: reduce) {
+    @content;
+  }
+}

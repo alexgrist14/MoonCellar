@@ -1,3 +1,39 @@
+@keyframes revealRise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--reveal-offset)) scale(var(--reveal-scale));
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes revealSlide {
+  from {
+    opacity: 0;
+    transform: translateX(var(--reveal-offset)) scale(var(--reveal-scale));
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes conceal {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(var(--reveal-scale));
+  }
+}
+
 .container {
   display: grid;
   height: 100%;
@@ -47,6 +83,32 @@
 
     @include mediaMd {
       align-self: auto;
+    }
+  }
+
+  &_cardReveal {
+    animation: revealRise var(--duration-base) var(--easing-out) both;
+  }
+
+  &_panelReveal {
+    animation: revealSlide var(--duration-base) var(--delay-stagger)
+      var(--easing-out) both;
+
+    @include mediaMd {
+      animation-name: revealRise;
+    }
+  }
+
+  &_conceal {
+    animation: conceal var(--duration-fast) var(--easing-in) both;
+  }
+
+  &_cardReveal,
+  &_panelReveal,
+  &_conceal {
+    @include reducedMotion {
+      animation-duration: var(--duration-instant);
+      animation-delay: 0s;
     }
   }
 }
