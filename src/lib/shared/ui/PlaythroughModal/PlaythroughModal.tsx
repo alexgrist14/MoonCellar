@@ -82,25 +82,33 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
   const { mutate: deletePlaythrough, isPending: isDeleting } =
     useDeletePlaythroughMutation();
 
+  const getFormValues = useCallback(
+    (playthrough?: IPlaythrough): ISavePlaythroughRequestInput => ({
+      userId,
+      gameId: game._id,
+      category: playthrough?.category || "wishlist",
+      platformId: playthrough?.platformId,
+      date: playthrough?.date || undefined,
+      time: playthrough?.time,
+      comment: playthrough?.comment || "",
+      isMastered: playthrough?.isMastered || false,
+    }),
+    [game._id, userId]
+  );
+
   const addHandler = useCallback(() => {
     setPlaythroughId(undefined);
 
-    reset({
-      userId,
-      gameId: game._id,
-      category: "wishlist",
-    });
-  }, [game, reset, userId]);
+    reset(getFormValues());
+  }, [getFormValues, reset]);
 
   const selectHandler = useCallback(
     (playthrough: IPlaythrough) => {
-      const { _id, ...play } = playthrough;
+      setPlaythroughId(playthrough._id);
 
-      setPlaythroughId(_id);
-
-      reset(play);
+      reset(getFormValues(playthrough));
     },
-    [reset]
+    [getFormValues, reset]
   );
 
   const saveHandler = (data: ISavePlaythroughRequest) => {
@@ -145,7 +153,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
       {
         onSuccess: () => {
           setPlaythroughId(undefined);
-          reset({ userId, gameId: game._id, category: "wishlist" });
+          reset(getFormValues());
           toast.success({ description: "Playthrough successfully removed" });
         },
       }

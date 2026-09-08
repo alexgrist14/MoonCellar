@@ -2,7 +2,7 @@ import { z } from "zod";
 import { RaAwardSchema } from "./ra.schema";
 import { RoleSchema } from "./role.schema";
 
-export const DEFAULT_BG_OPACITY = 0.4;
+export const DEFAULT_BG_OPACITY = 0.85;
 
 export const UserSettingsSchema = z.object({
   showAdultContent: z.boolean(),
