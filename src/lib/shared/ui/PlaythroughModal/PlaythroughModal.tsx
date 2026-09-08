@@ -48,6 +48,8 @@ const playthroughCategories: IPlaythroughMinimal["category"][] = [
   "dropped",
 ];
 
+const categoriesWithDate: IPlaythroughMinimal["category"][] = ["completed"];
+
 export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
   game,
   userId,
@@ -121,6 +123,18 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
         toast.success({ description: "Playthrough successfully created" });
       },
     });
+  };
+
+  const categoryHandler = (index: number) => {
+    const category = playthroughCategories[index];
+
+    setValue("category", category, { shouldValidate: true });
+
+    if (categoriesWithDate.includes(category) && !watch("date")) {
+      setValue("date", commonUtils.formatDate(new Date(), { isISO: true }), {
+        shouldValidate: true,
+      });
+    }
   };
 
   const deleteHandler = () => {
@@ -209,9 +223,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
           />
           <Dropdown
             placeholder="Select category..."
-            getIndex={(index) =>
-              setValue("category", playthroughCategories[index])
-            }
+            getIndex={categoryHandler}
             overwriteValue={commonUtils.upFL(watch("category") || "")}
             list={playthroughCategories.map((item) => commonUtils.upFL(item))}
           />
@@ -232,7 +244,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
           />
           {["completed", "played", "dropped"].includes(watch("category")) && (
             <div className={styles.modal__inputs}>
-              {watch("category") === "completed" && (
+              {categoriesWithDate.includes(watch("category")) && (
                 <DatePicker
                   value={watch("date") || ""}
                   onChange={(value) =>
