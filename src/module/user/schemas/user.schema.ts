@@ -3,6 +3,10 @@ import { MaxLength } from "class-validator";
 import mongoose, { Document } from "mongoose";
 import type { IRAAward } from "src/shared/zod/schemas/ra.schema";
 import type { IRole } from "src/shared/zod/schemas/role.schema";
+import {
+  DEFAULT_BG_OPACITY,
+  IUserSettings,
+} from "src/shared/zod/schemas/user.schema";
 
 @Schema({
   timestamps: true,
@@ -37,8 +41,11 @@ export class User extends Document {
   avatar: string;
   @Prop()
   background: string;
-  @Prop({ type: Object, default: { showAdultContent: false } })
-  settings: { showAdultContent: boolean };
+  @Prop({
+    type: Object,
+    default: { showAdultContent: false, bgOpacity: DEFAULT_BG_OPACITY },
+  })
+  settings: IUserSettings;
   @Prop()
   updatedAt: Date;
 }

@@ -11,6 +11,7 @@ import mongoose, { Model } from "mongoose";
 import { User } from "src/module/user/schemas/user.schema";
 import { mimeToExt } from "src/shared/constants";
 import {
+  DEFAULT_BG_OPACITY,
   IGetUserByStringRequest,
   IGetUserLoginsResponse,
   IUpdateUserDescriptionRequest,
@@ -202,13 +203,23 @@ export class UserProfileService {
     }
   }
 
-  async updateSettings(
-    userId: string,
-    { showAdultContent }: IUpdateUserSettingsRequest
-  ) {
+  async updateSettings(userId: string, settings: IUpdateUserSettingsRequest) {
     try {
       const user = await this.userModel.findById(userId);
-      user.settings = { ...(user.settings ?? {}), showAdultContent };
+
+      user.settings = {
+        showAdultContent: false,
+        bgOpacity: DEFAULT_BG_OPACITY,
+        ...(user.settings ?? {}),
+        ...(settings.showAdultContent !== undefined && {
+          showAdultContent: settings.showAdultContent,
+        }),
+        ...(settings.bgOpacity !== undefined && {
+          bgOpacity: settings.bgOpacity,
+        }),
+      };
+
+      user.markModified("settings");
       await user.save();
       return user;
     } catch (err) {

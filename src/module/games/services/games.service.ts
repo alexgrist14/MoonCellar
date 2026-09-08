@@ -21,6 +21,10 @@ import {
   IGetGameFollowingsStatusRequest,
   IGetGameFollowingsStatusResponse,
 } from "src/shared/zod/schemas/game-followings-status.schema";
+import {
+  IGameStats,
+  IGetGamesStatsResponse,
+} from "src/shared/zod/schemas/game-stats.schema";
 import { Game, GameDocument } from "../schemas/game.schema";
 import {
   IPlaythroughDocument,
@@ -819,5 +823,72 @@ export class GamesService implements OnModuleInit {
 
     result.sort((a, b) => a.userName.localeCompare(b.userName));
     return result;
+  }
+
+  async getGamesStats(gameIds: string[]): Promise<IGetGamesStatsResponse> {
+    try {
+      const gameObjectIds = gameIds.map(
+        (id) => new mongoose.Types.ObjectId(id)
+      );
+
+      const countPerCategory = (category: string) => ({
+        $sum: { $cond: [{ $in: [category, "$categories"] }, 1, 0] },
+      });
+
+      const rows = await this.playthroughs.aggregate<
+        Omit<IGameStats, "gameId"> & { _id: mongoose.Types.ObjectId }
+      >([
+        { $match: { gameId: { $in: gameObjectIds } } },
+        {
+          $group: {
+            _id: { gameId: "$gameId", userId: "$userId" },
+            categories: { $addToSet: "$category" },
+            isMastered: { $max: { $ifNull: ["$isMastered", false] } },
+          },
+        },
+        {
+          $group: {
+            _id: "$_id.gameId",
+            players: { $sum: 1 },
+            mastered: { $sum: { $cond: ["$isMastered", 1, 0] } },
+            completed: countPerCategory("completed"),
+            playing: countPerCategory("playing"),
+            backlog: countPerCategory("backlog"),
+            wishlist: countPerCategory("wishlist"),
+            dropped: countPerCategory("dropped"),
+            played: countPerCategory("played"),
+          },
+        },
+      ]);
+
+      const statsByGameId = new Map(
+        rows.map(({ _id, ...stats }) => [String(_id), stats])
+      );
+
+      return gameIds.map((gameId) => ({
+        gameId,
+        players: 0,
+        mastered: 0,
+        completed: 0,
+        playing: 0,
+        backlog: 0,
+        wishlist: 0,
+        dropped: 0,
+        played: 0,
+        ...statsByGameId.get(gameId),
+      }));
+    } catch (err) {
+      this.logger.error(
+        err,
+        `Failed to get games stats: ${gameIds.join(", ")}`
+      );
+      throw err;
+    }
+  }
+
+  async getGameStats(gameId: string): Promise<IGameStats> {
+    const [stats] = await this.getGamesStats([gameId]);
+
+    return stats;
   }
 }

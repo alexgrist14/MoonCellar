@@ -33,3 +33,5 @@ export class Playthrough {
 
 export const PlaythroughDatabaseSchema =
   SchemaFactory.createForClass(Playthrough);
+
+PlaythroughDatabaseSchema.index({ gameId: 1, userId: 1 });

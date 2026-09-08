@@ -42,6 +42,11 @@ import {
   GetGameFollowingsStatusRequestDto,
   GetGameFollowingsStatusResponseDto,
 } from "src/shared/zod/dto/game-followings-status.dto";
+import {
+  GetGamesStatsRequestDto,
+  GetGameStatsResponseDto,
+  GetGamesStatsResponseDto,
+} from "src/shared/zod/dto/game-stats.dto";
 import { GamesService } from "../services/games.service";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { RolesGuard } from "../../roles/roles.guard";
@@ -64,6 +69,20 @@ export class GamesController {
     @Query() dto: GetGameFollowingsStatusRequestDto
   ) {
     return this.games.getFollowingsStatus(gameId, dto);
+  }
+
+  @Get("/stats")
+  @ApiOperation({ summary: "Get playthrough stats for games" })
+  @ApiCreatedResponse({ type: GetGamesStatsResponseDto })
+  async getGamesStats(@Query() dto: GetGamesStatsRequestDto) {
+    return this.games.getGamesStats(dto.gameIds);
+  }
+
+  @Get("/:gameId/stats")
+  @ApiOperation({ summary: "Get playthrough stats for a game" })
+  @ApiCreatedResponse({ type: GetGameStatsResponseDto })
+  async getGameStats(@Param("gameId") gameId: string) {
+    return this.games.getGameStats(gameId);
   }
 
   @Get("/by-id/:id")
