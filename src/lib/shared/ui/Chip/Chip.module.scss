@@ -1,0 +1,31 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-x2);
+  max-width: 100%;
+  padding: var(--padding-x1) var(--padding-x3);
+  border-radius: var(--radius-x2);
+  transition: 0.2s ease;
+  overflow-wrap: anywhere;
+  @include font(13px, 17px, 400);
+
+  &_filled {
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+
+    &:hover {
+      background-color: var(--color-bg-hover);
+    }
+  }
+
+  &_outlined {
+    border: 1px solid var(--color-border-primary);
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-muted);
+
+    &:hover {
+      border-color: var(--color-accent);
+      color: var(--color-text-primary);
+    }
+  }
+}

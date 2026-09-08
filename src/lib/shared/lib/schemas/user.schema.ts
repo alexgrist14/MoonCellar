@@ -2,6 +2,13 @@ import { z } from "zod";
 import { RaAwardSchema } from "./ra.schema";
 import { RoleSchema } from "./role.schema";
 
+export const DEFAULT_BG_OPACITY = 0.4;
+
+export const UserSettingsSchema = z.object({
+  showAdultContent: z.boolean(),
+  bgOpacity: z.number().min(0).max(1).default(DEFAULT_BG_OPACITY),
+});
+
 export const UserSchemaZod = z.object({
   _id: z.string(),
   userName: z
@@ -22,9 +29,10 @@ export const UserSchemaZod = z.object({
   roles: RoleSchema.array().default(["user"]),
   avatar: z.string().url().nullable(),
   background: z.string().url().nullable(),
-  settings: z
-    .object({ showAdultContent: z.boolean() })
-    .default({ showAdultContent: false }),
+  settings: UserSettingsSchema.default({
+    showAdultContent: false,
+    bgOpacity: DEFAULT_BG_OPACITY,
+  }),
   updatedAt: z.date(),
 });
 
@@ -47,13 +55,14 @@ export const UpdateUserPasswordSchema = z.object({
 export const UpdateDescriptionSchema = UserSchemaZod.pick({
   description: true,
 });
-export const UpdateSettingsSchema = z.object({ showAdultContent: z.boolean() });
+export const UpdateSettingsSchema = UserSettingsSchema.partial();
 
 export const GetUserLoginsResponseSchema = z
   .object({ userName: z.string(), updatedAt: z.string() })
   .array();
 
 export type IUser = z.infer<typeof UserSchemaZod>;
+export type IUserSettings = z.infer<typeof UserSettingsSchema>;
 export type IGetUserByStringRequest = z.infer<typeof GetUserByStringSchema>;
 export type IGetUserByIdRequest = z.infer<typeof GetUserByIdSchema>;
 export type IUpdateUserEmailRequest = z.infer<typeof UpdateUserEmailSchema>;

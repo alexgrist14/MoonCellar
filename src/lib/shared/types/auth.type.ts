@@ -1,6 +1,7 @@
 import { IRole } from "../lib/schemas/role.schema";
 import { IRAAward } from "./retroachievements.type";
 import { IFollowers, IFollowings, IUserFilter, IUserPreset } from "./user.type";
+import { IUserSettings } from "../lib/schemas/user.schema";
 
 export interface IAuth {
   userName: string;
@@ -24,7 +25,7 @@ export interface IUser {
   roles?: string[];
   avatar: string;
   background?: string;
-  settings?: { showAdultContent?: boolean };
+  settings?: Partial<IUserSettings>;
 }
 
 export interface IAuthToken {

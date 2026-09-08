@@ -1,0 +1,39 @@
+.hltb {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x2);
+
+  & h4 {
+    @include font(16px, 20px, 500);
+    color: var(--color-neutral-100);
+  }
+
+  &__tiles {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gap-x2);
+  }
+
+  &__tile {
+    padding: var(--padding-x2) var(--padding-x1);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x4);
+    background-color: var(--color-bg-primary);
+    text-align: center;
+  }
+
+  &__value {
+    @include font(18px, 24px, 700);
+    color: var(--color-text-primary);
+  }
+
+  &__unit {
+    @include font(12px, 16px, 500);
+    color: var(--color-text-secondary);
+  }
+
+  &__label {
+    @include font(12px, 14px, 400);
+    color: var(--color-gray);
+  }
+}

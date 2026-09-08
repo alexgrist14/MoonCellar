@@ -16,13 +16,19 @@ import { FC, MouseEvent, useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import styles from "./Settings.module.scss";
 import { settingsSchema, SettingsSchema } from "./settings.schema";
+import {
+  DEFAULT_BG_OPACITY,
+  IUpdateUserSettingsRequest,
+} from "@/src/lib/shared/lib/schemas/user.schema";
 
 interface SettingsProps {}
 
 export const Settings: FC<SettingsProps> = ({}) => {
   const { isAuth, profile } = useAuthStore();
   const { mutate: updateProfile, isPending } = useUpdateProfileMutation();
-  const { bgOpacity, setBgOpacity } = useSettingsStore();
+  const setBgOpacityPreview = useSettingsStore((s) => s.setBgOpacityPreview);
+
+  const profileBgOpacity = profile?.settings?.bgOpacity ?? DEFAULT_BG_OPACITY;
   const blockedCountry = useGeoStore((s) => s.blockedCountry);
 
   const {
@@ -41,8 +47,11 @@ export const Settings: FC<SettingsProps> = ({}) => {
       description: profile?.description,
       raUsername: profile?.raUsername,
       showAdultContent: !!profile?.settings?.showAdultContent,
+      bgOpacity: Math.round(profileBgOpacity * 100),
     },
   });
+
+  useEffect(() => () => setBgOpacityPreview(undefined), [setBgOpacityPreview]);
 
   useEffect(() => {
     if (!profile) return;
@@ -52,13 +61,30 @@ export const Settings: FC<SettingsProps> = ({}) => {
       description: profile.description,
       raUsername: profile.raUsername,
       showAdultContent: !!profile.settings?.showAdultContent,
+      bgOpacity: Math.round(
+        (profile.settings?.bgOpacity ?? DEFAULT_BG_OPACITY) * 100
+      ),
     });
   }, [profile, reset]);
 
   const showAdultContent = watch("showAdultContent");
+  const bgOpacity = watch("bgOpacity");
 
   const onSubmit: SubmitHandler<SettingsSchema> = (data) => {
     if (!profile) return;
+
+    const settings: IUpdateUserSettingsRequest = {};
+
+    if (
+      !blockedCountry &&
+      data.showAdultContent !== !!profile.settings?.showAdultContent
+    ) {
+      settings.showAdultContent = !!data.showAdultContent;
+    }
+
+    if (data.bgOpacity / 100 !== profileBgOpacity) {
+      settings.bgOpacity = data.bgOpacity / 100;
+    }
 
     updateProfile(
       {
@@ -72,16 +98,14 @@ export const Settings: FC<SettingsProps> = ({}) => {
             raUsername: data.raUsername,
           }),
         ...(background && { background }),
-        ...(!blockedCountry &&
-          data.showAdultContent !== !!profile.settings?.showAdultContent && {
-            settings: { showAdultContent: !!data.showAdultContent },
-          }),
+        ...(!!Object.keys(settings).length && { settings }),
       },
       {
         onSuccess: () => {
           toast.success({ description: "Saved successfully" });
           setTempAvatar(undefined);
           setBackground(undefined);
+          setBgOpacityPreview(undefined);
         },
       }
     );
@@ -198,11 +222,16 @@ export const Settings: FC<SettingsProps> = ({}) => {
           </Button>
         </div>
         <RangeSelector
-          defaultValue={bgOpacity || 0}
-          callback={(val) => setBgOpacity(val)}
+          defaultValue={bgOpacity}
+          callback={(val) => setBgOpacityPreview(val / 100)}
+          finalCallback={(val) =>
+            setValue("bgOpacity", val, { shouldDirty: true })
+          }
           min={0}
           max={100}
-          text={`Background opacity ${bgOpacity || 0}%`}
+          text="Background dim"
+          isWithValue
+          formatValue={(value) => `${value}%`}
           step={1}
         />
       </section>

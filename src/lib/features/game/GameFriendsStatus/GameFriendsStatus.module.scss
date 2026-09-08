@@ -4,8 +4,8 @@
   gap: var(--gap-x2);
 
   &__title {
-    @include font(14px, 18px, 500);
-    color: var(--color-neutral-100);
+    @include font(16px, 20px, 500);
+    color: var(--color-text-primary);
   }
 
   &__list {

@@ -106,9 +106,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
 
         if (isRoyal) {
           const picked = tempGames[winner];
-          const remaining = tempGames.filter(
-            (game) => game._id !== picked._id
-          );
+          const remaining = tempGames.filter((game) => game._id !== picked._id);
           const isRoundOver = remaining.length <= 1;
 
           skipNextRoyalRedrawRef.current = true;
@@ -197,10 +195,14 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   }, [musicVolume]);
 
   useEffect(() => {
-    isRoyal
-      ? setTempGames(!!royalGamesData?.length ? shuffle(royalGamesData) : [])
-      : setTempGames([]);
+    if (!isRoyal) return;
+
+    setTempGames(!!royalGamesData?.length ? shuffle(royalGamesData) : []);
   }, [isRoyal, royalGamesData]);
+
+  useEffect(() => {
+    !isRoyal && setTempGames([]);
+  }, [isRoyal]);
 
   useEffect(() => {
     if (skipNextRoyalRedrawRef.current) {

@@ -3,7 +3,7 @@
 import { FC, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./GameAdminControls.module.scss";
-import { Box } from "@/src/lib/shared/ui/Box";
+import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal/ConfirmModal";
@@ -117,51 +117,53 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
   };
 
   return (
-    <Box title="Admin" classNameContent={styles.controls}>
-      <Button
-        color={ButtonColor.DEFAULT}
-        onClick={() => router.push(`/admin/games/${game._id}`)}
-      >
-        Edit game
-      </Button>
-      {!!igdbId && (
+    <ExpandMenu position="bottom-right" titleOpen="Admin">
+      <div className={styles.controls}>
         <Button
           color={ButtonColor.DEFAULT}
-          disabled={isParsing}
-          onClick={handleParse}
+          onClick={() => router.push(`/admin/games/${game._id}`)}
         >
-          {isParsing ? "Parsing…" : "Parse from IGDB"}
+          Edit game
         </Button>
-      )}
-      <Input
-        containerClassname={styles.input}
-        value={hltbId}
-        placeholder={
-          game.hltb?.hltbId
-            ? `HLTB id (current: ${game.hltb.hltbId})`
-            : "HLTB id (optional)"
-        }
-        disabled={isParsingHltb}
-        onChange={(event) => setHltbId(event.target.value)}
-      />
-      <Button
-        color={ButtonColor.DEFAULT}
-        disabled={isParsingHltb}
-        onClick={handleParseHltb}
-      >
-        {isParsingHltb
-          ? "Parsing…"
-          : hltbId.trim()
-            ? "Parse HLTB by id"
-            : "Parse from HLTB"}
-      </Button>
-      <Button
-        color={ButtonColor.RED}
-        disabled={isDeleting}
-        onClick={handleDelete}
-      >
-        Delete game
-      </Button>
-    </Box>
+        {!!igdbId && (
+          <Button
+            color={ButtonColor.DEFAULT}
+            disabled={isParsing}
+            onClick={handleParse}
+          >
+            {isParsing ? "Parsing…" : "Parse from IGDB"}
+          </Button>
+        )}
+        <Input
+          containerClassname={styles.input}
+          value={hltbId}
+          placeholder={
+            game.hltb?.hltbId
+              ? `HLTB id (current: ${game.hltb.hltbId})`
+              : "HLTB id (optional)"
+          }
+          disabled={isParsingHltb}
+          onChange={(event) => setHltbId(event.target.value)}
+        />
+        <Button
+          color={ButtonColor.DEFAULT}
+          disabled={isParsingHltb}
+          onClick={handleParseHltb}
+        >
+          {isParsingHltb
+            ? "Parsing…"
+            : hltbId.trim()
+              ? "Parse HLTB by id"
+              : "Parse from HLTB"}
+        </Button>
+        <Button
+          color={ButtonColor.RED}
+          disabled={isDeleting}
+          onClick={handleDelete}
+        >
+          Delete game
+        </Button>
+      </div>
+    </ExpandMenu>
   );
 };

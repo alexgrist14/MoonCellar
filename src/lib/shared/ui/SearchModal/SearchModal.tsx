@@ -82,7 +82,7 @@ export const SearchModal: FC = () => {
             <Loader type="pacman" />
           </div>
         ) : games?.length ? (
-          <GamesCards games={games} />
+          <GamesCards games={games} columns={4} />
         ) : (
           <div className={styles.modal__empty}>Games not found</div>
         ))}{" "}

@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { userAPI } from "@/src/lib/shared/api";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { IUserFilter, IUserPreset } from "@/src/lib/shared/types/user.type";
+import { IUpdateUserSettingsRequest } from "@/src/lib/shared/lib/schemas/user.schema";
 import { userQueryKeys } from "./user.query-keys";
 
 interface IUpdateProfileRequest {
@@ -10,7 +11,7 @@ interface IUpdateProfileRequest {
   avatar?: File;
   raUsername?: string;
   background?: File;
-  settings?: { showAdultContent: boolean };
+  settings?: IUpdateUserSettingsRequest;
 }
 
 export const useUpdateProfileMutation = () =>
@@ -58,7 +59,8 @@ export const useAddUserFollowingMutation = () =>
     }: {
       userId: string;
       followingId: string;
-    }) => userAPI.addUserFollowing(userId, followingId).then(({ data }) => data),
+    }) =>
+      userAPI.addUserFollowing(userId, followingId).then(({ data }) => data),
   });
 
 export const useRemoveUserFollowingMutation = () =>

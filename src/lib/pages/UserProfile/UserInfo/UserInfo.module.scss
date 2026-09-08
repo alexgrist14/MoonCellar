@@ -100,11 +100,7 @@
         list-style: initial;
 
         a {
-          color: var(--color-gray);
-
-          &:hover {
-            text-decoration: underline;
-          }
+          @include link;
         }
       }
     }

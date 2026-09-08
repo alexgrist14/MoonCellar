@@ -20,10 +20,10 @@ import {
 
 interface IGameRatingProps {
   game: IGameResponse;
-  isDisabled?: boolean;
+  className?: string;
 }
 
-export const GameRating: FC<IGameRatingProps> = ({ game }) => {
+export const GameRating: FC<IGameRatingProps> = ({ game, className }) => {
   const { profile } = useAuthStore();
 
   const { data: ratings, isPending } = useRatingsQuery(profile?._id ?? "");
@@ -81,32 +81,51 @@ export const GameRating: FC<IGameRatingProps> = ({ game }) => {
   const isLoading =
     (!!profile && isPending) || isCreating || isUpdating || isDeleting;
 
+  const currentRating = rating?.rating ?? undefined;
+
   return (
-    <div
-      className={classNames(styles.rating, {
-        [styles.rating_loading]: isLoading,
-      })}
-      onMouseLeave={() => setHoverIndex(undefined)}
-    >
-      {isLoading && <Loader className={styles.rating__loader} type="pulse" />}
-      {Array(10)
-        .fill("")
-        .map((_, index) => (
-          <SvgNumber
-            key={index}
-            value={index + 1}
-            className={classNames(styles.rating__number, {
-              [styles.rating__number_active]:
-                (hoverIndex === undefined &&
-                  rating &&
-                  rating.rating !== null &&
-                  rating.rating >= index + 1) ||
-                (hoverIndex !== undefined && hoverIndex >= index),
-            })}
-            onClick={() => changeHandler(index + 1)}
-            onMouseOver={() => setHoverIndex(index)}
-          />
-        ))}
+    <div className={classNames(styles.rating, className)}>
+      <div className={styles.rating__head}>
+        <p className={styles.rating__label}>Your rating</p>
+        <p
+          className={classNames(styles.rating__value, {
+            [styles.rating__value_empty]: currentRating === undefined,
+          })}
+        >
+          {currentRating === undefined ? "Not rated" : `${currentRating} / 10`}
+        </p>
+      </div>
+      <div
+        className={classNames(styles.rating__scale, {
+          [styles.rating__scale_loading]: isLoading,
+        })}
+        onMouseLeave={() => setHoverIndex(undefined)}
+      >
+        {isLoading && <Loader className={styles.rating__loader} type="pulse" />}
+        {Array(10)
+          .fill("")
+          .map((_, index) => (
+            <SvgNumber
+              key={index}
+              value={index + 1}
+              className={classNames(styles.rating__number, {
+                [styles.rating__number_active]:
+                  hoverIndex === undefined &&
+                  currentRating !== undefined &&
+                  currentRating >= index + 1,
+                [styles.rating__number_hovered]:
+                  hoverIndex !== undefined && hoverIndex >= index,
+              })}
+              onClick={() => changeHandler(index + 1)}
+              onMouseOver={() => setHoverIndex(index)}
+            />
+          ))}
+      </div>
+      <p className={styles.rating__hint}>
+        {currentRating === undefined
+          ? "Pick a number to rate"
+          : "Pick the same number to remove it"}
+      </p>
     </div>
   );
 };

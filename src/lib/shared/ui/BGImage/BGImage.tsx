@@ -6,6 +6,7 @@ import { useDebouncedCallback } from "use-debounce";
 import { useSettingsStore } from "../../store/settings.store";
 import { useAuthStore } from "../../store/auth.store";
 import { IGameResponse } from "../../lib/schemas/games.schema";
+import { DEFAULT_BG_OPACITY } from "../../lib/schemas/user.schema";
 import { useHideAdult } from "../../hooks/useHideAdult";
 import { isAdultGame } from "../../utils/adult.utils";
 
@@ -17,8 +18,11 @@ interface IBGImageProps {
 }
 
 export const BGImage = memo(({ game, userImage }: IBGImageProps) => {
-  const { bgOpacity } = useSettingsStore();
+  const bgOpacityPreview = useSettingsStore((s) => s.bgOpacityPreview);
+  const profileBgOpacity = useAuthStore((s) => s.profile?.settings?.bgOpacity);
   const authUserImage = useAuthStore((s) => s.profile?.background);
+
+  const bgOpacity = bgOpacityPreview ?? profileBgOpacity ?? DEFAULT_BG_OPACITY;
 
   const hideMedia = useHideAdult() && isAdultGame(game);
 
@@ -68,10 +72,7 @@ export const BGImage = memo(({ game, userImage }: IBGImageProps) => {
 
   return (
     <div className={styles.wrapper}>
-      <div
-        className={styles.overlay}
-        style={{ opacity: bgOpacity !== undefined ? bgOpacity / 100 : 0 }}
-      />
+      <div className={styles.overlay} style={{ opacity: bgOpacity }} />
       <div className={styles.place}>
         {!!bg && (
           <div

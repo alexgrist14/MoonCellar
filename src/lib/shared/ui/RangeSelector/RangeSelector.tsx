@@ -1,4 +1,4 @@
-import { CSSProperties, FC, useEffect, useState } from "react";
+import { CSSProperties, FC, useEffect, useRef, useState } from "react";
 import styles from "./RangeSelector.module.scss";
 import classNames from "classnames";
 import { Loader } from "../Loader";
@@ -16,6 +16,8 @@ interface RangeSelectorProps extends Partial<
   callback?: (value: number) => void;
   finalCallback?: (value: number) => void;
   isLoading?: boolean;
+  isWithValue?: boolean;
+  formatValue?: (value: number) => string;
 }
 
 export const RangeSelector: FC<RangeSelectorProps> = ({
@@ -29,19 +31,27 @@ export const RangeSelector: FC<RangeSelectorProps> = ({
   finalCallback,
   variant = "accent",
   isLoading,
+  isWithValue,
+  formatValue,
   ...props
 }) => {
   const [rangeValue, setRangeValue] = useState<string>("0");
   const [isActive, setIsActive] = useState(false);
 
+  const isInteracting = useRef(false);
+  const emittedValue = useRef<number>(undefined);
+
   useEffect(() => {
-    !!defaultValue
-      ? setRangeValue(defaultValue.toString())
-      : setRangeValue("0");
+    if (isInteracting.current || defaultValue === emittedValue.current) return;
+
+    setRangeValue(!!defaultValue ? defaultValue.toString() : "0");
   }, [defaultValue, setRangeValue]);
 
   const offset = (100 * +rangeValue) / (max || 100);
-  const left = `calc(${offset}% - ${7.5}px)`;
+  const thumbOffset = isWithValue
+    ? "var(--range-thumb-width)"
+    : "var(--range-thumb-size)";
+  const left = `${offset}%`;
   const width = `${offset}%`;
 
   const getStyles = (): CSSProperties => {
@@ -79,12 +89,16 @@ export const RangeSelector: FC<RangeSelectorProps> = ({
               styles[`slider__pointer_${variant}`],
               {
                 [styles.slider__pointer_active]: isActive,
+                [styles.slider__pointer_labelled]: isWithValue,
               }
             )}
             style={{
               left,
             }}
-          ></div>
+          >
+            {!!isWithValue &&
+              (formatValue ? formatValue(+rangeValue) : rangeValue)}
+          </div>
           <div
             className={classNames(
               styles.slider__bar,
@@ -95,6 +109,10 @@ export const RangeSelector: FC<RangeSelectorProps> = ({
             }}
           ></div>
           <input
+            style={{
+              left: `calc(-1 * ${thumbOffset} / 2)`,
+              width: `calc(100% + ${thumbOffset})`,
+            }}
             className={styles.slider__input}
             type="range"
             value={rangeValue}
@@ -104,10 +122,15 @@ export const RangeSelector: FC<RangeSelectorProps> = ({
             onMouseOut={() => {
               setIsActive(false);
             }}
+            onPointerDown={() => (isInteracting.current = true)}
             onChange={(e) => {
+              emittedValue.current = +e.target.value;
               setRangeValue(e.target.value);
               !!callback && callback(+e.target.value);
             }}
+            onPointerUp={() => (isInteracting.current = false)}
+            onPointerCancel={() => (isInteracting.current = false)}
+            onBlur={() => (isInteracting.current = false)}
             onMouseUp={() => !!finalCallback && finalCallback(+rangeValue)}
             onTouchEnd={() => !!finalCallback && finalCallback(+rangeValue)}
             min={min || 0}

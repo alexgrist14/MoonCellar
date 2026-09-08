@@ -2,18 +2,51 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  min-width: 0;
   font-size: 13px;
   line-height: 1;
   color: var(--color-text-muted);
+  filter: var(--shadow-text);
 
   &__item {
     display: inline-flex;
     align-items: center;
+    min-width: 0;
+
+    @include mediaSm {
+      display: none;
+
+      &:nth-last-child(2),
+      &:only-child {
+        display: inline-flex;
+      }
+    }
+  }
+
+  &__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x1);
+    min-width: 0;
+  }
+
+  &__back {
+    display: none;
+    flex-shrink: 0;
+
+    @include mediaSm {
+      display: inline-flex;
+    }
   }
 
   &__separator {
+    flex-shrink: 0;
     margin-inline: var(--padding-x2);
     color: var(--color-text-muted);
+
+    @include mediaSm {
+      display: none;
+    }
   }
 
   &__current {

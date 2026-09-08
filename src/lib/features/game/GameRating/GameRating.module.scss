@@ -1,16 +1,48 @@
 .rating {
   display: flex;
+  flex-direction: column;
+  gap: var(--gap-x2);
   height: fit-content;
-  width: 80%;
-  margin-inline: auto;
-  border-radius: var(--radius-x2);
-  overflow: hidden;
-  position: relative;
-  transition: opacity 0.3s;
+  width: 100%;
 
-  &_loading {
-    opacity: 0.5;
-    pointer-events: none;
+  &__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--gap-x2);
+  }
+
+  &__label {
+    @include font(13px, 17px, 400);
+    color: var(--color-gray);
+  }
+
+  &__value {
+    @include font(15px, 19px, 700);
+    color: var(--color-accent);
+
+    &_empty {
+      @include font(15px, 19px, 400);
+      color: var(--color-neutral-70);
+    }
+  }
+
+  &__scale {
+    display: flex;
+    position: relative;
+    border-radius: var(--radius-x4);
+    overflow: hidden;
+    transition: opacity 0.3s;
+
+    &_loading {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
+
+  &__hint {
+    @include font(12px, 16px, 400);
+    color: var(--color-neutral-70);
   }
 
   &__number {
@@ -21,8 +53,16 @@
     aspect-ratio: 1;
     transition: 0.3s;
 
+    & + & {
+      border-left: 1px solid var(--color-bg-primary);
+    }
+
     &_active {
       background-color: var(--color-accent);
+    }
+
+    &_hovered {
+      background-color: var(--color-bg-accent-tint);
     }
   }
 }

@@ -15,6 +15,7 @@ interface IBoxProps {
   contentStyle?: CSSProperties;
   isHeaderWithoutStyles?: boolean;
   isVerticalActions?: boolean;
+  isTitleStart?: boolean;
   className?: string;
   classNameContent?: string;
   isWithScrollBar?: boolean;

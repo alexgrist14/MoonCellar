@@ -1,0 +1,33 @@
+.overview {
+  gap: var(--gap-x4);
+  height: 100%;
+
+  & h4 {
+    @include font(16px, 20px, 500);
+    color: var(--color-text-primary);
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x2);
+
+    & p {
+      @include font(14px, 22px, 400);
+      color: var(--color-text-secondary);
+    }
+  }
+
+  &__keywords {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x2);
+    margin-top: auto;
+  }
+
+  &__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-x2);
+  }
+}

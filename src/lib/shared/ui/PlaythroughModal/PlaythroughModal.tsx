@@ -26,7 +26,6 @@ import { Box } from "../Box";
 import { toast } from "../../utils/toast.utils";
 import { IGameResponse } from "../../lib/schemas/games.schema";
 import { useCommonStore } from "../../store/common.store";
-import { GameRating } from "@/src/lib/features/game/GameRating";
 import { usePlaythroughsQuery } from "@/src/lib/entities/playthrough/api/playthrough.queries";
 import {
   useCreatePlaythroughMutation,
@@ -154,14 +153,6 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
       contentStyle={{ padding: "var(--padding-x5)" }}
       classNameContent={styles.wrapper}
     >
-      <GameRating
-        game={game}
-        isDisabled={
-          !playthroughs.some((play) =>
-            ["completed", "played", "dropped"].includes(play.category)
-          )
-        }
-      />
       <div className={styles.modal}>
         {!!playthroughs?.length && (
           <div className={styles.modal__top}>
@@ -251,18 +242,16 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
                 })}
                 value={watch("time") || ""}
               />
-              {watch("category") === "completed" && (
-                <ToggleSwitch
-                  label="Mastered?"
-                  leftContent="No"
-                  rightContent="Yes"
-                  value={watch("isMastered") ? "right" : "left"}
-                  clickCallback={() =>
-                    setValue("isMastered", !watch("isMastered"))
-                  }
-                />
-              )}
             </div>
+          )}
+          {watch("category") === "completed" && (
+            <ToggleSwitch
+              label="Mastered?"
+              leftContent="No"
+              rightContent="Yes"
+              value={watch("isMastered") ? "right" : "left"}
+              clickCallback={() => setValue("isMastered", !watch("isMastered"))}
+            />
           )}
           <Textarea
             {...register("comment")}

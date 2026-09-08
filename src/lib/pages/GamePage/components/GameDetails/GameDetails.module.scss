@@ -1,0 +1,40 @@
+.details {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--gap-x5) var(--gap-x8);
+  padding: var(--padding-x4);
+
+  @include mediaGt {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @include media960 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include mediaSm {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  &__row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x05);
+    min-width: 0;
+  }
+
+  &__label {
+    @include font(16px, 20px, 500);
+    color: var(--color-text-primary);
+  }
+
+  &__value {
+    @include font(14px, 20px, 400);
+    color: var(--color-text-secondary);
+
+    & a {
+      @include link;
+      color: inherit;
+    }
+  }
+}

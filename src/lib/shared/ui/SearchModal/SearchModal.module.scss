@@ -16,7 +16,7 @@
 
   &_active {
     height: 90vh;
-    grid-template-rows: auto 1fr min-content;
+    grid-template-rows: auto minmax(0, 1fr) min-content;
   }
 
   @include mediaMax($screenMd) {

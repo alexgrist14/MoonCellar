@@ -7,6 +7,8 @@
 
   div &__container {
     width: 100%;
+    height: 100%;
+    min-height: 0;
   }
 
   &__line {
@@ -23,16 +25,34 @@
 
   &__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(var(--games-card-min-width), 1fr)
+    );
     gap: var(--gap-x2);
     width: 100%;
 
-    @include mediaMin($screenGt) {
-      grid-template-columns: repeat(var(--games-columns, 6), minmax(0, 1fr));
+    &_limited {
+      grid-template-columns: repeat(
+        auto-fill,
+        minmax(
+          max(
+            var(--games-card-min-width),
+            calc(
+              (100% - (var(--games-columns) - 1) * var(--gap-x2)) /
+                var(--games-columns)
+            )
+          ),
+          1fr
+        )
+      );
     }
 
     @include mediaSm {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      &,
+      &_limited {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
     }
   }
 

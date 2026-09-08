@@ -7,21 +7,23 @@
     display: flex;
     cursor: pointer;
     border-radius: var(--radius-x2);
-    overflow: hidden;
+    overflow: clip;
     transition: all 0.3s;
-    border: 2px solid transparent;
+    outline: 2px solid transparent;
+    outline-offset: -2px;
     background-color: var(--color-bg-secondary);
     position: relative;
 
     &:hover {
       filter: brightness(0.6);
-      border-color: var(--color-accent);
+      outline-color: var(--color-accent);
     }
 
     & img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      border-radius: inherit;
     }
   }
 

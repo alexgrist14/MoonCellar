@@ -197,3 +197,15 @@ $fontMain: var(--font-general);
   align-items: center;
   justify-content: center;
 }
+
+@mixin link {
+  color: var(--color-gray);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--color-text-primary);
+  }
+}

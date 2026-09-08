@@ -11,5 +11,10 @@
   div &__scrollbar {
     margin-block: 100px 50px;
     height: calc(100% - 150px);
+
+    @include mediaMd {
+      margin-block: 150px 100px;
+      height: calc(100% - 250px);
+    }
   }
 }

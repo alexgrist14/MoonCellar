@@ -1,6 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
-import { IGetGamesRequest } from "../../../shared/lib/schemas/games.schema";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMemo } from "react";
+import {
+  IGameResponse,
+  IGetGamesRequest,
+} from "../../../shared/lib/schemas/games.schema";
 import { IGamesListResponse } from "@/src/lib/shared/types/games.type";
+import { IGameStats } from "@/src/lib/shared/lib/schemas/game-stats.schema";
 import { gameQueryKeys } from "./game.query-keys";
 import { adminGamesApi, gamesApi } from "@/src/lib/shared/api";
 
@@ -21,8 +26,30 @@ export const useGamesByIdsQuery = (
   ids: string[],
   search?: string,
   enabled = true
-) =>
-  useQuery({
+) => {
+  const queryClient = useQueryClient();
+
+  const cached = useMemo(() => {
+    if (!!search || !ids.length) return undefined;
+
+    const entries = queryClient.getQueriesData<IGameResponse[]>({
+      queryKey: [...gameQueryKeys.all, "by-ids"],
+    });
+
+    for (const [, games] of entries) {
+      if (!games?.length) continue;
+
+      const byId = new Map(games.map((game) => [game._id, game]));
+
+      if (ids.every((id) => byId.has(id))) {
+        return ids.map((id) => byId.get(id)!);
+      }
+    }
+
+    return undefined;
+  }, [ids, search, queryClient]);
+
+  return useQuery({
     queryKey: gameQueryKeys.byIds(ids, search),
     queryFn: async () => {
       const { data } = await gamesApi.getByIds({ _ids: ids, search });
@@ -34,7 +61,10 @@ export const useGamesByIdsQuery = (
     },
     enabled: enabled && ids.length > 0,
     staleTime: 60000,
+    initialData: cached,
+    initialDataUpdatedAt: () => (cached ? Date.now() : undefined),
   });
+};
 
 export const useGameFollowingsStatusQuery = (
   gameId: string,
@@ -46,6 +76,15 @@ export const useGameFollowingsStatusQuery = (
       gamesApi.getFollowingsStatus(gameId, profileId).then(({ data }) => data),
     enabled: !!gameId && !!profileId,
     staleTime: 60000,
+  });
+
+export const useGameStatsQuery = (gameId: string, initialData?: IGameStats) =>
+  useQuery({
+    queryKey: gameQueryKeys.stats(gameId),
+    queryFn: () => gamesApi.getStats(gameId).then(({ data }) => data),
+    enabled: !!gameId,
+    staleTime: 60000,
+    initialData,
   });
 
 export const useAdminGameQuery = (gameId?: string) =>

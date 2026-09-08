@@ -12,6 +12,7 @@ export const settingsSchema = z.object({
     .optional(),
   raUsername: z.string().optional(),
   showAdultContent: z.boolean().optional(),
+  bgOpacity: z.number().min(0).max(100),
 });
 
 export type SettingsSchema = z.infer<typeof settingsSchema>;

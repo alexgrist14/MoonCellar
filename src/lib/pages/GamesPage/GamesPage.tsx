@@ -92,7 +92,12 @@ export const GamesPage: FC<IGamesPageProps> = ({
         ) : !games?.length ? (
           <h2 className={styles.page__empty}>Games not found</h2>
         ) : (
-          <GamesCards games={games} isWithCombinedRating isWithoutScroll />
+          <GamesCards
+            games={games}
+            columns={6}
+            isWithCombinedRating
+            isWithoutScroll
+          />
         )}
       </Box>
     </>

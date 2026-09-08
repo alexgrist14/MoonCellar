@@ -1,0 +1,64 @@
+.ratings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x3);
+
+  & h4 {
+    @include font(16px, 20px, 500);
+    color: var(--color-neutral-100);
+  }
+
+  &__row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x1);
+
+    &_users {
+      --rating-color: var(--color-accent);
+    }
+
+    &_igdb {
+      --rating-color: var(--color-blue);
+    }
+
+    &_hltb {
+      --rating-color: var(--color-positive);
+    }
+  }
+
+  &__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--gap-x2);
+
+    & p {
+      @include font(13px, 17px, 400);
+      color: var(--color-gray);
+    }
+  }
+
+  &__value {
+    @include font(15px, 19px, 700);
+    color: var(--rating-color);
+  }
+
+  &__track {
+    height: 6px;
+    border-radius: var(--radius-x1);
+    background-color: var(--color-bg-primary);
+    overflow: hidden;
+  }
+
+  &__bar {
+    display: block;
+    height: 100%;
+    border-radius: var(--radius-x1);
+    background-color: var(--rating-color);
+  }
+
+  &__count {
+    @include font(12px, 14px, 400);
+    color: var(--color-neutral-70);
+  }
+}

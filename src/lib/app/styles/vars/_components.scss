@@ -10,6 +10,8 @@
   --cover-ratio: 528/704;
 
   --shadow-basic: 0px 4px 4px var(--color-neutral-5);
+  --shadow-text: drop-shadow(0 1px 2px var(--color-neutral-5))
+    drop-shadow(0 0 6px var(--color-neutral-5));
   --glow-accent: 0 0 0.4rem var(--color-accent);
   --glow-accent-sm: 0 0 0.15rem var(--color-accent);
 
@@ -17,6 +19,30 @@
 
   --navigation-progress-height: 1px;
   --navigation-progress-z-index: 1002;
+
+  --modal-text-width: min(720px, calc(100vw - var(--padding-x10)));
+  --games-card-min-width: 180px;
+  --range-track-height: 6px;
+  --range-thumb-size: 20px;
+  --range-thumb-width: 44px;
+  --range-thumb-height: 24px;
+  --scrollbar-horizontal-size: 6px;
+  --scrollbar-arrow-width: 32px;
+  --scrollbar-fade-width: 48px;
+  --game-keywords-collapsed-height: 66px;
+  --game-hero-artwork-height: 300px;
+  --game-hero-artwork-height-sm: 180px;
+  --game-hero-cover-width: 200px;
+  --game-hero-cover-offset: 104px;
+  --game-hero-counters-width: 300px;
+  --game-rating-popover-width: 320px;
+  --game-hero-scrim: linear-gradient(
+    180deg,
+    #191d248c 0%,
+    #191d2400 30%,
+    #212731d1 72%,
+    var(--color-bg-secondary) 100%
+  );
 
   --empty-state-image-size: 180px;
   --not-found-image-height: 240px;

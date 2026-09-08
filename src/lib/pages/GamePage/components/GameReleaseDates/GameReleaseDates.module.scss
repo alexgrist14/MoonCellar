@@ -1,0 +1,19 @@
+.dates {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--gap-x2) var(--gap-x6);
+  padding: var(--padding-x4);
+
+  @include mediaSm {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  & p {
+    @include font(14px, 20px, 400);
+    color: var(--color-text-secondary);
+  }
+
+  & span {
+    font-style: italic;
+  }
+}

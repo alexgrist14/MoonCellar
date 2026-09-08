@@ -157,12 +157,42 @@
     font-weight: 700;
     padding: var(--padding-x2);
     background-color: var(--color-bg-accent-tint);
+    cursor: pointer;
+    transition: 0.3s;
+
+    &:hover {
+      background-color: var(--color-bg-accent);
+    }
+
+    &_empty {
+      padding: var(--padding-x1);
+      color: var(--color-text-secondary);
+      background-color: var(--color-bg-primary-tint);
+
+      &:hover {
+        background-color: var(--color-bg-tertiary);
+      }
+    }
   }
 
   div &__royal {
     font-weight: 700;
     padding: var(--padding-x05);
     background-color: var(--color-bg-positive-tint);
+    cursor: pointer;
+    transition: 0.3s;
+
+    &:hover {
+      background-color: var(--color-bg-positive);
+    }
+
+    &_empty {
+      background-color: var(--color-bg-primary-tint);
+
+      &:hover {
+        background-color: var(--color-bg-tertiary);
+      }
+    }
   }
 
   div &__rank {
@@ -197,6 +227,12 @@
   div &__achievement {
     padding: var(--padding-x1);
     background-color: var(--color-bg-primary-tint);
+    cursor: pointer;
+    transition: 0.3s;
+
+    &:hover {
+      background-color: var(--color-bg-tertiary);
+    }
   }
 
   @include gameGlow;

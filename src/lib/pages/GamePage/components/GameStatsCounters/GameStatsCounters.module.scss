@@ -1,0 +1,44 @@
+.counters {
+  flex-shrink: 0;
+  width: var(--game-hero-counters-width);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--gap-x2);
+
+  @include mediaMd {
+    width: 100%;
+  }
+
+  &__item {
+    padding: var(--padding-x2) var(--padding-x3);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x3);
+    background-color: var(--color-bg-primary);
+
+    &_completed {
+      --counter-color: var(--color-positive);
+    }
+
+    &_backlog {
+      --counter-color: var(--color-pink);
+    }
+
+    &_playing {
+      --counter-color: var(--color-accent);
+    }
+
+    &_mastered {
+      --counter-color: var(--color-yellow);
+    }
+  }
+
+  &__label {
+    @include font(12px, 14px, 400);
+    color: var(--color-text-muted);
+  }
+
+  &__value {
+    @include font(20px, 26px, 700);
+    color: var(--counter-color);
+  }
+}

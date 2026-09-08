@@ -1,0 +1,134 @@
+.hero {
+  &__banner {
+    position: relative;
+    height: var(--game-hero-artwork-height);
+    background-color: var(--color-bg-tertiary);
+
+    @include mediaMd {
+      height: var(--game-hero-artwork-height-sm);
+    }
+  }
+
+  &__artwork {
+    object-fit: cover;
+  }
+
+  &__scrim {
+    position: absolute;
+    inset: 0;
+    background: var(--game-hero-scrim);
+  }
+
+  &__crumbs {
+    position: absolute;
+    top: var(--padding-x4);
+    left: var(--padding-x6);
+  }
+
+  &__royal {
+    position: absolute;
+    top: var(--padding-x4);
+    right: var(--padding-x6);
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    padding: var(--padding-x1) var(--padding-x3);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x2);
+    background-color: var(--color-bg-primary-tint);
+    color: var(--color-text-secondary);
+    @include font(13px, 17px, 400);
+  }
+
+  &__body {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    gap: var(--gap-x6);
+    padding: 0 var(--padding-x6) var(--padding-x6);
+    margin-top: calc(-1 * var(--game-hero-cover-offset));
+
+    @include mediaMd {
+      flex-direction: column;
+      align-items: center;
+      gap: var(--gap-x4);
+    }
+  }
+
+  &__cover {
+    width: var(--game-hero-cover-width);
+    flex-shrink: 0;
+  }
+
+  &__main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x3);
+
+    @include mediaMd {
+      width: 100%;
+      align-items: center;
+      text-align: center;
+    }
+  }
+
+  &__title {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x1);
+
+    & h1 {
+      @include font(38px, 42px, 700);
+      letter-spacing: -0.4px;
+      text-wrap: balance;
+
+      @include mediaMd {
+        @include font(28px, 32px, 700);
+      }
+    }
+  }
+
+  &__altNames {
+    @include font(12px, 14px, 400);
+    color: var(--color-gray);
+    @include lineClamp(1);
+  }
+
+  &__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-x2);
+
+    @include mediaMd {
+      justify-content: center;
+    }
+  }
+
+  &__chip {
+    padding: var(--padding-x1) var(--padding-x3);
+    border-radius: var(--radius-x2);
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+    transition: 0.2s ease;
+    @include font(13px, 17px, 400);
+
+    &:hover {
+      background-color: var(--color-bg-hover);
+    }
+  }
+
+  &__ratingControl {
+    width: var(--game-rating-popover-width);
+    max-width: 100%;
+  }
+
+  &__counters {
+    align-self: flex-end;
+
+    @include mediaMd {
+      align-self: stretch;
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import { CSSProperties, FC, ReactNode } from "react";
+import classNames from "classnames";
 import styles from "./GamesCards.module.scss";
 import { IGameResponse } from "../../lib/schemas/games.schema";
 import { GameCard } from "../GameCard";
@@ -29,7 +30,9 @@ export const GamesCards: FC<IGamesCardsProps> = ({
 
   const grid = (
     <div
-      className={styles.block__grid}
+      className={classNames(styles.block__grid, {
+        [styles.block__grid_limited]: !!columns,
+      })}
       style={
         columns ? ({ "--games-columns": columns } as CSSProperties) : undefined
       }
@@ -64,7 +67,7 @@ export const GamesCards: FC<IGamesCardsProps> = ({
         classNameContent={styles.block__content}
         classNameScrollbar={styles.block__scrollbar}
         classNameLine={styles.block__line}
-        contentStyle={{ maxHeight: "var(--page-height-available)" }}
+        contentStyle={{ maxHeight: "100%" }}
         fadeType="both"
         isWithRadius
       >

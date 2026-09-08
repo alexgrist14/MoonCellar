@@ -2,6 +2,14 @@
   &_clamped {
     @include lineClamp(4);
   }
+
+  &_limited {
+    overflow: hidden;
+  }
+}
+
+.modal {
+  width: var(--modal-text-width);
 }
 
 .toggle {
@@ -13,9 +21,5 @@
 
   &__icon {
     transition: transform 0.2s;
-
-    &_active {
-      transform: rotate(180deg);
-    }
   }
 }

@@ -1,140 +1,31 @@
 .page {
-  display: grid;
-  grid-template-columns: auto 1fr;
+  display: flex;
+  flex-direction: column;
   gap: var(--gap-x7);
-  height: 100%;
   position: relative;
 
-  @include mediaMax($screenMd) {
-    grid-template-columns: 1fr;
-    justify-items: center;
-    align-content: flex-start;
-  }
-
-  &__crumbs {
-    margin-bottom: var(--padding-x2);
-  }
-
-  &__left {
+  &__columns {
     display: flex;
-    flex-direction: column;
-    height: fit-content;
-    width: 240px;
-    padding: 0;
-    gap: var(--gap-x5);
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: var(--gap-x6);
 
-    @include mediaMax($screenMd) {
-      width: 100%;
+    @include mediaMd {
+      flex-direction: column;
     }
   }
 
-  &__leftTop {
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-x5);
-
-    @include mediaMax($screenMd) {
-      width: 240px;
-      margin-inline: auto;
-    }
-  }
-
-  &__right {
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-x2);
-    padding: var(--padding-x3) var(--padding-x4);
-    height: fit-content;
-
-    & a {
-      @include font(14px, 18px, 400);
-      color: var(--color-gray);
-      width: fit-content;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-  }
-
-  &__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--gap-x3);
-    width: 100%;
-
-    @include mediaMax($screenMd) {
-      flex-direction: column-reverse;
-      align-items: flex-start;
-    }
-  }
-
-  &__titleGroup {
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-x1);
+  &__column,
+  &__columnWide {
+    flex: 1 1 0;
     min-width: 0;
   }
 
-  &__altNames {
-    @include font(12px, 14px, 400);
-    color: var(--color-gray);
-  }
+  &__columnWide {
+    flex-grow: 2;
 
-  &__screenshots {
-    display: grid;
-    gap: var(--gap-x1);
-
-    & h4 {
-      @include font(16px, 20px, 500);
-    }
-  }
-
-  &__text,
-  &__links {
-    & h4 {
-      @include font(16px, 20px, 500);
-    }
-
-    & p {
-      @include font(14px, 18px, 400);
-      color: var(--color-gray);
-    }
-
-    & span {
-      font-style: italic;
-    }
-  }
-
-  &__info,
-  &__developers {
-    margin-top: 10px;
-
-    & span:not(.page__keywords) {
-      @include font(16px, 20px, 500);
-      color: var(--color-neutral-100);
-    }
-
-    & p {
-      @include font(14px, 18px, 400);
-      color: var(--color-gray);
-    }
-  }
-
-  &__links {
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-x1);
-  }
-
-  &__bottom {
-    display: flex;
-    column-gap: var(--gap-x12);
-    row-gap: var(--gap-x2);
-
-    @include mediaMax($screenMd) {
-      flex-direction: column;
+    @include mediaGt {
+      flex-basis: 100%;
     }
   }
 }

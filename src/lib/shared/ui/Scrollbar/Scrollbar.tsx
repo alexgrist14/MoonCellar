@@ -4,6 +4,7 @@ import React, { CSSProperties, FC, RefObject } from "react";
 import cl from "classnames";
 import styles from "./Scrollbar.module.scss";
 import { useScrollbar } from "../../hooks";
+import { SvgChevron } from "../svg";
 
 interface IScrollBarProps {
   id?: string;
@@ -20,6 +21,7 @@ interface IScrollBarProps {
   isChildrenOnly?: boolean;
   isResetScrollPosition?: boolean;
   isHorizontal?: boolean;
+  isWithArrows?: boolean;
   contentStyle?: CSSProperties;
   containerStyle?: CSSProperties;
   initialContentRef?: RefObject<HTMLDivElement | null>;
@@ -51,6 +53,7 @@ export const Scrollbar: FC<IScrollBarProps> = ({
   isChildrenOnly,
   isResetScrollPosition,
   isHorizontal,
+  isWithArrows,
   contentStyle,
   containerStyle,
   initialContentRef,
@@ -63,6 +66,9 @@ export const Scrollbar: FC<IScrollBarProps> = ({
     isDragging,
     lineBottom,
     lineTop,
+    arrowStart,
+    arrowEnd,
+    scrollByStep,
     contentRef,
     scrollTrackRef,
     thumbWidth,
@@ -98,12 +104,43 @@ export const Scrollbar: FC<IScrollBarProps> = ({
       ) : (
         <div
           id={id}
-          className={cl(classNameContent, styles.scrollbars__content)}
+          className={cl(classNameContent, styles.scrollbars__content, {
+            [styles.scrollbars__content_faded]: isHorizontal && isWithArrows,
+          })}
           style={contentStyle}
           ref={contentRef}
         >
           {children}
         </div>
+      )}
+
+      {isHorizontal && isWithArrows && (
+        <>
+          <button
+            type="button"
+            ref={arrowStart}
+            aria-label="Scroll left"
+            className={cl(
+              styles.scrollbars__arrow,
+              styles.scrollbars__arrow_start
+            )}
+            onClick={() => scrollByStep(-1)}
+          >
+            <SvgChevron size="16" style={{ transform: "rotate(90deg)" }} />
+          </button>
+          <button
+            type="button"
+            ref={arrowEnd}
+            aria-label="Scroll right"
+            className={cl(
+              styles.scrollbars__arrow,
+              styles.scrollbars__arrow_end
+            )}
+            onClick={() => scrollByStep(1)}
+          >
+            <SvgChevron size="16" style={{ transform: "rotate(-90deg)" }} />
+          </button>
+        </>
       )}
 
       <div

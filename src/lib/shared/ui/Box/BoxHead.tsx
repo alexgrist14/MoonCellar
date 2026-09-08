@@ -7,6 +7,7 @@ interface IBoxHeadProps {
   titleAction?: ReactNode;
   isHeaderWithoutStyles?: boolean;
   isVerticalActions?: boolean;
+  isTitleStart?: boolean;
   isExternal?: boolean;
 }
 
@@ -15,6 +16,7 @@ export const BoxHead: FC<IBoxHeadProps> = ({
   isVerticalActions,
   title,
   titleAction,
+  isTitleStart,
   isExternal,
 }) => {
   if (
@@ -24,10 +26,15 @@ export const BoxHead: FC<IBoxHeadProps> = ({
   )
     return null;
   return (
-    <div>
+    <div
+      className={
+        !!titleAction && !isExternal ? styles.template__head_action : undefined
+      }
+    >
       <h2
         className={classNames(styles.template__title, {
           [styles.template__title_vertical]: isVerticalActions,
+          [styles.template__title_start]: isTitleStart,
           [styles.template__title_external]: isExternal,
         })}
       >

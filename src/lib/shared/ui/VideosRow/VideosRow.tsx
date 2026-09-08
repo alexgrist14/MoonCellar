@@ -30,7 +30,11 @@ export const VideosRow: FC<IVideosRowProps> = ({ videos }) => {
   }, [videoIndex, videos]);
 
   return (
-    <Scrollbar classNameContent={styles.videos__content} isHorizontal>
+    <Scrollbar
+      classNameContent={styles.videos__content}
+      isHorizontal
+      isWithArrows
+    >
       {videos.map(
         (video, i) =>
           !!video && (

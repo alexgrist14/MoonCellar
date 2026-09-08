@@ -58,7 +58,26 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
   `min-height: 0` declarations; the scroll area's height comes from flex shrinking, not from
   the `max-height: 100%` on the content (that percentage resolves against an indefinite box and
   is ignored).
+- **A row of equal-height `Box` panels needs `height: auto`, not `height: 100%`.** An explicit
+  height on a flex item cancels `align-items: stretch`, and a percentage height resolves against
+  an indefinite parent and is dropped — so `height: 100%` on the item produces the opposite of
+  what it reads like. `Box` ships `height: fit-content` on both `.wrapper` and `.template`, which
+  cancels stretch the same way, so a column of Boxes passes `wrapperStyle={{ height: "auto" }}`
+  (the flex line stretches it) *and* `templateStyle={{ height: "100%" }}` (the wrapper now has a
+  definite height to resolve against). `.template__resizer` and `.template__content` carry
+  `flex-grow: 1` for the last leg; without them only the panel's background grows and
+  `justify-content: space-between` inside the content does nothing.
 - `Box`'s own radius is `var(--radius-x5)`. For structural UI wrapper components rendered directly inside a `Box` (`Button`, `Input`, `Textarea`, `CustomDropdown`, and similar reusable "chrome" primitives — not decorative elements like game covers/posters), the `border-radius` must be exactly one step below its structural parent's on the `--radius-x*` scale (parent `x5` → child `x4` → grandchild `x3`, etc.). This rule applies to structural wrapper nesting only, not to decorative/illustrative radii (e.g. card art, covers), which are a deliberate style choice independent of nesting depth.
+
+- **A rounded image tile needs the radius on the image too, and its hover ring must be an
+  `outline`, not a transparent `border`.** A `border: 2px solid transparent` shrinks the
+  content box, so the tile's own `background-color` shows through the border as a light kant
+  along the rounded corners; `overflow` alone also leaves a seam there, because the parent's
+  clip is a mask while the image keeps square corners. Use `outline: 2px solid transparent`
+  with `outline-offset: -2px` (draws inside, changes no geometry) plus `border-radius: inherit`
+  on the `img`. The media rails in `Slideshow` and `VideosRow` are built this way; the
+  alternatives and their trade-offs are in [`docs/rounded-tiles.md`](./docs/rounded-tiles.md),
+  which also records how the rails fade their cut edges and why scroll snapping was rolled back.
 
 ## Server rendering and SEO
 
@@ -95,6 +114,10 @@ before:
   `images`, or it loses them. Do not put `twitter.images` in the root layout: every page without
   its own `twitter` block inherits that image, and `twitter:image` stops following the page's
   own `og:image` (game pages shipped the site banner instead of the cover).
+- **Collapse long lists with CSS, never by slicing the array.** The game page carries up to 215
+  keyword links; rendering only the first N drops the rest from the HTML. `ExpandableBlock`'s
+  `clampHeight` prop hides the overflow with `max-height` while every link stays in the DOM —
+  use it (or the `lineClamp` mixin) instead of `items.slice(0, n)`.
 - **Never serve image URLs from under `/api`** — `robots.ts` disallows it, so crawlers cannot
   fetch them. The cover proxy lives at `/img/image-proxy` for exactly this reason.
 
@@ -163,6 +186,11 @@ component needs to build the value itself (a `basePath` string, not a `getHref` 
 ## Scrolling
 
 - Never rely on the browser's default/native scrollbar for a scrollable area. Use the shared `Scrollbar` component from `src/lib/shared/ui/Scrollbar` for any element that needs to scroll (vertically or horizontally via the `isHorizontal` prop).
+- **Measure the scrollbar track with `offsetWidth`/`offsetHeight`, never `clientWidth`/`clientHeight`.**
+  The track carries a 1px border, and the client box excludes it — sizing the thumb from the
+  client box leaves it short of the track end by exactly the border width on both axes. The
+  thumb's position is a plain proportion: `scrolled / (scrollSize - clientSize)` mapped onto
+  `trackSize - thumbSize`, so it reaches both ends exactly.
 
 ## Icons
 
@@ -174,6 +202,16 @@ component needs to build the value itself (a `basePath` string, not a `getHref` 
 
 - This CLAUDE.md file must be written in English only.
 
+## User settings
+
+- **`user.settings` is a Mongoose `Object` (Mixed) field, so a partial update must merge, not
+  assign.** `updateSettings` takes a partial payload and spreads it over the stored object
+  (with the schema defaults underneath, for accounts created before a key existed), then calls
+  `markModified("settings")`. Assigning only the changed key wipes the rest.
+- The background dim lives there as `bgOpacity` (0–1, default `DEFAULT_BG_OPACITY` in the
+  shared user schema), not in the client's persisted `settings` store — that store keeps only
+  `bgOpacityPreview`, a non-persisted override so the slider previews live before Save.
+
 ## Zod schemas
 
 - The zod schema files in the server repo's `src/shared/zod/schemas/` and
@@ -184,5 +222,8 @@ component needs to build the value itself (a `basePath` string, not a `getHref` 
   `Game-Gauntlet-Server`). Do not assume the name; check the actual sibling directories
   (`ls ..`) before referencing the server path.
 - Any change to a schema must be applied to both copies in the same change, byte for byte.
+- A new schema file must also be added to `SCHEMA_FILES` in the server's
+  `scripts/check-schema-parity.ts`. The list is hardcoded, so a file missing from it drifts
+  silently — the check passes while the two copies diverge.
 - Verify with `bun run check:schemas`.
 - `igdb.schema.ts` is client-only and exempt.

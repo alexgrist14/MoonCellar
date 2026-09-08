@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./Slideshow.module.scss";
 import { Scrollbar } from "../Scrollbar";
 import { modal } from "../Modal";
@@ -24,6 +24,35 @@ export const Slideshow: FC<ISlideshowProps> = ({ pictures }) => {
       )),
     [pictures]
   );
+
+  const shift = useCallback(
+    (direction: 1 | -1) =>
+      setScreenshotIndex((current) =>
+        current === undefined || !screenshots.length
+          ? current
+          : (current + direction + screenshots.length) % screenshots.length
+      ),
+    [screenshots.length]
+  );
+
+  useEffect(() => {
+    if (screenshotIndex === undefined) return;
+
+    const keydownHandler = (event: KeyboardEvent) => {
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+
+      const target = event.target as HTMLElement | null;
+
+      if (target?.closest("input, textarea, [contenteditable]")) return;
+
+      event.preventDefault();
+      shift(event.key === "ArrowRight" ? 1 : -1);
+    };
+
+    document.addEventListener("keydown", keydownHandler);
+
+    return () => document.removeEventListener("keydown", keydownHandler);
+  }, [screenshotIndex, shift]);
 
   useEffect(() => {
     modal.close();
@@ -60,23 +89,20 @@ export const Slideshow: FC<ISlideshowProps> = ({ pictures }) => {
 
             touchStartX.current = null;
 
-            if (deltaX > SWIPE_THRESHOLD && screenshotIndex > 0) {
-              setScreenshotIndex(screenshotIndex - 1);
-            } else if (
-              deltaX < -SWIPE_THRESHOLD &&
-              screenshotIndex < screenshots.length - 1
-            ) {
-              setScreenshotIndex(screenshotIndex + 1);
+            if (deltaX > SWIPE_THRESHOLD) {
+              shift(-1);
+            } else if (deltaX < -SWIPE_THRESHOLD) {
+              shift(1);
             }
           }}
         >
           <Button
             color={ButtonColor.TRANSPARENT}
             className={styles.slideshow__prev}
-            disabled={screenshotIndex === 0}
+            disabled={screenshots.length < 2}
             onClick={(e) => {
               e.stopPropagation();
-              setScreenshotIndex(screenshotIndex - 1);
+              shift(-1);
             }}
           >
             <SvgChevron style={{ transform: "rotate(90deg)" }} />
@@ -85,10 +111,10 @@ export const Slideshow: FC<ISlideshowProps> = ({ pictures }) => {
           <Button
             color={ButtonColor.TRANSPARENT}
             className={styles.slideshow__next}
-            disabled={screenshotIndex === screenshots.length - 1}
+            disabled={screenshots.length < 2}
             onClick={(e) => {
               e.stopPropagation();
-              setScreenshotIndex(screenshotIndex + 1);
+              shift(1);
             }}
           >
             <SvgChevron style={{ transform: "rotate(-90deg)" }} />
@@ -96,10 +122,14 @@ export const Slideshow: FC<ISlideshowProps> = ({ pictures }) => {
         </div>,
         { onClose: () => setScreenshotIndex(undefined) }
       );
-  }, [screenshotIndex, screenshots]);
+  }, [screenshotIndex, screenshots, shift]);
 
   return (
-    <Scrollbar classNameContent={styles.slideshow__content} isHorizontal>
+    <Scrollbar
+      classNameContent={styles.slideshow__content}
+      isHorizontal
+      isWithArrows
+    >
       {pictures.map(
         (picture, i) =>
           !!picture && (

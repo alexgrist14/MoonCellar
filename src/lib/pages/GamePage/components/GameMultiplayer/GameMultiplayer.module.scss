@@ -1,0 +1,15 @@
+.multiplayer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x2);
+  padding: var(--padding-x4);
+
+  & p {
+    @include font(14px, 20px, 400);
+    color: var(--color-text-secondary);
+  }
+
+  & span {
+    font-style: italic;
+  }
+}

@@ -11,6 +11,34 @@ import { useCommonStore } from "../store/common.store";
 import { useDebouncedCallback } from "use-debounce";
 import { useWindowResizeAction } from "./useWindowResizeAction";
 
+const toggleArrow = (arrow: HTMLButtonElement | null, isShown: boolean) => {
+  if (!arrow) return;
+
+  arrow.style.opacity = isShown ? "1" : "0";
+  arrow.style.pointerEvents = isShown ? "auto" : "none";
+};
+
+const getThumbOffset = (
+  scrolled: number,
+  scrollOffset: number,
+  trackSize: number,
+  thumbSize: number
+) => {
+  const maxOffset = Math.max(0, trackSize - thumbSize);
+
+  if (scrollOffset <= 0) return 0;
+
+  return Math.min(maxOffset, (scrolled / scrollOffset) * maxOffset);
+};
+
+const toggleFade = (
+  content: HTMLDivElement,
+  side: "start" | "end",
+  isShown: boolean
+) => {
+  content.style.setProperty(`--scroll-fade-${side}`, isShown ? "1" : "0");
+};
+
 export const useScrollbar = ({
   id,
   children,
@@ -38,6 +66,8 @@ export const useScrollbar = ({
 
   const lineTop = useRef<HTMLDivElement>(null);
   const lineBottom = useRef<HTMLDivElement>(null);
+  const arrowStart = useRef<HTMLButtonElement>(null);
+  const arrowEnd = useRef<HTMLButtonElement>(null);
 
   const scrollTrackRef = useRef<HTMLDivElement>(null);
   const scrollThumbRef = useRef<HTMLDivElement>(null);
@@ -202,10 +232,13 @@ export const useScrollbar = ({
       onScroll?.({ scrollLeft, scrollTop });
 
       if (isHorizontal) {
-        const leftOffset = (scrollLeft / scrollWidth) * trackSize;
         const scrollOffset = scrollWidth - clientWidth;
-        const thumbOffset =
-          leftOffset < trackSize - 10 ? leftOffset : trackSize - 10;
+        const thumbOffset = getThumbOffset(
+          scrollLeft,
+          scrollOffset,
+          trackSize,
+          scrollThumbRef.current.offsetWidth
+        );
 
         scrollThumbRef.current.style.left = `${thumbOffset}px`;
 
@@ -218,11 +251,20 @@ export const useScrollbar = ({
           scrollLeft + 1 < scrollOffset
             ? (lineBottom.current.style.opacity = "1")
             : (lineBottom.current.style.opacity = "0");
+
+        toggleArrow(arrowStart.current, scrollLeft > 1);
+        toggleArrow(arrowEnd.current, scrollLeft + 1 < scrollOffset);
+
+        toggleFade(contentRef.current, "start", scrollLeft > 1);
+        toggleFade(contentRef.current, "end", scrollLeft + 1 < scrollOffset);
       } else {
-        const topOffset = (scrollTop / scrollHeight) * trackSize;
         const scrollOffset = scrollHeight - clientHeight;
-        const thumbOffset =
-          topOffset < trackSize - 10 ? topOffset : trackSize - 10;
+        const thumbOffset = getThumbOffset(
+          scrollTop,
+          scrollOffset,
+          trackSize,
+          scrollThumbRef.current.offsetHeight
+        );
 
         !!onScrollBottom && onScrollBottom(scrollTop < scrollOffset - 10);
 
@@ -244,14 +286,14 @@ export const useScrollbar = ({
   const resizeHandler = useCallback(() => {
     if (contentRef.current && scrollTrackRef.current && !isHorizontal) {
       const { clientHeight, scrollHeight } = contentRef.current;
-      const { clientHeight: trackHeight } = scrollTrackRef.current;
+      const { offsetHeight: trackHeight } = scrollTrackRef.current;
       const thumbHeight = (clientHeight / scrollHeight) * trackHeight;
 
       setTrackSize(trackHeight);
       setThumbHeight(thumbHeight > 10 ? thumbHeight : 10);
     } else if (contentRef.current && scrollTrackRef.current && isHorizontal) {
       const { clientWidth, scrollWidth } = contentRef.current;
-      const { clientWidth: trackWidth } = scrollTrackRef.current;
+      const { offsetWidth: trackWidth } = scrollTrackRef.current;
       const thumbWidth = (clientWidth / scrollWidth) * trackWidth;
 
       setTrackSize(trackWidth);
@@ -294,18 +336,36 @@ export const useScrollbar = ({
     }
   }, [trackSize, contentRef, positionHandler]);
 
-  useEffect(() => {
+  const visibilityHandler = useCallback(() => {
     if (!contentRef.current) return;
 
     const { scrollHeight, clientHeight, scrollWidth, clientWidth } =
       contentRef.current;
 
-    if (isHorizontal) {
-      setIsVisible(scrollWidth !== clientWidth);
-    } else {
-      setIsVisible(scrollHeight !== clientHeight);
-    }
-  }, [isHorizontal, contentRef, children]);
+    setIsVisible(
+      isHorizontal ? scrollWidth !== clientWidth : scrollHeight !== clientHeight
+    );
+  }, [contentRef, isHorizontal]);
+
+  useEffect(() => {
+    visibilityHandler();
+  }, [visibilityHandler, children]);
+
+  useEffect(() => {
+    const content = contentRef.current;
+
+    if (!content) return;
+
+    const observer = new ResizeObserver(() => {
+      resizeHandler();
+      positionHandler();
+      visibilityHandler();
+    });
+
+    observer.observe(content);
+
+    return () => observer.disconnect();
+  }, [contentRef, resizeHandler, positionHandler, visibilityHandler]);
 
   useEffect(() => {
     if (!!id && !!scrollPosition?.[id]) {
@@ -340,9 +400,26 @@ export const useScrollbar = ({
     };
   }, [handleThumbMouseUp, handleThumbMouseMove]);
 
+  const scrollByStep = useCallback(
+    (direction: 1 | -1) => {
+      const content = contentRef.current;
+
+      if (!content) return;
+
+      content.scrollBy({
+        left: direction * content.clientWidth * 0.8,
+        behavior: "smooth",
+      });
+    },
+    [contentRef]
+  );
+
   return {
     lineTop,
     lineBottom,
+    arrowStart,
+    arrowEnd,
+    scrollByStep,
     isVisible,
     isDragging,
     scrollTrackRef,

@@ -38,3 +38,4 @@ export * from "./SvgXbox";
 export * from "./SvgStore";
 export * from "./SvgEmptyList";
 export * from "./SvgMoonBackdrop";
+export * from "./SvgOpenWindow";

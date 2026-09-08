@@ -132,7 +132,8 @@
         line-height: 1.5;
 
         .link {
-          text-decoration: underline;
+          @include link;
+          color: inherit;
         }
 
         .img {

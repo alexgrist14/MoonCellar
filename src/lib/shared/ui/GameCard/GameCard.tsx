@@ -16,9 +16,12 @@ import { SvgCrown } from "../svg/SvgCrown";
 import { useHideAdult } from "../../hooks/useHideAdult";
 import { isAdultGame } from "../../utils/adult.utils";
 import { GameControls } from "../GameControls";
+import { modal } from "../Modal";
+import { AchievementsModal } from "../AchievementsModal";
 import { useAuthStore } from "../../store/auth.store";
 import { playthroughPriorityOrder } from "../../constants/user.const";
 import { getAverageRating } from "../../utils/rating.utils";
+import { GameRatingPopover } from "@/src/lib/features/game/GameRatingPopover";
 
 interface IGameCardProps {
   game: IGameResponse;
@@ -43,12 +46,16 @@ export const GameCard = memo(
     isWithCombinedRating,
   }: IGameCardProps) => {
     const cardRef = useRef<HTMLDivElement>(null);
+    const ratingRef = useRef<HTMLDivElement>(null);
+
+    const [isRatingOpen, setIsRatingOpen] = useState(false);
 
     const hideMedia = useHideAdult() && isAdultGame(game);
 
     const combinedRating = useMemo(
-      () => (isWithCombinedRating ? getAverageRating(game) : null),
-      [game, isWithCombinedRating]
+      () =>
+        isWithCombinedRating || isInfoDisabled ? getAverageRating(game) : null,
+      [game, isWithCombinedRating, isInfoDisabled]
     );
 
     const [isLoading, setIsLoading] = useState(!!game.cover && !hideMedia);
@@ -56,6 +63,8 @@ export const GameCard = memo(
 
     const { parsedPlaythroughs, parsedRatings } = useUserStore();
     const royalGames = useGamesStore((s) => s.royalGames);
+    const addRoyalGame = useGamesStore((s) => s.addRoyalGame);
+    const removeRoyalGame = useGamesStore((s) => s.removeRoyalGame);
     const profile = useAuthStore((s) => s.profile);
 
     const filteredPlaythroughs = useMemo(
@@ -135,7 +144,7 @@ export const GameCard = memo(
           )}
           draggable={false}
         >
-          {(!!rank || !!isRoyal) && (
+          {(!!rank || !!profile?._id) && (
             <div
               className={classNames(
                 styles.card__rail,
@@ -143,22 +152,47 @@ export const GameCard = memo(
               )}
             >
               {!!rank && <div className={styles.card__rank}>{rank}</div>}
-              {!!isRoyal && (
-                <div className={styles.card__royal}>
-                  <SvgCrown size="20" color="contrast-reverse" />
+              {!!profile?._id && (
+                <div
+                  className={classNames(styles.card__royal, {
+                    [styles.card__royal_empty]: !isRoyal,
+                  })}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    isRoyal
+                      ? removeRoyalGame(game._id)
+                      : addRoyalGame(game._id);
+                  }}
+                >
+                  <SvgCrown
+                    size="16"
+                    color={isRoyal ? "contrast-reverse" : "secondary"}
+                  />
                 </div>
               )}
             </div>
           )}
-          {!!rating && (
+          {!!profile?._id && (
             <div
               className={classNames(
                 styles.card__rail,
                 styles.card__rail_bottomLeft
               )}
+              ref={ratingRef}
             >
-              <div className={styles.card__rating}>
-                <p>{rating}</p>
+              <div
+                className={classNames(styles.card__rating, {
+                  [styles.card__rating_empty]: !rating,
+                })}
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setIsRatingOpen((current) => !current);
+                }}
+              >
+                {!!rating ? <p>{rating}</p> : <SvgStar size="16" />}
               </div>
             </div>
           )}
@@ -170,7 +204,17 @@ export const GameCard = memo(
               )}
             >
               {!!game.retroachievements?.length && (
-                <div className={styles.card__achievement}>
+                <div
+                  className={styles.card__achievement}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    modal.open(<AchievementsModal game={game} />, {
+                      id: "game-achievements",
+                    });
+                  }}
+                >
                   <SvgAchievement
                     color={
                       isMastered
@@ -237,6 +281,12 @@ export const GameCard = memo(
             <Cover className={styles.card__placeholder} />
           )}
         </Link>
+        <GameRatingPopover
+          game={game}
+          anchorRef={ratingRef}
+          isOpen={isRatingOpen}
+          onClose={() => setIsRatingOpen(false)}
+        />
         {isInfoDisabled && (
           <GameControls game={game} className={styles.card__controls} />
         )}

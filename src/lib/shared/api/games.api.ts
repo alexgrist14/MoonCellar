@@ -14,6 +14,10 @@ import {
   IUpdateGameRequest,
 } from "../lib/schemas/games.schema";
 import { IGetGameFollowingsStatusResponse } from "../lib/schemas/game-followings-status.schema";
+import {
+  IGameStats,
+  IGetGamesStatsResponse,
+} from "../lib/schemas/game-stats.schema";
 import agent from "./agent.api";
 import { filesAPI } from "./files.api";
 
@@ -37,6 +41,16 @@ export const gamesApi = {
       `${GAMES_URL}/${gameId}/followings-status`,
       { params: { userId } }
     );
+  },
+
+  getStats: (gameId: string) => {
+    return agent.get<IGameStats>(`${GAMES_URL}/${gameId}/stats`);
+  },
+
+  getStatsByIds: (gameIds: string[]) => {
+    return agent.get<IGetGamesStatsResponse>(`${GAMES_URL}/stats`, {
+      params: { gameIds },
+    });
   },
 
   getByIds: (params: IGetGamesByIdsRequest) => {

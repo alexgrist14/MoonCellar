@@ -31,6 +31,13 @@ const getGame = cache(async (slug: string) =>
   isValidSlug(slug) ? fetchOrNull(gamesApi.getBySlug({ slug })) : null
 );
 
+const getStats = cache(async (gameId: string) =>
+  gamesApi
+    .getStats(gameId)
+    .then(({ data }) => data)
+    .catch(() => undefined)
+);
+
 export async function generateMetadata({
   params,
 }: {
@@ -94,6 +101,8 @@ const GamePageIndex = async ({ params }: { params: any }) => {
     notFound();
   }
 
+  const stats = await getStats(game._id);
+
   return (
     <>
       <JsonLd data={getVideoGameJsonLd(game)} />
@@ -104,7 +113,7 @@ const GamePageIndex = async ({ params }: { params: any }) => {
           { name: game.name, path: `/games/${game.slug}` },
         ])}
       />
-      <GamePage game={game} />
+      <GamePage game={game} stats={stats} />
     </>
   );
 };

@@ -1,6 +1,9 @@
 import { API_URL } from "../constants";
 import { IUser } from "../types/auth.type";
-import { IGetUserLoginsResponse } from "../lib/schemas/user.schema";
+import {
+  IGetUserLoginsResponse,
+  IUpdateUserSettingsRequest,
+} from "../lib/schemas/user.schema";
 import {
   CategoriesType,
   IFollowers,
@@ -138,7 +141,7 @@ const updateDescription = (
 
 const updateSettings = (
   userId: string,
-  settingsDto: { showAdultContent: boolean }
+  settingsDto: IUpdateUserSettingsRequest
 ) => {
   return agent.patch<IUser>(`${USER_URL}/settings/${userId}`, settingsDto);
 };
