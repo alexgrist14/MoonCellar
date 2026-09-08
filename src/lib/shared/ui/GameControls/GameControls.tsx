@@ -51,9 +51,10 @@ export const GameControls: FC<IGameControlsProps> = ({
         tooltip={
           !profile?._id
             ? "You must be logged in to view playthroughs"
-            : undefined
+            : "Playthroughs"
         }
         tooltipAlign="left"
+        aria-label="Playthroughs"
         color={ButtonColor.TRANSPARENT}
         className={classNames(styles.controls__action, {
           [styles.controls__action_disabled]: !profile?._id,
@@ -74,6 +75,7 @@ export const GameControls: FC<IGameControlsProps> = ({
           modal.open(<GameButtons game={game} />, { id: "game-menu" });
         }}
         color={ButtonColor.TRANSPARENT}
+        tooltip="Lists and actions"
         className={classNames(styles.controls__action)}
       >
         <SvgCircleMenu className={classNames(styles.controls__icon)} />

@@ -25,6 +25,7 @@ export interface IButtonProps extends Pick<
   | "form"
   | "style"
   | "ref"
+  | "aria-label"
 > {
   color?: IButtonColor;
   active?: boolean;
@@ -50,6 +51,10 @@ export const Button = memo(
     const button = (
       <button
         {...props}
+        aria-label={
+          props["aria-label"] ??
+          (typeof tooltip === "string" ? tooltip : undefined)
+        }
         ref={ref}
         className={cl(
           styles.button,

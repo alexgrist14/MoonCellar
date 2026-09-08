@@ -6,6 +6,7 @@ import { Cover } from "../Cover";
 import { Loader } from "../Loader";
 import { useUserStore } from "../../store/user.store";
 import { GameCardInfo } from "@/src/lib/entities/game/ui/GameCardInfo";
+import { Tooltip } from "../Tooltip";
 import { IGameResponse } from "../../lib/schemas/games.schema";
 import useCloseEvents from "../../hooks/useCloseEvents";
 import { Button } from "../Button";
@@ -153,24 +154,34 @@ export const GameCard = memo(
             >
               {!!rank && <div className={styles.card__rank}>{rank}</div>}
               {!!profile?._id && (
-                <div
-                  className={classNames(styles.card__royal, {
-                    [styles.card__royal_empty]: !isRoyal,
-                  })}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    isRoyal
-                      ? removeRoyalGame(game._id)
-                      : addRoyalGame(game._id);
-                  }}
+                <Tooltip
+                  content={
+                    isRoyal ? "Remove from royal games" : "Add to royal games"
+                  }
                 >
-                  <SvgCrown
-                    size="16"
-                    color={isRoyal ? "contrast-reverse" : "secondary"}
-                  />
-                </div>
+                  <div
+                    role="button"
+                    aria-label={
+                      isRoyal ? "Remove from royal games" : "Add to royal games"
+                    }
+                    className={classNames(styles.card__royal, {
+                      [styles.card__royal_empty]: !isRoyal,
+                    })}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+
+                      isRoyal
+                        ? removeRoyalGame(game._id)
+                        : addRoyalGame(game._id);
+                    }}
+                  >
+                    <SvgCrown
+                      size="16"
+                      color={isRoyal ? "contrast-reverse" : "secondary"}
+                    />
+                  </div>
+                </Tooltip>
               )}
             </div>
           )}
@@ -182,18 +193,26 @@ export const GameCard = memo(
               )}
               ref={ratingRef}
             >
-              <div
-                className={classNames(styles.card__rating, {
-                  [styles.card__rating_empty]: !rating,
-                })}
-                onClick={(event) => {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  setIsRatingOpen((current) => !current);
-                }}
+              <Tooltip
+                content={!!rating ? `Your rating: ${rating}` : "Rate the game"}
               >
-                {!!rating ? <p>{rating}</p> : <SvgStar size="16" />}
-              </div>
+                <div
+                  role="button"
+                  aria-label={
+                    !!rating ? `Your rating: ${rating}` : "Rate the game"
+                  }
+                  className={classNames(styles.card__rating, {
+                    [styles.card__rating_empty]: !rating,
+                  })}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setIsRatingOpen((current) => !current);
+                  }}
+                >
+                  {!!rating ? <p>{rating}</p> : <SvgStar size="16" />}
+                </div>
+              </Tooltip>
             </div>
           )}
           {(!!game.retroachievements?.length || !!combinedRating) && (
@@ -204,33 +223,50 @@ export const GameCard = memo(
               )}
             >
               {!!game.retroachievements?.length && (
-                <div
-                  className={styles.card__achievement}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    modal.open(<AchievementsModal game={game} />, {
-                      id: "game-achievements",
-                    });
-                  }}
+                <Tooltip
+                  content={
+                    isMastered
+                      ? "RetroAchievements: mastered"
+                      : isBeaten
+                        ? "RetroAchievements: beaten"
+                        : "RetroAchievements"
+                  }
                 >
-                  <SvgAchievement
-                    color={
-                      isMastered
-                        ? "attention"
-                        : isBeaten
-                          ? "positive"
-                          : "secondary"
-                    }
-                  />
-                </div>
+                  <div
+                    role="button"
+                    aria-label="RetroAchievements"
+                    className={styles.card__achievement}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+
+                      modal.open(<AchievementsModal game={game} />, {
+                        id: "game-achievements",
+                      });
+                    }}
+                  >
+                    <SvgAchievement
+                      color={
+                        isMastered
+                          ? "attention"
+                          : isBeaten
+                            ? "positive"
+                            : "secondary"
+                      }
+                    />
+                  </div>
+                </Tooltip>
               )}
               {!!combinedRating && (
-                <div className={styles.card__combined}>
-                  <SvgStar size="12" fillPercent={100} />
-                  <span>{combinedRating}</span>
-                </div>
+                <Tooltip content="Average of IGDB, HowLongToBeat and user ratings">
+                  <div
+                    aria-label={`Average rating: ${combinedRating}`}
+                    className={styles.card__combined}
+                  >
+                    <SvgStar size="12" fillPercent={100} />
+                    <span>{combinedRating}</span>
+                  </div>
+                </Tooltip>
               )}
             </div>
           )}
@@ -243,6 +279,7 @@ export const GameCard = memo(
             >
               <Button
                 color="transparent"
+                tooltip={isActive ? "Close" : "Game info"}
                 className={classNames(
                   styles.card__more,
                   isActive &&

@@ -68,6 +68,7 @@ export const Pagination = memo(
           <Button
             color={ButtonColor.TRANSPARENT}
             className={styles.pagination__button}
+            tooltip="First page"
             disabled={value === "1" || page === 1}
             onClick={() => {
               const page = 1;
@@ -81,6 +82,7 @@ export const Pagination = memo(
           <Button
             color={ButtonColor.TRANSPARENT}
             className={styles.pagination__button}
+            tooltip="Previous page"
             disabled={value === "1" || page === 1}
             onClick={() => {
               const p = page - 1 || 1;
@@ -111,6 +113,7 @@ export const Pagination = memo(
           <Button
             color={ButtonColor.TRANSPARENT}
             className={styles.pagination__button}
+            tooltip="Next page"
             disabled={value === max.toString() || page === max}
             onClick={() => {
               const p = page + 1;
@@ -124,6 +127,7 @@ export const Pagination = memo(
           <Button
             color={ButtonColor.TRANSPARENT}
             className={styles.pagination__button}
+            tooltip="Last page"
             disabled={value === max.toString() || page === max}
             onClick={() => {
               const page = max;

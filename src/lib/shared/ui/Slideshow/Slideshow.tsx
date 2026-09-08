@@ -99,6 +99,7 @@ export const Slideshow: FC<ISlideshowProps> = ({ pictures }) => {
           <Button
             color={ButtonColor.TRANSPARENT}
             className={styles.slideshow__prev}
+            tooltip="Previous screenshot"
             disabled={screenshots.length < 2}
             onClick={(e) => {
               e.stopPropagation();
@@ -111,6 +112,7 @@ export const Slideshow: FC<ISlideshowProps> = ({ pictures }) => {
           <Button
             color={ButtonColor.TRANSPARENT}
             className={styles.slideshow__next}
+            tooltip="Next screenshot"
             disabled={screenshots.length < 2}
             onClick={(e) => {
               e.stopPropagation();

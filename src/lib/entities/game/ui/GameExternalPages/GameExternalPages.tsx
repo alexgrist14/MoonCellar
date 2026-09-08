@@ -130,6 +130,7 @@ export const GameExternalPages: FC<IGameExternalPagesProps> = ({
       {isMore && (
         <Button
           color="transparent"
+          tooltip="All external pages"
           className={styles.stats__more}
           onClick={openModal}
         >

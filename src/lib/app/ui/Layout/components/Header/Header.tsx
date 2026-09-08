@@ -135,6 +135,7 @@ export const Header: FC = () => {
             <Button
               className={styles.burger__toggle}
               color={ButtonColor.TRANSPARENT}
+              tooltip="Menu"
               onClick={() => setIsMenuOpen((prev) => !prev)}
             >
               <SvgBurger
@@ -165,6 +166,7 @@ export const Header: FC = () => {
           <Button
             className={styles.burger__toggle}
             color={ButtonColor.TRANSPARENT}
+            tooltip="Search"
             onClick={searchClickHandler}
           >
             <SvgSearch size="20" className={styles.svg} />
