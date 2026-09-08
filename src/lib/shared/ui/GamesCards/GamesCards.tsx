@@ -6,6 +6,19 @@ import { GameCard } from "../GameCard";
 import { Scrollbar } from "../Scrollbar";
 
 const PRIORITY_COUNT = 6;
+const COLUMN_TIERS = [2, 3, 4, 5, 6];
+const MIN_COLUMNS = 2;
+
+const getSnappedColumns = (limit: number, columns?: number) =>
+  COLUMN_TIERS.reduce<Record<string, number>>((vars, tier) => {
+    let count = columns ? Math.min(tier, columns) : tier;
+
+    while (count > MIN_COLUMNS && limit % count !== 0) {
+      count -= 1;
+    }
+
+    return { ...vars, [`--games-columns-${tier}`]: count };
+  }, {});
 
 interface IGamesCardsProps {
   children?: ReactNode;
@@ -14,6 +27,7 @@ interface IGamesCardsProps {
   isWithCombinedRating?: boolean;
   isWithoutScroll?: boolean;
   columns?: number;
+  limit?: number;
   additionalGameNode?: (game: IGameResponse) => ReactNode;
 }
 
@@ -24,6 +38,7 @@ export const GamesCards: FC<IGamesCardsProps> = ({
   isWithCombinedRating,
   isWithoutScroll,
   columns,
+  limit,
   additionalGameNode,
 }) => {
   if (!games?.length) return null;
@@ -31,10 +46,15 @@ export const GamesCards: FC<IGamesCardsProps> = ({
   const grid = (
     <div
       className={classNames(styles.block__grid, {
-        [styles.block__grid_limited]: !!columns,
+        [styles.block__grid_limited]: !!columns && !limit,
+        [styles.block__grid_snapped]: !!limit,
       })}
       style={
-        columns ? ({ "--games-columns": columns } as CSSProperties) : undefined
+        limit
+          ? (getSnappedColumns(limit, columns) as CSSProperties)
+          : columns
+            ? ({ "--games-columns": columns } as CSSProperties)
+            : undefined
       }
     >
       {games.map((game, index) => (
@@ -52,7 +72,11 @@ export const GamesCards: FC<IGamesCardsProps> = ({
 
   if (isWithoutScroll) {
     return (
-      <div className={styles.block}>
+      <div
+        className={classNames(styles.block, {
+          [styles.block_snapped]: !!limit,
+        })}
+      >
         {grid}
         {children}
       </div>
@@ -60,7 +84,11 @@ export const GamesCards: FC<IGamesCardsProps> = ({
   }
 
   return (
-    <div className={styles.block}>
+    <div
+      className={classNames(styles.block, {
+        [styles.block_snapped]: !!limit,
+      })}
+    >
       <Scrollbar
         type="absolute"
         classNameContainer={styles.block__container}

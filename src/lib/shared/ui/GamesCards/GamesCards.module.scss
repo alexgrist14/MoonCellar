@@ -1,9 +1,16 @@
+$cardMinWidth: 180px;
+$cardsGap: 8px;
+
 .block {
   display: flex;
   flex-direction: column;
   flex: 1;
   height: 100%;
   border-radius: var(--radius-x5);
+
+  &_snapped {
+    container-type: inline-size;
+  }
 
   div &__container {
     width: 100%;
@@ -46,6 +53,19 @@
           1fr
         )
       );
+    }
+
+    &_snapped {
+      grid-template-columns: repeat(var(--games-columns-2), minmax(0, 1fr));
+
+      @for $i from 3 through 6 {
+        @container (min-width: #{$cardMinWidth * $i + $cardsGap * ($i - 1)}) {
+          grid-template-columns: repeat(
+            var(--games-columns-#{$i}),
+            minmax(0, 1fr)
+          );
+        }
+      }
     }
 
     @include mediaSm {

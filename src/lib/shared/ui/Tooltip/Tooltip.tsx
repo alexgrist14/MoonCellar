@@ -58,23 +58,34 @@ export const Tooltip = ({
   useLayoutEffect(() => {
     if (!triggerEl) return;
 
-    const show = () => setIsVisible(true);
     const hide = () => setIsVisible(false);
 
-    triggerEl.addEventListener("mouseenter", show);
-    triggerEl.addEventListener("mouseleave", hide);
-    triggerEl.addEventListener("focus", show);
+    const handlePointerEnter = (event: PointerEvent) => {
+      if (event.pointerType !== "mouse") return;
+
+      setIsVisible(true);
+    };
+
+    const handleFocus = () => {
+      if (!triggerEl.matches(":focus-visible")) return;
+
+      setIsVisible(true);
+    };
+
+    triggerEl.addEventListener("pointerenter", handlePointerEnter);
+    triggerEl.addEventListener("pointerleave", hide);
+    triggerEl.addEventListener("pointercancel", hide);
+    triggerEl.addEventListener("focus", handleFocus);
     triggerEl.addEventListener("blur", hide);
-    triggerEl.addEventListener("mousedown", hide);
-    triggerEl.addEventListener("touchstart", hide);
+    triggerEl.addEventListener("pointerdown", hide);
 
     return () => {
-      triggerEl.removeEventListener("mouseenter", show);
-      triggerEl.removeEventListener("mouseleave", hide);
-      triggerEl.removeEventListener("focus", show);
+      triggerEl.removeEventListener("pointerenter", handlePointerEnter);
+      triggerEl.removeEventListener("pointerleave", hide);
+      triggerEl.removeEventListener("pointercancel", hide);
+      triggerEl.removeEventListener("focus", handleFocus);
       triggerEl.removeEventListener("blur", hide);
-      triggerEl.removeEventListener("mousedown", hide);
-      triggerEl.removeEventListener("touchstart", hide);
+      triggerEl.removeEventListener("pointerdown", hide);
     };
   }, [triggerEl]);
 

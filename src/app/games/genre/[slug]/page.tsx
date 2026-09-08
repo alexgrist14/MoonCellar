@@ -2,7 +2,10 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { gamesApi } from "@/src/lib/shared/api";
-import { takeGames } from "@/src/lib/shared/constants/games.const";
+import {
+  takeGames,
+  takeHubGames,
+} from "@/src/lib/shared/constants/games.const";
 import { toSlug } from "@/src/lib/shared/utils/slug.utils";
 import { HubPage } from "@/src/lib/pages/HubPage";
 import { JsonLd } from "@/src/lib/shared/ui/JsonLd";
@@ -22,7 +25,6 @@ const DEFAULT_OG_IMAGE = "/images/og-default.png";
 const MIN_GAMES_FOR_INDEX = 100;
 const LARGE_GENRE_SIZE = 5000;
 const TOP_COUNT = 5;
-const RECENT_COUNT = 6;
 
 const getGenres = cache(async () =>
   gamesApi
@@ -109,13 +111,13 @@ const GenreHubPage = async ({
         sortBy: "first_release",
         sortOrder: "desc",
         years: [null, currentYear],
-        take: RECENT_COUNT,
+        take: takeHubGames,
         page: 1,
       })
       .then(({ data }) => data)
       .catch(emptyOnError),
     gamesApi
-      .getAll({ selected, take: takeGames, page: 1 })
+      .getAll({ selected, take: takeHubGames, page: 1 })
       .then(({ data }) => data)
       .catch(emptyOnError),
     getGenres(),

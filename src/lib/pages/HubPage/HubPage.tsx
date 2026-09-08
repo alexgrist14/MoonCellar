@@ -10,6 +10,7 @@ import { GameCard } from "../../shared/ui/GameCard";
 import { GamesCards } from "../../shared/ui/GamesCards";
 import { SectionTitle } from "../../shared/ui/SectionTitle";
 import { IGameResponse } from "../../shared/lib/schemas/games.schema";
+import { takeHubGames } from "../../shared/constants/games.const";
 
 export interface IHubLinkSection {
   label: string;
@@ -33,6 +34,8 @@ interface IHubPageProps {
   moreHref: string;
   linkSections: IHubLinkSection[];
 }
+
+const HUB_COLUMNS = 6;
 
 const getYear = (game: IGameResponse) =>
   game.first_release
@@ -114,6 +117,8 @@ export const HubPage: FC<IHubPageProps> = ({
           {!!recentGames?.length && (
             <GamesCards
               games={recentGames}
+              columns={HUB_COLUMNS}
+              limit={takeHubGames}
               isWithCombinedRating
               isWithoutScroll
             />
@@ -131,7 +136,13 @@ export const HubPage: FC<IHubPageProps> = ({
 
         <Box contentStyle={{ gap: "var(--gap-x5)", position: "relative" }}>
           <SectionTitle as="h2">{allTitle}</SectionTitle>
-          <GamesCards games={allGames} isWithCombinedRating isWithoutScroll />
+          <GamesCards
+            games={allGames}
+            columns={HUB_COLUMNS}
+            limit={takeHubGames}
+            isWithCombinedRating
+            isWithoutScroll
+          />
           <Link href={moreHref} className={styles.hub__more}>
             Show all {total.toLocaleString("en-US")} games
           </Link>

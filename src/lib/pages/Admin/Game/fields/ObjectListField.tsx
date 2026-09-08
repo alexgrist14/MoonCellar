@@ -1,4 +1,5 @@
 import { FC, useId, useMemo, useRef } from "react";
+import { DatePicker } from "@/src/lib/shared/ui/DatePicker";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { Checkbox } from "@/src/lib/shared/ui/Checkbox";
 import { dateInputToUnix, unixToDateInput } from "./DateField";
@@ -46,11 +47,7 @@ export const ObjectListField: FC<IObjectListFieldProps> = ({
 
   const keys = rowIdsRef.current;
 
-  const patch = (
-    index: number,
-    field: IObjectFieldDescriptor,
-    next: unknown
-  ) =>
+  const patch = (index: number, field: IObjectFieldDescriptor, next: unknown) =>
     onChange(
       items.map((item, i) =>
         i === index
@@ -111,14 +108,11 @@ export const ObjectListField: FC<IObjectListFieldProps> = ({
                   onChange={(e) => patch(index, field, e.target.checked)}
                 />
               ) : field.kind === "date" ? (
-                <Input
-                  type="date"
-                  value={unixToDateInput(
-                    item[field.key] as number | undefined
-                  )}
-                  disabled={disabled}
-                  onChange={(e) =>
-                    patch(index, field, dateInputToUnix(e.target.value))
+                <DatePicker
+                  value={unixToDateInput(item[field.key] as number | undefined)}
+                  isDisabled={disabled}
+                  onChange={(date) =>
+                    patch(index, field, dateInputToUnix(date))
                   }
                 />
               ) : (
@@ -129,9 +123,7 @@ export const ObjectListField: FC<IObjectListFieldProps> = ({
                       ? `${datalistPrefix}-${field.key}`
                       : undefined
                   }
-                  value={
-                    (item[field.key] as string | number | undefined) ?? ""
-                  }
+                  value={(item[field.key] as string | number | undefined) ?? ""}
                   disabled={disabled}
                   onChange={(e) =>
                     patch(

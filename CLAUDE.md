@@ -67,6 +67,15 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
   definite height to resolve against). `.template__resizer` and `.template__content` carry
   `flex-grow: 1` for the last leg; without them only the panel's background grows and
   `justify-content: space-between` inside the content does nothing.
+- **A `GamesCards` grid must never leave a ragged last row: its column count has to divide the
+  list's page size.** Pass the page size as `limit` (`takeHubGames`, `takeGames`, …) and the
+  component snaps each width tier down to the nearest divisor — with 30 games a 4-column tier
+  renders 3 columns. Without `limit` the grid falls back to `auto-fill`, which lands on any
+  count that fits. The `@container` thresholds in `GamesCards.module.scss` are built from
+  `$cardMinWidth`/`$cardsGap`, which duplicate `--games-card-min-width` and `--gap-x2` because a
+  container query cannot read a custom property — change one and change the other, or the grid
+  switches tiers at the wrong width.
+
 - `Box`'s own radius is `var(--radius-x5)`. For structural UI wrapper components rendered directly inside a `Box` (`Button`, `Input`, `Textarea`, `CustomDropdown`, and similar reusable "chrome" primitives — not decorative elements like game covers/posters), the `border-radius` must be exactly one step below its structural parent's on the `--radius-x*` scale (parent `x5` → child `x4` → grandchild `x3`, etc.). This rule applies to structural wrapper nesting only, not to decorative/illustrative radii (e.g. card art, covers), which are a deliberate style choice independent of nesting depth.
 
 - **A rounded image tile needs the radius on the image too, and its hover ring must be an
@@ -182,6 +191,17 @@ component needs to build the value itself (a `basePath` string, not a `getHref` 
 ## Text truncation
 
 - Never write raw `-webkit-line-clamp`/`-webkit-box-orient`/`line-clamp` rules. Use the shared `lineClamp($count)` mixin from `src/lib/app/styles/_mixins.scss` (available globally, no import needed) for any multi-line text truncation, passing the desired line count.
+
+## Date fields
+
+- Never render a native date input (`<input type="date">`). Use the shared `DatePicker`
+  (`src/lib/shared/ui/DatePicker`): the browser's own picker paints a dark calendar icon and a
+  white popup that ignore the site's dark theme. `DatePicker` takes and emits ISO `yyyy-mm-dd`
+  and displays `dd.mm.yyyy` through `commonUtils.formatDate`.
+- Its popover renders into `#dropdown-connector` through a portal, so a field inside a modal or
+  a clipped panel cannot cut it off. Parse the incoming ISO string by hand (`new Date(y, m - 1,
+  d)`), never `new Date("2026-09-20")` — the latter is parsed as UTC midnight and shows the
+  previous day in any negative-offset timezone.
 
 ## Scrolling
 

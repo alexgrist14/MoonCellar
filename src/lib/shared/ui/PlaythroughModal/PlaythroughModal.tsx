@@ -5,6 +5,7 @@ import { ButtonGroup } from "../Button/ButtonGroup";
 import { ButtonColor } from "../Button";
 import { Textarea } from "../Textarea";
 import { Input } from "../Input";
+import { DatePicker } from "../DatePicker";
 import { ToggleSwitch } from "../ToggleSwitch";
 import { commonUtils } from "../../utils/common.utils";
 import { useAuthStore } from "../../store/auth.store";
@@ -232,7 +233,12 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
           {["completed", "played", "dropped"].includes(watch("category")) && (
             <div className={styles.modal__inputs}>
               {watch("category") === "completed" && (
-                <Input {...register("date")} placeholder="Date" type="date" />
+                <DatePicker
+                  value={watch("date") || ""}
+                  onChange={(value) =>
+                    setValue("date", value, { shouldValidate: true })
+                  }
+                />
               )}
               <Input
                 placeholder="Game time (hours)"

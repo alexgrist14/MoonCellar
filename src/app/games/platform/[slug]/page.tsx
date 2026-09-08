@@ -3,7 +3,10 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import { gamesApi } from "@/src/lib/shared/api";
 import { platformsAPI } from "@/src/lib/shared/api/platforms.api";
-import { takeGames } from "@/src/lib/shared/constants/games.const";
+import {
+  takeGames,
+  takeHubGames,
+} from "@/src/lib/shared/constants/games.const";
 import { HubPage } from "@/src/lib/pages/HubPage";
 import { JsonLd } from "@/src/lib/shared/ui/JsonLd";
 import {
@@ -21,7 +24,6 @@ export async function generateStaticParams() {
 const DEFAULT_OG_IMAGE = "/images/og-default.png";
 const MIN_GAMES_FOR_INDEX = 100;
 const TOP_COUNT = 5;
-const RECENT_COUNT = 6;
 
 const getPlatforms = cache(async () =>
   platformsAPI
@@ -107,7 +109,7 @@ const PlatformHubPage = async ({
       .then(({ data }) => data)
       .catch(emptyOnError),
     gamesApi
-      .getAll({ selected, take: takeGames, page: 1 })
+      .getAll({ selected, take: takeHubGames, page: 1 })
       .then(({ data }) => data)
       .catch(emptyOnError),
     gamesApi
@@ -116,7 +118,7 @@ const PlatformHubPage = async ({
         sortBy: "first_release",
         sortOrder: "desc",
         years: [null, currentYear],
-        take: RECENT_COUNT,
+        take: takeHubGames,
         page: 1,
       })
       .then(({ data }) => data)

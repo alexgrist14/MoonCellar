@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Input } from "@/src/lib/shared/ui/Input";
+import { DatePicker } from "@/src/lib/shared/ui/DatePicker";
 import styles from "./fields.module.scss";
 
 export const unixToDateInput = (value?: number | null): string => {
@@ -54,12 +54,11 @@ export const DateField: FC<IDateFieldProps> = ({
 }) => (
   <div className={styles.field}>
     {!isLabelHidden && <span className={styles.label}>{label}</span>}
-    <Input
-      type="date"
+    <DatePicker
       value={unixToDateInput(value)}
-      disabled={disabled}
-      onChange={(e) => onChange(dateInputToUnix(e.target.value))}
-      error={error ? { type: "manual", message: error } : undefined}
+      isDisabled={disabled}
+      onChange={(date) => onChange(dateInputToUnix(date))}
     />
+    {!!error && <span className={styles.fieldError}>{error}</span>}
   </div>
 );
