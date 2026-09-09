@@ -116,18 +116,17 @@ and `INDEXNOW_KEY`.
 | `GEO_BLOCK_COUNTRIES` | `RU` | Country blocking is on in production through this default alone |
 | `NEXT_PUBLIC_FARO_APP_NAME` | `mooncellar-frontend` | Correct |
 | `NEXT_PUBLIC_APP_VERSION` | `0.0.0` | Every Faro event reports 0.0.0, so telemetry cannot be filtered by release |
-| `NEXT_PUBLIC_CORS_SERVER` | **nothing** | See below |
+| `NEXT_PUBLIC_CORS_SERVER` | **nothing** | Read only by dead code — see below |
 | `FRONT_URL` (api) | `https://mooncellar.space` | Correct |
 | `INDEXNOW_KEY` | a key hardcoded in `apps/api/src/shared/constants.ts` | Works; an IndexNow key is public by design, since the host must serve it at `/<key>.txt` |
 
 Two keys are set in production but referenced nowhere in the code — `NEXT_PUBLIC_LOKI_HOST` and
 `NEXT_PUBLIC_S3_HOST`. They can be dropped from `HOST_ENV_WEB`.
 
-> **`NEXT_PUBLIC_CORS_SERVER` has no fallback and is not set.**
-> `visitors.utils.ts` builds its request as `` `${process.env.NEXT_PUBLIC_CORS_SERVER}api?` ``,
-> so in production that URL starts with the literal string `undefined` and the visitor counter
-> request fails. This predates the monorepo; fixing it means adding the key to `HOST_ENV_WEB`,
-> not changing the migration.
+> **`NEXT_PUBLIC_CORS_SERVER` is unset, and setting it would change nothing.**
+> It is read only by `countVisitors` in `apps/web/src/lib/shared/utils/visitors.utils.ts`,
+> which nothing imports — the request is never made. The cleanup is deleting that file, not
+> adding the variable.
 
 ## `HOST_ENV_WEB` — contents
 
