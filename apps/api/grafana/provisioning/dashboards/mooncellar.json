@@ -1,0 +1,131 @@
+{
+  "title": "MoonCellar Backend",
+  "uid": "mooncellar-backend",
+  "schemaVersion": 39,
+  "timezone": "browser",
+  "time": { "from": "now-6h", "to": "now" },
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Request rate (RPS)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sum(rate(mooncellar_http_requests_total[5m])) by (route)",
+          "legendFormat": "{{route}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Error rate (5xx)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sum(rate(mooncellar_http_requests_total{status_code=~\"5..\"}[5m])) or vector(0)",
+          "legendFormat": "5xx"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Error logs / rate (backend + frontend)",
+      "description": "Rate of ERROR-level logs from Loki. Backend cron/app errors and frontend errors that never surface as HTTP 5xx live here.",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "bars", "fillOpacity": 40, "stacking": { "mode": "normal" } } } },
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "expr": "sum by (app) (count_over_time({app=~\".+\"} | detected_level=`error` [$__interval]))",
+          "legendFormat": "{{app}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Latency p50/p95/p99",
+      "description": "HTTP response-time percentiles in seconds. p50 = median (typical request), p95/p99 = slow tail. Uses $__rate_interval to reduce gaps on sparse traffic.",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "fieldConfig": { "defaults": { "unit": "s", "custom": { "spanNulls": 600000, "showPoints": "never", "lineInterpolation": "smooth" } } },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "histogram_quantile(0.50, sum(rate(mooncellar_http_request_duration_seconds_bucket[$__rate_interval])) by (le))",
+          "legendFormat": "p50"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "histogram_quantile(0.95, sum(rate(mooncellar_http_request_duration_seconds_bucket[$__rate_interval])) by (le))",
+          "legendFormat": "p95"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "histogram_quantile(0.99, sum(rate(mooncellar_http_request_duration_seconds_bucket[$__rate_interval])) by (le))",
+          "legendFormat": "p99"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Event loop lag",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "mooncellar_nodejs_eventloop_lag_seconds",
+          "legendFormat": "lag"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Mongo command latency p95",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "histogram_quantile(0.95, sum(rate(mooncellar_mongodb_command_duration_seconds_bucket[5m])) by (le, collection))",
+          "legendFormat": "{{collection}}"
+        }
+      ]
+    },
+    {
+      "type": "barchart",
+      "title": "Games synced per day",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sum(increase(mooncellar_games_synced_total[1d])) by (source, operation)",
+          "legendFormat": "{{source}} {{operation}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Sync cron runs",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 32 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sum(increase(mooncellar_sync_runs_total[1d])) by (exported_job, status)",
+          "legendFormat": "{{exported_job}} {{status}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Page views (Faro/Loki)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 32 },
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "expr": "sum by (event_data_route) (count_over_time({service_name=~\"unknown_service|mooncellar-frontend\"} | logfmt | event_name=`page_view` [$__interval]))",
+          "legendFormat": "{{event_data_route}}"
+        }
+      ]
+    }
+  ]
+}

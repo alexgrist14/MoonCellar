@@ -1,0 +1,29 @@
+{
+  "mcpServers": {
+    "codegraph": {
+      "type": "stdio",
+      "command": "codegraph",
+      "args": [
+        "serve",
+        "--mcp"
+      ]
+    },
+    "mongodb": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "mongodb-mcp-server@latest",
+        "--readOnly"
+      ]
+    },
+    "game-adder": {
+      "type": "stdio",
+      "command": "bun",
+      "args": [
+        "run",
+        "mcp/game-adder/index.ts"
+      ]
+    }
+  }
+}

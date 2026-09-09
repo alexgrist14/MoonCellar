@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: mooncellar-backend
+    metrics_path: /metrics
+    authorization:
+      type: Bearer
+      credentials: change-me-local-token
+    static_configs:
+      - targets: ["host.containers.internal:3228"]

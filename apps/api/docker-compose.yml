@@ -1,0 +1,101 @@
+services:
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - loki_data:/loki
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --tries=1 -O- http://localhost:3100/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - loki
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    healthcheck:
+      test:
+        ["CMD-SHELL", "wget -q --tries=1 -O- http://localhost:3001/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  alloy:
+    image: grafana/alloy:latest
+    ports:
+      - "12347:12347"
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - /etc/alloy/config.alloy
+    volumes:
+      - ./monitoring/faro.alloy:/etc/alloy/config.alloy:ro
+    depends_on:
+      - loki
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    command: ["mongod", "--auth"]
+    hostname: mongodb
+    volumes:
+      - mongodb-data:/data/db/
+    env_file:
+      - .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    ports:
+      - "27017:27017"
+    networks:
+      - mongodb_network
+
+  searxng:
+    image: docker.io/searxng/searxng:latest
+    ports:
+      - "8891:8080"
+    volumes:
+      - ./searxng:/etc/searxng:rw
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    profiles: [monitoring]
+    ports:
+      - "9090:9090"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=7d
+      - --storage.tsdb.retention.size=512MB
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    mem_limit: 256m
+    restart: unless-stopped
+
+volumes:
+  mongodb-data:
+    driver: local
+    name: mongo-data
+  loki_data:
+  grafana_data:
+  prometheus_data:
+
+networks:
+  mongodb_network:
+    driver: bridge
+    name: mongo-network
