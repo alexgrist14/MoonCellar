@@ -247,3 +247,22 @@ component needs to build the value itself (a `basePath` string, not a `getHref` 
   silently — the check passes while the two copies diverge.
 - Verify with `bun run check:schemas`.
 - `igdb.schema.ts` is client-only and exempt.
+
+## CodeGraph across the two repositories
+
+- **`MoonCellar` and the server repo have separate `.codegraph/` indexes, and a query resolves
+  against the session's working directory.** Both `.mcp.json` files launch `codegraph serve
+  --mcp` with no fixed path, so a session started in the client sees only the client's index.
+- **Querying a server symbol from a client session fails silently.** It does not error and does
+  not return empty — it returns plausible-looking client files instead. Asking for
+  `upsertCharacterFromIgdb linkGameCharacters IGDBService` (all server-only) came back with
+  `characters.schema.ts`, `igdb.api.ts` and `GamePage.tsx`, and nothing signalled that all three
+  requested symbols were missing.
+- **Pass `projectPath` with the absolute path to the other repo** when exploring server code
+  from a client session (or `cd` into it first for the CLI). The same query with
+  `projectPath: "…/MoonCellar-Server"` returned 80 symbols across 19 files.
+- This matters constantly here, because the zod schemas are mirrored across both repos and most
+  schema work touches server and client together.
+- The `codegraph prompt-hook` in `~/.claude/settings.json` is bound to the session's directory
+  the same way, so its auto-injected context describes the session's repo — not necessarily the
+  one being edited. Do not read its silence as "nothing relevant exists".

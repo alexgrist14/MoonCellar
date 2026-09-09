@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CharacterSchema } from "./characters.schema";
 
 export const RetroachievementsSchema = z.object({
   gameId: z.number(),
@@ -260,6 +261,7 @@ export const GameSchema = z.object({
   languages: z.string().array().optional(),
   externalPages: ExternalPageSchema.array().optional(),
   relatedGames: RelatedGamesSchema.optional(),
+  characters: CharacterSchema.array().optional(),
   averageRating: z.number().nullable().optional(),
   ratingsCount: z.number().nullable().optional(),
   isStopParsingPictures: z.boolean().optional(),
