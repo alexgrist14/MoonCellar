@@ -55,8 +55,10 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
   `bun --filter '*' dev`.** `bun --filter` runs the selected scripts in workspace dependency
   order and waits for a dependency's script to exit first; `@mooncellar/schemas`'s `dev` is
   `tsc --watch`, which never exits, so `web dev` is never spawned at all — the terminal just
-  sits on the tsc watch banner with no Next.js output. `build` may keep `--filter '*'`,
-  because build scripts terminate and the ordering is what we want there.
+  sits on the tsc watch banner with no Next.js output. The glob also silently skipped
+  `apps/api`, which has no `dev` script, so `dev:api` calls its `start:dev` by name.
+  `build` and `lint` may keep `--filter '*'`, because those scripts terminate and the
+  dependency ordering is what we want there.
 - **`nest build` must stay on tsc (`"webpack": false` in `apps/api/nest-cli.json`).**
   With hoisted dependencies webpack-node-externals no longer recognises
   `node_modules` and starts bundling NestJS itself, which dies on an optional
