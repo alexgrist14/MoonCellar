@@ -1,0 +1,16 @@
+.git
+.github
+.husky
+.claude
+.codegraph
+.cursor
+.agents
+node_modules
+**/node_modules
+apps/web/.next
+apps/api/dist
+apps/api/uploads
+packages/*/dist
+infra
+docs
+**/*.tsbuildinfo

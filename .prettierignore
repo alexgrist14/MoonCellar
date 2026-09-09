@@ -1,5 +1,8 @@
 # Ignore artifacts:
 .next/
+dist/
+node_modules/
+.codegraph/
 
 # Ignore specific files:
 package-lock.json
