@@ -68,6 +68,7 @@ jobs:
     env:
       DEPLOY_WEB: ${{ needs.changes.outputs.web }}
       DEPLOY_API: ${{ needs.changes.outputs.api }}
+      DEPLOY_ROOT: ${{ secrets.DEPLOY_ROOT }}
 
     steps:
       - name: Checkout code
@@ -113,21 +114,21 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: DEPLOY_WEB,DEPLOY_API
+          envs: DEPLOY_WEB,DEPLOY_API,DEPLOY_ROOT
           script: |
             set -e
 
             podman load < /tmp/images.tar.gz
 
             if [ "$DEPLOY_WEB" = "true" ]; then
-              cd ${{ secrets.WORK_DIR_WEB }}
+              cd "$DEPLOY_ROOT/Frontend"
               ./run.sh
               systemctl --user daemon-reload
               systemctl restart --user Mooncellar-Frontend.service
             fi
 
             if [ "$DEPLOY_API" = "true" ]; then
-              cd ${{ secrets.WORK_DIR_API }}
+              cd "$DEPLOY_ROOT/Backend"
               ./run.sh
               systemctl --user daemon-reload
               systemctl restart --user Mooncellar-Backend.service

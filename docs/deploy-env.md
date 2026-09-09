@@ -29,10 +29,17 @@ below (`SSH_HOST_WEB` / `SSH_HOST_API`).
 
 | Secret | Replaces | Description |
 |---|---|---|
-| `WORK_DIR_WEB` | `WORK_DIR` (frontend repo) | Directory on the host holding the frontend's `run.sh` and its systemd unit |
-| `WORK_DIR_API` | `WORK_DIR` (backend repo) | Same for the backend. Keep separate even if the paths look alike today — `run.sh` is per-service |
+| `DEPLOY_ROOT` | `WORK_DIR` in both repos | Directory holding both service directories — `Frontend` and `Backend` are appended by the deploy script |
 | `HOST_ENV_WEB` | `HOST_ENV` (frontend repo) | Whole `.env` file for `apps/web`, written by the workflow before `podman build` |
 | `HOST_ENV_API` | `HOST_ENV` (backend repo) | Whole `.env` file for `apps/api` |
+
+`DEPLOY_ROOT` is a new name on purpose. Repointing the existing `WORK_DIR` at the parent
+directory would break the old workflow for as long as it is still on `main`: it would `cd` into
+a directory that has no `run.sh`. Set `DEPLOY_ROOT`, merge, then delete `WORK_DIR`.
+
+The path is not a credential, but it stays a secret rather than moving into the workflow file:
+the repository is public, and the path names the deploy user, who is otherwise only identified
+by `SSH_USER`.
 
 `HOST_ENV_*` is a multi-line secret: the entire file, one `KEY=value` per line. The workflow
 writes it to the app's own directory, not to the repository root:
@@ -72,8 +79,7 @@ the host against the tables below, then set the secrets from that file:
 ```bash
 gh secret set HOST_ENV_WEB  < prod-web.env
 gh secret set HOST_ENV_API  < prod-api.env
-gh secret set WORK_DIR_WEB  --body "/home/deploy/mooncellar-frontend"
-gh secret set WORK_DIR_API  --body "/home/deploy/mooncellar-backend"
+gh secret set DEPLOY_ROOT   --body "/home/admin/Docker"
 ```
 
 Managing repository secrets requires the **admin** role; write access is not enough. Check with
@@ -93,6 +99,7 @@ multi-image archive over one SSH session, and restarts only the services it rebu
 | Exposed port | `3111` | `3228` |
 | Path filter | `apps/web/**`, `packages/**` | `apps/api/**`, `packages/**` |
 | Deploy flag in the SSH script | `DEPLOY_WEB` | `DEPLOY_API` |
+| Directory under `DEPLOY_ROOT` | `Frontend` | `Backend` |
 
 ---
 
@@ -200,10 +207,11 @@ Present in the current `.env` files, referenced nowhere in the code:
 
 ## Checklist before the first monorepo deploy
 
-1. `HOST_ENV_WEB`, `HOST_ENV_API`, `WORK_DIR_WEB`, `WORK_DIR_API` created; the old `HOST_ENV`
-   and `WORK_DIR` deleted so a workflow cannot silently fall back to them.
-2. The workflow references the new names — grep the yml for `HOST_ENV` and `WORK_DIR` without
-   a suffix and expect no hits.
+1. `HOST_ENV_WEB`, `HOST_ENV_API` and `DEPLOY_ROOT` created. The old `HOST_ENV` and `WORK_DIR`
+   are deleted only after the first successful deploy — until the merge lands they still serve
+   the workflow on `main`.
+2. The workflow references the new names — grep the yml for `HOST_ENV` without a suffix and for
+   `WORK_DIR`, and expect no hits.
 3. `git check-ignore -v apps/web/.env apps/api/.env` reports a match for both. The merged root
    `.gitignore` must keep the pattern as `.env`, not `/.env`: with a leading slash it only
    matches the repository root, and `apps/api/.env` — `JWT_SECRET`, `S3_KEY`,
