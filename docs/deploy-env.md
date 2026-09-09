@@ -46,14 +46,38 @@ writes it to the app's own directory, not to the repository root:
     fi
 ```
 
-Setting them from a local file is easier than pasting into the browser:
+### Where the production values actually live
+
+**A GitHub secret cannot be read back** — not through the UI, not through the API, not by the
+repository owner. The existing `HOST_ENV` of either repository is therefore not a source you
+can copy from.
+
+The production environment exists on the host, baked into the running image by the current
+`COPY ./.env .env`. Lift it from there:
 
 ```bash
-gh secret set HOST_ENV_WEB  < apps/web/.env
-gh secret set HOST_ENV_API  < apps/api/.env
+podman ps
+podman exec <container> cat /app/.env
+# or, without touching the running container:
+podman run --rm --entrypoint cat mooncellar-frontend:latest /app/.env
+```
+
+After the migration those paths become `/app/apps/web/.env` and `/app/apps/api/.env`.
+
+**Do not seed the secrets from a developer's local `.env`.** Ours mixes localhost URLs with
+live credentials, and it is missing half the variables the code reads — a build from it would
+ship a site calling `localhost:3228` with empty canonical links. Reconcile what you pull off
+the host against the tables below, then set the secrets from that file:
+
+```bash
+gh secret set HOST_ENV_WEB  < prod-web.env
+gh secret set HOST_ENV_API  < prod-api.env
 gh secret set WORK_DIR_WEB  --body "/home/deploy/mooncellar-frontend"
 gh secret set WORK_DIR_API  --body "/home/deploy/mooncellar-backend"
 ```
+
+Managing repository secrets requires the **admin** role; write access is not enough. Check with
+`gh api repos/<owner>/<repo> --jq .permissions`.
 
 ### Not secrets — these live in the workflow file
 
