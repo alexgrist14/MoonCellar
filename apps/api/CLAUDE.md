@@ -1,30 +1,11 @@
-# MoonCellar-Server
+# MoonCellar API (apps/api)
 
-## Package manager
-
-This project uses **bun** exclusively. Using `npm` is forbidden.
-
-- Install dependencies with `bun install` (never `npm install`).
-- Add/remove packages with `bun add` / `bun remove`.
-- Run scripts with `bun run <script>` (or `bunx` for one-off binaries).
-- Do not create or commit `package-lock.json` — only `bun.lock`/`bun.lockb` is allowed.
-
-## Code generation
-
-- Do not add comments when generating or modifying code.
-
-## Zod schemas
-
-- The zod schema files in `MoonCellar-Server/src/shared/zod/schemas/` and
-  `MoonCellar/src/lib/shared/lib/schemas/` are byte-identical copies. The server copy is
-  canonical — `createZodDto` generates the NestJS DTOs from it.
-- Any change to a schema must be applied to both copies in the same change, byte for byte.
-- Verify with `bun run check:schemas`.
-- `igdb.schema.ts` is client-only and exempt.
+Rules that apply to the NestJS service. Repository-wide rules live in the root
+[`CLAUDE.md`](../../CLAUDE.md).
 
 ## Docker
 
-- **Keep the `mongodb` service pinned to `mongo:7` — do not move it to `mongo:latest` or any
+- **Keep the `mongodb` service in `infra/docker-compose.yml` pinned to `mongo:7` — do not move it to `mongo:latest` or any
   8.x tag.** MongoDB 8.x vendors a TCMalloc that violates the kernel rseq ABI, and recent 8.x
   builds refuse to start on Linux kernels 6.19 through 7.0.13 with a fatal
   `MongoDB cannot start: Linux kernel versions 6.19 and newer has a known incompatibility`
@@ -41,24 +22,3 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
   nightly re-run rewrites all ~376k game documents and bumps their `updatedAt`, which
   `getGameSlugs` feeds to the sitemap as `lastmod` — every game would look freshly edited
   every day.
-
-
-## CodeGraph across the two repositories
-
-- **This repo and the `MoonCellar` client have separate `.codegraph/` indexes, and a query
-  resolves against the session's working directory.** Both `.mcp.json` files launch
-  `codegraph serve --mcp` with no fixed path, so a session started in one repo sees only that
-  repo's index.
-- **Querying across repos fails silently — it does not error and does not return empty.** It
-  returns plausible-looking symbols from the session's own repo instead. Asking a
-  client-rooted session for `upsertCharacterFromIgdb linkGameCharacters IGDBService` (all
-  server-only) came back with `characters.schema.ts`, `igdb.api.ts` and `GamePage.tsx`, and
-  nothing signalled that all three requested symbols were missing.
-- **Pass `projectPath` with the absolute path to the other repo** (or `cd` into it first for
-  the CLI). The same query with `projectPath` pointing here returned 80 symbols across 19
-  files.
-- This matters constantly, because the zod schemas are mirrored across both repos and most
-  schema work touches server and client together.
-- The `codegraph prompt-hook` in `~/.claude/settings.json` is bound to the session's directory
-  the same way, so its auto-injected context describes the session's repo — not necessarily
-  the one being edited. Do not read its silence as "nothing relevant exists".
