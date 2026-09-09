@@ -154,9 +154,8 @@ Present in the current `.env` files, referenced nowhere in the code:
 
 ## `.env.example`
 
-Neither repository ships one today, so `cp .env.example .env` from the README fails for anyone
-cloning the project. Both files are created during the migration and committed — keys only, no
-values.
+`apps/web/.env.example` and `apps/api/.env.example` are committed with keys only and no
+values; the real `.env` files stay untracked. The blocks below mirror them.
 
 <details>
 <summary><code>apps/web/.env.example</code></summary>
