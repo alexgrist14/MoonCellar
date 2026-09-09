@@ -96,6 +96,39 @@ multi-image archive over one SSH session, and restarts only the services it rebu
 
 ---
 
+## What production sets today
+
+Verified against the running containers. The host ships far fewer keys than the tables below
+list, because almost every variable the code reads has a hardcoded fallback — and in this
+deployment those fallbacks happen to be the production values.
+
+**Frontend — three keys set:** `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_LOKI_HOST`,
+`NEXT_PUBLIC_S3_HOST`.
+
+**Backend — fifteen keys set:** everything in its table except `FRONT_URL`, `LOCAL_CONNECTION`
+and `INDEXNOW_KEY`.
+
+| Unset in production | Falls back to | Verdict |
+|---|---|---|
+| `INTERNAL_API_URL` | `http://host.containers.internal:3228` | Correct for this host — the podman gateway |
+| `NEXT_PUBLIC_FRONT_URL` | `https://mooncellar.space` | Correct; canonical links and the sitemap are fine |
+| `LOKI_HOST` (web) | `http://host.containers.internal:3100` | Correct |
+| `GEO_BLOCK_COUNTRIES` | `RU` | Country blocking is on in production through this default alone |
+| `NEXT_PUBLIC_FARO_APP_NAME` | `mooncellar-frontend` | Correct |
+| `NEXT_PUBLIC_APP_VERSION` | `0.0.0` | Every Faro event reports 0.0.0, so telemetry cannot be filtered by release |
+| `NEXT_PUBLIC_CORS_SERVER` | **nothing** | See below |
+| `FRONT_URL` (api) | `https://mooncellar.space` | Correct |
+| `INDEXNOW_KEY` | a key hardcoded in `apps/api/src/shared/constants.ts` | Works; an IndexNow key is public by design, since the host must serve it at `/<key>.txt` |
+
+Two keys are set in production but referenced nowhere in the code — `NEXT_PUBLIC_LOKI_HOST` and
+`NEXT_PUBLIC_S3_HOST`. They can be dropped from `HOST_ENV_WEB`.
+
+> **`NEXT_PUBLIC_CORS_SERVER` has no fallback and is not set.**
+> `visitors.utils.ts` builds its request as `` `${process.env.NEXT_PUBLIC_CORS_SERVER}api?` ``,
+> so in production that URL starts with the literal string `undefined` and the visitor counter
+> request fails. This predates the monorepo; fixing it means adding the key to `HOST_ENV_WEB`,
+> not changing the migration.
+
 ## `HOST_ENV_WEB` — contents
 
 > **`NEXT_PUBLIC_*` values are inlined into the bundle at build time.** The workflow writes the
