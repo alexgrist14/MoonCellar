@@ -26,9 +26,9 @@ import {
   GetPlaythroughsResponseDto,
   SavePlaythroughRequestDto,
   UpdatePlaythroughsRequestDto,
-} from "src/shared/zod/dto/playthroughs.dto";
+} from "../../../shared/zod/dto/playthroughs.dto";
 import { PlaythroughsService } from "../services/playthroughs.service";
-import { UserIdGuard } from "src/module/auth/user.guard";
+import { UserIdGuard } from "../../auth/user.guard";
 
 @ApiTags("Playthroughs")
 @Controller("playthroughs")

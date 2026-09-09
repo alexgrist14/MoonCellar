@@ -15,14 +15,14 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { UserIdGuard } from "src/module/auth/user.guard";
+import { UserIdGuard } from "../../auth/user.guard";
 import { UserRatingsService } from "../services/user-ratings.service";
 import {
   AddUserRatingDto,
   GetUserRatingDto,
   RemoveUserRatingDto,
   UpdateUserRatingDto,
-} from "src/shared/zod/dto/user-ratings.dto";
+} from "../../../shared/zod/dto/user-ratings.dto";
 
 @ApiTags("User Ratings")
 @Controller("ratings")

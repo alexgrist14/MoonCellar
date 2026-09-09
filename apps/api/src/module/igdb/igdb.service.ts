@@ -17,7 +17,7 @@ import {
   runWithConcurrency,
 } from "./utils/igdb";
 import { ParserType } from "./interface/common.interface";
-import { getImageLink, normalizeGameName } from "src/shared/utils";
+import { getImageLink, normalizeGameName } from "../../shared/utils";
 import { findSteamAppInfo, mergeSteamStore } from "../steam/utils/steam.utils";
 import { Game, GameDocument } from "../games/schemas/game.schema";
 import { Platform, PlatformDocument } from "../games/schemas/platform.schema";
@@ -33,9 +33,9 @@ import {
 } from "../games/schemas/sync-state.schema";
 import { Cron } from "@nestjs/schedule";
 import { PinoLogger } from "nestjs-pino";
-import { runInCronLogContext } from "src/shared/cron-logging";
-import { runCronExclusive } from "src/shared/cron-mutex";
-import { BusinessMetricsService } from "src/module/metrics/business-metrics.service";
+import { runInCronLogContext } from "../../shared/cron-logging";
+import { runCronExclusive } from "../../shared/cron-mutex";
+import { BusinessMetricsService } from "../metrics/business-metrics.service";
 import {
   IGDB_CHARACTERS_LINK_GAMES_CRON,
   IGDB_CHARACTERS_LINK_GAMES_CRON_OPTIONS,

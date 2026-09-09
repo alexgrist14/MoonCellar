@@ -30,14 +30,14 @@ import {
   gamesFilters,
   combinedRatingExpr,
   combinedRatingsCountExpr,
-} from "src/shared/games";
-import { FileService } from "src/module/user/services/file-upload.service";
-import { User } from "src/module/user/schemas/user.schema";
-import { Rating } from "src/module/user/schemas/user-ratings.schema";
-import { UserLogs } from "src/module/user/schemas/user-logs.schema";
-import { IndexNowService } from "src/module/indexnow/indexnow.service";
-import { FRONT_URL } from "src/shared/constants";
-import { normalizeGameName } from "src/shared/utils";
+} from "../../../shared/games";
+import { FileService } from "../../user/services/file-upload.service";
+import { User } from "../../user/schemas/user.schema";
+import { Rating } from "../../user/schemas/user-ratings.schema";
+import { UserLogs } from "../../user/schemas/user-logs.schema";
+import { IndexNowService } from "../../indexnow/indexnow.service";
+import { FRONT_URL } from "../../../shared/constants";
+import { normalizeGameName } from "../../../shared/utils";
 import { pickFollowingsStatus } from "../utils/followings-status.utils";
 
 const SEARCH_CANDIDATES_LIMIT = 1000;

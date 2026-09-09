@@ -8,8 +8,8 @@ import { InjectModel } from "@nestjs/mongoose";
 import * as bcrypt from "bcryptjs";
 import { Query as ExpressQuery } from "express-serve-static-core";
 import mongoose, { Model } from "mongoose";
-import { User } from "src/module/user/schemas/user.schema";
-import { mimeToExt } from "src/shared/constants";
+import { User } from "../schemas/user.schema";
+import { mimeToExt } from "../../../shared/constants";
 import {
   DEFAULT_BG_OPACITY,
   IGetUserByStringRequest,

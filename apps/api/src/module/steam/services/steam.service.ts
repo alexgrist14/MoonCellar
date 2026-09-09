@@ -7,7 +7,7 @@ import {
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { Game, GameDocument } from "../../games/schemas/game.schema";
-import { BusinessMetricsService } from "src/module/metrics/business-metrics.service";
+import { BusinessMetricsService } from "../../metrics/business-metrics.service";
 import { findSteamAppInfo, mergeSteamStore } from "../utils/steam.utils";
 
 @Injectable()

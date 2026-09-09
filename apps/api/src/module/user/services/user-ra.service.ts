@@ -7,8 +7,8 @@ import {
   getUserProfile,
 } from "@retroachievements/api";
 import { Model } from "mongoose";
-import { User } from "src/module/user/schemas/user.schema";
-import { RA_MAIN_USER_NAME } from "src/shared/constants";
+import { User } from "../schemas/user.schema";
+import { RA_MAIN_USER_NAME } from "../../../shared/constants";
 import { BusinessMetricsService } from "../../metrics/business-metrics.service";
 
 @Injectable()

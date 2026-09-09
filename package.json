@@ -20,7 +20,7 @@
     }
   },
   "scripts": {
-    "dev": "bun --filter '*' dev",
+    "dev": "bun --filter @mooncellar/schemas build && (bun --filter @mooncellar/schemas dev & bun --filter web dev & wait)",
     "build": "bun --filter '*' build",
     "lint": "bun --filter '*' lint",
     "format": "prettier --write .",

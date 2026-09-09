@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import mongoose from "mongoose";
-import { CategoriesType } from "src/module/user/types/actions";
+import { CategoriesType } from "../../user/types/actions";
 
 export class GetPlaythroughsDTO {
   @ApiProperty()

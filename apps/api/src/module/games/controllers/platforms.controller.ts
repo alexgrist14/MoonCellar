@@ -1,7 +1,7 @@
 import { Controller, Get } from "@nestjs/common";
 import { ApiCreatedResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { PlatformsService } from "../services/platforms.service";
-import { PlatformResponseDto } from "src/shared/zod/dto/platforms.dto";
+import { PlatformResponseDto } from "../../../shared/zod/dto/platforms.dto";
 
 @ApiTags("Platforms")
 @Controller("platforms")

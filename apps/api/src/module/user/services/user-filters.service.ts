@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { Model } from "mongoose";
-import { User } from "src/module/user/schemas/user.schema";
+import { User } from "../schemas/user.schema";
 
 @Injectable()
 export class UserFiltersService {

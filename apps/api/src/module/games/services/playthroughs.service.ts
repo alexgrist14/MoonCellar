@@ -6,7 +6,7 @@ import {
   ISavePlaythroughRequest,
   IUpdatePlaythroughRequest,
 } from "@mooncellar/schemas";
-import { UserLogsService } from "src/module/user/services/user-logs.service";
+import { UserLogsService } from "../../user/services/user-logs.service";
 import { Platform, PlatformDocument } from "../schemas/platform.schema";
 import {
   IPlaythroughDocument,

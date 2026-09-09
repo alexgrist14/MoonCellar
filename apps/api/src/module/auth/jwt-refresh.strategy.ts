@@ -5,7 +5,7 @@ import { Strategy, ExtractJwt } from "passport-jwt";
 import { User } from "../user/schemas/user.schema";
 import { Model } from "mongoose";
 import type { Request } from "express";
-import { REFRESH_TOKEN } from "src/shared/constants";
+import { REFRESH_TOKEN } from "../../shared/constants";
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(

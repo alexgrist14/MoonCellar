@@ -1,7 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { Model } from "mongoose";
-import { setPagination } from "src/shared/pagination";
+import { setPagination } from "../../../shared/pagination";
 import {
   IGetUserLogsRequest,
   ILog,

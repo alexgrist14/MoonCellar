@@ -22,7 +22,7 @@ import {
   FRONT_URL,
   REFRESH_TOKEN,
   refreshExpire,
-} from "src/shared/constants";
+} from "../../shared/constants";
 import { IndexNowService } from "../indexnow/indexnow.service";
 
 @Injectable()

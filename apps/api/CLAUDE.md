@@ -3,6 +3,18 @@
 Rules that apply to the NestJS service. Repository-wide rules live in the root
 [`CLAUDE.md`](../../CLAUDE.md).
 
+## Imports
+
+- **Every import inside `src/` must be relative — never the non-relative `src/...` form.**
+  That form resolves only through `baseUrl`, and it survives into the compiled output unless
+  the Nest CLI path transformer rewrites it. The hook ran on a developer machine and did not
+  run inside the container image, so `dist` shipped `require("src/module/user/schemas/user.schema")`;
+  Bun resolved that to the TypeScript source instead of `dist`, and the service died at boot
+  with `SyntaxError: Export named 'IUserSettings' not found in module
+  '/app/packages/schemas/dist/index.js'` — a type-only export that exists in the `.ts` file but
+  not in compiled JavaScript. The old webpack build hid this by bundling everything.
+- Check with `grep -r 'require("src/' dist` after a build: it must print nothing.
+
 ## Docker
 
 - **Keep the `mongodb` service in `infra/docker-compose.yml` pinned to `mongo:7` — do not move it to `mongo:latest` or any

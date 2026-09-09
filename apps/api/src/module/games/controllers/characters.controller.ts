@@ -6,7 +6,7 @@ import {
   GetCharacterBySlugDto,
   GetCharactersDto,
   GetCharactersResponseDto,
-} from "src/shared/zod/dto/characters.dto";
+} from "../../../shared/zod/dto/characters.dto";
 
 @ApiTags("Characters")
 @Controller("characters")

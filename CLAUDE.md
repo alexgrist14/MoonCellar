@@ -51,6 +51,12 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
   `packages/schemas` (`@mooncellar/schemas`). Install and run everything from the root
   with `bun --filter <workspace> <script>` — never `cd` into an app to install, the
   lockfile is shared.
+- **The root `dev` script must launch each workspace with its own `bun --filter` call, never
+  `bun --filter '*' dev`.** `bun --filter` runs the selected scripts in workspace dependency
+  order and waits for a dependency's script to exit first; `@mooncellar/schemas`'s `dev` is
+  `tsc --watch`, which never exits, so `web dev` is never spawned at all — the terminal just
+  sits on the tsc watch banner with no Next.js output. `build` may keep `--filter '*'`,
+  because build scripts terminate and the ordering is what we want there.
 - **`nest build` must stay on tsc (`"webpack": false` in `apps/api/nest-cli.json`).**
   With hoisted dependencies webpack-node-externals no longer recognises
   `node_modules` and starts bundling NestJS itself, which dies on an optional

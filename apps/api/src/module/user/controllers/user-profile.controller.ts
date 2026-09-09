@@ -21,7 +21,7 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { RolesGuard } from "src/module/roles/roles.guard";
+import { RolesGuard } from "../../roles/roles.guard";
 import {
   GetUserByStringDto,
   GetUserLoginsResponseDto,
@@ -29,7 +29,7 @@ import {
   UpdateSettingsDto,
   UpdateUserEmailDto,
   UpdateUserPasswordDto,
-} from "src/shared/zod/dto/user.dto";
+} from "../../../shared/zod/dto/user.dto";
 import { IGetUserLoginsResponse } from "@mooncellar/schemas";
 import { UserIdGuard } from "../../auth/user.guard";
 import { User } from "../schemas/user.schema";

@@ -15,7 +15,7 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { UserIdGuard } from "src/module/auth/user.guard";
+import { UserIdGuard } from "../../auth/user.guard";
 import { PresetDto } from "../dto/presets.dto";
 import { UserPresetsService } from "../services/user-presets.service";
 

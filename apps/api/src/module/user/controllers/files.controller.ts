@@ -19,9 +19,9 @@ import {
 } from "@nestjs/swagger";
 import { FileService } from "../services/file-upload.service";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { RolesGuard } from "src/module/roles/roles.guard";
-import { Roles } from "src/module/roles/roles.decorator";
-import { GetFileRequestDto } from "src/shared/zod/dto/files.dto";
+import { RolesGuard } from "../../roles/roles.guard";
+import { Roles } from "../../roles/roles.decorator";
+import { GetFileRequestDto } from "../../../shared/zod/dto/files.dto";
 
 @ApiTags("Files Controller")
 @Controller("file")

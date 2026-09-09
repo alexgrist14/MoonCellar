@@ -37,22 +37,22 @@ import {
   GetGameSlugsResponseDto,
   GetRandomGameSlugResponseDto,
   UpdateGameDto,
-} from "src/shared/zod/dto/games.dto";
+} from "../../../shared/zod/dto/games.dto";
 import {
   GetGameFollowingsStatusRequestDto,
   GetGameFollowingsStatusResponseDto,
-} from "src/shared/zod/dto/game-followings-status.dto";
+} from "../../../shared/zod/dto/game-followings-status.dto";
 import {
   GetGamesStatsRequestDto,
   GetGameStatsResponseDto,
   GetGamesStatsResponseDto,
-} from "src/shared/zod/dto/game-stats.dto";
+} from "../../../shared/zod/dto/game-stats.dto";
 import { GamesService } from "../services/games.service";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { RolesGuard } from "../../roles/roles.guard";
 import { Roles } from "../../roles/roles.decorator";
 import { RolesEnum } from "@mooncellar/schemas";
-import { UserIdGuard } from "src/module/auth/user.guard";
+import { UserIdGuard } from "../../auth/user.guard";
 
 @ApiTags("Games")
 @Controller("games")

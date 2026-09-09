@@ -10,7 +10,7 @@ import {
   ListObjectsV2CommandInput,
 } from "@aws-sdk/client-s3";
 import { Injectable, Logger, NotFoundException } from "@nestjs/common";
-import { getS3Config, mimeToExt } from "src/shared/constants";
+import { getS3Config, mimeToExt } from "../../../shared/constants";
 import { IGetFileRequest, IGetFileResponse } from "@mooncellar/schemas";
 
 @Injectable()

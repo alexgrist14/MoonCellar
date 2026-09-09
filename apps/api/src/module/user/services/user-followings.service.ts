@@ -6,8 +6,8 @@ import {
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { Model } from "mongoose";
-import { User } from "src/module/user/schemas/user.schema";
-import { followListLookup } from "src/shared/utils";
+import { User } from "../schemas/user.schema";
+import { followListLookup } from "../../../shared/utils";
 
 @Injectable()
 export class UserFollowingsService {

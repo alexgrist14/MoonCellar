@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from "mongoose";
-import { Platform } from "src/module/games/schemas/platform.schema";
+import { Platform } from "../../games/schemas/platform.schema";
 
 @Schema()
 export class RAConsole {

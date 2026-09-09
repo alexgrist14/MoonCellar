@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import axios from "axios";
-import { FRONT_URL, INDEXNOW_KEY } from "src/shared/constants";
+import { FRONT_URL, INDEXNOW_KEY } from "../../shared/constants";
 
 const INDEXNOW_ENDPOINT = "https://api.indexnow.org/indexnow";
 

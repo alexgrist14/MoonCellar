@@ -5,7 +5,7 @@ import { Strategy, ExtractJwt } from "passport-jwt";
 import { User } from "../user/schemas/user.schema";
 import { Model } from "mongoose";
 import type { Request } from "express";
-import { ACCESS_TOKEN } from "src/shared/constants";
+import { ACCESS_TOKEN } from "../../shared/constants";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {

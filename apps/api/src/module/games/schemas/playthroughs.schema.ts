@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
-import { User } from "src/module/user/schemas/user.schema";
-import { CategoriesType } from "src/module/user/types/actions";
+import { User } from "../../user/schemas/user.schema";
+import { CategoriesType } from "../../user/types/actions";
 import { Platform } from "./platform.schema";
 import { Game } from "./game.schema";
 

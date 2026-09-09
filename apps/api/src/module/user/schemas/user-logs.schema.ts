@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
-import { Game } from "src/module/games/schemas/game.schema";
+import { Game } from "../../games/schemas/game.schema";
 import { ILogType } from "@mooncellar/schemas";
 
 export type UserLogsDocument = HydratedDocument<UserLogs>;

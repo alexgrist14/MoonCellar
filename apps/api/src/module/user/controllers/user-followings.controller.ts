@@ -14,7 +14,7 @@ import {
   ApiResponse,
   ApiCookieAuth,
 } from "@nestjs/swagger";
-import { UserIdGuard } from "src/module/auth/user.guard";
+import { UserIdGuard } from "../../auth/user.guard";
 import { RolesGuard } from "../../roles/roles.guard";
 import { Roles } from "../../roles/roles.decorator";
 import { RolesEnum } from "@mooncellar/schemas";

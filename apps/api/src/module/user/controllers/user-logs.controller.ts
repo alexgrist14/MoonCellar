@@ -15,11 +15,11 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
-import { UserIdGuard } from "src/module/auth/user.guard";
+import { UserIdGuard } from "../../auth/user.guard";
 import {
   GetUserLogsDto,
   RemoveUserLogDto,
-} from "src/shared/zod/dto/user-logs.dto";
+} from "../../../shared/zod/dto/user-logs.dto";
 
 @ApiTags("User Logs")
 @Controller("user")

@@ -15,7 +15,7 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { UserIdGuard } from "src/module/auth/user.guard";
+import { UserIdGuard } from "../../auth/user.guard";
 import { FilterDto } from "../dto/filters.dto";
 import { UserFiltersService } from "../services/user-filters.service";
 
