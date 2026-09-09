@@ -48,7 +48,7 @@ services:
     restart: unless-stopped
 
   mongodb:
-    image: mongo:latest
+    image: mongo:7
     container_name: mongodb
     command: ["mongod", "--auth"]
     hostname: mongodb

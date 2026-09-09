@@ -52,6 +52,8 @@ export const getLink = (type: ParserType) => {
       return "https://api.igdb.com/v4/games";
     case "platforms":
       return "https://api.igdb.com/v4/platforms";
+    case "characters":
+      return "https://api.igdb.com/v4/characters";
   }
 };
 
@@ -181,12 +183,17 @@ const parser = async <T>({
           if (options?.isCollectItems !== false) {
             items.push(...response.data);
           }
-          await parsingCallback(response.data, {
+          const isDone = await parsingCallback(response.data, {
             items: response.data,
             page,
             total,
             offset,
           });
+
+          if (isDone === false) {
+            logger.log(`Stopped early by callback with type: ${type}`);
+            return items;
+          }
         } else {
           if (options?.isCollectItems !== false) {
             items.push(...response.data);

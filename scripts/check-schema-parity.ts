@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 const SCHEMA_FILES = [
+  "characters.schema.ts",
   "files.schema.ts",
   "game-followings-status.schema.ts",
   "game-stats.schema.ts",

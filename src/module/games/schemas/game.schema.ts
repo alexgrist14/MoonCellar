@@ -12,6 +12,7 @@ import {
   IRetroachievementsField,
 } from "src/shared/zod/schemas/games.schema";
 import { Platform } from "./platform.schema";
+import { Character } from "./character.schema";
 
 export type GameDocument = HydratedDocument<Game>;
 
@@ -77,6 +78,8 @@ export class Game {
   externalPages: IExternalPageField[];
   @Prop({ type: Object })
   relatedGames: IRelatedGamesField;
+  @Prop({ ref: Character.name })
+  characters: mongoose.Types.ObjectId[];
   @Prop({ type: [Object] })
   retroachievements: IRetroachievementsField[];
   @Prop()
@@ -113,3 +116,4 @@ GameDatabaseSchema.index({ "igdb.total_rating": -1 });
 GameDatabaseSchema.index({ first_release: -1 });
 GameDatabaseSchema.index({ name: 1 });
 GameDatabaseSchema.index({ nameNormalized: 1 });
+GameDatabaseSchema.index({ characters: 1 });

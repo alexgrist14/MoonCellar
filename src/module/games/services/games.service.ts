@@ -100,6 +100,18 @@ const SEARCH_PROJECTION_STAGE = {
   },
 };
 
+const CHARACTERS_LOOKUP_STAGE = {
+  $lookup: {
+    from: "characters",
+    localField: "characters",
+    foreignField: "_id",
+    as: "characters",
+    pipeline: [{ $sort: { name: 1 as const } }],
+  },
+};
+
+const STRIP_CHARACTERS_STAGE = { $unset: "characters" };
+
 const TRIM_IGDB_STAGE = {
   $addFields: {
     igdb: {
@@ -211,7 +223,11 @@ export class GamesService implements OnModuleInit {
   async getGameBySlug({ slug }: IGetGameBySlugRequest) {
     try {
       const game = (
-        await this.Games.aggregate([{ $match: { slug } }, TRIM_IGDB_STAGE])
+        await this.Games.aggregate([
+          { $match: { slug } },
+          CHARACTERS_LOOKUP_STAGE,
+          TRIM_IGDB_STAGE,
+        ])
       ).pop();
 
       if (!game) throw new NotFoundException(`Game not found: ${slug}`);
@@ -226,7 +242,11 @@ export class GamesService implements OnModuleInit {
   async getGameById({ _id }: IGetGameByIdRequest) {
     try {
       const game = (
-        await this.Games.aggregate([{ $match: { _id } }, TRIM_IGDB_STAGE])
+        await this.Games.aggregate([
+          { $match: { _id } },
+          CHARACTERS_LOOKUP_STAGE,
+          TRIM_IGDB_STAGE,
+        ])
       ).pop();
 
       if (!game) throw new NotFoundException(`Game not found: ${_id}`);
@@ -255,6 +275,7 @@ export class GamesService implements OnModuleInit {
             },
           },
           TRIM_IGDB_STAGE,
+          STRIP_CHARACTERS_STAGE,
         ]);
       }
 
@@ -392,6 +413,7 @@ export class GamesService implements OnModuleInit {
           : []),
         ...(isDefaultSearchSort ? [{ $unset: SEARCH_RELEVANCE_FIELD }] : []),
         TRIM_IGDB_STAGE,
+        STRIP_CHARACTERS_STAGE,
       ]);
 
       const total = searchedIds
@@ -504,6 +526,7 @@ export class GamesService implements OnModuleInit {
           $sample: { size: 3 },
         },
         TRIM_IGDB_STAGE,
+        STRIP_CHARACTERS_STAGE,
       ]);
 
       return games;
@@ -526,6 +549,7 @@ export class GamesService implements OnModuleInit {
         },
         { $sort: { "igdb.hypes": -1, first_release: 1 } },
         TRIM_IGDB_STAGE,
+        STRIP_CHARACTERS_STAGE,
         {
           $addFields: {
             _releaseDate: {
@@ -641,6 +665,7 @@ export class GamesService implements OnModuleInit {
         { $sort: { first_release: -1 } },
         { $limit: 18 },
         TRIM_IGDB_STAGE,
+        STRIP_CHARACTERS_STAGE,
       ]);
 
       return games;

@@ -311,6 +311,255 @@ export class IgdbParserController {
   @UseGuards(RolesGuard)
   @Roles(RolesEnum.ADMIN)
   @UseGuards(AuthGuard("jwt"))
+  @Post("/characters/parse")
+  @ApiOperation({
+    summary:
+      "Parse a character directly from IGDB by IGDB id or slug (creates it if not present yet)",
+  })
+  @ApiResponse({ status: 200, description: "Successfully parsed" })
+  @ApiQuery({
+    name: "igdbId",
+    required: false,
+    description: "IGDB id of the character to parse",
+  })
+  @ApiQuery({
+    name: "slug",
+    required: false,
+    description: "IGDB slug of the character to parse",
+  })
+  @ApiQuery({
+    name: "parseImages",
+    default: true,
+    required: false,
+    type: Boolean,
+    description: "Download the mug shot and upload it to S3 while parsing",
+  })
+  @ApiQuery({
+    name: "field",
+    required: false,
+    description:
+      "Update only this single field on the character instead of a full upsert (e.g. akas, description, mugShot). The character must already exist; unknown fields are rejected",
+  })
+  @ApiQuery({
+    name: "forceParse",
+    default: false,
+    required: false,
+    type: Boolean,
+    description:
+      "When field is set, also overwrite the field if it is already filled. For mugShot, also re-download a mug shot that is already present",
+  })
+  async parseCharacter(
+    @Query("igdbId") igdbIdQuery?: string,
+    @Query("slug") slug?: string,
+    @Query("parseImages") parseImagesQuery?: string,
+    @Query("field") field?: string,
+    @Query("forceParse") forceParseQuery?: string
+  ) {
+    if (!igdbIdQuery && !slug) {
+      throw new BadRequestException("Either igdbId or slug must be provided");
+    }
+
+    return this.service.parseCharacterFromIgdb(
+      {
+        igdbId: igdbIdQuery ? Number(igdbIdQuery) : undefined,
+        slug,
+      },
+      {
+        parseImages:
+          parseImagesQuery === undefined ? true : parseImagesQuery === "true",
+        field,
+        forceParse: forceParseQuery === "true",
+      }
+    );
+  }
+
+  @ApiCookieAuth()
+  @UseGuards(RolesGuard)
+  @Roles(RolesEnum.ADMIN)
+  @UseGuards(AuthGuard("jwt"))
+  @Post("/characters/backfill")
+  @ApiOperation({
+    summary: "Backfill the full IGDB characters catalog into characters",
+  })
+  @ApiResponse({ status: 200, description: "Successfully started" })
+  @ApiQuery({
+    name: "limit",
+    default: 100,
+    required: false,
+    type: Number,
+    description: "Page size for each IGDB request batch",
+  })
+  @ApiQuery({
+    name: "delayMs",
+    default: 1000,
+    required: false,
+    type: Number,
+    description: "Delay in milliseconds between IGDB request batches",
+  })
+  @ApiQuery({
+    name: "concurrency",
+    default: 5,
+    required: false,
+    type: Number,
+    description: "Number of characters upserted concurrently per batch",
+  })
+  @ApiQuery({
+    name: "parseImages",
+    default: false,
+    required: false,
+    type: Boolean,
+    description: "Download mug shots and upload them to S3 while backfilling",
+  })
+  @ApiQuery({
+    name: "field",
+    required: false,
+    description:
+      "Update only this single field on existing characters instead of a full upsert (e.g. akas, description, mugShot). The character must already exist; unknown fields are rejected",
+  })
+  @ApiQuery({
+    name: "forceParse",
+    default: false,
+    required: false,
+    type: Boolean,
+    description:
+      "When field is set, also overwrite characters where the field is already filled. For mugShot, also re-download mug shots that are already present",
+  })
+  @ApiQuery({
+    name: "skipCheckpoint",
+    default: false,
+    required: false,
+    type: Boolean,
+    description:
+      "Skip full-catalog checkpoint bookkeeping; use for partial/filtered runs",
+  })
+  @ApiQuery({
+    name: "maxItems",
+    required: false,
+    type: Number,
+    description:
+      "Stop after this many characters instead of walking the whole catalog; use it for a bounded trial run. Implies skipCheckpoint, so a partial run never marks the backfill complete",
+  })
+  backfillCharacters(
+    @Query("limit") limitQuery?: string,
+    @Query("delayMs") delayMsQuery?: string,
+    @Query("concurrency") concurrencyQuery?: string,
+    @Query("parseImages") parseImagesQuery?: string,
+    @Query("field") field?: string,
+    @Query("forceParse") forceParseQuery?: string,
+    @Query("skipCheckpoint") skipCheckpointQuery?: string,
+    @Query("maxItems") maxItemsQuery?: string
+  ) {
+    void this.service
+      .backfillCharactersFromIgdb({
+        limit: Number(limitQuery) || undefined,
+        delayMs: Number(delayMsQuery) || undefined,
+        concurrency: Number(concurrencyQuery) || undefined,
+        parseImages: parseImagesQuery === "true",
+        field,
+        forceParse: forceParseQuery === "true",
+        skipCheckpoint: skipCheckpointQuery === "true",
+        maxItems: Number(maxItemsQuery) || undefined,
+      })
+      .catch(() => undefined);
+
+    return { message: "Backfill started" };
+  }
+
+  @ApiCookieAuth()
+  @UseGuards(RolesGuard)
+  @Roles(RolesEnum.ADMIN)
+  @UseGuards(AuthGuard("jwt"))
+  @Post("/characters/sync")
+  @ApiOperation({
+    summary:
+      "Sync changed IGDB characters into characters. Runs daily at 06:00 (Europe/Moscow); use this to re-run it manually",
+  })
+  @ApiResponse({ status: 200, description: "Successfully started" })
+  @ApiQuery({
+    name: "limit",
+    default: 100,
+    required: false,
+    type: Number,
+    description: "Page size for each IGDB request batch",
+  })
+  @ApiQuery({
+    name: "delayMs",
+    default: 1000,
+    required: false,
+    type: Number,
+    description: "Delay in milliseconds between IGDB request batches",
+  })
+  @ApiQuery({
+    name: "concurrency",
+    default: 5,
+    required: false,
+    type: Number,
+    description: "Number of characters upserted concurrently per batch",
+  })
+  @ApiQuery({
+    name: "parseImages",
+    default: true,
+    required: false,
+    type: Boolean,
+    description: "Download mug shots and upload them to S3 while syncing",
+  })
+  @ApiQuery({
+    name: "field",
+    required: false,
+    description:
+      "Update only this single field on existing characters instead of a full upsert",
+  })
+  @ApiQuery({
+    name: "forceParse",
+    default: false,
+    required: false,
+    type: Boolean,
+    description:
+      "When field is set, also overwrite characters where the field is already filled",
+  })
+  syncCharacters(
+    @Query("limit") limitQuery?: string,
+    @Query("delayMs") delayMsQuery?: string,
+    @Query("concurrency") concurrencyQuery?: string,
+    @Query("parseImages") parseImagesQuery?: string,
+    @Query("field") field?: string,
+    @Query("forceParse") forceParseQuery?: string
+  ) {
+    void this.service
+      .syncCharactersFromIgdb({
+        limit: Number(limitQuery) || undefined,
+        delayMs: Number(delayMsQuery) || undefined,
+        concurrency: Number(concurrencyQuery) || undefined,
+        parseImages:
+          parseImagesQuery === undefined ? true : parseImagesQuery === "true",
+        field,
+        forceParse: forceParseQuery === "true",
+      })
+      .catch(() => undefined);
+
+    return { message: "Sync started" };
+  }
+
+  @ApiCookieAuth()
+  @UseGuards(RolesGuard)
+  @Roles(RolesEnum.ADMIN)
+  @UseGuards(AuthGuard("jwt"))
+  @Post("/characters/link-games")
+  @ApiOperation({
+    summary:
+      "Resolve IGDB character game ids into internal references on both sides (character.gameIds and game.characters). Runs daily at 06:30 (Europe/Moscow), after the characters sync cron; use this to re-run it manually",
+  })
+  @ApiResponse({ status: 200, description: "Successfully started" })
+  linkGameCharacters() {
+    void this.service.linkGameCharacters().catch(() => undefined);
+
+    return { message: "Linking started" };
+  }
+
+  @ApiCookieAuth()
+  @UseGuards(RolesGuard)
+  @Roles(RolesEnum.ADMIN)
+  @UseGuards(AuthGuard("jwt"))
   @Get("/token")
   @ApiOperation({ summary: "Get IGDB token" })
   @ApiResponse({ status: 200, description: "Successfully started" })

@@ -7,6 +7,10 @@ import {
   Platform,
   PlatformDatabaseSchema,
 } from "../games/schemas/platform.schema";
+import {
+  Character,
+  CharacterDatabaseSchema,
+} from "../games/schemas/character.schema";
 import { FileService } from "../user/services/file-upload.service";
 import { HttpModule } from "@nestjs/axios";
 import { SyncState, SyncStateSchema } from "../games/schemas/sync-state.schema";
@@ -20,6 +24,7 @@ import { MetricsModule } from "../metrics/metrics.module";
     MongooseModule.forFeature([
       { name: Game.name, schema: GameDatabaseSchema },
       { name: Platform.name, schema: PlatformDatabaseSchema },
+      { name: Character.name, schema: CharacterDatabaseSchema },
       { name: SyncState.name, schema: SyncStateSchema },
     ]),
     MetricsModule,

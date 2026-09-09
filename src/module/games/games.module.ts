@@ -8,6 +8,7 @@ import { GamesController } from "./controllers/games.controller";
 import { PlaythroughsController } from "./controllers/playthorughs.controller";
 import { Platform, PlatformDatabaseSchema } from "./schemas/platform.schema";
 import { Game, GameDatabaseSchema } from "./schemas/game.schema";
+import { Character, CharacterDatabaseSchema } from "./schemas/character.schema";
 import {
   Playthrough,
   PlaythroughDatabaseSchema,
@@ -15,6 +16,8 @@ import {
 import { FileService } from "../user/services/file-upload.service";
 import { PlatformsController } from "./controllers/platforms.controller";
 import { PlatformsService } from "./services/platforms.service";
+import { CharactersController } from "./controllers/characters.controller";
+import { CharactersService } from "./services/characters.service";
 import { GamesService } from "./services/games.service";
 import { HltbService } from "./services/hltb.service";
 import { HltbController } from "./controllers/hltb.controller";
@@ -32,6 +35,7 @@ import { IndexNowModule } from "../indexnow/indexnow.module";
     PlaythroughsController,
     PlatformsController,
     HltbController,
+    CharactersController,
   ],
   providers: [
     GamesService,
@@ -40,11 +44,13 @@ import { IndexNowModule } from "../indexnow/indexnow.module";
     UserLogsService,
     FileService,
     PlatformsService,
+    CharactersService,
   ],
   imports: [
     MongooseModule.forFeature([
       { name: Game.name, schema: GameDatabaseSchema },
       { name: Platform.name, schema: PlatformDatabaseSchema },
+      { name: Character.name, schema: CharacterDatabaseSchema },
       { name: Playthrough.name, schema: PlaythroughDatabaseSchema },
       { name: UserLogs.name, schema: UserLogsSchema },
       { name: User.name, schema: UserSchema },

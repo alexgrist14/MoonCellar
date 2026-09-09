@@ -32,6 +32,7 @@ const createService = () => {
     {} as never,
     {} as never,
     {} as never,
+    {} as never,
     {} as never
   );
   return { service, updateOne, platforms };

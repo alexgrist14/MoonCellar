@@ -1,1 +1,1 @@
-export type ParserType = "games" | "platforms";
+export type ParserType = "games" | "platforms" | "characters";

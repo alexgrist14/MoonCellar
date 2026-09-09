@@ -21,6 +21,10 @@ import { getImageLink, normalizeGameName } from "src/shared/utils";
 import { findSteamAppInfo, mergeSteamStore } from "../steam/utils/steam.utils";
 import { Game, GameDocument } from "../games/schemas/game.schema";
 import { Platform, PlatformDocument } from "../games/schemas/platform.schema";
+import {
+  Character,
+  CharacterDocument,
+} from "../games/schemas/character.schema";
 import { FileService } from "../user/services/file-upload.service";
 import { HttpService } from "@nestjs/axios";
 import {
@@ -33,6 +37,13 @@ import { runInCronLogContext } from "src/shared/cron-logging";
 import { runCronExclusive } from "src/shared/cron-mutex";
 import { BusinessMetricsService } from "src/module/metrics/business-metrics.service";
 import {
+  IGDB_CHARACTERS_LINK_GAMES_CRON,
+  IGDB_CHARACTERS_LINK_GAMES_CRON_OPTIONS,
+  IGDB_CHARACTERS_SYNC_CRON,
+  IGDB_CHARACTERS_SYNC_CRON_OPTIONS,
+  IGDB_CHARACTERS_SYNC_TO_CHARACTERS_CONCURRENCY,
+  IGDB_CHARACTERS_SYNC_UPDATED_DELAY_MS,
+  IGDB_CHARACTERS_SYNC_UPDATED_LIMIT,
   IGDB_GAMES_LINK_RELATED_CRON,
   IGDB_GAMES_LINK_RELATED_CRON_OPTIONS,
   IGDB_GAMES_SYNC_CRON,
@@ -47,6 +58,10 @@ import {
   gameStatusNames,
 } from "./constants/common";
 import {
+  CHARACTER_GAMES_LINK_BATCH_SIZE,
+  CHARACTER_MUG_SHOT_FIELD,
+  CHARACTER_QUERY_FIELDS,
+  CHARACTERS_BUCKET,
   DEFAULT_GAMES_SYNC_CONCURRENCY,
   DEFAULT_IGDB_SYNC_DELAY_MS,
   DEFAULT_IGDB_SYNC_LIMIT,
@@ -54,6 +69,7 @@ import {
   PLATFORM_QUERY_FIELDS,
   RELATED_GAMES_LINK_BATCH_SIZE,
   SINGLE_GAME_QUERY_FIELDS,
+  UPDATABLE_CHARACTER_FIELDS,
   UPDATABLE_GAME_FIELDS,
   UPDATABLE_PLATFORM_FIELDS,
 } from "./constants/igdb";
@@ -107,10 +123,31 @@ const isFieldValueEmpty = (value: unknown) => {
 
 type UpdatablePlatformField = (typeof UPDATABLE_PLATFORM_FIELDS)[number];
 
+const ALL_UPDATABLE_CHARACTER_FIELDS = [
+  ...UPDATABLE_CHARACTER_FIELDS,
+  CHARACTER_MUG_SHOT_FIELD,
+] as const;
+
+type UpdatableCharacterField = (typeof ALL_UPDATABLE_CHARACTER_FIELDS)[number];
+
+const isSameObjectIdList = (
+  current: mongoose.Types.ObjectId[] | undefined,
+  next: mongoose.Types.ObjectId[]
+) => {
+  if ((current?.length || 0) !== next.length) return false;
+  if (!current?.length) return true;
+
+  const currentKeys = current.map((id) => id.toString()).sort();
+  const nextKeys = next.map((id) => id.toString()).sort();
+
+  return currentKeys.every((key, index) => key === nextKeys[index]);
+};
+
 @Injectable()
 export class IGDBService {
   private readonly logger = new Logger(IGDBService.name);
   private isSyncUpdatedGamesCronRunning = false;
+  private isSyncUpdatedCharactersCronRunning = false;
   constructor(
     @InjectModel(SyncState.name)
     private SyncStateModel: Model<SyncStateDocument>,
@@ -118,6 +155,8 @@ export class IGDBService {
     private Games: Model<GameDocument>,
     @InjectModel(Platform.name)
     private Platforms: Model<PlatformDocument>,
+    @InjectModel(Character.name)
+    private Characters: Model<CharacterDocument>,
     private fileService: FileService,
     private httpService: HttpService,
     private readonly pino: PinoLogger,
@@ -146,7 +185,7 @@ export class IGDBService {
       let checkpoint = 0;
 
       if (!options?.skipCheckpoint) {
-        await this.markGamesBackfillStarted();
+        await this.markBackfillStarted("games");
       }
 
       let alreadyFilledCount = 0;
@@ -234,13 +273,13 @@ export class IGDBService {
 
           if (!options?.skipCheckpoint) {
             checkpoint = getMaxUpdatedAt(items, checkpoint);
-            await this.setGamesBackfillProgress(checkpoint);
+            await this.setBackfillProgress("games", checkpoint);
           }
         },
       });
 
       if (!options?.skipCheckpoint) {
-        await this.markGamesBackfillCompleted(checkpoint);
+        await this.markBackfillCompleted("games", checkpoint);
       }
 
       this.logger.log(
@@ -268,7 +307,7 @@ export class IGDBService {
     try {
       const token = await this.getIgdbToken();
 
-      const state = await this.getGamesSyncState();
+      const state = await this.getBackfillState("games");
       if (!state?.backfillCompleted) {
         throw new BadRequestException(
           "IGDB games backfill must complete before sync can run"
@@ -1022,7 +1061,10 @@ export class IGDBService {
         splitscreenOnline: mode.splitscreenonline,
       })),
       ageRatings: (igdbGame.age_ratings || [])
-        .filter((rating) => rating.organization?.name && rating.rating_category?.rating)
+        .filter(
+          (rating) =>
+            rating.organization?.name && rating.rating_category?.rating
+        )
         .map((rating) => ({
           organization: rating.organization.name,
           rating: rating.rating_category.rating,
@@ -1145,6 +1187,553 @@ export class IGDBService {
     return slug;
   }
 
+  async backfillCharactersFromIgdb(options?: {
+    limit?: number;
+    delayMs?: number;
+    concurrency?: number;
+    parseImages?: boolean;
+    field?: string;
+    forceParse?: boolean;
+    skipCheckpoint?: boolean;
+    maxItems?: number;
+  }) {
+    try {
+      const token = await this.getIgdbToken();
+
+      let processedCount = 0;
+      let seenCount = 0;
+      let checkpoint = 0;
+
+      const isCheckpointed = !options?.skipCheckpoint && !options?.maxItems;
+
+      if (isCheckpointed) {
+        await this.markBackfillStarted("characters");
+      }
+
+      await igdbParser<IGDBExpandedCharacter>({
+        token,
+        action: "characters",
+        options: {
+          limit: options?.limit || DEFAULT_IGDB_SYNC_LIMIT,
+          delayMs: options?.delayMs ?? DEFAULT_IGDB_SYNC_DELAY_MS,
+          sort: "updated_at asc",
+          fields: CHARACTER_QUERY_FIELDS,
+          isCollectItems: false,
+        },
+        parsingCallback: async (allItems, page) => {
+          const items = options?.maxItems
+            ? allItems.slice(0, Math.max(options.maxItems - seenCount, 0))
+            : allItems;
+          seenCount += items.length;
+
+          const existingCharactersByIgdbId =
+            await this.getExistingCharactersByIgdbId(items, options?.field);
+
+          const itemsToProcess =
+            options?.field && !options?.forceParse
+              ? items.filter((igdbCharacter) => {
+                  const existingCharacter = existingCharactersByIgdbId.get(
+                    igdbCharacter.id
+                  );
+                  return (
+                    !existingCharacter ||
+                    isFieldValueEmpty(
+                      (existingCharacter as unknown as Record<string, unknown>)[
+                        options.field
+                      ]
+                    )
+                  );
+                })
+              : items;
+
+          await runWithConcurrency(
+            itemsToProcess,
+            options?.concurrency || DEFAULT_GAMES_SYNC_CONCURRENCY,
+            async (igdbCharacter) => {
+              try {
+                await this.upsertCharacterFromIgdb(
+                  igdbCharacter,
+                  existingCharactersByIgdbId.get(igdbCharacter.id),
+                  {
+                    parseImages: options?.parseImages ?? false,
+                    field: options?.field,
+                    forceParse: options?.forceParse,
+                  }
+                );
+                processedCount++;
+              } catch (e) {
+                this.logger.error(
+                  e,
+                  `Failed to upsert character from IGDB during backfill: ${igdbCharacter.id}`
+                );
+              }
+            }
+          );
+
+          this.logger.log(
+            `IGDB characters backfill progress: page ${page.page}, processed ${processedCount}/${options?.maxItems || page.total}`
+          );
+
+          if (isCheckpointed) {
+            checkpoint = getMaxUpdatedAt(items, checkpoint);
+            await this.setBackfillProgress("characters", checkpoint);
+          }
+
+          if (options?.maxItems && seenCount >= options.maxItems) return false;
+        },
+      });
+
+      if (isCheckpointed) {
+        await this.markBackfillCompleted("characters", checkpoint);
+      }
+
+      this.logger.log(
+        `IGDB characters backfill finished, processed ${processedCount} characters`
+      );
+
+      return {
+        processedCount,
+        lastUpdatedAt: checkpoint,
+      };
+    } catch (err) {
+      this.logger.error(err, "Failed to backfill characters from IGDB");
+      throw err;
+    }
+  }
+
+  async syncCharactersFromIgdb(options?: {
+    limit?: number;
+    delayMs?: number;
+    concurrency?: number;
+    parseImages?: boolean;
+    field?: string;
+    forceParse?: boolean;
+  }) {
+    try {
+      const token = await this.getIgdbToken();
+
+      const state = await this.getBackfillState("characters");
+      if (!state?.backfillCompleted) {
+        throw new BadRequestException(
+          "IGDB characters backfill must complete before sync can run"
+        );
+      }
+
+      let checkpoint = await this.getSyncCheckpoint("characters");
+      let changedCount = 0;
+
+      await igdbParser<IGDBExpandedCharacter>({
+        token,
+        action: "characters",
+        options: {
+          limit: options?.limit || DEFAULT_IGDB_SYNC_LIMIT,
+          delayMs: options?.delayMs ?? DEFAULT_IGDB_SYNC_DELAY_MS,
+          where: `updated_at > ${checkpoint}`,
+          sort: "updated_at asc",
+          fields: CHARACTER_QUERY_FIELDS,
+          isCollectItems: false,
+        },
+        parsingCallback: async (items) => {
+          const existingCharactersByIgdbId =
+            await this.getExistingCharactersByIgdbId(items, options?.field);
+
+          await runWithConcurrency(
+            items,
+            options?.concurrency || DEFAULT_GAMES_SYNC_CONCURRENCY,
+            async (igdbCharacter) => {
+              try {
+                await this.upsertCharacterFromIgdb(
+                  igdbCharacter,
+                  existingCharactersByIgdbId.get(igdbCharacter.id),
+                  {
+                    parseImages: options?.parseImages ?? true,
+                    field: options?.field,
+                    forceParse: options?.forceParse,
+                  }
+                );
+                changedCount++;
+              } catch (e) {
+                this.logger.error(
+                  e,
+                  `Failed to upsert character from IGDB: ${igdbCharacter.id}`
+                );
+              }
+            }
+          );
+
+          checkpoint = getMaxUpdatedAt(items, checkpoint);
+          await this.setSyncCheckpoint("characters", checkpoint);
+        },
+      });
+
+      return { changedCount, lastUpdatedAt: checkpoint };
+    } catch (err) {
+      this.logger.error(err, "Failed to sync characters from IGDB");
+      throw err;
+    }
+  }
+
+  async parseCharacterFromIgdb(
+    identifier: { igdbId?: number; slug?: string },
+    options?: { parseImages?: boolean; field?: string; forceParse?: boolean }
+  ) {
+    try {
+      if (!identifier.igdbId && !identifier.slug) {
+        throw new BadRequestException("Either igdbId or slug must be provided");
+      }
+
+      const token = await this.getIgdbToken();
+
+      const { data } = await igdbAgent<IGDBExpandedCharacter[]>(
+        getLink("characters"),
+        token,
+        buildIgdbQueryParams(CHARACTER_QUERY_FIELDS, {
+          where: identifier.igdbId
+            ? `id = ${identifier.igdbId}`
+            : `slug = "${identifier.slug}"`,
+          limit: 1,
+        })
+      );
+
+      const igdbCharacter = data?.[0];
+
+      if (!igdbCharacter) {
+        throw new NotFoundException(
+          `IGDB character not found: ${identifier.igdbId ?? identifier.slug}`
+        );
+      }
+
+      const existingCharacter = await this.Characters.findOne({
+        "igdb.characterId": igdbCharacter.id,
+      })
+        .select("_id slug createdAt mugShot igdb")
+        .lean();
+
+      return this.upsertCharacterFromIgdb(igdbCharacter, existingCharacter, {
+        parseImages: options?.parseImages ?? true,
+        field: options?.field,
+        forceParse: options?.forceParse,
+      });
+    } catch (err) {
+      this.logger.error(
+        err,
+        `Failed to parse character from IGDB: ${identifier.igdbId ?? identifier.slug}`
+      );
+      throw err;
+    }
+  }
+
+  async linkGameCharacters() {
+    try {
+      const characters = await this.Characters.find({
+        "igdb.characterId": { $exists: true },
+      })
+        .select("_id gameIds igdb.games")
+        .lean();
+
+      const games = await this.Games.find({
+        "igdb.gameId": { $exists: true },
+      })
+        .select("_id characters igdb.gameId")
+        .lean();
+
+      const gameIdByIgdbId = new Map(
+        games.map((game) => [game.igdb.gameId, game._id])
+      );
+      const characterIdsByGameId = new Map<string, mongoose.Types.ObjectId[]>();
+
+      const now = new Date().toISOString();
+      const characterOps = [];
+
+      for (const character of characters) {
+        const resolved = (character.igdb?.games || [])
+          .map((igdbGameId) => gameIdByIgdbId.get(igdbGameId))
+          .filter((id): id is mongoose.Types.ObjectId => !!id);
+
+        for (const gameId of resolved) {
+          const key = gameId.toString();
+          const bucket = characterIdsByGameId.get(key);
+
+          if (bucket) {
+            bucket.push(character._id);
+          } else {
+            characterIdsByGameId.set(key, [character._id]);
+          }
+        }
+
+        if (!isSameObjectIdList(character.gameIds, resolved)) {
+          characterOps.push({
+            updateOne: {
+              filter: { _id: character._id },
+              update: { $set: { gameIds: resolved, updatedAt: now } },
+            },
+          });
+        }
+      }
+
+      const gameOps = [];
+
+      for (const game of games) {
+        const resolved = characterIdsByGameId.get(game._id.toString()) || [];
+
+        if (isSameObjectIdList(game.characters, resolved)) continue;
+
+        gameOps.push({
+          updateOne: {
+            filter: { _id: game._id },
+            update: { $set: { characters: resolved, updatedAt: now } },
+          },
+        });
+      }
+
+      this.logger.log(
+        `Linking game characters: ${characterOps.length}/${characters.length} characters and ${gameOps.length}/${games.length} games to update`
+      );
+
+      for (
+        let i = 0;
+        i < characterOps.length;
+        i += CHARACTER_GAMES_LINK_BATCH_SIZE
+      ) {
+        await this.Characters.bulkWrite(
+          characterOps.slice(i, i + CHARACTER_GAMES_LINK_BATCH_SIZE)
+        );
+      }
+
+      for (
+        let i = 0;
+        i < gameOps.length;
+        i += CHARACTER_GAMES_LINK_BATCH_SIZE
+      ) {
+        await this.Games.bulkWrite(
+          gameOps.slice(i, i + CHARACTER_GAMES_LINK_BATCH_SIZE)
+        );
+      }
+
+      this.logger.log(
+        `Linked ${characterOps.length} character(s) to ${gameOps.length} game(s)`
+      );
+
+      return {
+        charactersMatched: characters.length,
+        charactersUpdated: characterOps.length,
+        gamesMatched: games.length,
+        gamesUpdated: gameOps.length,
+      };
+    } catch (err) {
+      this.logger.error(err, "Failed to link game characters");
+      throw err;
+    }
+  }
+
+  @Cron(IGDB_CHARACTERS_SYNC_CRON, IGDB_CHARACTERS_SYNC_CRON_OPTIONS)
+  async syncUpdatedCharactersCron() {
+    return runCronExclusive(() =>
+      runInCronLogContext(this.pino, "igdb-characters-sync", () =>
+        this.metrics.trackSync("igdb-characters-sync", () =>
+          this.runSyncUpdatedCharactersCron()
+        )
+      )
+    );
+  }
+
+  @Cron(
+    IGDB_CHARACTERS_LINK_GAMES_CRON,
+    IGDB_CHARACTERS_LINK_GAMES_CRON_OPTIONS
+  )
+  async linkGameCharactersCron() {
+    return runCronExclusive(() =>
+      runInCronLogContext(this.pino, "igdb-characters-link-games", () =>
+        this.metrics.trackSync("igdb-characters-link-games", () =>
+          this.linkGameCharacters()
+        )
+      )
+    );
+  }
+
+  private async runSyncUpdatedCharactersCron() {
+    if (this.isSyncUpdatedCharactersCronRunning) {
+      this.logger.warn("IGDB characters sync cron is already running");
+      return;
+    }
+
+    this.isSyncUpdatedCharactersCronRunning = true;
+
+    try {
+      const result = await this.syncCharactersFromIgdb({
+        limit: IGDB_CHARACTERS_SYNC_UPDATED_LIMIT,
+        delayMs: IGDB_CHARACTERS_SYNC_UPDATED_DELAY_MS,
+        concurrency: IGDB_CHARACTERS_SYNC_TO_CHARACTERS_CONCURRENCY,
+      });
+
+      if (!result?.changedCount) {
+        this.logger.log("IGDB characters sync cron finished without changes");
+        return result;
+      }
+
+      this.logger.log(
+        `IGDB characters sync cron finished with ${result.changedCount} changes`
+      );
+
+      return result;
+    } catch (err) {
+      this.logger.error(err, "Failed to run IGDB characters sync cron");
+      throw err;
+    } finally {
+      this.isSyncUpdatedCharactersCronRunning = false;
+    }
+  }
+
+  private async getExistingCharactersByIgdbId(
+    items: IGDBExpandedCharacter[],
+    field?: string
+  ) {
+    const existingCharacters = await this.Characters.find({
+      "igdb.characterId": { $in: items.map((item) => item.id) },
+    })
+      .select("_id slug createdAt mugShot igdb" + (field ? ` ${field}` : ""))
+      .lean();
+
+    return new Map(
+      existingCharacters.map((character) => [
+        character.igdb.characterId,
+        character,
+      ])
+    );
+  }
+
+  private async parseCharacterMugShotFromIgdb(
+    igdbCharacter: IGDBExpandedCharacter,
+    existingCharacter?: Pick<CharacterDocument, "mugShot" | "igdb">,
+    options?: { forceParse?: boolean }
+  ) {
+    if (!igdbCharacter.mug_shot?.url) return;
+
+    const isUnchanged =
+      !!existingCharacter?.mugShot &&
+      existingCharacter.igdb?.mug_shot === igdbCharacter.mug_shot.id;
+
+    if (isUnchanged && !options?.forceParse) return;
+
+    const key = String(igdbCharacter.id);
+
+    try {
+      await this.clearExistingImages(CHARACTERS_BUCKET, key);
+
+      const [link] = await this.sendArrayToS3(CHARACTERS_BUCKET, key, [
+        getImageLink(igdbCharacter.mug_shot.url, "cover_big", 2),
+      ]);
+
+      if (!link) return;
+
+      await this.Characters.updateOne(
+        { "igdb.characterId": igdbCharacter.id },
+        { $set: { mugShot: link } }
+      );
+    } catch (e) {
+      this.logger.error(
+        e,
+        `Failed to parse mug shot for character: ${igdbCharacter.slug}`
+      );
+    }
+  }
+
+  private async upsertCharacterFromIgdb(
+    igdbCharacter: IGDBExpandedCharacter,
+    existingCharacter?: Pick<
+      CharacterDocument,
+      "_id" | "slug" | "createdAt" | "mugShot" | "igdb"
+    >,
+    options?: { parseImages?: boolean; field?: string; forceParse?: boolean }
+  ) {
+    if (
+      options?.field &&
+      !ALL_UPDATABLE_CHARACTER_FIELDS.includes(
+        options.field as UpdatableCharacterField
+      )
+    ) {
+      throw new BadRequestException(
+        `Unknown field: ${options.field}. Allowed: ${ALL_UPDATABLE_CHARACTER_FIELDS.join(", ")}`
+      );
+    }
+
+    if (options?.field && !existingCharacter) {
+      throw new NotFoundException(
+        `Cannot update field "${options.field}": character not found in characters yet`
+      );
+    }
+
+    if (options?.field === CHARACTER_MUG_SHOT_FIELD) {
+      await this.parseCharacterMugShotFromIgdb(
+        igdbCharacter,
+        existingCharacter,
+        {
+          forceParse: options.forceParse,
+        }
+      );
+
+      this.logger.log(
+        `Parsed field "${options.field}" for character from IGDB: ${igdbCharacter.slug}`
+      );
+
+      return igdbCharacter.slug + " parsed";
+    }
+
+    const now = new Date().toISOString();
+
+    const update = {
+      name: igdbCharacter.name,
+      slug: igdbCharacter.slug,
+      akas: igdbCharacter.akas || [],
+      description: igdbCharacter.description ?? null,
+      gender: igdbCharacter.character_gender?.name ?? null,
+      species: igdbCharacter.character_species?.name ?? null,
+      countryName: igdbCharacter.country_name ?? null,
+      igdb: {
+        characterId: igdbCharacter.id,
+        games: igdbCharacter.games || [],
+        mug_shot: igdbCharacter.mug_shot?.id ?? null,
+        character_gender: igdbCharacter.character_gender?.id ?? null,
+        character_species: igdbCharacter.character_species?.id ?? null,
+        url: igdbCharacter.url ?? null,
+        checksum: igdbCharacter.checksum ?? null,
+      },
+      createdAt: existingCharacter?.createdAt || now,
+      updatedAt: now,
+    };
+
+    const setPayload = options?.field
+      ? {
+          [options.field]: update[options.field as keyof typeof update],
+          updatedAt: update.updatedAt,
+        }
+      : update;
+
+    await this.Characters.updateOne(
+      { "igdb.characterId": igdbCharacter.id },
+      { $set: setPayload },
+      { upsert: !options?.field }
+    );
+
+    if (options?.parseImages) {
+      await this.parseCharacterMugShotFromIgdb(
+        igdbCharacter,
+        existingCharacter,
+        {
+          forceParse: options.forceParse,
+        }
+      );
+    }
+
+    this.logger.log(
+      options?.field
+        ? `Parsed field "${options.field}" for character from IGDB: ${update.slug}`
+        : `Parsed character from IGDB: ${update.slug}`
+    );
+
+    return update.slug + " parsed";
+  }
+
   private async getSyncCheckpoint(type: ParserType) {
     const state = await this.SyncStateModel.findOne({
       parserType: type,
@@ -1153,17 +1742,17 @@ export class IGDBService {
     return state?.lastUpdatedAt || 0;
   }
 
-  private async getGamesSyncState() {
+  private async getBackfillState(type: ParserType) {
     return this.SyncStateModel.findOne({
-      parserType: "games",
+      parserType: type,
     }).lean();
   }
 
-  private async markGamesBackfillStarted() {
+  private async markBackfillStarted(type: ParserType) {
     const now = new Date().toISOString();
 
     return this.SyncStateModel.findOneAndUpdate(
-      { parserType: "games" },
+      { parserType: type },
       {
         $set: {
           backfillCompleted: false,
@@ -1180,11 +1769,14 @@ export class IGDBService {
     );
   }
 
-  private async setGamesBackfillProgress(backfillUpdatedAt: number) {
+  private async setBackfillProgress(
+    type: ParserType,
+    backfillUpdatedAt: number
+  ) {
     const now = new Date().toISOString();
 
     return this.SyncStateModel.findOneAndUpdate(
-      { parserType: "games" },
+      { parserType: type },
       {
         $set: {
           backfillUpdatedAt,
@@ -1196,11 +1788,11 @@ export class IGDBService {
     );
   }
 
-  private async markGamesBackfillCompleted(lastUpdatedAt: number) {
+  private async markBackfillCompleted(type: ParserType, lastUpdatedAt: number) {
     const now = new Date().toISOString();
 
     return this.SyncStateModel.findOneAndUpdate(
-      { parserType: "games" },
+      { parserType: type },
       {
         $set: {
           backfillCompleted: true,
@@ -1334,4 +1926,20 @@ interface IGDBExpandedGame {
   remakes?: number[];
   remasters?: number[];
   similar_games?: number[];
+}
+
+interface IGDBExpandedCharacter {
+  id: number;
+  name: string;
+  slug: string;
+  akas?: string[];
+  description?: string;
+  country_name?: string;
+  url?: string;
+  checksum?: string;
+  updated_at?: number;
+  games?: number[];
+  mug_shot?: { id: number; url: string };
+  character_gender?: { id: number; name: string };
+  character_species?: { id: number; name: string };
 }

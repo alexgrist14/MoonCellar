@@ -142,6 +142,41 @@ const UPDATABLE_GAME_FIELDS = [
   "igdb",
 ] as const;
 
+const CHARACTER_QUERY_FIELDS = [
+  "name",
+  "slug",
+  "akas",
+  "description",
+  "country_name",
+  "url",
+  "checksum",
+  "updated_at",
+  "games",
+  "mug_shot.id",
+  "mug_shot.url",
+  "character_gender.id",
+  "character_gender.name",
+  "character_species.id",
+  "character_species.name",
+].join(", ");
+
+const UPDATABLE_CHARACTER_FIELDS = [
+  "name",
+  "slug",
+  "akas",
+  "description",
+  "gender",
+  "species",
+  "countryName",
+  "igdb",
+] as const;
+
+const CHARACTER_MUG_SHOT_FIELD = "mugShot";
+
+const CHARACTERS_BUCKET = "mooncellar-characters";
+
+const CHARACTER_GAMES_LINK_BATCH_SIZE = 500;
+
 const UPDATABLE_PLATFORM_FIELDS = [
   "name",
   "slug",
@@ -152,6 +187,11 @@ const UPDATABLE_PLATFORM_FIELDS = [
 ] as const;
 
 export {
+  CHARACTER_GAMES_LINK_BATCH_SIZE,
+  CHARACTER_MUG_SHOT_FIELD,
+  CHARACTER_QUERY_FIELDS,
+  CHARACTERS_BUCKET,
+  UPDATABLE_CHARACTER_FIELDS,
   DEFAULT_IGDB_SYNC_LIMIT,
   DEFAULT_IGDB_SYNC_DELAY_MS,
   DEFAULT_GAMES_SYNC_CONCURRENCY,
