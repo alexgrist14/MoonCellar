@@ -3,8 +3,7 @@
 import { FC } from "react";
 import styles from "./GamePage.module.scss";
 import { BGImage } from "../../shared/ui/BGImage";
-import { IGameResponse } from "../../shared/lib/schemas/games.schema";
-import { IGameStats } from "../../shared/lib/schemas/game-stats.schema";
+import { IGameResponse, IGameStats } from "@mooncellar/schemas";
 import { useHideAdult } from "../../shared/hooks/useHideAdult";
 import { isAdultGame } from "../../shared/utils/adult.utils";
 import { GameAdminControls } from "../../features/game/GameAdminControls";

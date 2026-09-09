@@ -18,7 +18,7 @@ import { GamesListMenu } from "../../widgets/main";
 import { SectionTitle } from "../../shared/ui/SectionTitle";
 import { useGamesQuery } from "../../entities/game/api/game.queries";
 import { gameQueryKeys } from "../../entities/game/api/game.query-keys";
-import { IGetGamesRequest } from "../../shared/lib/schemas/games.schema";
+import { IGetGamesRequest } from "@mooncellar/schemas";
 import { IGamesListResponse } from "../../shared/types/games.type";
 
 interface IGamesPageProps {

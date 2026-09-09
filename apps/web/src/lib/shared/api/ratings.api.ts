@@ -1,12 +1,11 @@
 import { API_URL } from "../constants";
-import {} from "../lib/schemas/playthroughs.schema";
 import {
   IAddUserRatingRequest,
   IGetUserRatingsRequest,
   IRemoveUserRatingRequest,
   IUpdateUserRatingRequest,
   IUserRating,
-} from "../lib/schemas/user-ratings.schema";
+} from "@mooncellar/schemas";
 import agent from "./agent.api";
 
 const RATINGS_API = `${API_URL}/ratings`;

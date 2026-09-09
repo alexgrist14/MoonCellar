@@ -6,7 +6,7 @@ import { Box } from "@/src/lib/shared/ui/Box";
 import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
 import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { IGameFollowingsStatusItem } from "@/src/lib/shared/lib/schemas/game-followings-status.schema";
+import { IGameFollowingsStatusItem } from "@mooncellar/schemas";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import styles from "./GameFriendsStatus.module.scss";
 import { useGameFollowingsStatusQuery } from "@/src/lib/entities/game/api/game.queries";

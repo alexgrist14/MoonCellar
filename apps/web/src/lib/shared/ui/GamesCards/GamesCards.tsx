@@ -1,7 +1,7 @@
 import { CSSProperties, FC, ReactNode } from "react";
 import classNames from "classnames";
 import styles from "./GamesCards.module.scss";
-import { IGameResponse } from "../../lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 import { GameCard } from "../GameCard";
 import { Scrollbar } from "../Scrollbar";
 

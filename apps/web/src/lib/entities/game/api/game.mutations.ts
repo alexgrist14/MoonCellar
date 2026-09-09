@@ -3,7 +3,7 @@ import {
   IAddGameRequest,
   IGameResponse,
   IUpdateGameRequest,
-} from "@/src/lib/shared/lib/schemas/games.schema";
+} from "@mooncellar/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { gameQueryKeys } from "./game.query-keys";
 

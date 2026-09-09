@@ -2,8 +2,7 @@ import { FC, useLayoutEffect, useRef, useState } from "react";
 import styles from "./GameCardInfo.module.scss";
 import classNames from "classnames";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
-import { IPlaythroughMinimal } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
-import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
+import { IPlaythroughMinimal, IGameResponse } from "@mooncellar/schemas";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { GameControls } from "@/src/lib/shared/ui/GameControls";
 

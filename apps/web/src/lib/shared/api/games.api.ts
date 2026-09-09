@@ -12,12 +12,10 @@ import {
   IGetRandomGameSlugResponse,
   IUpcomingReleaseGroup,
   IUpdateGameRequest,
-} from "../lib/schemas/games.schema";
-import { IGetGameFollowingsStatusResponse } from "../lib/schemas/game-followings-status.schema";
-import {
+  IGetGameFollowingsStatusResponse,
   IGameStats,
   IGetGamesStatsResponse,
-} from "../lib/schemas/game-stats.schema";
+} from "@mooncellar/schemas";
 import agent from "./agent.api";
 import { filesAPI } from "./files.api";
 

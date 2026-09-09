@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { IPlaythrough } from "../lib/schemas/playthroughs.schema";
+import { IPlaythrough } from "@mooncellar/schemas";
 
 type IState = {
   playthroughs?: IPlaythrough[];

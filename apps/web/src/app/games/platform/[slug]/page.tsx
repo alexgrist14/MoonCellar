@@ -13,7 +13,7 @@ import {
   getBreadcrumbJsonLd,
   getItemListJsonLd,
 } from "@/src/lib/shared/utils/json-ld.utils";
-import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 
 export const revalidate = 3600;
 

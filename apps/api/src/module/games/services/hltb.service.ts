@@ -12,7 +12,7 @@ import { sleep } from "src/shared/utils";
 import { runInCronLogContext } from "src/shared/cron-logging";
 import { runCronExclusive } from "src/shared/cron-mutex";
 import { BusinessMetricsService } from "src/module/metrics/business-metrics.service";
-import { IHltbField } from "src/shared/zod/schemas/games.schema";
+import { IHltbField } from "@mooncellar/schemas";
 import { Game, GameDocument } from "../schemas/game.schema";
 import { Platform, PlatformDocument } from "../schemas/platform.schema";
 import {

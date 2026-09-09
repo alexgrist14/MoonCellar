@@ -4,7 +4,7 @@ import {
   GetCharacterBySlugSchema,
   GetCharactersRequestSchema,
   GetCharactersResponseSchema,
-} from "../schemas/characters.schema";
+} from "@mooncellar/schemas";
 
 export class GetCharactersDto extends createZodDto(
   GetCharactersRequestSchema

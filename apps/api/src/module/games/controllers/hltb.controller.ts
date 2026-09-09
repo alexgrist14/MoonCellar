@@ -18,7 +18,7 @@ import {
 } from "@nestjs/swagger";
 import { RolesGuard } from "../../roles/roles.guard";
 import { Roles } from "../../roles/roles.decorator";
-import { RolesEnum } from "src/shared/zod/schemas/role.schema";
+import { RolesEnum } from "@mooncellar/schemas";
 import { HltbService } from "../services/hltb.service";
 
 @ApiTags("HLTB")

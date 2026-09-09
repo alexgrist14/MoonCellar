@@ -2,7 +2,7 @@ import { FC } from "react";
 import styles from "./GamesList.module.scss";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { GameCard } from "@/src/lib/shared/ui/GameCard";
-import { IGameResponse } from "../../lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 
 interface IGamesListProps {
   games: IGameResponse[];

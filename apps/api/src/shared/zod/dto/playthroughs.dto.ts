@@ -7,7 +7,7 @@ import {
   PlaythroughsResponseSchema,
   SavePlaythroughRequestSchema,
   UpdatePlaythroughRequestSchema,
-} from "../schemas/playthroughs.schema";
+} from "@mooncellar/schemas";
 
 export class GetPlaythroughsRequestDto extends createZodDto(
   GetPlaythroughsRequestSchema

@@ -2,7 +2,7 @@
 
 import { FC } from "react";
 import styles from "./ReleaseRail.module.scss";
-import { IGameResponse } from "../../../shared/lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 import { GameCard } from "../../../shared/ui/GameCard";
 import { Scrollbar } from "../../../shared/ui/Scrollbar";
 

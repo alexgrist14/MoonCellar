@@ -6,7 +6,7 @@ import { UserLogs } from "../user/schemas/user-logs.schema";
 import { Rating } from "../user/schemas/user-ratings.schema";
 import { Playthrough } from "../games/schemas/playthroughs.schema";
 import { Game, GameDocument } from "../games/schemas/game.schema";
-import type { IRole } from "src/shared/zod/schemas/role.schema";
+import { type IRole } from "@mooncellar/schemas";
 
 @Injectable()
 export class AdminService {

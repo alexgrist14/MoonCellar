@@ -19,7 +19,7 @@ import { settingsSchema, SettingsSchema } from "./settings.schema";
 import {
   DEFAULT_BG_OPACITY,
   IUpdateUserSettingsRequest,
-} from "@/src/lib/shared/lib/schemas/user.schema";
+} from "@mooncellar/schemas";
 
 interface SettingsProps {}
 

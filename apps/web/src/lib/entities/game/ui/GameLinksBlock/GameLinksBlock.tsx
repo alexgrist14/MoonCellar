@@ -3,7 +3,7 @@ import classNames from "classnames";
 import styles from "./GameLinksBlock.module.scss";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Chip } from "@/src/lib/shared/ui/Chip";
-import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 import { getGameLinks } from "@/src/lib/shared/utils/links.utils";
 
 interface IGameLinksBlockProps {

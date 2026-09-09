@@ -1,4 +1,4 @@
-import { IGetGamesRequest } from "../../../shared/lib/schemas/games.schema";
+import { IGetGamesRequest } from "@mooncellar/schemas";
 
 export const gameQueryKeys = {
   all: ["games"] as const,

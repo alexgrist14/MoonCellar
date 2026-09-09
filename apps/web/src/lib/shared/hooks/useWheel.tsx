@@ -1,6 +1,6 @@
 import { useCallback, useRef } from "react";
 import { createImage, drawCoverImage } from "../utils/image.utils";
-import { IGameResponse } from "../lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 import { useStatesStore } from "../store/states.store";
 import { useGames } from "./useGames";
 import { useHideAdult } from "./useHideAdult";

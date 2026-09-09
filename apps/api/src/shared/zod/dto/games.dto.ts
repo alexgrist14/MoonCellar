@@ -10,7 +10,7 @@ import {
   GetGameSlugsResponseSchema,
   GetRandomGameSlugResponseSchema,
   UpdateGameRequestSchema,
-} from "../schemas/games.schema";
+} from "@mooncellar/schemas";
 
 export class GetGameByIdDto extends createZodDto(GetGameByIdSchema) {}
 export class GetGameBySlugDto extends createZodDto(GetGameBySlugSchema) {}

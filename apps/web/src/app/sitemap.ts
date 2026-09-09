@@ -3,8 +3,10 @@ import { unstable_cache } from "next/cache";
 import { gamesApi, userAPI } from "../lib/shared/api";
 import { platformsAPI } from "../lib/shared/api/platforms.api";
 import { toSlug } from "../lib/shared/utils/slug.utils";
-import { IGetGameSlugsResponse } from "../lib/shared/lib/schemas/games.schema";
-import { IGetUserLoginsResponse } from "../lib/shared/lib/schemas/user.schema";
+import {
+  IGetGameSlugsResponse,
+  IGetUserLoginsResponse,
+} from "@mooncellar/schemas";
 import { FRONT_URL, links } from "../lib/shared/constants";
 
 export const dynamic = "force-dynamic";

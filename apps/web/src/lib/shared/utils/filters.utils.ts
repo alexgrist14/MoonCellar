@@ -1,6 +1,6 @@
 import queryString from "query-string";
 import { IGameFiltersQuery } from "../types/filters.type";
-import { IGetGamesRequest } from "../lib/schemas/games.schema";
+import { IGetGamesRequest } from "@mooncellar/schemas";
 
 export const parseQueryFilters = (pathWithQuery: string): IGetGamesRequest => {
   const { query } = queryString.parseUrl(pathWithQuery, {

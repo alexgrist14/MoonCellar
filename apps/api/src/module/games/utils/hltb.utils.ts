@@ -1,4 +1,4 @@
-import { IHltbField } from "src/shared/zod/schemas/games.schema";
+import { IHltbField } from "@mooncellar/schemas";
 import {
   HLTB_NOT_FOUND_RETRY_DAYS,
   HLTB_STRONG_TITLE_SIMILARITY,

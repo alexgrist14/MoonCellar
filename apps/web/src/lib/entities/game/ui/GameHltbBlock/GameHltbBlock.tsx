@@ -1,7 +1,7 @@
 import { FC, useMemo } from "react";
 import styles from "./GameHltbBlock.module.scss";
 import { Box } from "@/src/lib/shared/ui/Box";
-import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 import { getHltbTiles } from "@/src/lib/shared/utils/hltb.utils";
 
 interface IGameHltbBlockProps {

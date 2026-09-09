@@ -1,5 +1,5 @@
 import { API_URL } from "../constants";
-import { IHltbField } from "../lib/schemas/games.schema";
+import { IHltbField } from "@mooncellar/schemas";
 import agent from "./agent.api";
 
 const HLTB_URL = `${API_URL}/hltb`;

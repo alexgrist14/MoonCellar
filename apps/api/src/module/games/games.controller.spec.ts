@@ -1,5 +1,5 @@
 import { ROLES_KEY } from "../roles/roles.decorator";
-import { RolesEnum } from "src/shared/zod/schemas/role.schema";
+import { RolesEnum } from "@mooncellar/schemas";
 import { GamesController } from "./controllers/games.controller";
 
 const MUTATING_HANDLERS = [

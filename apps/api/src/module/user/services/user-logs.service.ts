@@ -7,7 +7,7 @@ import {
   ILog,
   IRemoveUserLogRequest,
   IUserLog,
-} from "src/shared/zod/schemas/user-logs.schema";
+} from "@mooncellar/schemas";
 import { UserLogs } from "../schemas/user-logs.schema";
 
 export type ILogSegment = "added" | "updated" | "removed" | "rating";

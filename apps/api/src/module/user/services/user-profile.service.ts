@@ -18,7 +18,7 @@ import {
   IUpdateUserEmailRequest,
   IUpdateUserPasswordRequest,
   IUpdateUserSettingsRequest,
-} from "src/shared/zod/schemas/user.schema";
+} from "@mooncellar/schemas";
 import { FileService } from "./file-upload.service";
 
 @Injectable()

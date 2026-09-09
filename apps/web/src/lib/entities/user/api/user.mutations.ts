@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { userAPI } from "@/src/lib/shared/api";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { IUserFilter, IUserPreset } from "@/src/lib/shared/types/user.type";
-import { IUpdateUserSettingsRequest } from "@/src/lib/shared/lib/schemas/user.schema";
+import { IUpdateUserSettingsRequest } from "@mooncellar/schemas";
 import { userQueryKeys } from "./user.query-keys";
 
 interface IUpdateProfileRequest {

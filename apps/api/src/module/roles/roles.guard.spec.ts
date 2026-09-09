@@ -1,7 +1,7 @@
 import { ExecutionContext } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { RolesGuard } from "./roles.guard";
-import { RolesEnum } from "src/shared/zod/schemas/role.schema";
+import { RolesEnum } from "@mooncellar/schemas";
 
 function ctx(roles?: string[]): ExecutionContext {
   return {

@@ -11,7 +11,7 @@ import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import classNames from "classnames";
 import { SvgPen, SvgSettings, SvgSort } from "@/src/lib/shared/ui/svg";
 import { Separator } from "@/src/lib/shared/ui/Separator";
-import { IPlaythrough } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
+import { IPlaythrough } from "@mooncellar/schemas";
 import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
 import { useExpandStore } from "@/src/lib/shared/store/expand.store";
 import { SortType } from "@/src/lib/shared/types/sort.type";

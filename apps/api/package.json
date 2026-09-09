@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@mooncellar/schemas": "workspace:*",
     "@aws-sdk/client-s3": "^3.1090.0",
     "@modelcontextprotocol/sdk": "^1.30.0",
     "@nestjs/axios": "^4.0.1",

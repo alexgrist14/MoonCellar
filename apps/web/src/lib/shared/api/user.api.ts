@@ -3,7 +3,7 @@ import { IUser } from "../types/auth.type";
 import {
   IGetUserLoginsResponse,
   IUpdateUserSettingsRequest,
-} from "../lib/schemas/user.schema";
+} from "@mooncellar/schemas";
 import {
   CategoriesType,
   IFollowers,

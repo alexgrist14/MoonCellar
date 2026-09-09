@@ -7,7 +7,7 @@ import {
   UpdateSettingsSchema,
   UpdateUserEmailSchema,
   UpdateUserPasswordSchema,
-} from "../schemas/user.schema";
+} from "@mooncellar/schemas";
 
 export class GetUserByStringDto extends createZodDto(GetUserByStringSchema) {}
 export class GetUserByIdDto extends createZodDto(GetUserByIdSchema) {}

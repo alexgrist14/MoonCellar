@@ -1,4 +1,4 @@
-import { IGameResponse } from "../lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 
 export const ADULT_THEME_NAME = "Erotic";
 

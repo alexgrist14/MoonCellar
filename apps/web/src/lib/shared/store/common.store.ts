@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { IPlatform } from "../lib/schemas/platforms.schema";
+import { IPlatform } from "@mooncellar/schemas";
 
 export type IExpandPosition = "left" | "right" | "bottom-left" | "bottom-right";
 export type IScrollPosition =

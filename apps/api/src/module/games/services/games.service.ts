@@ -16,15 +16,11 @@ import {
   IGetGamesRequest,
   IGetGameSlugsRequest,
   IUpdateGameRequest,
-} from "src/shared/zod/schemas/games.schema";
-import {
   IGetGameFollowingsStatusRequest,
   IGetGameFollowingsStatusResponse,
-} from "src/shared/zod/schemas/game-followings-status.schema";
-import {
   IGameStats,
   IGetGamesStatsResponse,
-} from "src/shared/zod/schemas/game-stats.schema";
+} from "@mooncellar/schemas";
 import { Game, GameDocument } from "../schemas/game.schema";
 import {
   IPlaythroughDocument,

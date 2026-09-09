@@ -3,7 +3,7 @@
 import { FC } from "react";
 import classNames from "classnames";
 import styles from "./GameStatsCounters.module.scss";
-import { IGameStats } from "@/src/lib/shared/lib/schemas/game-stats.schema";
+import { IGameStats } from "@mooncellar/schemas";
 import { useGameStatsQuery } from "@/src/lib/entities/game/api/game.queries";
 
 interface IGameStatsCountersProps {

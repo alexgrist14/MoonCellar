@@ -5,8 +5,7 @@ import Image from "next/image";
 import { useDebouncedCallback } from "use-debounce";
 import { useSettingsStore } from "../../store/settings.store";
 import { useAuthStore } from "../../store/auth.store";
-import { IGameResponse } from "../../lib/schemas/games.schema";
-import { DEFAULT_BG_OPACITY } from "../../lib/schemas/user.schema";
+import { IGameResponse, DEFAULT_BG_OPACITY } from "@mooncellar/schemas";
 import { useHideAdult } from "../../hooks/useHideAdult";
 import { isAdultGame } from "../../utils/adult.utils";
 

@@ -12,7 +12,7 @@ import { createPortal } from "react-dom";
 import styles from "./GameRatingPopover.module.scss";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { GameRating } from "@/src/lib/features/game/GameRating";
-import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import useCloseEvents from "@/src/lib/shared/hooks/useCloseEvents";
 

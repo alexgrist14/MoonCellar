@@ -28,7 +28,7 @@ import {
   IAddGameRequest,
   IUpdateGameRequest,
   UpdateGameRequestSchema,
-} from "@/src/lib/shared/lib/schemas/games.schema";
+} from "@mooncellar/schemas";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";

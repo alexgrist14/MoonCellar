@@ -7,7 +7,7 @@ import { Button } from "@/src/lib/shared/ui/Button";
 import { RoyalGamesPanel } from "@/src/lib/shared/ui/RoyalGamesPanel";
 import { useGamesStore } from "@/src/lib/shared/store/games.store";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
-import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 
 interface IGamesListMenuProps {
   games?: IGameResponse[];

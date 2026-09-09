@@ -18,9 +18,8 @@ import { SvgBurger } from "../../shared/ui/svg";
 import { useStatesStore } from "../../shared/store/states.store";
 import { useSearchParams } from "next/navigation";
 import { UserNavigation } from "../../features/user/ui/UserNavigation";
-import { IPlaythrough } from "../../shared/lib/schemas/playthroughs.schema";
+import { IPlaythrough, IUserRating } from "@mooncellar/schemas";
 import { userAPI } from "../../shared/api";
-import { IUserRating } from "../../shared/lib/schemas/user-ratings.schema";
 import { useAuthStore } from "../../shared/store/auth.store";
 import { usePlaythroughsStore } from "../../shared/store/playthroughs.store";
 

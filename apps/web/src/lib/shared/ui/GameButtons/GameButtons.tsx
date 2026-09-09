@@ -1,7 +1,7 @@
 import { FC } from "react";
 import styles from "./GameButtons.module.scss";
 import { ButtonGroup } from "../Button/ButtonGroup";
-import { IGameResponse } from "../../lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 import { Box } from "../Box";
 
 export const GameButtons: FC<{ game: IGameResponse }> = ({ game }) => {

@@ -10,7 +10,7 @@ import {
   IReleaseDate,
   IRelatedGamesField,
   IRetroachievementsField,
-} from "src/shared/zod/schemas/games.schema";
+} from "@mooncellar/schemas";
 import { Platform } from "./platform.schema";
 import { Character } from "./character.schema";
 

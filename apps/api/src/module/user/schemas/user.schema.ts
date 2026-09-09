@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { MaxLength } from "class-validator";
 import mongoose, { Document } from "mongoose";
-import type { IRAAward } from "src/shared/zod/schemas/ra.schema";
-import type { IRole } from "src/shared/zod/schemas/role.schema";
 import {
+  type IRAAward,
+  type IRole,
   DEFAULT_BG_OPACITY,
   IUserSettings,
-} from "src/shared/zod/schemas/user.schema";
+} from "@mooncellar/schemas";
 
 @Schema({
   timestamps: true,

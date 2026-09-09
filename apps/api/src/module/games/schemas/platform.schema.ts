@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
-import { IPlatformFamily } from "src/shared/zod/schemas/platforms.schema";
+import { IPlatformFamily } from "@mooncellar/schemas";
 
 export type PlatformDocument = HydratedDocument<Platform>;
 

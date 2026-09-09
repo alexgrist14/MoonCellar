@@ -2,7 +2,7 @@ import { createZodDto } from "nestjs-zod";
 import {
   GetGameFollowingsStatusRequestSchema,
   GetGameFollowingsStatusResponseSchema,
-} from "../schemas/game-followings-status.schema";
+} from "@mooncellar/schemas";
 
 export class GetGameFollowingsStatusRequestDto extends createZodDto(
   GetGameFollowingsStatusRequestSchema

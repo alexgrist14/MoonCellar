@@ -1,6 +1,6 @@
 import { FC, Fragment, useCallback } from "react";
 import styles from "./GamePlaysInfo.module.scss";
-import { IPlaythrough } from "@/src/lib/shared/lib/schemas/playthroughs.schema";
+import { IPlaythrough } from "@mooncellar/schemas";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { RowsModal } from "@/src/lib/shared/ui/RowsModal";

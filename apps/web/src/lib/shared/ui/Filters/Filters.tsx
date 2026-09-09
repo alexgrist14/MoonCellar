@@ -17,7 +17,7 @@ import { useRemoveUserFilterMutation } from "@/src/lib/entities/user/api/user.mu
 import { modal } from "../Modal";
 import { SaveFilterForm } from "../SaveFilterForm";
 import { useAdvancedRouter } from "../../hooks/useAdvancedRouter";
-import { IGameFilters, IGetGamesRequest } from "../../lib/schemas/games.schema";
+import { IGameFilters, IGetGamesRequest } from "@mooncellar/schemas";
 import { toast } from "../../utils/toast.utils";
 import {
   parseQueryFilters,

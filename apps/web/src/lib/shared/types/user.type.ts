@@ -1,4 +1,4 @@
-import { IGameResponse } from "../lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 import { IUser } from "./auth.type";
 
 export type CategoriesType =

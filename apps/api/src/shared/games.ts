@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { IGetGamesRequest } from "./zod/schemas/games.schema";
+import { IGetGamesRequest } from "@mooncellar/schemas";
 
 const avgIgnoringNulls = (input: unknown[]) => ({
   $avg: {

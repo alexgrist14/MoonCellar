@@ -1,7 +1,6 @@
-import { IRole } from "../lib/schemas/role.schema";
+import { IRole, IUserSettings } from "@mooncellar/schemas";
 import { IRAAward } from "./retroachievements.type";
 import { IFollowers, IFollowings, IUserFilter, IUserPreset } from "./user.type";
-import { IUserSettings } from "../lib/schemas/user.schema";
 
 export interface IAuth {
   userName: string;

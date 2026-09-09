@@ -1,5 +1,5 @@
 import { FRONT_URL } from "../constants";
-import { IGameResponse } from "../lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 
 const MIN_RATINGS_FOR_AGGREGATE = 10;
 

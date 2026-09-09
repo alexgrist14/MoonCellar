@@ -11,10 +11,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { getS3Config, mimeToExt } from "src/shared/constants";
-import {
-  IGetFileRequest,
-  IGetFileResponse,
-} from "src/shared/zod/schemas/files.schema";
+import { IGetFileRequest, IGetFileResponse } from "@mooncellar/schemas";
 
 @Injectable()
 export class FileService {

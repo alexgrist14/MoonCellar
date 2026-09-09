@@ -51,7 +51,7 @@ import { GamesService } from "../services/games.service";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { RolesGuard } from "../../roles/roles.guard";
 import { Roles } from "../../roles/roles.decorator";
-import { RolesEnum } from "src/shared/zod/schemas/role.schema";
+import { RolesEnum } from "@mooncellar/schemas";
 import { UserIdGuard } from "src/module/auth/user.guard";
 
 @ApiTags("Games")

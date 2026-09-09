@@ -1,5 +1,5 @@
 import { API_URL } from "../constants";
-import { IPlatform } from "../lib/schemas/platforms.schema";
+import { IPlatform } from "@mooncellar/schemas";
 import agent from "./agent.api";
 
 const PLATFORM_API = `${API_URL}/platforms`;

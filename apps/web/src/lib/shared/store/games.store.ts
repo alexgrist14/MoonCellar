@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
-import { IGameResponse } from "../lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 
 type IState = {
   games?: IGameResponse[];

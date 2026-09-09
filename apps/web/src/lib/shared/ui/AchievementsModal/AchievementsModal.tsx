@@ -6,7 +6,7 @@ import { RowsModal } from "../RowsModal";
 import { Button, ButtonColor } from "../Button";
 import { useAuthStore } from "../../store/auth.store";
 import { useCommonStore } from "../../store/common.store";
-import { IGameResponse } from "../../lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 import { commonUtils } from "../../utils/common.utils";
 
 interface IAchievementsModalProps {

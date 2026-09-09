@@ -6,7 +6,7 @@ import {
   IGameResponse,
   IGenreResponse,
   IUpcomingReleaseGroup,
-} from "../../shared/lib/schemas/games.schema";
+} from "@mooncellar/schemas";
 import styles from "./MainPage.module.scss";
 import { Button } from "../../shared/ui/Button";
 import Link from "next/link";

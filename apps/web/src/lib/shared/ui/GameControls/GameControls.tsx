@@ -8,7 +8,7 @@ import { PlaythroughModal } from "../PlaythroughModal";
 import { useUserStore } from "../../store/user.store";
 import { GameButtons } from "../GameButtons";
 import { SvgCircleMenu, SvgPlay } from "../svg";
-import { IGameResponse } from "../../lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 
 interface IGameControlsProps {
   style?: CSSProperties;

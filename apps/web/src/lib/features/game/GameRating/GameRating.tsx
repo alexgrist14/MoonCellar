@@ -5,7 +5,7 @@ import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { useAsyncLoader } from "@/src/lib/shared/hooks/useAsyncLoader";
-import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 import { ratingsAPI } from "@/src/lib/shared/api/ratings.api";
 import { useUserStore } from "@/src/lib/shared/store/user.store";
 import { SvgNumber } from "@/src/lib/shared/ui/svg";

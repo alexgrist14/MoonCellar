@@ -4,7 +4,7 @@ import { FC, useMemo } from "react";
 import styles from "./GameReleaseDates.module.scss";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { dateRegions } from "@/src/lib/shared/constants";
-import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 
 interface IGameReleaseDatesProps {

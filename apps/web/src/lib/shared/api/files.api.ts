@@ -1,5 +1,5 @@
 import { API_URL } from "../constants";
-import { IGetFileRequest, IGetFileResponse } from "../lib/schemas/files.schema";
+import { IGetFileRequest, IGetFileResponse } from "@mooncellar/schemas";
 import agent from "./agent.api";
 
 const FILES_API = `${API_URL}/file`;

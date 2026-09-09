@@ -4,7 +4,7 @@ import {
   IPlaythroughMinimal,
   ISavePlaythroughRequest,
   IUpdatePlaythroughRequest,
-} from "@/src/lib/shared/lib/schemas/playthroughs.schema";
+} from "@mooncellar/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { playthroughQueryKeys } from "./playthrough.query-keys";
 import { useUserStore } from "@/src/lib/shared/store/user.store";

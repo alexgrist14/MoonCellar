@@ -13,7 +13,7 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { RolesEnum } from "src/shared/zod/schemas/role.schema";
+import { RolesEnum } from "@mooncellar/schemas";
 import { RolesGuard } from "../../roles/roles.guard";
 import { Roles } from "../../roles/roles.decorator";
 import { SteamService } from "../services/steam.service";

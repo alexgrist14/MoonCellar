@@ -3,7 +3,7 @@ import styles from "./GameOverview.module.scss";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Chip } from "@/src/lib/shared/ui/Chip";
 import { ExpandableBlock } from "@/src/lib/shared/ui/ExpandableBlock";
-import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 
 interface IGameOverviewProps {
   game: IGameResponse;

@@ -8,7 +8,7 @@ import { useAddUserFilterMutation } from "@/src/lib/entities/user/api/user.mutat
 import { getFiltersForQuery } from "../../utils/filters.utils";
 import { toast } from "../../utils/toast.utils";
 import { modal } from "../Modal";
-import { IGetGamesRequest } from "../../lib/schemas/games.schema";
+import { IGetGamesRequest } from "@mooncellar/schemas";
 
 export const SaveFilterForm: FC<{
   filters: IGetGamesRequest;

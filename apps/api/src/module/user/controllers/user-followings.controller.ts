@@ -17,7 +17,7 @@ import {
 import { UserIdGuard } from "src/module/auth/user.guard";
 import { RolesGuard } from "../../roles/roles.guard";
 import { Roles } from "../../roles/roles.decorator";
-import { RolesEnum } from "src/shared/zod/schemas/role.schema";
+import { RolesEnum } from "@mooncellar/schemas";
 import { UserFollowingsService } from "../services/user-followings.service";
 
 @ApiTags("User Followings")

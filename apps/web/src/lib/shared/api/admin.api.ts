@@ -1,6 +1,5 @@
 import { API_URL } from "../constants";
-import { IGameResponse } from "../lib/schemas/games.schema";
-import { IRole } from "../lib/schemas/role.schema";
+import { IGameResponse, IRole } from "@mooncellar/schemas";
 import { IUser } from "../types/auth.type";
 import agent from "./agent.api";
 

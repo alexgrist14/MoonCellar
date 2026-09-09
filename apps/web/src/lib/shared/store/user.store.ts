@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { IPlaythroughMinimal } from "../lib/schemas/playthroughs.schema";
-import { IUserRating } from "../lib/schemas/user-ratings.schema";
+import { IPlaythroughMinimal, IUserRating } from "@mooncellar/schemas";
 
 type IState = {
   playthroughs?: IPlaythroughMinimal[];

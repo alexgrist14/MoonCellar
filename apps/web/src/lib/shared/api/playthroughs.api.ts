@@ -6,7 +6,7 @@ import {
   IPlaythrough,
   ISavePlaythroughRequest,
   IUpdatePlaythroughRequest,
-} from "../lib/schemas/playthroughs.schema";
+} from "@mooncellar/schemas";
 import agent from "./agent.api";
 
 const PLAYTHROUGHS_API = `${API_URL}/playthroughs`;

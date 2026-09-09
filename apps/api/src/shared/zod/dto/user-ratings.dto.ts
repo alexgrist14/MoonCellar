@@ -4,7 +4,7 @@ import {
   GetUserRatingsSchema,
   RemoveUserRatingSchema,
   UpdateUserRatingSchema,
-} from "../schemas/user-ratings.schema";
+} from "@mooncellar/schemas";
 
 export class GetUserRatingDto extends createZodDto(GetUserRatingsSchema) {}
 export class AddUserRatingDto extends createZodDto(AddUserRatingSchema) {}

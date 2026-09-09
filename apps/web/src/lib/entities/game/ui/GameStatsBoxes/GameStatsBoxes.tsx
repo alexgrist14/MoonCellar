@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 import { GameHltbBlock } from "../GameHltbBlock";
 import { GameRatingsBlock } from "../GameRatingsBlock";
 import { GameExternalPages } from "../GameExternalPages";

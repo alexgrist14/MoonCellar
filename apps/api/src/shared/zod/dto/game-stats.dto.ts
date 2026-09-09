@@ -3,7 +3,7 @@ import {
   GetGamesStatsRequestSchema,
   GetGameStatsResponseSchema,
   GetGamesStatsResponseSchema,
-} from "../schemas/game-stats.schema";
+} from "@mooncellar/schemas";
 
 export class GetGamesStatsRequestDto extends createZodDto(
   GetGamesStatsRequestSchema

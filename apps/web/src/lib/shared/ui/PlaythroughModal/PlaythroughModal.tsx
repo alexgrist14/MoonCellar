@@ -15,7 +15,8 @@ import {
   ISavePlaythroughRequest,
   ISavePlaythroughRequestInput,
   SavePlaythroughRequestSchema,
-} from "../../lib/schemas/playthroughs.schema";
+  IGameResponse,
+} from "@mooncellar/schemas";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader } from "../Loader";
@@ -25,7 +26,6 @@ import { SvgPlus } from "../svg";
 import classNames from "classnames";
 import { Box } from "../Box";
 import { toast } from "../../utils/toast.utils";
-import { IGameResponse } from "../../lib/schemas/games.schema";
 import { useCommonStore } from "../../store/common.store";
 import { usePlaythroughsQuery } from "@/src/lib/entities/playthrough/api/playthrough.queries";
 import {

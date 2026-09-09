@@ -1,4 +1,4 @@
-import { IGetGamesRequest } from "../lib/schemas/games.schema";
+import { IGetGamesRequest } from "@mooncellar/schemas";
 
 type IFilterModeValue = "any" | "all";
 

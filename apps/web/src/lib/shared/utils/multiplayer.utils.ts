@@ -1,4 +1,4 @@
-import { IMultiplayerModeField } from "../lib/schemas/games.schema";
+import { IMultiplayerModeField } from "@mooncellar/schemas";
 
 export const formatMultiplayerMode = (mode: IMultiplayerModeField): string[] => {
   const labels: string[] = [];

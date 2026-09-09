@@ -1,5 +1,5 @@
 import { API_URL } from "../constants";
-import { IGameResponse } from "../lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 import agent from "./agent.api";
 
 const IGDB_URL = `${API_URL}/igdb`;

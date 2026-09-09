@@ -3,9 +3,9 @@ import { useMemo } from "react";
 import {
   IGameResponse,
   IGetGamesRequest,
-} from "../../../shared/lib/schemas/games.schema";
+  IGameStats,
+} from "@mooncellar/schemas";
 import { IGamesListResponse } from "@/src/lib/shared/types/games.type";
-import { IGameStats } from "@/src/lib/shared/lib/schemas/game-stats.schema";
 import { gameQueryKeys } from "./game.query-keys";
 import { adminGamesApi, gamesApi } from "@/src/lib/shared/api";
 

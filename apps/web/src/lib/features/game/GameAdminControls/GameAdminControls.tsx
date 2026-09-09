@@ -10,7 +10,7 @@ import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal/ConfirmModal";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { gamesApi, hltbApi, igdbApi } from "@/src/lib/shared/api";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { revalidateGamePage } from "@/src/lib/entities/game/api/game.actions";
 

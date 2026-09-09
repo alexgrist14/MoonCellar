@@ -2,7 +2,7 @@ import { FC, useMemo } from "react";
 import classNames from "classnames";
 import styles from "./GameRatingsBlock.module.scss";
 import { Box } from "@/src/lib/shared/ui/Box";
-import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 import { getGameRatingRows } from "@/src/lib/shared/utils/rating.utils";
 
 interface IGameRatingsBlockProps {

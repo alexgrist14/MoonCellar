@@ -3,7 +3,7 @@ import {
   IGameResponse,
   IGenreResponse,
   IUpcomingReleaseGroup,
-} from "../lib/shared/lib/schemas/games.schema";
+} from "@mooncellar/schemas";
 import { gamesApi } from "../lib/shared/api";
 import { platformsAPI } from "../lib/shared/api/platforms.api";
 import { unstable_cache } from "next/cache";

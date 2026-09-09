@@ -9,7 +9,7 @@ import {
   GameFriendsStatus,
   useGameFriendsStatus,
 } from "@/src/lib/features/game/GameFriendsStatus";
-import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 import {
   getGameExternalPages,
   getGameLinks,

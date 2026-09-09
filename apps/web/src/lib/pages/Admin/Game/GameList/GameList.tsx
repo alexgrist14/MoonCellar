@@ -5,10 +5,7 @@ import { useRouter } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 import { gamesApi } from "@/src/lib/shared/api";
 import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
-import {
-  IGameResponse,
-  IGetGamesRequest,
-} from "@/src/lib/shared/lib/schemas/games.schema";
+import { IGameResponse, IGetGamesRequest } from "@mooncellar/schemas";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { Table } from "@/src/lib/shared/ui/Table";

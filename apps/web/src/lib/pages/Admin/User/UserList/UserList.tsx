@@ -7,7 +7,7 @@ import styles from "./UserList.module.scss";
 import { IUser } from "@/src/lib/shared/types/auth.type";
 import Link from "next/link";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
-import { IRole } from "@/src/lib/shared/lib/schemas/role.schema";
+import { IRole } from "@mooncellar/schemas";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { modal } from "@/src/lib/shared/ui/Modal";

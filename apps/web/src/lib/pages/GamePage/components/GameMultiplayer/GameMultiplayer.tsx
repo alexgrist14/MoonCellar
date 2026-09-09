@@ -3,7 +3,7 @@
 import { FC, useMemo } from "react";
 import styles from "./GameMultiplayer.module.scss";
 import { Box } from "@/src/lib/shared/ui/Box";
-import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { formatMultiplayerMode } from "@/src/lib/shared/utils/multiplayer.utils";
 

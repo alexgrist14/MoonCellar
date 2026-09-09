@@ -7,7 +7,7 @@ import { Loader } from "../Loader";
 import { useUserStore } from "../../store/user.store";
 import { GameCardInfo } from "@/src/lib/entities/game/ui/GameCardInfo";
 import { Tooltip } from "../Tooltip";
-import { IGameResponse } from "../../lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 import useCloseEvents from "../../hooks/useCloseEvents";
 import { Button } from "../Button";
 import { SvgAchievement, SvgClose, SvgMore, SvgStar } from "../svg";

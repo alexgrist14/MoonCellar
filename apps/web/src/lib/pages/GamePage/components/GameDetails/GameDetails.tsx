@@ -2,7 +2,7 @@ import { FC, ReactNode, useMemo } from "react";
 import Link from "next/link";
 import styles from "./GameDetails.module.scss";
 import { Box } from "@/src/lib/shared/ui/Box";
-import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 
 interface IGameDetailsProps {
   game: IGameResponse;

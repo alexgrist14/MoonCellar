@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { transformBoolean } from "./utils";
+import { transformBoolean } from "@mooncellar/schemas";
 
 export const ParseImagesSchema = z.object({
   parseType: z.enum(["covers", "artworks", "screenshots"]),

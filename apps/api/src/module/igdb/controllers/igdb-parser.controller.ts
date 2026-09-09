@@ -15,7 +15,7 @@ import {
 } from "@nestjs/swagger";
 import { IGDBService } from "../igdb.service";
 import { AuthGuard } from "@nestjs/passport";
-import { RolesEnum } from "src/shared/zod/schemas/role.schema";
+import { RolesEnum } from "@mooncellar/schemas";
 import { RolesGuard } from "../../roles/roles.guard";
 import { Roles } from "../../roles/roles.decorator";
 

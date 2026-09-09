@@ -3,7 +3,7 @@ import styles from "./GameScoreColumn.module.scss";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { GameHltbBlock } from "@/src/lib/entities/game/ui/GameHltbBlock";
 import { GameRatingsBlock } from "@/src/lib/entities/game/ui/GameRatingsBlock";
-import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 import { getHltbTiles } from "@/src/lib/shared/utils/hltb.utils";
 import { getGameRatingRows } from "@/src/lib/shared/utils/rating.utils";
 

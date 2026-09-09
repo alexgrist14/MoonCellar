@@ -5,7 +5,7 @@ import { Character, CharacterDocument } from "../schemas/character.schema";
 import {
   IGetCharacterBySlugRequest,
   IGetCharactersRequest,
-} from "src/shared/zod/schemas/characters.schema";
+} from "@mooncellar/schemas";
 
 const DEFAULT_CHARACTERS_TAKE = 50;
 

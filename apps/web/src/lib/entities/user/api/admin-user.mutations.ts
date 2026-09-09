@@ -1,8 +1,7 @@
 import { adminUsersApi } from "@/src/lib/shared/api";
-import { IRole } from "@/src/lib/shared/lib/schemas/role.schema";
+import { IRole, IUser } from "@mooncellar/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { adminUserQueryKeys } from "./admin-user.query-keys";
-import { IUser } from "@/src/lib/shared/lib/schemas/user.schema";
 
 interface IUpdateAdminUserRoles {
   userId: string;

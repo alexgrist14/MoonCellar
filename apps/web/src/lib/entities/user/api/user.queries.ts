@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { gamesApi, userAPI } from "@/src/lib/shared/api";
-import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 import { ILogs } from "@/src/lib/shared/types/user.type";
 import { userQueryKeys } from "./user.query-keys";
 

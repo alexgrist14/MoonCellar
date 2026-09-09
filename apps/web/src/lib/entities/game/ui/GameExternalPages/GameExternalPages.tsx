@@ -6,7 +6,7 @@ import { Button } from "@/src/lib/shared/ui/Button";
 import { Tooltip } from "@/src/lib/shared/ui/Tooltip";
 import { RowsModal } from "@/src/lib/shared/ui/RowsModal";
 import { modal } from "@/src/lib/shared/ui/Modal";
-import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 import {
   SvgAmazon,
   SvgEpicGames,

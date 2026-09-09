@@ -5,7 +5,7 @@ import {
   IGetPlaythroughsRequest,
   ISavePlaythroughRequest,
   IUpdatePlaythroughRequest,
-} from "src/shared/zod/schemas/playthroughs.schema";
+} from "@mooncellar/schemas";
 import { UserLogsService } from "src/module/user/services/user-logs.service";
 import { Platform, PlatformDocument } from "../schemas/platform.schema";
 import {

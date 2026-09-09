@@ -7,7 +7,7 @@ import { Box } from "@/src/lib/shared/ui/Box";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { Slideshow } from "@/src/lib/shared/ui/Slideshow";
 import { VideosRow } from "@/src/lib/shared/ui/VideosRow";
-import { IGameResponse } from "@/src/lib/shared/lib/schemas/games.schema";
+import { IGameResponse } from "@mooncellar/schemas";
 
 interface IGameMediaProps {
   game: IGameResponse;

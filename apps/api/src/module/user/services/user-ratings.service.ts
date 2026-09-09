@@ -6,7 +6,7 @@ import {
   IGetUserRatingsRequest,
   IRemoveUserRatingRequest,
   IUpdateUserRatingRequest,
-} from "src/shared/zod/schemas/user-ratings.schema";
+} from "@mooncellar/schemas";
 import { Rating } from "../schemas/user-ratings.schema";
 import { UserLogsService } from "./user-logs.service";
 import { Game, GameDocument } from "../../games/schemas/game.schema";

@@ -4,7 +4,7 @@ import {
   IAddUserRatingRequest,
   IUpdateUserRatingRequest,
   IUserRating,
-} from "@/src/lib/shared/lib/schemas/user-ratings.schema";
+} from "@mooncellar/schemas";
 import { ratingsAPI } from "@/src/lib/shared/api/ratings.api";
 import { useUserStore } from "@/src/lib/shared/store/user.store";
 
