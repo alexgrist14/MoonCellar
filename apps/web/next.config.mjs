@@ -2,13 +2,15 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const projectRoot = dirname(fileURLToPath(import.meta.url));
+const monorepoRoot = join(projectRoot, "../..");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
   turbopack: {
-    root: projectRoot,
+    root: monorepoRoot,
   },
+  outputFileTracingRoot: monorepoRoot,
   sassOptions: {
     loadPaths: [join(projectRoot, "src/lib/app/styles")],
     additionalData: '@use "@/src/lib/app/styles/index.scss" as *;',
