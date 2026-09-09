@@ -469,18 +469,18 @@ podman build -f apps/api/Dockerfile -t mooncellar-backend:latest .
 
 ### CI/CD
 
-Two GitHub Actions workflows, split by path filter, so a frontend change never rebuilds the
-backend:
+One workflow, `.github/workflows/ci.yml`, with three jobs:
 
-| Workflow | Triggers on | Deploys |
-|---|---|---|
-| `.github/workflows/web.yml` | `apps/web/**`, `packages/**`, root configs | `Mooncellar-Frontend.service` |
-| `.github/workflows/api.yml` | `apps/api/**`, `packages/**`, root configs | `Mooncellar-Backend.service` |
+| Job | What it does |
+|---|---|
+| `changes` | Decides which workspaces a push touched — `apps/web/**`, `apps/api/**`, `packages/**` or the root manifests |
+| `lint` | Installs once and lints every workspace, on every push and pull request |
+| `deploy` | On `main` only, and only for the apps `changes` marked |
 
-Both run lint and a Prettier check on every push and pull request; on `main` they build an
-image with podman, copy it over SSH and restart the systemd unit on the production host. Each
-workflow writes its own environment file from its own secret — `HOST_ENV_WEB` for the frontend,
-`HOST_ENV_API` for the backend.
+The deploy job builds just the changed images, packs them into a single multi-image archive
+(both share the `oven/bun` base layer, so one archive is smaller than two), copies it over in
+one transfer and restarts only the services it rebuilt — one SSH session for both apps. Each
+app's environment file comes from its own secret: `HOST_ENV_WEB` and `HOST_ENV_API`.
 
 Every secret the pipeline needs, the contents of both `HOST_ENV_*` files and a checklist for
 the first deploy are documented in [`docs/deploy-env.md`](docs/deploy-env.md).

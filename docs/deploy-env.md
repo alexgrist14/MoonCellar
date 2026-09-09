@@ -38,10 +38,12 @@ below (`SSH_HOST_WEB` / `SSH_HOST_API`).
 writes it to the app's own directory, not to the repository root:
 
 ```yaml
-- name: Build image
+- name: Build images
   run: |
-    echo "${{ secrets.HOST_ENV_WEB }}" > apps/web/.env
-    podman build -f apps/web/Dockerfile -t $IMAGE_NAME:latest .
+    if [ "$DEPLOY_WEB" = "true" ]; then
+      echo "${{ secrets.HOST_ENV_WEB }}" > apps/web/.env
+      podman build -f apps/web/Dockerfile -t mooncellar-frontend:latest .
+    fi
 ```
 
 Setting them from a local file is easier than pasting into the browser:
@@ -55,13 +57,18 @@ gh secret set WORK_DIR_API  --body "/home/deploy/mooncellar-backend"
 
 ### Not secrets — these live in the workflow file
 
+A single `.github/workflows/ci.yml` deploys both apps: a `changes` job decides which
+workspaces were touched, and the deploy job builds only those, ships them in one
+multi-image archive over one SSH session, and restarts only the services it rebuilt.
+
 | Value | Frontend | Backend |
 |---|---|---|
-| `IMAGE_NAME` | `mooncellar-frontend` | `mooncellar-backend` |
+| Image name | `mooncellar-frontend` | `mooncellar-backend` |
 | systemd unit | `Mooncellar-Frontend.service` | `Mooncellar-Backend.service` |
 | Dockerfile | `apps/web/Dockerfile` | `apps/api/Dockerfile` |
 | Exposed port | `3111` | `3228` |
 | Path filter | `apps/web/**`, `packages/**` | `apps/api/**`, `packages/**` |
+| Deploy flag in the SSH script | `DEPLOY_WEB` | `DEPLOY_API` |
 
 ---
 
@@ -139,7 +146,7 @@ Present in the current `.env` files, referenced nowhere in the code:
 
 1. `HOST_ENV_WEB`, `HOST_ENV_API`, `WORK_DIR_WEB`, `WORK_DIR_API` created; the old `HOST_ENV`
    and `WORK_DIR` deleted so a workflow cannot silently fall back to them.
-2. Both workflows reference the new names — grep the yml for `HOST_ENV` and `WORK_DIR` without
+2. The workflow references the new names — grep the yml for `HOST_ENV` and `WORK_DIR` without
    a suffix and expect no hits.
 3. `git check-ignore -v apps/web/.env apps/api/.env` reports a match for both. The merged root
    `.gitignore` must keep the pattern as `.env`, not `/.env`: with a leading slash it only
@@ -147,8 +154,10 @@ Present in the current `.env` files, referenced nowhere in the code:
    `TWITCH_CLIENT_SECRET` — becomes committable.
 4. `FRONT_URL` (api) and `NEXT_PUBLIC_FRONT_URL` (web) point at the same origin, as do
    `NEXT_PUBLIC_CORS_SERVER` and the API's CORS configuration.
-5. Deploy one service manually first, check it, then the second — the workflows are
-   independent and a broken one does not roll the other back.
+5. The first run after the migration touches root files, so the `changes` job marks both
+   apps as changed and both are rebuilt and restarted in one pass. Watch that run: a failure
+   in either image build stops the deploy before anything is copied, so the host keeps
+   running the previous versions of both.
 
 ---
 
