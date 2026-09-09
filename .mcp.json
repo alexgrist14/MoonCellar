@@ -23,6 +23,15 @@
         "mongodb-mcp-server@latest",
         "--readOnly"
       ]
+    },
+    "game-adder": {
+      "type": "stdio",
+      "command": "bun",
+      "args": [
+        "run",
+        "--env-file=apps/api/.env",
+        "apps/api/mcp/game-adder/index.ts"
+      ]
     }
   }
 }

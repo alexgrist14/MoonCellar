@@ -4,18 +4,47 @@ on:
   push:
   pull_request:
 
-env:
-  IMAGE_NAME: mooncellar-frontend
-  IMAGE_TAG: ${{ github.sha }}
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      web: ${{ steps.filter.outputs.web }}
+      api: ${{ steps.filter.outputs.api }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Detect changed workspaces
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            web:
+              - 'apps/web/**'
+              - 'packages/**'
+              - 'package.json'
+              - 'bun.lock'
+              - '.github/workflows/ci.yml'
+            api:
+              - 'apps/api/**'
+              - 'packages/**'
+              - 'package.json'
+              - 'bun.lock'
+              - '.github/workflows/ci.yml'
+
   lint:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Fetch all history for all branches and tags
+          fetch-depth: 0
+
       - name: Use Bun
         uses: oven-sh/setup-bun@v2
         with:
@@ -29,49 +58,54 @@ jobs:
       - name: Run lint
         run: bun run lint
 
-      - name: Run format check
-        run: bun run format
-
-      # - name: Check commit messages
-      #   uses: wagoid/commitlint-github-action@v3
-      #   with:
-      #     configFile: commitlint.config.cjs
-
   deploy:
-    needs: lint
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [changes, lint]
+    if: >-
+      github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+      (needs.changes.outputs.web == 'true' || needs.changes.outputs.api == 'true')
     runs-on: ubuntu-latest
+
+    env:
+      DEPLOY_WEB: ${{ needs.changes.outputs.web }}
+      DEPLOY_API: ${{ needs.changes.outputs.api }}
+      DEPLOY_ROOT: ${{ secrets.DEPLOY_ROOT }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Test SSH connection
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: echo "SSH works!"
-
-      - name: Build image
+      - name: Build images
         run: |
-          echo "${{ secrets.HOST_ENV }}" > .env;
-          podman build \
-            -t $IMAGE_NAME:latest \
-            .
+          IMAGES=""
 
-      - name: Save image as tar
-        run: |
-          podman save $IMAGE_NAME:latest | gzip > image.tar.gz
+          if [ "$DEPLOY_WEB" = "true" ]; then
+            echo "${{ secrets.HOST_ENV_WEB }}" > apps/web/.env;
+            podman build \
+              -f apps/web/Dockerfile \
+              -t mooncellar-frontend:latest \
+              .
+            IMAGES="$IMAGES mooncellar-frontend:latest"
+          fi
 
-      - name: Copy image to server
+          if [ "$DEPLOY_API" = "true" ]; then
+            echo "${{ secrets.HOST_ENV_API }}" > apps/api/.env;
+            podman build \
+              -f apps/api/Dockerfile \
+              -t mooncellar-backend:latest \
+              .
+            IMAGES="$IMAGES mooncellar-backend:latest"
+          fi
+
+          podman save --multi-image-archive -o images.tar $IMAGES
+          gzip images.tar
+
+      - name: Copy images to server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "image.tar.gz"
+          source: "images.tar.gz"
           target: "/tmp/"
 
       - name: Deploy on server
@@ -80,13 +114,25 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: DEPLOY_WEB,DEPLOY_API,DEPLOY_ROOT
           script: |
-            podman load < /tmp/image.tar.gz
+            set -e
 
-            cd ${{ secrets.WORK_DIR }}
-            ./run.sh
-            systemctl --user daemon-reload
-            systemctl restart --user Mooncellar-Frontend.service
+            podman load < /tmp/images.tar.gz
+
+            if [ "$DEPLOY_WEB" = "true" ]; then
+              cd "$DEPLOY_ROOT/Frontend"
+              ./run.sh
+              systemctl --user daemon-reload
+              systemctl restart --user Mooncellar-Frontend.service
+            fi
+
+            if [ "$DEPLOY_API" = "true" ]; then
+              cd "$DEPLOY_ROOT/Backend"
+              ./run.sh
+              systemctl --user daemon-reload
+              systemctl restart --user Mooncellar-Backend.service
+            fi
 
             podman image prune -f
-            rm /tmp/image.tar.gz
+            rm /tmp/images.tar.gz
