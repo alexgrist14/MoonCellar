@@ -1,14 +1,12 @@
 {
-  "name": "mooncellar-server",
+  "name": "api",
   "version": "0.0.1",
   "description": "",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
-  "packageManager": "bun@1.3.12",
   "scripts": {
     "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
@@ -19,21 +17,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
-    "check:schemas": "bun run scripts/check-schema-parity.ts",
-    "prepare": "husky",
-    "pre-commit": "lint-staged"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "pre-push": "bun run lint"
-    }
-  },
-  "lint-staged": {
-    "src/**/*.{ts,tsx,js,jsx}": [
-      "bun run lint"
-    ]
+    "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1090.0",
@@ -53,7 +37,7 @@
     "@retroachievements/api": "^2.10.0",
     "@types/multer": "^2.2.0",
     "@willsoto/nestjs-prometheus": "^6.1.0",
-    "axios": "^1.18.1",
+    "axios": "catalog:",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
     "body-parser": "^2.3.0",
@@ -64,9 +48,7 @@
     "fs-extra": "^11.3.6",
     "fuzzysort": "^3.1.0",
     "howlongtobeat-ts": "^1.2.0",
-    "husky": "^9.1.7",
-    "jwt-decode": "^4.0.0",
-    "lint-staged": "^17.1.0",
+    "jwt-decode": "catalog:",
     "mongoose": "8.24.1",
     "multer": "^2.2.0",
     "nestjs-pino": "^4.6.1",
@@ -81,15 +63,12 @@
     "prom-client": "^15.1.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
-    "typescript-eslint": "^8.64.0",
     "uuid": "^14.0.1",
-    "zod": "^4.4.3"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@automock/adapters.nestjs": "^2.1.0",
     "@automock/jest": "^2.1.2",
-    "@commitlint/cli": "^21.2.1",
-    "@commitlint/config-conventional": "^21.2.0",
     "@nestjs/cli": "^11.0.24",
     "@nestjs/schematics": "^11.1.0",
     "@nestjs/testing": "^11.1.28",
@@ -98,24 +77,24 @@
     "@types/express": "^5.0.6",
     "@types/fs-extra": "^11.0.4",
     "@types/jest": "^30.0.0",
-    "@types/node": "^26.1.1",
+    "@types/node": "catalog:",
     "@types/passport-local": "^1.0.38",
     "@types/supertest": "^7.2.1",
     "@typescript-eslint/eslint-plugin": "^8.64.0",
     "@typescript-eslint/parser": "^8.64.0",
-    "eslint": "9.39.5",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.6",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "eslint-plugin-prettier": "catalog:",
     "jest": "^30.4.2",
     "onetime": "5.1.2",
-    "prettier": "^3.9.5",
     "source-map-support": "^0.5.21",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.11",
     "ts-loader": "^9.6.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "5.9.3"
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:"
   },
   "jest": {
     "moduleFileExtensions": [

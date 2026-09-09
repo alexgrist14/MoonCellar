@@ -55,7 +55,7 @@ services:
     volumes:
       - mongodb-data:/data/db/
     env_file:
-      - .env
+      - ../apps/api/.env
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin

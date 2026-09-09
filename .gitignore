@@ -42,3 +42,6 @@ next-env.d.ts
 
 **/Session.vim**
 **/node_modules**
+
+# monorepo
+infra/searxng/
