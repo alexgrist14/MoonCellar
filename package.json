@@ -1,6 +1,7 @@
 {
   "name": "mooncellar",
   "private": true,
+  "license": "SEE LICENSE IN LICENSE",
   "packageManager": "bun@1.3.12",
   "workspaces": {
     "packages": [

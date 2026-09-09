@@ -2,6 +2,7 @@
   "name": "web",
   "version": "0.1.0",
   "private": true,
+  "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "dev": "NODE_OPTIONS=--disable-warning=ExperimentalWarning next dev",
     "build": "NODE_OPTIONS=--disable-warning=ExperimentalWarning next build",

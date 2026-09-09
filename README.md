@@ -17,7 +17,7 @@
   <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript">
   <img src="https://img.shields.io/badge/MongoDB-8-47A248?style=flat-square&logo=mongodb&logoColor=white" alt="MongoDB">
   <img src="https://img.shields.io/badge/Bun-1.3-000000?style=flat-square&logo=bun&logoColor=white" alt="Bun">
-  <img src="https://img.shields.io/badge/license-GPL--3.0-blue?style=flat-square" alt="GPL-3.0">
+  <img src="https://img.shields.io/badge/license-source--available-blue?style=flat-square" alt="Source-available">
 </p>
 
 ---
@@ -494,4 +494,9 @@ repository root.
 
 ## License
 
-[GPL-3.0](LICENSE)
+Source-available, not open source. The code may be read, forked and improved by pull request;
+deploying it, hosting it or reusing it elsewhere is not permitted. Using the official site at
+[mooncellar.space](https://mooncellar.space) is not restricted by the licence at all.
+
+See [`LICENSE`](LICENSE), the [contribution terms](CONTRIBUTING.md), and
+[what the licence means in practice](docs/license.md).

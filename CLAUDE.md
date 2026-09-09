@@ -35,6 +35,18 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
 
 - This CLAUDE.md file must be written in English only.
 
+## Skills
+
+- **Skills resolve from the monorepo root, so every skill is available both from the root and
+  from inside a workspace** (`apps/web`, `apps/api`, `packages/schemas`) — do not copy one into
+  a workspace to make it visible there. A skill that must apply to a single workspace only goes
+  in `apps/<app>/.claude/skills/` and is then addressed with its directory prefix
+  (`apps/web:<name>`).
+- The checked-in skills live once in `.agents/skills/<name>/` and reach Claude Code through the
+  symlinks in `.claude/skills/`, with their origin recorded in `skills-lock.json`. Install new
+  ones into `.agents/skills` and symlink them, so the lockfile and any other agent tooling keep
+  seeing the same single copy.
+
 ## User settings
 
 - **`user.settings` is a Mongoose `Object` (Mixed) field, so a partial update must merge, not
