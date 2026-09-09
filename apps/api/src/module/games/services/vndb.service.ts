@@ -32,7 +32,7 @@ import {
   titleKeyVariants,
   tokenSetFrom,
 } from "../utils/title-match.utils";
-import { ICompanyField } from "src/shared/zod/schemas/games.schema";
+import { ICompanyField } from "@mooncellar/schemas";
 import {
   INCOMPATIBLE_GENRES,
   MAIN_GAME_TYPE,
@@ -70,7 +70,7 @@ import {
 } from "../constants/vndb";
 import { VndbCandidate } from "../schemas/vndb-candidates.schema";
 import { Platform } from "../schemas/platform.schema";
-import { sleep } from "src/shared/utils";
+import { sleep } from "../../../shared/utils";
 
 const VNDB_API_URL = "https://api.vndb.org/kana";
 
