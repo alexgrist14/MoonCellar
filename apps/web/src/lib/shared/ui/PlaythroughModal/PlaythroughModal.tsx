@@ -1,9 +1,9 @@
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
 import styles from "./PlaythroughModal.module.scss";
 import { Dropdown } from "../Dropdown";
 import { ButtonGroup } from "../Button/ButtonGroup";
 import { ButtonColor } from "../Button";
-import { Textarea } from "../Textarea";
+import { IRichEditorHandle, RichEditor } from "../RichEditor";
 import { Input } from "../Input";
 import { DatePicker } from "../DatePicker";
 import { ToggleSwitch } from "../ToggleSwitch";
@@ -58,6 +58,8 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
   const { systems } = useCommonStore();
 
   const [playthroughId, setPlaythroughId] = useState<string>();
+  const [isFlushing, setIsFlushing] = useState(false);
+  const editorRef = useRef<IRichEditorHandle>(null);
 
   const {
     register,
@@ -111,11 +113,30 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
     [getFormValues, reset]
   );
 
-  const saveHandler = (data: ISavePlaythroughRequest) => {
+  const saveHandler = async (data: ISavePlaythroughRequest) => {
     if (!profile) return;
+
+    let payload = data;
+
+    if (editorRef.current) {
+      setIsFlushing(true);
+
+      try {
+        payload = { ...data, comment: await editorRef.current.flushUploads() };
+      } catch {
+        toast.error({
+          title: "Upload failed",
+          description: "The images could not be uploaded, nothing was saved.",
+        });
+        return;
+      } finally {
+        setIsFlushing(false);
+      }
+    }
+
     if (playthroughId) {
       updatePlaythrough(
-        { userId: profile._id, playthroughId, playthrough: data },
+        { userId: profile._id, playthroughId, playthrough: payload },
         {
           onSuccess: (playthrough) => {
             selectHandler(playthrough);
@@ -125,7 +146,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
       );
       return;
     }
-    createPlaythrough(data, {
+    createPlaythrough(payload, {
       onSuccess: (playthrough) => {
         selectHandler(playthrough);
         toast.success({ description: "Playthrough successfully created" });
@@ -279,11 +300,15 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
               clickCallback={() => setValue("isMastered", !watch("isMastered"))}
             />
           )}
-          <Textarea
-            {...register("comment")}
+          <RichEditor
+            ref={editorRef}
+            value={watch("comment") || ""}
+            onChange={(html) =>
+              setValue("comment", html, { shouldValidate: true })
+            }
             placeholder="Enter comment..."
             className={styles.modal__comment}
-            isDisableAutoResize
+            error={errors.comment}
           />
           <div className={styles.modal__controls}>
             <ButtonGroup
@@ -292,7 +317,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
                   title: "Save",
                   color: ButtonColor.GREEN,
                   type: "submit",
-                  disabled: !isValid,
+                  disabled: !isValid || isFlushing,
                 },
                 {
                   title: "Delete",

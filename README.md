@@ -299,6 +299,8 @@ bun --filter web start          # serve the build on :3111
 bun --filter web lint           # eslint (max 10 warnings)
 bun --filter web lint:fix       # eslint --fix
 bun --filter web check:layout   # drives Chrome via playwright-core, fails on page overflow
+bun --filter web sync:tokens    # regenerates the design tokens inside docs/mockups
+bun --filter web check:tokens   # same read, exits 1 when a mockup is out of date
 ```
 
 `check:layout` needs a running `bun --filter web start`; set `CHROME_PATH` if Chrome is not on

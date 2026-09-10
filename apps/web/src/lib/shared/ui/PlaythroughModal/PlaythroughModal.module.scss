@@ -6,13 +6,17 @@
 .modal {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  width: min(80vw, 400px);
-  height: min(70vh, 500px);
+  width: var(--playthrough-modal-width);
+  height: var(--playthrough-modal-height);
   align-items: center;
   gap: var(--gap-x5);
   min-height: 320px;
   min-width: 300px;
+
+  @include mediaMin($screenMd) {
+    width: var(--resize-width, var(--playthrough-modal-width-lg));
+    height: var(--resize-height, var(--playthrough-modal-height-lg));
+  }
 
   &__bottom {
     display: flex;
@@ -50,11 +54,11 @@
     margin-top: auto;
   }
 
-  &__controls {
-    margin-top: auto;
+  &__comment {
+    flex: 1;
   }
 
-  div &__comment {
-    height: 100%;
+  &__controls {
+    margin-top: auto;
   }
 }

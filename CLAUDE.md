@@ -33,7 +33,14 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
 
 ## Language
 
-- This CLAUDE.md file must be written in English only.
+- **Everything written into this repository is English.** Code and identifiers, commit
+  messages, every `CLAUDE.md`, everything under `docs/` — including the copy inside
+  `docs/mockups/*.html` — and the user-facing strings the apps ship.
+- A mockup's headings, labels and placeholder text are UI copy for an English-language
+  product. Written in another language they cannot be lifted into a real screen, and the
+  mockup stops being a specification of what to build.
+- The conversation with whoever asked for the work happens in whatever language they use;
+  that never reaches a file.
 
 ## Skills
 

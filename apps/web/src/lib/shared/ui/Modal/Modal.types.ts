@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 export interface IModalParams {
   onClose?: () => void;
   id?: string;
+  isResizable?: boolean;
   // deps?: unknown[];
 }
 

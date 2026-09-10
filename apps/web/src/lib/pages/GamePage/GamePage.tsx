@@ -11,7 +11,7 @@ import { GameHero } from "./components/GameHero";
 import { GameOverview } from "./components/GameOverview";
 import { GameScoreColumn } from "./components/GameScoreColumn";
 import { GameSideColumn } from "./components/GameSideColumn";
-import { GameMedia } from "./components/GameMedia";
+import { GameMedia } from "../../entities/game/ui/GameMedia";
 import { GameDetails } from "./components/GameDetails";
 import { GameReleaseDates } from "./components/GameReleaseDates";
 import { GameMultiplayer } from "./components/GameMultiplayer";

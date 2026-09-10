@@ -9,7 +9,12 @@ import {
   ListObjectsV2Command,
   ListObjectsV2CommandInput,
 } from "@aws-sdk/client-s3";
-import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from "@nestjs/common";
 import { getS3Config, mimeToExt } from "../../../shared/constants";
 import { IGetFileRequest, IGetFileResponse } from "@mooncellar/schemas";
 
@@ -62,6 +67,24 @@ export class FileService {
       this.logger.error(err, `Failed to upload file: ${key}`);
       throw err;
     }
+  }
+
+  async uploadPublicImage(
+    file: Express.Multer.File,
+    key: string,
+    bucketName: string
+  ) {
+    const ext = mimeToExt[file.mimetype];
+
+    if (!ext) {
+      throw new BadRequestException(`Unsupported image type: ${file.mimetype}`);
+    }
+
+    await this.uploadFile(file, key, bucketName);
+
+    return process.env.S3_HOST_CDN.replace("%backet", bucketName) +
+      key +
+      `.${ext}`;
   }
 
   async getBuckets() {

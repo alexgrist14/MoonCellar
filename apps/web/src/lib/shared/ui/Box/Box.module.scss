@@ -110,6 +110,13 @@
   width: 100%;
   min-width: 0;
   height: fit-content;
+
+  &_resizable {
+    position: relative;
+    width: var(--resize-width, auto);
+    height: var(--resize-height, auto);
+    max-width: 100%;
+  }
 }
 
 .scrollbars {

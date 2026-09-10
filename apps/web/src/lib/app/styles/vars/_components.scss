@@ -21,6 +21,11 @@
   --navigation-progress-z-index: 1002;
 
   --modal-text-width: min(720px, calc(100vw - var(--padding-x10)));
+  --rich-editor-image-width: 200px;
+  --playthrough-modal-width: min(80vw, 400px);
+  --playthrough-modal-height: min(70vh, 500px);
+  --playthrough-modal-width-lg: min(88vw, 760px);
+  --playthrough-modal-height-lg: min(86vh, 780px);
   --games-card-min-width: 180px;
   --range-track-height: 6px;
   --range-thumb-size: 20px;

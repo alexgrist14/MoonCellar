@@ -1,0 +1,170 @@
+/* mooncellar-tokens:start */
+/* Generated from apps/web/src/lib/app/styles/vars by
+   `bun --filter web sync:tokens`. Do not edit by hand. */
+:root {
+  /* vars/_colors.scss */
+  --color-neutral-5: #080a0b;
+  --color-neutral-10: #0d1011;
+  --color-neutral-15: #121516;
+  --color-neutral-20: #161b1d;
+  --color-neutral-25: #1a2022;
+  --color-neutral-30: #1f2628;
+  --color-neutral-35: #262d2f;
+  --color-neutral-40: #2f3537;
+  --color-neutral-45: #383e40;
+  --color-neutral-50: #3f4750;
+  --color-neutral-55: #50575d;
+  --color-neutral-60: #5e6a6e;
+  --color-neutral-70: #747d82;
+  --color-neutral-80: #9192a1;
+  --color-neutral-85: #b0b2bc;
+  --color-neutral-90: #d9d9d9;
+  --color-neutral-95: #eaeaea;
+  --color-neutral-100: #ffffff;
+  --color-blue: #00a0ff;
+  --color-blue-light: #00d4ff;
+  --color-gray: #afb3b9;
+  --color-yellow: #ffc451;
+  --color-yellow-light: #f9f871;
+  --color-orange: #ff8862;
+  --color-pink: #ff4b8f;
+  --color-violet: #e735c4;
+  --color-positive: #00c292;
+  --color-negative: #d02729;
+  --color-primary: var(--color-neutral-30);
+  --color-secondary: var(--color-neutral-90);
+  --color-contrast: var(--color-neutral-100);
+  --color-contrast-reverse: var(--color-neutral-5);
+  --color-attention: #ffc451;
+  --color-text-primary: var(--color-neutral-100);
+  --color-text-secondary: var(--color-neutral-90);
+  --color-text-muted: var(--color-neutral-85);
+  --color-accent: #6951ee;
+  --color-bg-primary: #191d24;
+  --color-bg-secondary: #212731;
+  --color-bg-tertiary: #2c3340;
+  --color-bg-accent: #6951ee;
+  --color-bg-hover: #374151;
+  --color-bg-positive: #00c292;
+  --color-bg-primary-tint: #191d24ee;
+  --color-bg-secondary-tint: #212731ee;
+  --color-bg-tertiary-tint: #2c3340ee;
+  --color-bg-accent-tint: #6951eeee;
+  --color-bg-positive-tint: #00c292ee;
+  --color-border-primary: var(--color-neutral-35);
+  --color-scrollbar-track: var(--color-neutral-15);
+  --color-scrollbar-thumb: var(--color-neutral-80);
+  --color-border-secondary: var(--color-neutral-85);
+
+  /* vars/_common.scss */
+  --padding-x05: calc(var(--padding-x1) * 0.5);
+  --padding-x1: 4px;
+  --padding-x2: calc(var(--padding-x1) * 2);
+  --padding-x3: calc(var(--padding-x1) * 3);
+  --padding-x4: calc(var(--padding-x1) * 4);
+  --padding-x5: calc(var(--padding-x1) * 5);
+  --padding-x6: calc(var(--padding-x1) * 6);
+  --padding-x7: calc(var(--padding-x1) * 7);
+  --padding-x8: calc(var(--padding-x1) * 8);
+  --padding-x9: calc(var(--padding-x1) * 9);
+  --padding-x10: calc(var(--padding-x1) * 10);
+  --padding-x11: calc(var(--padding-x1) * 11);
+  --padding-x12: calc(var(--padding-x1) * 12);
+  --padding-x13: calc(var(--padding-x1) * 13);
+  --padding-x14: calc(var(--padding-x1) * 14);
+  --padding-x15: calc(var(--padding-x1) * 15);
+  --padding-x16: calc(var(--padding-x1) * 16);
+  --padding-x17: calc(var(--padding-x1) * 17);
+  --padding-x18: calc(var(--padding-x1) * 18);
+  --padding-x19: calc(var(--padding-x1) * 19);
+  --padding-x20: calc(var(--padding-x1) * 20);
+  --padding-x25: calc(var(--padding-x1) * 25);
+  --radius-x1: 4px;
+  --radius-x2: calc(var(--radius-x1) * 2);
+  --radius-x3: calc(var(--radius-x1) * 3);
+  --radius-x4: calc(var(--radius-x1) * 4);
+  --radius-x5: calc(var(--radius-x1) * 5);
+  --radius-x6: calc(var(--radius-x1) * 6);
+  --radius-x7: calc(var(--radius-x1) * 7);
+  --radius-x8: calc(var(--radius-x1) * 8);
+  --radius-x9: calc(var(--radius-x1) * 9);
+  --radius-x10: calc(var(--radius-x1) * 10);
+  --gap-x05: calc(var(--gap-x1) * 0.5);
+  --gap-x1: 4px;
+  --gap-x2: calc(var(--gap-x1) * 2);
+  --gap-x3: calc(var(--gap-x1) * 3);
+  --gap-x4: calc(var(--gap-x1) * 4);
+  --gap-x5: calc(var(--gap-x1) * 5);
+  --gap-x6: calc(var(--gap-x1) * 6);
+  --gap-x7: calc(var(--gap-x1) * 7);
+  --gap-x8: calc(var(--gap-x1) * 8);
+  --gap-x9: calc(var(--gap-x1) * 9);
+  --gap-x10: calc(var(--gap-x1) * 10);
+  --gap-x11: calc(var(--gap-x1) * 11);
+  --gap-x12: calc(var(--gap-x1) * 12);
+  --blur-x1: 6px;
+  --duration-instant: 1ms;
+  --duration-fast: 160ms;
+  --duration-base: 280ms;
+  --delay-stagger: 90ms;
+  --easing-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --easing-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --reveal-offset: 12px;
+  --reveal-scale: 0.96;
+  --header-height: 45px;
+  --container-padding-top: calc(var(--header-height) + var(--padding-x3));
+  --container-padding-bottom: var(--padding-x3);
+  --page-height-available: calc(
+    100vh - var(--container-padding-top) - var(--container-padding-bottom)
+  );
+
+  /* vars/_components.scss */
+  --game-completed-color: var(--color-positive);
+  --game-dropped-color: var(--color-negative);
+  --game-playing-color: var(--color-accent);
+  --game-wishlist-color: var(--color-violet);
+  --game-backlog-color: var(--color-pink);
+  --game-played-color: var(--color-blue);
+  --game-mastered-color: var(--color-yellow);
+  --cover-ratio: 528/704;
+  --shadow-basic: 0px 4px 4px var(--color-neutral-5);
+  --shadow-text: drop-shadow(0 1px 2px var(--color-neutral-5))
+    drop-shadow(0 0 6px var(--color-neutral-5));
+  --glow-accent: 0 0 0.4rem var(--color-accent);
+  --glow-accent-sm: 0 0 0.15rem var(--color-accent);
+  --avatar-size-sm: var(--padding-x6);
+  --navigation-progress-height: 1px;
+  --navigation-progress-z-index: 1002;
+  --modal-text-width: min(720px, calc(100vw - var(--padding-x10)));
+  --games-card-min-width: 180px;
+  --range-track-height: 6px;
+  --range-thumb-size: 20px;
+  --range-thumb-width: 44px;
+  --range-thumb-height: 24px;
+  --scrollbar-horizontal-size: 6px;
+  --scrollbar-arrow-width: 32px;
+  --scrollbar-fade-width: 48px;
+  --game-keywords-collapsed-height: 66px;
+  --game-hero-artwork-height: 300px;
+  --game-hero-artwork-height-sm: 180px;
+  --game-hero-cover-width: 200px;
+  --game-hero-cover-offset: 104px;
+  --game-hero-counters-width: 360px;
+  --game-rating-popover-width: 320px;
+  --date-picker-width: 300px;
+  --date-picker-field-min-width: 140px;
+  --date-picker-cell-size: 34px;
+  --date-picker-arrow-size: 28px;
+  --game-hero-scrim: linear-gradient(
+    180deg,
+    #191d248c 0%,
+    #191d2400 30%,
+    #212731d1 72%,
+    var(--color-bg-secondary) 100%
+  );
+  --empty-state-image-size: 180px;
+  --not-found-image-height: 240px;
+  --not-found-backdrop-size: 400px;
+  --not-found-content-width: 420px;
+}
+/* mooncellar-tokens:end */

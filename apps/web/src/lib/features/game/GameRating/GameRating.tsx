@@ -83,6 +83,8 @@ export const GameRating: FC<IGameRatingProps> = ({ game, className }) => {
 
   const currentRating = rating?.rating ?? undefined;
 
+  if (!profile) return null;
+
   return (
     <div className={classNames(styles.rating, className)}>
       <div className={styles.rating__head}>

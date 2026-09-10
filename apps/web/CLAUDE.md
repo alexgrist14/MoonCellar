@@ -10,6 +10,34 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
 - **A CSS custom property that derives from other custom properties must be declared on the same element whose values it reads.** `var()` inside a custom property is substituted where the property is *declared*, not where it is used, so a value computed in `:root` freezes the root defaults and ignores any modifier class further down. `--page-height-available` is declared on `.container` for this reason — declaring it in `:root` silently ignored `.container_bottomBar`.
 - For text colour use the semantic tokens, never a raw `--color-neutral-*`: `--color-text-primary` (headings and main copy), `--color-text-secondary` (body text, intro paragraphs), `--color-text-muted` (captions, notes, metadata, breadcrumbs). Picking neutrals by hand is how text ends up unreadable on a `Box` over `BGImage` — the muted step is deliberately the lightest one that still reads as secondary.
 
+## Rich text
+
+- **User-written HTML renders only through the shared `RichText`** (`shared/ui/RichText`), never
+  through `dangerouslySetInnerHTML`. It wraps `Interweave`, which parses the markup into React
+  elements and drops `script`/`iframe` outright — a second line of defence behind the API's
+  `sanitizeRichText`. Both places that show a playthrough comment (the profile's playthrough list
+  and the activity log) go through it, which is what keeps their formatting identical.
+- **The look of rendered rich text is defined once, in the `richText` mixin** (`_mixins.scss`),
+  and consumed by `RichText` and by `RichEditor`'s content area, so the editor shows what the
+  reader gets. Block spacing comes from `--rich-text-gap`. The mixin's `img { max-width: 100% }`
+  is load-bearing: without it a comment image renders at natural size and blows the activity
+  card open to the width of the upload.
+- **A rich-text container must restate `font-size` on its own `p`.** `root.scss` declares a bare
+  `p { font-size: 14px }`, and an explicit declaration beats an inherited one whatever the
+  specificity, so a size set on the wrapper silently does nothing to paragraphs — the `richText`
+  mixin sets `p { font-size: inherit; line-height: inherit }` for exactly this reason.
+- **Never collapse `<br>` with `br + br`.** The adjacent-sibling combinator ignores text nodes,
+  so in `Status<br/>Console<br/>Date<br/>` every `br` counts as the next one's sibling and the
+  rule hides all but the first — the whole activity feed collapsed into
+  `3DO Interactive MultiplayerDate: 06.09.2026Time: 5h`. Log rows are stored HTML snapshots
+  written at action time, so a rule like this breaks every historical entry at once and no
+  amount of re-saving fixes them.
+- **Log text built by the API must keep block-level content out of `<span>`.** A `<p>` or `<img>`
+  inside a span is invalid nesting and the parser hoists it out, which is how the activity feed
+  ended up with the comment escaping its card. `getPlaythroughDetailsText` wraps the small
+  metadata in a `div` and emits the comment as its own sibling block, so the comment renders at
+  the shared rich-text size rather than inheriting the 12px metadata size.
+
 ## Layout
 
 - **Every content block on a page must sit inside the shared `Box` component from `src/lib/shared/ui/Box`** — not only large sections and cards, but small ones too: breadcrumbs, page headings, intro paragraphs, link rows. Nothing renders directly on the page background.
@@ -154,6 +182,39 @@ component needs to build the value itself (a `basePath` string, not a `getHref` 
   behind an endless spinner. Use `isFetching` (or `isLoading`, which is `isPending &&
   isFetching`): both are `false` while a query is disabled and `true` on the first render of an
   enabled one, so nothing flashes before the loader appears.
+
+## Mockups
+
+Design proposals are built as standalone HTML in `docs/mockups/`, not as throwaway files
+outside the repository. The full reference — palette roles, scales, what a mockup must respect
+to be buildable — is [`docs/design-system.md`](../../docs/design-system.md). The rules that
+break silently when ignored:
+
+- **A mockup never restates a token.** It uses `var(--color-bg-primary)`, `var(--radius-x5)`,
+  `var(--duration-fast)` directly. Copying a hex into a mockup is how a proposal ends up
+  showing an accent the site stopped using six months ago, and nobody notices until it ships.
+- **The token block is generated, not written.** `bun --filter web sync:tokens` reads
+  `@forward "./vars/*"` out of `root.scss`, lifts each `:root` block, and injects the result
+  between `/* mooncellar-tokens:start */` and `/* mooncellar-tokens:end */` in every
+  `docs/mockups/*.html` plus `docs/design-tokens.css`. Edits inside those markers are
+  overwritten on the next run. The flow is one-directional: SCSS is the source.
+- **Start from `docs/mockups/_template.html`,** which already carries the markers, the
+  `--mock-` prefix convention and the font substitution note. A file without both markers is
+  reported as `no-markers` and skipped — the sync stays silent about it otherwise, so a
+  hand-rolled mockup quietly stops tracking the design system.
+- **Prefix anything the mockup invents with `--mock-`.** A name without the prefix came from
+  the site; a name with it exists only in the proposal and is the list of things to promote
+  into `vars/` if the design ships.
+- **`bun --filter web check:tokens` is the same read, exit 1 when stale.** Run it after
+  touching `vars/` — a token change that does not reach the mockups makes every open proposal
+  wrong.
+- **A mockup is named for its subject, never for a task number.** Ticket numbering lives in an
+  external tracker and is meaningless to anyone reading the file a year later — `editor.html`
+  with an eyebrow reading `MoonCellar · rich text editor`, not `task 7`. The filename, the
+  `<title>` and the eyebrow all name the thing being designed.
+- **The licensed faces cannot travel.** ApercuPro and Pentagra are local files, and a published
+  mockup may only pull fonts from Google Fonts. Substitute Hanken Grotesk and say so on the
+  page, or the mockup reads as a typography proposal it isn't.
 
 ## Verification
 

@@ -1,13 +1,16 @@
 import {
+  BadRequestException,
   Controller,
   Delete,
   Get,
   Post,
   Query,
+  Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
+import mongoose from "mongoose";
 import { AuthGuard } from "@nestjs/passport";
 import {
   ApiBody,
@@ -22,6 +25,15 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { RolesGuard } from "../../roles/roles.guard";
 import { Roles } from "../../roles/roles.decorator";
 import { GetFileRequestDto } from "../../../shared/zod/dto/files.dto";
+import { COMMENT_IMAGE_BUCKET } from "../../../shared/utils/rich-text.utils";
+
+const COMMENT_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+const COMMENT_IMAGE_MIME_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+];
 
 @ApiTags("Files Controller")
 @Controller("file")
@@ -32,6 +44,39 @@ export class FilesController {
   @ApiResponse({ status: 200, description: "Success" })
   async getFile(@Query() dto: GetFileRequestDto) {
     return this.fileService.getFile(dto);
+  }
+
+  @Post("/comment-image")
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"))
+  @UseInterceptors(
+    FileInterceptor("file", { limits: { fileSize: COMMENT_IMAGE_MAX_BYTES } })
+  )
+  @ApiConsumes("multipart/form-data")
+  @ApiBody({
+    schema: {
+      type: "object",
+      properties: { file: { type: "string", format: "binary" } },
+    },
+  })
+  @ApiResponse({ status: 201, description: "Public URL of the stored image" })
+  async uploadCommentImage(
+    @Req() req: { user?: { _id: mongoose.Types.ObjectId } },
+    @UploadedFile() file: Express.Multer.File
+  ) {
+    if (!file) throw new BadRequestException("No file uploaded");
+
+    if (!COMMENT_IMAGE_MIME_TYPES.includes(file.mimetype)) {
+      throw new BadRequestException(
+        `Unsupported image type: ${file.mimetype}. Allowed: ${COMMENT_IMAGE_MIME_TYPES.join(", ")}`
+      );
+    }
+
+    return this.fileService.uploadPublicImage(
+      file,
+      `${req.user._id.toString()}/${new mongoose.Types.ObjectId().toString()}`,
+      COMMENT_IMAGE_BUCKET
+    );
   }
 
   @Post("/object")

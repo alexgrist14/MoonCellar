@@ -24,7 +24,6 @@
   }
 
   &__comment {
-    @include font(13px, 17px, 400);
     color: var(--color-neutral-100);
   }
 }

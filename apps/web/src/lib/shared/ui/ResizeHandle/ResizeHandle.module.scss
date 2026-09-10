@@ -1,0 +1,20 @@
+.handle {
+  position: absolute;
+  right: var(--padding-x1);
+  bottom: var(--padding-x1);
+  z-index: 3;
+  display: none;
+  padding: var(--padding-x1);
+  color: var(--color-text-muted);
+  cursor: nwse-resize;
+  touch-action: none;
+  transition: color var(--duration-fast) var(--easing-out);
+
+  &:hover {
+    color: var(--color-accent);
+  }
+
+  @include mediaMin($screenMd) {
+    display: block;
+  }
+}

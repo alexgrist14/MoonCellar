@@ -10,8 +10,7 @@ import { WheelOptions } from "@/src/lib/features/wheel/WheelOptions";
 import { useWheelStore } from "@/src/lib/shared/store/wheel.store";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { ExpandableBlock } from "@/src/lib/shared/ui/ExpandableBlock";
-import { Slideshow } from "@/src/lib/shared/ui/Slideshow";
-import { VideosRow } from "@/src/lib/shared/ui/VideosRow";
+import { GameMedia } from "@/src/lib/entities/game/ui/GameMedia";
 import { GameStatsBoxes } from "@/src/lib/entities/game/ui/GameStatsBoxes";
 import { useHideAdult } from "@/src/lib/shared/hooks/useHideAdult";
 import { isAdultGame } from "@/src/lib/shared/utils/adult.utils";
@@ -153,16 +152,9 @@ export const WheelContainer: FC = () => {
                     </ExpandableBlock>
                   </div>
                 )}
-                {!hideMedia && !!shownWinner.screenshots?.length && (
+                {!hideMedia && (
                   <div className={styles.info__text}>
-                    <h4>Screenshots:</h4>
-                    <Slideshow pictures={shownWinner.screenshots} />
-                  </div>
-                )}
-                {!hideMedia && !!shownWinner.videos?.length && (
-                  <div className={styles.info__text}>
-                    <h4>Videos:</h4>
-                    <VideosRow videos={shownWinner.videos} />
+                    <GameMedia game={shownWinner} isBoxed={false} />
                   </div>
                 )}
                 {!!shownWinner.release_dates?.length && (
