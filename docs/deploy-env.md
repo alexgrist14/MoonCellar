@@ -109,8 +109,8 @@ Verified against the running containers. The host ships far fewer keys than the 
 list, because almost every variable the code reads has a hardcoded fallback — and in this
 deployment those fallbacks happen to be the production values.
 
-**Frontend — three keys set:** `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_LOKI_HOST`,
-`NEXT_PUBLIC_S3_HOST`.
+**Frontend — two keys set:** `NEXT_PUBLIC_API_URL` and `REVALIDATE_SECRET`. The two dead keys
+noted below, `NEXT_PUBLIC_LOKI_HOST` and `NEXT_PUBLIC_S3_HOST`, have since been dropped.
 
 **Backend — fifteen keys set:** everything in its table except `FRONT_URL`, `LOCAL_CONNECTION`
 and `INDEXNOW_KEY`.
@@ -151,9 +151,10 @@ Two keys are set in production but referenced nowhere in the code — `NEXT_PUBL
 | `NEXT_PUBLIC_FARO_APP_NAME` | no | Application name in Grafana Faro |
 | `LOKI_HOST` | no | Loki push endpoint for the `/api/logs` route handler. Server-side only — it must not become `NEXT_PUBLIC_*`, or the endpoint ends up in the browser bundle. Defaults to `http://host.containers.internal:3100` when unset (`apps/web/src/app/api/logs/route.ts`) |
 | `GEO_BLOCK_COUNTRIES` | no | Comma-separated ISO country codes to block, e.g. `RU,BY`. Empty disables blocking |
+| `REVALIDATE_SECRET` | **yes** | Shared secret for `POST /api/revalidate`, compared against the `x-revalidate-secret` header. Server-side only — never `NEXT_PUBLIC_*`, or the secret ships in the browser bundle. Unset disables the endpoint: it answers 503 instead of falling back to an unguarded default |
 
-Nothing in this file is a credential — everything the frontend needs is public by design. It
-still belongs in a secret, because the file also pins the internal API address.
+Everything the frontend needs is public by design except `REVALIDATE_SECRET`; the file also
+pins the internal API address, so it stays a secret on both counts.
 
 ---
 
@@ -250,6 +251,8 @@ NEXT_PUBLIC_FARO_APP_NAME=mooncellar-web
 LOKI_HOST=http://localhost:3100
 # Comma-separated ISO country codes to block; empty disables it
 GEO_BLOCK_COUNTRIES=
+# Shared secret guarding POST /api/revalidate
+REVALIDATE_SECRET=
 ```
 
 </details>

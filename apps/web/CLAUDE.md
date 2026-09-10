@@ -90,6 +90,22 @@ before:
   server action (`entities/game/api/game.actions.ts`) *before* `router.refresh()`, or the refresh
   refills the cache with the stale render. Background jobs on the server deliberately do not
   revalidate: a mass parse would turn every touched page into a cold render.
+- **A failed fetch in `generateMetadata` must never return `robots: noindex`.** The page
+  component still renders, so the response stays 200 with real content under a "Page not found"
+  head, and ISR caches that mix — the symptom is `<title>Page not found | MoonCellar</title>` on
+  a game page that loads perfectly for a human, invisible until someone checks the HTML. Return
+  neutral metadata on failure and leave the 404 to the page component, which calls `notFound()`
+  and lets Next add the `noindex` itself.
+- **`fetchOrNull` maps only 404 to `null`.** A 400 from the API is a contract violation, not a
+  missing record — `by-slug` answers 400 when the `slug` query param is absent, and treating that
+  as "not found" noindexed the whole catalogue. A route whose 404 really does come from a
+  request-shape rule must check that shape itself before calling the API: `/user/[name]` validates
+  the name with `GetUserByStringSchema` (an email, or 3–15 chars of `[a-zA-Z0-9_]`) so an
+  impossible username is a 404 instead of a 500.
+- **Purge a poisoned ISR entry with `POST /api/revalidate`** — header `x-revalidate-secret`
+  matching `REVALIDATE_SECRET`, body `{"slugs": [...]}` (max 200). `revalidatePath` inside a Route
+  Handler only *marks* the path; the re-render happens on the next visit, so request each page
+  once afterwards and check its `<title>`.
 - **A page-level `openGraph` or `twitter` object replaces the parent's wholesale — it does not
   merge.** A route that declares `openGraph` must restate `siteName`, `type`, `locale` and
   `images`, or it loses them. Do not put `twitter.images` in the root layout: every page without
