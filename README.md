@@ -110,13 +110,44 @@ bun --filter '@mooncellar/schemas' build
 bun run dev
 ```
 
-`bun run dev` fans out to every workspace and respects dependency order: `@mooncellar/schemas`
-compiles before the apps that import it. To run one side only:
+`bun run dev` builds `@mooncellar/schemas` once, then starts all three watchers in parallel in
+a single terminal — it is `dev:schemas`, `dev:api` and `dev:web` backgrounded together.
+
+### Running the modules separately
+
+One terminal per workspace. Use this when you want readable logs per process, a debugger
+attached to just one of them, or only part of the stack running.
 
 ```bash
-bun --filter web dev          # frontend on http://localhost:3000
-bun --filter api start:dev    # API on http://localhost:3228, Swagger at /api
+# once, before either app starts — both import the package's dist
+bun --filter '@mooncellar/schemas' build
+
+# terminal 1 — shared contracts, recompiled on every change
+bun --filter '@mooncellar/schemas' dev     # tsc --watch → packages/schemas/dist
+
+# terminal 2 — API on :3228, Swagger at :3228/api
+bun --filter api start:dev                 # needs MongoDB from the compose stack
+
+# terminal 3 — frontend on :3000
+bun --filter web dev                       # needs the API up: pages fetch it while rendering
 ```
+
+The root aliases run exactly these three: `bun run dev:schemas`, `bun run dev:api`,
+`bun run dev:web`.
+
+Three things that are easy to get wrong here:
+
+- **Build `@mooncellar/schemas` before starting either app.** Both resolve the package to its
+  `dist`, never its `src`, so on a fresh checkout the import fails until that first build exists.
+  The watcher keeps it current from then on.
+- **The API's script is `start:dev`, not `dev`.** `apps/api` has no `dev` script at all, which is
+  why the root alias spells the name out.
+- **Never start them with `bun --filter '*' dev`.** `bun --filter` runs the selected scripts in
+  dependency order and waits for each dependency to exit first — `@mooncellar/schemas`'s `dev` is
+  `tsc --watch`, which never exits, so `web dev` is never spawned at all and the terminal sits on
+  the tsc watch banner with no Next.js output. The glob also skips `apps/api` in silence, because
+  it has no script by that name. `build` and `lint` may keep `--filter '*'`: those scripts
+  terminate, and there the dependency ordering is exactly what is wanted.
 
 ### Services and ports
 
@@ -138,7 +169,10 @@ bun --filter api start:dev    # API on http://localhost:3228, Swagger at /api
 |---|---|
 | `bun install` | Installs all workspaces into one hoisted `node_modules` |
 | `bun install --filter './apps/api...'` | Installs one app and its workspace dependencies only |
-| `bun run dev` | `dev` in every workspace, in dependency order |
+| `bun run dev` | Builds the schemas, then runs all three watchers in one terminal |
+| `bun run dev:schemas` | `tsc --watch` for `@mooncellar/schemas` only |
+| `bun run dev:api` | `api start:dev` only — watch mode on :3228 |
+| `bun run dev:web` | `web dev` only — Next.js on :3000 |
 | `bun run build` | `build` in every workspace |
 | `bun run lint` | `lint` in every workspace |
 | `bun run format:check` | Prettier over the whole repo |
