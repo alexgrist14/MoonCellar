@@ -145,46 +145,42 @@ export const GameCard = memo(
           )}
           draggable={false}
         >
-          {(!!rank || !!profile?._id) && (
-            <div
-              className={classNames(
-                styles.card__rail,
-                styles.card__rail_topLeft
-              )}
+          <div
+            className={classNames(
+              styles.card__rail,
+              styles.card__rail_topLeft
+            )}
+          >
+            {!!rank && <div className={styles.card__rank}>{rank}</div>}
+            <Tooltip
+              content={
+                isRoyal ? "Remove from royal games" : "Add to royal games"
+              }
             >
-              {!!rank && <div className={styles.card__rank}>{rank}</div>}
-              {!!profile?._id && (
-                <Tooltip
-                  content={
-                    isRoyal ? "Remove from royal games" : "Add to royal games"
-                  }
-                >
-                  <div
-                    role="button"
-                    aria-label={
-                      isRoyal ? "Remove from royal games" : "Add to royal games"
-                    }
-                    className={classNames(styles.card__royal, {
-                      [styles.card__royal_empty]: !isRoyal,
-                    })}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      event.stopPropagation();
+              <div
+                role="button"
+                aria-label={
+                  isRoyal ? "Remove from royal games" : "Add to royal games"
+                }
+                className={classNames(styles.card__royal, {
+                  [styles.card__royal_empty]: !isRoyal,
+                })}
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
 
-                      isRoyal
-                        ? removeRoyalGame(game._id)
-                        : addRoyalGame(game._id);
-                    }}
-                  >
-                    <SvgCrown
-                      size="16"
-                      color={isRoyal ? "contrast-reverse" : "secondary"}
-                    />
-                  </div>
-                </Tooltip>
-              )}
-            </div>
-          )}
+                  isRoyal
+                    ? removeRoyalGame(game._id)
+                    : addRoyalGame(game._id);
+                }}
+              >
+                <SvgCrown
+                  size="16"
+                  color={isRoyal ? "contrast-reverse" : "secondary"}
+                />
+              </div>
+            </Tooltip>
+          </div>
           {!!profile?._id && (
             <div
               className={classNames(
