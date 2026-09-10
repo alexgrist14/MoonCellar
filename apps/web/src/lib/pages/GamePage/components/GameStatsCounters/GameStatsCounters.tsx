@@ -28,6 +28,8 @@ export const GameStatsCounters: FC<IGameStatsCountersProps> = ({
     { key: "backlog", label: "In backlog", value: stats.backlog },
     { key: "playing", label: "Playing now", value: stats.playing },
     { key: "mastered", label: "Mastered", value: stats.mastered },
+    { key: "wishlist", label: "In wishlist", value: stats.wishlist },
+    { key: "dropped", label: "Dropped", value: stats.dropped },
   ];
 
   return (

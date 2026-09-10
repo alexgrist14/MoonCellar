@@ -2,11 +2,15 @@
   flex-shrink: 0;
   width: var(--game-hero-counters-width);
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--gap-x2);
 
   @include mediaMd {
     width: 100%;
+  }
+
+  @include mediaSm {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   &__item {
@@ -16,19 +20,27 @@
     background-color: var(--color-bg-primary);
 
     &_completed {
-      --counter-color: var(--color-positive);
+      --counter-color: var(--game-completed-color);
     }
 
     &_backlog {
-      --counter-color: var(--color-pink);
+      --counter-color: var(--game-backlog-color);
     }
 
     &_playing {
-      --counter-color: var(--color-accent);
+      --counter-color: var(--game-playing-color);
     }
 
     &_mastered {
-      --counter-color: var(--color-yellow);
+      --counter-color: var(--game-mastered-color);
+    }
+
+    &_wishlist {
+      --counter-color: var(--game-wishlist-color);
+    }
+
+    &_dropped {
+      --counter-color: var(--game-dropped-color);
     }
   }
 
