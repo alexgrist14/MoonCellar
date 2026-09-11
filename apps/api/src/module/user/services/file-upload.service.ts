@@ -1,13 +1,11 @@
 import {
   DeleteObjectCommand,
   DeleteObjectsCommand,
-  PutObjectCommand,
   GetObjectCommand,
-  ListBucketsCommand,
-  S3Client,
-  PutObjectCommandInput,
   ListObjectsV2Command,
-  ListObjectsV2CommandInput,
+  PutObjectCommand,
+  PutObjectCommandInput,
+  S3Client,
 } from "@aws-sdk/client-s3";
 import {
   BadRequestException,
@@ -15,29 +13,56 @@ import {
   Logger,
   NotFoundException,
 } from "@nestjs/common";
-import { getS3Config, mimeToExt } from "../../../shared/constants";
 import { IGetFileRequest, IGetFileResponse } from "@mooncellar/schemas";
+import { mimeToExt } from "../../../shared/constants";
+import {
+  getS3Bucket,
+  getS3CdnUrl,
+  getS3Config,
+  S3_FOLDERS,
+  S3Folder,
+} from "../../../shared/s3";
+
+const DELETE_BATCH_SIZE = 1000;
+
+interface IStoredObject {
+  key: string;
+  etag?: string;
+}
 
 @Injectable()
 export class FileService {
   private readonly logger = new Logger(FileService.name);
   private readonly s3Client = new S3Client(getS3Config());
+  private readonly bucket = getS3Bucket();
+
+  private toKey(folder: S3Folder, key: string) {
+    return `${folder}/${key.replace(/^\/+/, "")}`;
+  }
+
+  getPublicUrl(folder: S3Folder, key: string) {
+    return `${getS3CdnUrl()}/${this.toKey(folder, key)}`;
+  }
+
+  getFolders(): S3Folder[] {
+    return Object.values(S3_FOLDERS);
+  }
 
   async uploadObject(
     Body: PutObjectCommandInput["Body"],
     key: string,
-    bucketName: string
+    folder: S3Folder
   ) {
     try {
       return await this.s3Client.send(
         new PutObjectCommand({
-          Bucket: bucketName,
-          Key: key,
+          Bucket: this.bucket,
+          Key: this.toKey(folder, key),
           Body,
         })
       );
     } catch (err) {
-      this.logger.error(err, `Failed to upload object: ${key}`);
+      this.logger.error(err, `Failed to upload object: ${folder}/${key}`);
       throw err;
     }
   }
@@ -45,26 +70,30 @@ export class FileService {
   async uploadFile(
     file: Express.Multer.File,
     key: string,
-    bucketName: string,
+    folder: S3Folder,
     mimetype?: string,
     isPrivate?: boolean
-  ) {
+  ): Promise<string | undefined> {
     try {
-      if (!file) return;
+      if (!file) return undefined;
 
-      const ext = mimeToExt[file.mimetype || mimetype] || "";
+      const contentType = file.mimetype || mimetype;
+      const ext = mimeToExt[contentType];
+      const storedKey = ext ? `${key}.${ext}` : key;
 
-      return await this.s3Client.send(
+      await this.s3Client.send(
         new PutObjectCommand({
-          Bucket: bucketName,
-          Key: key + `.${ext}`,
+          Bucket: this.bucket,
+          Key: this.toKey(folder, storedKey),
           Body: file.buffer,
-          ContentType: file.mimetype || mimetype,
+          ContentType: contentType,
           ACL: isPrivate ? "private" : "public-read",
         })
       );
+
+      return storedKey;
     } catch (err) {
-      this.logger.error(err, `Failed to upload file: ${key}`);
+      this.logger.error(err, `Failed to upload file: ${folder}/${key}`);
       throw err;
     }
   }
@@ -72,96 +101,90 @@ export class FileService {
   async uploadPublicImage(
     file: Express.Multer.File,
     key: string,
-    bucketName: string
+    folder: S3Folder
   ) {
-    const ext = mimeToExt[file.mimetype];
-
-    if (!ext) {
+    if (!mimeToExt[file.mimetype]) {
       throw new BadRequestException(`Unsupported image type: ${file.mimetype}`);
     }
 
-    await this.uploadFile(file, key, bucketName);
+    const storedKey = await this.uploadFile(file, key, folder);
 
-    return process.env.S3_HOST_CDN.replace("%backet", bucketName) +
-      key +
-      `.${ext}`;
+    if (!storedKey) throw new BadRequestException("No file uploaded");
+
+    return this.getPublicUrl(folder, storedKey);
   }
 
-  async getBuckets() {
-    try {
-      return await this.s3Client.send(new ListBucketsCommand());
-    } catch (err) {
-      this.logger.error(err, `Failed to get buckets`);
-      throw err;
-    }
-  }
+  private async listObjects(
+    folder: S3Folder,
+    prefix = ""
+  ): Promise<IStoredObject[]> {
+    const folderPrefix = this.toKey(folder, "");
+    const items: IStoredObject[] = [];
+    let continuationToken: string | undefined;
 
-  async getAllKeys(
-    bucketName: string,
-    options?: {
-      callback?: (keys: string[]) => Promise<unknown>;
-      prefix?: string;
-    }
-  ) {
-    try {
-      let keys = [];
-      let continuationToken = null;
-
-      do {
-        const params: ListObjectsV2CommandInput = {
-          Bucket: bucketName,
+    do {
+      const response = await this.s3Client.send(
+        new ListObjectsV2Command({
+          Bucket: this.bucket,
+          Prefix: this.toKey(folder, prefix),
           ContinuationToken: continuationToken,
-          Prefix: options?.prefix,
-        };
+        })
+      );
 
-        try {
-          const response = await this.s3Client.send(
-            new ListObjectsV2Command(params)
-          );
+      for (const item of response.Contents ?? []) {
+        if (!item.Key?.startsWith(folderPrefix)) continue;
 
-          keys = !!response.Contents?.length
-            ? keys.concat(response.Contents.map((item) => item.Key))
-            : [];
-          !!keys?.length && (await options?.callback?.(keys));
-          continuationToken = response.NextContinuationToken;
-        } catch (err) {
-          console.error("Error fetching keys:", err);
-          throw err;
-        }
-      } while (continuationToken);
-
-      return keys;
-    } catch (err) {
-      this.logger.error(err, `Failed to get all keys: ${bucketName}`);
-      throw err;
-    }
-  }
-
-  async clearBucket(bucketName: string) {
-    try {
-      const size = 1000;
-      const keys = await this.getAllKeys(bucketName);
-      if (!keys?.length) return;
-
-      for (let i = 0; i <= keys.length; i += size) {
-        const slice = keys.slice(i, i + size);
-        await this.deleteFiles(slice, bucketName);
-        console.log(`Removed keys from ${i} to ${i + size}`);
+        items.push({
+          key: item.Key.slice(folderPrefix.length),
+          etag: item.ETag?.replace(/"/g, ""),
+        });
       }
 
-      return keys;
+      continuationToken = response.IsTruncated
+        ? response.NextContinuationToken
+        : undefined;
+    } while (continuationToken);
+
+    return items;
+  }
+
+  async getAllKeys(folder: S3Folder, options?: { prefix?: string }) {
+    try {
+      const items = await this.listObjects(folder, options?.prefix);
+
+      return items.map((item) => item.key);
     } catch (err) {
-      this.logger.error(err, `Failed to clear bucket: ${bucketName}`);
+      this.logger.error(err, `Failed to get all keys: ${folder}`);
       throw err;
     }
   }
 
-  async getFile(params: IGetFileRequest): Promise<IGetFileResponse> {
+  async clearFolder(folder: S3Folder) {
     try {
-      const { bucketName, key, contentTo } = params;
+      const keys = await this.getAllKeys(folder);
 
+      await this.deleteFiles(keys, folder);
+
+      return keys;
+    } catch (err) {
+      this.logger.error(err, `Failed to clear folder: ${folder}`);
+      throw err;
+    }
+  }
+
+  async getFile(
+    folder: S3Folder,
+    key: string,
+    contentTo?: IGetFileRequest["contentTo"]
+  ): Promise<IGetFileResponse> {
+    try {
       const item = await this.s3Client
-        .send(new GetObjectCommand({ Bucket: bucketName, Key: key }))
+        .send(
+          new GetObjectCommand({
+            Bucket: this.bucket,
+            Key: this.toKey(folder, key),
+          })
+        )
         .catch((err) => {
           throw new NotFoundException(err.Code);
         });
@@ -180,83 +203,71 @@ export class FileService {
               : await item.Body.transformToString(),
       };
     } catch (err) {
-      this.logger.error(err, `Failed to get file: ${params.key}`);
+      this.logger.error(err, `Failed to get file: ${folder}/${key}`);
       throw err;
     }
   }
 
-  async deleteFile(key: string, bucketName: string) {
+  async deleteFile(key: string, folder: S3Folder) {
     try {
       return await this.s3Client.send(
         new DeleteObjectCommand({
-          Bucket: bucketName,
-          Key: key,
+          Bucket: this.bucket,
+          Key: this.toKey(folder, key),
         })
       );
     } catch (err) {
-      this.logger.error(err, `Failed to delete file: ${key}`);
+      this.logger.error(err, `Failed to delete file: ${folder}/${key}`);
       throw err;
     }
   }
 
-  async deleteFiles(keys: string[], bucketName: string) {
+  async deleteFiles(keys: string[], folder: S3Folder) {
     try {
-      return await this.s3Client.send(
-        new DeleteObjectsCommand({
-          Bucket: bucketName,
-          Delete: { Objects: keys.map((key) => ({ Key: key })) },
-        })
-      );
-    } catch (err) {
-      this.logger.error(err, `Failed to delete files: ${keys}`);
-      throw err;
-    }
-  }
+      const results = [];
 
-  async removeDuplicates(bucketName: string) {
-    try {
-      const etagMap = new Map<string, string[]>();
+      for (let i = 0; i < keys.length; i += DELETE_BATCH_SIZE) {
+        const batch = keys.slice(i, i + DELETE_BATCH_SIZE);
 
-      let continuationToken: string | undefined = undefined;
-
-      do {
-        const params: ListObjectsV2CommandInput = {
-          Bucket: bucketName,
-          ContinuationToken: continuationToken,
-        };
-
-        const response = await this.s3Client.send(
-          new ListObjectsV2Command(params)
+        results.push(
+          await this.s3Client.send(
+            new DeleteObjectsCommand({
+              Bucket: this.bucket,
+              Delete: {
+                Objects: batch.map((key) => ({ Key: this.toKey(folder, key) })),
+              },
+            })
+          )
         );
-
-        if (response.Contents) {
-          for (const item of response.Contents) {
-            if (item.ETag && item.Key) {
-              const etag = item.ETag.replace(/"/g, "");
-              if (!etagMap.has(etag)) {
-                etagMap.set(etag, []);
-              }
-              etagMap.get(etag)!.push(item.Key);
-            }
-          }
-        }
-
-        continuationToken = response.NextContinuationToken;
-      } while (continuationToken);
-
-      const keysToDelete: string[] = [];
-
-      for (const keys of etagMap.values()) {
-        if (keys.length > 1) {
-          keysToDelete.push(...keys.slice(1));
-        }
       }
 
-      if (keysToDelete.length > 0) {
-        await this.deleteFiles(keysToDelete, bucketName);
-      }
+      return results;
     } catch (err) {
-      this.logger.error(err, `Failed to remove duplicates: ${bucketName}`);
+      this.logger.error(err, `Failed to delete files in ${folder}: ${keys}`);
+      throw err;
+    }
+  }
+
+  async removeDuplicates(folder: S3Folder) {
+    try {
+      const seen = new Set<string>();
+      const duplicates: string[] = [];
+
+      for (const { key, etag } of await this.listObjects(folder)) {
+        if (!etag) continue;
+
+        if (seen.has(etag)) {
+          duplicates.push(key);
+        } else {
+          seen.add(etag);
+        }
+      }
+
+      await this.deleteFiles(duplicates, folder);
+
+      return duplicates;
+    } catch (err) {
+      this.logger.error(err, `Failed to remove duplicates: ${folder}`);
       throw err;
     }
   }

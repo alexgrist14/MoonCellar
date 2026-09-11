@@ -9,7 +9,6 @@ import * as bcrypt from "bcryptjs";
 import { Query as ExpressQuery } from "express-serve-static-core";
 import mongoose, { Model } from "mongoose";
 import { User } from "../schemas/user.schema";
-import { mimeToExt } from "../../../shared/constants";
 import {
   DEFAULT_BG_OPACITY,
   IGetUserByStringRequest,
@@ -20,6 +19,7 @@ import {
   IUpdateUserSettingsRequest,
 } from "@mooncellar/schemas";
 import { FileService } from "./file-upload.service";
+import { S3_FOLDERS } from "../../../shared/s3";
 
 @Injectable()
 export class UserProfileService {
@@ -146,13 +146,19 @@ export class UserProfileService {
     try {
       const user = await this.userModel.findById(userId);
       const avatarId = new mongoose.Types.ObjectId().toString();
-      const ext = mimeToExt[file.mimetype];
 
       if (!user) throw new NotFoundException("User not found");
 
-      await this.fileService.uploadFile(file, avatarId, "mooncellar-avatars");
+      const storedKey = await this.fileService.uploadFile(
+        file,
+        avatarId,
+        S3_FOLDERS.avatars
+      );
 
-      user.avatar = `https://mooncellar-avatars.s3.regru.cloud/${avatarId}${ext ? `.${ext}` : ""}`;
+      user.avatar = this.fileService.getPublicUrl(
+        S3_FOLDERS.avatars,
+        storedKey ?? avatarId
+      );
 
       return user.save();
     } catch (err) {
@@ -168,17 +174,19 @@ export class UserProfileService {
     try {
       const user = await this.userModel.findById(userId);
       const backgroundId = new mongoose.Types.ObjectId().toString();
-      const ext = mimeToExt[file.mimetype];
 
       if (!user) throw new NotFoundException("User not found");
 
-      await this.fileService.uploadFile(
+      const storedKey = await this.fileService.uploadFile(
         file,
         backgroundId,
-        "mooncellar-backgrounds"
+        S3_FOLDERS.backgrounds
       );
 
-      user.background = `https://mooncellar-backgrounds.s3.regru.cloud/${backgroundId}${ext ? `.${ext}` : ""}`;
+      user.background = this.fileService.getPublicUrl(
+        S3_FOLDERS.backgrounds,
+        storedKey ?? backgroundId
+      );
 
       return user.save();
     } catch (err) {

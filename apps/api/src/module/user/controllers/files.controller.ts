@@ -25,7 +25,11 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { RolesGuard } from "../../roles/roles.guard";
 import { Roles } from "../../roles/roles.decorator";
 import { GetFileRequestDto } from "../../../shared/zod/dto/files.dto";
-import { COMMENT_IMAGE_BUCKET } from "../../../shared/utils/rich-text.utils";
+import {
+  resolveS3Folder,
+  S3_FOLDERS,
+  S3Folder,
+} from "../../../shared/s3";
 
 const COMMENT_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 const COMMENT_IMAGE_MIME_TYPES = [
@@ -40,10 +44,26 @@ const COMMENT_IMAGE_MIME_TYPES = [
 export class FilesController {
   constructor(private readonly fileService: FileService) {}
 
+  private folderOf(bucketName?: string): S3Folder {
+    const folder = resolveS3Folder(bucketName);
+
+    if (!folder) {
+      throw new BadRequestException(
+        `Unknown storage folder: ${bucketName}. Allowed: ${Object.values(S3_FOLDERS).join(", ")}`
+      );
+    }
+
+    return folder;
+  }
+
   @Get("/")
   @ApiResponse({ status: 200, description: "Success" })
   async getFile(@Query() dto: GetFileRequestDto) {
-    return this.fileService.getFile(dto);
+    return this.fileService.getFile(
+      this.folderOf(dto.bucketName),
+      dto.key,
+      dto.contentTo
+    );
   }
 
   @Post("/comment-image")
@@ -75,7 +95,7 @@ export class FilesController {
     return this.fileService.uploadPublicImage(
       file,
       `${req.user._id.toString()}/${new mongoose.Types.ObjectId().toString()}`,
-      COMMENT_IMAGE_BUCKET
+      S3_FOLDERS.comments
     );
   }
 
@@ -90,7 +110,7 @@ export class FilesController {
     @Query("bucketName") bucketName: string,
     @Query("object") object: string
   ) {
-    return this.fileService.uploadObject(object, key, bucketName);
+    return this.fileService.uploadObject(object, key, this.folderOf(bucketName));
   }
 
   @Post("/")
@@ -98,7 +118,7 @@ export class FilesController {
   @UseGuards(AuthGuard("jwt"), RolesGuard)
   @Roles("admin")
   @UseInterceptors(FileInterceptor("file"))
-  @ApiResponse({ status: 201, description: "WhatsUp Niggga" })
+  @ApiResponse({ status: 201, description: "Key the file was stored under" })
   @ApiConsumes("multipart/form-data")
   @ApiBody({
     schema: {
@@ -116,7 +136,7 @@ export class FilesController {
     @Query("bucketName") bucketName: string,
     @UploadedFile() file: Express.Multer.File
   ) {
-    return this.fileService.uploadFile(file, key, bucketName);
+    return this.fileService.uploadFile(file, key, this.folderOf(bucketName));
   }
 
   @Delete("/")
@@ -128,7 +148,7 @@ export class FilesController {
     @Query("key") key: string,
     @Query("bucketName") bucketName: string
   ) {
-    return await this.fileService.deleteFile(key, bucketName);
+    return await this.fileService.deleteFile(key, this.folderOf(bucketName));
   }
 
   @Delete("/multi")
@@ -137,19 +157,22 @@ export class FilesController {
   @Roles("admin")
   @ApiResponse({ status: 200, description: "Success" })
   async deleteFiles(
-    @Query("keys") keys: string[],
+    @Query("keys") keys: string[] | string,
     @Query("bucketName") bucketName: string
   ) {
-    return await this.fileService.deleteFiles(keys, bucketName);
+    return await this.fileService.deleteFiles(
+      [keys].flat().filter(Boolean),
+      this.folderOf(bucketName)
+    );
   }
 
   @Get("/buckets")
   @ApiCookieAuth()
   @UseGuards(AuthGuard("jwt"), RolesGuard)
   @Roles("admin")
-  @ApiResponse({ status: 200, description: "Success" })
+  @ApiResponse({ status: 200, description: "Storage folders in the bucket" })
   async getBuckets() {
-    return await this.fileService.getBuckets();
+    return this.fileService.getFolders();
   }
 
   @Get("/bucket-keys")
@@ -159,7 +182,9 @@ export class FilesController {
     @Query("bucketName") bucketName: string,
     @Query("prefix") prefix: string | undefined
   ) {
-    return await this.fileService.getAllKeys(bucketName, { prefix });
+    return await this.fileService.getAllKeys(this.folderOf(bucketName), {
+      prefix,
+    });
   }
 
   @Delete("/clear-bucket")
@@ -168,7 +193,9 @@ export class FilesController {
   @Roles("admin")
   @ApiResponse({ status: 200, description: "Success" })
   async clearBucket(@Query("bucketName") bucketName: string) {
-    this.fileService.clearBucket(bucketName);
+    void this.fileService
+      .clearFolder(this.folderOf(bucketName))
+      .catch(() => undefined);
   }
 
   @Delete("/remove-duplicates")
@@ -177,6 +204,8 @@ export class FilesController {
   @Roles("admin")
   @ApiResponse({ status: 200, description: "Success" })
   async removeDuplicates(@Query("bucketName") bucketName: string) {
-    this.fileService.removeDuplicates(bucketName);
+    void this.fileService
+      .removeDuplicates(this.folderOf(bucketName))
+      .catch(() => undefined);
   }
 }

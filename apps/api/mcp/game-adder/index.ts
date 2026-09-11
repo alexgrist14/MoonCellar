@@ -16,7 +16,13 @@ import { writeFileSync, readFileSync, unlinkSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 import { AddGameRequestSchema } from "../../src/shared/zod/schemas/games.schema";
-import { getS3Config } from "../../src/shared/constants";
+import {
+  getS3Bucket,
+  getS3CdnUrl,
+  getS3Config,
+  S3_FOLDERS,
+  S3Folder,
+} from "../../src/shared/s3";
 
 const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:3228";
 const SEARXNG_URL = process.env.SEARXNG_URL || "http://localhost:8891";
@@ -25,17 +31,19 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const ACCESS_TOKEN_COOKIE = "accessMoonToken";
 
-const S3_BUCKETS = {
-  cover: "mooncellar-covers",
-  screenshots: "mooncellar-screenshots",
-  artworks: "mooncellar-artworks",
+const IMAGE_FOLDERS = {
+  cover: S3_FOLDERS.covers,
+  screenshots: S3_FOLDERS.screenshots,
+  artworks: S3_FOLDERS.artworks,
 } as const;
 
 const s3 = new S3Client(getS3Config());
+const bucket = getS3Bucket();
+const cdnUrl = getS3CdnUrl();
 
-const clearExistingImages = async (bucketName: string, slug: string) => {
+const clearExistingImages = async (folder: S3Folder, slug: string) => {
   const existing = await s3.send(
-    new ListObjectsV2Command({ Bucket: bucketName, Prefix: `${slug}/` })
+    new ListObjectsV2Command({ Bucket: bucket, Prefix: `${folder}/${slug}/` })
   );
   const keys = (existing.Contents || [])
     .map((o) => o.Key)
@@ -44,7 +52,7 @@ const clearExistingImages = async (bucketName: string, slug: string) => {
   if (keys.length) {
     await s3.send(
       new DeleteObjectsCommand({
-        Bucket: bucketName,
+        Bucket: bucket,
         Delete: { Objects: keys.map((Key) => ({ Key })) },
       })
     );
@@ -165,13 +173,13 @@ const cropToAspectRatio = (
 };
 
 const uploadImagesToS3 = async (
-  bucketName: string,
+  folder: S3Folder,
   slug: string,
   urls: string[],
   cropOptions?: { ratio: number; position: CropPosition },
   minDimension?: number
 ): Promise<string[]> => {
-  await clearExistingImages(bucketName, slug);
+  await clearExistingImages(folder, slug);
 
   const links: string[] = [];
 
@@ -213,17 +221,15 @@ const uploadImagesToS3 = async (
       const key = `${slug}/${randomBytes(12).toString("hex")}`;
       await s3.send(
         new PutObjectCommand({
-          Bucket: bucketName,
-          Key: `${key}.${ext}`,
+          Bucket: bucket,
+          Key: `${folder}/${key}.${ext}`,
           Body: bytes,
           ContentType: contentType || "image/jpeg",
           ACL: "public-read",
         })
       );
 
-      links.push(
-        `${process.env.S3_HOST_CDN.replace("%backet", bucketName)}${key}.${ext}`
-      );
+      links.push(`${cdnUrl}/${folder}/${key}.${ext}`);
     } catch (e) {
       console.error(`Image upload error for ${url}:`, e);
     }
@@ -581,7 +587,7 @@ server.registerTool(
 
     if (uploaded.cover) {
       const [link] = await uploadImagesToS3(
-        S3_BUCKETS.cover,
+        IMAGE_FOLDERS.cover,
         uploaded.slug,
         [uploaded.cover],
         coverCropPosition !== undefined
@@ -593,7 +599,7 @@ server.registerTool(
 
     if (uploaded.screenshots?.length) {
       uploaded.screenshots = await uploadImagesToS3(
-        S3_BUCKETS.screenshots,
+        IMAGE_FOLDERS.screenshots,
         uploaded.slug,
         uploaded.screenshots
       );
@@ -601,7 +607,7 @@ server.registerTool(
 
     if (uploaded.artworks?.length) {
       uploaded.artworks = await uploadImagesToS3(
-        S3_BUCKETS.artworks,
+        IMAGE_FOLDERS.artworks,
         uploaded.slug,
         uploaded.artworks,
         undefined,

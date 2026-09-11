@@ -1,4 +1,3 @@
-import { S3ClientConfig } from "@aws-sdk/client-s3";
 import { dirname, join } from "path";
 
 export const rootDir = join(dirname(process.argv[1]), "..");
@@ -14,15 +13,6 @@ export const RA_MAIN_USER_NAME = "alexgrist14";
 export const FRONT_URL = process.env.FRONT_URL || "https://mooncellar.space";
 export const INDEXNOW_KEY =
   process.env.INDEXNOW_KEY || "74a6b85cd7164d77a0cccb5baae3d563";
-
-export const getS3Config = (): S3ClientConfig => ({
-  endpoint: process.env.S3_HOST,
-  region: process.env.S3_REGION,
-  credentials: {
-    accessKeyId: process.env.S3_ID,
-    secretAccessKey: process.env.S3_KEY,
-  },
-});
 
 export const mimeToExt = {
   'image/jpeg': 'jpg',

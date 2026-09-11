@@ -61,7 +61,6 @@ import {
   CHARACTER_GAMES_LINK_BATCH_SIZE,
   CHARACTER_MUG_SHOT_FIELD,
   CHARACTER_QUERY_FIELDS,
-  CHARACTERS_BUCKET,
   DEFAULT_GAMES_SYNC_CONCURRENCY,
   DEFAULT_IGDB_SYNC_DELAY_MS,
   DEFAULT_IGDB_SYNC_LIMIT,
@@ -73,6 +72,7 @@ import {
   UPDATABLE_GAME_FIELDS,
   UPDATABLE_PLATFORM_FIELDS,
 } from "./constants/igdb";
+import { S3_FOLDERS, S3Folder } from "../../shared/s3";
 
 type ImageField = (typeof IMAGE_FIELDS)[number];
 
@@ -631,7 +631,7 @@ export class IGDBService {
   }
 
   private async sendArrayToS3(
-    bucketName: string,
+    folder: S3Folder,
     slug: string,
     images: ({ url: string } | string)[]
   ) {
@@ -660,17 +660,16 @@ export class IGDBService {
           continue;
         }
 
-        const key = `${slug}/${_id}`;
-        await this.fileService.uploadFile(
+        const storedKey = await this.fileService.uploadFile(
           response.data,
-          key,
-          bucketName,
+          `${slug}/${_id}`,
+          folder,
           "image/jpeg"
         );
 
-        links.push(
-          process.env.S3_HOST_CDN.replace("%backet", bucketName) + key + ".jpg"
-        );
+        if (storedKey) {
+          links.push(this.fileService.getPublicUrl(folder, storedKey));
+        }
       } catch (e: any) {
         this.logger.error(
           "Image error: " +
@@ -682,13 +681,13 @@ export class IGDBService {
     return links;
   }
 
-  private async clearExistingImages(bucketName: string, slug: string) {
-    const existingKeys = await this.fileService.getAllKeys(bucketName, {
+  private async clearExistingImages(folder: S3Folder, slug: string) {
+    const existingKeys = await this.fileService.getAllKeys(folder, {
       prefix: slug + "/",
     });
 
     if (existingKeys.length) {
-      await this.fileService.deleteFiles(existingKeys, bucketName);
+      await this.fileService.deleteFiles(existingKeys, folder);
     }
   }
 
@@ -822,8 +821,8 @@ export class IGDBService {
       (options?.forceParse || !existingGame?.cover)
     ) {
       try {
-        await this.clearExistingImages("mooncellar-covers", slug);
-        const [link] = await this.sendArrayToS3("mooncellar-covers", slug, [
+        await this.clearExistingImages(S3_FOLDERS.covers, slug);
+        const [link] = await this.sendArrayToS3(S3_FOLDERS.covers, slug, [
           getImageLink(igdbGame.cover.url, "cover_big", 2),
         ]);
 
@@ -842,9 +841,9 @@ export class IGDBService {
         (existingGame?.screenshots?.length || 0) !== screenshotsCount
       ) {
         try {
-          await this.clearExistingImages("mooncellar-screenshots", slug);
+          await this.clearExistingImages(S3_FOLDERS.screenshots, slug);
           update.screenshots = await this.sendArrayToS3(
-            "mooncellar-screenshots",
+            S3_FOLDERS.screenshots,
             slug,
             igdbGame.screenshots || []
           );
@@ -861,9 +860,9 @@ export class IGDBService {
         (existingGame?.artworks?.length || 0) !== artworksCount
       ) {
         try {
-          await this.clearExistingImages("mooncellar-artworks", slug);
+          await this.clearExistingImages(S3_FOLDERS.artworks, slug);
           update.artworks = await this.sendArrayToS3(
-            "mooncellar-artworks",
+            S3_FOLDERS.artworks,
             slug,
             igdbGame.artworks || []
           );
@@ -1618,9 +1617,9 @@ export class IGDBService {
     const key = String(igdbCharacter.id);
 
     try {
-      await this.clearExistingImages(CHARACTERS_BUCKET, key);
+      await this.clearExistingImages(S3_FOLDERS.characters, key);
 
-      const [link] = await this.sendArrayToS3(CHARACTERS_BUCKET, key, [
+      const [link] = await this.sendArrayToS3(S3_FOLDERS.characters, key, [
         getImageLink(igdbCharacter.mug_shot.url, "cover_big", 2),
       ]);
 

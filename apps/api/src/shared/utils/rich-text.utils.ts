@@ -1,7 +1,5 @@
 import * as sanitizeHtml from "sanitize-html";
 
-export const COMMENT_IMAGE_BUCKET = "mooncellar-comments";
-
 const options: sanitizeHtml.IOptions = {
   allowedTags: [
     "p",

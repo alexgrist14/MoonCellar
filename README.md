@@ -407,7 +407,7 @@ config in `infra/prometheus/`, and the Alloy receiver config in `infra/monitorin
 | `LOCAL_CONNECTION` | Extra comma-separated origins allowed by CORS in dev |
 | `TWITCH_CLIENT_ID` / `TWITCH_CLIENT_SECRET` | IGDB API credentials (IGDB authenticates via Twitch) |
 | `RETROACHIEVEMENTS_API_KEY` | RetroAchievements API key |
-| `S3_HOST`, `S3_HOST_CDN`, `S3_ID`, `S3_KEY`, `S3_REGION` | S3 storage for user uploads |
+| `S3_ID`, `S3_KEY`, `S3_ENDPOINT`, `S3_BUCKET`, `S3_CDN_URL` | DigitalOcean Spaces: one bucket, one folder per content type |
 | `LOKI_HOST` | Loki endpoint for log shipping |
 | `FARO_COLLECTOR_URL` | Grafana Alloy / Faro collector endpoint |
 | `PROMETHEUS_ENABLED` | Toggle the metrics endpoint |
