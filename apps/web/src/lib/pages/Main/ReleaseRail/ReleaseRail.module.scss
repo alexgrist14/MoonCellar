@@ -2,6 +2,7 @@
   display: flex;
   gap: var(--gap-x4);
   width: 100%;
+  padding: 0 !important;
   padding-bottom: var(--padding-x3);
 
   &__item {
@@ -11,6 +12,10 @@
     flex-direction: column;
     gap: var(--gap-x2);
     align-items: center;
+
+    @include mediaSm {
+      width: calc((100% - var(--gap-x4)) / 2);
+    }
   }
 
   &__date {

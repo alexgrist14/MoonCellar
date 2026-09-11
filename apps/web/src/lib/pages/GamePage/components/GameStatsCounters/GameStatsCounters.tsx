@@ -21,7 +21,7 @@ export const GameStatsCounters: FC<IGameStatsCountersProps> = ({
 }) => {
   const { data: stats } = useGameStatsQuery(gameId, initialStats);
 
-  if (!stats?.players) return null;
+  if (!stats) return null;
 
   const counters = [
     { key: "completed", label: "Beaten by", value: stats.completed },
@@ -31,6 +31,8 @@ export const GameStatsCounters: FC<IGameStatsCountersProps> = ({
     { key: "wishlist", label: "In wishlist", value: stats.wishlist },
     { key: "dropped", label: "Dropped", value: stats.dropped },
   ];
+
+  if (counters.every((counter) => !counter.value)) return null;
 
   return (
     <div className={classNames(styles.counters, className)}>

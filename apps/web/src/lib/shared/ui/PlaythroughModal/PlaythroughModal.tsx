@@ -17,7 +17,7 @@ import {
   SavePlaythroughRequestSchema,
   IGameResponse,
 } from "@mooncellar/schemas";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader } from "../Loader";
 import { Errors } from "../Errors";
@@ -63,6 +63,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
 
   const {
     register,
+    control,
     setValue,
     reset,
     watch,
@@ -300,16 +301,26 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
               clickCallback={() => setValue("isMastered", !watch("isMastered"))}
             />
           )}
-          <RichEditor
-            ref={editorRef}
-            value={watch("comment") || ""}
-            onChange={(html) =>
-              setValue("comment", html, { shouldValidate: true })
-            }
-            placeholder="Enter comment..."
-            className={styles.modal__comment}
-            error={errors.comment}
-          />
+          <div
+            className={classNames(styles.modal__comment, {
+              [styles.modal__comment_hidden]: watch("category") === "wishlist",
+            })}
+          >
+            <Controller
+              control={control}
+              name="comment"
+              render={({ field }) => (
+                <RichEditor
+                  ref={editorRef}
+                  value={field.value || ""}
+                  onChange={field.onChange}
+                  placeholder="Enter comment..."
+                  className={styles.modal__editor}
+                  error={errors.comment}
+                />
+              )}
+            />
+          </div>
           <div className={styles.modal__controls}>
             <ButtonGroup
               buttons={[

@@ -55,6 +55,16 @@
   }
 
   &__comment {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+    &_hidden {
+      display: none;
+    }
+  }
+
+  &__editor {
     flex: 1;
   }
 

@@ -118,6 +118,12 @@ before:
   server action (`entities/game/api/game.actions.ts`) *before* `router.refresh()`, or the refresh
   refills the cache with the stale render. Background jobs on the server deliberately do not
   revalidate: a mass parse would turn every touched page into a cold render.
+- **Never catch inside an `unstable_cache` callback.** Next stores whatever the callback resolves
+  to, so a `.catch(() => [])` inside turns a failed request into a legitimate empty result cached
+  for the whole `revalidate` window — the home page's "Browse By Platform" block disappeared for
+  an hour after a single render during an API outage, with `[]` sitting in the data cache. Let the
+  callback throw and fall back at the call site, as `sitemap.ts` does: a thrown error is never
+  written to the cache, so the next request retries.
 - **A failed fetch in `generateMetadata` must never return `robots: noindex`.** The page
   component still renders, so the response stays 200 with real content under a "Page not found"
   head, and ISR caches that mix — the symptom is `<title>Page not found | MoonCellar</title>` on
@@ -172,6 +178,20 @@ component needs to build the value itself (a `basePath` string, not a `getHref` 
   `Box` — an extra element between the cell and `Box` breaks the definite-height chain that the
   panel's `max-height: 100%` depends on. Animate only `opacity` and `transform`: animating height
   makes `Box`'s `useResizeDetector` fire on every frame.
+
+## Forms
+
+- **A field driven only by `setValue` never recomputes `formState.isValid`.** react-hook-form
+  runs its validity pass when a field *registers*; `setValue` without `shouldValidate` does not,
+  so a form whose fields are all `setValue`/`watch`-driven keeps the initial `isValid: false`
+  after `reset()`, and a `disabled: !isValid` button stays locked on a valid form. The symptom
+  was the playthrough modal's Save staying disabled for Wishlist until something was typed into
+  the comment — and staying enabled after the text was erased again. Completed, Played and
+  Dropped hid it because they render the registered `time` input. Wire custom inputs through
+  `Controller` (as `PlaythroughModal`'s `RichEditor` and `GameEditPage`'s fields do) so the
+  field registers. Hiding such a field must not unmount it: `{isShown && <Controller />}` drops
+  the registration and locks the button again — keep the `Controller` rendered and hide its
+  wrapper with a modifier class, as the modal does with the comment for Wishlist.
 
 ## Data fetching
 
