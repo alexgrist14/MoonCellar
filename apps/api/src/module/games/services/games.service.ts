@@ -29,8 +29,8 @@ import {
 } from "../schemas/playthroughs.schema";
 import {
   gamesFilters,
-  combinedRatingExpr,
   combinedRatingsCountExpr,
+  weightedRatingExpr,
 } from "../../../shared/games";
 import { FileService } from "../../user/services/file-upload.service";
 import { User } from "../../user/schemas/user.schema";
@@ -70,7 +70,7 @@ const COMBINED_RATINGS_COUNT_FIELD = "_combinedRatingsCount";
 
 const COMBINED_RATING_STAGE = {
   $addFields: {
-    [COMBINED_RATING_FIELD]: combinedRatingExpr,
+    [COMBINED_RATING_FIELD]: weightedRatingExpr,
   },
 };
 
