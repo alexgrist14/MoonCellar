@@ -1,7 +1,7 @@
-import { Injectable, OnModuleInit } from "@nestjs/common";
+import { Injectable, type OnModuleInit } from "@nestjs/common";
 import { InjectConnection } from "@nestjs/mongoose";
 import { InjectMetric } from "@willsoto/nestjs-prometheus";
-import { Connection } from "mongoose";
+import type { Connection } from "mongoose";
 import { Histogram } from "prom-client";
 import { MONGO_COMMAND_DURATION } from "./metrics.constants";
 

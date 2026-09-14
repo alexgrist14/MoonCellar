@@ -6,17 +6,17 @@ import {
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import * as bcrypt from "bcryptjs";
-import { Query as ExpressQuery } from "express-serve-static-core";
+import { type Query as ExpressQuery } from "express-serve-static-core";
 import mongoose, { Model } from "mongoose";
 import { User } from "../schemas/user.schema";
 import {
   DEFAULT_BG_OPACITY,
-  IGetUserByStringRequest,
-  IGetUserLoginsResponse,
-  IUpdateUserDescriptionRequest,
-  IUpdateUserEmailRequest,
-  IUpdateUserPasswordRequest,
-  IUpdateUserSettingsRequest,
+  type IGetUserByStringRequest,
+  type IGetUserLoginsResponse,
+  type IUpdateUserDescriptionRequest,
+  type IUpdateUserEmailRequest,
+  type IUpdateUserPasswordRequest,
+  type IUpdateUserSettingsRequest,
 } from "@mooncellar/schemas";
 import { FileService } from "./file-upload.service";
 import { S3_FOLDERS } from "../../../shared/s3";

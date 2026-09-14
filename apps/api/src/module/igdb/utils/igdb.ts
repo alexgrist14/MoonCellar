@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Logger } from "@nestjs/common";
-import { IGDBAuth } from "../interface/auth.interface";
-import { ParserType } from "../interface/common.interface";
+import { type IGDBAuth } from "../interface/auth.interface";
+import { type ParserType } from "../interface/common.interface";
 
 const logger = new Logger("IGDBParser");
 

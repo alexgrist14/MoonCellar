@@ -1,4 +1,4 @@
-import * as sanitizeHtml from "sanitize-html";
+import sanitizeHtml from "sanitize-html";
 
 const options: sanitizeHtml.IOptions = {
   allowedTags: [

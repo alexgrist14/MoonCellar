@@ -16,20 +16,23 @@ import {
   parseStoreNameFromUrl,
   runWithConcurrency,
 } from "./utils/igdb";
-import { ParserType } from "./interface/common.interface";
+import { type ParserType } from "./interface/common.interface";
 import { getImageLink, normalizeGameName } from "../../shared/utils";
 import { findSteamAppInfo, mergeSteamStore } from "../steam/utils/steam.utils";
-import { Game, GameDocument } from "../games/schemas/game.schema";
-import { Platform, PlatformDocument } from "../games/schemas/platform.schema";
+import { Game, type GameDocument } from "../games/schemas/game.schema";
+import {
+  Platform,
+  type PlatformDocument,
+} from "../games/schemas/platform.schema";
 import {
   Character,
-  CharacterDocument,
+  type CharacterDocument,
 } from "../games/schemas/character.schema";
 import { FileService } from "../user/services/file-upload.service";
 import { HttpService } from "@nestjs/axios";
 import {
   SyncState,
-  SyncStateDocument,
+  type SyncStateDocument,
 } from "../games/schemas/sync-state.schema";
 import { Cron } from "@nestjs/schedule";
 import { PinoLogger } from "nestjs-pino";
@@ -72,7 +75,7 @@ import {
   UPDATABLE_GAME_FIELDS,
   UPDATABLE_PLATFORM_FIELDS,
 } from "./constants/igdb";
-import { S3_FOLDERS, S3Folder } from "../../shared/s3";
+import { S3_FOLDERS, type S3Folder } from "../../shared/s3";
 
 type ImageField = (typeof IMAGE_FIELDS)[number];
 

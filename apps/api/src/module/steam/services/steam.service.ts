@@ -6,7 +6,7 @@ import {
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { Game, GameDocument } from "../../games/schemas/game.schema";
+import { Game, type GameDocument } from "../../games/schemas/game.schema";
 import { BusinessMetricsService } from "../../metrics/business-metrics.service";
 import { findSteamAppInfo, mergeSteamStore } from "../utils/steam.utils";
 

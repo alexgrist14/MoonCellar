@@ -15,7 +15,7 @@ import * as bcrypt from "bcryptjs";
 import { JwtService } from "@nestjs/jwt";
 import { BusinessMetricsService } from "../metrics/business-metrics.service";
 import { LoginDto } from "./dto/login.dto";
-import { Response } from "express";
+import { type Response } from "express";
 import {
   ACCESS_TOKEN,
   accessExpire,

@@ -3,17 +3,31 @@
 Rules that apply to the NestJS service. Repository-wide rules live in the root
 [`CLAUDE.md`](../../CLAUDE.md).
 
-## Imports
+## Runtime
 
-- **Every import inside `src/` must be relative — never the non-relative `src/...` form.**
-  That form resolves only through `baseUrl`, and it survives into the compiled output unless
-  the Nest CLI path transformer rewrites it. The hook ran on a developer machine and did not
-  run inside the container image, so `dist` shipped `require("src/module/user/schemas/user.schema")`;
-  Bun resolved that to the TypeScript source instead of `dist`, and the service died at boot
-  with `SyntaxError: Export named 'IUserSettings' not found in module
-  '/app/packages/schemas/dist/index.js'` — a type-only export that exists in the `.ts` file but
-  not in compiled JavaScript. The old webpack build hid this by bundling everything.
-- Check with `grep -r 'require("src/' dist` after a build: it must print nothing.
+- **Bun runs the TypeScript source directly — `start`, `start:dev` (`bun --watch`) and the
+  container all execute `src/main.ts`.** Bun strips types without checking them, so `build`
+  runs `typecheck` and `check:boot` instead of compiling. The container image runs `build`,
+  so either failure stops the deploy there.
+- **`tsconfig.build.json` type-checks with Bun's semantics (`module: preserve`,
+  `verbatimModuleSyntax`); do not relax it.** It is the only thing that catches two boot
+  failures before they ship:
+  - A type imported without `import type` and named in decorator metadata — a decorated
+    constructor, method *or property*, such as `@Prop() settings: IUserSettings` — stays in
+    Bun's output, and the boot dies with `SyntaxError: Export named 'IUserSettings' not found
+    in module …`. tsc reports it as `TS1484`. `isolatedModules` alone (`TS1272`) misses the
+    property case.
+  - `import * as x` of a CommonJS package whose export is a function yields a namespace Bun
+    will not call: `cookieParser is not a function. (In 'cookieParser()', 'cookieParser' is
+    an instance of Module)`. Use a default import; tsc reports the call as `TS2349`.
+- **A named value import from a CommonJS package must be an own property of its exports, and
+  tsc cannot check that.** mongoose's `Connection` lives on the prototype, so
+  `import { Connection } from "mongoose"` in a decorated constructor dies with
+  `SyntaxError: Export named 'Connection' not found in module …/mongoose/index.js`. Import it
+  as a type — `@InjectConnection()` supplies the injection token. `check:boot` exists for this
+  class of error: it loads `AppModule`, resolves the DI graph in Nest's preview mode without
+  instantiating providers or touching MongoDB, and generates the OpenAPI document. It needs no
+  `.env`.
 
 ## Storage
 

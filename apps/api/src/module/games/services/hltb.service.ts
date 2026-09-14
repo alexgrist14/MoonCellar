@@ -5,16 +5,19 @@ import {
 } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { InjectModel } from "@nestjs/mongoose";
-import { HowLongToBeatEntry, HowLongToBeatService } from "howlongtobeat-ts";
-import mongoose, { FilterQuery, Model } from "mongoose";
+import {
+  type HowLongToBeatEntry,
+  HowLongToBeatService,
+} from "howlongtobeat-ts";
+import mongoose, { type FilterQuery, Model } from "mongoose";
 import { PinoLogger } from "nestjs-pino";
 import { sleep } from "../../../shared/utils";
 import { runInCronLogContext } from "../../../shared/cron-logging";
 import { runCronExclusive } from "../../../shared/cron-mutex";
 import { BusinessMetricsService } from "../../metrics/business-metrics.service";
-import { IHltbField } from "@mooncellar/schemas";
-import { Game, GameDocument } from "../schemas/game.schema";
-import { Platform, PlatformDocument } from "../schemas/platform.schema";
+import { type IHltbField } from "@mooncellar/schemas";
+import { Game, type GameDocument } from "../schemas/game.schema";
+import { Platform, type PlatformDocument } from "../schemas/platform.schema";
 import {
   HLTB_CRON_DELAY_MS,
   HLTB_CRON_MAX_GAMES,
@@ -31,8 +34,8 @@ import {
   buildMissingHltbFilter,
   buildPlatformKeySet,
   hasHltbTimes,
-  HltbMatchContext,
-  HltbSearchEntry,
+  type HltbMatchContext,
+  type HltbSearchEntry,
   mapHltbEntryToField,
   selectHltbMatch,
 } from "../utils/hltb.utils";

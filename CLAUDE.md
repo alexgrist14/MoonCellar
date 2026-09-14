@@ -70,24 +70,16 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
   `packages/schemas` (`@mooncellar/schemas`). Install and run everything from the root
   with `bun --filter <workspace> <script>` — never `cd` into an app to install, the
   lockfile is shared.
-- **The root `dev` script must launch each workspace with its own `bun --filter` call, never
-  `bun --filter '*' dev`.** `bun --filter` runs the selected scripts in workspace dependency
-  order and waits for a dependency's script to exit first; `@mooncellar/schemas`'s `dev` is
-  `tsc --watch`, which never exits, so `web dev` is never spawned at all — the terminal just
-  sits on the tsc watch banner with no Next.js output. The glob also silently skipped
-  `apps/api`, which has no `dev` script, so `dev:api` calls its `start:dev` by name.
-  `build` and `lint` may keep `--filter '*'`, because those scripts terminate and the
-  dependency ordering is what we want there.
-- **`nest build` must stay on tsc (`"webpack": false` in `apps/api/nest-cli.json`).**
-  With hoisted dependencies webpack-node-externals no longer recognises
-  `node_modules` and starts bundling NestJS itself, which dies on an optional
-  `@fastify/static` loader inside `@nestjs/serve-static`.
-- **`apps/api/tsconfig.build.json` must keep `rootDir: "src"`, `include: ["src"]` and
-  `tsBuildInfoFile` inside `dist`.** Without the first two, tsc takes the common root of
-  every compiled file and the entry point moves to `dist/src/main.js`, so
-  `start:prod` and the container `CMD` stop finding it. Without the third,
-  `deleteOutDir` wipes `dist` while the build info survives, and the next build emits
-  declarations only — a silent, empty-looking build that exits 0.
+- **The root `dev` script must launch each app with its own `bun --filter` call, never
+  `bun --filter '*' dev`.** `apps/api` has no `dev` script and the glob skips it in silence,
+  so `dev:api` calls its `start:dev` by name. `build` and `lint` may keep `--filter '*'`,
+  because those scripts terminate and the dependency ordering is what we want there.
+- **`apps/api` has no compiled output: Bun executes `src/main.ts` in development and in the
+  container, and its `build` script type-checks and boot-checks instead of compiling.**
+  Never run the API with Node (`node dist/main`, `nest start`): `@mooncellar/schemas`
+  resolves to TypeScript source, tsc does not compile a dependency, and Node dies at boot
+  with `ERR_MODULE_NOT_FOUND` on the package's first extensionless import. The API-side rules
+  that follow from Bun are in `apps/api/CLAUDE.md`.
 - **`apps/web/next.config.mjs` points `turbopack.root` and `outputFileTracingRoot` at
   the monorepo root.** Pinning them to the app directory puts `packages/` outside the
   project root and imports from the shared package stop resolving.
@@ -99,16 +91,12 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
 
 - Request and response shapes live once in `packages/schemas` and are imported as
   `@mooncellar/schemas` by both apps. There are no copies to keep in sync any more.
-- The package compiles to CommonJS with declarations. Do not add an ESM build: Nest
-  resolves the package through `require`, and an ES module loaded from the CommonJS API
-  brings a second copy of zod into the process — its classes differ from the API's even
-  though zod 4.4.3 keeps `instanceof` passing, so nothing fails loudly.
-- **Keep `main` and `types` on `dist`, and never import the package's `src` directly.**
-  tsc treats the symlinked workspace package as an external library: with `main` on
-  `src`, `nest build` still exits 0 without compiling it, and the API dies at boot under
-  Node with `ERR_MODULE_NOT_FOUND` on the package's first relative import. A relative or
-  `paths` import of `src` fails with `TS6059` instead. The rejected alternatives, and
-  what dropping the build would take, are in `docs/schemas-package.md`.
+- **The package ships TypeScript source: `main` and `types` point at `src/index.ts`, and
+  there is no build or watcher.** Each consumer compiles it itself — Bun inside the API,
+  Turbopack for Next (it transpiles workspace packages on its own, so `transpilePackages`
+  stays empty), ts-jest in the API's tests. This holds only while the API runs on Bun (see
+  Monorepo). The measured alternatives, including the compiled CommonJS package this
+  replaced, are in `docs/schemas-package.md`.
 - `zod` is a peer dependency pinned through the root `catalog`. A second copy anywhere
   in the tree silently breaks type inference across the package boundary.
 - `igdb.schema.ts` stays in `apps/web`: it describes an upstream API the frontend reads

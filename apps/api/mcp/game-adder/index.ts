@@ -15,7 +15,7 @@ import { spawnSync } from "child_process";
 import { writeFileSync, readFileSync, unlinkSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
-import { AddGameRequestSchema } from "../../src/shared/zod/schemas/games.schema";
+import { AddGameRequestSchema } from "@mooncellar/schemas";
 import {
   getS3Bucket,
   getS3CdnUrl,

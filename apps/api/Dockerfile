@@ -9,7 +9,7 @@ COPY packages/schemas/package.json packages/schemas/
 RUN bun install --frozen-lockfile
 
 COPY . .
-RUN bun --filter '@mooncellar/schemas' build && bun --filter api build
+RUN bun --filter api build
 
 WORKDIR /app/apps/api
 EXPOSE 3228

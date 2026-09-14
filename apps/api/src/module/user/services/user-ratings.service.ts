@@ -2,14 +2,14 @@ import { Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { Model } from "mongoose";
 import {
-  IAddUserRatingRequest,
-  IGetUserRatingsRequest,
-  IRemoveUserRatingRequest,
-  IUpdateUserRatingRequest,
+  type IAddUserRatingRequest,
+  type IGetUserRatingsRequest,
+  type IRemoveUserRatingRequest,
+  type IUpdateUserRatingRequest,
 } from "@mooncellar/schemas";
 import { Rating } from "../schemas/user-ratings.schema";
 import { UserLogsService } from "./user-logs.service";
-import { Game, GameDocument } from "../../games/schemas/game.schema";
+import { Game, type GameDocument } from "../../games/schemas/game.schema";
 
 @Injectable()
 export class UserRatingsService {

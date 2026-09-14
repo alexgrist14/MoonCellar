@@ -1,8 +1,11 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "rootDir": "src",
-    "tsBuildInfoFile": "dist/.tsbuildinfo"
+    "noEmit": true,
+    "incremental": false,
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "verbatimModuleSyntax": true
   },
   "include": [
     "src"

@@ -1,7 +1,7 @@
 import {
   Injectable,
-  CanActivate,
-  ExecutionContext,
+  type CanActivate,
+  type ExecutionContext,
   BadRequestException,
 } from "@nestjs/common";
 import { jwtDecode } from "jwt-decode";

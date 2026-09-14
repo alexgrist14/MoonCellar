@@ -28,7 +28,7 @@ import { GetFileRequestDto } from "../../../shared/zod/dto/files.dto";
 import {
   resolveS3Folder,
   S3_FOLDERS,
-  S3Folder,
+  type S3Folder,
 } from "../../../shared/s3";
 
 const COMMENT_IMAGE_MAX_BYTES = 5 * 1024 * 1024;

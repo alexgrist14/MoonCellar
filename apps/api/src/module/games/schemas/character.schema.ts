@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { HydratedDocument } from "mongoose";
-import { ICharacterIGDBField } from "@mooncellar/schemas";
+import mongoose, { type HydratedDocument } from "mongoose";
+import { type ICharacterIGDBField } from "@mooncellar/schemas";
 
 export type CharacterDocument = HydratedDocument<Character>;
 
