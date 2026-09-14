@@ -199,9 +199,20 @@ component needs to build the value itself (a `basePath` string, not a `getHref` 
   (`enabled: false`, e.g. `useGamesByIdsQuery`'s `ids.length > 0`) never leaves `status:
   "pending"`, so `if (isPending) return <Loader />` renders forever and the empty-state branch
   below it is unreachable — that is how the profile's "List is empty" placeholder disappeared
-  behind an endless spinner. Use `isFetching` (or `isLoading`, which is `isPending &&
-  isFetching`): both are `false` while a query is disabled and `true` on the first render of an
-  enabled one, so nothing flashes before the loader appears.
+  behind an endless spinner. Use `isLoading` (`isPending && isFetching`): it is `false` while a
+  query is disabled and `true` on the first render of an enabled one, so nothing flashes before
+  the loader appears.
+- **Never gate a loader that replaces data on `isFetching` either.** It is also `true` during a
+  background refetch, so once a query is older than its `staleTime` a remount swaps the cached
+  list for the spinner — the `/games` catalogue showed a loader and refetched on every browser
+  Back instead of rendering from the cache. Keep `isFetching` for secondary indicators.
+- **Page state of a client page that fetches through React Query goes into the URL with
+  `window.history.pushState`, not `router.push`.** `router.push` re-runs the route's server
+  component, and `useSearchParams` does not change until that server render finishes, so the
+  client query never sees the new key in time: `/games` pagination just scrolled to the top and
+  swapped the cards later with no loader, even for pages already in the cache. `pushState`
+  updates `useSearchParams` immediately without a server request — `GamesPage` pagination and
+  `Filters` both go through it.
 
 ## Mockups
 
