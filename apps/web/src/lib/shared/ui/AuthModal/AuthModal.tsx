@@ -6,6 +6,7 @@ import { Resolver, SubmitHandler, useForm } from "react-hook-form";
 import { useAuth } from "../../hooks/auth";
 import Background from "../Background/Background";
 import { Loader } from "../Loader";
+import { useMinimumLoading } from "../../hooks/useMinimumLoading";
 import { modal } from "../Modal";
 import { SvgClose } from "../svg";
 import styles from "./AuthModal.module.scss";
@@ -16,6 +17,7 @@ export const AuthModal: FC = () => {
   const [isRegister, setIsRegister] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const isLoaderShown = useMinimumLoading(isLoading);
 
   const {
     register,
@@ -121,9 +123,9 @@ export const AuthModal: FC = () => {
                 color={ButtonColor.ACCENT}
                 className={styles.btn}
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoaderShown}
               >
-                {isLoading ? <Loader type="pulse" /> : "Sign up"}
+                {isLoaderShown ? <Loader type="pulse" /> : "Sign up"}
               </Button>
               <p>
                 Already have an account?{" "}
@@ -138,9 +140,9 @@ export const AuthModal: FC = () => {
                 color={ButtonColor.ACCENT}
                 className={styles.btn}
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoaderShown}
               >
-                {isLoading ? <Loader type="pulse" /> : "Sign in"}
+                {isLoaderShown ? <Loader type="pulse" /> : "Sign in"}
               </Button>
               <p>
                 Don&apos;t have an account?{" "}

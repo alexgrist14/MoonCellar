@@ -12,6 +12,7 @@ import { Box } from "../../shared/ui/Box";
 import { BGImage } from "../../shared/ui/BGImage";
 import { Breadcrumbs } from "../../shared/ui/Breadcrumbs";
 import { useAdvancedRouter } from "../../shared/hooks/useAdvancedRouter";
+import { useMinimumLoading } from "../../shared/hooks/useMinimumLoading";
 import { GamesCards } from "../../shared/ui/GamesCards";
 import { takeGames } from "../../shared/constants/games.const";
 import { GamesListMenu } from "../../widgets/main";
@@ -50,7 +51,12 @@ export const GamesPage: FC<IGamesPageProps> = ({
       : undefined;
   }, [params, initialParams, initialData]);
 
-  const { data, isLoading } = useGamesQuery(params, true, seededData);
+  const { data, isLoading: isGamesLoading } = useGamesQuery(
+    params,
+    true,
+    seededData
+  );
+  const isLoading = useMinimumLoading(isGamesLoading);
 
   const changePage = useCallback(
     (page: number) => {

@@ -5,6 +5,7 @@ import styles from "./RoyalGamesPanel.module.scss";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { GamesList } from "@/src/lib/shared/ui/GamesList";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
 import { ButtonColor } from "@/src/lib/shared/ui/Button";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
@@ -28,6 +29,8 @@ export const RoyalGamesPanel: FC = () => {
   const { data: royalGamesData, isLoading: isRoyalGamesLoading } =
     useGamesByIdsQuery(royalGames || []);
   const { data: savedPresets } = useUserPresetsQuery(profile?._id ?? "");
+  const isRoyalGamesLoaderShown = useMinimumLoading(isRoyalGamesLoading);
+  const isPresetsLoaderShown = useMinimumLoading(!savedPresets);
   const { mutate: addPreset } = useAddUserPresetMutation();
   const { mutate: removePreset } = useRemoveUserPresetMutation();
 
@@ -55,7 +58,7 @@ export const RoyalGamesPanel: FC = () => {
         ]}
       />
       {tabIndex === 0 &&
-        (!!royalGames?.length && isRoyalGamesLoading ? (
+        (!!royalGames?.length && isRoyalGamesLoaderShown ? (
           <Loader type="propogate" />
         ) : (
           <GamesList
@@ -99,7 +102,7 @@ export const RoyalGamesPanel: FC = () => {
         ))}
       {isAuth && tabIndex === 1 && (
         <>
-          {!!savedPresets ? (
+          {!!savedPresets && !isPresetsLoaderShown ? (
             <div className={styles.royal__saved}>
               {!!savedPresets?.length ? (
                 savedPresets.map((preset, i) => (

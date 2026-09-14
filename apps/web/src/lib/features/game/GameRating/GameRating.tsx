@@ -5,6 +5,7 @@ import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { useAsyncLoader } from "@/src/lib/shared/hooks/useAsyncLoader";
+import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { IGameResponse } from "@mooncellar/schemas";
 import { ratingsAPI } from "@/src/lib/shared/api/ratings.api";
 import { useUserStore } from "@/src/lib/shared/store/user.store";
@@ -78,8 +79,9 @@ export const GameRating: FC<IGameRatingProps> = ({ game, className }) => {
       );
     }
   };
-  const isLoading =
-    (!!profile && isPending) || isCreating || isUpdating || isDeleting;
+  const isLoading = useMinimumLoading(
+    (!!profile && isPending) || isCreating || isUpdating || isDeleting
+  );
 
   const currentRating = rating?.rating ?? undefined;
 

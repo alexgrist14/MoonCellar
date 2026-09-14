@@ -9,6 +9,7 @@ import { DatePicker } from "../DatePicker";
 import { ToggleSwitch } from "../ToggleSwitch";
 import { commonUtils } from "../../utils/common.utils";
 import { useAuthStore } from "../../store/auth.store";
+import { useUserStore } from "../../store/user.store";
 import {
   IPlaythrough,
   IPlaythroughMinimal,
@@ -20,6 +21,10 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader } from "../Loader";
+import {
+  MIN_LOADER_DURATION,
+  useMinimumLoading,
+} from "../../hooks/useMinimumLoading";
 import { Errors } from "../Errors";
 import { IButtonGroupItem } from "../../types/buttons.type";
 import { SvgPlus } from "../svg";
@@ -50,12 +55,17 @@ const playthroughCategories: IPlaythroughMinimal["category"][] = [
 
 const categoriesWithDate: IPlaythroughMinimal["category"][] = ["completed"];
 
+const MODAL_APPEARANCE_DURATION = 300;
+
 export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
   game,
   userId,
 }) => {
   const { profile } = useAuthStore();
   const { systems } = useCommonStore();
+  const knownPlaythroughs = useUserStore(
+    (state) => state.parsedPlaythroughs?.[game._id]
+  );
 
   const [playthroughId, setPlaythroughId] = useState<string>();
   const [isFlushing, setIsFlushing] = useState(false);
@@ -190,7 +200,18 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, game._id, isPending]);
 
-  const isLoading = isPending || isCreating || isUpdating || isDeleting;
+  const isOpening = useMinimumLoading(
+    isPending,
+    MODAL_APPEARANCE_DURATION + MIN_LOADER_DURATION
+  );
+  const isSaving = useMinimumLoading(isCreating || isUpdating || isDeleting);
+  const isLoading = isOpening || isSaving;
+  const listedPlaythroughs: IPlaythroughMinimal[] = isPending
+    ? (knownPlaythroughs ?? [])
+    : playthroughs;
+  const category =
+    watch("category") ?? listedPlaythroughs.at(-1)?.category ?? "wishlist";
+  const isWithoutComment = category === "wishlist";
 
   return (
     <Box
@@ -198,16 +219,26 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
       contentStyle={{ padding: "var(--padding-x5)" }}
       classNameContent={styles.wrapper}
     >
-      <div className={styles.modal}>
-        {!!playthroughs?.length && (
+      <div
+        className={classNames(styles.modal, {
+          [styles.modal_compact]: isWithoutComment,
+        })}
+      >
+        {!!listedPlaythroughs.length && (
           <div className={styles.modal__top}>
             <ButtonGroup
               buttons={[
-                ...playthroughs.map(
+                ...listedPlaythroughs.map(
                   (play) =>
                     ({
                       title: commonUtils.upFL(play?.category),
-                      onClick: () => selectHandler(play),
+                      onClick: () => {
+                        const playthrough = playthroughs.find(
+                          (item) => item._id === play._id
+                        );
+
+                        if (playthrough) selectHandler(playthrough);
+                      },
                       color: ButtonColor.FANCY,
                       active: play._id === playthroughId,
                     }) as IButtonGroupItem
@@ -303,7 +334,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
           )}
           <div
             className={classNames(styles.modal__comment, {
-              [styles.modal__comment_hidden]: watch("category") === "wishlist",
+              [styles.modal__comment_hidden]: isWithoutComment,
             })}
           >
             <Controller

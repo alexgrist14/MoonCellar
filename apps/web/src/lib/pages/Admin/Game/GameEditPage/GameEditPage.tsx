@@ -34,6 +34,7 @@ import { Box } from "@/src/lib/shared/ui/Box";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import {
   CollapsibleSection,
@@ -180,6 +181,10 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
   const { mutate: updateGame, isPending: isUpdating } = useUpdateGameMutation();
   const { mutateAsync: uploadGameImage, isPending: isUploading } =
     useUploadGameImageMutation();
+
+  const isPageLoading = useMinimumLoading(
+    isFiltersPending || isPlatformsPending || Boolean(gameId && isGamePending)
+  );
 
   const resolver = useMemo(
     () =>
@@ -696,11 +701,6 @@ const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
   };
 
   if (!isAdmin) return;
-
-  const isPageLoading =
-    isFiltersPending ||
-    isPlatformsPending ||
-    Boolean(gameId && isGamePending);
 
   if (isPageLoading || !filters) {
     return (

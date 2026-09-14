@@ -18,6 +18,11 @@
     height: var(--resize-height, var(--playthrough-modal-height-lg));
   }
 
+  &_compact {
+    height: var(--resize-height, auto);
+    min-height: 0;
+  }
+
   &__bottom {
     display: flex;
     flex-direction: column;

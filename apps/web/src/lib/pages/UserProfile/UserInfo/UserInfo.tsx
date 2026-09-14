@@ -16,6 +16,7 @@ import styles from "./UserInfo.module.scss";
 import Markdown from "react-markdown";
 import { RichText } from "@/src/lib/shared/ui/RichText";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { GameCard } from "@/src/lib/shared/ui/GameCard";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
@@ -55,6 +56,7 @@ const UserInfo: FC<UserInfoProps> = ({
     page,
     takeLogs
   );
+  const isLogsLoading = useMinimumLoading(isPending);
 
   const logs = logsData?.results ?? [];
   const totalLogs = logsData?.total ?? 0;
@@ -172,8 +174,8 @@ const UserInfo: FC<UserInfoProps> = ({
       <div className={styles.content__bottom}>
         <div className={styles.activity}>
           <SectionTitle as="h3">Activity</SectionTitle>
-          {isPending && <Loader type="moon" />}
-          {!isPending && logs.length > 0 && (
+          {isLogsLoading && <Loader type="moon" />}
+          {!isLogsLoading && logs.length > 0 && (
             <div className={styles.activity__wrapper}>
               <div className={styles.activity__list}>
                 {logs.map((log, i) => {

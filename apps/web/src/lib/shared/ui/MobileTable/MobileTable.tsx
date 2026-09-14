@@ -5,6 +5,7 @@ import { Button } from "@/src/lib/shared/ui/Button";
 import { SvgChevron } from "@/src/lib/shared/ui/svg";
 import classNames from "classnames";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { PaginationClient } from "@/src/lib/shared/ui/PaginationClient";
@@ -58,9 +59,11 @@ export const MobileTable = <T extends object>({
 
   const take = useRef(limit || 20);
 
+  const isLoaderShown = useMinimumLoading(!!isLoading);
+
   const isInactive = useMemo(
-    () => isLoading || sortedRows === undefined,
-    [sortedRows, isLoading]
+    () => isLoaderShown || sortedRows === undefined,
+    [sortedRows, isLoaderShown]
   );
 
   useEffect(() => {
