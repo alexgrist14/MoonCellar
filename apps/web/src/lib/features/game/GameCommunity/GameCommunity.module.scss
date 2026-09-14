@@ -436,6 +436,10 @@ $categories: completed, playing, dropped, played, backlog, wishlist;
     display: flex;
     gap: var(--gap-x2);
   }
+
+  &__signIn {
+    align-self: flex-start;
+  }
 }
 
 .quote {

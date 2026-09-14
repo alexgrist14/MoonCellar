@@ -8,6 +8,8 @@ export const useAuthRefresh = () => {
   const { setAuth, clear, setProfile, setIsAdmin } = useAuthStore();
 
   return useEffect(() => {
+    if (!useAuthStore.getState().isAuth) return;
+
     authAPI
       .refreshToken()
       .then((res) => {

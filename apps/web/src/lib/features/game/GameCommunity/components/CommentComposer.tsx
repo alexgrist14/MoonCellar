@@ -51,6 +51,7 @@ export const CommentComposer: FC<ICommentComposerProps> = ({
     return (
       <Button
         color={ButtonColor.DEFAULT}
+        className={styles.composer__signIn}
         onClick={() => requireAuth(() => undefined)}
       >
         Sign in to join the discussion

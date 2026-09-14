@@ -24,6 +24,7 @@ import {
   refreshExpire,
 } from "../../shared/constants";
 import { IndexNowService } from "../indexnow/indexnow.service";
+import { getAuthCookieOptions } from "./auth-cookies";
 
 @Injectable()
 export class AuthService {
@@ -154,38 +155,25 @@ export class AuthService {
     refreshToken: string,
     origin?: string
   ): void {
-    const domain = origin?.includes("localhost")
-      ? ".localhost"
-      : "mooncellar.space";
-    const secure = origin?.includes("https") ? true : false;
-    const sameSite =
-      origin?.includes("localhost") || !secure ? undefined : "none";
+    const options = getAuthCookieOptions(origin);
 
     res.cookie(ACCESS_TOKEN, accessToken, {
-      httpOnly: true,
-      domain: domain,
-      secure: secure,
-      sameSite: sameSite,
+      ...options,
       expires: new Date(Date.now() + accessExpire),
       maxAge: accessExpire,
     });
     res.cookie(REFRESH_TOKEN, refreshToken, {
-      httpOnly: true,
-      domain: domain,
-      secure: secure,
-      sameSite: sameSite,
+      ...options,
       expires: new Date(Date.now() + refreshExpire),
       maxAge: refreshExpire,
     });
   }
 
   clearCookies(res: Response, origin?: string): void {
-    res.clearCookie(ACCESS_TOKEN, {
-      httpOnly: !origin?.includes("localhost"),
-    });
-    res.clearCookie(REFRESH_TOKEN, {
-      httpOnly: !origin?.includes("localhost"),
-    });
+    const options = getAuthCookieOptions(origin);
+
+    res.clearCookie(ACCESS_TOKEN, options);
+    res.clearCookie(REFRESH_TOKEN, options);
   }
 
   async logout(userId: string): Promise<void> {
