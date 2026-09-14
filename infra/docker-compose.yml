@@ -1,3 +1,5 @@
+name: mooncellar
+
 services:
   loki:
     image: grafana/loki:latest
