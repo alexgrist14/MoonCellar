@@ -129,10 +129,6 @@
     outline: none;
     color: var(--color-text-primary);
 
-    img {
-      max-width: var(--rich-editor-image-width);
-    }
-
     p.is-editor-empty:first-child::before {
       content: attr(data-placeholder);
       float: left;

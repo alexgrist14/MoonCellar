@@ -1,0 +1,1750 @@
+<title>Game Page Comments</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* mooncellar-tokens:start */
+/* Generated from apps/web/src/lib/app/styles/vars by
+   `bun --filter web sync:tokens`. Do not edit by hand. */
+:root {
+  /* vars/_colors.scss */
+  --color-neutral-5: #080a0b;
+  --color-neutral-10: #0d1011;
+  --color-neutral-15: #121516;
+  --color-neutral-20: #161b1d;
+  --color-neutral-25: #1a2022;
+  --color-neutral-30: #1f2628;
+  --color-neutral-35: #262d2f;
+  --color-neutral-40: #2f3537;
+  --color-neutral-45: #383e40;
+  --color-neutral-50: #3f4750;
+  --color-neutral-55: #50575d;
+  --color-neutral-60: #5e6a6e;
+  --color-neutral-70: #747d82;
+  --color-neutral-80: #9192a1;
+  --color-neutral-85: #b0b2bc;
+  --color-neutral-90: #d9d9d9;
+  --color-neutral-95: #eaeaea;
+  --color-neutral-100: #ffffff;
+  --color-blue: #00a0ff;
+  --color-blue-light: #00d4ff;
+  --color-gray: #afb3b9;
+  --color-yellow: #ffc451;
+  --color-yellow-light: #f9f871;
+  --color-orange: #ff8862;
+  --color-pink: #ff4b8f;
+  --color-violet: #e735c4;
+  --color-positive: #00c292;
+  --color-negative: #d02729;
+  --color-primary: var(--color-neutral-30);
+  --color-secondary: var(--color-neutral-90);
+  --color-contrast: var(--color-neutral-100);
+  --color-contrast-reverse: var(--color-neutral-5);
+  --color-attention: #ffc451;
+  --color-text-primary: var(--color-neutral-100);
+  --color-text-secondary: var(--color-neutral-90);
+  --color-text-muted: var(--color-neutral-85);
+  --color-accent: #6951ee;
+  --color-bg-primary: #191d24;
+  --color-bg-secondary: #212731;
+  --color-bg-tertiary: #2c3340;
+  --color-bg-accent: #6951ee;
+  --color-bg-hover: #374151;
+  --color-bg-positive: #00c292;
+  --color-bg-primary-tint: #191d24ee;
+  --color-bg-secondary-tint: #212731ee;
+  --color-bg-tertiary-tint: #2c3340ee;
+  --color-bg-accent-tint: #6951eeee;
+  --color-bg-positive-tint: #00c292ee;
+  --color-border-primary: var(--color-neutral-35);
+  --color-scrollbar-track: var(--color-neutral-15);
+  --color-scrollbar-thumb: var(--color-neutral-80);
+  --color-border-secondary: var(--color-neutral-85);
+
+  /* vars/_common.scss */
+  --padding-x05: calc(var(--padding-x1) * 0.5);
+  --padding-x1: 4px;
+  --padding-x2: calc(var(--padding-x1) * 2);
+  --padding-x3: calc(var(--padding-x1) * 3);
+  --padding-x4: calc(var(--padding-x1) * 4);
+  --padding-x5: calc(var(--padding-x1) * 5);
+  --padding-x6: calc(var(--padding-x1) * 6);
+  --padding-x7: calc(var(--padding-x1) * 7);
+  --padding-x8: calc(var(--padding-x1) * 8);
+  --padding-x9: calc(var(--padding-x1) * 9);
+  --padding-x10: calc(var(--padding-x1) * 10);
+  --padding-x11: calc(var(--padding-x1) * 11);
+  --padding-x12: calc(var(--padding-x1) * 12);
+  --padding-x13: calc(var(--padding-x1) * 13);
+  --padding-x14: calc(var(--padding-x1) * 14);
+  --padding-x15: calc(var(--padding-x1) * 15);
+  --padding-x16: calc(var(--padding-x1) * 16);
+  --padding-x17: calc(var(--padding-x1) * 17);
+  --padding-x18: calc(var(--padding-x1) * 18);
+  --padding-x19: calc(var(--padding-x1) * 19);
+  --padding-x20: calc(var(--padding-x1) * 20);
+  --padding-x25: calc(var(--padding-x1) * 25);
+  --radius-x1: 4px;
+  --radius-x2: calc(var(--radius-x1) * 2);
+  --radius-x3: calc(var(--radius-x1) * 3);
+  --radius-x4: calc(var(--radius-x1) * 4);
+  --radius-x5: calc(var(--radius-x1) * 5);
+  --radius-x6: calc(var(--radius-x1) * 6);
+  --radius-x7: calc(var(--radius-x1) * 7);
+  --radius-x8: calc(var(--radius-x1) * 8);
+  --radius-x9: calc(var(--radius-x1) * 9);
+  --radius-x10: calc(var(--radius-x1) * 10);
+  --gap-x05: calc(var(--gap-x1) * 0.5);
+  --gap-x1: 4px;
+  --gap-x2: calc(var(--gap-x1) * 2);
+  --gap-x3: calc(var(--gap-x1) * 3);
+  --gap-x4: calc(var(--gap-x1) * 4);
+  --gap-x5: calc(var(--gap-x1) * 5);
+  --gap-x6: calc(var(--gap-x1) * 6);
+  --gap-x7: calc(var(--gap-x1) * 7);
+  --gap-x8: calc(var(--gap-x1) * 8);
+  --gap-x9: calc(var(--gap-x1) * 9);
+  --gap-x10: calc(var(--gap-x1) * 10);
+  --gap-x11: calc(var(--gap-x1) * 11);
+  --gap-x12: calc(var(--gap-x1) * 12);
+  --blur-x1: 6px;
+  --rich-text-gap: 8px;
+  --duration-instant: 1ms;
+  --duration-fast: 160ms;
+  --duration-base: 280ms;
+  --delay-stagger: 90ms;
+  --easing-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --easing-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --reveal-offset: 12px;
+  --reveal-scale: 0.96;
+  --header-height: 45px;
+  --container-padding-top: calc(var(--header-height) + var(--padding-x3));
+  --container-padding-bottom: var(--padding-x3);
+  --page-height-available: calc(
+    100vh - var(--container-padding-top) - var(--container-padding-bottom)
+  );
+
+  /* vars/_components.scss */
+  --game-completed-color: var(--color-positive);
+  --game-dropped-color: var(--color-negative);
+  --game-playing-color: var(--color-accent);
+  --game-wishlist-color: var(--color-violet);
+  --game-backlog-color: var(--color-pink);
+  --game-played-color: var(--color-blue);
+  --game-mastered-color: var(--color-yellow);
+  --cover-ratio: 528/704;
+  --shadow-basic: 0px 4px 4px var(--color-neutral-5);
+  --shadow-text: drop-shadow(0 1px 2px var(--color-neutral-5))
+    drop-shadow(0 0 6px var(--color-neutral-5));
+  --glow-accent: 0 0 0.4rem var(--color-accent);
+  --glow-accent-sm: 0 0 0.15rem var(--color-accent);
+  --avatar-size-sm: var(--padding-x6);
+  --navigation-progress-height: 1px;
+  --navigation-progress-z-index: 1002;
+  --modal-text-width: min(720px, calc(100vw - var(--padding-x10)));
+  --rich-editor-image-width: 400px;
+  --playthrough-modal-width: min(80vw, 400px);
+  --playthrough-modal-height: min(70vh, 500px);
+  --playthrough-modal-width-lg: min(88vw, 760px);
+  --playthrough-modal-height-lg: min(86vh, 780px);
+  --games-card-min-width: 180px;
+  --range-track-height: 6px;
+  --range-thumb-size: 20px;
+  --range-thumb-width: 44px;
+  --range-thumb-height: 24px;
+  --scrollbar-horizontal-size: 6px;
+  --scrollbar-arrow-width: 32px;
+  --scrollbar-fade-width: 48px;
+  --game-keywords-collapsed-height: 66px;
+  --game-hero-artwork-height: 300px;
+  --game-hero-artwork-height-sm: 180px;
+  --game-hero-cover-width: 200px;
+  --game-hero-cover-offset: 104px;
+  --game-hero-counters-width: 360px;
+  --game-rating-popover-width: 320px;
+  --date-picker-width: 300px;
+  --date-picker-field-min-width: 140px;
+  --date-picker-cell-size: 34px;
+  --date-picker-arrow-size: 28px;
+  --game-hero-scrim: linear-gradient(
+    180deg,
+    #191d248c 0%,
+    #191d2400 30%,
+    #212731d1 72%,
+    var(--color-bg-secondary) 100%
+  );
+  --spoiler-blur: 7px;
+  --community-avatar-size: 36px;
+  --community-reply-avatar-size: 28px;
+  --community-review-clamp-height: 132px;
+  --community-distribution-height: 8px;
+  --community-distribution-min-width: 240px;
+  --community-dot-size: 7px;
+  --community-empty-text-width: 240px;
+  --community-loading-height: 96px;
+  --empty-state-image-size: 180px;
+  --not-found-image-height: 240px;
+  --not-found-backdrop-size: 400px;
+  --not-found-content-width: 420px;
+}
+/* mooncellar-tokens:end */
+
+  :root {
+    --mock-ui: "Hanken Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mock-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --mock-ground: var(--color-neutral-10);
+    --mock-hairline: var(--color-neutral-30);
+    --mock-accent-dim: color-mix(in srgb, var(--color-accent) 18%, transparent);
+    --mock-accent-text: color-mix(in srgb, var(--color-accent) 55%, var(--color-neutral-100));
+    --mock-avatar: 36px;
+    --mock-avatar-sm: 28px;
+    --mock-thread-indent: 46px;
+    --mock-spoiler-blur: 7px;
+    --mock-review-lines: 4;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--mock-ground);
+    color: var(--color-text-primary);
+    font-family: var(--mock-ui);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .shell {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding-inline: var(--padding-x6);
+    padding-block: var(--padding-x14) var(--padding-x20);
+  }
+
+  @media (max-width: 520px) {
+    .shell {
+      padding-inline: var(--padding-x4);
+      padding-block: var(--padding-x9) var(--padding-x14);
+    }
+  }
+
+  h1, h2, h3, h4 { margin: 0; text-wrap: balance; }
+  p { margin: 0; }
+  button { font: inherit; color: inherit; }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+  }
+
+  .masthead { display: flex; flex-direction: column; gap: var(--gap-x4); }
+
+  .masthead h1 {
+    font-size: 34px;
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .lede { color: var(--color-text-secondary); max-width: 64ch; }
+
+  .brief {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1px;
+    background: var(--mock-hairline);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x4);
+    overflow: hidden;
+    margin: var(--gap-x2) 0 0;
+  }
+
+  .brief div { background: var(--color-bg-primary); padding: var(--padding-x4); }
+
+  .brief dt {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+    margin-bottom: var(--gap-x1);
+  }
+
+  .brief dd { margin: 0; font-size: 14px; color: var(--color-text-secondary); }
+
+  code.t { font-family: var(--mock-mono); font-size: 12px; color: var(--color-yellow); }
+
+  .variant { margin-top: var(--padding-x16); }
+
+  .variant__head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--gap-x3);
+    flex-wrap: wrap;
+    margin-bottom: var(--gap-x2);
+  }
+
+  .variant__letter {
+    font-family: var(--mock-mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-x1);
+    padding: 1px 7px;
+    flex-shrink: 0;
+  }
+
+  .variant__head h2 { font-size: 23px; font-weight: 700; letter-spacing: -0.2px; }
+
+  .variant__thesis {
+    color: var(--color-text-muted);
+    max-width: 66ch;
+    margin-bottom: var(--gap-x5);
+  }
+
+  .stage {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x4);
+    padding: var(--padding-x5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x4);
+  }
+
+  @media (max-width: 520px) { .stage { padding: var(--padding-x3); } }
+
+  .stage__context {
+    font-size: 12px;
+    color: var(--color-gray);
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x2);
+  }
+
+  .stage__context::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    flex-shrink: 0;
+  }
+
+  .stage__pair {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    gap: var(--gap-x4);
+    align-items: start;
+  }
+
+  @media (max-width: 860px) { .stage__pair { grid-template-columns: minmax(0, 1fr); } }
+
+  .box {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x5);
+    padding: var(--padding-x5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x4);
+    min-width: 0;
+  }
+
+  @media (max-width: 520px) { .box { padding: var(--padding-x4); } }
+
+  .box__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x3);
+    flex-wrap: wrap;
+  }
+
+  .box__title { display: flex; align-items: baseline; gap: var(--gap-x2); }
+  .box__title h3 { font-size: 18px; font-weight: 700; }
+
+  .count {
+    font-family: var(--mock-mono);
+    font-size: 13px;
+    color: var(--color-gray);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hints {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--gap-x4) var(--gap-x6);
+    margin-top: var(--gap-x5);
+  }
+
+  .hints h4 {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+    font-weight: 600;
+    margin-bottom: var(--gap-x2);
+  }
+
+  .hints ul {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    display: grid;
+    gap: var(--gap-x1);
+  }
+
+  .segmented {
+    display: inline-flex;
+    padding: 3px;
+    gap: 2px;
+    background: var(--color-bg-tertiary);
+    border-radius: var(--radius-x4);
+  }
+
+  .segmented button {
+    border: 0;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    padding: 3px var(--padding-x3);
+    border-radius: var(--radius-x3);
+    cursor: pointer;
+    transition: background var(--duration-fast) var(--easing-out),
+      color var(--duration-fast) var(--easing-out);
+  }
+
+  .segmented button[aria-pressed="true"] {
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+  }
+
+  .chips { display: flex; flex-wrap: wrap; gap: var(--gap-x2); }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    border: 1px solid var(--color-border-primary);
+    background: var(--color-bg-primary);
+    color: var(--color-text-muted);
+    border-radius: var(--radius-x4);
+    padding: var(--padding-x1) var(--padding-x3);
+    font-size: 13px;
+    line-height: 17px;
+    cursor: pointer;
+    transition: border-color var(--duration-fast) var(--easing-out),
+      color var(--duration-fast) var(--easing-out);
+  }
+
+  .chip:hover, .chip[aria-pressed="true"] {
+    border-color: var(--color-accent);
+    color: var(--color-text-primary);
+  }
+
+  .chip .count { font-size: 12px; }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--mock-cat, var(--color-gray));
+    flex-shrink: 0;
+  }
+
+  .cat-completed { --mock-cat: var(--game-completed-color); }
+  .cat-playing { --mock-cat: var(--game-playing-color); }
+  .cat-dropped { --mock-cat: var(--game-dropped-color); }
+  .cat-played { --mock-cat: var(--game-played-color); }
+  .cat-wishlist { --mock-cat: var(--game-wishlist-color); }
+  .cat-backlog { --mock-cat: var(--game-backlog-color); }
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 18px;
+    padding: 0 var(--padding-x2);
+    border-radius: var(--radius-x2);
+    color: color-mix(in srgb, var(--mock-cat) 62%, var(--color-neutral-100));
+    background: color-mix(in srgb, var(--mock-cat) 16%, transparent);
+    white-space: nowrap;
+  }
+
+  .mastered {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--game-mastered-color);
+    white-space: nowrap;
+  }
+
+  .avatar {
+    width: var(--mock-avatar);
+    height: var(--mock-avatar);
+    border-radius: 50%;
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+
+  .avatar--sm { width: var(--mock-avatar-sm); height: var(--mock-avatar-sm); font-size: 11px; }
+
+  .feed { display: flex; flex-direction: column; }
+
+  .entry {
+    display: grid;
+    grid-template-columns: var(--mock-avatar) minmax(0, 1fr);
+    gap: var(--gap-x3);
+    padding-block: var(--padding-x4);
+    border-top: 1px solid var(--color-border-primary);
+  }
+
+  .entry:first-child { border-top: 0; padding-top: 0; }
+  .entry:last-child { padding-bottom: 0; }
+
+  .entry__main { display: flex; flex-direction: column; gap: var(--gap-x2); min-width: 0; }
+
+  .entry__head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--gap-x1) var(--gap-x3);
+  }
+
+  .entry__name { font-weight: 600; font-size: 14px; }
+
+  .entry__meta {
+    font-family: var(--mock-mono);
+    font-size: 12px;
+    color: var(--color-gray);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .entry__score {
+    margin-left: auto;
+    font-family: var(--mock-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+  }
+
+  .entry__score span { color: var(--color-gray); font-size: 12px; }
+  .entry__score--empty { font-size: 12px; color: var(--color-gray); font-weight: 400; }
+
+  .entry__body {
+    color: var(--color-text-secondary);
+    font-size: 15px;
+    line-height: 1.6;
+    max-width: 70ch;
+    display: grid;
+    gap: var(--gap-x2);
+  }
+
+  .entry__body--clamped p {
+    display: -webkit-box;
+    -webkit-line-clamp: var(--mock-review-lines);
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .entry__actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--gap-x1) var(--gap-x2);
+    margin-left: calc(-1 * var(--padding-x2));
+  }
+
+  .entry__actions .entry__meta { margin-left: auto; }
+
+  .ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 0;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    padding: 3px var(--padding-x2);
+    border-radius: var(--radius-x3);
+    cursor: pointer;
+    transition: background var(--duration-fast) var(--easing-out),
+      color var(--duration-fast) var(--easing-out);
+  }
+
+  .ghost:hover { background: var(--color-bg-hover); color: var(--color-text-primary); }
+  .ghost svg { width: 15px; height: 15px; flex-shrink: 0; }
+  .ghost .count { font-size: 12px; color: inherit; }
+
+  .ghost[aria-pressed="true"] { color: var(--mock-accent-text); background: var(--mock-accent-dim); }
+  .ghost[aria-pressed="true"] svg path { fill: currentColor; }
+
+  .ghost--link { color: var(--mock-accent-text); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap-x2);
+    border: 2px solid transparent;
+    border-radius: var(--radius-x4);
+    font-size: 14px;
+    padding: 5px var(--padding-x4);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: filter var(--duration-fast) var(--easing-out);
+  }
+
+  .btn:hover { filter: brightness(0.85); }
+  .btn--accent { background: var(--color-bg-accent); color: var(--color-neutral-100); }
+  .btn--default { background: var(--color-bg-tertiary); color: var(--color-neutral-100); }
+  .btn svg { width: 15px; height: 15px; }
+
+  button:focus-visible,
+  [role="tab"]:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .box__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x3);
+    flex-wrap: wrap;
+    padding-top: var(--padding-x4);
+    border-top: 1px solid var(--color-border-primary);
+  }
+
+  .spoiler { position: relative; }
+
+  .spoiler__content {
+    filter: blur(var(--mock-spoiler-blur));
+    user-select: none;
+    transition: filter var(--duration-base) var(--easing-out);
+  }
+
+  .spoiler__cover {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .spoiler__cover button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    border: 1px solid color-mix(in srgb, var(--color-attention) 45%, transparent);
+    background: var(--color-bg-secondary-tint);
+    color: var(--color-attention);
+    font-size: 13px;
+    font-weight: 600;
+    padding: var(--padding-x1) var(--padding-x3);
+    border-radius: var(--radius-x4);
+    cursor: pointer;
+  }
+
+  .spoiler__cover svg { width: 15px; height: 15px; }
+
+  .spoiler.is-revealed .spoiler__content { filter: none; user-select: auto; }
+  .spoiler.is-revealed .spoiler__cover { display: none; }
+
+  .spoiler-flag {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-attention);
+    white-space: nowrap;
+  }
+
+  .composer {
+    display: grid;
+    grid-template-columns: var(--mock-avatar) minmax(0, 1fr);
+    gap: var(--gap-x3);
+  }
+
+  .composer__field {
+    border: 1px solid var(--color-border-primary);
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-x4);
+    overflow: hidden;
+    transition: border-color var(--duration-fast) var(--easing-out);
+  }
+
+  .composer__field:focus-within { border-color: var(--color-accent); }
+
+  .composer__tools {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: var(--padding-x1) var(--padding-x2);
+    border-bottom: 1px solid var(--color-border-primary);
+  }
+
+  .tool {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: transparent;
+    color: var(--color-text-secondary);
+    border-radius: var(--radius-x2);
+    cursor: pointer;
+    font-family: var(--mock-mono);
+    font-size: 13px;
+  }
+
+  .tool:hover { background: var(--color-bg-hover); color: var(--color-text-primary); }
+  .tool svg { width: 15px; height: 15px; }
+
+  .composer__text {
+    min-height: 72px;
+    padding: var(--padding-x3);
+    color: var(--color-text-primary);
+    outline: none;
+  }
+
+  .composer__text:empty::before { content: attr(data-ph); color: var(--color-gray); }
+
+  .composer__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x3);
+    flex-wrap: wrap;
+    padding: var(--padding-x2) var(--padding-x3);
+    border-top: 1px solid var(--color-border-primary);
+  }
+
+  .check {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    font-size: 13px;
+    color: var(--color-text-muted);
+    cursor: pointer;
+  }
+
+  .check input { accent-color: var(--color-accent); width: 15px; height: 15px; margin: 0; }
+
+  .thread {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x3);
+    margin-top: var(--gap-x2);
+    padding-left: var(--padding-x4);
+    border-left: 2px solid var(--color-border-primary);
+  }
+
+  .reply {
+    display: grid;
+    grid-template-columns: var(--mock-avatar-sm) minmax(0, 1fr);
+    gap: var(--gap-x3);
+  }
+
+  .reply .entry__body { font-size: 14px; }
+
+  .removed {
+    font-size: 14px;
+    color: var(--color-gray);
+    font-style: italic;
+  }
+
+  .tabs {
+    display: flex;
+    gap: var(--gap-x5);
+    border-bottom: 1px solid var(--color-border-primary);
+  }
+
+  .tabs [role="tab"] {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--gap-x2);
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: 16px;
+    font-weight: 600;
+    padding: 0 0 var(--padding-x2);
+    margin-bottom: -1px;
+    cursor: pointer;
+    transition: color var(--duration-fast) var(--easing-out),
+      border-color var(--duration-fast) var(--easing-out);
+  }
+
+  .tabs [role="tab"]:hover { color: var(--color-text-primary); }
+
+  .tabs [role="tab"][aria-selected="true"] {
+    color: var(--color-text-primary);
+    border-bottom-color: var(--color-accent);
+  }
+
+  .summary {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--gap-x3) var(--gap-x6);
+    align-items: center;
+    padding: var(--padding-x4);
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-x4);
+  }
+
+  @media (max-width: 620px) { .summary { grid-template-columns: minmax(0, 1fr); } }
+
+  .summary__score { display: flex; flex-direction: column; gap: 2px; }
+
+  .summary__value {
+    font-family: var(--mock-mono);
+    font-size: 30px;
+    font-weight: 500;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .summary__value span { font-size: 14px; color: var(--color-gray); }
+  .summary__label { font-size: 12px; color: var(--color-gray); }
+
+  .dist { display: flex; flex-direction: column; gap: var(--gap-x2); min-width: 0; }
+
+  .dist__bar {
+    display: flex;
+    height: 8px;
+    border-radius: 999px;
+    overflow: hidden;
+    gap: 2px;
+    background: var(--color-bg-tertiary);
+  }
+
+  .dist__bar i { display: block; height: 100%; background: var(--mock-cat); }
+
+  .dist__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-x1) var(--gap-x4);
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+
+  .dist__legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .dist__legend b { font-family: var(--mock-mono); font-weight: 500; color: var(--color-text-primary); }
+
+  .modal-piece {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x5);
+    padding: var(--padding-x4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x3);
+  }
+
+  .field {
+    border: 1px solid var(--color-border-primary);
+    background: var(--color-bg-primary);
+    border-radius: var(--radius-x4);
+    padding: var(--padding-x2) var(--padding-x3);
+    font-size: 14px;
+    color: var(--color-text-primary);
+  }
+
+  .field--note { color: var(--color-text-secondary); min-height: 88px; line-height: 1.55; }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x3);
+  }
+
+  .toggle-row p { font-size: 14px; }
+  .toggle-row small { display: block; font-size: 12px; color: var(--color-gray); line-height: 1.4; }
+
+  .switch {
+    position: relative;
+    width: 42px;
+    height: 24px;
+    border-radius: 999px;
+    border: 0;
+    background: var(--color-bg-tertiary);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background var(--duration-fast) var(--easing-out);
+  }
+
+  .switch::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-neutral-100);
+    transition: transform var(--duration-base) var(--easing-out);
+  }
+
+  .switch[aria-checked="true"] { background: var(--color-accent); }
+  .switch[aria-checked="true"]::after { transform: translateX(18px); }
+
+  .section { margin-top: var(--padding-x20); display: flex; flex-direction: column; gap: var(--gap-x5); }
+  .section > h2 { font-size: 23px; font-weight: 700; letter-spacing: -0.2px; }
+  .section > .lede { margin-top: calc(-1 * var(--gap-x3)); }
+
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x4);
+  }
+
+  table { width: 100%; border-collapse: collapse; min-width: 640px; font-size: 14px; }
+
+  th, td {
+    text-align: left;
+    padding: var(--padding-x3) var(--padding-x4);
+    border-top: 1px solid var(--color-border-primary);
+    vertical-align: top;
+  }
+
+  thead th {
+    border-top: 0;
+    background: var(--color-bg-secondary);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+    font-weight: 600;
+  }
+
+  tbody th { font-weight: 600; color: var(--color-text-primary); width: 22%; }
+  tbody td { color: var(--color-text-secondary); background: var(--color-bg-primary); }
+  tbody th { background: var(--color-bg-primary); }
+
+  .size {
+    font-family: var(--mock-mono);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 1px 7px;
+    border-radius: var(--radius-x1);
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+  }
+
+  .plan {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    border-top: 1px solid var(--color-border-primary);
+  }
+
+  @media (max-width: 760px) { .plan { grid-template-columns: minmax(0, 1fr); } }
+
+  .plan > div {
+    padding: var(--padding-x5) var(--padding-x5) var(--padding-x5) 0;
+    border-bottom: 1px solid var(--color-border-primary);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x2);
+    min-width: 0;
+  }
+
+  .plan h3 { font-size: 16px; font-weight: 700; }
+  .plan p, .plan li { font-size: 14px; color: var(--color-text-secondary); }
+  .plan ul { margin: 0; padding-left: 18px; display: grid; gap: var(--gap-x1); }
+
+  pre {
+    margin: 0;
+    font-family: var(--mock-mono);
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x4);
+    padding: var(--padding-x3) var(--padding-x4);
+    overflow-x: auto;
+  }
+
+  pre b { color: var(--mock-accent-text); font-weight: 500; }
+  pre i { color: var(--color-gray); font-style: normal; }
+
+  .recommend {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-x5);
+    padding: var(--padding-x5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x2);
+  }
+
+  .recommend h3 { font-size: 18px; font-weight: 700; }
+  .recommend p { color: var(--color-text-secondary); max-width: 72ch; }
+
+  .empty {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: var(--gap-x4);
+    align-items: center;
+  }
+
+  @media (max-width: 620px) { .empty { grid-template-columns: minmax(0, 1fr); } }
+
+  .empty__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .empty__icon svg { width: 22px; height: 22px; }
+  .empty h3 { font-size: 16px; font-weight: 700; }
+  .empty p { font-size: 14px; color: var(--color-text-muted); }
+
+  .note {
+    margin-top: var(--padding-x14);
+    font-size: 13px;
+    color: var(--color-gray);
+    border-left: 2px solid var(--color-border-primary);
+    padding-left: var(--padding-x3);
+  }
+
+  [hidden] { display: none !important; }
+
+  @media (max-width: 520px) {
+    :root { --mock-avatar: 30px; --mock-avatar-sm: 24px; }
+    .entry__score { margin-left: 0; }
+    .thread { padding-left: var(--padding-x3); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: var(--duration-instant) !important; }
+  }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.6-7.5-10.1A4.4 4.4 0 0 1 12 7.6a4.4 4.4 0 0 1 7.5 2.8c0 5.5-7.5 10.1-7.5 10.1Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-thumb" viewBox="0 0 24 24"><path d="M7.5 10.5 11 3.8a2 2 0 0 1 2.7 1.9l-.5 3.8h5a2 2 0 0 1 2 2.4l-1.3 6.5a2 2 0 0 1-2 1.6H7.5Zm0 0H4.5v9h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-reply" viewBox="0 0 24 24"><path d="M10 8 5 12.5 10 17M5.5 12.5H14a5 5 0 0 1 5 5V19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5.5 21V4.5m0 0h11l-2 4 2 4h-11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.8" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="18.5" cy="12" r="1.7" fill="currentColor"/></symbol>
+  <symbol id="i-comment" viewBox="0 0 24 24"><path d="M4.5 5.5h15v10h-8l-4.5 3.5v-3.5H4.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="m14.5 5.5 4 4L9 19H5v-4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+</svg>
+
+<div class="shell">
+  <header class="masthead">
+    <p class="eyebrow">MoonCellar · game page comments</p>
+    <h1>Game Page Comments</h1>
+    <p class="lede">
+      Three ways to let players talk about a game on its page. They differ in what a comment is
+      attached to: a playthrough the player already logged, a free-standing thread, or both in one
+      panel. Every example below is drawn for <strong>Hollow Knight</strong> with invented
+      usernames.
+    </p>
+    <dl class="brief">
+      <div>
+        <dt>Placement</dt>
+        <dd>Full-width panel after Details and before Release dates — the page is already long, so it sits below the facts.</dd>
+      </div>
+      <div>
+        <dt>Already stored</dt>
+        <dd>Playthrough notes with status, platform, hours and date; 1–10 user ratings; <code class="t">RichEditor</code> and <code class="t">RichText</code>.</dd>
+      </div>
+      <div>
+        <dt>Constraint</dt>
+        <dd>Game pages are ISR for an hour and must carry content in the server HTML.</dd>
+      </div>
+      <div>
+        <dt>Reality check</dt>
+        <dd>~376k games. Almost every page opens with zero comments, so the empty state is the common one.</dd>
+      </div>
+    </dl>
+  </header>
+
+  <section class="variant" aria-labelledby="variant-a">
+    <div class="variant__head">
+      <span class="variant__letter">A</span>
+      <h2 id="variant-a">Reviews from playthroughs</h2>
+    </div>
+    <p class="variant__thesis">
+      A comment is a playthrough note the player chose to publish. Nothing new to write — the
+      note already exists, and it arrives with context no free comment has: how far the player
+      got, on which platform, and in how many hours.
+    </p>
+
+    <div class="stage">
+      <p class="stage__context">Game page · after Details</p>
+      <div class="stage__pair">
+        <article class="box" aria-label="Player reviews">
+          <div class="box__head">
+            <div class="box__title">
+              <h3>Player reviews</h3>
+              <span class="count">38</span>
+            </div>
+            <div class="segmented" role="group" aria-label="Sort reviews">
+              <button type="button" aria-pressed="true" data-segment>Most helpful</button>
+              <button type="button" aria-pressed="false" data-segment>Newest</button>
+            </div>
+          </div>
+
+          <div class="chips" role="group" aria-label="Filter by status">
+            <button type="button" class="chip" aria-pressed="true" data-segment>All <span class="count">38</span></button>
+            <button type="button" class="chip cat-completed" aria-pressed="false" data-segment><i class="dot"></i>Completed <span class="count">24</span></button>
+            <button type="button" class="chip cat-playing" aria-pressed="false" data-segment><i class="dot"></i>Playing <span class="count">6</span></button>
+            <button type="button" class="chip cat-dropped" aria-pressed="false" data-segment><i class="dot"></i>Dropped <span class="count">5</span></button>
+            <button type="button" class="chip cat-played" aria-pressed="false" data-segment><i class="dot"></i>Played <span class="count">3</span></button>
+          </div>
+
+          <div class="feed">
+            <div class="entry">
+              <span class="avatar" aria-hidden="true">MS</span>
+              <div class="entry__main">
+                <div class="entry__head">
+                  <span class="entry__name">moth_scholar</span>
+                  <span class="status cat-completed"><i class="dot"></i>Completed</span>
+                  <span class="mastered">Mastered</span>
+                  <span class="entry__meta">Switch · 46 h</span>
+                  <span class="entry__score">10 <span>/ 10</span></span>
+                </div>
+                <div class="entry__body entry__body--clamped">
+                  <p>The map system sold me. You buy the map from Cornifer, and it only updates when you sit on a bench — by the City of Tears I had stopped fighting that and started enjoying being lost. Pantheon of Hallownest took another fifteen hours and I regret none of them, even the Nailsmith's fight on attempt forty.</p>
+                </div>
+                <div class="entry__actions">
+                  <button type="button" class="ghost" aria-pressed="false" data-count="27"><svg aria-hidden="true"><use href="#i-thumb"/></svg>Helpful <span class="count">27</span></button>
+                  <button type="button" class="ghost ghost--link">Read more</button>
+                  <span class="entry__meta">Finished 12.03.2025</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="entry">
+              <span class="avatar" aria-hidden="true">V7</span>
+              <div class="entry__main">
+                <div class="entry__head">
+                  <span class="entry__name">vessel_07</span>
+                  <span class="status cat-dropped"><i class="dot"></i>Dropped</span>
+                  <span class="entry__meta">PC · 12 h</span>
+                  <span class="spoiler-flag">Spoilers</span>
+                  <span class="entry__score">5 <span>/ 10</span></span>
+                </div>
+                <div class="entry__body spoiler" data-spoiler>
+                  <div class="spoiler__content">
+                    <p>I beat the Hollow Knight and got the worst ending. Finding out the real one needs the Void Heart from the Abyss, after the three Dreamers, was where my patience ran out — I had already spent two hours just getting back to the Black Egg.</p>
+                  </div>
+                  <div class="spoiler__cover">
+                    <button type="button" data-reveal><svg aria-hidden="true"><use href="#i-eye"/></svg>Show spoilers</button>
+                  </div>
+                </div>
+                <div class="entry__actions">
+                  <button type="button" class="ghost" aria-pressed="false" data-count="9"><svg aria-hidden="true"><use href="#i-thumb"/></svg>Helpful <span class="count">9</span></button>
+                  <span class="entry__meta">Dropped 02.11.2024</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="entry">
+              <span class="avatar" aria-hidden="true">LJ</span>
+              <div class="entry__main">
+                <div class="entry__head">
+                  <span class="entry__name">latejoiner</span>
+                  <span class="status cat-playing"><i class="dot"></i>Playing</span>
+                  <span class="entry__meta">PS4 · 21 h</span>
+                  <span class="entry__score entry__score--empty">Not rated</span>
+                </div>
+                <div class="entry__body">
+                  <p>Twenty hours in and Deepnest is the first area that genuinely unsettles me. The sound design alone makes me walk slower.</p>
+                </div>
+                <div class="entry__actions">
+                  <button type="button" class="ghost" aria-pressed="false" data-count="4"><svg aria-hidden="true"><use href="#i-thumb"/></svg>Helpful <span class="count">4</span></button>
+                  <span class="entry__meta">Updated 3 days ago</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="box__foot">
+            <button type="button" class="btn btn--default">Show 10 more</button>
+            <button type="button" class="btn btn--accent"><svg aria-hidden="true"><use href="#i-pen"/></svg>Write a review</button>
+          </div>
+        </article>
+
+        <aside class="modal-piece" aria-label="Playthrough modal with publish toggle">
+          <p class="stage__context">Playthrough modal · one new control</p>
+          <div class="field">Completed</div>
+          <div class="field">Nintendo Switch</div>
+          <div class="field field--note">The map system sold me. You buy the map from Cornifer, and it only updates when you sit on a bench…</div>
+          <div class="toggle-row">
+            <p>Show on the game page<small>Your status, platform, hours and rating are shown with it.</small></p>
+            <button type="button" class="switch" role="switch" aria-checked="true" aria-label="Show on the game page" data-switch></button>
+          </div>
+          <div class="toggle-row">
+            <p>Contains spoilers</p>
+            <button type="button" class="switch" role="switch" aria-checked="false" aria-label="Contains spoilers" data-switch></button>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <div class="hints">
+      <div>
+        <h4>Works because</h4>
+        <ul>
+          <li>No new editor or form — "Write a review" opens the playthrough modal the player already knows.</li>
+          <li>Every review carries status, hours and rating, so a "Dropped · 12 h · 5/10" reads differently from "Mastered · 46 h".</li>
+          <li>Cheapest to build: one flag on <code class="t">playthroughs</code>, one read endpoint, one helpful counter.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Costs</h4>
+        <ul>
+          <li>Existing notes were written as private — publishing must be opt-in per playthrough, never a migration.</li>
+          <li>No replies. A question like "Switch or PC?" has nowhere to go.</li>
+          <li>One review per playthrough, so a replay shows the same player twice unless grouped.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="variant" aria-labelledby="variant-b">
+    <div class="variant__head">
+      <span class="variant__letter">B</span>
+      <h2 id="variant-b">Discussion thread</h2>
+    </div>
+    <p class="variant__thesis">
+      A comment is its own object with one level of replies. Anyone signed in can ask or answer.
+      The player's status on the game is still shown next to their name, so an answer from someone
+      who finished it is recognisable at a glance.
+    </p>
+
+    <div class="stage">
+      <p class="stage__context">Game page · after Details</p>
+      <article class="box" aria-label="Discussion">
+        <div class="box__head">
+          <div class="box__title">
+            <h3>Discussion</h3>
+            <span class="count">112</span>
+          </div>
+          <div class="segmented" role="group" aria-label="Sort comments">
+            <button type="button" aria-pressed="true" data-segment>Top</button>
+            <button type="button" aria-pressed="false" data-segment>New</button>
+          </div>
+        </div>
+
+        <div class="composer">
+          <span class="avatar" aria-hidden="true">YOU</span>
+          <div class="composer__field">
+            <div class="composer__tools" aria-label="Formatting">
+              <button type="button" class="tool" aria-label="Bold"><b>B</b></button>
+              <button type="button" class="tool" aria-label="Italic"><i>I</i></button>
+              <button type="button" class="tool" aria-label="Link"><svg aria-hidden="true"><use href="#i-link"/></svg></button>
+              <button type="button" class="tool" aria-label="Mark as spoiler"><svg aria-hidden="true"><use href="#i-eye"/></svg></button>
+            </div>
+            <div class="composer__text" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Comment" data-ph="Ask about a boss, a route or a charm build…">Which charm build are you taking into the Radiance fight?</div>
+            <div class="composer__foot">
+              <label class="check" for="b-spoiler"><input type="checkbox" id="b-spoiler">Contains spoilers</label>
+              <button type="button" class="btn btn--accent">Post</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="feed">
+          <div class="entry">
+            <span class="avatar" aria-hidden="true">PC</span>
+            <div class="entry__main">
+              <div class="entry__head">
+                <span class="entry__name">pale_court</span>
+                <span class="status cat-completed"><i class="dot"></i>Completed · 61 h</span>
+                <span class="entry__meta">3 days ago</span>
+              </div>
+              <div class="entry__body">
+                <p>Is Steel Soul worth it on a first replay, or should I clear Godhome first to learn the fights?</p>
+              </div>
+              <div class="entry__actions">
+                <button type="button" class="ghost" aria-pressed="true" data-count="32"><svg aria-hidden="true"><use href="#i-heart"/></svg><span class="count">32</span></button>
+                <button type="button" class="ghost"><svg aria-hidden="true"><use href="#i-reply"/></svg>Reply</button>
+                <button type="button" class="ghost" aria-label="More actions"><svg aria-hidden="true"><use href="#i-more"/></svg></button>
+              </div>
+
+              <div class="thread">
+                <div class="reply">
+                  <span class="avatar avatar--sm" aria-hidden="true">MS</span>
+                  <div class="entry__main">
+                    <div class="entry__head">
+                      <span class="entry__name">moth_scholar</span>
+                      <span class="status cat-completed"><i class="dot"></i>Completed · 46 h</span>
+                      <span class="entry__meta">2 days ago</span>
+                    </div>
+                    <div class="entry__body"><p>Godhome first. Steel Soul punishes you for learning a fight; the Pantheons reward it.</p></div>
+                    <div class="entry__actions">
+                      <button type="button" class="ghost" aria-pressed="false" data-count="18"><svg aria-hidden="true"><use href="#i-heart"/></svg><span class="count">18</span></button>
+                      <button type="button" class="ghost"><svg aria-hidden="true"><use href="#i-reply"/></svg>Reply</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="reply">
+                  <span class="avatar avatar--sm" aria-hidden="true">GF</span>
+                  <div class="entry__main">
+                    <div class="entry__head">
+                      <span class="entry__name">grubfather</span>
+                      <span class="status cat-played"><i class="dot"></i>Played · 30 h</span>
+                      <span class="entry__meta">2 days ago</span>
+                    </div>
+                    <div class="entry__body"><p>Take the unbreakable charms from the start of the Steel Soul run. It removes most of the stress.</p></div>
+                    <div class="entry__actions">
+                      <button type="button" class="ghost" aria-pressed="false" data-count="7"><svg aria-hidden="true"><use href="#i-heart"/></svg><span class="count">7</span></button>
+                      <button type="button" class="ghost"><svg aria-hidden="true"><use href="#i-reply"/></svg>Reply</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="reply" hidden data-more-replies>
+                  <span class="avatar avatar--sm" aria-hidden="true">HR</span>
+                  <div class="entry__main">
+                    <div class="entry__head">
+                      <span class="entry__name">hornet_runs</span>
+                      <span class="status cat-playing"><i class="dot"></i>Playing</span>
+                      <span class="entry__meta">1 day ago</span>
+                    </div>
+                    <div class="entry__body"><p>Doing Steel Soul now without Godhome. The Watcher Knights are the wall, not the final boss.</p></div>
+                    <div class="entry__actions">
+                      <button type="button" class="ghost" aria-pressed="false" data-count="3"><svg aria-hidden="true"><use href="#i-heart"/></svg><span class="count">3</span></button>
+                      <button type="button" class="ghost"><svg aria-hidden="true"><use href="#i-reply"/></svg>Reply</button>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <button type="button" class="ghost ghost--link" data-toggle-replies data-label-open="Hide replies">Show 3 more replies</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="entry">
+            <span class="avatar" aria-hidden="true">QN</span>
+            <div class="entry__main">
+              <div class="entry__head">
+                <span class="entry__name">quietnail</span>
+                <span class="status cat-wishlist"><i class="dot"></i>Wishlist</span>
+                <span class="entry__meta">5 days ago</span>
+              </div>
+              <div class="entry__body">
+                <p>Does the Switch version still stutter when you enter Queen's Gardens? Deciding between it and PC.</p>
+              </div>
+              <div class="entry__actions">
+                <button type="button" class="ghost" aria-pressed="false" data-count="9"><svg aria-hidden="true"><use href="#i-heart"/></svg><span class="count">9</span></button>
+                <button type="button" class="ghost"><svg aria-hidden="true"><use href="#i-reply"/></svg>Reply</button>
+                <button type="button" class="ghost ghost--link"><svg aria-hidden="true"><use href="#i-comment"/></svg>2 replies</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="entry">
+            <span class="avatar" aria-hidden="true">·</span>
+            <div class="entry__main">
+              <p class="removed">This comment was hidden by a moderator.</p>
+              <div class="entry__actions">
+                <button type="button" class="ghost ghost--link"><svg aria-hidden="true"><use href="#i-comment"/></svg>4 replies</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="box__foot">
+          <button type="button" class="btn btn--default">Load more comments</button>
+          <span class="entry__meta">Showing 3 of 112</span>
+        </div>
+      </article>
+    </div>
+
+    <div class="hints">
+      <div>
+        <h4>Works because</h4>
+        <ul>
+          <li>Questions and answers have a home — builds, versions, where to find a charm.</li>
+          <li>The status chip next to a name comes from the existing playthrough, so it costs a lookup, not new data.</li>
+          <li>A hidden comment keeps its replies readable instead of breaking the thread.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Costs</h4>
+        <ul>
+          <li>A new collection, likes, reports and an admin queue — moderation becomes a job.</li>
+          <li>Free text is where spam and spoilers land. Rate limits and a spoiler flag are required from day one.</li>
+          <li>Short questions add little to the HTML a search engine sees, compared with reviews.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="variant" aria-labelledby="variant-c">
+    <div class="variant__head">
+      <span class="variant__letter">C</span>
+      <h2 id="variant-c">Reviews and discussion in one panel</h2>
+    </div>
+    <p class="variant__thesis">
+      One panel, two tabs. Reviews (variant A) open by default and lead with what players who
+      finished the game thought; Discussion (variant B) sits one click away. Each tab has its own
+      way to contribute.
+    </p>
+
+    <div class="stage">
+      <p class="stage__context">Game page · after Details</p>
+      <article class="box" aria-label="Community">
+        <div class="tabs" role="tablist" aria-label="Community">
+          <button type="button" role="tab" id="c-tab-reviews" aria-selected="true" aria-controls="c-panel-reviews" data-tab>Reviews <span class="count">38</span></button>
+          <button type="button" role="tab" id="c-tab-discussion" aria-selected="false" aria-controls="c-panel-discussion" tabindex="-1" data-tab>Discussion <span class="count">112</span></button>
+        </div>
+
+        <div role="tabpanel" id="c-panel-reviews" aria-labelledby="c-tab-reviews" class="box" style="padding:0;border:0;background:none">
+          <div class="summary">
+            <div class="summary__score">
+              <span class="summary__value">8.7 <span>/ 10</span></span>
+              <span class="summary__label">Average from 31 rated reviews</span>
+            </div>
+            <div class="dist" aria-label="Reviews by status">
+              <div class="dist__bar" role="img" aria-label="Completed 24, Playing 6, Dropped 5, Played 3">
+                <i class="cat-completed" style="width:63.2%"></i>
+                <i class="cat-playing" style="width:15.8%"></i>
+                <i class="cat-dropped" style="width:13.2%"></i>
+                <i class="cat-played" style="width:7.8%"></i>
+              </div>
+              <div class="dist__legend">
+                <span class="cat-completed"><i class="dot"></i>Completed <b>24</b></span>
+                <span class="cat-playing"><i class="dot"></i>Playing <b>6</b></span>
+                <span class="cat-dropped"><i class="dot"></i>Dropped <b>5</b></span>
+                <span class="cat-played"><i class="dot"></i>Played <b>3</b></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="feed">
+            <div class="entry">
+              <span class="avatar" aria-hidden="true">MS</span>
+              <div class="entry__main">
+                <div class="entry__head">
+                  <span class="entry__name">moth_scholar</span>
+                  <span class="status cat-completed"><i class="dot"></i>Completed</span>
+                  <span class="mastered">Mastered</span>
+                  <span class="entry__meta">Switch · 46 h</span>
+                  <span class="entry__score">10 <span>/ 10</span></span>
+                </div>
+                <div class="entry__body entry__body--clamped">
+                  <p>The map system sold me. You buy the map from Cornifer, and it only updates when you sit on a bench — by the City of Tears I had stopped fighting that and started enjoying being lost.</p>
+                </div>
+                <div class="entry__actions">
+                  <button type="button" class="ghost" aria-pressed="false" data-count="27"><svg aria-hidden="true"><use href="#i-thumb"/></svg>Helpful <span class="count">27</span></button>
+                  <button type="button" class="ghost"><svg aria-hidden="true"><use href="#i-reply"/></svg>Discuss</button>
+                  <span class="entry__meta">Finished 12.03.2025</span>
+                </div>
+              </div>
+            </div>
+            <div class="entry">
+              <span class="avatar" aria-hidden="true">V7</span>
+              <div class="entry__main">
+                <div class="entry__head">
+                  <span class="entry__name">vessel_07</span>
+                  <span class="status cat-dropped"><i class="dot"></i>Dropped</span>
+                  <span class="entry__meta">PC · 12 h</span>
+                  <span class="spoiler-flag">Spoilers</span>
+                  <span class="entry__score">5 <span>/ 10</span></span>
+                </div>
+                <div class="entry__body spoiler" data-spoiler>
+                  <div class="spoiler__content">
+                    <p>I beat the Hollow Knight and got the worst ending. Finding out the real one needs the Void Heart from the Abyss was where my patience ran out.</p>
+                  </div>
+                  <div class="spoiler__cover">
+                    <button type="button" data-reveal><svg aria-hidden="true"><use href="#i-eye"/></svg>Show spoilers</button>
+                  </div>
+                </div>
+                <div class="entry__actions">
+                  <button type="button" class="ghost" aria-pressed="false" data-count="9"><svg aria-hidden="true"><use href="#i-thumb"/></svg>Helpful <span class="count">9</span></button>
+                  <button type="button" class="ghost"><svg aria-hidden="true"><use href="#i-reply"/></svg>Discuss</button>
+                  <span class="entry__meta">Dropped 02.11.2024</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="box__foot">
+            <button type="button" class="btn btn--default">All 38 reviews</button>
+            <button type="button" class="btn btn--accent"><svg aria-hidden="true"><use href="#i-pen"/></svg>Write a review</button>
+          </div>
+        </div>
+
+        <div role="tabpanel" id="c-panel-discussion" aria-labelledby="c-tab-discussion" class="box" style="padding:0;border:0;background:none" hidden>
+          <div class="feed">
+            <div class="entry">
+              <span class="avatar" aria-hidden="true">PC</span>
+              <div class="entry__main">
+                <div class="entry__head">
+                  <span class="entry__name">pale_court</span>
+                  <span class="status cat-completed"><i class="dot"></i>Completed · 61 h</span>
+                  <span class="entry__meta">3 days ago</span>
+                </div>
+                <div class="entry__body"><p>Is Steel Soul worth it on a first replay, or should I clear Godhome first to learn the fights?</p></div>
+                <div class="entry__actions">
+                  <button type="button" class="ghost" aria-pressed="false" data-count="32"><svg aria-hidden="true"><use href="#i-heart"/></svg><span class="count">32</span></button>
+                  <button type="button" class="ghost ghost--link"><svg aria-hidden="true"><use href="#i-comment"/></svg>5 replies</button>
+                </div>
+              </div>
+            </div>
+            <div class="entry">
+              <span class="avatar" aria-hidden="true">CF</span>
+              <div class="entry__main">
+                <div class="entry__head">
+                  <span class="entry__name">cornifer_fan</span>
+                  <span class="status cat-completed"><i class="dot"></i>Completed · 46 h</span>
+                  <span class="entry__meta">on a review · 1 week ago</span>
+                </div>
+                <div class="entry__body"><p>Replying to moth_scholar's review: the bench-only map updates are exactly why the Quick Map charm feels like a reward and not a crutch.</p></div>
+                <div class="entry__actions">
+                  <button type="button" class="ghost" aria-pressed="false" data-count="11"><svg aria-hidden="true"><use href="#i-heart"/></svg><span class="count">11</span></button>
+                  <button type="button" class="ghost ghost--link"><svg aria-hidden="true"><use href="#i-comment"/></svg>1 reply</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="box__foot">
+            <button type="button" class="btn btn--default">All 112 comments</button>
+            <button type="button" class="btn btn--accent"><svg aria-hidden="true"><use href="#i-comment"/></svg>Start a discussion</button>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="hints">
+      <div>
+        <h4>Works because</h4>
+        <ul>
+          <li>The default tab is the one with the most signal per line, and it is also the one worth indexing.</li>
+          <li>"Discuss" on a review opens a thread about it, so reviews get replies without becoming threads themselves.</li>
+          <li>Can ship in two steps: Reviews tab alone first, Discussion tab later, same panel.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Costs</h4>
+        <ul>
+          <li>Carries the full cost of B once the second tab ships.</li>
+          <li>Two ways to contribute need two clear buttons — "Write a review" and "Start a discussion" must never look alike.</li>
+          <li>Only the active tab can be in the server HTML without making the panel heavy.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="empty-title">
+    <h2 id="empty-title">The state most pages will show</h2>
+    <p class="lede">Any variant needs this first, because it is what nearly every one of the ~376k game pages opens with.</p>
+    <div class="stage">
+      <p class="stage__context">Game page · a game nobody has reviewed yet</p>
+      <div class="box">
+        <div class="empty">
+          <span class="empty__icon" aria-hidden="true"><svg><use href="#i-comment"/></svg></span>
+          <div>
+            <h3>No reviews for Tunic yet</h3>
+            <p>Finished it, dropped it or still playing? Your playthrough note can be the first one here.</p>
+          </div>
+          <button type="button" class="btn btn--accent"><svg aria-hidden="true"><use href="#i-pen"/></svg>Write a review</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="compare-title">
+    <h2 id="compare-title">Side by side</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th scope="col">&nbsp;</th><th scope="col">A · Reviews</th><th scope="col">B · Discussion</th><th scope="col">C · Both</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">New data</th><td><code class="t">isPublic</code>, <code class="t">isSpoiler</code> and a helpful counter on playthroughs</td><td><code class="t">comments</code> and <code class="t">comment-likes</code> collections</td><td>Both</td></tr>
+          <tr><th scope="row">Writing UI</th><td>Two toggles in the existing playthrough modal</td><td>Inline composer on the page, compact <code class="t">RichEditor</code></td><td>Both, one per tab</td></tr>
+          <tr><th scope="row">Moderation</th><td>Low — tied to a real playthrough, one per game per player</td><td>High — reports, hide, rate limits</td><td>High once Discussion ships</td></tr>
+          <tr><th scope="row">Server HTML</th><td>Strong: long texts with status, hours and rating</td><td>Weak: short questions</td><td>Reviews tab rendered on the server</td></tr>
+          <tr><th scope="row">New icons</th><td><code class="t">SvgThumb</code>, <code class="t">SvgEye</code></td><td><code class="t">SvgHeart</code>, <code class="t">SvgReply</code>, <code class="t">SvgFlag</code>, <code class="t">SvgEye</code></td><td>All five</td></tr>
+          <tr><th scope="row">Size</th><td><span class="size">S</span></td><td><span class="size">L</span></td><td><span class="size">S</span> then <span class="size">L</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="build-title">
+    <h2 id="build-title">How it would be built</h2>
+    <p class="lede">Written for C, since it contains A and B. Shipping A alone is the first two rows of each block.</p>
+
+    <div class="plan">
+      <div>
+        <h3>Data</h3>
+        <pre><i>// packages/schemas/src/playthroughs.schema.ts</i>
+isPublic: z.boolean().optional()
+isSpoiler: z.boolean().optional()
+helpfulCount: z.number().optional()
+
+<i>// packages/schemas/src/comments.schema.ts</i>
+<b>CommentSchema</b> = z.object({
+  _id, gameId, userId,
+  parentId: z.string().optional(),
+  playthroughId: z.string().optional(),
+  body: z.string().max(4000),
+  isSpoiler: z.boolean(),
+  likesCount: z.number(),
+  repliesCount: z.number(),
+  status: z.enum(["visible", "hidden", "deleted"]),
+  createdAt, updatedAt,
+})</pre>
+        <p>Indexes: <code class="t">{ gameId, isPublic, helpfulCount }</code> on playthroughs, <code class="t">{ gameId, parentId, status, createdAt }</code> and <code class="t">{ gameId, likesCount }</code> on comments, unique <code class="t">{ commentId, userId }</code> on likes.</p>
+      </div>
+      <div>
+        <h3>API</h3>
+        <pre><b>GET</b>    /games/:gameId/reviews?status=&amp;sort=helpful|new&amp;cursor=
+<b>PUT</b>    /playthroughs/:id/helpful   <i>· DELETE to undo</i>
+<b>GET</b>    /games/:gameId/comments?sort=top|new&amp;cursor=
+<b>GET</b>    /comments/:id/replies?cursor=
+<b>POST</b>   /comments
+<b>PATCH</b>  /comments/:id   <i>· author only</i>
+<b>DELETE</b> /comments/:id   <i>· soft delete, keeps replies</i>
+<b>PUT</b>    /comments/:id/like
+<b>POST</b>   /comments/:id/report
+<b>PATCH</b>  /admin/comments/:id   <i>· hide / restore</i></pre>
+        <p>Bodies go through <code class="t">sanitizeRichText</code> like playthrough notes. Cursor pagination, not page numbers, so a new comment does not shift the next page.</p>
+      </div>
+      <div>
+        <h3>Server HTML and caching</h3>
+        <ul>
+          <li><code class="t">app/games/[slug]/page.tsx</code> fetches the first page of reviews next to <code class="t">getGame</code>, wrapped in <code class="t">cache()</code>, and passes it as <code class="t">initialData</code>.</li>
+          <li>The page stays ISR for an hour. The client query refetches on mount, so an author sees their review immediately while the HTML catches up.</li>
+          <li>Do not call <code class="t">revalidateGamePage</code> on every comment — a busy thread would turn the page into a cold render on each post.</li>
+          <li>Reviews with a rating can go into the game's JSON-LD as <code class="t">review</code> entries; discussion stays out of it.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Web</h3>
+        <ul>
+          <li><code class="t">entities/comment/api</code> — keys, queries, mutations, following the playthrough entity; likes and helpful update optimistically.</li>
+          <li><code class="t">features/game/GameComments</code> — the panel; bodies render only through <code class="t">RichText</code>, the composer is <code class="t">RichEditor</code>.</li>
+          <li>Status next to a name comes from the author's playthrough for this game, returned by the API with the comment.</li>
+          <li>Spoilers are blurred with CSS while the text stays in the HTML, so nothing is gated on client state.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="recommend">
+      <p class="eyebrow">Recommendation</p>
+      <h3>Build C in two steps, starting with the Reviews tab</h3>
+      <p>
+        Step one is variant A inside C's panel: publish toggle and spoiler toggle in the playthrough
+        modal, a read endpoint, a helpful counter and the empty state. It needs no moderation queue
+        and gives game pages real text in the server HTML. Add the Discussion tab once there are
+        enough published reviews to show that players want to talk on game pages at all.
+      </p>
+    </div>
+  </section>
+
+  <p class="note">
+    Colours, spacing and radii are the project's own tokens: the <code class="t">:root</code> block
+    above is generated from <code class="t">apps/web/src/lib/app/styles/vars</code> by
+    <code class="t">bun --filter web sync:tokens</code>. The typeface is substituted — Hanken
+    Grotesk stands in for ApercuPro, whose licensed file cannot be served from a third-party host.
+    Usernames and texts are invented examples. Icons are drawn inline for the mockup; on the site
+    each one becomes an <code class="t">Svg*</code> component in <code class="t">shared/ui/svg</code>.
+  </p>
+</div>
+
+<script>
+  document.querySelectorAll("[data-segment]").forEach((button) => {
+    button.addEventListener("click", () => {
+      button.parentElement.querySelectorAll("[data-segment]").forEach((item) => {
+        item.setAttribute("aria-pressed", String(item === button));
+      });
+    });
+  });
+
+  document.querySelectorAll("[data-count]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const isPressed = button.getAttribute("aria-pressed") === "true";
+      const count = button.querySelector(".count");
+      const base = Number(button.dataset.count);
+      const wasPressedInitially = button.dataset.initial === undefined
+        ? (button.dataset.initial = String(isPressed)) === "true"
+        : button.dataset.initial === "true";
+      const next = !isPressed;
+
+      button.setAttribute("aria-pressed", String(next));
+      count.textContent = String(base + (next ? 1 : 0) - (wasPressedInitially ? 1 : 0));
+    });
+  });
+
+  document.querySelectorAll("[data-reveal]").forEach((button) => {
+    button.addEventListener("click", () => {
+      button.closest("[data-spoiler]").classList.add("is-revealed");
+    });
+  });
+
+  document.querySelectorAll("[data-switch]").forEach((button) => {
+    button.addEventListener("click", () => {
+      button.setAttribute(
+        "aria-checked",
+        String(button.getAttribute("aria-checked") !== "true")
+      );
+    });
+  });
+
+  document.querySelectorAll("[data-toggle-replies]").forEach((button) => {
+    const label = button.textContent;
+
+    button.addEventListener("click", () => {
+      const replies = button.closest(".thread").querySelectorAll("[data-more-replies]");
+      const isOpening = replies[0]?.hidden;
+
+      replies.forEach((reply) => (reply.hidden = !isOpening));
+      button.textContent = isOpening ? button.dataset.labelOpen : label;
+    });
+  });
+
+  const tabs = document.querySelectorAll("[data-tab]");
+
+  const selectTab = (tab) => {
+    tabs.forEach((item) => {
+      const isSelected = item === tab;
+
+      item.setAttribute("aria-selected", String(isSelected));
+      item.tabIndex = isSelected ? 0 : -1;
+      document.getElementById(item.getAttribute("aria-controls")).hidden = !isSelected;
+    });
+  };
+
+  tabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => selectTab(tab));
+    tab.addEventListener("keydown", (event) => {
+      if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+
+      const next = tabs[(index + (event.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
+
+      selectTab(next);
+      next.focus();
+    });
+  });
+</script>

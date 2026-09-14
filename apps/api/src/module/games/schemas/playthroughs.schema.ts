@@ -26,6 +26,12 @@ export class Playthrough {
   @Prop()
   isMastered: boolean;
   @Prop()
+  isPublic: boolean;
+  @Prop()
+  isSpoiler: boolean;
+  @Prop({ default: 0 })
+  helpfulCount: number;
+  @Prop()
   createdAt: string;
   @Prop()
   updatedAt: string;
@@ -35,3 +41,4 @@ export const PlaythroughDatabaseSchema =
   SchemaFactory.createForClass(Playthrough);
 
 PlaythroughDatabaseSchema.index({ gameId: 1, userId: 1 });
+PlaythroughDatabaseSchema.index({ gameId: 1, isPublic: 1, helpfulCount: -1 });

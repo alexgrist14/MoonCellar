@@ -29,6 +29,27 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   instantiating providers or touching MongoDB, and generates the OpenAPI document. It needs no
   `.env`.
 
+## Database
+
+- **Declare reference paths as `@Prop({ type: mongoose.Schema.Types.ObjectId, ref })`; a bare
+  `@Prop({ ref }) x: mongoose.Types.ObjectId` becomes a `Mixed` path.** Mongoose casts string
+  ids only on `ObjectId` paths, so a query with a string id against a `Mixed` path matches
+  nothing and returns an empty result instead of an error — reviews on the game page showed
+  "Not rated" for authors who had rated the game. `Rating.userId`/`gameId` are declared the bare
+  way, which is why `UserRatingsService` wraps every id in `new mongoose.Types.ObjectId(...)`.
+  Before querying a model with string ids, check `schema.path(name).instance`, or convert
+  explicitly (`asObjectId`/`asObjectIds` in `module/comments/utils`).
+- **The `.env` connection string points at the production database, and Mongoose `autoIndex`
+  is on.** A new `Schema.index(...)` is built on production the first time any local process
+  loads that schema. One-off scripts that import schemas connect with `autoIndex: false`.
+
+## Tests
+
+- **A spec that imports anything reaching `shared/utils/rich-text.utils` must mock that
+  module.** Jest runs the source as CommonJS and cannot load `htmlparser2`, the ESM-only
+  dependency of `sanitize-html`, so the suite dies at import with `Must use import to load ES
+  Module` before a single test runs. `comments.controller.spec.ts` mocks it with `jest.mock`.
+
 ## Storage
 
 - **Everything lives in one DigitalOcean Space (`S3_BUCKET`, `mooncellar`); the former buckets are

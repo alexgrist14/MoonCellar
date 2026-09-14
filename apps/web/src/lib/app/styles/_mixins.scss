@@ -285,7 +285,7 @@ $fontMain: var(--font-general);
 
   img {
     display: block;
-    max-width: 100%;
+    max-width: min(100%, var(--rich-editor-image-width));
     height: auto;
     margin-block: var(--rich-text-gap);
     border-radius: var(--radius-x2);

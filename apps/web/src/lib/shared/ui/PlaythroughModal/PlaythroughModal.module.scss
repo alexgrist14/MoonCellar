@@ -73,6 +73,13 @@
     flex: 1;
   }
 
+  &__toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-x5);
+    margin-top: var(--gap-x3);
+  }
+
   &__controls {
     margin-top: auto;
   }

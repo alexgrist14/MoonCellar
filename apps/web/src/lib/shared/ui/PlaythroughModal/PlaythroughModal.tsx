@@ -18,7 +18,7 @@ import {
   SavePlaythroughRequestSchema,
   IGameResponse,
 } from "@mooncellar/schemas";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, DefaultValues, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader } from "../Loader";
 import {
@@ -42,6 +42,7 @@ import {
 interface IPlaythroughModalProps {
   userId: string;
   game: IGameResponse;
+  isReview?: boolean;
 }
 
 const playthroughCategories: IPlaythroughMinimal["category"][] = [
@@ -57,9 +58,14 @@ const categoriesWithDate: IPlaythroughMinimal["category"][] = ["completed"];
 
 const MODAL_APPEARANCE_DURATION = 300;
 
+const getReviewablePlaythrough = <T extends IPlaythroughMinimal>(
+  playthroughs: T[]
+) => [...playthroughs].reverse().find((play) => play.category !== "wishlist");
+
 export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
   game,
   userId,
+  isReview,
 }) => {
   const { profile } = useAuthStore();
   const { systems } = useCommonStore();
@@ -96,30 +102,39 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
     useDeletePlaythroughMutation();
 
   const getFormValues = useCallback(
-    (playthrough?: IPlaythrough): ISavePlaythroughRequestInput => ({
+    (
+      playthrough?: IPlaythrough,
+      isPublishing?: boolean
+    ): DefaultValues<ISavePlaythroughRequestInput> => ({
       userId,
       gameId: game._id,
-      category: playthrough?.category || "wishlist",
+      category:
+        playthrough?.category || (isPublishing ? undefined : "wishlist"),
       platformId: playthrough?.platformId,
       date: playthrough?.date || undefined,
       time: playthrough?.time,
       comment: playthrough?.comment || "",
       isMastered: playthrough?.isMastered || false,
+      isPublic: !!isPublishing || !!playthrough?.isPublic,
+      isSpoiler: !!playthrough?.isSpoiler,
     }),
     [game._id, userId]
   );
 
-  const addHandler = useCallback(() => {
-    setPlaythroughId(undefined);
+  const addHandler = useCallback(
+    (isPublishing?: boolean) => {
+      setPlaythroughId(undefined);
 
-    reset(getFormValues());
-  }, [getFormValues, reset]);
+      reset(getFormValues(undefined, isPublishing));
+    },
+    [getFormValues, reset]
+  );
 
   const selectHandler = useCallback(
-    (playthrough: IPlaythrough) => {
+    (playthrough: IPlaythrough, isPublishing?: boolean) => {
       setPlaythroughId(playthrough._id);
 
-      reset(getFormValues(playthrough));
+      reset(getFormValues(playthrough, isPublishing));
     },
     [getFormValues, reset]
   );
@@ -195,6 +210,13 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
   useEffect(() => {
     if (isPending) return;
 
+    if (isReview) {
+      const reviewable = getReviewablePlaythrough(playthroughs);
+
+      reviewable ? selectHandler(reviewable, true) : addHandler(true);
+      return;
+    }
+
     const last = playthroughs.at(-1);
     last ? selectHandler(last) : addHandler();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -209,9 +231,11 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
   const listedPlaythroughs: IPlaythroughMinimal[] = isPending
     ? (knownPlaythroughs ?? [])
     : playthroughs;
-  const category =
-    watch("category") ?? listedPlaythroughs.at(-1)?.category ?? "wishlist";
-  const isWithoutComment = category === "wishlist";
+  const expectedPlaythrough = isReview
+    ? getReviewablePlaythrough(listedPlaythroughs)
+    : listedPlaythroughs.at(-1);
+  const category = watch("category") ?? expectedPlaythrough?.category;
+  const isWithoutComment = !category || category === "wishlist";
 
   return (
     <Box
@@ -246,8 +270,8 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
                 {
                   title: "New",
                   color: ButtonColor.FANCY,
-                  active: !!watch("category") && !playthroughId,
-                  hidden: !watch("category") || !!playthroughId,
+                  active: !playthroughId,
+                  hidden: isPending || !!playthroughId,
                 },
               ]}
             />
@@ -255,7 +279,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
               buttons={[
                 {
                   title: <SvgPlus />,
-                  onClick: addHandler,
+                  onClick: () => addHandler(),
                   color: ButtonColor.ACCENT,
                   hidden: !playthroughId,
                   compact: true,
@@ -351,6 +375,34 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
                 />
               )}
             />
+            <div className={styles.modal__toggles}>
+              <Controller
+                control={control}
+                name="isPublic"
+                render={({ field }) => (
+                  <ToggleSwitch
+                    label="Show on the game page"
+                    leftContent="No"
+                    rightContent="Yes"
+                    value={field.value ? "right" : "left"}
+                    clickCallback={() => field.onChange(!field.value)}
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="isSpoiler"
+                render={({ field }) => (
+                  <ToggleSwitch
+                    label="Contains spoilers"
+                    leftContent="No"
+                    rightContent="Yes"
+                    value={field.value ? "right" : "left"}
+                    clickCallback={() => field.onChange(!field.value)}
+                  />
+                )}
+              />
+            </div>
           </div>
           <div className={styles.modal__controls}>
             <ButtonGroup

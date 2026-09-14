@@ -19,8 +19,11 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   and the activity log) go through it, which is what keeps their formatting identical.
 - **The look of rendered rich text is defined once, in the `richText` mixin** (`_mixins.scss`),
   and consumed by `RichText` and by `RichEditor`'s content area, so the editor shows what the
-  reader gets. Block spacing comes from `--rich-text-gap`. The mixin's `img { max-width: 100% }`
-  is load-bearing: without it a comment image renders at natural size and blows the activity
+  reader gets. Block spacing comes from `--rich-text-gap`. Images are capped there at
+  `min(100%, var(--rich-editor-image-width))`, and no consumer restates the width: while only the
+  editor capped it, a review on the game page stretched a screenshot across the whole panel,
+  and the profile looked right only because its column happened to be narrow. The `100%` half is
+  load-bearing too — without it a comment image renders at natural size and blows the activity
   card open to the width of the upload.
 - **A rich-text container must restate `font-size` on its own `p`.** `root.scss` declares a bare
   `p { font-size: 14px }`, and an explicit declaration beats an inherited one whatever the
