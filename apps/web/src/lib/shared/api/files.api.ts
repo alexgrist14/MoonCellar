@@ -28,6 +28,16 @@ const uploadFile = (file: File, key: string, bucketName: string) => {
   });
 };
 
+const uploadCommentImage = (file: File) => {
+  const formData = new FormData();
+
+  formData.append("file", file);
+
+  return agent.post<string>(`${FILES_API}/comment-image`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};
+
 const deleteFile = (key: string, bucketName: string) => {
   return agent.delete(`${FILES_API}/`, {
     params: { key, bucketName },
@@ -59,6 +69,7 @@ const clearBucket = (bucketName: string) => {
 export const filesAPI = {
   getFile,
   uploadFile,
+  uploadCommentImage,
   deleteFile,
   deleteFiles,
   getBuckets,

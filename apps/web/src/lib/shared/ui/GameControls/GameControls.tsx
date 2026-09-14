@@ -46,6 +46,7 @@ export const GameControls: FC<IGameControlsProps> = ({
             !!profile?._id &&
             modal.open(<PlaythroughModal game={game} userId={profile._id} />, {
               id: "game-playthroughs",
+              isResizable: true,
             });
         }}
         tooltip={

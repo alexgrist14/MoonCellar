@@ -109,8 +109,8 @@ Verified against the running containers. The host ships far fewer keys than the 
 list, because almost every variable the code reads has a hardcoded fallback — and in this
 deployment those fallbacks happen to be the production values.
 
-**Frontend — three keys set:** `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_LOKI_HOST`,
-`NEXT_PUBLIC_S3_HOST`.
+**Frontend — two keys set:** `NEXT_PUBLIC_API_URL` and `REVALIDATE_SECRET`. The two dead keys
+noted below, `NEXT_PUBLIC_LOKI_HOST` and `NEXT_PUBLIC_S3_HOST`, have since been dropped.
 
 **Backend — fifteen keys set:** everything in its table except `FRONT_URL`, `LOCAL_CONNECTION`
 and `INDEXNOW_KEY`.
@@ -151,9 +151,10 @@ Two keys are set in production but referenced nowhere in the code — `NEXT_PUBL
 | `NEXT_PUBLIC_FARO_APP_NAME` | no | Application name in Grafana Faro |
 | `LOKI_HOST` | no | Loki push endpoint for the `/api/logs` route handler. Server-side only — it must not become `NEXT_PUBLIC_*`, or the endpoint ends up in the browser bundle. Defaults to `http://host.containers.internal:3100` when unset (`apps/web/src/app/api/logs/route.ts`) |
 | `GEO_BLOCK_COUNTRIES` | no | Comma-separated ISO country codes to block, e.g. `RU,BY`. Empty disables blocking |
+| `REVALIDATE_SECRET` | **yes** | Shared secret for `POST /api/revalidate`, compared against the `x-revalidate-secret` header. Server-side only — never `NEXT_PUBLIC_*`, or the secret ships in the browser bundle. Unset disables the endpoint: it answers 503 instead of falling back to an unguarded default |
 
-Nothing in this file is a credential — everything the frontend needs is public by design. It
-still belongs in a secret, because the file also pins the internal API address.
+Everything the frontend needs is public by design except `REVALIDATE_SECRET`; the file also
+pins the internal API address, so it stays a secret on both counts.
 
 ---
 
@@ -171,9 +172,9 @@ still belongs in a secret, because the file also pins the internal API address.
 | `RETROACHIEVEMENTS_API_KEY` | **yes** | RetroAchievements API key |
 | `S3_ID` | **yes** | S3 access key id for user uploads |
 | `S3_KEY` | **yes** | S3 secret access key |
-| `S3_HOST` | no | S3 endpoint used for writes |
-| `S3_HOST_CDN` | no | Public CDN host the stored URLs are built from. Must be listed in the frontend's `next.config.mjs` `images.remotePatterns`, otherwise avatars fail to render |
-| `S3_REGION` | no | S3 region |
+| `S3_ENDPOINT` | no | Spaces API endpoint, `https://sfo3.digitaloceanspaces.com` (the default). The Space name goes in `S3_BUCKET`, never in this host. Replaces `S3_HOST`; `S3_HOST`, `S3_HOST_CDN` and `S3_REGION` are no longer read |
+| `S3_CDN_URL` | no | CDN origin stored URLs are built from, `https://mooncellar.sfo3.cdn.digitaloceanspaces.com` (the default). Must stay allowed by the frontend's `images.remotePatterns` and the image proxy allowlist |
+| `S3_BUCKET` | no | The single Space every upload goes to, `mooncellar` (the default). The former buckets are its top-level folders: `covers/`, `screenshots/`, `artworks/`, `characters/`, `avatars/`, `backgrounds/`, `comments/`, `common/` |
 | `LOKI_HOST` | no | Loki endpoint for `pino-loki` |
 | `FARO_COLLECTOR_URL` | no | Grafana Alloy endpoint the `faro` module forwards browser telemetry to |
 | `PROMETHEUS_ENABLED` | no | `true` / `false` — switches the `/metrics` endpoint off entirely |
@@ -191,6 +192,7 @@ These exist locally but must never end up in `HOST_ENV_*`:
 | `API_BASE_URL`, `SEARXNG_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` | The `game-adder` MCP server — a local development tool. `ADMIN_PASSWORD` is a real account password; keep it out of any shared secret |
 | `CHROME_PATH`, `CHECK_BASE_URL` | `bun --filter web check:layout`, run on a developer machine |
 | `MONGO_INITDB_ROOT_USERNAME`, `MONGO_INITDB_ROOT_PASSWORD` | `infra/docker-compose.yml`, local MongoDB only |
+| `LEGACY_S3_ID`, `LEGACY_S3_KEY`, `LEGACY_S3_ENDPOINT` | The one-off `apps/api/scripts/transfer-s3.ts` run that copies the regru buckets into the Space. Drop them once the old buckets are deleted |
 
 ## Dead variables — drop them during the migration
 
@@ -250,6 +252,12 @@ NEXT_PUBLIC_FARO_APP_NAME=mooncellar-web
 LOKI_HOST=http://localhost:3100
 # Comma-separated ISO country codes to block; empty disables it
 GEO_BLOCK_COUNTRIES=
+# Shared secret guarding POST /api/revalidate
+REVALIDATE_SECRET=
+
+# check:layout — run on a developer machine, never part of HOST_ENV_WEB
+CHROME_PATH=
+CHECK_BASE_URL=http://localhost:3111
 ```
 
 </details>
@@ -275,12 +283,12 @@ TWITCH_CLIENT_SECRET=
 
 RETROACHIEVEMENTS_API_KEY=
 
-# S3 storage for user uploads
+# DigitalOcean Spaces: one bucket, a folder per content type
 S3_ID=
 S3_KEY=
-S3_HOST=
-S3_HOST_CDN=
-S3_REGION=
+S3_ENDPOINT=https://sfo3.digitaloceanspaces.com
+S3_BUCKET=mooncellar
+S3_CDN_URL=https://mooncellar.sfo3.cdn.digitaloceanspaces.com
 
 # Observability
 LOKI_HOST=http://localhost:3100
@@ -296,6 +304,11 @@ API_BASE_URL=http://localhost:3228
 SEARXNG_URL=http://localhost:8891
 ADMIN_EMAIL=
 ADMIN_PASSWORD=
+
+# transfer-s3 script — one-off copy of the regru buckets, never part of HOST_ENV_API
+LEGACY_S3_ID=
+LEGACY_S3_KEY=
+LEGACY_S3_ENDPOINT=https://s3.regru.cloud
 ```
 
 </details>

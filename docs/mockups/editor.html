@@ -1,0 +1,1346 @@
+<title>Editor Toolbar Layouts</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* mooncellar-tokens:start */
+/* Generated from apps/web/src/lib/app/styles/vars by
+   `bun --filter web sync:tokens`. Do not edit by hand. */
+:root {
+  /* vars/_colors.scss */
+  --color-neutral-5: #080a0b;
+  --color-neutral-10: #0d1011;
+  --color-neutral-15: #121516;
+  --color-neutral-20: #161b1d;
+  --color-neutral-25: #1a2022;
+  --color-neutral-30: #1f2628;
+  --color-neutral-35: #262d2f;
+  --color-neutral-40: #2f3537;
+  --color-neutral-45: #383e40;
+  --color-neutral-50: #3f4750;
+  --color-neutral-55: #50575d;
+  --color-neutral-60: #5e6a6e;
+  --color-neutral-70: #747d82;
+  --color-neutral-80: #9192a1;
+  --color-neutral-85: #b0b2bc;
+  --color-neutral-90: #d9d9d9;
+  --color-neutral-95: #eaeaea;
+  --color-neutral-100: #ffffff;
+  --color-blue: #00a0ff;
+  --color-blue-light: #00d4ff;
+  --color-gray: #afb3b9;
+  --color-yellow: #ffc451;
+  --color-yellow-light: #f9f871;
+  --color-orange: #ff8862;
+  --color-pink: #ff4b8f;
+  --color-violet: #e735c4;
+  --color-positive: #00c292;
+  --color-negative: #d02729;
+  --color-primary: var(--color-neutral-30);
+  --color-secondary: var(--color-neutral-90);
+  --color-contrast: var(--color-neutral-100);
+  --color-contrast-reverse: var(--color-neutral-5);
+  --color-attention: #ffc451;
+  --color-text-primary: var(--color-neutral-100);
+  --color-text-secondary: var(--color-neutral-90);
+  --color-text-muted: var(--color-neutral-85);
+  --color-accent: #6951ee;
+  --color-bg-primary: #191d24;
+  --color-bg-secondary: #212731;
+  --color-bg-tertiary: #2c3340;
+  --color-bg-accent: #6951ee;
+  --color-bg-hover: #374151;
+  --color-bg-positive: #00c292;
+  --color-bg-primary-tint: #191d24ee;
+  --color-bg-secondary-tint: #212731ee;
+  --color-bg-tertiary-tint: #2c3340ee;
+  --color-bg-accent-tint: #6951eeee;
+  --color-bg-positive-tint: #00c292ee;
+  --color-border-primary: var(--color-neutral-35);
+  --color-scrollbar-track: var(--color-neutral-15);
+  --color-scrollbar-thumb: var(--color-neutral-80);
+  --color-border-secondary: var(--color-neutral-85);
+
+  /* vars/_common.scss */
+  --padding-x05: calc(var(--padding-x1) * 0.5);
+  --padding-x1: 4px;
+  --padding-x2: calc(var(--padding-x1) * 2);
+  --padding-x3: calc(var(--padding-x1) * 3);
+  --padding-x4: calc(var(--padding-x1) * 4);
+  --padding-x5: calc(var(--padding-x1) * 5);
+  --padding-x6: calc(var(--padding-x1) * 6);
+  --padding-x7: calc(var(--padding-x1) * 7);
+  --padding-x8: calc(var(--padding-x1) * 8);
+  --padding-x9: calc(var(--padding-x1) * 9);
+  --padding-x10: calc(var(--padding-x1) * 10);
+  --padding-x11: calc(var(--padding-x1) * 11);
+  --padding-x12: calc(var(--padding-x1) * 12);
+  --padding-x13: calc(var(--padding-x1) * 13);
+  --padding-x14: calc(var(--padding-x1) * 14);
+  --padding-x15: calc(var(--padding-x1) * 15);
+  --padding-x16: calc(var(--padding-x1) * 16);
+  --padding-x17: calc(var(--padding-x1) * 17);
+  --padding-x18: calc(var(--padding-x1) * 18);
+  --padding-x19: calc(var(--padding-x1) * 19);
+  --padding-x20: calc(var(--padding-x1) * 20);
+  --padding-x25: calc(var(--padding-x1) * 25);
+  --radius-x1: 4px;
+  --radius-x2: calc(var(--radius-x1) * 2);
+  --radius-x3: calc(var(--radius-x1) * 3);
+  --radius-x4: calc(var(--radius-x1) * 4);
+  --radius-x5: calc(var(--radius-x1) * 5);
+  --radius-x6: calc(var(--radius-x1) * 6);
+  --radius-x7: calc(var(--radius-x1) * 7);
+  --radius-x8: calc(var(--radius-x1) * 8);
+  --radius-x9: calc(var(--radius-x1) * 9);
+  --radius-x10: calc(var(--radius-x1) * 10);
+  --gap-x05: calc(var(--gap-x1) * 0.5);
+  --gap-x1: 4px;
+  --gap-x2: calc(var(--gap-x1) * 2);
+  --gap-x3: calc(var(--gap-x1) * 3);
+  --gap-x4: calc(var(--gap-x1) * 4);
+  --gap-x5: calc(var(--gap-x1) * 5);
+  --gap-x6: calc(var(--gap-x1) * 6);
+  --gap-x7: calc(var(--gap-x1) * 7);
+  --gap-x8: calc(var(--gap-x1) * 8);
+  --gap-x9: calc(var(--gap-x1) * 9);
+  --gap-x10: calc(var(--gap-x1) * 10);
+  --gap-x11: calc(var(--gap-x1) * 11);
+  --gap-x12: calc(var(--gap-x1) * 12);
+  --blur-x1: 6px;
+  --duration-instant: 1ms;
+  --duration-fast: 160ms;
+  --duration-base: 280ms;
+  --delay-stagger: 90ms;
+  --easing-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --easing-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --reveal-offset: 12px;
+  --reveal-scale: 0.96;
+  --header-height: 45px;
+  --container-padding-top: calc(var(--header-height) + var(--padding-x3));
+  --container-padding-bottom: var(--padding-x3);
+  --page-height-available: calc(
+    100vh - var(--container-padding-top) - var(--container-padding-bottom)
+  );
+
+  /* vars/_components.scss */
+  --game-completed-color: var(--color-positive);
+  --game-dropped-color: var(--color-negative);
+  --game-playing-color: var(--color-accent);
+  --game-wishlist-color: var(--color-violet);
+  --game-backlog-color: var(--color-pink);
+  --game-played-color: var(--color-blue);
+  --game-mastered-color: var(--color-yellow);
+  --cover-ratio: 528/704;
+  --shadow-basic: 0px 4px 4px var(--color-neutral-5);
+  --shadow-text: drop-shadow(0 1px 2px var(--color-neutral-5))
+    drop-shadow(0 0 6px var(--color-neutral-5));
+  --glow-accent: 0 0 0.4rem var(--color-accent);
+  --glow-accent-sm: 0 0 0.15rem var(--color-accent);
+  --avatar-size-sm: var(--padding-x6);
+  --navigation-progress-height: 1px;
+  --navigation-progress-z-index: 1002;
+  --modal-text-width: min(720px, calc(100vw - var(--padding-x10)));
+  --games-card-min-width: 180px;
+  --range-track-height: 6px;
+  --range-thumb-size: 20px;
+  --range-thumb-width: 44px;
+  --range-thumb-height: 24px;
+  --scrollbar-horizontal-size: 6px;
+  --scrollbar-arrow-width: 32px;
+  --scrollbar-fade-width: 48px;
+  --game-keywords-collapsed-height: 66px;
+  --game-hero-artwork-height: 300px;
+  --game-hero-artwork-height-sm: 180px;
+  --game-hero-cover-width: 200px;
+  --game-hero-cover-offset: 104px;
+  --game-hero-counters-width: 360px;
+  --game-rating-popover-width: 320px;
+  --date-picker-width: 300px;
+  --date-picker-field-min-width: 140px;
+  --date-picker-cell-size: 34px;
+  --date-picker-arrow-size: 28px;
+  --game-hero-scrim: linear-gradient(
+    180deg,
+    #191d248c 0%,
+    #191d2400 30%,
+    #212731d1 72%,
+    var(--color-bg-secondary) 100%
+  );
+  --empty-state-image-size: 180px;
+  --not-found-image-height: 240px;
+  --not-found-backdrop-size: 400px;
+  --not-found-content-width: 420px;
+}
+/* mooncellar-tokens:end */
+
+  :root {
+    --mock-ui: "Hanken Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mock-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --mock-ground: var(--color-neutral-10);
+    --mock-hairline: var(--color-neutral-30);
+    --mock-accent-dim: color-mix(in srgb, var(--color-accent) 18%, transparent);
+    --mock-accent-text: color-mix(in srgb, var(--color-accent) 55%, #ffffff);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--mock-ground);
+    color: var(--color-text-primary);
+    font-family: var(--mock-ui);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .shell {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding-inline: var(--padding-x6);
+    padding-block: var(--padding-x14) var(--padding-x20);
+  }
+
+  @media (max-width: 520px) {
+    .shell {
+      padding-inline: var(--padding-x4);
+      padding-block: var(--padding-x9) var(--padding-x14);
+    }
+  }
+
+  h1, h2, h3 { margin: 0; text-wrap: balance; }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+    margin: 0;
+  }
+
+  .masthead { display: flex; flex-direction: column; gap: var(--gap-x4); }
+
+  .masthead h1 {
+    font-size: 34px;
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .lede { color: var(--color-text-secondary); max-width: 62ch; margin: 0; }
+
+  .brief {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1px;
+    background: var(--mock-hairline);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x4);
+    overflow: hidden;
+    margin-top: var(--gap-x2);
+  }
+
+  .brief div { background: var(--color-bg-primary); padding: var(--padding-x4); }
+
+  .brief dt {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+    margin-bottom: var(--gap-x1);
+  }
+
+  .brief dd { margin: 0; font-size: 14px; color: var(--color-text-secondary); }
+
+  code.t { font-family: var(--mock-mono); font-size: 12px; color: var(--color-yellow); }
+
+  .variant { margin-top: var(--padding-x16); }
+
+  .variant__head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--gap-x3);
+    flex-wrap: wrap;
+    margin-bottom: var(--gap-x1);
+  }
+
+  .variant__letter {
+    font-family: var(--mock-mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-x1);
+    padding: 1px 7px;
+    flex-shrink: 0;
+  }
+
+  .variant__head h2 { font-size: 23px; font-weight: 700; letter-spacing: -0.2px; }
+
+  .variant__thesis {
+    color: var(--color-text-muted);
+    max-width: 64ch;
+    margin: 0 0 var(--gap-x5);
+  }
+
+  .stage {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-primary);
+    border-bottom: 0;
+    border-radius: var(--radius-x4) var(--radius-x4) 0 0;
+    padding: var(--padding-x5);
+  }
+
+  @media (max-width: 520px) { .stage { padding: var(--padding-x3); } }
+
+  .stage__context {
+    font-size: 12px;
+    color: var(--color-gray);
+    margin: 0 0 var(--gap-x3);
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x2);
+  }
+
+  .stage__context::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    flex-shrink: 0;
+  }
+
+  .hint {
+    margin: var(--gap-x3) 0 0;
+    font-size: 12.5px;
+    color: var(--color-gray);
+    border-left: 2px solid var(--color-border-primary);
+    padding-left: var(--padding-x3);
+  }
+
+  .toolbar { display: flex; align-items: center; gap: var(--gap-x1); flex-wrap: wrap; }
+
+  .tbtn {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: var(--radius-x2);
+    background: transparent;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: background var(--duration-fast) var(--easing-out),
+      color var(--duration-fast) var(--easing-out);
+    padding: 0;
+    flex-shrink: 0;
+  }
+
+  .tbtn:hover { background: var(--color-bg-hover); color: var(--color-text-primary); }
+  .tbtn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+  .tbtn[aria-pressed="true"] { background: var(--mock-accent-dim); color: var(--mock-accent-text); }
+  .tbtn svg { width: 15px; height: 15px; display: block; }
+
+  .tsep {
+    width: 1px;
+    height: 18px;
+    background: var(--color-border-primary);
+    margin-inline: var(--gap-x1);
+    flex-shrink: 0;
+  }
+
+  .ed { color: var(--color-text-primary); font-size: 15px; line-height: 1.65; outline: none; }
+
+  .ed:empty::before { content: attr(data-ph); color: var(--color-gray); pointer-events: none; }
+
+  .ed p { margin: 0 0 10px; }
+  .ed p:last-child { margin-bottom: 0; }
+
+  .ed a {
+    color: var(--mock-accent-text);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .ed ul, .ed ol { margin: 0 0 10px; padding-left: 22px; }
+  .ed li { margin-bottom: 2px; }
+
+  .ed blockquote {
+    margin: 0 0 10px;
+    padding-left: var(--padding-x3);
+    border-left: 2px solid var(--color-accent);
+    color: var(--color-text-muted);
+  }
+
+  .ed h3 { font-size: 17px; font-weight: 700; margin: 0 0 8px; }
+
+  .ed code {
+    font-family: var(--mock-mono);
+    font-size: 13px;
+    background: var(--color-bg-tertiary);
+    border-radius: var(--radius-x1);
+    padding: 1px 5px;
+  }
+
+  .ed figure { margin: var(--gap-x3) 0; position: relative; max-width: 320px; }
+  .ed figure img { width: 100%; max-width: 100%; display: block; border-radius: var(--radius-x3); }
+
+  .ed figcaption {
+    font-family: var(--mock-mono);
+    font-size: 11px;
+    color: var(--color-gray);
+    margin-top: 5px;
+  }
+
+  .upbar {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    height: 4px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-neutral-5) 70%, transparent);
+    overflow: hidden;
+  }
+
+  .upbar i {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--color-accent);
+    transition: width 750ms linear;
+  }
+
+  .counter {
+    font-family: var(--mock-mono);
+    font-size: 11px;
+    color: var(--color-gray);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .btn {
+    border: 2px solid transparent;
+    border-radius: var(--radius-x2);
+    font: inherit;
+    font-size: 14px;
+    padding: 5px var(--padding-x3);
+    cursor: pointer;
+    transition: filter var(--duration-fast) var(--easing-out),
+      background var(--duration-fast) var(--easing-out);
+  }
+
+  .btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  .btn_accent { background: var(--color-bg-accent); color: var(--color-neutral-100); }
+  .btn_accent:hover { filter: brightness(0.85); }
+  .btn_ghost { background: transparent; color: var(--color-text-muted); }
+  .btn_ghost:hover { background: var(--color-bg-hover); color: var(--color-text-primary); }
+
+  .actions { display: flex; align-items: center; gap: var(--gap-x2); }
+
+  .linkpop {
+    position: absolute;
+    z-index: 30;
+    display: none;
+    align-items: center;
+    gap: var(--gap-x2);
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x2);
+    padding: var(--padding-x2);
+    box-shadow: 0 10px 26px color-mix(in srgb, var(--color-neutral-5) 70%, transparent);
+  }
+
+  .linkpop.is-open { display: flex; }
+
+  .linkpop input {
+    font: inherit;
+    font-size: 13px;
+    width: 190px;
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x1);
+    color: var(--color-text-primary);
+    padding: 4px 8px;
+    outline: none;
+  }
+
+  .linkpop input:focus { border-color: var(--color-accent); }
+
+  .fieldA, .fieldB, .fieldC {
+    position: relative;
+    border: 2px solid var(--color-border-primary);
+    border-radius: var(--radius-x3);
+    background: var(--color-bg-primary);
+    transition: border-color var(--duration-fast) var(--easing-out);
+  }
+
+  .fieldA:focus-within, .fieldB:focus-within, .fieldC:focus-within {
+    border-color: var(--color-accent);
+  }
+
+  .fieldA__bar { padding: 6px var(--padding-x2); border-bottom: 1px solid var(--color-border-primary); }
+  .fieldA__body { padding: var(--padding-x3) var(--padding-x4); min-height: 150px; }
+
+  .fieldA__foot,
+  .fieldB__foot,
+  .fieldC__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x3);
+  }
+
+  .fieldA__foot {
+    padding: 9px var(--padding-x3) 9px var(--padding-x4);
+    border-top: 1px solid var(--color-border-primary);
+  }
+
+  .fieldB { padding: var(--padding-x4) var(--padding-x4) var(--padding-x3); }
+  .fieldB__body { min-height: 168px; }
+
+  .fieldB__foot {
+    margin-top: var(--gap-x2);
+    padding-top: var(--padding-x2);
+    border-top: 1px solid var(--color-border-primary);
+  }
+
+  .bubble {
+    position: absolute;
+    z-index: 25;
+    display: none;
+    gap: 2px;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x2);
+    padding: 3px;
+    box-shadow: 0 10px 26px color-mix(in srgb, var(--color-neutral-5) 75%, transparent);
+    transform: translate(-50%, -100%);
+  }
+
+  .bubble.is-open { display: flex; }
+
+  .plusrail { position: absolute; left: -2px; display: none; align-items: center; gap: 2px; }
+  .plusrail.is-open { display: flex; }
+
+  .slash {
+    font-family: var(--mock-mono);
+    font-size: 11px;
+    color: var(--color-gray);
+    background: var(--color-bg-tertiary);
+    border-radius: var(--radius-x1);
+    padding: 2px 6px;
+  }
+
+  .fieldC__row { display: flex; gap: var(--gap-x3); padding: var(--padding-x3); }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(140deg, var(--color-accent), var(--color-neutral-30));
+    color: var(--color-neutral-100);
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .fieldC__body {
+    flex: 1;
+    min-width: 0;
+    min-height: 22px;
+    transition: min-height var(--duration-base) var(--easing-out);
+  }
+
+  .fieldC.is-open .fieldC__body { min-height: 104px; }
+
+  .fieldC__drawer {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--duration-base) var(--easing-out);
+  }
+
+  .fieldC.is-open .fieldC__drawer { grid-template-rows: 1fr; }
+  .fieldC__drawerInner { overflow: hidden; }
+
+  .fieldC__foot {
+    padding: var(--padding-x2) var(--padding-x3) var(--padding-x2) 58px;
+    border-top: 1px solid var(--color-border-primary);
+  }
+
+  @media (max-width: 520px) { .fieldC__foot { padding-left: var(--padding-x3); } }
+
+  .thread { margin-top: var(--gap-x4); display: flex; flex-direction: column; gap: var(--gap-x3); }
+  .cmt { display: flex; gap: var(--gap-x3); }
+  .cmt__b { flex: 1; min-width: 0; }
+  .cmt__meta { display: flex; align-items: baseline; gap: var(--gap-x2); margin-bottom: 3px; }
+  .cmt__name { font-size: 13.5px; font-weight: 600; }
+  .cmt__time { font-size: 11.5px; color: var(--color-gray); }
+  .cmt__text { font-size: 14px; color: var(--color-text-secondary); margin: 0; }
+  .cmt__text strong { color: var(--color-text-primary); }
+
+  .spec {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1px;
+    background: var(--mock-hairline);
+    border: 1px solid var(--color-border-primary);
+    border-top: 0;
+    border-radius: 0 0 var(--radius-x4) var(--radius-x4);
+    overflow: hidden;
+  }
+
+  .spec > div { background: var(--color-bg-primary); padding: var(--padding-x4); }
+
+  .spec dt {
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+    margin-bottom: 7px;
+  }
+
+  .spec dd { margin: 0; font-size: 13.5px; color: var(--color-text-secondary); }
+
+  .spec code {
+    font-family: var(--mock-mono);
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .spec__cost { color: var(--color-yellow); }
+  .spec__win { color: var(--color-positive); }
+
+  .section { margin-top: var(--padding-x18); }
+  .section h2 { font-size: 23px; font-weight: 700; margin-top: var(--gap-x1); }
+
+  .tablewrap {
+    overflow-x: auto;
+    margin-top: var(--gap-x5);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x4);
+  }
+
+  table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: 13.5px; }
+
+  th, td {
+    text-align: left;
+    padding: var(--padding-x3) var(--padding-x4);
+    border-bottom: 1px solid var(--mock-hairline);
+    vertical-align: top;
+  }
+
+  thead th {
+    background: var(--color-bg-secondary);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+    font-weight: 600;
+  }
+
+  tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
+
+  tbody th {
+    font-weight: 600;
+    color: var(--color-text-primary);
+    background: var(--color-bg-primary);
+    white-space: nowrap;
+  }
+
+  td { color: var(--color-text-secondary); background: var(--color-bg-primary); }
+
+  .common ul {
+    margin: var(--gap-x5) 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--mock-hairline);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x4);
+    overflow: hidden;
+  }
+
+  .common li { background: var(--color-bg-primary); padding: var(--padding-x4); }
+  .common li b { display: block; font-size: 14px; margin-bottom: var(--gap-x1); }
+  .common li span { font-size: 13.5px; color: var(--color-text-muted); }
+
+  .note {
+    margin-top: var(--gap-x6);
+    font-size: 13px;
+    color: var(--color-gray);
+    border-left: 2px solid var(--color-border-primary);
+    padding-left: var(--padding-x3);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: var(--duration-instant) !important; }
+  }
+</style>
+
+<div class="shell">
+
+  <header class="masthead">
+    <p class="eyebrow">MoonCellar · rich text editor</p>
+    <h1>Three Tiptap editor layouts</h1>
+    <p class="lede">
+      One component for three places: comments under a game, the review field in the playthrough
+      modal, and later direct messages between users. The options do not differ in what they can
+      do — that part is identical throughout — but in where the toolbar lives and how much room
+      it takes at rest. The fields below are live: press the buttons, select text, drop in an
+      image.
+    </p>
+
+    <dl class="brief">
+      <div>
+        <dt>Formatting</dt>
+        <dd>Bold, italic, strikethrough, code, heading, lists, quote</dd>
+      </div>
+      <div>
+        <dt>Links</dt>
+        <dd>Added and edited on the selection, without leaving the page</dd>
+      </div>
+      <div>
+        <dt>Images</dt>
+        <dd>Uploaded to <code class="t">mooncellar-comments</code></dd>
+      </div>
+      <div>
+        <dt>Where it runs</dt>
+        <dd>Game page · playthrough modal · direct messages</dd>
+      </div>
+    </dl>
+  </header>
+
+  <section class="variant">
+    <div class="variant__head">
+      <span class="variant__letter">A</span>
+      <h2>Fixed toolbar</h2>
+    </div>
+    <p class="variant__thesis">
+      The toolbar sits above the field at all times. Nothing has to be guessed: every tool is
+      visible, and button state shows what applies at the cursor.
+    </p>
+
+    <div class="stage">
+      <p class="stage__context">Playthrough modal — Review field</p>
+
+      <div class="fieldA" data-editor="A">
+        <div class="fieldA__bar toolbar" data-toolbar></div>
+        <div class="fieldA__body">
+          <div class="ed" contenteditable="true" data-ph="Tell us about the playthrough…" data-body>
+            <p>Finished it on <strong>Steam Deck</strong> over two evenings — holds 60 fps almost everywhere except City&nbsp;17.</p>
+            <p>One gripe: <em>vehicle handling</em> was never adapted for a gamepad.</p>
+          </div>
+        </div>
+        <div class="fieldA__foot">
+          <span class="counter" data-count>0 / 4000</span>
+          <div class="actions">
+            <button class="btn btn_ghost" type="button">Cancel</button>
+            <button class="btn btn_accent" type="button">Save</button>
+          </div>
+        </div>
+        <div class="linkpop" data-linkpop>
+          <input type="url" id="link-a" placeholder="https://" aria-label="Link address">
+          <button class="btn btn_accent" type="button" data-linkok>OK</button>
+        </div>
+      </div>
+
+      <p class="hint">
+        The toolbar costs 43&nbsp;px of height at all times — invisible inside the modal, heavy
+        above a one-line comment on a game page.
+      </p>
+    </div>
+
+    <dl class="spec">
+      <div>
+        <dt>Tiptap extensions</dt>
+        <dd>
+          <code>StarterKit</code>
+          <code>Link · Image · Placeholder</code>
+          <code>CharacterCount</code>
+        </dd>
+      </div>
+      <div>
+        <dt>Strength</dt>
+        <dd class="spec__win">The most legible of the three. Nothing needs explaining.</dd>
+      </div>
+      <div>
+        <dt>Cost</dt>
+        <dd class="spec__cost">A lot of chrome at rest. Overkill for a one-line comment.</dd>
+      </div>
+      <div>
+        <dt>Effort</dt>
+        <dd>The least: one toolbar, one layout, no viewport positioning.</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="variant">
+    <div class="variant__head">
+      <span class="variant__letter">B</span>
+      <h2>Floating menu</h2>
+    </div>
+    <p class="variant__thesis">
+      No permanent toolbar at all. Text tools arrive on selection (<code class="t">BubbleMenu</code>),
+      block tools from a button on an empty line (<code class="t">FloatingMenu</code>) and from a
+      slash command.
+    </p>
+
+    <div class="stage">
+      <p class="stage__context">Game page — long-form review</p>
+
+      <div class="fieldB" data-editor="B">
+        <div class="fieldB__body">
+          <div class="ed" contenteditable="true" data-ph="Write a review…" data-body>
+            <p>A metroidvania that never holds your hand. The map is sold for geo, and for the
+              first three hours you genuinely get lost in Forgotten&nbsp;Crossroads.</p>
+            <p>Advice: <strong>do not save up for the map</strong> — buy the Compass, it saves more time.</p>
+            <p><br></p>
+          </div>
+        </div>
+        <div class="fieldB__foot">
+          <span class="slash">/ — commands</span>
+          <div class="actions">
+            <span class="counter" data-count>0 / 4000</span>
+            <button class="btn btn_accent" type="button">Publish</button>
+          </div>
+        </div>
+
+        <div class="bubble toolbar" data-bubble></div>
+        <div class="plusrail toolbar" data-plusrail></div>
+        <div class="linkpop" data-linkpop>
+          <input type="url" id="link-b" placeholder="https://" aria-label="Link address">
+          <button class="btn btn_accent" type="button" data-linkok>OK</button>
+        </div>
+      </div>
+
+      <p class="hint">
+        Select a word in the text — the toolbar comes to the selection. Put the caret on the
+        empty line below — the block button appears on the left.
+      </p>
+    </div>
+
+    <dl class="spec">
+      <div>
+        <dt>Tiptap extensions</dt>
+        <dd>
+          <code>StarterKit · Link · Image</code>
+          <code>BubbleMenu · FloatingMenu</code>
+          <code>Suggestion (slash commands)</code>
+        </dd>
+      </div>
+      <div>
+        <dt>Strength</dt>
+        <dd class="spec__win">A clean field. Equally at home with two lines and with a long review.</dd>
+      </div>
+      <div>
+        <dt>Cost</dt>
+        <dd class="spec__cost">The tools have to be discovered. A new user may never learn that formatting exists.</dd>
+      </div>
+      <div>
+        <dt>Effort</dt>
+        <dd>The most: two floating menus, slash commands, positioning inside a scrolling modal.</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="variant">
+    <div class="variant__head">
+      <span class="variant__letter">C</span>
+      <h2>Collapsing field</h2>
+    </div>
+    <p class="variant__thesis">
+      At rest it is an ordinary input in the site's style. On focus the field grows and a compact
+      toolbar slides out below. The compromise: it neither hogs the page nor hides the tools.
+    </p>
+
+    <div class="stage">
+      <p class="stage__context">Game page — comment thread</p>
+
+      <div class="fieldC" data-editor="C">
+        <div class="fieldC__row">
+          <div class="avatar" aria-hidden="true">SH</div>
+          <div class="fieldC__body">
+            <div class="ed" contenteditable="true" data-ph="Write a comment…" data-body></div>
+          </div>
+        </div>
+        <div class="fieldC__drawer">
+          <div class="fieldC__drawerInner">
+            <div class="fieldC__foot">
+              <div class="toolbar" data-toolbar></div>
+              <div class="actions">
+                <span class="counter" data-count>0 / 4000</span>
+                <button class="btn btn_accent" type="button">Send</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="linkpop" data-linkpop>
+          <input type="url" id="link-c" placeholder="https://" aria-label="Link address">
+          <button class="btn btn_accent" type="button" data-linkok>OK</button>
+        </div>
+      </div>
+
+      <div class="thread">
+        <div class="cmt">
+          <div class="avatar" aria-hidden="true">AK</div>
+          <div class="cmt__b">
+            <div class="cmt__meta">
+              <span class="cmt__name">alexgrist</span>
+              <span class="cmt__time">2 days ago</span>
+            </div>
+            <p class="cmt__text">The <strong>Any%</strong> speedrun category is fussier than it looks — stick to the Crystal Peak route.</p>
+          </div>
+        </div>
+        <div class="cmt">
+          <div class="avatar" aria-hidden="true">MV</div>
+          <div class="cmt__b">
+            <div class="cmt__meta">
+              <span class="cmt__name">m_volkov</span>
+              <span class="cmt__time">yesterday</span>
+            </div>
+            <p class="cmt__text">Finished at 112% after the DLC. Pantheon of Hallownest is a separate game inside the game.</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="hint">
+        Click the field — it opens. Move focus away while it is empty — it collapses again.
+      </p>
+    </div>
+
+    <dl class="spec">
+      <div>
+        <dt>Tiptap extensions</dt>
+        <dd>
+          <code>StarterKit · Link · Image</code>
+          <code>Placeholder · CharacterCount</code>
+        </dd>
+      </div>
+      <div>
+        <dt>Strength</dt>
+        <dd class="spec__win">One line at rest — the comment thread does not sprawl.</dd>
+      </div>
+      <div>
+        <dt>Cost</dt>
+        <dd class="spec__cost">The open/closed state has to be held by hand and survive validation.</dd>
+      </div>
+      <div>
+        <dt>Effort</dt>
+        <dd>Middling: the same toolbar as A, plus the open animation through grid-template-rows.</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="section">
+    <p class="eyebrow">Comparison</p>
+    <h2>Which one fits where</h2>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">A · Fixed</th>
+            <th scope="col">B · Floating</th>
+            <th scope="col">C · Collapsing</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Height at rest</th>
+            <td>~200 px</td>
+            <td>~200 px</td>
+            <td>~56 px</td>
+          </tr>
+          <tr>
+            <th scope="row">Playthrough modal</th>
+            <td>Good — there is room</td>
+            <td>Good, but a menu inside the modal's scroll needs care</td>
+            <td>Redundant — the field is always open anyway</td>
+          </tr>
+          <tr>
+            <th scope="row">Comment under a game</th>
+            <td>Heavy for one line</td>
+            <td>Good</td>
+            <td>Best of the three</td>
+          </tr>
+          <tr>
+            <th scope="row">Direct messages</th>
+            <td>Not suitable</td>
+            <td>Suitable</td>
+            <td>Suitable, the toolbar can be hidden by a prop</td>
+          </tr>
+          <tr>
+            <th scope="row">Discoverability</th>
+            <td>High</td>
+            <td>Low without a hint</td>
+            <td>High</td>
+          </tr>
+          <tr>
+            <th scope="row">Mobile</th>
+            <td>The toolbar wraps to two rows</td>
+            <td>Text selection fights the iOS system menu</td>
+            <td>Compact toolbar, fits one row</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="note">
+      The options are not mutually exclusive: if the base component takes the toolbar layout as a
+      prop (<code class="t">toolbar="fixed" | "bubble" | "collapsible"</code>), A lives in the
+      modal, C in the comment thread, and it is still one component. That costs roughly a day more
+      than a single option, and settles the question before the second use.
+    </p>
+  </section>
+
+  <section class="section common">
+    <p class="eyebrow">Shared</p>
+    <h2>What has to be built either way</h2>
+
+    <ul>
+      <li>
+        <b>The icons have to be drawn</b>
+        <span><code class="t">shared/ui/svg</code> carries no formatting icon, and the project bans
+        <code class="t">@iconify/react</code> along with every other icon library. That is ~10 new
+        <code class="t">Svg*</code> components built on the shared <code class="t">Svg</code> and
+        <code class="t">Path</code>.</span>
+      </li>
+      <li>
+        <b>Image upload already exists</b>
+        <span><code class="t">filesAPI.uploadFile(file, key, bucketName)</code> is generic — no new
+        endpoint, only the <code class="t">mooncellar-comments</code> bucket. The image host has to
+        join <code class="t">images.remotePatterns</code> in <code class="t">next.config.mjs</code>,
+        or <code class="t">next/image</code> will not render it.</span>
+      </li>
+      <li>
+        <b>The storage format decides the SEO</b>
+        <span>A playthrough's <code class="t">comment</code> is a plain string in Mongoose. Stored as
+        HTML, comments render on the server as they are. Stored as JSON, SSR needs
+        <code class="t">generateHTML</code> from <code class="t">@tiptap/html</code> — otherwise the
+        text never reaches the game page's HTML, which is exactly what
+        <code class="t">docs/seo.md</code> forbids.</span>
+      </li>
+      <li>
+        <b>Sanitising belongs on the backend</b>
+        <span>User HTML cannot be accepted as sent. The schema in
+        <code class="t">packages/schemas</code> has to strip markup down to an allowlist rather than
+        trust the client.</span>
+      </li>
+      <li>
+        <b>Abandoned images</b>
+        <span>A user uploads an image and closes the modal — the file stays in S3. That needs
+        cleanup: either a temporary key prefix and a cron, or deletion through
+        <code class="t">filesAPI.deleteFiles</code> on cancel.</span>
+      </li>
+      <li>
+        <b>The component is client-only</b>
+        <span>Tiptap runs in the browser only. Under <code class="t">apps/web/CLAUDE.md</code> shared
+        primitives carry no <code class="t">"use client"</code> — the editor gets its own client
+        wrapper with <code class="t">dynamic(…, { ssr: false })</code>.</span>
+      </li>
+    </ul>
+
+    <p class="note">
+      The colours, spacing and radii on this page are not copies but the project's own tokens: the
+      <code class="t">:root</code> block above is generated from
+      <code class="t">apps/web/src/lib/app/styles/vars</code> by
+      <code class="t">bun --filter web sync:tokens</code>. Edit the SCSS, run it again, and this page
+      follows. One exception — the typeface: Hanken Grotesk stands in for ApercuPro, whose licensed
+      file cannot be served from a third-party host.
+    </p>
+  </section>
+
+</div>
+
+<script>
+  (function () {
+    "use strict";
+
+    var ICONS = {
+      bold: '<path d="M4 2h5.2a3.3 3.3 0 0 1 0 6.6H4V2Zm0 6.6h5.8a3.4 3.4 0 0 1 0 6.8H4V8.6Z"/>',
+      italic: '<path d="M7 2h6M4 15h6M10.5 2 7.5 15"/>',
+      strike: '<path d="M3 9h12M12.5 5.2C11.9 3.8 10.3 3 8.6 3 6.4 3 5 4.1 5 5.7c0 1.2.8 2 2.3 2.6M5.5 12c.5 1.5 2 2.4 3.8 2.4 2.2 0 3.7-1 3.7-2.7 0-.8-.3-1.4-.9-1.9"/>',
+      code: '<path d="m6 4-4 5 4 5M12 4l4 5-4 5"/>',
+      h3: '<path d="M2 3v12M8 3v12M2 9h6M11.5 4.5h4l-2.4 3.2A2.6 2.6 0 1 1 11 11.8"/>',
+      ul: '<path d="M6 4.5h10M6 9h10M6 13.5h10M2.6 4.5h.01M2.6 9h.01M2.6 13.5h.01"/>',
+      ol: '<path d="M7 4.5h9M7 9h9M7 13.5h9M2 3.2h1v3M2 12h2v1.2l-2 .8V15h2"/>',
+      quote: '<path d="M7 4.5C5 5.4 4 6.9 4 9v4.5h4.5V9H6.2c0-1.4.3-2.4 1.6-3.1L7 4.5Zm7.5 0c-2 .9-3 2.4-3 4.5v4.5H16V9h-2.3c0-1.4.3-2.4 1.6-3.1l-.8-1.4Z"/>',
+      link: '<path d="M7.4 10.6a3.2 3.2 0 0 0 4.6 0l2.4-2.4a3.2 3.2 0 0 0-4.6-4.6l-1 1M10.6 7.4a3.2 3.2 0 0 0-4.6 0l-2.4 2.4a3.2 3.2 0 0 0 4.6 4.6l1-1"/>',
+      image: '<path d="M2.5 3.5h13v11h-13v-11ZM2.5 11.5l3.6-3.2 3.1 2.7 2.4-2 3.9 3.4"/><circle cx="6.4" cy="6.6" r="1.1"/>',
+      plus: '<path d="M9 3.5v11M3.5 9h11"/>'
+    };
+
+    var FILLED = { bold: true, quote: true };
+
+    function icon(name) {
+      return '<svg viewBox="0 0 18 18" fill="' + (FILLED[name] ? "currentColor" : "none") +
+        '" stroke="currentColor" stroke-width="' + (FILLED[name] ? "0" : "1.6") +
+        '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+        ICONS[name] + "</svg>";
+    }
+
+    function button(def) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "tbtn";
+      b.title = def.title;
+      b.setAttribute("aria-label", def.title);
+      b.dataset.cmd = def.cmd;
+      if (def.arg) b.dataset.arg = def.arg;
+      b.innerHTML = icon(def.icon);
+      return b;
+    }
+
+    var TEXT_TOOLS = [
+      { cmd: "bold", icon: "bold", title: "Bold" },
+      { cmd: "italic", icon: "italic", title: "Italic" },
+      { cmd: "strikeThrough", icon: "strike", title: "Strikethrough" },
+      { cmd: "code", icon: "code", title: "Code" }
+    ];
+
+    var BLOCK_TOOLS = [
+      { cmd: "formatBlock", arg: "h3", icon: "h3", title: "Heading" },
+      { cmd: "insertUnorderedList", icon: "ul", title: "Bullet list" },
+      { cmd: "insertOrderedList", icon: "ol", title: "Numbered list" },
+      { cmd: "formatBlock", arg: "blockquote", icon: "quote", title: "Quote" }
+    ];
+
+    var INSERT_TOOLS = [
+      { cmd: "link", icon: "link", title: "Link" },
+      { cmd: "image", icon: "image", title: "Image" }
+    ];
+
+    function fill(container, groups) {
+      groups.forEach(function (group, i) {
+        if (i > 0) {
+          var sep = document.createElement("span");
+          sep.className = "tsep";
+          container.appendChild(sep);
+        }
+        group.forEach(function (def) { container.appendChild(button(def)); });
+      });
+    }
+
+    function setupEditor(root) {
+      var body = root.querySelector("[data-body]");
+      var counter = root.querySelector("[data-count]");
+      var linkpop = root.querySelector("[data-linkpop]");
+      var savedRange = null;
+
+      function refreshCount() {
+        if (!counter) return;
+        var n = (body.textContent || "").replace(/\s+/g, " ").trim().length;
+        counter.textContent = n + " / 4000";
+      }
+
+      function syncStates() {
+        root.querySelectorAll(".tbtn[data-cmd]").forEach(function (b) {
+          var cmd = b.dataset.cmd;
+          if (cmd === "link" || cmd === "image" || cmd === "formatBlock" || cmd === "code") return;
+          var on = false;
+          try { on = document.queryCommandState(cmd); } catch (e) { on = false; }
+          b.setAttribute("aria-pressed", on ? "true" : "false");
+        });
+      }
+
+      function openLinkPopover(rect) {
+        var box = root.getBoundingClientRect();
+        linkpop.style.left = Math.max(8, rect.left - box.left) + "px";
+        linkpop.style.top = (rect.bottom - box.top + 8) + "px";
+        linkpop.classList.add("is-open");
+        var input = linkpop.querySelector("input");
+        input.value = "";
+        input.focus();
+      }
+
+      function applyLink() {
+        var input = linkpop.querySelector("input");
+        var url = input.value.trim();
+        linkpop.classList.remove("is-open");
+        if (!url || !savedRange) return;
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(savedRange);
+        document.execCommand("createLink", false, url);
+        refreshCount();
+      }
+
+      linkpop.querySelector("[data-linkok]").addEventListener("click", applyLink);
+      linkpop.querySelector("input").addEventListener("keydown", function (e) {
+        if (e.key === "Enter") { e.preventDefault(); applyLink(); }
+        if (e.key === "Escape") linkpop.classList.remove("is-open");
+      });
+
+      function insertImage(file) {
+        var reader = new FileReader();
+        reader.onload = function (ev) {
+          var fig = document.createElement("figure");
+          fig.innerHTML =
+            '<img alt="Uploaded image" src="' + ev.target.result + '">' +
+            '<div class="upbar"><i></i></div>' +
+            '<figcaption>uploading to mooncellar-comments…</figcaption>';
+          body.appendChild(fig);
+          requestAnimationFrame(function () {
+            fig.querySelector(".upbar i").style.width = "100%";
+          });
+          setTimeout(function () {
+            var bar = fig.querySelector(".upbar");
+            if (bar) bar.remove();
+            fig.querySelector("figcaption").textContent =
+              "mooncellar-comments/" + Math.random().toString(16).slice(2, 10) + ".webp";
+          }, 850);
+          refreshCount();
+        };
+        reader.readAsDataURL(file);
+      }
+
+      var picker = document.createElement("input");
+      picker.type = "file";
+      picker.accept = "image/*";
+      picker.hidden = true;
+      picker.addEventListener("change", function () {
+        if (picker.files && picker.files[0]) insertImage(picker.files[0]);
+        picker.value = "";
+      });
+      root.appendChild(picker);
+
+      root.addEventListener("mousedown", function (e) {
+        if (e.target.closest(".tbtn[data-cmd]")) e.preventDefault();
+      });
+
+      root.addEventListener("click", function (e) {
+        var b = e.target.closest(".tbtn[data-cmd]");
+        if (!b) return;
+        var cmd = b.dataset.cmd;
+
+        if (cmd === "image") { picker.click(); return; }
+
+        if (cmd === "link") {
+          var sel = window.getSelection();
+          if (!sel.rangeCount || sel.isCollapsed) return;
+          savedRange = sel.getRangeAt(0).cloneRange();
+          openLinkPopover(savedRange.getBoundingClientRect());
+          return;
+        }
+
+        body.focus();
+
+        if (cmd === "formatBlock") {
+          var current = document.queryCommandValue("formatBlock");
+          var want = b.dataset.arg;
+          document.execCommand(
+            "formatBlock",
+            false,
+            current && current.toLowerCase() === want ? "p" : want
+          );
+        } else if (cmd === "code") {
+          document.execCommand(
+            "insertHTML",
+            false,
+            "<code>" + (window.getSelection().toString() || "code") + "</code>"
+          );
+        } else {
+          document.execCommand(cmd, false, null);
+        }
+
+        refreshCount();
+        syncStates();
+      });
+
+      body.addEventListener("input", function () { refreshCount(); syncStates(); });
+      body.addEventListener("keyup", syncStates);
+      body.addEventListener("mouseup", syncStates);
+
+      refreshCount();
+    }
+
+    var a = document.querySelector('[data-editor="A"]');
+    fill(a.querySelector("[data-toolbar]"), [TEXT_TOOLS, BLOCK_TOOLS, INSERT_TOOLS]);
+    setupEditor(a);
+
+    var b = document.querySelector('[data-editor="B"]');
+    var bubble = b.querySelector("[data-bubble]");
+    var plusrail = b.querySelector("[data-plusrail]");
+    fill(bubble, [TEXT_TOOLS, [INSERT_TOOLS[0]]]);
+    fill(plusrail, [
+      [{ cmd: "noop", icon: "plus", title: "Insert block" }],
+      BLOCK_TOOLS.concat([INSERT_TOOLS[1]])
+    ]);
+    setupEditor(b);
+
+    var bBody = b.querySelector("[data-body]");
+
+    function placeBubble() {
+      var sel = window.getSelection();
+      if (!sel.rangeCount || sel.isCollapsed || !bBody.contains(sel.anchorNode)) {
+        bubble.classList.remove("is-open");
+        return;
+      }
+      var rect = sel.getRangeAt(0).getBoundingClientRect();
+      if (!rect.width && !rect.height) { bubble.classList.remove("is-open"); return; }
+      var box = b.getBoundingClientRect();
+      bubble.style.left = (rect.left - box.left + rect.width / 2) + "px";
+      bubble.style.top = (rect.top - box.top - 8) + "px";
+      bubble.classList.add("is-open");
+    }
+
+    function placePlus() {
+      var sel = window.getSelection();
+      if (!sel.rangeCount || !sel.isCollapsed || !bBody.contains(sel.anchorNode)) {
+        plusrail.classList.remove("is-open");
+        return;
+      }
+      var node = sel.anchorNode;
+      var block = node.nodeType === 1 ? node : node.parentElement;
+      while (block && block.parentElement !== bBody) block = block.parentElement;
+      if (!block || (block.textContent || "").trim().length) {
+        plusrail.classList.remove("is-open");
+        return;
+      }
+      var box = b.getBoundingClientRect();
+      var r = block.getBoundingClientRect();
+      plusrail.style.top = (r.top - box.top - 3) + "px";
+      plusrail.classList.add("is-open");
+    }
+
+    document.addEventListener("selectionchange", function () {
+      placeBubble();
+      placePlus();
+    });
+
+    bBody.addEventListener("blur", function () {
+      setTimeout(function () {
+        if (!b.contains(document.activeElement)) {
+          bubble.classList.remove("is-open");
+          plusrail.classList.remove("is-open");
+        }
+      }, 120);
+    });
+
+    var c = document.querySelector('[data-editor="C"]');
+    fill(c.querySelector("[data-toolbar]"), [
+      TEXT_TOOLS,
+      [BLOCK_TOOLS[1], BLOCK_TOOLS[3]],
+      INSERT_TOOLS
+    ]);
+    setupEditor(c);
+
+    var cBody = c.querySelector("[data-body]");
+    cBody.addEventListener("focus", function () { c.classList.add("is-open"); });
+    document.addEventListener("focusin", function (e) {
+      if (c.contains(e.target)) return;
+      if ((cBody.textContent || "").trim().length) return;
+      if (cBody.querySelector("figure")) return;
+      c.classList.remove("is-open");
+    });
+  })();
+</script>

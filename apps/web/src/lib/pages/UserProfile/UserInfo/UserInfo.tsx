@@ -14,7 +14,7 @@ import Link from "next/link";
 import { FC, useMemo, useState } from "react";
 import styles from "./UserInfo.module.scss";
 import Markdown from "react-markdown";
-import { Interweave } from "interweave";
+import { RichText } from "@/src/lib/shared/ui/RichText";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { GameCard } from "@/src/lib/shared/ui/GameCard";
 import { Box } from "@/src/lib/shared/ui/Box";
@@ -196,7 +196,7 @@ const UserInfo: FC<UserInfoProps> = ({
                           </Button>
                         )}
                         <p>{log.game.name}</p>
-                        <Interweave content={log.text} />
+                        <RichText content={log.text} className={styles.item__text} />
                         <p className={styles.date}>
                           {commonUtils.getHumanDate(log.date)}
                         </p>

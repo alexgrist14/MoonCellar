@@ -1,4 +1,17 @@
 .media {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x2);
+  min-width: 0;
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x2);
+    flex-wrap: wrap;
+  }
+
   &__panel {
     min-width: 0;
 

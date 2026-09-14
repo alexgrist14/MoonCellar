@@ -10,5 +10,27 @@
       "mcp__codegraph__codegraph_files",
       "mcp__codegraph__codegraph_status"
     ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/alexgrist/.local/bin/graphify hook-guard search"
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/alexgrist/.local/bin/graphify hook-guard read"
+          }
+        ]
+      }
+    ]
   }
 }

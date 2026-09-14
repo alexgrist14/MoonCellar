@@ -49,10 +49,7 @@ const FEATURED_PLATFORM_SLUGS = [
 
 const getFeaturedPlatforms = unstable_cache(
   async (): Promise<IPlatformCount[]> => {
-    const platforms = await platformsAPI
-      .getAll()
-      .then(({ data }) => data)
-      .catch(() => []);
+    const { data: platforms } = await platformsAPI.getAll();
 
     const featured = FEATURED_PLATFORM_SLUGS.map((slug) =>
       platforms.find((platform) => platform.slug === slug)
@@ -60,10 +57,13 @@ const getFeaturedPlatforms = unstable_cache(
 
     return Promise.all(
       featured.map(async (platform) => {
-        const { total } = await gamesApi
-          .getAll({ selected: { platforms: [platform._id] }, take: 1, page: 1 })
-          .then(({ data }) => data)
-          .catch(() => ({ total: 0 }));
+        const {
+          data: { total },
+        } = await gamesApi.getAll({
+          selected: { platforms: [platform._id] },
+          take: 1,
+          page: 1,
+        });
 
         return { name: platform.name, slug: platform.slug, count: total };
       })

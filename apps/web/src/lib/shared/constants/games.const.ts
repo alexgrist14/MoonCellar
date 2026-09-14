@@ -33,3 +33,5 @@ export const takeGames = 60;
 export const takeUserGames = 30;
 
 export const takeHubGames = 30;
+
+export const takeHubRecentGames = 6;

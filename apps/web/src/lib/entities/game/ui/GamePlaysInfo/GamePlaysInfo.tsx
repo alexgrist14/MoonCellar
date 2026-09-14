@@ -4,6 +4,7 @@ import { IPlaythrough } from "@mooncellar/schemas";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { RowsModal } from "@/src/lib/shared/ui/RowsModal";
+import { RichText } from "@/src/lib/shared/ui/RichText";
 
 interface IGamePlaysInfoProps {
   gameName: string;
@@ -47,7 +48,10 @@ export const GamePlaysInfo: FC<IGamePlaysInfoProps> = ({
               ))}
             </div>
             {!!play.comment && (
-              <p className={styles.plays__comment}>{play.comment}</p>
+              <RichText
+                content={play.comment}
+                className={styles.plays__comment}
+              />
             )}
           </div>
         );

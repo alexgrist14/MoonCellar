@@ -33,7 +33,14 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
 
 ## Language
 
-- This CLAUDE.md file must be written in English only.
+- **Everything written into this repository is English.** Code and identifiers, commit
+  messages, every `CLAUDE.md`, everything under `docs/` — including the copy inside
+  `docs/mockups/*.html` — and the user-facing strings the apps ship.
+- A mockup's headings, labels and placeholder text are UI copy for an English-language
+  product. Written in another language they cannot be lifted into a real screen, and the
+  mockup stops being a specification of what to build.
+- The conversation with whoever asked for the work happens in whatever language they use;
+  that never reaches a file.
 
 ## Skills
 
@@ -99,3 +106,13 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
   in the tree silently breaks type inference across the package boundary.
 - `igdb.schema.ts` stays in `apps/web`: it describes an upstream API the frontend reads
   directly, not the contract between the apps.
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+Rules:
+- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).

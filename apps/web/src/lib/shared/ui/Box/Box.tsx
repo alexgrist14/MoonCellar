@@ -1,10 +1,11 @@
-import { CSSProperties, FC, ReactNode } from "react";
+import { CSSProperties, FC, ReactNode, useRef } from "react";
 import { BoxHead } from "./BoxHead";
 import cn from "classnames";
 import styles from "./Box.module.scss";
 import { Scrollbar } from "../Scrollbar";
 import { useResizeDetector } from "react-resize-detector";
 import classNames from "classnames";
+import { ResizeHandle } from "../ResizeHandle";
 
 interface IBoxProps {
   children: ReactNode;
@@ -21,6 +22,7 @@ interface IBoxProps {
   isWithScrollBar?: boolean;
   isWithBlur?: boolean;
   isWithoutBorder?: boolean;
+  isResizable?: boolean;
   scrollFadeType?: "both" | "top" | "bottom";
 }
 
@@ -34,16 +36,22 @@ export const Box: FC<IBoxProps> = ({
   isWithScrollBar,
   isWithBlur,
   isWithoutBorder,
+  isResizable,
   scrollFadeType,
   ...headProps
 }) => {
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const { ref } = useResizeDetector({
     refreshMode: "debounce",
     refreshRate: 200,
   });
 
   return (
-    <div className={cn(styles.wrapper, className)} style={wrapperStyle}>
+    <div
+      ref={wrapperRef}
+      className={cn(styles.wrapper, { [styles.wrapper_resizable]: isResizable }, className)}
+      style={wrapperStyle}
+    >
       <BoxHead {...headProps} isExternal />
       <div
         style={templateStyle}
@@ -79,6 +87,7 @@ export const Box: FC<IBoxProps> = ({
           )}
         </div>
       </div>
+      {isResizable && <ResizeHandle targetRef={wrapperRef} />}
     </div>
   );
 };

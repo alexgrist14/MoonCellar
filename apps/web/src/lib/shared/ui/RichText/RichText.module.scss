@@ -1,0 +1,10 @@
+.richText {
+  @include richText;
+
+  color: var(--color-text-secondary);
+
+  strong,
+  b {
+    color: var(--color-text-primary);
+  }
+}

@@ -12,6 +12,7 @@ import {
   IPlaythroughDocument,
   Playthrough,
 } from "../schemas/playthroughs.schema";
+import { sanitizeRichText } from "../../../shared/utils/rich-text.utils";
 
 @Injectable()
 export class PlaythroughsService {
@@ -42,26 +43,28 @@ export class PlaythroughsService {
       ? "Mastered"
       : this.capitalize(play.category);
 
-    const details = [
+    const meta = [
       `Status: ${status}`,
       !!platform && `Console: ${platform.name}`,
       !!play.date && `Date: ${this.formatDate(play.date)}`,
       !!play.time && `Time: ${play.time}h`,
-      !!play.comment && `Comment: ${play.comment}`,
     ].filter(Boolean);
 
-    return {
-      platform,
-      details: details.length
-        ? `<span style="font-size: 12px">${details.join("<br/>")}</span>`
-        : "",
-    };
+    const small = (content: string) =>
+      `<div style="font-size: 12px">${content}</div>`;
+
+    const parts = [
+      meta.length && small(meta.join("<br/>")),
+      !!play.comment && `${small("Comment:")}${play.comment}`,
+    ].filter(Boolean);
+
+    return { platform, details: parts.join("") };
   }
 
   private buildLogText(header: string, details: string) {
     const boldHeader = `<b>${header}</b>`;
 
-    return details ? `${boldHeader}<br/>${details}` : boldHeader;
+    return details ? `${boldHeader}${details}` : boldHeader;
   }
 
   async getPlaythroughs(data: IGetPlaythroughsRequest) {
@@ -84,6 +87,7 @@ export class PlaythroughsService {
     try {
       const play = await this.GamesPlaythrouhgs.create({
         ...data,
+        comment: sanitizeRichText(data.comment),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       } as Parameters<Model<IPlaythroughDocument>["create"]>[0]);
@@ -116,7 +120,11 @@ export class PlaythroughsService {
     try {
       const play = await this.GamesPlaythrouhgs.findOneAndUpdate(
         { _id: id },
-        { ...data, updatedAt: new Date().toISOString() },
+        {
+          ...data,
+          comment: sanitizeRichText(data.comment),
+          updatedAt: new Date().toISOString(),
+        },
         {
           new: true,
         }

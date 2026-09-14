@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   Logger,
@@ -39,6 +40,7 @@ import { IndexNowService } from "../../indexnow/indexnow.service";
 import { FRONT_URL } from "../../../shared/constants";
 import { normalizeGameName } from "../../../shared/utils";
 import { pickFollowingsStatus } from "../utils/followings-status.utils";
+import { S3_FOLDERS } from "../../../shared/s3";
 
 const SEARCH_CANDIDATES_LIMIT = 1000;
 const SEARCH_SCORE_THRESHOLD = 0.3;
@@ -197,19 +199,21 @@ export class GamesService implements OnModuleInit {
       });
       if (!game) throw new NotFoundException("Game not found");
       const _id = new mongoose.Types.ObjectId();
+      const folder = {
+        cover: S3_FOLDERS.covers,
+        screenshot: S3_FOLDERS.screenshots,
+        artwork: S3_FOLDERS.artworks,
+      }[type];
 
-      await this.fileService.uploadFile(
+      const storedKey = await this.fileService.uploadFile(
         image,
-        gameId.toString() + "/" + _id.toString(),
-        "mooncellar-" + type + "s"
+        `${gameId.toString()}/${_id.toString()}`,
+        folder
       );
 
-      return (
-        `https://mooncellar-${type}s.s3.regru.cloud/` +
-        gameId.toString() +
-        "/" +
-        _id.toString()
-      );
+      if (!storedKey) throw new BadRequestException("No image uploaded");
+
+      return this.fileService.getPublicUrl(folder, storedKey);
     } catch (err) {
       this.logger.error(err, `Failed to upload image for game: ${gameId}`);
       throw err;
@@ -726,7 +730,7 @@ export class GamesService implements OnModuleInit {
       const uploaded = await this.fileService.uploadObject(
         JSON.stringify(result),
         "filters",
-        "mooncellar-common"
+        S3_FOLDERS.common
       );
 
       this.logger.log("Finished parsing common fields to json");

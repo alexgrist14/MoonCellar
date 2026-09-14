@@ -10,9 +10,13 @@ import { cookies } from "next/headers";
 import { fetchOrNull } from "@/src/lib/shared/utils/not-found.utils";
 import { notFound } from "next/navigation";
 import { cache, Suspense } from "react";
+import { GetUserByStringSchema } from "@mooncellar/schemas";
+
+const isValidName = (name: string) =>
+  GetUserByStringSchema.safeParse({ searchString: name }).success;
 
 const getUser = cache(async (name: string) =>
-  fetchOrNull(userAPI.getByString(name))
+  isValidName(name) ? fetchOrNull(userAPI.getByString(name)) : null
 );
 
 export async function generateMetadata({

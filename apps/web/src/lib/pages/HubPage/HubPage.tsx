@@ -10,7 +10,10 @@ import { GameCard } from "../../shared/ui/GameCard";
 import { GamesCards } from "../../shared/ui/GamesCards";
 import { SectionTitle } from "../../shared/ui/SectionTitle";
 import { IGameResponse } from "@mooncellar/schemas";
-import { takeHubGames } from "../../shared/constants/games.const";
+import {
+  takeHubGames,
+  takeHubRecentGames,
+} from "../../shared/constants/games.const";
 
 export interface IHubLinkSection {
   label: string;
@@ -118,7 +121,7 @@ export const HubPage: FC<IHubPageProps> = ({
             <GamesCards
               games={recentGames}
               columns={HUB_COLUMNS}
-              limit={takeHubGames}
+              limit={takeHubRecentGames}
               isWithCombinedRating
               isWithoutScroll
             />

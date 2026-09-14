@@ -5,6 +5,7 @@ import { gamesApi } from "@/src/lib/shared/api";
 import {
   takeGames,
   takeHubGames,
+  takeHubRecentGames,
 } from "@/src/lib/shared/constants/games.const";
 import { toSlug } from "@/src/lib/shared/utils/slug.utils";
 import { HubPage } from "@/src/lib/pages/HubPage";
@@ -111,7 +112,7 @@ const GenreHubPage = async ({
         sortBy: "first_release",
         sortOrder: "desc",
         years: [null, currentYear],
-        take: takeHubGames,
+        take: takeHubRecentGames,
         page: 1,
       })
       .then(({ data }) => data)

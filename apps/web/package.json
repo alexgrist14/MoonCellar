@@ -9,14 +9,21 @@
     "start": "NODE_OPTIONS=--disable-warning=ExperimentalWarning next start -p 3111",
     "lint": "eslint src --ext ts,tsx,js,jsx --report-unused-disable-directives --max-warnings 10",
     "lint:fix": "eslint src --ext js,jsx,ts,tsx --fix",
-    "check:layout": "node scripts/check-layout.mjs"
+    "check:layout": "node scripts/check-layout.mjs",
+    "sync:tokens": "node scripts/sync-design-tokens.mjs",
+    "check:tokens": "node scripts/sync-design-tokens.mjs --check"
   },
   "dependencies": {
-    "@mooncellar/schemas": "workspace:*",
     "@grafana/faro-web-sdk": "^2.8.2",
     "@hookform/resolvers": "^5.4.0",
+    "@mooncellar/schemas": "workspace:*",
     "@tanstack/react-query": "^5.101.4",
     "@tanstack/react-query-devtools": "^5.101.4",
+    "@tiptap/extension-image": "^3.31.3",
+    "@tiptap/extensions": "^3.31.3",
+    "@tiptap/pm": "^3.31.3",
+    "@tiptap/react": "^3.31.3",
+    "@tiptap/starter-kit": "^3.31.3",
     "@types/react-virtualized": "^9.22.3",
     "axios": "catalog:",
     "classnames": "^2.5.1",

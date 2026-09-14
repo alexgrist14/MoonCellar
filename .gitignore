@@ -46,3 +46,5 @@ next-env.d.ts
 # monorepo
 infra/searxng/
 packages/*/dist/
+graphify-out
+.codegraph/

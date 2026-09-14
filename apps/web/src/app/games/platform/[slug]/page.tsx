@@ -6,6 +6,7 @@ import { platformsAPI } from "@/src/lib/shared/api/platforms.api";
 import {
   takeGames,
   takeHubGames,
+  takeHubRecentGames,
 } from "@/src/lib/shared/constants/games.const";
 import { HubPage } from "@/src/lib/pages/HubPage";
 import { JsonLd } from "@/src/lib/shared/ui/JsonLd";
@@ -118,7 +119,7 @@ const PlatformHubPage = async ({
         sortBy: "first_release",
         sortOrder: "desc",
         years: [null, currentYear],
-        take: takeHubGames,
+        take: takeHubRecentGames,
         page: 1,
       })
       .then(({ data }) => data)
