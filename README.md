@@ -467,6 +467,9 @@ bun --filter '@mooncellar/schemas' build     # tsc → dist
 bun --filter '@mooncellar/schemas' dev       # tsc --watch
 ```
 
+Why the package is built instead of consumed as source, which alternatives were tried, and what
+dropping the build would take: [`docs/schemas-package.md`](docs/schemas-package.md).
+
 `zod` is a peer dependency resolved from the root catalog — a second copy in the tree silently
 breaks type inference and `instanceof` checks across package boundaries.
 

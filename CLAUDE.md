@@ -99,9 +99,16 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
 
 - Request and response shapes live once in `packages/schemas` and are imported as
   `@mooncellar/schemas` by both apps. There are no copies to keep in sync any more.
-- The package compiles to CommonJS with declarations. Do not import its `src` directly
-  and do not add an ESM build: Nest resolves it through `require`, and two module
-  instances would break `instanceof` and zod's inferred identities.
+- The package compiles to CommonJS with declarations. Do not add an ESM build: Nest
+  resolves the package through `require`, and an ES module loaded from the CommonJS API
+  brings a second copy of zod into the process — its classes differ from the API's even
+  though zod 4.4.3 keeps `instanceof` passing, so nothing fails loudly.
+- **Keep `main` and `types` on `dist`, and never import the package's `src` directly.**
+  tsc treats the symlinked workspace package as an external library: with `main` on
+  `src`, `nest build` still exits 0 without compiling it, and the API dies at boot under
+  Node with `ERR_MODULE_NOT_FOUND` on the package's first relative import. A relative or
+  `paths` import of `src` fails with `TS6059` instead. The rejected alternatives, and
+  what dropping the build would take, are in `docs/schemas-package.md`.
 - `zod` is a peer dependency pinned through the root `catalog`. A second copy anywhere
   in the tree silently breaks type inference across the package boundary.
 - `igdb.schema.ts` stays in `apps/web`: it describes an upstream API the frontend reads
