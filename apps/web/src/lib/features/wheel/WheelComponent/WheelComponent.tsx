@@ -13,6 +13,7 @@ import { useWheelStore } from "@/src/lib/shared/store/wheel.store";
 import { useSettingsStore } from "@/src/lib/shared/store/settings.store";
 import { SvgWheelPointer } from "@/src/lib/shared/ui/svg";
 import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
+import { useRoyalGames } from "@/src/lib/entities/royal/model/useRoyalGames";
 
 interface WheelComponentProps {
   primaryColor?: string;
@@ -61,7 +62,8 @@ export const WheelComponent: FC<WheelComponentProps> = ({
 }) => {
   const setWinner = useWheelStore((state) => state.setWinner);
 
-  const { addHistoryGame, games, royalGames } = useGamesStore();
+  const { addHistoryGame, games } = useGamesStore();
+  const { royalGames } = useRoyalGames();
   const {
     isFinished,
     isLoading: isGamesLoading,

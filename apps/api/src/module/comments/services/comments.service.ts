@@ -45,6 +45,7 @@ import {
   toObjectId,
   uniqueIds,
 } from "../utils/community.utils";
+import { CommentsGateway } from "../gateways/comments.gateway";
 import { VotesService } from "./votes.service";
 import { CommunityLookupService } from "./community-lookup.service";
 
@@ -64,7 +65,8 @@ export class CommentsService {
     @InjectModel(Playthrough.name)
     private Playthroughs: Model<IPlaythroughDocument>,
     private readonly votes: VotesService,
-    private readonly lookup: CommunityLookupService
+    private readonly lookup: CommunityLookupService,
+    private readonly events: CommentsGateway
   ) {}
 
   private readableStatuses(viewer: IViewer): ICommentStatus[] {
@@ -129,7 +131,11 @@ export class CommentsService {
     return { results: await this.decorate(replies, viewer), total };
   }
 
-  async createComment(data: ICreateCommentParams, viewer: User) {
+  async createComment(
+    data: ICreateCommentParams,
+    viewer: User,
+    socketId?: string
+  ) {
     const userId = getViewerId(viewer);
     const gameId = toObjectId(data.gameId, "game id");
 
@@ -193,18 +199,29 @@ export class CommentsService {
       isSpoiler: data.isSpoiler,
     });
 
-    if (parentId) {
-      await this.Comments.updateOne(
-        { _id: parentId },
-        { $inc: { repliesCount: 1 } },
-        { timestamps: false }
-      );
-    }
+    const parentRepliesCount = parentId
+      ? await this.incrementReplies(parentId, 1)
+      : null;
+
+    this.events.commentCreated(
+      {
+        gameId: String(gameId),
+        commentId: String(comment._id),
+        parentId: parentId ? String(parentId) : null,
+        parentRepliesCount,
+      },
+      socketId
+    );
 
     return this.decorateOne(comment, viewer);
   }
 
-  async updateComment(id: string, data: IUpdateCommentParams, viewer: User) {
+  async updateComment(
+    id: string,
+    data: IUpdateCommentParams,
+    viewer: User,
+    socketId?: string
+  ) {
     const comment = await this.findExisting(id);
 
     if (!isSameId(comment.userId, getViewerId(viewer))) {
@@ -223,10 +240,21 @@ export class CommentsService {
     comment.isSpoiler = data.isSpoiler;
     await comment.save();
 
+    this.events.commentUpdated(
+      {
+        gameId: String(comment.gameId),
+        commentId: String(comment._id),
+        body: comment.body,
+        isSpoiler: comment.isSpoiler,
+        updatedAt: new Date(comment.updatedAt).toISOString(),
+      },
+      socketId
+    );
+
     return this.decorateOne(comment, viewer);
   }
 
-  async deleteComment(id: string, viewer: User) {
+  async deleteComment(id: string, viewer: User, socketId?: string) {
     const comment = await this.findExisting(id);
 
     if (
@@ -236,7 +264,7 @@ export class CommentsService {
       throw new ForbiddenException("You can only delete your own comments");
     }
 
-    await this.changeStatus(comment, "deleted");
+    await this.changeStatus(comment, "deleted", socketId);
 
     return this.decorateOne(comment, viewer);
   }
@@ -244,18 +272,24 @@ export class CommentsService {
   async updateStatus(
     id: string,
     status: Exclude<ICommentStatus, "deleted">,
-    viewer: User
+    viewer: User,
+    socketId?: string
   ) {
     const comment = await this.findExisting(id);
 
     if (comment.status !== status) {
-      await this.changeStatus(comment, status);
+      await this.changeStatus(comment, status, socketId);
     }
 
     return this.decorateOne(comment, viewer);
   }
 
-  async setLike(id: string, viewer: User, isLiked: boolean) {
+  async setLike(
+    id: string,
+    viewer: User,
+    isLiked: boolean,
+    socketId?: string
+  ) {
     const userId = getViewerId(viewer);
     const comment = await this.findExisting(id);
 
@@ -282,6 +316,17 @@ export class CommentsService {
           { new: true, timestamps: false, projection: { likesCount: 1 } }
         ).lean<ILeanComment>()
       : comment;
+
+    if (isChanged && updated) {
+      this.events.commentLikesChanged(
+        {
+          gameId: String(comment.gameId),
+          commentId: String(comment._id),
+          likesCount: updated.likesCount,
+        },
+        socketId
+      );
+    }
 
     return { count: updated?.likesCount ?? 0, isActive: isLiked };
   }
@@ -324,7 +369,8 @@ export class CommentsService {
 
   private async changeStatus(
     comment: GameCommentDocument,
-    status: ICommentStatus
+    status: ICommentStatus,
+    socketId?: string
   ) {
     const repliesDelta =
       Number(status === "visible") - Number(comment.status === "visible");
@@ -335,13 +381,34 @@ export class CommentsService {
 
     await comment.save();
 
-    if (repliesDelta && comment.parentId) {
-      await this.Comments.updateOne(
-        { _id: comment.parentId },
-        { $inc: { repliesCount: repliesDelta } },
-        { timestamps: false }
-      );
-    }
+    const parentRepliesCount =
+      repliesDelta && comment.parentId
+        ? await this.incrementReplies(comment.parentId, repliesDelta)
+        : null;
+
+    this.events.commentStatusChanged(
+      {
+        gameId: String(comment.gameId),
+        commentId: String(comment._id),
+        parentId: comment.parentId ? String(comment.parentId) : null,
+        parentRepliesCount,
+        status,
+      },
+      socketId
+    );
+  }
+
+  private async incrementReplies(
+    parentId: mongoose.Types.ObjectId,
+    delta: number
+  ) {
+    const parent = await this.Comments.findByIdAndUpdate(
+      parentId,
+      { $inc: { repliesCount: delta } },
+      { new: true, timestamps: false, projection: { repliesCount: 1 } }
+    ).lean<ILeanComment>();
+
+    return parent?.repliesCount ?? null;
   }
 
   private async findReported(

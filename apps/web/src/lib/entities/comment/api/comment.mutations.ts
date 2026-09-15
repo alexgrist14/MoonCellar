@@ -1,12 +1,9 @@
 import {
   InfiniteData,
-  QueryClient,
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
 import {
-  IComment,
-  ICommentsResponse,
   ICreateCommentRequest,
   IReview,
   IReviewsResponse,
@@ -14,6 +11,7 @@ import {
 } from "@mooncellar/schemas";
 import { commentsAPI } from "@/src/lib/shared/api";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
+import { invalidateDiscussion, setCommentInCache } from "./comment.cache";
 import { commentQueryKeys } from "./comment.query-keys";
 
 const updateReviewPages = (
@@ -30,44 +28,6 @@ const updateReviewPages = (
       ),
     })),
   };
-
-const updateCommentPages = (
-  data: InfiniteData<ICommentsResponse, number> | undefined,
-  commentId: string,
-  update: (comment: IComment) => IComment
-) =>
-  data && {
-    ...data,
-    pages: data.pages.map((page) => ({
-      ...page,
-      results: page.results.map((comment) =>
-        comment._id === commentId ? update(comment) : comment
-      ),
-    })),
-  };
-
-const setCommentInCache = (
-  queryClient: QueryClient,
-  gameId: string,
-  commentId: string,
-  update: (comment: IComment) => IComment
-) => {
-  [commentQueryKeys.discussion(gameId), commentQueryKeys.replies()].forEach(
-    (queryKey) =>
-      queryClient.setQueriesData<InfiniteData<ICommentsResponse, number>>(
-        { queryKey },
-        (data) => updateCommentPages(data, commentId, update)
-      )
-  );
-};
-
-const invalidateDiscussion = (queryClient: QueryClient, gameId: string) =>
-  Promise.all([
-    queryClient.invalidateQueries({
-      queryKey: commentQueryKeys.discussion(gameId),
-    }),
-    queryClient.invalidateQueries({ queryKey: commentQueryKeys.replies() }),
-  ]);
 
 export const useReviewHelpfulMutation = (gameId: string) => {
   const queryClient = useQueryClient();

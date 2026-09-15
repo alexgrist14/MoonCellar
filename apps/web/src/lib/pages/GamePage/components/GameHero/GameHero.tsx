@@ -12,7 +12,7 @@ import { SvgCrown } from "@/src/lib/shared/ui/svg/SvgCrown";
 import { IGameResponse, IGameStats } from "@mooncellar/schemas";
 import { GameStatsCounters } from "../GameStatsCounters";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
-import { useGamesStore } from "@/src/lib/shared/store/games.store";
+import { useRoyalGames } from "@/src/lib/entities/royal/model/useRoyalGames";
 import { useHideAdult } from "@/src/lib/shared/hooks/useHideAdult";
 import { isAdultGame } from "@/src/lib/shared/utils/adult.utils";
 import { toSlug } from "@/src/lib/shared/utils/slug.utils";
@@ -24,7 +24,7 @@ interface IGameHeroProps {
 
 export const GameHero: FC<IGameHeroProps> = ({ game, stats }) => {
   const systems = useCommonStore((s) => s.systems);
-  const royalGames = useGamesStore((s) => s.royalGames);
+  const { royalGames } = useRoyalGames();
   const hideMedia = useHideAdult() && isAdultGame(game);
 
   const artwork = hideMedia

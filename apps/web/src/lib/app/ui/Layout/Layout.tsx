@@ -9,6 +9,7 @@ import { ModalsConnector } from "@/src/lib/shared/ui/Modal";
 import { ToastConnector } from "@/src/lib/shared/ui/Toast";
 import { useMediaStore } from "@/src/lib/shared/hooks/useMediaStore";
 import { useAuthRefresh } from "@/src/lib/shared/hooks/useAuthRefresh";
+import { useRoyalGamesSync } from "@/src/lib/entities/royal/model/useRoyalGamesSync";
 import { useGetUserInfo } from "@/src/lib/features/user/model/user.hooks";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { gamesApi, userAPI } from "@/src/lib/shared/api";
@@ -73,6 +74,7 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
   useAuthRefresh();
   useMediaStore();
   useGetUserInfo();
+  useRoyalGamesSync();
 
   useEffect(() => {
     if (!profile?._id) return;

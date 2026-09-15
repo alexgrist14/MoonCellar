@@ -12,7 +12,6 @@ import useCloseEvents from "../../hooks/useCloseEvents";
 import { Button } from "../Button";
 import { SvgAchievement, SvgClose, SvgMore, SvgStar } from "../svg";
 import Link from "next/link";
-import { useGamesStore } from "../../store/games.store";
 import { SvgCrown } from "../svg/SvgCrown";
 import { useHideAdult } from "../../hooks/useHideAdult";
 import { isAdultGame } from "../../utils/adult.utils";
@@ -23,6 +22,7 @@ import { useAuthStore } from "../../store/auth.store";
 import { playthroughPriorityOrder } from "../../constants/user.const";
 import { getAverageRating } from "../../utils/rating.utils";
 import { GameRatingPopover } from "@/src/lib/features/game/GameRatingPopover";
+import { useRoyalGames } from "@/src/lib/entities/royal/model/useRoyalGames";
 
 interface IGameCardProps {
   game: IGameResponse;
@@ -63,9 +63,7 @@ export const GameCard = memo(
     const [isActive, setIsActive] = useState(false);
 
     const { parsedPlaythroughs, parsedRatings } = useUserStore();
-    const royalGames = useGamesStore((s) => s.royalGames);
-    const addRoyalGame = useGamesStore((s) => s.addRoyalGame);
-    const removeRoyalGame = useGamesStore((s) => s.removeRoyalGame);
+    const { royalGames, addRoyalGame, removeRoyalGame } = useRoyalGames();
     const profile = useAuthStore((s) => s.profile);
 
     const filteredPlaythroughs = useMemo(

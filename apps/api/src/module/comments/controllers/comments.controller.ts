@@ -20,7 +20,7 @@ import {
   ApiOperation,
   ApiTags,
 } from "@nestjs/swagger";
-import { RolesEnum } from "@mooncellar/schemas";
+import { RolesEnum, SOCKET_ID_HEADER } from "@mooncellar/schemas";
 import {
   CommentResponseDto,
   CommentsResponseDto,
@@ -41,6 +41,12 @@ import type {
   IAuthorizedRequest,
   ICommunityRequest,
 } from "../types/community.type";
+
+const getSocketId = (request: IAuthorizedRequest) => {
+  const socketId = request.headers[SOCKET_ID_HEADER];
+
+  return typeof socketId === "string" ? socketId : undefined;
+};
 
 @ApiTags("Comments")
 @Controller()
@@ -81,7 +87,11 @@ export class CommentsController {
     @Body() dto: CreateCommentRequestDto,
     @Req() request: IAuthorizedRequest
   ) {
-    return this.comments.createComment(dto, request.user);
+    return this.comments.createComment(
+      dto,
+      request.user,
+      getSocketId(request)
+    );
   }
 
   @Patch("comments/:id")
@@ -95,7 +105,12 @@ export class CommentsController {
     @Body() dto: UpdateCommentRequestDto,
     @Req() request: IAuthorizedRequest
   ) {
-    return this.comments.updateComment(id, dto, request.user);
+    return this.comments.updateComment(
+      id,
+      dto,
+      request.user,
+      getSocketId(request)
+    );
   }
 
   @Delete("comments/:id")
@@ -108,7 +123,11 @@ export class CommentsController {
     @Param("id") id: string,
     @Req() request: IAuthorizedRequest
   ) {
-    return this.comments.deleteComment(id, request.user);
+    return this.comments.deleteComment(
+      id,
+      request.user,
+      getSocketId(request)
+    );
   }
 
   @Put("comments/:id/like")
@@ -121,7 +140,12 @@ export class CommentsController {
     @Param("id") id: string,
     @Req() request: IAuthorizedRequest
   ) {
-    return this.comments.setLike(id, request.user, true);
+    return this.comments.setLike(
+      id,
+      request.user,
+      true,
+      getSocketId(request)
+    );
   }
 
   @Delete("comments/:id/like")
@@ -134,7 +158,12 @@ export class CommentsController {
     @Param("id") id: string,
     @Req() request: IAuthorizedRequest
   ) {
-    return this.comments.setLike(id, request.user, false);
+    return this.comments.setLike(
+      id,
+      request.user,
+      false,
+      getSocketId(request)
+    );
   }
 
   @Post("comments/:id/report")
@@ -162,6 +191,11 @@ export class CommentsController {
     @Body() dto: UpdateCommentStatusRequestDto,
     @Req() request: IAuthorizedRequest
   ) {
-    return this.comments.updateStatus(id, dto.status, request.user);
+    return this.comments.updateStatus(
+      id,
+      dto.status,
+      request.user,
+      getSocketId(request)
+    );
   }
 }

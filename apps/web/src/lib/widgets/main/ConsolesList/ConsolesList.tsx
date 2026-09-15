@@ -5,17 +5,14 @@ import { useGamesStore } from "@/src/lib/shared/store/games.store";
 import { GamesList } from "@/src/lib/shared/ui/GamesList";
 import { RoyalGamesPanel } from "@/src/lib/shared/ui/RoyalGamesPanel";
 import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
+import { useRoyalGames } from "@/src/lib/entities/royal/model/useRoyalGames";
 
 export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
   initialTabIndex,
 }) => {
-  const {
-    games,
-    royalGames,
-    historyGames,
-    setHistoryGames,
-    removeHistoryGame,
-  } = useGamesStore();
+  const { games, historyGames, setHistoryGames, removeHistoryGame } =
+    useGamesStore();
+  const { royalGames } = useRoyalGames();
 
   const [tabIndex, setTabIndex] = useState(initialTabIndex || 0);
 

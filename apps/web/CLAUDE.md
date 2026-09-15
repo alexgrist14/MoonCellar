@@ -266,6 +266,33 @@ break silently when ignored:
   (the server render, which has no store, keeps the cookie's answer), and on disagreement calls
   `refreshAuth`, which either restores the session or gets the stale cookies cleared.
 
+## Sockets
+
+- **Nothing reachable from `shared/api` may import `socket.io-client`.** `shared/api/index.ts`
+  re-exports every API module, so an import there lands in almost every client bundle.
+  `comments.api.ts` reads the socket id from `shared/socket/socket-id.ts`, which has no
+  dependencies; only `shared/socket/comments.socket.ts` loads the client, and only
+  `useDiscussionSocket` imports that.
+- **The socket opens only from the Discussion tab.** `DiscussionTab` mounts after the tab is first
+  opened, so a game page nobody discusses holds no connection. Keep `useDiscussionSocket` out of
+  `GamePage` and `GameCommunity`, or every visitor of the 10 000 game pages opens a socket to the
+  API.
+- **`NEXT_PUBLIC_API_URL` must stay a bare origin.** Socket.IO reads the path of the URL it is
+  given as the namespace, so `https://api.mooncellar.space/v1` would ask for namespace
+  `/v1/comments` and the connection fails with `Invalid namespace`. The full contract is in
+  [`docs/sockets.md`](../../docs/sockets.md).
+- **`/royal` runs on its own `Manager`, and `socket.io-client` is loaded for it with a dynamic
+  `import()`.** `io()` caches one manager per origin and keeps the first caller's options, and
+  the API authenticates from the cookies of that manager's handshake — sharing it with the
+  anonymous `/comments` socket would send no credentials over polling and keep a pre-login
+  handshake after sign-in. The dynamic import keeps the client out of guests' bundles:
+  `useRoyalGames` is reached from every `GameCard`, so a static import ships it on every page.
+- **Read and change royal games only through `useRoyalGames`.** The list has two sources — the
+  persisted `games` store for guests, `royal.store` (filled over `/royal`) for a signed-in user —
+  and the hook picks the side and routes writes to it. Reading `useGamesStore().royalGames`
+  directly shows a signed-in user the leftover guest list, and writing to it changes nothing on
+  the account.
+
 ## Verification
 
 - **Do not reason about pixels — measure them.** `bun run check:layout` drives the installed

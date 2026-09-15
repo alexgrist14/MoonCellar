@@ -46,6 +46,11 @@ export class User extends Document {
     default: { showAdultContent: false, bgOpacity: DEFAULT_BG_OPACITY },
   })
   settings: IUserSettings;
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Game" }],
+    default: [],
+  })
+  royalGames: mongoose.Types.ObjectId[];
   @Prop()
   updatedAt: Date;
 }

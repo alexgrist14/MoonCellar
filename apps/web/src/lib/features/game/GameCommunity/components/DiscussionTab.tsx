@@ -9,6 +9,7 @@ import {
   useCommentsQuery,
 } from "@/src/lib/entities/comment/api/comment.queries";
 import { useCreateCommentMutation } from "@/src/lib/entities/comment/api/comment.mutations";
+import { useDiscussionSocket } from "@/src/lib/entities/comment/api/comment.socket";
 import styles from "../GameCommunity.module.scss";
 import { getPlainTextExcerpt } from "../utils";
 import { CommentComposer } from "./CommentComposer";
@@ -41,6 +42,8 @@ export const DiscussionTab: FC<IDiscussionTabProps> = ({
   const { data, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useCommentsQuery(game._id, sort);
   const { mutateAsync: createComment } = useCreateCommentMutation(game._id);
+
+  useDiscussionSocket(game._id);
 
   const isLoaderShown = useMinimumLoading(isLoading);
   const comments = flattenPages(data?.pages);

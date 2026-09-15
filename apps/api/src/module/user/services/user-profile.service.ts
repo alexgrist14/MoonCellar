@@ -39,6 +39,7 @@ export class UserProfileService {
           "-createdAt",
           "-updatedAt",
           "-refreshToken",
+          "-royalGames",
           "-__v",
         ]);
     } catch (err) {
@@ -52,7 +53,13 @@ export class UserProfileService {
         .findOne({
           $or: [{ userName: searchString }, { email: searchString }],
         })
-        .select(["-password", "-createdAt", "-refreshToken", "-__v"]);
+        .select([
+          "-password",
+          "-createdAt",
+          "-refreshToken",
+          "-royalGames",
+          "-__v",
+        ]);
     } catch (err) {
       this.logger.error(err, `Failed to find user by string: ${searchString}`);
       throw err;

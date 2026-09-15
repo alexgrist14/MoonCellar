@@ -5,7 +5,7 @@ import styles from "./GamesListMenu.module.scss";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { Button } from "@/src/lib/shared/ui/Button";
 import { RoyalGamesPanel } from "@/src/lib/shared/ui/RoyalGamesPanel";
-import { useGamesStore } from "@/src/lib/shared/store/games.store";
+import { useRoyalGames } from "@/src/lib/entities/royal/model/useRoyalGames";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { IGameResponse } from "@mooncellar/schemas";
 
@@ -14,7 +14,7 @@ interface IGamesListMenuProps {
 }
 
 export const GamesListMenu: FC<IGamesListMenuProps> = ({ games }) => {
-  const addRoyalGames = useGamesStore((state) => state.addRoyalGames);
+  const { addRoyalGames } = useRoyalGames();
 
   const [tabIndex, setTabIndex] = useState(0);
 

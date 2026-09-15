@@ -8,6 +8,8 @@ import { json } from "body-parser";
 import { rootDir } from "./shared/constants";
 import { cleanupOpenApiDoc } from "nestjs-zod";
 import { Logger } from "nestjs-pino";
+import { getCorsOrigins } from "./shared/cors";
+import { SocketIoAdapter } from "./shared/socket-io.adapter";
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -17,11 +19,9 @@ async function bootstrap() {
   app.use(cookieParser());
   app.enableCors({
     credentials: true,
-    origin: [
-      ...(process.env.LOCAL_CONNECTION?.split(",") || []),
-      "https://mooncellar.space",
-    ],
+    origin: getCorsOrigins(),
   });
+  app.useWebSocketAdapter(new SocketIoAdapter(app));
   app.useGlobalPipes(new ValidationPipe());
   app.use(json({ limit: "2mb" }));
   app.useLogger(app.get(Logger));

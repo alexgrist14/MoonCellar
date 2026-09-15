@@ -9,7 +9,7 @@ import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
 import { ButtonColor } from "@/src/lib/shared/ui/Button";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { useGamesStore } from "@/src/lib/shared/store/games.store";
+import { useRoyalGames } from "@/src/lib/entities/royal/model/useRoyalGames";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { SaveForm } from "@/src/lib/shared/ui/SaveForm";
@@ -21,7 +21,7 @@ import {
 } from "@/src/lib/entities/user/api/user.mutations";
 
 export const RoyalGamesPanel: FC = () => {
-  const { royalGames, setRoyalGames, removeRoyalGame } = useGamesStore();
+  const { royalGames, setRoyalGames, removeRoyalGame } = useRoyalGames();
   const { profile, isAuth } = useAuthStore();
 
   const [tabIndex, setTabIndex] = useState(0);

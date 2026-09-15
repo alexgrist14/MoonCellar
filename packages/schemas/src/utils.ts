@@ -11,3 +11,7 @@ export const transformBoolean = () =>
           : Boolean(val)
     )
     .optional();
+
+export const ObjectIdSchema = z
+  .string()
+  .regex(/^[a-f\d]{24}$/i, "Invalid id");

@@ -1,4 +1,5 @@
 export * from "./characters.schema";
+export * from "./comments-socket.schema";
 export * from "./comments.schema";
 export * from "./files.schema";
 export * from "./game-followings-status.schema";
@@ -8,6 +9,7 @@ export * from "./platforms.schema";
 export * from "./playthroughs.schema";
 export * from "./ra.schema";
 export * from "./role.schema";
+export * from "./royal-games.schema";
 export * from "./user-logs.schema";
 export * from "./user-ratings.schema";
 export * from "./user.schema";

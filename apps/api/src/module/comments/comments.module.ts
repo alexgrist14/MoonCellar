@@ -28,6 +28,7 @@ import {
   GameComment,
   GameCommentDatabaseSchema,
 } from "./schemas/game-comment.schema";
+import { CommentsGateway } from "./gateways/comments.gateway";
 import { CommentsService } from "./services/comments.service";
 import { CommunityLookupService } from "./services/community-lookup.service";
 import { ReviewsService } from "./services/reviews.service";
@@ -36,6 +37,7 @@ import { VotesService } from "./services/votes.service";
 @Module({
   controllers: [CommentsController, ReviewsController],
   providers: [
+    CommentsGateway,
     CommentsService,
     ReviewsService,
     VotesService,

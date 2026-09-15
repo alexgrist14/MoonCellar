@@ -24,6 +24,9 @@ import { UserRatingsController } from "./controllers/user-ratings.controller";
 import { UserRatingsService } from "./services/user-ratings.service";
 import { MetricsModule } from "../metrics/metrics.module";
 import { Game, GameDatabaseSchema } from "../games/schemas/game.schema";
+import { JwtModule } from "@nestjs/jwt";
+import { UserRoyalGamesService } from "./services/user-royal-games.service";
+import { RoyalGamesGateway } from "./gateways/royal-games.gateway";
 
 @Module({
   imports: [
@@ -34,6 +37,7 @@ import { Game, GameDatabaseSchema } from "../games/schemas/game.schema";
       { name: Game.name, schema: GameDatabaseSchema },
     ]),
     MetricsModule,
+    JwtModule.register({}),
   ],
 
   controllers: [
@@ -55,6 +59,8 @@ import { Game, GameDatabaseSchema } from "../games/schemas/game.schema";
     UserLogsService,
     UserRatingsService,
     UserRAService,
+    UserRoyalGamesService,
+    RoyalGamesGateway,
   ],
 })
 export class UserModule {}

@@ -11,10 +11,18 @@ import {
   IUpdateCommentRequest,
   IUpdateCommentStatusRequest,
   IVoteResponse,
+  SOCKET_ID_HEADER,
 } from "@mooncellar/schemas";
+import { getSocketId } from "../socket/socket-id";
 import agent from "./agent.api";
 
 const COMMENTS_API = `${API_URL}/comments`;
+
+const withSocketId = () => {
+  const socketId = getSocketId();
+
+  return socketId ? { headers: { [SOCKET_ID_HEADER]: socketId } } : {};
+};
 
 const getReviews = (gameId: string, params: IGetReviewsRequest) => {
   return agent.get<IReviewsResponse>(`${API_URL}/games/${gameId}/reviews`, {
@@ -43,23 +51,27 @@ const getReplies = (commentId: string, params: IGetRepliesRequest) => {
 };
 
 const create = (data: ICreateCommentRequest) => {
-  return agent.post<IComment>(COMMENTS_API, data);
+  return agent.post<IComment>(COMMENTS_API, data, withSocketId());
 };
 
 const update = (commentId: string, data: IUpdateCommentRequest) => {
-  return agent.patch<IComment>(`${COMMENTS_API}/${commentId}`, data);
+  return agent.patch<IComment>(
+    `${COMMENTS_API}/${commentId}`,
+    data,
+    withSocketId()
+  );
 };
 
 const remove = (commentId: string) => {
-  return agent.delete<IComment>(`${COMMENTS_API}/${commentId}`);
+  return agent.delete<IComment>(`${COMMENTS_API}/${commentId}`, withSocketId());
 };
 
 const setLike = (commentId: string, isLiked: boolean) => {
   const url = `${COMMENTS_API}/${commentId}/like`;
 
   return isLiked
-    ? agent.put<IVoteResponse>(url)
-    : agent.delete<IVoteResponse>(url);
+    ? agent.put<IVoteResponse>(url, undefined, withSocketId())
+    : agent.delete<IVoteResponse>(url, withSocketId());
 };
 
 const report = (commentId: string) => {
@@ -67,7 +79,11 @@ const report = (commentId: string) => {
 };
 
 const updateStatus = (commentId: string, data: IUpdateCommentStatusRequest) => {
-  return agent.patch<IComment>(`${COMMENTS_API}/${commentId}/status`, data);
+  return agent.patch<IComment>(
+    `${COMMENTS_API}/${commentId}/status`,
+    data,
+    withSocketId()
+  );
 };
 
 export const commentsAPI = {

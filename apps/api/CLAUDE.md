@@ -28,6 +28,11 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   class of error: it loads `AppModule`, resolves the DI graph in Nest's preview mode without
   instantiating providers or touching MongoDB, and generates the OpenAPI document. It needs no
   `.env`.
+- **Run a Bun script that imports decorated API code with `apps/api` as the working directory.**
+  Bun takes decorator settings from the `tsconfig.json` of the working directory, not of the
+  imported file. Started from the repository root, the same script dies inside `@Prop` with a bare
+  `TypeError` thrown by `Reflect.getMetadata`; started from `apps/api` it runs. This applies to
+  scratch scripts kept outside the app too.
 
 ## Auth
 
@@ -37,6 +42,36 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   `refreshToken`, otherwise leaves a valid `accessMoonToken` behind for up to seven days, and the
   web profile keeps treating that browser as its owner. `JwtRefreshGuard` and the refresh handler
   clear them on `UnauthorizedException` only — a database error must not log everyone out.
+
+## Sockets
+
+- **Pin `@nestjs/websockets` and `@nestjs/platform-socket.io` to the major of `@nestjs/core`.**
+  The npm `latest` of both is already 12.x while the app runs Nest 11, so a bare
+  `bun add @nestjs/websockets` installs a gateway runtime that does not match the core it plugs
+  into.
+- **Global `APP_PIPE`/`APP_INTERCEPTOR` providers never reach a gateway handler.** Nest builds the
+  WebSocket context creators without the application config, so `ZodValidationPipe` does not
+  validate a `@MessageBody()` DTO and `HttpMetricsInterceptor` does not run. Validate a socket
+  payload inside the handler (`DiscussionRoomRequestSchema.safeParse`) and answer through the ack.
+- **Never broadcast a decorated `IComment`.** `decorate()` fills `isLiked`, `isReported` and the
+  admin-only `reportsCount` for one viewer and keeps hidden bodies for admins, while a discussion
+  room is anonymous — every subscriber would receive that one viewer's flags and the moderators'
+  view. Events carry only what an anonymous reader already gets from REST, and anything
+  viewer-specific is refetched. The contract is in [`docs/sockets.md`](../../docs/sockets.md).
+- **Socket.IO server options belong in `SocketIoAdapter`, never in `@WebSocketGateway`.** Nest
+  creates one server per port from the options of whichever gateway it initialises first and
+  ignores the rest, so a `cors` block on one gateway silently decides CORS for every namespace —
+  or for none, depending on module order. `src/shared/socket-io.adapter.ts` sets the origins and
+  `credentials: true`, without which the `/royal` handshake receives no session cookie over
+  long-polling.
+- **An authenticated namespace reads the session once, from the handshake.** `RoyalGamesGateway`
+  verifies `accessMoonToken` from `socket.handshake.headers.cookie` in namespace middleware; a
+  rejected socket gets `connect_error` with `Unauthorized`, and Socket.IO does not retry it. The
+  handshake belongs to the underlying engine connection, not the namespace, which is why the web
+  client keeps `/royal` on its own `Manager`.
+- **Pass `ObjectId`s into the `royalGames` update pipelines.** Mongoose casts ordinary updates but
+  not aggregation-pipeline updates, so a string id would be stored as a string next to ObjectIds
+  and the `$in` checks that deduplicate the list would never match it.
 
 ## Database
 
