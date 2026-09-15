@@ -307,12 +307,14 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
             }
           />
           <Dropdown
+            isThroughPortal
             placeholder="Select category..."
             getIndex={categoryHandler}
             overwriteValue={commonUtils.upFL(watch("category") || "")}
             list={playthroughCategories.map((item) => commonUtils.upFL(item))}
           />
           <Dropdown
+            isThroughPortal
             placeholder="Select platform..."
             getIndex={(index) =>
               setValue("platformId", game.platformIds[index])

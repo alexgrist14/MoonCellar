@@ -286,6 +286,16 @@ break silently when ignored:
   d)`), never `new Date("2026-09-20")` — the latter is parsed as UTC midnight and shows the
   previous day in any negative-offset timezone.
 
+## Dropdowns
+
+- **`Dropdown` renders its list inline unless it gets `isThroughPortal`.** Unlike `DatePicker`,
+  the portal is opt-in: without the prop the list is an absolutely positioned child of the field,
+  so any ancestor with `overflow` — a modal's scroll area, a `Box` with `isWithScrollBar`, a
+  compact panel — cuts it off. The playthrough modal's category list was clipped in the compact
+  Wishlist layout for exactly this reason. Pass `isThroughPortal` for every dropdown inside a
+  modal or a scrollable panel; the portal list follows the field on scroll and resize, and
+  `#dropdown-connector` sits after `ModalsConnector` in `Layout`, so it stays above the modal.
+
 ## Scrolling
 
 - Never rely on the browser's default/native scrollbar for a scrollable area. Use the shared `Scrollbar` component from `src/lib/shared/ui/Scrollbar` for any element that needs to scroll (vertically or horizontally via the `isHorizontal` prop).
