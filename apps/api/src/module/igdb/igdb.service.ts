@@ -17,7 +17,11 @@ import {
   runWithConcurrency,
 } from "./utils/igdb";
 import { ParserType } from "./interface/common.interface";
-import { getImageLink, normalizeGameName } from "../../shared/utils";
+import {
+  getImageLink,
+  isSameObjectIdList,
+  normalizeGameName,
+} from "../../shared/utils";
 import { findSteamAppInfo, mergeSteamStore } from "../steam/utils/steam.utils";
 import { Game, GameDocument } from "../games/schemas/game.schema";
 import { Platform, PlatformDocument } from "../games/schemas/platform.schema";
@@ -130,19 +134,6 @@ const ALL_UPDATABLE_CHARACTER_FIELDS = [
 
 type UpdatableCharacterField = (typeof ALL_UPDATABLE_CHARACTER_FIELDS)[number];
 
-const isSameObjectIdList = (
-  current: mongoose.Types.ObjectId[] | undefined,
-  next: mongoose.Types.ObjectId[]
-) => {
-  if ((current?.length || 0) !== next.length) return false;
-  if (!current?.length) return true;
-
-  const currentKeys = current.map((id) => id.toString()).sort();
-  const nextKeys = next.map((id) => id.toString()).sort();
-
-  return currentKeys.every((key, index) => key === nextKeys[index]);
-};
-
 @Injectable()
 export class IGDBService {
   private readonly logger = new Logger(IGDBService.name);
@@ -218,7 +209,7 @@ export class IGDBService {
             "igdb.gameId": { $in: items.map((item) => item.id) },
           })
             .select(
-              "_id slug type createdAt igdb cover screenshots artworks isStopParsingPictures isStopParsing" +
+              "_id slug type createdAt igdb cover screenshots artworks isStopParsingPictures isStopParsing vndb" +
                 (options?.field ? ` ${options.field}` : "")
             )
             .lean();
@@ -333,7 +324,7 @@ export class IGDBService {
             "igdb.gameId": { $in: items.map((item) => item.id) },
           })
             .select(
-              "_id slug type createdAt igdb cover screenshots artworks isStopParsingPictures isStopParsing"
+              "_id slug type createdAt igdb cover screenshots artworks isStopParsingPictures isStopParsing vndb"
             )
             .lean();
 
@@ -464,7 +455,7 @@ export class IGDBService {
         "igdb.gameId": { $exists: true },
       })
         .select(
-          "_id igdb.gameId igdb.parent_game " +
+          "_id vndb igdb.gameId igdb.parent_game " +
             RELATED_GAME_ARRAY_FIELDS.map((field) => `igdb.${field}`).join(" ")
         )
         .lean();
@@ -477,6 +468,8 @@ export class IGDBService {
       const bulkOps = [];
 
       for (const game of games) {
+        if (game.vndb) continue;
+
         const relatedGames: Record<string, unknown> = {};
         let hasAny = false;
 
@@ -785,7 +778,7 @@ export class IGDBService {
       "igdb.gameId": igdbGame.id,
     })
       .select(
-        "_id slug type createdAt cover screenshots artworks isStopParsingPictures isStopParsing"
+        "_id slug type createdAt cover screenshots artworks isStopParsingPictures isStopParsing vndb"
       )
       .lean();
 
@@ -897,9 +890,15 @@ export class IGDBService {
       | "artworks"
       | "isStopParsingPictures"
       | "isStopParsing"
+      | "vndb"
     >,
     options?: { parseImages?: boolean; field?: string; forceParse?: boolean }
   ) {
+    if (existingGame?.vndb) {
+      this.logger.log(`Skipped game with VNDB data: ${existingGame.slug}`);
+      return existingGame.slug + " skipped";
+    }
+
     if (existingGame?.isStopParsing) {
       this.logger.log(`Skipped game with isStopParsing: ${existingGame.slug}`);
       return existingGame.slug + " skipped";
@@ -1432,6 +1431,7 @@ export class IGDBService {
 
       const games = await this.Games.find({
         "igdb.gameId": { $exists: true },
+        vndb: { $exists: false },
       })
         .select("_id characters igdb.gameId")
         .lean();

@@ -10,6 +10,7 @@ import {
   IReleaseDate,
   IRelatedGamesField,
   IRetroachievementsField,
+  IVndbField,
 } from "@mooncellar/schemas";
 import { Platform } from "./platform.schema";
 import { Character } from "./character.schema";
@@ -96,6 +97,8 @@ export class Game {
   @Prop({ type: Object })
   igdb: IGDBField;
   @Prop({ type: Object })
+  vndb: IVndbField;
+  @Prop({ type: Object })
   hltb: IHltbField;
   @Prop()
   hltbNotFoundAt: string;
@@ -108,6 +111,10 @@ export class Game {
 export const GameDatabaseSchema = SchemaFactory.createForClass(Game);
 GameDatabaseSchema.index({ slug: 1 }, { unique: true });
 GameDatabaseSchema.index({ "igdb.gameId": 1 });
+GameDatabaseSchema.index(
+  { "vndb.vnId": 1 },
+  { unique: true, partialFilterExpression: { "vndb.vnId": { $exists: true } } }
+);
 GameDatabaseSchema.index({ "hltb.updatedAt": 1, _id: 1 });
 GameDatabaseSchema.index({ "externalPages.name": 1, "externalPages.uid": 1 });
 GameDatabaseSchema.index({ hltbNotFoundAt: 1 });

@@ -2,6 +2,14 @@ export const VNDB_SCORE_THRESHOLD = 2;
 export const VNDB_SCORE_GAP = 3;
 export const VISUAL_NOVEL_GENRE = "Visual Novel";
 export const MAIN_GAME_TYPE = "Main Game";
+export const FAN_DISC_GAME_TYPE = "Fan Disc";
+export const FAN_DISC_GAME_TYPES = [
+  FAN_DISC_GAME_TYPE,
+  "Standalone Expansion",
+  "Expansion",
+  "DLC",
+];
+export const VNDB_ORIGINAL_RELATION = "orig";
 
 export const MIN_STRING_LENGTH = 8;
 export const MIN_TITLE_WORDS = 2;
@@ -39,6 +47,59 @@ export const VNDB_MAX_RETRIES = 4;
 export const VNDB_RETRY_DELAY_MS = 5000;
 export const VNDB_REQUEST_DELAY_MS = 400;
 
+export const VNDB_THEME_MIN_LEVEL = 1.2;
+export const VNDB_THEME_TAGS: Record<string, string> = {
+  g12: "Action",
+  g2: "Fantasy",
+  g105: "Science fiction",
+  g7: "Horror",
+  g789: "Thriller",
+  g3721: "Survival",
+  g104: "Comedy",
+  g147: "Drama",
+  g1801: "Educational",
+  g3650: "Sandbox",
+  g456: "Warfare",
+  g23: "Erotic",
+  g19: "Mystery",
+  g96: "Romance",
+};
+
+export const VNDB_WORLDWIDE_REGION = 8;
+export const VNDB_LANGUAGE_REGIONS: Record<string, number> = {
+  ja: 5,
+  zh: 6,
+  "zh-Hans": 6,
+  "zh-Hant": 6,
+  ko: 9,
+  "pt-br": 10,
+};
+
+export const VNDB_KEYWORD_MIN_RATING = 2;
+export const VNDB_STATUS_NAMES: Record<number, string> = {
+  0: "Released",
+  2: "Cancelled",
+};
+
+export const VNDB_WEBSITE_LINK = "website";
+export const VNDB_WIKI_LINKS = ["enwiki", "jawiki"];
+export const VNDB_IGNORED_LINKS = ["egs", "patreonp", "steamdb"];
+export const VNDB_STORE_NAMES: Record<string, string> = {
+  steam: "Steam",
+  gog: "GOG",
+  playstation_jp: "PlayStation Store",
+  playstation_na: "PlayStation Store",
+  playstation_eu: "PlayStation Store",
+  playstation_hk: "PlayStation Store",
+};
+
+export const VNDB_CHARACTER_GENDERS: Record<string, string> = {
+  m: "Male",
+  f: "Female",
+  b: "Other",
+  n: "Other",
+};
+
 export const INCOMPATIBLE_GENRES = [
   "Racing",
   "Sport",
@@ -67,8 +128,8 @@ export const VNDB_PLATFORM_SLUGS: Record<string, string[]> = {
   dos: ["dos"],
   dvd: ["dvd-player"],
   drc: ["dc"],
-  nes: ["nes", "famicom", "fds"],
-  sfc: ["snes", "sfam"],
+  nes: ["famicom", "nes", "fds"],
+  sfc: ["sfam", "snes"],
   fm7: ["fm-7"],
   fm8: ["fm-7"],
   fmt: ["fm-towns"],
@@ -76,6 +137,7 @@ export const VNDB_PLATFORM_SLUGS: Record<string, string[]> = {
   gbc: ["gbc"],
   msx: ["msx", "msx2"],
   nds: ["nds", "nintendo-dsi"],
+  vnd: ["nds"],
   swi: ["switch"],
   sw2: ["switch-2"],
   wii: ["wii"],

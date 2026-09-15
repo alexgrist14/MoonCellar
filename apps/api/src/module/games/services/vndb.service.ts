@@ -6,8 +6,10 @@ import { Game, GameDocument } from "../schemas/game.schema";
 import mongoose, { Model, Types } from "mongoose";
 import {
   IScoredCandidate,
+  IVndbCharacter,
   IVndbGameResponse,
   IVndbNovel,
+  IVndbReleaseEntry,
   IVndbReleaseResponse,
   IVnMatch,
   IScoreBreakdown,
@@ -20,6 +22,7 @@ import {
   TVndbCandidate,
   TVndbFilter,
   TVndbFilters,
+  IVndbImage,
 } from "../interface/vndb.interface";
 import {
   companySearchPrefix,
@@ -32,10 +35,17 @@ import {
   titleKeyVariants,
   tokenSetFrom,
 } from "../utils/title-match.utils";
-import { ICompanyField } from "@mooncellar/schemas";
+import {
+  ICompanyField,
+  IExternalPageField,
+  IReleaseDate,
+} from "@mooncellar/schemas";
 import {
   INCOMPATIBLE_GENRES,
   MAIN_GAME_TYPE,
+  FAN_DISC_GAME_TYPE,
+  FAN_DISC_GAME_TYPES,
+  VNDB_ORIGINAL_RELATION,
   MIN_COMPANY_PREFIX_LENGTH,
   MIN_DESCRIPTION_TOKENS,
   MIN_STRING_LENGTH,
@@ -43,6 +53,15 @@ import {
   REEDITION_TYPES,
   VISUAL_NOVEL_GENRE,
   VNDB_ANY_COMPANY_SCORE,
+  VNDB_CHARACTER_GENDERS,
+  VNDB_IGNORED_LINKS,
+  VNDB_LANGUAGE_REGIONS,
+  VNDB_WORLDWIDE_REGION,
+  VNDB_KEYWORD_MIN_RATING,
+  VNDB_STATUS_NAMES,
+  VNDB_STORE_NAMES,
+  VNDB_WEBSITE_LINK,
+  VNDB_WIKI_LINKS,
   VNDB_COMPANY_MISMATCH_SCORE,
   VNDB_DESCRIPTION_SIMILARITY,
   VNDB_FALLBACK_COMPANY_CHUNK_SIZE,
@@ -51,6 +70,8 @@ import {
   VNDB_MAX_RETRIES,
   VNDB_REQUEST_DELAY_MS,
   VNDB_RETRY_DELAY_MS,
+  VNDB_THEME_MIN_LEVEL,
+  VNDB_THEME_TAGS,
   VNDB_DISTINCTIVE_TITLE_SCORE,
   VNDB_STRONG_TITLE_SCORE,
   VNDB_WEAK_TITLE_SCORE,
@@ -69,8 +90,9 @@ import {
   VNDB_SCORE_THRESHOLD,
 } from "../constants/vndb";
 import { VndbCandidate } from "../schemas/vndb-candidates.schema";
+import { Character } from "../schemas/character.schema";
 import { Platform } from "../schemas/platform.schema";
-import { sleep } from "../../../shared/utils";
+import { isSameObjectIdList, sleep } from "../../../shared/utils";
 
 const VNDB_API_URL = "https://api.vndb.org/kana";
 
@@ -94,6 +116,33 @@ const CANDIDATE_PROJECTION = {
 const escapeRegExp = (value: string) =>
   value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
+const languageNames = new Intl.DisplayNames(["en"], {
+  type: "language",
+  languageDisplay: "standard",
+});
+
+const releaseDateFormats: Record<number, Intl.DateTimeFormat> = {
+  4: new Intl.DateTimeFormat("en-US", { year: "numeric", timeZone: "UTC" }),
+  7: new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }),
+  10: new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  }),
+};
+
+const toSlug = (value: string) =>
+  value
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
 @Injectable()
 export class VndbService {
   private readonly logger = new Logger(VndbService.name);
@@ -105,7 +154,9 @@ export class VndbService {
     @InjectModel(VndbCandidate.name)
     private readonly vndbCandidatesModel: Model<VndbCandidate>,
     @InjectModel(Platform.name)
-    private readonly platformsModel: Model<Platform>
+    private readonly platformsModel: Model<Platform>,
+    @InjectModel(Character.name)
+    private readonly charactersModel: Model<Character>
   ) {}
 
   async getStats() {
@@ -135,19 +186,56 @@ export class VndbService {
   }
 
   async backFill() {
-    let page = 1;
+    try {
+      let page = 1;
 
-    while (true) {
-      const data = await this.post<IVndbGameResponse>("/vn", { page });
-      const matches = await this.getVnMatches(data);
-      await sleep(3000);
-      if (data.more) {
-        page++;
-      } else {
-        break;
+      while (true) {
+        const data = await this.post<IVndbGameResponse>("/vn", { page });
+        const matches = await this.getVnMatches(data);
+        await sleep(3000);
+        if (data.more) {
+          page++;
+          console.log(matches);
+          break;
+        } else {
+          break;
+        }
+        console.log(matches);
       }
-      console.log(matches);
+
+      //await this.linkVndbCharacters();
+    } catch (e) {
+      console.log(e);
     }
+  }
+
+  private async insertVndbGame(matches: IVnMatch[]) {
+    await this.gamesModel.bulkWrite(
+      matches
+        .filter((match) => match.verdict === "matched")
+        .map((match) => ({
+          updateOne: {
+            filter: { _id: match.winner._id },
+            update: {
+              $set: {
+                name: match.vnName,
+                type: match.vndb.type,
+              },
+            },
+          },
+        }))
+    );
+  }
+
+  private async getVndbPlatformId(vndbPlatform: string) {
+    const [slug] = VNDB_PLATFORM_SLUGS[vndbPlatform] ?? [];
+    if (!slug) return null;
+
+    const platform = await this.platformsModel
+      .findOne({ slug }, { _id: 1 })
+      .lean<{ _id: Types.ObjectId }>();
+
+    return platform?._id ?? null;
   }
 
   private async getVnMatches(data: IVndbGameResponse): Promise<IVnMatch[]> {
@@ -160,10 +248,17 @@ export class VndbService {
     const novelsResponse = await this.post<IVndbGameResponse>("/vn", {
       filters: ["or", ...searchIdsFilters] satisfies TVndbFilters,
       fields:
-        "title,alttitle,titles.title,titles.lang,titles.latin,titles.official,titles.main,released,platforms,description,developers.name,developers.original,developers.aliases",
+        "title,alttitle,titles.title,titles.lang,titles.latin,titles.official,titles.main,released,platforms,description,developers.name,developers.original,developers.aliases,extlinks.url,extlinks.name,image.url,image.dims,image.sexual,image.violence,screenshots.url,screenshots.dims,screenshots.sexual,screenshots.violence,length_minutes,languages,devstatus,tags.id,tags.name,tags.rating,tags.spoiler,tags.lie,tags.category,relations.id,relations.relation,relations.relation_official",
     });
 
-    const vndbTitles = novelsResponse.results.map((vn) => this.getTitles(vn));
+    const vnIds = data.results.map(({ id }) => id);
+    const themesByVn = await this.getThemes(vnIds);
+    const characters = await this.getCharacters(vnIds);
+    //await this.saveCharacters(characters);
+
+    const vndbTitles = novelsResponse.results.map((vn) =>
+      this.getTitles(vn, themesByVn.get(vn.id) ?? [], characters)
+    );
 
     const vnIdsByKey = new Map<string, Set<string>>();
     const strongKeys: string[] = [];
@@ -240,9 +335,13 @@ export class VndbService {
     }
 
     const [signalsByVn, platformSlugById] = await Promise.all([
-      this.fetchReleaseSignals([...candidatesByVn.keys()]),
+      this.fetchReleaseSignals(vnIds),
       this.getPlatformSlugs(),
     ]);
+
+    const platformIdBySlug = new Map(
+      [...platformSlugById].map(([id, slug]) => [slug, new Types.ObjectId(id)])
+    );
 
     const enrichedTitles = vndbTitles.map((vn) => {
       const signals = signalsByVn.get(vn.id);
@@ -256,6 +355,12 @@ export class VndbService {
         platforms: [
           ...new Set([...vn.platforms, ...(signals?.platforms ?? [])]),
         ],
+        websites: [...new Set([...(signals?.websites ?? []), ...vn.websites])],
+        externalPages: signals?.externalPages ?? [],
+        release_dates: this.getReleaseDates(
+          signals?.releases ?? [],
+          platformIdBySlug
+        ),
       };
     });
 
@@ -297,6 +402,173 @@ export class VndbService {
     }
 
     return matches;
+  }
+
+  async linkVndbCharacters() {
+    const [characters, games] = await Promise.all([
+      this.charactersModel
+        .find({ "vndb.characterId": { $exists: true } })
+        .select("_id gameIds vndb.vns")
+        .lean(),
+      this.gamesModel
+        .find({ "vndb.vnId": { $exists: true } })
+        .select("_id characters vndb.vnId")
+        .lean(),
+    ]);
+
+    const gameIdByVnId = new Map(
+      games.map((game) => [game.vndb.vnId, game._id])
+    );
+    const characterIdsByVnId = new Map<string, Types.ObjectId[]>();
+    const now = new Date().toISOString();
+    const characterOps = [];
+
+    for (const character of characters) {
+      const gameIds = character.vndb.vns
+        .map((vnId) => gameIdByVnId.get(vnId))
+        .filter((id): id is Types.ObjectId => !!id);
+
+      for (const vnId of character.vndb.vns) {
+        const bucket = characterIdsByVnId.get(vnId);
+
+        if (bucket) {
+          bucket.push(character._id);
+        } else {
+          characterIdsByVnId.set(vnId, [character._id]);
+        }
+      }
+
+      if (!isSameObjectIdList(character.gameIds, gameIds)) {
+        characterOps.push({
+          updateOne: {
+            filter: { _id: character._id },
+            update: { $set: { gameIds, updatedAt: now } },
+          },
+        });
+      }
+    }
+
+    const gameOps = [];
+
+    for (const game of games) {
+      const gameCharacters = characterIdsByVnId.get(game.vndb.vnId) ?? [];
+
+      if (isSameObjectIdList(game.characters, gameCharacters)) continue;
+
+      gameOps.push({
+        updateOne: {
+          filter: { _id: game._id },
+          update: { $set: { characters: gameCharacters, updatedAt: now } },
+        },
+      });
+    }
+
+    if (characterOps.length) {
+      await this.charactersModel.bulkWrite(characterOps);
+    }
+
+    if (gameOps.length) {
+      await this.gamesModel.bulkWrite(gameOps);
+    }
+
+    this.logger.log(
+      `Linked VNDB characters: ${characterOps.length} character(s), ${gameOps.length} game(s) updated`
+    );
+
+    return {
+      charactersUpdated: characterOps.length,
+      gamesUpdated: gameOps.length,
+    };
+  }
+
+  private async getCharacters(vnIds: string[]): Promise<IVndbCharacter[]> {
+    const characters: IVndbCharacter[] = [];
+    const idFilters: TVndbFilter[] = vnIds.map((id) => ["id", "=", id]);
+
+    for (let page = 1, more = true; more; page++) {
+      const data = await this.post<{
+        more: boolean;
+        results: IVndbCharacter[];
+      }>("/character", {
+        filters: ["vn", "=", ["or", ...idFilters]],
+        fields:
+          "name,original,aliases,description,image.url,image.sexual,image.violence,sex,vns.id,gender",
+        results: 100,
+        page,
+      });
+
+      characters.push(...data.results);
+      more = data.more;
+
+      await sleep(VNDB_REQUEST_DELAY_MS);
+    }
+
+    return characters;
+  }
+
+  private async saveCharacters(characters: IVndbCharacter[]) {
+    if (!characters.length) return;
+
+    const now = new Date().toISOString();
+
+    await this.charactersModel.bulkWrite(
+      characters.map((character) => ({
+        updateOne: {
+          filter: { "vndb.characterId": character.id },
+          update: {
+            $set: {
+              name: character.name,
+              slug: [toSlug(character.name), character.id]
+                .filter(Boolean)
+                .join("-"),
+              akas: [
+                ...new Set(
+                  [character.original, ...(character.aliases ?? [])].filter(
+                    (aka): aka is string => !!aka
+                  )
+                ),
+              ],
+              description: character.description,
+              gender: VNDB_CHARACTER_GENDERS[character.sex?.[0] ?? ""] ?? null,
+              vndb: {
+                characterId: character.id,
+                vns: character.vns.map(({ id }) => id),
+                image: character.image?.url ?? null,
+              },
+              updatedAt: now,
+            },
+            $setOnInsert: { createdAt: now },
+          },
+          upsert: true,
+        },
+      })),
+      { ordered: false }
+    );
+  }
+
+  private async getThemes(vnIds: string[]): Promise<Map<string, string[]>> {
+    const themesByVn = new Map<string, string[]>();
+    const idFilters: TVndbFilter[] = vnIds.map((id) => ["id", "=", id]);
+
+    for (const [tagId, theme] of Object.entries(VNDB_THEME_TAGS)) {
+      const { results } = await this.post<IVndbGameResponse>("/vn", {
+        filters: [
+          "and",
+          ["or", ...idFilters],
+          ["tag", "=", [tagId, 0, VNDB_THEME_MIN_LEVEL]],
+        ],
+        fields: "id",
+        results: 100,
+      });
+
+      for (const { id } of results) {
+        themesByVn.set(id, [...(themesByVn.get(id) ?? []), theme]);
+      }
+
+      await sleep(VNDB_REQUEST_DELAY_MS);
+    }
+
+    return themesByVn;
   }
 
   private async post<T>(path: string, body: unknown): Promise<T> {
@@ -377,6 +649,30 @@ export class VndbService {
     return result;
   }
 
+  private getReleaseDates(
+    releases: IVndbReleaseEntry[],
+    platformIdBySlug: Map<string, Types.ObjectId>
+  ): TVndbReleaseDate[] {
+    return releases.flatMap(({ released, platform, region }) => {
+      const date = this.parseVndbDate(released);
+      const [slug] = VNDB_PLATFORM_SLUGS[platform] ?? [];
+      const platformId = platformIdBySlug.get(slug);
+
+      if (!date || !platformId) return [];
+
+      return [
+        {
+          date: Math.floor(+date / 1000),
+          human: releaseDateFormats[released.length].format(date),
+          month: date.getUTCMonth() + 1,
+          year: date.getUTCFullYear(),
+          platformId,
+          region,
+        },
+      ];
+    });
+  }
+
   private async getPlatformSlugs(): Promise<Map<string, string>> {
     const platforms = await this.platformsModel
       .find({}, { slug: 1 })
@@ -394,6 +690,9 @@ export class VndbService {
         publishers: Set<string>;
         releaseDates: Set<string>;
         platforms: Set<string>;
+        websites: Set<string>;
+        externalPages: Map<string, IExternalPageField>;
+        releases: Map<string, IVndbReleaseEntry>;
       }
     >();
     if (!vnIds.length) return new Map();
@@ -417,7 +716,7 @@ export class VndbService {
         const data = await this.post<IVndbReleaseResponse>("/release", {
           filters,
           fields:
-            "official,released,platforms,vns.id,producers.name,producers.original,producers.aliases,producers.publisher",
+            "official,released,platforms,vns.id,producers.name,producers.original,producers.aliases,producers.publisher,extlinks.id,extlinks.url,extlinks.name,extlinks.label,languages.lang",
           results: VNDB_RELEASE_PAGE_SIZE,
           page,
         });
@@ -434,6 +733,12 @@ export class VndbService {
             ])
             .filter((name): name is string => !!name);
 
+          const [language, ...otherLanguages] = release.languages ?? [];
+          const region =
+            language && !otherLanguages.length
+              ? (VNDB_LANGUAGE_REGIONS[language.lang] ?? VNDB_WORLDWIDE_REGION)
+              : VNDB_WORLDWIDE_REGION;
+
           for (const { id } of release.vns ?? []) {
             if (!wanted.has(id)) continue;
 
@@ -441,6 +746,9 @@ export class VndbService {
               publishers: new Set<string>(),
               releaseDates: new Set<string>(),
               platforms: new Set<string>(),
+              websites: new Set<string>(),
+              externalPages: new Map<string, IExternalPageField>(),
+              releases: new Map<string, IVndbReleaseEntry>(),
             };
 
             publishers.forEach((name) => signals.publishers.add(name));
@@ -448,6 +756,34 @@ export class VndbService {
             (release.platforms ?? []).forEach((platform) =>
               signals.platforms.add(platform)
             );
+            for (const platform of release.platforms ?? []) {
+              if (!release.released) continue;
+
+              signals.releases.set(
+                `${release.released}-${platform}-${region}`,
+                {
+                  released: release.released,
+                  platform,
+                  region,
+                }
+              );
+            }
+            for (const { id: uid, name, label, url } of release.extlinks ??
+              []) {
+              if (name === VNDB_WEBSITE_LINK) {
+                signals.websites.add(url);
+              } else if (!VNDB_IGNORED_LINKS.includes(name)) {
+                const pageName = VNDB_STORE_NAMES[name] ?? label;
+
+                if (!signals.externalPages.has(pageName)) {
+                  signals.externalPages.set(pageName, {
+                    name: pageName,
+                    uid: String(uid ?? url),
+                    url,
+                  });
+                }
+              }
+            }
 
             signalsByVn.set(id, signals);
           }
@@ -461,12 +797,15 @@ export class VndbService {
     }
 
     return new Map(
-      [...signalsByVn].map(([id, { publishers, releaseDates, platforms }]) => [
+      [...signalsByVn].map(([id, signals]) => [
         id,
         {
-          publishers: [...publishers],
-          releaseDates: [...releaseDates],
-          platforms: [...platforms],
+          publishers: [...signals.publishers],
+          releaseDates: [...signals.releaseDates],
+          platforms: [...signals.platforms],
+          websites: [...signals.websites],
+          externalPages: [...signals.externalPages.values()],
+          releases: [...signals.releases.values()],
         },
       ])
     );
@@ -689,6 +1028,16 @@ export class VndbService {
     );
   }
 
+  private typeMatchScore(vn: IVndbTitles, game: TVndbCandidate): number {
+    if (REEDITION_TYPES.includes(game.type)) return -1;
+
+    if (vn.type === FAN_DISC_GAME_TYPE) {
+      return FAN_DISC_GAME_TYPES.includes(game.type) ? 1 : 0;
+    }
+
+    return game.type === MAIN_GAME_TYPE ? 1 : 0;
+  }
+
   private scoreCandidate(
     vn: IVndbTitles,
     game: TVndbCandidate,
@@ -706,12 +1055,7 @@ export class VndbService {
             ? VNDB_DATE_CONTRADICTS_SCORE
             : 0,
       genre: this.genreMatchScore(game),
-      type:
-        game.type === MAIN_GAME_TYPE
-          ? 1
-          : REEDITION_TYPES.includes(game.type)
-            ? -1
-            : 0,
+      type: this.typeMatchScore(vn, game),
       title: titles.length
         ? this.titleMatchScore(titles, sharedTitles)
         : this.isSimilarTitle(vn, game)
@@ -791,6 +1135,7 @@ export class VndbService {
         verdict: "absent",
         reason: scored.length ? "below-threshold" : null,
         winner: null,
+        vndb: { ...vn },
         candidates: scored,
       };
     }
@@ -808,6 +1153,7 @@ export class VndbService {
       verdict: reason ? "ambiguous" : "matched",
       reason,
       winner: reason ? null : best.game,
+      vndb: { ...vn },
       candidates: scored,
     };
   }
@@ -866,7 +1212,11 @@ export class VndbService {
     return isConfirmed ? "confirms" : "contradicts";
   }
 
-  private getTitles(vn: IVndbNovel): IVndbTitles {
+  private getTitles(
+    vn: IVndbNovel,
+    themes: string[],
+    characters: IVndbCharacter[]
+  ): IVndbTitles {
     const englishTitles = vn.titles.filter(({ lang }) => lang === "en");
     const mainTitle = vn.titles.find(({ main }) => main);
 
@@ -880,6 +1230,8 @@ export class VndbService {
       vn.alttitle,
       ...vn.titles.flatMap(({ title, latin }) => [title, latin]),
     ].filter((title): title is string => !!title && title !== name);
+
+    const firstRelease = this.parseVndbDate(vn.released);
 
     return {
       id: vn.id,
@@ -902,12 +1254,49 @@ export class VndbService {
       publishers: [],
       releaseDates: vn.released ? [vn.released] : [],
       platforms: vn.platforms ?? [],
+      cover: vn.image,
+      themes,
+      characters: characters
+        .filter(({ vns }) => vns.some(({ id }) => id === vn.id))
+        .map(({ id }) => id),
+      screenshots: vn.screenshots,
+      length: vn.length_minutes,
+      websites: (vn.extlinks ?? [])
+        .filter(({ name }) => VNDB_WIKI_LINKS.includes(name))
+        .map(({ url }) => url),
+      keywords: (vn.tags ?? [])
+        .filter(
+          ({ id, category, rating, spoiler, lie }) =>
+            category !== "ero" &&
+            rating >= VNDB_KEYWORD_MIN_RATING &&
+            spoiler === 0 &&
+            !lie &&
+            !VNDB_THEME_TAGS[id]
+        )
+        .map(({ name }) => name),
+      first_release: firstRelease ? Math.floor(+firstRelease / 1000) : null,
+      release_dates: [],
+      status: VNDB_STATUS_NAMES[vn.devstatus] ?? null,
+      player_perspectives: [],
+      languages: (vn.languages ?? []).map((code) => languageNames.of(code)),
+      externalPages: [],
+      type: (vn.relations ?? []).some(
+        ({ relation, relation_official }) =>
+          relation === VNDB_ORIGINAL_RELATION && relation_official
+      )
+        ? FAN_DISC_GAME_TYPE
+        : MAIN_GAME_TYPE,
     };
   }
 }
 
+type TVndbReleaseDate = Omit<IReleaseDate, "platformId"> & {
+  platformId: Types.ObjectId;
+};
+
 export interface IVndbTitles {
   id: string;
+  type: string;
   name: string;
   released: string;
   description: string;
@@ -917,4 +1306,17 @@ export interface IVndbTitles {
   publishers: string[];
   releaseDates: string[];
   platforms: string[];
+  cover: IVndbImage;
+  keywords: string[];
+  themes: string[];
+  characters: string[];
+  screenshots: IVndbImage[];
+  websites: string[];
+  first_release: number;
+  release_dates: TVndbReleaseDate[];
+  status: string;
+  player_perspectives: string[];
+  languages: string[];
+  externalPages: IExternalPageField[];
+  length: number;
 }

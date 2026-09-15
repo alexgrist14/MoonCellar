@@ -78,6 +78,10 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
   `apps/api`, which has no `dev` script, so `dev:api` calls its `start:dev` by name.
   `build` and `lint` may keep `--filter '*'`, because those scripts terminate and the
   dependency ordering is what we want there.
+- **`dev:api` runs `bun run --cwd apps/api start:dev`, not `bun --filter api start:dev`.**
+  `--filter` wraps the output in its own elided panel and `nest start --watch` clears the
+  screen on every rebuild, so the Nest logs get cut off. `--cwd` must come after `run`;
+  `bun --cwd apps/api run …` only prints the `bun run` usage text.
 - **`nest build` must stay on tsc (`"webpack": false` in `apps/api/nest-cli.json`).**
   With hoisted dependencies webpack-node-externals no longer recognises
   `node_modules` and starts bundling NestJS itself, which dies on an optional

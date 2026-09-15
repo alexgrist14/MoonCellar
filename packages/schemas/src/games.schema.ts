@@ -6,6 +6,10 @@ export const RetroachievementsSchema = z.object({
   consoleId: z.number(),
 });
 
+export const VndbSchema = z.object({
+  vnId: z.string(),
+});
+
 export const IGDBSchema = z.object({
   gameId: z.number(),
   total_rating: z.number().nullable().optional(),
@@ -269,6 +273,7 @@ export const GameSchema = z.object({
   isCustom: z.boolean().optional(),
   retroachievements: RetroachievementsSchema.array().optional(),
   igdb: IGDBSchema.optional(),
+  vndb: VndbSchema.optional(),
   hltb: HltbSchema.optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
@@ -433,6 +438,7 @@ export const UpcomingReleaseGroupSchema = z.object({
 
 export type IRetroachievementsField = z.infer<typeof RetroachievementsSchema>;
 export type IGDBField = z.infer<typeof IGDBSchema>;
+export type IVndbField = z.infer<typeof VndbSchema>;
 export type IHltbField = z.infer<typeof HltbSchema>;
 export type ICompanyField = z.infer<typeof CompanySchema>;
 export type IGameFilters = z.infer<typeof GameFiltersSchema>;

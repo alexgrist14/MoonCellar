@@ -1,9 +1,16 @@
 import mongoose from "mongoose";
+import { IExternalPageField } from "@mooncellar/schemas";
 import { Game } from "../schemas/game.schema";
+import { IVndbTitles } from "../services/vndb.service";
 
 export type TFieldStatus = 0 | 1 | 2;
 
-export type TVndbFilterValue = string | number | TVndbFilter | TVndbFilters;
+export type TVndbFilterValue =
+  | string
+  | number
+  | [tagId: string, maxSpoiler: number, minLevel: number]
+  | TVndbFilter
+  | TVndbFilters;
 export type TVndbFilter = [
   field: string,
   operator: "=" | "!=",
@@ -73,6 +80,7 @@ export interface IVnMatch {
   reason: TMatchReason | null;
   winner: TVndbCandidate | null;
   candidates: IScoredCandidate[];
+  vndb: IVndbTitles;
 }
 
 export type TCandidatesByVn = Map<string, TVndbCandidate[]>;
@@ -81,6 +89,9 @@ export interface IVnReleaseSignals {
   publishers: string[];
   releaseDates: string[];
   platforms: string[];
+  websites: string[];
+  externalPages: IExternalPageField[];
+  releases: IVndbReleaseEntry[];
 }
 
 export type TReleaseSignalsByVn = Map<string, IVnReleaseSignals>;
@@ -191,7 +202,9 @@ export interface IVndbNovel {
   rating: number | null;
   votecount: number;
   screenshots: IVndbImage[] | null;
-  relations: { relation: string; relation_official: boolean }[];
+  relations:
+    | { id: string; relation: string; relation_official: boolean }[]
+    | null;
   tags:
     | ({
         rating: 0 | 1 | 2 | 3;
@@ -235,9 +248,52 @@ export interface IVndbRelease {
   platforms: string[] | null;
   vns: { id: string }[] | null;
   producers: IVndbReleaseProducer[] | null;
+  extlinks: IVndbExtlink[] | null;
+  languages: { lang: string }[] | null;
+}
+
+export interface IVndbReleaseEntry {
+  released: string;
+  platform: string;
+  region: number;
 }
 
 export interface IVndbReleaseResponse {
   more: boolean;
   results: IVndbRelease[];
 }
+
+export interface IVndbCharacter {
+  id: string;
+  name: string;
+  original: string | null;
+  aliases: string[];
+  description: string | null;
+  image: Omit<IVndbImage, "thumbnail" | "thumbnail_dims">;
+  blood_type: "a" | "b" | "ab" | "o" | null;
+  height: number | null;
+  weight: number | null;
+  bust: number | null;
+  waist: number | null;
+  hips: number | null;
+  cup: string | null;
+  age: number;
+  //Possibly null, otherwise an array of two integers: month and day, respectively.
+  birthday: [number, number] | null;
+  //Possibly null, otherwise an array of two strings: the character’s apparent (non-spoiler) sex and the character’s real (spoiler) sex.
+  // Possible values are null, "m", "f", "b" (meaning “both”) or "n" (sexless).
+  sex: [VndbCharacterSex, VndbCharacterSex] | null;
+  //Possibly null, otherwise an array of two strings indicating the character’s non-spoiler gender and the character’s actual (spoiler) gender.
+  //  Possible values are null, "m", "f", "o" (non-binary) or "a" (ambiguous).
+  gender: [VndbCharacterGender, VndbCharacterGender] | null;
+  vns: IVndbCharacterNovel[];
+}
+
+interface IVndbCharacterNovel extends IVndbNovel {
+  spoiler: number;
+  //String, "main" for protagonist, "primary" for main characters, "side" or "appears".
+  role: "main" | "primary" | "side" | "appears";
+}
+
+type VndbCharacterSex = "m" | "f" | "b" | "n" | null;
+type VndbCharacterGender = "m" | "f" | "o" | "a" | null;
