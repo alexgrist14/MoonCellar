@@ -49,6 +49,7 @@ export * from "./SvgListBullet";
 export * from "./SvgListNumbered";
 export * from "./SvgQuote";
 export * from "./SvgLink";
+export * from "./SvgEmoji";
 export * from "./SvgImage";
 export * from "./SvgHeart";
 export * from "./SvgThumb";

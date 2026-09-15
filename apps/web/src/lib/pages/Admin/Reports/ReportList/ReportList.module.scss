@@ -1,0 +1,137 @@
+.reports {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x4);
+  padding-block: var(--padding-x4);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-x3);
+}
+
+.count {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+
+  @include font(14px, 20px, 400);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x3);
+  padding: var(--padding-x4);
+  border-radius: var(--radius-x4);
+  background-color: var(--color-bg-secondary);
+
+  &__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x2);
+  }
+
+  &__context {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--gap-x2);
+    color: var(--color-text-primary);
+
+    @include font(14px, 20px, 600);
+
+    a {
+      color: inherit;
+    }
+  }
+
+  &__comment {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x2);
+  }
+
+  &__author {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--gap-x2);
+    color: var(--color-text-muted);
+
+    @include font(13px, 20px, 400);
+
+    a {
+      color: var(--color-text-primary);
+      font-weight: 600;
+    }
+  }
+
+  &__body {
+    color: var(--color-text-secondary);
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--gap-x2);
+  }
+}
+
+.badge {
+  padding-inline: var(--padding-x2);
+  border-radius: var(--radius-x3);
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+
+  @include font(12px, 18px, 600);
+
+  &_attention {
+    color: var(--color-attention);
+  }
+}
+
+.meta {
+  color: var(--color-text-muted);
+
+  @include font(13px, 20px, 400);
+}
+
+.removed {
+  color: var(--color-text-muted);
+  font-style: italic;
+
+  @include font(14px, 20px, 400);
+}
+
+.placeholder {
+  color: var(--color-text-muted);
+  text-align: center;
+
+  @include font(14px, 20px, 400);
+}
+
+.loading {
+  position: relative;
+  min-height: var(--community-loading-height);
+}
+
+.busy {
+  opacity: 0.5;
+  pointer-events: none;
+}

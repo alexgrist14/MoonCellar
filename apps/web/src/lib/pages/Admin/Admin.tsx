@@ -5,6 +5,7 @@ import { Box } from "@/src/lib/shared/ui/Box";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import UserList from "./User/UserList/UserList";
 import GameList from "./Game/GameList";
+import ReportList from "./Reports/ReportList/ReportList";
 
 const Admin = () => {
   const isAdmin = useAuthStore((s) => s.isAdmin);
@@ -19,9 +20,12 @@ const Admin = () => {
         contents={[
           { tabName: "Users", onTabClick: () => setTabIndex(0) },
           { tabName: "Games", onTabClick: () => setTabIndex(1) },
+          { tabName: "Reports", onTabClick: () => setTabIndex(2) },
         ]}
       />
-      {tabIndex === 0 ? <UserList /> : <GameList />}
+      {tabIndex === 0 && <UserList />}
+      {tabIndex === 1 && <GameList />}
+      {tabIndex === 2 && <ReportList />}
     </Box>
   );
 };

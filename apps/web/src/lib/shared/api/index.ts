@@ -7,3 +7,4 @@ export * from "./hltb.api";
 export * from "./igdb.api";
 export * from "./playthroughs.api";
 export * from "./comments.api";
+export * from "./comment-reports.api";

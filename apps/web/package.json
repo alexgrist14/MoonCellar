@@ -27,6 +27,7 @@
     "@types/react-virtualized": "^9.22.3",
     "axios": "catalog:",
     "classnames": "^2.5.1",
+    "emojibase-data": "^17.0.0",
     "interweave": "^13.1.1",
     "jwt-decode": "catalog:",
     "maxmind": "^5.0.6",

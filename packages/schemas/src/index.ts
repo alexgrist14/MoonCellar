@@ -1,4 +1,5 @@
 export * from "./characters.schema";
+export * from "./comment-reports.schema";
 export * from "./comments-socket.schema";
 export * from "./comments.schema";
 export * from "./files.schema";

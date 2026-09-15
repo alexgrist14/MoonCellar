@@ -40,6 +40,16 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   ended up with the comment escaping its card. `getPlaythroughDetailsText` wraps the small
   metadata in a `div` and emits the comment as its own sibling block, so the comment renders at
   the shared rich-text size rather than inheriting the 12px metadata size.
+- **The emoji picker hides what the browser cannot draw, and its probe must survive canvas
+  noise.** `EmojiPicker/emoji.data.ts` draws one probe emoji per Emoji version to a canvas twice,
+  in red and in blue: a colour glyph ignores `fillStyle` and both renders match, while a missing
+  glyph (an empty box) or a monochrome fallback follows the fill. Brave, Firefox's fingerprinting
+  protection and anti-fingerprinting extensions perturb `getImageData`; a probe that counted any
+  non-red pixel as colour passed every version under that noise, and users saw empty boxes for
+  Emoji 14 while headless Chrome looked correct. Keep the red/blue comparison and its thresholds,
+  and draw with the picker's computed `font-family` so the canvas falls back to the same emoji
+  font as the buttons. Fully random or blank readback fails every probe and drops to Emoji 5 —
+  fewer emoji, never boxes.
 
 ## Layout
 

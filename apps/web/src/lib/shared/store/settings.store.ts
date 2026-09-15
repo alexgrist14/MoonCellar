@@ -1,10 +1,14 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
+
+const RECENT_EMOJIS_LIMIT = 24;
+
 type IState = {
   bgOpacityPreview?: number;
   isMusicEnabled?: boolean;
   musicVolume?: number;
   isBounceBackEnabled?: boolean;
+  recentEmojis?: string[];
 };
 
 type IAction = {
@@ -12,6 +16,7 @@ type IAction = {
   setMusicEnabled: (isMusicEnabled: boolean) => void;
   setMusicVolume: (musicVolume: number) => void;
   setBounceBackEnabled: (isBounceBackEnabled: boolean) => void;
+  addRecentEmoji: (emoji: string) => void;
 };
 
 export const useSettingsStore = create<IState & IAction>()(
@@ -26,6 +31,13 @@ export const useSettingsStore = create<IState & IAction>()(
         setMusicVolume: (musicVolume) => set({ musicVolume }),
         setBounceBackEnabled: (isBounceBackEnabled) =>
           set({ isBounceBackEnabled }),
+        addRecentEmoji: (emoji) =>
+          set((state) => ({
+            recentEmojis: [
+              emoji,
+              ...(state.recentEmojis ?? []).filter((item) => item !== emoji),
+            ].slice(0, RECENT_EMOJIS_LIMIT),
+          })),
       }),
       {
         name: "settings",

@@ -10,6 +10,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { type FilterQuery, Model } from "mongoose";
 import {
   type IComment,
+  type ICommentReportResolution,
   type ICommentStatus,
   type ICreateCommentParams,
   type IGetCommentsParams,
@@ -264,7 +265,7 @@ export class CommentsService {
       throw new ForbiddenException("You can only delete your own comments");
     }
 
-    await this.changeStatus(comment, "deleted", socketId);
+    await this.changeStatus(comment, "deleted", viewer, socketId);
 
     return this.decorateOne(comment, viewer);
   }
@@ -278,7 +279,7 @@ export class CommentsService {
     const comment = await this.findExisting(id);
 
     if (comment.status !== status) {
-      await this.changeStatus(comment, status, socketId);
+      await this.changeStatus(comment, status, viewer, socketId);
     }
 
     return this.decorateOne(comment, viewer);
@@ -357,6 +358,27 @@ export class CommentsService {
     return { isReported: true };
   }
 
+  async resolveReports(
+    commentId: mongoose.Types.ObjectId,
+    resolution: ICommentReportResolution,
+    moderatorId: mongoose.Types.ObjectId | null
+  ) {
+    await this.Reports.updateMany(
+      {
+        commentId,
+        status: { $ne: "resolved" },
+      } as FilterQuery<CommentReportDocument>,
+      {
+        $set: {
+          status: "resolved",
+          resolution,
+          resolvedAt: new Date(),
+          resolvedBy: moderatorId,
+        },
+      }
+    );
+  }
+
   private async findExisting(id: string) {
     const comment = await this.Comments.findById(toObjectId(id, "comment id"));
 
@@ -370,6 +392,7 @@ export class CommentsService {
   private async changeStatus(
     comment: GameCommentDocument,
     status: ICommentStatus,
+    moderator: User,
     socketId?: string
   ) {
     const repliesDelta =
@@ -378,8 +401,13 @@ export class CommentsService {
     comment.status = status;
 
     if (status === "deleted") comment.body = "";
+    if (status !== "visible") comment.reportsCount = 0;
 
     await comment.save();
+
+    if (status !== "visible") {
+      await this.resolveReports(comment._id, status, getViewerId(moderator));
+    }
 
     const parentRepliesCount =
       repliesDelta && comment.parentId

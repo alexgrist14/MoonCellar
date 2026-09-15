@@ -16,6 +16,7 @@ import styles from "./RichEditor.module.scss";
 import {
   SvgBold,
   SvgCode,
+  SvgEmoji,
   SvgHeading,
   SvgImage,
   SvgItalic,
@@ -29,6 +30,7 @@ import { ISvgBaseProps } from "../svg/Svg/Svg";
 import { filesAPI } from "../../api/files.api";
 import { toast } from "../../utils/toast.utils";
 import { Loader } from "../Loader";
+import { EmojiPicker } from "../EmojiPicker";
 
 export interface IRichEditorHandle {
   flushUploads: () => Promise<string>;
@@ -53,6 +55,14 @@ interface IToolDef {
 }
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+
+const graphemeSegmenter =
+  typeof Intl !== "undefined" && "Segmenter" in Intl
+    ? new Intl.Segmenter()
+    : undefined;
+
+const countCharacters = (text: string) =>
+  graphemeSegmenter ? [...graphemeSegmenter.segment(text)].length : text.length;
 
 const textTools: IToolDef[] = [
   {
@@ -127,9 +137,13 @@ export const RichEditor: FC<IRichEditorProps> = ({
   ref,
 }) => {
   const fileRef = useRef<HTMLInputElement>(null);
+  const emojiButtonRef = useRef<HTMLButtonElement>(null);
   const pendingRef = useRef(new Map<string, File>());
   const [pendingCount, setPendingCount] = useState(0);
   const [linkValue, setLinkValue] = useState<string | undefined>();
+  const [isEmojiOpen, setIsEmojiOpen] = useState(false);
+
+  const closeEmojiPicker = useCallback(() => setIsEmojiOpen(false), []);
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -144,7 +158,7 @@ export const RichEditor: FC<IRichEditorProps> = ({
       }),
       Image,
       Placeholder.configure({ placeholder }),
-      CharacterCount.configure({ limit }),
+      CharacterCount.configure({ limit, textCounter: countCharacters }),
     ],
     content: value,
     editorProps: { attributes: { class: styles.editor__body } },
@@ -297,7 +311,29 @@ export const RichEditor: FC<IRichEditorProps> = ({
         >
           <SvgImage size="16" />
         </button>
+        <button
+          ref={emojiButtonRef}
+          type="button"
+          title="Emoji"
+          aria-label="Emoji"
+          aria-expanded={isEmojiOpen}
+          className={classNames(styles.editor__tool, {
+            [styles.editor__tool_active]: isEmojiOpen,
+          })}
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => setIsEmojiOpen((isOpen) => !isOpen)}
+        >
+          <SvgEmoji size="16" />
+        </button>
       </div>
+
+      {isEmojiOpen && (
+        <EmojiPicker
+          anchorRef={emojiButtonRef}
+          onSelect={(emoji) => editor.chain().focus().insertContent(emoji).run()}
+          onClose={closeEmojiPicker}
+        />
+      )}
 
       {linkValue !== undefined && (
         <div className={styles.editor__link}>

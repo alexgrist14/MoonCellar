@@ -14,6 +14,7 @@ import {
   Rating,
   UserRatingsDatabaseSchema,
 } from "../user/schemas/user-ratings.schema";
+import { CommentReportsController } from "./controllers/comment-reports.controller";
 import { CommentsController } from "./controllers/comments.controller";
 import { ReviewsController } from "./controllers/reviews.controller";
 import {
@@ -29,16 +30,22 @@ import {
   GameCommentDatabaseSchema,
 } from "./schemas/game-comment.schema";
 import { CommentsGateway } from "./gateways/comments.gateway";
+import { CommentReportsService } from "./services/comment-reports.service";
 import { CommentsService } from "./services/comments.service";
 import { CommunityLookupService } from "./services/community-lookup.service";
 import { ReviewsService } from "./services/reviews.service";
 import { VotesService } from "./services/votes.service";
 
 @Module({
-  controllers: [CommentsController, ReviewsController],
+  controllers: [
+    CommentsController,
+    ReviewsController,
+    CommentReportsController,
+  ],
   providers: [
     CommentsGateway,
     CommentsService,
+    CommentReportsService,
     ReviewsService,
     VotesService,
     CommunityLookupService,

@@ -161,6 +161,10 @@
   --date-picker-field-min-width: 140px;
   --date-picker-cell-size: 34px;
   --date-picker-arrow-size: 28px;
+  --emoji-picker-width: 328px;
+  --emoji-picker-cell-size: 34px;
+  --emoji-picker-group-size: 28px;
+  --emoji-picker-grid-height: 238px;
   --game-hero-scrim: linear-gradient(
     180deg,
     #191d248c 0%,
