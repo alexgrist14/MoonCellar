@@ -250,6 +250,22 @@ break silently when ignored:
   mockup may only pull fonts from Google Fonts. Substitute Hanken Grotesk and say so on the
   page, or the mockup reads as a typography proposal it isn't.
 
+## Auth
+
+- **The auth cookies are `httpOnly` and set by the API, so only an API response can remove
+  them.** `deleteCookie` writes `document.cookie`, which cannot touch an `httpOnly` cookie —
+  every call on `accessMoonToken`/`refreshMoonToken` is a no-op. A session ends only through
+  `POST /auth/:id/logout` or a rejected `POST /auth/refresh-token`, both of which clear the
+  cookies in their response.
+- **The persisted `auth` store and the cookies can disagree, so the profile trusts the viewer
+  only when both do.** `/user/[name]` decodes `accessMoonToken` on the server to decide who is
+  viewing, while `agent` sends `x-user-id` from the store. A browser logged out in the store but
+  still carrying a live cookie got the owner's profile: `PATCH profile-time` fired on open, log
+  deletion was offered, and every such request died with `400 Wrong user` from `UserIdGuard`.
+  `UserProfile` accepts the server's `authUserId` only when the store's profile has the same id
+  (the server render, which has no store, keeps the cookie's answer), and on disagreement calls
+  `refreshAuth`, which either restores the session or gets the stale cookies cleared.
+
 ## Verification
 
 - **Do not reason about pixels — measure them.** `bun run check:layout` drives the installed

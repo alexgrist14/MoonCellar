@@ -22,6 +22,7 @@ import { IPlaythrough, IUserRating } from "@mooncellar/schemas";
 import { userAPI } from "../../shared/api";
 import { useAuthStore } from "../../shared/store/auth.store";
 import { usePlaythroughsStore } from "../../shared/store/playthroughs.store";
+import { refreshAuth } from "../../shared/hooks/useAuthRefresh";
 
 interface UserProfileProps {
   user: IUser;
@@ -41,12 +42,23 @@ const UserProfile: FC<UserProfileProps> = ({
   const query = useSearchParams();
   const { isMobile } = useStatesStore();
 
+  const authProfile = useAuthStore((s) => s.profile);
+
+  const viewerId =
+    typeof window === "undefined" || authProfile?._id === authUserId
+      ? authUserId
+      : undefined;
+
   const isAuthedUser = useMemo(
-    () => authUserId === user._id,
-    [authUserId, user]
+    () => viewerId === user._id,
+    [viewerId, user]
   );
 
-  const authProfile = useAuthStore((s) => s.profile);
+  useEffect(() => {
+    if (authUserId && !viewerId) {
+      refreshAuth();
+    }
+  }, [authUserId, viewerId]);
 
   const displayUser = useMemo(
     () =>
@@ -143,12 +155,12 @@ const UserProfile: FC<UserProfileProps> = ({
               },
             ]}
           />
-          {tab === "settings" && authUserId === user._id && <Settings />}
+          {tab === "settings" && isAuthedUser && <Settings />}
           {tab === "profile" && (
             <UserInfo
               user={displayUser}
-              authUserFollowings={authUserFollowings}
-              authUserId={authUserId}
+              authUserFollowings={viewerId ? authUserFollowings : undefined}
+              authUserId={viewerId}
             />
           )}
           {isGamesTab && (

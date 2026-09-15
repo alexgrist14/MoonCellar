@@ -29,6 +29,15 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   instantiating providers or touching MongoDB, and generates the OpenAPI document. It needs no
   `.env`.
 
+## Auth
+
+- **Every path that ends a session clears the cookies in its own response, before anything
+  that can throw.** The browser cannot drop the `httpOnly` cookies itself, so a logout that
+  fails on the user update, or a refresh rejected because a logout elsewhere nulled
+  `refreshToken`, otherwise leaves a valid `accessMoonToken` behind for up to seven days, and the
+  web profile keeps treating that browser as its owner. `JwtRefreshGuard` and the refresh handler
+  clear them on `UnauthorizedException` only — a database error must not log everyone out.
+
 ## Database
 
 - **Declare reference paths as `@Prop({ type: mongoose.Schema.Types.ObjectId, ref })`; a bare

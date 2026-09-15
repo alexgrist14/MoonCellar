@@ -24,7 +24,7 @@ import {
   refreshExpire,
 } from "../../shared/constants";
 import { IndexNowService } from "../indexnow/indexnow.service";
-import { getAuthCookieOptions } from "./auth-cookies";
+import { clearAuthCookies, getAuthCookieOptions } from "./auth-cookies";
 
 @Injectable()
 export class AuthService {
@@ -121,7 +121,7 @@ export class AuthService {
     const user = await this.userModel.findById(userId);
 
     if (!user?.refreshToken) {
-      throw new ForbiddenException();
+      throw new UnauthorizedException();
     }
 
     try {
@@ -170,10 +170,7 @@ export class AuthService {
   }
 
   clearCookies(res: Response, origin?: string): void {
-    const options = getAuthCookieOptions(origin);
-
-    res.clearCookie(ACCESS_TOKEN, options);
-    res.clearCookie(REFRESH_TOKEN, options);
+    clearAuthCookies(res, origin);
   }
 
   async logout(userId: string): Promise<void> {
