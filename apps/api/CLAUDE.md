@@ -181,6 +181,15 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   `VNDB_REQUEST_DELAY_MS` apart.** VNDB allows 200 requests per 5 minutes; a call made straight
   through `httpService` skips the spacing, a long backfill starts collecting 429s, and once `post`
   runs out of retries the whole run aborts.
+- **`post` spaces requests through the `requestTurn` promise chain, never by reading `lastRequestAt`
+  alone.** The admin review preview, the decision worker and the sync call `post` at the same time;
+  each reading the timestamp directly sees the same value, they fire together, and the combined
+  rate breaks the 200-per-5-minutes limit mid-backfill.
+- **A review decision is only recorded by `decideCandidate`; `applyDecisions` writes the games in
+  batches of up to `VNDB_PAGE_SIZE`.** Building one VN costs about 18 VNDB requests (one per theme
+  tag in `getThemes`), roughly 30 seconds at the enforced spacing, and the batched calls cost the
+  same for 100 VNs. Writing the game inside the decision request holds it open for half a minute
+  per keypress.
 - **VNDB has no last-modified field, so the daily sync re-fetches the linked games with the
   oldest `vndb.syncedAt`.** `insertVndbGame` carries the stored `syncedAt` inside the `vndb` value
   it compares; dropping it makes `vndb` differ on every refresh and moves `updatedAt` for every

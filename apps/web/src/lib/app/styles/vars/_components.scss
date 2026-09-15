@@ -68,6 +68,10 @@
   --community-empty-text-width: 240px;
   --community-loading-height: 96px;
 
+  --vndb-review-height: max(360px, calc(100vh - 420px));
+  --vndb-cover-width: 120px;
+  --vndb-candidate-cover-width: 64px;
+
   --empty-state-image-size: 180px;
   --not-found-image-height: 240px;
   --not-found-backdrop-size: 400px;

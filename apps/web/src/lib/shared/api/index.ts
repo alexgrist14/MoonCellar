@@ -8,3 +8,4 @@ export * from "./igdb.api";
 export * from "./playthroughs.api";
 export * from "./comments.api";
 export * from "./comment-reports.api";
+export * from "./vndb-candidates.api";

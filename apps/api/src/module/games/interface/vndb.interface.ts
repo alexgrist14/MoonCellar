@@ -1,5 +1,11 @@
 import mongoose from "mongoose";
-import { type IExternalPageField } from "@mooncellar/schemas";
+import {
+  type IExternalPageField,
+  type IVndbDateSignal,
+  type IVndbDescriptionSignal,
+  type IVndbMatchReason,
+  type IVndbScoreBreakdown,
+} from "@mooncellar/schemas";
 import { Game } from "../schemas/game.schema";
 import { type IVndbTitles } from "../services/vndb.service";
 
@@ -32,28 +38,11 @@ export type TVndbCandidate = Pick<
   | "summary"
 > & { _id: mongoose.Types.ObjectId };
 
-export type TDateSignal = "confirms" | "contradicts" | "unknown";
-export type TDescriptionSignal = "match" | "mismatch" | "unknown";
-
-export type TMatchReason =
-  | "below-threshold"
-  | "competing-candidates"
-  | "weak-title"
-  | "date-contradicts"
-  | "description-mismatch"
-  | "no-company-evidence"
-  | "company-mismatch"
-  | "unverified-title";
+export type TDateSignal = IVndbDateSignal;
+export type TDescriptionSignal = IVndbDescriptionSignal;
+export type TMatchReason = IVndbMatchReason;
 export type TMatchVerdict = "matched" | "ambiguous" | "absent";
-
-export interface IScoreBreakdown {
-  date: number;
-  genre: number;
-  type: number;
-  title: number;
-  companies: number;
-  platforms: number;
-}
+export type IScoreBreakdown = IVndbScoreBreakdown;
 
 export interface IScoredCandidate {
   game: TVndbCandidate;

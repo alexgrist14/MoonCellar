@@ -6,6 +6,7 @@ import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import UserList from "./User/UserList/UserList";
 import GameList from "./Game/GameList";
 import ReportList from "./Reports/ReportList/ReportList";
+import VndbCandidates from "./VndbCandidates/VndbCandidates";
 
 const Admin = () => {
   const isAdmin = useAuthStore((s) => s.isAdmin);
@@ -21,11 +22,13 @@ const Admin = () => {
           { tabName: "Users", onTabClick: () => setTabIndex(0) },
           { tabName: "Games", onTabClick: () => setTabIndex(1) },
           { tabName: "Reports", onTabClick: () => setTabIndex(2) },
+          { tabName: "VNDB candidates", onTabClick: () => setTabIndex(3) },
         ]}
       />
       {tabIndex === 0 && <UserList />}
       {tabIndex === 1 && <GameList />}
       {tabIndex === 2 && <ReportList />}
+      {tabIndex === 3 && <VndbCandidates />}
     </Box>
   );
 };

@@ -1,5 +1,10 @@
 import { HttpService } from "@nestjs/axios";
-import { Injectable, Logger } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { firstValueFrom } from "rxjs";
 import { Game, type GameDocument } from "../schemas/game.schema";
@@ -39,6 +44,8 @@ import {
   type ICompanyField,
   type IExternalPageField,
   type IReleaseDate,
+  type IVndbCandidatesSummary,
+  type IVndbReviewItem,
 } from "@mooncellar/schemas";
 import {
   INCOMPATIBLE_GENRES,
@@ -175,6 +182,9 @@ export class VndbService {
   private readonly logger = new Logger(VndbService.name);
   private isRunning = false;
   private lastRequestAt = 0;
+  private requestTurn: Promise<void> = Promise.resolve();
+  private isApplyingDecisions = false;
+  private hasNewDecisions = false;
 
   constructor(
     private readonly httpService: HttpService,
@@ -674,7 +684,7 @@ export class VndbService {
     return platform?._id ?? null;
   }
 
-  private async getVnMatches(vnIds: string[]): Promise<IVnMatch[]> {
+  private async getVndbTitles(vnIds: string[]) {
     const searchIdsFilters: TVndbFilter[] = vnIds.map((id) => ["id", "=", id]);
 
     const novelsResponse = await this.post<IVndbGameResponse>("/vn", {
@@ -688,9 +698,55 @@ export class VndbService {
     const characters = await this.getCharacters(vnIds);
     await this.saveCharacters(characters);
 
-    const vndbTitles = novelsResponse.results.map((vn) =>
-      this.getTitles(vn, themesByVn.get(vn.id) ?? [], characters)
+    const [signalsByVn, platformSlugById] = await Promise.all([
+      this.fetchReleaseSignals(vnIds),
+      this.getPlatformSlugs(),
+    ]);
+
+    const platformIdBySlug = new Map(
+      [...platformSlugById].map(([id, slug]) => [slug, new Types.ObjectId(id)])
     );
+
+    const titles = novelsResponse.results.map((novel) => {
+      const vn = this.getTitles(
+        novel,
+        themesByVn.get(novel.id) ?? [],
+        characters
+      );
+      const signals = signalsByVn.get(vn.id);
+
+      return {
+        ...vn,
+        publishers: signals?.publishers ?? [],
+        releaseDates: [
+          ...new Set([...vn.releaseDates, ...(signals?.releaseDates ?? [])]),
+        ],
+        platforms: [
+          ...new Set([...vn.platforms, ...(signals?.platforms ?? [])]),
+        ],
+        platformIds: this.getPlatformIds(
+          [...vn.platforms, ...(signals?.platforms ?? [])],
+          platformIdBySlug
+        ),
+        companies: this.getCompanies(
+          vn.companies,
+          signals?.publisherNames ?? []
+        ),
+        websites: [...new Set([...(signals?.websites ?? []), ...vn.websites])],
+        externalPages: signals?.externalPages ?? [],
+        release_dates: this.getReleaseDates(
+          signals?.releases ?? [],
+          platformIdBySlug
+        ),
+      };
+    });
+
+    return { titles, platformSlugById };
+  }
+
+  private async getVnMatches(vnIds: string[]): Promise<IVnMatch[]> {
+    const { titles: vndbTitles, platformSlugById } =
+      await this.getVndbTitles(vnIds);
 
     const vnIdsByKey = new Map<string, Set<string>>();
     const strongKeys: string[] = [];
@@ -766,44 +822,6 @@ export class VndbService {
       for (const game of games) addCandidate(vnId, game);
     }
 
-    const [signalsByVn, platformSlugById] = await Promise.all([
-      this.fetchReleaseSignals(vnIds),
-      this.getPlatformSlugs(),
-    ]);
-
-    const platformIdBySlug = new Map(
-      [...platformSlugById].map(([id, slug]) => [slug, new Types.ObjectId(id)])
-    );
-
-    const enrichedTitles = vndbTitles.map((vn) => {
-      const signals = signalsByVn.get(vn.id);
-
-      return {
-        ...vn,
-        publishers: signals?.publishers ?? [],
-        releaseDates: [
-          ...new Set([...vn.releaseDates, ...(signals?.releaseDates ?? [])]),
-        ],
-        platforms: [
-          ...new Set([...vn.platforms, ...(signals?.platforms ?? [])]),
-        ],
-        platformIds: this.getPlatformIds(
-          [...vn.platforms, ...(signals?.platforms ?? [])],
-          platformIdBySlug
-        ),
-        companies: this.getCompanies(
-          vn.companies,
-          signals?.publisherNames ?? []
-        ),
-        websites: [...new Set([...(signals?.websites ?? []), ...vn.websites])],
-        externalPages: signals?.externalPages ?? [],
-        release_dates: this.getReleaseDates(
-          signals?.releases ?? [],
-          platformIdBySlug
-        ),
-      };
-    });
-
     const sharedTitles = new Set(
       [...vnIdsByKey].filter(([, vnIds]) => vnIds.size > 1).map(([key]) => key)
     );
@@ -818,7 +836,7 @@ export class VndbService {
       linkedGames.map((game) => [game.vndb.vnId, game])
     );
 
-    const matches = this.matchNovels(enrichedTitles, candidatesByVn, {
+    const matches = this.matchNovels(vndbTitles, candidatesByVn, {
       platformSlugById,
       sharedTitles,
     }).map((match) => {
@@ -863,6 +881,284 @@ export class VndbService {
     }
 
     return matches;
+  }
+
+  async getCandidatesSummary(): Promise<IVndbCandidatesSummary> {
+    const [pending, applying] = await Promise.all([
+      this.vndbCandidatesModel.countDocuments({
+        status: "pending",
+        decision: null,
+      }),
+      this.vndbCandidatesModel.countDocuments({
+        status: "pending",
+        decision: { $ne: null },
+      }),
+    ]);
+
+    if (applying) this.startApplyingDecisions();
+
+    return { pending, applying };
+  }
+
+  async getNextCandidate(after?: string): Promise<IVndbReviewItem | null> {
+    const undecided = { status: "pending", decision: null } as const;
+    const candidate = await this.vndbCandidatesModel
+      .findOne(
+        after
+          ? { ...undecided, _id: { $gt: new Types.ObjectId(after) } }
+          : undecided
+      )
+      .sort({ _id: 1 })
+      .lean();
+
+    if (!candidate) return null;
+
+    const [remaining, games, { results }, platformSlugById] =
+      await Promise.all([
+        this.vndbCandidatesModel.countDocuments({
+          ...undecided,
+          _id: { $gte: candidate._id },
+        }),
+        this.gamesModel
+          .find({
+            _id: { $in: candidate.candidates.map(({ gameId }) => gameId) },
+          })
+          .select(
+            "cover type summary alternative_names companies first_release platformIds vndb.vnId"
+          )
+          .lean(),
+        this.post<IVndbGameResponse>("/vn", {
+          filters: ["id", "=", candidate.vnId] satisfies TVndbFilter,
+          fields:
+            "title,alttitle,titles.title,titles.lang,titles.latin,titles.official,titles.main,released,platforms,description,developers.name,image.url,image.sexual,length_minutes",
+        }),
+        this.getPlatformSlugs(),
+      ]);
+
+    const platformIdBySlug = new Map(
+      [...platformSlugById].map(([id, slug]) => [slug, new Types.ObjectId(id)])
+    );
+    const gameById = new Map(games.map((game) => [String(game._id), game]));
+    const vn = results[0] ? this.getTitles(results[0], [], []) : null;
+
+    return {
+      id: String(candidate._id),
+      vnId: candidate.vnId,
+      reason: candidate.reason ?? null,
+      remaining,
+      vn: vn
+        ? {
+            name: vn.name,
+            originalName: vn.originalName,
+            alternativeNames: vn.alternativeNames,
+            description: stripBbcode(vn.description),
+            released: vn.released ?? null,
+            developers: vn.companies.map(({ name }) => name),
+            platformIds: this.getPlatformIds(
+              vn.platforms,
+              platformIdBySlug
+            ).map(String),
+            lengthMinutes: vn.length ?? null,
+            cover: vn.cover?.url ?? null,
+            isExplicitCover:
+              (vn.cover?.sexual ?? 0) > VNDB_EXPLICIT_SEXUAL_LEVEL,
+          }
+        : null,
+      candidates: candidate.candidates.map((entry) => {
+        const game = gameById.get(String(entry.gameId));
+
+        return {
+          gameId: String(entry.gameId),
+          slug: entry.slug,
+          name: entry.name,
+          score: entry.score,
+          breakdown: entry.breakdown,
+          dateSignal: entry.dateSignal,
+          descriptionSignal: entry.descriptionSignal,
+          hasCompanyMismatch: entry.hasCompanyMismatch,
+          game: game
+            ? {
+                cover: game.cover ?? null,
+                type: game.type ?? null,
+                summary: game.summary ?? null,
+                alternativeNames: game.alternative_names ?? [],
+                companies: game.companies ?? [],
+                firstRelease: game.first_release ?? null,
+                platformIds: (game.platformIds ?? []).map(String),
+                linkedVnId: game.vndb?.vnId ?? null,
+              }
+            : null,
+        };
+      }),
+    };
+  }
+
+  async decideCandidate(
+    vnId: string,
+    gameId: string | null
+  ): Promise<IVndbCandidatesSummary> {
+    const candidate = await this.vndbCandidatesModel
+      .findOne({ vnId, status: "pending", decision: null })
+      .select("candidates.gameId")
+      .lean();
+
+    if (!candidate) {
+      throw new NotFoundException(
+        `${vnId} has no candidates waiting for a decision`
+      );
+    }
+
+    if (
+      gameId &&
+      !candidate.candidates.some((entry) => String(entry.gameId) === gameId)
+    ) {
+      throw new BadRequestException(`The game is not a candidate for ${vnId}`);
+    }
+
+    await this.vndbCandidatesModel.updateOne(
+      { _id: candidate._id, decision: null },
+      {
+        $set: {
+          decision: gameId ? "match" : "skip",
+          winner: gameId ? new Types.ObjectId(gameId) : null,
+        },
+      }
+    );
+
+    this.startApplyingDecisions();
+
+    return this.getCandidatesSummary();
+  }
+
+  private startApplyingDecisions() {
+    this.hasNewDecisions = true;
+
+    if (this.isApplyingDecisions) return;
+
+    this.applyDecisions().catch((error) =>
+      this.logger.error(error, "Applying VNDB candidate decisions failed")
+    );
+  }
+
+  private async applyDecisions() {
+    this.isApplyingDecisions = true;
+
+    try {
+      while (this.hasNewDecisions) {
+        this.hasNewDecisions = false;
+        let applied = 0;
+
+        for (;;) {
+          const decided = await this.vndbCandidatesModel
+            .find({ status: "pending", decision: { $ne: null } })
+            .limit(VNDB_PAGE_SIZE)
+            .lean();
+
+          if (!decided.length) break;
+
+          applied += await this.applyDecisionBatch(decided);
+        }
+
+        if (applied) {
+          await this.linkVndbCharacters();
+          await this.linkVndbRelatedGames();
+        }
+      }
+    } finally {
+      this.isApplyingDecisions = false;
+    }
+  }
+
+  private async applyDecisionBatch(
+    decided: (VndbCandidate & { _id: Types.ObjectId })[]
+  ) {
+    const [{ titles }, winners] = await Promise.all([
+      this.getVndbTitles(decided.map(({ vnId }) => vnId)),
+      this.gamesModel
+        .find(
+          {
+            _id: {
+              $in: decided.flatMap(({ winner }) => (winner ? [winner] : [])),
+            },
+          },
+          CANDIDATE_PROJECTION
+        )
+        .lean(),
+    ]);
+
+    const titleByVnId = new Map(titles.map((vn) => [vn.id, vn]));
+    const winnerById = new Map(winners.map((game) => [String(game._id), game]));
+
+    const matches = decided.flatMap(
+      ({ vnId, vnName, decision, winner }): IVnMatch[] => {
+        const vndb = titleByVnId.get(vnId);
+        const game = winner ? winnerById.get(String(winner)) : undefined;
+
+        if (!vndb || (decision === "match" && !game)) return [];
+
+        return [
+          {
+            vnId,
+            vnName,
+            verdict: game ? "matched" : "absent",
+            reason: null,
+            winner: game ?? null,
+            vndb,
+            candidates: [],
+          },
+        ];
+      }
+    );
+
+    await this.insertVndbGame(matches);
+
+    const vnIds = matches.map(({ vnId }) => vnId);
+    const linkedGames = await this.gamesModel
+      .find({ "vndb.vnId": { $in: vnIds } })
+      .select("_id vndb.vnId")
+      .lean();
+    const gameIdByVnId = new Map(
+      linkedGames.map((game) => [game.vndb.vnId, game._id])
+    );
+
+    await this.gamesModel.updateMany(
+      { "vndb.vnId": { $in: vnIds } },
+      { $set: { "vndb.syncedAt": new Date().toISOString() } }
+    );
+
+    await this.vndbCandidatesModel.bulkWrite(
+      decided.map(({ _id, vnId, decision }) => {
+        const gameId = gameIdByVnId.get(vnId);
+
+        return {
+          updateOne: {
+            filter: { _id },
+            update: {
+              $set: gameId
+                ? {
+                    status: decision === "match" ? "resolved" : "absent",
+                    winner: gameId,
+                  }
+                : { decision: null, winner: null },
+            },
+          },
+        };
+      })
+    );
+
+    const returned = decided.filter(({ vnId }) => !gameIdByVnId.has(vnId));
+
+    if (returned.length) {
+      this.logger.warn(
+        `VNDB decisions returned to review, nothing was written for ${returned.map(({ vnId }) => vnId).join(", ")}`
+      );
+    }
+
+    this.logger.log(
+      `Applied ${decided.length - returned.length}/${decided.length} VNDB candidate decisions`
+    );
+
+    return decided.length - returned.length;
   }
 
   async linkVndbRelatedGames() {
@@ -1093,10 +1389,18 @@ export class VndbService {
     return themesByVn;
   }
 
-  private async post<T>(path: string, body: unknown): Promise<T> {
-    for (let attempt = 0; ; attempt++) {
+  private waitForRequestTurn() {
+    this.requestTurn = this.requestTurn.then(async () => {
       await sleep(this.lastRequestAt + VNDB_REQUEST_DELAY_MS - Date.now());
       this.lastRequestAt = Date.now();
+    });
+
+    return this.requestTurn;
+  }
+
+  private async post<T>(path: string, body: unknown): Promise<T> {
+    for (let attempt = 0; ; attempt++) {
+      await this.waitForRequestTurn();
 
       try {
         const { data } = await firstValueFrom(
