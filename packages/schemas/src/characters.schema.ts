@@ -10,6 +10,12 @@ export const CharacterIGDBSchema = z.object({
   checksum: z.string().nullable().optional(),
 });
 
+export const CharacterVndbSchema = z.object({
+  characterId: z.string(),
+  vns: z.string().array(),
+  image: z.string().nullable().optional(),
+});
+
 export const CharacterSchema = z.object({
   _id: z.string(),
   name: z.string(),
@@ -22,6 +28,7 @@ export const CharacterSchema = z.object({
   mugShot: z.string().nullable().optional(),
   gameIds: z.string().array().optional(),
   igdb: CharacterIGDBSchema.optional(),
+  vndb: CharacterVndbSchema.optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -50,6 +57,7 @@ export const GetCharactersRequestSchema = z.object({
 export const GetCharactersResponseSchema = CharacterSchema.array();
 
 export type ICharacterIGDBField = z.infer<typeof CharacterIGDBSchema>;
+export type ICharacterVndbField = z.infer<typeof CharacterVndbSchema>;
 export type ICharacterResponse = z.infer<typeof CharacterSchema>;
 export type IGetCharactersRequest = z.infer<typeof GetCharactersRequestSchema>;
 export type IGetCharacterBySlugRequest = z.infer<

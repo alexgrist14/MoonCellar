@@ -19,6 +19,7 @@ import { LoggerModule } from "nestjs-pino";
 import { pinoConfig } from "./module/logger/logger.module";
 import { MetricsModule } from "./module/metrics/metrics.module";
 import { HttpMetricsInterceptor } from "./module/metrics/http-metrics.interceptor";
+import { HttpModule } from "@nestjs/axios";
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { HttpMetricsInterceptor } from "./module/metrics/http-metrics.intercepto
       dbName: "games",
       monitorCommands: true,
     }),
+    HttpModule,
     AuthModule,
     UserModule,
     AdminModule,

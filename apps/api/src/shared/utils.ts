@@ -1,3 +1,4 @@
+import type { Types } from "mongoose";
 export const sleep = (ms: number): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
@@ -114,4 +115,17 @@ export const shuffle = <T>(arr: T[]) => {
   }
 
   return arr;
+};
+
+export const isSameObjectIdList = (
+  current: Types.ObjectId[] | undefined,
+  next: Types.ObjectId[]
+) => {
+  if ((current?.length || 0) !== next.length) return false;
+  if (!current?.length) return true;
+
+  const currentKeys = current.map((id) => id.toString()).sort();
+  const nextKeys = next.map((id) => id.toString()).sort();
+
+  return currentKeys.every((key, index) => key === nextKeys[index]);
 };

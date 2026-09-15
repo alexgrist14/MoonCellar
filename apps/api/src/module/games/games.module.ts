@@ -28,6 +28,13 @@ import {
   UserRatingsDatabaseSchema,
 } from "../user/schemas/user-ratings.schema";
 import { IndexNowModule } from "../indexnow/indexnow.module";
+import { VndbService } from "./services/vndb.service";
+import { VndbController } from "./controllers/vndb.controller";
+import { HttpModule } from "@nestjs/axios";
+import {
+  VndbCandidate,
+  VndbCandidateSchema,
+} from "./schemas/vndb-candidates.schema";
 
 @Module({
   controllers: [
@@ -36,6 +43,7 @@ import { IndexNowModule } from "../indexnow/indexnow.module";
     PlatformsController,
     HltbController,
     CharactersController,
+    VndbController,
   ],
   providers: [
     GamesService,
@@ -45,6 +53,7 @@ import { IndexNowModule } from "../indexnow/indexnow.module";
     FileService,
     PlatformsService,
     CharactersService,
+    VndbService,
   ],
   imports: [
     MongooseModule.forFeature([
@@ -55,9 +64,11 @@ import { IndexNowModule } from "../indexnow/indexnow.module";
       { name: UserLogs.name, schema: UserLogsSchema },
       { name: User.name, schema: UserSchema },
       { name: Rating.name, schema: UserRatingsDatabaseSchema },
+      { name: VndbCandidate.name, schema: VndbCandidateSchema },
     ]),
     MetricsModule,
     IndexNowModule,
+    HttpModule,
   ],
 })
 export class GamesModule {}

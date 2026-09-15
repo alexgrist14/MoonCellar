@@ -10,9 +10,11 @@ import {
   type IReleaseDate,
   type IRelatedGamesField,
   type IRetroachievementsField,
+  type IVndbField,
 } from "@mooncellar/schemas";
 import { Platform } from "./platform.schema";
 import { Character } from "./character.schema";
+import { normalizeTitle } from "../utils/title-match.utils";
 
 export type GameDocument = HydratedDocument<Game>;
 
@@ -95,6 +97,8 @@ export class Game {
   @Prop({ type: Object })
   igdb: IGDBField;
   @Prop({ type: Object })
+  vndb: IVndbField;
+  @Prop({ type: Object })
   hltb: IHltbField;
   @Prop()
   hltbNotFoundAt: string;
@@ -107,6 +111,14 @@ export class Game {
 export const GameDatabaseSchema = SchemaFactory.createForClass(Game);
 GameDatabaseSchema.index({ slug: 1 }, { unique: true });
 GameDatabaseSchema.index({ "igdb.gameId": 1 });
+GameDatabaseSchema.index(
+  { "vndb.syncedAt": 1 },
+  { partialFilterExpression: { "vndb.vnId": { $exists: true } } }
+);
+GameDatabaseSchema.index(
+  { "vndb.vnId": 1 },
+  { unique: true, partialFilterExpression: { "vndb.vnId": { $exists: true } } }
+);
 GameDatabaseSchema.index({ "hltb.updatedAt": 1, _id: 1 });
 GameDatabaseSchema.index({ "externalPages.name": 1, "externalPages.uid": 1 });
 GameDatabaseSchema.index({ hltbNotFoundAt: 1 });
@@ -117,3 +129,44 @@ GameDatabaseSchema.index({ first_release: -1 });
 GameDatabaseSchema.index({ name: 1 });
 GameDatabaseSchema.index({ nameNormalized: 1 });
 GameDatabaseSchema.index({ characters: 1 });
+
+GameDatabaseSchema.pre("save", function (next) {
+  if (this.isModified("name")) {
+    const normalized = normalizeTitle(this.name);
+
+    normalized
+      ? (this.nameNormalized = normalized)
+      : (this.nameNormalized = undefined);
+  }
+
+  next();
+});
+
+GameDatabaseSchema.pre(
+  ["findOneAndUpdate", "updateOne", "updateMany"],
+  function (next) {
+    const update = this.getUpdate();
+
+    if (!update || Array.isArray(update)) return next();
+
+    const name = update.$set?.name ?? (update as Record<string, unknown>).name;
+
+    if (typeof name !== "string") return next();
+
+    const normalized = normalizeTitle(name);
+
+    if (normalized) {
+      if (update.$set) {
+        update.$set.nameNormalized = normalized;
+      } else {
+        (update as Record<string, unknown>).nameNormalized = normalized;
+      }
+    } else {
+      update.$unset = { ...update.$unset, nameNormalized: "" };
+    }
+
+    this.setUpdate(update);
+
+    next();
+  }
+);

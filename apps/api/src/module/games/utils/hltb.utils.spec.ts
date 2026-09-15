@@ -7,11 +7,10 @@ import {
   hasHltbTimes,
   HltbMatchContext,
   mapHltbEntryToField,
-  normalizeCoreTitle,
   pickBestHltbMatch,
-  titleSimilarity,
 } from "./hltb.utils";
 import { HLTB_NOT_FOUND_RETRY_DAYS, HLTB_STALE_DAYS } from "../constants/hltb";
+import { normalizeCoreTitle, titleSimilarity } from "./title-match.utils";
 
 const ctx = (overrides: Partial<HltbMatchContext> = {}): HltbMatchContext => ({
   name: "Game",
@@ -59,9 +58,9 @@ describe("hltb.utils", () => {
 
   describe("normalizeCoreTitle", () => {
     it("strips edition/version markers", () => {
-      expect(normalizeCoreTitle("Final Fantasy: 20th Anniversary Edition")).toBe(
-        "final fantasy"
-      );
+      expect(
+        normalizeCoreTitle("Final Fantasy: 20th Anniversary Edition")
+      ).toBe("final fantasy");
       expect(normalizeCoreTitle("The Last of Us: Remastered")).toBe(
         "the last of us"
       );
@@ -215,7 +214,6 @@ describe("hltb.utils", () => {
 
       expect(result).toBeNull();
     });
-
 
     it("confirms an exact title corroborated by platform overlap", () => {
       const result = pickBestHltbMatch(
@@ -388,7 +386,9 @@ describe("hltb.utils", () => {
     });
 
     it("includes the edition-stripped core as a query", () => {
-      const queries = buildHltbSearchQueries("Hitman: Game of the Year Edition");
+      const queries = buildHltbSearchQueries(
+        "Hitman: Game of the Year Edition"
+      );
 
       expect(queries).toContain("hitman");
     });
