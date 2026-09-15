@@ -103,15 +103,13 @@ docker compose -f infra/docker-compose.yml up -d
 #    Prometheus sits behind a profile and starts only when asked:
 docker compose -f infra/docker-compose.yml --profile monitoring up -d
 
-# 5. Build the shared schemas package once (both apps import its dist)
-bun --filter '@mooncellar/schemas' build
-
-# 6. Run everything in watch mode
+# 5. Run everything in watch mode
 bun run dev
 ```
 
-`bun run dev` builds `@mooncellar/schemas` once, then starts all three watchers in parallel in
-a single terminal — it is `dev:schemas`, `dev:api` and `dev:web` backgrounded together.
+`bun run dev` starts both watchers in parallel in a single terminal — it is `dev:api` and
+`dev:web` backgrounded together. Nothing has to be built first: the API runs its TypeScript
+source on Bun, and both apps read `@mooncellar/schemas` straight from its `src`.
 
 ### Running the modules separately
 
@@ -119,33 +117,20 @@ One terminal per workspace. Use this when you want readable logs per process, a 
 attached to just one of them, or only part of the stack running.
 
 ```bash
-# once, before either app starts — both import the package's dist
-bun --filter '@mooncellar/schemas' build
+# terminal 1 — API on :3228, Swagger at :3228/api
+bun --filter api start:dev                 # bun --watch; needs MongoDB from the compose stack
 
-# terminal 1 — shared contracts, recompiled on every change
-bun --filter '@mooncellar/schemas' dev     # tsc --watch → packages/schemas/dist
-
-# terminal 2 — API on :3228, Swagger at :3228/api
-bun --filter api start:dev                 # needs MongoDB from the compose stack
-
-# terminal 3 — frontend on :3000
+# terminal 2 — frontend on :3000
 bun --filter web dev                       # needs the API up: pages fetch it while rendering
 ```
 
-The root aliases run exactly these three: `bun run dev:schemas`, `bun run dev:api`,
-`bun run dev:web`.
+The root aliases run exactly these two: `bun run dev:api`, `bun run dev:web`.
 
-Three things that are easy to get wrong here:
+Two things that are easy to get wrong here:
 
-- **Build `@mooncellar/schemas` before starting either app.** Both resolve the package to its
-  `dist`, never its `src`, so on a fresh checkout the import fails until that first build exists.
-  The watcher keeps it current from then on.
 - **The API's script is `start:dev`, not `dev`.** `apps/api` has no `dev` script at all, which is
   why the root alias spells the name out.
-- **Never start them with `bun --filter '*' dev`.** `bun --filter` runs the selected scripts in
-  dependency order and waits for each dependency to exit first — `@mooncellar/schemas`'s `dev` is
-  `tsc --watch`, which never exits, so `web dev` is never spawned at all and the terminal sits on
-  the tsc watch banner with no Next.js output. The glob also skips `apps/api` in silence, because
+- **Never start them with `bun --filter '*' dev`.** The glob skips `apps/api` in silence, because
   it has no script by that name. `build` and `lint` may keep `--filter '*'`: those scripts
   terminate, and there the dependency ordering is exactly what is wanted.
 
@@ -169,11 +154,10 @@ Three things that are easy to get wrong here:
 |---|---|
 | `bun install` | Installs all workspaces into one hoisted `node_modules` |
 | `bun install --filter './apps/api...'` | Installs one app and its workspace dependencies only |
-| `bun run dev` | Builds the schemas, then runs all three watchers in one terminal |
-| `bun run dev:schemas` | `tsc --watch` for `@mooncellar/schemas` only |
-| `bun run dev:api` | `api start:dev` only — watch mode on :3228 |
+| `bun run dev` | Runs the API and web watchers in one terminal |
+| `bun run dev:api` | `api start:dev` only — Bun watch mode on :3228 |
 | `bun run dev:web` | `web dev` only — Next.js on :3000 |
-| `bun run build` | `build` in every workspace |
+| `bun run build` | `build` in every workspace — the Next.js build, and a type check plus preview boot for the API |
 | `bun run lint` | `lint` in every workspace |
 | `bun run format:check` | Prettier over the whole repo |
 | `bun --filter web <script>` | Runs a script in one workspace |
@@ -421,9 +405,9 @@ config in `infra/prometheus/`, and the Alloy receiver config in `infra/monitorin
 <summary>Scripts</summary>
 
 ```bash
-bun --filter api start:dev      # watch mode on :3228
-bun --filter api start:prod     # run the build
-bun --filter api build          # nest build
+bun --filter api start:dev      # bun --watch on :3228
+bun --filter api start          # run the source once, as the container does
+bun --filter api build          # type check + preview boot — Bun runs the source
 bun --filter api lint           # eslint
 bun --filter api test           # unit tests (jest + automock)
 bun --filter api test:e2e       # e2e tests (supertest)
@@ -459,13 +443,17 @@ packages/schemas/src/
 ├── playthroughs.schema.ts      └── index.ts
 ```
 
-The package compiles to CommonJS with declarations, which both Nest (webpack/tsc) and Next
-consume without special handling:
+The package ships its TypeScript source and has no build step: Bun runs it inside the API,
+Turbopack compiles it like any other workspace package, and the API's jest tests transform it
+with ts-jest.
 
 ```bash
-bun --filter '@mooncellar/schemas' build     # tsc → dist
-bun --filter '@mooncellar/schemas' dev       # tsc --watch
+bun --filter '@mooncellar/schemas' typecheck
+bun --filter '@mooncellar/schemas' test
 ```
+
+Why it is consumed as source, why that depends on the API running on Bun, and which
+alternatives were measured: [`docs/schemas-package.md`](docs/schemas-package.md).
 
 `zod` is a peer dependency resolved from the root catalog — a second copy in the tree silently
 breaks type inference and `instanceof` checks across package boundaries.

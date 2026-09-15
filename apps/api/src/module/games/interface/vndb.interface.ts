@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import { IExternalPageField } from "@mooncellar/schemas";
+import { type IExternalPageField } from "@mooncellar/schemas";
 import { Game } from "../schemas/game.schema";
-import { IVndbTitles } from "../services/vndb.service";
+import { type IVndbTitles } from "../services/vndb.service";
 
 export type TFieldStatus = 0 | 1 | 2;
 
@@ -204,8 +204,7 @@ export interface IVndbNovel {
   votecount: number;
   screenshots: IVndbImage[] | null;
   relations:
-    | { id: string; relation: string; relation_official: boolean }[]
-    | null;
+    { id: string; relation: string; relation_official: boolean }[] | null;
   tags:
     | ({
         rating: 0 | 1 | 2 | 3;

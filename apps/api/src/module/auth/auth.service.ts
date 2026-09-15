@@ -15,7 +15,7 @@ import * as bcrypt from "bcryptjs";
 import { JwtService } from "@nestjs/jwt";
 import { BusinessMetricsService } from "../metrics/business-metrics.service";
 import { LoginDto } from "./dto/login.dto";
-import { Response } from "express";
+import { type Response } from "express";
 import {
   ACCESS_TOKEN,
   accessExpire,
@@ -24,6 +24,7 @@ import {
   refreshExpire,
 } from "../../shared/constants";
 import { IndexNowService } from "../indexnow/indexnow.service";
+import { clearAuthCookies, getAuthCookieOptions } from "./auth-cookies";
 
 @Injectable()
 export class AuthService {
@@ -120,7 +121,7 @@ export class AuthService {
     const user = await this.userModel.findById(userId);
 
     if (!user?.refreshToken) {
-      throw new ForbiddenException();
+      throw new UnauthorizedException();
     }
 
     try {
@@ -154,38 +155,22 @@ export class AuthService {
     refreshToken: string,
     origin?: string
   ): void {
-    const domain = origin?.includes("localhost")
-      ? ".localhost"
-      : "mooncellar.space";
-    const secure = origin?.includes("https") ? true : false;
-    const sameSite =
-      origin?.includes("localhost") || !secure ? undefined : "none";
+    const options = getAuthCookieOptions(origin);
 
     res.cookie(ACCESS_TOKEN, accessToken, {
-      httpOnly: true,
-      domain: domain,
-      secure: secure,
-      sameSite: sameSite,
+      ...options,
       expires: new Date(Date.now() + accessExpire),
       maxAge: accessExpire,
     });
     res.cookie(REFRESH_TOKEN, refreshToken, {
-      httpOnly: true,
-      domain: domain,
-      secure: secure,
-      sameSite: sameSite,
+      ...options,
       expires: new Date(Date.now() + refreshExpire),
       maxAge: refreshExpire,
     });
   }
 
   clearCookies(res: Response, origin?: string): void {
-    res.clearCookie(ACCESS_TOKEN, {
-      httpOnly: !origin?.includes("localhost"),
-    });
-    res.clearCookie(REFRESH_TOKEN, {
-      httpOnly: !origin?.includes("localhost"),
-    });
+    clearAuthCookies(res, origin);
   }
 
   async logout(userId: string): Promise<void> {

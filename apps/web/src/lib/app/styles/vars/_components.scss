@@ -21,7 +21,7 @@
   --navigation-progress-z-index: 1002;
 
   --modal-text-width: min(720px, calc(100vw - var(--padding-x10)));
-  --rich-editor-image-width: 200px;
+  --rich-editor-image-width: 400px;
   --playthrough-modal-width: min(80vw, 400px);
   --playthrough-modal-height: min(70vh, 500px);
   --playthrough-modal-width-lg: min(88vw, 760px);
@@ -53,6 +53,16 @@
     #212731d1 72%,
     var(--color-bg-secondary) 100%
   );
+
+  --spoiler-blur: 7px;
+  --community-avatar-size: 36px;
+  --community-reply-avatar-size: 28px;
+  --community-review-clamp-height: 132px;
+  --community-distribution-height: 8px;
+  --community-distribution-min-width: 240px;
+  --community-dot-size: 7px;
+  --community-empty-text-width: 240px;
+  --community-loading-height: 96px;
 
   --empty-state-image-size: 180px;
   --not-found-image-height: 240px;

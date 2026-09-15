@@ -11,13 +11,13 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { AuthGuard } from "@nestjs/passport";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import type { Request, Response } from "express";
 import { UserProfileService } from "../user/services/user-profile.service";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { SignUpDto } from "./dto/signup.dto";
+import { JwtRefreshGuard } from "./jwt-refresh.guard";
 
 @ApiTags("Auth")
 @Controller("auth")
@@ -86,7 +86,7 @@ export class AuthController {
   }
 
   @Post("/refresh-token")
-  @UseGuards(AuthGuard("jwt-refresh"))
+  @UseGuards(JwtRefreshGuard)
   @ApiOperation({ summary: "Refresh token" })
   @ApiResponse({ status: 200, description: "Refresh successful" })
   async refreshToken(
@@ -103,14 +103,21 @@ export class AuthController {
 
       const userId = payload.id;
 
-      const { accessToken, refreshToken } =
-        await this.authService.refreshToken(userId);
-      this.authService.setCookies(
-        res,
-        accessToken,
-        refreshToken,
-        headers?.origin
-      );
+      try {
+        const { accessToken, refreshToken } =
+          await this.authService.refreshToken(userId);
+        this.authService.setCookies(
+          res,
+          accessToken,
+          refreshToken,
+          headers?.origin
+        );
+      } catch (err) {
+        if (err instanceof UnauthorizedException) {
+          this.authService.clearCookies(res, headers?.origin);
+        }
+        throw err;
+      }
       return res.status(HttpStatus.OK).json({ userId });
     } else throw new UnauthorizedException();
   }
@@ -123,9 +130,9 @@ export class AuthController {
     @Res() res: Response,
     @Headers() headers: any
   ): Promise<Response> {
-    await this.authService.logout(userId);
-
     this.authService.clearCookies(res, headers?.origin);
+
+    await this.authService.logout(userId);
 
     return res
       .status(HttpStatus.OK)

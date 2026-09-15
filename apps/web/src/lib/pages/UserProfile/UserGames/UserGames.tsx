@@ -1,6 +1,7 @@
 import { SortType } from "@/src/lib/shared/types/sort.type";
 import { CategoriesFilterType } from "@/src/lib/shared/types/user.type";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { FC, useMemo, useState } from "react";
 import { useDebounce } from "use-debounce";
@@ -168,7 +169,9 @@ export const UserGames: FC<UserGamesProps> = ({
     [isSearchActive, searchedGames, pageGames, currentPage]
   );
 
-  const isFetching = isSearchActive ? isSearching : isPageFetching;
+  const isFetching = useMinimumLoading(
+    isSearchActive ? isSearching : isPageFetching
+  );
 
   const total = visibleIds.length;
 

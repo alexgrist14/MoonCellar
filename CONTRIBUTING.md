@@ -27,7 +27,6 @@ bun install
 cp apps/web/.env.example apps/web/.env
 cp apps/api/.env.example apps/api/.env
 docker compose -f infra/docker-compose.yml up -d
-bun --filter '@mooncellar/schemas' build
 bun run dev
 ```
 

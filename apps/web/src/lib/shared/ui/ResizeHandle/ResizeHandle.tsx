@@ -15,6 +15,41 @@ interface IResizeHandleProps {
   className?: string;
 }
 
+type IResizeProperty = "--resize-width" | "--resize-height";
+
+const SIZE_FIT_ATTEMPTS = 3;
+
+const getSizeOffset = (
+  element: HTMLElement,
+  property: IResizeProperty,
+  size: number
+) => {
+  let value = size;
+
+  for (let attempt = 0; attempt < SIZE_FIT_ATTEMPTS; attempt++) {
+    element.style.setProperty(property, `${value}px`);
+
+    const rect = element.getBoundingClientRect();
+    const difference =
+      size - (property === "--resize-width" ? rect.width : rect.height);
+
+    if (Math.abs(difference) < 0.5) break;
+
+    value += difference;
+  }
+
+  return size - value;
+};
+
+const restoreProperty = (
+  element: HTMLElement,
+  property: IResizeProperty,
+  value: string
+) =>
+  value
+    ? element.style.setProperty(property, value)
+    : element.style.removeProperty(property);
+
 export const ResizeHandle: FC<IResizeHandleProps> = ({
   targetRef,
   isCentered,
@@ -39,18 +74,38 @@ export const ResizeHandle: FC<IResizeHandleProps> = ({
       const startY = e.clientY;
       const speed = isCentered ? 2 : 1;
 
+      const initialWidth = element.style.getPropertyValue("--resize-width");
+      const initialHeight = element.style.getPropertyValue("--resize-height");
+      const widthOffset = getSizeOffset(element, "--resize-width", width);
+      const heightOffset = getSizeOffset(element, "--resize-height", height);
+
+      restoreProperty(element, "--resize-width", initialWidth);
+      restoreProperty(element, "--resize-height", initialHeight);
+
       const move = (event: globalThis.MouseEvent) => {
         const nextWidth = Math.min(
-          Math.max(width + (event.clientX - startX) * speed, minWidth),
-          window.innerWidth * maxWidthRatio
+          Math.max(
+            width + (event.clientX - startX) * speed,
+            Math.min(minWidth, width)
+          ),
+          Math.max(window.innerWidth * maxWidthRatio, width)
         );
         const nextHeight = Math.min(
-          Math.max(height + (event.clientY - startY) * speed, minHeight),
-          window.innerHeight * maxHeightRatio
+          Math.max(
+            height + (event.clientY - startY) * speed,
+            Math.min(minHeight, height)
+          ),
+          Math.max(window.innerHeight * maxHeightRatio, height)
         );
 
-        element.style.setProperty("--resize-width", `${nextWidth}px`);
-        element.style.setProperty("--resize-height", `${nextHeight}px`);
+        element.style.setProperty(
+          "--resize-width",
+          `${nextWidth - widthOffset}px`
+        );
+        element.style.setProperty(
+          "--resize-height",
+          `${nextHeight - heightOffset}px`
+        );
       };
 
       const stop = () => {

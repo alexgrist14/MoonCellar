@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { IGetGamesRequest } from "@mooncellar/schemas";
+import { type IGetGamesRequest } from "@mooncellar/schemas";
 
 const avgIgnoringNulls = (input: unknown[]) => ({
   $avg: {
@@ -23,6 +23,35 @@ export const combinedRatingsCountExpr = avgIgnoringNulls([
   "$igdb.total_rating_count",
   "$ratingsCount",
 ]);
+
+const RATING_PRIOR_MEAN = 65;
+const RATING_PRIOR_VOTES = 10;
+
+export const weightedRatingExpr = {
+  $let: {
+    vars: {
+      rating: combinedRatingExpr,
+      votes: { $ifNull: [combinedRatingsCountExpr, 0] },
+    },
+    in: {
+      $cond: [
+        { $eq: ["$$rating", null] },
+        null,
+        {
+          $divide: [
+            {
+              $add: [
+                { $multiply: ["$$rating", "$$votes"] },
+                RATING_PRIOR_MEAN * RATING_PRIOR_VOTES,
+              ],
+            },
+            { $add: ["$$votes", RATING_PRIOR_VOTES] },
+          ],
+        },
+      ],
+    },
+  },
+};
 
 const startOfYear = (year: number) => new Date(year, 0, 1).getTime() / 1000;
 

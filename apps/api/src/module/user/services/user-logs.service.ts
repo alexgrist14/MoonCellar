@@ -3,10 +3,10 @@ import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { Model } from "mongoose";
 import { setPagination } from "../../../shared/pagination";
 import {
-  IGetUserLogsRequest,
-  ILog,
-  IRemoveUserLogRequest,
-  IUserLog,
+  type IGetUserLogsRequest,
+  type ILog,
+  type IRemoveUserLogRequest,
+  type IUserLog,
 } from "@mooncellar/schemas";
 import { UserLogs } from "../schemas/user-logs.schema";
 

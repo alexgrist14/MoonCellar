@@ -1,4 +1,4 @@
-import { IExternalPageField } from "@mooncellar/schemas";
+import { type IExternalPageField } from "@mooncellar/schemas";
 
 const STEAM_APP_URL_REGEX =
   /(?:store\.steampowered\.com|steamcommunity\.com)\/app\/(\d+)(?:\/([^/?#]+))?/i;

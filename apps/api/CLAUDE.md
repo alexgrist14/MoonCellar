@@ -3,17 +3,61 @@
 Rules that apply to the NestJS service. Repository-wide rules live in the root
 [`CLAUDE.md`](../../CLAUDE.md).
 
-## Imports
+## Runtime
 
-- **Every import inside `src/` must be relative — never the non-relative `src/...` form.**
-  That form resolves only through `baseUrl`, and it survives into the compiled output unless
-  the Nest CLI path transformer rewrites it. The hook ran on a developer machine and did not
-  run inside the container image, so `dist` shipped `require("src/module/user/schemas/user.schema")`;
-  Bun resolved that to the TypeScript source instead of `dist`, and the service died at boot
-  with `SyntaxError: Export named 'IUserSettings' not found in module
-  '/app/packages/schemas/dist/index.js'` — a type-only export that exists in the `.ts` file but
-  not in compiled JavaScript. The old webpack build hid this by bundling everything.
-- Check with `grep -r 'require("src/' dist` after a build: it must print nothing.
+- **Bun runs the TypeScript source directly — `start`, `start:dev` (`bun --watch`) and the
+  container all execute `src/main.ts`.** Bun strips types without checking them, so `build`
+  runs `typecheck` and `check:boot` instead of compiling. The container image runs `build`,
+  so either failure stops the deploy there.
+- **`tsconfig.build.json` type-checks with Bun's semantics (`module: preserve`,
+  `verbatimModuleSyntax`); do not relax it.** It is the only thing that catches two boot
+  failures before they ship:
+  - A type imported without `import type` and named in decorator metadata — a decorated
+    constructor, method *or property*, such as `@Prop() settings: IUserSettings` — stays in
+    Bun's output, and the boot dies with `SyntaxError: Export named 'IUserSettings' not found
+    in module …`. tsc reports it as `TS1484`. `isolatedModules` alone (`TS1272`) misses the
+    property case.
+  - `import * as x` of a CommonJS package whose export is a function yields a namespace Bun
+    will not call: `cookieParser is not a function. (In 'cookieParser()', 'cookieParser' is
+    an instance of Module)`. Use a default import; tsc reports the call as `TS2349`.
+- **A named value import from a CommonJS package must be an own property of its exports, and
+  tsc cannot check that.** mongoose's `Connection` lives on the prototype, so
+  `import { Connection } from "mongoose"` in a decorated constructor dies with
+  `SyntaxError: Export named 'Connection' not found in module …/mongoose/index.js`. Import it
+  as a type — `@InjectConnection()` supplies the injection token. `check:boot` exists for this
+  class of error: it loads `AppModule`, resolves the DI graph in Nest's preview mode without
+  instantiating providers or touching MongoDB, and generates the OpenAPI document. It needs no
+  `.env`.
+
+## Auth
+
+- **Every path that ends a session clears the cookies in its own response, before anything
+  that can throw.** The browser cannot drop the `httpOnly` cookies itself, so a logout that
+  fails on the user update, or a refresh rejected because a logout elsewhere nulled
+  `refreshToken`, otherwise leaves a valid `accessMoonToken` behind for up to seven days, and the
+  web profile keeps treating that browser as its owner. `JwtRefreshGuard` and the refresh handler
+  clear them on `UnauthorizedException` only — a database error must not log everyone out.
+
+## Database
+
+- **Declare reference paths as `@Prop({ type: mongoose.Schema.Types.ObjectId, ref })`; a bare
+  `@Prop({ ref }) x: mongoose.Types.ObjectId` becomes a `Mixed` path.** Mongoose casts string
+  ids only on `ObjectId` paths, so a query with a string id against a `Mixed` path matches
+  nothing and returns an empty result instead of an error — reviews on the game page showed
+  "Not rated" for authors who had rated the game. `Rating.userId`/`gameId` are declared the bare
+  way, which is why `UserRatingsService` wraps every id in `new mongoose.Types.ObjectId(...)`.
+  Before querying a model with string ids, check `schema.path(name).instance`, or convert
+  explicitly (`asObjectId`/`asObjectIds` in `module/comments/utils`).
+- **The `.env` connection string points at the production database, and Mongoose `autoIndex`
+  is on.** A new `Schema.index(...)` is built on production the first time any local process
+  loads that schema. One-off scripts that import schemas connect with `autoIndex: false`.
+
+## Tests
+
+- **A spec that imports anything reaching `shared/utils/rich-text.utils` must mock that
+  module.** Jest runs the source as CommonJS and cannot load `htmlparser2`, the ESM-only
+  dependency of `sanitize-html`, so the suite dies at import with `Must use import to load ES
+  Module` before a single test runs. `comments.controller.spec.ts` mocks it with `jest.mock`.
 
 ## Storage
 

@@ -1,11 +1,11 @@
 import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { FilterQuery, Model } from "mongoose";
+import { type FilterQuery, Model } from "mongoose";
 import { User } from "../user/schemas/user.schema";
 import { UserLogs } from "../user/schemas/user-logs.schema";
 import { Rating } from "../user/schemas/user-ratings.schema";
 import { Playthrough } from "../games/schemas/playthroughs.schema";
-import { Game, GameDocument } from "../games/schemas/game.schema";
+import { Game, type GameDocument } from "../games/schemas/game.schema";
 import { type IRole } from "@mooncellar/schemas";
 
 @Injectable()

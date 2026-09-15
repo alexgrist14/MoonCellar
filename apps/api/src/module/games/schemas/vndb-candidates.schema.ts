@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Types } from "mongoose";
 import {
-  IScoreBreakdown,
-  TDateSignal,
-  TDescriptionSignal,
-  TMatchReason,
+  type IScoreBreakdown,
+  type TDateSignal,
+  type TDescriptionSignal,
+  type TMatchReason,
 } from "../interface/vndb.interface";
 
 export interface IVndbCandidateEntry {
@@ -24,11 +24,11 @@ export class VndbCandidate {
   vnId: string;
   @Prop()
   vnName: string;
-  @Prop()
+  @Prop({ type: String })
   reason: TMatchReason;
   @Prop({ type: [Object] })
   candidates: IVndbCandidateEntry[];
-  @Prop()
+  @Prop({ type: String })
   status: "resolved" | "pending" | "absent";
   @Prop({ type: Types.ObjectId, default: null })
   winner: Types.ObjectId | null;

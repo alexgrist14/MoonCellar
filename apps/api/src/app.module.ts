@@ -10,6 +10,7 @@ import { ServeStaticModule } from "@nestjs/serve-static";
 import { RetroachievementsModule } from "./module/retroach/retroach.module";
 import { SteamModule } from "./module/steam/steam.module";
 import { GamesModule } from "./module/games/games.module";
+import { CommentsModule } from "./module/comments/comments.module";
 import { APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
 import { ZodValidationPipe } from "nestjs-zod";
 import { AdminModule } from "./module/admin/admin.module";
@@ -36,6 +37,7 @@ import { HttpModule } from "@nestjs/axios";
     AdminModule,
     FaroModule,
     GamesModule,
+    CommentsModule,
     IgdbModule,
     RetroachievementsModule,
     SteamModule,

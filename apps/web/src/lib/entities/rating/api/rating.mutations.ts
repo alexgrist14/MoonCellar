@@ -7,6 +7,7 @@ import {
 } from "@mooncellar/schemas";
 import { ratingsAPI } from "@/src/lib/shared/api/ratings.api";
 import { useUserStore } from "@/src/lib/shared/store/user.store";
+import { commentQueryKeys } from "@/src/lib/entities/comment/api/comment.query-keys";
 
 export const useCreateRatingMutation = () => {
   const queryClient = useQueryClient();
@@ -14,6 +15,9 @@ export const useCreateRatingMutation = () => {
     mutationFn: (rating: IAddUserRatingRequest) =>
       ratingsAPI.add(rating).then(({ data }) => data),
     onSuccess: (rating) => {
+      queryClient.invalidateQueries({
+        queryKey: commentQueryKeys.reviews(rating.gameId),
+      });
       queryClient.setQueryData(
         ratingQueryKeys.list(rating.userId),
         (current: IUserRating[] | undefined) =>
@@ -31,6 +35,9 @@ export const useUpdateRatingMutation = () => {
     mutationFn: (rating: IUpdateUserRatingRequest) =>
       ratingsAPI.update(rating).then(({ data }) => data),
     onSuccess: (rating) => {
+      queryClient.invalidateQueries({
+        queryKey: commentQueryKeys.reviews(rating.gameId),
+      });
       queryClient.setQueryData(
         ratingQueryKeys.list(rating.userId),
         (current: IUserRating[] | undefined) =>
@@ -54,6 +61,9 @@ export const useDeleteRatingMutation = () => {
     mutationFn: ({ ratingId, userId }: { ratingId: string; userId: string }) =>
       ratingsAPI.remove({ _id: ratingId, userId }).then(({ data }) => data),
     onSuccess: (rating) => {
+      queryClient.invalidateQueries({
+        queryKey: commentQueryKeys.reviews(rating.gameId),
+      });
       queryClient.setQueryData(
         ratingQueryKeys.list(rating.userId),
         (current: IUserRating[] | undefined) =>

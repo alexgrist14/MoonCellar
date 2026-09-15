@@ -3,14 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "license": "SEE LICENSE IN LICENSE",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "dev": "tsc -p tsconfig.json --watch --preserveWatchOutput",
+    "typecheck": "tsc -p tsconfig.json",
     "test": "bun test"
   },
   "peerDependencies": {

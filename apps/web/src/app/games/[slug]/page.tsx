@@ -1,5 +1,5 @@
 import { GamePage } from "@/src/lib/pages/GamePage";
-import { gamesApi } from "@/src/lib/shared/api";
+import { commentsAPI, gamesApi } from "@/src/lib/shared/api";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
@@ -34,6 +34,13 @@ const getGame = cache(async (slug: string) =>
 const getStats = cache(async (gameId: string) =>
   gamesApi
     .getStats(gameId)
+    .then(({ data }) => data)
+    .catch(() => undefined)
+);
+
+const getReviews = cache(async (gameId: string) =>
+  commentsAPI
+    .getReviews(gameId, {})
     .then(({ data }) => data)
     .catch(() => undefined)
 );
@@ -101,11 +108,14 @@ const GamePageIndex = async ({ params }: { params: any }) => {
     notFound();
   }
 
-  const stats = await getStats(game._id);
+  const [stats, reviews] = await Promise.all([
+    getStats(game._id),
+    getReviews(game._id),
+  ]);
 
   return (
     <>
-      <JsonLd data={getVideoGameJsonLd(game)} />
+      <JsonLd data={getVideoGameJsonLd(game, reviews?.results)} />
       <JsonLd
         data={getBreadcrumbJsonLd([
           { name: "Home", path: "/" },
@@ -113,7 +123,7 @@ const GamePageIndex = async ({ params }: { params: any }) => {
           { name: game.name, path: `/games/${game.slug}` },
         ])}
       />
-      <GamePage game={game} stats={stats} />
+      <GamePage game={game} stats={stats} reviews={reviews} />
     </>
   );
 };

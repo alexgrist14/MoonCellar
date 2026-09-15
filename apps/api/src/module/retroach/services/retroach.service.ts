@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import {
-  AuthObject,
+  type AuthObject,
   buildAuthorization,
-  FetchedSystem,
-  GameList,
+  type FetchedSystem,
+  type GameList,
   getConsoleIds,
   getGameList,
   getUserAwards,
@@ -18,10 +18,10 @@ import { runInCronLogContext } from "../../../shared/cron-logging";
 import { runCronExclusive } from "../../../shared/cron-mutex";
 import { BusinessMetricsService } from "../../metrics/business-metrics.service";
 
-import { Game, GameDocument } from "../../games/schemas/game.schema";
+import { Game, type GameDocument } from "../../games/schemas/game.schema";
 import {
   Platform,
-  PlatformDocument,
+  type PlatformDocument,
 } from "../../games/schemas/platform.schema";
 import { User } from "../../user/schemas/user.schema";
 import { RA_MAIN_USER_NAME } from "../../../shared/constants";

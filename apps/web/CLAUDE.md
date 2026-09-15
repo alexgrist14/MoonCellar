@@ -19,8 +19,11 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   and the activity log) go through it, which is what keeps their formatting identical.
 - **The look of rendered rich text is defined once, in the `richText` mixin** (`_mixins.scss`),
   and consumed by `RichText` and by `RichEditor`'s content area, so the editor shows what the
-  reader gets. Block spacing comes from `--rich-text-gap`. The mixin's `img { max-width: 100% }`
-  is load-bearing: without it a comment image renders at natural size and blows the activity
+  reader gets. Block spacing comes from `--rich-text-gap`. Images are capped there at
+  `min(100%, var(--rich-editor-image-width))`, and no consumer restates the width: while only the
+  editor capped it, a review on the game page stretched a screenshot across the whole panel,
+  and the profile looked right only because its column happened to be narrow. The `100%` half is
+  load-bearing too — without it a comment image renders at natural size and blows the activity
   card open to the width of the upload.
 - **A rich-text container must restate `font-size` on its own `p`.** `root.scss` declares a bare
   `p { font-size: 14px }`, and an explicit declaration beats an inherited one whatever the
@@ -199,9 +202,20 @@ component needs to build the value itself (a `basePath` string, not a `getHref` 
   (`enabled: false`, e.g. `useGamesByIdsQuery`'s `ids.length > 0`) never leaves `status:
   "pending"`, so `if (isPending) return <Loader />` renders forever and the empty-state branch
   below it is unreachable — that is how the profile's "List is empty" placeholder disappeared
-  behind an endless spinner. Use `isFetching` (or `isLoading`, which is `isPending &&
-  isFetching`): both are `false` while a query is disabled and `true` on the first render of an
-  enabled one, so nothing flashes before the loader appears.
+  behind an endless spinner. Use `isLoading` (`isPending && isFetching`): it is `false` while a
+  query is disabled and `true` on the first render of an enabled one, so nothing flashes before
+  the loader appears.
+- **Never gate a loader that replaces data on `isFetching` either.** It is also `true` during a
+  background refetch, so once a query is older than its `staleTime` a remount swaps the cached
+  list for the spinner — the `/games` catalogue showed a loader and refetched on every browser
+  Back instead of rendering from the cache. Keep `isFetching` for secondary indicators.
+- **Page state of a client page that fetches through React Query goes into the URL with
+  `window.history.pushState`, not `router.push`.** `router.push` re-runs the route's server
+  component, and `useSearchParams` does not change until that server render finishes, so the
+  client query never sees the new key in time: `/games` pagination just scrolled to the top and
+  swapped the cards later with no loader, even for pages already in the cache. `pushState`
+  updates `useSearchParams` immediately without a server request — `GamesPage` pagination and
+  `Filters` both go through it.
 
 ## Mockups
 
@@ -235,6 +249,22 @@ break silently when ignored:
 - **The licensed faces cannot travel.** ApercuPro and Pentagra are local files, and a published
   mockup may only pull fonts from Google Fonts. Substitute Hanken Grotesk and say so on the
   page, or the mockup reads as a typography proposal it isn't.
+
+## Auth
+
+- **The auth cookies are `httpOnly` and set by the API, so only an API response can remove
+  them.** `deleteCookie` writes `document.cookie`, which cannot touch an `httpOnly` cookie —
+  every call on `accessMoonToken`/`refreshMoonToken` is a no-op. A session ends only through
+  `POST /auth/:id/logout` or a rejected `POST /auth/refresh-token`, both of which clear the
+  cookies in their response.
+- **The persisted `auth` store and the cookies can disagree, so the profile trusts the viewer
+  only when both do.** `/user/[name]` decodes `accessMoonToken` on the server to decide who is
+  viewing, while `agent` sends `x-user-id` from the store. A browser logged out in the store but
+  still carrying a live cookie got the owner's profile: `PATCH profile-time` fired on open, log
+  deletion was offered, and every such request died with `400 Wrong user` from `UserIdGuard`.
+  `UserProfile` accepts the server's `authUserId` only when the store's profile has the same id
+  (the server render, which has no store, keeps the cookie's answer), and on disagreement calls
+  `refreshAuth`, which either restores the session or gets the stale cookies cleared.
 
 ## Verification
 
@@ -271,6 +301,16 @@ break silently when ignored:
   a clipped panel cannot cut it off. Parse the incoming ISO string by hand (`new Date(y, m - 1,
   d)`), never `new Date("2026-09-20")` — the latter is parsed as UTC midnight and shows the
   previous day in any negative-offset timezone.
+
+## Dropdowns
+
+- **`Dropdown` renders its list inline unless it gets `isThroughPortal`.** Unlike `DatePicker`,
+  the portal is opt-in: without the prop the list is an absolutely positioned child of the field,
+  so any ancestor with `overflow` — a modal's scroll area, a `Box` with `isWithScrollBar`, a
+  compact panel — cuts it off. The playthrough modal's category list was clipped in the compact
+  Wishlist layout for exactly this reason. Pass `isThroughPortal` for every dropdown inside a
+  modal or a scrollable panel; the portal list follows the field on scroll and resize, and
+  `#dropdown-connector` sits after `ModalsConnector` in `Layout`, so it stays above the modal.
 
 ## Scrolling
 

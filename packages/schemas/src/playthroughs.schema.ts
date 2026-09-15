@@ -24,6 +24,15 @@ export const PlaythroughSchema = z.object({
   time: z.number().describe("Spent time (hours)").optional(),
   comment: z.string().describe("Note after complete").optional(),
   isMastered: z.boolean().describe("Check if mastered").optional(),
+  isPublic: z
+    .boolean()
+    .describe("Show the note as a review on the game page")
+    .optional(),
+  isSpoiler: z.boolean().describe("The note contains spoilers").optional(),
+  helpfulCount: z
+    .number()
+    .describe("Players who found the review helpful")
+    .optional(),
   createdAt: z.coerce.string().pipe(z.iso.date()),
   updatedAt: z.coerce.string().pipe(z.iso.date()),
 });
@@ -32,6 +41,7 @@ export const PlaythroughEditSchema = PlaythroughSchema.omit({
   _id: true,
   createdAt: true,
   updatedAt: true,
+  helpfulCount: true,
 });
 
 export const PlaythroughFullResponseSchema = PlaythroughSchema;

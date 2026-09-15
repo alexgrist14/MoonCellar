@@ -50,3 +50,8 @@ export * from "./SvgListNumbered";
 export * from "./SvgQuote";
 export * from "./SvgLink";
 export * from "./SvgImage";
+export * from "./SvgHeart";
+export * from "./SvgThumb";
+export * from "./SvgReply";
+export * from "./SvgFlag";
+export * from "./SvgEye";

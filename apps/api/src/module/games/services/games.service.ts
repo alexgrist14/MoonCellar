@@ -4,33 +4,33 @@ import {
   Injectable,
   Logger,
   NotFoundException,
-  OnModuleInit,
+  type OnModuleInit,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { Model } from "mongoose";
 import * as fuzzysort from "fuzzysort";
 import {
-  IAddGameRequest,
-  IGetGameByIdRequest,
-  IGetGameBySlugRequest,
-  IGetGamesByIdsRequest,
-  IGetGamesRequest,
-  IGetGameSlugsRequest,
-  IUpdateGameRequest,
-  IGetGameFollowingsStatusRequest,
-  IGetGameFollowingsStatusResponse,
-  IGameStats,
-  IGetGamesStatsResponse,
+  type IAddGameRequest,
+  type IGetGameByIdRequest,
+  type IGetGameBySlugRequest,
+  type IGetGamesByIdsRequest,
+  type IGetGamesRequest,
+  type IGetGameSlugsRequest,
+  type IUpdateGameRequest,
+  type IGetGameFollowingsStatusRequest,
+  type IGetGameFollowingsStatusResponse,
+  type IGameStats,
+  type IGetGamesStatsResponse,
 } from "@mooncellar/schemas";
-import { Game, GameDocument } from "../schemas/game.schema";
+import { Game, type GameDocument } from "../schemas/game.schema";
 import {
-  IPlaythroughDocument,
+  type IPlaythroughDocument,
   Playthrough,
 } from "../schemas/playthroughs.schema";
 import {
   gamesFilters,
-  combinedRatingExpr,
   combinedRatingsCountExpr,
+  weightedRatingExpr,
 } from "../../../shared/games";
 import { FileService } from "../../user/services/file-upload.service";
 import { User } from "../../user/schemas/user.schema";
@@ -70,7 +70,7 @@ const COMBINED_RATINGS_COUNT_FIELD = "_combinedRatingsCount";
 
 const COMBINED_RATING_STAGE = {
   $addFields: {
-    [COMBINED_RATING_FIELD]: combinedRatingExpr,
+    [COMBINED_RATING_FIELD]: weightedRatingExpr,
   },
 };
 

@@ -12,6 +12,7 @@ import { Tabs } from "../Tabs";
 import { ITabContent } from "../../types/tabs.type";
 import { useAuthStore } from "../../store/auth.store";
 import { Loader } from "../Loader";
+import { useMinimumLoading } from "../../hooks/useMinimumLoading";
 import { useUserFiltersQuery } from "@/src/lib/entities/user/api/user.queries";
 import { useRemoveUserFilterMutation } from "@/src/lib/entities/user/api/user.mutations";
 import { modal } from "../Modal";
@@ -71,6 +72,7 @@ export const Filters: FC<{
     ageRatings,
   } = useCommonStore();
   const { isLoading, isPlatformsLoading } = useStatesStore();
+  const isSavedFiltersLoaderShown = useMinimumLoading(!savedFilters);
   const { isExcludeHistory, setExcludeHistory } = useFiltersStore();
   const { expanded, setExpanded } = useExpandStore();
 
@@ -736,7 +738,7 @@ export const Filters: FC<{
       )}
       {tab === "saved" && (
         <div>
-          {!!savedFilters ? (
+          {!!savedFilters && !isSavedFiltersLoaderShown ? (
             <div className={styles.filters__saved}>
               {!!savedFilters?.length ? (
                 savedFilters.map((filter, i) => (

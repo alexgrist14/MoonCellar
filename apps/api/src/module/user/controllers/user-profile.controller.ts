@@ -30,7 +30,7 @@ import {
   UpdateUserEmailDto,
   UpdateUserPasswordDto,
 } from "../../../shared/zod/dto/user.dto";
-import { IGetUserLoginsResponse } from "@mooncellar/schemas";
+import { type IGetUserLoginsResponse } from "@mooncellar/schemas";
 import { UserIdGuard } from "../../auth/user.guard";
 import { User } from "../schemas/user.schema";
 import { UserProfileService } from "../services/user-profile.service";

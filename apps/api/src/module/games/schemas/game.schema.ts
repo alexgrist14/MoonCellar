@@ -1,16 +1,16 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { HydratedDocument } from "mongoose";
+import mongoose, { type HydratedDocument } from "mongoose";
 import {
-  IAgeRatingField,
-  ICompanyField,
-  IExternalPageField,
-  IGDBField,
-  IHltbField,
-  IMultiplayerModeField,
-  IReleaseDate,
-  IRelatedGamesField,
-  IRetroachievementsField,
-  IVndbField,
+  type IAgeRatingField,
+  type ICompanyField,
+  type IExternalPageField,
+  type IGDBField,
+  type IHltbField,
+  type IMultiplayerModeField,
+  type IReleaseDate,
+  type IRelatedGamesField,
+  type IRetroachievementsField,
+  type IVndbField,
 } from "@mooncellar/schemas";
 import { Platform } from "./platform.schema";
 import { Character } from "./character.schema";

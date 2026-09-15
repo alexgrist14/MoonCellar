@@ -11,7 +11,7 @@ RUN bun install --frozen-lockfile
 ADD https://git.io/GeoLite2-Country.mmdb /app/geo/GeoLite2-Country.mmdb
 
 COPY . .
-RUN bun --filter '@mooncellar/schemas' build && bun --filter web build
+RUN bun --filter web build
 
 WORKDIR /app/apps/web
 EXPOSE 3111

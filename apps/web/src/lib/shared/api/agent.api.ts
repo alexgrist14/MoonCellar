@@ -27,6 +27,7 @@ agent.interceptors.response.use(
         .catch((refreshError) => {
           deleteCookie(ACCESS_TOKEN);
           deleteCookie(REFRESH_TOKEN);
+          useAuthStore.getState().clear();
 
           logger.error("Token refresh failed", refreshError, {
             originalUrl: config?.url,

@@ -5,6 +5,7 @@ import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { useGamesStore } from "@/src/lib/shared/store/games.store";
 import { emptyGames } from "@/src/lib/shared/constants/games.const";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { useWheel } from "@/src/lib/shared/hooks/useWheel";
 import { shuffle } from "@/src/lib/shared/utils/common.utils";
 import { IGameResponse } from "@mooncellar/schemas";
@@ -61,8 +62,15 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   const setWinner = useWheelStore((state) => state.setWinner);
 
   const { addHistoryGame, games, royalGames } = useGamesStore();
-  const { isFinished, isLoading, isStarted, setFinished, setStarted, isRoyal } =
-    useStatesStore();
+  const {
+    isFinished,
+    isLoading: isGamesLoading,
+    isStarted,
+    setFinished,
+    setStarted,
+    isRoyal,
+  } = useStatesStore();
+  const isLoading = useMinimumLoading(!!isGamesLoading);
   const isMusicEnabled = useSettingsStore((state) => state.isMusicEnabled);
   const musicVolume = useSettingsStore((state) => state.musicVolume ?? 1);
   const isBounceBackEnabled = useSettingsStore(

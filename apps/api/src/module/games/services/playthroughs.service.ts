@@ -1,15 +1,15 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import mongoose, { FilterQuery, Model } from "mongoose";
+import mongoose, { type FilterQuery, Model } from "mongoose";
 import {
-  IGetPlaythroughsRequest,
-  ISavePlaythroughRequest,
-  IUpdatePlaythroughRequest,
+  type IGetPlaythroughsRequest,
+  type ISavePlaythroughRequest,
+  type IUpdatePlaythroughRequest,
 } from "@mooncellar/schemas";
 import { UserLogsService } from "../../user/services/user-logs.service";
-import { Platform, PlatformDocument } from "../schemas/platform.schema";
+import { Platform, type PlatformDocument } from "../schemas/platform.schema";
 import {
-  IPlaythroughDocument,
+  type IPlaythroughDocument,
   Playthrough,
 } from "../schemas/playthroughs.schema";
 import { sanitizeRichText } from "../../../shared/utils/rich-text.utils";

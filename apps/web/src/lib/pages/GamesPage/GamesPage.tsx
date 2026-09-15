@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useMemo } from "react";
+import { FC, useCallback, useMemo } from "react";
 import { hashKey } from "@tanstack/react-query";
 import styles from "./GamesPage.module.scss";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
@@ -12,6 +12,7 @@ import { Box } from "../../shared/ui/Box";
 import { BGImage } from "../../shared/ui/BGImage";
 import { Breadcrumbs } from "../../shared/ui/Breadcrumbs";
 import { useAdvancedRouter } from "../../shared/hooks/useAdvancedRouter";
+import { useMinimumLoading } from "../../shared/hooks/useMinimumLoading";
 import { GamesCards } from "../../shared/ui/GamesCards";
 import { takeGames } from "../../shared/constants/games.const";
 import { GamesListMenu } from "../../widgets/main";
@@ -30,7 +31,7 @@ export const GamesPage: FC<IGamesPageProps> = ({
   initialParams,
   initialData,
 }) => {
-  const { asPath, query } = useAdvancedRouter();
+  const { asPath, pathname, query } = useAdvancedRouter();
 
   const params = useMemo(
     () => ({
@@ -50,10 +51,23 @@ export const GamesPage: FC<IGamesPageProps> = ({
       : undefined;
   }, [params, initialParams, initialData]);
 
-  const { data, isPending, isFetching } = useGamesQuery(
+  const { data, isLoading: isGamesLoading } = useGamesQuery(
     params,
     true,
     seededData
+  );
+  const isLoading = useMinimumLoading(isGamesLoading);
+
+  const changePage = useCallback(
+    (page: number) => {
+      if (page === params.page) return;
+
+      const nextQuery = new URLSearchParams(query.toString());
+
+      nextQuery.set("page", page.toString());
+      window.history.pushState(null, "", `${pathname}?${nextQuery}`);
+    },
+    [params.page, pathname, query]
   );
 
   const games = data?.results;
@@ -71,7 +85,9 @@ export const GamesPage: FC<IGamesPageProps> = ({
         take={takeGames}
         total={total}
         isFixed
-        isDisabled={isFetching}
+        isDisabled={isLoading}
+        page={params.page}
+        onPageChange={changePage}
       />
       <Box
         contentStyle={{
@@ -87,7 +103,7 @@ export const GamesPage: FC<IGamesPageProps> = ({
           ]}
         />
         <SectionTitle as="h1">Games</SectionTitle>
-        {isPending || isFetching ? (
+        {isLoading ? (
           <Loader type="pacman" />
         ) : !games?.length ? (
           <h2 className={styles.page__empty}>Games not found</h2>

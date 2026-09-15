@@ -7,6 +7,7 @@ import {
 } from "@mooncellar/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { playthroughQueryKeys } from "./playthrough.query-keys";
+import { commentQueryKeys } from "@/src/lib/entities/comment/api/comment.query-keys";
 import { useUserStore } from "@/src/lib/shared/store/user.store";
 import { usePlaythroughsStore } from "@/src/lib/shared/store/playthroughs.store";
 
@@ -16,6 +17,9 @@ export const useCreatePlaythroughMutation = () => {
     mutationFn: (playthrough: ISavePlaythroughRequest) =>
       playthroughsAPI.create(playthrough).then(({ data }) => data),
     onSuccess: (playthrough: IPlaythrough) => {
+      queryClient.invalidateQueries({
+        queryKey: commentQueryKeys.reviews(playthrough.gameId),
+      });
       queryClient.setQueryData(
         playthroughQueryKeys.list(playthrough.userId, playthrough.gameId),
         (current: IPlaythrough[] | undefined) =>
@@ -56,6 +60,9 @@ export const useDeletePlaythroughMutation = () => {
       playthroughsAPI.remove(userId, playthroughId).then(({ data }) => data),
 
     onSuccess: (playthrough: IPlaythrough) => {
+      queryClient.invalidateQueries({
+        queryKey: commentQueryKeys.reviews(playthrough.gameId),
+      });
       queryClient.setQueryData(
         playthroughQueryKeys.list(playthrough.userId, playthrough.gameId),
         (current: IPlaythrough[] | undefined) =>
@@ -103,6 +110,9 @@ export const useUpdatePlaythroughMutation = () => {
         .then(({ data }) => data),
 
     onSuccess: (playthrough: IPlaythrough) => {
+      queryClient.invalidateQueries({
+        queryKey: commentQueryKeys.reviews(playthrough.gameId),
+      });
       queryClient.setQueryData(
         playthroughQueryKeys.list(playthrough.userId, playthrough.gameId),
         (current: IPlaythrough[] | undefined) =>

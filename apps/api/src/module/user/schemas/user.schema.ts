@@ -5,7 +5,7 @@ import {
   type IRAAward,
   type IRole,
   DEFAULT_BG_OPACITY,
-  IUserSettings,
+  type IUserSettings,
 } from "@mooncellar/schemas";
 
 @Schema({

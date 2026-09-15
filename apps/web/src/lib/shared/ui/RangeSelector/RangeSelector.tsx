@@ -2,6 +2,7 @@ import { CSSProperties, FC, useEffect, useRef, useState } from "react";
 import styles from "./RangeSelector.module.scss";
 import classNames from "classnames";
 import { Loader } from "../Loader";
+import { useMinimumLoading } from "../../hooks/useMinimumLoading";
 
 interface RangeSelectorProps extends Partial<
   Pick<HTMLInputElement, "disabled">
@@ -40,6 +41,7 @@ export const RangeSelector: FC<RangeSelectorProps> = ({
 
   const isInteracting = useRef(false);
   const emittedValue = useRef<number>(undefined);
+  const isLoaderShown = useMinimumLoading(!!isLoading);
 
   useEffect(() => {
     if (isInteracting.current || defaultValue === emittedValue.current) return;
@@ -79,7 +81,7 @@ export const RangeSelector: FC<RangeSelectorProps> = ({
       style={getStyles()}
     >
       {!!text && <span className={styles.selector__text}>{text}</span>}
-      {isLoading ? (
+      {isLoaderShown ? (
         <Loader type="moon" />
       ) : (
         <div className={styles.slider}>

@@ -1,4 +1,5 @@
 export * from "./characters.schema";
+export * from "./comments.schema";
 export * from "./files.schema";
 export * from "./game-followings-status.schema";
 export * from "./games.schema";

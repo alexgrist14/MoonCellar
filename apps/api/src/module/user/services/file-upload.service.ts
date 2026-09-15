@@ -4,7 +4,7 @@ import {
   GetObjectCommand,
   ListObjectsV2Command,
   PutObjectCommand,
-  PutObjectCommandInput,
+  type PutObjectCommandInput,
   S3Client,
 } from "@aws-sdk/client-s3";
 import {
@@ -13,14 +13,17 @@ import {
   Logger,
   NotFoundException,
 } from "@nestjs/common";
-import { IGetFileRequest, IGetFileResponse } from "@mooncellar/schemas";
+import {
+  type IGetFileRequest,
+  type IGetFileResponse,
+} from "@mooncellar/schemas";
 import { mimeToExt } from "../../../shared/constants";
 import {
   getS3Bucket,
   getS3CdnUrl,
   getS3Config,
   S3_FOLDERS,
-  S3Folder,
+  type S3Folder,
 } from "../../../shared/s3";
 
 const DELETE_BATCH_SIZE = 1000;

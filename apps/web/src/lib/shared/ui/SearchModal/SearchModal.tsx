@@ -3,6 +3,7 @@ import styles from "./SearchModal.module.scss";
 import { FC, useEffect, useState } from "react";
 import { Button } from "../Button";
 import { Loader } from "../Loader";
+import { useMinimumLoading } from "../../hooks/useMinimumLoading";
 import { ButtonGroup } from "../Button/ButtonGroup";
 import { modal } from "../Modal";
 import { useDisableScroll } from "../../hooks";
@@ -33,13 +34,9 @@ export const SearchModal: FC = () => {
 
   const games = data?.results;
   const total = data?.total ?? 0;
-  const isSearching = isDebouncing || isFetching;
+  const isSearching = useMinimumLoading(isDebouncing || isFetching);
   const showMoreGamesButton =
-    !!games?.length &&
-    !!total &&
-    takeGames < total &&
-    !isFetching &&
-    !isDebouncing;
+    !!games?.length && !!total && takeGames < total && !isSearching;
   useDisableScroll();
 
   useEffect(() => {

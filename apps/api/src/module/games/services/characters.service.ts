@@ -1,10 +1,10 @@
 import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { Model } from "mongoose";
-import { Character, CharacterDocument } from "../schemas/character.schema";
+import { Character, type CharacterDocument } from "../schemas/character.schema";
 import {
-  IGetCharacterBySlugRequest,
-  IGetCharactersRequest,
+  type IGetCharacterBySlugRequest,
+  type IGetCharactersRequest,
 } from "@mooncellar/schemas";
 
 const DEFAULT_CHARACTERS_TAKE = 50;

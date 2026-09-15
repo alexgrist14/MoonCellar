@@ -2,27 +2,27 @@ import { HttpService } from "@nestjs/axios";
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { firstValueFrom } from "rxjs";
-import { Game, GameDocument } from "../schemas/game.schema";
+import { Game, type GameDocument } from "../schemas/game.schema";
 import mongoose, { Model, Types } from "mongoose";
 import {
-  IScoredCandidate,
-  IVndbCharacter,
-  IVndbGameResponse,
-  IVndbNovel,
-  IVndbReleaseEntry,
-  IVndbReleaseResponse,
-  IVnMatch,
-  IScoreBreakdown,
-  IScoreContext,
-  TCandidatesByVn,
-  TDateSignal,
-  TDescriptionSignal,
-  TMatchReason,
-  TReleaseSignalsByVn,
-  TVndbCandidate,
-  TVndbFilter,
-  TVndbFilters,
-  IVndbImage,
+  type IScoredCandidate,
+  type IVndbCharacter,
+  type IVndbGameResponse,
+  type IVndbNovel,
+  type IVndbReleaseEntry,
+  type IVndbReleaseResponse,
+  type IVnMatch,
+  type IScoreBreakdown,
+  type IScoreContext,
+  type TCandidatesByVn,
+  type TDateSignal,
+  type TDescriptionSignal,
+  type TMatchReason,
+  type TReleaseSignalsByVn,
+  type TVndbCandidate,
+  type TVndbFilter,
+  type TVndbFilters,
+  type IVndbImage,
 } from "../interface/vndb.interface";
 import {
   companySearchPrefix,
@@ -36,9 +36,9 @@ import {
   tokenSetFrom,
 } from "../utils/title-match.utils";
 import {
-  ICompanyField,
-  IExternalPageField,
-  IReleaseDate,
+  type ICompanyField,
+  type IExternalPageField,
+  type IReleaseDate,
 } from "@mooncellar/schemas";
 import {
   INCOMPATIBLE_GENRES,
@@ -102,7 +102,7 @@ import { VndbCandidate } from "../schemas/vndb-candidates.schema";
 import { Character } from "../schemas/character.schema";
 import { Platform } from "../schemas/platform.schema";
 import { isSameObjectIdList, sleep } from "../../../shared/utils";
-import { S3_FOLDERS, S3Folder } from "../../../shared/s3";
+import { S3_FOLDERS, type S3Folder } from "../../../shared/s3";
 import { FileService } from "../../user/services/file-upload.service";
 import { Cron } from "@nestjs/schedule";
 import { PinoLogger } from "nestjs-pino";

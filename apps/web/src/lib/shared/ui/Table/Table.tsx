@@ -4,6 +4,7 @@ import { ITableHeaders, ITableRows } from "@/src/lib/shared/types/table.type";
 import classNames from "classnames";
 import { CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { MobileTable } from "@/src/lib/shared/ui/MobileTable";
 import { PaginationClient } from "@/src/lib/shared/ui/PaginationClient";
@@ -57,9 +58,11 @@ export const Table = <T extends object>({
     return keys;
   }, [headers]);
 
+  const isLoaderShown = useMinimumLoading(!!isLoading);
+
   const isInactive = useMemo(
-    () => isLoading || sortedRows === undefined,
-    [sortedRows, isLoading]
+    () => isLoaderShown || sortedRows === undefined,
+    [sortedRows, isLoaderShown]
   );
 
   useEffect(() => {
@@ -144,7 +147,7 @@ export const Table = <T extends object>({
         <div className={classNames(styles.table)}>
           {!rows?.length ? (
             <p className={styles.table__empty}>
-              {isLoading ? "" : "List is empty"}
+              {isLoaderShown ? "" : "List is empty"}
             </p>
           ) : (
             keys
@@ -268,7 +271,7 @@ export const Table = <T extends object>({
           )}
         </div>
       )}
-      {!isLoading && (
+      {!isLoaderShown && (
         <PaginationClient
           page={page}
           setPage={setPage}
