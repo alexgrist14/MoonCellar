@@ -112,6 +112,10 @@ export const GameDatabaseSchema = SchemaFactory.createForClass(Game);
 GameDatabaseSchema.index({ slug: 1 }, { unique: true });
 GameDatabaseSchema.index({ "igdb.gameId": 1 });
 GameDatabaseSchema.index(
+  { "vndb.syncedAt": 1 },
+  { partialFilterExpression: { "vndb.vnId": { $exists: true } } }
+);
+GameDatabaseSchema.index(
   { "vndb.vnId": 1 },
   { unique: true, partialFilterExpression: { "vndb.vnId": { $exists: true } } }
 );

@@ -44,6 +44,12 @@ export class FileService {
     return `${getS3CdnUrl()}/${this.toKey(folder, key)}`;
   }
 
+  getKeyFromUrl(folder: S3Folder, url?: string | null) {
+    const prefix = this.getPublicUrl(folder, "");
+
+    return url?.startsWith(prefix) ? url.slice(prefix.length) : null;
+  }
+
   getFolders(): S3Folder[] {
     return Object.values(S3_FOLDERS);
   }

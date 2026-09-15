@@ -8,6 +8,12 @@ export const RetroachievementsSchema = z.object({
 
 export const VndbSchema = z.object({
   vnId: z.string(),
+  lengthMinutes: z.number().nullable().optional(),
+  relations: z
+    .object({ vnId: z.string(), relation: z.string() })
+    .array()
+    .optional(),
+  syncedAt: z.string().optional(),
 });
 
 export const IGDBSchema = z.object({
@@ -93,6 +99,14 @@ export const RelatedGamesSchema = z.object({
   remakes: z.string().array().optional(),
   remasters: z.string().array().optional(),
   similar_games: z.string().array().optional(),
+  sequels: z.string().array().optional(),
+  prequels: z.string().array().optional(),
+  side_stories: z.string().array().optional(),
+  parent_stories: z.string().array().optional(),
+  same_series: z.string().array().optional(),
+  same_setting: z.string().array().optional(),
+  shared_characters: z.string().array().optional(),
+  alternative_versions: z.string().array().optional(),
 });
 
 export const HltbSchema = z.object({

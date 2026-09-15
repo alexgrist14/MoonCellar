@@ -2,6 +2,7 @@ export const VNDB_SCORE_THRESHOLD = 2;
 export const VNDB_SCORE_GAP = 3;
 export const VISUAL_NOVEL_GENRE = "Visual Novel";
 export const MAIN_GAME_TYPE = "Main Game";
+export const SINGLE_PLAYER_MODE = "Single player";
 export const FAN_DISC_GAME_TYPE = "Fan Disc";
 export const FAN_DISC_GAME_TYPES = [
   FAN_DISC_GAME_TYPE,
@@ -10,6 +11,18 @@ export const FAN_DISC_GAME_TYPES = [
   "DLC",
 ];
 export const VNDB_ORIGINAL_RELATION = "orig";
+export const VNDB_RELATION_FIELDS: Record<string, string> = {
+  seq: "sequels",
+  preq: "prequels",
+  side: "side_stories",
+  par: "parent_stories",
+  ser: "same_series",
+  set: "same_setting",
+  char: "shared_characters",
+  alt: "alternative_versions",
+  fan: "standalone_expansions",
+};
+export const VNDB_SHARED_RELATION_FIELDS = ["standalone_expansions"];
 
 export const MIN_STRING_LENGTH = 8;
 export const MIN_TITLE_WORDS = 2;
@@ -45,7 +58,14 @@ export const VNDB_RELEASE_PAGE_SIZE = 100;
 export const VNDB_RELEASE_ID_CHUNK_SIZE = 25;
 export const VNDB_MAX_RETRIES = 4;
 export const VNDB_RETRY_DELAY_MS = 5000;
-export const VNDB_REQUEST_DELAY_MS = 400;
+export const VNDB_REQUEST_DELAY_MS = 1600;
+export const VNDB_PAGE_SIZE = 100;
+export const VNDB_SYNC_REFRESH_LIMIT = 2000;
+export const VNDB_SYNC_CRON = "0 6 * * *";
+export const VNDB_SYNC_CRON_OPTIONS = {
+  name: "vndb-daily-sync",
+  timeZone: "Europe/Moscow",
+};
 
 export const VNDB_THEME_MIN_LEVEL = 1.2;
 export const VNDB_THEME_TAGS: Record<string, string> = {
@@ -76,6 +96,8 @@ export const VNDB_LANGUAGE_REGIONS: Record<string, number> = {
 };
 
 export const VNDB_KEYWORD_MIN_RATING = 2;
+export const VNDB_EXPLICIT_SEXUAL_LEVEL = 1;
+export const VNDB_EXPLICIT_IMAGES_KEYWORD = "18+ images";
 export const VNDB_STATUS_NAMES: Record<number, string> = {
   0: "Released",
   2: "Cancelled",

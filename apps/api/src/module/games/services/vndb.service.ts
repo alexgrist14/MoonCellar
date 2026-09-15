@@ -43,9 +43,14 @@ import {
 import {
   INCOMPATIBLE_GENRES,
   MAIN_GAME_TYPE,
+  SINGLE_PLAYER_MODE,
+  VNDB_EXPLICIT_IMAGES_KEYWORD,
+  VNDB_EXPLICIT_SEXUAL_LEVEL,
   FAN_DISC_GAME_TYPE,
   FAN_DISC_GAME_TYPES,
   VNDB_ORIGINAL_RELATION,
+  VNDB_RELATION_FIELDS,
+  VNDB_SHARED_RELATION_FIELDS,
   MIN_COMPANY_PREFIX_LENGTH,
   MIN_DESCRIPTION_TOKENS,
   MIN_STRING_LENGTH,
@@ -69,6 +74,10 @@ import {
   VNDB_FUZZY_TITLE_SIMILARITY,
   VNDB_MAX_RETRIES,
   VNDB_REQUEST_DELAY_MS,
+  VNDB_PAGE_SIZE,
+  VNDB_SYNC_CRON,
+  VNDB_SYNC_CRON_OPTIONS,
+  VNDB_SYNC_REFRESH_LIMIT,
   VNDB_RETRY_DELAY_MS,
   VNDB_THEME_MIN_LEVEL,
   VNDB_THEME_TAGS,
@@ -93,6 +102,13 @@ import { VndbCandidate } from "../schemas/vndb-candidates.schema";
 import { Character } from "../schemas/character.schema";
 import { Platform } from "../schemas/platform.schema";
 import { isSameObjectIdList, sleep } from "../../../shared/utils";
+import { S3_FOLDERS, S3Folder } from "../../../shared/s3";
+import { FileService } from "../../user/services/file-upload.service";
+import { Cron } from "@nestjs/schedule";
+import { PinoLogger } from "nestjs-pino";
+import { runInCronLogContext } from "../../../shared/cron-logging";
+import { runCronExclusive } from "../../../shared/cron-mutex";
+import { BusinessMetricsService } from "../../metrics/business-metrics.service";
 
 const VNDB_API_URL = "https://api.vndb.org/kana";
 
@@ -136,6 +152,17 @@ const releaseDateFormats: Record<number, Intl.DateTimeFormat> = {
   }),
 };
 
+const stripBbcode = (value: string) =>
+  value
+    .replace(/\[spoiler\][\s\S]*?\[\/spoiler\]/gi, "")
+    .replace(/\[url=[^\]]*\]([\s\S]*?)\[\/url\]/gi, "$1")
+    .replace(/\[From [^\]]*\]/gi, "")
+    .replace(/\[\/?[a-z]+(?:=[^\]]*)?\]/gi, "")
+    .trim();
+
+const isEmptyValue = (value: unknown) =>
+  value == null || value === "" || (Array.isArray(value) && !value.length);
+
 const toSlug = (value: string) =>
   value
     .toLowerCase()
@@ -146,6 +173,8 @@ const toSlug = (value: string) =>
 @Injectable()
 export class VndbService {
   private readonly logger = new Logger(VndbService.name);
+  private isRunning = false;
+  private lastRequestAt = 0;
 
   constructor(
     private readonly httpService: HttpService,
@@ -156,12 +185,17 @@ export class VndbService {
     @InjectModel(Platform.name)
     private readonly platformsModel: Model<Platform>,
     @InjectModel(Character.name)
-    private readonly charactersModel: Model<Character>
+    private readonly charactersModel: Model<Character>,
+    private readonly fileService: FileService,
+    private readonly pino: PinoLogger,
+    private readonly metrics: BusinessMetricsService
   ) {}
 
   async getStats() {
     const { data } = await firstValueFrom(
-      this.httpService.get<IVndbGameResponse[]>(`${VNDB_API_URL}/stats`)
+      this.httpService.get<{ vn: number; chars: number; releases: number }>(
+        `${VNDB_API_URL}/stats`
+      )
     );
     return data;
   }
@@ -185,46 +219,448 @@ export class VndbService {
     }
   }
 
-  async backFill() {
+  @Cron(VNDB_SYNC_CRON, VNDB_SYNC_CRON_OPTIONS)
+  async syncCron() {
+    return runCronExclusive(() =>
+      runInCronLogContext(this.pino, "vndb-sync", () =>
+        this.metrics.trackSync("vndb-sync", () => this.sync())
+      )
+    );
+  }
+
+  get isSyncRunning() {
+    return this.isRunning;
+  }
+
+  async backFill(options: { fromVnId?: string; limit?: number } = {}) {
+    const { vn: target } = await this.getStats();
+
+    return this.runSync("backfill", (totals) =>
+      this.processNewVns("backfill", totals, { ...options, target })
+    );
+  }
+
+  async sync() {
+    return this.runSync("sync", async (totals) => {
+      await this.processNewVns("sync", totals, {
+        fromVnId: await this.getLastVnId(),
+      });
+      await this.refreshLinkedVns(totals);
+    });
+  }
+
+  private async runSync(
+    mode: string,
+    run: (totals: TVndbSyncTotals) => Promise<void>
+  ) {
+    if (this.isRunning) {
+      this.logger.warn(`VNDB ${mode} skipped: another VNDB sync is running`);
+      return;
+    }
+
+    this.isRunning = true;
+    const startedAt = Date.now();
+    const totals: TVndbSyncTotals = {
+      vns: 0,
+      matched: 0,
+      ambiguous: 0,
+      absent: 0,
+      created: 0,
+      updated: 0,
+      unchanged: 0,
+      failed: 0,
+      covers: 0,
+      screenshots: 0,
+      characters: 0,
+    };
+
     try {
-      let page = 1;
+      this.logger.log(`VNDB ${mode} started`);
 
-      while (true) {
-        const data = await this.post<IVndbGameResponse>("/vn", { page });
-        const matches = await this.getVnMatches(data);
-        await sleep(3000);
-        if (data.more) {
-          page++;
-          console.log(matches);
-          break;
-        } else {
-          break;
-        }
-        console.log(matches);
-      }
+      await run(totals);
+      await this.linkVndbCharacters();
+      await this.linkVndbRelatedGames();
 
-      //await this.linkVndbCharacters();
-    } catch (e) {
-      console.log(e);
+      this.logger.log(
+        `VNDB ${mode} finished in ${Math.round((Date.now() - startedAt) / 1000)}s: ${totals.vns} VNs, ${totals.created} games created, ${totals.updated} updated, ${totals.unchanged} unchanged, ${totals.failed} failed`
+      );
+
+      return totals;
+    } catch (error) {
+      this.logger.error(error, `VNDB ${mode} failed after ${totals.vns} VNs`);
+      throw error;
+    } finally {
+      this.isRunning = false;
     }
   }
 
+  private async processNewVns(
+    mode: string,
+    totals: TVndbSyncTotals,
+    {
+      fromVnId,
+      limit,
+      target,
+    }: { fromVnId?: string; limit?: number; target?: number }
+  ) {
+    let cursor = fromVnId;
+
+    while (!limit || totals.vns < limit) {
+      const { results, more } = await this.post<IVndbGameResponse>("/vn", {
+        filters: cursor ? ["id", ">", cursor] : ["id", ">=", "v1"],
+        fields: "id",
+        sort: "id",
+        results: limit
+          ? Math.min(VNDB_PAGE_SIZE, limit - totals.vns)
+          : VNDB_PAGE_SIZE,
+      });
+
+      if (!results.length) break;
+
+      cursor = results[results.length - 1].id;
+      await this.processVns(
+        mode,
+        results.map(({ id }) => id),
+        totals,
+        target
+      );
+
+      if (!more) break;
+    }
+  }
+
+  private async refreshLinkedVns(totals: TVndbSyncTotals) {
+    const games = await this.gamesModel
+      .find({ "vndb.vnId": { $exists: true } })
+      .sort({ "vndb.syncedAt": 1 })
+      .limit(VNDB_SYNC_REFRESH_LIMIT)
+      .select("vndb.vnId")
+      .lean();
+
+    for (let i = 0; i < games.length; i += VNDB_PAGE_SIZE) {
+      await this.processVns(
+        "sync refresh",
+        games.slice(i, i + VNDB_PAGE_SIZE).map(({ vndb }) => vndb.vnId),
+        totals
+      );
+    }
+  }
+
+  private async processVns(
+    mode: string,
+    vnIds: string[],
+    totals: TVndbSyncTotals,
+    target?: number
+  ) {
+    const matches = await this.getVnMatches(vnIds);
+    const saved = await this.insertVndbGame(matches);
+
+    await this.gamesModel.updateMany(
+      { "vndb.vnId": { $in: vnIds } },
+      { $set: { "vndb.syncedAt": new Date().toISOString() } }
+    );
+
+    totals.vns += vnIds.length;
+    totals.characters += new Set(
+      matches.flatMap(({ vndb }) => vndb.characters)
+    ).size;
+    matches.forEach(({ verdict }) => totals[verdict]++);
+    (Object.keys(saved) as (keyof typeof saved)[]).forEach(
+      (key) => (totals[key] += saved[key])
+    );
+
+    this.logger.log(
+      `VNDB ${mode} progress: up to ${vnIds[vnIds.length - 1]}, ${totals.vns}${target ? `/${target}` : ""} VNs | matched ${totals.matched}, ambiguous ${totals.ambiguous}, absent ${totals.absent} | games created ${totals.created}, updated ${totals.updated}, unchanged ${totals.unchanged}, failed ${totals.failed} | uploaded ${totals.covers} covers, ${totals.screenshots} screenshots | ${totals.characters} characters`
+    );
+  }
+
+  private async getLastVnId() {
+    const maxVnId = (field: string) => [
+      { $match: { [field]: { $exists: true } } },
+      {
+        $group: {
+          _id: null,
+          max: { $max: { $toInt: { $substrCP: [`$${field}`, 1, 10] } } },
+        },
+      },
+    ];
+
+    const [[games], [candidates]] = await Promise.all([
+      this.gamesModel.aggregate<{ max: number }>(maxVnId("vndb.vnId")),
+      this.vndbCandidatesModel.aggregate<{ max: number }>(maxVnId("vnId")),
+    ]);
+    const max = Math.max(games?.max ?? 0, candidates?.max ?? 0);
+
+    return max ? `v${max}` : undefined;
+  }
+
   private async insertVndbGame(matches: IVnMatch[]) {
-    await this.gamesModel.bulkWrite(
-      matches
-        .filter((match) => match.verdict === "matched")
-        .map((match) => ({
-          updateOne: {
-            filter: { _id: match.winner._id },
-            update: {
-              $set: {
-                name: match.vnName,
-                type: match.vndb.type,
-              },
+    const stats = {
+      created: 0,
+      updated: 0,
+      unchanged: 0,
+      failed: 0,
+      covers: 0,
+      screenshots: 0,
+    };
+    const targets = matches.filter(({ verdict }) => verdict !== "ambiguous");
+    if (!targets.length) return stats;
+
+    const existingGames = await this.gamesModel
+      .find({
+        $or: [
+          {
+            _id: {
+              $in: targets
+                .filter(({ winner }) => winner)
+                .map(({ winner }) => winner._id),
             },
           },
-        }))
+          { "vndb.vnId": { $in: targets.map(({ vnId }) => vnId) } },
+        ],
+      })
+      .select(
+        "_id name nameNormalized type summary alternative_names genres keywords themes companies websites externalPages first_release release_dates platformIds status languages cover screenshots isStopParsingPictures vndb"
+      )
+      .lean();
+
+    const gameById = new Map(
+      existingGames.map((game) => [String(game._id), game])
     );
+    const gameByVnId = new Map(
+      existingGames
+        .filter(({ vndb }) => vndb?.vnId)
+        .map((game) => [game.vndb.vnId, game])
+    );
+
+    const now = new Date().toISOString();
+    const reservedSlugs = new Set<string>();
+    const ops = [];
+
+    for (const { vndb: vn, vnId, winner } of targets) {
+      const existingGame = winner
+        ? gameById.get(String(winner._id))
+        : gameByVnId.get(vnId);
+      const gameId = existingGame?._id ?? new Types.ObjectId();
+      const { uploadedScreenshots, ...images } = await this.uploadVndbImages(
+        gameId,
+        vn,
+        existingGame
+      );
+
+      if (images.cover) stats.covers++;
+      stats.screenshots += uploadedScreenshots;
+
+      const fields = Object.fromEntries(
+        Object.entries({
+          name: vn.name,
+          nameNormalized: normalizeTitle(vn.name),
+          type: vn.type,
+          summary: stripBbcode(vn.description),
+          alternative_names: [
+            ...new Set([
+              ...vn.alternativeNames,
+              ...(existingGame?.alternative_names ?? []),
+              existingGame?.name,
+            ]),
+          ].filter((alias) => alias && alias !== vn.name),
+          genres: [
+            ...new Set([...(existingGame?.genres ?? []), VISUAL_NOVEL_GENRE]),
+          ],
+          keywords: vn.keywords,
+          themes: vn.themes,
+          companies: vn.companies,
+          websites: [
+            ...new Set([...(existingGame?.websites ?? []), ...vn.websites]),
+          ],
+          externalPages: [
+            ...vn.externalPages,
+            ...(existingGame?.externalPages ?? []).filter(
+              (page) => !vn.externalPages.some(({ name }) => name === page.name)
+            ),
+          ],
+          first_release: vn.first_release,
+          release_dates: vn.release_dates,
+          platformIds: vn.platformIds,
+          status: vn.status,
+          languages: vn.languages,
+          ...images,
+          vndb: {
+            vnId,
+            lengthMinutes: vn.length,
+            relations: vn.relations,
+            syncedAt: existingGame?.vndb?.syncedAt,
+          },
+        }).filter(([, value]) => !isEmptyValue(value))
+      );
+
+      if (existingGame) {
+        const changedFields = Object.fromEntries(
+          Object.entries(fields).filter(
+            ([field, value]) =>
+              JSON.stringify(value) !==
+              JSON.stringify((existingGame as Record<string, unknown>)[field])
+          )
+        );
+
+        if (!Object.keys(changedFields).length) {
+          stats.unchanged++;
+          continue;
+        }
+
+        stats.updated++;
+        ops.push({
+          updateOne: {
+            filter: { _id: gameId },
+            update: { $set: { ...changedFields, updatedAt: now } },
+          },
+        });
+        continue;
+      }
+
+      stats.created++;
+      ops.push({
+        insertOne: {
+          document: {
+            _id: gameId,
+            ...fields,
+            updatedAt: now,
+            slug: await this.resolveUniqueSlug(vn.name, vnId, reservedSlugs),
+            modes: [SINGLE_PLAYER_MODE],
+            isCustom: false,
+            createdAt: now,
+          },
+        },
+      });
+    }
+
+    if (!ops.length) return stats;
+
+    try {
+      await this.gamesModel.bulkWrite(ops, { ordered: false });
+    } catch (error) {
+      stats.failed =
+        (error as { writeErrors?: unknown[] }).writeErrors?.length ??
+        ops.length;
+      this.logger.error(
+        error,
+        `Failed to save ${stats.failed}/${ops.length} VNDB games`
+      );
+      return stats;
+    }
+
+    return stats;
+  }
+
+  private async uploadVndbImages(
+    gameId: Types.ObjectId,
+    vn: IVndbTitles,
+    game?: Pick<Game, "cover" | "screenshots" | "isStopParsingPictures">
+  ): Promise<{
+    cover?: string;
+    screenshots?: string[];
+    uploadedScreenshots: number;
+  }> {
+    if (game?.isStopParsingPictures) return { uploadedScreenshots: 0 };
+
+    const isStored = (folder: S3Folder, url: string, imageId: string) =>
+      this.fileService.getKeyFromUrl(folder, url)?.replace(/\.[^./]+$/, "") ===
+      `${gameId}/${imageId}`;
+
+    const images: {
+      cover?: string;
+      screenshots?: string[];
+    } = {};
+
+    if (vn.cover && !isStored(S3_FOLDERS.covers, game?.cover, vn.cover.id)) {
+      const cover = await this.uploadVndbImage(
+        S3_FOLDERS.covers,
+        gameId,
+        vn.cover
+      );
+
+      if (cover) {
+        images.cover = cover;
+      }
+    }
+
+    const storedScreenshots = game?.screenshots ?? [];
+    const vndbScreenshots: string[] = [];
+    let uploadedScreenshots = 0;
+
+    for (const screenshot of vn.screenshots ?? []) {
+      const storedUrl = storedScreenshots.find((url) =>
+        isStored(S3_FOLDERS.screenshots, url, screenshot.id)
+      );
+      const url =
+        storedUrl ??
+        (await this.uploadVndbImage(
+          S3_FOLDERS.screenshots,
+          gameId,
+          screenshot
+        ));
+
+      if (!url) continue;
+      if (!storedUrl) uploadedScreenshots++;
+
+      vndbScreenshots.push(url);
+    }
+
+    images.screenshots = [
+      ...vndbScreenshots,
+      ...storedScreenshots.filter((url) => !vndbScreenshots.includes(url)),
+    ];
+
+    return { ...images, uploadedScreenshots };
+  }
+
+  private async uploadVndbImage(
+    folder: S3Folder,
+    gameId: Types.ObjectId,
+    image: IVndbImage
+  ) {
+    try {
+      const { data, headers } =
+        await this.httpService.axiosRef.get<ArrayBuffer>(image.url, {
+          responseType: "arraybuffer",
+        });
+      const storedKey = await this.fileService.uploadFile(
+        {
+          buffer: Buffer.from(data),
+          mimetype: String(headers["content-type"]).split(";")[0],
+        } as Express.Multer.File,
+        `${gameId}/${image.id}`,
+        folder
+      );
+
+      return storedKey
+        ? this.fileService.getPublicUrl(folder, storedKey)
+        : null;
+    } catch (error) {
+      this.logger.error(error, `Failed to upload VNDB image: ${image.url}`);
+      return null;
+    }
+  }
+
+  private async resolveUniqueSlug(
+    name: string,
+    vnId: string,
+    reservedSlugs: Set<string>
+  ) {
+    const baseSlug = toSlug(name) || vnId;
+    let slug = baseSlug;
+
+    for (
+      let suffix = 2;
+      reservedSlugs.has(slug) || (await this.gamesModel.exists({ slug }));
+      suffix++
+    ) {
+      slug = `${baseSlug}-${suffix}`;
+    }
+
+    reservedSlugs.add(slug);
+
+    return slug;
   }
 
   private async getVndbPlatformId(vndbPlatform: string) {
@@ -238,23 +674,19 @@ export class VndbService {
     return platform?._id ?? null;
   }
 
-  private async getVnMatches(data: IVndbGameResponse): Promise<IVnMatch[]> {
-    const searchIdsFilters: TVndbFilter[] = data.results.map(({ id }) => [
-      "id",
-      "=",
-      id,
-    ]);
+  private async getVnMatches(vnIds: string[]): Promise<IVnMatch[]> {
+    const searchIdsFilters: TVndbFilter[] = vnIds.map((id) => ["id", "=", id]);
 
     const novelsResponse = await this.post<IVndbGameResponse>("/vn", {
       filters: ["or", ...searchIdsFilters] satisfies TVndbFilters,
+      results: vnIds.length,
       fields:
-        "title,alttitle,titles.title,titles.lang,titles.latin,titles.official,titles.main,released,platforms,description,developers.name,developers.original,developers.aliases,extlinks.url,extlinks.name,image.url,image.dims,image.sexual,image.violence,screenshots.url,screenshots.dims,screenshots.sexual,screenshots.violence,length_minutes,languages,devstatus,tags.id,tags.name,tags.rating,tags.spoiler,tags.lie,tags.category,relations.id,relations.relation,relations.relation_official",
+        "title,alttitle,titles.title,titles.lang,titles.latin,titles.official,titles.main,released,platforms,description,developers.name,developers.original,developers.aliases,extlinks.url,extlinks.name,image.url,image.dims,image.sexual,image.violence,screenshots.url,screenshots.dims,screenshots.sexual,screenshots.violence,length_minutes,languages,devstatus,tags.id,tags.name,tags.rating,tags.spoiler,tags.lie,tags.category,relations.id,relations.relation,relations.relation_official,image.id,screenshots.id",
     });
 
-    const vnIds = data.results.map(({ id }) => id);
     const themesByVn = await this.getThemes(vnIds);
     const characters = await this.getCharacters(vnIds);
-    //await this.saveCharacters(characters);
+    await this.saveCharacters(characters);
 
     const vndbTitles = novelsResponse.results.map((vn) =>
       this.getTitles(vn, themesByVn.get(vn.id) ?? [], characters)
@@ -355,6 +787,14 @@ export class VndbService {
         platforms: [
           ...new Set([...vn.platforms, ...(signals?.platforms ?? [])]),
         ],
+        platformIds: this.getPlatformIds(
+          [...vn.platforms, ...(signals?.platforms ?? [])],
+          platformIdBySlug
+        ),
+        companies: this.getCompanies(
+          vn.companies,
+          signals?.publisherNames ?? []
+        ),
         websites: [...new Set([...(signals?.websites ?? []), ...vn.websites])],
         externalPages: signals?.externalPages ?? [],
         release_dates: this.getReleaseDates(
@@ -368,9 +808,30 @@ export class VndbService {
       [...vnIdsByKey].filter(([, vnIds]) => vnIds.size > 1).map(([key]) => key)
     );
 
+    const linkedGames = await this.gamesModel
+      .find(
+        { "vndb.vnId": { $in: vnIds } },
+        { ...CANDIDATE_PROJECTION, "vndb.vnId": 1 }
+      )
+      .lean();
+    const linkedGameByVnId = new Map(
+      linkedGames.map((game) => [game.vndb.vnId, game])
+    );
+
     const matches = this.matchNovels(enrichedTitles, candidatesByVn, {
       platformSlugById,
       sharedTitles,
+    }).map((match) => {
+      const linkedGame = linkedGameByVnId.get(match.vnId);
+
+      return linkedGame
+        ? {
+            ...match,
+            verdict: "matched" as const,
+            reason: null,
+            winner: linkedGame,
+          }
+        : match;
     });
     const candidatesForMatch = matches.filter(
       ({ verdict }) => verdict === "ambiguous"
@@ -402,6 +863,71 @@ export class VndbService {
     }
 
     return matches;
+  }
+
+  async linkVndbRelatedGames() {
+    const games = await this.gamesModel
+      .find({ "vndb.vnId": { $exists: true } })
+      .select("_id relatedGames vndb.vnId vndb.relations")
+      .lean();
+
+    const gameIdByVnId = new Map(
+      games.map((game) => [game.vndb.vnId, game._id])
+    );
+    const now = new Date().toISOString();
+    const ops = [];
+
+    for (const game of games) {
+      const linked: Record<string, Types.ObjectId[]> = Object.fromEntries(
+        Object.values(VNDB_RELATION_FIELDS).map((field) => [field, []])
+      );
+      let parentGame: Types.ObjectId | undefined;
+
+      for (const { vnId, relation } of game.vndb.relations ?? []) {
+        const relatedId = gameIdByVnId.get(vnId);
+        if (!relatedId) continue;
+
+        if (relation === VNDB_ORIGINAL_RELATION) {
+          parentGame ??= relatedId;
+        } else if (VNDB_RELATION_FIELDS[relation]) {
+          linked[VNDB_RELATION_FIELDS[relation]].push(relatedId);
+        }
+      }
+
+      const relatedGames = {
+        ...game.relatedGames,
+        ...Object.fromEntries(
+          Object.entries(linked).filter(
+            ([field, ids]) =>
+              ids.length || !VNDB_SHARED_RELATION_FIELDS.includes(field)
+          )
+        ),
+        ...(parentGame && { parent_game: parentGame }),
+      };
+
+      if (
+        JSON.stringify(relatedGames) === JSON.stringify(game.relatedGames ?? {})
+      ) {
+        continue;
+      }
+
+      ops.push({
+        updateOne: {
+          filter: { _id: game._id },
+          update: { $set: { relatedGames, updatedAt: now } },
+        },
+      });
+    }
+
+    if (ops.length) {
+      await this.gamesModel.bulkWrite(ops);
+    }
+
+    this.logger.log(
+      `Linked VNDB related games: ${ops.length}/${games.length} games updated`
+    );
+
+    return { gamesMatched: games.length, gamesUpdated: ops.length };
   }
 
   async linkVndbCharacters() {
@@ -499,8 +1025,6 @@ export class VndbService {
 
       characters.push(...data.results);
       more = data.more;
-
-      await sleep(VNDB_REQUEST_DELAY_MS);
     }
 
     return characters;
@@ -564,8 +1088,6 @@ export class VndbService {
       for (const { id } of results) {
         themesByVn.set(id, [...(themesByVn.get(id) ?? []), theme]);
       }
-
-      await sleep(VNDB_REQUEST_DELAY_MS);
     }
 
     return themesByVn;
@@ -573,6 +1095,9 @@ export class VndbService {
 
   private async post<T>(path: string, body: unknown): Promise<T> {
     for (let attempt = 0; ; attempt++) {
+      await sleep(this.lastRequestAt + VNDB_REQUEST_DELAY_MS - Date.now());
+      this.lastRequestAt = Date.now();
+
       try {
         const { data } = await firstValueFrom(
           this.httpService.post<T>(`${VNDB_API_URL}${path}`, body)
@@ -580,13 +1105,20 @@ export class VndbService {
 
         return data;
       } catch (error) {
-        const status = (error as { response?: { status?: number } }).response
-          ?.status;
+        const { response, code } = error as {
+          response?: { status?: number };
+          code?: string;
+        };
 
-        if (status !== 429 || attempt >= VNDB_MAX_RETRIES) throw error;
+        if (
+          (response && response.status !== 429) ||
+          attempt >= VNDB_MAX_RETRIES
+        ) {
+          throw error;
+        }
 
         this.logger.warn(
-          `VNDB throttled ${path}, retry ${attempt + 1}/${VNDB_MAX_RETRIES}`
+          `VNDB request ${path} failed (${response?.status ?? code}), retry ${attempt + 1}/${VNDB_MAX_RETRIES}`
         );
         await sleep(VNDB_RETRY_DELAY_MS * (attempt + 1));
       }
@@ -649,6 +1181,40 @@ export class VndbService {
     return result;
   }
 
+  private getPlatformIds(
+    platforms: string[],
+    platformIdBySlug: Map<string, Types.ObjectId>
+  ): Types.ObjectId[] {
+    const ids = platforms
+      .map((platform) =>
+        platformIdBySlug.get(VNDB_PLATFORM_SLUGS[platform]?.[0])
+      )
+      .filter((id): id is Types.ObjectId => !!id);
+
+    return [...new Map(ids.map((id) => [String(id), id])).values()];
+  }
+
+  private getCompanies(
+    developers: ICompanyField[],
+    publisherNames: string[]
+  ): ICompanyField[] {
+    return [
+      ...developers.map((company) => ({
+        ...company,
+        publisher: publisherNames.includes(company.name),
+      })),
+      ...[...new Set(publisherNames)]
+        .filter((name) => !developers.some((company) => company.name === name))
+        .map((name) => ({
+          name,
+          developer: false,
+          publisher: true,
+          porting: false,
+          supporting: false,
+        })),
+    ];
+  }
+
   private getReleaseDates(
     releases: IVndbReleaseEntry[],
     platformIdBySlug: Map<string, Types.ObjectId>
@@ -693,6 +1259,7 @@ export class VndbService {
         websites: Set<string>;
         externalPages: Map<string, IExternalPageField>;
         releases: Map<string, IVndbReleaseEntry>;
+        publisherNames: Set<string>;
       }
     >();
     if (!vnIds.length) return new Map();
@@ -749,9 +1316,13 @@ export class VndbService {
               websites: new Set<string>(),
               externalPages: new Map<string, IExternalPageField>(),
               releases: new Map<string, IVndbReleaseEntry>(),
+              publisherNames: new Set<string>(),
             };
 
             publishers.forEach((name) => signals.publishers.add(name));
+            (release.producers ?? [])
+              .filter(({ publisher }) => publisher)
+              .forEach(({ name }) => signals.publisherNames.add(name));
             if (release.released) signals.releaseDates.add(release.released);
             (release.platforms ?? []).forEach((platform) =>
               signals.platforms.add(platform)
@@ -791,8 +1362,6 @@ export class VndbService {
 
         more = data.more;
         page++;
-
-        await sleep(VNDB_REQUEST_DELAY_MS);
       }
     }
 
@@ -806,6 +1375,7 @@ export class VndbService {
           websites: [...signals.websites],
           externalPages: [...signals.externalPages.values()],
           releases: [...signals.releases.values()],
+          publisherNames: [...signals.publisherNames],
         },
       ])
     );
@@ -1232,6 +1802,9 @@ export class VndbService {
     ].filter((title): title is string => !!title && title !== name);
 
     const firstRelease = this.parseVndbDate(vn.released);
+    const hasExplicitImages = [vn.image, ...(vn.screenshots ?? [])].some(
+      (image) => image && image.sexual > VNDB_EXPLICIT_SEXUAL_LEVEL
+    );
 
     return {
       id: vn.id,
@@ -1252,8 +1825,16 @@ export class VndbService {
         ),
       ],
       publishers: [],
+      companies: (vn.developers ?? []).map(({ name }) => ({
+        name,
+        developer: true,
+        publisher: false,
+        porting: false,
+        supporting: false,
+      })),
       releaseDates: vn.released ? [vn.released] : [],
       platforms: vn.platforms ?? [],
+      platformIds: [],
       cover: vn.image,
       themes,
       characters: characters
@@ -1273,13 +1854,17 @@ export class VndbService {
             !lie &&
             !VNDB_THEME_TAGS[id]
         )
-        .map(({ name }) => name),
+        .map(({ name }) => name)
+        .concat(hasExplicitImages ? [VNDB_EXPLICIT_IMAGES_KEYWORD] : []),
       first_release: firstRelease ? Math.floor(+firstRelease / 1000) : null,
       release_dates: [],
       status: VNDB_STATUS_NAMES[vn.devstatus] ?? null,
       player_perspectives: [],
       languages: (vn.languages ?? []).map((code) => languageNames.of(code)),
       externalPages: [],
+      relations: (vn.relations ?? [])
+        .filter(({ relation_official }) => relation_official)
+        .map(({ id, relation }) => ({ vnId: id, relation })),
       type: (vn.relations ?? []).some(
         ({ relation, relation_official }) =>
           relation === VNDB_ORIGINAL_RELATION && relation_official
@@ -1290,6 +1875,21 @@ export class VndbService {
   }
 }
 
+type TVndbSyncTotals = Record<
+  | "vns"
+  | "matched"
+  | "ambiguous"
+  | "absent"
+  | "created"
+  | "updated"
+  | "unchanged"
+  | "failed"
+  | "covers"
+  | "screenshots"
+  | "characters",
+  number
+>;
+
 type TVndbReleaseDate = Omit<IReleaseDate, "platformId"> & {
   platformId: Types.ObjectId;
 };
@@ -1297,6 +1897,9 @@ type TVndbReleaseDate = Omit<IReleaseDate, "platformId"> & {
 export interface IVndbTitles {
   id: string;
   type: string;
+  companies: ICompanyField[];
+  platformIds: Types.ObjectId[];
+  relations: { vnId: string; relation: string }[];
   name: string;
   released: string;
   description: string;

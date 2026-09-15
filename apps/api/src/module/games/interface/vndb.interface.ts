@@ -92,6 +92,7 @@ export interface IVnReleaseSignals {
   websites: string[];
   externalPages: IExternalPageField[];
   releases: IVndbReleaseEntry[];
+  publisherNames: string[];
 }
 
 export type TReleaseSignalsByVn = Map<string, IVnReleaseSignals>;

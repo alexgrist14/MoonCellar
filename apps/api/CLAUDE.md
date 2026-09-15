@@ -82,3 +82,30 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   without it fails with `E11000 duplicate key ... { igdb.characterId: null }`. Mongoose
   `autoIndex` never changes the options of an existing index, so on an existing database the old
   `igdb.characterId_1` must be dropped by hand before the partial one can be built.
+
+## VNDB
+
+- **`bulkWrite` skips Mongoose middleware, so every VNDB game write sets `nameNormalized`
+  itself.** The `name` hook in `game.schema.ts` only runs for `save`/`updateOne`/`updateMany`
+  queries; a game written through `bulkWrite` without it is never found by the
+  `nameNormalized` lookup that VNDB matching and search rely on.
+- **VNDB images are stored under `<folder>/<gameId>/<vndbImageId>` and must stay that way.**
+  `insertVndbGame` skips any image whose key the game already references, so `backFill` can be
+  re-run without re-uploading. A random key (as `sendArrayToS3` uses) uploads every cover and
+  screenshot again on each run and leaves the previous copies orphaned in the Space.
+- **`insertVndbGame` writes an existing game only when a compared field actually changed, and
+  every field it writes must also be in the `select` of existing games.** It compares each value
+  with the stored one and skips the game otherwise, so `updatedAt` (the sitemap `lastmod`) does
+  not move on a re-run. A field missing from the `select` always compares as changed, and every
+  VNDB game gets a fresh `updatedAt` on each `backFill`.
+- **Every VNDB API call goes through `VndbService.post`, which spaces requests
+  `VNDB_REQUEST_DELAY_MS` apart.** VNDB allows 200 requests per 5 minutes; a call made straight
+  through `httpService` skips the spacing, a long backfill starts collecting 429s, and once `post`
+  runs out of retries the whole run aborts.
+- **VNDB has no last-modified field, so the daily sync re-fetches the linked games with the
+  oldest `vndb.syncedAt`.** `insertVndbGame` carries the stored `syncedAt` inside the `vndb` value
+  it compares; dropping it makes `vndb` differ on every refresh and moves `updatedAt` for every
+  refreshed game.
+- **A VNDB request that filters by several ids must pass `results`.** VNDB returns 10 items by
+  default and reports the rest only through `more: true`; the detail request in `getVnMatches`
+  once ran without it and silently processed 10 of every 100 VNs on a page, with no error.
