@@ -46,6 +46,7 @@ import {
   type IReleaseDate,
   type IGetVndbCandidatesParams,
   type IVndbCandidatesResponse,
+  type IVndbCandidateState,
   type IVndbCandidatesSummary,
   type IVndbReviewItem,
 } from "@mooncellar/schemas";
@@ -137,6 +138,22 @@ const CANDIDATE_PROJECTION = {
   platformIds: 1,
   summary: 1,
 };
+
+const UNDECIDED_FILTER = { status: "pending", decision: null } as const;
+
+const candidateState = ({
+  status,
+  decision,
+}: Pick<VndbCandidate, "status" | "decision">): IVndbCandidateState =>
+  status === "resolved"
+    ? "matched"
+    : status === "absent"
+      ? "new-game"
+      : decision === "match"
+        ? "queued-match"
+        : decision === "skip"
+          ? "queued-new"
+          : "waiting";
 
 const escapeRegExp = (value: string) =>
   value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -252,16 +269,26 @@ export class VndbService {
     const fromVnId = options.restart
       ? undefined
       : (options.fromVnId ?? (await this.getLastVnId()));
+    const processed = fromVnId ? await this.getProcessedVnCount() : 0;
 
     return this.runSync("backfill", (totals) =>
-      this.processNewVns("backfill", totals, { ...options, fromVnId, target })
+      this.processNewVns("backfill", totals, {
+        ...options,
+        fromVnId,
+        target,
+        processed,
+      })
     );
   }
 
   async sync() {
+    const { vn: target } = await this.getStats();
+
     return this.runSync("sync", async (totals) => {
       await this.processNewVns("sync", totals, {
         fromVnId: await this.getLastVnId(),
+        processed: await this.getProcessedVnCount(),
+        target,
       });
       await this.refreshLinkedVns(totals);
     });
@@ -318,7 +345,13 @@ export class VndbService {
       fromVnId,
       limit,
       target,
-    }: { fromVnId?: string; limit?: number; target?: number }
+      processed = 0,
+    }: {
+      fromVnId?: string;
+      limit?: number;
+      target?: number;
+      processed?: number;
+    }
   ) {
     let cursor = fromVnId;
 
@@ -343,7 +376,7 @@ export class VndbService {
         mode,
         results.map(({ id }) => id),
         totals,
-        target
+        { target, processed }
       );
 
       if (!more) break;
@@ -371,7 +404,7 @@ export class VndbService {
     mode: string,
     vnIds: string[],
     totals: TVndbSyncTotals,
-    target?: number
+    { target, processed = 0 }: { target?: number; processed?: number } = {}
   ) {
     const matches = await this.getVnMatches(vnIds);
     const saved = await this.insertVndbGame(matches);
@@ -391,8 +424,17 @@ export class VndbService {
     );
 
     this.logger.log(
-      `VNDB ${mode} progress: up to ${vnIds[vnIds.length - 1]}, ${totals.vns}${target ? `/${target}` : ""} VNs | matched ${totals.matched}, ambiguous ${totals.ambiguous}, absent ${totals.absent} | games created ${totals.created}, updated ${totals.updated}, unchanged ${totals.unchanged}, failed ${totals.failed} | uploaded ${totals.covers} covers, ${totals.screenshots} screenshots | ${totals.characters} characters`
+      `VNDB ${mode} progress: up to ${vnIds[vnIds.length - 1]}, ${processed + totals.vns}${target ? `/${target}` : ""} VNs | matched ${totals.matched}, ambiguous ${totals.ambiguous}, absent ${totals.absent} | games created ${totals.created}, updated ${totals.updated}, unchanged ${totals.unchanged}, failed ${totals.failed} | uploaded ${totals.covers} covers, ${totals.screenshots} screenshots | ${totals.characters} characters`
     );
+  }
+
+  private async getProcessedVnCount() {
+    const [games, candidates] = await Promise.all([
+      this.gamesModel.countDocuments({ "vndb.vnId": { $exists: true } }),
+      this.vndbCandidatesModel.countDocuments({}),
+    ]);
+
+    return games + candidates;
   }
 
   private async getLastVnId() {
@@ -948,16 +990,7 @@ export class VndbService {
             vnId,
             vnName,
             reason: reason ?? null,
-            state:
-              status === "resolved"
-                ? "matched"
-                : status === "absent"
-                  ? "new-game"
-                  : decision === "match"
-                    ? "queued-match"
-                    : decision === "skip"
-                      ? "queued-new"
-                      : "waiting",
+            state: candidateState({ status, decision }),
             candidates: (candidates ?? []).map(
               ({ gameId, name, slug, score }) => ({
                 gameId: String(gameId),
@@ -980,41 +1013,40 @@ export class VndbService {
   }
 
   async getCandidatesSummary(): Promise<IVndbCandidatesSummary> {
-    const [pending, applying] = await Promise.all([
-      this.vndbCandidatesModel.countDocuments({
-        status: "pending",
-        decision: null,
-      }),
+    const [pending, applying, first] = await Promise.all([
+      this.vndbCandidatesModel.countDocuments(UNDECIDED_FILTER),
       this.vndbCandidatesModel.countDocuments({
         status: "pending",
         decision: { $ne: null },
       }),
+      this.vndbCandidatesModel
+        .findOne(UNDECIDED_FILTER)
+        .sort({ _id: 1 })
+        .select("vnId")
+        .lean(),
     ]);
 
     if (applying) this.startApplyingDecisions();
 
-    return { pending, applying };
+    return { pending, applying, firstVnId: first?.vnId ?? null };
   }
 
-  async getNextCandidate(after?: string): Promise<IVndbReviewItem | null> {
-    const undecided = { status: "pending", decision: null } as const;
-    const candidate = await this.vndbCandidatesModel
-      .findOne(
-        after
-          ? { ...undecided, _id: { $gt: new Types.ObjectId(after) } }
-          : undecided
-      )
-      .sort({ _id: 1 })
-      .lean();
+  async getCandidate(vnId: string): Promise<IVndbReviewItem | null> {
+    const candidate = await this.vndbCandidatesModel.findOne({ vnId }).lean();
 
     if (!candidate) return null;
 
-    const [remaining, games, { results }, platformSlugById] = await Promise.all(
-      [
+    const [remaining, next, games, { results }, platformSlugById] =
+      await Promise.all([
         this.vndbCandidatesModel.countDocuments({
-          ...undecided,
+          ...UNDECIDED_FILTER,
           _id: { $gte: candidate._id },
         }),
+        this.vndbCandidatesModel
+          .findOne({ ...UNDECIDED_FILTER, _id: { $gt: candidate._id } })
+          .sort({ _id: 1 })
+          .select("vnId")
+          .lean(),
         this.gamesModel
           .find({
             _id: { $in: candidate.candidates.map(({ gameId }) => gameId) },
@@ -1029,8 +1061,7 @@ export class VndbService {
             "title,alttitle,titles.title,titles.lang,titles.latin,titles.official,titles.main,released,platforms,description,developers.name,image.url,image.sexual,length_minutes,rating,votecount",
         }),
         this.getPlatformSlugs(),
-      ]
-    );
+      ]);
 
     const platformIdBySlug = new Map(
       [...platformSlugById].map(([id, slug]) => [slug, new Types.ObjectId(id)])
@@ -1042,7 +1073,9 @@ export class VndbService {
       id: String(candidate._id),
       vnId: candidate.vnId,
       reason: candidate.reason ?? null,
+      state: candidateState(candidate),
       remaining,
+      nextVnId: next?.vnId ?? null,
       vn: vn
         ? {
             name: vn.name,

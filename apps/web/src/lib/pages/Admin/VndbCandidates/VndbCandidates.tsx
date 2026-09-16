@@ -1,6 +1,7 @@
 import { FC, useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import classNames from "classnames";
+import { useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Loader } from "@/src/lib/shared/ui/Loader";
@@ -8,15 +9,15 @@ import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { usePlatformsQuery } from "@/src/lib/entities/platform/api/platform.queries";
 import {
-  nextVndbCandidateQueryOptions,
-  useNextVndbCandidateQuery,
   useVndbCandidatesSummaryQuery,
+  useVndbReviewItemQuery,
+  vndbReviewItemQueryOptions,
 } from "@/src/lib/entities/game/api/vndb-candidates.queries";
 import { useDecideVndbCandidateMutation } from "@/src/lib/entities/game/api/vndb-candidates.mutations";
-import { vndbCandidateQueryKeys } from "@/src/lib/entities/game/api/vndb-candidates.query-keys";
+import { setAdminQuery } from "../admin-url";
 import { CandidateCard, Fact } from "./CandidateCard";
 import { CandidateList } from "./CandidateList";
-import { REASON_LABELS } from "./labels";
+import { REASON_LABELS, STATE_LABELS } from "./labels";
 import styles from "./VndbCandidates.module.scss";
 
 const SCROLL_STYLE = { maxHeight: "var(--vndb-review-height)" };
@@ -30,22 +31,26 @@ const isTypingTarget = (target: EventTarget | null) =>
   target instanceof HTMLElement &&
   !!target.closest("input, textarea, select, [contenteditable='true']");
 
+const openConflict = (vnId: string | null, isReplace?: boolean) =>
+  setAdminQuery({ tab: "vndb", vn: vnId }, isReplace);
+
 const VndbCandidates: FC = () => {
   const queryClient = useQueryClient();
-  const [isReviewing, setIsReviewing] = useState(false);
-  const [after, setAfter] = useState<string | null>(null);
-  const [selection, setSelection] = useState({ itemId: "", index: 0 });
+  const searchParams = useSearchParams();
+  const vnId = searchParams.get("vn");
+  const [selection, setSelection] = useState({ vnId: "", index: 0 });
 
   const { data: summary } = useVndbCandidatesSummaryQuery();
-  const { data, isLoading } = useNextVndbCandidateQuery(after, isReviewing);
+  const { data, isLoading } = useVndbReviewItemQuery(vnId);
   const { mutate: decide } = useDecideVndbCandidateMutation();
   const { data: platforms } = usePlatformsQuery();
   const isLoaderShown = useMinimumLoading(isLoading);
 
-  const item = isReviewing ? (data?.item ?? null) : null;
+  const item = data?.item ?? null;
   const selectedIndex =
-    item && selection.itemId === item.id ? selection.index : 0;
+    item && selection.vnId === item.vnId ? selection.index : 0;
   const selected = item?.candidates[selectedIndex];
+  const isDecidable = item?.state === "waiting";
   const vn = item?.vn;
   const pending = summary?.pending ?? 0;
   const applying = summary?.applying ?? 0;
@@ -57,26 +62,28 @@ const VndbCandidates: FC = () => {
       .join(", ");
 
   const select = useCallback(
-    (index: number) => item && setSelection({ itemId: item.id, index }),
+    (index: number) => item && setSelection({ vnId: item.vnId, index }),
     [item]
   );
 
   const resolve = useCallback(
     (gameId: string | null) => {
-      if (!item) return;
+      if (!item || item.state !== "waiting") return;
 
       decide({ vnId: item.vnId, gameId });
-      setAfter(item.id);
+      openConflict(item.nextVnId, true);
     },
     [item, decide]
   );
 
   useEffect(() => {
-    if (item) queryClient.prefetchQuery(nextVndbCandidateQueryOptions(item.id));
+    if (item?.nextVnId) {
+      queryClient.prefetchQuery(vndbReviewItemQueryOptions(item.nextVnId));
+    }
   }, [item, queryClient]);
 
   useEffect(() => {
-    if (!item) return;
+    if (!item || !isDecidable) return;
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (
@@ -110,13 +117,7 @@ const VndbCandidates: FC = () => {
     window.addEventListener("keydown", onKeyDown);
 
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [item, selectedIndex, selected, select, resolve]);
-
-  const startReview = () => {
-    queryClient.removeQueries({ queryKey: vndbCandidateQueryKeys.nextAll() });
-    setAfter(null);
-    setIsReviewing(true);
-  };
+  }, [item, isDecidable, selectedIndex, selected, select, resolve]);
 
   return (
     <div className={styles.review}>
@@ -129,31 +130,37 @@ const VndbCandidates: FC = () => {
           {applying > 0 &&
             ` · ${pluralize(applying, "decision")} being written to games`}
         </p>
-        {isReviewing ? (
-          item && (
-            <p className={styles.status}>{item.remaining} left in this pass</p>
-          )
+        {vnId ? (
+          <div className={classNames(styles.action, styles.action_end)}>
+            {!!item && (
+              <p className={styles.status}>
+                {item.remaining} left in the queue
+              </p>
+            )}
+            <Button onClick={() => openConflict(null)}>Back to the list</Button>
+          </div>
         ) : (
           <Button
             color={ButtonColor.ACCENT}
-            disabled={!pending}
-            onClick={startReview}
+            disabled={!summary?.firstVnId}
+            onClick={() => openConflict(summary?.firstVnId ?? null)}
           >
             Start review
           </Button>
         )}
       </div>
 
-      {!isReviewing && <CandidateList />}
+      {!vnId && <CandidateList />}
 
-      {isReviewing &&
+      {!!vnId &&
         (isLoaderShown ? (
           <div className={styles.loading}>
             <Loader type="pulse" />
           </div>
         ) : !item ? (
           <p className={styles.placeholder}>
-            Review finished. Every VN in the queue has a decision.
+            No candidate record for {vnId}. The review queue never held it, or
+            it was removed.
           </p>
         ) : (
           <>
@@ -173,6 +180,17 @@ const VndbCandidates: FC = () => {
                       {item.reason && (
                         <span className={styles.reason}>
                           {REASON_LABELS[item.reason]}
+                        </span>
+                      )}
+                      {!isDecidable && (
+                        <span
+                          className={classNames(styles.badge, {
+                            [styles.badge_positive]:
+                              item.state === "matched" ||
+                              item.state === "new-game",
+                          })}
+                        >
+                          {STATE_LABELS[item.state]}
                         </span>
                       )}
                     </div>
@@ -252,7 +270,7 @@ const VndbCandidates: FC = () => {
                         key={candidate.gameId}
                         candidate={candidate}
                         isSelected={index === selectedIndex}
-                        isMatchShown={item.candidates.length > 1}
+                        isMatchShown={isDecidable && item.candidates.length > 1}
                         platformNames={platformNames}
                         onSelect={() => select(index)}
                         onMatch={() => resolve(candidate.gameId)}
@@ -267,6 +285,7 @@ const VndbCandidates: FC = () => {
               <div className={styles.action}>
                 <Button
                   className={styles.actionButton}
+                  disabled={!isDecidable}
                   onClick={() => resolve(null)}
                 >
                   <kbd className={styles.key}>←</kbd>
@@ -275,25 +294,45 @@ const VndbCandidates: FC = () => {
                 <span className={styles.caption}>Adds it as a new game</span>
               </div>
 
-              <p className={styles.hint}>
-                <kbd className={styles.key}>↑</kbd>
-                <kbd className={styles.key}>↓</kbd>
-                choose a candidate
-              </p>
+              {isDecidable ? (
+                <p className={styles.hint}>
+                  <kbd className={styles.key}>↑</kbd>
+                  <kbd className={styles.key}>↓</kbd>
+                  choose a candidate
+                </p>
+              ) : (
+                <p className={styles.hint}>
+                  This VN already has a decision
+                </p>
+              )}
 
               <div className={classNames(styles.action, styles.action_end)}>
-                <span className={styles.caption}>
-                  {selected ? `Updates ${selected.name}` : ""}
-                </span>
-                <Button
-                  className={styles.actionButton}
-                  color={ButtonColor.GREEN}
-                  disabled={!selected?.game}
-                  onClick={() => selected && resolve(selected.gameId)}
-                >
-                  Match
-                  <kbd className={styles.key}>→</kbd>
-                </Button>
+                {isDecidable ? (
+                  <>
+                    <span className={styles.caption}>
+                      {selected ? `Updates ${selected.name}` : ""}
+                    </span>
+                    <Button
+                      className={styles.actionButton}
+                      color={ButtonColor.GREEN}
+                      disabled={!selected?.game}
+                      onClick={() => selected && resolve(selected.gameId)}
+                    >
+                      Match
+                      <kbd className={styles.key}>→</kbd>
+                    </Button>
+                  </>
+                ) : (
+                  !!item.nextVnId && (
+                    <Button
+                      className={styles.actionButton}
+                      color={ButtonColor.ACCENT}
+                      onClick={() => openConflict(item.nextVnId, true)}
+                    >
+                      Open the next waiting VN
+                    </Button>
+                  )
+                )}
               </div>
             </div>
           </>

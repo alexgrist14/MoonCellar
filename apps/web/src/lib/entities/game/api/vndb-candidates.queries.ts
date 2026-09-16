@@ -5,12 +5,18 @@ import { vndbCandidateQueryKeys } from "./vndb-candidates.query-keys";
 
 const SUMMARY_REFRESH_MS = 5000;
 
-export const nextVndbCandidateQueryOptions = (after: string | null) =>
+export const vndbReviewItemQueryOptions = (vnId: string) =>
   queryOptions({
-    queryKey: vndbCandidateQueryKeys.next(after),
+    queryKey: vndbCandidateQueryKeys.item(vnId),
     queryFn: () =>
-      adminVndbCandidatesApi.getNext(after).then(({ data }) => data),
+      adminVndbCandidatesApi.getItem(vnId).then(({ data }) => data),
     staleTime: Infinity,
+  });
+
+export const useVndbReviewItemQuery = (vnId: string | null) =>
+  useQuery({
+    ...vndbReviewItemQueryOptions(vnId ?? ""),
+    enabled: !!vnId,
   });
 
 export const useVndbCandidatesSummaryQuery = () =>
@@ -29,8 +35,3 @@ export const useVndbCandidatesQuery = (params: IGetVndbCandidatesParams) =>
       adminVndbCandidatesApi.getList(params).then(({ data }) => data),
     placeholderData: keepPreviousData,
   });
-
-export const useNextVndbCandidateQuery = (
-  after: string | null,
-  enabled: boolean
-) => useQuery({ ...nextVndbCandidateQueryOptions(after), enabled });

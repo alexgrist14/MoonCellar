@@ -64,6 +64,16 @@
   }
 }
 
+.rowAction {
+  color: var(--color-blue);
+
+  @include font(13px, 18px, 600);
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .rowScore {
   color: var(--color-text-muted);
   font-variant-numeric: tabular-nums;

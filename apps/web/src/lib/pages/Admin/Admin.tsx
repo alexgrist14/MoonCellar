@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useAuthStore } from "../../shared/store/auth.store";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
@@ -7,22 +7,28 @@ import UserList from "./User/UserList/UserList";
 import GameList from "./Game/GameList";
 import ReportList from "./Reports/ReportList/ReportList";
 import VndbCandidates from "./VndbCandidates/VndbCandidates";
+import { ADMIN_TABS, getAdminTabIndex, setAdminQuery } from "./admin-url";
 
 const Admin = () => {
   const isAdmin = useAuthStore((s) => s.isAdmin);
-  const [tabIndex, setTabIndex] = useState(0);
+  const searchParams = useSearchParams();
+  const tabIndex = getAdminTabIndex(searchParams.get("tab"));
 
   if (!isAdmin) return;
+
+  const selectTab = (index: number) =>
+    setAdminQuery({ tab: ADMIN_TABS[index], vn: null });
 
   return (
     <Box wrapperStyle={{maxHeight: 'calc(100vh - 38 * var(--padding-x1)'}} templateStyle={{borderRadius: 'var(--radius-x5) var(--radius-x5) 0 0'}}>
       <Tabs
         defaultTabIndex={tabIndex}
+        isUseDefaultIndex
         contents={[
-          { tabName: "Users", onTabClick: () => setTabIndex(0) },
-          { tabName: "Games", onTabClick: () => setTabIndex(1) },
-          { tabName: "Reports", onTabClick: () => setTabIndex(2) },
-          { tabName: "VNDB candidates", onTabClick: () => setTabIndex(3) },
+          { tabName: "Users", onTabClick: () => selectTab(0) },
+          { tabName: "Games", onTabClick: () => selectTab(1) },
+          { tabName: "Reports", onTabClick: () => selectTab(2) },
+          { tabName: "VNDB candidates", onTabClick: () => selectTab(3) },
         ]}
       />
       {tabIndex === 0 && <UserList />}

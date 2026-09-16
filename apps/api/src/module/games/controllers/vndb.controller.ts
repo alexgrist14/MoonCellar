@@ -23,10 +23,9 @@ import { RolesGuard } from "../../roles/roles.guard";
 import { Roles } from "../../roles/roles.decorator";
 import {
   DecideVndbCandidateRequestDto,
-  GetNextVndbCandidateRequestDto,
   GetVndbCandidatesRequestDto,
-  NextVndbCandidateResponseDto,
   VndbCandidatesResponseDto,
+  VndbReviewItemResponseDto,
   VndbCandidatesSummaryDto,
 } from "../../../shared/zod/dto/vndb-candidates.dto";
 
@@ -156,14 +155,14 @@ export class VndbController {
   @UseGuards(RolesGuard)
   @Roles(RolesEnum.ADMIN)
   @UseGuards(AuthGuard("jwt"))
-  @Get("candidates/next")
+  @Get("candidates/:vnId")
   @ApiOperation({
     summary:
-      "Get the next VN waiting for a match decision, with its VNDB data and candidate games",
+      "Get one candidate VN with its VNDB data, candidate games and the next VN to review",
   })
-  @ApiOkResponse({ type: NextVndbCandidateResponseDto })
-  async getNextCandidate(@Query() dto: GetNextVndbCandidateRequestDto) {
-    return { item: await this.vndbService.getNextCandidate(dto.after) };
+  @ApiOkResponse({ type: VndbReviewItemResponseDto })
+  async getCandidate(@Param("vnId") vnId: string) {
+    return { item: await this.vndbService.getCandidate(vnId) };
   }
 
   @UseGuards(RolesGuard)

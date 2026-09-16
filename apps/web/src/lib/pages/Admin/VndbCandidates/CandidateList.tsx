@@ -7,6 +7,7 @@ import { Input } from "@/src/lib/shared/ui/Input";
 import { Table } from "@/src/lib/shared/ui/Table";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { useVndbCandidatesQuery } from "@/src/lib/entities/game/api/vndb-candidates.queries";
+import { setAdminQuery } from "../admin-url";
 import { REASON_LABELS, STATE_LABELS } from "./labels";
 import styles from "./VndbCandidates.module.scss";
 
@@ -53,6 +54,7 @@ export const CandidateList: FC = () => {
           reason: { content: "Why it waits" },
           candidates: { content: "Candidates" },
           result: { content: "Result" },
+          conflict: { content: "Conflict" },
         }}
         rows={rows.map((row) => ({
           vn: {
@@ -115,6 +117,20 @@ export const CandidateList: FC = () => {
               </Link>
             ) : (
               "—"
+            ),
+          },
+          conflict: {
+            content: (
+              <a
+                className={styles.rowAction}
+                href={`/admin?tab=vndb&vn=${row.vnId}`}
+                onClick={(event) => {
+                  event.preventDefault();
+                  setAdminQuery({ tab: "vndb", vn: row.vnId });
+                }}
+              >
+                Open conflict
+              </a>
             ),
           },
         }))}

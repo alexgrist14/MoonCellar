@@ -34,6 +34,16 @@ export const VndbScoreBreakdownSchema = z.object({
   type: z.number(),
 });
 
+export const VNDB_CANDIDATES_PAGE_SIZE = 20;
+
+export const VndbCandidateStateSchema = z.enum([
+  "waiting",
+  "queued-match",
+  "queued-new",
+  "matched",
+  "new-game",
+]);
+
 export const VndbReviewNovelSchema = z.object({
   name: z.string().describe("Name the game gets from VNDB"),
   originalName: z.string().describe("Title in the original language"),
@@ -85,7 +95,12 @@ export const VndbReviewItemSchema = z.object({
   id: z.string().describe("Candidate record id"),
   vnId: z.string(),
   reason: VndbMatchReasonSchema.nullable(),
+  state: VndbCandidateStateSchema.describe("Where the VN stands in the review"),
   remaining: z.number().describe("Undecided VNs from this one onwards"),
+  nextVnId: z
+    .string()
+    .nullable()
+    .describe("Next VN waiting for a decision after this one"),
   vn: VndbReviewNovelSchema.nullable().describe(
     "Null if VNDB no longer has the VN"
   ),
@@ -95,17 +110,11 @@ export const VndbReviewItemSchema = z.object({
 export const VndbCandidatesSummarySchema = z.object({
   pending: z.number().describe("VNs waiting for a decision"),
   applying: z.number().describe("Decisions not yet written to games"),
+  firstVnId: z
+    .string()
+    .nullable()
+    .describe("First VN waiting for a decision, where a review starts"),
 });
-
-export const VNDB_CANDIDATES_PAGE_SIZE = 20;
-
-export const VndbCandidateStateSchema = z.enum([
-  "waiting",
-  "queued-match",
-  "queued-new",
-  "matched",
-  "new-game",
-]);
 
 export const GetVndbCandidatesRequestSchema = z.object({
   page: z.coerce.number().int().min(1).default(1).describe("Page"),
@@ -148,13 +157,7 @@ export const VndbCandidatesResponseSchema = z.object({
   total: z.number().describe("Rows matching the search"),
 });
 
-export const GetNextVndbCandidateRequestSchema = z.object({
-  after: ObjectIdSchema.optional().describe(
-    "Return the first undecided VN after this candidate record"
-  ),
-});
-
-export const NextVndbCandidateResponseSchema = z.object({
+export const VndbReviewItemResponseSchema = z.object({
   item: VndbReviewItemSchema.nullable(),
 });
 
@@ -188,11 +191,8 @@ export type IVndbReviewItem = z.infer<typeof VndbReviewItemSchema>;
 export type IVndbCandidatesSummary = z.infer<
   typeof VndbCandidatesSummarySchema
 >;
-export type IGetNextVndbCandidateRequest = z.infer<
-  typeof GetNextVndbCandidateRequestSchema
->;
-export type INextVndbCandidateResponse = z.infer<
-  typeof NextVndbCandidateResponseSchema
+export type IVndbReviewItemResponse = z.infer<
+  typeof VndbReviewItemResponseSchema
 >;
 export type IDecideVndbCandidateRequest = z.infer<
   typeof DecideVndbCandidateRequestSchema
