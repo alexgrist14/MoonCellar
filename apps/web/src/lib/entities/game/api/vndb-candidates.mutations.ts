@@ -20,5 +20,17 @@ export const useDecideVndbCandidateMutation = () => {
         }),
       ]);
     },
+    onError: (_error, { vnId }) =>
+      Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: vndbCandidateQueryKeys.item(vnId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: vndbCandidateQueryKeys.summary(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: vndbCandidateQueryKeys.listAll(),
+        }),
+      ]),
   });
 };

@@ -101,6 +101,10 @@ export const VndbReviewItemSchema = z.object({
     .string()
     .nullable()
     .describe("Next VN waiting for a decision after this one"),
+  decidedBy: z
+    .string()
+    .nullable()
+    .describe("Admin who recorded the decision"),
   vn: VndbReviewNovelSchema.nullable().describe(
     "Null if VNDB no longer has the VN"
   ),

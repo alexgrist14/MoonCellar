@@ -34,6 +34,8 @@ export class VndbCandidate {
   winner: Types.ObjectId | null;
   @Prop({ type: String, default: null })
   decision: "match" | "skip" | null;
+  @Prop({ type: Object, default: null })
+  decidedBy: { userId: Types.ObjectId; userName: string } | null;
 }
 
 export const VndbCandidateSchema = SchemaFactory.createForClass(VndbCandidate);

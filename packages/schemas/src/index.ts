@@ -16,3 +16,4 @@ export * from "./user-ratings.schema";
 export * from "./user.schema";
 export * from "./utils";
 export * from "./vndb-candidates.schema";
+export * from "./vndb-review-socket.schema";

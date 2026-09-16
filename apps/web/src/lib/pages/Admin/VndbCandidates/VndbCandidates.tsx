@@ -14,6 +14,7 @@ import {
   vndbReviewItemQueryOptions,
 } from "@/src/lib/entities/game/api/vndb-candidates.queries";
 import { useDecideVndbCandidateMutation } from "@/src/lib/entities/game/api/vndb-candidates.mutations";
+import { useVndbReviewSocket } from "@/src/lib/entities/game/api/vndb-candidates.socket";
 import { setAdminQuery } from "../admin-url";
 import { CandidateCard, Fact } from "./CandidateCard";
 import { CandidateList } from "./CandidateList";
@@ -45,6 +46,8 @@ const VndbCandidates: FC = () => {
   const { mutate: decide } = useDecideVndbCandidateMutation();
   const { data: platforms } = usePlatformsQuery();
   const isLoaderShown = useMinimumLoading(isLoading);
+
+  useVndbReviewSocket(vnId);
 
   const item = data?.item ?? null;
   const selectedIndex =
@@ -191,6 +194,7 @@ const VndbCandidates: FC = () => {
                           })}
                         >
                           {STATE_LABELS[item.state]}
+                          {item.decidedBy && ` · ${item.decidedBy}`}
                         </span>
                       )}
                     </div>
@@ -302,7 +306,9 @@ const VndbCandidates: FC = () => {
                 </p>
               ) : (
                 <p className={styles.hint}>
-                  This VN already has a decision
+                  {item.decidedBy
+                    ? `${item.decidedBy} already decided this VN`
+                    : "This VN already has a decision"}
                 </p>
               )}
 

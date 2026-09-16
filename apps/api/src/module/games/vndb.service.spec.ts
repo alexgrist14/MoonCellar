@@ -1,4 +1,4 @@
-import { BadRequestException } from "@nestjs/common";
+import { BadRequestException, ConflictException } from "@nestjs/common";
 import { Types } from "mongoose";
 import { of } from "rxjs";
 import { VndbService } from "./services/vndb.service";
@@ -10,6 +10,8 @@ jest.mock("../../shared/utils", () => ({
   sleep: jest.fn(() => Promise.resolve()),
 }));
 
+const ADMIN = { _id: new Types.ObjectId(), userName: "alex" };
+
 const query = (value: unknown) => ({
   select: () => query(value),
   limit: () => query(value),
@@ -17,14 +19,21 @@ const query = (value: unknown) => ({
   lean: () => Promise.resolve(value),
 });
 
+const createReviewEvents = () => ({
+  candidateDecided: jest.fn(),
+  candidatesApplied: jest.fn(),
+});
+
 const createService = ({
   httpService = {},
   gamesModel = {},
   candidatesModel = {},
+  reviewEvents = createReviewEvents(),
 }: {
   httpService?: object;
   gamesModel?: object;
   candidatesModel?: object;
+  reviewEvents?: ReturnType<typeof createReviewEvents>;
 }) =>
   new VndbService(
     httpService as never,
@@ -34,7 +43,8 @@ const createService = ({
     {} as never,
     {} as never,
     {} as never,
-    {} as never
+    {} as never,
+    reviewEvents as never
   );
 
 describe("VndbService", () => {
@@ -55,32 +65,86 @@ describe("VndbService", () => {
     expect(secondWait).toBeGreaterThan(VNDB_REQUEST_DELAY_MS - 100);
   });
 
-  it("rejects a match with a game that is not a candidate", async () => {
-    const updateOne = jest.fn();
+  it("records a decision only on an undecided VN among its candidates", async () => {
+    const gameId = String(new Types.ObjectId());
+    const findOneAndUpdate = jest.fn(() =>
+      query({ status: "pending", decision: "match" })
+    );
+    const reviewEvents = createReviewEvents();
     const service = createService({
+      reviewEvents,
       candidatesModel: {
+        findOneAndUpdate,
+        countDocuments: jest.fn().mockResolvedValue(0),
+        findOne: () => query(null),
+        find: () => query([]),
+      },
+    });
+
+    await service.decideCandidate("v1", gameId, ADMIN);
+
+    expect(findOneAndUpdate).toHaveBeenCalledWith(
+      {
+        vnId: "v1",
+        status: "pending",
+        decision: null,
+        "candidates.gameId": new Types.ObjectId(gameId),
+      },
+      expect.anything(),
+      { new: true }
+    );
+    expect(reviewEvents.candidateDecided).toHaveBeenCalledWith({
+      vnId: "v1",
+      state: "queued-match",
+      decidedBy: "alex",
+    });
+  });
+
+  it("refuses a decision on a VN another admin has already decided", async () => {
+    const reviewEvents = createReviewEvents();
+    const service = createService({
+      reviewEvents,
+      candidatesModel: {
+        findOneAndUpdate: () => query(null),
         findOne: () =>
           query({
-            _id: new Types.ObjectId(),
-            candidates: [{ gameId: new Types.ObjectId() }],
+            status: "pending",
+            decision: "skip",
+            decidedBy: { userName: "maria" },
           }),
-        updateOne,
+      },
+    });
+
+    const decision = service.decideCandidate("v1", null, ADMIN);
+
+    await expect(decision).rejects.toBeInstanceOf(ConflictException);
+    await expect(decision).rejects.toThrow("maria has already decided v1");
+    expect(reviewEvents.candidateDecided).not.toHaveBeenCalled();
+  });
+
+  it("rejects a match with a game that is not a candidate", async () => {
+    const service = createService({
+      candidatesModel: {
+        findOneAndUpdate: () => query(null),
+        findOne: () => query({ status: "pending", decision: null }),
       },
     });
 
     await expect(
-      service.decideCandidate("v1", String(new Types.ObjectId()))
+      service.decideCandidate("v1", String(new Types.ObjectId()), ADMIN)
     ).rejects.toBeInstanceOf(BadRequestException);
-    expect(updateOne).not.toHaveBeenCalled();
   });
 
   it("returns a match with a deleted game to review without creating a game", async () => {
     const bulkWrite = jest.fn();
     const insertVndbGame = jest.fn();
+    const reviewEvents = createReviewEvents();
     const service = createService({
+      reviewEvents,
       gamesModel: { find: () => query([]), updateMany: jest.fn() },
       candidatesModel: { bulkWrite },
     });
+    const _id = new Types.ObjectId();
 
     Object.assign(service, {
       insertVndbGame,
@@ -89,7 +153,7 @@ describe("VndbService", () => {
 
     const applied = await service["applyDecisionBatch"]([
       {
-        _id: new Types.ObjectId(),
+        _id,
         vnId: "v1",
         vnName: "Visual novel",
         decision: "match",
@@ -99,8 +163,12 @@ describe("VndbService", () => {
 
     expect(applied).toBe(0);
     expect(insertVndbGame).toHaveBeenCalledWith([]);
-    expect(bulkWrite.mock.calls[0][0][0].updateOne.update).toEqual({
-      $set: { decision: null, winner: null },
+    expect(bulkWrite.mock.calls[0][0][0].updateOne).toEqual({
+      filter: { _id, status: "pending", decision: "match" },
+      update: { $set: { decision: null, winner: null, decidedBy: null } },
+    });
+    expect(reviewEvents.candidatesApplied).toHaveBeenCalledWith({
+      vnIds: ["v1"],
     });
   });
 });
