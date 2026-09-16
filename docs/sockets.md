@@ -1,13 +1,14 @@
 # Sockets
 
-MoonCellar keeps two real-time channels open over Socket.IO, both served by the API process:
+MoonCellar keeps three real-time channels open over Socket.IO, all served by the API process:
 
 | Namespace | Who connects | What it does |
 |---|---|---|
 | `/comments` | Anyone with a game's Discussion tab open | **Notifications only.** Tells other readers that a comment was posted, edited, moderated or liked. Every change still goes through REST. |
 | `/royal` | Every signed-in user, on every page | **State.** Royal games — the user's list of games for the royal wheel — are read and changed over this socket and pushed to the user's other tabs and devices. |
+| `/vndb-review` | Admins with the VNDB candidates tab open | **Notifications only.** Tells other admins that a VN was matched or skipped, and when queued decisions were written to games. |
 
-This document describes how both work, every event on the wire, what depends on the sockets and
+This document describes how they work, every event on the wire, what depends on the sockets and
 what deliberately does not.
 
 Verified on 2026-09-15 with Bun 1.4.2, NestJS 11.2, Socket.IO 4.8.3, MongoDB 8.2 and Next.js
@@ -20,7 +21,7 @@ Verified on 2026-09-15 with Bun 1.4.2, NestJS 11.2, Socket.IO 4.8.3, MongoDB 8.2
 | Library | Socket.IO 4.8 through `@nestjs/websockets` + `@nestjs/platform-socket.io` 11 |
 | Server | The API process itself, same port (3228), HTTP path `/socket.io/` |
 | Adapter | `SocketIoAdapter` (`apps/api/src/shared/socket-io.adapter.ts`), installed in `main.ts` |
-| Contract | `packages/schemas/src/comments-socket.schema.ts`, `packages/schemas/src/royal-games.schema.ts` |
+| Contract | `packages/schemas/src/comments-socket.schema.ts`, `packages/schemas/src/royal-games.schema.ts`, `packages/schemas/src/vndb-review-socket.schema.ts` |
 
 - **Transports.** Default Socket.IO behaviour: an HTTP long-polling handshake, then an upgrade to
   WebSocket. If the upgrade is blocked (see [Deployment](#deployment)) the connection keeps
@@ -429,6 +430,62 @@ because `WheelComponent` rebuilds its round from the list whenever the list chan
 | `entities/royal/api/royal.requests.ts` | `syncRoyalGames`, `addAccountRoyalGames`, `removeAccountRoyalGames`, `replaceAccountRoyalGames`: optimistic update, ack with timeout, the ack's list as the result, a toast for `rejected`, a toast and a resync on failure |
 | `entities/royal/model/useRoyalGames.ts` | The list and the four actions, guest or account |
 | `entities/royal/model/useRoyalGamesSync.ts` | Mounted once in `Layout`: connects for a signed-in user, moves the guest list, syncs on `connect`, applies `royal:changed`, refreshes the session once on `Unauthorized`, disconnects and clears on sign-out |
+
+---
+
+## `/vndb-review` — VNDB candidate review
+
+Admins resolving VNDB candidates see each other's decisions live. When one admin matches or skips a
+VN, every other open VNDB candidates tab marks it as decided, and an admin who has that VN open gets
+a toast and loses the Skip and Match buttons.
+
+| | |
+|---|---|
+| Rooms | None — every socket of the namespace belongs to an admin and receives every event |
+| Authentication | Session cookie `accessMoonToken` of a user with the `admin` role, verified when the namespace connects |
+| Server code | `apps/api/src/module/games/gateways/vndb-review.gateway.ts`, emitted from `VndbService` |
+| Client code | `apps/web/src/lib/shared/socket/vndb-review.socket.ts`, `apps/web/src/lib/entities/game/api/vndb-candidates.socket.ts` |
+| Only consumer | `VndbCandidates` (`apps/web/src/lib/pages/Admin/VndbCandidates/VndbCandidates.tsx`) |
+
+- **The database, not the socket, stops a second decision.** `decideCandidate` writes with one
+  `findOneAndUpdate` whose filter requires `status: "pending"`, `decision: null` and, for a match,
+  the game among the candidates. When two admins decide the same VN at the same moment only one
+  write matches; the other request answers `409` with the name of the admin who decided. The worker
+  writes a batch back only to records still `pending` with the same decision. The socket makes the
+  race rare by telling everyone first; it is not what prevents it.
+- **Decisions still go through REST** (`POST /vndb/candidates/:vnId/decision`). The decider's own tab
+  receives its event too, which keeps its cached item correct if the admin goes back to it.
+- **Lifecycle.** The socket opens when the VNDB candidates tab mounts and closes when it unmounts. It
+  runs on its own `Manager` with credentials and loads `socket.io-client` with a dynamic import, for
+  the same reasons as `/royal`. On `Unauthorized` the client refreshes the session once and
+  reconnects; on `reconnect` it refetches every review query to catch up.
+- **The role is checked once, at connect.** An admin whose role is removed keeps receiving events
+  until the socket disconnects.
+
+### Server → client events
+
+#### `candidate:decided`
+
+Emitted by `VndbService.decideCandidate` after the decision is written.
+
+| Field | Type | Meaning |
+|---|---|---|
+| `vnId` | string | The VN |
+| `state` | `"queued-match"` \| `"queued-new"` | State after the decision |
+| `decidedBy` | string \| null | User name of the admin who decided |
+
+Client: patches `state` and `decidedBy` of the cached review item, refetches the summary and the
+list, and shows a toast when the VN was waiting and is the one open on screen.
+
+#### `candidates:applied`
+
+Emitted by `VndbService.applyDecisionBatch` after a batch is written.
+
+| Field | Type | Meaning |
+|---|---|---|
+| `vnIds` | string[] | VNs of the batch — written to games, or returned to review because nothing could be written |
+
+Client: invalidates those review items, the summary and the list.
 
 ---
 

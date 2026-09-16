@@ -31,6 +31,8 @@ import { IndexNowModule } from "../indexnow/indexnow.module";
 import { VndbService } from "./services/vndb.service";
 import { VndbController } from "./controllers/vndb.controller";
 import { HttpModule } from "@nestjs/axios";
+import { JwtModule } from "@nestjs/jwt";
+import { VndbReviewGateway } from "./gateways/vndb-review.gateway";
 import {
   VndbCandidate,
   VndbCandidateSchema,
@@ -54,6 +56,7 @@ import {
     PlatformsService,
     CharactersService,
     VndbService,
+    VndbReviewGateway,
   ],
   imports: [
     MongooseModule.forFeature([
@@ -69,6 +72,7 @@ import {
     MetricsModule,
     IndexNowModule,
     HttpModule,
+    JwtModule.register({}),
   ],
 })
 export class GamesModule {}

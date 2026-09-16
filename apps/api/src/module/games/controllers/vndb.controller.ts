@@ -15,12 +15,14 @@ import {
   Param,
   Post,
   Query,
+  Req,
   UseGuards,
 } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { RolesEnum } from "@mooncellar/schemas";
 import { RolesGuard } from "../../roles/roles.guard";
 import { Roles } from "../../roles/roles.decorator";
+import type { IAuthorizedRequest } from "../../comments/types/community.type";
 import {
   DecideVndbCandidateRequestDto,
   GetVndbCandidatesRequestDto,
@@ -177,8 +179,9 @@ export class VndbController {
   @ApiOkResponse({ type: VndbCandidatesSummaryDto })
   decideCandidate(
     @Param("vnId") vnId: string,
-    @Body() dto: DecideVndbCandidateRequestDto
+    @Body() dto: DecideVndbCandidateRequestDto,
+    @Req() request: IAuthorizedRequest
   ) {
-    return this.vndbService.decideCandidate(vnId, dto.gameId);
+    return this.vndbService.decideCandidate(vnId, dto.gameId, request.user);
   }
 }

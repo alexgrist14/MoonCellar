@@ -1,6 +1,7 @@
 import { HttpService } from "@nestjs/axios";
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   Logger,
   NotFoundException,
@@ -119,6 +120,8 @@ import { PinoLogger } from "nestjs-pino";
 import { runInCronLogContext } from "../../../shared/cron-logging";
 import { runCronExclusive } from "../../../shared/cron-mutex";
 import { BusinessMetricsService } from "../../metrics/business-metrics.service";
+import type { User } from "../../user/schemas/user.schema";
+import { VndbReviewGateway } from "../gateways/vndb-review.gateway";
 
 const VNDB_API_URL = "https://api.vndb.org/kana";
 
@@ -218,7 +221,8 @@ export class VndbService {
     private readonly charactersModel: Model<Character>,
     private readonly fileService: FileService,
     private readonly pino: PinoLogger,
-    private readonly metrics: BusinessMetricsService
+    private readonly metrics: BusinessMetricsService,
+    private readonly reviewEvents: VndbReviewGateway
   ) {}
 
   async getStats() {
@@ -1076,6 +1080,7 @@ export class VndbService {
       state: candidateState(candidate),
       remaining,
       nextVnId: next?.vnId ?? null,
+      decidedBy: candidate.decidedBy?.userName ?? null,
       vn: vn
         ? {
             name: vn.name,
@@ -1125,39 +1130,62 @@ export class VndbService {
 
   async decideCandidate(
     vnId: string,
-    gameId: string | null
+    gameId: string | null,
+    user: Pick<User, "_id" | "userName">
   ): Promise<IVndbCandidatesSummary> {
     const candidate = await this.vndbCandidatesModel
-      .findOne({ vnId, status: "pending", decision: null })
-      .select("candidates.gameId")
+      .findOneAndUpdate(
+        {
+          vnId,
+          ...UNDECIDED_FILTER,
+          ...(gameId
+            ? { "candidates.gameId": new Types.ObjectId(gameId) }
+            : {}),
+        },
+        {
+          $set: {
+            decision: gameId ? "match" : "skip",
+            winner: gameId ? new Types.ObjectId(gameId) : null,
+            decidedBy: {
+              userId: new Types.ObjectId(String(user._id)),
+              userName: user.userName,
+            },
+          },
+        },
+        { new: true }
+      )
+      .select("status decision")
       .lean();
 
-    if (!candidate) {
-      throw new NotFoundException(
-        `${vnId} has no candidates waiting for a decision`
-      );
-    }
+    if (!candidate) throw await this.getDecisionError(vnId);
 
-    if (
-      gameId &&
-      !candidate.candidates.some((entry) => String(entry.gameId) === gameId)
-    ) {
-      throw new BadRequestException(`The game is not a candidate for ${vnId}`);
-    }
-
-    await this.vndbCandidatesModel.updateOne(
-      { _id: candidate._id, decision: null },
-      {
-        $set: {
-          decision: gameId ? "match" : "skip",
-          winner: gameId ? new Types.ObjectId(gameId) : null,
-        },
-      }
-    );
-
+    this.reviewEvents.candidateDecided({
+      vnId,
+      state: candidateState(candidate),
+      decidedBy: user.userName,
+    });
     this.startApplyingDecisions();
 
     return this.getCandidatesSummary();
+  }
+
+  private async getDecisionError(vnId: string) {
+    const candidate = await this.vndbCandidatesModel
+      .findOne({ vnId })
+      .select("status decision decidedBy")
+      .lean();
+
+    if (!candidate) {
+      return new NotFoundException(`${vnId} is not in the review queue`);
+    }
+
+    if (candidateState(candidate) !== "waiting") {
+      return new ConflictException(
+        `${candidate.decidedBy?.userName ?? "Another admin"} has already decided ${vnId}`
+      );
+    }
+
+    return new BadRequestException(`The game is not a candidate for ${vnId}`);
   }
 
   private startApplyingDecisions() {
@@ -1261,7 +1289,7 @@ export class VndbService {
 
         return {
           updateOne: {
-            filter: { _id },
+            filter: { _id, status: "pending", decision },
             update: {
               $set: gameId
                 ? {
@@ -1269,12 +1297,16 @@ export class VndbService {
                     winner: gameId,
                     decision: null,
                   }
-                : { decision: null, winner: null },
+                : { decision: null, winner: null, decidedBy: null },
             },
           },
         };
       })
     );
+
+    this.reviewEvents.candidatesApplied({
+      vnIds: decided.map(({ vnId }) => vnId),
+    });
 
     const returned = decided.filter(({ vnId }) => !gameIdByVnId.has(vnId));
 
