@@ -8,6 +8,8 @@ import {
   IReview,
   IReviewsResponse,
   IUpdateCommentRequest,
+  IUserReview,
+  IUserReviewsResponse,
 } from "@mooncellar/schemas";
 import { commentsAPI } from "@/src/lib/shared/api";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
@@ -28,6 +30,59 @@ const updateReviewPages = (
       ),
     })),
   };
+
+const setHelpfulVote = <T extends IReview | IUserReview>(
+  review: T,
+  isHelpful: boolean,
+  count?: number
+): T => ({
+  ...review,
+  isHelpful,
+  helpfulCount:
+    count ?? Math.max(0, review.helpfulCount + (isHelpful ? 1 : -1)),
+});
+
+export const useUserReviewHelpfulMutation = (userId: string) => {
+  const queryClient = useQueryClient();
+
+  const setReview = (
+    reviewId: string,
+    update: (review: IUserReview) => IUserReview
+  ) =>
+    queryClient.setQueriesData<IUserReviewsResponse>(
+      { queryKey: commentQueryKeys.userReviews(userId) },
+      (data) =>
+        data && {
+          ...data,
+          results: data.results.map((review) =>
+            review._id === reviewId ? update(review) : review
+          ),
+        }
+    );
+
+  return useMutation({
+    mutationFn: ({
+      reviewId,
+      isHelpful,
+    }: {
+      reviewId: string;
+      isHelpful: boolean;
+    }) =>
+      commentsAPI
+        .setReviewHelpful(reviewId, isHelpful)
+        .then(({ data }) => data),
+    onMutate: ({ reviewId, isHelpful }) =>
+      setReview(reviewId, (review) => setHelpfulVote(review, isHelpful)),
+    onSuccess: (vote, { reviewId }) =>
+      setReview(reviewId, (review) =>
+        setHelpfulVote(review, vote.isActive, vote.count)
+      ),
+    onError: () =>
+      queryClient.invalidateQueries({
+        queryKey: commentQueryKeys.userReviews(userId),
+      }),
+  });
+};
 
 export const useReviewHelpfulMutation = (gameId: string) => {
   const queryClient = useQueryClient();
@@ -50,17 +105,11 @@ export const useReviewHelpfulMutation = (gameId: string) => {
         .setReviewHelpful(reviewId, isHelpful)
         .then(({ data }) => data),
     onMutate: ({ reviewId, isHelpful }) =>
-      setReview(reviewId, (review) => ({
-        ...review,
-        isHelpful,
-        helpfulCount: Math.max(0, review.helpfulCount + (isHelpful ? 1 : -1)),
-      })),
+      setReview(reviewId, (review) => setHelpfulVote(review, isHelpful)),
     onSuccess: (vote, { reviewId }) =>
-      setReview(reviewId, (review) => ({
-        ...review,
-        isHelpful: vote.isActive,
-        helpfulCount: vote.count,
-      })),
+      setReview(reviewId, (review) =>
+        setHelpfulVote(review, vote.isActive, vote.count)
+      ),
     onError: () =>
       queryClient.invalidateQueries({
         queryKey: commentQueryKeys.reviews(gameId),

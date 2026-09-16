@@ -2,7 +2,7 @@
   display: grid;
   gap: var(--gap-x1);
   align-items: center;
-  padding-inline: var(--padding-x2);
+  padding: var(--padding-x1) calc(var(--range-thumb-size) / 2);
   color: $textColor;
   user-select: none;
   width: 100%;
@@ -14,6 +14,10 @@
     white-space: nowrap;
     text-align: center;
     @include font(12px, 15px, 500);
+  }
+
+  &_labelled {
+    padding-inline: calc(var(--range-thumb-width) / 2);
   }
 
   &_disabled {
@@ -43,6 +47,38 @@
     cursor: pointer;
     height: var(--range-thumb-height);
     touch-action: pan-x;
+
+    &_dual {
+      appearance: none;
+      background-color: transparent;
+      pointer-events: none;
+
+      &::-webkit-slider-thumb {
+        appearance: none;
+        pointer-events: auto;
+        width: var(--range-thumb-size);
+        height: var(--range-thumb-height);
+        border-radius: 50%;
+      }
+
+      &::-moz-range-thumb {
+        pointer-events: auto;
+        width: var(--range-thumb-size);
+        height: var(--range-thumb-height);
+        border: 0;
+        border-radius: 50%;
+      }
+    }
+
+    &_labelled {
+      &::-webkit-slider-thumb {
+        width: var(--range-thumb-width);
+      }
+
+      &::-moz-range-thumb {
+        width: var(--range-thumb-width);
+      }
+    }
   }
 
   &__pointer {

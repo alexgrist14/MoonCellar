@@ -2,11 +2,12 @@
 
 import { FC, useEffect, useMemo, useState } from "react";
 import { userListCategories } from "../../shared/constants/user.const";
-import { SortType } from "../../shared/types/sort.type";
+import { ReviewSortType, SortType } from "../../shared/types/sort.type";
 import { IUser } from "../../shared/types/auth.type";
 import { IFollowings } from "../../shared/types/user.type";
 import { Settings } from "./Settings";
 import { UserGames } from "./UserGames";
+import { UserReviews } from "./UserReviews";
 import UserInfo from "./UserInfo/UserInfo";
 import styles from "./UserProfile.module.scss";
 import cn from "classnames";
@@ -18,7 +19,11 @@ import { SvgBurger } from "../../shared/ui/svg";
 import { useStatesStore } from "../../shared/store/states.store";
 import { useSearchParams } from "next/navigation";
 import { UserNavigation } from "../../features/user/ui/UserNavigation";
-import { IPlaythrough, IUserRating } from "@mooncellar/schemas";
+import {
+  IPlaythrough,
+  IUserRating,
+  IUserReviewsOrder,
+} from "@mooncellar/schemas";
 import { userAPI } from "../../shared/api";
 import { useAuthStore } from "../../shared/store/auth.store";
 import { usePlaythroughsStore } from "../../shared/store/playthroughs.store";
@@ -49,10 +54,7 @@ const UserProfile: FC<UserProfileProps> = ({
       ? authUserId
       : undefined;
 
-  const isAuthedUser = useMemo(
-    () => viewerId === user._id,
-    [viewerId, user]
-  );
+  const isAuthedUser = useMemo(() => viewerId === user._id, [viewerId, user]);
 
   useEffect(() => {
     if (authUserId && !viewerId) {
@@ -101,6 +103,25 @@ const UserProfile: FC<UserProfileProps> = ({
     SortType.DATE_ADDED
   );
   const [sortOrder, setSortOrder] = useState("desc");
+  const [reviewSort, setReviewSort] = useState<ReviewSortType>(
+    ReviewSortType.DATE
+  );
+  const [reviewOrder, setReviewOrder] = useState<IUserReviewsOrder>("desc");
+
+  const navigationProps = {
+    user: displayUser,
+    isAuthedUser,
+    playthroughs: effectivePlaythroughs,
+    selectedSort,
+    sortOrder,
+    onSortChange: setSelectedSort,
+    onSortOrderChange: setSortOrder,
+    reviewSort,
+    reviewOrder,
+    onReviewSortChange: setReviewSort,
+    onReviewOrderChange: (value: string) =>
+      setReviewOrder(value as IUserReviewsOrder),
+  };
 
   return (
     <>
@@ -133,15 +154,7 @@ const UserProfile: FC<UserProfileProps> = ({
             }
             titleStyle={{ width: "fit-content" }}
           >
-            <UserNavigation
-              user={displayUser}
-              isAuthedUser={isAuthedUser}
-              playthroughs={effectivePlaythroughs}
-              selectedSort={selectedSort}
-              sortOrder={sortOrder}
-              onSortChange={setSelectedSort}
-              onSortOrderChange={setSortOrder}
-            />
+            <UserNavigation {...navigationProps} />
           </ExpandMenu>
         )}
         <Box classNameContent={styles.content}>
@@ -163,6 +176,15 @@ const UserProfile: FC<UserProfileProps> = ({
               authUserId={viewerId}
             />
           )}
+          {tab === "reviews" && (
+            <UserReviews
+              userId={user._id}
+              userName={displayUser.userName}
+              isOwnProfile={isAuthedUser}
+              sort={reviewSort}
+              order={reviewOrder}
+            />
+          )}
           {isGamesTab && (
             <UserGames
               playthroughs={effectivePlaythroughs}
@@ -173,15 +195,7 @@ const UserProfile: FC<UserProfileProps> = ({
           )}
         </Box>
         <div className={styles.navigation}>
-          <UserNavigation
-            user={displayUser}
-            isAuthedUser={isAuthedUser}
-            playthroughs={effectivePlaythroughs}
-            selectedSort={selectedSort}
-            sortOrder={sortOrder}
-            onSortChange={setSelectedSort}
-            onSortOrderChange={setSortOrder}
-          />
+          <UserNavigation {...navigationProps} />
         </div>
       </div>
     </>

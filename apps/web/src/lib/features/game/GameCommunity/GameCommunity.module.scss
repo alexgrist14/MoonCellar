@@ -61,33 +61,6 @@ $categories: completed, playing, dropped, played, backlog, wishlist;
   font-variant-numeric: tabular-nums;
 }
 
-.segmented {
-  display: inline-flex;
-  gap: var(--gap-x05);
-  padding: var(--padding-x05);
-  border-radius: var(--radius-x4);
-  background-color: var(--color-bg-tertiary);
-
-  &__button {
-    padding: var(--padding-x05) var(--padding-x3);
-    border: 0;
-    border-radius: var(--radius-x3);
-    background-color: transparent;
-    color: var(--color-text-muted);
-    cursor: pointer;
-    transition:
-      background-color var(--duration-fast) var(--easing-out),
-      color var(--duration-fast) var(--easing-out);
-
-    @include font(13px, 20px, 400);
-
-    &_active {
-      background-color: var(--color-bg-primary);
-      color: var(--color-text-primary);
-    }
-  }
-}
-
 .summary {
   display: flex;
   flex-wrap: wrap;
@@ -247,8 +220,7 @@ $categories: completed, playing, dropped, played, backlog, wishlist;
     @include font(15px, 20px, 600);
   }
 
-  &__scale,
-  &__unrated {
+  &__scale {
     color: var(--color-text-muted);
 
     @include font(12px, 16px, 400);
@@ -288,33 +260,6 @@ $categories: completed, playing, dropped, played, backlog, wishlist;
     width: var(--community-reply-avatar-size);
     height: var(--community-reply-avatar-size);
   }
-}
-
-.status {
-  display: inline-flex;
-  align-items: center;
-  padding-inline: var(--padding-x2);
-  border-radius: var(--radius-x2);
-  background-color: color-mix(
-    in srgb,
-    var(--community-category-color) 16%,
-    transparent
-  );
-  color: color-mix(
-    in srgb,
-    var(--community-category-color) 62%,
-    var(--color-neutral-100)
-  );
-  white-space: nowrap;
-
-  @include font(12px, 18px, 600);
-}
-
-.mastered {
-  color: var(--game-mastered-color);
-  white-space: nowrap;
-
-  @include font(12px, 18px, 600);
 }
 
 .badge {
@@ -544,7 +489,6 @@ $categories: completed, playing, dropped, played, backlog, wishlist;
 }
 
 @each $category in $categories {
-  .status_#{$category},
   .dot_#{$category},
   .distribution__segment_#{$category} {
     --community-category-color: var(--game-#{$category}-color);
@@ -553,7 +497,6 @@ $categories: completed, playing, dropped, played, backlog, wishlist;
 
 @include reducedMotion {
   .chip,
-  .segmented__button,
   .entry__name,
   .action,
   .busy > * {

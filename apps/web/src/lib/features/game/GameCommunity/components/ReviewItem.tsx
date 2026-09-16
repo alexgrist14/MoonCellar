@@ -8,7 +8,7 @@ import { SvgReply, SvgThumb } from "@/src/lib/shared/ui/svg";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import styles from "../GameCommunity.module.scss";
 import { AuthorName, CommunityAvatar } from "./CommunityAuthor";
-import { AuthorStatus } from "./AuthorStatus";
+import { AuthorStatus } from "@/src/lib/shared/ui/AuthorStatus";
 
 interface IReviewItemProps {
   review: IReview;
@@ -27,10 +27,7 @@ export const ReviewItem: FC<IReviewItemProps> = ({
   onHelpful,
   onDiscuss,
 }) => {
-  const meta = [
-    review.platformName,
-    typeof review.time === "number" && `${review.time} h`,
-  ]
+  const meta = [review.platformName, !!review.time && `${review.time} h`]
     .filter(Boolean)
     .join(" · ");
 
@@ -48,21 +45,18 @@ export const ReviewItem: FC<IReviewItemProps> = ({
           {review.isSpoiler && (
             <span className={styles.entry__spoiler}>Spoilers</span>
           )}
-          <span className={styles.entry__score}>
-            {review.rating !== null ? (
-              <>
-                {review.rating}
-                <span className={styles.entry__scale}> / 10</span>
-              </>
-            ) : (
-              <span className={styles.entry__unrated}>Not rated</span>
-            )}
-          </span>
+          {review.rating !== null && (
+            <span className={styles.entry__score}>
+              {review.rating}
+              <span className={styles.entry__scale}> / 10</span>
+            </span>
+          )}
         </div>
         <Spoiler isActive={review.isSpoiler}>
           <ExpandableBlock
             clampHeight="var(--community-review-clamp-height)"
-            modalTitle={`${review.author?.userName ?? "Player"}'s review`}
+            title={`${review.author?.userName ?? "Player"}'s review`}
+            mode="drawer"
           >
             <RichText content={review.comment} className={styles.entry__body} />
           </ExpandableBlock>
@@ -89,7 +83,9 @@ export const ReviewItem: FC<IReviewItemProps> = ({
             Discuss
           </button>
           {review.date ? (
-            <span className={classNames(styles.entry__meta, styles.entry__date)}>
+            <span
+              className={classNames(styles.entry__meta, styles.entry__date)}
+            >
               Finished {formatIsoDate(review.date)}
             </span>
           ) : (

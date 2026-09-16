@@ -15,7 +15,7 @@ import { getPlainTextExcerpt } from "../utils";
 import { CommentComposer } from "./CommentComposer";
 import { CommentItem } from "./CommentItem";
 import { CommentQuote } from "./CommentQuote";
-import { SortToggle } from "./SortToggle";
+import { SortToggle } from "@/src/lib/shared/ui/SortToggle";
 
 interface IDiscussionTabProps {
   game: IGameResponse;

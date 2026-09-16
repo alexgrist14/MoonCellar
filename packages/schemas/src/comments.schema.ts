@@ -5,11 +5,22 @@ export const COMMENT_MAX_LENGTH = 10000;
 export const COMMENT_TEXT_LIMIT = 2000;
 export const COMMENTS_PAGE_SIZE = 10;
 export const REVIEWS_PAGE_SIZE = 10;
+export const USER_REVIEWS_PAGE_SIZE = 10;
 
 export const CommentStatusSchema = z.enum(["visible", "hidden", "deleted"]);
 export const CommentsSortSchema = z.enum(["top", "new"]);
 export const ReviewsSortSchema = z.enum(["helpful", "new"]);
 export const ReviewCategorySchema = categoriesZod.exclude(["wishlist"]);
+export const UserReviewStatusSchema = z.enum([
+  "playing",
+  "completed",
+  "mastered",
+  "played",
+  "backlog",
+  "dropped",
+]);
+export const UserReviewsSortSchema = z.enum(["date", "rating", "helpful"]);
+export const UserReviewsOrderSchema = z.enum(["asc", "desc"]);
 
 export const CommunityAuthorSchema = z.object({
   _id: z.string().describe("User id"),
@@ -164,6 +175,69 @@ export const ReviewsResponseSchema = z.object({
   summary: ReviewsSummarySchema,
 });
 
+export const UserReviewGameSchema = z.object({
+  _id: z.string().describe("Game id"),
+  name: z.string().describe("Game name"),
+  slug: z.string().describe("Game slug"),
+  cover: z.string().nullable().describe("Cover url"),
+});
+
+export const UserReviewSchema = ReviewSchema.omit({ author: true }).extend({
+  isPublic: z.boolean().describe("Published on the game page"),
+  game: UserReviewGameSchema.nullable().describe("Reviewed game"),
+});
+
+export const UserReviewsSummarySchema = z.object({
+  total: z.number().describe("Reviews visible to the viewer"),
+  ratedCount: z.number().describe("Reviewed games the author rated"),
+  averageRating: z.number().nullable().describe("Average of those ratings"),
+  statuses: z
+    .object({ status: UserReviewStatusSchema, count: z.number() })
+    .array()
+    .describe("Reviews per status"),
+});
+
+export const UserReviewsResponseSchema = z.object({
+  results: UserReviewSchema.array(),
+  total: z.number().describe("Reviews matching the filters"),
+  summary: UserReviewsSummarySchema,
+  games: UserReviewGameSchema.array().describe("Games the author reviewed"),
+});
+
+export const GetUserReviewsRequestSchema = z.object({
+  gameIds: z
+    .string()
+    .array()
+    .or(z.string().transform((value) => [value]))
+    .optional()
+    .describe("Filter by games"),
+  status: UserReviewStatusSchema.optional().describe("Filter by status"),
+  ratingMin: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(10)
+    .optional()
+    .describe("Lowest rating to include"),
+  ratingMax: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(10)
+    .optional()
+    .describe("Highest rating to include"),
+  sort: UserReviewsSortSchema.default("date").describe("Sort field"),
+  order: UserReviewsOrderSchema.default("desc").describe("Sort direction"),
+  page: z.coerce.number().int().min(1).default(1).describe("Page"),
+  take: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(50)
+    .default(USER_REVIEWS_PAGE_SIZE)
+    .describe("Page size"),
+});
+
 export const GetReviewsRequestSchema = z.object({
   category: ReviewCategorySchema.optional().describe("Filter by status"),
   sort: ReviewsSortSchema.default("helpful").describe("Sort order"),
@@ -204,3 +278,14 @@ export type IReviewsSummary = z.infer<typeof ReviewsSummarySchema>;
 export type IReviewsResponse = z.infer<typeof ReviewsResponseSchema>;
 export type IGetReviewsRequest = z.input<typeof GetReviewsRequestSchema>;
 export type IGetReviewsParams = z.infer<typeof GetReviewsRequestSchema>;
+export type IUserReviewStatus = z.infer<typeof UserReviewStatusSchema>;
+export type IUserReviewsSort = z.infer<typeof UserReviewsSortSchema>;
+export type IUserReviewsOrder = z.infer<typeof UserReviewsOrderSchema>;
+export type IUserReviewGame = z.infer<typeof UserReviewGameSchema>;
+export type IUserReview = z.infer<typeof UserReviewSchema>;
+export type IUserReviewsSummary = z.infer<typeof UserReviewsSummarySchema>;
+export type IUserReviewsResponse = z.infer<typeof UserReviewsResponseSchema>;
+export type IGetUserReviewsRequest = z.input<
+  typeof GetUserReviewsRequestSchema
+>;
+export type IGetUserReviewsParams = z.infer<typeof GetUserReviewsRequestSchema>;

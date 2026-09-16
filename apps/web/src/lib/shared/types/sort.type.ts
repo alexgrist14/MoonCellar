@@ -6,3 +6,9 @@ export enum SortType {
   PLAYTHROUGHS = "By playthroughs count",
   COMMENTS = "By comments",
 }
+
+export enum ReviewSortType {
+  DATE = "By date",
+  RATING = "By rating",
+  HELPFUL = "By helpful votes",
+}

@@ -1,11 +1,11 @@
-import { FC, useEffect, useMemo, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import classNames from "classnames";
 import styles from "./GameExternalPages.module.scss";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Button } from "@/src/lib/shared/ui/Button";
 import { Tooltip } from "@/src/lib/shared/ui/Tooltip";
-import { RowsModal } from "@/src/lib/shared/ui/RowsModal";
-import { modal } from "@/src/lib/shared/ui/Modal";
+import { Popover } from "@/src/lib/shared/ui/Popover";
+import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
 import { IGameResponse } from "@mooncellar/schemas";
 import {
   SvgAmazon,
@@ -43,7 +43,11 @@ export const GameExternalPages: FC<IGameExternalPagesProps> = ({
   isBoxed = true,
 }) => {
   const storeBoxRef = useRef<HTMLDivElement>(null);
+  const moreRef = useRef<HTMLButtonElement>(null);
   const [isMore, setIsMore] = useState(false);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
+  const closePopover = useCallback(() => setIsPopoverOpen(false), []);
 
   const storeItems = useMemo(() => getGameExternalPages(game), [game]);
 
@@ -66,36 +70,6 @@ export const GameExternalPages: FC<IGameExternalPagesProps> = ({
   }, [storeItems]);
 
   if (!storeItems.length) return null;
-
-  const openModal = () =>
-    modal.open(
-      <RowsModal
-        title="External pages"
-        classNameRow={styles.rowReset}
-        rows={sortedItems.map((store, i) => {
-          const StoreIcon = (store.name && storeIcons[store.name]) || SvgStore;
-
-          return (
-            <a
-              key={store.uid + i}
-              href={store.url!}
-              target="_blank"
-              rel="noreferrer"
-              className={styles.row__button}
-            >
-              <span className={styles.row__icon}>
-                <StoreIcon size="20" color="contrast" />
-              </span>
-              <div className={styles.row__info}>
-                <p className={styles.row__title}>{store.name || "Store"}</p>
-                <span className={styles.row__link}>{store.url}</span>
-              </div>
-            </a>
-          );
-        })}
-      />,
-      { id: "game-external-pages" }
-    );
 
   const content = (
     <div className={styles.stats}>
@@ -129,14 +103,53 @@ export const GameExternalPages: FC<IGameExternalPagesProps> = ({
       </div>
       {isMore && (
         <Button
+          ref={moreRef}
           color="transparent"
-          tooltip="All external pages"
+          tooltip={isPopoverOpen ? undefined : "All external pages"}
+          active={isPopoverOpen}
+          aria-expanded={isPopoverOpen}
           className={styles.stats__more}
-          onClick={openModal}
+          onClick={() => setIsPopoverOpen((isOpen) => !isOpen)}
         >
           <SvgMore />
         </Button>
       )}
+      <Popover
+        anchorRef={moreRef}
+        isOpen={isPopoverOpen}
+        onClose={closePopover}
+        title="External pages"
+        contentStyle={{ padding: "var(--padding-x2)" }}
+      >
+        <Scrollbar
+          type="absolute"
+          classNameContent={styles.popover__list}
+          contentStyle={{ maxHeight: "var(--popover-max-height)" }}
+        >
+          {sortedItems.map((store, i) => {
+            const StoreIcon =
+              (store.name && storeIcons[store.name]) || SvgStore;
+
+            return (
+              <a
+                key={store.uid + i}
+                href={store.url!}
+                target="_blank"
+                rel="noreferrer"
+                className={styles.row__button}
+              >
+                <span className={styles.row__icon}>
+                  <StoreIcon size="20" color="contrast" />
+                </span>
+                <div className={styles.row__info}>
+                  <p className={styles.row__title}>{store.name || "Store"}</p>
+                  <span className={styles.row__link}>{store.url}</span>
+                </div>
+              </a>
+            );
+          })}
+        </Scrollbar>
+      </Popover>
     </div>
   );
 

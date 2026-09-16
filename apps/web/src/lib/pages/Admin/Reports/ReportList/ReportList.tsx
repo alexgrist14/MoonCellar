@@ -11,7 +11,7 @@ import { modal } from "@/src/lib/shared/ui/Modal";
 import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal/ConfirmModal";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
-import { SortToggle } from "@/src/lib/features/game/GameCommunity/components/SortToggle";
+import { SortToggle } from "@/src/lib/shared/ui/SortToggle";
 import { useCommentReportsQuery } from "@/src/lib/entities/comment/api/comment-reports.queries";
 import { useResolveCommentReportMutation } from "@/src/lib/entities/comment/api/comment-reports.mutations";
 import { ReportCard } from "./ReportCard";

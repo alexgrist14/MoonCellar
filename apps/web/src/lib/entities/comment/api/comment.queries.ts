@@ -1,6 +1,11 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useInfiniteQuery,
+  useQuery,
+} from "@tanstack/react-query";
 import {
   ICommentsSort,
+  IGetUserReviewsRequest,
   IReviewCategory,
   IReviewsResponse,
   IReviewsSort,
@@ -14,8 +19,7 @@ interface IPage<T> {
 }
 
 const getNextPageParam = <T>(lastPage: IPage<T>, pages: IPage<T>[]) =>
-  pages.reduce((count, page) => count + page.results.length, 0) <
-  lastPage.total
+  pages.reduce((count, page) => count + page.results.length, 0) < lastPage.total
     ? pages.length + 1
     : undefined;
 
@@ -54,6 +58,19 @@ export const useReviewsQuery = (
       ? { pages: [initialData], pageParams: [1] }
       : undefined,
     initialDataUpdatedAt: 0,
+  });
+
+export const useUserReviewsQuery = (
+  userId: string,
+  params: IGetUserReviewsRequest
+) =>
+  useQuery({
+    queryKey: commentQueryKeys.userReviewsList(userId, params),
+    queryFn: () =>
+      commentsAPI.getUserReviews(userId, params).then(({ data }) => data),
+    enabled: !!userId,
+    placeholderData: keepPreviousData,
+    staleTime: 60000,
   });
 
 export const useCommentsQuery = (

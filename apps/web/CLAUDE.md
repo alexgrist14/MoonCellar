@@ -309,10 +309,27 @@ break silently when ignored:
   Chrome through `playwright-core` and reports `main.container` height against the viewport at
   three widths, failing when a page marked `mustFit` overflows. Requires a running
   `bun run start`; set `CHROME_PATH` if Chrome is not on the default channel.
+- **Every route answering 404 in `next dev` while the log shows no `Compiling …` line means the
+  Turbopack persistent cache is stale, not that the routes are gone.** The pages come back as the
+  not-found body under a 404 status and nothing in the log mentions the cache. Delete
+  `apps/web/.next/dev` and restart — the dev server rebuilds its route table from source.
 - **`curl` cannot see JSON-LD or anything JS injects.** Check structured data with Google's
   Rich Results Test; a "no schema found" conclusion drawn from `curl` is a false finding.
 - Before adding a helper, search for an existing one. `getAverageRating` (the combined
   IGDB / HowLongToBeat / user rating) already existed in `src/lib/shared/utils/rating.utils.ts`.
+
+## Drawer
+
+- **Open long content beside the page with `drawer.open(node, { title })` from
+  `shared/ui/Drawer`, never with a second panel of your own.** `DrawerConnector` is mounted once
+  in `Layout`, docked to the window's right edge under the header, and it is what keeps the panel
+  and `ExpandMenu` from overlapping: opening the drawer clears `useExpandStore`, and any menu that
+  expands closes the drawer. A hand-rolled panel on the right edge ends up on top of the
+  bottom-right menus (the profile's Menu, the admin controls on game pages).
+- **Every element that opens the drawer carries `data-drawer-trigger`.** The drawer closes on a
+  mousedown outside it, and mousedown fires before click — without the attribute, clicking
+  "Show more" on the next review closes the panel and reopens it with a slide instead of swapping
+  the text in place. `ExpandableBlock mode="drawer"` sets it on its own button.
 
 ## Modals
 
@@ -341,6 +358,10 @@ break silently when ignored:
 
 ## Dropdowns
 
+- **`Dropdown`'s wrapper carries `min-width: 170px`, so two of them never fit side by side on a
+  phone.** The profile's rating filter (`From`/`To`) ran off the screen edge until its row gave the
+  wrappers `flex: 1 1 0; min-width: 0` — a child selector from the parent module beats
+  `.wrapper`'s own rule, so override it there instead of lowering the shared minimum.
 - **`Dropdown` renders its list inline unless it gets `isThroughPortal`.** Unlike `DatePicker`,
   the portal is opt-in: without the prop the list is an absolutely positioned child of the field,
   so any ancestor with `overflow` — a modal's scroll area, a `Box` with `isWithScrollBar`, a
@@ -351,6 +372,10 @@ break silently when ignored:
 
 ## Scrolling
 
+- **`Scrollbar`'s `fadeType` does nothing on a vertical scroll area.** The mask is applied only
+  with `isHorizontal` and `isWithArrows`; `Box`, `Dropdown` and `GamesCards` pass `fadeType`
+  and get no fade. A vertical scroll with fading edges is `ExpandableBlock mode="scroll"`, which
+  measures the scroll position itself and drives the mask from its own classes.
 - Never rely on the browser's default/native scrollbar for a scrollable area. Use the shared `Scrollbar` component from `src/lib/shared/ui/Scrollbar` for any element that needs to scroll (vertically or horizontally via the `isHorizontal` prop).
 - **Measure the scrollbar track with `offsetWidth`/`offsetHeight`, never `clientWidth`/`clientHeight`.**
   The track carries a 1px border, and the client box excludes it — sizing the thumb from the

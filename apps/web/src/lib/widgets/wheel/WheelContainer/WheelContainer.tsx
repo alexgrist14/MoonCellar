@@ -139,7 +139,7 @@ export const WheelContainer: FC = () => {
                 {!!shownWinner.summary && (
                   <div className={styles.info__text}>
                     <h4>Summary:</h4>
-                    <ExpandableBlock modalTitle="Summary">
+                    <ExpandableBlock title="Summary" mode="scroll">
                       <p>{shownWinner.summary}</p>
                     </ExpandableBlock>
                   </div>
@@ -147,7 +147,7 @@ export const WheelContainer: FC = () => {
                 {!!shownWinner.storyline && (
                   <div className={styles.info__text}>
                     <h4>Storyline:</h4>
-                    <ExpandableBlock modalTitle="Storyline">
+                    <ExpandableBlock title="Storyline" mode="scroll">
                       <p>{shownWinner.storyline}</p>
                     </ExpandableBlock>
                   </div>

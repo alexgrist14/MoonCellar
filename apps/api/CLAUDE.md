@@ -73,6 +73,20 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   not aggregation-pipeline updates, so a string id would be stored as a string next to ObjectIds
   and the `$in` checks that deduplicate the list would never match it.
 
+## User logs
+
+- **A playthrough log records what changed and never the note.** `getPlaythroughMeta` builds the
+  four log fields (Status, Console, Date, Time); adding and removing a playthrough render all of
+  them, an update renders only the ones that differ from the document read before the write, and
+  a field that was cleared shows as `—`. The comment is a review, shown on the game page and on
+  the profile; copying it into the log duplicated it into a place where deleting the log was the
+  only way to take it back.
+- **Old logs are stripped when they are read, not migrated.** `renderLogText` removes both stored
+  shapes per segment — `<div style="font-size: 12px">Comment:</div>` with everything after it, and
+  the older `<br/>Comment: …` that ran to the end of its `<span>` — so historical rows keep their
+  text in the database while the API stops serving it. Log rows are HTML snapshots written at
+  action time, so the rendering step is the only place that can change what they show.
+
 ## Database
 
 - **Declare reference paths as `@Prop({ type: mongoose.Schema.Types.ObjectId, ref })`; a bare

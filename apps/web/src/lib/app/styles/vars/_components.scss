@@ -41,6 +41,12 @@
   --game-hero-cover-offset: 104px;
   --game-hero-counters-width: 360px;
   --game-rating-popover-width: 320px;
+  --popover-width: 320px;
+  --popover-max-height: 320px;
+  --drawer-width: max(20vw, 460px);
+  --drawer-z-index: 5;
+  --expandable-scroll-height: 132px;
+  --expandable-fade-height: 32px;
 
   --date-picker-width: 300px;
   --date-picker-field-min-width: 140px;
@@ -67,6 +73,9 @@
   --community-dot-size: 7px;
   --community-empty-text-width: 240px;
   --community-loading-height: 96px;
+  --user-review-card-width: 170px;
+  --user-review-card-width-sm: 140px;
+  --user-review-rating-filter-width: 260px;
 
   --vndb-review-height: max(360px, calc(100vh - 420px));
   --vndb-cover-width: 120px;

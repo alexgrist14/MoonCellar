@@ -14,7 +14,7 @@ import { Separator } from "@/src/lib/shared/ui/Separator";
 import { IPlaythrough } from "@mooncellar/schemas";
 import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
 import { useExpandStore } from "@/src/lib/shared/store/expand.store";
-import { SortType } from "@/src/lib/shared/types/sort.type";
+import { ReviewSortType, SortType } from "@/src/lib/shared/types/sort.type";
 import { CustomDropdown } from "@/src/lib/shared/ui/CustomDropdown";
 import useCloseEvents from "@/src/lib/shared/hooks/useCloseEvents";
 
@@ -24,6 +24,9 @@ const sortOptions = [
   { label: SortType.PLAYTHROUGHS },
   { label: SortType.COMMENTS },
 ];
+const reviewSortOptions = Object.values(ReviewSortType).map((label) => ({
+  label,
+}));
 const sortOrderOptions = [{ label: "asc" }, { label: "desc" }];
 
 export const UserNavigation: FC<{
@@ -34,6 +37,10 @@ export const UserNavigation: FC<{
   sortOrder: string;
   onSortChange: (value: SortType) => void;
   onSortOrderChange: (value: string) => void;
+  reviewSort: ReviewSortType;
+  reviewOrder: string;
+  onReviewSortChange: (value: ReviewSortType) => void;
+  onReviewOrderChange: (value: string) => void;
 }> = ({
   isAuthedUser,
   user,
@@ -42,6 +49,10 @@ export const UserNavigation: FC<{
   sortOrder,
   onSortChange,
   onSortOrderChange,
+  reviewSort,
+  reviewOrder,
+  onReviewSortChange,
+  onReviewOrderChange,
 }) => {
   const { setQuery, query } = useAdvancedRouter();
 
@@ -57,6 +68,11 @@ export const UserNavigation: FC<{
     query.get("list") === "all";
 
   const isProfileTab = !query.get("list") || query.get("list") === "profile";
+  const isReviewsTab = query.get("list") === "reviews";
+
+  const reviewsCount = playthroughs?.filter(
+    (play) => !!play.comment && play.category !== "wishlist"
+  ).length;
 
   const allPlays = playthroughs?.reduce((res: IPlaythrough[], play) => {
     if (!res.some((p) => p.gameId === play.gameId)) {
@@ -64,6 +80,15 @@ export const UserNavigation: FC<{
     }
     return res;
   }, []);
+
+  const renderSortIcon = (order: string) => (
+    <SvgSort
+      size="24"
+      className={classNames(styles.sort__icon, {
+        [styles.sort__icon_active]: order === "desc",
+      })}
+    />
+  );
 
   const handleEditListClick = () => {
     modal.open(<CustomFolder />);
@@ -151,6 +176,20 @@ export const UserNavigation: FC<{
           </>
         )}
       </Box>
+      <Box>
+        <Button
+          className={styles.btn}
+          active={query.get("list") === "reviews"}
+          color={ButtonColor.TRANSPARENT}
+          onClick={() => {
+            setExpanded([]);
+            setQuery({ list: "reviews" });
+          }}
+        >
+          <span>Reviews</span>
+          <span>{reviewsCount}</span>
+        </Button>
+      </Box>
       {isAuthedUser && (
         <Box>
           <Button
@@ -169,29 +208,38 @@ export const UserNavigation: FC<{
           </Button>
         </Box>
       )}
-      {isGamesTab && (
+      {(isGamesTab || isReviewsTab) && (
         <Box>
           <div className={styles.sort} ref={sortRef}>
-            <CustomDropdown
-              isOpen={isSortOpen}
-              setIsOpen={setIsSortOpen}
-              onSelect={onSortChange}
-              onExtendedSelect={onSortOrderChange}
-              extendedSelected={sortOrder}
-              options={sortOptions}
-              selected={selectedSort}
-              extendedOptions={sortOrderOptions}
-              headerClassName={styles.sort__header}
-              className={styles.sort__dropdown}
-              icon={
-                <SvgSort
-                  size="24"
-                  className={classNames(styles.sort__icon, {
-                    [styles.sort__icon_active]: sortOrder === "desc",
-                  })}
-                />
-              }
-            />
+            {isReviewsTab ? (
+              <CustomDropdown
+                isOpen={isSortOpen}
+                setIsOpen={setIsSortOpen}
+                onSelect={onReviewSortChange}
+                onExtendedSelect={onReviewOrderChange}
+                extendedSelected={reviewOrder}
+                options={reviewSortOptions}
+                selected={reviewSort}
+                extendedOptions={sortOrderOptions}
+                headerClassName={styles.sort__header}
+                className={styles.sort__dropdown}
+                icon={renderSortIcon(reviewOrder)}
+              />
+            ) : (
+              <CustomDropdown
+                isOpen={isSortOpen}
+                setIsOpen={setIsSortOpen}
+                onSelect={onSortChange}
+                onExtendedSelect={onSortOrderChange}
+                extendedSelected={sortOrder}
+                options={sortOptions}
+                selected={selectedSort}
+                extendedOptions={sortOrderOptions}
+                headerClassName={styles.sort__header}
+                className={styles.sort__dropdown}
+                icon={renderSortIcon(sortOrder)}
+              />
+            )}
           </div>
         </Box>
       )}

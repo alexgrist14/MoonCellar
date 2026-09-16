@@ -28,7 +28,7 @@ import styles from "../GameCommunity.module.scss";
 import { useRequireAuth } from "../useRequireAuth";
 import { getPlainTextExcerpt } from "../utils";
 import { AuthorName, CommunityAvatar } from "./CommunityAuthor";
-import { AuthorStatus } from "./AuthorStatus";
+import { AuthorStatus } from "@/src/lib/shared/ui/AuthorStatus";
 import { CommentComposer } from "./CommentComposer";
 import { CommentQuote } from "./CommentQuote";
 import { CommentReplies } from "./CommentReplies";

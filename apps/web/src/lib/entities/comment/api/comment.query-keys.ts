@@ -1,5 +1,6 @@
 import {
   ICommentsSort,
+  IGetUserReviewsRequest,
   IReviewCategory,
   IReviewsSort,
 } from "@mooncellar/schemas";
@@ -12,8 +13,11 @@ export const commentQueryKeys = {
     gameId: string,
     sort: IReviewsSort,
     category?: IReviewCategory
-  ) =>
-    [...commentQueryKeys.reviews(gameId), sort, category ?? "all"] as const,
+  ) => [...commentQueryKeys.reviews(gameId), sort, category ?? "all"] as const,
+  userReviews: (userId: string) =>
+    [...commentQueryKeys.all, "user-reviews", userId] as const,
+  userReviewsList: (userId: string, params: IGetUserReviewsRequest) =>
+    [...commentQueryKeys.userReviews(userId), params] as const,
   discussion: (gameId: string) =>
     [...commentQueryKeys.all, "discussion", gameId] as const,
   discussionList: (gameId: string, sort: ICommentsSort) =>

@@ -1,23 +1,22 @@
-import { SortType } from "@/src/lib/shared/types/sort.type";
 import classNames from "classnames";
-import { FC, ReactNode, useRef, useState } from "react";
+import { ReactNode, useRef, useState } from "react";
 import { Radio } from "../Radio";
 import styles from "./CustomDropdown.module.scss";
 
-interface CustomDropdownProps {
-  options: { label: SortType }[];
+interface CustomDropdownProps<T extends string> {
+  options: { label: T }[];
   extendedOptions?: { label: string }[];
-  selected: SortType;
+  selected: T;
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
-  onSelect: (value: SortType) => void;
+  onSelect: (value: T) => void;
   onExtendedSelect?: (value: string) => void;
   extendedSelected?: string;
   className?: string;
   headerClassName?: string;
   icon?: ReactNode;
 }
-export const CustomDropdown: FC<CustomDropdownProps> = ({
+export const CustomDropdown = <T extends string>({
   options,
   selected,
   extendedOptions,
@@ -29,12 +28,12 @@ export const CustomDropdown: FC<CustomDropdownProps> = ({
   className,
   headerClassName,
   icon,
-}) => {
+}: CustomDropdownProps<T>) => {
   const headerRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   const [openUpward, setOpenUpward] = useState(false);
 
-  const handleSelect = (value: SortType) => {
+  const handleSelect = (value: T) => {
     onSelect(value);
     setIsOpen(false);
   };

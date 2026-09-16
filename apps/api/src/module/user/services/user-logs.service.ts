@@ -33,6 +33,9 @@ const SEGMENT_MARKER_REGEX = /<!--segment:([a-z]+)-->/g;
 const DETAILS_REGEX =
   /(?:<br\/>)*<span style="font-size: 12px">[\s\S]*?<\/span>/g;
 const DETAILS_SEGMENTS_PRIORITY = ["removed", "updated", "added"];
+const COMMENT_BLOCK_REGEX =
+  /<div style="font-size: 12px">Comment:<\/div>[\s\S]*$/;
+const LEGACY_COMMENT_REGEX = /(?:<br\/>)?Comment:[\s\S]*?(?=<\/span>|$)/;
 
 function buildSegmentMarker(segment: string) {
   return `<!--segment:${segment}-->`;
@@ -95,9 +98,15 @@ function stripDuplicatedDetails(
   );
 }
 
+function stripComment(content: string): string {
+  return content
+    .replace(COMMENT_BLOCK_REGEX, "")
+    .replace(LEGACY_COMMENT_REGEX, "");
+}
+
 function renderLogText(text: string): string {
   return stripDuplicatedDetails(parseLogSegments(text))
-    .map(({ content }) => content)
+    .map(({ content }) => stripComment(content))
     .join("<br/><br/>");
 }
 

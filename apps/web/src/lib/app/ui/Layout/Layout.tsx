@@ -6,6 +6,7 @@ import { Header } from "./components";
 import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
 import { useResizeDetector } from "react-resize-detector";
 import { ModalsConnector } from "@/src/lib/shared/ui/Modal";
+import { DrawerConnector } from "@/src/lib/shared/ui/Drawer";
 import { ToastConnector } from "@/src/lib/shared/ui/Toast";
 import { useMediaStore } from "@/src/lib/shared/hooks/useMediaStore";
 import { useAuthRefresh } from "@/src/lib/shared/hooks/useAuthRefresh";
@@ -149,6 +150,7 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
       </Scrollbar>
       <ToastConnector />
       <ModalsConnector />
+      <DrawerConnector />
       <div id="expand-connector"></div>
       <div id="pagination-connector"></div>
       <div id="tooltip-connector"></div>

@@ -24,7 +24,7 @@ export const GameOverview: FC<IGameOverviewProps> = ({ game, className }) => {
       {!!game.summary && (
         <div className={styles.overview__text}>
           <h4>Summary:</h4>
-          <ExpandableBlock modalTitle="Summary">
+          <ExpandableBlock title="Summary" mode="scroll">
             <p>{game.summary}</p>
           </ExpandableBlock>
         </div>
@@ -32,7 +32,7 @@ export const GameOverview: FC<IGameOverviewProps> = ({ game, className }) => {
       {!!game.storyline && (
         <div className={styles.overview__text}>
           <h4>Storyline:</h4>
-          <ExpandableBlock modalTitle="Storyline">
+          <ExpandableBlock title="Storyline" mode="scroll">
             <p>{game.storyline}</p>
           </ExpandableBlock>
         </div>
@@ -41,7 +41,7 @@ export const GameOverview: FC<IGameOverviewProps> = ({ game, className }) => {
         <div className={styles.overview__keywords}>
           <h4>Keywords:</h4>
           <ExpandableBlock
-            modalTitle="Keywords"
+            title="Keywords"
             clampHeight="var(--game-keywords-collapsed-height)"
             classNameContent={styles.overview__chips}
           >

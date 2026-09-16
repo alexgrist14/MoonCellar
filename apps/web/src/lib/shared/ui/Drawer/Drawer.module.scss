@@ -1,0 +1,39 @@
+.drawer {
+  position: fixed;
+  top: var(--header-height);
+  right: 0;
+  z-index: var(--drawer-z-index);
+  width: var(--drawer-width);
+  height: calc(100vh - var(--header-height));
+  padding: var(--padding-x2);
+  transform: translateX(100%);
+  visibility: hidden;
+  transition:
+    transform var(--duration-base) var(--easing-out),
+    visibility var(--duration-base) var(--easing-out);
+
+  @include mediaSm {
+    width: 100vw;
+  }
+
+  &_open {
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  &__box {
+    height: 100%;
+  }
+
+  &__close {
+    flex-shrink: 0;
+    padding: var(--padding-x1);
+    border-radius: var(--radius-x3);
+  }
+}
+
+@include reducedMotion {
+  .drawer {
+    transition-duration: var(--duration-instant);
+  }
+}

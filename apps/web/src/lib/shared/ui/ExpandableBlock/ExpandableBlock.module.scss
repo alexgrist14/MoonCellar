@@ -23,3 +23,34 @@
     transition: transform 0.2s;
   }
 }
+
+.scroll {
+  position: relative;
+
+  &_fadeTop {
+    --expandable-fade-top: 1;
+  }
+
+  &_fadeBottom {
+    --expandable-fade-bottom: 1;
+  }
+}
+
+.scroll .scroll__content {
+  padding: 0 var(--padding-x4) 0 0;
+  overscroll-behavior: contain;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 calc(var(--expandable-fade-top, 0) * var(--expandable-fade-height)),
+    #000
+      calc(
+        100% - var(--expandable-fade-bottom, 0) * var(--expandable-fade-height)
+      ),
+    transparent 100%
+  );
+}
+
+.scroll .scroll__scrollbar {
+  right: 0;
+}

@@ -6,10 +6,12 @@ import {
   IGetCommentsRequest,
   IGetRepliesRequest,
   IGetReviewsRequest,
+  IGetUserReviewsRequest,
   IReportResponse,
   IReviewsResponse,
   IUpdateCommentRequest,
   IUpdateCommentStatusRequest,
+  IUserReviewsResponse,
   IVoteResponse,
   SOCKET_ID_HEADER,
 } from "@mooncellar/schemas";
@@ -27,6 +29,13 @@ const withSocketId = () => {
 const getReviews = (gameId: string, params: IGetReviewsRequest) => {
   return agent.get<IReviewsResponse>(`${API_URL}/games/${gameId}/reviews`, {
     params,
+  });
+};
+
+const getUserReviews = (userId: string, params: IGetUserReviewsRequest) => {
+  return agent.get<IUserReviewsResponse>(`${API_URL}/user/${userId}/reviews`, {
+    params,
+    paramsSerializer: { indexes: null },
   });
 };
 
@@ -88,6 +97,7 @@ const updateStatus = (commentId: string, data: IUpdateCommentStatusRequest) => {
 
 export const commentsAPI = {
   getReviews,
+  getUserReviews,
   setReviewHelpful,
   getComments,
   getReplies,

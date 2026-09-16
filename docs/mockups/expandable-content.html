@@ -1,0 +1,2093 @@
+<title>Expanding Long Content</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* mooncellar-tokens:start */
+/* Generated from apps/web/src/lib/app/styles/vars by
+   `bun --filter web sync:tokens`. Do not edit by hand. */
+:root {
+  /* vars/_colors.scss */
+  --color-neutral-5: #080a0b;
+  --color-neutral-10: #0d1011;
+  --color-neutral-15: #121516;
+  --color-neutral-20: #161b1d;
+  --color-neutral-25: #1a2022;
+  --color-neutral-30: #1f2628;
+  --color-neutral-35: #262d2f;
+  --color-neutral-40: #2f3537;
+  --color-neutral-45: #383e40;
+  --color-neutral-50: #3f4750;
+  --color-neutral-55: #50575d;
+  --color-neutral-60: #5e6a6e;
+  --color-neutral-70: #747d82;
+  --color-neutral-80: #9192a1;
+  --color-neutral-85: #b0b2bc;
+  --color-neutral-90: #d9d9d9;
+  --color-neutral-95: #eaeaea;
+  --color-neutral-100: #ffffff;
+  --color-blue: #00a0ff;
+  --color-blue-light: #00d4ff;
+  --color-gray: #afb3b9;
+  --color-yellow: #ffc451;
+  --color-yellow-light: #f9f871;
+  --color-orange: #ff8862;
+  --color-pink: #ff4b8f;
+  --color-violet: #e735c4;
+  --color-positive: #00c292;
+  --color-negative: #d02729;
+  --color-primary: var(--color-neutral-30);
+  --color-secondary: var(--color-neutral-90);
+  --color-contrast: var(--color-neutral-100);
+  --color-contrast-reverse: var(--color-neutral-5);
+  --color-attention: #ffc451;
+  --color-text-primary: var(--color-neutral-100);
+  --color-text-secondary: var(--color-neutral-90);
+  --color-text-muted: var(--color-neutral-85);
+  --color-accent: #6951ee;
+  --color-bg-primary: #191d24;
+  --color-bg-secondary: #212731;
+  --color-bg-tertiary: #2c3340;
+  --color-bg-accent: #6951ee;
+  --color-bg-hover: #374151;
+  --color-bg-positive: #00c292;
+  --color-bg-primary-tint: #191d24ee;
+  --color-bg-secondary-tint: #212731ee;
+  --color-bg-tertiary-tint: #2c3340ee;
+  --color-bg-accent-tint: #6951eeee;
+  --color-bg-positive-tint: #00c292ee;
+  --color-border-primary: var(--color-neutral-35);
+  --color-scrollbar-track: var(--color-neutral-15);
+  --color-scrollbar-thumb: var(--color-neutral-80);
+  --color-border-secondary: var(--color-neutral-85);
+
+  /* vars/_common.scss */
+  --padding-x05: calc(var(--padding-x1) * 0.5);
+  --padding-x1: 4px;
+  --padding-x2: calc(var(--padding-x1) * 2);
+  --padding-x3: calc(var(--padding-x1) * 3);
+  --padding-x4: calc(var(--padding-x1) * 4);
+  --padding-x5: calc(var(--padding-x1) * 5);
+  --padding-x6: calc(var(--padding-x1) * 6);
+  --padding-x7: calc(var(--padding-x1) * 7);
+  --padding-x8: calc(var(--padding-x1) * 8);
+  --padding-x9: calc(var(--padding-x1) * 9);
+  --padding-x10: calc(var(--padding-x1) * 10);
+  --padding-x11: calc(var(--padding-x1) * 11);
+  --padding-x12: calc(var(--padding-x1) * 12);
+  --padding-x13: calc(var(--padding-x1) * 13);
+  --padding-x14: calc(var(--padding-x1) * 14);
+  --padding-x15: calc(var(--padding-x1) * 15);
+  --padding-x16: calc(var(--padding-x1) * 16);
+  --padding-x17: calc(var(--padding-x1) * 17);
+  --padding-x18: calc(var(--padding-x1) * 18);
+  --padding-x19: calc(var(--padding-x1) * 19);
+  --padding-x20: calc(var(--padding-x1) * 20);
+  --padding-x25: calc(var(--padding-x1) * 25);
+  --radius-x1: 4px;
+  --radius-x2: calc(var(--radius-x1) * 2);
+  --radius-x3: calc(var(--radius-x1) * 3);
+  --radius-x4: calc(var(--radius-x1) * 4);
+  --radius-x5: calc(var(--radius-x1) * 5);
+  --radius-x6: calc(var(--radius-x1) * 6);
+  --radius-x7: calc(var(--radius-x1) * 7);
+  --radius-x8: calc(var(--radius-x1) * 8);
+  --radius-x9: calc(var(--radius-x1) * 9);
+  --radius-x10: calc(var(--radius-x1) * 10);
+  --gap-x05: calc(var(--gap-x1) * 0.5);
+  --gap-x1: 4px;
+  --gap-x2: calc(var(--gap-x1) * 2);
+  --gap-x3: calc(var(--gap-x1) * 3);
+  --gap-x4: calc(var(--gap-x1) * 4);
+  --gap-x5: calc(var(--gap-x1) * 5);
+  --gap-x6: calc(var(--gap-x1) * 6);
+  --gap-x7: calc(var(--gap-x1) * 7);
+  --gap-x8: calc(var(--gap-x1) * 8);
+  --gap-x9: calc(var(--gap-x1) * 9);
+  --gap-x10: calc(var(--gap-x1) * 10);
+  --gap-x11: calc(var(--gap-x1) * 11);
+  --gap-x12: calc(var(--gap-x1) * 12);
+  --blur-x1: 6px;
+  --rich-text-gap: 8px;
+  --duration-instant: 1ms;
+  --duration-fast: 160ms;
+  --duration-base: 280ms;
+  --delay-stagger: 90ms;
+  --easing-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --easing-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --reveal-offset: 12px;
+  --reveal-scale: 0.96;
+  --header-height: 45px;
+  --container-padding-top: calc(var(--header-height) + var(--padding-x3));
+  --container-padding-bottom: var(--padding-x3);
+  --page-height-available: calc(
+    100vh - var(--container-padding-top) - var(--container-padding-bottom)
+  );
+
+  /* vars/_components.scss */
+  --game-completed-color: var(--color-positive);
+  --game-dropped-color: var(--color-negative);
+  --game-playing-color: var(--color-accent);
+  --game-wishlist-color: var(--color-violet);
+  --game-backlog-color: var(--color-pink);
+  --game-played-color: var(--color-blue);
+  --game-mastered-color: var(--color-yellow);
+  --cover-ratio: 528/704;
+  --shadow-basic: 0px 4px 4px var(--color-neutral-5);
+  --shadow-text: drop-shadow(0 1px 2px var(--color-neutral-5))
+    drop-shadow(0 0 6px var(--color-neutral-5));
+  --glow-accent: 0 0 0.4rem var(--color-accent);
+  --glow-accent-sm: 0 0 0.15rem var(--color-accent);
+  --avatar-size-sm: var(--padding-x6);
+  --navigation-progress-height: 1px;
+  --navigation-progress-z-index: 1002;
+  --modal-text-width: min(720px, calc(100vw - var(--padding-x10)));
+  --rich-editor-image-width: 400px;
+  --playthrough-modal-width: min(80vw, 400px);
+  --playthrough-modal-height: min(70vh, 500px);
+  --playthrough-modal-width-lg: min(88vw, 760px);
+  --playthrough-modal-height-lg: min(86vh, 780px);
+  --games-card-min-width: 180px;
+  --range-track-height: 6px;
+  --range-thumb-size: 20px;
+  --range-thumb-width: 44px;
+  --range-thumb-height: 24px;
+  --scrollbar-horizontal-size: 6px;
+  --scrollbar-arrow-width: 32px;
+  --scrollbar-fade-width: 48px;
+  --game-keywords-collapsed-height: 66px;
+  --game-hero-artwork-height: 300px;
+  --game-hero-artwork-height-sm: 180px;
+  --game-hero-cover-width: 200px;
+  --game-hero-cover-offset: 104px;
+  --game-hero-counters-width: 360px;
+  --game-rating-popover-width: 320px;
+  --popover-width: 320px;
+  --popover-max-height: 320px;
+  --drawer-width: max(20vw, 460px);
+  --drawer-z-index: 5;
+  --expandable-scroll-height: 132px;
+  --expandable-fade-height: 32px;
+  --date-picker-width: 300px;
+  --date-picker-field-min-width: 140px;
+  --date-picker-cell-size: 34px;
+  --date-picker-arrow-size: 28px;
+  --emoji-picker-width: 328px;
+  --emoji-picker-cell-size: 34px;
+  --emoji-picker-group-size: 28px;
+  --emoji-picker-grid-height: 238px;
+  --game-hero-scrim: linear-gradient(
+    180deg,
+    #191d248c 0%,
+    #191d2400 30%,
+    #212731d1 72%,
+    var(--color-bg-secondary) 100%
+  );
+  --spoiler-blur: 7px;
+  --community-avatar-size: 36px;
+  --community-reply-avatar-size: 28px;
+  --community-review-clamp-height: 132px;
+  --community-distribution-height: 8px;
+  --community-distribution-min-width: 240px;
+  --community-dot-size: 7px;
+  --community-empty-text-width: 240px;
+  --community-loading-height: 96px;
+  --user-review-card-width: 170px;
+  --user-review-card-width-sm: 140px;
+  --user-review-rating-filter-width: 260px;
+  --vndb-review-height: max(360px, calc(100vh - 420px));
+  --vndb-cover-width: 120px;
+  --vndb-search-width: 320px;
+  --vndb-candidate-cover-width: 64px;
+  --empty-state-image-size: 180px;
+  --not-found-image-height: 240px;
+  --not-found-backdrop-size: 400px;
+  --not-found-content-width: 420px;
+}
+/* mooncellar-tokens:end */
+
+  :root {
+    --mock-ui: "Hanken Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mock-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --mock-ground: var(--color-neutral-10);
+    --mock-hairline: var(--color-neutral-30);
+    --mock-accent-text: color-mix(in srgb, var(--color-accent) 55%, var(--color-neutral-100));
+    --mock-accent-dim: color-mix(in srgb, var(--color-accent) 18%, transparent);
+    --mock-cover-width: 92px;
+    --mock-avatar: 36px;
+    --mock-expanded-cap: 320px;
+    --mock-fade-height: 48px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--mock-ground);
+    color: var(--color-text-primary);
+    font-family: var(--mock-ui);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .shell {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding-inline: var(--padding-x6);
+    padding-block: var(--padding-x14) var(--padding-x20);
+  }
+
+  @media (max-width: 520px) {
+    .shell {
+      padding-inline: var(--padding-x4);
+      padding-block: var(--padding-x9) var(--padding-x14);
+    }
+  }
+
+  h1, h2, h3, h4 { margin: 0; text-wrap: balance; }
+  p { margin: 0; }
+  button { font: inherit; color: inherit; }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+  }
+
+  .masthead { display: flex; flex-direction: column; gap: var(--gap-x4); }
+
+  .masthead h1 {
+    font-size: 34px;
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .lede { color: var(--color-text-secondary); max-width: 64ch; }
+
+  .brief {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1px;
+    background: var(--mock-hairline);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x4);
+    overflow: hidden;
+    margin: var(--gap-x2) 0 0;
+  }
+
+  .brief div { background: var(--color-bg-primary); padding: var(--padding-x4); }
+
+  .brief dt {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+    margin-bottom: var(--gap-x1);
+  }
+
+  .brief dd { margin: 0; font-size: 14px; color: var(--color-text-secondary); }
+
+  code.t { font-family: var(--mock-mono); font-size: 12px; color: var(--color-yellow); }
+
+  .section { margin-top: var(--padding-x16); display: flex; flex-direction: column; gap: var(--gap-x4); }
+
+  .variant { margin-top: var(--padding-x16); }
+
+  .variant__head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--gap-x3);
+    flex-wrap: wrap;
+    margin-bottom: var(--gap-x2);
+  }
+
+  .variant__letter {
+    font-family: var(--mock-mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-x1);
+    padding: 1px 7px;
+    flex-shrink: 0;
+  }
+
+  .variant__head h2 { font-size: 23px; font-weight: 700; letter-spacing: -0.2px; }
+
+  .variant__thesis {
+    color: var(--color-text-muted);
+    max-width: 66ch;
+    margin-bottom: var(--gap-x5);
+  }
+
+  .stage {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x4);
+    padding: var(--padding-x5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x4);
+  }
+
+  @media (max-width: 520px) { .stage { padding: var(--padding-x3); } }
+
+  .stage__context {
+    font-size: 12px;
+    color: var(--color-gray);
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x2);
+  }
+
+  .stage__context::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    flex-shrink: 0;
+  }
+
+  .stage__pair {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    gap: var(--gap-x4);
+    align-items: start;
+  }
+
+  @media (max-width: 860px) { .stage__pair { grid-template-columns: minmax(0, 1fr); } }
+
+  .box {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x5);
+    padding: var(--padding-x5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x4);
+    min-width: 0;
+  }
+
+  @media (max-width: 520px) { .box { padding: var(--padding-x4); } }
+
+  .box__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x3);
+    flex-wrap: wrap;
+  }
+
+  .box__title { display: flex; align-items: baseline; gap: var(--gap-x2); }
+  .box__title h3 { font-size: 17px; font-weight: 700; }
+
+  .count {
+    font-family: var(--mock-mono);
+    font-size: 13px;
+    color: var(--color-gray);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .review {
+    display: grid;
+    grid-template-columns: var(--mock-cover-width) minmax(0, 1fr);
+    gap: var(--gap-x4);
+    padding-block: var(--padding-x4);
+    border-top: 1px solid var(--color-border-primary);
+    align-items: start;
+  }
+
+  .review:first-of-type { border-top: 0; padding-top: 0; }
+
+  .review__main { display: flex; flex-direction: column; gap: var(--gap-x2); min-width: 0; }
+
+  .review__head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--gap-x1) var(--gap-x3);
+  }
+
+  .review__game { font-weight: 600; font-size: 15px; }
+
+  .cover {
+    width: var(--mock-cover-width);
+    aspect-ratio: var(--cover-ratio);
+    border-radius: var(--radius-x4);
+    background:
+      linear-gradient(150deg,
+        color-mix(in srgb, var(--mock-art, var(--color-accent)) 75%, var(--color-neutral-5)),
+        var(--color-neutral-15));
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: var(--padding-x1);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-align: center;
+    text-transform: uppercase;
+    color: var(--color-neutral-95);
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .art-hollow { --mock-art: var(--color-blue); }
+  .art-disco { --mock-art: var(--color-pink); }
+  .art-tunic { --mock-art: var(--color-yellow); }
+
+  .meta {
+    font-family: var(--mock-mono);
+    font-size: 12px;
+    color: var(--color-gray);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  p.meta { white-space: normal; }
+
+  .score {
+    margin-left: auto;
+    font-family: var(--mock-mono);
+    font-size: 15px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .score span { font-size: 12px; color: var(--color-gray); }
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 18px;
+    padding: 0 var(--padding-x2);
+    border-radius: var(--radius-x2);
+    color: color-mix(in srgb, var(--game-completed-color) 62%, var(--color-neutral-100));
+    background: color-mix(in srgb, var(--game-completed-color) 16%, transparent);
+    white-space: nowrap;
+  }
+
+  .body {
+    color: var(--color-text-secondary);
+    font-size: 15px;
+    line-height: 1.6;
+    display: grid;
+    gap: var(--rich-text-gap);
+  }
+
+  .body p + p { margin-top: 0; }
+
+  /* shared collapse mechanics -------------------------------------------- */
+
+  .collapse { position: relative; }
+
+  .collapse__inner {
+    overflow: hidden;
+    max-height: var(--mock-clamp, var(--community-review-clamp-height));
+    transition: max-height var(--duration-base) var(--easing-out);
+  }
+
+  .collapse.is-open .collapse__inner { max-height: var(--mock-open, 900px); }
+
+  .collapse__fade {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: var(--mock-fade-height);
+    pointer-events: none;
+    background: linear-gradient(to bottom, transparent, var(--color-bg-primary));
+    transition: opacity var(--duration-fast) var(--easing-out);
+  }
+
+  .collapse.is-open .collapse__fade { opacity: 0; }
+  .collapse[data-capped].is-open .collapse__fade { opacity: 1; }
+
+  .scrollarea { position: relative; }
+
+  .scrollbox {
+    max-height: var(--mock-clamp, var(--community-review-clamp-height));
+    overflow-y: auto;
+    padding-right: var(--padding-x4);
+    scrollbar-width: none;
+    overscroll-behavior: contain;
+  }
+
+  .scrollbox::-webkit-scrollbar { display: none; }
+
+  .scrollbar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: var(--scrollbar-horizontal-size);
+    border-radius: var(--radius-x3);
+    background: var(--color-scrollbar-track);
+  }
+
+  .scrollbar[hidden] { display: none; }
+
+  .scrollbar i {
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-radius: inherit;
+    background: var(--color-scrollbar-thumb);
+  }
+
+  .ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 0;
+    background: transparent;
+    color: var(--mock-accent-text);
+    font-size: 13px;
+    padding: 3px var(--padding-x2);
+    margin-left: calc(-1 * var(--padding-x2));
+    border-radius: var(--radius-x3);
+    cursor: pointer;
+    width: fit-content;
+    transition: background var(--duration-fast) var(--easing-out);
+  }
+
+  .ghost:hover { background: var(--color-bg-hover); }
+  .ghost svg { width: 15px; height: 15px; flex-shrink: 0; }
+  .ghost__chevron { transition: rotate var(--duration-fast) var(--easing-out); }
+  .is-open .ghost__chevron { rotate: 180deg; }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--gap-x1) var(--gap-x2);
+  }
+
+  .actions .meta { margin-left: auto; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: var(--gap-x2); }
+
+  .chip {
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x4);
+    padding: var(--padding-x1) var(--padding-x3);
+    font-size: 13px;
+    line-height: 17px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  .overview { display: flex; flex-direction: column; gap: var(--gap-x4); }
+  .overview h4 { font-size: 13px; color: var(--color-gray); font-weight: 600; margin-bottom: var(--gap-x1); }
+
+  .modal-piece {
+    border: 1px dashed color-mix(in srgb, var(--color-accent) 45%, transparent);
+    border-radius: var(--radius-x4);
+    padding: var(--padding-x4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x3);
+    background: var(--color-bg-secondary-tint);
+  }
+
+  .modal-piece__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x3);
+  }
+
+  .modal-piece h4 { font-size: 15px; font-weight: 700; }
+
+  .drawer {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-primary);
+    border-left: 2px solid var(--color-accent);
+    border-radius: var(--radius-x4);
+    padding: var(--padding-x4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x3);
+    position: sticky;
+    top: var(--padding-x4);
+  }
+
+  .drawer__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x3);
+  }
+
+  .drawer h4 { font-size: 15px; font-weight: 700; }
+
+  .review_active {
+    border-radius: var(--radius-x3);
+    background: var(--mock-accent-dim);
+    box-shadow: 0 0 0 var(--padding-x2) var(--mock-accent-dim);
+  }
+
+  .excerpt {
+    color: var(--color-text-secondary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .frame {
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x4);
+    background: var(--color-neutral-15);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .frame__bar {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x3);
+    padding: var(--padding-x2) var(--padding-x4);
+    border-bottom: 1px solid var(--color-border-primary);
+    background: var(--color-bg-primary);
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+
+  .frame__bar b { color: var(--color-text-primary); font-weight: 600; }
+  .frame__bar span { margin-left: auto; color: var(--color-gray); font-family: var(--mock-mono); }
+
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x4);
+    padding: var(--padding-x4);
+  }
+
+  .hero {
+    display: flex;
+    gap: var(--gap-x4);
+    align-items: flex-end;
+    padding: var(--padding-x4);
+    border-radius: var(--radius-x4);
+    background:
+      linear-gradient(180deg, #191d248c 0%, #191d2400 30%, #212731d1 72%, var(--color-bg-secondary) 100%),
+      linear-gradient(120deg, color-mix(in srgb, var(--color-blue) 55%, var(--color-neutral-5)), var(--color-neutral-15));
+    min-height: 150px;
+  }
+
+  .hero__cover {
+    width: 86px;
+    aspect-ratio: var(--cover-ratio);
+    border-radius: var(--radius-x3);
+    background: linear-gradient(150deg, color-mix(in srgb, var(--color-blue) 75%, var(--color-neutral-5)), var(--color-neutral-15));
+    flex-shrink: 0;
+  }
+
+  .hero__text { display: flex; flex-direction: column; gap: var(--gap-x2); min-width: 0; }
+  .hero__text h3 { font-size: 22px; font-weight: 700; }
+
+  .cols { display: flex; flex-wrap: wrap; gap: var(--gap-x4); align-items: stretch; }
+  .cols > .box { flex-basis: 140px; }
+  .cols > .box { padding: var(--padding-x4); gap: var(--gap-x3); }
+  .cols__wide { flex: 2 1 0; }
+  .cols__side { flex: 1 1 0; }
+
+  .skeleton {
+    border-radius: var(--radius-x2);
+    background: var(--color-bg-tertiary);
+    height: 10px;
+  }
+
+  .skeleton_wide { width: 100%; }
+  .skeleton_half { width: 60%; }
+  .skeleton_tall { height: 74px; }
+
+  .tabs {
+    display: flex;
+    gap: var(--gap-x4);
+    border-bottom: 1px solid var(--color-border-primary);
+    padding-bottom: var(--padding-x2);
+    font-size: 14px;
+    color: var(--color-text-muted);
+  }
+
+  .tabs b {
+    color: var(--color-text-primary);
+    font-weight: 600;
+    box-shadow: inset 0 -2px 0 var(--color-accent);
+    padding-bottom: var(--padding-x2);
+  }
+
+  .edge-drawer {
+    position: absolute;
+    top: 33px;
+    right: 0;
+    bottom: 0;
+    width: 52%;
+    border-left: 2px solid var(--color-accent);
+    background: var(--color-bg-secondary);
+    padding: var(--padding-x4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x3);
+    box-shadow: -12px 0 24px #08090b99;
+  }
+
+  .phone {
+    width: 320px;
+    max-width: 100%;
+    margin-inline: auto;
+  }
+
+  .sheet {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    border-radius: var(--radius-x5) var(--radius-x5) 0 0;
+    border-top: 1px solid var(--color-border-primary);
+    background: var(--color-bg-secondary);
+    padding: var(--padding-x4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x3);
+    box-shadow: 0 -12px 24px #08090b99;
+  }
+
+  .sheet__grip {
+    width: 40px;
+    height: 4px;
+    border-radius: var(--radius-x1);
+    background: var(--color-neutral-55);
+    margin-inline: auto;
+  }
+
+  .scrim {
+    position: absolute;
+    inset: 0;
+    background: #08090b8c;
+  }
+
+  .hints {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--gap-x4) var(--gap-x6);
+    margin-top: var(--gap-x5);
+  }
+
+  .hints h4 {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+    font-weight: 600;
+    margin-bottom: var(--gap-x2);
+  }
+
+  .hints ul {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    display: grid;
+    gap: var(--gap-x1);
+  }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--color-border-primary); border-radius: var(--radius-x4); }
+
+  table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 720px; }
+
+  th, td { text-align: left; padding: var(--padding-x3) var(--padding-x4); vertical-align: top; }
+
+  thead th { background: var(--color-bg-secondary); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-gray); }
+
+  tbody tr { border-top: 1px solid var(--color-border-primary); }
+  tbody th { color: var(--color-text-muted); font-weight: 600; white-space: nowrap; }
+  tbody td { color: var(--color-text-secondary); }
+
+  .plan { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--gap-x5); }
+
+  .plan > div {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x4);
+    padding: var(--padding-x4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x3);
+  }
+
+  .plan h3 { font-size: 15px; font-weight: 700; }
+  .plan p { font-size: 13px; color: var(--color-text-muted); }
+  .plan ul { margin: 0; padding-left: 18px; font-size: 13px; color: var(--color-text-secondary); display: grid; gap: var(--gap-x1); }
+
+  pre {
+    margin: 0;
+    font-family: var(--mock-mono);
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--color-text-secondary);
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-x3);
+    padding: var(--padding-x3);
+    overflow-x: auto;
+  }
+
+  pre i { color: var(--color-gray); font-style: normal; }
+  pre b { color: var(--mock-accent-text); font-weight: 500; }
+
+  .recommend {
+    background: var(--mock-accent-dim);
+    border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+    border-radius: var(--radius-x4);
+    padding: var(--padding-x5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x2);
+  }
+
+  .recommend h3 { font-size: 18px; font-weight: 700; }
+  .recommend p { color: var(--color-text-secondary); max-width: 72ch; }
+
+  .note {
+    margin-top: var(--padding-x14);
+    font-size: 13px;
+    color: var(--color-gray);
+    border-left: 2px solid var(--color-border-primary);
+    padding-left: var(--padding-x3);
+  }
+
+  button:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: var(--duration-instant) !important; }
+  }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-window" viewBox="0 0 24 24"><path d="M13 5h6v6M19 5l-7 7M17 14v4.5H5.5V7H10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-thumb" viewBox="0 0 24 24"><path d="M7 10.5 11 4a2 2 0 0 1 2.9 2.4L13 10h5.2a2 2 0 0 1 2 2.5l-1.4 5.6a2 2 0 0 1-2 1.4H7Zm0 0V20M4.5 10.5h2.2V20H4.5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+</svg>
+
+<div class="shell">
+  <header class="masthead">
+    <p class="eyebrow">MoonCellar · long content in a panel</p>
+    <h1>Expanding Long Content</h1>
+    <p class="lede">
+      Every long block on the site — a review, a game summary, a wall of keywords — is clamped by
+      <code class="t">ExpandableBlock</code>, and the only way to read the rest is a modal. These are
+      the ways to open it without leaving the page: in place, by scrolling, or a mix. Each variant is
+      drawn twice, on a review and on the game page's Summary and Keywords, because those are the two
+      shapes the component has to serve.
+    </p>
+    <dl class="brief">
+      <div>
+        <dt>Where it is used</dt>
+        <dd>Reviews on the game page and on the profile, Summary, Storyline and Keywords in <code class="t">GameOverview</code>, the gauntlet winner panel.</dd>
+      </div>
+      <div>
+        <dt>Today</dt>
+        <dd>Clamp to <code class="t">--community-review-clamp-height</code> (132px) or four lines, then <em>Show more</em> opens the whole text in a modal.</dd>
+      </div>
+      <div>
+        <dt>Must hold</dt>
+        <dd>The full text stays in the server HTML — collapsing is CSS, never <code class="t">slice()</code>. Scroll areas use the shared <code class="t">Scrollbar</code>.</dd>
+      </div>
+      <div>
+        <dt>Reality check</dt>
+        <dd>Most notes are two or three lines and never clamp at all; the pattern only shows up on the long ones.</dd>
+      </div>
+    </dl>
+  </header>
+
+  <section class="variant" aria-labelledby="variant-a">
+    <div class="variant__head">
+      <span class="variant__letter">A</span>
+      <h2 id="variant-a">Expand in place</h2>
+    </div>
+    <p class="variant__thesis">
+      <em>Show more</em> grows the block itself and pushes everything below it down; <em>Show less</em>
+      puts it back. No layer, no navigation — the review stays in the feed you were reading, and the
+      next review moves out of the way. Try both toggles below.
+    </p>
+
+    <div class="stage">
+      <p class="stage__context">Game page · Reviews — click "Show more"</p>
+      <div class="stage__pair">
+        <article class="box" aria-label="Reviews">
+          <div class="box__head">
+            <div class="box__title"><h3>Player reviews</h3><span class="count">38</span></div>
+          </div>
+
+          <div class="review">
+            <span class="cover art-hollow" aria-hidden="true">Hollow Knight</span>
+            <div class="review__main">
+              <div class="review__head">
+                <span class="review__game">moth_scholar</span>
+                <span class="status">Completed</span>
+                <span class="meta">Switch · 46 h</span>
+                <span class="score">10 <span>/ 10</span></span>
+              </div>
+              <div class="collapse" data-collapse style="--mock-open: 460px">
+                <div class="collapse__inner">
+                  <div class="body">
+                    <p>The map system sold me. You buy the map from Cornifer, and it only updates when you sit on a bench — by the City of Tears I had stopped fighting that and started enjoying being lost.</p>
+                    <p>Pantheon of Hallownest took another fifteen hours and I regret none of them, even the Nailsmith's fight on attempt forty. What stays with me is how little the game explains and how much it trusts you to notice: the first time a bench appeared exactly where I needed one, I understood the whole design.</p>
+                    <p>If you bounce off the first two hours, give it until Greenpath. That is where the game stops being a platformer with a nail and starts being the thing everyone writes essays about.</p>
+                  </div>
+                </div>
+                <span class="collapse__fade" aria-hidden="true"></span>
+                <span class="scrollbar" aria-hidden="true" hidden><i></i></span>
+              </div>
+              <button type="button" class="ghost" data-toggle data-label-open="Show less" data-label-closed="Show more">
+                Show more<svg class="ghost__chevron" aria-hidden="true"><use href="#i-chevron"/></svg>
+              </button>
+              <div class="actions">
+                <button type="button" class="ghost" style="color: var(--color-text-muted)"><svg aria-hidden="true"><use href="#i-thumb"/></svg>Helpful <span class="count">27</span></button>
+                <span class="meta">Finished 12.03.2025</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="review">
+            <span class="cover art-disco" aria-hidden="true">Disco Elysium</span>
+            <div class="review__main">
+              <div class="review__head">
+                <span class="review__game">vessel_07</span>
+                <span class="status">Completed</span>
+                <span class="meta">PC · 34 h</span>
+                <span class="score">9 <span>/ 10</span></span>
+              </div>
+              <div class="body"><p>The review below the fold is the one that gets pushed down. Two lines, no clamp, no toggle — most reviews look like this.</p></div>
+            </div>
+          </div>
+        </article>
+
+        <aside class="box" aria-label="Game overview">
+          <div class="box__title"><h3>Details</h3></div>
+          <div class="overview">
+            <div>
+              <h4>Summary</h4>
+              <div class="collapse" data-collapse style="--mock-clamp: 96px; --mock-open: 300px">
+                <div class="collapse__inner">
+                  <div class="body">
+                    <p>A forgotten kingdom lies beneath a quiet town, and something is drawing the bugs of Hallownest back underground. Explore a vast interconnected world of caverns, cities and wastes, fight beasts both broken and holy, and uncover why the kingdom fell.</p>
+                  </div>
+                </div>
+                <span class="collapse__fade" aria-hidden="true"></span>
+              </div>
+              <button type="button" class="ghost" data-toggle data-label-open="Show less" data-label-closed="Show more">
+                Show more<svg class="ghost__chevron" aria-hidden="true"><use href="#i-chevron"/></svg>
+              </button>
+            </div>
+            <div>
+              <h4>Keywords</h4>
+              <div class="collapse" data-collapse style="--mock-clamp: var(--game-keywords-collapsed-height); --mock-open: 220px">
+                <div class="collapse__inner">
+                  <div class="chips">
+                    <span class="chip">metroidvania</span>
+                    <span class="chip">insects</span>
+                    <span class="chip">hand-drawn</span>
+                    <span class="chip">difficult</span>
+                    <span class="chip">exploration</span>
+                    <span class="chip">bosses</span>
+                    <span class="chip">silent protagonist</span>
+                    <span class="chip">underground</span>
+                    <span class="chip">map drawing</span>
+                    <span class="chip">charms</span>
+                    <span class="chip">fallen kingdom</span>
+                    <span class="chip">dark fantasy</span>
+                  </div>
+                </div>
+                <span class="collapse__fade" aria-hidden="true"></span>
+              </div>
+              <button type="button" class="ghost" data-toggle data-label-open="Show less" data-label-closed="Show all 47">
+                Show all 47<svg class="ghost__chevron" aria-hidden="true"><use href="#i-chevron"/></svg>
+              </button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <div class="hints">
+      <div>
+        <h4>Works because</h4>
+        <ul>
+          <li>Reading never leaves the page: no layer opens, nothing has to be closed, the scroll position is where you left it.</li>
+          <li>One state, one toggle — the same control collapses the block again.</li>
+          <li>Works for both shapes: a wall of text and a grid of keyword chips.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Costs</h4>
+        <ul>
+          <li>A very long note — and reviews can be a screen tall — pushes the rest of the feed far down, so the next review is a scroll away.</li>
+          <li>Animating <code class="t">max-height</code> to a guessed value is jumpy; it has to be measured (<code class="t">scrollHeight</code>).</li>
+          <li>Collapsing a block you scrolled past leaves the viewport in the middle of nowhere unless the toggle scrolls the block back into view.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="variant" aria-labelledby="variant-b">
+    <div class="variant__head">
+      <span class="variant__letter">B</span>
+      <h2 id="variant-b">Scroll inside the block</h2>
+    </div>
+    <p class="variant__thesis">
+      Nothing expands at all. The block keeps its height and the long text scrolls inside it, with the
+      shared <code class="t">Scrollbar</code>. Every row in the feed stays the same size, so the list
+      stays scannable no matter how much someone wrote. Scroll the two blocks below.
+    </p>
+
+    <div class="stage">
+      <p class="stage__context">Game page · Reviews — the card never changes height</p>
+      <div class="stage__pair">
+        <article class="box" aria-label="Reviews">
+          <div class="box__head">
+            <div class="box__title"><h3>Player reviews</h3><span class="count">38</span></div>
+          </div>
+
+          <div class="review">
+            <span class="cover art-hollow" aria-hidden="true">Hollow Knight</span>
+            <div class="review__main">
+              <div class="review__head">
+                <span class="review__game">moth_scholar</span>
+                <span class="status">Completed</span>
+                <span class="meta">Switch · 46 h</span>
+                <span class="score">10 <span>/ 10</span></span>
+              </div>
+              <div class="scrollarea" data-scrollarea>
+                <div class="scrollbox">
+                  <div class="body">
+                    <p>The map system sold me. You buy the map from Cornifer, and it only updates when you sit on a bench — by the City of Tears I had stopped fighting that and started enjoying being lost.</p>
+                    <p>Pantheon of Hallownest took another fifteen hours and I regret none of them, even the Nailsmith's fight on attempt forty. What stays with me is how little the game explains and how much it trusts you to notice: the first time a bench appeared exactly where I needed one, I understood the whole design.</p>
+                    <p>If you bounce off the first two hours, give it until Greenpath. That is where the game stops being a platformer with a nail and starts being the thing everyone writes essays about.</p>
+                  </div>
+                </div>
+                <span class="scrollbar" aria-hidden="true"><i></i></span>
+              </div>
+              <div class="actions">
+                <button type="button" class="ghost" style="color: var(--color-text-muted)"><svg aria-hidden="true"><use href="#i-thumb"/></svg>Helpful <span class="count">27</span></button>
+                <span class="meta">Finished 12.03.2025</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="review">
+            <span class="cover art-disco" aria-hidden="true">Disco Elysium</span>
+            <div class="review__main">
+              <div class="review__head">
+                <span class="review__game">vessel_07</span>
+                <span class="status">Completed</span>
+                <span class="meta">PC · 34 h</span>
+                <span class="score">9 <span>/ 10</span></span>
+              </div>
+              <div class="scrollarea" data-scrollarea>
+                <div class="scrollbox">
+                  <div class="body"><p>A short note keeps its natural height — the block only becomes scrollable once the text is taller than the clamp.</p></div>
+                </div>
+                <span class="scrollbar" aria-hidden="true"><i></i></span>
+              </div>
+              <div class="actions">
+                <button type="button" class="ghost" style="color: var(--color-text-muted)"><svg aria-hidden="true"><use href="#i-thumb"/></svg>Helpful <span class="count">9</span></button>
+                <span class="meta">Finished 28.01.2025</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <aside class="box" aria-label="Game overview">
+          <div class="box__title"><h3>Details</h3></div>
+          <div class="overview">
+            <div>
+              <h4>Summary</h4>
+              <div class="scrollarea" data-scrollarea>
+                <div class="scrollbox" style="--mock-clamp: 96px">
+                  <div class="body">
+                    <p>A forgotten kingdom lies beneath a quiet town, and something is drawing the bugs of Hallownest back underground. Explore a vast interconnected world of caverns, cities and wastes, fight beasts both broken and holy, and uncover why the kingdom fell.</p>
+                  </div>
+                </div>
+                <span class="scrollbar" aria-hidden="true"><i></i></span>
+              </div>
+            </div>
+            <div>
+              <h4>Keywords</h4>
+              <div class="scrollarea" data-scrollarea>
+                <div class="scrollbox" style="--mock-clamp: var(--game-keywords-collapsed-height)">
+                  <div class="chips">
+                    <span class="chip">metroidvania</span>
+                    <span class="chip">insects</span>
+                    <span class="chip">hand-drawn</span>
+                    <span class="chip">difficult</span>
+                    <span class="chip">exploration</span>
+                    <span class="chip">bosses</span>
+                    <span class="chip">silent protagonist</span>
+                    <span class="chip">underground</span>
+                    <span class="chip">map drawing</span>
+                    <span class="chip">charms</span>
+                    <span class="chip">fallen kingdom</span>
+                    <span class="chip">dark fantasy</span>
+                  </div>
+                </div>
+                <span class="scrollbar" aria-hidden="true"><i></i></span>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <div class="hints">
+      <div>
+        <h4>Works because</h4>
+        <ul>
+          <li>The page never jumps: card heights are fixed, so the feed below stays exactly where it was.</li>
+          <li>No control to hit — the text is one wheel turn away.</li>
+          <li>The panel is predictable for the layout around it, which is what <code class="t">check:layout</code> measures.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Costs</h4>
+        <ul>
+          <li>A scroll area inside a scrolling page is the classic trap: the wheel stops at the block's end, and on a phone the text is hard to grab past.</li>
+          <li>Nothing tells you how much is left except the thumb, and a 132px window makes a long review feel like reading through a slot.</li>
+          <li>Keywords lose their point: the whole set exists to be scanned at once.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="variant" aria-labelledby="variant-c">
+    <div class="variant__head">
+      <span class="variant__letter">C</span>
+      <h2 id="variant-c">Expand in place, then scroll</h2>
+    </div>
+    <p class="variant__thesis">
+      A and B in one control. <em>Show more</em> grows the block, but only up to a cap — a third of
+      the viewport. A note that fits under the cap is simply open; one that does not keeps scrolling
+      inside the expanded block. The feed below never gets pushed more than one screen.
+    </p>
+
+    <div class="stage">
+      <p class="stage__context">Game page · Reviews — the long one hits the cap and scrolls</p>
+      <div class="stage__pair">
+        <article class="box" aria-label="Reviews">
+          <div class="box__head">
+            <div class="box__title"><h3>Player reviews</h3><span class="count">38</span></div>
+          </div>
+
+          <div class="review">
+            <span class="cover art-hollow" aria-hidden="true">Hollow Knight</span>
+            <div class="review__main">
+              <div class="review__head">
+                <span class="review__game">moth_scholar</span>
+                <span class="status">Completed</span>
+                <span class="meta">Switch · 46 h</span>
+                <span class="score">10 <span>/ 10</span></span>
+              </div>
+              <div class="collapse" data-collapse data-capped style="--mock-open: var(--mock-expanded-cap)">
+                <div class="collapse__inner">
+                  <div class="body">
+                    <p>The map system sold me. You buy the map from Cornifer, and it only updates when you sit on a bench — by the City of Tears I had stopped fighting that and started enjoying being lost.</p>
+                    <p>Pantheon of Hallownest took another fifteen hours and I regret none of them, even the Nailsmith's fight on attempt forty. What stays with me is how little the game explains and how much it trusts you to notice: the first time a bench appeared exactly where I needed one, I understood the whole design.</p>
+                    <p>If you bounce off the first two hours, give it until Greenpath. That is where the game stops being a platformer with a nail and starts being the thing everyone writes essays about. The Colosseum is optional and I still did all three rounds, which tells you everything about how the combat lands once it clicks.</p>
+                    <p>Charms are the build system and the difficulty slider at once: Quick Focus for the shaky hands, Fragile Strength when a boss has too much health, Grubsong when you are learning a pattern and expect to be hit.</p>
+                  </div>
+                </div>
+                <span class="collapse__fade" aria-hidden="true"></span>
+                <span class="scrollbar" aria-hidden="true" hidden><i></i></span>
+              </div>
+              <button type="button" class="ghost" data-toggle data-label-open="Show less" data-label-closed="Show more">
+                Show more<svg class="ghost__chevron" aria-hidden="true"><use href="#i-chevron"/></svg>
+              </button>
+              <div class="actions">
+                <button type="button" class="ghost" style="color: var(--color-text-muted)"><svg aria-hidden="true"><use href="#i-thumb"/></svg>Helpful <span class="count">27</span></button>
+                <span class="meta">Finished 12.03.2025</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <aside class="box" aria-label="Game overview">
+          <div class="box__title"><h3>Details</h3></div>
+          <div class="overview">
+            <div>
+              <h4>Summary</h4>
+              <div class="collapse" data-collapse data-capped style="--mock-clamp: 96px; --mock-open: 180px">
+                <div class="collapse__inner">
+                  <div class="body">
+                    <p>A forgotten kingdom lies beneath a quiet town, and something is drawing the bugs of Hallownest back underground. Explore a vast interconnected world of caverns, cities and wastes, fight beasts both broken and holy, and uncover why the kingdom fell.</p>
+                  </div>
+                </div>
+                <span class="collapse__fade" aria-hidden="true"></span>
+                <span class="scrollbar" aria-hidden="true" hidden><i></i></span>
+              </div>
+              <button type="button" class="ghost" data-toggle data-label-open="Show less" data-label-closed="Show more">
+                Show more<svg class="ghost__chevron" aria-hidden="true"><use href="#i-chevron"/></svg>
+              </button>
+            </div>
+            <div>
+              <h4>Keywords</h4>
+              <div class="collapse" data-collapse data-capped style="--mock-clamp: var(--game-keywords-collapsed-height); --mock-open: 140px">
+                <div class="collapse__inner">
+                  <div class="chips">
+                    <span class="chip">metroidvania</span>
+                    <span class="chip">insects</span>
+                    <span class="chip">hand-drawn</span>
+                    <span class="chip">difficult</span>
+                    <span class="chip">exploration</span>
+                    <span class="chip">bosses</span>
+                    <span class="chip">silent protagonist</span>
+                    <span class="chip">underground</span>
+                    <span class="chip">map drawing</span>
+                    <span class="chip">charms</span>
+                    <span class="chip">fallen kingdom</span>
+                    <span class="chip">dark fantasy</span>
+                  </div>
+                </div>
+                <span class="collapse__fade" aria-hidden="true"></span>
+                <span class="scrollbar" aria-hidden="true" hidden><i></i></span>
+              </div>
+              <button type="button" class="ghost" data-toggle data-label-open="Show less" data-label-closed="Show all 47">
+                Show all 47<svg class="ghost__chevron" aria-hidden="true"><use href="#i-chevron"/></svg>
+              </button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <div class="hints">
+      <div>
+        <h4>Works because</h4>
+        <ul>
+          <li>The common case (a note a little over the clamp) opens fully in place — the scroll area appears only for the rare monster.</li>
+          <li>The feed below moves by a bounded amount, so the list never collapses into one endless entry.</li>
+          <li>One component, one prop: the cap is a number, and passing <code class="t">Infinity</code> gives variant A.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Costs</h4>
+        <ul>
+          <li>Two behaviours behind one button: the same <em>Show more</em> sometimes ends in a scroll area, which has to be obvious from the fade.</li>
+          <li>The cap is a guess; as a viewport fraction it needs re-measuring on resize.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="variant" aria-labelledby="variant-d">
+    <div class="variant__head">
+      <span class="variant__letter">D</span>
+      <h2 id="variant-d">Modal — what ships today</h2>
+    </div>
+    <p class="variant__thesis">
+      The baseline, for comparison. <em>Show more</em> opens the text in a centred panel over the page.
+      Reading is comfortable and the feed does not move, but it is a layer: Escape or a click outside
+      closes it, and on a phone it covers everything.
+    </p>
+
+    <div class="stage">
+      <p class="stage__context">Game page · Reviews — current behaviour</p>
+      <div class="stage__pair">
+        <article class="box" aria-label="Reviews">
+          <div class="box__head">
+            <div class="box__title"><h3>Player reviews</h3><span class="count">38</span></div>
+          </div>
+          <div class="review">
+            <span class="cover art-hollow" aria-hidden="true">Hollow Knight</span>
+            <div class="review__main">
+              <div class="review__head">
+                <span class="review__game">moth_scholar</span>
+                <span class="status">Completed</span>
+                <span class="meta">Switch · 46 h</span>
+                <span class="score">10 <span>/ 10</span></span>
+              </div>
+              <div class="collapse">
+                <div class="collapse__inner">
+                  <div class="body">
+                    <p>The map system sold me. You buy the map from Cornifer, and it only updates when you sit on a bench — by the City of Tears I had stopped fighting that and started enjoying being lost.</p>
+                    <p>Pantheon of Hallownest took another fifteen hours and I regret none of them, even the Nailsmith's fight on attempt forty.</p>
+                  </div>
+                </div>
+                <span class="collapse__fade" aria-hidden="true"></span>
+              </div>
+              <button type="button" class="ghost">Show more<svg aria-hidden="true"><use href="#i-window"/></svg></button>
+              <div class="actions">
+                <button type="button" class="ghost" style="color: var(--color-text-muted)"><svg aria-hidden="true"><use href="#i-thumb"/></svg>Helpful <span class="count">27</span></button>
+                <span class="meta">Finished 12.03.2025</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <div class="modal-piece" aria-label="Modal with the full review">
+          <div class="modal-piece__head">
+            <h4>moth_scholar's review</h4>
+            <button type="button" class="ghost" style="color: var(--color-text-muted)"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+          </div>
+          <div class="body">
+            <p>The map system sold me. You buy the map from Cornifer, and it only updates when you sit on a bench — by the City of Tears I had stopped fighting that and started enjoying being lost.</p>
+            <p>Pantheon of Hallownest took another fifteen hours and I regret none of them, even the Nailsmith's fight on attempt forty.</p>
+          </div>
+          <p class="meta">Modal · <code class="t">--modal-text-width</code></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="hints">
+      <div>
+        <h4>Works because</h4>
+        <ul>
+          <li>The text gets the full reading width, away from the card's own layout.</li>
+          <li>The feed never moves — position in the list is kept for free.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Costs</h4>
+        <ul>
+          <li>A layer for reading two extra paragraphs. Back closes it and navigates (<code class="t">ModalsConnector</code> closes on <code class="t">popstate</code>).</li>
+          <li>Comparing two reviews means opening and closing two modals.</li>
+          <li>On a phone it covers the whole screen, which reads as navigation rather than as "more of this card".</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="variant" aria-labelledby="variant-e">
+    <div class="variant__head">
+      <span class="variant__letter">E</span>
+      <h2 id="variant-e">Accordion — one open at a time</h2>
+    </div>
+    <p class="variant__thesis">
+      Variant A with a rule: opening a review folds the one that was open. The list can never grow by
+      more than one review, whatever people write, and there is no cap to guess and no scroll area
+      inside the card. Open each of the three below and watch the others close.
+    </p>
+
+    <div class="stage">
+      <p class="stage__context">Game page · Reviews — only one body is open</p>
+      <article class="box" aria-label="Reviews" data-accordion>
+        <div class="box__head">
+          <div class="box__title"><h3>Player reviews</h3><span class="count">38</span></div>
+        </div>
+
+        <div class="review">
+          <span class="cover art-hollow" aria-hidden="true">Hollow Knight</span>
+          <div class="review__main">
+            <div class="review__head">
+              <span class="review__game">moth_scholar</span>
+              <span class="status">Completed</span>
+              <span class="meta">Switch · 46 h</span>
+              <span class="score">10 <span>/ 10</span></span>
+            </div>
+            <div class="collapse is-open" data-collapse style="--mock-open: 320px">
+              <div class="collapse__inner">
+                <div class="body">
+                  <p>The map system sold me. You buy the map from Cornifer, and it only updates when you sit on a bench — by the City of Tears I had stopped fighting that and started enjoying being lost.</p>
+                  <p>Pantheon of Hallownest took another fifteen hours and I regret none of them, even the Nailsmith's fight on attempt forty. What stays with me is how little the game explains and how much it trusts you to notice.</p>
+                </div>
+              </div>
+              <span class="collapse__fade" aria-hidden="true"></span>
+            </div>
+            <button type="button" class="ghost is-open" data-toggle data-accordion-toggle data-label-open="Show less" data-label-closed="Show more">
+              Show less<svg class="ghost__chevron" aria-hidden="true"><use href="#i-chevron"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="review">
+          <span class="cover art-disco" aria-hidden="true">Disco Elysium</span>
+          <div class="review__main">
+            <div class="review__head">
+              <span class="review__game">vessel_07</span>
+              <span class="status">Completed</span>
+              <span class="meta">PC · 34 h</span>
+              <span class="score">9 <span>/ 10</span></span>
+            </div>
+            <div class="collapse" data-collapse style="--mock-open: 300px">
+              <div class="collapse__inner">
+                <div class="body">
+                  <p>I failed the first skill check of the game and the failure was better written than most successes I have read elsewhere. Played the whole thing as a wreck who believes in something anyway.</p>
+                  <p>The thought cabinet is the best character sheet in the genre: you are not picking stats, you are deciding what this man is allowed to believe for the next six hours.</p>
+                </div>
+              </div>
+              <span class="collapse__fade" aria-hidden="true"></span>
+            </div>
+            <button type="button" class="ghost" data-toggle data-accordion-toggle data-label-open="Show less" data-label-closed="Show more">
+              Show more<svg class="ghost__chevron" aria-hidden="true"><use href="#i-chevron"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="review">
+          <span class="cover art-tunic" aria-hidden="true">Tunic</span>
+          <div class="review__main">
+            <div class="review__head">
+              <span class="review__game">latejoiner</span>
+              <span class="status">Completed</span>
+              <span class="meta">Steam Deck · 19 h</span>
+              <span class="score">8 <span>/ 10</span></span>
+            </div>
+            <div class="collapse" data-collapse style="--mock-open: 260px">
+              <div class="collapse__inner">
+                <div class="body">
+                  <p>The manual is the whole game. Finding a page that explains a mechanic you have been fighting for two hours is the single best feeling I had in a game this year.</p>
+                  <p>Combat is the weakest part and the one place I turned on the assist mode without regret.</p>
+                </div>
+              </div>
+              <span class="collapse__fade" aria-hidden="true"></span>
+            </div>
+            <button type="button" class="ghost" data-toggle data-accordion-toggle data-label-open="Show less" data-label-closed="Show more">
+              Show more<svg class="ghost__chevron" aria-hidden="true"><use href="#i-chevron"/></svg>
+            </button>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="hints">
+      <div>
+        <h4>Works because</h4>
+        <ul>
+          <li>The list grows by one review at most, so it never turns into a single endless entry.</li>
+          <li>No cap to guess, no nested scroll — the open review is simply whole.</li>
+          <li>Reading top to bottom becomes one click per review, and the previous one gets out of the way by itself.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Costs</h4>
+        <ul>
+          <li>Two reviews cannot be compared side by side — opening the second closes the first.</li>
+          <li>A block closing on its own moves the page under the cursor; the opened one has to be scrolled into view.</li>
+          <li>Wrong for the game page's Details, where Summary, Storyline and Keywords are read together.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="variant" aria-labelledby="variant-f">
+    <div class="variant__head">
+      <span class="variant__letter">F</span>
+      <h2 id="variant-f">Drawer — a reader beside the list</h2>
+    </div>
+    <p class="variant__thesis">
+      The full text opens in a panel docked to the side of the feed instead of over the page. The list
+      stays where it is and stays clickable, so moving between reviews is one click each with nothing
+      to close in between. Click "Read" on either review.
+    </p>
+
+    <div class="stage">
+      <p class="stage__context">Game page · Reviews — the list keeps working while the panel is open</p>
+      <div class="stage__pair" data-drawer-stage>
+        <article class="box" aria-label="Reviews">
+          <div class="box__head">
+            <div class="box__title"><h3>Player reviews</h3><span class="count">38</span></div>
+          </div>
+
+          <div class="review review_active" data-drawer-row>
+            <span class="cover art-hollow" aria-hidden="true">Hollow Knight</span>
+            <div class="review__main">
+              <div class="review__head">
+                <span class="review__game">moth_scholar</span>
+                <span class="status">Completed</span>
+                <span class="score">10 <span>/ 10</span></span>
+              </div>
+              <p class="excerpt">The map system sold me. You buy the map from Cornifer, and it only updates when you sit on a bench — by the City of Tears I had stopped fighting that.</p>
+              <button type="button" class="ghost" data-read="full-hollow" data-author="moth_scholar">Read<svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+            </div>
+          </div>
+
+          <div class="review" data-drawer-row>
+            <span class="cover art-disco" aria-hidden="true">Disco Elysium</span>
+            <div class="review__main">
+              <div class="review__head">
+                <span class="review__game">vessel_07</span>
+                <span class="status">Completed</span>
+                <span class="score">9 <span>/ 10</span></span>
+              </div>
+              <p class="excerpt">I failed the first skill check of the game and the failure was better written than most successes I have read elsewhere.</p>
+              <button type="button" class="ghost" data-read="full-disco" data-author="vessel_07">Read<svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+            </div>
+          </div>
+        </article>
+
+        <aside class="drawer" aria-label="Review reader">
+          <div class="drawer__head">
+            <h4 data-drawer-title>moth_scholar's review</h4>
+            <button type="button" class="ghost" style="color: var(--color-text-muted)" aria-label="Close"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+          </div>
+          <div class="body" data-drawer-body>
+            <p>The map system sold me. You buy the map from Cornifer, and it only updates when you sit on a bench — by the City of Tears I had stopped fighting that and started enjoying being lost.</p>
+            <p>Pantheon of Hallownest took another fifteen hours and I regret none of them, even the Nailsmith's fight on attempt forty.</p>
+          </div>
+          <p class="meta">Docked panel · sticky while the list scrolls</p>
+        </aside>
+      </div>
+    </div>
+
+    <div hidden>
+      <div id="full-hollow">
+        <p>The map system sold me. You buy the map from Cornifer, and it only updates when you sit on a bench — by the City of Tears I had stopped fighting that and started enjoying being lost.</p>
+        <p>Pantheon of Hallownest took another fifteen hours and I regret none of them, even the Nailsmith's fight on attempt forty.</p>
+      </div>
+      <div id="full-disco">
+        <p>I failed the first skill check of the game and the failure was better written than most successes I have read elsewhere. Played the whole thing as a wreck who believes in something anyway.</p>
+        <p>The thought cabinet is the best character sheet in the genre: you are not picking stats, you are deciding what this man is allowed to believe for the next six hours.</p>
+      </div>
+    </div>
+
+    <div class="hints">
+      <div>
+        <h4>Works because</h4>
+        <ul>
+          <li>Reading several reviews in a row costs one click each — the panel swaps instead of opening and closing.</li>
+          <li>The feed never moves and never shrinks; the reader gets a comfortable column of its own.</li>
+          <li>The open review has an id, so the panel state can live in the URL and be linked.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Costs</h4>
+        <ul>
+          <li>The most code of all seven: a panel, a selected id, a sticky container and a mobile fallback (a bottom sheet, or plain variant A).</li>
+          <li>Below <code class="t">mediaMd</code> the two columns do not fit, so the pattern exists only on desktop.</li>
+          <li>Half the width of the feed is spent on a panel that is empty until something is clicked.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="drawer-page-title">
+    <h2 id="drawer-page-title">F on a whole page</h2>
+    <p class="lede">
+      The drawer is the only variant whose cost is paid by the page around it, not by the card, so it
+      has to be judged at page scale: what it takes width from, what it covers, and what is left on a
+      phone. Same game page as always, with the Reviews panel near the bottom.
+    </p>
+
+    <div class="stage">
+      <p class="stage__context">Desktop · the panel lives inside the Reviews block</p>
+      <div class="frame">
+        <div class="frame__bar"><b>MoonCellar</b> Games · Gauntlet · Random <span>/games/hollow-knight</span></div>
+        <div class="page" data-drawer-stage>
+          <div class="hero">
+            <div class="hero__cover"></div>
+            <div class="hero__text">
+              <h3>Hollow Knight</h3>
+              <div class="chips">
+                <span class="chip">Team Cherry · 2017</span>
+                <span class="chip">Switch · PC · PS4</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="cols">
+            <div class="box cols__wide">
+              <div class="box__title"><h3>Details</h3></div>
+              <div class="skeleton skeleton_wide"></div>
+              <div class="skeleton skeleton_wide"></div>
+              <div class="skeleton skeleton_half"></div>
+            </div>
+            <div class="box cols__side">
+              <div class="box__title"><h3>Score</h3></div>
+              <div class="skeleton skeleton_tall"></div>
+            </div>
+            <div class="box cols__side">
+              <div class="box__title"><h3>Lists</h3></div>
+              <div class="skeleton skeleton_tall"></div>
+            </div>
+          </div>
+
+          <div class="box">
+            <div class="tabs"><b>Reviews 38</b><span>Discussion 12</span></div>
+            <div class="stage__pair">
+              <div>
+                <div class="review review_active" data-drawer-row>
+                  <span class="cover art-hollow" aria-hidden="true">Hollow Knight</span>
+                  <div class="review__main">
+                    <div class="review__head">
+                      <span class="review__game">moth_scholar</span>
+                      <span class="status">Completed</span>
+                      <span class="score">10 <span>/ 10</span></span>
+                    </div>
+                    <p class="excerpt">The map system sold me. You buy the map from Cornifer, and it only updates when you sit on a bench — by the City of Tears I had stopped fighting that.</p>
+                    <button type="button" class="ghost" data-read="full-hollow" data-author="moth_scholar">Read<svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+                  </div>
+                </div>
+                <div class="review" data-drawer-row>
+                  <span class="cover art-disco" aria-hidden="true">Disco Elysium</span>
+                  <div class="review__main">
+                    <div class="review__head">
+                      <span class="review__game">vessel_07</span>
+                      <span class="status">Completed</span>
+                      <span class="score">9 <span>/ 10</span></span>
+                    </div>
+                    <p class="excerpt">I failed the first skill check of the game and the failure was better written than most successes I have read elsewhere.</p>
+                    <button type="button" class="ghost" data-read="full-disco" data-author="vessel_07">Read<svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+                  </div>
+                </div>
+                <div class="review" data-drawer-row>
+                  <span class="cover art-tunic" aria-hidden="true">Tunic</span>
+                  <div class="review__main">
+                    <div class="review__head">
+                      <span class="review__game">latejoiner</span>
+                      <span class="status">Completed</span>
+                      <span class="score">8 <span>/ 10</span></span>
+                    </div>
+                    <p class="excerpt">The manual is the whole game. Finding a page that explains a mechanic you have been fighting for two hours is the best feeling I had this year.</p>
+                    <button type="button" class="ghost" data-read="full-hollow" data-author="latejoiner">Read<svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+                  </div>
+                </div>
+              </div>
+
+              <aside class="drawer" aria-label="Review reader">
+                <div class="drawer__head">
+                  <h4 data-drawer-title>moth_scholar's review</h4>
+                  <button type="button" class="ghost" style="color: var(--color-text-muted)" aria-label="Close"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+                </div>
+                <div class="body" data-drawer-body>
+                  <p>The map system sold me. You buy the map from Cornifer, and it only updates when you sit on a bench — by the City of Tears I had stopped fighting that and started enjoying being lost.</p>
+                  <p>Pantheon of Hallownest took another fifteen hours and I regret none of them, even the Nailsmith's fight on attempt forty.</p>
+                </div>
+                <div class="actions">
+                  <button type="button" class="ghost" style="color: var(--color-text-muted)"><svg aria-hidden="true"><use href="#i-thumb"/></svg>Helpful <span class="count">27</span></button>
+                  <span class="meta">Finished 12.03.2025</span>
+                </div>
+              </aside>
+            </div>
+          </div>
+
+          <div class="cols">
+            <div class="box cols__side">
+              <div class="box__title"><h3>Release dates</h3></div>
+              <div class="skeleton skeleton_wide"></div>
+            </div>
+            <div class="box cols__side">
+              <div class="box__title"><h3>Multiplayer</h3></div>
+              <div class="skeleton skeleton_wide"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="meta">Click "Read" on any row — the panel swaps, the page does not move.</p>
+    </div>
+
+    <div class="stage" style="margin-top: var(--gap-x5)">
+      <p class="stage__context">Two cheaper places to put the same panel</p>
+      <div class="stage__pair">
+        <div class="frame" style="min-height: 300px">
+          <div class="frame__bar"><b>MoonCellar</b> <span>docked to the window</span></div>
+          <div class="page" style="gap: var(--gap-x3)">
+            <div class="hero" style="min-height: 110px"><div class="hero__cover" style="width: 62px"></div><div class="hero__text"><h3>Hollow Knight</h3></div></div>
+            <div class="box">
+              <div class="tabs"><b>Reviews 38</b><span>Discussion 12</span></div>
+              <div class="skeleton skeleton_wide"></div>
+              <div class="skeleton skeleton_wide"></div>
+              <div class="skeleton skeleton_half"></div>
+            </div>
+          </div>
+          <aside class="edge-drawer" aria-label="Review reader docked to the window">
+            <div class="drawer__head">
+              <h4>moth_scholar's review</h4>
+              <button type="button" class="ghost" style="color: var(--color-text-muted)" aria-label="Close"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            </div>
+            <div class="body">
+              <p>The map system sold me. You buy the map from Cornifer, and it only updates when you sit on a bench — by the City of Tears I had stopped fighting that and started enjoying being lost.</p>
+            </div>
+            <p class="meta">Full height, over the page</p>
+          </aside>
+        </div>
+
+        <div class="frame phone" style="min-height: 300px">
+          <div class="frame__bar"><b>MoonCellar</b> <span>390px</span></div>
+          <div class="page" style="gap: var(--gap-x3)">
+            <div class="hero" style="min-height: 96px"><div class="hero__cover" style="width: 52px"></div><div class="hero__text"><h3 style="font-size: 17px">Hollow Knight</h3></div></div>
+            <div class="box" style="padding: var(--padding-x3)">
+              <div class="tabs"><b>Reviews 38</b></div>
+              <div class="skeleton skeleton_wide"></div>
+              <div class="skeleton skeleton_half"></div>
+            </div>
+          </div>
+          <span class="scrim" aria-hidden="true"></span>
+          <aside class="sheet" aria-label="Review reader as a bottom sheet">
+            <span class="sheet__grip" aria-hidden="true"></span>
+            <h4>moth_scholar's review</h4>
+            <div class="body">
+              <p>The map system sold me. You buy the map from Cornifer, and it only updates when you sit on a bench.</p>
+            </div>
+            <p class="meta">Bottom sheet · the phone fallback</p>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <div class="hints">
+      <div>
+        <h4>What the page pays</h4>
+        <ul>
+          <li>Inside the panel (top): the feed drops to about 55% of its width, so a review row loses roughly 300px — covers, status and rating stay, the excerpt gets two lines instead of four.</li>
+          <li>Docked to the window (bottom left): the feed keeps its width but the panel covers the right half of everything, including the blocks the reader was not looking at.</li>
+          <li>On a phone neither fits: the panel becomes a bottom sheet, which is variant D with a nicer gesture.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>What it buys</h4>
+        <ul>
+          <li>Reading three reviews in a row is three clicks and no closing, against six actions with the modal.</li>
+          <li>The list keeps its scroll position and its filters — the panel is the only thing that changes.</li>
+          <li>The open review can sit in the URL, so a link opens the page with that review already in the panel.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="variant" aria-labelledby="variant-g">
+    <div class="variant__head">
+      <span class="variant__letter">G</span>
+      <h2 id="variant-g">No clamp at all</h2>
+    </div>
+    <p class="variant__thesis">
+      Print everything. No control, no state, no component — the card is as tall as the text. Worth
+      putting on the table because the median note is two or three lines: the clamp exists for a
+      minority, and every variant above is machinery bought for that minority.
+    </p>
+
+    <div class="stage">
+      <p class="stage__context">Game page · Reviews — the feed as it is written</p>
+      <article class="box" aria-label="Reviews">
+        <div class="box__head">
+          <div class="box__title"><h3>Player reviews</h3><span class="count">38</span></div>
+        </div>
+        <div class="review">
+          <span class="cover art-hollow" aria-hidden="true">Hollow Knight</span>
+          <div class="review__main">
+            <div class="review__head">
+              <span class="review__game">moth_scholar</span>
+              <span class="status">Completed</span>
+              <span class="meta">Switch · 46 h</span>
+              <span class="score">10 <span>/ 10</span></span>
+            </div>
+            <div class="body">
+              <p>The map system sold me. You buy the map from Cornifer, and it only updates when you sit on a bench — by the City of Tears I had stopped fighting that and started enjoying being lost.</p>
+              <p>Pantheon of Hallownest took another fifteen hours and I regret none of them, even the Nailsmith's fight on attempt forty. What stays with me is how little the game explains and how much it trusts you to notice: the first time a bench appeared exactly where I needed one, I understood the whole design.</p>
+              <p>If you bounce off the first two hours, give it until Greenpath. That is where the game stops being a platformer with a nail and starts being the thing everyone writes essays about.</p>
+            </div>
+            <div class="actions">
+              <button type="button" class="ghost" style="color: var(--color-text-muted)"><svg aria-hidden="true"><use href="#i-thumb"/></svg>Helpful <span class="count">27</span></button>
+              <span class="meta">Finished 12.03.2025</span>
+            </div>
+          </div>
+        </div>
+        <div class="review">
+          <span class="cover art-disco" aria-hidden="true">Disco Elysium</span>
+          <div class="review__main">
+            <div class="review__head">
+              <span class="review__game">vessel_07</span>
+              <span class="status">Completed</span>
+              <span class="meta">PC · 34 h</span>
+              <span class="score">9 <span>/ 10</span></span>
+            </div>
+            <div class="body">
+              <p>Two lines, like almost every note on the site. Nothing to expand, nothing to collapse.</p>
+            </div>
+            <div class="actions">
+              <button type="button" class="ghost" style="color: var(--color-text-muted)"><svg aria-hidden="true"><use href="#i-thumb"/></svg>Helpful <span class="count">9</span></button>
+              <span class="meta">Finished 28.01.2025</span>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="hints">
+      <div>
+        <h4>Works because</h4>
+        <ul>
+          <li>Nothing to build, nothing to measure, nothing to animate — <code class="t">ExpandableBlock</code> disappears from these call sites.</li>
+          <li>Every word is visible to a reader and to Ctrl+F, with no state in between.</li>
+          <li>Honest about the data: most notes are short, and the long ones are the reason people open a review section at all.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Costs</h4>
+        <ul>
+          <li>One screen-tall review can bury the rest of the page — exactly the case the clamp was added for.</li>
+          <li>Keywords still need a clamp: 215 chips on some games is a wall, not a list.</li>
+          <li>The panel's height stops being predictable, which is what <code class="t">check:layout</code> watches on game pages.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="compare-title">
+    <h2 id="compare-title">Side by side</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Variant</th>
+            <th scope="col">Feed below</th>
+            <th scope="col">Clicks to read</th>
+            <th scope="col">A screen-long note</th>
+            <th scope="col">Keywords grid</th>
+            <th scope="col">Phone</th>
+            <th scope="col">Build</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">A · In place</th>
+            <td>Pushed by the whole text</td>
+            <td>1, plus 1 to fold back</td>
+            <td>Takes over the list</td>
+            <td>Good</td>
+            <td>Good</td>
+            <td><span class="count">S</span></td>
+          </tr>
+          <tr>
+            <th scope="row">B · Inner scroll</th>
+            <td>Never moves</td>
+            <td>0</td>
+            <td>Read through a slot</td>
+            <td>Poor — the point is scanning all of them</td>
+            <td>Nested scroll, hard to grab</td>
+            <td><span class="count">S</span></td>
+          </tr>
+          <tr>
+            <th scope="row">C · In place, capped</th>
+            <td>Pushed by at most the cap</td>
+            <td>1</td>
+            <td>Scrolls inside the cap</td>
+            <td>Good</td>
+            <td>Good</td>
+            <td><span class="count">M</span></td>
+          </tr>
+          <tr>
+            <th scope="row">D · Modal (today)</th>
+            <td>Never moves</td>
+            <td>1, plus closing</td>
+            <td>Comfortable</td>
+            <td>Fine</td>
+            <td>Covers the screen</td>
+            <td><span class="count">—</span></td>
+          </tr>
+          <tr>
+            <th scope="row">E · Accordion</th>
+            <td>Pushed by one review at a time</td>
+            <td>1, the previous closes itself</td>
+            <td>Whole, but alone</td>
+            <td>Wrong — the Details blocks are read together</td>
+            <td>Good</td>
+            <td><span class="count">M</span></td>
+          </tr>
+          <tr>
+            <th scope="row">F · Drawer</th>
+            <td>Never moves</td>
+            <td>1 per review, nothing to close</td>
+            <td>Comfortable, in its own column</td>
+            <td>Not applicable</td>
+            <td>Needs a bottom sheet or falls back to A</td>
+            <td><span class="count">L</span></td>
+          </tr>
+          <tr>
+            <th scope="row">G · No clamp</th>
+            <td>Always as long as the text</td>
+            <td>0</td>
+            <td>Buries the page</td>
+            <td>Still needs a clamp of its own</td>
+            <td>Long, but nothing breaks</td>
+            <td><span class="count">XS</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note" style="margin-top: var(--gap-x2)">
+      Server HTML is identical in all seven: the text is always rendered in full and collapsing is
+      CSS, never <code class="t">slice()</code>.
+    </p>
+  </section>
+
+  <section class="section" aria-labelledby="build-title">
+    <h2 id="build-title">How it would be built</h2>
+    <p class="lede">All four are one component with one prop; nothing at the call sites changes except that prop.</p>
+
+    <div class="plan">
+      <div>
+        <h3>Component</h3>
+        <pre><i>// shared/ui/ExpandableBlock</i>
+<b>mode</b>:
+  | "inline"   <i>· A</i>
+  | "scroll"   <i>· B</i>
+  | "capped"   <i>· C</i>
+  | "modal"    <i>· D, default</i>
+  | "none"     <i>· G</i>
+<b>clampHeight</b>?: string
+<b>expandedHeight</b>?: string
+<b>modalTitle</b>?: string
+<b>group</b>?: string  <i>· E, one per group</i></pre>
+        <p>
+          Default stays <code class="t">"modal"</code>, so every existing call site keeps its behaviour
+          until it is switched over one at a time.
+        </p>
+      </div>
+      <div>
+        <h3>Mechanics</h3>
+        <ul>
+          <li>Open height comes from <code class="t">scrollHeight</code> measured by the existing <code class="t">useResizeDetector</code>, not from a guess, or the animation stutters.</li>
+          <li>Animate <code class="t">max-height</code> with <code class="t">--duration-base</code> / <code class="t">--easing-out</code>; under <code class="t">reducedMotion</code> drop to <code class="t">--duration-instant</code>, never <code class="t">none</code>.</li>
+          <li>The fade at the bottom is a gradient to <code class="t">--color-bg-primary</code> and must vanish when open.</li>
+          <li>Collapsing scrolls the block back into view if its top is above the viewport.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Scroll areas</h3>
+        <ul>
+          <li>"scroll" and the capped state of "capped" render the shared <code class="t">Scrollbar</code> — a native scrollbar does not match the theme.</li>
+          <li><code class="t">overscroll-behavior: contain</code> so the page does not start scrolling when the block ends.</li>
+          <li>The container needs <code class="t">min-height: 0</code> for the flex chain, as <code class="t">Box</code> already does.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Where each fits</h3>
+        <ul>
+          <li>Reviews (game page, profile): <b>C</b> — one click, bounded push; <b>E</b> if the feed still feels long.</li>
+          <li>Summary and Storyline: <b>A</b> — a paragraph or two, nothing to cap.</li>
+          <li>Keywords: <b>A</b> — the grid is meant to be seen whole.</li>
+          <li>Gauntlet winner panel: <b>B</b> — the panel has a fixed height by design.</li>
+          <li>Short notes everywhere: <b>G</b> — below the clamp the component renders nothing extra anyway.</li>
+          <li><b>F</b> only if reading many reviews in a row becomes a real use case; it is a layout, not a prop.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="recommend">
+      <p class="eyebrow">Recommendation</p>
+      <h3>Ship C for reviews and A for the game page; keep E and F in reserve</h3>
+      <p>
+        The modal is doing a job that the card can do itself: two extra paragraphs do not deserve a
+        layer. Adding <code class="t">mode</code> to <code class="t">ExpandableBlock</code> is a day's
+        work and can be rolled out one call site at a time, because the default keeps today's
+        behaviour. <b>E</b> is a second flag on top of C and only pays off once feeds are long enough
+        to feel it; <b>F</b> is a different screen, worth building the day someone reads reviews in a
+        row rather than one at a time. <b>G</b> is the honest baseline to measure the rest against —
+        if the clamp fires on one note in fifty, most of this machinery is optional.
+      </p>
+    </div>
+  </section>
+
+  <p class="note">
+    Colours, spacing and radii are the project's own tokens: the <code class="t">:root</code> block
+    above is generated from <code class="t">apps/web/src/lib/app/styles/vars</code> by
+    <code class="t">bun --filter web sync:tokens</code>. The typeface is substituted — Hanken Grotesk
+    stands in for ApercuPro, whose licensed file cannot be served from a third-party host. The
+    scrollbars here are the browser's own, styled to match; on the site every scroll area is the
+    shared <code class="t">Scrollbar</code>. Covers are coloured placeholders and the reviews are
+    invented.
+  </p>
+</div>
+
+<script>
+  const chevron =
+    '<svg class="ghost__chevron" aria-hidden="true"><use href="#i-chevron"/></svg>';
+
+  const syncScrollbar = (scroller, bar) => {
+    if (!bar) return;
+
+    const track = bar.clientHeight;
+    const ratio = scroller.clientHeight / scroller.scrollHeight;
+
+    if (ratio >= 1) {
+      bar.hidden = true;
+      return;
+    }
+
+    const thumb = bar.querySelector("i");
+    const height = Math.max(24, track * ratio);
+
+    bar.hidden = false;
+    thumb.style.height = `${height}px`;
+    thumb.style.top = `${
+      (scroller.scrollTop / (scroller.scrollHeight - scroller.clientHeight)) *
+      (track - height)
+    }px`;
+  };
+
+  const watchScroller = (scroller, bar) => {
+    const update = () => syncScrollbar(scroller, bar);
+
+    scroller.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    update();
+
+    return update;
+  };
+
+  document.querySelectorAll("[data-scrollarea]").forEach((area) => {
+    watchScroller(area.querySelector(".scrollbox"), area.querySelector(".scrollbar"));
+  });
+
+  const setToggleState = (button, block, isOpen) => {
+    block.classList.toggle("is-open", isOpen);
+    button.classList.toggle("is-open", isOpen);
+    button.innerHTML =
+      (isOpen ? button.dataset.labelOpen : button.dataset.labelClosed) + chevron;
+  };
+
+  document.querySelectorAll("[data-toggle]").forEach((button) => {
+    const block = button.previousElementSibling;
+    const inner = block.querySelector(".collapse__inner");
+    const bar = block.querySelector(".scrollbar");
+    const group = button.closest("[data-accordion]");
+    let update;
+
+    button.addEventListener("click", () => {
+      const isOpen = !block.classList.contains("is-open");
+
+      if (isOpen && group) {
+        group.querySelectorAll("[data-accordion-toggle]").forEach((other) => {
+          if (other !== button) {
+            setToggleState(other, other.previousElementSibling, false);
+          }
+        });
+      }
+
+      setToggleState(button, block, isOpen);
+
+      if (!block.hasAttribute("data-capped")) return;
+
+      inner.classList.toggle("scrollbox", isOpen);
+
+      if (!isOpen) {
+        inner.scrollTop = 0;
+        if (bar) bar.hidden = true;
+        return;
+      }
+
+      update = update || watchScroller(inner, bar);
+      window.setTimeout(update, 40);
+    });
+  });
+
+  document.querySelectorAll("[data-drawer-stage]").forEach((stage) => {
+    const title = stage.querySelector("[data-drawer-title]");
+    const body = stage.querySelector("[data-drawer-body]");
+
+    stage.querySelectorAll("[data-read]").forEach((button) => {
+      button.addEventListener("click", () => {
+        stage.querySelectorAll("[data-drawer-row]").forEach((row) => {
+          row.classList.toggle("review_active", row.contains(button));
+        });
+
+        title.textContent = `${button.dataset.author}'s review`;
+        body.innerHTML = document.getElementById(button.dataset.read).innerHTML;
+      });
+    });
+  });
+</script>

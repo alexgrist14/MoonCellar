@@ -1,0 +1,302 @@
+$categories: completed, playing, mastered, played, backlog, dropped;
+
+.reviews {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x4);
+
+  &__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x3);
+  }
+
+  &__total {
+    color: var(--color-text-primary);
+
+    @include font(15px, 20px, 600);
+  }
+
+  &__average {
+    color: var(--color-text-muted);
+
+    @include font(13px, 20px, 400);
+  }
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--gap-x3);
+
+  &__game {
+    flex: 2 1 var(--games-card-min-width);
+    min-width: 0;
+  }
+
+  &__rating {
+    display: flex;
+    flex: 1 1 var(--user-review-rating-filter-width);
+    align-items: center;
+    gap: var(--gap-x2);
+    min-width: 0;
+
+    > div {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+  }
+
+  &__label {
+    color: var(--color-text-muted);
+
+    @include font(13px, 20px, 400);
+  }
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-x2);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-x2);
+  padding: var(--padding-x1) var(--padding-x3);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-x4);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--easing-out),
+    color var(--duration-fast) var(--easing-out);
+
+  @include font(13px, 17px, 400);
+
+  &:hover,
+  &_active {
+    border-color: var(--color-accent);
+    color: var(--color-text-primary);
+  }
+
+  &__count {
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+
+    @include font(12px, 16px, 400);
+  }
+}
+
+.dot {
+  width: var(--community-dot-size);
+  height: var(--community-dot-size);
+  border-radius: 50%;
+  background-color: var(--status-category-color, var(--color-gray));
+  flex-shrink: 0;
+}
+
+.results {
+  min-height: var(--community-loading-height);
+}
+
+.busy {
+  position: relative;
+  pointer-events: none;
+
+  > * {
+    opacity: 0.4;
+    transition: opacity var(--duration-fast) var(--easing-out);
+  }
+
+  > .busy__loader {
+    opacity: 1;
+  }
+}
+
+.feed {
+  display: flex;
+  flex-direction: column;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: var(--user-review-card-width) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--gap-x4);
+  padding-block: var(--padding-x5);
+  border-top: 1px solid var(--color-border-primary);
+
+  &:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+
+  &__card {
+    display: flex;
+    width: var(--user-review-card-width);
+  }
+
+  &__placeholder {
+    width: 100%;
+    aspect-ratio: var(--cover-ratio);
+    border-radius: var(--radius-x4);
+  }
+
+  &__main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x2);
+    min-width: 0;
+  }
+
+  &__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--gap-x1) var(--gap-x3);
+  }
+
+  &__game {
+    color: var(--color-text-primary);
+    transition: color var(--duration-fast) var(--easing-out);
+
+    @include font(15px, 20px, 600);
+
+    &:hover {
+      color: var(--color-accent);
+    }
+  }
+
+  &__meta {
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+
+    @include font(12px, 16px, 400);
+  }
+
+  &__date {
+    margin-left: auto;
+  }
+
+  &__flag {
+    color: var(--color-attention);
+    white-space: nowrap;
+
+    @include font(12px, 16px, 600);
+
+    &_muted {
+      color: var(--color-text-muted);
+    }
+  }
+
+  &__score {
+    margin-left: auto;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+
+    @include font(15px, 20px, 600);
+  }
+
+  &__scale {
+    color: var(--color-text-muted);
+
+    @include font(12px, 16px, 400);
+  }
+
+  &__body {
+    color: var(--color-text-secondary);
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--gap-x1) var(--gap-x2);
+    margin-left: calc(-1 * var(--padding-x2));
+  }
+
+  &__helpful {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    padding: var(--padding-x1) var(--padding-x2);
+    color: var(--color-text-muted);
+
+    @include font(13px, 20px, 400);
+  }
+
+  &__count {
+    font-variant-numeric: tabular-nums;
+  }
+
+  @include mediaMax($screenSm) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--gap-x3);
+
+    &__card {
+      width: var(--user-review-card-width-sm);
+    }
+
+    &__score,
+    &__date {
+      margin-left: 0;
+    }
+  }
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-x2);
+  padding: var(--padding-x1) var(--padding-x2);
+  border: 0;
+  border-radius: var(--radius-x3);
+  background-color: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--easing-out),
+    color var(--duration-fast) var(--easing-out);
+
+  @include font(13px, 20px, 400);
+
+  &:hover {
+    background-color: var(--color-bg-hover);
+    color: var(--color-text-primary);
+  }
+
+  &_active {
+    color: var(--color-accent);
+
+    svg path {
+      fill: currentColor;
+    }
+  }
+}
+
+@each $category in $categories {
+  .dot_#{$category} {
+    --status-category-color: var(--game-#{$category}-color);
+  }
+}
+
+@include reducedMotion {
+  .busy > *,
+  .chip,
+  .action,
+  .item__game {
+    transition-duration: var(--duration-instant);
+  }
+}

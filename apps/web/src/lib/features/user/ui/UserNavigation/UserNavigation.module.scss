@@ -12,7 +12,7 @@
     display: flex;
     justify-content: space-between;
     border-radius: var(--radius-x4);
-    padding: var(--padding-x1) var(--padding-x2);
+    padding: var(--padding-x1) var(--padding-x3);
     gap: var(--gap-x2);
     color: var(--color-neutral-90);
 
@@ -68,6 +68,7 @@
 
     &__header {
       height: 36px;
+      padding-inline: var(--padding-x3);
       border-radius: var(--radius-x4);
     }
 

@@ -14,6 +14,11 @@ import {
 } from "../schemas/playthroughs.schema";
 import { sanitizeRichText } from "../../../shared/utils/rich-text.utils";
 
+const DETAIL_LABELS = ["Status", "Console", "Date", "Time"] as const;
+const REMOVED_VALUE = "—";
+
+type IPlaythroughMeta = Partial<Record<(typeof DETAIL_LABELS)[number], string>>;
+
 @Injectable()
 export class PlaythroughsService {
   private readonly logger = new Logger(PlaythroughsService.name);
@@ -34,31 +39,40 @@ export class PlaythroughsService {
     return `${day}.${month}.${year}`;
   }
 
-  private async getPlaythroughDetailsText(play: IPlaythroughDocument) {
+  private async getPlaythroughMeta(
+    play: IPlaythroughDocument
+  ): Promise<IPlaythroughMeta> {
     const platform = !!play.platformId
       ? await this.Platforms.findById(play.platformId).orFail()
       : undefined;
 
-    const status = play.isMastered
-      ? "Mastered"
-      : this.capitalize(play.category);
+    return {
+      Status: play.isMastered ? "Mastered" : this.capitalize(play.category),
+      Console: platform?.name,
+      Date: !!play.date ? this.formatDate(play.date) : undefined,
+      Time: !!play.time ? `${play.time}h` : undefined,
+    };
+  }
 
-    const meta = [
-      `Status: ${status}`,
-      !!platform && `Console: ${platform.name}`,
-      !!play.date && `Date: ${this.formatDate(play.date)}`,
-      !!play.time && `Time: ${play.time}h`,
-    ].filter(Boolean);
+  private getFullDetails(meta: IPlaythroughMeta) {
+    return DETAIL_LABELS.filter((label) => !!meta[label]).map(
+      (label) => `${label}: ${meta[label]}`
+    );
+  }
 
-    const small = (content: string) =>
-      `<div style="font-size: 12px">${content}</div>`;
+  private getChangedDetails(
+    previous: IPlaythroughMeta,
+    next: IPlaythroughMeta
+  ) {
+    return DETAIL_LABELS.filter((label) => previous[label] !== next[label]).map(
+      (label) => `${label}: ${next[label] ?? REMOVED_VALUE}`
+    );
+  }
 
-    const parts = [
-      meta.length && small(meta.join("<br/>")),
-      !!play.comment && `${small("Comment:")}${play.comment}`,
-    ].filter(Boolean);
-
-    return { platform, details: parts.join("") };
+  private renderDetails(details: string[]) {
+    return details.length
+      ? `<div style="font-size: 12px">${details.join("<br/>")}</div>`
+      : "";
   }
 
   private buildLogText(header: string, details: string) {
@@ -92,8 +106,11 @@ export class PlaythroughsService {
         updatedAt: new Date().toISOString(),
       } as Parameters<Model<IPlaythroughDocument>["create"]>[0]);
 
-      const { details } = await this.getPlaythroughDetailsText(play);
-      const text = this.buildLogText("Added game to playthroughs", details);
+      const meta = await this.getPlaythroughMeta(play);
+      const text = this.buildLogText(
+        "Added game to playthroughs",
+        this.renderDetails(this.getFullDetails(meta))
+      );
 
       await this.logsService.createUserLog({
         userId: play.userId.toString(),
@@ -118,6 +135,9 @@ export class PlaythroughsService {
     data: IUpdatePlaythroughRequest
   ) {
     try {
+      const previous = await this.GamesPlaythrouhgs.findById(id).orFail();
+      const previousMeta = await this.getPlaythroughMeta(previous);
+
       const play = await this.GamesPlaythrouhgs.findOneAndUpdate(
         { _id: id },
         {
@@ -130,8 +150,11 @@ export class PlaythroughsService {
         }
       );
 
-      const { details } = await this.getPlaythroughDetailsText(play);
-      const text = this.buildLogText("Updated playthrough", details);
+      const meta = await this.getPlaythroughMeta(play);
+      const text = this.buildLogText(
+        "Updated playthrough",
+        this.renderDetails(this.getChangedDetails(previousMeta, meta))
+      );
 
       await this.logsService.createUserLog({
         userId: play.userId.toString(),
@@ -157,8 +180,11 @@ export class PlaythroughsService {
         }
       );
 
-      const { details } = await this.getPlaythroughDetailsText(play);
-      const text = this.buildLogText("Removed playthrough", details);
+      const meta = await this.getPlaythroughMeta(play);
+      const text = this.buildLogText(
+        "Removed playthrough",
+        this.renderDetails(this.getFullDetails(meta))
+      );
 
       await this.logsService.createUserLog({
         userId: play.userId.toString(),

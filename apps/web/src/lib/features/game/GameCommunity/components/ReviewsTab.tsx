@@ -24,7 +24,7 @@ import styles from "../GameCommunity.module.scss";
 import { useRequireAuth } from "../useRequireAuth";
 import { ReviewItem } from "./ReviewItem";
 import { ReviewsSummary } from "./ReviewsSummary";
-import { SortToggle } from "./SortToggle";
+import { SortToggle } from "@/src/lib/shared/ui/SortToggle";
 
 interface IReviewsTabProps {
   game: IGameResponse;

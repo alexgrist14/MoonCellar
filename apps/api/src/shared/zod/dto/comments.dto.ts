@@ -6,10 +6,12 @@ import {
   GetCommentsRequestSchema,
   GetRepliesRequestSchema,
   GetReviewsRequestSchema,
+  GetUserReviewsRequestSchema,
   ReportResponseSchema,
   ReviewsResponseSchema,
   UpdateCommentRequestSchema,
   UpdateCommentStatusRequestSchema,
+  UserReviewsResponseSchema,
   VoteResponseSchema,
 } from "@mooncellar/schemas";
 
@@ -46,3 +48,11 @@ export class GetReviewsRequestDto extends createZodDto(
 ) {}
 
 export class ReviewsResponseDto extends createZodDto(ReviewsResponseSchema) {}
+
+export class GetUserReviewsRequestDto extends createZodDto(
+  GetUserReviewsRequestSchema
+) {}
+
+export class UserReviewsResponseDto extends createZodDto(
+  UserReviewsResponseSchema
+) {}

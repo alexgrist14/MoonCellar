@@ -1,11 +1,12 @@
 import classNames from "classnames";
-import styles from "../GameCommunity.module.scss";
+import styles from "./SortToggle.module.scss";
 
 interface ISortToggleProps<T extends string> {
   label: string;
   value: T;
   options: { value: T; label: string }[];
   onChange: (value: T) => void;
+  className?: string;
 }
 
 export const SortToggle = <T extends string>({
@@ -13,8 +14,13 @@ export const SortToggle = <T extends string>({
   value,
   options,
   onChange,
+  className,
 }: ISortToggleProps<T>) => (
-  <div className={styles.segmented} role="group" aria-label={label}>
+  <div
+    className={classNames(styles.segmented, className)}
+    role="group"
+    aria-label={label}
+  >
     {options.map((option) => (
       <button
         key={option.value}

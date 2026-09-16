@@ -19,7 +19,9 @@ import {
 } from "@nestjs/swagger";
 import {
   GetReviewsRequestDto,
+  GetUserReviewsRequestDto,
   ReviewsResponseDto,
+  UserReviewsResponseDto,
   VoteResponseDto,
 } from "../../../shared/zod/dto/comments.dto";
 import { OptionalJwtGuard } from "../../auth/optional-jwt.guard";
@@ -45,6 +47,18 @@ export class ReviewsController {
     @Req() request: ICommunityRequest
   ) {
     return this.reviews.getReviews(gameId, dto, request.user);
+  }
+
+  @Get("user/:userId/reviews")
+  @ApiOperation({ summary: "Get reviews written by a user" })
+  @ApiCreatedResponse({ type: UserReviewsResponseDto })
+  @UseGuards(OptionalJwtGuard)
+  async getUserReviews(
+    @Param("userId") userId: string,
+    @Query() dto: GetUserReviewsRequestDto,
+    @Req() request: ICommunityRequest
+  ) {
+    return this.reviews.getUserReviews(userId, dto, request.user);
   }
 
   @Put("reviews/:id/helpful")
