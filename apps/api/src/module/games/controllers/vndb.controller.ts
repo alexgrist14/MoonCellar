@@ -24,7 +24,9 @@ import { Roles } from "../../roles/roles.decorator";
 import {
   DecideVndbCandidateRequestDto,
   GetNextVndbCandidateRequestDto,
+  GetVndbCandidatesRequestDto,
   NextVndbCandidateResponseDto,
+  VndbCandidatesResponseDto,
   VndbCandidatesSummaryDto,
 } from "../../../shared/zod/dto/vndb-candidates.dto";
 
@@ -136,6 +138,19 @@ export class VndbController {
   @ApiOkResponse({ type: VndbCandidatesSummaryDto })
   getCandidatesSummary() {
     return this.vndbService.getCandidatesSummary();
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(RolesEnum.ADMIN)
+  @UseGuards(AuthGuard("jwt"))
+  @Get("candidates/list")
+  @ApiOperation({
+    summary:
+      "List candidate VNs with their state and candidate games, waiting ones first",
+  })
+  @ApiOkResponse({ type: VndbCandidatesResponseDto })
+  getCandidates(@Query() dto: GetVndbCandidatesRequestDto) {
+    return this.vndbService.getCandidates(dto);
   }
 
   @UseGuards(RolesGuard)

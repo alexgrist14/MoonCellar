@@ -8,7 +8,12 @@ export const useDecideVndbCandidateMutation = () => {
   return useMutation({
     mutationFn: ({ vnId, gameId }: { vnId: string; gameId: string | null }) =>
       adminVndbCandidatesApi.decide(vnId, gameId).then(({ data }) => data),
-    onSuccess: (summary) =>
-      queryClient.setQueryData(vndbCandidateQueryKeys.summary(), summary),
+    onSuccess: (summary) => {
+      queryClient.setQueryData(vndbCandidateQueryKeys.summary(), summary);
+
+      return queryClient.invalidateQueries({
+        queryKey: vndbCandidateQueryKeys.listAll(),
+      });
+    },
   });
 };

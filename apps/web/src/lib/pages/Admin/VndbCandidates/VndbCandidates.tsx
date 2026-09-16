@@ -2,7 +2,6 @@ import { FC, useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import classNames from "classnames";
 import { useQueryClient } from "@tanstack/react-query";
-import { IVndbMatchReason } from "@mooncellar/schemas";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
@@ -16,18 +15,9 @@ import {
 import { useDecideVndbCandidateMutation } from "@/src/lib/entities/game/api/vndb-candidates.mutations";
 import { vndbCandidateQueryKeys } from "@/src/lib/entities/game/api/vndb-candidates.query-keys";
 import { CandidateCard, Fact } from "./CandidateCard";
+import { CandidateList } from "./CandidateList";
+import { REASON_LABELS } from "./labels";
 import styles from "./VndbCandidates.module.scss";
-
-const REASON_LABELS: Record<IVndbMatchReason, string> = {
-  "below-threshold": "No candidate scored high enough",
-  "competing-candidates": "Candidates scored too close to call",
-  "weak-title": "The titles only loosely match",
-  "date-contradicts": "Release dates contradict each other",
-  "description-mismatch": "The descriptions do not match",
-  "no-company-evidence": "No shared developer or publisher",
-  "company-mismatch": "Developers and publishers differ",
-  "unverified-title": "Only the title matches",
-};
 
 const SCROLL_STYLE = { maxHeight: "var(--vndb-review-height)" };
 
@@ -153,6 +143,8 @@ const VndbCandidates: FC = () => {
           </Button>
         )}
       </div>
+
+      {!isReviewing && <CandidateList />}
 
       {isReviewing &&
         (isLoaderShown ? (

@@ -1,6 +1,8 @@
 import {
   IDecideVndbCandidateRequest,
+  IGetVndbCandidatesParams,
   INextVndbCandidateResponse,
+  IVndbCandidatesResponse,
   IVndbCandidatesSummary,
 } from "@mooncellar/schemas";
 import { API_URL } from "../constants";
@@ -10,6 +12,12 @@ const VNDB_CANDIDATES_URL = `${API_URL}/vndb/candidates`;
 
 const getSummary = () => {
   return agent.get<IVndbCandidatesSummary>(VNDB_CANDIDATES_URL);
+};
+
+const getList = (params: IGetVndbCandidatesParams) => {
+  return agent.get<IVndbCandidatesResponse>(`${VNDB_CANDIDATES_URL}/list`, {
+    params,
+  });
 };
 
 const getNext = (after: string | null) => {
@@ -30,6 +38,7 @@ const decide = (
 
 export const adminVndbCandidatesApi = {
   getSummary,
+  getList,
   getNext,
   decide,
 };

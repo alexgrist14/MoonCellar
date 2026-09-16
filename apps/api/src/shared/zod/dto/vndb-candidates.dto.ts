@@ -2,7 +2,9 @@ import { createZodDto } from "nestjs-zod";
 import {
   DecideVndbCandidateRequestSchema,
   GetNextVndbCandidateRequestSchema,
+  GetVndbCandidatesRequestSchema,
   NextVndbCandidateResponseSchema,
+  VndbCandidatesResponseSchema,
   VndbCandidatesSummarySchema,
 } from "@mooncellar/schemas";
 
@@ -20,4 +22,12 @@ export class DecideVndbCandidateRequestDto extends createZodDto(
 
 export class VndbCandidatesSummaryDto extends createZodDto(
   VndbCandidatesSummarySchema
+) {}
+
+export class GetVndbCandidatesRequestDto extends createZodDto(
+  GetVndbCandidatesRequestSchema
+) {}
+
+export class VndbCandidatesResponseDto extends createZodDto(
+  VndbCandidatesResponseSchema
 ) {}

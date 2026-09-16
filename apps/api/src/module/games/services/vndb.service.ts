@@ -44,6 +44,8 @@ import {
   type ICompanyField,
   type IExternalPageField,
   type IReleaseDate,
+  type IGetVndbCandidatesParams,
+  type IVndbCandidatesResponse,
   type IVndbCandidatesSummary,
   type IVndbReviewItem,
 } from "@mooncellar/schemas";
@@ -894,6 +896,89 @@ export class VndbService {
     return matches;
   }
 
+  async getCandidates({
+    page,
+    take,
+    search,
+  }: IGetVndbCandidatesParams): Promise<IVndbCandidatesResponse> {
+    const filter = search
+      ? {
+          $or: [
+            { vnName: new RegExp(escapeRegExp(search), "i") },
+            { "candidates.name": new RegExp(escapeRegExp(search), "i") },
+          ],
+        }
+      : {};
+
+    const [total, rows] = await Promise.all([
+      this.vndbCandidatesModel.countDocuments(filter),
+      this.vndbCandidatesModel.aggregate<VndbCandidate>([
+        { $match: filter },
+        {
+          $addFields: {
+            isWaiting: {
+              $and: [
+                { $eq: ["$status", "pending"] },
+                { $eq: [{ $ifNull: ["$decision", null] }, null] },
+              ],
+            },
+          },
+        },
+        { $sort: { isWaiting: -1, _id: 1 } },
+        { $skip: (page - 1) * take },
+        { $limit: take },
+      ]),
+    ]);
+
+    const winners = await this.gamesModel
+      .find({
+        _id: { $in: rows.flatMap(({ winner }) => (winner ? [winner] : [])) },
+      })
+      .select("name slug")
+      .lean();
+    const winnerById = new Map(winners.map((game) => [String(game._id), game]));
+
+    return {
+      total,
+      results: rows.map(
+        ({ vnId, vnName, reason, status, decision, winner, candidates }) => {
+          const winnerGame = winner ? winnerById.get(String(winner)) : null;
+
+          return {
+            vnId,
+            vnName,
+            reason: reason ?? null,
+            state:
+              status === "resolved"
+                ? "matched"
+                : status === "absent"
+                  ? "new-game"
+                  : decision === "match"
+                    ? "queued-match"
+                    : decision === "skip"
+                      ? "queued-new"
+                      : "waiting",
+            candidates: (candidates ?? []).map(
+              ({ gameId, name, slug, score }) => ({
+                gameId: String(gameId),
+                name,
+                slug,
+                score,
+              })
+            ),
+            winner: winnerGame
+              ? {
+                  _id: String(winnerGame._id),
+                  name: winnerGame.name,
+                  slug: winnerGame.slug,
+                }
+              : null,
+          };
+        }
+      ),
+    };
+  }
+
   async getCandidatesSummary(): Promise<IVndbCandidatesSummary> {
     const [pending, applying] = await Promise.all([
       this.vndbCandidatesModel.countDocuments({
@@ -1149,6 +1234,7 @@ export class VndbService {
                 ? {
                     status: decision === "match" ? "resolved" : "absent",
                     winner: gameId,
+                    decision: null,
                   }
                 : { decision: null, winner: null },
             },

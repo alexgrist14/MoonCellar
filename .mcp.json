@@ -41,7 +41,7 @@
         "--rm",
         "-i",
         "-e",
-        "GRAFANA_URL",
+        "GRAFANA_URL=https://grafana.mooncellar.space",
         "-e",
         "GRAFANA_SERVICE_ACCOUNT_TOKEN",
         "mcp/grafana",
@@ -61,11 +61,7 @@
         "-disable-quickwit",
         "-disable-snowflake",
         "-disable-sift"
-      ],
-      "env": {
-        "GRAFANA_URL": "https://grafana.mooncellar.space",
-        "GRAFANA_SERVICE_ACCOUNT_TOKEN": "${GRAFANA_MCP_TOKEN}"
-      }
+      ]
     }
   }
 }

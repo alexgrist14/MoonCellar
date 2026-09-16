@@ -97,6 +97,57 @@ export const VndbCandidatesSummarySchema = z.object({
   applying: z.number().describe("Decisions not yet written to games"),
 });
 
+export const VNDB_CANDIDATES_PAGE_SIZE = 20;
+
+export const VndbCandidateStateSchema = z.enum([
+  "waiting",
+  "queued-match",
+  "queued-new",
+  "matched",
+  "new-game",
+]);
+
+export const GetVndbCandidatesRequestSchema = z.object({
+  page: z.coerce.number().int().min(1).default(1).describe("Page"),
+  take: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(50)
+    .default(VNDB_CANDIDATES_PAGE_SIZE)
+    .describe("Page size"),
+  search: z
+    .string()
+    .trim()
+    .max(200)
+    .optional()
+    .describe("Match a VN title or a candidate game name"),
+});
+
+export const VndbCandidateGameSchema = z.object({
+  gameId: z.string(),
+  name: z.string(),
+  slug: z.string(),
+  score: z.number(),
+});
+
+export const VndbCandidateRowSchema = z.object({
+  vnId: z.string(),
+  vnName: z.string(),
+  reason: VndbMatchReasonSchema.nullable(),
+  state: VndbCandidateStateSchema.describe("Where the VN stands in the review"),
+  candidates: VndbCandidateGameSchema.array(),
+  winner: z
+    .object({ _id: z.string(), name: z.string(), slug: z.string() })
+    .nullable()
+    .describe("Game the VN ended up in"),
+});
+
+export const VndbCandidatesResponseSchema = z.object({
+  results: VndbCandidateRowSchema.array(),
+  total: z.number().describe("Rows matching the search"),
+});
+
 export const GetNextVndbCandidateRequestSchema = z.object({
   after: ObjectIdSchema.optional().describe(
     "Return the first undecided VN after this candidate record"
@@ -113,6 +164,17 @@ export const DecideVndbCandidateRequestSchema = z.object({
   ),
 });
 
+export type IVndbCandidateState = z.infer<typeof VndbCandidateStateSchema>;
+export type IVndbCandidateRow = z.infer<typeof VndbCandidateRowSchema>;
+export type IGetVndbCandidatesRequest = z.input<
+  typeof GetVndbCandidatesRequestSchema
+>;
+export type IGetVndbCandidatesParams = z.infer<
+  typeof GetVndbCandidatesRequestSchema
+>;
+export type IVndbCandidatesResponse = z.infer<
+  typeof VndbCandidatesResponseSchema
+>;
 export type IVndbMatchReason = z.infer<typeof VndbMatchReasonSchema>;
 export type IVndbDateSignal = z.infer<typeof VndbDateSignalSchema>;
 export type IVndbDescriptionSignal = z.infer<
