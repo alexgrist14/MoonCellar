@@ -9,6 +9,8 @@ export const RetroachievementsSchema = z.object({
 export const VndbSchema = z.object({
   vnId: z.string(),
   lengthMinutes: z.number().nullable().optional(),
+  rating: z.number().nullable().optional(),
+  votecount: z.number().nullable().optional(),
   relations: z
     .object({ vnId: z.string(), relation: z.string() })
     .array()

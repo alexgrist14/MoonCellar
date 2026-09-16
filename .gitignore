@@ -48,3 +48,5 @@ infra/searxng/
 packages/*/dist/
 graphify-out
 .codegraph/
+
+.claude/settings.local.json

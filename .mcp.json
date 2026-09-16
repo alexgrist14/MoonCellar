@@ -32,6 +32,40 @@
         "--env-file=apps/api/.env",
         "apps/api/mcp/game-adder/index.ts"
       ]
+    },
+    "grafana": {
+      "type": "stdio",
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "-e",
+        "GRAFANA_URL",
+        "-e",
+        "GRAFANA_SERVICE_ACCOUNT_TOKEN",
+        "mcp/grafana",
+        "-t",
+        "stdio",
+        "-disable-write",
+        "-disable-asserts",
+        "-disable-athena",
+        "-disable-clickhouse",
+        "-disable-cloudwatch",
+        "-disable-elasticsearch",
+        "-disable-graphite",
+        "-disable-influxdb",
+        "-disable-incident",
+        "-disable-oncall",
+        "-disable-pyroscope",
+        "-disable-quickwit",
+        "-disable-snowflake",
+        "-disable-sift"
+      ],
+      "env": {
+        "GRAFANA_URL": "https://grafana.mooncellar.space",
+        "GRAFANA_SERVICE_ACCOUNT_TOKEN": "${GRAFANA_MCP_TOKEN}"
+      }
     }
   }
 }

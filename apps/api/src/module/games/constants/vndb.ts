@@ -97,7 +97,7 @@ export const VNDB_LANGUAGE_REGIONS: Record<string, number> = {
 
 export const VNDB_KEYWORD_MIN_RATING = 2;
 export const VNDB_EXPLICIT_SEXUAL_LEVEL = 1;
-export const VNDB_EXPLICIT_IMAGES_KEYWORD = "18+ images";
+export const VNDB_EXPLICIT_IMAGES_KEYWORD = "pay gorn";
 export const VNDB_STATUS_NAMES: Record<number, string> = {
   0: "Released",
   2: "Cancelled",

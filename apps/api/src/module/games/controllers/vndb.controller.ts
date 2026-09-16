@@ -54,7 +54,14 @@ export class VndbController {
   @ApiQuery({
     name: "fromVnId",
     required: false,
-    description: "Start after this VNDB id (e.g. v30000) to resume a run",
+    description:
+      "Override the resume point; by default the run continues after the last VN written to games or candidates",
+  })
+  @ApiQuery({
+    name: "restart",
+    required: false,
+    type: Boolean,
+    description: "Start from the first VN instead of resuming",
   })
   @ApiQuery({
     name: "limit",
@@ -64,14 +71,19 @@ export class VndbController {
   })
   backFill(
     @Query("fromVnId") fromVnId?: string,
-    @Query("limit") limit?: string
+    @Query("limit") limit?: string,
+    @Query("restart") restart?: string
   ) {
     if (this.vndbService.isSyncRunning) {
       return { message: "VNDB sync is already running" };
     }
 
     this.vndbService
-      .backFill({ fromVnId, limit: limit ? Number(limit) : undefined })
+      .backFill({
+        fromVnId,
+        limit: limit ? Number(limit) : undefined,
+        restart: restart === "true",
+      })
       .catch(() => undefined);
 
     return { message: "VNDB backfill started" };
@@ -93,6 +105,24 @@ export class VndbController {
     this.vndbService.sync().catch(() => undefined);
 
     return { message: "VNDB sync started" };
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(RolesEnum.ADMIN)
+  @UseGuards(AuthGuard("jwt"))
+  @Post("link-related")
+  @ApiOperation({
+    summary:
+      "Link related games for every VNDB game: resolve VNDB relations into game ids. Run it after a backfill",
+  })
+  linkRelatedGames() {
+    if (this.vndbService.isLinkingRelatedGames) {
+      return { message: "VNDB related games linking is already running" };
+    }
+
+    this.vndbService.linkVndbRelatedGames().catch(() => undefined);
+
+    return { message: "VNDB related games linking started" };
   }
 
   @UseGuards(RolesGuard)

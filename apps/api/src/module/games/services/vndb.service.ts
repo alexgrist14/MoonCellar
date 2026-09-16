@@ -181,6 +181,7 @@ const toSlug = (value: string) =>
 export class VndbService {
   private readonly logger = new Logger(VndbService.name);
   private isRunning = false;
+  private isLinkingRelated = false;
   private lastRequestAt = 0;
   private requestTurn: Promise<void> = Promise.resolve();
   private isApplyingDecisions = false;
@@ -242,11 +243,16 @@ export class VndbService {
     return this.isRunning;
   }
 
-  async backFill(options: { fromVnId?: string; limit?: number } = {}) {
+  async backFill(
+    options: { fromVnId?: string; limit?: number; restart?: boolean } = {}
+  ) {
     const { vn: target } = await this.getStats();
+    const fromVnId = options.restart
+      ? undefined
+      : (options.fromVnId ?? (await this.getLastVnId()));
 
     return this.runSync("backfill", (totals) =>
-      this.processNewVns("backfill", totals, { ...options, target })
+      this.processNewVns("backfill", totals, { ...options, fromVnId, target })
     );
   }
 
@@ -289,7 +295,6 @@ export class VndbService {
 
       await run(totals);
       await this.linkVndbCharacters();
-      await this.linkVndbRelatedGames();
 
       this.logger.log(
         `VNDB ${mode} finished in ${Math.round((Date.now() - startedAt) / 1000)}s: ${totals.vns} VNs, ${totals.created} games created, ${totals.updated} updated, ${totals.unchanged} unchanged, ${totals.failed} failed`
@@ -314,6 +319,10 @@ export class VndbService {
     }: { fromVnId?: string; limit?: number; target?: number }
   ) {
     let cursor = fromVnId;
+
+    this.logger.log(
+      `VNDB ${mode} starts after ${cursor ?? "the first VN in VNDB"}`
+    );
 
     while (!limit || totals.vns < limit) {
       const { results, more } = await this.post<IVndbGameResponse>("/vn", {
@@ -499,6 +508,8 @@ export class VndbService {
             vnId,
             lengthMinutes: vn.length,
             relations: vn.relations,
+            rating: vn.rating,
+            votecount: vn.votecount,
             syncedAt: existingGame?.vndb?.syncedAt,
           },
         }).filter(([, value]) => !isEmptyValue(value))
@@ -691,7 +702,7 @@ export class VndbService {
       filters: ["or", ...searchIdsFilters] satisfies TVndbFilters,
       results: vnIds.length,
       fields:
-        "title,alttitle,titles.title,titles.lang,titles.latin,titles.official,titles.main,released,platforms,description,developers.name,developers.original,developers.aliases,extlinks.url,extlinks.name,image.url,image.dims,image.sexual,image.violence,screenshots.url,screenshots.dims,screenshots.sexual,screenshots.violence,length_minutes,languages,devstatus,tags.id,tags.name,tags.rating,tags.spoiler,tags.lie,tags.category,relations.id,relations.relation,relations.relation_official,image.id,screenshots.id",
+        "title,alttitle,titles.title,titles.lang,titles.latin,titles.official,titles.main,released,platforms,rating,votecount,description,developers.name,developers.original,developers.aliases,extlinks.url,extlinks.name,image.url,image.dims,image.sexual,image.violence,screenshots.url,screenshots.dims,screenshots.sexual,screenshots.violence,length_minutes,languages,devstatus,tags.id,tags.name,tags.rating,tags.spoiler,tags.lie,tags.category,relations.id,relations.relation,relations.relation_official,image.id,screenshots.id",
     });
 
     const themesByVn = await this.getThemes(vnIds);
@@ -913,8 +924,8 @@ export class VndbService {
 
     if (!candidate) return null;
 
-    const [remaining, games, { results }, platformSlugById] =
-      await Promise.all([
+    const [remaining, games, { results }, platformSlugById] = await Promise.all(
+      [
         this.vndbCandidatesModel.countDocuments({
           ...undecided,
           _id: { $gte: candidate._id },
@@ -930,10 +941,11 @@ export class VndbService {
         this.post<IVndbGameResponse>("/vn", {
           filters: ["id", "=", candidate.vnId] satisfies TVndbFilter,
           fields:
-            "title,alttitle,titles.title,titles.lang,titles.latin,titles.official,titles.main,released,platforms,description,developers.name,image.url,image.sexual,length_minutes",
+            "title,alttitle,titles.title,titles.lang,titles.latin,titles.official,titles.main,released,platforms,description,developers.name,image.url,image.sexual,length_minutes,rating,votecount",
         }),
         this.getPlatformSlugs(),
-      ]);
+      ]
+    );
 
     const platformIdBySlug = new Map(
       [...platformSlugById].map(([id, slug]) => [slug, new Types.ObjectId(id)])
@@ -1061,7 +1073,6 @@ export class VndbService {
 
         if (applied) {
           await this.linkVndbCharacters();
-          await this.linkVndbRelatedGames();
         }
       }
     } finally {
@@ -1161,7 +1172,29 @@ export class VndbService {
     return decided.length - returned.length;
   }
 
+  get isLinkingRelatedGames() {
+    return this.isLinkingRelated;
+  }
+
   async linkVndbRelatedGames() {
+    if (this.isLinkingRelated) {
+      this.logger.warn("VNDB related games linking is already running");
+      return;
+    }
+
+    this.isLinkingRelated = true;
+
+    try {
+      return await this.runRelatedGamesLinking();
+    } catch (error) {
+      this.logger.error(error, "VNDB related games linking failed");
+      throw error;
+    } finally {
+      this.isLinkingRelated = false;
+    }
+  }
+
+  private async runRelatedGamesLinking() {
     const games = await this.gamesModel
       .find({ "vndb.vnId": { $exists: true } })
       .select("_id relatedGames vndb.vnId vndb.relations")
@@ -2166,6 +2199,8 @@ export class VndbService {
       player_perspectives: [],
       languages: (vn.languages ?? []).map((code) => languageNames.of(code)),
       externalPages: [],
+      rating: vn.rating,
+      votecount: vn.votecount,
       relations: (vn.relations ?? [])
         .filter(({ relation_official }) => relation_official)
         .map(({ id, relation }) => ({ vnId: id, relation })),
@@ -2226,4 +2261,6 @@ export interface IVndbTitles {
   languages: string[];
   externalPages: IExternalPageField[];
   length: number;
+  rating: number;
+  votecount: number;
 }
