@@ -1,5 +1,6 @@
 import { MainPage } from "../lib/pages/Main";
 import {
+  FEATURED_PLATFORM_SLUGS,
   IGameResponse,
   IGenreResponse,
   IUpcomingReleaseGroup,
@@ -33,19 +34,6 @@ export const metadata: Metadata = {
     canonical: "/",
   },
 };
-
-const FEATURED_PLATFORM_SLUGS = [
-  "win",
-  "ps5",
-  "ps4--1",
-  "switch",
-  "series-x-s",
-  "ps2",
-  "xbox360",
-  "snes",
-  "nes",
-  "genesis-slash-megadrive",
-];
 
 const getFeaturedPlatforms = unstable_cache(
   async (): Promise<IPlatformCount[]> => {

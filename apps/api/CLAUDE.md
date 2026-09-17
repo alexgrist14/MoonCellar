@@ -87,6 +87,35 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   text in the database while the API stops serving it. Log rows are HTML snapshots written at
   action time, so the rendering step is the only place that can change what they show.
 
+## Custom lists and favourites
+
+- **Public user search is `GET /users/search`; never point a search box at `GET /user/search`.**
+  The older endpoint matches an exact e-mail as well as a user name, so exposing it would tell
+  anyone whether an address has an account. The new one matches names only and returns public
+  fields.
+- **Every write to `CustomList.games` must also set `gamesCount`.** The catalogue filters on it
+  (`gamesCount >= minGames`, and `>= 1` hides empty lists) and sorts by it without looking at the
+  array, so a write that forgets it makes a list vanish from `/lists` or sort as empty.
+- **A rename moves the old slug into `previousSlugs`; never drop that array.** `getBySlug` matches
+  previous slugs so the web route can `permanentRedirect` — links shared before the rename keep
+  working only through it.
+- **`likesCount` changes only through `$inc` with `timestamps: false`, and only when the like
+  document was actually inserted or deleted.** A like must not move `updatedAt`: "Recently
+  updated", the popularity tie-break and the profile's Lists panel all order by it, so a like that
+  bumps it reshuffles lists nobody edited. The unique `{ listId, userId }` index makes a repeated
+  like a no-op — keep reading `upsertedCount`/`deletedCount` rather than incrementing blindly.
+- **Lists with a `generator` belong to `GeneratedListsService`, never to a person.** They are owned
+  by the `MoonCellar` account, rebuilt every Monday (and by `POST /lists/generated/refresh`), and a
+  rebuild overwrites their games, name and description — an edit made by hand is lost within a
+  week. The unique partial index on `generator.kind` + `generator.key` is what stops two API
+  processes (the server and a local `dev:api` on the same database) from creating a list twice;
+  keep it. The platform set is `FEATURED_PLATFORM_SLUGS` from `@mooncellar/schemas`, shared with
+  the home page's "Browse By Platform", so changing one changes both.
+- **Adding or removing a game in a list never writes a user log.** Lists are edited in bulk, and
+  logging every addition buried playthroughs and ratings in the activity feed; the feed records
+  what happened to a game, not how it was filed. Favourites do log, through the `favorite`
+  segment.
+
 ## Database
 
 - **Declare reference paths as `@Prop({ type: mongoose.Schema.Types.ObjectId, ref })`; a bare

@@ -20,4 +20,4 @@ export const playthroughPriorityOrder: CategoriesType[] = [
   "mastered",
 ];
 
-export const takeLogs = 10;
+export const takeLogs = 20;

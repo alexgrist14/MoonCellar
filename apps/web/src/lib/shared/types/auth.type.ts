@@ -14,6 +14,7 @@ export interface IUser {
   email: string;
   followings: IFollowings;
   followers: IFollowers;
+  favorites?: string[];
   filters: IUserFilter[];
   presets: IUserPreset[];
   updatedAt: Date;

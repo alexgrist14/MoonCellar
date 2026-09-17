@@ -8,6 +8,7 @@ import { IFollowings } from "../../shared/types/user.type";
 import { Settings } from "./Settings";
 import { UserGames } from "./UserGames";
 import { UserReviews } from "./UserReviews";
+import { UserLists } from "./UserLists";
 import UserInfo from "./UserInfo/UserInfo";
 import styles from "./UserProfile.module.scss";
 import cn from "classnames";
@@ -20,6 +21,8 @@ import { useStatesStore } from "../../shared/store/states.store";
 import { useSearchParams } from "next/navigation";
 import { UserNavigation } from "../../features/user/ui/UserNavigation";
 import {
+  ICustomList,
+  IGameResponse,
   IPlaythrough,
   IUserRating,
   IUserReviewsOrder,
@@ -35,6 +38,9 @@ interface UserProfileProps {
   authUserId?: string;
   playthroughs: IPlaythrough[];
   ratings: IUserRating[];
+  favoriteGames: IGameResponse[];
+  lists: ICustomList[];
+  likedLists: ICustomList[];
 }
 
 const UserProfile: FC<UserProfileProps> = ({
@@ -43,6 +49,9 @@ const UserProfile: FC<UserProfileProps> = ({
   authUserId,
   playthroughs,
   ratings,
+  favoriteGames,
+  lists,
+  likedLists,
 }) => {
   const query = useSearchParams();
   const { isMobile } = useStatesStore();
@@ -69,6 +78,7 @@ const UserProfile: FC<UserProfileProps> = ({
             ...user,
             avatar: authProfile.avatar,
             background: authProfile.background,
+            favorites: authProfile.favorites ?? user.favorites,
           }
         : user,
     [isAuthedUser, authProfile, user]
@@ -158,22 +168,44 @@ const UserProfile: FC<UserProfileProps> = ({
           </ExpandMenu>
         )}
         <Box classNameContent={styles.content}>
-          <Breadcrumbs
-            className={styles.crumbs}
-            items={[
-              { name: "Home", href: "/" },
-              {
-                name: displayUser.userName,
-                href: `/user/${displayUser.userName}`,
-              },
-            ]}
-          />
+          {tab !== "profile" && (
+            <Breadcrumbs
+              className={styles.crumbs}
+              items={[
+                { name: "Home", href: "/" },
+                {
+                  name: displayUser.userName,
+                  href: `/user/${displayUser.userName}`,
+                },
+              ]}
+            />
+          )}
           {tab === "settings" && isAuthedUser && <Settings />}
           {tab === "profile" && (
             <UserInfo
               user={displayUser}
               authUserFollowings={viewerId ? authUserFollowings : undefined}
               authUserId={viewerId}
+              isOwner={isAuthedUser}
+              playthroughs={effectivePlaythroughs}
+              favoriteGames={favoriteGames}
+              lists={lists}
+              likedLists={likedLists}
+            />
+          )}
+          {tab === "lists" && (
+            <UserLists
+              userId={user._id}
+              userName={displayUser.userName}
+              isOwnProfile={isAuthedUser}
+            />
+          )}
+          {tab === "liked" && (
+            <UserLists
+              userId={user._id}
+              userName={displayUser.userName}
+              isOwnProfile={isAuthedUser}
+              kind="liked"
             />
           )}
           {tab === "reviews" && (

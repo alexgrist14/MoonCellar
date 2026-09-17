@@ -2,6 +2,7 @@ export * from "./characters.schema";
 export * from "./comment-reports.schema";
 export * from "./comments-socket.schema";
 export * from "./comments.schema";
+export * from "./custom-lists.schema";
 export * from "./files.schema";
 export * from "./game-followings-status.schema";
 export * from "./games.schema";

@@ -33,8 +33,8 @@ interface ILayoutProps {
 
 const LAST_ONLINE_UPDATE_INTERVAL = 5 * 60 * 1000;
 
-const TOP_MENU_ROUTES = ["/games", "/gauntlet"];
-const BOTTOM_BAR_ROUTES = ["/games", "/gauntlet"];
+const TOP_MENU_ROUTES = ["/games", "/gauntlet", "/lists"];
+const BOTTOM_BAR_ROUTES = ["/games", "/gauntlet", "/lists"];
 const BOTTOM_BAR_PREFIXES = ["/user/"];
 
 const hasTopMenu = (pathname: string) => TOP_MENU_ROUTES.includes(pathname);

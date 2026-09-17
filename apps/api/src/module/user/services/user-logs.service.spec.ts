@@ -70,3 +70,49 @@ describe("UserLogsService.getUserLogs", () => {
     );
   });
 });
+
+const renderSegments = async (text: string) => {
+  const { results } = await createService([text]).getUserLogs(USER_ID, {});
+
+  return results[0].segments;
+};
+
+describe("UserLogsService.getUserLogs segments", () => {
+  it("parses the details of a playthrough and a rating in one log", async () => {
+    const segments = await renderSegments(
+      "<!--segment:added--><b>Added game to playthroughs</b>" +
+        '<div style="font-size: 12px">Status: Completed<br/>Console: PC<br/>Date: 16.09.2026<br/>Time: 42h</div>' +
+        "<br/><br/><!--segment:rating-->Set rating 9"
+    );
+
+    expect(segments).toMatchObject([
+      {
+        kind: "added",
+        title: "Added game to playthroughs",
+        status: "Completed",
+        console: "PC",
+        date: "16.09.2026",
+        time: "42h",
+      },
+      { kind: "rating", title: "Set rating 9", rating: 9 },
+    ]);
+  });
+
+  it("reads the category of a legacy log without markers", async () => {
+    const segments = await renderSegments(
+      "Added to playing<br/>PC (Microsoft Windows)"
+    );
+
+    expect(segments).toMatchObject([
+      { kind: "added", status: "Playing", console: "PC (Microsoft Windows)" },
+    ]);
+  });
+
+  it("marks a removed favourite as a removal", async () => {
+    const segments = await renderSegments(
+      "<!--segment:favorite--><b>Removed from favourites</b>"
+    );
+
+    expect(segments).toMatchObject([{ kind: "favorite", isRemoval: true }]);
+  });
+});

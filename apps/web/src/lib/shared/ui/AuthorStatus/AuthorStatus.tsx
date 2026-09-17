@@ -1,8 +1,6 @@
 import { FC } from "react";
-import classNames from "classnames";
 import { IPlaythrough } from "@mooncellar/schemas";
-import { commonUtils } from "../../utils/common.utils";
-import styles from "./AuthorStatus.module.scss";
+import { StatusBadge, StatusDetails } from "../StatusBadge";
 
 interface IAuthorStatusProps {
   category: IPlaythrough["category"];
@@ -16,10 +14,8 @@ export const AuthorStatus: FC<IAuthorStatusProps> = ({
   isMastered,
 }) => (
   <>
-    <span className={classNames(styles.status, styles[`status_${category}`])}>
-      {commonUtils.upFL(category)}
-      {!!time && ` · ${time} h`}
-    </span>
-    {isMastered && <span className={styles.mastered}>Mastered</span>}
+    <StatusBadge status={category} />
+    {isMastered && <StatusBadge status="mastered" />}
+    <StatusDetails items={[!!time && `${time} h`]} />
   </>
 );

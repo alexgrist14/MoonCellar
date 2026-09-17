@@ -1,5 +1,18 @@
 import { z } from "zod";
 
+export const FEATURED_PLATFORM_SLUGS = [
+  "win",
+  "ps5",
+  "ps4--1",
+  "switch",
+  "series-x-s",
+  "ps2",
+  "xbox360",
+  "snes",
+  "nes",
+  "genesis-slash-megadrive",
+];
+
 export const PlatformFamilySchema = z.object({
   name: z.string(),
   slug: z.string(),

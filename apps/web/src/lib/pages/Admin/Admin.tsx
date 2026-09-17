@@ -20,7 +20,7 @@ const Admin = () => {
     setAdminQuery({ tab: ADMIN_TABS[index], vn: null });
 
   return (
-    <Box wrapperStyle={{maxHeight: 'calc(100vh - 38 * var(--padding-x1)'}} templateStyle={{borderRadius: 'var(--radius-x5) var(--radius-x5) 0 0'}}>
+    <Box>
       <Tabs
         defaultTabIndex={tabIndex}
         isUseDefaultIndex

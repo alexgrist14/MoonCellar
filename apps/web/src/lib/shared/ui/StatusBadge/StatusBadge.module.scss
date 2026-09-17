@@ -1,0 +1,38 @@
+$statuses: completed, mastered, playing, played, wishlist, backlog, dropped;
+
+.badge {
+  --status-badge-color: var(--color-gray);
+
+  display: inline-flex;
+  align-items: center;
+  padding-inline: var(--padding-x2);
+  border-radius: var(--radius-x2);
+  background-color: color-mix(
+    in srgb,
+    var(--status-badge-color) 16%,
+    transparent
+  );
+  color: color-mix(
+    in srgb,
+    var(--status-badge-color) 62%,
+    var(--color-neutral-100)
+  );
+  white-space: nowrap;
+
+  @include font(12px, 18px, 600);
+}
+
+@each $status in $statuses {
+  .badge_#{$status} {
+    --status-badge-color: var(--game-#{$status}-color);
+  }
+}
+
+.details {
+  min-width: 0;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+
+  @include font(12px, 18px, 400);
+}

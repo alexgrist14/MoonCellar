@@ -3,6 +3,7 @@
   gap: var(--gap-x1);
   align-items: center;
   padding: var(--padding-x1) calc(var(--range-thumb-size) / 2);
+  margin-bottom: var(--padding-x2);
   color: $textColor;
   user-select: none;
   width: 100%;

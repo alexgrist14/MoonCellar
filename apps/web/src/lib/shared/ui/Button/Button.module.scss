@@ -1,13 +1,12 @@
 .button {
   text-align: center;
-  border-width: 2px;
+  border-width: 1px;
   border-style: solid;
   border-radius: var(--radius-x2);
   border-color: var(--color-bg-primary);
   font-size: 14px;
-  padding: var(--padding-x1) var(--padding-x3);
+  padding: var(--padding-x1) var(--padding-x2);
   transition: 0.2s;
-  padding-inline: var(--padding-x3);
 
   @include textEllipsis;
   @include flexCenter;

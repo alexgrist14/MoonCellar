@@ -56,3 +56,7 @@ export * from "./SvgThumb";
 export * from "./SvgReply";
 export * from "./SvgFlag";
 export * from "./SvgEye";
+export * from "./SvgHeartFilled";
+export * from "./SvgLock";
+export * from "./SvgGrip";
+export * from "./SvgCheck";

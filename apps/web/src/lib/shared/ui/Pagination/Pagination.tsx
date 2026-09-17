@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { memo, RefObject, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./Pagination.module.scss";
 import { Button, ButtonColor } from "../Button";
 import { Input } from "../Input";
@@ -18,6 +18,7 @@ interface IPaginationProps {
   callback?: (page: number) => void;
   page?: number;
   onPageChange?: (page: number) => void;
+  scrollTargetRef?: RefObject<HTMLElement | null>;
 }
 
 export const Pagination = memo(
@@ -29,6 +30,7 @@ export const Pagination = memo(
     callback,
     page: controlledPage,
     onPageChange,
+    scrollTargetRef,
   }: IPaginationProps) => {
     const { query, setQuery } = useAdvancedRouter();
     const centerRef = useRef<HTMLDivElement>(null);
@@ -46,7 +48,15 @@ export const Pagination = memo(
     };
 
     const changeCallback = (page: number) => {
-      scrollPageToTop("smooth");
+      if (scrollTargetRef?.current) {
+        scrollTargetRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      } else {
+        scrollPageToTop("smooth");
+      }
+
       setValue(page.toString());
       callback?.(page);
     };
@@ -62,6 +72,7 @@ export const Pagination = memo(
         <div
           className={classNames(styles.pagination, {
             [styles.pagination_fixed]: isFixed,
+            [styles.pagination_inline]: !isFixed,
             [styles.pagination_disabled]: isDisabled,
           })}
         >
@@ -97,6 +108,7 @@ export const Pagination = memo(
             <Input
               containerStyles={{ padding: "var(--padding-x1)", width: "75px" }}
               className={styles.pagination__input}
+              containerClassname={styles.pagination__field}
               type="number"
               value={value || page}
               onChange={(e) => setValue(e.target.value)}
@@ -142,7 +154,29 @@ export const Pagination = memo(
       );
     };
 
-    if (!isFixed) return renderBlock();
+    const renderInline = () => {
+      const from = (page - 1) * take + 1;
+      const to = Math.min(page * take, total);
+
+      return (
+        <nav className={styles.inline} aria-label="Pagination">
+          <p className={styles.inline__summary}>
+            Page {page} of {max}
+          </p>
+          {renderBlock()}
+          <p
+            className={classNames(
+              styles.inline__summary,
+              styles.inline__summary_end
+            )}
+          >
+            Showing {from}–{to} of {total}
+          </p>
+        </nav>
+      );
+    };
+
+    if (!isFixed) return renderInline();
 
     const connector = commonUtils.checkWindow(() =>
       document.getElementById("pagination-connector")

@@ -1,0 +1,5 @@
+.mark {
+  background: color-mix(in srgb, var(--color-accent) 38%, transparent);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-x1);
+}

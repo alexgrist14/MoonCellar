@@ -2,6 +2,9 @@ import { API_URL } from "../constants";
 import { IUser } from "../types/auth.type";
 import {
   IGetUserLoginsResponse,
+  ISearchUsersRequest,
+  ISearchUsersResponse,
+  IUpdateFavoritesResponse,
   IUpdateUserSettingsRequest,
 } from "@mooncellar/schemas";
 import {
@@ -150,6 +153,23 @@ const setRaUserInfo = (userId: string, raUserName: string) => {
   return agent.patch<IUser>(`${USER_URL}/ra/${userId}/${raUserName}`);
 };
 
+const getFavorites = (userId: string) => {
+  return agent.get<IUpdateFavoritesResponse>(`${USER_URL}/${userId}/favorites`);
+};
+
+const updateFavorites = (userId: string, gameIds: string[]) => {
+  return agent.patch<IUpdateFavoritesResponse>(
+    `${USER_URL}/${userId}/favorites`,
+    { gameIds }
+  );
+};
+
+const searchUsers = (params: ISearchUsersRequest) => {
+  return agent.get<ISearchUsersResponse>(`${API_URL}/users/search`, {
+    params,
+  });
+};
+
 const updateUserTime = (userId: string) => {
   return agent.patch<IUser>(`${USER_URL}/profile-time/${userId}`);
 };
@@ -177,4 +197,7 @@ export const userAPI = {
   getPresets,
   updateUserTime,
   updateSettings,
+  getFavorites,
+  updateFavorites,
+  searchUsers,
 };

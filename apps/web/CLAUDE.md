@@ -8,6 +8,11 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
 - Only use the global CSS variables defined in `:root` (see `src/lib/app/styles/vars/`) for colors, borders, padding, radius, gap, etc. — never hardcode raw values (hex colors, px, etc.) for anything already covered by a `:root` variable.
 - If a new value is needed that isn't covered by an existing `:root` variable, add it as a new CSS variable in `:root` (in the relevant file under `src/lib/app/styles/vars/`) instead of hardcoding it inline.
 - **A CSS custom property that derives from other custom properties must be declared on the same element whose values it reads.** `var()` inside a custom property is substituted where the property is *declared*, not where it is used, so a value computed in `:root` freezes the root defaults and ignores any modifier class further down. `--page-height-available` is declared on `.container` for this reason — declaring it in `:root` silently ignored `.container_bottomBar`.
+- **A button's inline padding is always twice its block padding** — the shared `Button` uses
+  `var(--padding-x1) var(--padding-x2)`, and any override keeps the 1:2 ratio on the same scale
+  (`x2`/`x4`, `x05`/`x1`). The only exception is a button that holds a single icon and nothing
+  else, which keeps equal padding. This is the site's button shape; a text button with a 1:3 ratio
+  reads as a different control next to its neighbours.
 - For text colour use the semantic tokens, never a raw `--color-neutral-*`: `--color-text-primary` (headings and main copy), `--color-text-secondary` (body text, intro paragraphs), `--color-text-muted` (captions, notes, metadata, breadcrumbs). Picking neutrals by hand is how text ends up unreadable on a `Box` over `BGImage` — the muted step is deliberately the lightest one that still reads as secondary.
 
 ## Rich text
@@ -89,6 +94,11 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   container query cannot read a custom property — change one and change the other, or the grid
   switches tiers at the wrong width.
 
+- **The `/lists` grid has the same container-query duplication as `GamesCards`.**
+  `ListsPage.module.scss` copies `--list-card-min-width` and `--gap-x4` into `$listCardMinWidth` and
+  `$listCardsGap` for its `@container` thresholds; change the token and the variable together, and
+  keep every column count a divisor of `CUSTOM_LISTS_PAGE_SIZE` (24).
+
 - `Box`'s own radius is `var(--radius-x5)`. For structural UI wrapper components rendered directly inside a `Box` (`Button`, `Input`, `Textarea`, `CustomDropdown`, and similar reusable "chrome" primitives — not decorative elements like game covers/posters), the `border-radius` must be exactly one step below its structural parent's on the `--radius-x*` scale (parent `x5` → child `x4` → grandchild `x3`, etc.). This rule applies to structural wrapper nesting only, not to decorative/illustrative radii (e.g. card art, covers), which are a deliberate style choice independent of nesting depth.
 
 - **A rounded image tile needs the radius on the image too, and its hover ring must be an
@@ -100,6 +110,12 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   on the `img`. The media rails in `Slideshow` and `VideosRow` are built this way; the
   alternatives and their trade-offs are in [`docs/rounded-tiles.md`](../../docs/rounded-tiles.md),
   which also records how the rails fade their cut edges and why scroll snapping was rolled back.
+- **When the tile's content is positioned, put the ring on an `::after` overlay.** `next/image`
+  with `fill`, or a grid of positioned cells, paints above its container's outline, so the ring is
+  hidden and shows only through the gaps — the list tile's mosaic showed four accent dots on hover
+  instead of a frame. Draw it on `&::after` (`position: absolute; inset: 0; z-index: 1;
+  border-radius: inherit; pointer-events: none`) with the same inset outline, as `ListCard`,
+  `TopFive` and `FavoritesFullPopover` do.
 
 ## Server rendering and SEO
 
@@ -164,6 +180,11 @@ before:
   use it (or the `lineClamp` mixin) instead of `items.slice(0, n)`.
 - **Never serve image URLs from under `/api`** — `robots.ts` disallows it, so crawlers cannot
   fetch them. The cover proxy lives at `/img/image-proxy` for exactly this reason.
+
+- **A server fetch of anything private must forward the request's cookies.** Server-side `agent`
+  calls carry no session, and `GET /lists/by-slug` answers 404 for a private list unless the viewer
+  is its owner — without forwarding `cookies()` as the `Cookie` header, owners get "Page not found"
+  on their own private lists while everyone else sees the correct 404.
 
 ## Server and client components
 

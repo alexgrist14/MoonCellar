@@ -1,10 +1,11 @@
-import { FC, Fragment, useCallback } from "react";
+import { FC, useCallback } from "react";
 import styles from "./GamePlaysInfo.module.scss";
 import { IPlaythrough } from "@mooncellar/schemas";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { RowsModal } from "@/src/lib/shared/ui/RowsModal";
 import { RichText } from "@/src/lib/shared/ui/RichText";
+import { StatusBadge, StatusDetails } from "@/src/lib/shared/ui/StatusBadge";
 
 interface IGamePlaysInfoProps {
   gameName: string;
@@ -26,36 +27,28 @@ export const GamePlaysInfo: FC<IGamePlaysInfoProps> = ({
   return (
     <RowsModal
       title={gameName}
-      rows={playthroughs.map((play) => {
-        const segments = [
-          commonUtils.upFL(play.category),
-          !!play.date && commonUtils.formatDate(play.date),
-          play.platformId !== undefined
-            ? getPlatform(play.platformId)?.name
-            : undefined,
-          !!play.time && `${play.time} hours`,
-          !!play.isMastered && "Mastered",
-        ].filter((segment): segment is string => !!segment);
-
-        return (
-          <div key={play._id} className={styles.plays__info}>
-            <div className={styles.plays__meta}>
-              {segments.map((segment, i) => (
-                <Fragment key={i}>
-                  {i > 0 && <span className={styles.plays__dot} />}
-                  <span>{segment}</span>
-                </Fragment>
-              ))}
-            </div>
-            {!!play.comment && (
-              <RichText
-                content={play.comment}
-                className={styles.plays__comment}
-              />
-            )}
+      rows={playthroughs.map((play) => (
+        <div key={play._id} className={styles.plays__info}>
+          <div className={styles.plays__meta}>
+            <StatusBadge status={play.category} />
+            {!!play.isMastered && <StatusBadge status="mastered" />}
+            <StatusDetails
+              items={[
+                play.platformId !== undefined &&
+                  getPlatform(play.platformId)?.name,
+                !!play.time && `${play.time} h`,
+                !!play.date && commonUtils.formatDate(play.date),
+              ]}
+            />
           </div>
-        );
-      })}
+          {!!play.comment && (
+            <RichText
+              content={play.comment}
+              className={styles.plays__comment}
+            />
+          )}
+        </div>
+      ))}
     />
   );
 };

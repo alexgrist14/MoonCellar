@@ -1,0 +1,134 @@
+.modal {
+  width: var(--popover-width);
+  max-width: 100%;
+}
+
+.loading {
+  position: relative;
+  min-height: var(--community-loading-height);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x2);
+
+  &__game {
+    font-size: 12px;
+    color: var(--color-text-muted);
+
+    @include lineClamp(1);
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x05);
+    padding-right: var(--padding-x3);
+  }
+
+  &__note {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    padding: var(--padding-x2);
+  }
+
+  &__footer {
+    padding-top: var(--padding-x2);
+    border-top: 1px solid var(--color-border-primary);
+  }
+
+  & &__new {
+    width: 100%;
+    justify-content: flex-start;
+    gap: var(--gap-x2);
+    border-radius: var(--radius-x4);
+    color: var(--color-text-secondary);
+  }
+
+  &_touch .row {
+    min-height: var(--padding-x11);
+  }
+}
+
+.row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--gap-x2);
+  padding: var(--padding-x2);
+  border-radius: var(--radius-x3);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--easing-out);
+
+  &:hover {
+    background-color: var(--color-bg-hover);
+  }
+
+  &_pending {
+    cursor: progress;
+    opacity: 0.7;
+  }
+
+  &__name {
+    font-size: 14px;
+    color: var(--color-text-primary);
+
+    @include lineClamp(1);
+  }
+
+  &__lock {
+    color: var(--color-text-muted);
+  }
+
+  &__count {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @include reducedMotion {
+    transition-duration: var(--duration-instant);
+  }
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x1);
+  padding: var(--padding-x2);
+  font-size: 13px;
+  color: var(--color-text-muted);
+
+  & b {
+    font-size: 14px;
+    color: var(--color-text-primary);
+    font-weight: 600;
+  }
+}
+
+.create {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x1);
+
+  &__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--gap-x2);
+    align-items: center;
+
+    & button {
+      border-radius: var(--radius-x4);
+    }
+  }
+
+  &__hint {
+    font-size: 12px;
+    color: var(--color-text-muted);
+
+    &_error {
+      color: var(--color-negative);
+    }
+  }
+}

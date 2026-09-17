@@ -7,7 +7,7 @@ import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
 import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { IGameFollowingsStatusItem } from "@mooncellar/schemas";
-import { commonUtils } from "@/src/lib/shared/utils/common.utils";
+import { StatusBadge, StatusDetails } from "@/src/lib/shared/ui/StatusBadge";
 import styles from "./GameFriendsStatus.module.scss";
 import { useGameFollowingsStatusQuery } from "@/src/lib/entities/game/api/game.queries";
 
@@ -16,12 +16,10 @@ interface IGameFriendsStatusProps {
   isBoxed?: boolean;
 }
 
-const formatStatus = (item: IGameFollowingsStatusItem) => {
-  const label = commonUtils.upFL(item.category);
-  const countPart = item.count > 1 ? ` ×${item.count}` : "";
-  const ratingPart = item.rating != null ? ` – ${item.rating}` : "";
-  return `${label}${countPart}${ratingPart}`;
-};
+const getStatusDetails = (item: IGameFollowingsStatusItem) => [
+  item.count > 1 && `×${item.count}`,
+  item.rating != null && `${item.rating} / 10`,
+];
 
 export const useGameFriendsStatus = (gameId: string) => {
   const profile = useAuthStore((s) => s.profile);
@@ -59,7 +57,10 @@ export const GameFriendsStatus: FC<IGameFriendsStatusProps> = ({
             </div>
             <span className={styles.block__name}>{item.userName}</span>
           </Link>
-          <span className={styles.block__status}>{formatStatus(item)}</span>
+          <span className={styles.block__status}>
+            <StatusBadge status={item.category} />
+            <StatusDetails items={getStatusDetails(item)} />
+          </span>
         </div>
       ))}
     </div>

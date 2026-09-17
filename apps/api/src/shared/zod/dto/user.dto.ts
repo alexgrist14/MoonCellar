@@ -3,6 +3,10 @@ import {
   GetUserByIdSchema,
   GetUserByStringSchema,
   GetUserLoginsResponseSchema,
+  SearchUsersRequestSchema,
+  SearchUsersResponseSchema,
+  UpdateFavoritesRequestSchema,
+  UpdateFavoritesResponseSchema,
   UpdateDescriptionSchema,
   UpdateSettingsSchema,
   UpdateUserEmailSchema,
@@ -21,4 +25,14 @@ export class UpdateDescriptionDto extends createZodDto(
 export class UpdateSettingsDto extends createZodDto(UpdateSettingsSchema) {}
 export class GetUserLoginsResponseDto extends createZodDto(
   GetUserLoginsResponseSchema
+) {}
+export class UpdateFavoritesDto extends createZodDto(
+  UpdateFavoritesRequestSchema
+) {}
+export class UpdateFavoritesResponseDto extends createZodDto(
+  UpdateFavoritesResponseSchema
+) {}
+export class SearchUsersDto extends createZodDto(SearchUsersRequestSchema) {}
+export class SearchUsersResponseDto extends createZodDto(
+  SearchUsersResponseSchema
 ) {}

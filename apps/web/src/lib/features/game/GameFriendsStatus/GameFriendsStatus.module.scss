@@ -58,8 +58,9 @@
   }
 
   &__status {
-    @include font(13px, 17px, 400);
-    color: var(--color-gray);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x2);
     flex-shrink: 0;
   }
 }

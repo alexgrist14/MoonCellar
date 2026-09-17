@@ -51,6 +51,11 @@ export class User extends Document {
     default: [],
   })
   royalGames: mongoose.Types.ObjectId[];
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Game" }],
+    default: [],
+  })
+  favorites: mongoose.Types.ObjectId[];
   @Prop()
   updatedAt: Date;
 }

@@ -1,0 +1,102 @@
+.search {
+  position: relative;
+  width: 100%;
+  max-width: var(--list-search-width);
+
+  &__icon {
+    position: absolute;
+    top: 50%;
+    left: var(--padding-x3);
+    transform: translateY(-50%);
+    color: var(--color-text-muted);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  &__input {
+    padding-left: var(--padding-x7);
+  }
+}
+
+.dropdown {
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  padding: var(--padding-x1);
+  border-radius: var(--radius-x3);
+  border: 1px solid var(--color-border-primary);
+  background: var(--color-bg-secondary);
+  box-shadow: var(--shadow-basic);
+
+  &__note {
+    padding: var(--padding-x3);
+    font-size: 13px;
+    color: var(--color-text-muted);
+  }
+
+  &__hint {
+    padding: var(--padding-x2) var(--padding-x3) var(--padding-x1);
+    border-top: 1px solid var(--color-border-primary);
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+}
+
+.result {
+  display: grid;
+  grid-template-columns: var(--list-row-cover-width) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--gap-x3);
+  padding: var(--padding-x2);
+  border-radius: var(--radius-x2);
+
+  &_active {
+    background: var(--color-bg-hover);
+  }
+
+  &__cover {
+    position: relative;
+    display: block;
+    width: var(--list-row-cover-width);
+    aspect-ratio: var(--cover-ratio);
+    border-radius: var(--radius-x1);
+    overflow: hidden;
+    background: var(--color-bg-tertiary);
+  }
+
+  &__image {
+    object-fit: cover;
+    border-radius: inherit;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+
+    @include lineClamp(1);
+  }
+
+  &__meta {
+    font-size: 12px;
+    color: var(--color-text-muted);
+
+    @include lineClamp(1);
+  }
+
+  &__added {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x1);
+    padding-inline: var(--padding-x2);
+    font-size: 13px;
+    color: var(--color-text-muted);
+  }
+}

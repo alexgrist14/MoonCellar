@@ -1,0 +1,81 @@
+$listCardMinWidth: 180px;
+$listCardsGap: 16px;
+
+.page {
+  &__heading {
+    display: flex;
+    align-items: baseline;
+    gap: var(--gap-x3);
+  }
+
+  &__total {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__applied {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--gap-x2);
+  }
+
+  &__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    padding: var(--padding-x1) var(--padding-x2);
+    border: 0;
+    border-radius: var(--radius-x4);
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--easing-out);
+
+    & svg {
+      color: var(--color-text-muted);
+    }
+
+    &:hover {
+      background: var(--color-bg-hover);
+
+      & svg {
+        color: var(--color-negative);
+      }
+    }
+  }
+
+  &__clear {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--color-accent);
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  &__empty {
+    margin-block: auto;
+  }
+
+  &__grid {
+    container-type: inline-size;
+    width: 100%;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--gap-x4);
+
+  @container (min-width: #{3 * $listCardMinWidth + 2 * $listCardsGap}) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @container (min-width: #{4 * $listCardMinWidth + 3 * $listCardsGap}) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

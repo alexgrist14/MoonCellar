@@ -1,0 +1,2302 @@
+<title>Custom Lists</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* mooncellar-tokens:start */
+/* Generated from apps/web/src/lib/app/styles/vars by
+   `bun --filter web sync:tokens`. Do not edit by hand. */
+:root {
+  /* vars/_colors.scss */
+  --color-neutral-5: #080a0b;
+  --color-neutral-10: #0d1011;
+  --color-neutral-15: #121516;
+  --color-neutral-20: #161b1d;
+  --color-neutral-25: #1a2022;
+  --color-neutral-30: #1f2628;
+  --color-neutral-35: #262d2f;
+  --color-neutral-40: #2f3537;
+  --color-neutral-45: #383e40;
+  --color-neutral-50: #3f4750;
+  --color-neutral-55: #50575d;
+  --color-neutral-60: #5e6a6e;
+  --color-neutral-70: #747d82;
+  --color-neutral-80: #9192a1;
+  --color-neutral-85: #b0b2bc;
+  --color-neutral-90: #d9d9d9;
+  --color-neutral-95: #eaeaea;
+  --color-neutral-100: #ffffff;
+  --color-blue: #00a0ff;
+  --color-blue-light: #00d4ff;
+  --color-gray: #afb3b9;
+  --color-yellow: #ffc451;
+  --color-yellow-light: #f9f871;
+  --color-orange: #ff8862;
+  --color-pink: #ff4b8f;
+  --color-violet: #e735c4;
+  --color-positive: #00c292;
+  --color-negative: #d02729;
+  --color-primary: var(--color-neutral-30);
+  --color-secondary: var(--color-neutral-90);
+  --color-contrast: var(--color-neutral-100);
+  --color-contrast-reverse: var(--color-neutral-5);
+  --color-attention: #ffc451;
+  --color-text-primary: var(--color-neutral-100);
+  --color-text-secondary: var(--color-neutral-90);
+  --color-text-muted: var(--color-neutral-85);
+  --color-accent: #6951ee;
+  --color-bg-primary: #191d24;
+  --color-bg-secondary: #212731;
+  --color-bg-tertiary: #2c3340;
+  --color-bg-accent: #6951ee;
+  --color-bg-hover: #374151;
+  --color-bg-positive: #00c292;
+  --color-bg-primary-tint: #191d24ee;
+  --color-bg-secondary-tint: #212731ee;
+  --color-bg-tertiary-tint: #2c3340ee;
+  --color-bg-accent-tint: #6951eeee;
+  --color-bg-positive-tint: #00c292ee;
+  --color-border-primary: var(--color-neutral-35);
+  --color-scrollbar-track: var(--color-neutral-15);
+  --color-scrollbar-thumb: var(--color-neutral-80);
+  --color-border-secondary: var(--color-neutral-85);
+
+  /* vars/_common.scss */
+  --padding-x05: calc(var(--padding-x1) * 0.5);
+  --padding-x1: 4px;
+  --padding-x2: calc(var(--padding-x1) * 2);
+  --padding-x3: calc(var(--padding-x1) * 3);
+  --padding-x4: calc(var(--padding-x1) * 4);
+  --padding-x5: calc(var(--padding-x1) * 5);
+  --padding-x6: calc(var(--padding-x1) * 6);
+  --padding-x7: calc(var(--padding-x1) * 7);
+  --padding-x8: calc(var(--padding-x1) * 8);
+  --padding-x9: calc(var(--padding-x1) * 9);
+  --padding-x10: calc(var(--padding-x1) * 10);
+  --padding-x11: calc(var(--padding-x1) * 11);
+  --padding-x12: calc(var(--padding-x1) * 12);
+  --padding-x13: calc(var(--padding-x1) * 13);
+  --padding-x14: calc(var(--padding-x1) * 14);
+  --padding-x15: calc(var(--padding-x1) * 15);
+  --padding-x16: calc(var(--padding-x1) * 16);
+  --padding-x17: calc(var(--padding-x1) * 17);
+  --padding-x18: calc(var(--padding-x1) * 18);
+  --padding-x19: calc(var(--padding-x1) * 19);
+  --padding-x20: calc(var(--padding-x1) * 20);
+  --padding-x25: calc(var(--padding-x1) * 25);
+  --radius-x1: 4px;
+  --radius-x2: calc(var(--radius-x1) * 2);
+  --radius-x3: calc(var(--radius-x1) * 3);
+  --radius-x4: calc(var(--radius-x1) * 4);
+  --radius-x5: calc(var(--radius-x1) * 5);
+  --radius-x6: calc(var(--radius-x1) * 6);
+  --radius-x7: calc(var(--radius-x1) * 7);
+  --radius-x8: calc(var(--radius-x1) * 8);
+  --radius-x9: calc(var(--radius-x1) * 9);
+  --radius-x10: calc(var(--radius-x1) * 10);
+  --gap-x05: calc(var(--gap-x1) * 0.5);
+  --gap-x1: 4px;
+  --gap-x2: calc(var(--gap-x1) * 2);
+  --gap-x3: calc(var(--gap-x1) * 3);
+  --gap-x4: calc(var(--gap-x1) * 4);
+  --gap-x5: calc(var(--gap-x1) * 5);
+  --gap-x6: calc(var(--gap-x1) * 6);
+  --gap-x7: calc(var(--gap-x1) * 7);
+  --gap-x8: calc(var(--gap-x1) * 8);
+  --gap-x9: calc(var(--gap-x1) * 9);
+  --gap-x10: calc(var(--gap-x1) * 10);
+  --gap-x11: calc(var(--gap-x1) * 11);
+  --gap-x12: calc(var(--gap-x1) * 12);
+  --blur-x1: 6px;
+  --rich-text-gap: 8px;
+  --duration-instant: 1ms;
+  --duration-fast: 160ms;
+  --duration-base: 280ms;
+  --delay-stagger: 90ms;
+  --easing-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --easing-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --reveal-offset: 12px;
+  --reveal-scale: 0.96;
+  --header-height: 45px;
+  --container-padding-top: calc(var(--header-height) + var(--padding-x3));
+  --container-padding-bottom: var(--padding-x3);
+  --page-height-available: calc(
+    100vh - var(--container-padding-top) - var(--container-padding-bottom)
+  );
+
+  /* vars/_components.scss */
+  --game-completed-color: var(--color-positive);
+  --game-dropped-color: var(--color-negative);
+  --game-playing-color: var(--color-accent);
+  --game-wishlist-color: var(--color-violet);
+  --game-backlog-color: var(--color-pink);
+  --game-played-color: var(--color-blue);
+  --game-mastered-color: var(--color-yellow);
+  --cover-ratio: 528/704;
+  --shadow-basic: 0px 4px 4px var(--color-neutral-5);
+  --shadow-text: drop-shadow(0 1px 2px var(--color-neutral-5))
+    drop-shadow(0 0 6px var(--color-neutral-5));
+  --glow-accent: 0 0 0.4rem var(--color-accent);
+  --glow-accent-sm: 0 0 0.15rem var(--color-accent);
+  --avatar-size-sm: var(--padding-x6);
+  --navigation-progress-height: 1px;
+  --navigation-progress-z-index: 1002;
+  --modal-text-width: min(720px, calc(100vw - var(--padding-x10)));
+  --rich-editor-image-width: 400px;
+  --playthrough-modal-width: min(80vw, 400px);
+  --playthrough-modal-height: min(70vh, 500px);
+  --playthrough-modal-width-lg: min(88vw, 760px);
+  --playthrough-modal-height-lg: min(86vh, 780px);
+  --games-card-min-width: 180px;
+  --range-track-height: 6px;
+  --range-thumb-size: 20px;
+  --range-thumb-width: 44px;
+  --range-thumb-height: 24px;
+  --scrollbar-horizontal-size: 6px;
+  --scrollbar-arrow-width: 32px;
+  --scrollbar-fade-width: 48px;
+  --game-keywords-collapsed-height: 66px;
+  --game-hero-artwork-height: 300px;
+  --game-hero-artwork-height-sm: 180px;
+  --game-hero-cover-width: 200px;
+  --game-hero-cover-offset: 104px;
+  --game-hero-counters-width: 360px;
+  --game-rating-popover-width: 320px;
+  --popover-width: 320px;
+  --popover-max-height: 320px;
+  --drawer-width: max(20vw, 460px);
+  --drawer-z-index: 5;
+  --expandable-scroll-height: 132px;
+  --expandable-fade-height: 32px;
+  --date-picker-width: 300px;
+  --date-picker-field-min-width: 140px;
+  --date-picker-cell-size: 34px;
+  --date-picker-arrow-size: 28px;
+  --emoji-picker-width: 328px;
+  --emoji-picker-cell-size: 34px;
+  --emoji-picker-group-size: 28px;
+  --emoji-picker-grid-height: 238px;
+  --game-hero-scrim: linear-gradient(
+    180deg,
+    #191d248c 0%,
+    #191d2400 30%,
+    #212731d1 72%,
+    var(--color-bg-secondary) 100%
+  );
+  --spoiler-blur: 7px;
+  --community-avatar-size: 36px;
+  --community-reply-avatar-size: 28px;
+  --community-review-clamp-height: 132px;
+  --community-distribution-height: 8px;
+  --community-distribution-min-width: 240px;
+  --community-dot-size: 7px;
+  --community-empty-text-width: 240px;
+  --community-loading-height: 96px;
+  --user-review-card-width: 170px;
+  --user-review-card-width-sm: 140px;
+  --user-review-rating-filter-width: 260px;
+  --vndb-review-height: max(360px, calc(100vh - 420px));
+  --vndb-cover-width: 120px;
+  --vndb-search-width: 320px;
+  --vndb-candidate-cover-width: 64px;
+  --empty-state-image-size: 180px;
+  --not-found-image-height: 240px;
+  --not-found-backdrop-size: 400px;
+  --not-found-content-width: 420px;
+  --favorite-color: var(--color-pink);
+  --game-controls-icon-size: 24px;
+  --game-controls-icon-size-sm: 20px;
+  --game-controls-badge-size: 15px;
+  --top-five-cover-width: 44px;
+  --list-card-min-width: 180px;
+  --list-card-row-mosaic-size: 44px;
+  --list-card-count-height: 20px;
+  --list-search-width: 320px;
+  --list-row-cover-width: 40px;
+  --profile-hero-height: 168px;
+  --profile-avatar-size: 112px;
+  --profile-avatar-size-sm: 72px;
+  --activity-cover-width: 80px;
+  --activity-dot-size: 12px;
+  --people-avatar-size: 22px;
+  --search-modal-width: 900px;
+  --search-tab-height: 36px;
+}
+/* mooncellar-tokens:end */
+
+  :root {
+    --mock-ui: "Hanken Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mock-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --mock-ground: var(--color-neutral-10);
+    --mock-accent-text: color-mix(in srgb, var(--color-accent) 55%, var(--color-neutral-100));
+    --mock-accent-dim: color-mix(in srgb, var(--color-accent) 18%, transparent);
+    --mock-nav-width: 232px;
+    --mock-cover-width-sm: 34px;
+    --mock-row-cover-width: 40px;
+    --mock-rank-width: 22px;
+    --mock-handle-size: 16px;
+    --mock-row-action-size: 28px;
+    --mock-search-width: 460px;
+    --mock-field-height: 38px;
+    --mock-avatar-size: 24px;
+    --mock-empty-size: calc(var(--empty-state-image-size) * 0.6);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--mock-ground);
+    color: var(--color-text-primary);
+    font-family: var(--mock-ui);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .shell {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding-inline: var(--padding-x6);
+    padding-block: var(--padding-x14) var(--padding-x20);
+  }
+
+  @media (max-width: 520px) {
+    .shell {
+      padding-inline: var(--padding-x4);
+      padding-block: var(--padding-x9) var(--padding-x14);
+    }
+  }
+
+  h1, h2, h3, h4 { margin: 0; text-wrap: balance; }
+  p { margin: 0; }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+    margin: 0;
+  }
+
+  .masthead { display: flex; flex-direction: column; gap: var(--gap-x4); }
+  .masthead h1 { font-size: 34px; line-height: 1.15; font-weight: 700; letter-spacing: -0.5px; }
+  .lede { color: var(--color-text-secondary); max-width: 66ch; margin: 0; }
+
+  .brief {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+    gap: var(--gap-x4) var(--gap-x6);
+    margin: var(--gap-x4) 0 0;
+    padding-top: var(--padding-x5);
+    border-top: 1px solid var(--color-border-primary);
+  }
+
+  .brief dt {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+    margin-bottom: var(--gap-x1);
+  }
+
+  .brief dd { margin: 0; font-size: 14px; color: var(--color-text-secondary); }
+
+  code.t { font-family: var(--mock-mono); font-size: 12px; color: var(--color-yellow); overflow-wrap: anywhere; }
+
+  .section { margin-top: var(--padding-x16); display: flex; flex-direction: column; gap: var(--gap-x4); }
+  .section > h2 { font-size: 23px; font-weight: 700; letter-spacing: -0.2px; }
+
+  .variant { margin-top: var(--padding-x16); }
+
+  .variant__head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--gap-x3);
+    flex-wrap: wrap;
+    margin-bottom: var(--gap-x2);
+  }
+
+  .variant__letter {
+    font-family: var(--mock-mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-x1);
+    padding: 1px 7px;
+    flex-shrink: 0;
+  }
+
+  .variant__head h2 { font-size: 23px; font-weight: 700; letter-spacing: -0.2px; }
+
+  .variant__thesis {
+    color: var(--color-text-muted);
+    max-width: 70ch;
+    margin-bottom: var(--gap-x5);
+    display: grid;
+    gap: var(--gap-x2);
+  }
+
+  .stage {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x4);
+    padding: var(--padding-x5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x4);
+    min-width: 0;
+  }
+
+  @media (max-width: 520px) { .stage { padding: var(--padding-x3); } }
+
+  .stage__context {
+    font-size: 12px;
+    color: var(--color-gray);
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x2);
+  }
+
+  .stage__context::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    flex-shrink: 0;
+  }
+
+  .frame {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--mock-nav-width);
+    gap: var(--gap-x4);
+    align-items: start;
+    padding: var(--padding-x4);
+    border-radius: var(--radius-x4);
+    background:
+      radial-gradient(110% 70% at 90% 0%, color-mix(in srgb, var(--color-accent) 24%, transparent), transparent 62%),
+      radial-gradient(90% 60% at 0% 100%, color-mix(in srgb, var(--color-blue) 14%, transparent), transparent 60%),
+      var(--color-neutral-15);
+  }
+
+  .frame--solo { grid-template-columns: minmax(0, 1fr); }
+
+  @media (max-width: 900px) { .frame { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 520px) { .frame { padding: var(--padding-x2); } }
+
+  .box {
+    background: var(--color-bg-primary-tint);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x5);
+    padding: var(--padding-x5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x4);
+    min-width: 0;
+  }
+
+  @media (max-width: 520px) { .box { padding: var(--padding-x4); } }
+
+  .count {
+    font-family: var(--mock-mono);
+    font-size: 13px;
+    color: var(--color-gray);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .meta {
+    font-family: var(--mock-mono);
+    font-size: 12px;
+    color: var(--color-gray);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  button { font: inherit; }
+
+  button:focus-visible, a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+  .nav { display: flex; flex-direction: column; gap: var(--gap-x2); min-width: 0; }
+  .nav .box { padding: var(--padding-x2); gap: 2px; }
+
+  .nav__btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x2);
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    line-height: 24px;
+    padding: var(--padding-x1) var(--padding-x3);
+    border-radius: var(--radius-x4);
+    cursor: pointer;
+    text-align: left;
+    text-decoration: none;
+    transition: background var(--duration-fast) var(--easing-out);
+  }
+
+  .nav__btn:hover, .nav__btn[aria-current="page"] { background: var(--color-bg-hover); color: var(--color-text-primary); }
+  .nav__btn .count { font-size: 12px; flex-shrink: 0; }
+
+  .nav__label { display: flex; align-items: center; gap: var(--gap-x2); min-width: 0; }
+  .nav__label span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .nav__label svg { width: 14px; height: 14px; color: var(--color-gray); flex-shrink: 0; }
+  .nav__label--tall { gap: var(--gap-x4); }
+  .nav__label--tall svg { width: 22px; height: 22px; color: var(--color-neutral-80); }
+
+  .nav__title { font-weight: 600; color: var(--color-text-primary); }
+  .nav__sep { height: 1px; background: var(--color-border-primary); margin: var(--padding-x1) var(--padding-x3); }
+  .nav__btn--new { color: var(--mock-accent-text); }
+  .nav__btn--new svg { width: 16px; height: 16px; }
+
+  .nav__sort {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x2);
+    padding: var(--padding-x1) var(--padding-x3);
+    font-size: 14px;
+    color: var(--color-text-secondary);
+  }
+
+  .nav__sort svg { width: 20px; height: 20px; color: var(--color-accent); }
+  .nav__sort b { font-weight: 600; color: var(--color-text-primary); }
+
+  .avatar {
+    width: var(--mock-avatar-size);
+    height: var(--mock-avatar-size);
+    border-radius: var(--radius-x3);
+    background: linear-gradient(140deg, var(--color-violet), var(--color-blue));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--color-neutral-100);
+    flex-shrink: 0;
+  }
+
+  .crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--gap-x1) var(--gap-x2);
+    font-size: 13px;
+    color: var(--color-text-muted);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .crumbs li { display: inline-flex; align-items: center; gap: var(--gap-x2); }
+  .crumbs li + li::before { content: "›"; color: var(--color-gray); }
+  .crumbs a { color: inherit; text-decoration: none; }
+  .crumbs a:hover { color: var(--color-text-primary); }
+  .crumbs [aria-current] { color: var(--color-text-primary); }
+
+  .lhead { display: flex; flex-direction: column; gap: var(--gap-x3); }
+
+  .lhead__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--gap-x2) var(--gap-x3);
+    flex-wrap: wrap;
+  }
+
+  .lhead__title { display: flex; align-items: center; gap: var(--gap-x2) var(--gap-x3); flex-wrap: wrap; min-width: 0; }
+  .lhead h3 { font-size: 26px; line-height: 1.2; font-weight: 700; letter-spacing: -0.3px; }
+  .lhead__desc { color: var(--color-text-secondary); max-width: 62ch; }
+
+  .lhead__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--gap-x1) var(--gap-x2);
+    font-size: 13px;
+    color: var(--color-text-muted);
+  }
+
+  .lhead__meta > span + span::before { content: "·"; margin-right: var(--gap-x2); color: var(--color-gray); }
+  .lhead__actions { display: flex; gap: var(--gap-x1); flex-wrap: wrap; }
+
+  .lhead__note {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x2);
+  }
+
+  .lhead__note svg { width: 14px; height: 14px; color: var(--color-gray); flex-shrink: 0; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 22px;
+    padding: 0 var(--padding-x2);
+    border-radius: var(--radius-x2);
+    color: var(--color-text-muted);
+    background: var(--color-bg-tertiary);
+    white-space: nowrap;
+  }
+
+  .badge svg { width: 12px; height: 12px; }
+
+  .ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 0;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    padding: 4px var(--padding-x2);
+    border-radius: var(--radius-x3);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background var(--duration-fast) var(--easing-out),
+      color var(--duration-fast) var(--easing-out);
+  }
+
+  .ghost:hover { background: var(--color-bg-hover); color: var(--color-text-primary); }
+  .ghost svg { width: 15px; height: 15px; flex-shrink: 0; }
+  .ghost--danger { color: var(--color-negative); }
+  .ghost--danger:hover { color: var(--color-negative); }
+  .ghost.is-done { color: var(--color-positive); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap-x2);
+    border: 2px solid transparent;
+    border-radius: var(--radius-x4);
+    font-size: 14px;
+    padding: 5px var(--padding-x4);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: filter var(--duration-fast) var(--easing-out);
+  }
+
+  .btn:hover { filter: brightness(0.85); }
+  .btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+  .btn--accent { background: var(--color-bg-accent); color: var(--color-neutral-100); }
+  .btn--default { background: var(--color-bg-tertiary); color: var(--color-neutral-100); }
+  .btn--red { background: var(--color-negative); color: var(--color-neutral-100); }
+  .btn--sm { font-size: 13px; padding: 2px var(--padding-x3); border-radius: var(--radius-x3); border-width: 1px; }
+
+  .btn--added {
+    background: transparent;
+    color: var(--color-positive);
+    cursor: default;
+  }
+
+  .btn--added:hover { filter: none; }
+  .btn:disabled:not(.btn--added) { opacity: 0.4; cursor: not-allowed; filter: none; }
+  .ghost .icon-x { width: 10px; height: 13px; }
+  @media (max-width: 720px) { .hide-md { display: none; } }
+  @media (max-width: 440px) { .hide-sm { display: none; } }
+
+  .btn[aria-pressed="true"] { background: var(--color-bg-accent); color: var(--color-neutral-100); }
+
+  .segmented {
+    display: inline-flex;
+    flex-wrap: wrap;
+    padding: 3px;
+    gap: 2px;
+    background: var(--color-bg-tertiary);
+    border-radius: var(--radius-x4);
+  }
+
+  .segmented button {
+    border: 0;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    padding: 3px var(--padding-x3);
+    border-radius: var(--radius-x3);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background var(--duration-fast) var(--easing-out),
+      color var(--duration-fast) var(--easing-out);
+  }
+
+  .segmented button[aria-pressed="true"] { background: var(--color-bg-primary); color: var(--color-text-primary); }
+
+  .dot {
+    width: var(--community-dot-size);
+    height: var(--community-dot-size);
+    border-radius: 50%;
+    background: var(--mock-cat, var(--color-gray));
+    flex-shrink: 0;
+  }
+
+  .cat-completed { --mock-cat: var(--game-completed-color); }
+  .cat-playing { --mock-cat: var(--game-playing-color); }
+  .cat-dropped { --mock-cat: var(--game-dropped-color); }
+  .cat-played { --mock-cat: var(--game-played-color); }
+  .cat-backlog { --mock-cat: var(--game-backlog-color); }
+  .cat-mastered { --mock-cat: var(--game-mastered-color); }
+  .cat-wishlist { --mock-cat: var(--game-wishlist-color); }
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 20px;
+    padding: 0 var(--padding-x2);
+    border-radius: var(--radius-x2);
+    color: color-mix(in srgb, var(--mock-cat) 62%, var(--color-neutral-100));
+    background: color-mix(in srgb, var(--mock-cat) 16%, transparent);
+    white-space: nowrap;
+  }
+
+  .status--none {
+    color: var(--color-gray);
+    background: transparent;
+    font-weight: 400;
+  }
+
+  .score {
+    font-family: var(--mock-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    min-width: 2ch;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .score--empty { color: var(--color-gray); }
+
+  .cover {
+    width: var(--mock-cover-width-sm);
+    max-width: 100%;
+    aspect-ratio: var(--cover-ratio);
+    border-radius: var(--radius-x2);
+    background:
+      linear-gradient(150deg,
+        color-mix(in srgb, var(--mock-art, var(--color-accent)) 75%, var(--color-neutral-5)),
+        var(--color-neutral-15));
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: var(--padding-x1);
+    font-size: 0;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-align: center;
+    line-height: 1.25;
+    color: var(--color-neutral-95);
+    text-transform: uppercase;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .art-hollow { --mock-art: var(--color-blue); }
+  .art-sh2 { --mock-art: var(--color-neutral-55); }
+  .art-outer { --mock-art: var(--color-orange); }
+  .art-tunic { --mock-art: var(--color-yellow); }
+  .art-animalwell { --mock-art: var(--color-positive); }
+  .art-elden { --mock-art: var(--color-neutral-60); }
+  .art-stardew { --mock-art: var(--color-positive); }
+  .art-shorthike { --mock-art: var(--color-positive); }
+  .art-spiritfarer { --mock-art: var(--color-orange); }
+  .art-unpacking { --mock-art: var(--color-pink); }
+  .art-nitw { --mock-art: var(--color-orange); }
+  .art-chicory { --mock-art: var(--color-yellow-light); }
+  .art-wandersong { --mock-art: var(--color-blue-light); }
+  .art-celeste { --mock-art: var(--color-blue-light); }
+  .art-venba { --mock-art: var(--color-yellow); }
+  .art-botany { --mock-art: var(--color-violet); }
+  .art-gator { --mock-art: var(--color-blue); }
+  .art-dorf { --mock-art: var(--color-yellow-light); }
+  .art-kindwords { --mock-art: var(--color-blue); }
+  .art-alba { --mock-art: var(--color-blue-light); }
+  .art-little { --mock-art: var(--color-pink); }
+  .art-darksouls { --mock-art: var(--color-neutral-45); }
+  .art-bloodborne { --mock-art: var(--color-negative); }
+  .art-sekiro { --mock-art: var(--color-orange); }
+  .art-ittakestwo { --mock-art: var(--color-pink); }
+  .art-overcooked { --mock-art: var(--color-yellow); }
+  .art-drg { --mock-art: var(--color-orange); }
+  .art-wanderstop { --mock-art: var(--color-pink); }
+  .art-wanderer { --mock-art: var(--color-neutral-60); }
+  .art-spiritnorth { --mock-art: var(--color-blue-light); }
+  .art-spirittea { --mock-art: var(--color-positive); }
+
+  .search { position: relative; width: 100%; max-width: var(--mock-search-width); }
+
+  .input {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    background: var(--color-bg-tertiary);
+    border: 1px solid transparent;
+    border-radius: var(--radius-x4);
+    padding: 0 var(--padding-x3);
+    min-height: var(--mock-field-height);
+    color: var(--color-text-primary);
+    font-size: 14px;
+    min-width: 0;
+  }
+
+  .input > svg { width: 16px; height: 16px; color: var(--color-gray); flex-shrink: 0; }
+  .input--focus { border-color: var(--color-accent); box-shadow: var(--glow-accent-sm); }
+  .input--error { border-color: var(--color-negative); }
+  .input__value { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .input__placeholder { color: var(--color-gray); }
+  .input__count { font-family: var(--mock-mono); font-size: 11px; color: var(--color-gray); flex-shrink: 0; }
+
+  .input--area {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--gap-x1);
+    padding-block: var(--padding-x2);
+    min-height: calc(var(--mock-field-height) * 2.4);
+    line-height: 1.5;
+  }
+
+  .input--area .input__value { white-space: normal; flex: 1; }
+  .input--area .input__count { align-self: flex-end; }
+
+  .caret {
+    display: inline-block;
+    width: 1px;
+    height: 16px;
+    margin-left: 1px;
+    vertical-align: -3px;
+    background: var(--color-text-primary);
+    animation: mock-blink 1.1s steps(1) infinite;
+  }
+
+  @keyframes mock-blink { 50% { opacity: 0; } }
+
+  .results {
+    position: absolute;
+    top: calc(100% + var(--gap-x2));
+    left: 0;
+    right: 0;
+    z-index: 3;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x4);
+    padding: var(--padding-x1);
+    box-shadow: var(--shadow-basic);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .results--static { position: static; box-shadow: none; }
+  .results--inline { position: static; box-shadow: none; background: transparent; border: 0; padding: 0; }
+
+  .result {
+    display: grid;
+    grid-template-columns: var(--mock-cover-width-sm) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--gap-x3);
+    padding: var(--padding-x1) var(--padding-x2);
+    border-radius: var(--radius-x3);
+  }
+
+  .result:hover, .result.is-active { background: var(--color-bg-hover); }
+  .result__text { display: flex; flex-direction: column; min-width: 0; line-height: 1.35; }
+  .result__name { font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .result__name mark { background: none; color: var(--mock-accent-text); }
+  .result__meta { font-size: 12px; color: var(--color-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .results__foot {
+    font-size: 12px;
+    color: var(--color-gray);
+    padding: var(--padding-x1) var(--padding-x2) 2px;
+    border-top: 1px solid var(--color-border-primary);
+    margin-top: 2px;
+  }
+
+  .results__empty {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--padding-x3) var(--padding-x2);
+    font-size: 13px;
+    color: var(--color-text-muted);
+  }
+
+  .results__empty b { color: var(--color-text-primary); font-weight: 600; }
+
+  .skeleton {
+    border-radius: var(--radius-x2);
+    background: linear-gradient(90deg, var(--color-bg-tertiary) 20%, var(--color-bg-hover) 50%, var(--color-bg-tertiary) 80%);
+    background-size: 200% 100%;
+    animation: mock-shimmer 1.4s linear infinite;
+  }
+
+  .skeleton--cover { width: var(--mock-cover-width-sm); aspect-ratio: var(--cover-ratio); }
+  .skeleton--line { height: 10px; width: 70%; }
+  .skeleton--line-short { height: 8px; width: 40%; margin-top: 6px; }
+  .skeleton--btn { width: 44px; height: 22px; }
+
+  @keyframes mock-shimmer { to { background-position: -200% 0; } }
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x2) var(--gap-x3);
+    flex-wrap: wrap;
+  }
+
+  .toolbar__hint { font-size: 13px; color: var(--color-text-muted); }
+
+  .shelf {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--gap-x2);
+  }
+
+  @media (max-width: 720px) { .shelf { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 440px) { .shelf { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+  .gcard {
+    position: relative;
+    display: block;
+    min-width: 0;
+    border-radius: var(--radius-x4);
+    outline: 2px solid transparent;
+    outline-offset: -2px;
+    text-decoration: none;
+    transition: outline-color var(--duration-fast) var(--easing-out);
+  }
+
+  .gcard:hover { outline-color: var(--color-accent); }
+
+  .gcard .cover {
+    width: 100%;
+    border-radius: inherit;
+    font-size: 10px;
+    padding: var(--padding-x2) var(--padding-x2) var(--padding-x8);
+  }
+
+  .gcard.is-lifted { outline-color: var(--color-accent); transform: translateY(-4px); box-shadow: var(--shadow-basic); }
+
+  .rail { position: absolute; display: flex; gap: 2px; }
+  .rail--tl { top: var(--padding-x1); left: var(--padding-x1); }
+  .rail--tr { top: var(--padding-x1); right: var(--padding-x1); }
+  .rail--br { bottom: var(--padding-x1); right: var(--padding-x1); }
+
+  .pip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 5px;
+    border: 0;
+    border-radius: var(--radius-x2);
+    background: var(--color-bg-primary-tint);
+    color: var(--color-text-primary);
+    font-family: var(--mock-mono);
+    font-size: 11px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pip svg { width: 12px; height: 12px; }
+  .pip--star svg { color: var(--color-accent); }
+  .pip--remove { background: var(--color-negative); color: var(--color-neutral-100); cursor: pointer; }
+  .pip--remove svg { width: 9px; height: 11px; }
+  .pip--pos { color: var(--color-text-muted); }
+
+  .caption { font-size: 12px; color: var(--color-gray); }
+
+  .addpanel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x3);
+    background: var(--color-bg-secondary);
+    border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+    border-radius: var(--radius-x4);
+    padding: var(--padding-x3);
+  }
+
+  .addpanel__row { display: flex; align-items: center; gap: var(--gap-x2) var(--gap-x3); flex-wrap: wrap; }
+  .addpanel__row .search { flex: 1 1 220px; max-width: none; }
+  .addpanel__label { font-size: 13px; color: var(--color-text-muted); }
+  .addpanel__place { display: inline-flex; align-items: center; gap: var(--gap-x2); }
+
+  .ranks { display: flex; flex-direction: column; }
+
+  .rank {
+    display: grid;
+    grid-template-columns:
+      var(--mock-rank-width) var(--mock-handle-size) var(--mock-row-cover-width)
+      minmax(0, 1fr) auto auto var(--mock-row-action-size);
+    grid-template-areas: "num handle cover main mine added action";
+    align-items: center;
+    gap: var(--gap-x1) var(--gap-x3);
+    padding: var(--padding-x2);
+    border-top: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x3);
+  }
+
+  .rank:first-child { border-top-color: transparent; }
+  .rank:hover { background: color-mix(in srgb, var(--color-bg-hover) 45%, transparent); }
+
+  .rank__num {
+    grid-area: num;
+    font-family: var(--mock-mono);
+    font-size: 13px;
+    color: var(--color-gray);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rank__handle {
+    grid-area: handle;
+    width: var(--mock-handle-size);
+    height: var(--mock-handle-size);
+    color: var(--color-neutral-60);
+    cursor: grab;
+  }
+
+  .rank .cover { grid-area: cover; width: var(--mock-row-cover-width); }
+  .rank__main { grid-area: main; display: flex; flex-direction: column; min-width: 0; line-height: 1.35; }
+
+  .rank__name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .rank__name:hover { color: var(--mock-accent-text); }
+  .rank__meta { font-size: 12px; color: var(--color-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rank__mine { grid-area: mine; display: flex; align-items: center; justify-content: flex-end; gap: var(--gap-x2); }
+  .rank__added { grid-area: added; font-family: var(--mock-mono); font-size: 12px; color: var(--color-gray); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+  .rank__remove {
+    grid-area: action;
+    width: var(--mock-row-action-size);
+    height: var(--mock-row-action-size);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: var(--radius-x2);
+    background: transparent;
+    color: var(--color-gray);
+    cursor: pointer;
+  }
+
+  .rank__remove svg { width: 10px; height: 13px; }
+  .rank__remove:hover { background: var(--color-bg-hover); color: var(--color-negative); }
+
+  .rank.is-dragging {
+    background: var(--color-bg-secondary);
+    border-color: transparent;
+    outline: 1px solid var(--color-accent);
+    box-shadow: var(--shadow-basic);
+    transform: translateX(var(--padding-x2));
+  }
+
+  .rank.is-dragging .rank__handle { color: var(--color-accent); cursor: grabbing; }
+
+  .dropline {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    font-size: 11px;
+    color: var(--mock-accent-text);
+    padding-left: calc(var(--mock-rank-width) + var(--gap-x3));
+  }
+
+  .dropline::after { content: ""; flex: 1; height: 2px; border-radius: var(--radius-x1); background: var(--color-accent); }
+
+  @media (max-width: 720px) {
+    .rank {
+      grid-template-columns:
+        var(--mock-rank-width) var(--mock-handle-size) var(--mock-row-cover-width)
+        minmax(0, 1fr) var(--mock-row-action-size);
+      grid-template-areas:
+        "num handle cover main action"
+        "num handle cover mine action";
+    }
+
+    .rank__mine { justify-content: flex-start; }
+    .rank__added { display: none; }
+  }
+
+  .ranks__more { display: flex; justify-content: center; padding-top: var(--padding-x2); }
+
+  .lists-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--gap-x3);
+  }
+
+  @media (max-width: 720px) { .lists-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+  .lcard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x2);
+    padding: var(--padding-x2);
+    border-radius: var(--radius-x4);
+    border: 1px solid var(--color-border-primary);
+    background: var(--color-bg-secondary-tint);
+    color: inherit;
+    text-decoration: none;
+    min-width: 0;
+    transition: border-color var(--duration-fast) var(--easing-out);
+  }
+
+  .lcard:hover { border-color: var(--color-accent); }
+
+  .mosaic {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2px;
+    border-radius: var(--radius-x3);
+    overflow: hidden;
+  }
+
+  .mosaic .cover { width: 100%; border-radius: 0; }
+  .lcard__body { display: flex; flex-direction: column; gap: 2px; padding-inline: var(--padding-x1); min-width: 0; }
+
+  .lcard__name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.35;
+    min-width: 0;
+  }
+
+  .lcard__name span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lcard__name svg { width: 13px; height: 13px; color: var(--color-gray); flex-shrink: 0; }
+  .lcard__meta { font-size: 12px; color: var(--color-text-muted); }
+
+  .box__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x3);
+    flex-wrap: wrap;
+  }
+
+  .box__title { display: flex; align-items: baseline; gap: var(--gap-x2); }
+  .box__title h3 { font-size: 22px; font-weight: 700; }
+
+  .pair {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    gap: var(--gap-x4);
+    align-items: start;
+  }
+
+  .pair--wide { grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); }
+
+  .pair__cell { display: flex; flex-direction: column; gap: var(--gap-x2); min-width: 0; }
+
+  .modal {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x5);
+    padding: var(--padding-x5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x4);
+    box-shadow: var(--shadow-basic);
+    min-width: 0;
+  }
+
+  .modal h3 { font-size: 20px; font-weight: 700; }
+  .modal__text { font-size: 14px; color: var(--color-text-secondary); }
+  .modal__warn { font-size: 13px; color: var(--color-attention); }
+
+  .formfield { display: flex; flex-direction: column; gap: var(--gap-x1); min-width: 0; }
+
+  .formfield__label {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--gap-x2);
+    font-size: 13px;
+    color: var(--color-text-muted);
+  }
+
+  .formfield__label i { font-style: normal; color: var(--color-gray); }
+  .helper { font-size: 12px; color: var(--color-gray); }
+  .helper--error { color: var(--color-negative); }
+
+  .toggle-row { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--gap-x3); }
+  .toggle-row > div { display: flex; flex-direction: column; gap: 2px; }
+  .toggle-row b { font-size: 14px; font-weight: 600; }
+
+  .switch {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    width: 60px;
+    height: 30px;
+    flex-shrink: 0;
+    border: 4px solid transparent;
+    border-radius: var(--radius-x6);
+    outline: 3px solid var(--color-negative);
+    background: var(--color-bg-primary);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--color-neutral-100);
+    cursor: pointer;
+    scale: 0.8;
+    padding: 0;
+    transition: outline-color var(--duration-base) var(--easing-out);
+  }
+
+  .switch span { position: relative; z-index: 1; opacity: 0.7; text-align: center; }
+
+  .switch::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 50%;
+    border-radius: var(--radius-x4);
+    background: var(--color-negative);
+    transition: transform var(--duration-base) var(--easing-out),
+      background var(--duration-base) var(--easing-out);
+  }
+
+  .switch[aria-checked="true"] { outline-color: var(--color-positive); }
+  .switch[aria-checked="true"]::before { transform: translateX(100%); background: var(--color-positive); }
+
+  .modal__foot {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: var(--gap-x2);
+    padding-top: var(--padding-x4);
+    border-top: 1px solid var(--color-border-primary);
+  }
+
+  .modal__foot .ghost--danger { margin-right: auto; margin-left: calc(-1 * var(--padding-x2)); }
+
+  .emptystate {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--gap-x2);
+    padding-block: var(--padding-x6);
+  }
+
+  .emptystate__moon {
+    width: var(--mock-empty-size);
+    max-width: 100%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle at 36% 34%, var(--color-neutral-40), var(--color-neutral-20) 68%);
+    box-shadow:
+      0 0 0 var(--padding-x3) color-mix(in srgb, var(--color-neutral-100) 4%, transparent),
+      0 0 0 var(--padding-x7) color-mix(in srgb, var(--color-neutral-100) 2%, transparent);
+    margin-bottom: var(--padding-x6);
+    opacity: 0.8;
+  }
+
+  .emptystate__title { font-size: 16px; font-weight: 600; }
+  .emptystate p { font-size: 14px; color: var(--color-text-muted); max-width: 36ch; }
+
+  .hints {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: var(--gap-x4) var(--gap-x6);
+  }
+
+  .hints h4 {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+    font-weight: 600;
+    margin-bottom: var(--gap-x2);
+  }
+
+  .hints ul, .plan ul {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    display: grid;
+    gap: var(--gap-x1);
+  }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--color-border-primary); border-radius: var(--radius-x4); }
+
+  table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 620px; }
+  th, td { text-align: left; padding: var(--padding-x3) var(--padding-x4); vertical-align: top; }
+  thead th { background: var(--color-bg-secondary); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-gray); }
+  tbody tr { border-top: 1px solid var(--color-border-primary); }
+  tbody th { color: var(--color-text-muted); font-weight: 600; white-space: nowrap; }
+  tbody td { color: var(--color-text-secondary); }
+
+  .size {
+    font-family: var(--mock-mono);
+    font-size: 12px;
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x1);
+    padding: 0 6px;
+    color: var(--color-text-primary);
+  }
+
+  .plan { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: var(--gap-x5); }
+
+  .plan > div {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x4);
+    padding: var(--padding-x4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x3);
+    min-width: 0;
+  }
+
+  .plan h3 { font-size: 15px; font-weight: 700; }
+  .plan p { font-size: 13px; color: var(--color-text-muted); }
+  .plan ul { font-size: 13px; }
+
+  pre {
+    margin: 0;
+    font-family: var(--mock-mono);
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--color-text-secondary);
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-x3);
+    padding: var(--padding-x3);
+    overflow-x: auto;
+  }
+
+  pre i { color: var(--color-gray); font-style: normal; }
+  pre b { color: var(--mock-accent-text); font-weight: 500; }
+
+  .recommend {
+    background: var(--mock-accent-dim);
+    border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+    border-radius: var(--radius-x4);
+    padding: var(--padding-x5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x2);
+  }
+
+  .recommend h3 { font-size: 18px; font-weight: 700; }
+  .recommend p { color: var(--color-text-secondary); max-width: 72ch; }
+
+  .note {
+    margin-top: var(--padding-x14);
+    font-size: 13px;
+    color: var(--color-gray);
+    border-left: 2px solid var(--color-border-primary);
+    padding-left: var(--padding-x3);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      transition-duration: var(--duration-instant) !important;
+      animation-duration: var(--duration-instant) !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-list" viewBox="0 0 18 18"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M6 4.5h10M6 9h10M6 13.5h10M2.6 4.5h.01M2.6 9h.01M2.6 13.5h.01"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3.25a.75.75 0 0 1 .75.75v7.25H20a.75.75 0 0 1 0 1.5h-7.25V20a.75.75 0 0 1-1.5 0v-7.25H4a.75.75 0 0 1 0-1.5h7.25V4a.75.75 0 0 1 .75-.75"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0m18 11l-6-6"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M16.035 3.015a3 3 0 0 1 4.099-.135l.144.135l.707.707a3 3 0 0 1 .135 4.098l-.135.144L9.773 19.177a1.5 1.5 0 0 1-.562.354l-.162.047l-4.454 1.028a1 1 0 0 1-1.22-1.088l.02-.113l1.027-4.455a1.5 1.5 0 0 1 .29-.598l.111-.125zm-.707 3.535l-8.99 8.99l-.636 2.758l2.758-.637l8.99-8.99l-2.122-2.12Zm3.536-2.121a1 1 0 0 0-1.32-.083l-.094.083l-.708.707l2.122 2.121l.707-.707a1 1 0 0 0 .083-1.32l-.083-.094z"/></symbol>
+  <symbol id="i-crown" viewBox="0 0 24 24"><path fill="currentColor" d="M2.4 6.6a1.3 1.3 0 0 1 1.98.28L6.9 10.5l3.98-5.6a1.37 1.37 0 0 1 2.24 0l3.98 5.6 2.52-3.62A1.3 1.3 0 0 1 21.6 6.6c.5.31.73.92.56 1.48l-2.5 8.32H4.34l-2.5-8.32c-.17-.56.06-1.17.56-1.48Z"/><path fill="currentColor" d="M4.6 18.1h14.8a.9.9 0 0 1 0 1.8H4.6a.9.9 0 0 1 0-1.8Z"/></symbol>
+  <symbol id="i-close" viewBox="0 0 384 512"><path fill="currentColor" d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path fill="currentColor" d="M10.92 2.868a1.25 1.25 0 0 1 2.16 0l2.795 4.798l5.428 1.176a1.25 1.25 0 0 1 .667 2.054l-3.7 4.141l.56 5.525a1.25 1.25 0 0 1-1.748 1.27L12 19.592l-5.082 2.24a1.25 1.25 0 0 1-1.748-1.27l.56-5.525l-3.7-4.14a1.25 1.25 0 0 1 .667-2.055l5.428-1.176zM12 4.987L9.687 8.959a1.25 1.25 0 0 1-.816.592l-4.492.973l3.062 3.427c.234.262.347.61.312.959l-.463 4.573l4.206-1.854a1.25 1.25 0 0 1 1.008 0l4.206 1.854l-.463-4.573a1.25 1.25 0 0 1 .311-.959l3.063-3.427l-4.492-.973a1.25 1.25 0 0 1-.816-.592z"/></symbol>
+  <symbol id="i-more" viewBox="0 0 16 16"><path fill="currentColor" d="M3 9.5a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12ZM12 9.2a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6Z"/></symbol>
+  <symbol id="i-sort" viewBox="0 0 24 24"><rect x="3" y="14" width="4" height="6" rx="1" fill="currentColor"/><rect x="10" y="9" width="4" height="11" rx="1" fill="currentColor"/><rect x="17" y="4" width="4" height="16" rx="1" fill="currentColor"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 512 512"><path fill="currentColor" d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/></symbol>
+  <symbol id="i-link" viewBox="0 0 18 18"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M7.4 10.6a3.2 3.2 0 0 0 4.6 0l2.4-2.4a3.2 3.2 0 0 0-4.6-4.6l-1 1M10.6 7.4a3.2 3.2 0 0 0-4.6 0l-2.4 2.4a3.2 3.2 0 0 0 4.6 4.6l1-1"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><path fill="currentColor" d="M14.279 2.152C13.909 2 13.439 2 12.5 2s-1.408 0-1.779.152a2 2 0 0 0-1.09 1.083c-.094.223-.13.484-.145.863a1.62 1.62 0 0 1-.796 1.353a1.64 1.64 0 0 1-1.579.008c-.338-.178-.583-.276-.825-.308a2.03 2.03 0 0 0-1.49.396c-.318.242-.553.646-1.022 1.453c-.47.807-.704 1.21-.757 1.605c-.07.526.074 1.058.4 1.479c.148.192.357.353.68.555c.477.297.783.803.783 1.361s-.306 1.064-.782 1.36c-.324.203-.533.364-.682.556a2 2 0 0 0-.399 1.479c.053.394.287.798.757 1.605s.704 1.21 1.022 1.453c.424.323.96.465 1.49.396c.242-.032.487-.13.825-.308a1.64 1.64 0 0 1 1.58.008c.486.28.774.795.795 1.353c.015.38.051.64.145.863c.204.49.596.88 1.09 1.083c.37.152.84.152 1.779.152s1.409 0 1.779-.152a2 2 0 0 0 1.09-1.083c.094-.223.13-.483.145-.863c.02-.558.309-1.074.796-1.353a1.64 1.64 0 0 1 1.579-.008c.338.178.583.276.825.308c.53.07 1.066-.073 1.49-.396c.318-.242.553-.646 1.022-1.453c.47-.807.704-1.21.757-1.605a2 2 0 0 0-.4-1.479c-.148-.192-.357-.353-.68-.555c-.477-.297-.783-.803-.783-1.361s.306-1.064.782-1.36c.324-.203.533-.364.682-.556a2 2 0 0 0 .399-1.479c-.053-.394-.287-.798-.757-1.605s-.704-1.21-1.022-1.453a2.03 2.03 0 0 0-1.49-.396c-.242.032-.487.13-.825.308a1.64 1.64 0 0 1-1.58-.008a1.62 1.62 0 0 1-.795-1.353c-.015-.38-.051-.64-.145-.863a2 2 0 0 0-1.09-1.083M12.5 15c1.67 0 3.023-1.343 3.023-3S14.169 9 12.5 9s-3.023 1.343-3.023 3s1.354 3 3.023 3"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M6.5 10.5h11a1.5 1.5 0 0 1 1.5 1.5v7a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 19v-7a1.5 1.5 0 0 1 1.5-1.5Zm2-.2V7.5a3.5 3.5 0 0 1 7 0v2.8"/></symbol>
+  <symbol id="i-grip" viewBox="0 0 16 16"><path fill="currentColor" d="M6 4a1.2 1.2 0 1 1 0-2.4A1.2 1.2 0 0 1 6 4m4 0a1.2 1.2 0 1 1 0-2.4A1.2 1.2 0 0 1 10 4M6 9.2a1.2 1.2 0 1 1 0-2.4 1.2 1.2 0 0 1 0 2.4m4 0a1.2 1.2 0 1 1 0-2.4 1.2 1.2 0 0 1 0 2.4M6 14.4A1.2 1.2 0 1 1 6 12a1.2 1.2 0 0 1 0 2.4m4 0a1.2 1.2 0 1 1 0-2.4 1.2 1.2 0 0 1 0 2.4"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+</svg>
+
+<div class="shell">
+  <header class="masthead">
+    <p class="eyebrow">MoonCellar · custom lists</p>
+    <h1>Custom Lists</h1>
+    <p class="lede">
+      Next to the seven fixed categories, a player can make lists of their own — named, described,
+      in their own order — and anyone can open one by link. This page draws two ways to lay out a
+      list and the pieces both of them share: the entry in the profile navigation, the dialog that
+      creates and edits a list, the search that adds a game, and the states a list goes through.
+      Adding a game from a game card or a game page is drawn in its own mockup. Every example
+      belongs to the invented profile <strong>moth_scholar</strong>.
+    </p>
+    <dl class="brief">
+      <div>
+        <dt>Placement</dt>
+        <dd>A <em>Lists</em> panel in the profile's navigation column; a <code class="t">?list=lists</code> tab with every list; each list at <code class="t">/user/&lt;name&gt;/lists/&lt;slug&gt;</code>.</dd>
+      </div>
+      <div>
+        <dt>Data assumed</dt>
+        <dd>Its own collection: <code class="t">userId</code>, <code class="t">name</code>, <code class="t">slug</code>, <code class="t">description</code> (≤ 300), <code class="t">isPrivate</code>, ordered <code class="t">games[]</code> of <code class="t">{ gameId, addedAt }</code>, <code class="t">updatedAt</code>.</dd>
+      </div>
+      <div>
+        <dt>Must have</dt>
+        <dd>Create a list from the profile; search for a game on the list page and add it; remove games; public and private lists.</dd>
+      </div>
+      <div>
+        <dt>Replaces</dt>
+        <dd>The owner-only <em>Edit</em> row under the categories, which opens the unfinished <code class="t">CustomFolder</code> modal (“Create new folder”).</dd>
+      </div>
+      <div>
+        <dt>Open limits</dt>
+        <dd>Up to 50 lists per player and 500 games per list are placeholders, to be decided.</dd>
+      </div>
+    </dl>
+  </header>
+
+  <section class="variant" aria-labelledby="variant-a">
+    <div class="variant__head">
+      <span class="variant__letter">A</span>
+      <h2 id="variant-a">Shelf grid</h2>
+    </div>
+    <div class="variant__thesis">
+      <p>
+        The list looks like every other list on the profile: the same <code class="t">GamesCards</code>
+        grid of covers, 30 per page like the categories, sorted from the navigation column. Search sits
+        in the header and drops its results over the grid through the portal. Manage switches the grid
+        into edit mode — a remove button and the position on each card, and cards can be dragged.
+      </p>
+      <p>
+        Best for visitors, who scan covers. Weak for curating: dragging a card across a wrapping
+        grid is imprecise, worst on a phone, and the order is only readable from the small position
+        numbers. Every card is a link in the server HTML, so a public list is indexable as it is.
+      </p>
+    </div>
+
+    <div class="stage">
+      <p class="stage__context">Owner · /user/moth_scholar/lists/cozy-winter-evenings · Manage on, typing in search</p>
+      <div class="frame">
+        <article class="box" aria-label="Cozy winter evenings">
+          <ol class="crumbs">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">moth_scholar</a></li>
+            <li><a href="#">Lists</a></li>
+            <li><span aria-current="page">Cozy winter evenings</span></li>
+          </ol>
+
+          <div class="lhead">
+            <div class="lhead__top">
+              <div class="lhead__title"><h3>Cozy winter evenings</h3></div>
+              <div class="lhead__actions">
+                <button type="button" class="ghost"><svg aria-hidden="true"><use href="#i-pen"/></svg>Edit</button>
+                <button type="button" class="ghost" data-copy><svg aria-hidden="true"><use href="#i-link"/></svg><span>Copy link</span></button>
+              </div>
+            </div>
+            <p class="lhead__desc">Short, warm and finishable in a weekend. Nothing with a fail state.</p>
+            <p class="lhead__meta"><span>14 games</span><span>Updated 3 days ago</span><span>Public</span></p>
+          </div>
+
+          <div class="toolbar">
+            <div class="search">
+              <div class="input input--focus">
+                <svg aria-hidden="true"><use href="#i-search"/></svg>
+                <span class="input__value">wander<span class="caret" aria-hidden="true"></span></span>
+                <button type="button" class="ghost" aria-label="Clear search"><svg class="icon-x" aria-hidden="true"><use href="#i-close"/></svg></button>
+              </div>
+              <div class="results" role="listbox" aria-label="Search results">
+                <div class="result is-active" role="option" aria-selected="false">
+                  <span class="cover art-wanderstop" aria-hidden="true">Wanderstop</span>
+                  <span class="result__text">
+                    <span class="result__name"><mark>Wander</mark>stop</span>
+                    <span class="result__meta">2025 · PC, PlayStation 5</span>
+                  </span>
+                  <button type="button" class="btn btn--accent btn--sm" data-add><svg aria-hidden="true"><use href="#i-plus"/></svg>Add</button>
+                </div>
+                <div class="result" role="option" aria-selected="true">
+                  <span class="cover art-wandersong" aria-hidden="true">Wandersong</span>
+                  <span class="result__text">
+                    <span class="result__name"><mark>Wander</mark>song</span>
+                    <span class="result__meta">2018 · PC, Nintendo Switch</span>
+                  </span>
+                  <button type="button" class="btn btn--added btn--sm" disabled><svg aria-hidden="true"><use href="#i-check"/></svg>Added</button>
+                </div>
+                <div class="result" role="option" aria-selected="false">
+                  <span class="cover art-wanderer" aria-hidden="true">The Wanderer</span>
+                  <span class="result__text">
+                    <span class="result__name">The <mark>Wander</mark>er: Frankenstein's Creature</span>
+                    <span class="result__meta">2019 · PC, Nintendo Switch</span>
+                  </span>
+                  <button type="button" class="btn btn--accent btn--sm" data-add><svg aria-hidden="true"><use href="#i-plus"/></svg>Add</button>
+                </div>
+                <p class="results__foot">↑ ↓ to move · Enter adds · Esc closes</p>
+              </div>
+            </div>
+            <button type="button" class="btn btn--default" aria-pressed="true" data-toggle>Done</button>
+          </div>
+
+          <p class="toolbar__hint">Drag a card to move it. Order is saved as you drop.</p>
+
+          <div class="shelf">
+            <a class="gcard" href="#"><span class="cover art-shorthike">A Short Hike</span><span class="rail rail--tl"><span class="pip pip--pos">1</span></span><span class="rail rail--tr"><span class="pip pip--remove" role="button" aria-label="Remove A Short Hike"><svg aria-hidden="true"><use href="#i-close"/></svg></span></span><span class="rail rail--br"><span class="pip pip--star"><svg aria-hidden="true"><use href="#i-star"/></svg>8.6</span></span></a>
+            <a class="gcard" href="#"><span class="cover art-unpacking">Unpacking</span><span class="rail rail--tl"><span class="pip pip--pos">2</span></span><span class="rail rail--tr"><span class="pip pip--remove" role="button" aria-label="Remove Unpacking"><svg aria-hidden="true"><use href="#i-close"/></svg></span></span><span class="rail rail--br"><span class="pip pip--star"><svg aria-hidden="true"><use href="#i-star"/></svg>8.2</span></span></a>
+            <a class="gcard" href="#"><span class="cover art-spiritfarer">Spiritfarer</span><span class="rail rail--tl"><span class="pip pip--pos">3</span></span><span class="rail rail--tr"><span class="pip pip--remove" role="button" aria-label="Remove Spiritfarer"><svg aria-hidden="true"><use href="#i-close"/></svg></span></span><span class="rail rail--br"><span class="pip pip--star"><svg aria-hidden="true"><use href="#i-star"/></svg>8.4</span></span></a>
+            <a class="gcard" href="#"><span class="cover art-chicory">Chicory: A Colorful Tale</span><span class="rail rail--tl"><span class="pip pip--pos">4</span></span><span class="rail rail--tr"><span class="pip pip--remove" role="button" aria-label="Remove Chicory"><svg aria-hidden="true"><use href="#i-close"/></svg></span></span><span class="rail rail--br"><span class="pip pip--star"><svg aria-hidden="true"><use href="#i-star"/></svg>8.5</span></span></a>
+            <a class="gcard is-lifted" href="#"><span class="cover art-wandersong">Wandersong</span><span class="rail rail--tl"><span class="pip pip--pos">5</span></span><span class="rail rail--tr"><span class="pip pip--remove" role="button" aria-label="Remove Wandersong"><svg aria-hidden="true"><use href="#i-close"/></svg></span></span><span class="rail rail--br"><span class="pip pip--star"><svg aria-hidden="true"><use href="#i-star"/></svg>8.1</span></span></a>
+            <a class="gcard" href="#"><span class="cover art-nitw">Night in the Woods</span><span class="rail rail--tl"><span class="pip pip--pos">6</span></span><span class="rail rail--tr"><span class="pip pip--remove" role="button" aria-label="Remove Night in the Woods"><svg aria-hidden="true"><use href="#i-close"/></svg></span></span><span class="rail rail--br"><span class="pip pip--star"><svg aria-hidden="true"><use href="#i-star"/></svg>8.3</span></span></a>
+            <a class="gcard" href="#"><span class="cover art-stardew">Stardew Valley</span><span class="rail rail--tl"><span class="pip pip--pos">7</span></span><span class="rail rail--tr"><span class="pip pip--remove" role="button" aria-label="Remove Stardew Valley"><svg aria-hidden="true"><use href="#i-close"/></svg></span></span><span class="rail rail--br"><span class="pip pip--star"><svg aria-hidden="true"><use href="#i-star"/></svg>8.9</span></span></a>
+            <a class="gcard" href="#"><span class="cover art-venba">Venba</span><span class="rail rail--tl"><span class="pip pip--pos">8</span></span><span class="rail rail--tr"><span class="pip pip--remove" role="button" aria-label="Remove Venba"><svg aria-hidden="true"><use href="#i-close"/></svg></span></span><span class="rail rail--br"><span class="pip pip--star"><svg aria-hidden="true"><use href="#i-star"/></svg>7.9</span></span></a>
+            <a class="gcard" href="#"><span class="cover art-botany">Botany Manor</span><span class="rail rail--tl"><span class="pip pip--pos">9</span></span><span class="rail rail--tr"><span class="pip pip--remove" role="button" aria-label="Remove Botany Manor"><svg aria-hidden="true"><use href="#i-close"/></svg></span></span><span class="rail rail--br"><span class="pip pip--star"><svg aria-hidden="true"><use href="#i-star"/></svg>7.8</span></span></a>
+            <a class="gcard" href="#"><span class="cover art-gator">Lil Gator Game</span><span class="rail rail--tl"><span class="pip pip--pos">10</span></span><span class="rail rail--tr"><span class="pip pip--remove" role="button" aria-label="Remove Lil Gator Game"><svg aria-hidden="true"><use href="#i-close"/></svg></span></span><span class="rail rail--br"><span class="pip pip--star"><svg aria-hidden="true"><use href="#i-star"/></svg>8.0</span></span></a>
+            <a class="gcard" href="#"><span class="cover art-dorf">Dorfromantik</span><span class="rail rail--tl"><span class="pip pip--pos">11</span></span><span class="rail rail--tr"><span class="pip pip--remove" role="button" aria-label="Remove Dorfromantik"><svg aria-hidden="true"><use href="#i-close"/></svg></span></span><span class="rail rail--br"><span class="pip pip--star"><svg aria-hidden="true"><use href="#i-star"/></svg>8.4</span></span></a>
+            <a class="gcard" href="#"><span class="cover art-kindwords">Kind Words</span><span class="rail rail--tl"><span class="pip pip--pos">12</span></span><span class="rail rail--tr"><span class="pip pip--remove" role="button" aria-label="Remove Kind Words"><svg aria-hidden="true"><use href="#i-close"/></svg></span></span><span class="rail rail--br"><span class="pip pip--star"><svg aria-hidden="true"><use href="#i-star"/></svg>7.5</span></span></a>
+            <a class="gcard" href="#"><span class="cover art-alba">Alba: A Wildlife Adventure</span><span class="rail rail--tl"><span class="pip pip--pos">13</span></span><span class="rail rail--tr"><span class="pip pip--remove" role="button" aria-label="Remove Alba"><svg aria-hidden="true"><use href="#i-close"/></svg></span></span><span class="rail rail--br"><span class="pip pip--star"><svg aria-hidden="true"><use href="#i-star"/></svg>7.7</span></span></a>
+            <a class="gcard" href="#"><span class="cover art-little">A Little to the Left</span><span class="rail rail--tl"><span class="pip pip--pos">14</span></span><span class="rail rail--tr"><span class="pip pip--remove" role="button" aria-label="Remove A Little to the Left"><svg aria-hidden="true"><use href="#i-close"/></svg></span></span><span class="rail rail--br"><span class="pip pip--star"><svg aria-hidden="true"><use href="#i-star"/></svg>7.9</span></span></a>
+          </div>
+          <p class="caption">Five columns divide the page size of 30, so a full page never ends in a partial row; a list shorter than a page simply stops. Drawn narrower than the site — at 1440 px the content panel fits five 180 px cards.</p>
+        </article>
+
+        <nav class="nav" aria-label="Profile navigation">
+          <div class="box">
+            <a class="nav__btn" href="#"><span class="nav__label nav__label--tall"><span class="avatar" aria-hidden="true">ms</span><span>Profile</span></span></a>
+          </div>
+          <div class="box">
+            <a class="nav__btn" href="#"><span>All</span><span class="count">214</span></a>
+            <a class="nav__btn" href="#"><span>Playing</span><span class="count">6</span></a>
+            <a class="nav__btn" href="#"><span>Completed</span><span class="count">118</span></a>
+            <a class="nav__btn" href="#"><span>Mastered</span><span class="count">21</span></a>
+            <a class="nav__btn" href="#"><span>Played</span><span class="count">19</span></a>
+            <a class="nav__btn" href="#"><span>Wishlist</span><span class="count">38</span></a>
+            <a class="nav__btn" href="#"><span>Backlog</span><span class="count">9</span></a>
+            <a class="nav__btn" href="#"><span>Dropped</span><span class="count">3</span></a>
+          </div>
+          <div class="box">
+            <a class="nav__btn" href="#"><span class="nav__label"><svg aria-hidden="true"><use href="#i-list"/></svg><span class="nav__title">Lists</span></span><span class="count">4</span></a>
+            <a class="nav__btn" href="#" aria-current="page"><span class="nav__label"><span>Cozy winter evenings</span></span><span class="count">14</span></a>
+            <a class="nav__btn" href="#"><span class="nav__label"><span>Best maps in games</span></span><span class="count">23</span></a>
+            <a class="nav__btn" href="#"><span class="nav__label"><span>Souls on original hardware</span><svg aria-label="Private"><use href="#i-lock"/></svg></span><span class="count">7</span></a>
+            <a class="nav__btn" href="#"><span class="nav__label"><span>Co-op with friends</span></span><span class="count">5</span></a>
+            <div class="nav__sep" role="separator"></div>
+            <button type="button" class="nav__btn nav__btn--new"><span>New list</span><svg aria-hidden="true"><use href="#i-plus"/></svg></button>
+          </div>
+          <div class="box">
+            <a class="nav__btn" href="#"><span>Reviews</span><span class="count">38</span></a>
+          </div>
+          <div class="box">
+            <a class="nav__btn" href="#"><span class="nav__label nav__label--tall"><svg aria-hidden="true"><use href="#i-settings"/></svg><span>Settings</span></span></a>
+          </div>
+          <div class="box">
+            <div class="nav__sort"><span>Sort: <b>Custom order</b></span><svg aria-hidden="true"><use href="#i-sort"/></svg></div>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  <section class="variant" aria-labelledby="variant-b">
+    <div class="variant__head">
+      <span class="variant__letter">B</span>
+      <h2 id="variant-b">Ranked rows</h2>
+    </div>
+    <div class="variant__thesis">
+      <p>
+        The list reads as a ranking: a numbered row per game with its year and platforms, and — for
+        whoever is looking — their own status and rating of that game, so a visitor sees at once what
+        they have already played. The owner gets a drag handle and a remove button on every row.
+        <em>Add games</em> opens a search panel pinned above the first row; results are added at the
+        top or at the end, and the panel stays open for the next one.
+      </p>
+      <p>
+        Best for curating, and the only layout where the order itself is legible. Costs a new row
+        component and a drag-and-drop dependency, shows far fewer covers per screen, and differs from
+        every other list on the profile. Rows are plain links, so it is as crawlable as A.
+      </p>
+    </div>
+
+    <div class="stage">
+      <p class="stage__context">Owner · /user/moth_scholar/lists/cozy-winter-evenings · Add games open, dragging Wandersong</p>
+      <div class="frame">
+        <article class="box" aria-label="Cozy winter evenings">
+          <ol class="crumbs">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">moth_scholar</a></li>
+            <li><a href="#">Lists</a></li>
+            <li><span aria-current="page">Cozy winter evenings</span></li>
+          </ol>
+
+          <div class="lhead">
+            <div class="lhead__top">
+              <div class="lhead__title"><h3>Cozy winter evenings</h3></div>
+              <div class="lhead__actions">
+                <button type="button" class="btn btn--default btn--sm" aria-pressed="true" data-toggle><svg aria-hidden="true"><use href="#i-plus"/></svg>Add games</button>
+                <button type="button" class="ghost"><svg aria-hidden="true"><use href="#i-pen"/></svg>Edit</button>
+                <button type="button" class="ghost" data-copy><svg aria-hidden="true"><use href="#i-link"/></svg><span>Copy link</span></button>
+              </div>
+            </div>
+            <p class="lhead__desc">Short, warm and finishable in a weekend. Nothing with a fail state.</p>
+            <p class="lhead__meta"><span>14 games</span><span>Updated 3 days ago</span><span>Public</span></p>
+          </div>
+
+          <div class="addpanel">
+            <div class="addpanel__row">
+              <div class="search">
+                <div class="input input--focus">
+                  <svg aria-hidden="true"><use href="#i-search"/></svg>
+                  <span class="input__value">spirit<span class="caret" aria-hidden="true"></span></span>
+                </div>
+              </div>
+              <span class="addpanel__place">
+                <span class="addpanel__label">Add to</span>
+                <span class="segmented" role="group" aria-label="Where new games go">
+                  <button type="button" aria-pressed="false" data-segment>Top</button>
+                  <button type="button" aria-pressed="true" data-segment>End</button>
+                </span>
+              </span>
+              <button type="button" class="ghost" aria-label="Close search"><svg class="icon-x" aria-hidden="true"><use href="#i-close"/></svg></button>
+            </div>
+            <div class="results results--inline" role="listbox" aria-label="Search results">
+              <div class="result" role="option" aria-selected="true">
+                <span class="cover art-spiritfarer" aria-hidden="true">Spiritfarer</span>
+                <span class="result__text">
+                  <span class="result__name"><mark>Spirit</mark>farer</span>
+                  <span class="result__meta">2020 · PC, Nintendo Switch · #3 in this list</span>
+                </span>
+                <button type="button" class="btn btn--added btn--sm" disabled><svg aria-hidden="true"><use href="#i-check"/></svg>Added</button>
+              </div>
+              <div class="result is-active" role="option" aria-selected="false">
+                <span class="cover art-spirittea" aria-hidden="true">Spirittea</span>
+                <span class="result__text">
+                  <span class="result__name"><mark>Spirit</mark>tea</span>
+                  <span class="result__meta">2023 · PC, Nintendo Switch</span>
+                </span>
+                <button type="button" class="btn btn--accent btn--sm" data-add><svg aria-hidden="true"><use href="#i-plus"/></svg>Add</button>
+              </div>
+              <div class="result" role="option" aria-selected="false">
+                <span class="cover art-spiritnorth" aria-hidden="true">Spirit of the North</span>
+                <span class="result__text">
+                  <span class="result__name"><mark>Spirit</mark> of the North</span>
+                  <span class="result__meta">2019 · PC, PlayStation 4</span>
+                </span>
+                <button type="button" class="btn btn--accent btn--sm" data-add><svg aria-hidden="true"><use href="#i-plus"/></svg>Add</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="ranks">
+            <div class="rank">
+              <span class="rank__num">1</span>
+              <svg class="rank__handle" aria-label="Drag to reorder"><use href="#i-grip"/></svg>
+              <span class="cover art-shorthike" aria-hidden="true">A Short Hike</span>
+              <span class="rank__main"><a class="rank__name" href="#">A Short Hike</a><span class="rank__meta">2019 · PC, Nintendo Switch</span></span>
+              <span class="rank__mine"><span class="status cat-completed"><i class="dot"></i>Completed</span><span class="score">9</span></span>
+              <span class="rank__added">03.12.2025</span>
+              <button type="button" class="rank__remove" aria-label="Remove A Short Hike"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            </div>
+            <div class="rank">
+              <span class="rank__num">2</span>
+              <svg class="rank__handle" aria-label="Drag to reorder"><use href="#i-grip"/></svg>
+              <span class="cover art-unpacking" aria-hidden="true">Unpacking</span>
+              <span class="rank__main"><a class="rank__name" href="#">Unpacking</a><span class="rank__meta">2021 · PC, Nintendo Switch</span></span>
+              <span class="rank__mine"><span class="status cat-completed"><i class="dot"></i>Completed</span><span class="score">8</span></span>
+              <span class="rank__added">03.12.2025</span>
+              <button type="button" class="rank__remove" aria-label="Remove Unpacking"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            </div>
+            <p class="dropline">Drop to move to 3</p>
+            <div class="rank">
+              <span class="rank__num">3</span>
+              <svg class="rank__handle" aria-label="Drag to reorder"><use href="#i-grip"/></svg>
+              <span class="cover art-spiritfarer" aria-hidden="true">Spiritfarer</span>
+              <span class="rank__main"><a class="rank__name" href="#">Spiritfarer</a><span class="rank__meta">2020 · PC, Nintendo Switch</span></span>
+              <span class="rank__mine"><span class="status cat-playing"><i class="dot"></i>Playing</span><span class="score score--empty">—</span></span>
+              <span class="rank__added">05.12.2025</span>
+              <button type="button" class="rank__remove" aria-label="Remove Spiritfarer"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            </div>
+            <div class="rank">
+              <span class="rank__num">4</span>
+              <svg class="rank__handle" aria-label="Drag to reorder"><use href="#i-grip"/></svg>
+              <span class="cover art-chicory" aria-hidden="true">Chicory</span>
+              <span class="rank__main"><a class="rank__name" href="#">Chicory: A Colorful Tale</a><span class="rank__meta">2021 · PC, PlayStation 5</span></span>
+              <span class="rank__mine"><span class="status cat-mastered"><i class="dot"></i>Mastered</span><span class="score">10</span></span>
+              <span class="rank__added">05.12.2025</span>
+              <button type="button" class="rank__remove" aria-label="Remove Chicory"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            </div>
+            <div class="rank is-dragging">
+              <span class="rank__num">5</span>
+              <svg class="rank__handle" aria-label="Drag to reorder"><use href="#i-grip"/></svg>
+              <span class="cover art-wandersong" aria-hidden="true">Wandersong</span>
+              <span class="rank__main"><a class="rank__name" href="#">Wandersong</a><span class="rank__meta">2018 · PC, Nintendo Switch</span></span>
+              <span class="rank__mine"><span class="status cat-backlog"><i class="dot"></i>Backlog</span><span class="score score--empty">—</span></span>
+              <span class="rank__added">11.01.2026</span>
+              <button type="button" class="rank__remove" aria-label="Remove Wandersong"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            </div>
+            <div class="rank">
+              <span class="rank__num">6</span>
+              <svg class="rank__handle" aria-label="Drag to reorder"><use href="#i-grip"/></svg>
+              <span class="cover art-nitw" aria-hidden="true">Night in the Woods</span>
+              <span class="rank__main"><a class="rank__name" href="#">Night in the Woods</a><span class="rank__meta">2017 · PC, Nintendo Switch</span></span>
+              <span class="rank__mine"><span class="status cat-completed"><i class="dot"></i>Completed</span><span class="score">8</span></span>
+              <span class="rank__added">11.01.2026</span>
+              <button type="button" class="rank__remove" aria-label="Remove Night in the Woods"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            </div>
+            <div class="rank">
+              <span class="rank__num">7</span>
+              <svg class="rank__handle" aria-label="Drag to reorder"><use href="#i-grip"/></svg>
+              <span class="cover art-stardew" aria-hidden="true">Stardew Valley</span>
+              <span class="rank__main"><a class="rank__name" href="#">Stardew Valley</a><span class="rank__meta">2016 · PC, Nintendo Switch</span></span>
+              <span class="rank__mine"><span class="status cat-played"><i class="dot"></i>Played</span><span class="score">7</span></span>
+              <span class="rank__added">20.02.2026</span>
+              <button type="button" class="rank__remove" aria-label="Remove Stardew Valley"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            </div>
+            <div class="rank">
+              <span class="rank__num">8</span>
+              <svg class="rank__handle" aria-label="Drag to reorder"><use href="#i-grip"/></svg>
+              <span class="cover art-venba" aria-hidden="true">Venba</span>
+              <span class="rank__main"><a class="rank__name" href="#">Venba</a><span class="rank__meta">2023 · PC, Nintendo Switch</span></span>
+              <span class="rank__mine"><span class="status cat-wishlist"><i class="dot"></i>Wishlist</span><span class="score score--empty">—</span></span>
+              <span class="rank__added">02.04.2026</span>
+              <button type="button" class="rank__remove" aria-label="Remove Venba"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            </div>
+            <div class="rank">
+              <span class="rank__num">9</span>
+              <svg class="rank__handle" aria-label="Drag to reorder"><use href="#i-grip"/></svg>
+              <span class="cover art-botany" aria-hidden="true">Botany Manor</span>
+              <span class="rank__main"><a class="rank__name" href="#">Botany Manor</a><span class="rank__meta">2024 · PC, Nintendo Switch</span></span>
+              <span class="rank__mine"><span class="status cat-completed"><i class="dot"></i>Completed</span><span class="score">7</span></span>
+              <span class="rank__added">18.05.2026</span>
+              <button type="button" class="rank__remove" aria-label="Remove Botany Manor"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            </div>
+            <div class="rank">
+              <span class="rank__num">10</span>
+              <svg class="rank__handle" aria-label="Drag to reorder"><use href="#i-grip"/></svg>
+              <span class="cover art-gator" aria-hidden="true">Lil Gator Game</span>
+              <span class="rank__main"><a class="rank__name" href="#">Lil Gator Game</a><span class="rank__meta">2022 · PC, Nintendo Switch</span></span>
+              <span class="rank__mine"><span class="status cat-dropped"><i class="dot"></i>Dropped</span><span class="score">5</span></span>
+              <span class="rank__added">18.05.2026</span>
+              <button type="button" class="rank__remove" aria-label="Remove Lil Gator Game"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            </div>
+            <div class="rank">
+              <span class="rank__num">11</span>
+              <svg class="rank__handle" aria-label="Drag to reorder"><use href="#i-grip"/></svg>
+              <span class="cover art-dorf" aria-hidden="true">Dorfromantik</span>
+              <span class="rank__main"><a class="rank__name" href="#">Dorfromantik</a><span class="rank__meta">2022 · PC, Nintendo Switch</span></span>
+              <span class="rank__mine"><span class="status cat-played"><i class="dot"></i>Played</span><span class="score">8</span></span>
+              <span class="rank__added">30.06.2026</span>
+              <button type="button" class="rank__remove" aria-label="Remove Dorfromantik"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            </div>
+            <div class="rank">
+              <span class="rank__num">12</span>
+              <svg class="rank__handle" aria-label="Drag to reorder"><use href="#i-grip"/></svg>
+              <span class="cover art-kindwords" aria-hidden="true">Kind Words</span>
+              <span class="rank__main"><a class="rank__name" href="#">Kind Words</a><span class="rank__meta">2019 · PC</span></span>
+              <span class="rank__mine"><span class="status status--none">Not in your games</span></span>
+              <span class="rank__added">29.08.2026</span>
+              <button type="button" class="rank__remove" aria-label="Remove Kind Words"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            </div>
+            <div class="rank">
+              <span class="rank__num">13</span>
+              <svg class="rank__handle" aria-label="Drag to reorder"><use href="#i-grip"/></svg>
+              <span class="cover art-alba" aria-hidden="true">Alba</span>
+              <span class="rank__main"><a class="rank__name" href="#">Alba: A Wildlife Adventure</a><span class="rank__meta">2020 · PC, Nintendo Switch</span></span>
+              <span class="rank__mine"><span class="status cat-completed"><i class="dot"></i>Completed</span><span class="score">7</span></span>
+              <span class="rank__added">29.08.2026</span>
+              <button type="button" class="rank__remove" aria-label="Remove Alba"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            </div>
+            <div class="rank">
+              <span class="rank__num">14</span>
+              <svg class="rank__handle" aria-label="Drag to reorder"><use href="#i-grip"/></svg>
+              <span class="cover art-little" aria-hidden="true">A Little to the Left</span>
+              <span class="rank__main"><a class="rank__name" href="#">A Little to the Left</a><span class="rank__meta">2022 · PC, Nintendo Switch</span></span>
+              <span class="rank__mine"><span class="status cat-backlog"><i class="dot"></i>Backlog</span><span class="score score--empty">—</span></span>
+              <span class="rank__added">14.09.2026</span>
+              <button type="button" class="rank__remove" aria-label="Remove A Little to the Left"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            </div>
+          </div>
+          <p class="caption">Status and rating are the viewer's own, fetched after the page renders; the rows themselves come from the server. On a phone the date is dropped and the status moves under the title. Handles also answer to the keyboard: Space picks a row up, arrows move it.</p>
+        </article>
+
+        <nav class="nav" aria-label="Profile navigation">
+          <div class="box">
+            <a class="nav__btn" href="#"><span class="nav__label nav__label--tall"><span class="avatar" aria-hidden="true">ms</span><span>Profile</span></span></a>
+          </div>
+          <div class="box">
+            <a class="nav__btn" href="#"><span>All</span><span class="count">214</span></a>
+            <a class="nav__btn" href="#"><span>Playing</span><span class="count">6</span></a>
+            <a class="nav__btn" href="#"><span>Completed</span><span class="count">118</span></a>
+            <a class="nav__btn" href="#"><span>Mastered</span><span class="count">21</span></a>
+            <a class="nav__btn" href="#"><span>Played</span><span class="count">19</span></a>
+            <a class="nav__btn" href="#"><span>Wishlist</span><span class="count">38</span></a>
+            <a class="nav__btn" href="#"><span>Backlog</span><span class="count">9</span></a>
+            <a class="nav__btn" href="#"><span>Dropped</span><span class="count">3</span></a>
+          </div>
+          <div class="box">
+            <a class="nav__btn" href="#"><span class="nav__label"><svg aria-hidden="true"><use href="#i-list"/></svg><span class="nav__title">Lists</span></span><span class="count">4</span></a>
+            <a class="nav__btn" href="#" aria-current="page"><span class="nav__label"><span>Cozy winter evenings</span></span><span class="count">14</span></a>
+            <a class="nav__btn" href="#"><span class="nav__label"><span>Best maps in games</span></span><span class="count">23</span></a>
+            <a class="nav__btn" href="#"><span class="nav__label"><span>Souls on original hardware</span><svg aria-label="Private"><use href="#i-lock"/></svg></span><span class="count">7</span></a>
+            <a class="nav__btn" href="#"><span class="nav__label"><span>Co-op with friends</span></span><span class="count">5</span></a>
+            <div class="nav__sep" role="separator"></div>
+            <button type="button" class="nav__btn nav__btn--new"><span>New list</span><svg aria-hidden="true"><use href="#i-plus"/></svg></button>
+          </div>
+          <div class="box">
+            <a class="nav__btn" href="#"><span>Reviews</span><span class="count">38</span></a>
+          </div>
+          <div class="box">
+            <a class="nav__btn" href="#"><span class="nav__label nav__label--tall"><svg aria-hidden="true"><use href="#i-settings"/></svg><span>Settings</span></span></a>
+          </div>
+          <div class="box">
+            <div class="nav__sort"><span>Sort: <b>Custom order</b></span><svg aria-hidden="true"><use href="#i-sort"/></svg></div>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="nav-title">
+    <h2 id="nav-title">The Lists panel, for the owner and for a visitor</h2>
+    <p class="lede">
+      Same in both variants. It sits between the categories and Reviews, and replaces the categories'
+      <em>Edit</em> row. The heading row opens the Lists tab; a private list is marked with a lock and
+      is left out entirely for anyone else, count included. A player without lists shows no panel to
+      visitors and a single <em>New list</em> row to themselves.
+    </p>
+    <div class="stage">
+      <div class="pair">
+        <div class="pair__cell">
+          <p class="stage__context">moth_scholar on their own profile</p>
+          <div class="frame frame--solo">
+            <div class="nav">
+              <div class="box">
+                <a class="nav__btn" href="#"><span class="nav__label"><svg aria-hidden="true"><use href="#i-list"/></svg><span class="nav__title">Lists</span></span><span class="count">4</span></a>
+                <a class="nav__btn" href="#"><span class="nav__label"><span>Cozy winter evenings</span></span><span class="count">14</span></a>
+                <a class="nav__btn" href="#"><span class="nav__label"><span>Best maps in games</span></span><span class="count">23</span></a>
+                <a class="nav__btn" href="#"><span class="nav__label"><span>Souls on original hardware</span><svg aria-label="Private"><use href="#i-lock"/></svg></span><span class="count">7</span></a>
+                <a class="nav__btn" href="#"><span class="nav__label"><span>Co-op with friends</span></span><span class="count">5</span></a>
+                <div class="nav__sep" role="separator"></div>
+                <button type="button" class="nav__btn nav__btn--new"><span>New list</span><svg aria-hidden="true"><use href="#i-plus"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="pair__cell">
+          <p class="stage__context">A visitor on moth_scholar's profile</p>
+          <div class="frame frame--solo">
+            <div class="nav">
+              <div class="box">
+                <a class="nav__btn" href="#"><span class="nav__label"><svg aria-hidden="true"><use href="#i-list"/></svg><span class="nav__title">Lists</span></span><span class="count">3</span></a>
+                <a class="nav__btn" href="#"><span class="nav__label"><span>Cozy winter evenings</span></span><span class="count">14</span></a>
+                <a class="nav__btn" href="#"><span class="nav__label"><span>Best maps in games</span></span><span class="count">23</span></a>
+                <a class="nav__btn" href="#"><span class="nav__label"><span>Co-op with friends</span></span><span class="count">5</span></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="caption">With more than eight lists the panel shows the eight most recently updated and a “Show all 23” row that opens the Lists tab. On a phone the panel lives in the profile's Menu drawer with the rest of the column.</p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="tab-title">
+    <h2 id="tab-title">The Lists tab</h2>
+    <p class="lede">
+      <code class="t">?list=lists</code> on the profile: every list as a card with the first four covers.
+      It is what the heading of the Lists panel opens, and where a visitor lands from a shared profile.
+    </p>
+    <div class="stage">
+      <p class="stage__context">Owner · /user/moth_scholar?list=lists</p>
+      <div class="frame">
+        <article class="box" aria-label="Lists by moth_scholar">
+          <ol class="crumbs">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">moth_scholar</a></li>
+            <li><span aria-current="page">Lists</span></li>
+          </ol>
+          <div class="box__head">
+            <div class="box__title"><h3>Lists</h3><span class="count">4</span></div>
+            <button type="button" class="btn btn--accent"><svg aria-hidden="true"><use href="#i-plus"/></svg>New list</button>
+          </div>
+          <div class="lists-grid">
+            <a class="lcard" href="#">
+              <span class="mosaic" aria-hidden="true">
+                <span class="cover art-shorthike"></span><span class="cover art-unpacking"></span><span class="cover art-spiritfarer"></span><span class="cover art-chicory"></span>
+              </span>
+              <span class="lcard__body">
+                <span class="lcard__name"><span>Cozy winter evenings</span></span>
+                <span class="lcard__meta">14 games · 3 days ago</span>
+              </span>
+            </a>
+            <a class="lcard" href="#">
+              <span class="mosaic" aria-hidden="true">
+                <span class="cover art-hollow"></span><span class="cover art-outer"></span><span class="cover art-tunic"></span><span class="cover art-animalwell"></span>
+              </span>
+              <span class="lcard__body">
+                <span class="lcard__name"><span>Best maps in games</span></span>
+                <span class="lcard__meta">23 games · 2 weeks ago</span>
+              </span>
+            </a>
+            <a class="lcard" href="#">
+              <span class="mosaic" aria-hidden="true">
+                <span class="cover art-elden"></span><span class="cover art-darksouls"></span><span class="cover art-bloodborne"></span><span class="cover art-sekiro"></span>
+              </span>
+              <span class="lcard__body">
+                <span class="lcard__name"><svg aria-label="Private"><use href="#i-lock"/></svg><span>Souls on original hardware</span></span>
+                <span class="lcard__meta">7 games · 4 months ago</span>
+              </span>
+            </a>
+            <a class="lcard" href="#">
+              <span class="mosaic" aria-hidden="true">
+                <span class="cover art-ittakestwo"></span><span class="cover art-stardew"></span><span class="cover art-overcooked"></span><span class="cover art-drg"></span>
+              </span>
+              <span class="lcard__body">
+                <span class="lcard__name"><span>Co-op with friends</span></span>
+                <span class="lcard__meta">5 games · 1 month ago</span>
+              </span>
+            </a>
+          </div>
+          <p class="caption">Newest update first. A visitor sees three cards and no New list button. A list with fewer than four games fills the empty tiles with the panel colour.</p>
+        </article>
+
+        <nav class="nav" aria-label="Profile navigation">
+          <div class="box">
+            <a class="nav__btn" href="#"><span class="nav__label nav__label--tall"><span class="avatar" aria-hidden="true">ms</span><span>Profile</span></span></a>
+          </div>
+          <div class="box">
+            <a class="nav__btn" href="#"><span>All</span><span class="count">214</span></a>
+            <a class="nav__btn" href="#"><span>Playing</span><span class="count">6</span></a>
+            <a class="nav__btn" href="#"><span>Completed</span><span class="count">118</span></a>
+            <a class="nav__btn" href="#"><span>Mastered</span><span class="count">21</span></a>
+            <a class="nav__btn" href="#"><span>Played</span><span class="count">19</span></a>
+            <a class="nav__btn" href="#"><span>Wishlist</span><span class="count">38</span></a>
+            <a class="nav__btn" href="#"><span>Backlog</span><span class="count">9</span></a>
+            <a class="nav__btn" href="#"><span>Dropped</span><span class="count">3</span></a>
+          </div>
+          <div class="box">
+            <a class="nav__btn" href="#" aria-current="page"><span class="nav__label"><svg aria-hidden="true"><use href="#i-list"/></svg><span class="nav__title">Lists</span></span><span class="count">4</span></a>
+            <a class="nav__btn" href="#"><span class="nav__label"><span>Cozy winter evenings</span></span><span class="count">14</span></a>
+            <a class="nav__btn" href="#"><span class="nav__label"><span>Best maps in games</span></span><span class="count">23</span></a>
+            <a class="nav__btn" href="#"><span class="nav__label"><span>Souls on original hardware</span><svg aria-label="Private"><use href="#i-lock"/></svg></span><span class="count">7</span></a>
+            <a class="nav__btn" href="#"><span class="nav__label"><span>Co-op with friends</span></span><span class="count">5</span></a>
+            <div class="nav__sep" role="separator"></div>
+            <button type="button" class="nav__btn nav__btn--new"><span>New list</span><svg aria-hidden="true"><use href="#i-plus"/></svg></button>
+          </div>
+          <div class="box">
+            <a class="nav__btn" href="#"><span>Reviews</span><span class="count">38</span></a>
+          </div>
+          <div class="box">
+            <a class="nav__btn" href="#"><span class="nav__label nav__label--tall"><svg aria-hidden="true"><use href="#i-settings"/></svg><span>Settings</span></span></a>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="modal-title">
+    <h2 id="modal-title">Creating, editing and deleting a list</h2>
+    <p class="lede">
+      One modal for both, opened from <em>New list</em> (panel, Lists tab, and the game-card popover)
+      and from <em>Edit</em> on the list page. After <em>Create</em> the player lands on the new, empty
+      list with the search focused. Deleting goes through the shared <code class="t">ConfirmModal</code>.
+    </p>
+    <div class="stage">
+      <div class="pair pair--wide">
+        <div class="pair__cell">
+          <p class="stage__context">New list · from the Lists panel</p>
+          <div class="modal" role="dialog" aria-labelledby="new-list-title">
+            <h3 id="new-list-title">New list</h3>
+            <div class="formfield">
+              <span class="formfield__label"><span>Name</span><i>23 / 60</i></span>
+              <div class="input input--focus"><span class="input__value">Metroidvanias to finish<span class="caret" aria-hidden="true"></span></span></div>
+            </div>
+            <div class="formfield">
+              <span class="formfield__label"><span>Description</span><i>Optional</i></span>
+              <div class="input input--area"><span class="input__value input__placeholder">What ties these games together?</span><span class="input__count">0 / 300</span></div>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <b>Private list</b>
+                <span class="helper">Only you can open it.</span>
+              </div>
+              <button type="button" class="switch" role="switch" aria-checked="true" aria-label="Private list" data-switch><span>OFF</span><span>ON</span></button>
+            </div>
+            <div class="modal__foot">
+              <button type="button" class="btn btn--default">Cancel</button>
+              <button type="button" class="btn btn--accent">Create</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="pair__cell">
+          <p class="stage__context">Edit list · from the list page</p>
+          <div class="modal" role="dialog" aria-labelledby="edit-list-title">
+            <h3 id="edit-list-title">Edit list</h3>
+            <div class="formfield">
+              <span class="formfield__label"><span>Name</span><i>20 / 60</i></span>
+              <div class="input"><span class="input__value">Cozy winter evenings</span></div>
+            </div>
+            <div class="formfield">
+              <span class="formfield__label"><span>Description</span><i>Optional</i></span>
+              <div class="input input--area"><span class="input__value">Short, warm and finishable in a weekend. Nothing with a fail state.</span><span class="input__count">66 / 300</span></div>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <b>Private list</b>
+                <span class="helper">Making it private hides it from your profile and breaks links already shared.</span>
+              </div>
+              <button type="button" class="switch" role="switch" aria-checked="false" aria-label="Private list" data-switch><span>OFF</span><span>ON</span></button>
+            </div>
+            <div class="modal__foot">
+              <button type="button" class="ghost ghost--danger">Delete list</button>
+              <button type="button" class="btn btn--default">Cancel</button>
+              <button type="button" class="btn btn--accent">Save</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="pair__cell">
+          <p class="stage__context">Delete list · ConfirmModal</p>
+          <div class="modal" role="alertdialog" aria-labelledby="delete-list-title">
+            <h3 id="delete-list-title">Delete list</h3>
+            <p class="modal__text">Delete “Cozy winter evenings”? The 14 games stay in your categories and playthroughs; only the list goes.</p>
+            <p class="modal__warn">Links to this list will stop working.</p>
+            <div class="modal__foot">
+              <button type="button" class="btn btn--default">Cancel</button>
+              <button type="button" class="btn btn--red">Delete</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="pair__cell">
+          <p class="stage__context">Validation · on blur and on Create</p>
+          <div class="modal" role="dialog" aria-labelledby="invalid-list-title">
+            <h3 id="invalid-list-title">New list</h3>
+            <div class="formfield">
+              <span class="formfield__label"><span>Name</span><i>2 / 60</i></span>
+              <div class="input input--error"><span class="input__value">Co</span></div>
+              <span class="helper helper--error">Name must be at least 3 characters.</span>
+            </div>
+            <p class="caption">Checked on Create, against the player's other lists:</p>
+            <div class="formfield">
+              <span class="formfield__label"><span>Name</span><i>18 / 60</i></span>
+              <div class="input input--error"><span class="input__value">Co-op with friends</span></div>
+              <span class="helper helper--error">You already have a list with this name.</span>
+            </div>
+            <div class="modal__foot">
+              <button type="button" class="btn btn--default">Cancel</button>
+              <button type="button" class="btn btn--accent" disabled>Create</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="states-title">
+    <h2 id="states-title">Other states</h2>
+    <p class="lede">Drawn once in the header style both variants share.</p>
+
+    <div class="stage">
+      <p class="stage__context">Owner · a list just created, nothing in it yet</p>
+      <article class="box" aria-label="Metroidvanias to finish">
+        <ol class="crumbs">
+          <li><a href="#">Home</a></li>
+          <li><a href="#">moth_scholar</a></li>
+          <li><a href="#">Lists</a></li>
+          <li><span aria-current="page">Metroidvanias to finish</span></li>
+        </ol>
+        <div class="lhead">
+          <div class="lhead__top">
+            <div class="lhead__title"><h3>Metroidvanias to finish</h3><span class="badge"><svg aria-hidden="true"><use href="#i-lock"/></svg>Private</span></div>
+            <div class="lhead__actions">
+              <button type="button" class="ghost"><svg aria-hidden="true"><use href="#i-pen"/></svg>Edit</button>
+            </div>
+          </div>
+          <p class="lhead__meta"><span>0 games</span><span>Created just now</span></p>
+        </div>
+        <div class="search">
+          <div class="input input--focus">
+            <svg aria-hidden="true"><use href="#i-search"/></svg>
+            <span class="input__value input__placeholder"><span class="caret" aria-hidden="true"></span>Search for a game to add…</span>
+          </div>
+        </div>
+        <div class="emptystate">
+          <span class="emptystate__moon" aria-hidden="true"></span>
+          <p class="emptystate__title">This list is empty</p>
+          <p>Search for a game to add the first one. You can also add games from any game card.</p>
+        </div>
+      </article>
+    </div>
+
+    <div class="stage">
+      <p class="stage__context">Owner · a private list</p>
+      <article class="box" aria-label="Souls on original hardware">
+        <div class="lhead">
+          <div class="lhead__top">
+            <div class="lhead__title"><h3>Souls on original hardware</h3><span class="badge"><svg aria-hidden="true"><use href="#i-lock"/></svg>Private</span></div>
+            <div class="lhead__actions">
+              <button type="button" class="ghost"><svg aria-hidden="true"><use href="#i-pen"/></svg>Edit</button>
+            </div>
+          </div>
+          <p class="lhead__meta"><span>7 games</span><span>Updated 4 months ago</span></p>
+          <p class="lhead__note"><svg aria-hidden="true"><use href="#i-eye"/></svg>Only you can see this list. Anyone else opening its link gets “Page not found”.</p>
+        </div>
+      </article>
+      <p class="caption">No Copy link on a private list — there is nobody to send it to.</p>
+    </div>
+
+    <div class="stage">
+      <p class="stage__context">Visitor · someone else's public list, as it reaches search engines</p>
+      <article class="box" aria-label="Best maps in games">
+        <ol class="crumbs">
+          <li><a href="#">Home</a></li>
+          <li><a href="#">moth_scholar</a></li>
+          <li><a href="#">Lists</a></li>
+          <li><span aria-current="page">Best maps in games</span></li>
+        </ol>
+        <div class="lhead">
+          <div class="lhead__top">
+            <div class="lhead__title"><h3>Best maps in games</h3></div>
+            <div class="lhead__actions">
+              <button type="button" class="ghost" data-copy><svg aria-hidden="true"><use href="#i-link"/></svg><span>Copy link</span></button>
+            </div>
+          </div>
+          <p class="lhead__desc">Worlds you learn by walking them. The map is half the game in every one of these.</p>
+          <p class="lhead__meta"><span class="nav__label"><span class="avatar" aria-hidden="true">ms</span><span>moth_scholar</span></span><span>23 games</span><span>Updated 2 weeks ago</span></p>
+        </div>
+        <div class="shelf">
+            <a class="gcard" href="#"><span class="cover art-hollow">Hollow Knight</span><span class="rail rail--tl"><span class="pip"><svg aria-hidden="true"><use href="#i-crown"/></svg></span></span><span class="rail rail--tr"><span class="pip"><svg aria-hidden="true"><use href="#i-more"/></svg></span></span><span class="rail rail--br"><span class="pip pip--star"><svg aria-hidden="true"><use href="#i-star"/></svg>8.9</span></span></a>
+            <a class="gcard" href="#"><span class="cover art-outer">Outer Wilds</span><span class="rail rail--tl"><span class="pip"><svg aria-hidden="true"><use href="#i-crown"/></svg></span></span><span class="rail rail--tr"><span class="pip"><svg aria-hidden="true"><use href="#i-more"/></svg></span></span><span class="rail rail--br"><span class="pip pip--star"><svg aria-hidden="true"><use href="#i-star"/></svg>9.1</span></span></a>
+            <a class="gcard hide-sm" href="#"><span class="cover art-tunic">Tunic</span><span class="rail rail--tl"><span class="pip"><svg aria-hidden="true"><use href="#i-crown"/></svg></span></span><span class="rail rail--tr"><span class="pip"><svg aria-hidden="true"><use href="#i-more"/></svg></span></span><span class="rail rail--br"><span class="pip pip--star"><svg aria-hidden="true"><use href="#i-star"/></svg>8.5</span></span></a>
+            <a class="gcard hide-md" href="#"><span class="cover art-animalwell">Animal Well</span><span class="rail rail--tl"><span class="pip"><svg aria-hidden="true"><use href="#i-crown"/></svg></span></span><span class="rail rail--tr"><span class="pip"><svg aria-hidden="true"><use href="#i-more"/></svg></span></span><span class="rail rail--br"><span class="pip pip--star"><svg aria-hidden="true"><use href="#i-star"/></svg>8.7</span></span></a>
+            <a class="gcard hide-md" href="#"><span class="cover art-sh2">Silent Hill 2</span><span class="rail rail--tl"><span class="pip"><svg aria-hidden="true"><use href="#i-crown"/></svg></span></span><span class="rail rail--tr"><span class="pip"><svg aria-hidden="true"><use href="#i-more"/></svg></span></span><span class="rail rail--br"><span class="pip pip--star"><svg aria-hidden="true"><use href="#i-star"/></svg>8.8</span></span></a>
+        </div>
+        <p class="caption">The first row of 23. No Edit, no search, no Manage, no remove buttons, no drag handles. The sort in the navigation reads “Author's order” instead of “Custom order”. Page title: “Best maps in games — a list by moth_scholar | MoonCellar”.</p>
+      </article>
+    </div>
+
+    <div class="stage">
+      <p class="stage__context">Search results · loading, nothing found, list full</p>
+      <div class="pair">
+        <div class="pair__cell">
+          <div class="results results--static" aria-label="Loading results">
+            <div class="result"><span class="skeleton skeleton--cover"></span><span class="result__text"><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line-short"></span></span><span class="skeleton skeleton--btn"></span></div>
+            <div class="result"><span class="skeleton skeleton--cover"></span><span class="result__text"><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line-short"></span></span><span class="skeleton skeleton--btn"></span></div>
+            <p class="results__foot">Searching after 300 ms without typing</p>
+          </div>
+        </div>
+        <div class="pair__cell">
+          <div class="results results--static" aria-label="No results">
+            <div class="results__empty">
+              <b>Nothing found for “hollow nite”</b>
+              <span>Check the spelling or try the original title.</span>
+            </div>
+          </div>
+        </div>
+        <div class="pair__cell">
+          <div class="results results--static" aria-label="List is full">
+            <div class="result">
+              <span class="cover art-celeste" aria-hidden="true">Celeste</span>
+              <span class="result__text">
+                <span class="result__name"><mark>Cele</mark>ste</span>
+                <span class="result__meta">2018 · PC, Nintendo Switch</span>
+              </span>
+              <button type="button" class="btn btn--default btn--sm" disabled>Add</button>
+            </div>
+            <p class="results__foot">This list is full — 500 of 500 games.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="compare-title">
+    <h2 id="compare-title">Side by side</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th scope="col">&nbsp;</th><th scope="col">A · Shelf grid</th><th scope="col">B · Ranked rows</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Games per screen</th><td>15–20 covers</td><td>8–10 rows</td></tr>
+          <tr><th scope="row">Reading the order</th><td>Small position numbers, only in Manage</td><td>The numbers are the layout</td></tr>
+          <tr><th scope="row">Reordering</th><td>Drag cards across a wrapping grid</td><td>Drag handles or keyboard, one axis</td></tr>
+          <tr><th scope="row">Adding a game</th><td>Header search, results over the grid, always at the end</td><td>Pinned panel, choose top or end, stays open</td></tr>
+          <tr><th scope="row">What a visitor learns</th><td>Covers and average rating</td><td>Year, platforms, and their own status and rating</td></tr>
+          <tr><th scope="row">Consistency</th><td>Same grid as All / Completed / Wishlist</td><td>A new layout on the profile</td></tr>
+          <tr><th scope="row">Reused as is</th><td><code class="t">GamesCards</code>, <code class="t">GameCard</code>, <code class="t">Input</code>, <code class="t">Pagination</code></td><td><code class="t">Input</code>, <code class="t">Pagination</code>; a new row component and a drag-and-drop package</td></tr>
+          <tr><th scope="row">Server HTML</th><td>Card links</td><td>Row links with year and platforms as text</td></tr>
+          <tr><th scope="row">Build size</th><td><span class="size">M</span></td><td><span class="size">L</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="build-title">
+    <h2 id="build-title">How it would be built</h2>
+    <p class="lede">Everything below is shared by both variants; only the list body differs.</p>
+
+    <div class="plan">
+      <div>
+        <h3>API</h3>
+        <pre><b>GET</b>    /users/:name/lists        <i>private ones for the owner only</i>
+<b>GET</b>    /lists/:slug?user=:name   <i>404 if private and not the owner</i>
+<b>POST</b>   /lists                    <i>{ name, description?, isPrivate }</i>
+<b>PATCH</b>  /lists/:id                <i>{ name?, description?, isPrivate? }</i>
+<b>DELETE</b> /lists/:id
+<b>POST</b>   /lists/:id/games          <i>{ gameId, position: "start" | "end" }</i>
+<b>DELETE</b> /lists/:id/games/:gameId
+<b>PATCH</b>  /lists/:id/order          <i>{ gameIds: string[] }</i></pre>
+        <p>
+          Every write checks the owner. <code class="t">order</code> takes the full id list and is
+          rejected unless it holds exactly the stored games, so two tabs cannot silently drop one.
+          The game read pages 30 at a time in the stored order and joins the game fields the cards need.
+        </p>
+      </div>
+      <div>
+        <h3>Data</h3>
+        <ul>
+          <li>Zod schemas in <code class="t">packages/schemas</code> (<code class="t">custom-lists.schema.ts</code>): the list, create and update requests (name trimmed, 3–60; description ≤ 300), add and reorder requests.</li>
+          <li>New collection with <code class="t">{ userId, slug }</code> unique and <code class="t">{ "games.gameId": 1 }</code>, which answers “which of my lists hold this game” for the game-card popover.</li>
+          <li>Ids declared as <code class="t">Schema.Types.ObjectId</code> paths, not bare <code class="t">ref</code>, or string ids match nothing.</li>
+          <li>Slug from the name; a clash inside one profile gets <code class="t">-2</code>. Names are unique per player, case-insensitively.</li>
+          <li>A game appears in a list at most once.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Web</h3>
+        <ul>
+          <li>Route <code class="t">app/user/[name]/lists/[slug]</code>, rendered on the server with the first page of games; <code class="t">notFound()</code> only from the page component, never from <code class="t">generateMetadata</code>.</li>
+          <li><code class="t">UserNavigation</code> gains the Lists panel; the categories' Edit row and <code class="t">CustomFolderModal</code> are removed.</li>
+          <li><code class="t">UserLists</code> for <code class="t">?list=lists</code>; <code class="t">ListModal</code> for create and edit, fields wired through <code class="t">Controller</code>; <code class="t">ListSearch</code> built on <code class="t">Input</code> with results through the <code class="t">#dropdown-connector</code> portal, reusing the catalogue's name search.</li>
+          <li>Add and remove are optimistic React Query mutations that also refresh the game-card popover's data.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Activity, icons, tokens</h3>
+        <ul>
+          <li>Lists never write to the activity feed: adding, removing and reordering games leave no log, or the feed would fill with filing instead of playing.</li>
+          <li>New <code class="t">Svg*</code> components: <code class="t">SvgLock</code>, <code class="t">SvgGrip</code> (B only), <code class="t">SvgCheck</code>. <code class="t">SvgList</code>, <code class="t">SvgLink</code>, <code class="t">SvgPlus</code>, <code class="t">SvgSearch</code>, <code class="t">SvgPen</code>, <code class="t">SvgClose</code> exist.</li>
+          <li>Tokens to promote: <code class="t">--mock-search-width</code>, <code class="t">--mock-row-cover-width</code>, <code class="t">--mock-rank-width</code>, <code class="t">--mock-handle-size</code>, <code class="t">--mock-row-action-size</code>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="hints">
+      <div>
+        <h4>Open questions</h4>
+        <ul>
+          <li>Limits: 50 lists per player and 500 games per list are placeholders.</li>
+          <li>Renaming changes the slug. Keep old slugs as redirects, or let shared links break?</li>
+          <li>Can a visitor copy someone else's list into their own?</li>
+          <li>Are the five favourite games a list of their own, or separate from lists? They are drawn in the profile mockup.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Not in this round</h4>
+        <ul>
+          <li>A note per game inside a list.</li>
+          <li>Lists with several authors.</li>
+          <li>A public directory of everyone's lists.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="recommend">
+      <p class="eyebrow">Recommendation</p>
+      <h3>Variant A, with B's rows as its Manage mode</h3>
+      <p>
+        Visitors read a list the way they read the rest of the profile, so the page stays the cover
+        grid they already know, and it ships mostly from existing components. Ordering is the one job
+        the grid does badly, so Manage swaps the grid for B's compact rows — handles, remove, and the
+        pinned search with top or end — and Done swaps it back. If lists turn out to be mostly
+        rankings, B's rows can become the default view later without changing the API.
+      </p>
+    </div>
+  </section>
+
+  <p class="note">
+    Colours, spacing and radii are the project's own tokens: the <code class="t">:root</code> block
+    above is generated from <code class="t">apps/web/src/lib/app/styles/vars</code> by
+    <code class="t">bun --filter web sync:tokens</code>. The typeface is substituted — Hanken
+    Grotesk stands in for ApercuPro, whose licensed file cannot be served from a third-party host.
+    Covers are coloured placeholders, and the profile, its lists and the dates are invented.
+    Icons are drawn inline here; on the site each one is an <code class="t">Svg*</code> component
+    in <code class="t">shared/ui/svg</code>.
+  </p>
+</div>
+
+<script>
+  document.querySelectorAll("[data-segment]").forEach((button) => {
+    button.addEventListener("click", () => {
+      button.parentElement.querySelectorAll("[data-segment]").forEach((item) => {
+        item.setAttribute("aria-pressed", String(item === button));
+      });
+    });
+  });
+
+  document.querySelectorAll("[data-switch]").forEach((button) => {
+    button.addEventListener("click", () => {
+      button.setAttribute("aria-checked", String(button.getAttribute("aria-checked") !== "true"));
+    });
+  });
+
+  document.querySelectorAll("[data-toggle]").forEach((button) => {
+    button.addEventListener("click", () => {
+      button.setAttribute("aria-pressed", String(button.getAttribute("aria-pressed") !== "true"));
+    });
+  });
+
+  document.querySelectorAll("[data-add]").forEach((button) => {
+    button.addEventListener("click", () => {
+      button.className = "btn btn--added btn--sm";
+      button.disabled = true;
+      button.innerHTML = '<svg aria-hidden="true"><use href="#i-check"/></svg>Added';
+    });
+  });
+
+  document.querySelectorAll("[data-copy]").forEach((button) => {
+    const label = button.querySelector("span");
+    button.addEventListener("click", () => {
+      label.textContent = "Link copied";
+      button.classList.add("is-done");
+      setTimeout(() => {
+        label.textContent = "Copy link";
+        button.classList.remove("is-done");
+      }, 1600);
+    });
+  });
+</script>

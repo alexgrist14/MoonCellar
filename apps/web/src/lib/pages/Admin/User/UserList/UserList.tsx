@@ -23,7 +23,7 @@ const ALL_ROLES: IRole[] = ["user", "admin", "moderator"];
 
 const UserList: FC = () => {
   const tableId = useId();
-  const { data: users = [], isPending } = useAdminUsersQuery();
+  const { data: users = [], isLoading } = useAdminUsersQuery();
   const currentUser = useAuthStore((state) => state.profile);
   const { mutate: updateUserRoles, isPending: isUpdatingRoles } =
     useUpdateAdminUserRolesMutation();
@@ -87,6 +87,7 @@ const UserList: FC = () => {
     <div id={tableId}>
       <Table
         mobileHeadField="userName"
+        isLoading={isLoading}
         headers={{
           userName: { content: "User" },
           raUsername: { content: "RA Username" },

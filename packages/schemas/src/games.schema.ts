@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { CharacterSchema } from "./characters.schema";
 
+export const ADULT_THEME_NAME = "Erotic";
+
 export const RetroachievementsSchema = z.object({
   gameId: z.number(),
   consoleId: z.number(),

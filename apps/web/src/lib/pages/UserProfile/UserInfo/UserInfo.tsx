@@ -1,224 +1,351 @@
-import { useUserLogsQuery } from "@/src/lib/entities/user/api/user.queries";
+import { FC, useMemo } from "react";
+import Image from "next/image";
+import Markdown from "react-markdown";
+import { ICustomList, IGameResponse, IPlaythrough } from "@mooncellar/schemas";
+import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
 import {
-  useAddUserFollowingMutation,
-  useRemoveUserFollowingMutation,
-  useRemoveUserLogMutation,
-} from "@/src/lib/entities/user/api/user.mutations";
+  useLikedListsQuery,
+  useUserListsQuery,
+} from "@/src/lib/entities/list/api";
+import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
+import { useAuthStore } from "@/src/lib/shared/store/auth.store";
+import { useExpandStore } from "@/src/lib/shared/store/expand.store";
 import { IUser } from "@/src/lib/shared/types/auth.type";
 import { IFollowings } from "@/src/lib/shared/types/user.type";
 import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
-import { Button } from "@/src/lib/shared/ui/Button";
-import { commonUtils } from "@/src/lib/shared/utils/common.utils";
-import Image from "next/image";
-import Link from "next/link";
-import { FC, useMemo, useState } from "react";
-import styles from "./UserInfo.module.scss";
-import Markdown from "react-markdown";
-import { RichText } from "@/src/lib/shared/ui/RichText";
-import { Loader } from "@/src/lib/shared/ui/Loader";
-import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
-import { GameCard } from "@/src/lib/shared/ui/GameCard";
-import { Box } from "@/src/lib/shared/ui/Box";
+import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
+import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
+import { DRAWER_TRIGGER_ATTRIBUTE, drawer } from "@/src/lib/shared/ui/Drawer";
+import { ListCard } from "@/src/lib/shared/ui/ListCard";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
-import { Pagination } from "@/src/lib/shared/ui/Pagination";
-import { takeLogs } from "@/src/lib/shared/constants/user.const";
-import { SvgClose } from "@/src/lib/shared/ui/svg";
-import { modal } from "@/src/lib/shared/ui/Modal";
-import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal/ConfirmModal";
-import { toast } from "@/src/lib/shared/utils/toast.utils";
+import { SvgListBullet } from "@/src/lib/shared/ui/svg";
+import { commonUtils } from "@/src/lib/shared/utils/common.utils";
+import { ActivityTimeline } from "./ActivityTimeline";
+import { IPeopleTab, PeopleDrawer } from "./PeopleDrawer";
+import { TopFive } from "./TopFive";
+import { useViewerFollowings } from "./useViewerFollowings";
+import styles from "./UserInfo.module.scss";
 
 interface UserInfoProps {
   user: IUser;
   authUserFollowings?: IFollowings;
   authUserId?: string;
+  isOwner: boolean;
+  playthroughs: IPlaythrough[];
+  favoriteGames: IGameResponse[];
+  lists: ICustomList[];
+  likedLists: ICustomList[];
 }
+
+type IPerson = Pick<IUser, "_id" | "userName" | "avatar">;
+
+const LISTS_PREVIEW_LIMIT = 6;
+const STACK_LIMIT = 3;
+
+const formatCount = new Intl.NumberFormat("en-US").format;
+
+const PeopleStack: FC<{ people: IPerson[] }> = ({ people }) =>
+  people.length ? (
+    <span className={styles.stack} aria-hidden="true">
+      {people.slice(0, STACK_LIMIT).map((person) => (
+        <span key={person._id} className={styles.stack__item}>
+          <Avatar user={person} isWithoutTooltip isWithoutHover />
+        </span>
+      ))}
+    </span>
+  ) : null;
 
 const UserInfo: FC<UserInfoProps> = ({
   user,
   authUserFollowings,
   authUserId,
+  isOwner,
+  playthroughs,
+  favoriteGames,
+  lists: initialLists,
+  likedLists: initialLikedLists,
 }) => {
-  const {
-    _id: id,
-    followings: userFollowings,
-    followers: userFollowers,
-    userName,
-  } = user;
+  const { _id: id, userName } = user;
+  const { setQuery } = useAdvancedRouter();
+  const { setExpanded } = useExpandStore();
+  const viewerProfile = useAuthStore((s) => s.profile);
 
-  const [page, setPage] = useState(1);
-
-  const [userAuthFollowings, setUserAuthFollowings] = useState<IFollowings>(
-    authUserFollowings || { followings: [] }
+  const { followingIds, toggleFollowing, isBusy } = useViewerFollowings(
+    authUserId,
+    authUserFollowings
   );
 
-  const { data: logsData, isPending, isFetching } = useUserLogsQuery(
-    user._id,
-    page,
-    takeLogs
+  const isFollow = followingIds.has(id);
+  const canFollow = !!authUserId && authUserId !== id;
+
+  const baseFollowers = useMemo(
+    () => user.followers?.followers ?? [],
+    [user.followers]
   );
-  const isLogsLoading = useMinimumLoading(isPending);
+  const followings = useMemo(
+    () => user.followings?.followings ?? [],
+    [user.followings]
+  );
 
-  const logs = logsData?.results ?? [];
-  const totalLogs = logsData?.total ?? 0;
+  const followers = useMemo(() => {
+    if (!authUserId || authUserId === id) return baseFollowers;
 
-  const { mutate: addFollowing } = useAddUserFollowingMutation();
-  const { mutate: removeFollowing } = useRemoveUserFollowingMutation();
-  const { mutate: removeLog } = useRemoveUserLogMutation();
-
-  const isFollow = useMemo(() => {
-    return userAuthFollowings?.followings
-      .map((follow) => follow._id)
-      .includes(id);
-  }, [id, userAuthFollowings?.followings]);
-
-  const handleFollowClick = () => {
-    if (!authUserId) return;
-    const mutate = isFollow ? removeFollowing : addFollowing;
-    mutate(
-      { userId: authUserId, followingId: id },
-      { onSuccess: (data) => setUserAuthFollowings(data) }
+    const withoutViewer = baseFollowers.filter(
+      (person) => person._id !== authUserId
     );
-  };
+    const viewer =
+      baseFollowers.find((person) => person._id === authUserId) ??
+      (viewerProfile?._id === authUserId
+        ? {
+            _id: viewerProfile._id,
+            userName: viewerProfile.userName,
+            avatar: viewerProfile.avatar,
+          }
+        : undefined);
 
-  const handleDeleteLog = (logId: string) => {
-    const modalId = `delete-log-${logId}`;
+    return isFollow && viewer ? [viewer, ...withoutViewer] : withoutViewer;
+  }, [authUserId, baseFollowers, id, isFollow, viewerProfile]);
 
-    modal.open(
-      <ConfirmModal
-        title="Delete Log"
-        message="Are you sure you want to delete this log entry?"
-        onConfirm={() =>
-          removeLog(
-            { userId: id, _id: logId },
-            {
-              onSuccess: () => {
-                modal.close(modalId);
-                toast.success({ description: "Log deleted successfully" });
-              },
-            }
-          )
-        }
-        onCancel={() => modal.close(modalId)}
+  const favoriteIds = useMemo(() => user.favorites ?? [], [user.favorites]);
+  const isServerOrder =
+    favoriteIds.length === favoriteGames.length &&
+    favoriteIds.every((gameId, index) => favoriteGames[index]?._id === gameId);
+
+  const { data: liveFavorites } = useGamesByIdsQuery(
+    favoriteIds,
+    undefined,
+    isOwner && !isServerOrder
+  );
+
+  const topGames = useMemo(() => {
+    if (isServerOrder || !isOwner) return favoriteGames;
+
+    const pool = [...(liveFavorites ?? []), ...favoriteGames];
+
+    return favoriteIds.flatMap((gameId) => {
+      const game = pool.find((item) => item._id === gameId);
+
+      return game ? [game] : [];
+    });
+  }, [favoriteGames, favoriteIds, isOwner, isServerOrder, liveFavorites]);
+
+  const { data: liveLists } = useUserListsQuery(id);
+  const lists = liveLists ?? initialLists;
+  const { data: liveLikedLists } = useLikedListsQuery(id);
+  const likedLists = liveLikedLists ?? initialLikedLists;
+
+  const gamesCount = useMemo(
+    () => new Set(playthroughs.map((play) => play.gameId)).size,
+    [playthroughs]
+  );
+  const reviewsCount = useMemo(
+    () =>
+      playthroughs.filter(
+        (play) => !!play.comment && play.category !== "wishlist"
+      ).length,
+    [playthroughs]
+  );
+
+  const isListsVisible = isOwner || !!lists.length;
+
+  const openPeople = (initialTab: IPeopleTab) =>
+    drawer.open(
+      <PeopleDrawer
+        followers={followers}
+        followings={followings}
+        initialTab={initialTab}
+        viewerId={authUserId}
+        viewerFollowings={authUserFollowings}
       />,
-      { id: modalId }
+      { title: userName }
     );
+
+  const goTo = (list: string) => {
+    setExpanded([]);
+    setQuery({ list, page: 1 });
   };
+
+  const triggerProps = { [DRAWER_TRIGGER_ATTRIBUTE]: "" };
 
   return (
-    <>
-      <div className={styles.content__top}>
-        <div className={styles.profile}>
-          <div className={styles.profile__left}>
-            <div className={styles.profile__image}>
-              <Image
-                key={id}
-                src={user.avatar || "/images/user.png"}
-                width={160}
-                height={160}
-                alt="profile"
-                className={styles.image}
-              />
-              {id !== authUserId && (
-                <Button className={styles.btn} onClick={handleFollowClick}>
-                  {isFollow ? "Unfollow" : "Follow"}
-                </Button>
-              )}
-            </div>
-            <div className={styles.profile__info}>
-              <div className={styles.profile__name}>{userName}</div>
-              <div className={styles.date}>
-                <span>Last seen:</span>{" "}
-                {commonUtils.getHumanDate(user.updatedAt)}
-              </div>
-              {user.description && (
-                <div className={styles.profile__description}>
-                  <Markdown>{user.description}</Markdown>
-                </div>
-              )}
-            </div>
-          </div>
-          <div className={styles.friendsGroup}>
-            <div className={styles.friends}>
-              <SectionTitle as="h3">Following</SectionTitle>
-              <div className={styles.friends__list}>
-                {!!userFollowings &&
-                  userFollowings.followings.map((item, i) => (
-                    <Link
-                      href={`/user/${item.userName}`}
-                      className={styles.friends__item}
-                      key={`${id}_${i}`}
-                    >
-                      <Avatar user={item} />
-                    </Link>
-                  ))}
-              </div>
-            </div>
-            <div className={styles.friends}>
-              <SectionTitle as="h3">Followers</SectionTitle>
-              <div className={styles.friends__list}>
-                {!!userFollowers &&
-                  userFollowers.followers.map((item, i) => (
-                    <Link
-                      href={`/user/${item.userName}`}
-                      className={styles.friends__item}
-                      key={`${id}_${i}`}
-                    >
-                      <Avatar user={item} />
-                    </Link>
-                  ))}
-              </div>
-            </div>
-          </div>
+    <div className={styles.profile}>
+      <header className={styles.hero}>
+        <div className={styles.hero__banner}>
+          {!!user.background && (
+            <Image
+              src={user.background}
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className={styles.hero__image}
+            />
+          )}
+          <div className={styles.hero__scrim} />
+          <Breadcrumbs
+            className={styles.hero__crumbs}
+            items={[
+              { name: "Home", href: "/" },
+              { name: userName, href: `/user/${userName}` },
+            ]}
+          />
         </div>
-      </div>
-      <div className={styles.content__bottom}>
-        <div className={styles.activity}>
-          <SectionTitle as="h3">Activity</SectionTitle>
-          {isLogsLoading && <Loader type="moon" />}
-          {!isLogsLoading && logs.length > 0 && (
-            <div className={styles.activity__wrapper}>
-              <div className={styles.activity__list}>
-                {logs.map((log, i) => {
-                  if (!log.game) return null;
-
-                  return (
-                    <div key={i} className={styles.item}>
-                      <GameCard game={log.game} className={styles.item__card} />
-                      <Box
-                        classNameContent={styles.item__text}
-                        wrapperStyle={{ marginBlock: "var(--padding-x2)" }}
-                        contentStyle={{paddingRight: "var(--padding-x8)"}}
-                      >
-                        {id === authUserId && (
-                          <Button
-                            className={styles.item__delete}
-                            onClick={() => handleDeleteLog(log._id)}
-                          >
-                            <SvgClose size="16" color="negative" />
-                          </Button>
-                        )}
-                        <p>{log.game.name}</p>
-                        <RichText content={log.text} className={styles.item__text} />
-                        <p className={styles.date}>
-                          {commonUtils.getHumanDate(log.date)}
-                        </p>
-                      </Box>
-                    </div>
-                  );
-                })}
-              </div>
-              <Pagination
-                take={takeLogs}
-                total={totalLogs}
-                isDisabled={isFetching}
-                page={page}
-                onPageChange={setPage}
-              />
-            </div>
+        <div className={styles.hero__head}>
+          <div className={styles.hero__avatar}>
+            <Image
+              key={id}
+              src={user.avatar || "/images/user.png"}
+              width={224}
+              height={224}
+              alt={userName}
+              priority
+              className={styles.hero__avatarImage}
+            />
+          </div>
+          <div className={styles.hero__main}>
+            <h1 className={styles.hero__name}>{userName}</h1>
+            <p className={styles.hero__seen}>
+              Last seen <span>{commonUtils.getHumanDate(user.updatedAt)}</span>
+            </p>
+          </div>
+          {canFollow && (
+            <Button
+              color={isFollow ? ButtonColor.DEFAULT : ButtonColor.ACCENT}
+              className={styles.hero__follow}
+              disabled={isBusy}
+              onClick={() => toggleFollowing(id)}
+            >
+              {isFollow ? "Unfollow" : "Follow"}
+            </Button>
           )}
         </div>
+        {!!user.description && (
+          <div className={styles.bio}>
+            <Markdown>{user.description}</Markdown>
+          </div>
+        )}
+      </header>
+
+      <div className={styles.counters}>
+        <button
+          type="button"
+          className={styles.counter}
+          onClick={() => goTo("all")}
+        >
+          <span className={styles.counter__label}>Games</span>
+          <span className={styles.counter__value}>
+            {formatCount(gamesCount)}
+          </span>
+        </button>
+        <button
+          type="button"
+          className={styles.counter}
+          onClick={() => goTo("reviews")}
+        >
+          <span className={styles.counter__label}>Reviews</span>
+          <span className={styles.counter__value}>
+            {formatCount(reviewsCount)}
+          </span>
+        </button>
+        <button
+          type="button"
+          className={styles.counter}
+          onClick={() => openPeople("followers")}
+          {...triggerProps}
+        >
+          <span className={styles.counter__label}>Followers</span>
+          <span className={styles.counter__value}>
+            {formatCount(followers.length)}
+            <PeopleStack people={followers} />
+          </span>
+        </button>
+        <button
+          type="button"
+          className={styles.counter}
+          onClick={() => openPeople("followings")}
+          {...triggerProps}
+        >
+          <span className={styles.counter__label}>Following</span>
+          <span className={styles.counter__value}>
+            {formatCount(followings.length)}
+            <PeopleStack people={followings} />
+          </span>
+        </button>
       </div>
-    </>
+
+      <TopFive userId={id} games={topGames} isOwner={isOwner} />
+
+      {isListsVisible && (
+        <section className={styles.lists} aria-labelledby="profile-lists">
+          <div className={styles.lists__head}>
+            <SectionTitle as="h3">
+              <span id="profile-lists">Lists</span>
+            </SectionTitle>
+            {!!lists.length && (
+              <Button
+                color={ButtonColor.TRANSPARENT}
+                className={styles.lists__all}
+                onClick={() => goTo("lists")}
+              >
+                All lists
+              </Button>
+            )}
+          </div>
+          {!lists.length ? (
+            <div className={styles.hint}>
+              <SvgListBullet
+                size="24"
+                style={{ color: "var(--color-accent)" }}
+              />
+              <p>
+                No lists yet. Collect games around any idea — “Best maps in
+                games”, “Co-op with friends”.
+              </p>
+              <Button
+                color={ButtonColor.ACCENT}
+                className={styles.hint__action}
+                onClick={() => goTo("lists")}
+              >
+                Create a list
+              </Button>
+            </div>
+          ) : (
+            <div className={styles.lists__items}>
+              {lists.slice(0, LISTS_PREVIEW_LIMIT).map((list) => (
+                <ListCard
+                  key={list._id}
+                  list={list}
+                  layout="row"
+                  isWithAuthor={false}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+      {!!likedLists.length && (
+        <section className={styles.lists} aria-labelledby="profile-liked-lists">
+          <div className={styles.lists__head}>
+            <SectionTitle as="h3">
+              <span id="profile-liked-lists">Liked lists</span>
+            </SectionTitle>
+            <Button
+              color={ButtonColor.TRANSPARENT}
+              className={styles.lists__all}
+              onClick={() => goTo("liked")}
+            >
+              All liked
+            </Button>
+          </div>
+          <div className={styles.lists__items}>
+            {likedLists.slice(0, LISTS_PREVIEW_LIMIT).map((list) => (
+              <ListCard key={list._id} list={list} layout="row" />
+            ))}
+          </div>
+        </section>
+      )}
+      <ActivityTimeline userId={id} isOwner={isOwner} />
+    </div>
   );
 };
 

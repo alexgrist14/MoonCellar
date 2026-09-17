@@ -1,0 +1,26 @@
+.like {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-x2);
+  font-variant-numeric: tabular-nums;
+
+  &:disabled {
+    opacity: 1;
+    cursor: default !important;
+  }
+}
+
+.icon {
+  display: inline-flex;
+  translate: 0 calc(var(--padding-x05) * -0.5);
+  color: var(--color-text-muted);
+  transition: color var(--duration-fast) var(--easing-out);
+
+  .like_active & {
+    color: var(--favorite-color);
+  }
+
+  @include reducedMotion {
+    transition-duration: var(--duration-instant);
+  }
+}

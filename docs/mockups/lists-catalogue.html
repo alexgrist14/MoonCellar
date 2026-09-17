@@ -1,0 +1,932 @@
+<title>Lists Catalogue</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* mooncellar-tokens:start */
+/* Generated from apps/web/src/lib/app/styles/vars by
+   `bun --filter web sync:tokens`. Do not edit by hand. */
+:root {
+  /* vars/_colors.scss */
+  --color-neutral-5: #080a0b;
+  --color-neutral-10: #0d1011;
+  --color-neutral-15: #121516;
+  --color-neutral-20: #161b1d;
+  --color-neutral-25: #1a2022;
+  --color-neutral-30: #1f2628;
+  --color-neutral-35: #262d2f;
+  --color-neutral-40: #2f3537;
+  --color-neutral-45: #383e40;
+  --color-neutral-50: #3f4750;
+  --color-neutral-55: #50575d;
+  --color-neutral-60: #5e6a6e;
+  --color-neutral-70: #747d82;
+  --color-neutral-80: #9192a1;
+  --color-neutral-85: #b0b2bc;
+  --color-neutral-90: #d9d9d9;
+  --color-neutral-95: #eaeaea;
+  --color-neutral-100: #ffffff;
+  --color-blue: #00a0ff;
+  --color-blue-light: #00d4ff;
+  --color-gray: #afb3b9;
+  --color-yellow: #ffc451;
+  --color-yellow-light: #f9f871;
+  --color-orange: #ff8862;
+  --color-pink: #ff4b8f;
+  --color-violet: #e735c4;
+  --color-positive: #00c292;
+  --color-negative: #d02729;
+  --color-primary: var(--color-neutral-30);
+  --color-secondary: var(--color-neutral-90);
+  --color-contrast: var(--color-neutral-100);
+  --color-contrast-reverse: var(--color-neutral-5);
+  --color-attention: #ffc451;
+  --color-text-primary: var(--color-neutral-100);
+  --color-text-secondary: var(--color-neutral-90);
+  --color-text-muted: var(--color-neutral-85);
+  --color-accent: #6951ee;
+  --color-bg-primary: #191d24;
+  --color-bg-secondary: #212731;
+  --color-bg-tertiary: #2c3340;
+  --color-bg-accent: #6951ee;
+  --color-bg-hover: #374151;
+  --color-bg-positive: #00c292;
+  --color-bg-primary-tint: #191d24ee;
+  --color-bg-secondary-tint: #212731ee;
+  --color-bg-tertiary-tint: #2c3340ee;
+  --color-bg-accent-tint: #6951eeee;
+  --color-bg-positive-tint: #00c292ee;
+  --color-border-primary: var(--color-neutral-35);
+  --color-scrollbar-track: var(--color-neutral-15);
+  --color-scrollbar-thumb: var(--color-neutral-80);
+  --color-border-secondary: var(--color-neutral-85);
+
+  /* vars/_common.scss */
+  --padding-x05: calc(var(--padding-x1) * 0.5);
+  --padding-x1: 4px;
+  --padding-x2: calc(var(--padding-x1) * 2);
+  --padding-x3: calc(var(--padding-x1) * 3);
+  --padding-x4: calc(var(--padding-x1) * 4);
+  --padding-x5: calc(var(--padding-x1) * 5);
+  --padding-x6: calc(var(--padding-x1) * 6);
+  --padding-x7: calc(var(--padding-x1) * 7);
+  --padding-x8: calc(var(--padding-x1) * 8);
+  --padding-x9: calc(var(--padding-x1) * 9);
+  --padding-x10: calc(var(--padding-x1) * 10);
+  --padding-x11: calc(var(--padding-x1) * 11);
+  --padding-x12: calc(var(--padding-x1) * 12);
+  --padding-x13: calc(var(--padding-x1) * 13);
+  --padding-x14: calc(var(--padding-x1) * 14);
+  --padding-x15: calc(var(--padding-x1) * 15);
+  --padding-x16: calc(var(--padding-x1) * 16);
+  --padding-x17: calc(var(--padding-x1) * 17);
+  --padding-x18: calc(var(--padding-x1) * 18);
+  --padding-x19: calc(var(--padding-x1) * 19);
+  --padding-x20: calc(var(--padding-x1) * 20);
+  --padding-x25: calc(var(--padding-x1) * 25);
+  --radius-x1: 4px;
+  --radius-x2: calc(var(--radius-x1) * 2);
+  --radius-x3: calc(var(--radius-x1) * 3);
+  --radius-x4: calc(var(--radius-x1) * 4);
+  --radius-x5: calc(var(--radius-x1) * 5);
+  --radius-x6: calc(var(--radius-x1) * 6);
+  --radius-x7: calc(var(--radius-x1) * 7);
+  --radius-x8: calc(var(--radius-x1) * 8);
+  --radius-x9: calc(var(--radius-x1) * 9);
+  --radius-x10: calc(var(--radius-x1) * 10);
+  --gap-x05: calc(var(--gap-x1) * 0.5);
+  --gap-x1: 4px;
+  --gap-x2: calc(var(--gap-x1) * 2);
+  --gap-x3: calc(var(--gap-x1) * 3);
+  --gap-x4: calc(var(--gap-x1) * 4);
+  --gap-x5: calc(var(--gap-x1) * 5);
+  --gap-x6: calc(var(--gap-x1) * 6);
+  --gap-x7: calc(var(--gap-x1) * 7);
+  --gap-x8: calc(var(--gap-x1) * 8);
+  --gap-x9: calc(var(--gap-x1) * 9);
+  --gap-x10: calc(var(--gap-x1) * 10);
+  --gap-x11: calc(var(--gap-x1) * 11);
+  --gap-x12: calc(var(--gap-x1) * 12);
+  --blur-x1: 6px;
+  --rich-text-gap: 8px;
+  --duration-instant: 1ms;
+  --duration-fast: 160ms;
+  --duration-base: 280ms;
+  --delay-stagger: 90ms;
+  --easing-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --easing-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --reveal-offset: 12px;
+  --reveal-scale: 0.96;
+  --header-height: 45px;
+  --container-padding-top: calc(var(--header-height) + var(--padding-x3));
+  --container-padding-bottom: var(--padding-x3);
+  --page-height-available: calc(
+    100vh - var(--container-padding-top) - var(--container-padding-bottom)
+  );
+
+  /* vars/_components.scss */
+  --game-completed-color: var(--color-positive);
+  --game-dropped-color: var(--color-negative);
+  --game-playing-color: var(--color-accent);
+  --game-wishlist-color: var(--color-violet);
+  --game-backlog-color: var(--color-pink);
+  --game-played-color: var(--color-blue);
+  --game-mastered-color: var(--color-yellow);
+  --cover-ratio: 528/704;
+  --shadow-basic: 0px 4px 4px var(--color-neutral-5);
+  --shadow-text: drop-shadow(0 1px 2px var(--color-neutral-5))
+    drop-shadow(0 0 6px var(--color-neutral-5));
+  --glow-accent: 0 0 0.4rem var(--color-accent);
+  --glow-accent-sm: 0 0 0.15rem var(--color-accent);
+  --avatar-size-sm: var(--padding-x6);
+  --navigation-progress-height: 1px;
+  --navigation-progress-z-index: 1002;
+  --modal-text-width: min(720px, calc(100vw - var(--padding-x10)));
+  --rich-editor-image-width: 400px;
+  --playthrough-modal-width: min(80vw, 400px);
+  --playthrough-modal-height: min(70vh, 500px);
+  --playthrough-modal-width-lg: min(88vw, 760px);
+  --playthrough-modal-height-lg: min(86vh, 780px);
+  --games-card-min-width: 180px;
+  --range-track-height: 6px;
+  --range-thumb-size: 20px;
+  --range-thumb-width: 44px;
+  --range-thumb-height: 24px;
+  --scrollbar-horizontal-size: 6px;
+  --scrollbar-arrow-width: 32px;
+  --scrollbar-fade-width: 48px;
+  --game-keywords-collapsed-height: 66px;
+  --game-hero-artwork-height: 300px;
+  --game-hero-artwork-height-sm: 180px;
+  --game-hero-cover-width: 200px;
+  --game-hero-cover-offset: 104px;
+  --game-hero-counters-width: 360px;
+  --game-rating-popover-width: 320px;
+  --popover-width: 320px;
+  --popover-max-height: 320px;
+  --drawer-width: max(20vw, 460px);
+  --drawer-z-index: 5;
+  --expandable-scroll-height: 132px;
+  --expandable-fade-height: 32px;
+  --date-picker-width: 300px;
+  --date-picker-field-min-width: 140px;
+  --date-picker-cell-size: 34px;
+  --date-picker-arrow-size: 28px;
+  --emoji-picker-width: 328px;
+  --emoji-picker-cell-size: 34px;
+  --emoji-picker-group-size: 28px;
+  --emoji-picker-grid-height: 238px;
+  --game-hero-scrim: linear-gradient(
+    180deg,
+    #191d248c 0%,
+    #191d2400 30%,
+    #212731d1 72%,
+    var(--color-bg-secondary) 100%
+  );
+  --spoiler-blur: 7px;
+  --community-avatar-size: 36px;
+  --community-reply-avatar-size: 28px;
+  --community-review-clamp-height: 132px;
+  --community-distribution-height: 8px;
+  --community-distribution-min-width: 240px;
+  --community-dot-size: 7px;
+  --community-empty-text-width: 240px;
+  --community-loading-height: 96px;
+  --user-review-card-width: 170px;
+  --user-review-card-width-sm: 140px;
+  --user-review-rating-filter-width: 260px;
+  --vndb-review-height: max(360px, calc(100vh - 420px));
+  --vndb-cover-width: 120px;
+  --vndb-search-width: 320px;
+  --vndb-candidate-cover-width: 64px;
+  --empty-state-image-size: 180px;
+  --not-found-image-height: 240px;
+  --not-found-backdrop-size: 400px;
+  --not-found-content-width: 420px;
+  --favorite-color: var(--color-pink);
+  --game-controls-icon-size: 24px;
+  --game-controls-icon-size-sm: 20px;
+  --game-controls-badge-size: 15px;
+  --top-five-cover-width: 44px;
+  --list-card-min-width: 180px;
+  --list-card-row-mosaic-size: 44px;
+  --list-card-count-height: 20px;
+  --list-search-width: 320px;
+  --list-row-cover-width: 40px;
+  --profile-hero-height: 168px;
+  --profile-avatar-size: 112px;
+  --profile-avatar-size-sm: 72px;
+  --activity-cover-width: 80px;
+  --activity-dot-size: 12px;
+  --people-avatar-size: 22px;
+  --search-modal-width: 900px;
+  --search-tab-height: 36px;
+}
+/* mooncellar-tokens:end */
+
+  :root {
+    --mock-ui: "Hanken Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mock-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --mock-ground: var(--color-neutral-10);
+    --mock-accent-text: color-mix(in srgb, var(--color-accent) 55%, var(--color-neutral-100));
+    --mock-filters-width: 300px;
+    --mock-list-card-min: 200px;
+    --mock-strip-cover: 56px;
+    --mock-strip-overlap: 22px;
+    --mock-backdrop:
+      radial-gradient(90% 60% at 30% 0%, color-mix(in srgb, var(--color-blue) 32%, transparent), transparent 60%),
+      radial-gradient(70% 60% at 100% 100%, color-mix(in srgb, var(--color-violet) 28%, transparent), transparent 60%),
+      linear-gradient(170deg, var(--color-neutral-25), var(--color-neutral-5));
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--mock-ground);
+    color: var(--color-text-primary);
+    font-family: var(--mock-ui);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .shell { max-width: 1180px; margin: 0 auto; padding-inline: var(--padding-x6); padding-block: var(--padding-x14) var(--padding-x20); }
+  @media (max-width: 520px) { .shell { padding-inline: var(--padding-x4); padding-block: var(--padding-x9) var(--padding-x14); } }
+
+  h1, h2, h3, h4 { margin: 0; text-wrap: balance; }
+  p { margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; }
+  :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+  .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-gray); }
+  .masthead { display: flex; flex-direction: column; gap: var(--gap-x4); }
+  .masthead h1 { font-size: 34px; line-height: 1.15; font-weight: 700; letter-spacing: -0.5px; }
+  .lede { color: var(--color-text-secondary); max-width: 66ch; }
+
+  .brief { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--gap-x3) var(--gap-x6); margin: var(--padding-x3) 0 0; padding-top: var(--padding-x5); border-top: 1px solid var(--color-border-primary); }
+  .brief dt { font-size: 12px; font-weight: 600; }
+  .brief dd { margin: 0; font-size: 14px; color: var(--color-text-muted); }
+
+  code.t { font-family: var(--mock-mono); font-size: 12px; color: var(--color-yellow); }
+
+  .variant, .section { margin-top: var(--padding-x16); }
+  .variant__head { display: flex; align-items: baseline; gap: var(--gap-x3); flex-wrap: wrap; margin-bottom: var(--gap-x2); }
+  .variant__letter { font-family: var(--mock-mono); font-size: 13px; font-weight: 500; color: var(--color-accent); border: 1px solid var(--color-accent); border-radius: var(--radius-x1); padding: 1px 7px; flex-shrink: 0; }
+  .variant__head h2, .section > h2 { font-size: 23px; font-weight: 700; letter-spacing: -0.2px; }
+  .variant__thesis, .section > h2 + p { color: var(--color-text-muted); max-width: 70ch; margin: var(--gap-x2) 0 var(--gap-x5); }
+  .variant__thesis { margin-top: 0; }
+
+  .stage { background: var(--color-bg-secondary); border: 1px solid var(--color-border-primary); border-radius: var(--radius-x4); padding: var(--padding-x5); display: flex; flex-direction: column; gap: var(--gap-x4); min-width: 0; }
+  @media (max-width: 520px) { .stage { padding: var(--padding-x3); } }
+  .stage__context { font-size: 12px; color: var(--color-gray); display: flex; align-items: center; gap: var(--gap-x2); flex-wrap: wrap; }
+  .stage__context::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--color-accent); flex-shrink: 0; }
+
+  .pros { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--gap-x3) var(--gap-x6); font-size: 14px; color: var(--color-text-muted); }
+  .pros h3 { font-size: 12px; font-weight: 600; color: var(--color-text-primary); margin-bottom: var(--gap-x1); }
+  .pros ul { margin: 0; padding-left: 18px; display: grid; gap: var(--gap-x1); }
+
+  .site { border-radius: var(--radius-x4); overflow: hidden; background: var(--mock-backdrop); display: flex; flex-direction: column; min-width: 0; }
+
+  .topbar { display: flex; align-items: center; gap: var(--gap-x5); height: var(--header-height); padding-inline: var(--padding-x4); background: var(--color-bg-primary); border-bottom: 1px solid var(--color-border-primary); overflow: hidden; }
+  .logo { font-weight: 600; color: var(--mock-accent-text); padding-right: var(--padding-x4); border-right: 1px solid var(--color-border-primary); white-space: nowrap; }
+  .topnav { display: flex; gap: var(--gap-x4); font-size: 14px; flex: 1; min-width: 0; }
+  .topnav a { display: inline-flex; align-items: center; gap: 6px; color: var(--color-text-secondary); white-space: nowrap; }
+  .topnav svg { width: 16px; height: 16px; }
+  .topnav a[aria-current="page"] { color: var(--color-text-primary); box-shadow: inset 0 -2px 0 var(--color-accent); }
+  .topnav .new { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-yellow); }
+  .topbar .av { margin-left: auto; }
+
+  @media (max-width: 640px) { .topnav a:not([aria-current]) span, .topnav a:not([aria-current]) .new { display: none; } .logo { display: none; } }
+
+  .site__body { position: relative; display: grid; grid-template-columns: var(--mock-filters-width) minmax(0, 1fr); gap: var(--gap-x4); padding: 0 var(--padding-x4) var(--padding-x12) 0; min-width: 0; }
+  .site__body--closed { grid-template-columns: minmax(0, 1fr); padding-left: var(--padding-x4); }
+  @media (max-width: 900px) { .site__body { grid-template-columns: minmax(0, 1fr); padding-left: var(--padding-x4); } .site__body > .filters { display: none; } }
+  @media (max-width: 520px) { .site__body { padding: 0 var(--padding-x2) var(--padding-x12); } }
+
+  .menu-tabs { display: flex; justify-content: space-between; grid-column: 1 / -1; margin-left: calc(-1 * var(--padding-x4)); }
+  .site__body:not(.site__body--closed) .menu-tabs { margin-left: 0; }
+  .menu-tab { background: var(--color-bg-primary); color: var(--color-text-primary); padding: var(--padding-x2) var(--padding-x10); border-radius: 0 0 var(--radius-x2) 0; font-size: 14px; border: 0; }
+
+  .filters { background: var(--color-bg-primary-tint); border-right: 1px solid var(--color-border-primary); padding: var(--padding-x4); display: flex; flex-direction: column; gap: var(--gap-x4); align-self: stretch; }
+  .filters--standalone { border: 1px solid var(--color-border-primary); border-radius: var(--radius-x5); max-width: 360px; width: 100%; }
+
+  .fgroup { display: flex; flex-direction: column; gap: var(--gap-x2); }
+  .fgroup__head { display: flex; justify-content: space-between; align-items: center; gap: var(--gap-x2); }
+  .fgroup h4 { font-size: 15px; font-weight: 500; }
+
+  .ctl { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-x2); min-height: 38px; padding: 0 var(--padding-x3); background: var(--color-bg-secondary); border: 1px solid transparent; border-radius: var(--radius-x2); font-size: 14px; color: var(--color-text-primary); min-width: 0; }
+  .ctl--placeholder { color: var(--color-gray); }
+  .ctl svg { width: 12px; height: 12px; flex-shrink: 0; }
+  .ctl--open { border-color: var(--color-accent); border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+  .row { display: flex; gap: var(--gap-x2); align-items: center; }
+  .row .ctl { flex: 1; }
+
+  .toggle { display: inline-flex; padding: 2px; gap: 2px; border-radius: var(--radius-x4); background: var(--color-bg-secondary); font-size: 10px; flex-shrink: 0; }
+  .toggle span { padding: 0 var(--padding-x2); border-radius: var(--radius-x3); line-height: 18px; color: var(--color-gray); display: grid; place-items: center; }
+  .toggle span.on { background: var(--color-bg-hover); color: var(--color-text-primary); }
+  .toggle svg { width: 10px; height: 10px; }
+
+  .drop { border: 1px solid var(--color-accent); border-top: 0; border-radius: 0 0 var(--radius-x2) var(--radius-x2); background: var(--color-bg-secondary); overflow: hidden; margin-top: calc(-1 * var(--gap-x2)); }
+  .drop__search { margin: var(--padding-x2); padding: 2px var(--padding-x2); border: 1px solid var(--color-border-secondary); border-radius: var(--radius-x2); font-size: 13px; }
+  .drop__row { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: var(--gap-x2); align-items: center; padding: var(--padding-x2) var(--padding-x3); border-top: 1px solid var(--color-border-primary); font-size: 14px; color: var(--color-text-muted); }
+  .drop__row .cover { --mock-cover-w: 28px; padding: 0; font-size: 0; border-radius: var(--radius-x1); }
+  .radio { width: 16px; height: 16px; border-radius: 50%; background: var(--color-neutral-15); box-shadow: inset 0 0 0 2px var(--color-neutral-35); }
+  .radio.on { background: var(--color-positive); box-shadow: none; }
+  .reset { font-size: 12px; background: var(--color-negative); color: var(--color-neutral-100); border-radius: var(--radius-x1); padding: 0 6px; line-height: 18px; }
+
+  .range { display: flex; flex-direction: column; gap: var(--gap-x2); padding: var(--padding-x1) calc(var(--range-thumb-size) / 2); font-size: 14px; color: var(--color-text-muted); }
+  .range__track { position: relative; height: var(--range-track-height); border-radius: var(--radius-x3); background: var(--color-neutral-45); }
+  .range__fill { position: absolute; inset-block: 0; left: 0; width: 18%; border-radius: var(--radius-x3); background: var(--color-accent); }
+  .range__thumb { position: absolute; top: 50%; left: 18%; width: var(--range-thumb-size); height: var(--range-thumb-size); border-radius: 50%; background: var(--color-neutral-100); transform: translate(-50%, -50%); }
+
+  .fbuttons { display: grid; gap: var(--gap-x2); margin-top: var(--gap-x2); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--gap-x2); border: 1px solid transparent; border-radius: var(--radius-x2); padding: 6px var(--padding-x4); font-size: 14px; font-weight: 500; line-height: 20px; cursor: pointer; white-space: nowrap; color: var(--color-text-primary); }
+  .btn--primary { background: var(--color-bg-accent); }
+  .btn--danger { background: color-mix(in srgb, var(--color-negative) 85%, var(--color-neutral-5)); }
+  .btn--default { background: var(--color-bg-tertiary); }
+  .btn--block { width: 100%; }
+  .btn svg { width: 14px; height: 14px; }
+
+  .main { background: var(--color-bg-primary-tint); border: 1px solid var(--color-border-primary); border-radius: var(--radius-x5); padding: var(--padding-x5); display: flex; flex-direction: column; gap: var(--gap-x4); min-width: 0; margin-top: var(--padding-x4); }
+  @media (max-width: 520px) { .main { padding: var(--padding-x3); } }
+  .site__body:not(.site__body--closed) .main { margin-top: var(--padding-x4); }
+  .site__body .menu-tabs + .filters { margin-top: 0; }
+
+  .crumbs { display: flex; gap: var(--gap-x2); font-size: 13px; color: var(--color-text-muted); }
+  .crumbs span:last-child { color: var(--color-text-primary); }
+
+  .heading { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-x3); flex-wrap: wrap; }
+  .stitle { display: flex; align-items: center; gap: var(--gap-x2); font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 400; line-height: 1.2; }
+  .stitle::before { content: ""; width: 4px; height: 24px; border-radius: var(--radius-x2); background: var(--color-accent); flex-shrink: 0; }
+  .stitle .count { font-size: 14px; }
+  .count { font-family: var(--mock-mono); font-size: 12px; color: var(--color-gray); font-variant-numeric: tabular-nums; }
+
+  .applied { display: flex; flex-wrap: wrap; gap: var(--gap-x2); align-items: center; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; line-height: 22px; padding: 0 var(--padding-x2) 0 var(--padding-x3); border-radius: var(--radius-x4); background: var(--color-bg-tertiary); color: var(--color-text-secondary); border: 0; cursor: pointer; }
+  .pill svg { width: 8px; height: 10px; color: var(--color-gray); }
+  .pill:hover svg { color: var(--color-negative); }
+  .clear { font-size: 13px; color: var(--mock-accent-text); background: none; border: 0; cursor: pointer; }
+
+  .cover {
+    width: var(--mock-cover-w, 100%);
+    max-width: 100%;
+    aspect-ratio: var(--cover-ratio);
+    border-radius: var(--radius-x3);
+    background:
+      linear-gradient(155deg,
+        color-mix(in srgb, var(--mock-art, var(--color-accent)) 78%, var(--color-neutral-5)) 0%,
+        color-mix(in srgb, var(--mock-art, var(--color-accent)) 28%, var(--color-neutral-10)) 70%,
+        var(--color-neutral-10) 100%);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-neutral-100) 8%, transparent);
+    flex-shrink: 0;
+  }
+
+  .art-hollow { --mock-art: var(--color-blue); }
+  .art-silk { --mock-art: var(--color-negative); }
+  .art-body { --mock-art: var(--color-neutral-55); }
+  .art-moor { --mock-art: var(--color-violet); }
+  .art-ed { --mock-art: var(--color-blue-light); }
+  .art-ing { --mock-art: var(--color-neutral-60); }
+  .art-sh2 { --mock-art: var(--color-neutral-55); }
+  .art-outer { --mock-art: var(--color-orange); }
+  .art-well { --mock-art: var(--color-positive); }
+  .art-elden { --mock-art: var(--color-neutral-60); }
+  .art-tunic { --mock-art: var(--color-yellow); }
+  .art-celeste { --mock-art: var(--color-blue-light); }
+  .art-hades { --mock-art: var(--color-negative); }
+  .art-signalis { --mock-art: var(--color-violet); }
+  .art-pink { --mock-art: var(--color-pink); }
+  .art-lime { --mock-art: var(--color-yellow-light); }
+
+  .av { width: var(--mock-av-size, 18px); height: var(--mock-av-size, 18px); border-radius: 50%; display: grid; place-items: center; font-size: 0; background: color-mix(in srgb, var(--mock-av, var(--color-accent)) 70%, var(--color-neutral-15)); flex-shrink: 0; }
+  .av--md { --mock-av-size: 30px; font-size: 11px; font-weight: 700; color: var(--color-neutral-100); }
+  .av-1 { --mock-av: var(--color-blue); }
+  .av-2 { --mock-av: var(--color-orange); }
+  .av-3 { --mock-av: var(--color-positive); }
+  .av-4 { --mock-av: var(--color-pink); }
+  .av-5 { --mock-av: var(--color-yellow); }
+  .av-6 { --mock-av: var(--color-violet); }
+
+  mark { background: color-mix(in srgb, var(--color-accent) 38%, transparent); color: var(--color-text-primary); border-radius: 2px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--mock-list-card-min), 1fr)); gap: var(--gap-x4); }
+  .grid--three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-width: 1100px) { .grid--three { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 520px) { .grid--three, .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-x3); } .lcard__desc { display: none; } }
+
+  .lcard { display: flex; flex-direction: column; gap: var(--gap-x2); min-width: 0; }
+  .lcard__art { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px; border-radius: var(--radius-x5); overflow: hidden; outline: 2px solid transparent; outline-offset: -2px; transition: outline-color var(--duration-fast) var(--easing-out), transform var(--duration-base) var(--easing-out); position: relative; }
+  .lcard:hover .lcard__art { outline-color: var(--color-accent); transform: translateY(-2px); }
+  .lcard__art .cover { border-radius: 0; box-shadow: none; }
+  .lcard__count { position: absolute; right: var(--padding-x2); bottom: var(--padding-x2); font-family: var(--mock-mono); font-size: 12px; line-height: 20px; padding: 0 var(--padding-x2); border-radius: var(--radius-x2); background: var(--color-bg-primary-tint); }
+  .lcard__name { font-size: 15px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .lcard__by { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--color-text-muted); }
+  .lcard__meta { font-size: 12px; color: var(--color-gray); }
+  .lcard__desc { font-size: 13px; color: var(--color-text-secondary); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  .rows { display: flex; flex-direction: column; }
+  .lrow { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--gap-x5); align-items: center; padding-block: var(--padding-x4); border-bottom: 1px solid var(--color-border-primary); }
+  .lrow:first-child { padding-top: 0; }
+  .lrow:last-child { border-bottom: 0; padding-bottom: 0; }
+  .strip { display: flex; padding-right: var(--mock-strip-overlap); }
+  .strip .cover { --mock-cover-w: var(--mock-strip-cover); margin-right: calc(-1 * var(--mock-strip-overlap)); box-shadow: 4px 0 8px color-mix(in srgb, var(--color-neutral-5) 70%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--color-neutral-100) 8%, transparent); border-radius: var(--radius-x2); }
+  .lrow__body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .lrow__head { display: flex; align-items: baseline; gap: var(--gap-x3); flex-wrap: wrap; }
+  .lrow__name { font-size: 17px; font-weight: 600; line-height: 1.3; }
+  .lrow__name:hover { color: var(--mock-accent-text); }
+  .lrow__side { text-align: right; display: flex; flex-direction: column; gap: 2px; align-items: flex-end; }
+  .lrow__side b { font-family: var(--mock-mono); font-weight: 500; font-size: 15px; }
+
+  @media (max-width: 760px) {
+    .lrow { grid-template-columns: minmax(0, 1fr); gap: var(--gap-x2); }
+    .lrow__side { flex-direction: row; gap: var(--gap-x3); align-items: baseline; }
+    .strip .cover { --mock-cover-w: 44px; }
+  }
+
+  .pager { position: absolute; left: 50%; bottom: var(--padding-x3); transform: translateX(-50%); display: inline-flex; gap: 2px; padding: 3px; background: var(--color-bg-primary); border: 1px solid var(--color-border-primary); border-radius: var(--radius-x3); }
+  .pager span { min-width: 32px; height: 28px; display: grid; place-items: center; border-radius: var(--radius-x2); color: var(--color-text-muted); font-size: 13px; }
+  .pager span.on { background: var(--color-bg-tertiary); color: var(--color-text-primary); }
+  .pager svg { width: 14px; height: 14px; }
+  .pager .flip svg { transform: scaleX(-1); }
+
+  .two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-x4); align-items: start; }
+  @media (max-width: 900px) { .two { grid-template-columns: minmax(0, 1fr); } }
+
+  .explain { display: flex; flex-direction: column; gap: var(--gap-x3); font-size: 14px; color: var(--color-text-muted); }
+  .explain h3 { font-size: 15px; font-weight: 600; color: var(--color-text-primary); }
+  .explain ul { margin: 0; padding-left: 18px; display: grid; gap: var(--gap-x2); }
+  .explain b { color: var(--color-text-secondary); font-weight: 600; }
+
+  .map { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 460px; }
+  .map th, .map td { text-align: left; vertical-align: top; padding: var(--padding-x2); border-bottom: 1px solid var(--color-border-primary); }
+  .map th { font-size: 12px; font-weight: 600; color: var(--color-text-muted); }
+  .map td:first-child { font-family: var(--mock-mono); font-size: 12px; color: var(--color-yellow); white-space: nowrap; }
+  .map td { color: var(--color-text-secondary); }
+  .scroll-x { overflow-x: auto; }
+
+  .modal { background: var(--color-bg-secondary); border-radius: var(--radius-x3); padding: var(--padding-x4); display: flex; flex-direction: column; gap: var(--gap-x3); box-shadow: var(--shadow-basic); border: 1px solid var(--color-border-primary); }
+  .query { display: flex; align-items: center; gap: var(--gap-x2); background: var(--color-bg-tertiary); border: 2px solid var(--color-accent); border-radius: var(--radius-x2); padding: 4px 4px 4px var(--padding-x3); }
+  .query svg { width: 16px; height: 16px; color: var(--color-gray); }
+  .query__text { flex: 1; font-size: 15px; line-height: 30px; }
+  .query .btn { padding: 2px var(--padding-x3); font-size: 13px; border-radius: var(--radius-x1); background: var(--color-bg-hover); }
+  .query .btn.hot, .btn.hot { box-shadow: 0 0 0 2px var(--color-yellow); }
+  .tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; padding: 3px; background: var(--color-bg-primary); border-radius: var(--radius-x2); }
+  .tab { display: flex; justify-content: center; gap: var(--gap-x2); padding-block: 6px; border-radius: var(--radius-x1); color: var(--color-text-muted); font-size: 14px; white-space: nowrap; }
+  .tab.on { background: var(--color-bg-accent); color: var(--color-text-primary); }
+  .tab.on .count { color: var(--color-text-primary); }
+  .callout { font-size: 12px; color: var(--color-yellow); display: flex; gap: var(--gap-x2); align-items: baseline; }
+
+  .empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--gap-x2); padding: var(--padding-x10) var(--padding-x4); font-size: 14px; color: var(--color-text-muted); }
+  .empty b { font-size: 18px; color: var(--color-text-primary); font-weight: 600; }
+
+  .phone { max-width: 400px; width: 100%; margin-inline: auto; }
+  .phone .site__body { grid-template-columns: minmax(0, 1fr); padding: 0 var(--padding-x2) var(--padding-x12); }
+  .phone .main { padding: var(--padding-x3); }
+  .phone .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-x3); }
+  .phone .lcard__name { font-size: 14px; }
+  .phone .lcard__desc { display: none; }
+  .phone .topnav a:not([aria-current]) span, .phone .topnav .new, .phone .logo { display: none; }
+
+  .compare-wrap { overflow-x: auto; }
+  .compare { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 600px; }
+  .compare th, .compare td { text-align: left; vertical-align: top; padding: var(--padding-x3); border-bottom: 1px solid var(--color-border-primary); }
+  .compare thead th { font-size: 12px; font-weight: 600; }
+  .compare tbody th { font-weight: 500; color: var(--color-text-muted); width: 26%; }
+  .compare td { color: var(--color-text-secondary); }
+  .good { color: var(--color-positive); }
+  .warn { color: var(--color-yellow); }
+
+  .build { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: var(--gap-x4); }
+  .build .panel { background: var(--color-bg-primary); border: 1px solid var(--color-border-primary); border-radius: var(--radius-x5); padding: var(--padding-x5); display: flex; flex-direction: column; gap: var(--gap-x3); min-width: 0; }
+  .build h3 { font-size: 15px; font-weight: 600; }
+  .build ul { margin: 0; padding-left: 18px; display: grid; gap: var(--gap-x2); font-size: 14px; color: var(--color-text-secondary); }
+  .build pre { margin: 0; overflow-x: auto; font-family: var(--mock-mono); font-size: 12px; line-height: 1.7; color: var(--color-text-secondary); background: var(--color-bg-secondary); border-radius: var(--radius-x4); padding: var(--padding-x3); }
+
+  .reco { margin-top: var(--gap-x4); border-left: 2px solid var(--color-accent); padding: var(--padding-x2) var(--padding-x4); display: grid; gap: var(--gap-x2); max-width: 75ch; }
+  .reco h3 { font-size: 17px; }
+  .reco p { color: var(--color-text-secondary); font-size: 14px; }
+
+  .note { margin-top: var(--padding-x14); font-size: 13px; color: var(--color-gray); border-left: 2px solid var(--color-border-primary); padding-left: var(--padding-x3); max-width: 80ch; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition-duration: var(--duration-instant) !important; } }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-search" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0m18 11l-6-6"/></symbol>
+  <symbol id="i-games" viewBox="0 0 20 20"><path fill="currentColor" d="M15.9 5.5C15.3 4.5 14.2 4 13 4H7c-1.2 0-2.3.5-2.9 1.5c-2.3 3.5-2.8 8.8-1.2 9.9s5.2-3.7 7.1-3.7s5.4 4.8 7.1 3.7c1.6-1.1 1.1-6.4-1.2-9.9M8 9H7v1H6V9H5V8h1V7h1v1h1zm5.4.5c0 .5-.4.9-.9.9s-.9-.4-.9-.9s.4-.9.9-.9s.9.4.9.9m1.9-2c0 .5-.4.9-.9.9s-.9-.4-.9-.9s.4-.9.9-.9s.9.4.9.9"/></symbol>
+  <symbol id="i-list" viewBox="0 0 18 18"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M6 4.5h10M6 9h10M6 13.5h10M2.6 4.5h.01M2.6 9h.01M2.6 13.5h.01"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 512 512"><path fill="currentColor" d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/></symbol>
+  <symbol id="i-close" viewBox="0 0 384 512"><path fill="currentColor" d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path fill="currentColor" d="M15.835 11.63L9.205 5.2C8.79 4.799 8 5.042 8 5.57v12.86c0 .528.79.771 1.205.37l6.63-6.43a.5.5 0 0 0 0-.74"/></symbol>
+  <symbol id="i-gauntlet" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path fill="none" stroke="currentColor" stroke-width="1.8" d="M12 3.5v17M3.5 12h17"/></symbol>
+</svg>
+
+<div class="shell">
+  <header class="masthead">
+    <p class="eyebrow">MoonCellar · lists catalogue</p>
+    <h1>Lists Catalogue</h1>
+    <p class="lede">
+      A page for every public list on the site, built the way <code class="t">/games</code> is:
+      filters in the left drawer, results in one panel, pagination pinned to the bottom. The search
+      modal's Lists tab hands its query over to it, the way the Games tab hands over to the
+      catalogue. What is being decided is how a list reads in a grid of hundreds — as a cover
+      mosaic or as a row with a strip of covers. The players and lists are invented; queries
+      match the Search Modal mockup.
+    </p>
+    <dl class="brief">
+      <div>
+        <dt>Route</dt>
+        <dd><code class="t">/lists</code>, rendered on the server from the query string like <code class="t">/games</code>. A header link sits next to Games.</dd>
+      </div>
+      <div>
+        <dt>Entry points</dt>
+        <dd>"More lists" and "Advanced" in the search modal's Lists tab open <code class="t">/lists?search=…</code>. The header link opens it unfiltered.</dd>
+      </div>
+      <div>
+        <dt>What is listed</dt>
+        <dd>Public lists with at least one game. A private list never appears, not even to its owner — they have it on their profile.</dd>
+      </div>
+      <div>
+        <dt>Filters</dt>
+        <dd>Name and description, author, games the list contains (any or all), size, last update; sort by update, creation, size or name.</dd>
+      </div>
+    </dl>
+  </header>
+
+  <section class="section" aria-labelledby="handover-title">
+    <h2 id="handover-title">From the search modal to the page</h2>
+    <p>The Lists tab changes in one place: its bottom button no longer loads more lists into the modal. It becomes "More lists", and "Advanced" appears in the field — both go to the catalogue with the query already applied, exactly as "More games" and "Advanced" do on the Games tab. The Users tab keeps "Show more" inside the modal; there is no user catalogue.</p>
+    <div class="two">
+      <div class="stage">
+        <p class="stage__context">Search modal · Lists tab, bottom of the first 6 results</p>
+        <div class="modal">
+          <div class="query"><svg aria-hidden="true"><use href="#i-search"/></svg><span class="query__text">hollow</span><span class="btn hot">Advanced</span></div>
+          <div class="tabs"><span class="tab">Games <span class="count">48</span></span><span class="tab">Users <span class="count">3</span></span><span class="tab on">Lists <span class="count">14</span></span></div>
+          <a class="btn btn--default btn--block hot" href="#">More lists</a>
+          <p class="callout"><span>●</span><span>Both open <code class="t">/lists?search=hollow</code> and close the modal.</span></p>
+        </div>
+      </div>
+      <div class="stage">
+        <p class="stage__context">What each tab's buttons do</p>
+        <div class="scroll-x">
+          <table class="map">
+            <thead><tr><th>Tab</th><th>"Advanced"</th><th>Bottom button</th></tr></thead>
+            <tbody>
+              <tr><td>Games</td><td><code class="t">/games?search=</code>, as today</td><td>"More games" → <code class="t">/games?search=</code>, as today</td></tr>
+              <tr><td>Lists</td><td><code class="t">/lists?search=</code> <span class="warn">new</span></td><td>"More lists" → <code class="t">/lists?search=</code> <span class="warn">new</span></td></tr>
+              <tr><td>Users</td><td>Hidden</td><td>"Show 10 more users", appended in the modal</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="variant" aria-labelledby="variant-a">
+    <div class="variant__head">
+      <span class="variant__letter">A</span>
+      <h2 id="variant-a">Mosaic grid</h2>
+    </div>
+    <p class="variant__thesis">
+      Each list is a cover-shaped tile made of its first four covers, with the name, the author and
+      the size under it — the same proportions as a game card, so the page feels like a sibling of
+      <code class="t">/games</code>. Drawn as a visitor arrives from the modal: the query is applied,
+      the drawer is open, and the applied filters repeat above the grid as removable pills.
+    </p>
+    <div class="stage">
+      <p class="stage__context">/lists?search=hollow · Filters open · 1440px</p>
+      <div class="site">
+        <div class="topbar">
+          <span class="logo">MoonCellar</span>
+          <nav class="topnav" aria-label="Main">
+            <a href="#"><svg aria-hidden="true"><use href="#i-games"/></svg><span>Games</span></a>
+            <a href="#" aria-current="page"><svg aria-hidden="true"><use href="#i-list"/></svg><span>Lists</span><span class="new">new</span></a>
+            <a href="#"><svg aria-hidden="true"><use href="#i-gauntlet"/></svg><span>Gauntlet</span></a>
+            <a href="#"><svg aria-hidden="true"><use href="#i-search"/></svg><span>Search</span></a>
+          </nav>
+          <span class="av av--md av-5">MS</span>
+        </div>
+        <div class="site__body">
+          <aside class="filters" aria-label="Filters">
+            <div class="fgroup">
+              <h4>Sort by</h4>
+              <div class="row"><span class="ctl">Recently updated <svg aria-hidden="true"><use href="#i-chevron"/></svg></span><span class="toggle"><span><svg style="transform:rotate(180deg)"><use href="#i-chevron"/></svg></span><span class="on"><svg><use href="#i-chevron"/></svg></span></span></div>
+            </div>
+            <div class="fgroup">
+              <h4>List name</h4>
+              <span class="ctl">hollow</span>
+            </div>
+            <div class="fgroup">
+              <h4>Author</h4>
+              <span class="ctl ctl--placeholder">Enter user name...</span>
+            </div>
+            <div class="fgroup">
+              <div class="fgroup__head"><h4>Contains games</h4><span class="toggle"><span class="on">Any</span><span>All</span></span></div>
+              <span class="ctl ctl--placeholder">Select games... <svg aria-hidden="true"><use href="#i-chevron"/></svg></span>
+            </div>
+            <div class="fgroup">
+              <h4>Last updated</h4>
+              <span class="ctl">Any time <svg aria-hidden="true"><use href="#i-chevron"/></svg></span>
+            </div>
+            <div class="range">
+              <span>Any size</span>
+              <span class="range__track"><span class="range__fill" style="width:0"></span><span class="range__thumb" style="left:0"></span></span>
+            </div>
+            <div class="fbuttons">
+              <button type="button" class="btn btn--primary">Filter lists</button>
+              <button type="button" class="btn btn--danger">Clear filters</button>
+            </div>
+          </aside>
+          <main class="main">
+            <nav class="crumbs" aria-label="Breadcrumbs"><a href="#">Home</a><span>›</span><span>Lists</span></nav>
+            <div class="heading"><h1 class="stitle">Lists <span class="count">14</span></h1></div>
+            <div class="applied">
+              <button type="button" class="pill">Name: hollow <svg aria-hidden="true"><use href="#i-close"/></svg></button>
+              <button type="button" class="clear">Clear all</button>
+            </div>
+            <div class="grid grid--three">
+              <a class="lcard" href="#"><span class="lcard__art"><span class="cover art-hollow"></span><span class="cover art-well"></span><span class="cover art-elden"></span><span class="cover art-ed"></span><span class="lcard__count">27</span></span><span class="lcard__name"><mark>Hollow</mark> Knight-likes</span><span class="lcard__by"><span class="av av-3"></span>jellybeard · 3 days ago</span></a>
+              <a class="lcard" href="#"><span class="lcard__art"><span class="cover art-silk"></span><span class="cover art-hollow"></span><span class="cover art-moor"></span><span class="cover art-tunic"></span><span class="lcard__count">14</span></span><span class="lcard__name">Metroidvanias after <mark>Hollow</mark> Knight</span><span class="lcard__by"><span class="av av-1"></span>ravenkeeper · 1 week ago</span></a>
+              <a class="lcard" href="#"><span class="lcard__art"><span class="cover art-sh2"></span><span class="cover art-body"></span><span class="cover art-signalis"></span><span class="cover art-ing"></span><span class="lcard__count">11</span></span><span class="lcard__name"><mark>Hollow</mark>ed-out horror</span><span class="lcard__by"><span class="av av-4"></span>sol_orbit · 2 months ago</span></a>
+              <a class="lcard" href="#"><span class="lcard__art"><span class="cover art-outer"></span><span class="cover art-hollow"></span><span class="cover art-elden"></span><span class="cover art-well"></span><span class="lcard__count">23</span></span><span class="lcard__name">Best maps in games</span><span class="lcard__by"><span class="av av-5"></span>moth_scholar · 2 weeks ago</span><span class="lcard__desc">Worlds you learn by walking them — from <mark>Hollow</mark>nest to Hyrule.</span></a>
+              <a class="lcard" href="#"><span class="lcard__art"><span class="cover art-silk"></span><span class="cover art-celeste"></span><span class="cover art-hollow"></span><span class="cover art-hades"></span><span class="lcard__count">18</span></span><span class="lcard__name">Hard but fair</span><span class="lcard__by"><span class="av av-2"></span>thehollowking · 1 month ago</span><span class="lcard__desc">Platformers that punish you and are right to — <mark>Hollow</mark> Knight's Path of Pain included.</span></a>
+              <a class="lcard" href="#"><span class="lcard__art"><span class="cover art-body"></span><span class="cover art-sh2"></span><span class="cover art-ing"></span><span class="cover art-moor"></span><span class="lcard__count">9</span></span><span class="lcard__name">Rainy night horror</span><span class="lcard__by"><span class="av av-6"></span>hollowmoth · 1 month ago</span><span class="lcard__desc">Short and quiet, starting with <mark>Hollow</mark>body.</span></a>
+            </div>
+            <span class="pager" aria-hidden="true"><span class="flip"><svg><use href="#i-arrow"/></svg></span><span class="on">1</span><span><svg><use href="#i-arrow"/></svg></span></span>
+          </main>
+        </div>
+      </div>
+      <div class="pros">
+        <div><h3>Works for</h3><ul><li>Reads like <code class="t">/games</code>: tiles in cover proportions, the drawer, the pinned pagination.</li><li>Most lists per screen — three or four columns of 24 per page.</li><li>A list is recognised by its covers before its name is read.</li></ul></div>
+        <div><h3>Costs</h3><ul><li>The description gets two clamped lines at most, and only when it explains the match.</li><li>Four covers say little about a list of 200 games.</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="variant" aria-labelledby="variant-b">
+    <div class="variant__head">
+      <span class="variant__letter">B</span>
+      <h2 id="variant-b">Rows with a cover strip</h2>
+    </div>
+    <p class="variant__thesis">
+      Each list is a row: a fanned strip of its first five covers, the name large, the author, two
+      lines of description, and the size on the right. Lists are chosen by what they are about, and
+      this layout gives the words room. Drawn unfiltered with the drawer closed.
+    </p>
+    <div class="stage">
+      <p class="stage__context">/lists · Filters closed · 1440px</p>
+      <div class="site">
+        <div class="topbar">
+          <span class="logo">MoonCellar</span>
+          <nav class="topnav" aria-label="Main">
+            <a href="#"><svg aria-hidden="true"><use href="#i-games"/></svg><span>Games</span></a>
+            <a href="#" aria-current="page"><svg aria-hidden="true"><use href="#i-list"/></svg><span>Lists</span><span class="new">new</span></a>
+            <a href="#"><svg aria-hidden="true"><use href="#i-gauntlet"/></svg><span>Gauntlet</span></a>
+            <a href="#"><svg aria-hidden="true"><use href="#i-search"/></svg><span>Search</span></a>
+          </nav>
+          <span class="av av--md av-5">MS</span>
+        </div>
+        <div class="site__body site__body--closed">
+          <div class="menu-tabs"><span class="menu-tab">Filters</span></div>
+          <main class="main" style="margin-top:0">
+            <nav class="crumbs" aria-label="Breadcrumbs"><a href="#">Home</a><span>›</span><span>Lists</span></nav>
+            <div class="heading"><h1 class="stitle">Lists <span class="count">1 284</span></h1><span class="count">Sorted by recently updated</span></div>
+            <div class="rows">
+              <article class="lrow">
+                <span class="strip" aria-hidden="true"><span class="cover art-well"></span><span class="cover art-celeste"></span><span class="cover art-outer"></span><span class="cover art-pink"></span><span class="cover art-tunic"></span></span>
+                <div class="lrow__body">
+                  <div class="lrow__head"><a class="lrow__name" href="#">Cozy winter evenings</a></div>
+                  <span class="lcard__by"><span class="av av-5"></span>moth_scholar</span>
+                  <p class="lcard__desc">Short, warm and finishable in a weekend. Nothing with a fail state.</p>
+                </div>
+                <div class="lrow__side"><b>14</b><span class="lcard__meta">3 hours ago</span></div>
+              </article>
+              <article class="lrow">
+                <span class="strip" aria-hidden="true"><span class="cover art-hades"></span><span class="cover art-lime"></span><span class="cover art-moor"></span><span class="cover art-hollow"></span><span class="cover art-sh2"></span></span>
+                <div class="lrow__body">
+                  <div class="lrow__head"><a class="lrow__name" href="#">Unforgettable soundtracks</a></div>
+                  <span class="lcard__by"><span class="av av-1"></span>lumen_ultra</span>
+                  <p class="lcard__desc">Games I still listen to without playing them. Headphones on, in no particular order.</p>
+                </div>
+                <div class="lrow__side"><b>31</b><span class="lcard__meta">5 hours ago</span></div>
+              </article>
+              <article class="lrow">
+                <span class="strip" aria-hidden="true"><span class="cover art-hollow"></span><span class="cover art-well"></span><span class="cover art-elden"></span><span class="cover art-ed"></span><span class="cover art-silk"></span></span>
+                <div class="lrow__body">
+                  <div class="lrow__head"><a class="lrow__name" href="#">Hollow Knight-likes</a></div>
+                  <span class="lcard__by"><span class="av av-3"></span>jellybeard</span>
+                  <p class="lcard__desc">Hand-drawn, hard, and built around a map you have to buy first.</p>
+                </div>
+                <div class="lrow__side"><b>27</b><span class="lcard__meta">3 days ago</span></div>
+              </article>
+              <article class="lrow">
+                <span class="strip" aria-hidden="true"><span class="cover art-signalis"></span><span class="cover art-body"></span><span class="cover art-ing"></span><span class="cover art-sh2"></span><span class="cover art-moor"></span></span>
+                <div class="lrow__body">
+                  <div class="lrow__head"><a class="lrow__name" href="#">Detective work</a></div>
+                  <span class="lcard__by"><span class="av av-2"></span>ravenkeeper</span>
+                  <p class="lcard__desc">Games where you solve the case yourself — no highlighted clues, no auto-journal.</p>
+                </div>
+                <div class="lrow__side"><b>8</b><span class="lcard__meta">4 days ago</span></div>
+              </article>
+            </div>
+            <span class="pager" aria-hidden="true"><span class="flip"><svg><use href="#i-arrow"/></svg></span><span class="on">1</span><span>2</span><span>3</span><span>…</span><span>54</span><span><svg><use href="#i-arrow"/></svg></span></span>
+          </main>
+        </div>
+      </div>
+      <div class="pros">
+        <div><h3>Works for</h3><ul><li>The name and description — the reason to open a list — are readable without hovering.</li><li>Five covers instead of four, and the strip keeps them large.</li><li>Keeps working on a phone as a single column.</li></ul></div>
+        <div><h3>Costs</h3><ul><li>Four or five lists per screen instead of nine to twelve.</li><li>A layout the site does not use anywhere else.</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="filters-title">
+    <h2 id="filters-title">The filter drawer</h2>
+    <p>Built from the pieces the games drawer already uses — <code class="t">Dropdown</code> with its inline search and reset, the Any / All <code class="t">ToggleSwitch</code>, <code class="t">RangeSelector</code>, the button group at the bottom — so it opens in the same <code class="t">ExpandMenu</code> on the left. Drawn with a richer query than the one above.</p>
+    <div class="two">
+      <div class="stage" style="align-items:center">
+        <p class="stage__context" style="align-self:flex-start">Contains games open · lists holding Hollow Knight, 10+ games, updated this year</p>
+        <aside class="filters filters--standalone" aria-label="Filters">
+          <div class="fgroup">
+            <h4>Sort by</h4>
+            <div class="row"><span class="ctl">Most games <svg aria-hidden="true"><use href="#i-chevron"/></svg></span><span class="toggle"><span><svg style="transform:rotate(180deg)"><use href="#i-chevron"/></svg></span><span class="on"><svg><use href="#i-chevron"/></svg></span></span></div>
+          </div>
+          <div class="fgroup">
+            <h4>List name</h4>
+            <span class="ctl ctl--placeholder">Enter name of the list...</span>
+          </div>
+          <div class="fgroup">
+            <h4>Author</h4>
+            <span class="ctl ctl--placeholder">Enter user name...</span>
+          </div>
+          <div class="fgroup">
+            <div class="fgroup__head"><h4>Contains games</h4><span class="toggle"><span>Any</span><span class="on">All</span></span></div>
+            <span class="ctl ctl--open">1 selected <span style="display:flex;gap:6px;align-items:center"><span class="reset">Reset</span><svg style="transform:rotate(180deg)" aria-hidden="true"><use href="#i-chevron"/></svg></span></span>
+            <div class="drop">
+              <div class="drop__search">hollow k</div>
+              <div class="drop__row"><span class="cover art-hollow"></span><span>Hollow Knight</span><span class="radio on" aria-label="Selected"></span></div>
+              <div class="drop__row"><span class="cover art-silk"></span><span>Hollow Knight: Silksong</span><span class="radio"></span></div>
+              <div class="drop__row"><span class="cover art-ing"></span><span>Hollow Knight: Voidheart Edition</span><span class="radio"></span></div>
+            </div>
+          </div>
+          <div class="fgroup">
+            <h4>Last updated</h4>
+            <span class="ctl">Past year <svg aria-hidden="true"><use href="#i-chevron"/></svg></span>
+          </div>
+          <div class="range">
+            <span>From 10 games</span>
+            <span class="range__track"><span class="range__fill"></span><span class="range__thumb"></span></span>
+          </div>
+          <div class="fbuttons">
+            <button type="button" class="btn btn--primary">Filter lists</button>
+            <button type="button" class="btn btn--danger">Clear filters</button>
+          </div>
+        </aside>
+      </div>
+      <div class="stage explain">
+        <h3>Fields</h3>
+        <ul>
+          <li><b>Sort by</b> — Recently updated (default), Newest, Most games, Name; the arrow toggle flips the order.</li>
+          <li><b>List name</b> — matches the name and the description; name matches rank first, as in the modal. Enter applies, as on <code class="t">/games</code>.</li>
+          <li><b>Author</b> — a user name, prefix match.</li>
+          <li><b>Contains games</b> — the catalogue's game search inside the dropdown. <i>Any</i>: holds at least one of them. <i>All</i>: holds every one. This is also what lets a game page link to "public lists with this game" later.</li>
+          <li><b>Last updated</b> — Any time, Past week, Past month, Past year.</li>
+          <li><b>Size</b> — "From N games", the same single-thumb range as rating on <code class="t">/games</code>.</li>
+        </ul>
+        <h3>Not in this round</h3>
+        <ul>
+          <li>Saved filters (the Saved tab of the games drawer).</li>
+          <li>Genres or platforms of the games inside a list — it needs aggregates per list, kept up to date on every change.</li>
+        </ul>
+        <div class="scroll-x">
+          <table class="map">
+            <thead><tr><th>Query</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td>search=hollow</td><td>Name or description</td></tr>
+              <tr><td>author=moth_scholar</td><td>Author's user name</td></tr>
+              <tr><td>games=id,id&amp;gamesMode=all</td><td>Contains games, any or all</td></tr>
+              <tr><td>minGames=10</td><td>Size</td></tr>
+              <tr><td>updated=year</td><td>week, month, year</td></tr>
+              <tr><td>sortBy=gamesCount&amp;sortOrder=desc</td><td>updatedAt, createdAt, gamesCount, name</td></tr>
+              <tr><td>page=2</td><td>24 lists per page</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="states-title">
+    <h2 id="states-title">Other states</h2>
+    <p>Drawn with variant A's tiles.</p>
+    <div class="two">
+      <div class="stage">
+        <p class="stage__context">Nothing matches the filters</p>
+        <div class="site">
+          <div class="site__body site__body--closed">
+            <div class="menu-tabs"><span class="menu-tab">Filters</span></div>
+            <main class="main" style="margin-top:0">
+              <nav class="crumbs" aria-label="Breadcrumbs"><a href="#">Home</a><span>›</span><span>Lists</span></nav>
+              <div class="heading"><h1 class="stitle">Lists <span class="count">0</span></h1></div>
+              <div class="applied">
+                <button type="button" class="pill">Name: silksong <svg aria-hidden="true"><use href="#i-close"/></svg></button>
+                <button type="button" class="pill">From 100 games <svg aria-hidden="true"><use href="#i-close"/></svg></button>
+                <button type="button" class="clear">Clear all</button>
+              </div>
+              <div class="empty">
+                <b>No lists found</b>
+                <span>Nothing matches all of these filters. Remove one, or clear them all.</span>
+              </div>
+            </main>
+          </div>
+        </div>
+      </div>
+      <div class="stage">
+        <p class="stage__context">Phone · 400px · two tiles per row, filters behind the Filters tab</p>
+        <div class="phone">
+          <div class="site">
+            <div class="topbar">
+              <nav class="topnav" aria-label="Main">
+                <a href="#"><svg aria-hidden="true"><use href="#i-games"/></svg><span>Games</span></a>
+                <a href="#" aria-current="page"><svg aria-hidden="true"><use href="#i-list"/></svg><span>Lists</span></a>
+                <a href="#"><svg aria-hidden="true"><use href="#i-gauntlet"/></svg><span>Gauntlet</span></a>
+                <a href="#"><svg aria-hidden="true"><use href="#i-search"/></svg><span>Search</span></a>
+              </nav>
+              <span class="av av--md av-5">MS</span>
+            </div>
+            <div class="site__body site__body--closed">
+              <div class="menu-tabs"><span class="menu-tab">Filters</span></div>
+              <main class="main" style="margin-top:0">
+                <div class="heading"><h1 class="stitle">Lists <span class="count">14</span></h1></div>
+                <div class="grid">
+                  <a class="lcard" href="#"><span class="lcard__art"><span class="cover art-hollow"></span><span class="cover art-well"></span><span class="cover art-elden"></span><span class="cover art-ed"></span><span class="lcard__count">27</span></span><span class="lcard__name"><mark>Hollow</mark> Knight-likes</span><span class="lcard__by"><span class="av av-3"></span>jellybeard</span></a>
+                  <a class="lcard" href="#"><span class="lcard__art"><span class="cover art-silk"></span><span class="cover art-hollow"></span><span class="cover art-moor"></span><span class="cover art-tunic"></span><span class="lcard__count">14</span></span><span class="lcard__name">Metroidvanias after <mark>Hollow</mark> Knight</span><span class="lcard__by"><span class="av av-1"></span>ravenkeeper</span></a>
+                </div>
+                <span class="pager" aria-hidden="true"><span class="flip"><svg><use href="#i-arrow"/></svg></span><span class="on">1</span><span><svg><use href="#i-arrow"/></svg></span></span>
+              </main>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="compare-title">
+    <h2 id="compare-title">Side by side</h2>
+    <div class="stage compare-wrap" style="padding:var(--padding-x2) var(--padding-x4)">
+      <table class="compare">
+        <thead><tr><th scope="col"></th><th scope="col">A · Mosaic grid</th><th scope="col">B · Rows with a cover strip</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Lists per screen at 1440</th><td class="good">9–12</td><td>4–5</td></tr>
+          <tr><th scope="row">Name and description</th><td>Name in two lines; description only when it explains the match</td><td class="good">Name large, two lines of description always</td></tr>
+          <tr><th scope="row">Consistency</th><td class="good">Same tile as the profile's Lists tab and the modal</td><td>A new row layout</td></tr>
+          <tr><th scope="row">Phone</th><td>Two tiles per row</td><td>One row per list, strip shrinks</td></tr>
+          <tr><th scope="row">Build size</th><td class="good">S — one tile component, reused</td><td>M — tile for the profile and modal, row for the catalogue</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="build-title">
+    <h2 id="build-title">How it would be built</h2>
+    <p>Most of this is the lists search endpoint from the modal, extended with filters.</p>
+    <div class="build">
+      <div class="panel">
+        <h3>API</h3>
+<pre>GET /lists?search=&amp;author=&amp;games=&amp;gamesMode=
+          &amp;minGames=&amp;updated=&amp;sortBy=&amp;sortOrder=
+          &amp;page=&amp;take=24</pre>
+        <ul>
+          <li>One endpoint serves the catalogue and the modal's Lists tab (<code class="t">take=6</code>); the separate <code class="t">/lists/search</code> from the Search Modal mockup is no longer needed.</li>
+          <li>Always <code class="t">isPrivate: false</code> and at least one game; the response carries the first four or five game covers and the author's name and avatar only.</li>
+          <li>A stored <code class="t">gamesCount</code> kept by the add and remove writes, so size filtering and sorting do not count arrays per request.</li>
+          <li>Indexes: a partial index on <code class="t">isPrivate: false</code> with <code class="t">updatedAt</code>, <code class="t">gamesCount</code>; the existing <code class="t">games.gameId</code> index answers "contains". <code class="t">autoIndex</code> builds them on production at first load.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Web</h3>
+        <ul>
+          <li><code class="t">app/lists/page.tsx</code> mirrors <code class="t">app/games/page.tsx</code>: parses the query, fetches the first page on the server, passes <code class="t">initialData</code>, adds breadcrumb and <code class="t">ItemList</code> JSON-LD.</li>
+          <li><code class="t">ListsPage</code> mirrors <code class="t">GamesPage</code>: <code class="t">ExpandMenu</code> with <code class="t">ListsFilters</code>, fixed <code class="t">Pagination</code>, page changes through <code class="t">pushState</code>, not <code class="t">router.push</code>.</li>
+          <li><code class="t">ListsFilters</code> is a new component built from the same pieces as <code class="t">Filters</code>; the games drawer is not made generic.</li>
+          <li>The tile (A) becomes one <code class="t">ListCard</code>, shared by the catalogue, the profile's Lists tab and the search modal.</li>
+          <li>A grid of 24 divides into 4, 3, 2 and 1 columns, so no page ends in a ragged row.</li>
+          <li>Header: a "Lists" link with <code class="t">SvgListBullet</code> between Games and Gauntlet.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="reco">
+      <p class="eyebrow">Recommendation</p>
+      <h3>Variant A</h3>
+      <p>The catalogue is for browsing many lists quickly, and A shows twice as many per screen with the tile that the profile and the search modal already use — one component instead of two. B's strength, the description, is what the list page itself is for, one click away.</p>
+    </div>
+  </section>
+
+  <p class="note">
+    Colours, spacing and radii are the project's own tokens: the <code class="t">:root</code>
+    block above is generated from <code class="t">apps/web/src/lib/app/styles/vars</code> by
+    <code class="t">bun --filter web sync:tokens</code>. Covers and avatars are gradient
+    placeholders, the players and lists are invented, and the Gauntlet icon is a stand-in. The
+    typeface is substituted — Hanken Grotesk stands in for ApercuPro, whose licensed file cannot
+    be served from a third-party host.
+  </p>
+</div>

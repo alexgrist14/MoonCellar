@@ -1,0 +1,1782 @@
+<title>Profile Overview</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* mooncellar-tokens:start */
+/* Generated from apps/web/src/lib/app/styles/vars by
+   `bun --filter web sync:tokens`. Do not edit by hand. */
+:root {
+  /* vars/_colors.scss */
+  --color-neutral-5: #080a0b;
+  --color-neutral-10: #0d1011;
+  --color-neutral-15: #121516;
+  --color-neutral-20: #161b1d;
+  --color-neutral-25: #1a2022;
+  --color-neutral-30: #1f2628;
+  --color-neutral-35: #262d2f;
+  --color-neutral-40: #2f3537;
+  --color-neutral-45: #383e40;
+  --color-neutral-50: #3f4750;
+  --color-neutral-55: #50575d;
+  --color-neutral-60: #5e6a6e;
+  --color-neutral-70: #747d82;
+  --color-neutral-80: #9192a1;
+  --color-neutral-85: #b0b2bc;
+  --color-neutral-90: #d9d9d9;
+  --color-neutral-95: #eaeaea;
+  --color-neutral-100: #ffffff;
+  --color-blue: #00a0ff;
+  --color-blue-light: #00d4ff;
+  --color-gray: #afb3b9;
+  --color-yellow: #ffc451;
+  --color-yellow-light: #f9f871;
+  --color-orange: #ff8862;
+  --color-pink: #ff4b8f;
+  --color-violet: #e735c4;
+  --color-positive: #00c292;
+  --color-negative: #d02729;
+  --color-primary: var(--color-neutral-30);
+  --color-secondary: var(--color-neutral-90);
+  --color-contrast: var(--color-neutral-100);
+  --color-contrast-reverse: var(--color-neutral-5);
+  --color-attention: #ffc451;
+  --color-text-primary: var(--color-neutral-100);
+  --color-text-secondary: var(--color-neutral-90);
+  --color-text-muted: var(--color-neutral-85);
+  --color-accent: #6951ee;
+  --color-bg-primary: #191d24;
+  --color-bg-secondary: #212731;
+  --color-bg-tertiary: #2c3340;
+  --color-bg-accent: #6951ee;
+  --color-bg-hover: #374151;
+  --color-bg-positive: #00c292;
+  --color-bg-primary-tint: #191d24ee;
+  --color-bg-secondary-tint: #212731ee;
+  --color-bg-tertiary-tint: #2c3340ee;
+  --color-bg-accent-tint: #6951eeee;
+  --color-bg-positive-tint: #00c292ee;
+  --color-border-primary: var(--color-neutral-35);
+  --color-scrollbar-track: var(--color-neutral-15);
+  --color-scrollbar-thumb: var(--color-neutral-80);
+  --color-border-secondary: var(--color-neutral-85);
+
+  /* vars/_common.scss */
+  --padding-x05: calc(var(--padding-x1) * 0.5);
+  --padding-x1: 4px;
+  --padding-x2: calc(var(--padding-x1) * 2);
+  --padding-x3: calc(var(--padding-x1) * 3);
+  --padding-x4: calc(var(--padding-x1) * 4);
+  --padding-x5: calc(var(--padding-x1) * 5);
+  --padding-x6: calc(var(--padding-x1) * 6);
+  --padding-x7: calc(var(--padding-x1) * 7);
+  --padding-x8: calc(var(--padding-x1) * 8);
+  --padding-x9: calc(var(--padding-x1) * 9);
+  --padding-x10: calc(var(--padding-x1) * 10);
+  --padding-x11: calc(var(--padding-x1) * 11);
+  --padding-x12: calc(var(--padding-x1) * 12);
+  --padding-x13: calc(var(--padding-x1) * 13);
+  --padding-x14: calc(var(--padding-x1) * 14);
+  --padding-x15: calc(var(--padding-x1) * 15);
+  --padding-x16: calc(var(--padding-x1) * 16);
+  --padding-x17: calc(var(--padding-x1) * 17);
+  --padding-x18: calc(var(--padding-x1) * 18);
+  --padding-x19: calc(var(--padding-x1) * 19);
+  --padding-x20: calc(var(--padding-x1) * 20);
+  --padding-x25: calc(var(--padding-x1) * 25);
+  --radius-x1: 4px;
+  --radius-x2: calc(var(--radius-x1) * 2);
+  --radius-x3: calc(var(--radius-x1) * 3);
+  --radius-x4: calc(var(--radius-x1) * 4);
+  --radius-x5: calc(var(--radius-x1) * 5);
+  --radius-x6: calc(var(--radius-x1) * 6);
+  --radius-x7: calc(var(--radius-x1) * 7);
+  --radius-x8: calc(var(--radius-x1) * 8);
+  --radius-x9: calc(var(--radius-x1) * 9);
+  --radius-x10: calc(var(--radius-x1) * 10);
+  --gap-x05: calc(var(--gap-x1) * 0.5);
+  --gap-x1: 4px;
+  --gap-x2: calc(var(--gap-x1) * 2);
+  --gap-x3: calc(var(--gap-x1) * 3);
+  --gap-x4: calc(var(--gap-x1) * 4);
+  --gap-x5: calc(var(--gap-x1) * 5);
+  --gap-x6: calc(var(--gap-x1) * 6);
+  --gap-x7: calc(var(--gap-x1) * 7);
+  --gap-x8: calc(var(--gap-x1) * 8);
+  --gap-x9: calc(var(--gap-x1) * 9);
+  --gap-x10: calc(var(--gap-x1) * 10);
+  --gap-x11: calc(var(--gap-x1) * 11);
+  --gap-x12: calc(var(--gap-x1) * 12);
+  --blur-x1: 6px;
+  --rich-text-gap: 8px;
+  --duration-instant: 1ms;
+  --duration-fast: 160ms;
+  --duration-base: 280ms;
+  --delay-stagger: 90ms;
+  --easing-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --easing-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --reveal-offset: 12px;
+  --reveal-scale: 0.96;
+  --header-height: 45px;
+  --container-padding-top: calc(var(--header-height) + var(--padding-x3));
+  --container-padding-bottom: var(--padding-x3);
+  --page-height-available: calc(
+    100vh - var(--container-padding-top) - var(--container-padding-bottom)
+  );
+
+  /* vars/_components.scss */
+  --game-completed-color: var(--color-positive);
+  --game-dropped-color: var(--color-negative);
+  --game-playing-color: var(--color-accent);
+  --game-wishlist-color: var(--color-violet);
+  --game-backlog-color: var(--color-pink);
+  --game-played-color: var(--color-blue);
+  --game-mastered-color: var(--color-yellow);
+  --cover-ratio: 528/704;
+  --shadow-basic: 0px 4px 4px var(--color-neutral-5);
+  --shadow-text: drop-shadow(0 1px 2px var(--color-neutral-5))
+    drop-shadow(0 0 6px var(--color-neutral-5));
+  --glow-accent: 0 0 0.4rem var(--color-accent);
+  --glow-accent-sm: 0 0 0.15rem var(--color-accent);
+  --avatar-size-sm: var(--padding-x6);
+  --navigation-progress-height: 1px;
+  --navigation-progress-z-index: 1002;
+  --modal-text-width: min(720px, calc(100vw - var(--padding-x10)));
+  --rich-editor-image-width: 400px;
+  --playthrough-modal-width: min(80vw, 400px);
+  --playthrough-modal-height: min(70vh, 500px);
+  --playthrough-modal-width-lg: min(88vw, 760px);
+  --playthrough-modal-height-lg: min(86vh, 780px);
+  --games-card-min-width: 180px;
+  --range-track-height: 6px;
+  --range-thumb-size: 20px;
+  --range-thumb-width: 44px;
+  --range-thumb-height: 24px;
+  --scrollbar-horizontal-size: 6px;
+  --scrollbar-arrow-width: 32px;
+  --scrollbar-fade-width: 48px;
+  --game-keywords-collapsed-height: 66px;
+  --game-hero-artwork-height: 300px;
+  --game-hero-artwork-height-sm: 180px;
+  --game-hero-cover-width: 200px;
+  --game-hero-cover-offset: 104px;
+  --game-hero-counters-width: 360px;
+  --game-rating-popover-width: 320px;
+  --popover-width: 320px;
+  --popover-max-height: 320px;
+  --drawer-width: max(20vw, 460px);
+  --drawer-z-index: 5;
+  --expandable-scroll-height: 132px;
+  --expandable-fade-height: 32px;
+  --date-picker-width: 300px;
+  --date-picker-field-min-width: 140px;
+  --date-picker-cell-size: 34px;
+  --date-picker-arrow-size: 28px;
+  --emoji-picker-width: 328px;
+  --emoji-picker-cell-size: 34px;
+  --emoji-picker-group-size: 28px;
+  --emoji-picker-grid-height: 238px;
+  --game-hero-scrim: linear-gradient(
+    180deg,
+    #191d248c 0%,
+    #191d2400 30%,
+    #212731d1 72%,
+    var(--color-bg-secondary) 100%
+  );
+  --spoiler-blur: 7px;
+  --community-avatar-size: 36px;
+  --community-reply-avatar-size: 28px;
+  --community-review-clamp-height: 132px;
+  --community-distribution-height: 8px;
+  --community-distribution-min-width: 240px;
+  --community-dot-size: 7px;
+  --community-empty-text-width: 240px;
+  --community-loading-height: 96px;
+  --user-review-card-width: 170px;
+  --user-review-card-width-sm: 140px;
+  --user-review-rating-filter-width: 260px;
+  --vndb-review-height: max(360px, calc(100vh - 420px));
+  --vndb-cover-width: 120px;
+  --vndb-search-width: 320px;
+  --vndb-candidate-cover-width: 64px;
+  --empty-state-image-size: 180px;
+  --not-found-image-height: 240px;
+  --not-found-backdrop-size: 400px;
+  --not-found-content-width: 420px;
+  --favorite-color: var(--color-pink);
+  --game-controls-icon-size: 24px;
+  --game-controls-icon-size-sm: 20px;
+  --game-controls-badge-size: 15px;
+  --top-five-cover-width: 44px;
+  --list-card-min-width: 180px;
+  --list-card-row-mosaic-size: 44px;
+  --list-card-count-height: 20px;
+  --list-search-width: 320px;
+  --list-row-cover-width: 40px;
+  --profile-hero-height: 168px;
+  --profile-avatar-size: 112px;
+  --profile-avatar-size-sm: 72px;
+  --activity-cover-width: 80px;
+  --activity-dot-size: 12px;
+  --people-avatar-size: 22px;
+  --search-modal-width: 900px;
+  --search-tab-height: 36px;
+}
+/* mooncellar-tokens:end */
+
+  :root {
+    --mock-ui: "Hanken Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mock-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --mock-ground: var(--color-neutral-10);
+    --mock-hairline: var(--color-neutral-30);
+    --mock-accent-text: color-mix(in srgb, var(--color-accent) 55%, var(--color-neutral-100));
+    --mock-nav-width: 220px;
+    --mock-profile-avatar: 112px;
+    --mock-profile-avatar-sm: 72px;
+    --mock-activity-cover: 40px;
+    --mock-activity-cover-lg: 56px;
+    --mock-people-avatar: 26px;
+    --mock-drawer-avatar: var(--community-avatar-size);
+    --mock-hero-height: 168px;
+    --mock-backdrop:
+      radial-gradient(110% 70% at 12% 0%, color-mix(in srgb, var(--color-blue) 30%, transparent), transparent 62%),
+      radial-gradient(80% 60% at 100% 100%, color-mix(in srgb, var(--color-violet) 26%, transparent), transparent 60%),
+      linear-gradient(165deg, var(--color-neutral-25), var(--color-neutral-5));
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--mock-ground);
+    color: var(--color-text-primary);
+    font-family: var(--mock-ui);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .shell {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding-inline: var(--padding-x6);
+    padding-block: var(--padding-x14) var(--padding-x20);
+  }
+
+  @media (max-width: 520px) {
+    .shell {
+      padding-inline: var(--padding-x4);
+      padding-block: var(--padding-x9) var(--padding-x14);
+    }
+  }
+
+  h1, h2, h3 { margin: 0; text-wrap: balance; }
+  p { margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; }
+
+  :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+  }
+
+  .masthead { display: flex; flex-direction: column; gap: var(--gap-x4); }
+  .masthead h1 { font-size: 34px; line-height: 1.15; font-weight: 700; letter-spacing: -0.5px; }
+  .lede { color: var(--color-text-secondary); max-width: 66ch; }
+
+  .brief {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--gap-x3) var(--gap-x6);
+    margin: var(--padding-x3) 0 0;
+    padding-top: var(--padding-x5);
+    border-top: 1px solid var(--color-border-primary);
+  }
+
+  .brief dt { font-size: 12px; font-weight: 600; color: var(--color-text-primary); }
+  .brief dd { margin: 0; font-size: 14px; color: var(--color-text-muted); }
+
+  code.t { font-family: var(--mock-mono); font-size: 12px; color: var(--color-yellow); }
+
+  .variant, .section { margin-top: var(--padding-x16); }
+
+  .variant__head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--gap-x3);
+    flex-wrap: wrap;
+    margin-bottom: var(--gap-x2);
+  }
+
+  .variant__letter {
+    font-family: var(--mock-mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-x1);
+    padding: 1px 7px;
+    flex-shrink: 0;
+  }
+
+  .variant__head h2, .section > h2 { font-size: 23px; font-weight: 700; letter-spacing: -0.2px; }
+
+  .variant__thesis {
+    color: var(--color-text-muted);
+    max-width: 70ch;
+    margin-bottom: var(--gap-x5);
+  }
+
+  .section > h2 + p { color: var(--color-text-muted); max-width: 70ch; margin: var(--gap-x2) 0 var(--gap-x5); }
+
+  .stage {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x4);
+    padding: var(--padding-x5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x4);
+  }
+
+  .stage__context {
+    font-size: 12px;
+    color: var(--color-gray);
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    flex-wrap: wrap;
+  }
+
+  .stage__context::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    flex-shrink: 0;
+  }
+
+  .pros {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--gap-x3) var(--gap-x6);
+    font-size: 14px;
+    color: var(--color-text-muted);
+  }
+
+  .pros h3 { font-size: 12px; font-weight: 600; color: var(--color-text-primary); margin-bottom: var(--gap-x1); }
+  .pros ul { margin: 0; padding-left: 18px; display: grid; gap: var(--gap-x1); }
+
+  @media (max-width: 520px) { .stage { padding: var(--padding-x3); } }
+
+  .frame {
+    background: var(--mock-backdrop);
+    border-radius: var(--radius-x4);
+    padding: var(--padding-x5);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--mock-nav-width);
+    gap: var(--gap-x4);
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .frame { grid-template-columns: minmax(0, 1fr); padding: var(--padding-x3); }
+  }
+
+  .panel {
+    background: var(--color-bg-primary-tint);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x5);
+    padding: var(--padding-x5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x6);
+    min-width: 0;
+  }
+
+  @media (max-width: 520px) { .panel { padding: var(--padding-x4); gap: var(--gap-x5); } }
+
+  .crumbs { display: flex; align-items: center; gap: var(--gap-x2); font-size: 13px; color: var(--color-text-muted); }
+  .crumbs span:last-child { color: var(--color-text-primary); }
+
+  .nav { display: flex; flex-direction: column; gap: var(--gap-x2); }
+  .nav .panel { padding: var(--padding-x2); gap: 0; }
+
+  .nav__label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+    padding: var(--padding-x1) var(--padding-x3) var(--padding-x1);
+  }
+
+  .nav__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x2);
+    padding: var(--padding-x1) var(--padding-x3);
+    min-height: 32px;
+    border: 0;
+    background: transparent;
+    border-radius: var(--radius-x4);
+    font-size: 14px;
+    line-height: 1.3;
+    color: var(--color-text-secondary);
+    text-align: left;
+    cursor: pointer;
+    transition: background var(--duration-fast) var(--easing-out);
+  }
+
+  .nav__row:hover { background: var(--color-bg-hover); }
+  .nav__row[aria-current="page"] { background: var(--color-bg-accent); color: var(--color-text-primary); }
+  .nav__row[aria-current="page"] .count { color: var(--color-text-primary); }
+  .nav__row--muted { color: var(--color-text-muted); }
+  .nav__row svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--color-gray); }
+  .nav__name { display: inline-flex; align-items: center; gap: var(--gap-x1); min-width: 0; }
+  .nav__name svg { width: 12px; height: 12px; }
+
+  .nav__note {
+    font-size: 12px;
+    color: var(--color-gray);
+    padding: var(--padding-x2) var(--padding-x3) var(--padding-x1);
+  }
+
+  @media (max-width: 900px) {
+    .nav { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  }
+
+  .count {
+    font-family: var(--mock-mono);
+    font-size: 12px;
+    color: var(--color-gray);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stitle-row { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-x3); flex-wrap: wrap; }
+
+  .stitle { display: flex; align-items: center; gap: var(--gap-x2); font-size: 20px; font-weight: 600; line-height: 1.2; }
+  .stitle::before { content: ""; width: 4px; height: 20px; border-radius: var(--radius-x2); background: var(--color-accent); flex-shrink: 0; }
+  .stitle .count { font-size: 13px; font-weight: 400; }
+
+  .block { display: flex; flex-direction: column; gap: var(--gap-x4); min-width: 0; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap-x2);
+    border: 1px solid transparent;
+    border-radius: var(--radius-x4);
+    padding: 6px var(--padding-x4);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background var(--duration-fast) var(--easing-out), border-color var(--duration-fast) var(--easing-out);
+  }
+
+  .btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .btn--primary { background: var(--color-bg-accent); color: var(--color-text-primary); }
+  .btn--primary:hover { box-shadow: var(--glow-accent); }
+  .btn--primary[aria-pressed="true"] { background: var(--color-bg-tertiary); border-color: var(--color-accent); }
+  .btn--default { background: var(--color-bg-tertiary); color: var(--color-text-primary); }
+  .btn--default:hover { background: var(--color-bg-hover); }
+  .btn--sm { padding: 2px var(--padding-x3); font-size: 13px; }
+
+  .ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 0;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    padding: 3px var(--padding-x2);
+    border-radius: var(--radius-x3);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background var(--duration-fast) var(--easing-out), color var(--duration-fast) var(--easing-out);
+  }
+
+  .ghost:hover { background: var(--color-bg-hover); color: var(--color-text-primary); }
+  .ghost svg { width: 14px; height: 14px; flex-shrink: 0; }
+  .ghost--link { color: var(--mock-accent-text); }
+
+  .segmented { display: inline-flex; padding: 3px; gap: 2px; background: var(--color-bg-tertiary); border-radius: var(--radius-x4); }
+
+  .segmented button {
+    border: 0;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    padding: 3px var(--padding-x3);
+    border-radius: var(--radius-x3);
+    cursor: pointer;
+  }
+
+  .segmented button[aria-pressed="true"] { background: var(--color-bg-primary); color: var(--color-text-primary); }
+
+  .field {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    background: var(--color-bg-tertiary);
+    border-radius: var(--radius-x4);
+    color: var(--color-gray);
+    font-size: 13px;
+    padding: 6px var(--padding-x3);
+  }
+
+  .field svg { width: 14px; height: 14px; }
+
+  .cover {
+    width: var(--mock-cover-w, 100%);
+    max-width: 100%;
+    aspect-ratio: var(--cover-ratio);
+    border-radius: var(--radius-x3);
+    background:
+      linear-gradient(155deg,
+        color-mix(in srgb, var(--mock-art, var(--color-accent)) 78%, var(--color-neutral-5)) 0%,
+        color-mix(in srgb, var(--mock-art, var(--color-accent)) 28%, var(--color-neutral-10)) 70%,
+        var(--color-neutral-10) 100%);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-neutral-100) 8%, transparent);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: var(--padding-x2);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1.2;
+    text-align: center;
+    text-transform: uppercase;
+    color: var(--color-neutral-95);
+    flex-shrink: 0;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .cover--mini { font-size: 0; padding: 0; border-radius: var(--radius-x2); }
+
+  .art-hollow { --mock-art: var(--color-blue); }
+  .art-sh2 { --mock-art: var(--color-neutral-55); }
+  .art-outer { --mock-art: var(--color-orange); }
+  .art-disco { --mock-art: var(--color-pink); }
+  .art-tunic { --mock-art: var(--color-yellow); }
+  .art-hades { --mock-art: var(--color-negative); }
+  .art-celeste { --mock-art: var(--color-blue-light); }
+  .art-signalis { --mock-art: var(--color-violet); }
+  .art-well { --mock-art: var(--color-positive); }
+  .art-pentiment { --mock-art: var(--color-yellow-light); }
+  .art-elden { --mock-art: var(--color-neutral-60); }
+  .art-hike { --mock-art: var(--color-positive); }
+  .art-spirit { --mock-art: var(--color-orange); }
+  .art-unpack { --mock-art: var(--color-pink); }
+
+  .av {
+    width: var(--mock-av-size, var(--mock-people-avatar));
+    height: var(--mock-av-size, var(--mock-people-avatar));
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--color-neutral-100);
+    background: color-mix(in srgb, var(--mock-av, var(--color-accent)) 70%, var(--color-neutral-15));
+    flex-shrink: 0;
+  }
+
+  .av-1 { --mock-av: var(--color-blue); }
+  .av-2 { --mock-av: var(--color-orange); }
+  .av-3 { --mock-av: var(--color-positive); }
+  .av-4 { --mock-av: var(--color-pink); }
+  .av-5 { --mock-av: var(--color-yellow); }
+  .av-6 { --mock-av: var(--color-violet); }
+
+  .stack { display: flex; padding-left: 8px; }
+  .stack .av { margin-left: -8px; outline: 2px solid var(--color-bg-primary); font-size: 0; }
+
+  .avatar-lg {
+    width: var(--mock-profile-avatar);
+    aspect-ratio: 1;
+    border-radius: var(--radius-x4);
+    background:
+      radial-gradient(70% 70% at 30% 25%, color-mix(in srgb, var(--color-yellow-light) 55%, transparent), transparent 70%),
+      linear-gradient(160deg, color-mix(in srgb, var(--color-orange) 70%, var(--color-neutral-15)), var(--color-neutral-15));
+    display: grid;
+    place-items: center;
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--color-neutral-100);
+    flex-shrink: 0;
+  }
+
+  .name { font-size: 26px; font-weight: 700; line-height: 1.2; letter-spacing: -0.3px; }
+  .seen { font-size: 13px; color: var(--color-text-muted); }
+  .seen b { font-weight: 500; color: var(--color-text-secondary); }
+
+  .bio { font-size: 14px; color: var(--color-text-secondary); max-width: 60ch; display: grid; gap: var(--rich-text-gap); }
+  .bio a { color: var(--mock-accent-text); }
+
+  .people {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    font-size: 13px;
+    color: var(--color-text-muted);
+    border: 0;
+    background: transparent;
+    padding: 2px var(--padding-x1);
+    border-radius: var(--radius-x3);
+    cursor: pointer;
+  }
+
+  .people:hover { background: var(--color-bg-hover); }
+  .people b { font-family: var(--mock-mono); font-weight: 500; color: var(--color-text-primary); font-variant-numeric: tabular-nums; }
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 20px;
+    padding: 0 var(--padding-x2);
+    border-radius: var(--radius-x2);
+    color: color-mix(in srgb, var(--mock-cat) 62%, var(--color-neutral-100));
+    background: color-mix(in srgb, var(--mock-cat) 16%, transparent);
+    white-space: nowrap;
+  }
+
+  .dot { width: var(--community-dot-size); height: var(--community-dot-size); border-radius: 50%; background: var(--mock-cat, var(--color-gray)); flex-shrink: 0; }
+
+  .cat-completed { --mock-cat: var(--game-completed-color); }
+  .cat-playing { --mock-cat: var(--game-playing-color); }
+  .cat-dropped { --mock-cat: var(--game-dropped-color); }
+  .cat-played { --mock-cat: var(--game-played-color); }
+  .cat-backlog { --mock-cat: var(--game-backlog-color); }
+  .cat-wishlist { --mock-cat: var(--game-wishlist-color); }
+  .cat-mastered { --mock-cat: var(--game-mastered-color); }
+  .cat-favorite { --mock-cat: var(--color-pink); }
+  .cat-rating { --mock-cat: var(--color-accent); }
+  .cat-removed { --mock-cat: var(--color-gray); }
+
+  .kv {
+    font-size: 12px;
+    line-height: 20px;
+    color: var(--color-text-muted);
+    background: var(--color-bg-tertiary);
+    border-radius: var(--radius-x2);
+    padding: 0 var(--padding-x2);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .rate { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; color: var(--color-text-primary); font-variant-numeric: tabular-nums; }
+  .rate svg { width: 14px; height: 14px; color: var(--color-accent); }
+
+  .verb { display: inline; font-size: 13px; line-height: 20px; color: var(--color-text-secondary); }
+  .verb svg { display: inline-block; width: 14px; height: 14px; margin-right: 6px; vertical-align: -2px; color: var(--mock-cat, var(--color-gray)); }
+  .verb b { font-weight: 600; color: var(--color-text-primary); }
+
+  .line { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap-x1) var(--gap-x2); }
+
+  .del {
+    width: 26px;
+    height: 26px;
+    border: 0;
+    border-radius: var(--radius-x3);
+    background: transparent;
+    color: var(--color-gray);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--easing-out), background var(--duration-fast) var(--easing-out);
+  }
+
+  .del svg { width: 10px; height: 12px; }
+  .del:hover { background: var(--color-bg-hover); color: var(--color-negative); }
+  .is-owner .del, .del:focus-visible { opacity: 1; }
+  @media (hover: hover) { .is-owner .del { opacity: 0; } .is-owner *:hover > .del, .is-owner .del:focus-visible { opacity: 1; } }
+
+  .foot { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-x3); flex-wrap: wrap; font-size: 13px; color: var(--color-gray); }
+
+  .pager { display: inline-flex; gap: 2px; background: var(--color-bg-tertiary); border-radius: var(--radius-x4); padding: 3px; }
+  .pager button { border: 0; background: transparent; color: var(--color-text-muted); min-width: 28px; height: 26px; border-radius: var(--radius-x3); font-family: var(--mock-mono); font-size: 12px; cursor: pointer; }
+  .pager button[aria-current="page"] { background: var(--color-bg-accent); color: var(--color-text-primary); }
+
+
+  .who {
+    display: grid;
+    grid-template-columns: var(--mock-profile-avatar) minmax(0, 1fr) auto;
+    gap: var(--gap-x2) var(--gap-x5);
+    align-items: start;
+  }
+
+  .who__main { display: flex; flex-direction: column; gap: var(--gap-x1); min-width: 0; }
+  .who__main .bio { margin-top: var(--gap-x2); }
+  .who__side { display: flex; flex-direction: column; align-items: flex-end; gap: var(--gap-x2); }
+
+  @media (max-width: 640px) {
+    .who { grid-template-columns: var(--mock-profile-avatar-sm) minmax(0, 1fr); }
+    .who .avatar-lg { width: var(--mock-profile-avatar-sm); font-size: 28px; }
+    .who__side { grid-column: 1 / -1; align-items: flex-start; flex-direction: row; flex-wrap: wrap; }
+    .who__main .bio { grid-column: 1 / -1; }
+  }
+
+  .favs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--gap-x3); }
+  .fav { display: flex; flex-direction: column; gap: var(--gap-x2); min-width: 0; }
+  .fav .cover { transition: transform var(--duration-base) var(--easing-out), box-shadow var(--duration-base) var(--easing-out); }
+  .fav:hover .cover { transform: translateY(-3px); box-shadow: var(--shadow-basic), inset 0 0 0 1px color-mix(in srgb, var(--color-neutral-100) 12%, transparent); }
+  .fav__name { font-size: 13px; line-height: 1.3; color: var(--color-text-secondary); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .fav__meta { font-size: 12px; color: var(--color-gray); display: inline-flex; align-items: center; gap: 6px; }
+
+  @media (max-width: 520px) {
+    .favs { gap: var(--gap-x2); }
+    .favs .cover { font-size: 0; }
+    .fav__name, .fav__meta { display: none; }
+  }
+
+  .split { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); gap: var(--gap-x6); align-items: start; }
+  @media (max-width: 900px) { .split { grid-template-columns: minmax(0, 1fr); } }
+
+  .feed { display: flex; flex-direction: column; }
+
+  .day {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+    padding: var(--padding-x4) 0 var(--padding-x2);
+    border-bottom: 1px solid var(--color-border-primary);
+  }
+
+  .day:first-child { padding-top: 0; }
+
+  .entry {
+    display: grid;
+    grid-template-columns: var(--mock-activity-cover) minmax(0, 1fr) auto;
+    gap: var(--gap-x1) var(--gap-x3);
+    padding-block: var(--padding-x3);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-border-primary) 60%, transparent);
+    align-items: start;
+  }
+
+  .entry .cover { --mock-cover-w: var(--mock-activity-cover); }
+  .entry__body { display: flex; flex-direction: column; gap: var(--gap-x1); min-width: 0; }
+  .entry__game { font-size: 14px; font-weight: 600; line-height: 1.3; }
+  .entry__game:hover { color: var(--mock-accent-text); }
+  .entry__side { display: flex; align-items: center; gap: var(--gap-x1); }
+  .time { font-size: 12px; color: var(--color-gray); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+  @media (max-width: 520px) {
+    .entry { grid-template-columns: var(--mock-activity-cover) minmax(0, 1fr); }
+    .entry__side { grid-column: 2; justify-content: space-between; }
+  }
+
+  .lcards { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--gap-x3); }
+  @media (max-width: 900px) and (min-width: 521px) { .lcards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+  .lcard {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: var(--gap-x3);
+    align-items: center;
+    padding: var(--padding-x2);
+    border-radius: var(--radius-x4);
+    background: var(--color-bg-secondary-tint);
+    border: 1px solid var(--color-border-primary);
+    transition: border-color var(--duration-fast) var(--easing-out);
+  }
+
+  .lcard:hover { border-color: var(--color-accent); }
+  .mosaic { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px; border-radius: var(--radius-x3); overflow: hidden; }
+  .mosaic .cover { border-radius: 0; font-size: 0; padding: 0; box-shadow: none; }
+  .lcard__name { font-size: 14px; font-weight: 600; line-height: 1.3; }
+  .lcard__meta { font-size: 12px; color: var(--color-gray); }
+
+
+  .b-grid { display: grid; grid-template-columns: 208px minmax(0, 1fr); gap: var(--gap-x6); align-items: start; }
+  @media (max-width: 760px) { .b-grid { grid-template-columns: minmax(0, 1fr); } }
+
+  .idcard { display: flex; flex-direction: column; gap: var(--gap-x4); }
+  .idcard .avatar-lg { width: 100%; font-size: 64px; }
+  .idcard__actions { display: grid; grid-template-columns: 1fr auto; gap: var(--gap-x2); }
+
+  @media (max-width: 760px) {
+    .idcard { display: grid; grid-template-columns: var(--mock-profile-avatar-sm) minmax(0, 1fr); column-gap: var(--gap-x4); }
+    .idcard .avatar-lg { width: var(--mock-profile-avatar-sm); font-size: 28px; grid-row: span 2; }
+    .idcard > :not(.avatar-lg):not(.idhead) { grid-column: 1 / -1; }
+  }
+
+  .facts { display: grid; gap: var(--gap-x1); padding-top: var(--padding-x4); border-top: 1px solid var(--color-border-primary); }
+  .fact { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--color-text-muted); padding: 2px 0; }
+  .fact b { font-family: var(--mock-mono); font-weight: 500; font-size: 13px; color: var(--color-text-primary); }
+
+  .facegrid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--gap-x1); }
+  .facegrid .av { --mock-av-size: 100%; aspect-ratio: 1; height: auto; font-size: 10px; }
+  .facegrid__more { aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; background: var(--color-bg-tertiary); color: var(--color-text-muted); font-size: 11px; font-family: var(--mock-mono); }
+
+  .ptitle { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; font-weight: 600; }
+  .ptitle a { font-size: 12px; font-weight: 400; color: var(--mock-accent-text); }
+
+  .favs--b { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .fav--slot .cover { position: relative; }
+
+  .tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-x3); }
+  @media (max-width: 1100px) { .tiles { grid-template-columns: minmax(0, 1fr); } }
+
+  .tile {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--mock-activity-cover-lg) minmax(0, 1fr);
+    gap: var(--gap-x3);
+    padding: var(--padding-x3);
+    border-radius: var(--radius-x4);
+    background: var(--color-bg-secondary-tint);
+    border: 1px solid var(--color-border-primary);
+    align-content: start;
+  }
+
+  .tile .cover { --mock-cover-w: var(--mock-activity-cover-lg); }
+  .tile__body { display: flex; flex-direction: column; gap: var(--gap-x2); min-width: 0; }
+  .tile__head { display: flex; justify-content: space-between; gap: var(--gap-x2); align-items: start; }
+  .tile .del { position: absolute; top: var(--padding-x2); right: var(--padding-x2); }
+  .tile__head .time { padding-right: var(--padding-x7); }
+
+
+  .panel--hero { padding-top: 0; overflow: hidden; }
+
+  .hero {
+    position: relative;
+    height: var(--mock-hero-height);
+    margin-inline: calc(-1 * var(--padding-x5));
+    background:
+      radial-gradient(60% 90% at 78% 30%, color-mix(in srgb, var(--color-yellow-light) 32%, transparent), transparent 65%),
+      radial-gradient(70% 120% at 20% 100%, color-mix(in srgb, var(--color-violet) 45%, transparent), transparent 70%),
+      linear-gradient(120deg, color-mix(in srgb, var(--color-blue) 45%, var(--color-neutral-10)), var(--color-neutral-15));
+  }
+
+  .hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 35%, var(--color-bg-primary) 100%); }
+  .hero .crumbs { position: absolute; top: var(--padding-x4); left: var(--padding-x5); z-index: 1; }
+  .hero .crumbs span:last-child { color: var(--color-neutral-100); }
+
+  @media (max-width: 520px) { .hero { margin-inline: calc(-1 * var(--padding-x4)); } .hero .crumbs { left: var(--padding-x4); } }
+
+  .c-head {
+    display: grid;
+    grid-template-columns: var(--mock-profile-avatar) minmax(0, 1fr) auto;
+    gap: var(--gap-x5);
+    align-items: end;
+    margin-top: calc(-1 * var(--mock-profile-avatar) / 2 - var(--padding-x6));
+    position: relative;
+  }
+
+  .c-head .avatar-lg { outline: 4px solid var(--color-bg-primary); }
+  .c-head__main { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding-bottom: var(--padding-x1); }
+
+  @media (max-width: 640px) {
+    .c-head { grid-template-columns: var(--mock-profile-avatar-sm) minmax(0, 1fr); margin-top: calc(-1 * var(--mock-profile-avatar-sm) / 2 - var(--padding-x6)); }
+    .c-head .avatar-lg { width: var(--mock-profile-avatar-sm); font-size: 28px; }
+    .c-head > .btn { grid-column: 1 / -1; justify-self: start; }
+  }
+
+  .counters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gap-x2); }
+  @media (max-width: 640px) { .counters { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+  .counter {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--padding-x2) var(--padding-x3);
+    border-radius: var(--radius-x4);
+    background: var(--color-bg-secondary);
+    border: 1px solid transparent;
+    text-align: left;
+    color: inherit;
+    cursor: pointer;
+    transition: border-color var(--duration-fast) var(--easing-out);
+  }
+
+  .counter:hover { border-color: var(--color-accent); }
+  .counter span { font-size: 12px; color: var(--color-text-muted); }
+  .counter b { font-size: 20px; font-weight: 600; line-height: 1.2; font-variant-numeric: tabular-nums; display: flex; align-items: center; justify-content: space-between; gap: var(--gap-x2); }
+  .counter .stack .av { outline-color: var(--color-bg-secondary); --mock-av-size: 22px; }
+
+  .podium { display: grid; grid-template-columns: minmax(0, 1.5fr) repeat(4, minmax(0, 1fr)); gap: var(--gap-x3); align-items: end; }
+  .podium .fav:first-child .cover { font-size: 12px; }
+  .rank { font-family: var(--mock-mono); font-size: 12px; color: var(--color-gray); font-variant-numeric: tabular-nums; }
+  .fav:first-child .rank { color: var(--color-yellow); }
+
+  @media (max-width: 520px) {
+    .podium { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .podium .fav:first-child { grid-column: 1 / -1; display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: end; }
+    .podium .fav:first-child .fav__name, .podium .fav:first-child .fav__meta { display: -webkit-box; }
+    .podium .cover { font-size: 0; }
+  }
+
+  .c-split { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: var(--gap-x6); align-items: start; }
+  @media (max-width: 900px) { .c-split { grid-template-columns: minmax(0, 1fr); } }
+
+  .tl { position: relative; display: flex; flex-direction: column; gap: var(--gap-x5); padding-left: var(--padding-x7); }
+  .tl::before { content: ""; position: absolute; left: 5px; top: 8px; bottom: 8px; width: 2px; border-radius: 1px; background: var(--color-border-primary); }
+  .tl__day { position: relative; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-gray); }
+  .tl__day::before { content: ""; position: absolute; left: calc(-1 * var(--padding-x7) + 1px); top: 50%; width: 10px; height: 2px; background: var(--color-border-primary); }
+
+  .tl__item { position: relative; display: grid; grid-template-columns: var(--mock-activity-cover) minmax(0, 1fr) auto; gap: var(--gap-x3); align-items: start; }
+  .tl__item .cover { --mock-cover-w: var(--mock-activity-cover); }
+  .tl__dot { position: absolute; left: calc(-1 * var(--padding-x7)); top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--mock-cat); box-shadow: 0 0 0 3px var(--color-bg-primary); }
+
+  @media (max-width: 520px) {
+    .tl__item { grid-template-columns: var(--mock-activity-cover) minmax(0, 1fr); }
+    .tl__item .entry__side { grid-column: 2; }
+  }
+
+  .side { display: flex; flex-direction: column; gap: var(--gap-x5); }
+
+  .mini-lists { display: flex; flex-direction: column; gap: var(--gap-x1); }
+  .mini-list { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: var(--gap-x3); align-items: center; padding: var(--padding-x1); border-radius: var(--radius-x4); }
+  .mini-list:hover { background: var(--color-bg-hover); }
+  .mini-list .mosaic { border-radius: var(--radius-x2); }
+
+
+  .pieces { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-x4); align-items: start; }
+  @media (max-width: 900px) { .pieces { grid-template-columns: minmax(0, 1fr); } }
+
+  .piece { display: flex; flex-direction: column; gap: var(--gap-x3); min-width: 0; }
+  .piece > h3 { font-size: 15px; font-weight: 600; }
+  .piece > p { font-size: 14px; color: var(--color-text-muted); max-width: 62ch; }
+
+  .old {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: var(--gap-x3);
+    padding: var(--padding-x3);
+    border-radius: var(--radius-x4);
+    border: 1px dashed var(--color-border-primary);
+    opacity: 0.75;
+  }
+
+  .old__text { background: var(--color-bg-primary); border: 1px solid var(--color-border-primary); border-radius: var(--radius-x5); padding: var(--padding-x3); font-size: 13px; color: var(--color-text-secondary); display: grid; gap: 2px; align-content: start; }
+  .old__text small { font-size: 12px; color: var(--color-text-muted); }
+
+  .label-before { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-gray); }
+
+  .map { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .map th, .map td { text-align: left; padding: var(--padding-x2) var(--padding-x2); border-bottom: 1px solid var(--color-border-primary); vertical-align: top; }
+  .map th { font-weight: 600; color: var(--color-text-muted); font-size: 12px; }
+  .map td:first-child { font-family: var(--mock-mono); font-size: 12px; color: var(--color-yellow); white-space: nowrap; }
+  .scroll-x { overflow-x: auto; }
+
+  .drawer {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x5);
+    display: flex;
+    flex-direction: column;
+    max-width: 420px;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .drawer__head { display: flex; justify-content: space-between; align-items: center; padding: var(--padding-x4) var(--padding-x5); border-bottom: 1px solid var(--color-border-primary); }
+  .drawer__head h4 { margin: 0; font-size: 16px; font-weight: 600; }
+  .drawer__tools { display: flex; flex-direction: column; gap: var(--gap-x3); padding: var(--padding-x4) var(--padding-x5) var(--padding-x2); }
+  .drawer__list { display: flex; flex-direction: column; padding: 0 var(--padding-x3) var(--padding-x3); }
+
+  .person { display: grid; grid-template-columns: var(--mock-drawer-avatar) minmax(0, 1fr) auto; gap: var(--gap-x3); align-items: center; padding: var(--padding-x2); border-radius: var(--radius-x4); }
+  .person:hover { background: var(--color-bg-hover); }
+  .person .av { --mock-av-size: var(--mock-drawer-avatar); font-size: 12px; }
+  .person__name { font-size: 14px; font-weight: 600; line-height: 1.25; }
+  .person__meta { font-size: 12px; color: var(--color-gray); }
+  .person .btn { padding: 2px var(--padding-x3); font-size: 13px; }
+  .mutual { font-size: 11px; color: var(--mock-accent-text); }
+
+  .edit-favs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--gap-x3); }
+  @media (max-width: 520px) { .edit-favs { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+  .slot { display: flex; flex-direction: column; gap: var(--gap-x2); min-width: 0; }
+  .slot .cover { cursor: grab; }
+  .slot__bar { display: flex; justify-content: space-between; align-items: center; gap: 2px; }
+
+  .icon-btn {
+    width: 26px;
+    height: 26px;
+    border: 0;
+    border-radius: var(--radius-x3);
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-muted);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+
+  .icon-btn:hover { background: var(--color-bg-hover); color: var(--color-text-primary); }
+  .icon-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .icon-btn svg { width: 12px; height: 12px; }
+  .icon-btn--flip svg { transform: scaleX(-1); }
+  .icon-btn--danger:hover { color: var(--color-negative); }
+
+  .slot__grip { position: absolute; top: var(--padding-x1); left: var(--padding-x1); width: 20px; height: 20px; border-radius: var(--radius-x2); background: var(--color-bg-primary-tint); display: grid; place-items: center; color: var(--color-text-muted); }
+  .slot__grip svg { width: 12px; height: 12px; }
+
+  .slot--empty .cover {
+    background: transparent;
+    box-shadow: none;
+    border: 1px dashed var(--color-neutral-50);
+    align-items: center;
+    color: var(--color-gray);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    flex-direction: column;
+    gap: var(--gap-x2);
+    cursor: pointer;
+  }
+
+  .slot--empty .cover svg { width: 18px; height: 18px; }
+  .slot--dragging .cover { outline: 2px solid var(--color-accent); outline-offset: -2px; transform: rotate(-2deg) scale(1.03); box-shadow: var(--shadow-basic); }
+
+  .hint {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--gap-x3);
+    padding: var(--padding-x4);
+    border-radius: var(--radius-x4);
+    border: 1px dashed var(--color-neutral-50);
+    font-size: 14px;
+    color: var(--color-text-muted);
+  }
+
+  .hint svg { width: 22px; height: 22px; color: var(--color-pink); flex-shrink: 0; }
+
+  .ctrl-demo { display: inline-flex; gap: var(--gap-x1); padding: var(--padding-x1); border-radius: var(--radius-x3); background: var(--color-bg-primary); outline: 1px solid var(--color-border-primary); vertical-align: middle; }
+  .ctrl-demo span { width: 28px; height: 28px; border-radius: var(--radius-x2); display: grid; place-items: center; }
+  .ctrl-demo span.on { background: var(--color-bg-accent); }
+  .ctrl-demo svg { width: 16px; height: 16px; }
+
+  .compare { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 640px; }
+  .compare th, .compare td { text-align: left; vertical-align: top; padding: var(--padding-x3); border-bottom: 1px solid var(--color-border-primary); }
+  .compare thead th { font-size: 12px; font-weight: 600; color: var(--color-text-primary); }
+  .compare tbody th { font-weight: 500; color: var(--color-text-muted); width: 22%; }
+  .compare td { color: var(--color-text-secondary); }
+  .good { color: var(--color-positive); }
+  .warn { color: var(--color-yellow); }
+
+  .build { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: var(--gap-x4); }
+  .build .panel { background: var(--color-bg-primary); gap: var(--gap-x3); }
+  .build h3 { font-size: 15px; font-weight: 600; }
+  .build ul { margin: 0; padding-left: 18px; display: grid; gap: var(--gap-x2); font-size: 14px; color: var(--color-text-secondary); }
+
+  .note {
+    margin-top: var(--padding-x14);
+    font-size: 13px;
+    color: var(--color-gray);
+    border-left: 2px solid var(--color-border-primary);
+    padding-left: var(--padding-x3);
+    max-width: 80ch;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: var(--duration-instant) !important; }
+  }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-heart" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M12 20.5s-7.5-4.6-7.5-10.1A4.4 4.4 0 0 1 12 7.6a4.4 4.4 0 0 1 7.5 2.8c0 5.5-7.5 10.1-7.5 10.1Z"/></symbol>
+  <symbol id="i-heart-fill" viewBox="0 0 24 24"><path fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M12 20.5s-7.5-4.6-7.5-10.1A4.4 4.4 0 0 1 12 7.6a4.4 4.4 0 0 1 7.5 2.8c0 5.5-7.5 10.1-7.5 10.1Z"/></symbol>
+  <symbol id="i-list" viewBox="0 0 18 18"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M6 4.5h10M6 9h10M6 13.5h10M2.6 4.5h.01M2.6 9h.01M2.6 13.5h.01"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3.25a.75.75 0 0 1 .75.75v7.25H20a.75.75 0 0 1 0 1.5h-7.25V20a.75.75 0 0 1-1.5 0v-7.25H4a.75.75 0 0 1 0-1.5h7.25V4a.75.75 0 0 1 .75-.75"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M16.035 3.015a3 3 0 0 1 4.099-.135l.144.135l.707.707a3 3 0 0 1 .135 4.098l-.135.144L9.773 19.177a1.5 1.5 0 0 1-.562.354l-.162.047l-4.454 1.028a1 1 0 0 1-1.22-1.088l.02-.113l1.027-4.455a1.5 1.5 0 0 1 .29-.598l.111-.125zm-.707 3.535l-8.99 8.99l-.636 2.758l2.758-.637l8.99-8.99l-2.122-2.12Zm3.536-2.121a1 1 0 0 0-1.32-.083l-.094.083l-.708.707l2.122 2.121l.707-.707a1 1 0 0 0 .083-1.32l-.083-.094z"/></symbol>
+  <symbol id="i-close" viewBox="0 0 384 512"><path fill="currentColor" d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0m18 11l-6-6"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path fill="currentColor" d="M10.92 2.868a1.25 1.25 0 0 1 2.16 0l2.795 4.798l5.428 1.176a1.25 1.25 0 0 1 .667 2.054l-3.7 4.141l.56 5.525a1.25 1.25 0 0 1-1.748 1.27L12 19.592l-5.082 2.24a1.25 1.25 0 0 1-1.748-1.27l.56-5.525l-3.7-4.14a1.25 1.25 0 0 1 .667-2.055l5.428-1.176z"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M4 16q-.425 0-.712-.288T3 15t.288-.712T4 14h6q.425 0 .713.288T11 15t-.288.713T10 16zm0-4q-.425 0-.712-.288T3 11t.288-.712T4 10h10q.425 0 .713.288T15 11t-.288.713T14 12zm0-4q-.425 0-.712-.288T3 7t.288-.712T4 6h10q.425 0 .713.288T15 7t-.288.713T14 8zm12.775 12.475q-.125.075-.25.075t-.25-.05t-.2-.162t-.075-.263v-6.15q0-.15.075-.262t.2-.163t.25-.05t.25.075l4.6 3.05q.125.075.175.188t.05.237t-.05.238t-.175.187z"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path fill="currentColor" d="M2 8a1 1 0 0 1 1-1h18a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1m0 4a1 1 0 0 1 1-1h18a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1m1 3a1 1 0 1 0 0 2h12a1 1 0 1 0 0-2z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path fill="currentColor" d="M15.835 11.63L9.205 5.2C8.79 4.799 8 5.042 8 5.57v12.86c0 .528.79.771 1.205.37l6.63-6.43a.5.5 0 0 0 0-.74"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M6.5 10.5h11a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1Zm2.5 0V7.5a3 3 0 0 1 6 0v3"/></symbol>
+  <symbol id="i-grip" viewBox="0 0 24 24"><path fill="currentColor" d="M9 5.5a1.5 1.5 0 1 1-3 0a1.5 1.5 0 0 1 3 0m0 6.5a1.5 1.5 0 1 1-3 0a1.5 1.5 0 0 1 3 0m0 6.5a1.5 1.5 0 1 1-3 0a1.5 1.5 0 0 1 3 0m9-13a1.5 1.5 0 1 1-3 0a1.5 1.5 0 0 1 3 0m0 6.5a1.5 1.5 0 1 1-3 0a1.5 1.5 0 0 1 3 0m0 6.5a1.5 1.5 0 1 1-3 0a1.5 1.5 0 0 1 3 0"/></symbol>
+  <symbol id="i-more" viewBox="0 0 16 16"><path fill="currentColor" d="M3 9.5a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M5 12h14"/></symbol>
+</svg>
+
+<div class="shell">
+  <header class="masthead">
+    <p class="eyebrow">MoonCellar · user profile</p>
+    <h1>Profile Overview</h1>
+    <p class="lede">
+      Three layouts for the first tab of a profile, now that it has to carry more than an avatar
+      and a feed: five favourite games, custom lists, an activity history that can be read at a
+      glance, and follower counts that no longer grow into a wall of avatars. Every example is
+      drawn for the invented profile <strong>moth_scholar</strong>; the favourites heart and the
+      lists popover are in the Game Controls mockup, the list page in Custom Lists.
+    </p>
+    <dl class="brief">
+      <div>
+        <dt>Placement</dt>
+        <dd><code class="t">/user/[name]</code>, the default <code class="t">profile</code> tab inside the content <code class="t">Box</code>. <code class="t">UserNavigation</code> stays on the right and gains a Lists panel.</dd>
+      </div>
+      <div>
+        <dt>Already stored</dt>
+        <dd>Avatar, background, a Markdown description of up to 450 characters, follower and following ids, activity logs merged per game, playthrough counts.</dd>
+      </div>
+      <div>
+        <dt>New data</dt>
+        <dd><code class="t">user.favorites</code> — up to five game ids in the owner's order, set with the heart in GameControls. Custom lists live in their own collection.</dd>
+      </div>
+      <div>
+        <dt>What breaks today</dt>
+        <dd>Every follower avatar is rendered; one activity entry is a full <code class="t">GameCard</code> plus a card of text, so ten entries fill three screens.</dd>
+      </div>
+    </dl>
+  </header>
+
+  <section class="variant" aria-labelledby="variant-a">
+    <div class="variant__head">
+      <span class="variant__letter">A</span>
+      <h2 id="variant-a">Favourites shelf</h2>
+    </div>
+    <p class="variant__thesis">
+      Identity in one row, then the five favourites as the largest thing on the page — they are the
+      one part of a profile the owner chose by hand. Activity turns into a dense day-grouped feed on
+      the left, lists sit beside it as cards. Followers collapse into two counters with a face stack;
+      the full list opens in the drawer.
+    </p>
+    <div class="stage">
+      <p class="stage__context">Visitor view · moth_scholar · 1440px</p>
+      <div class="frame">
+        <main class="panel">
+          <nav class="crumbs" aria-label="Breadcrumbs"><a href="#">Home</a><span>›</span><span>moth_scholar</span></nav>
+
+          <div class="who">
+            <div class="avatar-lg" aria-hidden="true">m</div>
+            <div class="who__main">
+              <h3 class="name">moth_scholar</h3>
+              <p class="seen">Last seen <b>2 hours ago</b> · Joined March 2023</p>
+              <div class="bio">
+                <p>Slow player. Metroidvanias, survival horror and anything with a good map. Currently 100%-ing the Souls series on original hardware — progress in <a href="#">my list</a>.</p>
+              </div>
+            </div>
+            <div class="who__side">
+              <button type="button" class="btn btn--primary" data-follow aria-pressed="false">Follow</button>
+              <button type="button" class="people" data-drawer-trigger>
+                <span class="stack" aria-hidden="true"><span class="av av-1">RK</span><span class="av av-2">LU</span><span class="av av-3">JB</span><span class="av av-4">SO</span></span>
+                <b>27</b> followers
+              </button>
+              <button type="button" class="people" data-drawer-trigger><b>12</b> following</button>
+            </div>
+          </div>
+
+          <div class="block">
+            <div class="stitle-row"><h3 class="stitle">Favourites</h3></div>
+            <div class="favs">
+              <a class="fav" href="#"><span class="cover art-hollow">Hollow Knight</span><span class="fav__name">Hollow Knight</span><span class="fav__meta"><i class="dot cat-mastered"></i>Mastered</span></a>
+              <a class="fav" href="#"><span class="cover art-sh2">Silent Hill 2</span><span class="fav__name">Silent Hill 2</span><span class="fav__meta"><i class="dot cat-completed"></i>Completed</span></a>
+              <a class="fav" href="#"><span class="cover art-outer">Outer Wilds</span><span class="fav__name">Outer Wilds</span><span class="fav__meta"><i class="dot cat-completed"></i>Completed</span></a>
+              <a class="fav" href="#"><span class="cover art-disco">Disco Elysium</span><span class="fav__name">Disco Elysium</span><span class="fav__meta"><i class="dot cat-played"></i>Played</span></a>
+              <a class="fav" href="#"><span class="cover art-tunic">Tunic</span><span class="fav__name">Tunic</span><span class="fav__meta"><i class="dot cat-playing"></i>Playing</span></a>
+            </div>
+          </div>
+
+          <div class="split">
+            <div class="block">
+              <div class="stitle-row"><h3 class="stitle">Activity</h3></div>
+              <div class="feed">
+                <p class="day">Today</p>
+                <article class="entry">
+                  <span class="cover cover--mini art-hades" aria-hidden="true"></span>
+                  <div class="entry__body">
+                    <a class="entry__game" href="#">Hades</a>
+                    <div class="line"><span class="status cat-completed"><i class="dot"></i>Completed</span><span class="kv">PC</span><span class="kv">42 h</span><span class="kv">16.09.2026</span></div>
+                    <div class="line"><span class="verb cat-rating"><svg aria-hidden="true"><use href="#i-star"/></svg>Rated <b>9</b></span></div>
+                  </div>
+                  <div class="entry__side"><time class="time">2 hours ago</time></div>
+                </article>
+                <p class="day">Yesterday</p>
+                <article class="entry">
+                  <span class="cover cover--mini art-outer" aria-hidden="true"></span>
+                  <div class="entry__body">
+                    <a class="entry__game" href="#">Outer Wilds</a>
+                    <div class="line"><span class="verb cat-favorite"><svg aria-hidden="true"><use href="#i-heart-fill"/></svg>Added to <b>favourites</b></span></div>
+                  </div>
+                  <div class="entry__side"><time class="time">Yesterday, 22:14</time></div>
+                </article>
+                <article class="entry">
+                  <span class="cover cover--mini art-signalis" aria-hidden="true"></span>
+                  <div class="entry__body">
+                    <a class="entry__game" href="#">Signalis</a>
+                    <div class="line"><span class="verb">Playthrough changed</span><span class="status cat-dropped"><i class="dot"></i>Dropped</span><span class="kv">6 h</span></div>
+                  </div>
+                  <div class="entry__side"><time class="time">Yesterday, 19:02</time></div>
+                </article>
+                <p class="day">14 September</p>
+                <article class="entry">
+                  <span class="cover cover--mini art-pentiment" aria-hidden="true"></span>
+                  <div class="entry__body">
+                    <a class="entry__game" href="#">Pentiment</a>
+                    <div class="line"><span class="status cat-mastered"><i class="dot"></i>Mastered</span><span class="kv">Switch</span><span class="kv">21 h</span></div>
+                  </div>
+                  <div class="entry__side"><time class="time">14.09, 11:40</time></div>
+                </article>
+                <article class="entry">
+                  <span class="cover cover--mini art-tunic" aria-hidden="true"></span>
+                  <div class="entry__body">
+                    <a class="entry__game" href="#">Tunic</a>
+                    <div class="line"><span class="status cat-wishlist"><i class="dot"></i>Wishlist</span></div>
+                  </div>
+                  <div class="entry__side"><time class="time">14.09, 09:15</time></div>
+                </article>
+              </div>
+              <div class="foot">
+                <span>Showing 1–10 of 486</span>
+                <div class="pager" role="group" aria-label="Pages"><button type="button" aria-current="page">1</button><button type="button">2</button><button type="button">3</button><button type="button">…</button><button type="button">49</button></div>
+              </div>
+            </div>
+
+            <div class="block">
+              <div class="stitle-row"><h3 class="stitle">Lists <span class="count">3</span></h3><a class="ghost ghost--link" href="#">All lists</a></div>
+              <div class="lcards">
+                <a class="lcard" href="#">
+                  <span class="mosaic" aria-hidden="true"><span class="cover art-hike"></span><span class="cover art-celeste"></span><span class="cover art-spirit"></span><span class="cover art-unpack"></span></span>
+                  <span><span class="lcard__name">Cozy winter evenings</span><br><span class="lcard__meta">14 games · updated 5 hours ago</span></span>
+                </a>
+                <a class="lcard" href="#">
+                  <span class="mosaic" aria-hidden="true"><span class="cover art-outer"></span><span class="cover art-hollow"></span><span class="cover art-elden"></span><span class="cover art-well"></span></span>
+                  <span><span class="lcard__name">Best maps in games</span><br><span class="lcard__meta">23 games · updated 2 weeks ago</span></span>
+                </a>
+                <a class="lcard" href="#">
+                  <span class="mosaic" aria-hidden="true"><span class="cover art-hades"></span><span class="cover art-well"></span><span class="cover art-spirit"></span><span class="cover art-celeste"></span></span>
+                  <span><span class="lcard__name">Co-op with friends</span><br><span class="lcard__meta">5 games · updated 1 month ago</span></span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="nav" aria-label="Profile navigation">
+          <div class="panel">
+            <a class="nav__row" href="#">All <span class="count">214</span></a>
+            <a class="nav__row" href="#">Playing <span class="count">6</span></a>
+            <a class="nav__row" href="#">Completed <span class="count">118</span></a>
+            <a class="nav__row" href="#">Mastered <span class="count">21</span></a>
+            <a class="nav__row" href="#">Played <span class="count">19</span></a>
+            <a class="nav__row" href="#">Wishlist <span class="count">38</span></a>
+            <a class="nav__row" href="#">Backlog <span class="count">9</span></a>
+            <a class="nav__row" href="#">Dropped <span class="count">3</span></a>
+          </div>
+          <div class="panel"><a class="nav__row" href="#">Reviews <span class="count">38</span></a></div>
+          <div class="panel">
+            <p class="nav__label">Lists</p>
+            <a class="nav__row" href="#">Cozy winter evenings <span class="count">14</span></a>
+            <a class="nav__row" href="#">Best maps in games <span class="count">23</span></a>
+            <a class="nav__row" href="#">Co-op with friends <span class="count">5</span></a>
+          </div>
+        </aside>
+      </div>
+      <div class="pros">
+        <div><h3>Works for</h3><ul><li>Favourites read before anything else, at 1440 and on a phone.</li><li>Activity shows about ten entries per screen instead of three.</li><li>Keeps today's structure: header, then content — the smallest rewrite of <code class="t">UserInfo</code>.</li></ul></div>
+        <div><h3>Costs</h3><ul><li>Lists appear twice on desktop, in the navigation and as cards.</li><li>A profile with no favourites and no lists starts with a bare header — needs the owner hint below.</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="variant" aria-labelledby="variant-b">
+    <div class="variant__head">
+      <span class="variant__letter">B</span>
+      <h2 id="variant-b">Identity column</h2>
+    </div>
+    <p class="variant__thesis">
+      Who the person is stays pinned in a narrow column — avatar, bio, counts, the faces of followers —
+      and the wide column is for games only: favourites on top, then activity as compact tiles in two
+      columns, close to today's grid but a third of its height. Drawn as the owner, so the edit and
+      delete affordances are visible.
+    </p>
+    <div class="stage">
+      <p class="stage__context">Owner view · moth_scholar · 1440px</p>
+      <div class="frame is-owner">
+        <main class="panel">
+          <nav class="crumbs" aria-label="Breadcrumbs"><a href="#">Home</a><span>›</span><span>moth_scholar</span></nav>
+          <div class="b-grid">
+            <div class="idcard">
+              <div class="avatar-lg" aria-hidden="true">m</div>
+              <div class="idhead">
+                <h3 class="name">moth_scholar</h3>
+                <p class="seen">Online now · Joined March 2023</p>
+              </div>
+              <div class="idcard__actions" style="grid-template-columns:1fr">
+                <a class="btn btn--default btn--sm" href="#"><svg aria-hidden="true"><use href="#i-pen"/></svg>Edit profile</a>
+              </div>
+              <div class="bio">
+                <p>Slow player. Metroidvanias, survival horror and anything with a good map. Currently 100%-ing the Souls series on original hardware.</p>
+              </div>
+              <div class="facts">
+                <div class="fact">Games <b>214</b></div>
+                <div class="fact">Completed or mastered <b>139</b></div>
+                <div class="fact">Reviews <b>38</b></div>
+                <div class="fact">Hours logged <b>2418</b></div>
+              </div>
+              <div class="block" style="gap:var(--gap-x2)">
+                <p class="ptitle">Followers · 27 <a href="#" data-drawer-trigger>Show all</a></p>
+                <div class="facegrid">
+                  <span class="av av-1">RK</span><span class="av av-2">LU</span><span class="av av-3">JB</span><span class="av av-4">SO</span><span class="av av-5">TE</span><span class="facegrid__more">+22</span>
+                </div>
+              </div>
+              <div class="block" style="gap:var(--gap-x2)">
+                <p class="ptitle">Following · 12 <a href="#" data-drawer-trigger>Show all</a></p>
+                <div class="facegrid">
+                  <span class="av av-6">NA</span><span class="av av-3">JB</span><span class="av av-2">PI</span><span class="av av-5">VO</span><span class="av av-1">QE</span><span class="facegrid__more">+7</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="block" style="gap:var(--gap-x6)">
+              <div class="block">
+                <div class="stitle-row"><h3 class="stitle">Favourites</h3><button type="button" class="ghost"><svg aria-hidden="true"><use href="#i-pen"/></svg>Edit</button></div>
+                <div class="favs favs--b">
+                  <a class="fav" href="#"><span class="cover art-hollow">Hollow Knight</span><span class="fav__name">Hollow Knight</span></a>
+                  <a class="fav" href="#"><span class="cover art-sh2">Silent Hill 2</span><span class="fav__name">Silent Hill 2</span></a>
+                  <a class="fav" href="#"><span class="cover art-outer">Outer Wilds</span><span class="fav__name">Outer Wilds</span></a>
+                  <a class="fav" href="#"><span class="cover art-disco">Disco Elysium</span><span class="fav__name">Disco Elysium</span></a>
+                  <a class="fav" href="#"><span class="cover art-tunic">Tunic</span><span class="fav__name">Tunic</span></a>
+                </div>
+              </div>
+
+              <div class="block">
+                <div class="stitle-row">
+                  <h3 class="stitle">Activity</h3>
+                  <div class="segmented" role="group" aria-label="Filter activity">
+                    <button type="button" aria-pressed="true" data-segment>All</button>
+                    <button type="button" aria-pressed="false" data-segment>Playthroughs</button>
+                    <button type="button" aria-pressed="false" data-segment>Ratings</button>
+                    <button type="button" aria-pressed="false" data-segment>Lists</button>
+                  </div>
+                </div>
+                <div class="tiles">
+                  <article class="tile">
+                    <span class="cover cover--mini art-hades" aria-hidden="true"></span>
+                    <div class="tile__body">
+                      <div class="tile__head"><a class="entry__game" href="#">Hades</a><time class="time">2 h ago</time></div>
+                      <div class="line"><span class="status cat-completed"><i class="dot"></i>Completed</span><span class="kv">PC</span><span class="kv">42 h</span></div>
+                      <div class="line"><span class="verb cat-rating"><svg aria-hidden="true"><use href="#i-star"/></svg>Rated <b>9</b></span></div>
+                    </div>
+                    <button type="button" class="del" aria-label="Delete log entry"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+                  </article>
+                  <article class="tile">
+                    <span class="cover cover--mini art-outer" aria-hidden="true"></span>
+                    <div class="tile__body">
+                      <div class="tile__head"><a class="entry__game" href="#">Outer Wilds</a><time class="time">Yesterday</time></div>
+                      <div class="line"><span class="verb cat-favorite"><svg aria-hidden="true"><use href="#i-heart-fill"/></svg>Added to <b>favourites</b></span></div>
+                    </div>
+                    <button type="button" class="del" aria-label="Delete log entry"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+                  </article>
+                  <article class="tile">
+                    <span class="cover cover--mini art-signalis" aria-hidden="true"></span>
+                    <div class="tile__body">
+                      <div class="tile__head"><a class="entry__game" href="#">Signalis</a><time class="time">Yesterday</time></div>
+                      <div class="line"><span class="verb">Changed</span><span class="status cat-dropped"><i class="dot"></i>Dropped</span><span class="kv">6 h</span></div>
+                    </div>
+                    <button type="button" class="del" aria-label="Delete log entry"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+                  </article>
+                  <article class="tile">
+                    <span class="cover cover--mini art-pentiment" aria-hidden="true"></span>
+                    <div class="tile__body">
+                      <div class="tile__head"><a class="entry__game" href="#">Pentiment</a><time class="time">14.09</time></div>
+                      <div class="line"><span class="status cat-mastered"><i class="dot"></i>Mastered</span><span class="kv">Switch</span><span class="kv">21 h</span><span class="kv">14.09.2026</span></div>
+                    </div>
+                    <button type="button" class="del" aria-label="Delete log entry"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+                  </article>
+                  <article class="tile">
+                    <span class="cover cover--mini art-well" aria-hidden="true"></span>
+                    <div class="tile__body">
+                      <div class="tile__head"><a class="entry__game" href="#">Animal Well</a><time class="time">14.09</time></div>
+                      <div class="line"><span class="verb cat-removed"><svg aria-hidden="true"><use href="#i-minus"/></svg>Removed rating</span></div>
+                    </div>
+                    <button type="button" class="del" aria-label="Delete log entry"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+                  </article>
+                </div>
+                <div class="foot">
+                  <span>Showing 1–10 of 486</span>
+                  <div class="pager" role="group" aria-label="Pages"><button type="button" aria-current="page">1</button><button type="button">2</button><button type="button">3</button><button type="button">…</button><button type="button">49</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="nav" aria-label="Profile navigation">
+          <div class="panel">
+            <a class="nav__row" href="#">All <span class="count">214</span></a>
+            <a class="nav__row" href="#">Playing <span class="count">6</span></a>
+            <a class="nav__row" href="#">Completed <span class="count">118</span></a>
+            <a class="nav__row" href="#">Mastered <span class="count">21</span></a>
+            <a class="nav__row" href="#">Played <span class="count">19</span></a>
+            <a class="nav__row" href="#">Wishlist <span class="count">38</span></a>
+            <a class="nav__row" href="#">Backlog <span class="count">9</span></a>
+            <a class="nav__row" href="#">Dropped <span class="count">3</span></a>
+          </div>
+          <div class="panel"><a class="nav__row" href="#">Reviews <span class="count">38</span></a></div>
+          <div class="panel">
+            <p class="nav__label">Lists</p>
+            <a class="nav__row" href="#">Cozy winter evenings <span class="count">14</span></a>
+            <a class="nav__row" href="#">Best maps in games <span class="count">23</span></a>
+            <a class="nav__row" href="#"><span class="nav__name">Souls on original hardware <svg aria-label="Private"><use href="#i-lock"/></svg></span><span class="count">7</span></a>
+            <a class="nav__row" href="#">Co-op with friends <span class="count">5</span></a>
+            <button type="button" class="nav__row nav__row--muted">New list <svg aria-hidden="true"><use href="#i-plus"/></svg></button>
+          </div>
+          <div class="panel"><a class="nav__row" href="#">Settings</a></div>
+        </aside>
+      </div>
+      <div class="pros">
+        <div><h3>Works for</h3><ul><li>Identity and games never compete for width; favourites and tiles get the whole wide column.</li><li>Follower faces are always visible but capped at five plus a counter.</li><li>A filter on activity is cheap here: the log <code class="t">type</code> field already exists.</li></ul></div>
+        <div><h3>Costs</h3><ul><li>Three columns on desktop (identity, games, navigation) — the wide column is about 700px at 1440.</li><li>On a phone the identity column becomes a header, which is variant A again.</li><li>The stat facts need a new aggregate (hours, completed count) on the profile response.</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="variant" aria-labelledby="variant-c">
+    <div class="variant__head">
+      <span class="variant__letter">C</span>
+      <h2 id="variant-c">Banner and ranked five</h2>
+    </div>
+    <p class="variant__thesis">
+      The profile borrows the game page's hero: the user's own background becomes a banner inside the
+      panel, the avatar overlaps it, and counters sit in tiles like "Beaten by" on a game. Favourites
+      are ranked — number one is drawn larger — which only makes sense if the owner's order is meant
+      to be read. Activity becomes a timeline whose dots take the category colour.
+    </p>
+    <div class="stage">
+      <p class="stage__context">Visitor view · moth_scholar · 1440px</p>
+      <div class="frame">
+        <main class="panel panel--hero">
+          <div class="hero">
+            <nav class="crumbs" aria-label="Breadcrumbs"><a href="#">Home</a><span>›</span><span>moth_scholar</span></nav>
+          </div>
+          <div class="c-head">
+            <div class="avatar-lg" aria-hidden="true">m</div>
+            <div class="c-head__main">
+              <h3 class="name">moth_scholar</h3>
+              <p class="seen">Last seen <b>2 hours ago</b> · Joined March 2023</p>
+            </div>
+            <button type="button" class="btn btn--primary" data-follow aria-pressed="false">Follow</button>
+          </div>
+          <div class="bio" style="margin-top:calc(-1 * var(--gap-x2))">
+            <p>Slow player. Metroidvanias, survival horror and anything with a good map. Currently 100%-ing the Souls series on original hardware — progress in <a href="#">my list</a>.</p>
+          </div>
+          <div class="counters">
+            <a class="counter" href="#"><span>Games</span><b>214</b></a>
+            <a class="counter" href="#"><span>Reviews</span><b>38</b></a>
+            <button type="button" class="counter" data-drawer-trigger><span>Followers</span><b>27 <span class="stack" aria-hidden="true"><span class="av av-1">RK</span><span class="av av-2">LU</span><span class="av av-3">JB</span></span></b></button>
+            <button type="button" class="counter" data-drawer-trigger><span>Following</span><b>12 <span class="stack" aria-hidden="true"><span class="av av-6">NA</span><span class="av av-5">VO</span></span></b></button>
+          </div>
+
+          <div class="block">
+            <div class="stitle-row"><h3 class="stitle">Top 5</h3></div>
+            <div class="podium">
+              <a class="fav" href="#"><span class="cover art-hollow">Hollow Knight</span><span class="fav__meta"><span class="rank">No. 1</span></span><span class="fav__name">Hollow Knight</span></a>
+              <a class="fav" href="#"><span class="cover art-sh2">Silent Hill 2</span><span class="fav__meta"><span class="rank">No. 2</span></span><span class="fav__name">Silent Hill 2</span></a>
+              <a class="fav" href="#"><span class="cover art-outer">Outer Wilds</span><span class="fav__meta"><span class="rank">No. 3</span></span><span class="fav__name">Outer Wilds</span></a>
+              <a class="fav" href="#"><span class="cover art-disco">Disco Elysium</span><span class="fav__meta"><span class="rank">No. 4</span></span><span class="fav__name">Disco Elysium</span></a>
+              <a class="fav" href="#"><span class="cover art-tunic">Tunic</span><span class="fav__meta"><span class="rank">No. 5</span></span><span class="fav__name">Tunic</span></a>
+            </div>
+          </div>
+
+          <div class="c-split">
+            <div class="block">
+              <div class="stitle-row"><h3 class="stitle">Activity</h3></div>
+              <div class="tl">
+                <p class="tl__day">Today</p>
+                <article class="tl__item cat-completed">
+                  <i class="tl__dot" aria-hidden="true"></i>
+                  <span class="cover cover--mini art-hades" aria-hidden="true"></span>
+                  <div class="entry__body">
+                    <p class="verb">Completed <a class="entry__game" href="#">Hades</a></p>
+                    <div class="line"><span class="kv">PC</span><span class="kv">42 h</span><span class="kv">16.09.2026</span><span class="rate"><svg aria-hidden="true"><use href="#i-star"/></svg>9</span></div>
+                  </div>
+                  <div class="entry__side"><time class="time">2 hours ago</time></div>
+                </article>
+                <p class="tl__day">Yesterday</p>
+                <article class="tl__item cat-favorite">
+                  <i class="tl__dot" aria-hidden="true"></i>
+                  <span class="cover cover--mini art-outer" aria-hidden="true"></span>
+                  <div class="entry__body">
+                    <p class="verb">Put <a class="entry__game" href="#">Outer Wilds</a> in the top 5</p>
+                  </div>
+                  <div class="entry__side"><time class="time">22:14</time></div>
+                </article>
+                <article class="tl__item cat-dropped">
+                  <i class="tl__dot" aria-hidden="true"></i>
+                  <span class="cover cover--mini art-signalis" aria-hidden="true"></span>
+                  <div class="entry__body">
+                    <p class="verb">Dropped <a class="entry__game" href="#">Signalis</a></p>
+                    <div class="line"><span class="kv">6 h</span></div>
+                  </div>
+                  <div class="entry__side"><time class="time">19:02</time></div>
+                </article>
+                <p class="tl__day">14 September</p>
+                <article class="tl__item cat-mastered">
+                  <i class="tl__dot" aria-hidden="true"></i>
+                  <span class="cover cover--mini art-pentiment" aria-hidden="true"></span>
+                  <div class="entry__body">
+                    <p class="verb">Mastered <a class="entry__game" href="#">Pentiment</a></p>
+                    <div class="line"><span class="kv">Switch</span><span class="kv">21 h</span></div>
+                  </div>
+                  <div class="entry__side"><time class="time">11:40</time></div>
+                </article>
+              </div>
+              <div class="foot">
+                <span>Showing 1–10 of 486</span>
+                <div class="pager" role="group" aria-label="Pages"><button type="button" aria-current="page">1</button><button type="button">2</button><button type="button">3</button><button type="button">…</button><button type="button">49</button></div>
+              </div>
+            </div>
+            <div class="side">
+              <div class="block">
+                <div class="stitle-row"><h3 class="stitle">Lists</h3></div>
+                <div class="mini-lists">
+                  <a class="mini-list" href="#"><span class="mosaic" aria-hidden="true"><span class="cover art-hike"></span><span class="cover art-celeste"></span><span class="cover art-spirit"></span><span class="cover art-unpack"></span></span><span><span class="lcard__name">Cozy winter evenings</span><br><span class="lcard__meta">14 games</span></span></a>
+                  <a class="mini-list" href="#"><span class="mosaic" aria-hidden="true"><span class="cover art-outer"></span><span class="cover art-hollow"></span><span class="cover art-elden"></span><span class="cover art-well"></span></span><span><span class="lcard__name">Best maps in games</span><br><span class="lcard__meta">23 games</span></span></a>
+                  <a class="mini-list" href="#"><span class="mosaic" aria-hidden="true"><span class="cover art-hades"></span><span class="cover art-well"></span><span class="cover art-spirit"></span><span class="cover art-celeste"></span></span><span><span class="lcard__name">Co-op with friends</span><br><span class="lcard__meta">5 games</span></span></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="nav" aria-label="Profile navigation">
+          <div class="panel">
+            <a class="nav__row" href="#">All <span class="count">214</span></a>
+            <a class="nav__row" href="#">Playing <span class="count">6</span></a>
+            <a class="nav__row" href="#">Completed <span class="count">118</span></a>
+            <a class="nav__row" href="#">Mastered <span class="count">21</span></a>
+            <a class="nav__row" href="#">Played <span class="count">19</span></a>
+            <a class="nav__row" href="#">Wishlist <span class="count">38</span></a>
+            <a class="nav__row" href="#">Backlog <span class="count">9</span></a>
+            <a class="nav__row" href="#">Dropped <span class="count">3</span></a>
+          </div>
+          <div class="panel"><a class="nav__row" href="#">Reviews <span class="count">38</span></a></div>
+          <div class="panel">
+            <p class="nav__label">Lists</p>
+            <a class="nav__row" href="#">Cozy winter evenings <span class="count">14</span></a>
+            <a class="nav__row" href="#">Best maps in games <span class="count">23</span></a>
+            <a class="nav__row" href="#">Co-op with friends <span class="count">5</span></a>
+          </div>
+        </aside>
+      </div>
+      <div class="pros">
+        <div><h3>Works for</h3><ul><li>The most personal first screen: the user's background finally appears inside the panel, not only behind it.</li><li>The timeline reads as sentences ("Dropped Signalis"), the closest to how people describe what they did.</li><li>Counter tiles are a pattern visitors already know from game pages.</li></ul></div>
+        <div><h3>Costs</h3><ul><li>A ranking invites the question "why is this No. 3" — the order must be deliberate, so reordering becomes a must-have, not a nice-to-have.</li><li>The banner doubles the background: <code class="t">BGImage</code> already shows it behind the page.</li><li>Sentences need a verb per log kind, so every segment must be parsed; unparsed legacy text cannot be shown this way.</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="pieces-title">
+    <h2 id="pieces-title">Shared by every variant</h2>
+    <p>These pieces do not change between A, B and C — only where they sit does.</p>
+    <div class="pieces">
+      <div class="stage piece">
+        <h3>One activity entry, before and after</h3>
+        <p>A log row is a stored HTML snapshot merged per game: segments for added, updated, removed and rating. The feed renders those segments as a status chip plus the fields that changed, instead of a paragraph under a full game card.</p>
+        <p class="label-before">Current</p>
+        <div class="old" aria-hidden="true">
+          <span class="cover art-hades">Hades</span>
+          <div class="old__text"><b>Hades</b>Added game to playthroughs<small>Status: Completed</small><small>Console: PC (Microsoft Windows)</small><small>Date: 16.09.2026</small><small>Time: 42h</small><br>Set rating 9<small>2 hours ago</small></div>
+        </div>
+        <p class="label-before">Proposed</p>
+        <div class="panel" style="padding:var(--padding-x3) var(--padding-x4)">
+          <div class="feed">
+            <article class="entry" style="border-bottom:0;padding-block:0">
+              <span class="cover cover--mini art-hades" aria-hidden="true"></span>
+              <div class="entry__body">
+                <a class="entry__game" href="#">Hades</a>
+                <div class="line"><span class="status cat-completed"><i class="dot"></i>Completed</span><span class="kv">PC</span><span class="kv">42 h</span><span class="kv">16.09.2026</span></div>
+                <div class="line"><span class="verb cat-rating"><svg aria-hidden="true"><use href="#i-star"/></svg>Rated <b>9</b></span></div>
+              </div>
+              <div class="entry__side"><time class="time">2 hours ago</time></div>
+            </article>
+          </div>
+        </div>
+        <div class="scroll-x">
+          <table class="map">
+            <thead><tr><th>Stored segment</th><th>Rendered as</th></tr></thead>
+            <tbody>
+              <tr><td>added</td><td>Status chip, then every filled field: platform short name, hours, finish date</td></tr>
+              <tr><td>updated</td><td>"Playthrough changed" and only the fields that differ; a cleared field shows as —</td></tr>
+              <tr><td>removed</td><td>"Removed from Completed", grey</td></tr>
+              <tr><td>rating</td><td>Star and the value; "Removed rating" in grey</td></tr>
+              <tr><td>favorite <span class="warn">new</span></td><td>Pink heart, "Added to favourites" / "Removed from favourites"</td></tr>
+              <tr><td>legacy text</td><td>Falls back to <code class="t">RichText</code> with today's HTML, so nothing old disappears</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="piece" style="gap:var(--gap-x4)">
+        <div class="stage piece">
+          <h3>Followers and following in the drawer</h3>
+          <p>Counts open the shared <code class="t">drawer.open()</code> panel with both lists behind a switch, a name search and a follow button per row. The profile response carries only the counts and the first five avatars.</p>
+          <div class="drawer" role="dialog" aria-label="Followers of moth_scholar">
+            <div class="drawer__head"><h4>moth_scholar</h4><button type="button" class="icon-btn" aria-label="Close"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+            <div class="drawer__tools">
+              <div class="segmented" role="group" aria-label="Switch list">
+                <button type="button" aria-pressed="true" data-segment>Followers <span class="count">27</span></button>
+                <button type="button" aria-pressed="false" data-segment>Following <span class="count">12</span></button>
+              </div>
+              <label class="field" for="people-search"><svg aria-hidden="true"><use href="#i-search"/></svg><span id="people-search">Search by name</span></label>
+            </div>
+            <div class="drawer__list">
+              <div class="person"><span class="av av-1">RK</span><div><p class="person__name">ravenkeeper</p><p class="person__meta">Last seen 3 days ago · <span class="mutual">Follows you</span></p></div><button type="button" class="btn btn--primary" data-follow aria-pressed="true">Following</button></div>
+              <div class="person"><span class="av av-2">LU</span><div><p class="person__name">lumen_ultra</p><p class="person__meta">Online now</p></div><button type="button" class="btn btn--primary" data-follow aria-pressed="false">Follow</button></div>
+              <div class="person"><span class="av av-3">JB</span><div><p class="person__name">jellybeard</p><p class="person__meta">Last seen 1 week ago</p></div><button type="button" class="btn btn--primary" data-follow aria-pressed="false">Follow</button></div>
+              <div class="person"><span class="av av-4">SO</span><div><p class="person__name">sol_orbit</p><p class="person__meta">Last seen yesterday</p></div><button type="button" class="btn btn--primary" data-follow aria-pressed="true">Following</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage piece">
+        <h3>Owner: editing the favourites</h3>
+        <p>"Edit" turns the row into slots: drag to reorder (arrows do the same from the keyboard), remove with ×, and an empty slot opens the search modal. Games are also added from the heart on any game card; the profile never needs to be open for that.</p>
+        <div class="panel">
+          <div class="stitle-row"><h3 class="stitle">Favourites <span class="count">4 / 5</span></h3></div>
+          <div class="edit-favs">
+            <div class="slot">
+              <span class="cover art-hollow"><span class="slot__grip" aria-hidden="true"><svg><use href="#i-grip"/></svg></span>Hollow Knight</span>
+              <div class="slot__bar"><button type="button" class="icon-btn icon-btn--flip" aria-label="Move left" disabled><svg aria-hidden="true"><use href="#i-arrow"/></svg></button><button type="button" class="icon-btn icon-btn--danger" aria-label="Remove Hollow Knight"><svg aria-hidden="true"><use href="#i-close"/></svg></button><button type="button" class="icon-btn" aria-label="Move right"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button></div>
+            </div>
+            <div class="slot slot--dragging">
+              <span class="cover art-outer"><span class="slot__grip" aria-hidden="true"><svg><use href="#i-grip"/></svg></span>Outer Wilds</span>
+              <div class="slot__bar"><button type="button" class="icon-btn icon-btn--flip" aria-label="Move left"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button><button type="button" class="icon-btn icon-btn--danger" aria-label="Remove Outer Wilds"><svg aria-hidden="true"><use href="#i-close"/></svg></button><button type="button" class="icon-btn" aria-label="Move right"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button></div>
+            </div>
+            <div class="slot">
+              <span class="cover art-sh2"><span class="slot__grip" aria-hidden="true"><svg><use href="#i-grip"/></svg></span>Silent Hill 2</span>
+              <div class="slot__bar"><button type="button" class="icon-btn icon-btn--flip" aria-label="Move left"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button><button type="button" class="icon-btn icon-btn--danger" aria-label="Remove Silent Hill 2"><svg aria-hidden="true"><use href="#i-close"/></svg></button><button type="button" class="icon-btn" aria-label="Move right"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button></div>
+            </div>
+            <div class="slot">
+              <span class="cover art-disco"><span class="slot__grip" aria-hidden="true"><svg><use href="#i-grip"/></svg></span>Disco Elysium</span>
+              <div class="slot__bar"><button type="button" class="icon-btn icon-btn--flip" aria-label="Move left"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button><button type="button" class="icon-btn icon-btn--danger" aria-label="Remove Disco Elysium"><svg aria-hidden="true"><use href="#i-close"/></svg></button><button type="button" class="icon-btn" aria-label="Move right" disabled><svg aria-hidden="true"><use href="#i-arrow"/></svg></button></div>
+            </div>
+            <div class="slot slot--empty">
+              <button type="button" class="cover" style="border-style:dashed"><svg aria-hidden="true"><use href="#i-plus"/></svg>Add a game</button>
+            </div>
+          </div>
+          <div class="foot"><span>Changes apply when you press Save.</span><span style="display:flex;gap:var(--gap-x2)"><button type="button" class="btn btn--default btn--sm">Cancel</button><button type="button" class="btn btn--primary btn--sm">Save</button></span></div>
+        </div>
+      </div>
+
+      <div class="stage piece">
+        <h3>Empty states</h3>
+        <p>A visitor never sees an empty section: no favourites and no lists means those blocks are not rendered. The owner gets one hint in place of the favourites row, pointing at the control that fills it.</p>
+        <div class="hint">
+          <svg aria-hidden="true"><use href="#i-heart"/></svg>
+          <span style="flex:1 1 200px">Pick up to five favourite games — press the heart on any game card or game page.</span>
+          <span class="ctrl-demo" aria-hidden="true"><span class="on"><svg><use href="#i-play"/></svg></span><span><svg style="color:var(--color-pink)"><use href="#i-heart"/></svg></span><span><svg><use href="#i-list"/></svg></span><span><svg><use href="#i-more"/></svg></span></span>
+        </div>
+        <div class="hint">
+          <svg aria-hidden="true" style="color:var(--color-accent)"><use href="#i-list"/></svg>
+          <span style="flex:1 1 200px">No lists yet. Collect games around any idea — "Best maps in games", "Co-op with friends". <a class="ghost ghost--link" href="#" style="padding-inline:0">Create a list</a></span>
+        </div>
+        <div class="hint">
+          <svg aria-hidden="true" style="color:var(--color-gray)"><use href="#i-play"/></svg>
+          <span style="flex:1 1 200px">Nothing here yet. Add a game to your playthroughs and it will show up in the activity.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="compare-title">
+    <h2 id="compare-title">Side by side</h2>
+    <div class="stage scroll-x" style="padding:var(--padding-x2) var(--padding-x4)">
+      <table class="compare">
+        <thead>
+          <tr><th scope="col"></th><th scope="col">A · Favourites shelf</th><th scope="col">B · Identity column</th><th scope="col">C · Banner and ranked five</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">First screen at 1440×900</th><td>Header, favourites, first three activity entries</td><td>Avatar and bio, favourites, four tiles</td><td>Banner, counters, top 5 — activity starts below the fold</td></tr>
+          <tr><th scope="row">Activity per screen</th><td class="good">About 10 rows</td><td>About 8 tiles in two columns</td><td>About 7 timeline items</td></tr>
+          <tr><th scope="row">Favourites</th><td>Equal set of five</td><td>Equal set of five</td><td class="warn">Ranked; No. 1 larger</td></tr>
+          <tr><th scope="row">Followers</th><td>Two counters and a face stack</td><td class="good">Face grids, always visible</td><td>Counter tiles with faces</td></tr>
+          <tr><th scope="row">Phone</th><td class="good">Stacks as drawn</td><td>Identity column turns into A's header</td><td>Banner shrinks; podium becomes one big plus four small</td></tr>
+          <tr><th scope="row">New API data</th><td>Favourites, counts, parsed log segments</td><td class="warn">Plus a stats aggregate (hours, completed)</td><td>Favourites, counts, parsed segments with a verb for every kind</td></tr>
+          <tr><th scope="row">Rewrite size</th><td class="good">Smallest: <code class="t">UserInfo</code> reorganised</td><td>Medium: new grid, stats query</td><td>Largest: hero, reorder as must-have, sentence renderer</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="build-title">
+    <h2 id="build-title">How it would be built</h2>
+    <p>Whichever layout wins, the data work below is the same. It is listed so the choice can be made on the drawing, not on hidden cost.</p>
+    <div class="build">
+      <div class="panel">
+        <h3>API · user</h3>
+        <ul>
+          <li><code class="t">favorites: ObjectId[]</code> on <code class="t">User</code>, declared with <code class="t">type: mongoose.Schema.Types.ObjectId, ref: "Game"</code> so string ids cast; at most five, validated in <code class="t">packages/schemas</code>.</li>
+          <li><code class="t">PATCH /user/:id/favorites</code> takes the whole ordered array — reorder, remove and replace are one request.</li>
+          <li>The profile response returns favourites populated with <code class="t">name</code>, <code class="t">slug</code>, <code class="t">cover</code>, plus <code class="t">followersCount</code>, <code class="t">followingsCount</code> and the first five of each instead of the full arrays.</li>
+          <li><code class="t">GET /user/:id/followers?page=</code> and <code class="t">/followings</code> feed the drawer.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>API · activity</h3>
+        <ul>
+          <li><code class="t">renderLogText</code> already splits segments; the logs endpoint additionally returns <code class="t">segments: [{ kind, status?, platform?, time?, date?, rating?, list? }]</code>, parsed from the fixed <code class="t">Status / Console / Date / Time</code> labels — old rows parse the same way, nothing is migrated.</li>
+          <li>One new segment kind, <code class="t">favorite</code>, written by the favourites service through <code class="t">createUserLog</code>, so it merges per game like the others. Lists never write a log.</li>
+          <li>A segment that does not parse keeps its <code class="t">text</code> and renders through <code class="t">RichText</code>.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Web</h3>
+        <ul>
+          <li><code class="t">UserInfo</code> splits into <code class="t">ProfileHeader</code>, <code class="t">FavoriteGames</code>, <code class="t">ActivityFeed</code> and <code class="t">PeopleDrawer</code>; all render on the server so the profile HTML carries the favourites and the first page of activity.</li>
+          <li><code class="t">UserNavigation</code> gains the Lists panel; the unfinished <code class="t">CustomFolder</code> modal and its Edit row are removed.</li>
+          <li>Pagination stays on the shared <code class="t">Pagination</code>; log deletion keeps <code class="t">ConfirmModal</code>.</li>
+          <li>Drag reordering needs a small pointer handler of our own or a dependency — to be decided; the arrow buttons work without it.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>New tokens and icons</h3>
+        <ul>
+          <li>Tokens to promote into <code class="t">vars/_components.scss</code>: <code class="t">--mock-profile-avatar</code>, <code class="t">--mock-profile-avatar-sm</code>, <code class="t">--mock-activity-cover</code>, <code class="t">--mock-people-avatar</code>, <code class="t">--mock-nav-width</code>; C also <code class="t">--mock-hero-height</code>.</li>
+          <li>The favourite colour is <code class="t">--color-pink</code>, which is also <code class="t">--game-backlog-color</code> — a <code class="t">--favorite-color</code> alias keeps the two separable.</li>
+          <li>New <code class="t">Svg*</code> components: <code class="t">SvgLock</code> (private lists), <code class="t">SvgGrip</code> (drag handle), a filled state for <code class="t">SvgHeart</code>, <code class="t">SvgMinus</code>.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <p class="note">
+    Colours, spacing and radii are the project's own tokens: the <code class="t">:root</code>
+    block above is generated from <code class="t">apps/web/src/lib/app/styles/vars</code> by
+    <code class="t">bun --filter web sync:tokens</code>. Covers and avatars are gradient
+    placeholders; the backdrop behind each frame stands in for <code class="t">BGImage</code>.
+    The typeface is substituted — Hanken Grotesk stands in for ApercuPro, whose licensed file
+    cannot be served from a third-party host.
+  </p>
+</div>
+
+<script>
+  document.querySelectorAll("[data-segment]").forEach((button) => {
+    button.addEventListener("click", () => {
+      button.parentElement.querySelectorAll("[data-segment]").forEach((item) => {
+        item.setAttribute("aria-pressed", String(item === button));
+      });
+    });
+  });
+
+  document.querySelectorAll("[data-follow]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const next = button.getAttribute("aria-pressed") !== "true";
+      button.setAttribute("aria-pressed", String(next));
+      button.textContent = next ? "Following" : "Follow";
+    });
+  });
+</script>

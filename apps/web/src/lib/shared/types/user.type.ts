@@ -1,4 +1,4 @@
-import { IGameResponse } from "@mooncellar/schemas";
+import { IGameResponse, ILogSegment } from "@mooncellar/schemas";
 import { IUser } from "./auth.type";
 
 export type CategoriesType =
@@ -21,6 +21,7 @@ export interface ILogs {
   text: string;
   gameId: string;
   userId: string;
+  segments?: ILogSegment[];
 }
 
 export interface IUserLogs {

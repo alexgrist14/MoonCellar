@@ -12,6 +12,7 @@ import {
   SvgGauntlet,
   SvgRandom,
   SvgBurger,
+  SvgListBullet,
 } from "@/src/lib/shared/ui/svg";
 import Link from "next/link";
 import { FC, MouseEvent, useCallback, useMemo, useRef, useState } from "react";
@@ -72,6 +73,17 @@ export const Header: FC = () => {
         {
           title: (
             <>
+              <SvgListBullet className={styles.svg} />
+              <span>Lists</span>
+            </>
+          ),
+          link: "/lists",
+          color: ButtonColor.TRANSPARENT,
+          onClick: closeMenu,
+        },
+        {
+          title: (
+            <>
               <SvgGauntlet className={styles.svg} />
               <span>Gauntlet</span>
             </>
@@ -90,19 +102,8 @@ export const Header: FC = () => {
           onClick: randomClickHandler,
           color: ButtonColor.TRANSPARENT,
         },
-        isAdmin && {
-          title: (
-            <>
-              <SvgAdmin className={styles.svg} />
-              <span>Admin</span>
-            </>
-          ),
-          link: "/admin",
-          color: ButtonColor.TRANSPARENT,
-          onClick: closeMenu,
-        },
-      ].filter(Boolean) as IButtonGroupItem[],
-    [isAdmin, randomClickHandler, closeMenu]
+      ] as IButtonGroupItem[],
+    [randomClickHandler, closeMenu]
   );
 
   const buttons = useMemo(
@@ -180,6 +181,27 @@ export const Header: FC = () => {
         </div>
       </div>
       <div className={styles.container__right}>
+        {isAdmin && (
+          <ButtonGroup
+            wrapperClassName={classNames(
+              styles.container__buttons,
+              styles.admin
+            )}
+            buttons={[
+              {
+                title: (
+                  <>
+                    <SvgAdmin className={styles.svg} />
+                    <span className={styles.admin__label}>Admin</span>
+                  </>
+                ),
+                link: "/admin",
+                color: ButtonColor.TRANSPARENT,
+                onClick: closeMenu,
+              },
+            ]}
+          />
+        )}
         <Link
           href={`/user/${profile?.userName}`}
           onClick={handleProfileClick}

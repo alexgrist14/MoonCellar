@@ -33,6 +33,20 @@
     }
   }
 
+  .admin {
+    @include mediaMd {
+      & button {
+        padding: var(--padding-x05);
+      }
+    }
+
+    &__label {
+      @include mediaMd {
+        display: none;
+      }
+    }
+  }
+
   .nav_desktop {
     display: flex;
     align-items: center;

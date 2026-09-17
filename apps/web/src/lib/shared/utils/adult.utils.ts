@@ -1,6 +1,4 @@
-import { IGameResponse } from "@mooncellar/schemas";
-
-export const ADULT_THEME_NAME = "Erotic";
+import { ADULT_THEME_NAME, IGameResponse } from "@mooncellar/schemas";
 
 export const isAdultGame = (
   game?: Pick<IGameResponse, "themes"> | null
