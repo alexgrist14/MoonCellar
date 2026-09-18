@@ -85,11 +85,6 @@
   color: var(--color-text-primary);
 
   @include textEllipsis;
-
-  &:hover,
-  &:focus-visible {
-    color: var(--color-accent);
-  }
 }
 
 .follow {
