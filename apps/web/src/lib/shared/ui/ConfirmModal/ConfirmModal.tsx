@@ -1,4 +1,4 @@
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, useState } from "react";
 import styles from "./ConfirmModal.module.scss";
 import { Button, ButtonColor } from "../Button/Button";
 
@@ -8,7 +8,7 @@ interface IConfirmModalProps {
   warning?: string;
   confirmText?: string;
   cancelText?: string;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<unknown>;
   onCancel: () => void;
 }
 
@@ -21,16 +21,38 @@ export const ConfirmModal: FC<IConfirmModalProps> = ({
   onConfirm,
   onCancel,
 }) => {
+  const [isConfirming, setIsConfirming] = useState(false);
+
+  const handleConfirm = async () => {
+    if (isConfirming) return;
+
+    setIsConfirming(true);
+
+    try {
+      await onConfirm();
+    } catch {
+      setIsConfirming(false);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <h3>{title}</h3>
       <p>{message}</p>
       {warning && <p className={styles.warning}>{warning}</p>}
       <div className={styles.buttons}>
-        <Button color={ButtonColor.DEFAULT} onClick={onCancel}>
+        <Button
+          color={ButtonColor.DEFAULT}
+          disabled={isConfirming}
+          onClick={onCancel}
+        >
           {cancelText}
         </Button>
-        <Button color={ButtonColor.RED} onClick={onConfirm}>
+        <Button
+          color={ButtonColor.RED}
+          disabled={isConfirming}
+          onClick={handleConfirm}
+        >
           {confirmText}
         </Button>
       </div>

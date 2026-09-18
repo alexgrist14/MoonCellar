@@ -23,6 +23,7 @@ import { playthroughPriorityOrder } from "../../constants/user.const";
 import { getAverageRating } from "../../utils/rating.utils";
 import { GameRatingPopover } from "@/src/lib/features/game/GameRatingPopover";
 import { useRoyalGames } from "@/src/lib/entities/royal/model/useRoyalGames";
+import { Checkbox } from "../Checkbox";
 
 interface IGameCardProps {
   game: IGameResponse;
@@ -33,6 +34,9 @@ interface IGameCardProps {
   priority?: boolean;
   rank?: number;
   isWithCombinedRating?: boolean;
+  isSelectable?: boolean;
+  isSelected?: boolean;
+  onSelect?: (gameId: string) => void;
 }
 
 export const GameCard = memo(
@@ -45,6 +49,9 @@ export const GameCard = memo(
     priority,
     rank,
     isWithCombinedRating,
+    isSelectable,
+    isSelected,
+    onSelect,
   }: IGameCardProps) => {
     const cardRef = useRef<HTMLDivElement>(null);
     const ratingRef = useRef<HTMLDivElement>(null);
@@ -125,7 +132,8 @@ export const GameCard = memo(
         className={classNames(
           styles.wrapper,
           spreadDirection === "height" && styles.wrapper_height,
-          isInfoDisabled && styles.wrapper_stacked
+          isInfoDisabled && styles.wrapper_stacked,
+          isSelectable && styles.wrapper_selectable
         )}
         style={style}
         ref={cardRef}
@@ -139,15 +147,33 @@ export const GameCard = memo(
             styles[
               `card_${lastPlaythrough?.isMastered ? "mastered" : lastPlaythrough?.category}`
             ],
-            isInfoDisabled && styles.card_stacked
+            isInfoDisabled && styles.card_stacked,
+            isSelected && styles.card_selected
           )}
           draggable={false}
+          onClick={
+            isSelectable
+              ? (event) => {
+                  event.preventDefault();
+                  onSelect?.(game._id);
+                }
+              : undefined
+          }
         >
+          {isSelectable && (
+            <Checkbox
+              className={styles.card__select}
+              colorTheme="on"
+              checked={!!isSelected}
+              aria-label={
+                isSelected ? `Deselect ${game.name}` : `Select ${game.name}`
+              }
+              onChange={() => onSelect?.(game._id)}
+              onClick={(event) => event.stopPropagation()}
+            />
+          )}
           <div
-            className={classNames(
-              styles.card__rail,
-              styles.card__rail_topLeft
-            )}
+            className={classNames(styles.card__rail, styles.card__rail_topLeft)}
           >
             {!!rank && <div className={styles.card__rank}>{rank}</div>}
             <Tooltip
@@ -167,9 +193,7 @@ export const GameCard = memo(
                   event.preventDefault();
                   event.stopPropagation();
 
-                  isRoyal
-                    ? removeRoyalGame(game._id)
-                    : addRoyalGame(game._id);
+                  isRoyal ? removeRoyalGame(game._id) : addRoyalGame(game._id);
                 }}
               >
                 <SvgCrown

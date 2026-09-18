@@ -1,0 +1,50 @@
+.modal {
+  width: var(--modal-text-width);
+  max-width: 100%;
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x1);
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    padding: var(--padding-x1) var(--padding-x2);
+    border-radius: var(--radius-x3);
+    background: var(--color-bg-primary);
+    cursor: pointer;
+  }
+
+  &__name {
+    @include textEllipsis;
+    flex: 1;
+    min-width: 0;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+  }
+
+  &__count {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+
+  &__empty {
+    font-size: 13px;
+    color: var(--color-text-muted);
+  }
+
+  &__create {
+    display: flex;
+    gap: var(--gap-x2);
+  }
+
+  &__createToggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x1);
+    width: fit-content;
+  }
+}

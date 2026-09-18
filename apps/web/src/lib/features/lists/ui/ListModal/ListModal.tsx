@@ -70,7 +70,8 @@ export const ListModal: FC<IListModalProps> = ({ list, userName, gameId }) => {
 
   const { mutate: createList, isPending: isCreating } = useCreateListMutation();
   const { mutate: updateList, isPending: isUpdating } = useUpdateListMutation();
-  const { mutate: deleteList, isPending: isDeleting } = useDeleteListMutation();
+  const { mutateAsync: deleteList, isPending: isDeleting } =
+    useDeleteListMutation();
 
   const {
     control,
@@ -146,16 +147,14 @@ export const ListModal: FC<IListModalProps> = ({ list, userName, gameId }) => {
           list.isPrivate ? undefined : "Links to this list will stop working."
         }
         onCancel={() => modal.close(DELETE_MODAL_ID)}
-        onConfirm={() =>
-          deleteList(list._id, {
-            onSuccess: () => {
-              modal.close(DELETE_MODAL_ID);
-              modal.close(LIST_MODAL_ID);
-              toast.success({ description: "List deleted" });
-              router.push(`/user/${userName}?list=lists`);
-            },
-          })
-        }
+        onConfirm={async () => {
+          await deleteList({ id: list._id, userName, slug: list.slug });
+
+          modal.close(DELETE_MODAL_ID);
+          modal.close(LIST_MODAL_ID);
+          toast.success({ description: "List deleted" });
+          router.push(`/user/${userName}?list=lists`);
+        }}
       />,
       { id: DELETE_MODAL_ID }
     );

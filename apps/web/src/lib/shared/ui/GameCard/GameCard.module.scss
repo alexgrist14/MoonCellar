@@ -25,6 +25,14 @@
     max-height: none;
     gap: var(--gap-x4);
   }
+
+  &_selectable {
+    cursor: pointer;
+
+    .card__rail_topLeft {
+      display: none;
+    }
+  }
 }
 
 .card {
@@ -37,6 +45,24 @@
   background: var(--color-bg-secondary);
   user-select: none;
   filter: drop-shadow(0 0 0.2rem var(--color-neutral-10));
+
+  &_selected::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    border-radius: inherit;
+    pointer-events: none;
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+  }
+
+  &__select {
+    position: absolute;
+    top: var(--padding-x2);
+    left: var(--padding-x2);
+    z-index: 5;
+  }
 
   &__cover {
     display: flex;

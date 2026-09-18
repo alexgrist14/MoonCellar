@@ -4,7 +4,14 @@ import classNames from "classnames";
 
 interface ICheckboxProps extends Pick<
   InputHTMLAttributes<HTMLInputElement>,
-  "required" | "disabled" | "onChange" | "id" | "checked" | "className"
+  | "required"
+  | "disabled"
+  | "onChange"
+  | "onClick"
+  | "id"
+  | "checked"
+  | "className"
+  | "aria-label"
 > {
   colorTheme?: "accent" | "on" | "off";
   borderColor?: string;

@@ -1,0 +1,851 @@
+<title>Games selection</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* mooncellar-tokens:start */
+/* Generated from apps/web/src/lib/app/styles/vars by
+   `bun --filter web sync:tokens`. Do not edit by hand. */
+:root {
+  /* vars/_colors.scss */
+  --color-neutral-5: #080a0b;
+  --color-neutral-10: #0d1011;
+  --color-neutral-15: #121516;
+  --color-neutral-20: #161b1d;
+  --color-neutral-25: #1a2022;
+  --color-neutral-30: #1f2628;
+  --color-neutral-35: #262d2f;
+  --color-neutral-40: #2f3537;
+  --color-neutral-45: #383e40;
+  --color-neutral-50: #3f4750;
+  --color-neutral-55: #50575d;
+  --color-neutral-60: #5e6a6e;
+  --color-neutral-70: #747d82;
+  --color-neutral-80: #9192a1;
+  --color-neutral-85: #b0b2bc;
+  --color-neutral-90: #d9d9d9;
+  --color-neutral-95: #eaeaea;
+  --color-neutral-100: #ffffff;
+  --color-blue: #00a0ff;
+  --color-blue-light: #00d4ff;
+  --color-gray: #afb3b9;
+  --color-yellow: #ffc451;
+  --color-yellow-light: #f9f871;
+  --color-orange: #ff8862;
+  --color-pink: #ff4b8f;
+  --color-violet: #e735c4;
+  --color-positive: #00c292;
+  --color-negative: #d02729;
+  --color-primary: var(--color-neutral-30);
+  --color-secondary: var(--color-neutral-90);
+  --color-contrast: var(--color-neutral-100);
+  --color-contrast-reverse: var(--color-neutral-5);
+  --color-attention: #ffc451;
+  --color-text-primary: var(--color-neutral-100);
+  --color-text-secondary: var(--color-neutral-90);
+  --color-text-muted: var(--color-neutral-85);
+  --color-accent: #6951ee;
+  --color-bg-primary: #191d24;
+  --color-bg-secondary: #212731;
+  --color-bg-tertiary: #2c3340;
+  --color-bg-accent: #6951ee;
+  --color-bg-hover: #374151;
+  --color-bg-positive: #00c292;
+  --color-bg-primary-tint: #191d24ee;
+  --color-bg-secondary-tint: #212731ee;
+  --color-bg-tertiary-tint: #2c3340ee;
+  --color-bg-accent-tint: #6951eeee;
+  --color-bg-positive-tint: #00c292ee;
+  --color-border-primary: var(--color-neutral-35);
+  --color-scrollbar-track: var(--color-neutral-15);
+  --color-scrollbar-thumb: var(--color-neutral-80);
+  --color-border-secondary: var(--color-neutral-85);
+
+  /* vars/_common.scss */
+  --padding-x05: calc(var(--padding-x1) * 0.5);
+  --padding-x1: 4px;
+  --padding-x2: calc(var(--padding-x1) * 2);
+  --padding-x3: calc(var(--padding-x1) * 3);
+  --padding-x4: calc(var(--padding-x1) * 4);
+  --padding-x5: calc(var(--padding-x1) * 5);
+  --padding-x6: calc(var(--padding-x1) * 6);
+  --padding-x7: calc(var(--padding-x1) * 7);
+  --padding-x8: calc(var(--padding-x1) * 8);
+  --padding-x9: calc(var(--padding-x1) * 9);
+  --padding-x10: calc(var(--padding-x1) * 10);
+  --padding-x11: calc(var(--padding-x1) * 11);
+  --padding-x12: calc(var(--padding-x1) * 12);
+  --padding-x13: calc(var(--padding-x1) * 13);
+  --padding-x14: calc(var(--padding-x1) * 14);
+  --padding-x15: calc(var(--padding-x1) * 15);
+  --padding-x16: calc(var(--padding-x1) * 16);
+  --padding-x17: calc(var(--padding-x1) * 17);
+  --padding-x18: calc(var(--padding-x1) * 18);
+  --padding-x19: calc(var(--padding-x1) * 19);
+  --padding-x20: calc(var(--padding-x1) * 20);
+  --padding-x25: calc(var(--padding-x1) * 25);
+  --radius-x1: 4px;
+  --radius-x2: calc(var(--radius-x1) * 2);
+  --radius-x3: calc(var(--radius-x1) * 3);
+  --radius-x4: calc(var(--radius-x1) * 4);
+  --radius-x5: calc(var(--radius-x1) * 5);
+  --radius-x6: calc(var(--radius-x1) * 6);
+  --radius-x7: calc(var(--radius-x1) * 7);
+  --radius-x8: calc(var(--radius-x1) * 8);
+  --radius-x9: calc(var(--radius-x1) * 9);
+  --radius-x10: calc(var(--radius-x1) * 10);
+  --gap-x05: calc(var(--gap-x1) * 0.5);
+  --gap-x1: 4px;
+  --gap-x2: calc(var(--gap-x1) * 2);
+  --gap-x3: calc(var(--gap-x1) * 3);
+  --gap-x4: calc(var(--gap-x1) * 4);
+  --gap-x5: calc(var(--gap-x1) * 5);
+  --gap-x6: calc(var(--gap-x1) * 6);
+  --gap-x7: calc(var(--gap-x1) * 7);
+  --gap-x8: calc(var(--gap-x1) * 8);
+  --gap-x9: calc(var(--gap-x1) * 9);
+  --gap-x10: calc(var(--gap-x1) * 10);
+  --gap-x11: calc(var(--gap-x1) * 11);
+  --gap-x12: calc(var(--gap-x1) * 12);
+  --blur-x1: 6px;
+  --rich-text-gap: 8px;
+  --duration-instant: 1ms;
+  --duration-fast: 160ms;
+  --duration-base: 280ms;
+  --delay-stagger: 90ms;
+  --easing-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --easing-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --reveal-offset: 12px;
+  --reveal-scale: 0.96;
+  --header-height: 45px;
+  --container-padding-top: calc(var(--header-height) + var(--padding-x3));
+  --container-padding-bottom: var(--padding-x3);
+  --page-height-available: calc(
+    100vh - var(--container-padding-top) - var(--container-padding-bottom)
+  );
+
+  /* vars/_components.scss */
+  --game-completed-color: var(--color-positive);
+  --game-dropped-color: var(--color-negative);
+  --game-playing-color: var(--color-accent);
+  --game-wishlist-color: var(--color-violet);
+  --game-backlog-color: var(--color-pink);
+  --game-played-color: var(--color-blue);
+  --game-mastered-color: var(--color-yellow);
+  --cover-ratio: 528/704;
+  --shadow-basic: 0px 4px 4px var(--color-neutral-5);
+  --shadow-text: drop-shadow(0 1px 2px var(--color-neutral-5))
+    drop-shadow(0 0 6px var(--color-neutral-5));
+  --glow-accent: 0 0 0.4rem var(--color-accent);
+  --glow-accent-sm: 0 0 0.15rem var(--color-accent);
+  --avatar-size-sm: var(--padding-x6);
+  --navigation-progress-height: 1px;
+  --navigation-progress-z-index: 1002;
+  --modal-text-width: min(720px, calc(100vw - var(--padding-x10)));
+  --rich-editor-image-width: 400px;
+  --playthrough-modal-width: min(80vw, 400px);
+  --playthrough-modal-height: min(70vh, 500px);
+  --playthrough-modal-width-lg: min(88vw, 760px);
+  --playthrough-modal-height-lg: min(86vh, 780px);
+  --games-card-min-width: 180px;
+  --range-track-height: 6px;
+  --range-thumb-size: 20px;
+  --range-thumb-width: 44px;
+  --range-thumb-height: 24px;
+  --scrollbar-horizontal-size: 6px;
+  --scrollbar-arrow-width: 32px;
+  --scrollbar-fade-width: 48px;
+  --game-keywords-collapsed-height: 66px;
+  --game-hero-artwork-height: 300px;
+  --game-hero-artwork-height-sm: 180px;
+  --game-hero-cover-width: 200px;
+  --game-hero-cover-offset: 104px;
+  --game-hero-counters-width: 360px;
+  --game-rating-popover-width: 320px;
+  --popover-width: 320px;
+  --popover-max-height: 320px;
+  --drawer-width: max(20vw, 460px);
+  --drawer-z-index: 5;
+  --expandable-scroll-height: 132px;
+  --expandable-fade-height: 32px;
+  --date-picker-width: 300px;
+  --date-picker-field-min-width: 140px;
+  --date-picker-cell-size: 34px;
+  --date-picker-arrow-size: 28px;
+  --emoji-picker-width: 328px;
+  --emoji-picker-cell-size: 34px;
+  --emoji-picker-group-size: 28px;
+  --emoji-picker-grid-height: 238px;
+  --game-hero-scrim: linear-gradient(
+    180deg,
+    #191d248c 0%,
+    #191d2400 30%,
+    #212731d1 72%,
+    var(--color-bg-secondary) 100%
+  );
+  --spoiler-blur: 7px;
+  --community-avatar-size: 36px;
+  --community-reply-avatar-size: 28px;
+  --community-review-clamp-height: 132px;
+  --community-distribution-height: 8px;
+  --community-distribution-min-width: 240px;
+  --community-dot-size: 7px;
+  --community-empty-text-width: 240px;
+  --community-loading-height: 96px;
+  --user-review-card-width: 170px;
+  --user-review-card-width-sm: 140px;
+  --user-review-rating-filter-width: 260px;
+  --vndb-review-height: max(360px, calc(100vh - 420px));
+  --vndb-cover-width: 120px;
+  --vndb-search-width: 320px;
+  --vndb-candidate-cover-width: 64px;
+  --empty-state-image-size: 180px;
+  --not-found-image-height: 240px;
+  --not-found-backdrop-size: 400px;
+  --not-found-content-width: 420px;
+  --favorite-color: var(--color-pink);
+  --game-controls-icon-size: 24px;
+  --game-controls-icon-size-sm: 20px;
+  --game-controls-badge-size: 15px;
+  --top-five-cover-width: 44px;
+  --list-card-min-width: 180px;
+  --list-card-row-mosaic-size: 44px;
+  --list-card-count-height: 20px;
+  --list-search-width: 320px;
+  --list-row-cover-width: 40px;
+  --profile-hero-height: 168px;
+  --profile-avatar-size: 112px;
+  --profile-avatar-size-sm: 72px;
+  --activity-cover-width: 80px;
+  --activity-dot-size: 12px;
+  --people-avatar-size: 22px;
+  --search-modal-width: 900px;
+  --search-tab-height: 36px;
+}
+/* mooncellar-tokens:end */
+
+  :root {
+    --mock-ui: "Hanken Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mock-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --mock-ground: var(--color-neutral-10);
+    --mock-accent-text: color-mix(in srgb, var(--color-accent) 55%, var(--color-neutral-100));
+    --mock-royal-text: color-mix(in srgb, var(--color-attention) 70%, var(--color-neutral-100));
+    --mock-expand-title-height: 34px;
+    --mock-viewport-height: 430px;
+    --mock-wheel-size: 260px;
+    --mock-wheel-size-sm: 196px;
+    --mock-rail-width: 244px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--mock-ground);
+    color: var(--color-text-primary);
+    font-family: var(--mock-ui);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4 { margin: 0; text-wrap: balance; }
+  p { margin: 0; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  ol, ul { margin: 0; padding: 0; list-style: none; }
+
+  .shell { max-width: 1180px; margin: 0 auto; padding-inline: var(--padding-x6); padding-block: var(--padding-x14) var(--padding-x20); }
+  @media (max-width: 520px) { .shell { padding-inline: var(--padding-x4); padding-block: var(--padding-x9) var(--padding-x14); } }
+
+  .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-gray); display: flex; align-items: center; gap: var(--gap-x2); }
+  .masthead { display: flex; flex-direction: column; gap: var(--gap-x4); }
+  .masthead h1 { font-size: 34px; line-height: 1.15; font-weight: 700; letter-spacing: -0.5px; }
+  .lede { color: var(--color-text-secondary); max-width: 68ch; }
+  code.t { font-family: var(--mock-mono); font-size: 12px; color: var(--color-yellow); }
+
+  .variant, .section { margin-top: var(--padding-x16); }
+  .variant__head { display: flex; align-items: baseline; gap: var(--gap-x3); flex-wrap: wrap; margin-bottom: var(--gap-x2); }
+  .variant__letter { font-family: var(--mock-mono); font-size: 13px; font-weight: 500; color: var(--color-accent); border: 1px solid var(--color-accent); border-radius: var(--radius-x1); padding: 1px 7px; flex-shrink: 0; }
+  .variant__head h2, .section > h2 { font-size: 23px; font-weight: 700; letter-spacing: -0.2px; }
+  .variant__thesis, .section > h2 + p { color: var(--color-text-muted); max-width: 72ch; margin: var(--gap-x2) 0 var(--gap-x5); }
+  .variant__thesis { margin-top: 0; }
+  .caption { font-size: 12px; color: var(--color-gray); margin-top: var(--gap-x2); }
+  .caption b { color: var(--color-text-muted); font-weight: 600; }
+  ul.plain { margin: var(--gap-x4) 0 0; padding-left: var(--padding-x4); color: var(--color-text-muted); font-size: 13px; list-style: disc; }
+  ul.plain li + li { margin-top: var(--gap-x1); }
+  .note { margin-top: var(--gap-x6); font-size: 13px; color: var(--color-gray); border-left: 2px solid var(--color-border-primary); padding-left: var(--padding-x3); }
+
+  /* ------------------------------------------------------------------ *
+   * Replicas of the shipped components. Class names follow the module   *
+   * they copy, so a reviewer can diff them against the real SCSS.       *
+   * ------------------------------------------------------------------ */
+
+  /* Box — shared/ui/Box */
+  .box {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius-x5);
+    width: 100%;
+    min-width: 0;
+    background: var(--color-bg-secondary-tint);
+    box-shadow: 0 0 5px 0 var(--color-neutral-10);
+    color: var(--color-neutral-100);
+  }
+  .box_blur { backdrop-filter: blur(var(--blur-x1)); }
+  .box__title {
+    display: flex;
+    gap: var(--gap-x5);
+    align-items: flex-end;
+    padding: var(--padding-x2) var(--padding-x3);
+    border-bottom: 1px solid var(--color-bg-primary);
+    border-radius: var(--radius-x5) var(--radius-x5) 0 0;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+  }
+  .box__content { display: flex; flex-direction: column; gap: var(--gap-x3); padding: var(--padding-x4); min-width: 0; }
+
+  /* Button — shared/ui/Button */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap-x2);
+    text-align: center;
+    border: 1px solid var(--color-bg-primary);
+    border-radius: var(--radius-x2);
+    font-size: 14px;
+    padding: var(--padding-x1) var(--padding-x2);
+    transition: 0.2s;
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-neutral-100);
+  }
+  .btn:hover { filter: brightness(0.8); }
+  .btn_accent { background-color: var(--color-accent); color: var(--color-neutral-100); }
+  .btn_transparent { background-color: transparent; border-color: transparent; }
+  .btn_transparent:hover { background-color: var(--color-bg-hover); filter: none; }
+  .btn_wide { width: 100%; padding-block: var(--padding-x2); }
+  .btn_royal { background-color: var(--color-attention); color: var(--color-contrast-reverse); }
+  .btn[disabled] { opacity: 0.5; pointer-events: none; }
+
+  /* Tabs — shared/ui/Tabs */
+  .tabs { display: flex; padding: var(--padding-x05); }
+  .tabs .btn { border-radius: 0; margin-left: -1px; flex: 1; }
+  .tabs .btn:first-child { border-radius: var(--radius-x2) 0 0 var(--radius-x2); margin-left: 0; }
+  .tabs .btn:last-child { border-radius: 0 var(--radius-x2) var(--radius-x2) 0; }
+  .btn_tabActive { color: var(--color-accent); background-color: var(--color-bg-secondary); }
+  .btn_tabActive_royal { color: var(--mock-royal-text); background-color: var(--color-bg-secondary); }
+
+  /* Chip — shared/ui/Chip */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    max-width: 100%;
+    padding: var(--padding-x1) var(--padding-x3);
+    border-radius: var(--radius-x2);
+    font-size: 13px;
+    line-height: 17px;
+    border: 1px solid var(--color-border-primary);
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-muted);
+  }
+  .chip_filled { border-color: transparent; background-color: var(--color-bg-tertiary); color: var(--color-text-primary); }
+
+  /* ToggleSwitch — shared/ui/ToggleSwitch */
+  .toggle__wrapper { display: flex; align-items: center; gap: var(--gap-x1); font-size: 13px; color: var(--color-text-muted); }
+  .toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    width: 60px;
+    height: 30px;
+    border-radius: var(--radius-x6);
+    border: 4px solid transparent;
+    outline: 3px solid var(--color-negative);
+    position: relative;
+    font-size: 10px;
+    font-weight: 600;
+    background: var(--color-bg-primary);
+    flex-shrink: 0;
+  }
+  .toggle span { z-index: 1; opacity: 0.7; text-align: center; }
+  .toggle::after { content: ""; position: absolute; inset: 0 50% 0 0; border-radius: var(--radius-x6); background: var(--color-bg-hover); transition: 0.2s; }
+  .toggle_on { outline-color: var(--color-positive); }
+  .toggle_on::after { inset: 0 0 0 50%; }
+
+  /* SectionTitle — shared/ui/SectionTitle */
+  .sectionTitle { display: flex; align-items: center; gap: var(--gap-x2); font-size: 26px; font-weight: 700; }
+  .sectionTitle::before { content: ""; width: 4px; height: 24px; background: var(--color-accent); border-radius: var(--radius-x2); flex-shrink: 0; }
+
+  /* GameCard — shared/ui/GameCard */
+  .card { display: flex; width: 100%; aspect-ratio: var(--cover-ratio); border-radius: var(--radius-x4); background: var(--color-bg-secondary); filter: drop-shadow(0 0 0.2rem var(--color-neutral-10)); overflow: hidden; position: relative; }
+  .card__art { position: absolute; inset: 0; background: linear-gradient(160deg, color-mix(in srgb, var(--mock-art, var(--color-accent)) 80%, var(--color-neutral-5)) 0%, color-mix(in srgb, var(--mock-art, var(--color-accent)) 26%, var(--color-neutral-10)) 72%, var(--color-neutral-15) 100%); }
+  .card__name { position: absolute; inset: auto 0 0 0; padding: var(--padding-x2); font-size: 11px; color: var(--color-text-primary); filter: var(--shadow-text); }
+  .art-sh2 { --mock-art: var(--color-neutral-55); }
+  .art-outer { --mock-art: var(--color-orange); }
+  .art-disco { --mock-art: var(--color-pink); }
+  .art-obra { --mock-art: var(--color-neutral-60); }
+  .art-tunic { --mock-art: var(--color-yellow); }
+
+  /* Scrollbar — shared/ui/Scrollbar, type="absolute" */
+  .scroll { position: relative; overflow: hidden; }
+  .scroll__track { position: absolute; top: 5px; bottom: 5px; right: 4px; width: var(--scrollbar-horizontal-size); border: 1px solid var(--color-border-primary); border-radius: var(--radius-x1); background-color: var(--color-scrollbar-track); }
+  .scroll__thumb { position: absolute; top: 12%; right: 4px; width: var(--scrollbar-horizontal-size); height: 46%; border-radius: var(--radius-x1); background: var(--color-scrollbar-thumb); opacity: 0.7; }
+
+  /* ExpandMenu — shared/ui/ExpandMenu */
+  .viewport { position: relative; height: var(--mock-viewport-height); border-radius: var(--radius-x4); overflow: hidden; border: 1px solid var(--color-border-primary); background: radial-gradient(130% 100% at 76% 4%, color-mix(in srgb, var(--color-accent) 18%, transparent) 0%, transparent 60%), var(--color-bg-primary); }
+  .viewport__header { display: flex; align-items: center; gap: var(--gap-x4); height: var(--header-height); padding-inline: var(--padding-x4); background: var(--color-bg-secondary-tint); border-bottom: 1px solid var(--color-border-primary); position: relative; z-index: 5; }
+  .viewport__logo { font-weight: 600; color: var(--mock-accent-text); font-size: 13px; }
+  .viewport__crumbs { font-size: 12px; color: var(--color-gray); }
+  .viewport__stage { position: absolute; inset: var(--header-height) 0 0 0; padding: var(--padding-x4); overflow: hidden; }
+
+  .expand__title {
+    position: absolute;
+    top: var(--header-height);
+    z-index: 4;
+    height: var(--mock-expand-title-height);
+    width: 128px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap-x2);
+    padding: var(--padding-x1);
+    font-size: 13px;
+    background-color: color-mix(in srgb, var(--color-bg-hover) 90%, transparent);
+    color: var(--color-text-primary);
+  }
+  .expand__title_left { left: 0; border-radius: 0 0 var(--radius-x2) 0; }
+  .expand__title_right { right: 0; border-radius: 0 0 0 var(--radius-x2); }
+  .expand__title_bottomRight { right: 0; top: auto; bottom: 0; border-radius: var(--radius-x2) 0 0 0; }
+
+  .expand__menu {
+    position: absolute;
+    top: var(--header-height);
+    bottom: 0;
+    width: 300px;
+    background: var(--color-bg-secondary-tint);
+    outline: 2px solid var(--color-bg-hover);
+    backdrop-filter: blur(var(--blur-x1));
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x3);
+    padding: var(--padding-x4);
+    padding-top: calc(var(--mock-expand-title-height) + var(--padding-x3));
+  }
+  .expand__menu_left { left: 0; }
+  .expand__menu_right { right: 0; }
+
+  /* the wheel — features/wheel/WheelComponent draws it on a canvas */
+  .wheel { position: relative; width: var(--mock-wheel-size); aspect-ratio: 1; margin-inline: auto; }
+  .wheel_sm { width: var(--mock-wheel-size-sm); }
+  .wheel__disc { position: absolute; inset: 0; border-radius: 50%; box-shadow: inset 0 0 0 1px var(--color-border-primary), var(--shadow-basic); background: conic-gradient(from -90deg, color-mix(in srgb, var(--color-accent) 72%, var(--color-neutral-5)) 0 12.5%, var(--color-bg-tertiary) 0 25%, color-mix(in srgb, var(--color-blue) 58%, var(--color-neutral-5)) 0 37.5%, var(--color-bg-tertiary) 0 50%, color-mix(in srgb, var(--color-violet) 55%, var(--color-neutral-5)) 0 62.5%, var(--color-bg-tertiary) 0 75%, color-mix(in srgb, var(--color-orange) 55%, var(--color-neutral-5)) 0 87.5%, var(--color-bg-tertiary) 0 100%); }
+  .wheel__hub { position: absolute; inset: 27%; border-radius: 50%; background: var(--color-bg-secondary); border: 1px solid var(--color-border-primary); display: grid; place-items: center; }
+  .wheel__pointer { position: absolute; top: 50%; right: -10px; translate: 0 -50%; rotate: 180deg; line-height: 0; }
+
+  .queue { display: flex; flex-direction: column; gap: var(--gap-x1); }
+  .queue__row { display: flex; align-items: center; gap: var(--gap-x2); font-size: 13px; color: var(--color-text-secondary); padding: var(--padding-x1) var(--padding-x2); border-radius: var(--radius-x2); background: var(--color-bg-primary); }
+  .queue__cover { width: 20px; aspect-ratio: var(--cover-ratio); border-radius: var(--radius-x1); flex-shrink: 0; background: linear-gradient(160deg, color-mix(in srgb, var(--mock-art, var(--color-accent)) 80%, var(--color-neutral-5)) 0%, color-mix(in srgb, var(--mock-art, var(--color-accent)) 26%, var(--color-neutral-10)) 72%, var(--color-neutral-15) 100%); }
+  .queue__remove { margin-left: auto; display: flex; background: none; border: 0; padding: 0; color: var(--color-text-muted); }
+  .queue__remove:hover { color: var(--color-negative); }
+
+  .meta { display: flex; flex-wrap: wrap; gap: var(--gap-x1) var(--gap-x3); font-size: 13px; color: var(--color-text-secondary); }
+  .meta span { color: var(--color-gray); }
+  .statsRow { display: flex; gap: var(--gap-x2); flex-wrap: wrap; }
+  .expandable { position: relative; max-height: var(--expandable-scroll-height); overflow: hidden; font-size: 13px; color: var(--color-text-muted); padding-right: var(--padding-x4); mask-image: linear-gradient(to bottom, #000 calc(100% - var(--expandable-fade-height)), transparent 100%); }
+
+  .stage { display: grid; gap: var(--gap-x4); height: 100%; min-height: 0; }
+  .stage_three { grid-template-columns: 104px minmax(0, 1fr) minmax(0, 1.1fr); align-items: start; }
+  .stage_rail { grid-template-columns: var(--mock-rail-width) minmax(0, 1fr); align-items: stretch; }
+  .stage_solo { grid-template-columns: minmax(0, 1fr); place-items: center; align-content: center; }
+
+  table.compare { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: var(--gap-x4); }
+  table.compare th, table.compare td { text-align: left; padding: var(--padding-x2) var(--padding-x3); border-bottom: 1px solid var(--color-border-primary); vertical-align: top; }
+  table.compare th { color: var(--color-gray); font-weight: 600; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; }
+  table.compare td:first-child { color: var(--color-text-muted); width: 22%; }
+
+  /* Checkbox — shared/ui/Checkbox */
+  .checkbox { width: 18px; aspect-ratio: 1; background-color: var(--color-bg-primary); border: 2px solid var(--color-neutral-10); border-radius: 50%; display: inline-grid; place-items: center; flex-shrink: 0; }
+  .checkbox_on { background-color: var(--color-positive); border-color: var(--color-neutral-10); }
+  .checkbox_on svg { color: var(--color-contrast-reverse); }
+
+  /* GamesCards grid — shared/ui/GamesCards */
+  .grid { display: grid; grid-template-columns: repeat(var(--mock-columns, 6), minmax(0, 1fr)); gap: var(--gap-x2); }
+  .card_pick { cursor: pointer; }
+  .card_picked { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+  .card__pick { position: absolute; top: var(--padding-x2); left: var(--padding-x2); z-index: 2; }
+  .card__controls { position: absolute; inset: auto var(--padding-x1) var(--padding-x1) var(--padding-x1); display: flex; gap: var(--gap-x1); background-color: var(--color-bg-primary); border-radius: var(--radius-x3); padding: var(--padding-x1); outline: 1px solid var(--color-border-primary); }
+  .card__controls span { flex: 1; height: 12px; border-radius: var(--radius-x2); background: var(--color-bg-tertiary); }
+  .card_dimmed .card__art { opacity: 0.45; }
+
+  /* the action bar a variant adds */
+  .actionBar { display: flex; align-items: center; gap: var(--gap-x3); flex-wrap: wrap; }
+  .actionBar__count { font-family: var(--mock-mono); font-size: 12px; color: var(--color-text-muted); }
+  .bar_sticky { position: absolute; inset: auto var(--padding-x4) var(--padding-x4) var(--padding-x4); z-index: 6; }
+
+  .icon { width: 16px; height: 16px; flex-shrink: 0; }
+  .icon_sm { width: 12px; height: 12px; }
+  .icon_lg { width: 22px; height: 22px; }
+
+  @media (max-width: 900px) {
+    .stage_three, .stage_rail { grid-template-columns: minmax(0, 1fr); }
+    .expand__menu { width: 220px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: var(--duration-instant) !important; }
+  }
+</style>
+
+<svg width="0" height="0" style="position: absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-gauntlet" viewBox="0 0 256 256">
+      <path fill="currentColor" d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m39.11 25.19C170.24 83.71 155 99.44 135 113.61c-2.25-24.48-8.44-49.8-38.37-67.82a87.9 87.9 0 0 1 70.5 3.4ZM40.18 133.54c28.34-20 49.57-14.68 71.87-4.39c-20.05 14.19-38.86 32.21-39.53 67.11a87.92 87.92 0 0 1-32.34-62.72m136.5 67.73c-31.45-14.55-37.47-35.58-39.71-60c12.72 5.86 26.31 10.75 41.3 10.75c11.33 0 23.46-2.8 36.63-10.08a88.2 88.2 0 0 1-38.22 59.33"/>
+    </symbol>
+    <symbol id="i-close" viewBox="0 0 384 512">
+      <path fill="currentColor" d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+    </symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M14.279 2.152C13.909 2 13.439 2 12.5 2s-1.408 0-1.779.152a2 2 0 0 0-1.09 1.083c-.094.223-.13.484-.145.863a1.62 1.62 0 0 1-.796 1.353a1.64 1.64 0 0 1-1.579.008c-.338-.178-.583-.276-.825-.308a2.03 2.03 0 0 0-1.49.396c-.318.242-.553.646-1.022 1.453c-.47.807-.704 1.21-.757 1.605c-.07.526.074 1.058.4 1.479c.148.192.357.353.68.555c.477.297.783.803.783 1.361s-.306 1.064-.782 1.36c-.324.203-.533.364-.682.556a2 2 0 0 0-.399 1.479c.053.394.287.798.757 1.605s.704 1.21 1.022 1.453c.424.323.96.465 1.49.396c.242-.032.487-.13.825-.308a1.64 1.64 0 0 1 1.58.008c.486.28.774.795.795 1.353c.015.38.051.64.145.863c.204.49.596.88 1.09 1.083c.37.152.84.152 1.779.152s1.409 0 1.779-.152a2 2 0 0 0 1.09-1.083c.094-.223.13-.483.145-.863c.02-.558.309-1.074.796-1.353a1.64 1.64 0 0 1 1.579-.008c.338.178.583.276.825.308c.53.07 1.066-.073 1.49-.396c.318-.242.553-.646 1.022-1.453c.47-.807.704-1.21.757-1.605a2 2 0 0 0-.4-1.479c-.148-.192-.357-.353-.68-.555c-.477-.297-.783-.803-.783-1.361s.306-1.064.782-1.36c.324-.203.533-.364.682-.556a2 2 0 0 0 .399-1.479c-.053-.394-.287-.798-.757-1.605s-.704-1.21-1.022-1.453a2.03 2.03 0 0 0-1.49-.396c-.242.032-.487.13-.825.308a1.64 1.64 0 0 1-1.58-.008a1.62 1.62 0 0 1-.795-1.353c-.015-.38-.051-.64-.145-.863a2 2 0 0 0-1.09-1.083M12.5 15c1.67 0 3.023-1.343 3.023-3S14.169 9 12.5 9s-3.023 1.343-3.023 3s1.354 3 3.023 3"/>
+    </symbol>
+    <symbol id="i-crown" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M2.4 6.6a1.3 1.3 0 0 1 1.98.28L6.9 10.5l3.98-5.6a1.37 1.37 0 0 1 2.24 0l3.98 5.6 2.52-3.62A1.3 1.3 0 0 1 21.6 6.6c.5.31.73.92.56 1.48l-2.5 8.32H4.34l-2.5-8.32c-.17-.56.06-1.17.56-1.48Z"/>
+      <path fill="currentColor" d="M4.6 18.1h14.8a.9.9 0 0 1 0 1.8H4.6a.9.9 0 0 1 0-1.8Z"/>
+    </symbol>
+    <symbol id="i-random" viewBox="0 0 640 512">
+      <path fill="currentColor" d="M274.9 34.3c-28.1-28.1-73.7-28.1-101.8 0L34.3 173.1c-28.1 28.1-28.1 73.7 0 101.8l138.8 138.8c28.1 28.1 73.7 28.1 101.8 0l138.8-138.8c28.1-28.1 28.1-73.7 0-101.8zM200 224a24 24 0 1 1 48 0a24 24 0 1 1-48 0M96 200a24 24 0 1 1 0 48a24 24 0 1 1 0-48m128 176a24 24 0 1 1 0-48a24 24 0 1 1 0 48m128-176a24 24 0 1 1 0 48a24 24 0 1 1 0-48m-128-80a24 24 0 1 1 0-48a24 24 0 1 1 0 48m96 328c0 35.3 28.7 64 64 64h192c35.3 0 64-28.7 64-64V256c0-35.3-28.7-64-64-64H461.7c11.6 36 3.1 77-25.4 105.5L320 413.8z"/>
+    </symbol>
+    <symbol id="i-listBullet" viewBox="0 0 18 18">
+      <path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M6 4.5h10M6 9h10M6 13.5h10M2.6 4.5h.01M2.6 9h.01M2.6 13.5h.01"/>
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 448 512">
+      <path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"/>
+    </symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M12 3.25a.75.75 0 0 1 .75.75v7.25H20a.75.75 0 0 1 0 1.5h-7.25V20a.75.75 0 0 1-1.5 0v-7.25H4a.75.75 0 0 1 0-1.5h7.25V4a.75.75 0 0 1 .75-.75"/>
+    </symbol>
+    <symbol id="i-games" viewBox="0 0 20 20">
+      <path fill="currentColor" d="M15.9 5.5C15.3 4.5 14.2 4 13 4H7c-1.2 0-2.3.5-2.9 1.5c-2.3 3.5-2.8 8.8-1.2 9.9s5.2-3.7 7.1-3.7s5.4 4.8 7.1 3.7c1.6-1.1 1.1-6.4-1.2-9.9M8 9H7v1H6V9H5V8h1V7h1v1h1zm5.4.5c0 .5-.4.9-.9.9s-.9-.4-.9-.9s.4-.9.9-.9s.9.4.9.9m1.9-2c0 .5-.4.9-.9.9s-.9-.4-.9-.9s.4-.9.9-.9s.9.4.9.9"/>
+    </symbol>
+    <symbol id="i-pointer" viewBox="-6 -6 112 112">
+      <path d="M100,25 L50,50 L100,75 A100,100 0 0 0 100,25 Z" fill="var(--color-contrast)" stroke="var(--color-contrast-reverse)" stroke-width="4" stroke-linejoin="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="shell">
+  <header class="masthead">
+    <p class="eyebrow"><svg class="icon"><use href="#i-games"/></svg> MoonCellar · games catalogue</p>
+    <h1>Selecting several games at once</h1>
+    <p class="lede">
+      The <code class="t">Manage</code> drawer's Controls tab can add every game on the page to
+      Royal, all or nothing. The ask is a Select mode: a switch in Controls that makes the cards
+      pickable, a select-all alongside it, and the picked games going to Royal or to any custom
+      list. Three layouts differ in where the selection lives once it is on — a bar over the grid,
+      the drawer itself, or a tray you assemble. Drawn with the shipped components
+      (<code class="t">Box</code>, <code class="t">Button</code>, <code class="t">Tabs</code>,
+      <code class="t">Checkbox</code>, <code class="t">GameCard</code>,
+      <code class="t">ExpandMenu</code>) and icons from <code class="t">shared/ui/svg</code>.
+    </p>
+  </header>
+
+  <section class="section" aria-labelledby="today-title">
+    <h2 id="today-title">Where it plugs in</h2>
+    <p>
+      Controls is the first tab of <code class="t">GamesListMenu</code>, inside the right-hand
+      <code class="t">ExpandMenu</code> titled Manage. It holds exactly one button today.
+    </p>
+    <div class="box" style="max-width: 320px; margin-top: var(--gap-x5)">
+      <div class="tabs">
+        <button class="btn btn_tabActive" type="button">Controls</button>
+        <button class="btn" type="button">Royal</button>
+      </div>
+      <div class="box__content">
+        <button class="btn" type="button">Add games to Royal</button>
+      </div>
+    </div>
+    <ul class="plain">
+      <li>Royal already takes a batch — <code class="t">addRoyalGames(ids)</code> from <code class="t">useRoyalGames</code>.</li>
+      <li>Custom lists do not: <code class="t">ListsPanel</code> is built around a single <code class="t">game</code>, so a bulk destination needs a variant of it that takes many ids.</li>
+      <li>Selection is page-local state; the grid is <code class="t">GamesCards</code> and each tile is a <code class="t">GameCard</code> whose bottom row is already occupied by <code class="t">GameControls</code>.</li>
+    </ul>
+  </section>
+
+  <section class="variant" aria-labelledby="variant-a">
+    <div class="variant__head">
+      <span class="variant__letter">A</span>
+      <h2 id="variant-a">Action bar over the grid</h2>
+    </div>
+    <p class="variant__thesis">
+      Controls keeps one switch. Turning it on puts a <code class="t">Checkbox</code> in the corner
+      of every card and floats a bar above the grid holding the count, select-all and both
+      destinations. The drawer can be closed the whole time — everything you need after flipping
+      the switch is on the page.
+    </p>
+
+    <div class="viewport" style="--mock-viewport-height: 460px">
+      <div class="viewport__header">
+        <span class="viewport__logo">MoonCellar</span>
+        <span class="viewport__crumbs">Home / Games</span>
+      </div>
+      <span class="expand__title expand__title_left"><svg class="icon"><use href="#i-listBullet"/></svg> Filters</span>
+      <span class="expand__title expand__title_right"><svg class="icon"><use href="#i-settings"/></svg> Manage</span>
+
+      <div class="viewport__stage" style="padding-inline: var(--padding-x11)">
+        <div class="box" style="height: 100%">
+          <div class="box__content" style="gap: var(--gap-x4)">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: var(--gap-x4)">
+              <span class="sectionTitle">Games</span>
+            </div>
+            <div class="box" style="background: var(--color-bg-primary)">
+              <div class="box__content" style="padding: var(--padding-x2) var(--padding-x3)">
+                <div class="actionBar">
+                  <span class="actionBar__count">4 of 30 selected</span>
+                  <button class="btn" type="button">Select all</button>
+                  <button class="btn btn_transparent" type="button">Clear</button>
+                  <span style="flex: 1"></span>
+                  <button class="btn" type="button"><svg class="icon"><use href="#i-crown"/></svg> Add to Royal</button>
+                  <button class="btn btn_accent" type="button"><svg class="icon"><use href="#i-listBullet"/></svg> Add to list</button>
+                </div>
+              </div>
+            </div>
+            <div class="grid" style="--mock-columns: 6">
+              <div class="card card_pick card_picked art-sh2"><span class="card__art"></span><span class="card__pick"><span class="checkbox checkbox_on"><svg class="icon icon_sm"><use href="#i-check"/></svg></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick art-outer"><span class="card__art"></span><span class="card__pick"><span class="checkbox"></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick card_picked art-disco"><span class="card__art"></span><span class="card__pick"><span class="checkbox checkbox_on"><svg class="icon icon_sm"><use href="#i-check"/></svg></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick art-obra"><span class="card__art"></span><span class="card__pick"><span class="checkbox"></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick card_picked art-tunic"><span class="card__art"></span><span class="card__pick"><span class="checkbox checkbox_on"><svg class="icon icon_sm"><use href="#i-check"/></svg></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick art-sh2"><span class="card__art"></span><span class="card__pick"><span class="checkbox"></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick art-outer"><span class="card__art"></span><span class="card__pick"><span class="checkbox"></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick card_picked art-disco"><span class="card__art"></span><span class="card__pick"><span class="checkbox checkbox_on"><svg class="icon icon_sm"><use href="#i-check"/></svg></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick art-obra"><span class="card__art"></span><span class="card__pick"><span class="checkbox"></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick art-tunic"><span class="card__art"></span><span class="card__pick"><span class="checkbox"></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick art-sh2"><span class="card__art"></span><span class="card__pick"><span class="checkbox"></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick art-outer"><span class="card__art"></span><span class="card__pick"><span class="checkbox"></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="caption"><b>Select mode on.</b> The bar is a <code class="t">Box</code> on the page background; the corner marks are the real <code class="t">Checkbox</code>, which is round and turns <code class="t">--color-positive</code> when checked.</p>
+
+    <div class="box" style="max-width: 340px; margin-top: var(--gap-x5)">
+      <div class="tabs">
+        <button class="btn btn_tabActive" type="button">Controls</button>
+        <button class="btn" type="button">Royal</button>
+      </div>
+      <div class="box__content">
+        <div class="toggle__wrapper"><span class="toggle toggle_on"><span></span><span></span></span> Select mode</div>
+        <button class="btn" type="button">Add games to Royal</button>
+      </div>
+    </div>
+    <p class="caption"><b>The drawer in this variant.</b> One <code class="t">ToggleSwitch</code> added; the existing whole-page button stays, because "everything on this page" is still a separate intent from "the four I picked".</p>
+
+    <ul class="plain">
+      <li>The destinations are next to the selection, so the drawer never has to be reopened.</li>
+      <li>Costs a row above the grid; on a phone that row wraps to two.</li>
+      <li>The bar must not cover the pagination, which is already fixed to the bottom of the page.</li>
+    </ul>
+  </section>
+
+  <section class="variant" aria-labelledby="variant-b">
+    <div class="variant__head">
+      <span class="variant__letter">B</span>
+      <h2 id="variant-b">Everything in Controls</h2>
+    </div>
+    <p class="variant__thesis">
+      Nothing new floats over the grid. The Controls tab grows into the whole selection panel —
+      switch, count, select-all, both destinations — and the only change on the page is that a card
+      can be picked. The drawer stays open while you work, which it already does for filtering.
+    </p>
+
+    <div class="viewport" style="--mock-viewport-height: 460px">
+      <div class="viewport__header">
+        <span class="viewport__logo">MoonCellar</span>
+        <span class="viewport__crumbs">Home / Games</span>
+      </div>
+      <span class="expand__title expand__title_left"><svg class="icon"><use href="#i-listBullet"/></svg> Filters</span>
+
+      <div class="expand__menu expand__menu_right" style="width: 292px">
+        <span class="expand__title expand__title_right" style="top: 0">
+          <svg class="icon"><use href="#i-settings"/></svg> Manage
+        </span>
+        <div class="tabs">
+          <button class="btn btn_tabActive" type="button">Controls</button>
+          <button class="btn" type="button">Royal</button>
+        </div>
+        <div class="toggle__wrapper"><span class="toggle toggle_on"><span></span><span></span></span> Select mode</div>
+        <div class="box" style="background: var(--color-bg-primary)">
+          <div class="box__content" style="padding: var(--padding-x3); gap: var(--gap-x2)">
+            <p class="actionBar__count">4 of 30 selected</p>
+            <div style="display: flex; gap: var(--gap-x2)">
+              <button class="btn" type="button" style="flex: 1">Select all</button>
+              <button class="btn btn_transparent" type="button" style="flex: 1">Clear</button>
+            </div>
+          </div>
+        </div>
+        <p class="eyebrow">Add the selection to</p>
+        <button class="btn" type="button"><svg class="icon"><use href="#i-crown"/></svg> Royal games</button>
+        <button class="btn btn_accent" type="button"><svg class="icon"><use href="#i-listBullet"/></svg> A custom list…</button>
+        <button class="btn btn_transparent" type="button" style="margin-top: auto">Add every game on this page to Royal</button>
+      </div>
+
+      <div class="viewport__stage" style="padding-inline: var(--padding-x11); padding-right: 300px">
+        <div class="box" style="height: 100%">
+          <div class="box__content" style="gap: var(--gap-x4)">
+            <span class="sectionTitle">Games</span>
+            <div class="grid" style="--mock-columns: 4">
+              <div class="card card_pick card_picked art-sh2"><span class="card__art"></span><span class="card__pick"><span class="checkbox checkbox_on"><svg class="icon icon_sm"><use href="#i-check"/></svg></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick art-outer"><span class="card__art"></span><span class="card__pick"><span class="checkbox"></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick card_picked art-disco"><span class="card__art"></span><span class="card__pick"><span class="checkbox checkbox_on"><svg class="icon icon_sm"><use href="#i-check"/></svg></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick art-obra"><span class="card__art"></span><span class="card__pick"><span class="checkbox"></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick card_picked art-tunic"><span class="card__art"></span><span class="card__pick"><span class="checkbox checkbox_on"><svg class="icon icon_sm"><use href="#i-check"/></svg></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick art-sh2"><span class="card__art"></span><span class="card__pick"><span class="checkbox"></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick art-outer"><span class="card__art"></span><span class="card__pick"><span class="checkbox"></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick card_picked art-disco"><span class="card__art"></span><span class="card__pick"><span class="checkbox checkbox_on"><svg class="icon icon_sm"><use href="#i-check"/></svg></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="caption"><b>Select mode on, drawer open.</b> The whole-page button drops to the bottom of the panel, where it stops competing with the selection it is not part of.</p>
+
+    <ul class="plain">
+      <li>The grid gains nothing but the corner checkbox — no bar, no shifted layout, pagination untouched.</li>
+      <li>The open drawer covers part of the grid on a narrow screen, which is exactly where you are picking.</li>
+      <li>Closing the drawer hides the count and the destinations, so the switch has to stay visible some other way — the checkboxes on the cards are the only hint left.</li>
+    </ul>
+  </section>
+
+  <section class="variant" aria-labelledby="variant-c">
+    <div class="variant__head">
+      <span class="variant__letter">C</span>
+      <h2 id="variant-c">Selection tray</h2>
+    </div>
+    <p class="variant__thesis">
+      The drawer becomes a tray: picking a card adds a row to it, the same shape the Royal panel
+      already uses. You see what you have gathered rather than a number, and a wrong pick is removed
+      from the tray without hunting for its card. Built for curating a handful, not for sweeping a
+      page.
+    </p>
+
+    <div class="viewport" style="--mock-viewport-height: 460px">
+      <div class="viewport__header">
+        <span class="viewport__logo">MoonCellar</span>
+        <span class="viewport__crumbs">Home / Games</span>
+      </div>
+      <span class="expand__title expand__title_left"><svg class="icon"><use href="#i-listBullet"/></svg> Filters</span>
+
+      <div class="expand__menu expand__menu_right" style="width: 292px">
+        <span class="expand__title expand__title_right" style="top: 0">
+          <svg class="icon"><use href="#i-settings"/></svg> Manage
+        </span>
+        <div class="tabs">
+          <button class="btn btn_tabActive" type="button">Selection (4)</button>
+          <button class="btn" type="button">Royal</button>
+        </div>
+        <div class="toggle__wrapper"><span class="toggle toggle_on"><span></span><span></span></span> Select mode</div>
+        <div class="queue">
+          <div class="queue__row"><span class="queue__cover art-sh2"></span> Silent Hill 2 <button class="queue__remove" type="button"><svg class="icon icon_sm"><use href="#i-close"/></svg></button></div>
+          <div class="queue__row"><span class="queue__cover art-disco"></span> Disco Elysium <button class="queue__remove" type="button"><svg class="icon icon_sm"><use href="#i-close"/></svg></button></div>
+          <div class="queue__row"><span class="queue__cover art-tunic"></span> Tunic <button class="queue__remove" type="button"><svg class="icon icon_sm"><use href="#i-close"/></svg></button></div>
+          <div class="queue__row"><span class="queue__cover art-obra"></span> Return of the Obra Dinn <button class="queue__remove" type="button"><svg class="icon icon_sm"><use href="#i-close"/></svg></button></div>
+        </div>
+        <div style="display: flex; gap: var(--gap-x2)">
+          <button class="btn" type="button" style="flex: 1">Select all</button>
+          <button class="btn btn_transparent" type="button" style="flex: 1">Clear</button>
+        </div>
+        <button class="btn" type="button"><svg class="icon"><use href="#i-crown"/></svg> Add 4 to Royal</button>
+        <button class="btn btn_accent" type="button"><svg class="icon"><use href="#i-listBullet"/></svg> Add 4 to a list…</button>
+      </div>
+
+      <div class="viewport__stage" style="padding-inline: var(--padding-x11); padding-right: 300px">
+        <div class="box" style="height: 100%">
+          <div class="box__content" style="gap: var(--gap-x4)">
+            <span class="sectionTitle">Games</span>
+            <div class="grid" style="--mock-columns: 4">
+              <div class="card card_pick card_picked art-sh2"><span class="card__art"></span><span class="card__pick"><span class="checkbox checkbox_on"><svg class="icon icon_sm"><use href="#i-check"/></svg></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick card_dimmed art-outer"><span class="card__art"></span><span class="card__pick"><span class="checkbox"></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick card_picked art-disco"><span class="card__art"></span><span class="card__pick"><span class="checkbox checkbox_on"><svg class="icon icon_sm"><use href="#i-check"/></svg></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick card_picked art-obra"><span class="card__art"></span><span class="card__pick"><span class="checkbox checkbox_on"><svg class="icon icon_sm"><use href="#i-check"/></svg></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick card_picked art-tunic"><span class="card__art"></span><span class="card__pick"><span class="checkbox checkbox_on"><svg class="icon icon_sm"><use href="#i-check"/></svg></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick card_dimmed art-sh2"><span class="card__art"></span><span class="card__pick"><span class="checkbox"></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick card_dimmed art-outer"><span class="card__art"></span><span class="card__pick"><span class="checkbox"></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+              <div class="card card_pick card_dimmed art-disco"><span class="card__art"></span><span class="card__pick"><span class="checkbox"></span></span><span class="card__controls"><span></span><span></span><span></span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="caption"><b>Select mode on.</b> Unpicked cards dim so the picked set reads at a glance; the tray rows are the same markup the Royal panel uses today.</p>
+
+    <ul class="plain">
+      <li>The only variant where the selection survives a page change — the tray is a list of ids, not a set of visible cards.</li>
+      <li>That is also its cost: the selection has to be stored somewhere real, and it needs a rule for when it is dropped.</li>
+      <li>Select all across 30 cards fills the tray with 30 rows, which is more scrolling than the count in A or B.</li>
+    </ul>
+  </section>
+
+  <section class="section" aria-labelledby="dest-title">
+    <h2 id="dest-title">Choosing the list</h2>
+    <p>
+      Royal is one call. "A custom list" needs a picker, and the one that exists —
+      <code class="t">ListsPanel</code> — is written around a single game. The bulk version keeps its
+      shape: the user's lists with a <code class="t">Checkbox</code> each, a filter once there are
+      more than nine, and inline creation.
+    </p>
+    <div class="box" style="max-width: 360px; margin-top: var(--gap-x5)">
+      <div class="box__title"><span style="flex: 1">Add 4 games to</span></div>
+      <div class="box__content">
+        <label class="queue__row"><span class="checkbox checkbox_on"><svg class="icon icon_sm"><use href="#i-check"/></svg></span> Backlog 2026</label>
+        <label class="queue__row"><span class="checkbox"></span> Horror night</label>
+        <label class="queue__row"><span class="checkbox"></span> Short and sweet</label>
+        <button class="btn btn_transparent" type="button"><svg class="icon"><use href="#i-plus"/></svg> Create a list</button>
+        <button class="btn btn_accent" type="button">Add</button>
+      </div>
+    </div>
+    <ul class="plain">
+      <li>A game already in a list must show as checked and adding again must stay a no-op, the way the per-game panel behaves.</li>
+      <li>Partial state matters: with four games picked and two of them already in a list, the row is neither on nor off. The shared <code class="t">Checkbox</code> has no indeterminate state today — that is a component change to count in.</li>
+    </ul>
+  </section>
+
+  <section class="section" aria-labelledby="compare-title">
+    <h2 id="compare-title">Side by side</h2>
+    <table class="compare">
+      <thead><tr><th></th><th>A · Action bar</th><th>B · In Controls</th><th>C · Tray</th></tr></thead>
+      <tbody>
+        <tr><td>Where the count and actions are</td><td>Bar above the grid</td><td>The Manage drawer</td><td>The Manage drawer, as rows</td></tr>
+        <tr><td>Drawer open while picking</td><td>Not needed</td><td>Yes</td><td>Yes</td></tr>
+        <tr><td>Grid layout changes</td><td>Loses a row to the bar</td><td>None</td><td>None</td></tr>
+        <tr><td>Survives paging</td><td>No</td><td>No</td><td>Yes, if the ids are kept</td></tr>
+        <tr><td>Build size</td><td>Switch, bar, card checkbox, bulk list picker</td><td>Switch, panel, card checkbox, bulk list picker</td><td>All of B plus stored selection and its lifetime</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section" aria-labelledby="build-title">
+    <h2 id="build-title">What building it touches, whichever wins</h2>
+    <ul class="plain">
+      <li><code class="t">GameCard</code> gains a selectable state. The bottom row is already
+        <code class="t">GameControls</code>, so the mark goes in a corner; in select mode the card's
+        own navigation has to be suppressed or the first pick leaves the page.</li>
+      <li><code class="t">GamesListMenu</code> gains the switch and keeps
+        <code class="t">addRoyalGames</code> for the batch.</li>
+      <li>The bulk list picker is new: <code class="t">ListsPanel</code> takes one
+        <code class="t">game</code>, and <code class="t">useAddListGameMutation</code> is per game —
+        adding four games to a list is four calls unless the API grows a batch route.</li>
+      <li>Every write to <code class="t">CustomList.games</code> must also set
+        <code class="t">gamesCount</code>; the catalogue filters and sorts on it without reading the
+        array.</li>
+      <li>Selection is not a filter and must not reach the URL — the query string is already the
+        source of truth for what the page shows.</li>
+    </ul>
+  </section>
+
+  <p class="note">
+    Colours, spacing and radii are the project's own tokens: the <code class="t">:root</code> block
+    above is generated from <code class="t">apps/web/src/lib/app/styles/vars</code> by
+    <code class="t">bun --filter web sync:tokens</code>. Panels, buttons, tabs, chips, checkboxes,
+    cards and drawer chrome are drawn from the shipped components' own SCSS, and the icons are the
+    real paths out of <code class="t">shared/ui/svg</code>. The typeface is substituted — Hanken
+    Grotesk stands in for ApercuPro, whose licensed file cannot be served from a third-party host.
+  </p>
+</div>

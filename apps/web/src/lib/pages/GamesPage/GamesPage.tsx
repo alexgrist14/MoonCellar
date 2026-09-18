@@ -4,7 +4,7 @@ import { FC, useCallback, useMemo } from "react";
 import { hashKey } from "@tanstack/react-query";
 import styles from "./GamesPage.module.scss";
 import { ExpandMenu } from "../../shared/ui/ExpandMenu";
-import { Filters } from "../../shared/ui/Filters";
+import { AppliedGameFilters, Filters } from "../../shared/ui/Filters";
 import { Loader } from "../../shared/ui/Loader";
 import { Pagination } from "../../shared/ui/Pagination";
 import { parseQueryFilters } from "../../shared/utils/filters.utils";
@@ -13,6 +13,7 @@ import { BGImage } from "../../shared/ui/BGImage";
 import { Breadcrumbs } from "../../shared/ui/Breadcrumbs";
 import { useAdvancedRouter } from "../../shared/hooks/useAdvancedRouter";
 import { useMinimumLoading } from "../../shared/hooks/useMinimumLoading";
+import { useGamesSelectionStore } from "../../shared/store/games-selection.store";
 import { GamesCards } from "../../shared/ui/GamesCards";
 import { takeGames } from "../../shared/constants/games.const";
 import { GamesListMenu } from "../../widgets/main";
@@ -32,6 +33,9 @@ export const GamesPage: FC<IGamesPageProps> = ({
   initialData,
 }) => {
   const { asPath, pathname, query } = useAdvancedRouter();
+  const isSelectMode = useGamesSelectionStore((state) => state.isSelectMode);
+  const selected = useGamesSelectionStore((state) => state.selected);
+  const toggleGame = useGamesSelectionStore((state) => state.toggleGame);
 
   const params = useMemo(
     () => ({
@@ -78,7 +82,11 @@ export const GamesPage: FC<IGamesPageProps> = ({
       <ExpandMenu position="left" titleOpen="Filters">
         <Filters />
       </ExpandMenu>
-      <ExpandMenu position="right" titleOpen="Manage">
+      <ExpandMenu
+        position="right"
+        titleOpen="Manage"
+        isCloseOnOutsideDisabled={isSelectMode}
+      >
         <GamesListMenu games={games} />
       </ExpandMenu>
       <Pagination
@@ -103,6 +111,7 @@ export const GamesPage: FC<IGamesPageProps> = ({
           ]}
         />
         <SectionTitle as="h1">Games</SectionTitle>
+        <AppliedGameFilters />
         {isLoading ? (
           <Loader type="pacman" />
         ) : !games?.length ? (
@@ -113,6 +122,9 @@ export const GamesPage: FC<IGamesPageProps> = ({
             columns={6}
             isWithCombinedRating
             isWithoutScroll
+            isSelectable={isSelectMode}
+            selectedIds={selected}
+            onSelectGame={toggleGame}
           />
         )}
       </Box>

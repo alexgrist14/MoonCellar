@@ -360,7 +360,32 @@ break silently when ignored:
   the pushed depth in sync with programmatic closes needs bookkeeping that breaks as soon as
   anything else touches history.
 
+- **`modal.open` stores the JSX it is given, so props passed at open time never update.**
+  `ModalsConnector` keeps the element in state; the component that opened it can re-render all it
+  likes and the modal will not see the new values. A modal that needs a pending state owns it —
+  `ConfirmModal` disables its buttons from its own `useState` while it awaits `onConfirm`, which is
+  why that callback may return a promise.
+
 - Before building a new modal that shows a title plus a list of "row" blocks (an icon/content on one side, text on the other — e.g. `AchievementsModal`, `GamePlaysInfo`), ask the user whether the shared `RowsModal` component (`src/lib/shared/ui/RowsModal`) should be used instead of a bespoke layout. Do not silently assume either way.
+
+## Data fetching failures
+
+- **Every failed request already shows a toast**, from the response interceptor in
+  `shared/api/agent.api.ts`. Nothing else needs to report an API error, and anything that makes a
+  request the user did not ask for — a background refetch above all — turns a routine failure into
+  a notification they cannot explain.
+- **A mutation that deletes a resource must not leave a query for that resource to refetch.**
+  Deleting a list used to invalidate `listQueryKeys.all`, which included the `bySlug` query the open
+  list page was still rendering: it refetched, got `404 List not found`, and the interceptor toasted
+  it. `useDeleteListMutation` now skips that one key with a `predicate`. `removeQueries` does not
+  work here — an active observer immediately recreates the query and refetches it.
+- **`QueryClient` does not retry 4xx.** A 404 or a 403 is not transient, and React Query's default
+  `retry: 3` turned one deletion into four requests and four toasts, spread over the 1s/2s/4s
+  backoff — which is why the success toast arrived seconds later and the delete looked like it had
+  failed twice first.
+- **Do not return the invalidation promise from a mutation's `onSuccess`.** React Query awaits it
+  before the per-call `onSuccess`, so the toast, the modal close and the navigation all wait for
+  every refetch to settle.
 
 ## Text truncation
 
@@ -376,6 +401,49 @@ break silently when ignored:
   a clipped panel cannot cut it off. Parse the incoming ISO string by hand (`new Date(y, m - 1,
   d)`), never `new Date("2026-09-20")` — the latter is parsed as UTC midnight and shows the
   previous day in any negative-offset timezone.
+
+## Filters
+
+- **The chip row that shows which filters are applied is the shared `AppliedFilters`
+  (`shared/ui/AppliedFilters`); each page derives its own chips.** It renders nothing when the
+  list is empty, so a page can mount it unconditionally. `/games` binds through
+  `AppliedGameFilters`, which sits next to `Filters` because it is the companion of the same
+  `ExpandMenu`, reads the query with `parseQueryFilters` and writes it back with
+  `pushFiltersToQuery`; `/lists` builds its chips from `parseListsQuery` and pushes with
+  `pushListsQuery`. Neither keeps filter state of its own — the URL is the state.
+- **`selected.platforms` and `excluded.platforms` hold platform `_id`s; every other category
+  holds the value that is displayed.** `Filters` feeds the platform dropdown
+  `systems.map(item => item.name)` for display and `systems.map(item => item._id)` for the
+  value, so anything rendering a platform filter has to map the id back through
+  `useCommonStore().systems` or a raw ObjectId lands on screen.
+- **Removing the last value of a category must also drop its `mode` entry.** `mode.<category>`
+  carries the any/all toggle, and leaving it behind keeps a match mode in the URL for a filter
+  that no longer exists — harmless to the query, but it comes back the next time that category
+  is used.
+- **"Clear all" keeps `sortBy`/`sortOrder`.** Sorting is not a filter, and dropping it resets
+  the catalogue to its default order, which reads as the page losing the user's place.
+
+## Selecting several games
+
+- **Select mode pins the Manage drawer open through `isCloseOnOutsideDisabled`.** `ExpandMenu`
+  closes on any outside `mousedown`, and the whole point of the mode is that the count, select-all
+  and the two destinations live in that panel — without the pin, picking the first card collapses
+  the controls you are using. The prop exists only for this; a drawer that is pinned for any other
+  reason traps the user.
+- **In select mode the card's `Link` is neutralised and the top-left rail is hidden.**
+  `GameCard`'s `onClick` calls `preventDefault` so a pick does not navigate, and
+  `wrapper_selectable` hides `card__rail_topLeft` — rank and the per-game royal crown sit exactly
+  where the selection checkbox goes and mean something different while picking.
+- **The selected ring is an `::after` overlay, never an `outline` on `.card`.** The cover `img`
+  fills the card and paints over an outline drawn on the parent, which is the same trap the rounded
+  tile rule in Layout describes.
+- **Adding a selection to a list is one request per game.** `listsAPI.addGame` takes a single
+  `gameId`, so `useAddListGamesMutation` awaits them in order — `position: "end"` means the order
+  is the selection order — and invalidates once at the end rather than per game. Making this faster
+  is a batch route on the API, not parallel requests.
+- **The selection never reaches the URL.** The query string is what decides which games the page
+  shows; a selection in it would turn a shared link into someone else's checkboxes. It lives in
+  `games-selection.store`, which is deliberately not persisted, and turning the mode off clears it.
 
 ## Dropdowns
 

@@ -23,7 +23,7 @@ import { ListCard } from "../../shared/ui/ListCard";
 import { Loader } from "../../shared/ui/Loader";
 import { Pagination } from "../../shared/ui/Pagination";
 import { SectionTitle } from "../../shared/ui/SectionTitle";
-import { SvgClose } from "../../shared/ui/svg";
+import { AppliedFilters, IAppliedFilter } from "../../shared/ui/AppliedFilters";
 import {
   getListsGameIds,
   hasListsFilters,
@@ -35,12 +35,6 @@ import styles from "./ListsPage.module.scss";
 interface IListsPageProps {
   initialParams?: IGetCustomListsRequest;
   initialData?: IGetCustomListsResponse;
-}
-
-interface IAppliedFilter {
-  key: string;
-  label: string;
-  next: IGetCustomListsRequest;
 }
 
 export const ListsPage: FC<IListsPageProps> = ({
@@ -88,7 +82,7 @@ export const ListsPage: FC<IListsPageProps> = ({
       result.push({
         key: "search",
         label: `Name: ${params.search}`,
-        next: { ...base, search: undefined },
+        onRemove: () => pushListsQuery({ ...base, search: undefined }),
       });
     }
 
@@ -96,7 +90,7 @@ export const ListsPage: FC<IListsPageProps> = ({
       result.push({
         key: "author",
         label: `Author: ${params.author}`,
-        next: { ...base, author: undefined },
+        onRemove: () => pushListsQuery({ ...base, author: undefined }),
       });
     }
 
@@ -108,7 +102,8 @@ export const ListsPage: FC<IListsPageProps> = ({
       result.push({
         key: "games",
         label: `${params.gamesMode === "all" && gameIds.length > 1 ? "Contains all" : "Contains"}: ${names.join(", ")}`,
-        next: { ...base, games: undefined, gamesMode: undefined },
+        onRemove: () =>
+          pushListsQuery({ ...base, games: undefined, gamesMode: undefined }),
       });
     }
 
@@ -116,7 +111,7 @@ export const ListsPage: FC<IListsPageProps> = ({
       result.push({
         key: "minGames",
         label: `From ${params.minGames} games`,
-        next: { ...base, minGames: undefined },
+        onRemove: () => pushListsQuery({ ...base, minGames: undefined }),
       });
     }
 
@@ -128,7 +123,7 @@ export const ListsPage: FC<IListsPageProps> = ({
       result.push({
         key: "updated",
         label: `Updated: ${label?.toLowerCase() ?? params.updated}`,
-        next: { ...base, updated: undefined },
+        onRemove: () => pushListsQuery({ ...base, updated: undefined }),
       });
     }
 
@@ -170,34 +165,15 @@ export const ListsPage: FC<IListsPageProps> = ({
           <SectionTitle as="h1">Lists</SectionTitle>
           {!isLoading && <span className={styles.page__total}>{total}</span>}
         </div>
-        {!!applied.length && (
-          <div className={styles.page__applied}>
-            {applied.map((filter) => (
-              <button
-                key={filter.key}
-                type="button"
-                className={styles.page__pill}
-                aria-label={`Remove filter ${filter.label}`}
-                onClick={() => pushListsQuery(filter.next)}
-              >
-                {filter.label}
-                <SvgClose size="12" />
-              </button>
-            ))}
-            <button
-              type="button"
-              className={styles.page__clear}
-              onClick={() =>
-                pushListsQuery({
-                  sortBy: params.sortBy,
-                  sortOrder: params.sortOrder,
-                })
-              }
-            >
-              Clear all
-            </button>
-          </div>
-        )}
+        <AppliedFilters
+          filters={applied}
+          onClearAll={() =>
+            pushListsQuery({
+              sortBy: params.sortBy,
+              sortOrder: params.sortOrder,
+            })
+          }
+        />
         {isLoading ? (
           <Loader type="pacman" />
         ) : !lists.length ? (

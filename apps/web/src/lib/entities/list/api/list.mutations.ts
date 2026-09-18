@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { hashKey, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   IAddCustomListGameRequest,
   ICreateCustomListRequest,
@@ -41,11 +41,28 @@ export const useUpdateListMutation = () => {
 };
 
 export const useDeleteListMutation = () => {
-  const invalidate = useInvalidateLists();
+  const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => listsAPI.remove(id).then(({ data }) => data),
-    onSuccess: () => invalidate(),
+    mutationFn: ({ id }: { id: string; userName?: string; slug?: string }) =>
+      listsAPI.remove(id).then(({ data }) => data),
+    onSuccess: (_result, { userName, slug }) => {
+      const deletedKey =
+        userName && slug
+          ? hashKey(listQueryKeys.bySlug(userName, slug))
+          : undefined;
+
+      void Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: listQueryKeys.all,
+          predicate: (query) =>
+            !deletedKey || hashKey(query.queryKey) !== deletedKey,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: [...userQueryKeys.all, "logs"],
+        }),
+      ]);
+    },
   });
 };
 
@@ -55,6 +72,21 @@ export const useAddListGameMutation = () => {
   return useMutation({
     mutationFn: ({ id, dto }: { id: string; dto: IAddCustomListGameRequest }) =>
       listsAPI.addGame(id, dto).then(({ data }) => data),
+    onSuccess: () => invalidate(),
+  });
+};
+
+export const useAddListGamesMutation = () => {
+  const invalidate = useInvalidateLists();
+
+  return useMutation({
+    mutationFn: async ({ id, gameIds }: { id: string; gameIds: string[] }) => {
+      for (const gameId of gameIds) {
+        await listsAPI.addGame(id, { gameId, position: "end" });
+      }
+
+      return gameIds.length;
+    },
     onSuccess: () => invalidate(),
   });
 };

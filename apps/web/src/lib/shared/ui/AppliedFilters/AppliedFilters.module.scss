@@ -1,0 +1,41 @@
+.applied {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--gap-x2);
+
+  &__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    padding: var(--padding-x1) var(--padding-x2);
+    border: 0;
+    border-radius: var(--radius-x4);
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--easing-out);
+
+    & svg {
+      color: var(--color-text-muted);
+    }
+
+    &:hover {
+      background: var(--color-bg-hover);
+
+      & svg {
+        color: var(--color-negative);
+      }
+    }
+  }
+
+  &__clear {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--color-accent);
+    font-size: 13px;
+    cursor: pointer;
+  }
+}
