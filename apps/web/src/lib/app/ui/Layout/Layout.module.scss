@@ -1,11 +1,19 @@
 .layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   margin: 0;
 }
 
 .scrollbars {
+  div &__container {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
   div &__content {
     padding: 0;
-    max-height: 100vh;
+    max-height: 100%;
   }
 
   div &__scrollbar {

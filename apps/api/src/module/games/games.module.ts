@@ -30,6 +30,10 @@ import {
 import { IndexNowModule } from "../indexnow/indexnow.module";
 import { VndbService } from "./services/vndb.service";
 import { VndbController } from "./controllers/vndb.controller";
+import { ImageDedupeController } from "./controllers/image-dedupe.controller";
+import { ImageDedupeService } from "./services/image-dedupe.service";
+import { ImageOrphansController } from "./controllers/image-orphans.controller";
+import { ImageOrphansService } from "./services/image-orphans.service";
 import { HttpModule } from "@nestjs/axios";
 import { JwtModule } from "@nestjs/jwt";
 import { VndbReviewGateway } from "./gateways/vndb-review.gateway";
@@ -46,6 +50,8 @@ import {
     HltbController,
     CharactersController,
     VndbController,
+    ImageDedupeController,
+    ImageOrphansController,
   ],
   providers: [
     GamesService,
@@ -57,6 +63,8 @@ import {
     CharactersService,
     VndbService,
     VndbReviewGateway,
+    ImageDedupeService,
+    ImageOrphansService,
   ],
   imports: [
     MongooseModule.forFeature([

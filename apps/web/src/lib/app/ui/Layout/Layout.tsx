@@ -134,6 +134,7 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
       <Scrollbar
         id={PAGE_SCROLL_ID}
         initialContentRef={scrollContentRef}
+        classNameContainer={styles.scrollbars__container}
         classNameContent={styles.scrollbars__content}
         classNameScrollbar={styles.scrollbars__scrollbar}
         type="absolute"

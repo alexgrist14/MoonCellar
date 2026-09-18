@@ -265,14 +265,8 @@ table {
 html,
 body {
   height: 100%;
+  overflow: hidden;
   scroll-behavior: smooth !important;
-}
-
-.root,
-#__next {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
 }
 
 .main {

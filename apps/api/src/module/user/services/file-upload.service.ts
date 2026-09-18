@@ -28,9 +28,11 @@ import {
 
 const DELETE_BATCH_SIZE = 1000;
 
-interface IStoredObject {
+export interface IStoredObject {
   key: string;
   etag?: string;
+  size?: number;
+  lastModified?: Date;
 }
 
 @Injectable()
@@ -123,12 +125,11 @@ export class FileService {
     return this.getPublicUrl(folder, storedKey);
   }
 
-  private async listObjects(
+  async *iterateObjects(
     folder: S3Folder,
     prefix = ""
-  ): Promise<IStoredObject[]> {
+  ): AsyncGenerator<IStoredObject[]> {
     const folderPrefix = this.toKey(folder, "");
-    const items: IStoredObject[] = [];
     let continuationToken: string | undefined;
 
     do {
@@ -140,19 +141,36 @@ export class FileService {
         })
       );
 
+      const page: IStoredObject[] = [];
+
       for (const item of response.Contents ?? []) {
         if (!item.Key?.startsWith(folderPrefix)) continue;
 
-        items.push({
+        page.push({
           key: item.Key.slice(folderPrefix.length),
           etag: item.ETag?.replace(/"/g, ""),
+          size: item.Size,
+          lastModified: item.LastModified,
         });
       }
+
+      if (page.length) yield page;
 
       continuationToken = response.IsTruncated
         ? response.NextContinuationToken
         : undefined;
     } while (continuationToken);
+  }
+
+  private async listObjects(
+    folder: S3Folder,
+    prefix = ""
+  ): Promise<IStoredObject[]> {
+    const items: IStoredObject[] = [];
+
+    for await (const page of this.iterateObjects(folder, prefix)) {
+      items.push(...page);
+    }
 
     return items;
   }

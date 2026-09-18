@@ -12,7 +12,6 @@ import { Scrollbar } from "../Scrollbar";
 import { GamesCards } from "../GamesCards";
 import { ListCard } from "../ListCard";
 import { SvgGames, SvgListBullet, SvgProfile } from "../svg";
-import { useDisableScroll } from "../../hooks";
 import { useMinimumLoading } from "../../hooks/useMinimumLoading";
 import { useExpandStore } from "../../store/expand.store";
 import { useAdvancedRouter } from "../../hooks/useAdvancedRouter";
@@ -100,8 +99,6 @@ export const SearchModal: FC = () => {
   const isSearching = useMinimumLoading(
     isSearchActive && (isDebouncing || activeCount.isPending)
   );
-
-  useDisableScroll();
 
   useEffect(() => {
     isSearchActive && modal.close(MODAL_ID);

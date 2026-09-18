@@ -393,6 +393,32 @@ break silently when ignored:
 
 ## Scrolling
 
+- **The page is not the document. Everything scrolls `#page-scroll`** — the `Scrollbar` that
+  `Layout` wraps around `main` (`PAGE_SCROLL_ID` in `shared/utils/common.utils`), while `html` and
+  `body` carry `overflow: hidden`. Anything that reads, moves or freezes page scroll targets that
+  container, never `window`/`document.body`: `scrollPageToTop` and `useDisableScroll` both look it
+  up by id, and a `window.scrollY` read is always 0.
+- **Never size that container in `vh`.** `100vh` is the *large* viewport on mobile — the height
+  with the URL bar retracted — while `html`/`body` at `height: 100%` are the visible one, so a
+  `max-height: 100vh` scroller stood taller than `body` by the URL-bar height. The document then
+  grew a second, parasitic scroll of those few dozen pixels: a full-height native scrollbar that
+  `root.scss`'s `* { scrollbar-width: none }` does not reliably hide on every Chromium (it showed
+  in Berry), and a page that swiped away under every `position: fixed` modal. The chain is
+  `html`/`body` `height: 100%` → `.layout` flex column `height: 100%` → the scroll container
+  `flex: 1 1 auto; min-height: 0` → content `max-height: 100%`. It is percentages the whole way
+  down on purpose; `dvh` would fix the same bug only on engines new enough to know the unit.
+- **`.layout` is what holds that chain, not `.root`/`#__next`.** Those selectors match nothing under
+  the App Router — `app/layout.tsx` renders `body` → `QueryProvider` (no DOM node) → `Layout` — and
+  the `reset.scss` rule that used to size them was dead, which is why the height chain broke and a
+  `vh` value was reached for in the first place.
+- **Modals freeze the page from `ModalsConnector`, once, through `useDisableScroll(!!content.length)`.**
+  The hook counts locks in a module-level counter, so closing the top of a stack does not hand
+  scrolling back while a modal underneath is still open. Do not call it from an individual modal.
+- **Never put `overscroll-behavior: contain` on a panel inside the page.** The ancestor it refuses
+  to chain to is `#page-scroll`, so the wheel over that panel stops moving the page entirely once
+  the panel hits its end — the game page's Summary and Storyline are 132px tall and sit mid-page,
+  and they froze the whole site under the cursor. `Scrollbar` deliberately leaves the property
+  unset.
 - **`Scrollbar`'s `fadeType` does nothing on a vertical scroll area.** The mask is applied only
   with `isHorizontal` and `isWithArrows`; `Box`, `Dropdown` and `GamesCards` pass `fadeType`
   and get no fade. A vertical scroll with fading edges is `ExpandableBlock mode="scroll"`, which

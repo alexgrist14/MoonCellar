@@ -1,23 +1,23 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
+import { PAGE_SCROLL_ID } from "../utils/common.utils";
 
-export const useDisableScroll = () => {
-  const scrollYWindow = useRef(0);
+let lockCount = 0;
+
+export const useDisableScroll = (isActive = true) => {
   useEffect(() => {
-    scrollYWindow.current = window.scrollY;
+    if (!isActive) return;
 
-    document.body.style.position = "fixed";
-    document.body.style.left = "0";
-    document.body.style.right = "0";
-    document.body.style.top = `-${scrollYWindow.current}px`;
+    const container = document.getElementById(PAGE_SCROLL_ID);
+
+    if (!container) return;
+
+    lockCount++;
+    container.style.overflow = "hidden";
 
     return () => {
-      const scrollY = document.body.style.top;
-      document.body.style.position = "";
-      document.body.style.top = "";
-      window.scroll({
-        top: parseInt(scrollY || "0") * -1,
-        behavior: "instant",
-      });
+      lockCount--;
+
+      if (!lockCount) container.style.removeProperty("overflow");
     };
-  }, []);
+  }, [isActive]);
 };

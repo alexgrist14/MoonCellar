@@ -172,6 +172,41 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   to `S3_CDN_URL/<folder>/…` across `games`, `characters`, `users`, `playthroughs` and `userlogs`.
   It is a dry run unless called with `--apply`; apply it only after the objects are copied into the
   Space, or every rewritten link 404s.
+- **Duplicate game images are found by md5 *and* by perceptual hash, because neither alone finds
+  them all.** `ImageDedupeService` (`POST /games/images/dedupe/:slug`, and the background run on
+  `POST /games/images/dedupe`) needs both: IGDB serves the same picture under several `image_id`s,
+  which is byte-identical and md5 catches it, while the copy of a picture that VNDB also has was
+  fetched through IGDB's `t_1080p` transform (`getImageLink(url, "1080p")` in `igdb.service.ts`) —
+  an upscale of a smaller original, so every byte differs and only the perceptual hash matches it.
+- **The perceptual hash is a 256-bit dHash and `DEFAULT_PERCEPTUAL_THRESHOLD` is 10; do not raise it
+  much.** Measured over the Grisaia and Patlabor screenshot sets, real duplicates land at distance
+  0–7 and the nearest non-duplicate at 23 — and those non-duplicates are the same CG with different
+  dialogue or a different localisation, which a looser threshold would delete. The 64-bit variant
+  put that boundary at 4 against 10 and is too tight to use.
+- **Delete a dropped image only after comparing `parseS3ImageUrl` refs, never URL strings.** A
+  legacy `s3.regru.cloud/mooncellar-screenshots/<key>` URL and the current
+  `S3_CDN_URL/screenshots/<key>` URL are different strings addressing the same object in the Space,
+  so deleting the dropped one by URL would take the kept one with it. This is also what keeps the
+  orphan sweep safe before `migrate-s3-urls.ts --apply` has run: a game still holding regru URLs
+  resolves to the same keys, so its objects count as referenced instead of as orphans.
+- **`ImageOrphansService` reads every reference first and only then lists the Space, and it never
+  deletes an object newer than `cutoff`.** An object uploaded between the two steps is in the
+  listing but not in the reference set, so it would look like an orphan; `cutoff` is the earlier of
+  the scan's start and `now - minAgeDays` (7 by default) and excludes it. Lowering `minAgeDays` to 0
+  leaves only the scan-start guard, which is enough for a run nothing else is writing during.
+- **The reference set covers `games.cover`/`screenshots`/`artworks` *and* the rich-text fields
+  `gamecomments.body`, `playthroughs.comment`, `userlogs.text`.** Those hold pasted URLs that can
+  point at a cover or a screenshot; none do today, but the three collections are small enough that
+  scanning them costs nothing and a deletion there is not recoverable.
+- **`LastModified` in the Space is the rclone copy time, not the original upload, so a fresh
+  `transfer-s3.ts` run hides the whole corpus behind `minAgeDays`.** The objects copied from regru
+  all carry the date of the transfer — a cover for `the-fruit-of-grisaia` that no game has
+  referenced for months still reads `2026-09-11`. After a transfer, either wait out `minAgeDays` or
+  lower it deliberately; do not read a run full of `tooRecent` as "no orphans".
+- **The sweep refuses to delete rather than trusting a scan that looks wrong:** an empty reference
+  set for a folder, more than 500k orphans in one run, or orphans above `maxDeleteRatio` (0.2)
+  all report `refusedReason` and delete nothing. Narrow a large run with `prefix`, which limits the
+  listing while the references are still read from the whole catalogue.
 
 ## Docker
 

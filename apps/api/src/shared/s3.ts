@@ -48,3 +48,34 @@ export const resolveS3Folder = (name?: string): S3Folder | undefined => {
     ? (candidate as S3Folder)
     : undefined;
 };
+
+const LEGACY_S3_URL =
+  /^https?:\/\/(?:s3\.regru\.cloud\/mooncellar-([a-z0-9-]+)|mooncellar-([a-z0-9-]+)\.s3\.regru\.cloud)\/(.+)$/i;
+
+export interface IS3ObjectRef {
+  folder: S3Folder;
+  key: string;
+}
+
+export const parseS3ImageUrl = (
+  url?: string | null
+): IS3ObjectRef | undefined => {
+  if (!url) return undefined;
+
+  const cdnPrefix = `${getS3CdnUrl()}/`;
+
+  if (url.startsWith(cdnPrefix)) {
+    const [name, ...rest] = url.slice(cdnPrefix.length).split("/");
+    const folder = resolveS3Folder(name);
+
+    return folder && rest.length ? { folder, key: rest.join("/") } : undefined;
+  }
+
+  const legacy = url.match(LEGACY_S3_URL);
+
+  if (!legacy) return undefined;
+
+  const folder = resolveS3Folder(legacy[1] ?? legacy[2]);
+
+  return folder ? { folder, key: legacy[3] } : undefined;
+};
