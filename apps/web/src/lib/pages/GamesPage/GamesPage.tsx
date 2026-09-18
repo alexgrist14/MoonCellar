@@ -82,11 +82,7 @@ export const GamesPage: FC<IGamesPageProps> = ({
       <ExpandMenu position="left" titleOpen="Filters">
         <Filters />
       </ExpandMenu>
-      <ExpandMenu
-        position="right"
-        titleOpen="Manage"
-        isCloseOnOutsideDisabled={isSelectMode}
-      >
+      <ExpandMenu position="right" titleOpen="Manage">
         <GamesListMenu games={games} />
       </ExpandMenu>
       <Pagination

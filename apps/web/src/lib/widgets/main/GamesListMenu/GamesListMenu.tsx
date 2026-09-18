@@ -125,22 +125,6 @@ export const GamesListMenu: FC<IGamesListMenuProps> = ({ games }) => {
               </Button>
             </>
           )}
-
-          <Button
-            color={ButtonColor.TRANSPARENT}
-            className={styles.menu__page}
-            disabled={!games?.length}
-            onClick={() => {
-              if (!games?.length) return;
-
-              addRoyalGames(pageIds);
-              toast.success({
-                description: "Page games were added to Royal",
-              });
-            }}
-          >
-            Add every game on this page to Royal
-          </Button>
         </div>
       )}
       {tabIndex === 1 && <RoyalGamesPanel />}

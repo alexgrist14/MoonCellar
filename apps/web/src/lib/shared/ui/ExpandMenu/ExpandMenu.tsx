@@ -27,8 +27,9 @@ interface IExpandMenuProps extends Pick<
   titleClassName?: string;
   menuStyle?: CSSProperties;
   titleStyle?: CSSProperties;
-  isCloseOnOutsideDisabled?: boolean;
 }
+
+export const EXPAND_KEEP_OPEN_ATTRIBUTE = "data-keep-expand-open";
 
 export const ExpandMenu = memo(
   ({
@@ -39,7 +40,6 @@ export const ExpandMenu = memo(
     titleClassName,
     menuStyle,
     titleStyle,
-    isCloseOnOutsideDisabled,
     ...props
   }: IExpandMenuProps) => {
     const { expanded, setExpanded } = useExpandStore();
@@ -64,10 +64,15 @@ export const ExpandMenu = memo(
 
     const closeHandler = () =>
       isActive &&
-      !isCloseOnOutsideDisabled &&
       setExpanded(expanded?.filter((pos) => pos !== position) || []);
 
-    useCloseEvents([expandRef], () => closeHandler());
+    useCloseEvents([expandRef], (event) => {
+      const target = event?.target as HTMLElement | null;
+
+      if (target?.closest(`[${EXPAND_KEEP_OPEN_ATTRIBUTE}]`)) return;
+
+      closeHandler();
+    });
 
     if (!connector) return null;
 

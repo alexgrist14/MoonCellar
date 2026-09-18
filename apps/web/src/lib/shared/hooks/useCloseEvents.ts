@@ -2,7 +2,7 @@ import { RefObject, useEffect } from "react";
 
 const useCloseEvents = (
   refs: RefObject<HTMLElement | null>[],
-  callback: () => void
+  callback: (event?: Event) => void
 ): void => {
   useEffect(() => {
     const clickHandler = (e: MouseEvent): void => {
@@ -21,7 +21,7 @@ const useCloseEvents = (
         (result, ref) =>
           ref.current?.contains(e.target as Node) ? (result = false) : result,
         true
-      ) && callback();
+      ) && callback(e);
     };
 
     const keydownHandler = (e: KeyboardEvent): void => {

@@ -24,6 +24,7 @@ import { getAverageRating } from "../../utils/rating.utils";
 import { GameRatingPopover } from "@/src/lib/features/game/GameRatingPopover";
 import { useRoyalGames } from "@/src/lib/entities/royal/model/useRoyalGames";
 import { Checkbox } from "../Checkbox";
+import { EXPAND_KEEP_OPEN_ATTRIBUTE } from "../ExpandMenu";
 
 interface IGameCardProps {
   game: IGameResponse;
@@ -137,6 +138,7 @@ export const GameCard = memo(
         )}
         style={style}
         ref={cardRef}
+        {...(isSelectable && { [EXPAND_KEEP_OPEN_ATTRIBUTE]: "" })}
       >
         <Link
           href={`/games/${game.slug}`}
