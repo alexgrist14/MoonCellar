@@ -48,6 +48,7 @@ export const GameControls: FC<IGameControlsProps> = ({
         tooltipAlign="left"
         tone={tone}
         isActive={!!tone}
+        data-prevent-progress
         badge={playsCount > 1 ? playsCount : undefined}
         isDisabled={!profile?._id}
         onClick={() =>

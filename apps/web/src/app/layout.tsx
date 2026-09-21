@@ -7,13 +7,14 @@ import { Metadata } from "next";
 import { FaroInit } from "../lib/shared/ui/FaroInit";
 import { FaroRouteTracker } from "../lib/shared/ui/FaroRouteTracker";
 import { GeoInit } from "../lib/shared/ui/GeoInit";
-import { NavigationProgress } from "../lib/shared/ui/NavigationProgress";
 import "@/src/lib/app/styles/reset.scss";
 import "@/src/lib/app/styles/root.scss";
 import { QueryProvider } from "../lib/app/providers/QueryProvider";
 import { FRONT_URL } from "../lib/shared/constants";
 import { JsonLd } from "../lib/shared/ui/JsonLd";
 import { getWebSiteJsonLd } from "../lib/shared/utils/json-ld.utils";
+import { ProgressProvider } from "@bprogress/next/app";
+import Providers from "./providers";
 
 export const metadata: Metadata = {
   metadataBase: new URL(FRONT_URL),
@@ -99,12 +100,11 @@ export default function App({ children }: { children: ReactNode }) {
           <FaroInit />
           <GeoInit />
           <FaroRouteTracker />
-          <Suspense fallback={null}>
-            <NavigationProgress />
-          </Suspense>
-          <Layout className={classNames(general.variable, pentagra.variable)}>
-            {children}
-          </Layout>
+          <Providers>
+            <Layout className={classNames(general.variable, pentagra.variable)}>
+              {children}
+            </Layout>
+          </Providers>
         </QueryProvider>
       </body>
     </html>

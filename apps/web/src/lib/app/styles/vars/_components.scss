@@ -10,8 +10,7 @@
   --cover-ratio: 528/704;
 
   --shadow-basic: 0px 4px 4px var(--color-neutral-5);
-  --shadow-text: drop-shadow(0 1px 2px var(--color-neutral-5))
-    drop-shadow(0 0 6px var(--color-neutral-5));
+  --shadow-text: drop-shadow(0 1px 2px var(--color-neutral-5)) drop-shadow(0 0 6px var(--color-neutral-5));
   --glow-accent: 0 0 0.4rem var(--color-accent);
   --glow-accent-sm: 0 0 0.15rem var(--color-accent);
 
@@ -19,6 +18,10 @@
 
   --navigation-progress-height: 1px;
   --navigation-progress-z-index: 1002;
+  --bprogress-color: var(--color-accent) !important;
+  --bprogress-height: var(--navigation-progress-height) !important;
+  --bprogress-box-shadow: var(--glow-accent) !important;
+  --bprogress-z-index: var(--navigation-progress-z-index) !important;
 
   --modal-text-width: min(720px, calc(100vw - var(--padding-x10)));
   --rich-editor-image-width: 400px;
@@ -56,13 +59,11 @@
   --emoji-picker-cell-size: 34px;
   --emoji-picker-group-size: 28px;
   --emoji-picker-grid-height: 238px;
-  --game-hero-scrim: linear-gradient(
-    180deg,
-    #191d248c 0%,
-    #191d2400 30%,
-    #212731d1 72%,
-    var(--color-bg-secondary) 100%
-  );
+  --game-hero-scrim: linear-gradient(180deg,
+      #191d248c 0%,
+      #191d2400 30%,
+      #212731d1 72%,
+      var(--color-bg-secondary) 100%);
 
   --spoiler-blur: 7px;
   --community-avatar-size: 36px;

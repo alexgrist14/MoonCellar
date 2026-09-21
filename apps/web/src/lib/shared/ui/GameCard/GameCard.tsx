@@ -188,6 +188,7 @@ export const GameCard = memo(
                 aria-label={
                   isRoyal ? "Remove from royal games" : "Add to royal games"
                 }
+                data-prevent-progress
                 className={classNames(styles.card__royal, {
                   [styles.card__royal_empty]: !isRoyal,
                 })}
@@ -221,6 +222,7 @@ export const GameCard = memo(
                   aria-label={
                     !!rating ? `Your rating: ${rating}` : "Rate the game"
                   }
+                  data-prevent-progress
                   className={classNames(styles.card__rating, {
                     [styles.card__rating_empty]: !rating,
                   })}
@@ -256,6 +258,7 @@ export const GameCard = memo(
                     role="button"
                     aria-label="RetroAchievements"
                     className={styles.card__achievement}
+                    data-prevent-progress
                     onClick={(event) => {
                       event.preventDefault();
                       event.stopPropagation();
@@ -307,6 +310,7 @@ export const GameCard = memo(
                       `card__more_${lastPlaythrough?.isMastered ? "mastered" : lastPlaythrough?.category}`
                     ]
                 )}
+                data-prevent-progress
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();

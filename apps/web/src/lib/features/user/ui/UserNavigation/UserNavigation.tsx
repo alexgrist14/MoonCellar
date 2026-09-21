@@ -27,7 +27,6 @@ import {
 } from "@/src/lib/entities/list/api";
 import { openListModal } from "@/src/lib/features/lists/ui/ListModal";
 import { getListHref } from "@/src/lib/shared/ui/ListCard";
-import { startNavigation } from "@/src/lib/shared/store/navigation.store";
 
 const NAVIGATION_LISTS_LIMIT = 8;
 
@@ -107,7 +106,6 @@ export const UserNavigation: FC<{
       return;
     }
 
-    startNavigation();
     router.push(`${profilePath}?${queryString.stringify(value)}`);
   };
 
