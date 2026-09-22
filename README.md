@@ -159,7 +159,8 @@ Two things that are easy to get wrong here:
 | `bun run dev:web` | `web dev` only — Next.js on :3000 |
 | `bun run build` | `build` in every workspace — the Next.js build, and a type check plus preview boot for the API |
 | `bun run lint` | `lint` in every workspace |
-| `bun run mongo` | Opens an SSH tunnel to the production MongoDB on `localhost:27017` — see *Reaching a production service* |
+| `bun run mongo` | Opens a background SSH tunnel to the production MongoDB on `localhost:27017` — see *Reaching a production service* |
+| `bun run mongo:stop` | Closes it |
 | `bun run format:check` | Prettier over the whole repo |
 | `bun --filter web <script>` | Runs a script in one workspace |
 | `bun add <pkg> --filter web` | Adds a dependency to one workspace, never to the root |
@@ -504,9 +505,25 @@ The connection stays open for as long as the SSH session does; use the tunnel fr
 terminal, and close the session to take it down. MongoDB has a shortcut:
 
 ```bash
-bun run mongo    # ssh -L 27017:localhost:27017 root@31.57.201.233
+bun run mongo
 mongosh "mongodb://<user>:<password>@localhost:27017/games?authSource=admin"
+bun run mongo:stop
 ```
+
+`-f -N` puts that session in the background — no shell, no terminal to keep open — so it is not
+tied to the window it was started from and `mongo:stop` is how it goes away
+(`pkill` on the forwarding pattern). It is still an ordinary SSH session, not a service: it dies
+with the network and with a laptop going to sleep, and whatever was connected through it drops
+at that moment. `ServerAliveInterval=30` keeps an idle one from being discarded by a NAT and
+makes a dead one fail in about a minute and a half instead of hanging.
+
+`ExitOnForwardFailure=yes` is what makes a busy local port an error. Without it `ssh` reports
+`bind: Address already in use`, backgrounds itself anyway and sits there forwarding nothing —
+the tunnel looks up and is not, which is the trap worth knowing about when the development
+stack already holds 27017.
+
+Nothing on the server depends on any of this: the API talks to `mongodb:27017` over the
+container network and never goes through the host.
 
 Grafana is the same mechanism on another port — `ssh -L 3000:localhost:3000 root@<host>`, then
 http://localhost:3000. So is anything else that binds to loopback there: Prometheus, Loki, a
