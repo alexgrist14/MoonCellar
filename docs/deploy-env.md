@@ -95,7 +95,7 @@ refuses to start rather than fall back to `admin`.
 
 | Variable | Secret | Description |
 |---|---|---|
-| `MONGO_DATA_DIR` | no | Absolute path on the host bind-mounted as MongoDB's `/data/db` — `/home/admin/mongodb` on the old host, which is what the podman `run.sh` mounted. A directory, not a named volume, so the data stays where an operator can see it and `docker-compose down -v` cannot take it with the rest |
+| `MONGO_DATA_DIR` | no | Absolute path on the host bind-mounted as MongoDB's `/data/db` — `/home/admin/mongodb` on the old host, which is what the podman `run.sh` mounted. A directory, not a named volume, so the data stays where an operator can see it and `docker compose down -v` cannot take it with the rest |
 | `MONGO_ROOT_USERNAME` | **yes** | MongoDB root user, created **only** when `MONGO_DATA_DIR` is empty. A directory carried over from another host already holds its users, and these two keys are then ignored — set them to the old values anyway, or the next person cannot tell which credentials are live. Must match the API's `MONGO_CONNECTION_STRING` |
 | `MONGO_ROOT_PASSWORD` | **yes** | Its password |
 | `GRAFANA_DATA_DIR` | no | Host directory bind-mounted as `/var/lib/grafana` — `/home/admin/grafana` on the old host. It holds every dashboard built in the UI; only the JSON under `infra/grafana/provisioning/` comes from the repository |
@@ -142,7 +142,7 @@ them with `docker run -d --restart always`. Two consequences worth knowing befor
   `127.0.0.1:3111:3111` instead — same firewall caveat as above.
 - **Infrastructure is deployed only when `infra/**` changes.** The `changes` job has its own
   `infra` filter; the deploy `scp`s the directory to `/opt/mooncellar/infra` and runs
-  `docker-compose -f docker-compose.prod.yml up -d`, which is idempotent: it starts what is
+  `docker compose -f docker-compose.prod.yml up -d`, which is idempotent: it starts what is
   missing and leaves what is already running. A push that only touches `apps/**` does not
   restart MongoDB.
 
@@ -403,13 +403,12 @@ LEGACY_S3_ENDPOINT=https://s3.regru.cloud
 The deploy creates its own containers and network, so the host needs almost nothing prepared.
 What it does need, and what the pipeline will not do for you:
 
-1. **Docker, enabled at boot, plus standalone Compose.** `systemctl enable --now docker`, and
-   `docker-compose version --short` must answer with a `2.x` — the deploy calls the standalone
-   `docker-compose` binary, not the `docker compose` plugin, and `docker-compose.prod.yml` is a
-   Compose Spec file that v1 cannot parse (top-level `name:`, `${VAR:?}`). The `Check the
-   server` step asserts both before anything is built. `--restart always` is executed by the
-   daemon, so a daemon that does not start brings nothing up with it. `SSH_USER` must reach it:
-   `root`, or a user in the `docker` group.
+1. **Docker with Compose v2, enabled at boot.** `systemctl enable --now docker`, and
+   `docker compose version` must answer — `docker-compose.prod.yml` is a Compose Spec file
+   (top-level `name:`, `${VAR:?}`, `external: true`) that the old Python `docker-compose` v1
+   cannot parse. The `Check the server` step asserts both before anything is built.
+   `--restart always` is executed by the daemon, so a daemon that does not start brings nothing
+   up with it. `SSH_USER` must reach it: `root`, or a user in the `docker` group.
 2. **The MongoDB data.** Nothing in the pipeline copies a database. MongoDB bind-mounts
    `MONGO_DATA_DIR`, so moving hosts is moving that directory — put it in place *before* the
    first deploy, or compose starts an empty one and initialises a new root user.
