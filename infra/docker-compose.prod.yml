@@ -1,0 +1,91 @@
+name: mooncellar-infra
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    command: ["mongod", "--auth"]
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:?missing in infra/.env}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?missing in infra/.env}
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - mooncellar
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    command: -config.file=/etc/loki/local-config.yaml
+    restart: always
+    volumes:
+      - loki_data:/loki
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --tries=1 -O- http://localhost:3100/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mooncellar
+
+  alloy:
+    image: grafana/alloy:latest
+    container_name: alloy
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - /etc/alloy/config.alloy
+    restart: always
+    volumes:
+      - ./monitoring/faro.alloy:/etc/alloy/config.alloy:ro
+    depends_on:
+      - loki
+    networks:
+      - mooncellar
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: always
+    ports:
+      - "127.0.0.1:3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:?missing in infra/.env}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?missing in infra/.env}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - loki
+    networks:
+      - mooncellar
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=7d
+      - --storage.tsdb.retention.size=512MB
+    restart: always
+    volumes:
+      - ./prometheus/prometheus.prod.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/metrics_token:/etc/prometheus/metrics_token:ro
+      - prometheus_data:/prometheus
+    mem_limit: 256m
+    networks:
+      - mooncellar
+
+volumes:
+  mongodb-data:
+    driver: local
+    name: mongo-data
+  loki_data:
+  grafana_data:
+  prometheus_data:
+
+networks:
+  mooncellar:
+    name: mooncellar
+    external: true

@@ -50,3 +50,4 @@ graphify-out
 .codegraph/
 
 .claude/settings.local.json
+infra/prometheus/metrics_token

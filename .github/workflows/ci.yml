@@ -14,6 +14,7 @@ jobs:
     outputs:
       web: ${{ steps.filter.outputs.web }}
       api: ${{ steps.filter.outputs.api }}
+      infra: ${{ steps.filter.outputs.infra }}
 
     steps:
       - name: Checkout code
@@ -35,6 +36,9 @@ jobs:
               - 'packages/**'
               - 'package.json'
               - 'bun.lock'
+              - '.github/workflows/ci.yml'
+            infra:
+              - 'infra/**'
               - '.github/workflows/ci.yml'
 
   lint:
@@ -62,25 +66,27 @@ jobs:
     needs: [changes, lint]
     if: >-
       github.event_name == 'push' && github.ref == 'refs/heads/main' &&
-      (needs.changes.outputs.web == 'true' || needs.changes.outputs.api == 'true')
+      (needs.changes.outputs.web == 'true' || needs.changes.outputs.api == 'true' ||
+       needs.changes.outputs.infra == 'true')
     runs-on: ubuntu-latest
 
     env:
       DEPLOY_WEB: ${{ needs.changes.outputs.web }}
       DEPLOY_API: ${{ needs.changes.outputs.api }}
-      DEPLOY_ROOT: ${{ secrets.DEPLOY_ROOT }}
+      DEPLOY_INFRA: ${{ needs.changes.outputs.infra }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Build images
+        if: needs.changes.outputs.web == 'true' || needs.changes.outputs.api == 'true'
         run: |
           IMAGES=""
 
           if [ "$DEPLOY_WEB" = "true" ]; then
             echo "${{ secrets.HOST_ENV_WEB }}" > apps/web/.env;
-            podman build \
+            docker build \
               -f apps/web/Dockerfile \
               -t mooncellar-frontend:latest \
               .
@@ -89,17 +95,17 @@ jobs:
 
           if [ "$DEPLOY_API" = "true" ]; then
             echo "${{ secrets.HOST_ENV_API }}" > apps/api/.env;
-            podman build \
+            docker build \
               -f apps/api/Dockerfile \
               -t mooncellar-backend:latest \
               .
             IMAGES="$IMAGES mooncellar-backend:latest"
           fi
 
-          podman save --multi-image-archive -o images.tar $IMAGES
-          gzip images.tar
+          docker save $IMAGES | gzip > images.tar.gz
 
       - name: Copy images to server
+        if: needs.changes.outputs.web == 'true' || needs.changes.outputs.api == 'true'
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -108,31 +114,63 @@ jobs:
           source: "images.tar.gz"
           target: "/tmp/"
 
+      - name: Prepare infra files
+        if: needs.changes.outputs.infra == 'true'
+        run: |
+          echo "${{ secrets.HOST_ENV_INFRA }}" > infra/.env
+          grep -E '^METRICS_TOKEN=' infra/.env | cut -d= -f2- > infra/prometheus/metrics_token
+          test -s infra/prometheus/metrics_token
+
+      - name: Copy infra to server
+        if: needs.changes.outputs.infra == 'true'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "infra"
+          target: "/opt/mooncellar/"
+
       - name: Deploy on server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: DEPLOY_WEB,DEPLOY_API,DEPLOY_ROOT
+          envs: DEPLOY_WEB,DEPLOY_API,DEPLOY_INFRA
           script: |
             set -e
 
-            podman load < /tmp/images.tar.gz
+            docker network inspect mooncellar >/dev/null 2>&1 \
+              || docker network create mooncellar
+
+            if [ "$DEPLOY_INFRA" = "true" ]; then
+              docker compose -f /opt/mooncellar/infra/docker-compose.prod.yml up -d
+            fi
+
+            run_app() {
+              docker rm -f "$1" 2>/dev/null || true
+              docker run -d \
+                --name "$1" \
+                --restart always \
+                --network mooncellar \
+                -p "$2:$2" \
+                --add-host host.docker.internal:host-gateway \
+                --add-host host.containers.internal:host-gateway \
+                "$1:latest"
+            }
+
+            if [ -f /tmp/images.tar.gz ]; then
+              docker load < /tmp/images.tar.gz
+              rm /tmp/images.tar.gz
+            fi
 
             if [ "$DEPLOY_WEB" = "true" ]; then
-              cd "$DEPLOY_ROOT/Frontend"
-              ./run.sh
-              systemctl --user daemon-reload
-              systemctl restart --user Mooncellar-Frontend.service
+              run_app mooncellar-frontend 3111
             fi
 
             if [ "$DEPLOY_API" = "true" ]; then
-              cd "$DEPLOY_ROOT/Backend"
-              ./run.sh
-              systemctl --user daemon-reload
-              systemctl restart --user Mooncellar-Backend.service
+              run_app mooncellar-backend 3228
             fi
 
-            podman image prune -f
-            rm /tmp/images.tar.gz
+            docker image prune -f

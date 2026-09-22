@@ -470,9 +470,16 @@ frontend reads directly and are not part of the contract between the two apps.
 
 <br>
 
-`infra/docker-compose.yml` brings up MongoDB, Loki, Grafana, Alloy and SearXNG; Prometheus is
-behind the `monitoring` profile. Config files live next to it — `grafana/provisioning`,
-`prometheus/prometheus.yml`, `monitoring/faro.alloy`, `searxng/`.
+`infra/docker-compose.yml` is the **local** stack: MongoDB, Loki, Grafana, Alloy and SearXNG,
+with Prometheus behind the `monitoring` profile. Config files live next to it —
+`grafana/provisioning`, `prometheus/prometheus.yml`, `monitoring/faro.alloy`, `searxng/`.
+
+`infra/docker-compose.prod.yml` is the **production** stack, deployed by the workflow whenever
+`infra/**` changes. Same services minus SearXNG, every one of them `restart: always`, all on the
+external `mooncellar` network the app containers join — so nothing but Grafana
+(`127.0.0.1:3001`) publishes a port, and the apps reach `mongodb`, `loki` and `alloy` by name.
+Credentials come from `infra/.env`, written from the `HOST_ENV_INFRA` secret; the local file's
+`admin`/`admin` defaults never leave a developer machine.
 
 ```bash
 docker compose -f infra/docker-compose.yml up -d
@@ -487,8 +494,8 @@ Each app has its own Dockerfile, but both build from the **repository root** as 
 root lockfile and the shared package are available:
 
 ```bash
-podman build -f apps/web/Dockerfile -t mooncellar-frontend:latest .
-podman build -f apps/api/Dockerfile -t mooncellar-backend:latest .
+docker build -f apps/web/Dockerfile -t mooncellar-frontend:latest .
+docker build -f apps/api/Dockerfile -t mooncellar-backend:latest .
 ```
 
 ### CI/CD
@@ -499,12 +506,14 @@ One workflow, `.github/workflows/ci.yml`, with three jobs:
 |---|---|
 | `changes` | Decides which workspaces a push touched — `apps/web/**`, `apps/api/**`, `packages/**` or the root manifests |
 | `lint` | Installs once and lints every workspace, on every push and pull request |
-| `deploy` | On `main` only, and only for the apps `changes` marked |
+| `deploy` | On `main` only, and only for the apps — or the infrastructure — `changes` marked |
 
-The deploy job builds just the changed images, packs them into a single multi-image archive
-(both share the `oven/bun` base layer, so one archive is smaller than two), copies it over in
-one transfer and restarts only the services it rebuilt — one SSH session for both apps. Each
-app's environment file comes from its own secret: `HOST_ENV_WEB` and `HOST_ENV_API`.
+The deploy job builds just the changed images, packs them into a single archive (both share the
+`oven/bun` base layer, so one archive is smaller than two), copies it over in one transfer and
+replaces only the containers it rebuilt — one SSH session for both apps. The host runs root
+Docker: each app is a `docker run -d --restart always` container named `mooncellar-frontend` /
+`mooncellar-backend`, with no `run.sh` and no systemd unit of its own. Each app's environment
+file comes from its own secret: `HOST_ENV_WEB` and `HOST_ENV_API`.
 
 Every secret the pipeline needs, the contents of both `HOST_ENV_*` files and a checklist for
 the first deploy are documented in [`docs/deploy-env.md`](docs/deploy-env.md).

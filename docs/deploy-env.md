@@ -19,7 +19,7 @@ Repository settings → Secrets and variables → Actions → *Repository secret
 | Secret | Used by | Description |
 |---|---|---|
 | `SSH_HOST` | both workflows | Production host the image is copied to and deployed on |
-| `SSH_USER` | both workflows | SSH user; also the owner of the `systemctl --user` units |
+| `SSH_USER` | both workflows | SSH user on the production host. It must reach the root Docker daemon — `root` itself, or a user in the `docker` group |
 | `SSH_PRIVATE_KEY` | both workflows | Private key for that user, no passphrase |
 
 If the API and the site ever move to different hosts, these split the same way as everything
@@ -29,17 +29,19 @@ below (`SSH_HOST_WEB` / `SSH_HOST_API`).
 
 | Secret | Replaces | Description |
 |---|---|---|
-| `DEPLOY_ROOT` | `WORK_DIR` in both repos | Directory holding both service directories — `Frontend` and `Backend` are appended by the deploy script |
-| `HOST_ENV_WEB` | `HOST_ENV` (frontend repo) | Whole `.env` file for `apps/web`, written by the workflow before `podman build` |
+| `HOST_ENV_WEB` | `HOST_ENV` (frontend repo) | Whole `.env` file for `apps/web`, written by the workflow before `docker build` |
 | `HOST_ENV_API` | `HOST_ENV` (backend repo) | Whole `.env` file for `apps/api` |
+| `HOST_ENV_INFRA` | new | Whole `.env` file for `infra/docker-compose.prod.yml` — see below |
 
-`DEPLOY_ROOT` is a new name on purpose. Repointing the existing `WORK_DIR` at the parent
-directory would break the old workflow for as long as it is still on `main`: it would `cd` into
-a directory that has no `run.sh`. Set `DEPLOY_ROOT`, merge, then delete `WORK_DIR`.
+There is no path secret any more. The deploy owns the containers outright — `docker run
+--restart always` from the workflow — so nothing has to exist on the host beforehand and no
+directory is `cd`-ed into. `WORK_DIR` and `DEPLOY_ROOT` can both be deleted.
 
-The path is not a credential, but it stays a secret rather than moving into the workflow file:
-the repository is public, and the path names the deploy user, who is otherwise only identified
-by `SSH_USER`.
+`HOST_ENV_INFRA` has no equivalent on the old host — it is a new file, written from
+`infra/.env.example`, with passwords generated once (`openssl rand -base64 24`). One catch:
+`MONGO_ROOT_*` is applied only to an empty `mongo-data` volume. Restoring a dump into a fresh
+volume takes the new credentials; copying the old volume across keeps the old ones, and then
+these two keys have to repeat what the old host used.
 
 `HOST_ENV_*` is a multi-line secret: the entire file, one `KEY=value` per line. The workflow
 writes it to the app's own directory, not to the repository root:
@@ -49,7 +51,7 @@ writes it to the app's own directory, not to the repository root:
   run: |
     if [ "$DEPLOY_WEB" = "true" ]; then
       echo "${{ secrets.HOST_ENV_WEB }}" > apps/web/.env
-      podman build -f apps/web/Dockerfile -t mooncellar-frontend:latest .
+      docker build -f apps/web/Dockerfile -t mooncellar-frontend:latest .
     fi
 ```
 
@@ -63,10 +65,10 @@ The production environment exists on the host, baked into the running image by t
 `COPY ./.env .env`. Lift it from there:
 
 ```bash
-podman ps
-podman exec <container> cat /app/.env
+docker ps
+docker exec <container> cat /app/.env
 # or, without touching the running container:
-podman run --rm --entrypoint cat mooncellar-frontend:latest /app/.env
+docker run --rm --entrypoint cat mooncellar-frontend:latest /app/.env
 ```
 
 After the migration those paths become `/app/apps/web/.env` and `/app/apps/api/.env`.
@@ -77,13 +79,68 @@ ship a site calling `localhost:3228` with empty canonical links. Reconcile what 
 the host against the tables below, then set the secrets from that file:
 
 ```bash
-gh secret set HOST_ENV_WEB  < prod-web.env
-gh secret set HOST_ENV_API  < prod-api.env
-gh secret set DEPLOY_ROOT   --body "/home/admin/Docker"
+gh secret set HOST_ENV_WEB   < prod-web.env
+gh secret set HOST_ENV_API   < prod-api.env
+gh secret set HOST_ENV_INFRA < prod-infra.env
 ```
 
 Managing repository secrets requires the **admin** role; write access is not enough. Check with
 `gh api repos/<owner>/<repo> --jq .permissions`.
+
+### `HOST_ENV_INFRA` — contents
+
+Written to `infra/.env` before the directory is copied, and read by
+`infra/docker-compose.prod.yml` through `${...}` interpolation. Every key is required: compose
+refuses to start rather than fall back to `admin`.
+
+| Variable | Secret | Description |
+|---|---|---|
+| `MONGO_ROOT_USERNAME` | **yes** | MongoDB root user created on the first start of an empty volume. Must match the credentials in the API's `MONGO_CONNECTION_STRING` |
+| `MONGO_ROOT_PASSWORD` | **yes** | Its password |
+| `GRAFANA_ADMIN_USER` | **yes** | Grafana admin login |
+| `GRAFANA_ADMIN_PASSWORD` | **yes** | Grafana admin password |
+| `METRICS_TOKEN` | **yes** | Bearer token Prometheus sends when scraping the API's `/metrics`. Must be byte-identical to the API's own `METRICS_TOKEN`, or every scrape is a 401 |
+
+`METRICS_TOKEN` is also written to `infra/prometheus/metrics_token`, because a Prometheus
+config file cannot read an environment variable — `prometheus.prod.yml` points
+`credentials_file` at it. The file is gitignored; it exists only on the runner and the host.
+
+The two `MONGO_INITDB_ROOT_*` values in `infra/docker-compose.yml` stay `admin`/`admin`: that
+file is the local development stack and is never deployed.
+
+### The host runs root Docker
+
+The deploy job builds both images on the runner, ships them as one gzipped archive and starts
+them with `docker run -d --restart always`. Two consequences worth knowing before touching it:
+
+- **The container is the unit of deployment — there is no `run.sh` and no systemd unit on the
+  host.** A redeploy is `docker rm -f` followed by `docker run`, and `--restart always` is what
+  brings both apps back after a reboot or a crash — including one stopped by hand, because the
+  policy is re-applied when the daemon starts. `docker stop` therefore holds only until the next
+  reboot; to take an app down for longer, remove the container. This needs `systemctl enable
+  docker` on the host: a restart policy is executed by the daemon, so a daemon that does not
+  start at boot brings nothing up with it.
+- **Everything shares one user-defined network, `mooncellar`, and talks over container DNS.**
+  The deploy creates it before anything starts; `infra/docker-compose.prod.yml` joins it as an
+  external network. Inside it the apps reach `mongodb:27017`, `loki:3100`,
+  `alloy:12347` and each other (`mooncellar-backend:3228`) by name, so **none of the
+  infrastructure publishes a port to the host** — a database on a root-Docker box would
+  otherwise be on the public internet, because Docker's iptables rules are not filtered by a
+  host firewall. Only Grafana is published, on `127.0.0.1:3001`; reach it through an SSH tunnel.
+- **Because nothing is published, the address variables must be set — the code's fallbacks are
+  wrong here.** `INTERNAL_API_URL`, `LOKI_HOST` (both apps) and `FARO_COLLECTOR_URL` default to
+  `host.containers.internal` / `localhost`, which resolve to the host gateway, where nothing
+  listens any more. The values are in the `HOST_ENV_*` tables below. `--add-host` still maps
+  `host.containers.internal` and `host.docker.internal` to the gateway, for anything genuinely
+  running on the host.
+- **The two app ports are published on all interfaces** (`-p 3111:3111`, `-p 3228:3228`), so a
+  reverse proxy in a container can reach them. If the proxy runs on the host, bind them to
+  `127.0.0.1:3111:3111` instead — same firewall caveat as above.
+- **Infrastructure is deployed only when `infra/**` changes.** The `changes` job has its own
+  `infra` filter; the deploy `scp`s the directory to `/opt/mooncellar/infra` and runs
+  `docker compose -f docker-compose.prod.yml up -d`, which is idempotent: it starts what is
+  missing and leaves what is already running. A push that only touches `apps/**` does not
+  restart MongoDB.
 
 ### Not secrets — these live in the workflow file
 
@@ -94,12 +151,11 @@ multi-image archive over one SSH session, and restarts only the services it rebu
 | Value | Frontend | Backend |
 |---|---|---|
 | Image name | `mooncellar-frontend` | `mooncellar-backend` |
-| systemd unit | `Mooncellar-Frontend.service` | `Mooncellar-Backend.service` |
+| Container name | `mooncellar-frontend` | `mooncellar-backend` |
 | Dockerfile | `apps/web/Dockerfile` | `apps/api/Dockerfile` |
 | Exposed port | `3111` | `3228` |
 | Path filter | `apps/web/**`, `packages/**` | `apps/api/**`, `packages/**` |
 | Deploy flag in the SSH script | `DEPLOY_WEB` | `DEPLOY_API` |
-| Directory under `DEPLOY_ROOT` | `Frontend` | `Backend` |
 
 ---
 
@@ -117,9 +173,9 @@ and `INDEXNOW_KEY`.
 
 | Unset in production | Falls back to | Verdict |
 |---|---|---|
-| `INTERNAL_API_URL` | `http://host.containers.internal:3228` | Correct for this host — the podman gateway |
+| `INTERNAL_API_URL` | `http://host.containers.internal:3228` | **No longer correct** — set it to `http://mooncellar-backend:3228` |
 | `NEXT_PUBLIC_FRONT_URL` | `https://mooncellar.space` | Correct; canonical links and the sitemap are fine |
-| `LOKI_HOST` (web) | `http://host.containers.internal:3100` | Correct |
+| `LOKI_HOST` (web) | `http://host.containers.internal:3100` | **No longer correct** — set it to `http://loki:3100` |
 | `GEO_BLOCK_COUNTRIES` | `RU` | Country blocking is on in production through this default alone |
 | `NEXT_PUBLIC_FARO_APP_NAME` | `mooncellar-frontend` | Correct |
 | `NEXT_PUBLIC_APP_VERSION` | `0.0.0` | Every Faro event reports 0.0.0, so telemetry cannot be filtered by release |
@@ -138,18 +194,18 @@ Two keys are set in production but referenced nowhere in the code — `NEXT_PUBL
 ## `HOST_ENV_WEB` — contents
 
 > **`NEXT_PUBLIC_*` values are inlined into the bundle at build time.** The workflow writes the
-> `.env` before `podman build`, so a change here needs a rebuild and redeploy — restarting the
-> systemd unit picks up nothing.
+> `.env` before `docker build`, so a change here needs a rebuild and redeploy — restarting the
+> container picks up nothing.
 
 | Variable | Secret | Description |
 |---|---|---|
 | `NEXT_PUBLIC_API_URL` | no | Public API URL used from the browser — `https://api.mooncellar.space` in production, `http://localhost:3228` in dev |
-| `INTERNAL_API_URL` | no | API URL used from server components and route handlers. On the same host this is the container-internal address, which is why it is separate from the public one |
+| `INTERNAL_API_URL` | no | API URL used from server components and route handlers — `http://mooncellar-backend:3228`, the container name on the `mooncellar` network. Separate from the public one, and it must be set: the fallback points at the host gateway, where nothing listens |
 | `NEXT_PUBLIC_FRONT_URL` | no | Public URL of the site. Canonical links, sitemap and Open Graph URLs are built from it — a wrong value here is an SEO incident, not a cosmetic bug |
 | `NEXT_PUBLIC_CORS_SERVER` | no | Origin sent as the CORS credentials target; must match the API's `FRONT_URL` |
 | `NEXT_PUBLIC_APP_VERSION` | no | Version tag attached to every Faro event, so telemetry can be filtered by release |
 | `NEXT_PUBLIC_FARO_APP_NAME` | no | Application name in Grafana Faro |
-| `LOKI_HOST` | no | Loki push endpoint for the `/api/logs` route handler. Server-side only — it must not become `NEXT_PUBLIC_*`, or the endpoint ends up in the browser bundle. Defaults to `http://host.containers.internal:3100` when unset (`apps/web/src/app/api/logs/route.ts`) |
+| `LOKI_HOST` | no | Loki push endpoint for the `/api/logs` route handler — `http://loki:3100`. Server-side only — it must not become `NEXT_PUBLIC_*`, or the endpoint ends up in the browser bundle. Must be set: the fallback is `http://host.containers.internal:3100` (`apps/web/src/app/api/logs/route.ts`), and Loki no longer publishes a port on the host |
 | `GEO_BLOCK_COUNTRIES` | no | Comma-separated ISO country codes to block, e.g. `RU,BY`. Empty disables blocking |
 | `REVALIDATE_SECRET` | **yes** | Shared secret for `POST /api/revalidate`, compared against the `x-revalidate-secret` header. Server-side only — never `NEXT_PUBLIC_*`, or the secret ships in the browser bundle. Unset disables the endpoint: it answers 503 instead of falling back to an unguarded default |
 
@@ -162,7 +218,7 @@ pins the internal API address, so it stays a secret on both counts.
 
 | Variable | Secret | Description |
 |---|---|---|
-| `MONGO_CONNECTION_STRING` | **yes** | Full MongoDB URI including credentials, database `games` |
+| `MONGO_CONNECTION_STRING` | **yes** | Full MongoDB URI including credentials, database `games` — `mongodb://<MONGO_ROOT_USERNAME>:<MONGO_ROOT_PASSWORD>@mongodb:27017/games?authSource=admin` against the compose MongoDB |
 | `JWT_SECRET` | **yes** | Signing key for access and refresh tokens. Rotating it logs every user out |
 | `JWT_EXPIRE` | no | Access token lifetime, e.g. `15m` — consumed via `ConfigService` in `auth.module.ts` |
 | `FRONT_URL` | no | Public frontend URL. Drives CORS and links in generated content; must match the frontend's `NEXT_PUBLIC_FRONT_URL` |
@@ -175,8 +231,8 @@ pins the internal API address, so it stays a secret on both counts.
 | `S3_ENDPOINT` | no | Spaces API endpoint, `https://sfo3.digitaloceanspaces.com` (the default). The Space name goes in `S3_BUCKET`, never in this host. Replaces `S3_HOST`; `S3_HOST`, `S3_HOST_CDN` and `S3_REGION` are no longer read |
 | `S3_CDN_URL` | no | CDN origin stored URLs are built from, `https://mooncellar.sfo3.cdn.digitaloceanspaces.com` (the default). Must stay allowed by the frontend's `images.remotePatterns` and the image proxy allowlist |
 | `S3_BUCKET` | no | The single Space every upload goes to, `mooncellar` (the default). The former buckets are its top-level folders: `covers/`, `screenshots/`, `artworks/`, `characters/`, `avatars/`, `backgrounds/`, `comments/`, `common/` |
-| `LOKI_HOST` | no | Loki endpoint for `pino-loki` |
-| `FARO_COLLECTOR_URL` | no | Grafana Alloy endpoint the `faro` module forwards browser telemetry to |
+| `LOKI_HOST` | no | Loki endpoint for `pino-loki` — `http://loki:3100` |
+| `FARO_COLLECTOR_URL` | no | Grafana Alloy endpoint the `faro` module forwards browser telemetry to — `http://alloy:12347/collect`. The browser never reaches Alloy itself; it posts to the API's `/faro`, which is why Alloy needs no published port. Keep the `/collect` path, it is part of the default |
 | `PROMETHEUS_ENABLED` | no | `true` / `false` — switches the `/metrics` endpoint off entirely |
 | `METRICS_TOKEN` | **yes** | Bearer token guarding `/metrics`. Prometheus must be configured with the same value |
 | `INDEXNOW_KEY` | **yes** | IndexNow key used to submit new game pages to search engines |
@@ -209,12 +265,12 @@ Present in the current `.env` files, referenced nowhere in the code:
 
 ## Checklist before the first monorepo deploy
 
-1. `HOST_ENV_WEB`, `HOST_ENV_API` and `DEPLOY_ROOT` created. The old `HOST_ENV` and `WORK_DIR`
-   are deleted only after the first successful deploy — until the merge lands they still serve
-   the workflow on `main`.
+1. `HOST_ENV_WEB`, `HOST_ENV_API` and `HOST_ENV_INFRA` created. The old `HOST_ENV`, `WORK_DIR` and
+   `DEPLOY_ROOT` are deleted only after the first successful deploy — until the merge lands
+   they still serve the workflow on `main`.
 2. The workflow references the new names — grep the yml for `HOST_ENV` without a suffix and for
    `WORK_DIR`, and expect no hits.
-3. `git check-ignore -v apps/web/.env apps/api/.env` reports a match for both. The merged root
+3. `git check-ignore -v apps/web/.env apps/api/.env infra/.env` reports a match for all three. The merged root
    `.gitignore` must keep the pattern as `.env`, not `/.env`: with a leading slash it only
    matches the repository root, and `apps/api/.env` — `JWT_SECRET`, `S3_KEY`,
    `TWITCH_CLIENT_SECRET` — becomes committable.
@@ -229,8 +285,9 @@ Present in the current `.env` files, referenced nowhere in the code:
 
 ## `.env.example`
 
-`apps/web/.env.example` and `apps/api/.env.example` are committed with keys only and no
-values; the real `.env` files stay untracked. The blocks below mirror them.
+`apps/web/.env.example`, `apps/api/.env.example` and `infra/.env.example` are committed with
+keys only and no values; the real `.env` files stay untracked. The blocks below mirror them,
+with one comment per key — what each value means is in the tables above.
 
 <details>
 <summary><code>apps/web/.env.example</code></summary>
@@ -258,6 +315,22 @@ REVALIDATE_SECRET=
 # check:layout — run on a developer machine, never part of HOST_ENV_WEB
 CHROME_PATH=
 CHECK_BASE_URL=http://localhost:3111
+```
+
+</details>
+
+<details>
+<summary><code>infra/.env.example</code></summary>
+
+```dotenv
+# MongoDB root user, created on the first start of an empty mongo-data volume
+MONGO_ROOT_USERNAME=
+MONGO_ROOT_PASSWORD=
+# Grafana admin login, published on 127.0.0.1:3001
+GRAFANA_ADMIN_USER=
+GRAFANA_ADMIN_PASSWORD=
+# Bearer token Prometheus sends to the API's /metrics — identical to the API's METRICS_TOKEN
+METRICS_TOKEN=
 ```
 
 </details>
@@ -312,3 +385,40 @@ LEGACY_S3_ENDPOINT=https://s3.regru.cloud
 ```
 
 </details>
+
+---
+
+## Moving to a new host
+
+The deploy creates its own containers and network, so the host needs almost nothing prepared.
+What it does need, and what the pipeline will not do for you:
+
+1. **Docker with the Compose v2 plugin, enabled at boot.** `systemctl enable --now docker`, and
+   `docker compose version` must answer — the deploy calls `docker compose`, not the standalone
+   `docker-compose`. `--restart always` is executed by the daemon, so a daemon that does not
+   start brings nothing up with it. `SSH_USER` must reach it: `root`, or a user in the `docker`
+   group.
+2. **The MongoDB data.** Nothing in the pipeline copies a database. Dump the old host and
+   restore into the new volume *before* DNS moves, while the old site is still serving:
+
+   ```bash
+   # old host
+   podman exec mongodb mongodump --archive --gzip -u <user> -p <pass> \
+     --authenticationDatabase admin > mooncellar.archive.gz
+
+   # new host, after the first infra deploy created the mongodb container
+   docker exec -i mongodb mongorestore --archive --gzip -u <user> -p <pass> \
+     --authenticationDatabase admin < mooncellar.archive.gz
+   ```
+
+   The root user is created only on the **first** start of an empty `mongo-data` volume. Changing
+   `MONGO_ROOT_PASSWORD` afterwards does nothing — the credentials live in the volume, and only
+   `db.changeUserPassword` in a shell changes them.
+3. **The reverse proxy and TLS.** Ports `3111` and `3228` are published on the host; nothing else
+   terminates HTTPS or routes `mooncellar.space` / `api.mooncellar.space` to them.
+4. **A firewall that understands Docker.** `ufw` filters the `INPUT` chain, while Docker's
+   published ports traverse `FORWARD` through `DOCKER-USER`. The infrastructure publishes
+   nothing, so the exposure is the two app ports — deliberate, if the proxy is containerised;
+   otherwise bind them to `127.0.0.1`.
+5. **DNS last.** Deploy, check the new host through a hosts entry, and only then move the A
+   records. The old host keeps serving until they propagate.
