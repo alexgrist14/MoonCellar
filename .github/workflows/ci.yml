@@ -88,7 +88,8 @@ jobs:
           script: |
             set -e
             docker version --format 'docker {{.Server.Version}}'
-            docker compose version
+            docker-compose version --short | grep -qE '^v?2\.' \
+              || { docker-compose version; echo "Compose v2 required"; exit 1; }
 
       - name: Build images
         if: needs.changes.outputs.web == 'true' || needs.changes.outputs.api == 'true'
@@ -156,7 +157,7 @@ jobs:
               || docker network create mooncellar
 
             if [ "$DEPLOY_INFRA" = "true" ]; then
-              docker compose -f /opt/mooncellar/infra/docker-compose.prod.yml up -d
+              docker-compose -f /opt/mooncellar/infra/docker-compose.prod.yml up -d
             fi
 
             run_app() {
