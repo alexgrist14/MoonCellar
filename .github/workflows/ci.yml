@@ -3,6 +3,7 @@ name: CI/CD
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: deploy-${{ github.ref }}
@@ -12,15 +13,16 @@ jobs:
   changes:
     runs-on: ubuntu-latest
     outputs:
-      web: ${{ steps.filter.outputs.web }}
-      api: ${{ steps.filter.outputs.api }}
-      infra: ${{ steps.filter.outputs.infra }}
+      web: ${{ steps.filter.outputs.web == 'true' || github.event_name == 'workflow_dispatch' }}
+      api: ${{ steps.filter.outputs.api == 'true' || github.event_name == 'workflow_dispatch' }}
+      infra: ${{ steps.filter.outputs.infra == 'true' || github.event_name == 'workflow_dispatch' }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Detect changed workspaces
+        if: github.event_name != 'workflow_dispatch'
         uses: dorny/paths-filter@v3
         id: filter
         with:
@@ -65,7 +67,8 @@ jobs:
   deploy:
     needs: [changes, lint]
     if: >-
-      github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      github.ref == 'refs/heads/main' &&
       (needs.changes.outputs.web == 'true' || needs.changes.outputs.api == 'true' ||
        needs.changes.outputs.infra == 'true')
     runs-on: ubuntu-latest

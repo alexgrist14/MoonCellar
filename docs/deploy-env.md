@@ -200,6 +200,12 @@ Two keys are set in production but referenced nowhere in the code — `NEXT_PUBL
 > **`NEXT_PUBLIC_*` values are inlined into the bundle at build time.** The workflow writes the
 > `.env` before `docker build`, so a change here needs a rebuild and redeploy — restarting the
 > container picks up nothing.
+>
+> **Re-running a workflow from the GitHub UI does not do it either.** A re-run reads the new
+> secret, but it re-evaluates the same `changes` filters against the same commit: a run whose
+> commit touched only `infra/**` skips `Build images` again and the old image keeps serving the
+> old `.env`. Rotating a `HOST_ENV_*` value is what **Actions → CI/CD → Run workflow** is for —
+> `workflow_dispatch` forces all three outputs to `true` and rebuilds everything.
 
 | Variable | Secret | Description |
 |---|---|---|
