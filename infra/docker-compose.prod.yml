@@ -10,7 +10,11 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:?missing in infra/.env}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?missing in infra/.env}
     volumes:
-      - ${MONGO_DATA_DIR:?missing in infra/.env}:/data/db
+      - type: bind
+        source: ${MONGO_DATA_DIR:?missing in infra/.env}
+        target: /data/db
+        bind:
+          create_host_path: false
     networks:
       - mooncellar
 
@@ -54,7 +58,11 @@ services:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:?missing in infra/.env}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?missing in infra/.env}
     volumes:
-      - ${GRAFANA_DATA_DIR:?missing in infra/.env}:/var/lib/grafana
+      - type: bind
+        source: ${GRAFANA_DATA_DIR:?missing in infra/.env}
+        target: /var/lib/grafana
+        bind:
+          create_host_path: false
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
     depends_on:
       - loki
@@ -72,7 +80,11 @@ services:
     volumes:
       - ./prometheus/prometheus.prod.yml:/etc/prometheus/prometheus.yml:ro
       - ./prometheus/metrics_token:/etc/prometheus/metrics_token:ro
-      - ${PROMETHEUS_DATA_DIR:?missing in infra/.env}:/prometheus
+      - type: bind
+        source: ${PROMETHEUS_DATA_DIR:?missing in infra/.env}
+        target: /prometheus
+        bind:
+          create_host_path: false
     mem_limit: 256m
     networks:
       - mooncellar

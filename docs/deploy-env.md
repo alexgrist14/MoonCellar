@@ -95,7 +95,7 @@ refuses to start rather than fall back to `admin`.
 
 | Variable | Secret | Description |
 |---|---|---|
-| `MONGO_DATA_DIR` | no | Absolute path on the host bind-mounted as MongoDB's `/data/db` — `/home/admin/mongodb` on the old host, which is what the podman `run.sh` mounted. A directory, not a named volume, so the data stays where an operator can see it and `docker compose down -v` cannot take it with the rest |
+| `MONGO_DATA_DIR` | no | Absolute path on the host bind-mounted as MongoDB's `/data/db` — `/home/admin/mongodb` on the old host, which is what the podman `run.sh` mounted. A directory, not a named volume, so the data stays where an operator can see it and `docker compose down -v` cannot take it with the rest. **A typo here does not fail** by default: Docker creates the missing directory and MongoDB initialises an empty database in it, which looks like a successful deploy of a site with no games. All three data mounts therefore set `create_host_path: false`, so compose refuses to start on a path that does not exist |
 | `MONGO_ROOT_USERNAME` | **yes** | MongoDB root user, created **only** when `MONGO_DATA_DIR` is empty. A directory carried over from another host already holds its users, and these two keys are then ignored — set them to the old values anyway, or the next person cannot tell which credentials are live. Must match the API's `MONGO_CONNECTION_STRING` |
 | `MONGO_ROOT_PASSWORD` | **yes** | Its password |
 | `GRAFANA_DATA_DIR` | no | Host directory bind-mounted as `/var/lib/grafana` — `/home/admin/grafana` on the old host. It holds every dashboard built in the UI; only the JSON under `infra/grafana/provisioning/` comes from the repository |
