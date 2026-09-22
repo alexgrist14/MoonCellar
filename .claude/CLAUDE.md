@@ -8,3 +8,6 @@ In repositories indexed by CodeGraph (a `.codegraph/` directory exists at the re
 
 If there is no `.codegraph/` directory, skip CodeGraph entirely — indexing is the user's decision.
 <!-- CODEGRAPH_END -->
+# graphify
+- **graphify** (`.claude/skills/graphify/SKILL.md`) - any input to knowledge graph. Trigger: `/graphify`
+When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.

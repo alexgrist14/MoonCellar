@@ -18,7 +18,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/alexgrist/.local/bin/graphify hook-guard search"
+            "command": "/home/deck/.local/bin/graphify hook-guard search",
+            "timeout": 10
           }
         ]
       },
@@ -27,7 +28,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/alexgrist/.local/bin/graphify hook-guard read"
+            "command": "/home/deck/.local/bin/graphify hook-guard read",
+            "timeout": 10
           }
         ]
       }
