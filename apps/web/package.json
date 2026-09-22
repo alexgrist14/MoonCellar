@@ -14,6 +14,7 @@
     "check:tokens": "node scripts/sync-design-tokens.mjs --check"
   },
   "dependencies": {
+    "@bprogress/next": "^3.2.12",
     "@grafana/faro-web-sdk": "^2.8.2",
     "@hookform/resolvers": "^5.4.0",
     "@mooncellar/schemas": "workspace:*",

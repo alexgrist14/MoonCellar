@@ -1,19 +1,19 @@
 import { Layout } from "@/src/lib/app/ui/Layout";
 import localFont from "next/font/local";
 import classNames from "classnames";
-import { ReactNode, Suspense } from "react";
+import { ReactNode } from "react";
 import { polyfill } from "interweave-ssr";
 import { Metadata } from "next";
 import { FaroInit } from "@/src/lib/shared/ui/FaroInit";
 import { FaroRouteTracker } from "@/src/lib/shared/ui/FaroRouteTracker";
 import { GeoInit } from "@/src/lib/shared/ui/GeoInit";
-import { NavigationProgress } from "@/src/lib/shared/ui/NavigationProgress";
 import "@/src/lib/app/styles/reset.scss";
 import "@/src/lib/app/styles/root.scss";
 import { QueryProvider } from "@/src/lib/app/providers/QueryProvider";
 import { FRONT_URL } from "@/src/lib/shared/constants";
 import { JsonLd } from "@/src/lib/shared/ui/JsonLd";
 import { getWebSiteJsonLd } from "@/src/lib/shared/utils/json-ld.utils";
+import Providers from "./providers";
 
 export const metadata: Metadata = {
   metadataBase: new URL(FRONT_URL),
@@ -99,12 +99,11 @@ export default function App({ children }: { children: ReactNode }) {
           <FaroInit />
           <GeoInit />
           <FaroRouteTracker />
-          <Suspense fallback={null}>
-            <NavigationProgress />
-          </Suspense>
-          <Layout className={classNames(general.variable, pentagra.variable)}>
-            {children}
-          </Layout>
+          <Providers>
+            <Layout className={classNames(general.variable, pentagra.variable)}>
+              {children}
+            </Layout>
+          </Providers>
         </QueryProvider>
       </body>
     </html>

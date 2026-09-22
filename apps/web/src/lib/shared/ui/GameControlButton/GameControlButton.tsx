@@ -42,6 +42,7 @@ export const GameControlButton: FC<IGameControlButtonProps> = ({
     aria-pressed={isPressed}
     aria-expanded={isExpanded}
     aria-disabled={isDisabled || undefined}
+    data-prevent-progress
     className={classNames(styles.action, {
       [styles.action_disabled]: isDisabled,
     })}

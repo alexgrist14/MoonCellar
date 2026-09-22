@@ -19,6 +19,10 @@
 
   --navigation-progress-height: 1px;
   --navigation-progress-z-index: 1002;
+  --bprogress-color: var(--color-accent) !important;
+  --bprogress-height: var(--navigation-progress-height) !important;
+  --bprogress-box-shadow: var(--glow-accent) !important;
+  --bprogress-z-index: var(--navigation-progress-z-index) !important;
 
   --modal-text-width: min(720px, calc(100vw - var(--padding-x10)));
   --rich-editor-image-width: 400px;
