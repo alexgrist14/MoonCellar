@@ -2,7 +2,7 @@ name: mooncellar-infra
 
 services:
   mongodb:
-    image: mongo:7
+    image: mongo:8
     container_name: mongodb
     command: ["mongod", "--auth"]
     restart: always
@@ -10,7 +10,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:?missing in infra/.env}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?missing in infra/.env}
     volumes:
-      - mongodb-data:/data/db
+      - ${MONGO_DATA_DIR:?missing in infra/.env}:/data/db
     networks:
       - mooncellar
 
@@ -49,12 +49,12 @@ services:
     container_name: grafana
     restart: always
     ports:
-      - "127.0.0.1:3001:3000"
+      - "127.0.0.1:3000:3000"
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:?missing in infra/.env}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?missing in infra/.env}
     volumes:
-      - grafana_data:/var/lib/grafana
+      - ${GRAFANA_DATA_DIR:?missing in infra/.env}:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
     depends_on:
       - loki
@@ -72,18 +72,13 @@ services:
     volumes:
       - ./prometheus/prometheus.prod.yml:/etc/prometheus/prometheus.yml:ro
       - ./prometheus/metrics_token:/etc/prometheus/metrics_token:ro
-      - prometheus_data:/prometheus
+      - ${PROMETHEUS_DATA_DIR:?missing in infra/.env}:/prometheus
     mem_limit: 256m
     networks:
       - mooncellar
 
 volumes:
-  mongodb-data:
-    driver: local
-    name: mongo-data
   loki_data:
-  grafana_data:
-  prometheus_data:
 
 networks:
   mooncellar:

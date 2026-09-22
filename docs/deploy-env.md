@@ -95,10 +95,13 @@ refuses to start rather than fall back to `admin`.
 
 | Variable | Secret | Description |
 |---|---|---|
-| `MONGO_ROOT_USERNAME` | **yes** | MongoDB root user created on the first start of an empty volume. Must match the credentials in the API's `MONGO_CONNECTION_STRING` |
+| `MONGO_DATA_DIR` | no | Absolute path on the host bind-mounted as MongoDB's `/data/db` — `/home/admin/mongodb` on the old host, which is what the podman `run.sh` mounted. A directory, not a named volume, so the data stays where an operator can see it and `docker compose down -v` cannot take it with the rest |
+| `MONGO_ROOT_USERNAME` | **yes** | MongoDB root user, created **only** when `MONGO_DATA_DIR` is empty. A directory carried over from another host already holds its users, and these two keys are then ignored — set them to the old values anyway, or the next person cannot tell which credentials are live. Must match the API's `MONGO_CONNECTION_STRING` |
 | `MONGO_ROOT_PASSWORD` | **yes** | Its password |
+| `GRAFANA_DATA_DIR` | no | Host directory bind-mounted as `/var/lib/grafana` — `/home/admin/grafana` on the old host. It holds every dashboard built in the UI; only the JSON under `infra/grafana/provisioning/` comes from the repository |
 | `GRAFANA_ADMIN_USER` | **yes** | Grafana admin login |
 | `GRAFANA_ADMIN_PASSWORD` | **yes** | Grafana admin password |
+| `PROMETHEUS_DATA_DIR` | no | Host directory bind-mounted as `/prometheus` — `/home/admin/prometheus` on the old host. Seven days of metrics history; losing it is survivable, keeping it is one line |
 | `METRICS_TOKEN` | **yes** | Bearer token Prometheus sends when scraping the API's `/metrics`. Must be byte-identical to the API's own `METRICS_TOKEN`, or every scrape is a 401 |
 
 `METRICS_TOKEN` is also written to `infra/prometheus/metrics_token`, because a Prometheus
@@ -122,7 +125,8 @@ them with `docker run -d --restart always`. Two consequences worth knowing befor
   start at boot brings nothing up with it.
 - **Everything shares one user-defined network, `mooncellar`, and talks over container DNS.**
   The deploy creates it before anything starts; `infra/docker-compose.prod.yml` joins it as an
-  external network. Inside it the apps reach `mongodb:27017`, `loki:3100`,
+  external network. The old host published every one of these ports and had the apps reach them
+  back through the podman gateway; inside the network they reach `mongodb:27017`, `loki:3100`,
   `alloy:12347` and each other (`mooncellar-backend:3228`) by name, so **none of the
   infrastructure publishes a port to the host** — a database on a root-Docker box would
   otherwise be on the public internet, because Docker's iptables rules are not filtered by a
@@ -323,12 +327,18 @@ CHECK_BASE_URL=http://localhost:3111
 <summary><code>infra/.env.example</code></summary>
 
 ```dotenv
-# MongoDB root user, created on the first start of an empty mongo-data volume
+# Host directory bind-mounted as MongoDB's /data/db
+MONGO_DATA_DIR=
+# MongoDB root user — created only when that directory is empty
 MONGO_ROOT_USERNAME=
 MONGO_ROOT_PASSWORD=
-# Grafana admin login, published on 127.0.0.1:3001
+# Host directory bind-mounted as /var/lib/grafana
+GRAFANA_DATA_DIR=
+# Grafana admin login, published on 127.0.0.1:3000
 GRAFANA_ADMIN_USER=
 GRAFANA_ADMIN_PASSWORD=
+# Host directory bind-mounted as /prometheus
+PROMETHEUS_DATA_DIR=
 # Bearer token Prometheus sends to the API's /metrics — identical to the API's METRICS_TOKEN
 METRICS_TOKEN=
 ```
@@ -398,8 +408,32 @@ What it does need, and what the pipeline will not do for you:
    `docker-compose`. `--restart always` is executed by the daemon, so a daemon that does not
    start brings nothing up with it. `SSH_USER` must reach it: `root`, or a user in the `docker`
    group.
-2. **The MongoDB data.** Nothing in the pipeline copies a database. Dump the old host and
-   restore into the new volume *before* DNS moves, while the old site is still serving:
+2. **The MongoDB data.** Nothing in the pipeline copies a database. MongoDB bind-mounts
+   `MONGO_DATA_DIR`, so moving hosts is moving that directory — put it in place *before* the
+   first deploy, or compose starts an empty one and initialises a new root user.
+
+   Copy it from a **stopped** MongoDB: a `dbpath` snapshotted while mongod was writing can
+   refuse to start. An empty `mongod.lock` is the sign of a clean shutdown — two bytes in it
+   means the copy was taken from a running server, and it is worth repeating.
+
+   The files are also WiredTiger internals, readable only by the same major version. The old
+   host ran `mongo:latest` and its `WiredTiger` file reads `WiredTiger 12.0.0`, which is
+   MongoDB 8 — hence `image: mongo:8` in `docker-compose.prod.yml`. Confirm with
+   `podman exec Mongo mongod --version` before trusting a file copy; pointing `mongo:7` at
+   these files fails at startup rather than silently.
+
+   ```bash
+   # old host, mongod stopped
+   tar -C <old dbpath> -czf mongo-data.tgz .
+
+   # new host
+   mkdir -p <MONGO_DATA_DIR> && tar -C <MONGO_DATA_DIR> -xzf mongo-data.tgz
+   ```
+
+   Ownership sorts itself out: the `mongo` image's entrypoint starts as root and `chown`s
+   `/data/db` to its own `mongodb` user before dropping privileges.
+
+   Across major versions, or from a running instance, use a dump instead:
 
    ```bash
    # old host
@@ -411,9 +445,9 @@ What it does need, and what the pipeline will not do for you:
      --authenticationDatabase admin < mooncellar.archive.gz
    ```
 
-   The root user is created only on the **first** start of an empty `mongo-data` volume. Changing
-   `MONGO_ROOT_PASSWORD` afterwards does nothing — the credentials live in the volume, and only
-   `db.changeUserPassword` in a shell changes them.
+   A carried-over directory keeps its own users. Changing `MONGO_ROOT_PASSWORD` afterwards does
+   nothing — the credentials live in the data files, and only `db.changeUserPassword` in a shell
+   changes them.
 3. **The reverse proxy and TLS.** Ports `3111` and `3228` are published on the host; nothing else
    terminates HTTPS or routes `mooncellar.space` / `api.mooncellar.space` to them.
 4. **A firewall that understands Docker.** `ufw` filters the `INPUT` chain, while Docker's

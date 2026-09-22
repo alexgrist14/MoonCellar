@@ -1,0 +1,463 @@
+{
+  "title": "Traffic by Country",
+  "uid": "traffic-by-country",
+  "tags": [
+    "nginx",
+    "geoip",
+    "traffic"
+  ],
+  "schemaVersion": 39,
+  "timezone": "browser",
+  "refresh": "1m",
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 10,
+      "type": "stat",
+      "title": "Живые посетители — запросов",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "bfrs8zndk816oe"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "loki",
+            "uid": "bfrs8zndk816oe"
+          },
+          "expr": "sum(count_over_time({job=\"nginx\", vhost=\"mooncellar.space\", country_name!=\"\"} | pattern `<_> - <_> [<_>] \"<method> <path> <_>\" <status> <_> \"<_>\" \"<ua>\" <_>` | status=~`2..|30.` | ua!~`(?i)(bot|crawler|spider|slurp|scan|curl|wget|python|java|go-http|libredtail|l9explore|headless|monitor|uptime|facebookexternalhit|preview|fetch)` | path!~`(?i)\\.(ico|png|jpe?g|gif|svg|webp|css|js|ttf|woff2?|map|txt|xml)$` | path!~`^/_next/` [$__range]))",
+          "queryType": "instant",
+          "format": "table"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "green"
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 11,
+      "type": "stat",
+      "title": "Боты и сканеры — запросов",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "bfrs8zndk816oe"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "loki",
+            "uid": "bfrs8zndk816oe"
+          },
+          "expr": "sum(count_over_time({job=\"nginx\", vhost=\"mooncellar.space\"} [$__range])) - sum(count_over_time({job=\"nginx\", vhost=\"mooncellar.space\", country_name!=\"\"} | pattern `<_> - <_> [<_>] \"<method> <path> <_>\" <status> <_> \"<_>\" \"<ua>\" <_>` | status=~`2..|30.` | ua!~`(?i)(bot|crawler|spider|slurp|scan|curl|wget|python|java|go-http|libredtail|l9explore|headless|monitor|uptime|facebookexternalhit|preview|fetch)` | path!~`(?i)\\.(ico|png|jpe?g|gif|svg|webp|css|js|ttf|woff2?|map|txt|xml)$` | path!~`^/_next/` [$__range]))",
+          "queryType": "instant",
+          "format": "table"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "orange"
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 12,
+      "type": "stat",
+      "title": "Стран с живыми посетителями",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "bfrs8zndk816oe"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "loki",
+            "uid": "bfrs8zndk816oe"
+          },
+          "expr": "count(sum by (country_name) (count_over_time({job=\"nginx\", vhost=\"mooncellar.space\", country_name!=\"\"} | pattern `<_> - <_> [<_>] \"<method> <path> <_>\" <status> <_> \"<_>\" \"<ua>\" <_>` | status=~`2..|30.` | ua!~`(?i)(bot|crawler|spider|slurp|scan|curl|wget|python|java|go-http|libredtail|l9explore|headless|monitor|uptime|facebookexternalhit|preview|fetch)` | path!~`(?i)\\.(ico|png|jpe?g|gif|svg|webp|css|js|ttf|woff2?|map|txt|xml)$` | path!~`^/_next/` [$__range])))",
+          "queryType": "instant",
+          "format": "table"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 1,
+      "type": "geomap",
+      "title": "Живые посетители по странам",
+      "description": "Только mooncellar.space, успешные ответы, без ботов и статики.",
+      "gridPos": {
+        "h": 11,
+        "w": 14,
+        "x": 0,
+        "y": 4
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "bfrs8zndk816oe"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "loki",
+            "uid": "bfrs8zndk816oe"
+          },
+          "expr": "sum by (country) (count_over_time({job=\"nginx\", vhost=\"mooncellar.space\", country_name!=\"\"} | pattern `<_> - <_> [<_>] \"<method> <path> <_>\" <status> <_> \"<_>\" \"<ua>\" <_>` | status=~`2..|30.` | ua!~`(?i)(bot|crawler|spider|slurp|scan|curl|wget|python|java|go-http|libredtail|l9explore|headless|monitor|uptime|facebookexternalhit|preview|fetch)` | path!~`(?i)\\.(ico|png|jpe?g|gif|svg|webp|css|js|ttf|woff2?|map|txt|xml)$` | path!~`^/_next/` [$__range]))",
+          "queryType": "instant",
+          "format": "table"
+        }
+      ],
+      "options": {
+        "view": {
+          "id": "zero",
+          "lat": 20,
+          "lon": 0,
+          "zoom": 1
+        },
+        "controls": {
+          "showZoom": true,
+          "showAttribution": true
+        },
+        "basemap": {
+          "type": "default",
+          "name": "Basemap"
+        },
+        "layers": [
+          {
+            "type": "markers",
+            "name": "Countries",
+            "location": {
+              "mode": "lookup",
+              "lookup": "country",
+              "gazetteer": "public/gazetteer/countries.json"
+            },
+            "config": {
+              "showLegend": false,
+              "style": {
+                "size": {
+                  "field": "Value #A",
+                  "min": 6,
+                  "max": 28,
+                  "fixed": 8
+                },
+                "color": {
+                  "field": "Value #A",
+                  "fixed": "semi-dark-green"
+                },
+                "opacity": 0.8,
+                "symbol": {
+                  "mode": "fixed",
+                  "fixed": "img/icons/marker/circle.svg"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 2,
+      "type": "piechart",
+      "title": "Доля живого трафика",
+      "gridPos": {
+        "h": 11,
+        "w": 10,
+        "x": 14,
+        "y": 4
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "bfrs8zndk816oe"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "loki",
+            "uid": "bfrs8zndk816oe"
+          },
+          "expr": "topk(10, sum by (country_name) (count_over_time({job=\"nginx\", vhost=\"mooncellar.space\", country_name!=\"\"} | pattern `<_> - <_> [<_>] \"<method> <path> <_>\" <status> <_> \"<_>\" \"<ua>\" <_>` | status=~`2..|30.` | ua!~`(?i)(bot|crawler|spider|slurp|scan|curl|wget|python|java|go-http|libredtail|l9explore|headless|monitor|uptime|facebookexternalhit|preview|fetch)` | path!~`(?i)\\.(ico|png|jpe?g|gif|svg|webp|css|js|ttf|woff2?|map|txt|xml)$` | path!~`^/_next/` [$__range])))",
+          "queryType": "instant",
+          "format": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {}
+          }
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true,
+          "values": [
+            "value"
+          ]
+        },
+        "pieType": "donut",
+        "tooltip": {
+          "mode": "single"
+        },
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "",
+          "values": true
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Живые посетители во времени",
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 15
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "bfrs8zndk816oe"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "loki",
+            "uid": "bfrs8zndk816oe"
+          },
+          "expr": "sum by (country_name) (count_over_time({job=\"nginx\", vhost=\"mooncellar.space\", country_name!=\"\"} | pattern `<_> - <_> [<_>] \"<method> <path> <_>\" <status> <_> \"<_>\" \"<ua>\" <_>` | status=~`2..|30.` | ua!~`(?i)(bot|crawler|spider|slurp|scan|curl|wget|python|java|go-http|libredtail|l9explore|headless|monitor|uptime|facebookexternalhit|preview|fetch)` | path!~`(?i)\\.(ico|png|jpe?g|gif|svg|webp|css|js|ttf|woff2?|map|txt|xml)$` | path!~`^/_next/` [$__auto]))",
+          "queryType": "range",
+          "legendFormat": "{{country_name}}"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "calcs": [
+            "sum"
+          ],
+          "sortBy": "Total",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            }
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 4,
+      "type": "table",
+      "title": "Страны — живые посетители",
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 25
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "bfrs8zndk816oe"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "loki",
+            "uid": "bfrs8zndk816oe"
+          },
+          "expr": "topk(25, sum by (country_name) (count_over_time({job=\"nginx\", vhost=\"mooncellar.space\", country_name!=\"\"} | pattern `<_> - <_> [<_>] \"<method> <path> <_>\" <status> <_> \"<_>\" \"<ua>\" <_>` | status=~`2..|30.` | ua!~`(?i)(bot|crawler|spider|slurp|scan|curl|wget|python|java|go-http|libredtail|l9explore|headless|monitor|uptime|facebookexternalhit|preview|fetch)` | path!~`(?i)\\.(ico|png|jpe?g|gif|svg|webp|css|js|ttf|woff2?|map|txt|xml)$` | path!~`^/_next/` [$__range])))",
+          "queryType": "instant",
+          "format": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "country_name": "Страна",
+              "Value #A": "Запросов",
+              "Value": "Запросов"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Запросов",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "filterable": true
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Запросов"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "gauge",
+                  "mode": "gradient"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "continuous-GrYlRd"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
