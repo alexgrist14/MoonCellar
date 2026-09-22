@@ -79,6 +79,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Check the server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            docker version --format 'docker {{.Server.Version}}'
+            docker compose version
+
       - name: Build images
         if: needs.changes.outputs.web == 'true' || needs.changes.outputs.api == 'true'
         run: |
