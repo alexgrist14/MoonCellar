@@ -6,6 +6,9 @@ services:
     container_name: mongodb
     command: ["mongod", "--auth"]
     restart: always
+    ports:
+      # Loopback only: reachable via SSH tunnel, never from the public internet.
+      - "127.0.0.1:27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:?missing in infra/.env}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?missing in infra/.env}
