@@ -9,7 +9,7 @@ import {
 import styles from "./RangeSelector.module.scss";
 import classNames from "classnames";
 import { Loader } from "../Loader";
-import { useMinimumLoading } from "../../hooks/useMinimumLoading";
+import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 
 export type IRangeValue = [number, number];
 

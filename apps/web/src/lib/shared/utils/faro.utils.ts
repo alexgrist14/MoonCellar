@@ -1,5 +1,5 @@
 import { getWebInstrumentations, initializeFaro } from "@grafana/faro-web-sdk";
-import { API_URL } from "../constants";
+import { API_URL } from "@/src/lib/shared/constants";
 
 let initialized = false;
 

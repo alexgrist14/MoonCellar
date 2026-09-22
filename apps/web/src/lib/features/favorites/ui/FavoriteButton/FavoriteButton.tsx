@@ -11,7 +11,7 @@ import {
 import { FAVORITES_MAX, IGameResponse } from "@mooncellar/schemas";
 import { useUpdateFavoritesMutation } from "@/src/lib/entities/user/api/favorites.mutations";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { GameControlButton } from "@/src/lib/shared/ui/GameControls/GameControlButton";
+import { GameControlButton } from "@/src/lib/shared/ui/GameControlButton";
 import { SvgHeart, SvgHeartFilled } from "@/src/lib/shared/ui/svg";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { FavoritesFullPopover } from "../FavoritesFullPopover";

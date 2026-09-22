@@ -1,19 +1,19 @@
-import { MainPage } from "../lib/pages/Main";
+import { MainPage } from "@/src/lib/pages/Main";
 import {
   FEATURED_PLATFORM_SLUGS,
   IGameResponse,
   IGenreResponse,
   IUpcomingReleaseGroup,
 } from "@mooncellar/schemas";
-import { gamesApi } from "../lib/shared/api";
-import { platformsAPI } from "../lib/shared/api/platforms.api";
+import { gamesApi } from "@/src/lib/shared/api";
+import { platformsAPI } from "@/src/lib/shared/api/platforms.api";
 import { unstable_cache } from "next/cache";
-import { IPlatformCount } from "../lib/shared/types/games.type";
+import { IPlatformCount } from "@/src/lib/shared/types/games.type";
 import { Metadata } from "next";
 import {
   MAIN_PAGE_DESCRIPTION,
   MAIN_PAGE_META_TITLE,
-} from "../lib/pages/Main/MainPage.constants";
+} from "@/src/lib/pages/Main/MainPage.constants";
 
 export const dynamic = "force-dynamic";
 

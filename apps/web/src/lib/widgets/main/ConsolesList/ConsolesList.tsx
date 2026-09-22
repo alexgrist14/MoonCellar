@@ -2,8 +2,8 @@ import { FC, useState } from "react";
 import styles from "./ConsolesList.module.scss";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { useGamesStore } from "@/src/lib/shared/store/games.store";
-import { GamesList } from "@/src/lib/shared/ui/GamesList";
-import { RoyalGamesPanel } from "@/src/lib/shared/ui/RoyalGamesPanel";
+import { GamesList } from "@/src/lib/widgets/game/GamesList";
+import { RoyalGamesPanel } from "@/src/lib/widgets/main/RoyalGamesPanel";
 import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
 import { useRoyalGames } from "@/src/lib/entities/royal/model/useRoyalGames";
 

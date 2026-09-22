@@ -1,4 +1,4 @@
-import Admin from "@/src/lib/pages/Admin/Admin";
+import { Admin } from "@/src/lib/pages/Admin";
 import { FC, Suspense } from "react";
 import { PageLoader } from "@/src/lib/shared/ui/PageLoader";
 

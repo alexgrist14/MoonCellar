@@ -4,7 +4,7 @@ import queryString from "query-string";
 import styles from "./UserNavigation.module.scss";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
-import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
+import { Avatar } from "@/src/lib/shared/ui/Avatar";
 import { IUser } from "@/src/lib/shared/types/auth.type";
 import { userListCategories } from "@/src/lib/shared/constants/user.const";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
@@ -20,7 +20,7 @@ import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
 import { useExpandStore } from "@/src/lib/shared/store/expand.store";
 import { ReviewSortType, SortType } from "@/src/lib/shared/types/sort.type";
 import { CustomDropdown } from "@/src/lib/shared/ui/CustomDropdown";
-import useCloseEvents from "@/src/lib/shared/hooks/useCloseEvents";
+import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
 import {
   useLikedListsQuery,
   useUserListsQuery,

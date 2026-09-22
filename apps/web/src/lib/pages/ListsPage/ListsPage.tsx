@@ -7,29 +7,29 @@ import {
   IGetCustomListsRequest,
   IGetCustomListsResponse,
 } from "@mooncellar/schemas";
-import { useGamesByIdsQuery } from "../../entities/game/api/game.queries";
-import { useListsQuery } from "../../entities/list/api/list.queries";
-import { listQueryKeys } from "../../entities/list/api/list.query-keys";
-import { ListsFilters } from "../../features/lists/ui/ListsFilters";
-import { LIST_UPDATED_OPTIONS } from "../../features/lists/ui/ListsFilters/ListsFilters";
-import { useAdvancedRouter } from "../../shared/hooks/useAdvancedRouter";
-import { useMinimumLoading } from "../../shared/hooks/useMinimumLoading";
-import { BGImage } from "../../shared/ui/BGImage";
-import { Box } from "../../shared/ui/Box";
-import { Breadcrumbs } from "../../shared/ui/Breadcrumbs";
-import { EmptyState } from "../../shared/ui/EmptyState";
-import { ExpandMenu } from "../../shared/ui/ExpandMenu";
-import { ListCard } from "../../shared/ui/ListCard";
-import { Loader } from "../../shared/ui/Loader";
-import { Pagination } from "../../shared/ui/Pagination";
-import { SectionTitle } from "../../shared/ui/SectionTitle";
-import { AppliedFilters, IAppliedFilter } from "../../shared/ui/AppliedFilters";
+import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
+import { useListsQuery } from "@/src/lib/entities/list/api/list.queries";
+import { listQueryKeys } from "@/src/lib/entities/list/api/list.query-keys";
+import { ListsFilters } from "@/src/lib/features/lists/ui/ListsFilters";
+import { LIST_UPDATED_OPTIONS } from "@/src/lib/features/lists/ui/ListsFilters";
+import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
+import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
+import { BGImage } from "@/src/lib/shared/ui/BGImage";
+import { Box } from "@/src/lib/shared/ui/Box";
+import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
+import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
+import { ListCard } from "@/src/lib/shared/ui/ListCard";
+import { Loader } from "@/src/lib/shared/ui/Loader";
+import { Pagination } from "@/src/lib/shared/ui/Pagination";
+import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
+import { AppliedFilters, IAppliedFilter } from "@/src/lib/shared/ui/AppliedFilters";
 import {
   getListsGameIds,
   hasListsFilters,
   parseListsQuery,
   pushListsQuery,
-} from "./lists-query.utils";
+} from "@/src/lib/features/lists/model/lists-query.utils";
 import styles from "./ListsPage.module.scss";
 
 interface IListsPageProps {

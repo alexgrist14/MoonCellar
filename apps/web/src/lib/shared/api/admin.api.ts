@@ -1,6 +1,6 @@
-import { API_URL } from "../constants";
+import { API_URL } from "@/src/lib/shared/constants";
 import { IGameResponse, IRole } from "@mooncellar/schemas";
-import { IUser } from "../types/auth.type";
+import { IUser } from "@/src/lib/shared/types/auth.type";
 import agent from "./agent.api";
 
 const ADMIN_URL = `${API_URL}/admin`;

@@ -15,7 +15,7 @@ import { DRAWER_TRIGGER_ATTRIBUTE, drawerEvents } from "./drawer.api";
 import { Box } from "../Box";
 import { Button, ButtonColor } from "../Button";
 import { SvgClose } from "../svg";
-import { useExpandStore } from "../../store/expand.store";
+import { useExpandStore } from "@/src/lib/shared/store/expand.store";
 
 const IGNORED_CLICK_TARGETS = [
   `[${DRAWER_TRIGGER_ATTRIBUTE}]`,

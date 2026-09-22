@@ -1,6 +1,6 @@
 import { RefObject, useEffect } from "react";
 
-const useCloseEvents = (
+export const useCloseEvents = (
   refs: RefObject<HTMLElement | null>[],
   callback: (event?: Event) => void
 ): void => {
@@ -38,4 +38,3 @@ const useCloseEvents = (
   }, [refs, callback]);
 };
 
-export default useCloseEvents;

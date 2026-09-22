@@ -2,7 +2,7 @@ import { FC, MouseEvent, RefObject, useCallback } from "react";
 import classNames from "classnames";
 import styles from "./ResizeHandle.module.scss";
 import { SvgResize } from "../svg";
-import { ISvgSizes } from "../../types/common.type";
+import { ISvgSizes } from "@/src/lib/shared/types/common.type";
 
 interface IResizeHandleProps {
   targetRef: RefObject<HTMLElement | null>;

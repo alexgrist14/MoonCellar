@@ -8,18 +8,18 @@ import {
   IUpcomingReleaseGroup,
 } from "@mooncellar/schemas";
 import styles from "./MainPage.module.scss";
-import { Button } from "../../shared/ui/Button";
+import { Button } from "@/src/lib/shared/ui/Button";
 import Link from "next/link";
-import { commonUtils } from "../../shared/utils/common.utils";
-import { ReleaseRail } from "./ReleaseRail";
-import { GauntletWheel } from "./GauntletWheel";
-import { useHideAdult } from "../../shared/hooks/useHideAdult";
-import { isAdultGame } from "../../shared/utils/adult.utils";
-import { toSlug } from "../../shared/utils/slug.utils";
-import { IPlatformCount } from "../../shared/types/games.type";
-import { Box } from "../../shared/ui/Box";
-import { BGImage } from "../../shared/ui/BGImage";
-import { SectionTitle } from "../../shared/ui/SectionTitle";
+import { commonUtils } from "@/src/lib/shared/utils/common.utils";
+import { ReleaseRail } from "@/src/lib/widgets/main/ReleaseRail";
+import { GauntletWheel } from "@/src/lib/widgets/main/GauntletWheel";
+import { useHideAdult } from "@/src/lib/shared/hooks/useHideAdult";
+import { isAdultGame } from "@/src/lib/shared/utils/adult.utils";
+import { toSlug } from "@/src/lib/shared/utils/slug.utils";
+import { IPlatformCount } from "@/src/lib/shared/types/games.type";
+import { Box } from "@/src/lib/shared/ui/Box";
+import { BGImage } from "@/src/lib/shared/ui/BGImage";
+import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import { MAIN_PAGE_DESCRIPTION, MAIN_PAGE_TITLE } from "./MainPage.constants";
 
 interface MainPageProps {

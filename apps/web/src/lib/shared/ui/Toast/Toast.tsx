@@ -13,7 +13,7 @@ import cn from "classnames";
 import styles from "./Toast.module.scss";
 import { TOAST_SETTINGS } from "./toast.const";
 import classNames from "classnames";
-import { IToast } from "../../types/toast.type";
+import { IToast } from "@/src/lib/shared/types/toast.type";
 
 type IToastType = "success" | "error";
 

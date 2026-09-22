@@ -1,4 +1,4 @@
-import UserProfile from "@/src/lib/pages/UserProfile/UserProfile";
+import { UserProfile } from "@/src/lib/pages/UserProfile";
 import {
   gamesApi,
   listsAPI,

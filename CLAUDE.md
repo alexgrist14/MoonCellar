@@ -87,6 +87,15 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
   manifest before `bun install --frozen-lockfile`; a partial copy fails the frozen
   lockfile check.
 
+## Frontend architecture
+
+- **`apps/web` is Feature-Sliced Design and every component belongs to a layer** —
+  `app → pages → widgets → features → entities → shared`, all under `src/lib`. Nothing lives
+  next to the page that renders it: a page composes widgets, a widget composes features and
+  entities, and imports only ever point down that list. How to choose the layer, and the
+  public-API and naming rules that go with it, are in
+  [`apps/web/CLAUDE.md`](apps/web/CLAUDE.md).
+
 ## Zod schemas
 
 - Request and response shapes live once in `packages/schemas` and are imported as

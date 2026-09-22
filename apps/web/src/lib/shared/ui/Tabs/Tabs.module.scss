@@ -12,6 +12,23 @@
       justify-content: center;
     }
 
+    &_segmented {
+      display: inline-flex;
+      flex-wrap: nowrap;
+      min-width: 0;
+      max-width: none;
+      overflow: visible;
+      gap: var(--gap-x05);
+      border-radius: var(--radius-x4);
+      background-color: var(--color-bg-tertiary);
+
+      .tabs__button {
+        flex: 0 0 auto;
+        margin-left: 0;
+        border-radius: var(--radius-x3);
+      }
+    }
+
     &_vertical {
       flex-direction: column;
       width: 100%;

@@ -1,0 +1,432 @@
+import { FC, useCallback, useEffect, useRef, useState } from "react";
+import styles from "./PlaythroughModal.module.scss";
+import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
+import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
+import { ButtonColor } from "@/src/lib/shared/ui/Button";
+import { IRichEditorHandle, RichEditor } from "@/src/lib/shared/ui/RichEditor";
+import { Input } from "@/src/lib/shared/ui/Input";
+import { DatePicker } from "@/src/lib/shared/ui/DatePicker";
+import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
+import { commonUtils } from "@/src/lib/shared/utils/common.utils";
+import { useAuthStore } from "@/src/lib/shared/store/auth.store";
+import { useUserStore } from "@/src/lib/shared/store/user.store";
+import {
+  IPlaythrough,
+  IPlaythroughMinimal,
+  ISavePlaythroughRequest,
+  ISavePlaythroughRequestInput,
+  SavePlaythroughRequestSchema,
+  IGameResponse,
+} from "@mooncellar/schemas";
+import { Controller, DefaultValues, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader } from "@/src/lib/shared/ui/Loader";
+import {
+  MIN_LOADER_DURATION,
+  useMinimumLoading,
+} from "@/src/lib/shared/hooks/useMinimumLoading";
+import { Errors } from "@/src/lib/shared/ui/Errors";
+import { IButtonGroupItem } from "@/src/lib/shared/types/buttons.type";
+import { SvgPlus } from "@/src/lib/shared/ui/svg";
+import classNames from "classnames";
+import { Box } from "@/src/lib/shared/ui/Box";
+import { toast } from "@/src/lib/shared/utils/toast.utils";
+import { useCommonStore } from "@/src/lib/shared/store/common.store";
+import { usePlaythroughsQuery } from "@/src/lib/entities/playthrough/api/playthrough.queries";
+import {
+  useCreatePlaythroughMutation,
+  useUpdatePlaythroughMutation,
+  useDeletePlaythroughMutation,
+} from "@/src/lib/entities/playthrough/api/playthrough.mutations";
+
+interface IPlaythroughModalProps {
+  userId: string;
+  game: IGameResponse;
+  isReview?: boolean;
+}
+
+const playthroughCategories: IPlaythroughMinimal["category"][] = [
+  "wishlist",
+  "playing",
+  "completed",
+  "played",
+  "backlog",
+  "dropped",
+];
+
+const categoriesWithDate: IPlaythroughMinimal["category"][] = ["completed"];
+
+const MODAL_APPEARANCE_DURATION = 300;
+
+const getReviewablePlaythrough = <T extends IPlaythroughMinimal>(
+  playthroughs: T[]
+) => [...playthroughs].reverse().find((play) => play.category !== "wishlist");
+
+export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
+  game,
+  userId,
+  isReview,
+}) => {
+  const { profile } = useAuthStore();
+  const { systems } = useCommonStore();
+  const knownPlaythroughs = useUserStore(
+    (state) => state.parsedPlaythroughs?.[game._id]
+  );
+
+  const [playthroughId, setPlaythroughId] = useState<string>();
+  const [isFlushing, setIsFlushing] = useState(false);
+  const editorRef = useRef<IRichEditorHandle>(null);
+
+  const {
+    register,
+    control,
+    setValue,
+    reset,
+    watch,
+    handleSubmit,
+    formState: { errors, isValid },
+  } = useForm<ISavePlaythroughRequestInput, unknown, ISavePlaythroughRequest>({
+    mode: "all",
+    resolver: zodResolver(SavePlaythroughRequestSchema),
+  });
+
+  const { data: playthroughs = [], isPending } = usePlaythroughsQuery(
+    userId,
+    game._id
+  );
+  const { mutate: createPlaythrough, isPending: isCreating } =
+    useCreatePlaythroughMutation();
+  const { mutate: updatePlaythrough, isPending: isUpdating } =
+    useUpdatePlaythroughMutation();
+  const { mutate: deletePlaythrough, isPending: isDeleting } =
+    useDeletePlaythroughMutation();
+
+  const getFormValues = useCallback(
+    (
+      playthrough?: IPlaythrough,
+      isPublishing?: boolean
+    ): DefaultValues<ISavePlaythroughRequestInput> => ({
+      userId,
+      gameId: game._id,
+      category:
+        playthrough?.category || (isPublishing ? undefined : "wishlist"),
+      platformId: playthrough?.platformId,
+      date: playthrough?.date || undefined,
+      time: playthrough?.time,
+      comment: playthrough?.comment || "",
+      isMastered: playthrough?.isMastered || false,
+      isPublic: !!isPublishing || !!playthrough?.isPublic,
+      isSpoiler: !!playthrough?.isSpoiler,
+    }),
+    [game._id, userId]
+  );
+
+  const addHandler = useCallback(
+    (isPublishing?: boolean) => {
+      setPlaythroughId(undefined);
+
+      reset(getFormValues(undefined, isPublishing));
+    },
+    [getFormValues, reset]
+  );
+
+  const selectHandler = useCallback(
+    (playthrough: IPlaythrough, isPublishing?: boolean) => {
+      setPlaythroughId(playthrough._id);
+
+      reset(getFormValues(playthrough, isPublishing));
+    },
+    [getFormValues, reset]
+  );
+
+  const saveHandler = async (data: ISavePlaythroughRequest) => {
+    if (!profile) return;
+
+    let payload = data;
+
+    if (editorRef.current) {
+      setIsFlushing(true);
+
+      try {
+        payload = { ...data, comment: await editorRef.current.flushUploads() };
+      } catch {
+        toast.error({
+          title: "Upload failed",
+          description: "The images could not be uploaded, nothing was saved.",
+        });
+        return;
+      } finally {
+        setIsFlushing(false);
+      }
+    }
+
+    if (playthroughId) {
+      updatePlaythrough(
+        { userId: profile._id, playthroughId, playthrough: payload },
+        {
+          onSuccess: (playthrough) => {
+            selectHandler(playthrough);
+            toast.success({ description: "Playthrough successfully updated" });
+          },
+        }
+      );
+      return;
+    }
+    createPlaythrough(payload, {
+      onSuccess: (playthrough) => {
+        selectHandler(playthrough);
+        toast.success({ description: "Playthrough successfully created" });
+      },
+    });
+  };
+
+  const categoryHandler = (index: number) => {
+    const category = playthroughCategories[index];
+
+    setValue("category", category, { shouldValidate: true });
+
+    if (categoriesWithDate.includes(category) && !watch("date")) {
+      setValue("date", commonUtils.formatDate(new Date(), { isISO: true }), {
+        shouldValidate: true,
+      });
+    }
+  };
+
+  const deleteHandler = () => {
+    if (!profile || !playthroughId) return;
+
+    deletePlaythrough(
+      { userId: profile._id, playthroughId },
+      {
+        onSuccess: () => {
+          setPlaythroughId(undefined);
+          reset(getFormValues());
+          toast.success({ description: "Playthrough successfully removed" });
+        },
+      }
+    );
+  };
+
+  useEffect(() => {
+    if (isPending) return;
+
+    if (isReview) {
+      const reviewable = getReviewablePlaythrough(playthroughs);
+
+      reviewable ? selectHandler(reviewable, true) : addHandler(true);
+      return;
+    }
+
+    const last = playthroughs.at(-1);
+    last ? selectHandler(last) : addHandler();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, game._id, isPending]);
+
+  const isOpening = useMinimumLoading(
+    isPending,
+    MODAL_APPEARANCE_DURATION + MIN_LOADER_DURATION
+  );
+  const isSaving = useMinimumLoading(isCreating || isUpdating || isDeleting);
+  const isLoading = isOpening || isSaving;
+  const listedPlaythroughs: IPlaythroughMinimal[] = isPending
+    ? (knownPlaythroughs ?? [])
+    : playthroughs;
+  const expectedPlaythrough = isReview
+    ? getReviewablePlaythrough(listedPlaythroughs)
+    : listedPlaythroughs.at(-1);
+  const category = watch("category") ?? expectedPlaythrough?.category;
+  const isWithoutComment = !category || category === "wishlist";
+
+  return (
+    <Box
+      isWithScrollBar
+      contentStyle={{ padding: "var(--padding-x5)" }}
+      classNameContent={styles.wrapper}
+    >
+      <div
+        className={classNames(styles.modal, {
+          [styles.modal_compact]: isWithoutComment,
+        })}
+      >
+        {!!listedPlaythroughs.length && (
+          <div className={styles.modal__top}>
+            <ButtonGroup
+              buttons={[
+                ...listedPlaythroughs.map(
+                  (play) =>
+                    ({
+                      title: commonUtils.upFL(play?.category),
+                      onClick: () => {
+                        const playthrough = playthroughs.find(
+                          (item) => item._id === play._id
+                        );
+
+                        if (playthrough) selectHandler(playthrough);
+                      },
+                      color: ButtonColor.FANCY,
+                      active: play._id === playthroughId,
+                    }) as IButtonGroupItem
+                ),
+                {
+                  title: "New",
+                  color: ButtonColor.FANCY,
+                  active: !playthroughId,
+                  hidden: isPending || !!playthroughId,
+                },
+              ]}
+            />
+            <ButtonGroup
+              buttons={[
+                {
+                  title: <SvgPlus />,
+                  onClick: () => addHandler(),
+                  color: ButtonColor.ACCENT,
+                  hidden: !playthroughId,
+                  compact: true,
+                },
+              ]}
+            />
+          </div>
+        )}
+        {isLoading && <Loader type="pacman" />}
+        <form
+          className={classNames(styles.modal__bottom, {
+            [styles.modal__bottom_active]: !isLoading,
+          })}
+          onSubmit={handleSubmit(saveHandler)}
+        >
+          <Errors
+            errors={
+              !!errors
+                ? Object.keys(errors).map((key) => ({
+                    title: commonUtils.upFL(key),
+                    description:
+                      errors[key as keyof ISavePlaythroughRequest]?.message,
+                  }))
+                : []
+            }
+          />
+          <Dropdown
+            isThroughPortal
+            placeholder="Select category..."
+            getIndex={categoryHandler}
+            overwriteValue={commonUtils.upFL(watch("category") || "")}
+            list={playthroughCategories.map((item) => commonUtils.upFL(item))}
+          />
+          <Dropdown
+            isThroughPortal
+            placeholder="Select platform..."
+            getIndex={(index) =>
+              setValue("platformId", game.platformIds[index])
+            }
+            overwriteValue={
+              systems?.find((item) => item._id === watch("platformId"))?.name ||
+              ""
+            }
+            list={
+              systems
+                ?.filter((sys) => game.platformIds.includes(sys._id))
+                .map((item) => item.name) || []
+            }
+          />
+          {["completed", "played", "dropped"].includes(watch("category")) && (
+            <div className={styles.modal__inputs}>
+              {categoriesWithDate.includes(watch("category")) && (
+                <DatePicker
+                  value={watch("date") || ""}
+                  onChange={(value) =>
+                    setValue("date", value, { shouldValidate: true })
+                  }
+                />
+              )}
+              <Input
+                placeholder="Game time (hours)"
+                {...register("time", {
+                  setValueAs: (value) =>
+                    value === "" || value == null ? undefined : Number(value),
+                })}
+                value={watch("time") || ""}
+              />
+            </div>
+          )}
+          {watch("category") === "completed" && (
+            <ToggleSwitch
+              label="Mastered?"
+              leftContent="No"
+              rightContent="Yes"
+              value={watch("isMastered") ? "right" : "left"}
+              clickCallback={() => setValue("isMastered", !watch("isMastered"))}
+            />
+          )}
+          <div
+            className={classNames(styles.modal__comment, {
+              [styles.modal__comment_hidden]: isWithoutComment,
+            })}
+          >
+            <Controller
+              control={control}
+              name="comment"
+              render={({ field }) => (
+                <RichEditor
+                  ref={editorRef}
+                  value={field.value || ""}
+                  onChange={field.onChange}
+                  placeholder="Enter comment..."
+                  className={styles.modal__editor}
+                  error={errors.comment}
+                />
+              )}
+            />
+            <div className={styles.modal__toggles}>
+              <Controller
+                control={control}
+                name="isPublic"
+                render={({ field }) => (
+                  <ToggleSwitch
+                    label="Show on the game page"
+                    leftContent="No"
+                    rightContent="Yes"
+                    value={field.value ? "right" : "left"}
+                    clickCallback={() => field.onChange(!field.value)}
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="isSpoiler"
+                render={({ field }) => (
+                  <ToggleSwitch
+                    label="Contains spoilers"
+                    leftContent="No"
+                    rightContent="Yes"
+                    value={field.value ? "right" : "left"}
+                    clickCallback={() => field.onChange(!field.value)}
+                  />
+                )}
+              />
+            </div>
+          </div>
+          <div className={styles.modal__controls}>
+            <ButtonGroup
+              buttons={[
+                {
+                  title: "Save",
+                  color: ButtonColor.GREEN,
+                  type: "submit",
+                  disabled: !isValid || isFlushing,
+                },
+                {
+                  title: "Delete",
+                  color: ButtonColor.RED,
+                  onClick: deleteHandler,
+                  type: "button",
+                  hidden: !playthroughId,
+                },
+              ]}
+            />
+          </div>
+        </form>
+      </div>
+    </Box>
+  );
+};

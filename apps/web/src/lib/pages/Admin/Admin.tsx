@@ -1,15 +1,15 @@
 "use client";
 import { useSearchParams } from "next/navigation";
-import { useAuthStore } from "../../shared/store/auth.store";
+import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
-import UserList from "./User/UserList/UserList";
-import GameList from "./Game/GameList";
-import ReportList from "./Reports/ReportList/ReportList";
-import VndbCandidates from "./VndbCandidates/VndbCandidates";
-import { ADMIN_TABS, getAdminTabIndex, setAdminQuery } from "./admin-url";
+import { UserList } from "@/src/lib/widgets/admin/UserList";
+import { GameList } from "@/src/lib/widgets/admin/GameList";
+import { ReportList } from "@/src/lib/widgets/admin/ReportList";
+import { VndbCandidates } from "@/src/lib/widgets/admin/VndbCandidates";
+import { ADMIN_TABS, getAdminTabIndex, setAdminQuery } from "@/src/lib/shared/utils/admin-url.utils";
 
-const Admin = () => {
+export const Admin = () => {
   const isAdmin = useAuthStore((s) => s.isAdmin);
   const searchParams = useSearchParams();
   const tabIndex = getAdminTabIndex(searchParams.get("tab"));
@@ -38,5 +38,3 @@ const Admin = () => {
     </Box>
   );
 };
-
-export default Admin;

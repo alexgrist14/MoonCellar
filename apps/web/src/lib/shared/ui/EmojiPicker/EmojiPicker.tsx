@@ -11,9 +11,9 @@ import classNames from "classnames";
 import { Input } from "../Input";
 import { Loader } from "../Loader";
 import { Scrollbar } from "../Scrollbar";
-import useCloseEvents from "../../hooks/useCloseEvents";
-import { useSettingsStore } from "../../store/settings.store";
-import { commonUtils } from "../../utils/common.utils";
+import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
+import { useSettingsStore } from "@/src/lib/shared/store/settings.store";
+import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import {
   EMOJI_GROUPS,
   IEmoji,

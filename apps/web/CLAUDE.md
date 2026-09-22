@@ -3,6 +3,65 @@
 Rules that apply to the Next.js app. Repository-wide rules live in the root
 [`CLAUDE.md`](../../CLAUDE.md).
 
+## Architecture (Feature-Sliced Design)
+
+- **Every component belongs to a layer, and never sits next to the page that happens to render
+  it first.** `src/lib` is Feature-Sliced Design: `app` → `pages` → `widgets` → `features` →
+  `entities` → `shared`, and `src/app` holds Next route files that do nothing but load data and
+  pick a page. A page directory contains the page and nothing else — `<Name>.tsx`,
+  `<Name>.module.scss`, `index.ts`, and at most its own route constants — and composes
+  everything it shows out of the layers below. A `components/` folder inside a page, or a
+  sibling folder like `pages/UserProfile/UserInfo/`, is the violation this rule exists to
+  prevent: the second screen that needs the component either imports it out of a page, which
+  reverses the layer order, or copies it and the two drift apart.
+- **`bun run lint` fails on a component inside a page folder and on any import that points up
+  a layer** (`scripts/check-fsd.mjs`). It runs after ESLint, needs no dependencies, and there is
+  no exception list — a component that has to reach up belongs one layer higher.
+- **Pick the layer from what the code is, not from where it is used first:**
+  - `entities/<entity>/` — one domain object: `api/` for its queries, mutations and query keys,
+    `ui/` for components that render that object and nothing else
+    (`entities/game/ui/GameOverview`), `model/` for its client state.
+  - `features/<feature>/` — one thing the user does, with the state that action needs
+    (`features/user/ui/PeopleDrawer`, `features/favorites/ui/TopFive`,
+    `features/user/model/useViewerFollowings`).
+  - `widgets/<area>/` — a self-contained page section that composes features and entities
+    (`widgets/user/UserInfo`, `widgets/game/GameHero`, `widgets/admin/UserList`).
+  - `pages/<Page>/` — layout and route state only: which tab is open, what the params mean,
+    which widgets to place and in what order.
+  - `shared/` — no domain knowledge at all: the UI kit, hooks, utils, types, api client.
+    A generic form control belongs here (`shared/ui/Fields`), not in the one page that needs it.
+- **Imports point down the layer list, and never sideways between `entities` slices or between
+  `features` slices.** `features/lists/ui/ListsFilters` used to import
+  `pages/ListsPage/lists-query.utils`, so the feature could not be used without the page it was
+  supposed to serve; the helper lives in `features/lists/model/` now. When two slices of one
+  layer need the same code, move that code one layer down — that is the fix, not a `../../` hop
+  between siblings. The `widgets` groups are the exception: they are page areas, not independent
+  slices, so `widgets/main` composing `widgets/game/GamesList` is fine.
+- **A component that composes two different feature slices is a widget, not a feature.**
+  `GameControls` puts the favourites button next to the lists button, which is why it sits in
+  `widgets/game/` while the plain `GameControlButton` it is built from stays in `shared/ui/`.
+  This is also why the whole `GameCard` → `GamesCards`/`GamesList` chain lives in `widgets/game`:
+  a card that embeds those controls cannot be shared UI, and anything rendering that card follows
+  it up.
+- **A slice is consumed through its `index.ts` and exports named components, never a default.**
+  `import { UserInfo } from "@/src/lib/widgets/user/UserInfo"`, not `.../UserInfo/UserInfo`.
+  The barrel is the slice's public API: files behind it can be renamed or split without
+  touching a consumer, and a default export imported under a second name is how one component
+  ends up looking like two in a search.
+- **Cross-slice imports use the `@/src/lib/...` alias; a relative path never leaves its own
+  slice** — `entities/game`, `features/lists`, `widgets/user`, `pages/GamePage`, and each
+  `shared/<segment>` (`shared/ui`, `shared/hooks`, …). A relative path that climbs out of the
+  slice marks a component in the wrong place, and it breaks silently the next time either file
+  moves.
+- **Folder name, file name and exported name are the same word.**
+  `widgets/user/UserGames/UserGames.tsx` exports `UserGames`. When they disagree, an import
+  reads as one component and renders another.
+- **A `.module.scss` never crosses a slice boundary.** `GauntletHeader` used to import
+  `pages/GauntletPage/GauntletPage.module.scss`, which meant moving the component dragged the
+  page's stylesheet with it and deleting a page rule would silently unstyle the widget.
+  Components inside one slice may share that slice's module (`UserReviewItem` uses
+  `UserReviews.module.scss`); anything outside it gets its own.
+
 ## Styling
 
 - Only use the global CSS variables defined in `:root` (see `src/lib/app/styles/vars/`) for colors, borders, padding, radius, gap, etc. — never hardcode raw values (hex colors, px, etc.) for anything already covered by a `:root` variable.
@@ -188,7 +247,8 @@ before:
 
 ## Server and client components
 
-Shared UI (`Box`, `GamesCards`, `GameCard`, `Pagination`, …) carries no `"use client"`
+Shared UI (`Box`, `Pagination`, `Tabs`, …) and the game widgets (`GamesCards`, `GameCard`)
+carry no `"use client"`
 directive — those components are client-side only because they are imported from client pages.
 Importing one directly into a route under `src/app/` makes Next treat it as a server component
 and it fails at runtime (`useRef is not a function`). Wrap it in a small `"use client"`
@@ -444,6 +504,20 @@ break silently when ignored:
 - **The selection never reaches the URL.** The query string is what decides which games the page
   shows; a selection in it would turn a shared link into someone else's checkboxes. It lives in
   `games-selection.store`, which is deliberately not persisted, and turning the mode off clears it.
+
+## Tabs
+
+- **Every row of mutually exclusive switches is the shared `Tabs`** (`shared/ui/Tabs`) — never a
+  hand-rolled row of buttons. `SortToggle` was exactly that duplicate and is gone; its pill look
+  is now `theme="segmented"` on `Tabs`, with the button half living as `ButtonColor.SEGMENTED`.
+- **`theme="segmented"` is the compact pill switcher** used for sorting and status filters
+  (comments Top/New, reviews sort, the admin report status). The default `fancy` theme stays for
+  full-width page tabs. Pass `ariaLabel` with it: the theme sets `role="group"` and
+  `aria-pressed` on the buttons, and without a label the group is unnamed for a screen reader.
+- **The segmented modifier has to out-specify the base tab rules.**
+  `.tabs__buttons_segmented .tabs__button` restores the radius and cancels the `flex: 1` and
+  `margin-left: -1px` that make the default tabs a joined strip; a single-class modifier loses to
+  `.tabs__button` and the pills render as one welded bar.
 
 ## Dropdowns
 

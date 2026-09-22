@@ -4,7 +4,7 @@ import Image from "next/image";
 import classNames from "classnames";
 import { SvgVideoPlay } from "../../../svg";
 import { Loader } from "../../../Loader";
-import { getYoutubeThumbnailUrl } from "../../../../utils/youtube.utils";
+import { getYoutubeThumbnailUrl } from "@/src/lib/shared/utils/youtube.utils";
 
 export const VideoThumbnail: FC<{ video: string }> = ({ video }) => {
   const [isLoading, setIsLoading] = useState(true);

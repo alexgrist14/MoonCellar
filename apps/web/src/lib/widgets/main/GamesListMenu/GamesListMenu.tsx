@@ -5,7 +5,7 @@ import styles from "./GamesListMenu.module.scss";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
-import { RoyalGamesPanel } from "@/src/lib/shared/ui/RoyalGamesPanel";
+import { RoyalGamesPanel } from "@/src/lib/widgets/main/RoyalGamesPanel";
 import { useRoyalGames } from "@/src/lib/entities/royal/model/useRoyalGames";
 import { useGamesSelectionStore } from "@/src/lib/shared/store/games-selection.store";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";

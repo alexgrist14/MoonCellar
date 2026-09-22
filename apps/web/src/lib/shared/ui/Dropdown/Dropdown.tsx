@@ -4,7 +4,7 @@ import cl from "classnames";
 import styles from "./Dropdown.module.scss";
 import { IDropDownListProps } from "./Dropdown.types";
 import { useDropdown } from "./useDropdown";
-import { commonUtils } from "../../utils/common.utils";
+import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { DropdownControls } from "./components/DropdownControls";
 import { DropdownField } from "./components/DropdownField";
 import { DropdownList } from "./components/DropdownList";

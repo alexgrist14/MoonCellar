@@ -7,7 +7,7 @@ import type {
 } from "react";
 import cn from "classnames";
 import styles from "./Svg.module.scss";
-import { ISvgColors, ISvgSizes } from "../../../types/common.type";
+import { ISvgColors, ISvgSizes } from "@/src/lib/shared/types/common.type";
 
 export interface ISvgBaseProps {
   id?: string;

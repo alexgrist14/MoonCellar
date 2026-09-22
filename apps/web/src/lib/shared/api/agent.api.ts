@@ -1,10 +1,10 @@
 import axios, { AxiosError } from "axios";
-import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/src/lib/shared/constants";
 import { authAPI } from "./auth.api";
-import { deleteCookie } from "../utils/cookies.utils";
-import { toast } from "../utils/toast.utils";
-import { useAuthStore } from "../store/auth.store";
-import { logger } from "../utils/logger.utils";
+import { deleteCookie } from "@/src/lib/shared/utils/cookies.utils";
+import { toast } from "@/src/lib/shared/utils/toast.utils";
+import { useAuthStore } from "@/src/lib/shared/store/auth.store";
+import { logger } from "@/src/lib/shared/utils/logger.utils";
 
 export const agent = axios.create({
   withCredentials: true,

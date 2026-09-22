@@ -1,4 +1,4 @@
-import GameEditPage from "@/src/lib/pages/Admin/Game/GameEditPage";
+import { GameEditPage } from "@/src/lib/pages/GameEditPage";
 import { Suspense } from "react";
 import { PageLoader } from "@/src/lib/shared/ui/PageLoader";
 

@@ -1,5 +1,5 @@
-import { API_URL } from "../constants";
-import { IGamesListResponse } from "../types/games.type";
+import { API_URL } from "@/src/lib/shared/constants";
+import { IGamesListResponse } from "@/src/lib/shared/types/games.type";
 import {
   IAddGameRequest,
   IGameResponse,

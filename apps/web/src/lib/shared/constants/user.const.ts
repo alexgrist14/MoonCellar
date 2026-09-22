@@ -1,4 +1,4 @@
-import { CategoriesType } from "../types/user.type";
+import { CategoriesType } from "@/src/lib/shared/types/user.type";
 
 export const userListCategories: CategoriesType[] = [
   "playing",

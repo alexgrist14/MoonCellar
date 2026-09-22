@@ -7,7 +7,7 @@ import {
   MoonLoader,
 } from "react-spinners";
 import classNames from "classnames";
-import { accentColor } from "../../constants";
+import { accentColor } from "@/src/lib/shared/constants";
 
 export const Loader: FC<{
   type?: "pulse" | "propogate" | "pacman" | "moon";

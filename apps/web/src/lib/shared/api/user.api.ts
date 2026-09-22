@@ -1,5 +1,5 @@
-import { API_URL } from "../constants";
-import { IUser } from "../types/auth.type";
+import { API_URL } from "@/src/lib/shared/constants";
+import { IUser } from "@/src/lib/shared/types/auth.type";
 import {
   IGetUserLoginsResponse,
   ISearchUsersRequest,
@@ -15,7 +15,7 @@ import {
   IUserFilter,
   IUserGames,
   IUserPreset,
-} from "../types/user.type";
+} from "@/src/lib/shared/types/user.type";
 import agent from "./agent.api";
 
 const USER_URL = `${API_URL}/user`;

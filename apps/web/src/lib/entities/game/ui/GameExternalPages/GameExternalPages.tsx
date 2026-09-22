@@ -19,7 +19,7 @@ import {
   SvgXbox,
   SvgYoutube,
 } from "@/src/lib/shared/ui/svg";
-import { ISvgBaseProps } from "@/src/lib/shared/ui/svg/Svg/Svg";
+import { ISvgBaseProps } from "@/src/lib/shared/ui/svg/Svg";
 import { getGameExternalPages } from "@/src/lib/shared/utils/links.utils";
 
 const storeIcons: Record<string, FC<ISvgBaseProps>> = {

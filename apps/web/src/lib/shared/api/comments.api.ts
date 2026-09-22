@@ -1,4 +1,4 @@
-import { API_URL } from "../constants";
+import { API_URL } from "@/src/lib/shared/constants";
 import {
   IComment,
   ICommentsResponse,
@@ -15,7 +15,7 @@ import {
   IVoteResponse,
   SOCKET_ID_HEADER,
 } from "@mooncellar/schemas";
-import { getSocketId } from "../socket/socket-id";
+import { getSocketId } from "@/src/lib/shared/socket/socket-id";
 import agent from "./agent.api";
 
 const COMMENTS_API = `${API_URL}/comments`;

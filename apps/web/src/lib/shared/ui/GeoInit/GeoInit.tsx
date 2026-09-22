@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useGeoStore } from "../../store/geo.store";
+import { useGeoStore } from "@/src/lib/shared/store/geo.store";
 
 export const GeoInit = () => {
   const setGeo = useGeoStore((s) => s.setGeo);

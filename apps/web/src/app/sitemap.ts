@@ -1,13 +1,13 @@
 import { MetadataRoute } from "next";
 import { unstable_cache } from "next/cache";
-import { gamesApi, userAPI } from "../lib/shared/api";
-import { platformsAPI } from "../lib/shared/api/platforms.api";
-import { toSlug } from "../lib/shared/utils/slug.utils";
+import { gamesApi, userAPI } from "@/src/lib/shared/api";
+import { platformsAPI } from "@/src/lib/shared/api/platforms.api";
+import { toSlug } from "@/src/lib/shared/utils/slug.utils";
 import {
   IGetGameSlugsResponse,
   IGetUserLoginsResponse,
 } from "@mooncellar/schemas";
-import { FRONT_URL, links } from "../lib/shared/constants";
+import { FRONT_URL, links } from "@/src/lib/shared/constants";
 
 export const dynamic = "force-dynamic";
 

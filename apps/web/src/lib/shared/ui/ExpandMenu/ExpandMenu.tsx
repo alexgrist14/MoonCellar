@@ -8,14 +8,14 @@ import {
 } from "react";
 import styles from "./ExpandMenu.module.scss";
 import { Scrollbar } from "../Scrollbar";
-import { IExpandPosition } from "../../store/common.store";
+import { IExpandPosition } from "@/src/lib/shared/store/common.store";
 import classNames from "classnames";
-import { useStatesStore } from "../../store/states.store";
+import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { useResizeDetector } from "react-resize-detector";
-import { useExpandStore } from "../../store/expand.store";
-import { commonUtils } from "../../utils/common.utils";
+import { useExpandStore } from "@/src/lib/shared/store/expand.store";
+import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { createPortal } from "react-dom";
-import useCloseEvents from "../../hooks/useCloseEvents";
+import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
 
 interface IExpandMenuProps extends Pick<
   HTMLAttributes<HTMLDivElement>,

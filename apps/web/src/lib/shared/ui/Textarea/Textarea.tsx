@@ -4,7 +4,7 @@ import cn from "classnames";
 import styles from "./Textarea.module.scss";
 import { SvgResize } from "../svg";
 import classNames from "classnames";
-import { useAutoResizeTextArea } from "../../hooks";
+import { useAutoResizeTextArea } from "@/src/lib/shared/hooks";
 
 export const Textarea: FC<ITextareaProps> = ({
   className,

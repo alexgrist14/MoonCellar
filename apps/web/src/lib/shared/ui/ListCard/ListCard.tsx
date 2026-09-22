@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import classNames from "classnames";
 import { ICustomList } from "@mooncellar/schemas";
-import { commonUtils } from "../../utils/common.utils";
+import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { Highlight } from "../Highlight";
 import { SvgHeartFilled, SvgLock } from "../svg";
 import styles from "./ListCard.module.scss";

@@ -1,5 +1,5 @@
 import { useThrottledCallback } from "use-debounce";
-import { useStatesStore } from "../store/states.store";
+import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { useEffect } from "react";
 
 export const useMediaStore = () => {

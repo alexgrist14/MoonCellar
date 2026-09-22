@@ -1,5 +1,5 @@
 import { Path, Svg } from "./Svg/Svg";
-import { FCCLSC } from "../../types/common.type";
+import { FCCLSC } from "@/src/lib/shared/types/common.type";
 
 export const SvgAchievement: FCCLSC = (props) => {
   return (

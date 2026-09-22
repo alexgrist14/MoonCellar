@@ -5,8 +5,8 @@ import { createPortal } from "react-dom";
 import classNames from "classnames";
 import styles from "./DatePicker.module.scss";
 import { SvgCalendar, SvgChevron } from "../svg";
-import { commonUtils } from "../../utils/common.utils";
-import useCloseEvents from "../../hooks/useCloseEvents";
+import { commonUtils } from "@/src/lib/shared/utils/common.utils";
+import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
 
 interface IDatePickerProps {
   value?: string;

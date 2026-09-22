@@ -5,7 +5,7 @@ import {
   IVndbCandidatesSummary,
   IVndbReviewItemResponse,
 } from "@mooncellar/schemas";
-import { API_URL } from "../constants";
+import { API_URL } from "@/src/lib/shared/constants";
 import agent from "./agent.api";
 
 const VNDB_CANDIDATES_URL = `${API_URL}/vndb/candidates`;

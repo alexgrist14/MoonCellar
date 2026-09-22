@@ -1,5 +1,5 @@
 import queryString from "query-string";
-import { IGameFiltersQuery } from "../types/filters.type";
+import { IGameFiltersQuery } from "@/src/lib/shared/types/filters.type";
 import { IGetGamesRequest } from "@mooncellar/schemas";
 
 export const parseQueryFilters = (pathWithQuery: string): IGetGamesRequest => {

@@ -11,6 +11,7 @@ export enum ButtonColor {
   GREEN_BORDER = "greenBorder",
   TRANSPARENT = "transparent",
   FANCY = "fancy",
+  SEGMENTED = "segmented",
 }
 
 type IButtonColor = ButtonColor | `${ButtonColor}`;
@@ -26,6 +27,7 @@ export interface IButtonProps extends Pick<
   | "style"
   | "ref"
   | "aria-label"
+  | "aria-pressed"
 > {
   color?: IButtonColor;
   active?: boolean;

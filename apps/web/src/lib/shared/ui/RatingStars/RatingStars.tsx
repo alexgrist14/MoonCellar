@@ -2,7 +2,7 @@ import { FC } from "react";
 import classNames from "classnames";
 import styles from "./RatingStars.module.scss";
 import { SvgStar } from "../svg";
-import { ISvgSizes } from "../../types/common.type";
+import { ISvgSizes } from "@/src/lib/shared/types/common.type";
 import { Tooltip } from "../Tooltip";
 
 const STARS_COUNT = 10;

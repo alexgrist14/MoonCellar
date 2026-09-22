@@ -1,25 +1,25 @@
 "use client";
 
 import { FC, useEffect, useMemo, useState } from "react";
-import { userListCategories } from "../../shared/constants/user.const";
-import { ReviewSortType, SortType } from "../../shared/types/sort.type";
-import { IUser } from "../../shared/types/auth.type";
-import { IFollowings } from "../../shared/types/user.type";
-import { Settings } from "./Settings";
-import { UserGames } from "./UserGames";
-import { UserReviews } from "./UserReviews";
-import { UserLists } from "./UserLists";
-import UserInfo from "./UserInfo/UserInfo";
+import { userListCategories } from "@/src/lib/shared/constants/user.const";
+import { ReviewSortType, SortType } from "@/src/lib/shared/types/sort.type";
+import { IUser } from "@/src/lib/shared/types/auth.type";
+import { IFollowings } from "@/src/lib/shared/types/user.type";
+import { Settings } from "@/src/lib/features/user/ui/Settings";
+import { UserGames } from "@/src/lib/widgets/user/UserGames";
+import { UserReviews } from "@/src/lib/widgets/user/UserReviews";
+import { UserLists } from "@/src/lib/widgets/user/UserLists";
+import { UserInfo } from "@/src/lib/widgets/user/UserInfo";
 import styles from "./UserProfile.module.scss";
 import cn from "classnames";
-import { Box } from "../../shared/ui/Box";
-import { BGImage } from "../../shared/ui/BGImage";
+import { Box } from "@/src/lib/shared/ui/Box";
+import { BGImage } from "@/src/lib/shared/ui/BGImage";
 import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
-import { ExpandMenu } from "../../shared/ui/ExpandMenu";
-import { SvgBurger } from "../../shared/ui/svg";
-import { useStatesStore } from "../../shared/store/states.store";
+import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
+import { SvgBurger } from "@/src/lib/shared/ui/svg";
+import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { useSearchParams } from "next/navigation";
-import { UserNavigation } from "../../features/user/ui/UserNavigation";
+import { UserNavigation } from "@/src/lib/features/user/ui/UserNavigation";
 import {
   ICustomList,
   IGameResponse,
@@ -27,10 +27,10 @@ import {
   IUserRating,
   IUserReviewsOrder,
 } from "@mooncellar/schemas";
-import { userAPI } from "../../shared/api";
-import { useAuthStore } from "../../shared/store/auth.store";
-import { usePlaythroughsStore } from "../../shared/store/playthroughs.store";
-import { refreshAuth } from "../../shared/hooks/useAuthRefresh";
+import { userAPI } from "@/src/lib/shared/api";
+import { useAuthStore } from "@/src/lib/shared/store/auth.store";
+import { usePlaythroughsStore } from "@/src/lib/shared/store/playthroughs.store";
+import { refreshAuth } from "@/src/lib/shared/hooks/useAuthRefresh";
 
 interface UserProfileProps {
   user: IUser;
@@ -43,7 +43,7 @@ interface UserProfileProps {
   likedLists: ICustomList[];
 }
 
-const UserProfile: FC<UserProfileProps> = ({
+export const UserProfile: FC<UserProfileProps> = ({
   user,
   authUserFollowings,
   authUserId,
@@ -233,5 +233,3 @@ const UserProfile: FC<UserProfileProps> = ({
     </>
   );
 };
-
-export default UserProfile;

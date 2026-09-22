@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { initGlobalErrorHandlers } from "../../utils/error-handler.utils";
+import { initGlobalErrorHandlers } from "@/src/lib/shared/utils/error-handler.utils";
 
 /**
  * Компонент для инициализации глобальных обработчиков ошибок

@@ -1,4 +1,4 @@
-import { IUser } from "../types/auth.type";
+import { IUser } from "@/src/lib/shared/types/auth.type";
 
 const getRoundedSeconds = (value: number) => {
   const seconds = Math.abs(value);

@@ -11,7 +11,7 @@
   @include textEllipsis;
   @include flexCenter;
 
-  &:hover:not(&_fancyColor):not(&_transparentColor) {
+  &:hover:not(&_fancyColor):not(&_transparentColor):not(&_segmentedColor) {
     filter: brightness(0.8);
   }
 
@@ -51,6 +51,22 @@
     &:hover,
     &_active {
       background-color: var(--color-bg-hover);
+    }
+  }
+
+  &_segmentedColor {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--color-text-muted);
+    font-size: 13px;
+
+    &:hover {
+      color: var(--color-text-primary);
+    }
+
+    &_active {
+      background-color: var(--color-bg-primary);
+      color: var(--color-text-primary);
     }
   }
 

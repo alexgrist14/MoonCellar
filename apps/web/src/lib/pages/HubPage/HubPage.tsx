@@ -3,17 +3,17 @@
 import { FC } from "react";
 import Link from "next/link";
 import styles from "./HubPage.module.scss";
-import { Box } from "../../shared/ui/Box";
-import { BGImage } from "../../shared/ui/BGImage";
-import { Breadcrumbs } from "../../shared/ui/Breadcrumbs";
-import { GameCard } from "../../shared/ui/GameCard";
-import { GamesCards } from "../../shared/ui/GamesCards";
-import { SectionTitle } from "../../shared/ui/SectionTitle";
+import { Box } from "@/src/lib/shared/ui/Box";
+import { BGImage } from "@/src/lib/shared/ui/BGImage";
+import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
+import { GameCard } from "@/src/lib/widgets/game/GameCard";
+import { GamesCards } from "@/src/lib/widgets/game/GamesCards";
+import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import { IGameResponse } from "@mooncellar/schemas";
 import {
   takeHubGames,
   takeHubRecentGames,
-} from "../../shared/constants/games.const";
+} from "@/src/lib/shared/constants/games.const";
 
 export interface IHubLinkSection {
   label: string;

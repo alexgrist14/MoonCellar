@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 import { ComponentProps } from "react";
-import { Toast } from "../ui/Toast/Toast";
+import { Toast } from "@/src/lib/shared/ui/Toast/Toast";
 
 export const evToast = new EventEmitter();
 

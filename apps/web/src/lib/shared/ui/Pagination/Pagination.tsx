@@ -2,13 +2,13 @@ import { memo, RefObject, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./Pagination.module.scss";
 import { Button, ButtonColor } from "../Button";
 import { Input } from "../Input";
-import { keyboardUtils } from "../../utils/keyboard.utils";
+import { keyboardUtils } from "@/src/lib/shared/utils/keyboard.utils";
 import classNames from "classnames";
 import { SvgDoubleArrow } from "../svg/SvgDoubleArrow";
 import { SvgArrow } from "../svg/SvgArrow";
 import { createPortal } from "react-dom";
-import { useAdvancedRouter } from "../../hooks/useAdvancedRouter";
-import { commonUtils, scrollPageToTop } from "../../utils/common.utils";
+import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
+import { commonUtils, scrollPageToTop } from "@/src/lib/shared/utils/common.utils";
 
 interface IPaginationProps {
   total: number;

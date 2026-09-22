@@ -1,11 +1,11 @@
 import { useCallback } from "react";
 import { useAdvancedRouter } from "./useAdvancedRouter";
-import { useGamesStore } from "../store/games.store";
-import { useStatesStore } from "../store/states.store";
-import { parseQueryFilters } from "../utils/filters.utils";
-import { gamesApi } from "../api";
-import { useFiltersStore } from "../store/filters.store";
-import { shuffle } from "../utils/common.utils";
+import { useGamesStore } from "@/src/lib/shared/store/games.store";
+import { useStatesStore } from "@/src/lib/shared/store/states.store";
+import { parseQueryFilters } from "@/src/lib/shared/utils/filters.utils";
+import { gamesApi } from "@/src/lib/shared/api";
+import { useFiltersStore } from "@/src/lib/shared/store/filters.store";
+import { shuffle } from "@/src/lib/shared/utils/common.utils";
 
 export const useGames = () => {
   const { asPath } = useAdvancedRouter();

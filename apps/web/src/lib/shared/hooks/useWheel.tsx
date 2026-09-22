@@ -1,11 +1,11 @@
 import { useCallback, useRef } from "react";
-import { createImage, drawCoverImage } from "../utils/image.utils";
+import { createImage, drawCoverImage } from "@/src/lib/shared/utils/image.utils";
 import { IGameResponse } from "@mooncellar/schemas";
-import { useStatesStore } from "../store/states.store";
+import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { useGames } from "./useGames";
 import { useHideAdult } from "./useHideAdult";
-import { isAdultGame } from "../utils/adult.utils";
-import { generateWheelColors } from "../utils/wheel.utils";
+import { isAdultGame } from "@/src/lib/shared/utils/adult.utils";
+import { generateWheelColors } from "@/src/lib/shared/utils/wheel.utils";
 
 interface IDrawProps {
   images?: HTMLImageElement[];

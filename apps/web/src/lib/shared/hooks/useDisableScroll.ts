@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { PAGE_SCROLL_ID } from "../utils/common.utils";
+import { PAGE_SCROLL_ID } from "@/src/lib/shared/utils/common.utils";
 
 let lockCount = 0;
 

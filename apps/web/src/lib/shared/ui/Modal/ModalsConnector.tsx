@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import EventEmitter from "events";
 import { IModal, IModalPropsState } from "./Modal.types";
 import { Modal } from "./Modal";
-import { useDisableScroll } from "../../hooks/useDisableScroll";
+import { useDisableScroll } from "@/src/lib/shared/hooks/useDisableScroll";
 
 const ev = new EventEmitter();
 

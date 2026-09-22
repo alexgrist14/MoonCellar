@@ -445,7 +445,7 @@ a toast and loses the Skip and Match buttons.
 | Authentication | Session cookie `accessMoonToken` of a user with the `admin` role, verified when the namespace connects |
 | Server code | `apps/api/src/module/games/gateways/vndb-review.gateway.ts`, emitted from `VndbService` |
 | Client code | `apps/web/src/lib/shared/socket/vndb-review.socket.ts`, `apps/web/src/lib/entities/game/api/vndb-candidates.socket.ts` |
-| Only consumer | `VndbCandidates` (`apps/web/src/lib/pages/Admin/VndbCandidates/VndbCandidates.tsx`) |
+| Only consumer | `VndbCandidates` (`apps/web/src/lib/widgets/admin/VndbCandidates/VndbCandidates.tsx`) |
 
 - **The database, not the socket, stops a second decision.** `decideCandidate` writes with one
   `findOneAndUpdate` whose filter requires `status: "pending"`, `decision: null` and, for a match,

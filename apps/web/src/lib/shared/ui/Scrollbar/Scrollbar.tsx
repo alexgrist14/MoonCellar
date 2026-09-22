@@ -3,7 +3,7 @@
 import React, { CSSProperties, FC, RefObject } from "react";
 import cl from "classnames";
 import styles from "./Scrollbar.module.scss";
-import { useScrollbar } from "../../hooks";
+import { useScrollbar } from "@/src/lib/shared/hooks";
 import { SvgChevron } from "../svg";
 
 interface IScrollBarProps {

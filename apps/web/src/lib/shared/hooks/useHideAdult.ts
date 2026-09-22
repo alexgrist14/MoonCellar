@@ -1,5 +1,5 @@
-import { useGeoStore } from "../store/geo.store";
-import { useAuthStore } from "../store/auth.store";
+import { useGeoStore } from "@/src/lib/shared/store/geo.store";
+import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 
 export const useHideAdult = (): boolean => {
   const blockedCountry = useGeoStore((s) => s.blockedCountry);

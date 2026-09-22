@@ -2,7 +2,7 @@
 
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
-import { useNavigationStore } from "../store/navigation.store";
+import { useNavigationStore } from "@/src/lib/shared/store/navigation.store";
 
 const NAVIGATION_TIMEOUT = 15000;
 

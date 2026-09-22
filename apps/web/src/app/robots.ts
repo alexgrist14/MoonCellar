@@ -1,5 +1,5 @@
 import { MetadataRoute } from "next";
-import { FRONT_URL } from "../lib/shared/constants";
+import { FRONT_URL } from "@/src/lib/shared/constants";
 
 export default function robots(): MetadataRoute.Robots {
   return {

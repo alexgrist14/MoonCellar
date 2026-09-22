@@ -4,7 +4,7 @@ import {
   IGetCommentReportsRequest,
   IResolveCommentReportsResponse,
 } from "@mooncellar/schemas";
-import { API_URL } from "../constants";
+import { API_URL } from "@/src/lib/shared/constants";
 import agent from "./agent.api";
 
 const COMMENT_REPORTS_URL = `${API_URL}/admin/comment-reports`;

@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { Suspense } from "react";
 import { ListsPage } from "@/src/lib/pages/ListsPage";
-import { parseListsQuery } from "@/src/lib/pages/ListsPage/lists-query.utils";
+import { parseListsQuery } from "@/src/lib/features/lists/model/lists-query.utils";
 import { listsAPI } from "@/src/lib/shared/api";
 import { JsonLd } from "@/src/lib/shared/ui/JsonLd";
 import { PageLoader } from "@/src/lib/shared/ui/PageLoader";

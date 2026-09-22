@@ -5,7 +5,7 @@ import {
   type ICommentsClientEvents,
   type ICommentsServerEvents,
 } from "@mooncellar/schemas";
-import { API_URL } from "../constants";
+import { API_URL } from "@/src/lib/shared/constants";
 import { setSocketId } from "./socket-id";
 
 export type ICommentsSocket = Socket<

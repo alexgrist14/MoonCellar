@@ -3,11 +3,11 @@ import styles from "./BGImage.module.scss";
 import classNames from "classnames";
 import Image from "next/image";
 import { useDebouncedCallback } from "use-debounce";
-import { useSettingsStore } from "../../store/settings.store";
-import { useAuthStore } from "../../store/auth.store";
+import { useSettingsStore } from "@/src/lib/shared/store/settings.store";
+import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { IGameResponse, DEFAULT_BG_OPACITY } from "@mooncellar/schemas";
-import { useHideAdult } from "../../hooks/useHideAdult";
-import { isAdultGame } from "../../utils/adult.utils";
+import { useHideAdult } from "@/src/lib/shared/hooks/useHideAdult";
+import { isAdultGame } from "@/src/lib/shared/utils/adult.utils";
 
 const DEFAULT_IMAGE = "/images/moon.jpg";
 

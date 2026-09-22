@@ -1,11 +1,11 @@
 import { useRouter } from "next/navigation";
-import { authAPI, userAPI } from "../api";
-import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
-import { useAuthStore } from "../store/auth.store";
-import { IAuth } from "../types/auth.type";
-import { modal } from "../ui/Modal";
-import { deleteCookie } from "../utils/cookies.utils";
-import { useUserStore } from "../store/user.store";
+import { authAPI, userAPI } from "@/src/lib/shared/api";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/src/lib/shared/constants";
+import { useAuthStore } from "@/src/lib/shared/store/auth.store";
+import { IAuth } from "@/src/lib/shared/types/auth.type";
+import { modal } from "@/src/lib/shared/ui/Modal";
+import { deleteCookie } from "@/src/lib/shared/utils/cookies.utils";
+import { useUserStore } from "@/src/lib/shared/store/user.store";
 
 export const useAuth = () => {
   const { clear, setProfile, setAuth } = useAuthStore();

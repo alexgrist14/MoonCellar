@@ -26,9 +26,9 @@ import {
   SvgQuote,
   SvgStrike,
 } from "../svg";
-import { ISvgBaseProps } from "../svg/Svg/Svg";
-import { filesAPI } from "../../api/files.api";
-import { toast } from "../../utils/toast.utils";
+import { ISvgBaseProps } from "../svg/Svg";
+import { filesAPI } from "@/src/lib/shared/api/files.api";
+import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { Loader } from "../Loader";
 import { EmojiPicker } from "../EmojiPicker";
 

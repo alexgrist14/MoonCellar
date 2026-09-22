@@ -1,7 +1,7 @@
-import { useAuthStore } from "../store/auth.store";
-import { authAPI, userAPI } from "../api";
-import { deleteCookie } from "../utils/cookies.utils";
-import { REFRESH_TOKEN } from "../constants";
+import { useAuthStore } from "@/src/lib/shared/store/auth.store";
+import { authAPI, userAPI } from "@/src/lib/shared/api";
+import { deleteCookie } from "@/src/lib/shared/utils/cookies.utils";
+import { REFRESH_TOKEN } from "@/src/lib/shared/constants";
 import { useEffect } from "react";
 
 export const refreshAuth = () => {

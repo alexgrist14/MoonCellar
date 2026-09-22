@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import useCloseEvents from "../../hooks/useCloseEvents";
+import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
 import {
   IDropDownListProps,
   IDropdownClickOptions,

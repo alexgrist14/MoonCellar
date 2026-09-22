@@ -1,4 +1,4 @@
-import { FRONT_URL } from "../constants";
+import { FRONT_URL } from "@/src/lib/shared/constants";
 import { IGameResponse, IReview } from "@mooncellar/schemas";
 
 const MIN_RATINGS_FOR_AGGREGATE = 10;

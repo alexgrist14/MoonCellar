@@ -4,10 +4,10 @@ import Image from "next/image";
 import styles from "./AchievementsModal.module.scss";
 import { RowsModal } from "../RowsModal";
 import { Button, ButtonColor } from "../Button";
-import { useAuthStore } from "../../store/auth.store";
-import { useCommonStore } from "../../store/common.store";
+import { useAuthStore } from "@/src/lib/shared/store/auth.store";
+import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { IGameResponse } from "@mooncellar/schemas";
-import { commonUtils } from "../../utils/common.utils";
+import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 
 interface IAchievementsModalProps {
   game: IGameResponse;

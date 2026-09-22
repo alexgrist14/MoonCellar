@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Box } from "../../shared/ui/Box";
-import { Button, ButtonColor } from "../../shared/ui/Button";
-import { SvgMoonBackdrop } from "../../shared/ui/svg";
+import { Box } from "@/src/lib/shared/ui/Box";
+import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
+import { SvgMoonBackdrop } from "@/src/lib/shared/ui/svg";
 import styles from "./NotFoundPage.module.scss";
 
 export const NotFoundPage = () => {

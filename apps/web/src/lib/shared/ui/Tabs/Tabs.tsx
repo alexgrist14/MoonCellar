@@ -1,9 +1,9 @@
 import { FC, useEffect, useState } from "react";
-import { Button, IButtonProps } from "../Button";
+import { Button, ButtonColor, IButtonProps } from "../Button";
 import cl from "classnames";
 import styles from "./Tabs.module.scss";
 import Link from "next/link";
-import { ITabContent } from "../../types/tabs.type";
+import { ITabContent } from "@/src/lib/shared/types/tabs.type";
 
 interface ITabs {
   contents: ITabContent[];
@@ -16,6 +16,8 @@ interface ITabs {
   buttonColor?: IButtonProps["color"];
   resetCallback?: () => void;
   isAdaptive?: boolean;
+  theme?: "segmented";
+  ariaLabel?: string;
   isHideTabsButtons?: boolean;
 }
 export const Tabs: FC<ITabs> = ({
@@ -27,10 +29,16 @@ export const Tabs: FC<ITabs> = ({
   isUseDefaultIndex,
   isStopPropagation,
   isHideTabsButtons,
-  buttonColor = "fancy",
+  buttonColor,
+  theme,
+  ariaLabel,
   resetCallback,
   isAdaptive,
 }) => {
+  const isSegmented = theme === "segmented";
+  const color =
+    buttonColor ?? (isSegmented ? ButtonColor.SEGMENTED : ButtonColor.FANCY);
+
   const [tabIndex, setTabIndex] = useState(
     defaultTabIndex > contents.length - 1
       ? contents.length - 1
@@ -47,7 +55,10 @@ export const Tabs: FC<ITabs> = ({
     <div
       className={cl(styles.tabs__buttons, buttonsClassName, {
         [styles.tabs__buttons_adaptive]: isAdaptive,
+        [styles.tabs__buttons_segmented]: isSegmented,
       })}
+      role={isSegmented ? "group" : undefined}
+      aria-label={ariaLabel}
     >
       {!isHideTabsButtons &&
         contents?.map((content, i) => {
@@ -58,7 +69,7 @@ export const Tabs: FC<ITabs> = ({
               className={cl(styles.tabs__link, content.className)}
             >
               <Button
-                color={buttonColor}
+                color={color}
                 style={content.style}
                 className={cl({
                   [styles.tabs__button_adaptive]: isAdaptive,
@@ -76,13 +87,14 @@ export const Tabs: FC<ITabs> = ({
             </Link>
           ) : (
             <Button
-              color={buttonColor}
+              color={color}
               className={cl(styles.tabs__button, content.className, {
                 [styles.tabs__button_adaptive]: isAdaptive,
               })}
               key={i}
               style={content.style}
               active={!content.isUnselectable && i === tabIndex}
+              aria-pressed={isSegmented ? i === tabIndex : undefined}
               onClick={() => {
                 !!resetCallback && resetCallback();
                 content.onTabClick && content.onTabClick(content.tabName);

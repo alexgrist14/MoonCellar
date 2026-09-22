@@ -22,7 +22,7 @@ import {
   getListsGameIds,
   parseListsQuery,
   pushListsQuery,
-} from "@/src/lib/pages/ListsPage/lists-query.utils";
+} from "@/src/lib/features/lists/model/lists-query.utils";
 import styles from "./ListsFilters.module.scss";
 
 const FILTERS_ID = "lists-filters";

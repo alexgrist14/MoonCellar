@@ -3,7 +3,7 @@ import styles from "./VideosRow.module.scss";
 import { Scrollbar } from "../Scrollbar";
 import { modal } from "../Modal";
 import { VideoThumbnail } from "./components/VideoThumbnail";
-import { getYoutubeEmbedUrl } from "../../utils/youtube.utils";
+import { getYoutubeEmbedUrl } from "@/src/lib/shared/utils/youtube.utils";
 
 interface IVideosRowProps {
   videos: string[];

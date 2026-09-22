@@ -2,24 +2,24 @@
 
 import { FC } from "react";
 import styles from "./GamePage.module.scss";
-import { BGImage } from "../../shared/ui/BGImage";
+import { BGImage } from "@/src/lib/shared/ui/BGImage";
 import {
   IGameResponse,
   IGameStats,
   IReviewsResponse,
 } from "@mooncellar/schemas";
-import { useHideAdult } from "../../shared/hooks/useHideAdult";
-import { isAdultGame } from "../../shared/utils/adult.utils";
-import { GameAdminControls } from "../../features/game/GameAdminControls";
-import { GameHero } from "./components/GameHero";
-import { GameOverview } from "./components/GameOverview";
-import { GameScoreColumn } from "./components/GameScoreColumn";
-import { GameSideColumn } from "./components/GameSideColumn";
-import { GameMedia } from "../../entities/game/ui/GameMedia";
-import { GameDetails } from "./components/GameDetails";
-import { GameReleaseDates } from "./components/GameReleaseDates";
-import { GameMultiplayer } from "./components/GameMultiplayer";
-import { GameCommunity } from "../../features/game/GameCommunity";
+import { useHideAdult } from "@/src/lib/shared/hooks/useHideAdult";
+import { isAdultGame } from "@/src/lib/shared/utils/adult.utils";
+import { GameAdminControls } from "@/src/lib/features/game/ui/GameAdminControls";
+import { GameHero } from "@/src/lib/widgets/game/GameHero";
+import { GameOverview } from "@/src/lib/entities/game/ui/GameOverview";
+import { GameScoreColumn } from "@/src/lib/widgets/game/GameScoreColumn";
+import { GameSideColumn } from "@/src/lib/widgets/game/GameSideColumn";
+import { GameMedia } from "@/src/lib/entities/game/ui/GameMedia";
+import { GameDetails } from "@/src/lib/entities/game/ui/GameDetails";
+import { GameReleaseDates } from "@/src/lib/entities/game/ui/GameReleaseDates";
+import { GameMultiplayer } from "@/src/lib/entities/game/ui/GameMultiplayer";
+import { GameCommunity } from "@/src/lib/features/game/ui/GameCommunity";
 
 interface IGamePageProps {
   game: IGameResponse;

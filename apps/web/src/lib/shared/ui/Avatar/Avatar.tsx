@@ -1,7 +1,7 @@
 import Image from "next/image";
 import classNames from "classnames";
 import { FC } from "react";
-import { IUser } from "../../types/auth.type";
+import { IUser } from "@/src/lib/shared/types/auth.type";
 import { SvgProfile } from "../svg";
 import { Tooltip } from "../Tooltip";
 import styles from "./Avatar.module.scss";
@@ -13,7 +13,7 @@ interface AvatarProps {
   priority?: boolean;
 }
 
-const Avatar: FC<AvatarProps> = ({
+export const Avatar: FC<AvatarProps> = ({
   user,
   isWithoutTooltip,
   isWithoutHover,
@@ -49,4 +49,3 @@ const Avatar: FC<AvatarProps> = ({
   );
 };
 
-export default Avatar;

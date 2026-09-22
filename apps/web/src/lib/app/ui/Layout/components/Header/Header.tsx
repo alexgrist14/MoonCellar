@@ -1,9 +1,9 @@
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { AuthModal } from "@/src/lib/shared/ui/AuthModal";
-import Avatar from "@/src/lib/shared/ui/Avatar/Avatar";
+import { Avatar } from "@/src/lib/shared/ui/Avatar";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { modal } from "@/src/lib/shared/ui/Modal";
-import { SearchModal } from "@/src/lib/shared/ui/SearchModal";
+import { SearchModal } from "@/src/lib/widgets/search/SearchModal";
 import { Separator } from "@/src/lib/shared/ui/Separator";
 import {
   SvgAdmin,
@@ -22,7 +22,7 @@ import { IButtonGroupItem } from "@/src/lib/shared/types/buttons.type";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { gamesApi } from "@/src/lib/shared/api";
 import { useRouter } from "next/navigation";
-import useCloseEvents from "@/src/lib/shared/hooks/useCloseEvents";
+import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
 import classNames from "classnames";
 
 export const Header: FC = () => {

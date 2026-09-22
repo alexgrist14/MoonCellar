@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { NotFoundPage } from "../lib/pages/NotFoundPage";
+import { NotFoundPage } from "@/src/lib/pages/NotFoundPage";
 
 export const metadata: Metadata = {
   title: "Page not found",

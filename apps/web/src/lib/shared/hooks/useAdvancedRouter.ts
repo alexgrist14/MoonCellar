@@ -1,6 +1,6 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import queryString from "query-string";
-import { startNavigation } from "../store/navigation.store";
+import { startNavigation } from "@/src/lib/shared/store/navigation.store";
 
 export const useAdvancedRouter = () => {
   const pathname = usePathname();

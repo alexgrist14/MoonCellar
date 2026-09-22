@@ -1,4 +1,4 @@
-import { API_URL } from "../constants";
+import { API_URL } from "@/src/lib/shared/constants";
 import { IGameResponse } from "@mooncellar/schemas";
 import agent from "./agent.api";
 

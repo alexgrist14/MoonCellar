@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { ChangeEvent, Dispatch, FC, SetStateAction, useState } from "react";
-import { useAuthStore } from "../../store/auth.store";
+import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { SvgCamera } from "../svg";
 import styles from "./AvatarSettings.module.scss";
 
@@ -9,7 +9,7 @@ interface AvatarSettingsProps {
   setTempAvatar?: Dispatch<SetStateAction<File | undefined>>;
 }
 
-const AvatarSettings: FC<AvatarSettingsProps> = ({
+export const AvatarSettings: FC<AvatarSettingsProps> = ({
   tempAvatar,
   setTempAvatar,
 }) => {
@@ -82,4 +82,3 @@ const AvatarSettings: FC<AvatarSettingsProps> = ({
   );
 };
 
-export default AvatarSettings;

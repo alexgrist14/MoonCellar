@@ -1,5 +1,5 @@
 import { HTMLAttributeAnchorTarget, ReactNode } from "react";
-import { IButtonProps } from "../ui/Button";
+import { IButtonProps } from "@/src/lib/shared/ui/Button";
 
 export interface IButtonGroupItem extends IButtonProps {
   title: string | ReactNode;

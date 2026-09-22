@@ -2,7 +2,7 @@ import { GauntletPage } from "@/src/lib/pages/GauntletPage/GauntletPage";
 import { Metadata } from "next";
 import { Suspense } from "react";
 import styles from "@/src/lib/pages/GauntletPage/GauntletPage.module.scss";
-import { GauntletHeader } from "@/src/lib/pages/GauntletPage/GauntletHeader";
+import { GauntletHeader } from "@/src/lib/widgets/gauntlet/GauntletHeader";
 import { PageLoader } from "@/src/lib/shared/ui/PageLoader";
 import { JsonLd } from "@/src/lib/shared/ui/JsonLd";
 import { getBreadcrumbJsonLd } from "@/src/lib/shared/utils/json-ld.utils";

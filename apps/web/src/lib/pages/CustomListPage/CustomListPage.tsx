@@ -33,7 +33,7 @@ import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
-import { GamesCards } from "@/src/lib/shared/ui/GamesCards";
+import { GamesCards } from "@/src/lib/widgets/game/GamesCards";
 import { getListHref } from "@/src/lib/shared/ui/ListCard";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";

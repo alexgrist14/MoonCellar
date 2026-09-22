@@ -14,8 +14,8 @@ import { createPortal } from "react-dom";
 import classNames from "classnames";
 import styles from "./Popover.module.scss";
 import { Box } from "../Box";
-import { commonUtils } from "../../utils/common.utils";
-import useCloseEvents from "../../hooks/useCloseEvents";
+import { commonUtils } from "@/src/lib/shared/utils/common.utils";
+import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
 
 interface IPopoverProps {
   children: ReactNode;

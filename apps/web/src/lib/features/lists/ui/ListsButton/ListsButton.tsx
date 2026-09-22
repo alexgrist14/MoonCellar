@@ -6,7 +6,7 @@ import { useMyListGameCountsQuery } from "@/src/lib/entities/list/api/list.queri
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
-import { GameControlButton } from "@/src/lib/shared/ui/GameControls/GameControlButton";
+import { GameControlButton } from "@/src/lib/shared/ui/GameControlButton";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { SvgListBullet } from "@/src/lib/shared/ui/svg";
 import { ListsModal, ListsPopover } from "../ListsPopover";

@@ -4,7 +4,7 @@ import {
   IRoyalServerEvents,
   ROYAL_SOCKET_NAMESPACE,
 } from "@mooncellar/schemas";
-import { API_URL } from "../constants";
+import { API_URL } from "@/src/lib/shared/constants";
 
 export type IRoyalSocket = Socket<IRoyalServerEvents, IRoyalClientEvents>;
 

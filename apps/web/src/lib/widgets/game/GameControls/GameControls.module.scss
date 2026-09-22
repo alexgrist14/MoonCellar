@@ -1,0 +1,12 @@
+.controls {
+  display: flex;
+  gap: var(--gap-x1);
+  width: 100%;
+  background-color: var(--color-bg-primary);
+  border-radius: var(--radius-x3);
+  z-index: 1;
+  padding: var(--padding-x1);
+  outline: 1px solid var(--color-border-primary);
+  margin-top: auto;
+  container-type: inline-size;
+}

@@ -1,6 +1,6 @@
 import { FC } from "react";
 import styles from "./Errors.module.scss";
-import { IErrorMessage } from "../../types/error.types";
+import { IErrorMessage } from "@/src/lib/shared/types/error.types";
 
 interface IErrorsProps {
   errors: IErrorMessage[];

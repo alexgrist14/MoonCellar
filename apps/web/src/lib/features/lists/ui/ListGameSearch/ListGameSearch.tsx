@@ -19,7 +19,7 @@ import {
 } from "@mooncellar/schemas";
 import { useAddListGameMutation } from "@/src/lib/entities/list/api";
 import { useGamesQuery } from "@/src/lib/entities/game/api/game.queries";
-import useCloseEvents from "@/src/lib/shared/hooks/useCloseEvents";
+import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Cover } from "@/src/lib/shared/ui/Cover";

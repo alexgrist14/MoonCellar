@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Toast } from "./Toast";
 import styles from "./Toast.module.scss";
-import { IToast } from "../../types/toast.type";
-import { evToast } from "../../utils/toast.utils";
+import { IToast } from "@/src/lib/shared/types/toast.type";
+import { evToast } from "@/src/lib/shared/utils/toast.utils";
 
 export const ToastConnector = () => {
   const [toasters, setToasters] = useState<IToast[]>([]);

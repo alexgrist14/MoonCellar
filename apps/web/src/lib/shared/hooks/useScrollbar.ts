@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { useCommonStore } from "../store/common.store";
+import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { useDebouncedCallback } from "use-debounce";
 import { useWindowResizeAction } from "./useWindowResizeAction";
 

@@ -2,7 +2,7 @@
 
 import classNames from "classnames";
 import { useEffect, useState } from "react";
-import { useNavigationPending } from "../../hooks";
+import { useNavigationPending } from "@/src/lib/shared/hooks";
 import styles from "./NavigationProgress.module.scss";
 
 const RESET_DELAY = 500;

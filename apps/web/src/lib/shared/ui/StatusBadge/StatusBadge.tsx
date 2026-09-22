@@ -1,6 +1,6 @@
 import { FC, ReactNode } from "react";
 import classNames from "classnames";
-import { commonUtils } from "../../utils/common.utils";
+import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import styles from "./StatusBadge.module.scss";
 
 interface IStatusBadgeProps {
