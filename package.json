@@ -26,6 +26,7 @@
     "dev:web": "bun --filter web dev",
     "build": "bun --filter '*' build",
     "lint": "bun --filter '*' lint",
+    "mongo": "ssh -L 27017:localhost:27017 root@31.57.201.233",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky",

@@ -159,6 +159,7 @@ Two things that are easy to get wrong here:
 | `bun run dev:web` | `web dev` only — Next.js on :3000 |
 | `bun run build` | `build` in every workspace — the Next.js build, and a type check plus preview boot for the API |
 | `bun run lint` | `lint` in every workspace |
+| `bun run mongo` | Opens an SSH tunnel to the production MongoDB on `localhost:27017` — see *Reaching a production service* |
 | `bun run format:check` | Prettier over the whole repo |
 | `bun --filter web <script>` | Runs a script in one workspace |
 | `bun add <pkg> --filter web` | Adds a dependency to one workspace, never to the root |
@@ -487,6 +488,37 @@ docker compose -f infra/docker-compose.yml --profile monitoring up -d
 docker compose -f infra/docker-compose.yml down
 docker compose -f infra/docker-compose.yml logs -f mongodb
 ```
+
+### Reaching a production service
+
+Nothing on the production host is published to the internet except the two app ports, which sit
+behind nginx. MongoDB and Grafana are bound to `127.0.0.1` on the server, so they are reachable
+only from the server itself — or through an SSH tunnel, which is what forwards a local port to
+one on the far end:
+
+```bash
+ssh -L <local port>:localhost:<remote port> <user>@<host>
+```
+
+The connection stays open for as long as the SSH session does; use the tunnel from a second
+terminal, and close the session to take it down. MongoDB has a shortcut:
+
+```bash
+bun run mongo    # ssh -L 27017:localhost:27017 root@31.57.201.233
+mongosh "mongodb://<user>:<password>@localhost:27017/games?authSource=admin"
+```
+
+Grafana is the same mechanism on another port — `ssh -L 3000:localhost:3000 root@<host>`, then
+http://localhost:3000. So is anything else that binds to loopback there: Prometheus, Loki, a
+container you published by hand while debugging.
+
+**The local port has to be free.** The development stack publishes 27017 and 3100 itself, and
+`ssh` fails with `bind: Address already in use` while still opening the shell, so the tunnel
+looks up and is not. Stop the local service, or forward to a different port
+(`-L 27018:localhost:27017`) and connect to that one.
+
+This is also the only way in for a GUI client: point Compass or a Grafana browser tab at
+`localhost`, never at the server's public address — there is nothing listening on it.
 
 ### Container images
 
