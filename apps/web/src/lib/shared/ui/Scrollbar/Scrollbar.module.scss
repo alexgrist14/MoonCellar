@@ -169,7 +169,8 @@
       var(--color-bg-primary) 100%
     );
     pointer-events: none;
-    transition: 0.4s;
+    opacity: 0;
+    transition: opacity var(--duration-base) var(--easing-out);
 
     // &_radius {
     //   border-radius: 0 0 var(--radius-x4) var(--radius-x4);

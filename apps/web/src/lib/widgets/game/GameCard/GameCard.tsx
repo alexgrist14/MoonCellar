@@ -1,4 +1,4 @@
-import { CSSProperties, memo, useMemo, useRef, useState } from "react";
+import { CSSProperties, FC, memo, useMemo, useRef, useState } from "react";
 import styles from "./GameCard.module.scss";
 import classNames from "classnames";
 import Image from "next/image";
@@ -10,7 +10,21 @@ import { Tooltip } from "@/src/lib/shared/ui/Tooltip";
 import { IGameResponse } from "@mooncellar/schemas";
 import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
 import { Button } from "@/src/lib/shared/ui/Button";
-import { SvgAchievement, SvgClose, SvgMore, SvgStar } from "@/src/lib/shared/ui/svg";
+import {
+  SvgAchievement,
+  SvgBookmark,
+  SvgCheck,
+  SvgClock,
+  SvgClose,
+  SvgFlag,
+  SvgMore,
+  SvgPlayTriangle,
+  SvgStar,
+  SvgTrophy,
+} from "@/src/lib/shared/ui/svg";
+import { ISvgBaseProps } from "@/src/lib/shared/ui/svg/Svg/Svg";
+import { CategoriesType } from "@/src/lib/shared/types/user.type";
+import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import Link from "next/link";
 import { SvgCrown } from "@/src/lib/shared/ui/svg/SvgCrown";
 import { useHideAdult } from "@/src/lib/shared/hooks/useHideAdult";
@@ -18,6 +32,10 @@ import { isAdultGame } from "@/src/lib/shared/utils/adult.utils";
 import { GameControls } from "@/src/lib/widgets/game/GameControls";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { AchievementsModal } from "@/src/lib/shared/ui/AchievementsModal";
+import {
+  PLAYTHROUGH_MODAL_ID,
+  PlaythroughModal,
+} from "@/src/lib/features/game/ui/PlaythroughModal";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { playthroughPriorityOrder } from "@/src/lib/shared/constants/user.const";
 import { getAverageRating } from "@/src/lib/shared/utils/rating.utils";
@@ -25,6 +43,16 @@ import { GameRatingPopover } from "@/src/lib/features/game/ui/GameRatingPopover"
 import { useRoyalGames } from "@/src/lib/entities/royal/model/useRoyalGames";
 import { Checkbox } from "@/src/lib/shared/ui/Checkbox";
 import { EXPAND_KEEP_OPEN_ATTRIBUTE } from "@/src/lib/shared/ui/ExpandMenu";
+
+const STATUS_ICONS: Record<CategoriesType, FC<ISvgBaseProps>> = {
+  wishlist: SvgBookmark,
+  backlog: SvgClock,
+  playing: SvgPlayTriangle,
+  played: SvgCheck,
+  completed: SvgFlag,
+  mastered: SvgTrophy,
+  dropped: SvgClose,
+};
 
 interface IGameCardProps {
   game: IGameResponse;
@@ -99,6 +127,11 @@ export const GameCard = memo(
 
     const rating = parsedRatings?.[game._id];
 
+    const status: CategoriesType | undefined = lastPlaythrough?.isMastered
+      ? "mastered"
+      : lastPlaythrough?.category;
+    const StatusIcon = status && STATUS_ICONS[status];
+
     const isRoyal = useMemo(
       () => royalGames?.includes(game?._id),
       [game, royalGames]
@@ -146,9 +179,7 @@ export const GameCard = memo(
           className={classNames(
             styles.card,
             className,
-            styles[
-              `card_${lastPlaythrough?.isMastered ? "mastered" : lastPlaythrough?.category}`
-            ],
+            styles[`card_${status}`],
             isInfoDisabled && styles.card_stacked,
             isSelected && styles.card_selected
           )}
@@ -235,6 +266,30 @@ export const GameCard = memo(
                   {!!rating ? <p>{rating}</p> : <SvgStar size="16" />}
                 </div>
               </Tooltip>
+              {!!status && !!StatusIcon && (
+                <Tooltip content={`${commonUtils.upFL(status)} · Playthroughs`}>
+                  <div
+                    role="button"
+                    aria-label={`Status: ${status}. Open playthroughs`}
+                    data-prevent-progress
+                    className={classNames(
+                      styles.card__status,
+                      styles[`card__status_${status}`]
+                    )}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+
+                      modal.open(
+                        <PlaythroughModal game={game} userId={profile._id} />,
+                        { id: PLAYTHROUGH_MODAL_ID, isResizable: true }
+                      );
+                    }}
+                  >
+                    <StatusIcon size="16" style={{ color: "inherit" }} />
+                  </div>
+                </Tooltip>
+              )}
             </div>
           )}
           {(!!game.retroachievements?.length || !!combinedRating) && (
@@ -305,10 +360,7 @@ export const GameCard = memo(
                 tooltip={isActive ? "Close" : "Game info"}
                 className={classNames(
                   styles.card__more,
-                  isActive &&
-                    styles[
-                      `card__more_${lastPlaythrough?.isMastered ? "mastered" : lastPlaythrough?.category}`
-                    ]
+                  isActive && styles[`card__more_${status}`]
                 )}
                 data-prevent-progress
                 onClick={(e) => {

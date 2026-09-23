@@ -6,6 +6,7 @@ import { Input } from "@/src/lib/shared/ui/Input";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
 import { ButtonColor } from "@/src/lib/shared/ui/Button";
+import { SavedList } from "@/src/lib/shared/ui/SavedList";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import { SvgChevron } from "@/src/lib/shared/ui/svg";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
@@ -48,11 +49,13 @@ export const Filters: FC<{
   const { asPath } = useAdvancedRouter();
   const { profile, isAuth } = useAuthStore();
 
-  const [filters, setFilters] = useState<IGetGamesRequest>();
+  const [filters, setFilters] = useState<IGetGamesRequest | undefined>(() =>
+    parseQueryFilters(asPath)
+  );
   const [tab, setTab] = useState<"filters" | "saved">("filters");
 
   const { data: savedFilters } = useUserFiltersQuery(
-    isAuth ? profile?._id ?? "" : ""
+    isAuth ? (profile?._id ?? "") : ""
   );
   const { mutate: removeFilter } = useRemoveUserFilterMutation();
 
@@ -148,7 +151,9 @@ export const Filters: FC<{
     }));
   };
 
-  const renderModeToggle = (key: keyof NonNullable<IGetGamesRequest["mode"]>) => (
+  const renderModeToggle = (
+    key: keyof NonNullable<IGetGamesRequest["mode"]>
+  ) => (
     <ToggleSwitch
       isColorless
       isDisabled={isLoading}
@@ -201,7 +206,8 @@ export const Filters: FC<{
                   getIndex={(index) => {
                     const temp: IGetGamesRequest = {
                       ...filters,
-                      sortBy: index >= 0 ? sortOptions[index]?.value : undefined,
+                      sortBy:
+                        index >= 0 ? sortOptions[index]?.value : undefined,
                     };
 
                     setFilters(temp);
@@ -260,6 +266,7 @@ export const Filters: FC<{
                 overflowRootId="filters"
                 isDisabled={isLoading}
                 list={gameTypes || []}
+                isLoading={!gameTypes}
                 overwriteValue={getValue("types")}
                 initialMultiValue={getSelectedArray("types", gameTypes)}
                 initialExcludeValue={getExcludedArray("types", gameTypes)}
@@ -284,6 +291,7 @@ export const Filters: FC<{
                 overflowRootId="filters"
                 isDisabled={isLoading}
                 list={gameModes || []}
+                isLoading={!gameModes}
                 overwriteValue={getValue("modes")}
                 initialMultiValue={getSelectedArray("modes", gameModes)}
                 initialExcludeValue={getExcludedArray("modes", gameModes)}
@@ -296,287 +304,311 @@ export const Filters: FC<{
                 }
               />
             </div>
-          </div>
-          <div className={styles.filters__wrapper}>
-            <div className={styles.filters__header}>
-              <h4>Platforms</h4>
-              {renderModeToggle("platforms")}
-            </div>
-            <Dropdown
-              isWithReset
-              isMulti
-              isWithExclude
-              overflowRootId="filters"
-              isDisabled={isLoading || isPlatformsLoading}
-              list={systems?.map((item) => item.name) || []}
-              overwriteValue={getValue("platforms")}
-              initialMultiValue={getSelectedArray(
-                "platforms",
-                systems?.map((item) => item._id)
-              )}
-              initialExcludeValue={getExcludedArray(
-                "platforms",
-                systems?.map((item) => item._id)
-              )}
-              placeholder="Select platforms..."
-              getIndexes={(indexes) =>
-                setSelected(
+            <div className={styles.filters__wrapper}>
+              <div className={styles.filters__header}>
+                <h4>Platforms</h4>
+                {renderModeToggle("platforms")}
+              </div>
+              <Dropdown
+                isWithReset
+                isMulti
+                isWithExclude
+                overflowRootId="filters"
+                isDisabled={isLoading || isPlatformsLoading}
+                list={systems?.map((item) => item.name) || []}
+                isLoading={!systems}
+                overwriteValue={getValue("platforms")}
+                initialMultiValue={getSelectedArray(
                   "platforms",
-                  indexes,
                   systems?.map((item) => item._id)
-                )
-              }
-              getExcludeIndexes={(indexes) =>
-                setExcluded(
+                )}
+                initialExcludeValue={getExcludedArray(
                   "platforms",
-                  indexes,
                   systems?.map((item) => item._id)
-                )
-              }
-            />
-          </div>
-          <div className={styles.filters__wrapper}>
-            <div className={styles.filters__header}>
-              <h4>Genres</h4>
-              {renderModeToggle("genres")}
+                )}
+                placeholder="Select platforms..."
+                getIndexes={(indexes) =>
+                  setSelected(
+                    "platforms",
+                    indexes,
+                    systems?.map((item) => item._id)
+                  )
+                }
+                getExcludeIndexes={(indexes) =>
+                  setExcluded(
+                    "platforms",
+                    indexes,
+                    systems?.map((item) => item._id)
+                  )
+                }
+              />
             </div>
-            <Dropdown
-              isWithReset
-              isMulti
-              isWithExclude
-              overflowRootId="filters"
-              isDisabled={isLoading}
-              list={genres || []}
-              overwriteValue={getValue("genres")}
-              initialMultiValue={getSelectedArray("genres", genres)}
-              initialExcludeValue={getExcludedArray("genres", genres)}
-              placeholder="Select genres..."
-              getIndexes={(indexes) => setSelected("genres", indexes, genres)}
-              getExcludeIndexes={(indexes) =>
-                setExcluded("genres", indexes, genres)
-              }
-            />
-          </div>
-          <div className={styles.filters__wrapper}>
-            <div className={styles.filters__header}>
-              <h4>Themes</h4>
-              {renderModeToggle("themes")}
+            <div className={styles.filters__wrapper}>
+              <div className={styles.filters__header}>
+                <h4>Genres</h4>
+                {renderModeToggle("genres")}
+              </div>
+              <Dropdown
+                isWithReset
+                isMulti
+                isWithExclude
+                overflowRootId="filters"
+                isDisabled={isLoading}
+                list={genres || []}
+                isLoading={!genres}
+                overwriteValue={getValue("genres")}
+                initialMultiValue={getSelectedArray("genres", genres)}
+                initialExcludeValue={getExcludedArray("genres", genres)}
+                placeholder="Select genres..."
+                getIndexes={(indexes) => setSelected("genres", indexes, genres)}
+                getExcludeIndexes={(indexes) =>
+                  setExcluded("genres", indexes, genres)
+                }
+              />
             </div>
-            <Dropdown
-              isWithReset
-              isMulti
-              isWithExclude
-              overflowRootId="filters"
-              isDisabled={isLoading}
-              list={themes || []}
-              overwriteValue={getValue("themes")}
-              initialMultiValue={getSelectedArray("themes", themes)}
-              initialExcludeValue={getExcludedArray("themes", themes)}
-              placeholder="Select themes..."
-              getIndexes={(indexes) => setSelected("themes", indexes, themes)}
-              getExcludeIndexes={(indexes) =>
-                setExcluded("themes", indexes, themes)
-              }
-            />
-          </div>
-          <div className={styles.filters__wrapper}>
-            <div className={styles.filters__header}>
-              <h4>Keywords</h4>
-              {renderModeToggle("keywords")}
+            <div className={styles.filters__wrapper}>
+              <div className={styles.filters__header}>
+                <h4>Themes</h4>
+                {renderModeToggle("themes")}
+              </div>
+              <Dropdown
+                isWithReset
+                isMulti
+                isWithExclude
+                overflowRootId="filters"
+                isDisabled={isLoading}
+                list={themes || []}
+                isLoading={!themes}
+                overwriteValue={getValue("themes")}
+                initialMultiValue={getSelectedArray("themes", themes)}
+                initialExcludeValue={getExcludedArray("themes", themes)}
+                placeholder="Select themes..."
+                getIndexes={(indexes) => setSelected("themes", indexes, themes)}
+                getExcludeIndexes={(indexes) =>
+                  setExcluded("themes", indexes, themes)
+                }
+              />
             </div>
-            <Dropdown
-              isWithReset
-              isMulti
-              isWithExclude
-              overflowRootId="filters"
-              isDisabled={isLoading}
-              list={keywords || []}
-              overwriteValue={getValue("keywords")}
-              initialMultiValue={getSelectedArray("keywords", keywords)}
-              initialExcludeValue={getExcludedArray("keywords", keywords)}
-              placeholder="Select keywords..."
-              getIndexes={(indexes) =>
-                setSelected("keywords", indexes, keywords)
-              }
-              getExcludeIndexes={(indexes) =>
-                setExcluded("keywords", indexes, keywords)
-              }
-            />
-          </div>
-          <div className={styles.filters__wrapper}>
-            <div className={styles.filters__header}>
-              <h4>Franchises</h4>
-              {renderModeToggle("franchises")}
+            <div className={styles.filters__wrapper}>
+              <div className={styles.filters__header}>
+                <h4>Keywords</h4>
+                {renderModeToggle("keywords")}
+              </div>
+              <Dropdown
+                isWithReset
+                isMulti
+                isWithExclude
+                overflowRootId="filters"
+                isDisabled={isLoading}
+                list={keywords || []}
+                isLoading={!keywords}
+                overwriteValue={getValue("keywords")}
+                initialMultiValue={getSelectedArray("keywords", keywords)}
+                initialExcludeValue={getExcludedArray("keywords", keywords)}
+                placeholder="Select keywords..."
+                getIndexes={(indexes) =>
+                  setSelected("keywords", indexes, keywords)
+                }
+                getExcludeIndexes={(indexes) =>
+                  setExcluded("keywords", indexes, keywords)
+                }
+              />
             </div>
-            <Dropdown
-              isWithReset
-              isMulti
-              isWithExclude
-              overflowRootId="filters"
-              isDisabled={isLoading}
-              list={franchises || []}
-              overwriteValue={getValue("franchises")}
-              initialMultiValue={getSelectedArray("franchises", franchises)}
-              initialExcludeValue={getExcludedArray("franchises", franchises)}
-              placeholder="Select franchises..."
-              getIndexes={(indexes) =>
-                setSelected("franchises", indexes, franchises)
-              }
-              getExcludeIndexes={(indexes) =>
-                setExcluded("franchises", indexes, franchises)
-              }
-            />
-          </div>
-          <div className={styles.filters__wrapper}>
-            <div className={styles.filters__header}>
-              <h4>Companies</h4>
-              {renderModeToggle("companies")}
+            <div className={styles.filters__wrapper}>
+              <div className={styles.filters__header}>
+                <h4>Franchises</h4>
+                {renderModeToggle("franchises")}
+              </div>
+              <Dropdown
+                isWithReset
+                isMulti
+                isWithExclude
+                overflowRootId="filters"
+                isDisabled={isLoading}
+                list={franchises || []}
+                isLoading={!franchises}
+                overwriteValue={getValue("franchises")}
+                initialMultiValue={getSelectedArray("franchises", franchises)}
+                initialExcludeValue={getExcludedArray("franchises", franchises)}
+                placeholder="Select franchises..."
+                getIndexes={(indexes) =>
+                  setSelected("franchises", indexes, franchises)
+                }
+                getExcludeIndexes={(indexes) =>
+                  setExcluded("franchises", indexes, franchises)
+                }
+              />
             </div>
-            <Dropdown
-              isWithReset
-              isMulti
-              isWithExclude
-              overflowRootId="filters"
-              isDisabled={isLoading}
-              list={companies || []}
-              overwriteValue={getValue("companies")}
-              initialMultiValue={getSelectedArray("companies", companies)}
-              initialExcludeValue={getExcludedArray("companies", companies)}
-              placeholder="Select companies..."
-              getIndexes={(indexes) =>
-                setSelected("companies", indexes, companies)
-              }
-              getExcludeIndexes={(indexes) =>
-                setExcluded("companies", indexes, companies)
-              }
-            />
-          </div>
-          <div className={styles.filters__wrapper}>
-            <div className={styles.filters__header}>
-              <h4>Game Engines</h4>
-              {renderModeToggle("game_engines")}
+            <div className={styles.filters__wrapper}>
+              <div className={styles.filters__header}>
+                <h4>Companies</h4>
+                {renderModeToggle("companies")}
+              </div>
+              <Dropdown
+                isWithReset
+                isMulti
+                isWithExclude
+                overflowRootId="filters"
+                isDisabled={isLoading}
+                list={companies || []}
+                isLoading={!companies}
+                overwriteValue={getValue("companies")}
+                initialMultiValue={getSelectedArray("companies", companies)}
+                initialExcludeValue={getExcludedArray("companies", companies)}
+                placeholder="Select companies..."
+                getIndexes={(indexes) =>
+                  setSelected("companies", indexes, companies)
+                }
+                getExcludeIndexes={(indexes) =>
+                  setExcluded("companies", indexes, companies)
+                }
+              />
             </div>
-            <Dropdown
-              isWithReset
-              isMulti
-              isWithExclude
-              overflowRootId="filters"
-              isDisabled={isLoading}
-              list={gameEngines || []}
-              overwriteValue={getValue("game_engines")}
-              initialMultiValue={getSelectedArray("game_engines", gameEngines)}
-              initialExcludeValue={getExcludedArray(
-                "game_engines",
-                gameEngines
-              )}
-              placeholder="Select game engines..."
-              getIndexes={(indexes) =>
-                setSelected("game_engines", indexes, gameEngines)
-              }
-              getExcludeIndexes={(indexes) =>
-                setExcluded("game_engines", indexes, gameEngines)
-              }
-            />
-          </div>
-          <div className={styles.filters__wrapper}>
-            <div className={styles.filters__header}>
-              <h4>Player Perspectives</h4>
-              {renderModeToggle("player_perspectives")}
+            <div className={styles.filters__wrapper}>
+              <div className={styles.filters__header}>
+                <h4>Game Engines</h4>
+                {renderModeToggle("game_engines")}
+              </div>
+              <Dropdown
+                isWithReset
+                isMulti
+                isWithExclude
+                overflowRootId="filters"
+                isDisabled={isLoading}
+                list={gameEngines || []}
+                isLoading={!gameEngines}
+                overwriteValue={getValue("game_engines")}
+                initialMultiValue={getSelectedArray(
+                  "game_engines",
+                  gameEngines
+                )}
+                initialExcludeValue={getExcludedArray(
+                  "game_engines",
+                  gameEngines
+                )}
+                placeholder="Select game engines..."
+                getIndexes={(indexes) =>
+                  setSelected("game_engines", indexes, gameEngines)
+                }
+                getExcludeIndexes={(indexes) =>
+                  setExcluded("game_engines", indexes, gameEngines)
+                }
+              />
             </div>
-            <Dropdown
-              isWithReset
-              isMulti
-              isWithExclude
-              overflowRootId="filters"
-              isDisabled={isLoading}
-              list={playerPerspectives || []}
-              overwriteValue={getValue("player_perspectives")}
-              initialMultiValue={getSelectedArray(
-                "player_perspectives",
-                playerPerspectives
-              )}
-              initialExcludeValue={getExcludedArray(
-                "player_perspectives",
-                playerPerspectives
-              )}
-              placeholder="Select player perspectives..."
-              getIndexes={(indexes) =>
-                setSelected("player_perspectives", indexes, playerPerspectives)
-              }
-              getExcludeIndexes={(indexes) =>
-                setExcluded("player_perspectives", indexes, playerPerspectives)
-              }
-            />
-          </div>
-          <div className={styles.filters__wrapper}>
-            <div className={styles.filters__header}>
-              <h4>Languages</h4>
-              {renderModeToggle("languages")}
+            <div className={styles.filters__wrapper}>
+              <div className={styles.filters__header}>
+                <h4>Player Perspectives</h4>
+                {renderModeToggle("player_perspectives")}
+              </div>
+              <Dropdown
+                isWithReset
+                isMulti
+                isWithExclude
+                overflowRootId="filters"
+                isDisabled={isLoading}
+                list={playerPerspectives || []}
+                isLoading={!playerPerspectives}
+                overwriteValue={getValue("player_perspectives")}
+                initialMultiValue={getSelectedArray(
+                  "player_perspectives",
+                  playerPerspectives
+                )}
+                initialExcludeValue={getExcludedArray(
+                  "player_perspectives",
+                  playerPerspectives
+                )}
+                placeholder="Select player perspectives..."
+                getIndexes={(indexes) =>
+                  setSelected(
+                    "player_perspectives",
+                    indexes,
+                    playerPerspectives
+                  )
+                }
+                getExcludeIndexes={(indexes) =>
+                  setExcluded(
+                    "player_perspectives",
+                    indexes,
+                    playerPerspectives
+                  )
+                }
+              />
             </div>
-            <Dropdown
-              isWithReset
-              isMulti
-              isWithExclude
-              overflowRootId="filters"
-              isDisabled={isLoading}
-              list={languages || []}
-              overwriteValue={getValue("languages")}
-              initialMultiValue={getSelectedArray("languages", languages)}
-              initialExcludeValue={getExcludedArray("languages", languages)}
-              placeholder="Select languages..."
-              getIndexes={(indexes) =>
-                setSelected("languages", indexes, languages)
-              }
-              getExcludeIndexes={(indexes) =>
-                setExcluded("languages", indexes, languages)
-              }
-            />
-          </div>
-          <div className={styles.filters__wrapper}>
-            <div className={styles.filters__header}>
-              <h4>Status</h4>
-              {renderModeToggle("status")}
+            <div className={styles.filters__wrapper}>
+              <div className={styles.filters__header}>
+                <h4>Languages</h4>
+                {renderModeToggle("languages")}
+              </div>
+              <Dropdown
+                isWithReset
+                isMulti
+                isWithExclude
+                overflowRootId="filters"
+                isDisabled={isLoading}
+                list={languages || []}
+                isLoading={!languages}
+                overwriteValue={getValue("languages")}
+                initialMultiValue={getSelectedArray("languages", languages)}
+                initialExcludeValue={getExcludedArray("languages", languages)}
+                placeholder="Select languages..."
+                getIndexes={(indexes) =>
+                  setSelected("languages", indexes, languages)
+                }
+                getExcludeIndexes={(indexes) =>
+                  setExcluded("languages", indexes, languages)
+                }
+              />
             </div>
-            <Dropdown
-              isWithReset
-              isMulti
-              isWithExclude
-              overflowRootId="filters"
-              isDisabled={isLoading}
-              list={statuses || []}
-              overwriteValue={getValue("status")}
-              initialMultiValue={getSelectedArray("status", statuses)}
-              initialExcludeValue={getExcludedArray("status", statuses)}
-              placeholder="Select status..."
-              getIndexes={(indexes) => setSelected("status", indexes, statuses)}
-              getExcludeIndexes={(indexes) =>
-                setExcluded("status", indexes, statuses)
-              }
-            />
-          </div>
-          <div className={styles.filters__wrapper}>
-            <div className={styles.filters__header}>
-              <h4>Age Ratings</h4>
-              {renderModeToggle("ageRatings")}
+            <div className={styles.filters__wrapper}>
+              <div className={styles.filters__header}>
+                <h4>Status</h4>
+                {renderModeToggle("status")}
+              </div>
+              <Dropdown
+                isWithReset
+                isMulti
+                isWithExclude
+                overflowRootId="filters"
+                isDisabled={isLoading}
+                list={statuses || []}
+                isLoading={!statuses}
+                overwriteValue={getValue("status")}
+                initialMultiValue={getSelectedArray("status", statuses)}
+                initialExcludeValue={getExcludedArray("status", statuses)}
+                placeholder="Select status..."
+                getIndexes={(indexes) =>
+                  setSelected("status", indexes, statuses)
+                }
+                getExcludeIndexes={(indexes) =>
+                  setExcluded("status", indexes, statuses)
+                }
+              />
             </div>
-            <Dropdown
-              isWithReset
-              isMulti
-              isWithExclude
-              overflowRootId="filters"
-              isDisabled={isLoading}
-              list={ageRatings || []}
-              overwriteValue={getValue("ageRatings")}
-              initialMultiValue={getSelectedArray("ageRatings", ageRatings)}
-              initialExcludeValue={getExcludedArray("ageRatings", ageRatings)}
-              placeholder="Select age ratings..."
-              getIndexes={(indexes) =>
-                setSelected("ageRatings", indexes, ageRatings)
-              }
-              getExcludeIndexes={(indexes) =>
-                setExcluded("ageRatings", indexes, ageRatings)
-              }
-            />
+            <div className={styles.filters__wrapper}>
+              <div className={styles.filters__header}>
+                <h4>Age Ratings</h4>
+                {renderModeToggle("ageRatings")}
+              </div>
+              <Dropdown
+                isWithReset
+                isMulti
+                isWithExclude
+                overflowRootId="filters"
+                isDisabled={isLoading}
+                list={ageRatings || []}
+                isLoading={!ageRatings}
+                overwriteValue={getValue("ageRatings")}
+                initialMultiValue={getSelectedArray("ageRatings", ageRatings)}
+                initialExcludeValue={getExcludedArray("ageRatings", ageRatings)}
+                placeholder="Select age ratings..."
+                getIndexes={(indexes) =>
+                  setSelected("ageRatings", indexes, ageRatings)
+                }
+                getExcludeIndexes={(indexes) =>
+                  setExcluded("ageRatings", indexes, ageRatings)
+                }
+              />
+            </div>
           </div>
           <div className={styles.filters__wrapper}>
             <h4>Years</h4>
@@ -739,48 +771,28 @@ export const Filters: FC<{
       {tab === "saved" && (
         <div>
           {!!savedFilters && !isSavedFiltersLoaderShown ? (
-            <div className={styles.filters__saved}>
+            <div>
               {!!savedFilters?.length ? (
-                savedFilters.map((filter, i) => (
-                  <ButtonGroup
-                    key={i}
-                    wrapperStyle={{
-                      padding: "0",
-                      display: "grid",
-                      gridTemplateColumns: "1fr 20%",
-                      width: "100%",
-                    }}
-                    buttons={[
-                      {
-                        title: filter.name,
-                        color: ButtonColor.FANCY,
-                        style: { justifyContent: "flex-start" },
-                        compact: true,
-                        onClick: () => {
-                          setFilters(parseQueryFilters(`?${filter.filter}`));
-                          setTab("filters");
-                        },
-                      },
-                      {
-                        title: "Remove",
-                        compact: true,
-                        onClick: () =>
-                          !!profile &&
-                          removeFilter(
-                            { userId: profile._id, name: filter.name },
-                            {
-                              onSuccess: () =>
-                                toast.success({
-                                  description:
-                                    "Filter was successfully removed!",
-                                }),
-                            }
-                          ),
-                        color: ButtonColor.RED,
-                      },
-                    ]}
-                  />
-                ))
+                <SavedList
+                  items={savedFilters.map((filter) => ({
+                    name: filter.name,
+                    onApply: () => {
+                      setFilters(parseQueryFilters(`?${filter.filter}`));
+                      setTab("filters");
+                    },
+                    onRemove: () =>
+                      !!profile &&
+                      removeFilter(
+                        { userId: profile._id, name: filter.name },
+                        {
+                          onSuccess: () =>
+                            toast.success({
+                              description: "Filter was successfully removed!",
+                            }),
+                        }
+                      ),
+                  }))}
+                />
               ) : (
                 <p style={{ textAlign: "center" }}>List is empty</p>
               )}

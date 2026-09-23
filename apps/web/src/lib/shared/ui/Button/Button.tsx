@@ -1,4 +1,4 @@
-import { memo, ReactNode, ComponentPropsWithRef } from "react";
+import { memo, ReactNode, ComponentPropsWithRef, isValidElement } from "react";
 import cl from "classnames";
 import styles from "./Button.module.scss";
 import { Tooltip } from "../Tooltip";
@@ -50,6 +50,9 @@ export const Button = memo(
     ref,
     ...props
   }: IButtonProps) => {
+    const isIconOnly =
+      isValidElement(children) && typeof children.type !== "string";
+
     const button = (
       <button
         {...props}
@@ -66,6 +69,7 @@ export const Button = memo(
             [styles.button_active]: active,
             [styles[`button_${color}Color_active`]]: active,
             [styles.button_compact]: compact,
+            [styles.button_icon]: isIconOnly,
             [styles.button_hidden]: hidden,
           }
         )}

@@ -34,7 +34,10 @@ import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
 import { GamesCards } from "@/src/lib/widgets/game/GamesCards";
-import { getListHref } from "@/src/lib/shared/ui/ListCard";
+import {
+  getListHref,
+  getProfileHref,
+} from "@/src/lib/shared/utils/links.utils";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import {
@@ -299,7 +302,7 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
             items={[
               { name: "Home", href: "/" },
               { name: user.userName, href: `/user/${user.userName}` },
-              { name: "Lists", href: `/user/${user.userName}?list=lists` },
+              { name: "Lists", href: getProfileHref(user.userName, "lists") },
               { name: list.name, href: getListHref(list) },
             ]}
           />

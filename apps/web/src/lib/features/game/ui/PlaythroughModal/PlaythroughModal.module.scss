@@ -7,15 +7,16 @@
   display: flex;
   flex-direction: column;
   width: var(--playthrough-modal-width);
-  height: var(--playthrough-modal-height);
   align-items: center;
   gap: var(--gap-x5);
-  min-height: 320px;
+  min-height: max(320px, var(--playthrough-modal-height));
   min-width: 300px;
+  flex-shrink: 0;
 
   @include mediaMin($screenMd) {
     width: var(--resize-width, var(--playthrough-modal-width-lg));
     height: var(--resize-height, var(--playthrough-modal-height-lg));
+    min-height: 320px;
   }
 
   &_compact {

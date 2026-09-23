@@ -244,24 +244,6 @@
     justify-content: space-between;
     gap: var(--gap-x2);
   }
-
-  &__all {
-    color: var(--color-accent);
-  }
-
-  &__items {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--gap-x1) var(--gap-x4);
-
-    @include mediaLg {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    @include mediaSm {
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
 }
 
 .hint {

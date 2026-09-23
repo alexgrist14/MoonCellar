@@ -60,6 +60,18 @@
     }
   }
 
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x2);
+  }
+
+  &__close {
+    flex-shrink: 0;
+    padding: var(--padding-x1);
+    border-radius: var(--radius-x3);
+  }
+
   &__head {
     &_action {
       display: flex;
@@ -125,7 +137,9 @@
   }
 
   div &__scrollbar {
-    right: -8px;
+    right: 8px;
+    height: calc(100% - 60px);
+    margin-block: 20px;
   }
 
   div &__line {

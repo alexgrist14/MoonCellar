@@ -13,8 +13,6 @@ import styles from "./Drawer.module.scss";
 import { IDrawerParams, IDrawerState } from "./Drawer.types";
 import { DRAWER_TRIGGER_ATTRIBUTE, drawerEvents } from "./drawer.api";
 import { Box } from "../Box";
-import { Button, ButtonColor } from "../Button";
-import { SvgClose } from "../svg";
 import { useExpandStore } from "@/src/lib/shared/store/expand.store";
 
 const IGNORED_CLICK_TARGETS = [
@@ -155,17 +153,8 @@ export const DrawerConnector = () => {
         isTitleStart
         isWithBlur
         isWithScrollBar
-        titleAction={
-          <Button
-            ref={closeButtonRef}
-            color={ButtonColor.TRANSPARENT}
-            className={styles.drawer__close}
-            tooltip="Close"
-            onClick={closeDrawer}
-          >
-            <SvgClose size="16" />
-          </Button>
-        }
+        onClose={closeDrawer}
+        closeButtonRef={closeButtonRef}
         className={styles.drawer__box}
         wrapperStyle={{ height: "100%" }}
         templateStyle={{ height: "100%" }}

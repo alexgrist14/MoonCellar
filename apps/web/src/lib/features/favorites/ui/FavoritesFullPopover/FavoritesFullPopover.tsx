@@ -47,7 +47,7 @@ export const FavoritesFullPopover: FC<IFavoritesFullPopoverProps> = ({
       {
         onSuccess: () => {
           toast.success({
-            title: "Replaced in your top 5",
+            title: "Replaced in your top 10",
             description: selectedGame
               ? `${game.name} took ${selectedGame.name}'s place`
               : game.name,
@@ -63,7 +63,7 @@ export const FavoritesFullPopover: FC<IFavoritesFullPopoverProps> = ({
       anchorRef={anchorRef}
       isOpen
       onClose={onClose}
-      title="Your top 5 is full"
+      title="Your top 10 is full"
       contentStyle={{ padding: "var(--padding-x3)" }}
     >
       <div className={styles.full} onClick={(event) => event.stopPropagation()}>
@@ -111,7 +111,7 @@ export const FavoritesFullPopover: FC<IFavoritesFullPopoverProps> = ({
         </div>
         <p className={styles.full__hint}>
           {selectedGame
-            ? `${selectedGame.name} leaves the top 5; ${game.name} takes place ${(selected ?? 0) + 1}.`
+            ? `${selectedGame.name} leaves the top 10; ${game.name} takes place ${(selected ?? 0) + 1}.`
             : "Nothing changes until you replace one."}
         </p>
         <div className={styles.full__actions}>

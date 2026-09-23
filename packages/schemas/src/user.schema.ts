@@ -4,7 +4,7 @@ import { RoleSchema } from "./role.schema";
 import { ObjectIdSchema } from "./utils";
 
 export const DEFAULT_BG_OPACITY = 0.85;
-export const FAVORITES_MAX = 5;
+export const FAVORITES_MAX = 10;
 export const USERS_SEARCH_PAGE_SIZE = 10;
 
 export const UserSettingsSchema = z.object({

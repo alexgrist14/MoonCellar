@@ -1,7 +1,9 @@
-import { DragEvent, FC, useState } from "react";
+import { FC, useState } from "react";
 import Image from "next/image";
 import classNames from "classnames";
 import { FAVORITES_MAX, IGameResponse } from "@mooncellar/schemas";
+import { useDragSort } from "@/src/lib/shared/hooks";
+import { moveItem } from "@/src/lib/shared/utils/common.utils";
 import { useUpdateFavoritesMutation } from "@/src/lib/entities/user/api/favorites.mutations";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Cover } from "@/src/lib/shared/ui/Cover";
@@ -18,9 +20,9 @@ import {
   SvgPlay,
 } from "@/src/lib/shared/ui/svg";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
-import styles from "./TopFive.module.scss";
+import styles from "./TopTen.module.scss";
 
-interface ITopFiveProps {
+interface ITopTenProps {
   userId: string;
   games: IGameResponse[];
   isOwner: boolean;
@@ -66,20 +68,12 @@ const GameCover: FC<{ game: IGameResponse; sizes: string }> = ({
     <Cover isWithoutText className={styles.image} />
   );
 
-const move = <T,>(items: T[], from: number, to: number) => {
-  if (to < 0 || to >= items.length || from === to) return items;
-
-  const next = [...items];
-  const [item] = next.splice(from, 1);
-
-  next.splice(to, 0, item);
-
-  return next;
-};
-
-export const TopFive: FC<ITopFiveProps> = ({ userId, games, isOwner }) => {
+export const TopTen: FC<ITopTenProps> = ({ userId, games, isOwner }) => {
   const [draft, setDraft] = useState<IGameResponse[] | null>(null);
-  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const { dragIndex, overIndex, getItemProps } = useDragSort(
+    draft ?? [],
+    setDraft
+  );
   const { mutate: updateFavorites, isPending } = useUpdateFavoritesMutation();
 
   const isEditing = !!draft;
@@ -100,20 +94,11 @@ export const TopFive: FC<ITopFiveProps> = ({ userId, games, isOwner }) => {
     );
   };
 
-  const handleDrop = (event: DragEvent<HTMLLIElement>, index: number) => {
-    event.preventDefault();
-
-    if (dragIndex === null || !draft) return;
-
-    setDraft(move(draft, dragIndex, index));
-    setDragIndex(null);
-  };
-
   return (
-    <section className={styles.top} aria-labelledby="profile-top-five">
+    <section className={styles.top} aria-labelledby="profile-top-ten">
       <div className={styles.head}>
         <SectionTitle as="h3">
-          <span id="profile-top-five">Top 5</span>
+          <span id="profile-top-ten">Top 10</span>
           {isEditing && (
             <span className={styles.count}>
               {draft.length} / {FAVORITES_MAX}
@@ -140,7 +125,7 @@ export const TopFive: FC<ITopFiveProps> = ({ userId, games, isOwner }) => {
             style={{ color: "var(--favorite-color)" }}
           />
           <p className={styles.hint__text}>
-            Pick up to five favourite games — press the heart on any game card
+            Pick up to ten favourite games — press the heart on any game card
             or game page.
           </p>
           <span className={styles.bar} aria-hidden="true">
@@ -185,26 +170,23 @@ export const TopFive: FC<ITopFiveProps> = ({ userId, games, isOwner }) => {
                 key={game._id}
                 className={classNames(styles.slot, {
                   [styles.slot_dragging]: dragIndex === index,
+                  [styles.slot_over]: overIndex === index,
                 })}
-                draggable
-                onDragStart={() => setDragIndex(index)}
-                onDragEnd={() => setDragIndex(null)}
-                onDragOver={(event) => event.preventDefault()}
-                onDrop={(event) => handleDrop(event, index)}
+                {...getItemProps(index)}
               >
-                <span className={styles.cover}>
+                <div className={styles.cover}>
                   <GameCover game={game} sizes="160px" />
                   <span className={styles.grip} aria-hidden="true">
                     <SvgGrip size="12" style={{ color: "inherit" }} />
                   </span>
-                </span>
-                <span className={styles.slot__bar}>
+                </div>
+                <div className={styles.slot__bar}>
                   <button
                     type="button"
                     className={classNames(styles.icon, styles.icon_flip)}
                     aria-label={`Move ${game.name} left`}
                     disabled={index === 0}
-                    onClick={() => setDraft(move(draft, index, index - 1))}
+                    onClick={() => setDraft(moveItem(draft, index, index - 1))}
                   >
                     <SvgArrow style={ARROW_ICON_STYLE} />
                   </button>
@@ -223,11 +205,11 @@ export const TopFive: FC<ITopFiveProps> = ({ userId, games, isOwner }) => {
                     className={styles.icon}
                     aria-label={`Move ${game.name} right`}
                     disabled={index === draft.length - 1}
-                    onClick={() => setDraft(move(draft, index, index + 1))}
+                    onClick={() => setDraft(moveItem(draft, index, index + 1))}
                   >
                     <SvgArrow style={ARROW_ICON_STYLE} />
                   </button>
-                </span>
+                </div>
                 <span className={styles.name} title={game.name}>
                   {game.name}
                 </span>
@@ -238,9 +220,9 @@ export const TopFive: FC<ITopFiveProps> = ({ userId, games, isOwner }) => {
                 key={`empty-${i}`}
                 className={classNames(styles.slot, styles.slot_empty)}
               >
-                <span className={styles.cover}>
+                <div className={styles.cover}>
                   <span className={styles.empty}>Empty slot</span>
-                </span>
+                </div>
               </li>
             ))}
           </ol>

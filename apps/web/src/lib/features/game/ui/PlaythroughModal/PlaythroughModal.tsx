@@ -28,6 +28,7 @@ import {
 import { Errors } from "@/src/lib/shared/ui/Errors";
 import { IButtonGroupItem } from "@/src/lib/shared/types/buttons.type";
 import { SvgPlus } from "@/src/lib/shared/ui/svg";
+import { modal } from "@/src/lib/shared/ui/Modal";
 import classNames from "classnames";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
@@ -45,6 +46,8 @@ interface IPlaythroughModalProps {
   isReview?: boolean;
 }
 
+export const PLAYTHROUGH_MODAL_ID = "game-playthroughs";
+
 const playthroughCategories: IPlaythroughMinimal["category"][] = [
   "wishlist",
   "playing",
@@ -56,11 +59,19 @@ const playthroughCategories: IPlaythroughMinimal["category"][] = [
 
 const categoriesWithDate: IPlaythroughMinimal["category"][] = ["completed"];
 
+const categoriesWithoutComment: IPlaythroughMinimal["category"][] = [
+  "wishlist",
+  "playing",
+];
+
 const MODAL_APPEARANCE_DURATION = 300;
 
 const getReviewablePlaythrough = <T extends IPlaythroughMinimal>(
   playthroughs: T[]
-) => [...playthroughs].reverse().find((play) => play.category !== "wishlist");
+) =>
+  [...playthroughs]
+    .reverse()
+    .find((play) => !categoriesWithoutComment.includes(play.category));
 
 export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
   game,
@@ -235,10 +246,14 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
     ? getReviewablePlaythrough(listedPlaythroughs)
     : listedPlaythroughs.at(-1);
   const category = watch("category") ?? expectedPlaythrough?.category;
-  const isWithoutComment = !category || category === "wishlist";
+  const isWithoutComment =
+    !category || categoriesWithoutComment.includes(category);
 
   return (
     <Box
+      title="Playthroughs"
+      isTitleStart
+      onClose={() => modal.close(PLAYTHROUGH_MODAL_ID)}
       isWithScrollBar
       contentStyle={{ padding: "var(--padding-x5)" }}
       classNameContent={styles.wrapper}

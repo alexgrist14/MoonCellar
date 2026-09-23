@@ -2,7 +2,6 @@ import { FC } from "react";
 import styles from "./GameButtons.module.scss";
 import { ButtonGroup } from "../Button/ButtonGroup";
 import { IGameResponse } from "@mooncellar/schemas";
-import { Box } from "../Box";
 
 export const GameButtons: FC<{ game: IGameResponse }> = ({ game }) => {
   const commonOptions = {
@@ -15,7 +14,7 @@ export const GameButtons: FC<{ game: IGameResponse }> = ({ game }) => {
   );
 
   return (
-    <Box className={styles.menu}>
+    <div className={styles.menu} onClick={(event) => event.stopPropagation()}>
       <ButtonGroup
         wrapperClassName={styles.actions}
         buttons={[
@@ -59,6 +58,6 @@ export const GameButtons: FC<{ game: IGameResponse }> = ({ game }) => {
           },
         ]}
       />
-    </Box>
+    </div>
   );
 };

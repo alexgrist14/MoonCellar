@@ -20,10 +20,14 @@ import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
 import { ListCard } from "@/src/lib/shared/ui/ListCard";
+import { ListCardsGrid } from "@/src/lib/shared/ui/ListCardsGrid";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
-import { AppliedFilters, IAppliedFilter } from "@/src/lib/shared/ui/AppliedFilters";
+import {
+  AppliedFilters,
+  IAppliedFilter,
+} from "@/src/lib/shared/ui/AppliedFilters";
 import {
   getListsGameIds,
   hasListsFilters,
@@ -187,13 +191,11 @@ export const ListsPage: FC<IListsPageProps> = ({
             }
           />
         ) : (
-          <div className={styles.page__grid}>
-            <div className={styles.grid}>
-              {lists.map((list) => (
-                <ListCard key={list._id} list={list} query={params.search} />
-              ))}
-            </div>
-          </div>
+          <ListCardsGrid>
+            {lists.map((list) => (
+              <ListCard key={list._id} list={list} query={params.search} />
+            ))}
+          </ListCardsGrid>
         )}
       </Box>
     </>

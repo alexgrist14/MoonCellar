@@ -6,8 +6,7 @@ import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { GamesList } from "@/src/lib/widgets/game/GamesList";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
-import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
-import { ButtonColor } from "@/src/lib/shared/ui/Button";
+import { SavedList } from "@/src/lib/shared/ui/SavedList";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useRoyalGames } from "@/src/lib/entities/royal/model/useRoyalGames";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
@@ -63,9 +62,7 @@ export const RoyalGamesPanel: FC = () => {
         ) : (
           <GamesList
             games={royalGamesData || []}
-            getGames={(games) =>
-              setRoyalGames(games.map((game) => game._id))
-            }
+            getGames={(games) => setRoyalGames(games.map((game) => game._id))}
             removeGame={(game) => removeRoyalGame(game._id)}
             saveCallback={
               isAuth
@@ -105,45 +102,23 @@ export const RoyalGamesPanel: FC = () => {
           {!!savedPresets && !isPresetsLoaderShown ? (
             <div className={styles.royal__saved}>
               {!!savedPresets?.length ? (
-                savedPresets.map((preset, i) => (
-                  <ButtonGroup
-                    key={i}
-                    wrapperStyle={{
-                      padding: "0",
-                      display: "grid",
-                      gridTemplateColumns: "1fr 20%",
-                      width: "100%",
-                    }}
-                    buttons={[
-                      {
-                        title: preset.name,
-                        color: ButtonColor.FANCY,
-                        style: { textAlign: "start" },
-                        compact: true,
-                        onClick: () => {
-                          setRoyalGames(preset.preset);
-                        },
-                      },
-                      {
-                        title: "Remove",
-                        compact: true,
-                        onClick: () =>
-                          !!profile &&
-                          removePreset(
-                            { userId: profile._id, name: preset.name },
-                            {
-                              onSuccess: () =>
-                                toast.success({
-                                  description:
-                                    "Preset was successfully removed",
-                                }),
-                            }
-                          ),
-                        color: ButtonColor.RED,
-                      },
-                    ]}
-                  />
-                ))
+                <SavedList
+                  items={savedPresets.map((preset) => ({
+                    name: preset.name,
+                    onApply: () => setRoyalGames(preset.preset),
+                    onRemove: () =>
+                      !!profile &&
+                      removePreset(
+                        { userId: profile._id, name: preset.name },
+                        {
+                          onSuccess: () =>
+                            toast.success({
+                              description: "Preset was successfully removed",
+                            }),
+                        }
+                      ),
+                  }))}
+                />
               ) : (
                 <p style={{ textAlign: "center" }}>List is empty</p>
               )}

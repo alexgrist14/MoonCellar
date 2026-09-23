@@ -68,10 +68,13 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
 - If a new value is needed that isn't covered by an existing `:root` variable, add it as a new CSS variable in `:root` (in the relevant file under `src/lib/app/styles/vars/`) instead of hardcoding it inline.
 - **A CSS custom property that derives from other custom properties must be declared on the same element whose values it reads.** `var()` inside a custom property is substituted where the property is *declared*, not where it is used, so a value computed in `:root` freezes the root defaults and ignores any modifier class further down. `--page-height-available` is declared on `.container` for this reason — declaring it in `:root` silently ignored `.container_bottomBar`.
 - **A button's inline padding is always twice its block padding** — the shared `Button` uses
-  `var(--padding-x1) var(--padding-x2)`, and any override keeps the 1:2 ratio on the same scale
-  (`x2`/`x4`, `x05`/`x1`). The only exception is a button that holds a single icon and nothing
-  else, which keeps equal padding. This is the site's button shape; a text button with a 1:3 ratio
-  reads as a different control next to its neighbours.
+  `var(--padding-x2) var(--padding-x4)` and `compact` uses `x05`/`x1`, and any override keeps
+  the 1:2 ratio on the same scale. The only exception is a button that holds a single icon and
+  nothing else, which keeps equal padding: `Button` detects that itself (one child that is a
+  component element, e.g. `<SvgClose />`) and adds `button_icon`, so do not pass a padding
+  override for it. Native `<button>`s styled in a module follow the same rule. This is the
+  site's button shape; a text button with a 1:3 ratio reads as a different control next to its
+  neighbours.
 - For text colour use the semantic tokens, never a raw `--color-neutral-*`: `--color-text-primary` (headings and main copy), `--color-text-secondary` (body text, intro paragraphs), `--color-text-muted` (captions, notes, metadata, breadcrumbs). Picking neutrals by hand is how text ends up unreadable on a `Box` over `BGImage` — the muted step is deliberately the lightest one that still reads as secondary.
 
 ## Rich text
@@ -126,6 +129,12 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   does nothing and the panel overflows the screen. Give the cell `align-self: stretch` plus
   `min-height: 0`, and pass `wrapperStyle`/`templateStyle` with `minHeight: 0; maxHeight: 100%`
   so the constraint reaches the scrollable content.
+- **A child of a scrolling `Box` that sets its own `min-height` needs `flex-shrink: 0`.**
+  With `isWithScrollBar` the content is a flex column capped at `max-height: 90vh`. An explicit
+  `min-height` replaces the flex item's automatic content-based minimum, so the child shrinks to
+  the cap and its content spills past its box — scrolled to the end, the last row (the playthrough
+  modal's Save/Delete) sits on the container's bottom padding instead of above it. The same
+  happens with a fixed `height` the content can outgrow.
 - **Clamping `Box`'s height is not the same as clamping its content.** `.template` is a column
   flex container; its child is the resize-observer wrapper (`.template__resizer`), which carries
   `min-height: 0` so it can shrink below its content, and `Scrollbar`'s container gets
@@ -254,6 +263,12 @@ Importing one directly into a route under `src/app/` makes Next treat it as a se
 and it fails at runtime (`useRef is not a function`). Wrap it in a small `"use client"`
 component instead of adding the directive to the shared primitive.
 
+**Plain helpers never live in a component module.** A route under `src/app/` that imports
+only a function from a component file still pulls in the whole module, so the day that
+component gains a hook every page fails with "You're importing a module that depends on
+`useState` into a React Server Component module". `getListHref` sat in `ListCard.tsx` and
+broke every route when the card got a loading state; helpers go in `shared/utils`.
+
 Functions cannot be passed from a server component to a client one. Pass the data a client
 component needs to build the value itself (a `basePath` string, not a `getHref` callback).
 
@@ -264,6 +279,10 @@ component needs to build the value itself (a `basePath` string, not a `getHref` 
   `@keyframes` names per file, so every shared keyframe is emitted once per module in the built
   CSS. Keep keyframes used by one component in that component's own `.module.scss`; move them to
   `_animations.scss` only when a second component needs them.
+- **`Loader`'s `text-align: start` is load-bearing.** `react-spinners`' `PacmanLoader` places
+  its two body halves with `position: absolute` and no `left`, so they sit at their inline static
+  position; an inherited `text-align: center` (the search modal's empty state has one) pushes the
+  body right while the dots keep their explicit `left`, and the dots fly past the mouth.
 - **An exit animation whose end unmounts the node must never be switched off with `animation:
   none`.** `useDelayedUnmount` drops the node on `animationend`; with no animation the event never
   fires and the block stays on screen forever. Inside the `reducedMotion` mixin set

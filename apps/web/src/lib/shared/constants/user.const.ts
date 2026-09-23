@@ -20,4 +20,28 @@ export const playthroughPriorityOrder: CategoriesType[] = [
   "mastered",
 ];
 
+export const profileTabs = [
+  "all",
+  ...userListCategories,
+  "lists",
+  "liked",
+  "reviews",
+  "settings",
+];
+
+export const profileTabLabels: Record<string, string> = {
+  all: "All",
+  playing: "Playing",
+  completed: "Completed",
+  mastered: "Mastered",
+  played: "Played",
+  wishlist: "Wishlist",
+  backlog: "Backlog",
+  dropped: "Dropped",
+  lists: "Lists",
+  liked: "Liked lists",
+  reviews: "Reviews",
+  settings: "Settings",
+};
+
 export const takeLogs = 20;

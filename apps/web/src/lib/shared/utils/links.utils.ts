@@ -1,4 +1,18 @@
-import { IGameResponse } from "@mooncellar/schemas";
+import { ICustomList, IGameResponse } from "@mooncellar/schemas";
+
+export const getProfileHref = (userName: string, tab?: string | null) =>
+  !tab || tab === "profile" ? `/user/${userName}` : `/user/${userName}/${tab}`;
+
+export const getProfileTab = (pathname: string, userName: string) => {
+  const prefix = `/user/${userName}/`;
+
+  return pathname.startsWith(prefix)
+    ? pathname.slice(prefix.length).split("/")[0] || null
+    : null;
+};
+
+export const getListHref = (list: Pick<ICustomList, "slug" | "author">) =>
+  `/user/${list.author?.userName ?? ""}/lists/${list.slug}`;
 
 export interface IGameLink {
   url: string;

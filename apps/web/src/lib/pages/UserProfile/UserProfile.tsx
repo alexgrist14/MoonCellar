@@ -1,10 +1,17 @@
 "use client";
 
-import { FC, useEffect, useMemo, useState } from "react";
-import { userListCategories } from "@/src/lib/shared/constants/user.const";
+import { FC, ReactNode, useEffect, useMemo, useState } from "react";
+import {
+  profileTabLabels,
+  userListCategories,
+} from "@/src/lib/shared/constants/user.const";
+import { getProfileHref } from "@/src/lib/shared/utils/links.utils";
 import { ReviewSortType, SortType } from "@/src/lib/shared/types/sort.type";
 import { IUser } from "@/src/lib/shared/types/auth.type";
-import { IFollowings } from "@/src/lib/shared/types/user.type";
+import {
+  CategoriesFilterType,
+  IFollowings,
+} from "@/src/lib/shared/types/user.type";
 import { Settings } from "@/src/lib/features/user/ui/Settings";
 import { UserGames } from "@/src/lib/widgets/user/UserGames";
 import { UserReviews } from "@/src/lib/widgets/user/UserReviews";
@@ -18,7 +25,7 @@ import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
 import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
 import { SvgBurger } from "@/src/lib/shared/ui/svg";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
-import { useSearchParams } from "next/navigation";
+import { useSelectedLayoutSegment } from "next/navigation";
 import { UserNavigation } from "@/src/lib/features/user/ui/UserNavigation";
 import {
   ICustomList,
@@ -41,6 +48,7 @@ interface UserProfileProps {
   favoriteGames: IGameResponse[];
   lists: ICustomList[];
   likedLists: ICustomList[];
+  children?: ReactNode;
 }
 
 export const UserProfile: FC<UserProfileProps> = ({
@@ -52,8 +60,9 @@ export const UserProfile: FC<UserProfileProps> = ({
   favoriteGames,
   lists,
   likedLists,
+  children,
 }) => {
-  const query = useSearchParams();
+  const segment = useSelectedLayoutSegment();
   const { isMobile } = useStatesStore();
 
   const authProfile = useAuthStore((s) => s.profile);
@@ -102,10 +111,7 @@ export const UserProfile: FC<UserProfileProps> = ({
   const effectivePlaythroughs =
     isAuthedUser && storePlaythroughs ? storePlaythroughs : playthroughs;
 
-  const tab = useMemo(
-    () => (!!query?.get("list") ? (query.get("list") as string) : "profile"),
-    [query]
-  );
+  const tab = segment ?? "profile";
 
   const isGamesTab = userListCategories.some((t) => t === tab) || tab === "all";
 
@@ -175,7 +181,11 @@ export const UserProfile: FC<UserProfileProps> = ({
                 { name: "Home", href: "/" },
                 {
                   name: displayUser.userName,
-                  href: `/user/${displayUser.userName}`,
+                  href: getProfileHref(displayUser.userName),
+                },
+                {
+                  name: profileTabLabels[tab] ?? tab,
+                  href: getProfileHref(displayUser.userName, tab),
                 },
               ]}
             />
@@ -219,12 +229,14 @@ export const UserProfile: FC<UserProfileProps> = ({
           )}
           {isGamesTab && (
             <UserGames
+              list={tab as CategoriesFilterType}
               playthroughs={effectivePlaythroughs}
               ratings={ratings}
               selectedSort={selectedSort}
               sortOrder={sortOrder}
             />
           )}
+          {children}
         </Box>
         <div className={styles.navigation}>
           <UserNavigation {...navigationProps} />

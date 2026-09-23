@@ -75,12 +75,4 @@
     }
   }
 
-  &__saved {
-    display: grid;
-    gap: var(--gap-x1);
-
-    & button {
-      width: 100%;
-    }
-  }
 }

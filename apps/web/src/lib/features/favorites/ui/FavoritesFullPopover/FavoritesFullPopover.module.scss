@@ -15,7 +15,7 @@
 
   &__grid {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, var(--top-five-cover-width)));
+    grid-template-columns: repeat(5, minmax(0, var(--top-ten-cover-width)));
     justify-content: space-between;
     gap: var(--gap-x2);
   }

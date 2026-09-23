@@ -70,7 +70,7 @@
 
 .podium {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: var(--gap-x3);
   align-items: end;
   list-style: none;
@@ -83,17 +83,10 @@
 
 .item {
   min-width: 0;
-
-  @include mediaSm {
-    &:first-child {
-      grid-column: 1 / -1;
-    }
-  }
 }
 
 .cover {
   position: relative;
-  display: block;
   width: 100%;
   aspect-ratio: var(--cover-ratio);
   border-radius: var(--radius-x4);
@@ -122,6 +115,11 @@
 .image {
   object-fit: cover;
   border-radius: inherit;
+  transition: opacity var(--duration-fast) var(--easing-out);
+
+  @include reducedMotion {
+    transition-duration: var(--duration-instant);
+  }
 }
 
 .name {
@@ -166,6 +164,16 @@
     outline-color: var(--color-accent);
   }
 
+  &_over {
+    .image {
+      opacity: 0.5;
+    }
+
+    .cover::after {
+      outline-color: var(--color-accent);
+    }
+  }
+
   &_empty {
     cursor: default;
 
@@ -177,7 +185,7 @@
 
   &__bar {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     gap: var(--gap-x05);
   }
 }

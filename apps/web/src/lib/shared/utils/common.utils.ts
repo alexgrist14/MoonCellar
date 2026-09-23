@@ -59,6 +59,17 @@ const upFL = (string: string) => {
     : "";
 };
 
+export const moveItem = <T>(items: T[], from: number, to: number) => {
+  if (to < 0 || to >= items.length || from === to) return items;
+
+  const next = [...items];
+  const [item] = next.splice(from, 1);
+
+  next.splice(to, 0, item);
+
+  return next;
+};
+
 export const shuffle = <T>(arr: T[]) => {
   const tempArr = structuredClone(arr);
 
@@ -202,6 +213,7 @@ export const scrollPageToTop = (behavior: ScrollBehavior = "auto") => {
 export const commonUtils = {
   upFL,
   shuffle,
+  moveItem,
   getWordEnding,
   checkWindow,
   addLeadingZero,

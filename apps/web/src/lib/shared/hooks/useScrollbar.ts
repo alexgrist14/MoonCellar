@@ -84,7 +84,7 @@ export const useScrollbar = ({
   const [startScrollPosition, setStartScrollPosition] = useState(0);
 
   const [isDragging, setIsDragging] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
 
   const { pageDir, clientDir } = useMemo(() => {
     const clientDir: "clientX" | "clientY" = isHorizontal

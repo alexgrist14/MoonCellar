@@ -8,6 +8,7 @@ import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { ListCard } from "@/src/lib/shared/ui/ListCard";
+import { ListCardsGrid } from "@/src/lib/shared/ui/ListCardsGrid";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import { SvgPlus } from "@/src/lib/shared/ui/svg";
@@ -85,11 +86,11 @@ export const UserLists: FC<IUserListsProps> = ({
           )}
         </div>
       ) : (
-        <div className={styles.lists__grid}>
+        <ListCardsGrid>
           {lists.map((list) => (
             <ListCard key={list._id} list={list} isWithAuthor={isLiked} />
           ))}
-        </div>
+        </ListCardsGrid>
       )}
     </section>
   );

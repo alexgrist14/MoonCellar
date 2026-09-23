@@ -21,6 +21,7 @@ export const Dropdown = memo((props: IDropDownListProps) => {
     isMulti,
     isCompact,
     isDisabled,
+    isLoading,
     isWithReset,
     isWithInput,
     isWithAll,
@@ -55,6 +56,21 @@ export const Dropdown = memo((props: IDropDownListProps) => {
     handleValueChange,
     handleValueBlur,
   } = useDropdown(props);
+
+  if (isLoading) {
+    return (
+      <div className={styles.wrapper} style={wrapperStyle}>
+        {title && <h4>{title}</h4>}
+        <div
+          aria-busy="true"
+          className={cl(className, styles.skeleton, {
+            [styles.skeleton_compact]: isCompact,
+          })}
+          style={style}
+        />
+      </div>
+    );
+  }
 
   const dropdownConnector = commonUtils.checkWindow(() =>
     document.getElementById("dropdown-connector")

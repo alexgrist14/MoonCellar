@@ -17,10 +17,36 @@
     &_empty {
       background: var(--color-bg-tertiary);
     }
+
+    &_image::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: var(--color-bg-tertiary);
+      animation: skeletonPulse 0.9s var(--easing-in) infinite alternate;
+
+      @include reducedMotion {
+        animation: none;
+      }
+    }
+
+    &_loaded::before {
+      animation-play-state: paused;
+    }
   }
 
   &__image {
     object-fit: cover;
+    opacity: 0;
+    transition: opacity calc(var(--duration-base) * 2) var(--easing-out);
+
+    &_loaded {
+      opacity: 1;
+    }
+
+    @include reducedMotion {
+      transition-duration: var(--duration-instant);
+    }
   }
 }
 
@@ -30,6 +56,26 @@
   gap: var(--gap-x1);
   min-width: 0;
   color: var(--color-text-primary);
+
+  &__byline {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x1);
+    min-width: 0;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+
+    .likes {
+      flex-shrink: 0;
+    }
+  }
+
+  &__author {
+    min-width: 0;
+
+    @include textEllipsis;
+  }
 
   &__art {
     position: relative;

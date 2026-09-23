@@ -1,6 +1,3 @@
-$listCardMinWidth: 180px;
-$listCardsGap: 16px;
-
 .page {
   &__heading {
     display: flex;
@@ -16,24 +13,5 @@ $listCardsGap: 16px;
 
   &__empty {
     margin-block: auto;
-  }
-
-  &__grid {
-    container-type: inline-size;
-    width: 100%;
-  }
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--gap-x4);
-
-  @container (min-width: #{3 * $listCardMinWidth + 2 * $listCardsGap}) {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  @container (min-width: #{4 * $listCardMinWidth + 3 * $listCardsGap}) {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }

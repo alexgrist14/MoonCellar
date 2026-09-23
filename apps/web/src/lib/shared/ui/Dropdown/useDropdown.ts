@@ -33,7 +33,7 @@ export const useDropdown = ({
   isThroughPortal,
 }: IDropDownListProps) => {
   const [isActive, setIsActive] = useState(false);
-  const [value, setValue] = useState(initialValue);
+  const [value, setValue] = useState(overwriteValue ?? initialValue);
   const [multiValue, setMultiValue] = useState<number[]>(
     initialMultiValue || []
   );

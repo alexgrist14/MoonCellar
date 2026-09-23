@@ -1,6 +1,4 @@
 import { FC, useMemo, useRef, useState } from "react";
-import Link from "next/link";
-import queryString from "query-string";
 import styles from "./UserNavigation.module.scss";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
@@ -9,12 +7,7 @@ import { IUser } from "@/src/lib/shared/types/auth.type";
 import { userListCategories } from "@/src/lib/shared/constants/user.const";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import classNames from "classnames";
-import {
-  SvgLock,
-  SvgPlus,
-  SvgSettings,
-  SvgSort,
-} from "@/src/lib/shared/ui/svg";
+import { SvgSettings, SvgSort } from "@/src/lib/shared/ui/svg";
 import { IPlaythrough } from "@mooncellar/schemas";
 import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
 import { useExpandStore } from "@/src/lib/shared/store/expand.store";
@@ -22,13 +15,13 @@ import { ReviewSortType, SortType } from "@/src/lib/shared/types/sort.type";
 import { CustomDropdown } from "@/src/lib/shared/ui/CustomDropdown";
 import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
 import {
+  getProfileHref,
+  getProfileTab,
+} from "@/src/lib/shared/utils/links.utils";
+import {
   useLikedListsQuery,
   useUserListsQuery,
 } from "@/src/lib/entities/list/api";
-import { openListModal } from "@/src/lib/features/lists/ui/ListModal";
-import { getListHref } from "@/src/lib/shared/ui/ListCard";
-
-const NAVIGATION_LISTS_LIMIT = 8;
 
 const sortOptions = [
   { label: SortType.DATE_ADDED },
@@ -66,7 +59,7 @@ export const UserNavigation: FC<{
   onReviewSortChange,
   onReviewOrderChange,
 }) => {
-  const { setQuery, query, pathname, router } = useAdvancedRouter();
+  const { pathname, router } = useAdvancedRouter();
 
   const { setExpanded } = useExpandStore();
 
@@ -75,16 +68,13 @@ export const UserNavigation: FC<{
 
   useCloseEvents([sortRef], () => setIsSortOpen(false));
 
-  const profilePath = `/user/${user.userName}`;
-  const isOnProfilePage = pathname === profilePath;
-  const currentList = isOnProfilePage ? query.get("list") : null;
+  const currentList = getProfileTab(pathname, user.userName);
 
   const isGamesTab =
     userListCategories.some((category) => category === currentList) ||
     currentList === "all";
 
-  const isProfileTab =
-    isOnProfilePage && (!currentList || currentList === "profile");
+  const isProfileTab = pathname === getProfileHref(user.userName);
   const isReviewsTab = currentList === "reviews";
   const isListsTab = currentList === "lists";
   const isLikedTab = currentList === "liked";
@@ -98,15 +88,9 @@ export const UserNavigation: FC<{
     [isAuthedUser, userLists]
   );
 
-  const goToTab = (value: { [key: string]: string | number }) => {
+  const goToTab = (tab: string) => {
     setExpanded([]);
-
-    if (isOnProfilePage) {
-      setQuery(value);
-      return;
-    }
-
-    router.push(`${profilePath}?${queryString.stringify(value)}`);
+    router.push(getProfileHref(user.userName, tab));
   };
 
   const reviewsCount = playthroughs?.filter(
@@ -134,9 +118,9 @@ export const UserNavigation: FC<{
       {!isProfileTab && (
         <Box>
           <Button
-            className={classNames(styles.btn, styles.tall)}
+            className={styles.btn}
             color={ButtonColor.TRANSPARENT}
-            onClick={() => goToTab({ list: "profile" })}
+            onClick={() => goToTab("profile")}
           >
             <div>
               <div className={styles.avatar}>
@@ -156,7 +140,7 @@ export const UserNavigation: FC<{
           className={styles.btn}
           active={currentList === "all"}
           color={ButtonColor.TRANSPARENT}
-          onClick={() => goToTab({ list: "all", page: 1 })}
+          onClick={() => goToTab("all")}
         >
           <span>All</span>
           <span>{allPlays.length}</span>
@@ -179,7 +163,7 @@ export const UserNavigation: FC<{
               className={styles.btn}
               active={currentList === category}
               color={ButtonColor.TRANSPARENT}
-              onClick={() => goToTab({ list: category.toLowerCase(), page: 1 })}
+              onClick={() => goToTab(category.toLowerCase())}
             >
               <span>{commonUtils.upFL(category)}</span>
               <span>{plays.length}</span>
@@ -187,115 +171,34 @@ export const UserNavigation: FC<{
           );
         })}
       </Box>
-      {(isAuthedUser || !!visibleLists.length) && (
-        <Box>
+      <Box>
+        {(isAuthedUser || !!visibleLists.length) && (
           <Button
             className={styles.btn}
             active={isListsTab}
             color={ButtonColor.TRANSPARENT}
-            onClick={() => goToTab({ list: "lists" })}
+            onClick={() => goToTab("lists")}
           >
             <span>Lists</span>
             <span>{visibleLists.length}</span>
           </Button>
-          {visibleLists.slice(0, NAVIGATION_LISTS_LIMIT).map((list) => {
-            const href = getListHref({
-              slug: list.slug,
-              author: { _id: user._id, userName: user.userName },
-            });
-
-            return (
-              <Link
-                key={list._id}
-                href={href}
-                onClick={() => setExpanded([])}
-                className={classNames(styles.list, {
-                  [styles.list_active]: pathname === href,
-                })}
-              >
-                <span className={styles.list__name}>
-                  {list.name}
-                  {list.isPrivate && (
-                    <SvgLock
-                      size="12"
-                      aria-label="Private"
-                      className={styles.list__lock}
-                      style={{ color: "inherit" }}
-                    />
-                  )}
-                </span>
-                <span className={styles.list__count}>{list.gamesCount}</span>
-              </Link>
-            );
-          })}
-          {visibleLists.length > NAVIGATION_LISTS_LIMIT && (
-            <Button
-              className={classNames(styles.btn, styles.last)}
-              color={ButtonColor.TRANSPARENT}
-              onClick={() => goToTab({ list: "lists" })}
-            >
-              <span>Show all {visibleLists.length}</span>
-            </Button>
-          )}
-          {isAuthedUser && (
-            <Button
-              color={ButtonColor.TRANSPARENT}
-              className={classNames(styles.btn, styles.last)}
-              onClick={() => openListModal({ userName: user.userName })}
-            >
-              <div className={styles.edit}>
-                <span>New list</span>
-                <SvgPlus size="16" />
-              </div>
-            </Button>
-          )}
-        </Box>
-      )}
-      {!!likedLists.length && (
-        <Box>
+        )}
+        {!!likedLists.length && (
           <Button
             className={styles.btn}
             active={isLikedTab}
             color={ButtonColor.TRANSPARENT}
-            onClick={() => goToTab({ list: "liked" })}
+            onClick={() => goToTab("liked")}
           >
             <span>Liked lists</span>
             <span>{likedLists.length}</span>
           </Button>
-          {likedLists.slice(0, NAVIGATION_LISTS_LIMIT).map((list) => {
-            const href = getListHref(list);
-
-            return (
-              <Link
-                key={list._id}
-                href={href}
-                onClick={() => setExpanded([])}
-                className={classNames(styles.list, {
-                  [styles.list_active]: pathname === href,
-                })}
-              >
-                <span className={styles.list__name}>{list.name}</span>
-                <span className={styles.list__count}>{list.gamesCount}</span>
-              </Link>
-            );
-          })}
-          {likedLists.length > NAVIGATION_LISTS_LIMIT && (
-            <Button
-              className={classNames(styles.btn, styles.last)}
-              color={ButtonColor.TRANSPARENT}
-              onClick={() => goToTab({ list: "liked" })}
-            >
-              <span>Show all {likedLists.length}</span>
-            </Button>
-          )}
-        </Box>
-      )}
-      <Box>
+        )}
         <Button
           className={styles.btn}
           active={isReviewsTab}
           color={ButtonColor.TRANSPARENT}
-          onClick={() => goToTab({ list: "reviews" })}
+          onClick={() => goToTab("reviews")}
         >
           <span>Reviews</span>
           <span>{reviewsCount}</span>
@@ -304,10 +207,10 @@ export const UserNavigation: FC<{
       {isAuthedUser && (
         <Box>
           <Button
-            className={classNames(styles.btn, styles.tall)}
+            className={styles.btn}
             active={currentList === "settings"}
             color={ButtonColor.TRANSPARENT}
-            onClick={() => goToTab({ list: "settings" })}
+            onClick={() => goToTab("settings")}
           >
             <div>
               <SvgSettings size="24" />

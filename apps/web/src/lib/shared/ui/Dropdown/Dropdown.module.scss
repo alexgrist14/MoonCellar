@@ -6,6 +6,22 @@
   min-width: 170px;
 }
 
+.skeleton {
+  width: 100%;
+  height: 40px;
+  border-radius: var(--radius-x2);
+  background-color: var(--color-bg-primary);
+  animation: skeletonPulse 0.9s var(--easing-in) infinite alternate;
+
+  &_compact {
+    height: 30px;
+  }
+
+  @include reducedMotion {
+    animation: none;
+  }
+}
+
 .dropdown {
   display: flex;
   position: relative;
@@ -178,7 +194,6 @@
     left: 0;
     height: fit-content;
     opacity: 0;
-    transition: 0.2s;
     overflow: hidden;
     transform-origin: top;
     pointer-events: none;
@@ -201,7 +216,6 @@
 
     &_active {
       opacity: 1;
-      // box-shadow: $basicShadow;
     }
   }
 
@@ -210,11 +224,18 @@
     pointer-events: none;
     height: fit-content;
     visibility: hidden;
+    opacity: 0;
     background-color: var(--color-bg-hover);
 
     &_active {
       pointer-events: all;
       visibility: visible;
+      opacity: 1;
+      transition: opacity var(--duration-base) var(--easing-out);
+    }
+
+    @include reducedMotion {
+      transition-duration: var(--duration-instant);
     }
   }
 

@@ -5,6 +5,7 @@ import {
   playthroughsAPI,
   userAPI,
 } from "@/src/lib/shared/api";
+import { getProfileUser } from "./profile.data";
 import { ratingsAPI } from "@/src/lib/shared/api/ratings.api";
 import { ACCESS_TOKEN } from "@/src/lib/shared/constants";
 import { IAuthToken } from "@/src/lib/shared/types/auth.type";
@@ -12,21 +13,9 @@ import { jwtDecode } from "jwt-decode";
 import { Metadata } from "next";
 import { PageLoader } from "@/src/lib/shared/ui/PageLoader";
 import { cookies } from "next/headers";
-import { fetchOrNull } from "@/src/lib/shared/utils/not-found.utils";
 import { notFound } from "next/navigation";
-import { cache, Suspense } from "react";
-import {
-  GetUserByStringSchema,
-  ICustomList,
-  IGameResponse,
-} from "@mooncellar/schemas";
-
-const isValidName = (name: string) =>
-  GetUserByStringSchema.safeParse({ searchString: name }).success;
-
-const getUser = cache(async (name: string) =>
-  isValidName(name) ? fetchOrNull(userAPI.getByString(name)) : null
-);
+import { ReactNode, Suspense } from "react";
+import { ICustomList, IGameResponse } from "@mooncellar/schemas";
 
 const getFavoriteGames = async (ids?: string[]): Promise<IGameResponse[]> => {
   if (!ids?.length) return [];
@@ -56,7 +45,7 @@ export async function generateMetadata({
 }: {
   params: any;
 }): Promise<Metadata> {
-  const user = await getUser((await params).name);
+  const user = await getProfileUser((await params).name);
 
   if (!user) {
     return {
@@ -66,7 +55,10 @@ export async function generateMetadata({
   }
 
   return {
-    title: "Profile: " + user.userName,
+    title: {
+      default: "Profile: " + user.userName,
+      template: "%s | MoonCellar",
+    },
     description:
       user.description ||
       `${user.userName}'s game library, ratings and achievements on MoonCellar`,
@@ -85,7 +77,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function User({ params }: { params: any }) {
+export default async function ProfileLayout({
+  children,
+  params,
+}: {
+  children: ReactNode;
+  params: any;
+}) {
   const cookie = await cookies();
   const accessToken = cookie.get(ACCESS_TOKEN);
 
@@ -97,7 +95,7 @@ export default async function User({ params }: { params: any }) {
     ? (await userAPI.getUserFollowings(authUserInfo.id)).data
     : undefined;
 
-  const user = await getUser((await params).name);
+  const user = await getProfileUser((await params).name);
 
   if (!user) {
     notFound();
@@ -131,7 +129,9 @@ export default async function User({ params }: { params: any }) {
         favoriteGames={favoriteGames}
         lists={lists}
         likedLists={likedLists}
-      />
+      >
+        {children}
+      </UserProfile>
     </Suspense>
   );
 }

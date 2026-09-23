@@ -1,4 +1,4 @@
-import { CSSProperties, FC, useMemo } from "react";
+import { CSSProperties, FC, useMemo, useRef, useState } from "react";
 import classNames from "classnames";
 import { IGameResponse } from "@mooncellar/schemas";
 import { FavoriteButton } from "@/src/lib/features/favorites/ui/FavoriteButton";
@@ -8,7 +8,11 @@ import { useUserStore } from "@/src/lib/shared/store/user.store";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { GameButtons } from "@/src/lib/shared/ui/GameButtons";
 import { modal } from "@/src/lib/shared/ui/Modal";
-import { PlaythroughModal } from "@/src/lib/features/game/ui/PlaythroughModal";
+import { Popover } from "@/src/lib/shared/ui/Popover";
+import {
+  PLAYTHROUGH_MODAL_ID,
+  PlaythroughModal,
+} from "@/src/lib/features/game/ui/PlaythroughModal";
 import { SvgMore, SvgPlay } from "@/src/lib/shared/ui/svg";
 import {
   GameControlButton,
@@ -29,6 +33,8 @@ export const GameControls: FC<IGameControlsProps> = ({
   className,
   style,
 }) => {
+  const linksRef = useRef<HTMLButtonElement>(null);
+  const [isLinksOpen, setIsLinksOpen] = useState(false);
   const profile = useAuthStore((s) => s.profile);
   const playthroughs = useUserStore((s) => s.parsedPlaythroughs?.[game._id]);
 
@@ -56,7 +62,7 @@ export const GameControls: FC<IGameControlsProps> = ({
           !!game._id &&
           !!profile?._id &&
           modal.open(<PlaythroughModal game={game} userId={profile._id} />, {
-            id: "game-playthroughs",
+            id: PLAYTHROUGH_MODAL_ID,
             isResizable: true,
           })
         }
@@ -64,14 +70,23 @@ export const GameControls: FC<IGameControlsProps> = ({
       <FavoriteButton game={game} />
       <ListsButton game={game} />
       <GameControlButton
+        ref={linksRef}
         icon={<SvgMore size="16" style={ICON_STYLE} />}
         label="External links"
-        tooltip="External links"
+        tooltip={isLinksOpen ? undefined : "External links"}
         tooltipAlign="right"
-        onClick={() =>
-          modal.open(<GameButtons game={game} />, { id: "game-menu" })
-        }
+        isExpanded={isLinksOpen}
+        onClick={() => setIsLinksOpen((current) => !current)}
       />
+      <Popover
+        anchorRef={linksRef}
+        isOpen={isLinksOpen}
+        onClose={() => setIsLinksOpen(false)}
+        align="end"
+        width="300px"
+      >
+        <GameButtons game={game} />
+      </Popover>
     </div>
   );
 };

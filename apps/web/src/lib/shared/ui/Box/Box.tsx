@@ -1,4 +1,4 @@
-import { CSSProperties, FC, ReactNode, useRef } from "react";
+import { CSSProperties, FC, ReactNode, Ref, useRef } from "react";
 import { BoxHead } from "./BoxHead";
 import cn from "classnames";
 import styles from "./Box.module.scss";
@@ -24,6 +24,8 @@ interface IBoxProps {
   isWithoutBorder?: boolean;
   isResizable?: boolean;
   scrollFadeType?: "both" | "top" | "bottom";
+  onClose?: () => void;
+  closeButtonRef?: Ref<HTMLButtonElement>;
 }
 
 export const Box: FC<IBoxProps> = ({
@@ -49,7 +51,11 @@ export const Box: FC<IBoxProps> = ({
   return (
     <div
       ref={wrapperRef}
-      className={cn(styles.wrapper, { [styles.wrapper_resizable]: isResizable }, className)}
+      className={cn(
+        styles.wrapper,
+        { [styles.wrapper_resizable]: isResizable },
+        className
+      )}
       style={wrapperStyle}
     >
       <BoxHead {...headProps} isExternal />

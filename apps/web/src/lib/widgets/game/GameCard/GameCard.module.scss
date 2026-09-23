@@ -1,3 +1,5 @@
+$statuses: wishlist, backlog, playing, played, completed, mastered, dropped;
+
 .wrapper {
   width: 100%;
   height: auto;
@@ -168,6 +170,7 @@
   div &__more,
   div &__royal,
   div &__achievement,
+  div &__status,
   div &__rank,
   div &__combined {
     width: 30px;
@@ -248,6 +251,23 @@
     transition: 0.3s;
 
     @include gameGlowOutline;
+  }
+
+  div &__status {
+    padding: var(--padding-x1);
+    background-color: var(--color-bg-primary-tint);
+    cursor: pointer;
+    transition: 0.3s;
+
+    &:hover {
+      background-color: var(--color-bg-tertiary);
+    }
+
+    @each $status in $statuses {
+      &_#{$status} {
+        color: var(--game-#{$status}-color);
+      }
+    }
   }
 
   div &__achievement {

@@ -10,7 +10,7 @@ import {
   FEATURED_PLATFORM_SLUGS,
   type IGetGamesRequest,
 } from "@mooncellar/schemas";
-import { gamesFilters, weightedRatingExpr } from "../../../shared/games";
+import { gamesFilters } from "../../../shared/games";
 import { runCronExclusive } from "../../../shared/cron-mutex";
 import { runInCronLogContext } from "../../../shared/cron-logging";
 import { Game } from "../../games/schemas/game.schema";
@@ -20,6 +20,10 @@ import { User } from "../../user/schemas/user.schema";
 import {
   GENERATED_LIST_DECADES,
   GENERATED_LIST_GAME_TYPES,
+  GENERATED_LIST_HLTB_WEIGHT,
+  GENERATED_LIST_LAUNCH_WINDOW_SECONDS,
+  GENERATED_LIST_PRIOR_MEAN,
+  GENERATED_LIST_PRIOR_VOTES,
   GENERATED_LIST_SIZE,
   GENERATED_LIST_VOTES_STEPS,
   GENERATED_LISTS_CRON,
@@ -39,6 +43,7 @@ type IGeneratedListDefinition = {
   name: string;
   scope: string;
   filters: Pick<IGetGamesRequest, "selected" | "years">;
+  launchPlatforms?: { allowed: string[]; current: string[] };
 };
 
 export type IGeneratedListsReport = {
@@ -53,6 +58,51 @@ const GENERATED_LISTS_JOB = "generated-lists-refresh";
 
 const RATING_SOURCES =
   "ranked by the combined rating from IGDB, HowLongToBeat and MoonCellar players. Updated every week.";
+
+const ratingSources = [
+  {
+    rating: "$igdb.total_rating",
+    weight: { $ifNull: ["$igdb.total_rating_count", 0] },
+  },
+  {
+    rating: { $multiply: ["$averageRating", 10] },
+    weight: { $ifNull: ["$ratingsCount", 0] },
+  },
+  { rating: "$hltb.reviewScore", weight: GENERATED_LIST_HLTB_WEIGHT },
+].map(({ rating, weight }) => {
+  const hasRating = { $ne: [{ $ifNull: [rating, null] }, null] };
+
+  return {
+    weighted: { $cond: [hasRating, { $multiply: [rating, weight] }, 0] },
+    weight: { $cond: [hasRating, weight, 0] },
+  };
+});
+
+const generatedScoreExpr = {
+  $let: {
+    vars: {
+      weighted: { $add: ratingSources.map((source) => source.weighted) },
+      weight: { $add: ratingSources.map((source) => source.weight) },
+    },
+    in: {
+      $cond: [
+        { $gt: ["$$weight", 0] },
+        {
+          $divide: [
+            {
+              $add: [
+                "$$weighted",
+                GENERATED_LIST_PRIOR_MEAN * GENERATED_LIST_PRIOR_VOTES,
+              ],
+            },
+            { $add: ["$$weight", GENERATED_LIST_PRIOR_VOTES] },
+          ],
+        },
+        null,
+      ],
+    },
+  },
+};
 
 const isDuplicateKeyError = (error: unknown) =>
   (error as { code?: number } | null)?.code === 11000;
@@ -189,8 +239,8 @@ export class GeneratedListsService {
     const [genres, platforms] = await Promise.all([
       this.gameModel.distinct("genres"),
       this.platformModel
-        .find({ slug: { $in: FEATURED_PLATFORM_SLUGS } })
-        .select("_id name slug")
+        .find()
+        .select("_id name slug family generation")
         .lean(),
     ]);
 
@@ -219,18 +269,106 @@ export class GeneratedListsService {
       platforms.find((platform) => platform.slug === slug)
     )
       .filter((platform) => !!platform)
-      .map((platform): IGeneratedListDefinition => ({
-        kind: "platform",
-        key: platform.slug,
-        name: `Best ${platform.name} games`,
-        scope: `on ${platform.name}`,
-        filters: { selected: { platforms: [platform._id.toString()] } },
-      }));
+      .map((platform): IGeneratedListDefinition => {
+        const relatives = platforms.filter(
+          (item) =>
+            !!platform.family?.slug &&
+            item.family?.slug === platform.family.slug &&
+            typeof item.generation === "number"
+        );
+        const toIds = (generations: number[]) => [
+          platform._id.toString(),
+          ...relatives
+            .filter((item) => generations.includes(item.generation))
+            .map((item) => item._id.toString()),
+        ];
+
+        return {
+          kind: "platform",
+          key: platform.slug,
+          name: `Best ${platform.name} games`,
+          scope: `on ${platform.name}`,
+          filters: { selected: { platforms: [platform._id.toString()] } },
+          launchPlatforms: {
+            allowed: toIds([platform.generation, platform.generation - 1]),
+            current: toIds([platform.generation]),
+          },
+        };
+      });
 
     return [...decades, ...genreLists, ...platformLists];
   }
 
-  private async findTopGameIds({ filters }: IGeneratedListDefinition) {
+  private launchPlatformsMatch({
+    allowed,
+    current,
+  }: NonNullable<IGeneratedListDefinition["launchPlatforms"]>) {
+    const launchIds = {
+      $let: {
+        vars: {
+          launch: {
+            $filter: {
+              input: { $ifNull: ["$release_dates", []] },
+              as: "release",
+              cond: {
+                $lte: [
+                  "$$release.date",
+                  {
+                    $add: [
+                      "$first_release",
+                      GENERATED_LIST_LAUNCH_WINDOW_SECONDS,
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+        },
+        in: {
+          $cond: [
+            { $gt: [{ $size: "$$launch" }, 0] },
+            {
+              $map: {
+                input: "$$launch",
+                as: "release",
+                in: { $toString: "$$release.platformId" },
+              },
+            },
+            {
+              $map: {
+                input: { $ifNull: ["$platformIds", []] },
+                as: "id",
+                in: { $toString: "$$id" },
+              },
+            },
+          ],
+        },
+      },
+    };
+
+    return {
+      $match: {
+        $expr: {
+          $let: {
+            vars: { ids: launchIds },
+            in: {
+              $and: [
+                { $setIsSubset: ["$$ids", allowed] },
+                {
+                  $gt: [{ $size: { $setIntersection: ["$$ids", current] } }, 0],
+                },
+              ],
+            },
+          },
+        },
+      },
+    };
+  }
+
+  private async findTopGameIds({
+    filters,
+    launchPlatforms,
+  }: IGeneratedListDefinition) {
     const now = Math.floor(Date.now() / 1000);
     let ids: mongoose.Types.ObjectId[] = [];
     let usedVotes = GENERATED_LIST_VOTES_STEPS[0];
@@ -247,8 +385,11 @@ export class GeneratedListsService {
             excluded: { themes: [ADULT_THEME_NAME] },
             votes,
           }),
+          ...(launchPlatforms
+            ? [this.launchPlatformsMatch(launchPlatforms)]
+            : []),
           { $match: { first_release: { $lte: now } } },
-          { $addFields: { generatedScore: weightedRatingExpr } },
+          { $addFields: { generatedScore: generatedScoreExpr } },
           { $match: { generatedScore: { $ne: null } } },
           {
             $sort: {

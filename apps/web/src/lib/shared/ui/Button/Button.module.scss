@@ -5,7 +5,7 @@
   border-radius: var(--radius-x2);
   border-color: var(--color-bg-primary);
   font-size: 14px;
-  padding: var(--padding-x1) var(--padding-x2);
+  padding: var(--padding-x2) var(--padding-x4);
   transition: 0.2s;
 
   @include textEllipsis;
@@ -90,8 +90,16 @@
     cursor: not-allowed !important;
   }
 
+  &_icon {
+    padding: var(--padding-x2);
+  }
+
   &_compact {
-    padding: var(--padding-x05);
+    padding: var(--padding-x05) var(--padding-x1);
+
+    &.button_icon {
+      padding: var(--padding-x05);
+    }
   }
 
   &_hidden {

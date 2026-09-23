@@ -56,7 +56,7 @@ export const GameControlButton: FC<IGameControlButtonProps> = ({
     <span
       className={classNames(
         styles.glyph,
-        !!tone && styles[`controls__glyph_${tone}`],
+        !!tone && styles[`glyph_${tone}`],
         {
           [styles.glyph_active]: isActive,
           [styles.glyph_disabled]: isDisabled,

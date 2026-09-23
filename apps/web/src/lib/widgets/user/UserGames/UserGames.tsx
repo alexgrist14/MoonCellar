@@ -28,6 +28,7 @@ interface UserGamesProps {
   ratings: IUserRating[];
   selectedSort: SortType;
   sortOrder: string;
+  list: CategoriesFilterType;
 }
 
 export const UserGames: FC<UserGamesProps> = ({
@@ -35,10 +36,10 @@ export const UserGames: FC<UserGamesProps> = ({
   ratings,
   selectedSort,
   sortOrder,
+  list,
 }) => {
   const query = useSearchParams();
   const page = Number(query.get("page"));
-  const list = query.get("list") as CategoriesFilterType;
 
   const parsedGamesRatings = useMemo(() => {
     return ratings?.reduce(

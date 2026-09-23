@@ -1,6 +1,8 @@
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, Ref } from "react";
 import classNames from "classnames";
 import styles from "./Box.module.scss";
+import { Button, ButtonColor } from "../Button";
+import { SvgClose } from "../svg";
 
 interface IBoxHeadProps {
   title?: string;
@@ -9,6 +11,8 @@ interface IBoxHeadProps {
   isVerticalActions?: boolean;
   isTitleStart?: boolean;
   isExternal?: boolean;
+  onClose?: () => void;
+  closeButtonRef?: Ref<HTMLButtonElement>;
 }
 
 export const BoxHead: FC<IBoxHeadProps> = ({
@@ -18,6 +22,8 @@ export const BoxHead: FC<IBoxHeadProps> = ({
   titleAction,
   isTitleStart,
   isExternal,
+  onClose,
+  closeButtonRef,
 }) => {
   if (
     !title ||
@@ -25,10 +31,28 @@ export const BoxHead: FC<IBoxHeadProps> = ({
     (!isExternal && isHeaderWithoutStyles)
   )
     return null;
+
+  const action = onClose ? (
+    <div className={styles.template__actions}>
+      {titleAction}
+      <Button
+        ref={closeButtonRef}
+        color={ButtonColor.TRANSPARENT}
+        className={styles.template__close}
+        tooltip="Close"
+        onClick={onClose}
+      >
+        <SvgClose size="16" />
+      </Button>
+    </div>
+  ) : (
+    titleAction
+  );
+
   return (
     <div
       className={
-        !!titleAction && !isExternal ? styles.template__head_action : undefined
+        !!action && !isExternal ? styles.template__head_action : undefined
       }
     >
       <h2
@@ -40,7 +64,7 @@ export const BoxHead: FC<IBoxHeadProps> = ({
       >
         {title}
       </h2>
-      {!!titleAction && titleAction}
+      {action}
     </div>
   );
 };

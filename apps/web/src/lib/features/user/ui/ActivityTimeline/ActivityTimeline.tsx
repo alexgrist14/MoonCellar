@@ -168,14 +168,14 @@ const renderSegment = (
         <span className={styles.sentence}>
           {segment.isRemoval ? (
             isLead ? (
-              <>Removed {gameLink} from the top 5</>
+              <>Removed {gameLink} from the top 10</>
             ) : (
-              "Removed from the top 5"
+              "Removed from the top 10"
             )
           ) : isLead ? (
-            <>Put {gameLink} in the top 5</>
+            <>Put {gameLink} in the top 10</>
           ) : (
-            "Put in the top 5"
+            "Put in the top 10"
           )}
         </span>
       );

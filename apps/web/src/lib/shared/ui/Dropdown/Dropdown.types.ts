@@ -32,6 +32,7 @@ export interface IDropDownListProps {
   isMulti?: boolean;
   isCompact?: boolean;
   isDisabled?: boolean;
+  isLoading?: boolean;
   isWithReset?: boolean;
   isWithSearch?: boolean;
   isWithInput?: boolean;

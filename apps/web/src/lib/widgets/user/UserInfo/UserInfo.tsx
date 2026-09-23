@@ -7,6 +7,7 @@ import {
   useLikedListsQuery,
   useUserListsQuery,
 } from "@/src/lib/entities/list/api";
+import { getProfileHref } from "@/src/lib/shared/utils/links.utils";
 import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useExpandStore } from "@/src/lib/shared/store/expand.store";
@@ -17,12 +18,13 @@ import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { DRAWER_TRIGGER_ATTRIBUTE, drawer } from "@/src/lib/shared/ui/Drawer";
 import { ListCard } from "@/src/lib/shared/ui/ListCard";
+import { ListCardsGrid } from "@/src/lib/shared/ui/ListCardsGrid";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import { SvgListBullet } from "@/src/lib/shared/ui/svg";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { ActivityTimeline } from "@/src/lib/features/user/ui/ActivityTimeline";
 import { IPeopleTab, PeopleDrawer } from "@/src/lib/features/user/ui/PeopleDrawer";
-import { TopFive } from "@/src/lib/widgets/user/TopFive";
+import { TopTen } from "@/src/lib/widgets/user/TopTen";
 import { useViewerFollowings } from "@/src/lib/features/user/model/useViewerFollowings";
 import styles from "./UserInfo.module.scss";
 
@@ -66,7 +68,7 @@ export const UserInfo: FC<UserInfoProps> = ({
   likedLists: initialLikedLists,
 }) => {
   const { _id: id, userName } = user;
-  const { setQuery } = useAdvancedRouter();
+  const { router } = useAdvancedRouter();
   const { setExpanded } = useExpandStore();
   const viewerProfile = useAuthStore((s) => s.profile);
 
@@ -162,7 +164,7 @@ export const UserInfo: FC<UserInfoProps> = ({
 
   const goTo = (list: string) => {
     setExpanded([]);
-    setQuery({ list, page: 1 });
+    router.push(getProfileHref(userName, list));
   };
 
   const triggerProps = { [DRAWER_TRIGGER_ATTRIBUTE]: "" };
@@ -273,7 +275,7 @@ export const UserInfo: FC<UserInfoProps> = ({
         </button>
       </div>
 
-      <TopFive userId={id} games={topGames} isOwner={isOwner} />
+      <TopTen userId={id} games={topGames} isOwner={isOwner} />
 
       {isListsVisible && (
         <section className={styles.lists} aria-labelledby="profile-lists">
@@ -284,7 +286,6 @@ export const UserInfo: FC<UserInfoProps> = ({
             {!!lists.length && (
               <Button
                 color={ButtonColor.TRANSPARENT}
-                className={styles.lists__all}
                 onClick={() => goTo("lists")}
               >
                 All lists
@@ -310,16 +311,11 @@ export const UserInfo: FC<UserInfoProps> = ({
               </Button>
             </div>
           ) : (
-            <div className={styles.lists__items}>
+            <ListCardsGrid>
               {lists.slice(0, LISTS_PREVIEW_LIMIT).map((list) => (
-                <ListCard
-                  key={list._id}
-                  list={list}
-                  layout="row"
-                  isWithAuthor={false}
-                />
+                <ListCard key={list._id} list={list} isWithAuthor={false} />
               ))}
-            </div>
+            </ListCardsGrid>
           )}
         </section>
       )}
@@ -331,17 +327,16 @@ export const UserInfo: FC<UserInfoProps> = ({
             </SectionTitle>
             <Button
               color={ButtonColor.TRANSPARENT}
-              className={styles.lists__all}
               onClick={() => goTo("liked")}
             >
               All liked
             </Button>
           </div>
-          <div className={styles.lists__items}>
+          <ListCardsGrid>
             {likedLists.slice(0, LISTS_PREVIEW_LIMIT).map((list) => (
-              <ListCard key={list._id} list={list} layout="row" />
+              <ListCard key={list._id} list={list} />
             ))}
-          </div>
+          </ListCardsGrid>
         </section>
       )}
       <ActivityTimeline userId={id} isOwner={isOwner} />

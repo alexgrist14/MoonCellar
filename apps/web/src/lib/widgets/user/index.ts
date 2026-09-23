@@ -1,4 +1,4 @@
-export * from "./TopFive";
+export * from "./TopTen";
 export * from "./UserGames";
 export * from "./UserInfo";
 export * from "./UserLists";

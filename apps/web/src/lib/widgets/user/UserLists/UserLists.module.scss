@@ -37,13 +37,4 @@
       border-radius: var(--radius-x4);
     }
   }
-
-  &__grid {
-    display: grid;
-    grid-template-columns: repeat(
-      auto-fill,
-      minmax(var(--list-card-min-width), 1fr)
-    );
-    gap: var(--gap-x5) var(--gap-x4);
-  }
 }

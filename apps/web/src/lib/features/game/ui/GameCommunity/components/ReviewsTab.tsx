@@ -10,7 +10,10 @@ import {
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { modal } from "@/src/lib/shared/ui/Modal";
-import { PlaythroughModal } from "@/src/lib/features/game/ui/PlaythroughModal";
+import {
+  PLAYTHROUGH_MODAL_ID,
+  PlaythroughModal,
+} from "@/src/lib/features/game/ui/PlaythroughModal";
 import { SvgComment, SvgPen } from "@/src/lib/shared/ui/svg";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
@@ -66,7 +69,7 @@ export const ReviewsTab: FC<IReviewsTabProps> = ({
     requireAuth((profile) =>
       modal.open(
         <PlaythroughModal game={game} userId={profile._id} isReview />,
-        { id: "game-playthroughs", isResizable: true }
+        { id: PLAYTHROUGH_MODAL_ID, isResizable: true }
       )
     );
 
@@ -109,8 +112,8 @@ export const ReviewsTab: FC<IReviewsTabProps> = ({
         <div className={styles.empty__text}>
           <p className={styles.empty__title}>No reviews for {game.name} yet</p>
           <p className={styles.empty__description}>
-            Finished it, dropped it or still playing? Your playthrough note can
-            be the first one here.
+            Finished it or dropped it? Your playthrough note can be the first
+            one here.
           </p>
         </div>
         {writeButton}

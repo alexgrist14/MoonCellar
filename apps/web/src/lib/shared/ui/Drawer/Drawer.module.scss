@@ -24,12 +24,6 @@
   &__box {
     height: 100%;
   }
-
-  &__close {
-    flex-shrink: 0;
-    padding: var(--padding-x1);
-    border-radius: var(--radius-x3);
-  }
 }
 
 @include reducedMotion {

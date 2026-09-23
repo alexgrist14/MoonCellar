@@ -19,7 +19,10 @@ import { Box } from "@/src/lib/shared/ui/Box";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal/ConfirmModal";
 import { Input } from "@/src/lib/shared/ui/Input";
-import { getListHref } from "@/src/lib/shared/ui/ListCard";
+import {
+  getListHref,
+  getProfileHref,
+} from "@/src/lib/shared/utils/links.utils";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { Textarea } from "@/src/lib/shared/ui/Textarea";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
@@ -153,7 +156,7 @@ export const ListModal: FC<IListModalProps> = ({ list, userName, gameId }) => {
           modal.close(DELETE_MODAL_ID);
           modal.close(LIST_MODAL_ID);
           toast.success({ description: "List deleted" });
-          router.push(`/user/${userName}?list=lists`);
+          router.push(getProfileHref(userName, "lists"));
         }}
       />,
       { id: DELETE_MODAL_ID }

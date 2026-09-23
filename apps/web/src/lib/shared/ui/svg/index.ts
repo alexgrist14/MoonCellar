@@ -60,3 +60,7 @@ export * from "./SvgHeartFilled";
 export * from "./SvgLock";
 export * from "./SvgGrip";
 export * from "./SvgCheck";
+export * from "./SvgBookmark";
+export * from "./SvgClock";
+export * from "./SvgTrophy";
+export * from "./SvgPlayTriangle";

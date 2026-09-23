@@ -73,6 +73,7 @@
       @include flexCenter;
       aspect-ratio: 1;
       height: 32px;
+      padding: var(--padding-x05);
       border-radius: var(--radius-x2);
     }
 
@@ -99,7 +100,6 @@
         width: 100%;
         justify-content: flex-start;
         gap: var(--gap-x2);
-        padding: var(--padding-x1) var(--padding-x2);
         border-radius: var(--radius-x4);
       }
     }
