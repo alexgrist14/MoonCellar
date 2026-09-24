@@ -2,10 +2,11 @@ import { FC } from "react";
 import Image from "next/image";
 import classNames from "classnames";
 import { ICharacterResponse } from "@mooncellar/schemas";
+import { useHideAdult } from "@/src/lib/shared/hooks/useHideAdult";
 import styles from "./CharacterPortrait.module.scss";
 
 interface ICharacterPortraitProps {
-  character: Pick<ICharacterResponse, "name" | "mugShot">;
+  character: Pick<ICharacterResponse, "name" | "mugShot" | "isExplicitImage">;
   sizes: string;
   className?: string;
   priority?: boolean;
@@ -24,21 +25,25 @@ export const CharacterPortrait: FC<ICharacterPortraitProps> = ({
   sizes,
   className,
   priority,
-}) => (
-  <div className={classNames(styles.portrait, className)}>
-    {character.mugShot ? (
-      <Image
-        src={character.mugShot}
-        alt={character.name}
-        fill
-        sizes={sizes}
-        priority={priority}
-        className={styles.portrait__image}
-      />
-    ) : (
-      <span className={styles.portrait__initials} aria-hidden="true">
-        {getInitials(character.name)}
-      </span>
-    )}
-  </div>
-);
+}) => {
+  const hideImage = useHideAdult() && !!character.isExplicitImage;
+
+  return (
+    <div className={classNames(styles.portrait, className)}>
+      {character.mugShot && !hideImage ? (
+        <Image
+          src={character.mugShot}
+          alt={character.name}
+          fill
+          sizes={sizes}
+          priority={priority}
+          className={styles.portrait__image}
+        />
+      ) : (
+        <span className={styles.portrait__initials} aria-hidden="true">
+          {getInitials(character.name)}
+        </span>
+      )}
+    </div>
+  );
+};

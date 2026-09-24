@@ -198,6 +198,7 @@ export class VndbService {
   private readonly logger = new Logger(VndbService.name);
   private isRunning = false;
   private isLinkingRelated = false;
+  private isRefreshingCharacters = false;
   private lastRequestAt = 0;
   private requestTurn: Promise<void> = Promise.resolve();
   private isApplyingDecisions = false;
@@ -668,8 +669,7 @@ export class VndbService {
     if (game?.isStopParsingPictures) return { uploadedScreenshots: 0 };
 
     const isStored = (folder: S3Folder, url: string, imageId: string) =>
-      this.fileService.getKeyFromUrl(folder, url)?.replace(/\.[^./]+$/, "") ===
-      `${gameId}/${imageId}`;
+      this.isStoredVndbImage(folder, url, `${gameId}/${imageId}`);
 
     const images: {
       cover?: string;
@@ -718,10 +718,21 @@ export class VndbService {
     return { ...images, uploadedScreenshots };
   }
 
+  private isStoredVndbImage(
+    folder: S3Folder,
+    url: string | null | undefined,
+    key: string
+  ) {
+    return (
+      this.fileService.getKeyFromUrl(folder, url)?.replace(/\.[^./]+$/, "") ===
+      key
+    );
+  }
+
   private async uploadVndbImage(
     folder: S3Folder,
-    gameId: Types.ObjectId,
-    image: IVndbImage
+    keyPrefix: Types.ObjectId | string,
+    image: Pick<IVndbImage, "id" | "url">
   ) {
     try {
       const { data, headers } =
@@ -733,7 +744,7 @@ export class VndbService {
           buffer: Buffer.from(data),
           mimetype: String(headers["content-type"]).split(";")[0],
         } as Express.Multer.File,
-        `${gameId}/${image.id}`,
+        `${keyPrefix}/${image.id}`,
         folder
       );
 
@@ -789,7 +800,11 @@ export class VndbService {
     });
 
     const themesByVn = await this.getThemes(vnIds);
-    const characters = await this.getCharacters(vnIds);
+    const characters = await this.getCharacters([
+      "vn",
+      "=",
+      ["or", ...searchIdsFilters],
+    ]);
     await this.saveCharacters(characters);
 
     const [signalsByVn, platformSlugById] = await Promise.all([
@@ -1522,18 +1537,65 @@ export class VndbService {
     };
   }
 
-  private async getCharacters(vnIds: string[]): Promise<IVndbCharacter[]> {
+  get isRefreshingVndbCharacters() {
+    return this.isRefreshingCharacters;
+  }
+
+  async refreshVndbCharacters() {
+    if (this.isRefreshingCharacters) {
+      this.logger.warn("VNDB characters refresh is already running");
+      return;
+    }
+
+    this.isRefreshingCharacters = true;
+
+    try {
+      const characterIds = (
+        await this.charactersModel
+          .find({ "vndb.characterId": { $exists: true } })
+          .select("vndb.characterId")
+          .lean()
+      ).map(({ vndb }) => vndb.characterId);
+      const totals = { characters: 0, images: 0 };
+
+      for (let i = 0; i < characterIds.length; i += VNDB_PAGE_SIZE) {
+        const characters = await this.getCharacters([
+          "or",
+          ...characterIds
+            .slice(i, i + VNDB_PAGE_SIZE)
+            .map((id): TVndbFilter => ["id", "=", id]),
+        ]);
+
+        totals.images += await this.saveCharacters(characters);
+        totals.characters += characters.length;
+
+        this.logger.log(
+          `VNDB characters refresh: ${Math.min(i + VNDB_PAGE_SIZE, characterIds.length)}/${characterIds.length} | refreshed ${totals.characters} | uploaded ${totals.images} images`
+        );
+      }
+
+      return totals;
+    } catch (error) {
+      this.logger.error(error, "VNDB characters refresh failed");
+      throw error;
+    } finally {
+      this.isRefreshingCharacters = false;
+    }
+  }
+
+  private async getCharacters(
+    filters: TVndbFilter | TVndbFilters
+  ): Promise<IVndbCharacter[]> {
     const characters: IVndbCharacter[] = [];
-    const idFilters: TVndbFilter[] = vnIds.map((id) => ["id", "=", id]);
 
     for (let page = 1, more = true; more; page++) {
       const data = await this.post<{
         more: boolean;
         results: IVndbCharacter[];
       }>("/character", {
-        filters: ["vn", "=", ["or", ...idFilters]],
+        filters,
         fields:
-          "name,original,aliases,description,image.url,image.sexual,image.violence,sex,vns.id,gender",
+          "name,original,aliases,description,image.id,image.url,image.sexual,image.violence,sex,vns.id,gender,traits.name,traits.group_name,traits.spoiler,traits.lie,traits.sexual",
         results: 100,
         page,
       });
@@ -1546,7 +1608,7 @@ export class VndbService {
   }
 
   private async saveCharacters(characters: IVndbCharacter[]) {
-    if (!characters.length) return;
+    if (!characters.length) return 0;
 
     const now = new Date().toISOString();
 
@@ -1569,6 +1631,15 @@ export class VndbService {
               ],
               description: character.description,
               gender: VNDB_CHARACTER_GENDERS[character.sex?.[0] ?? ""] ?? null,
+              isExplicitImage:
+                (character.image?.sexual ?? 0) > VNDB_EXPLICIT_SEXUAL_LEVEL,
+              traits: (character.traits ?? [])
+                .filter(({ lie, sexual }) => !lie && !sexual)
+                .map(({ name, group_name, spoiler }) => ({
+                  group: group_name,
+                  name,
+                  isSpoiler: spoiler > 0,
+                })),
               vndb: {
                 characterId: character.id,
                 vns: character.vns.map(({ id }) => id),
@@ -1583,6 +1654,48 @@ export class VndbService {
       })),
       { ordered: false }
     );
+
+    return this.uploadCharacterImages(characters);
+  }
+
+  private async uploadCharacterImages(characters: IVndbCharacter[]) {
+    const stored = await this.charactersModel
+      .find({ "vndb.characterId": { $in: characters.map(({ id }) => id) } })
+      .select("mugShot vndb.characterId")
+      .lean();
+    const mugShotById = new Map(
+      stored.map(({ mugShot, vndb }) => [vndb.characterId, mugShot])
+    );
+    let uploaded = 0;
+
+    for (const { id, image } of characters) {
+      if (
+        !image ||
+        this.isStoredVndbImage(
+          S3_FOLDERS.characters,
+          mugShotById.get(id),
+          `${id}/${image.id}`
+        )
+      ) {
+        continue;
+      }
+
+      const mugShot = await this.uploadVndbImage(
+        S3_FOLDERS.characters,
+        id,
+        image
+      );
+
+      if (!mugShot) continue;
+
+      await this.charactersModel.updateOne(
+        { "vndb.characterId": id },
+        { $set: { mugShot } }
+      );
+      uploaded++;
+    }
+
+    return uploaded;
   }
 
   private async getThemes(vnIds: string[]): Promise<Map<string, string[]>> {
