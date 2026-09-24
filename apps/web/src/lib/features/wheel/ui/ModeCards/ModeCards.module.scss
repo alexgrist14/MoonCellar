@@ -1,0 +1,122 @@
+.modes {
+  display: grid;
+  gap: var(--gap-x2);
+}
+
+.card {
+  --tone: var(--color-accent);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--gap-x3);
+  align-items: center;
+  width: 100%;
+  padding: var(--padding-x3);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-x4);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast),
+    background-color var(--duration-fast),
+    box-shadow var(--duration-fast);
+
+  &_royal {
+    --tone: var(--color-attention);
+  }
+
+  &:hover {
+    border-color: color-mix(
+      in srgb,
+      var(--tone) 50%,
+      var(--color-border-primary)
+    );
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--tone);
+    outline-offset: 2px;
+  }
+
+  &[aria-checked="true"] {
+    border-color: var(--tone);
+    background-color: color-mix(
+      in srgb,
+      var(--tone) 12%,
+      var(--color-bg-secondary)
+    );
+    box-shadow:
+      0 0 0 1px var(--tone),
+      0 0 var(--padding-x5) color-mix(in srgb, var(--tone) 30%, transparent);
+  }
+
+  &__icon {
+    display: grid;
+    place-items: center;
+    width: var(--padding-x11);
+    aspect-ratio: 1;
+    border-radius: var(--radius-x3);
+    background-color: color-mix(in srgb, var(--tone) 18%, transparent);
+    color: var(--tone);
+
+    svg {
+      width: var(--padding-x6);
+      height: var(--padding-x6);
+      color: inherit;
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__name {
+    @include font(16px, 20px, 700);
+  }
+
+  &__text {
+    color: var(--color-text-muted);
+    @include font(12px, 17px, 400);
+  }
+
+  &__count {
+    margin-top: var(--gap-x1);
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+    @include font(12px, 16px, 400);
+
+    b {
+      color: var(--tone);
+      font-weight: 700;
+    }
+  }
+
+  &__radio {
+    display: grid;
+    place-items: center;
+    align-self: start;
+    width: var(--padding-x5);
+    aspect-ratio: 1;
+    border: 2px solid var(--color-border-secondary);
+    border-radius: 50%;
+  }
+
+  &[aria-checked="true"] &__radio {
+    border-color: var(--tone);
+
+    &::after {
+      content: "";
+      width: var(--padding-x2);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background-color: var(--tone);
+    }
+  }
+
+  @include reducedMotion {
+    transition-duration: var(--duration-instant);
+  }
+}

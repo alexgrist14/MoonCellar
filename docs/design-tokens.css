@@ -229,6 +229,10 @@
   --game-images-modal-width: min(92vw, 960px);
   --requests-queue-width: 440px;
   --field-control-height: 40px;
+  --gauntlet-mode-cards-width: 300px;
+  --gauntlet-winner-cover-width: 132px;
+  --gauntlet-wheel-max-width: 50vw;
+  --gauntlet-fact-label-width: 110px;
   --object-field-min-width: 160px;
   --requests-panel-min-height: 240px;
   --requests-diff-min-width: 560px;

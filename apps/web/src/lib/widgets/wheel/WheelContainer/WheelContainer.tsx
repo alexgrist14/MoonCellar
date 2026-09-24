@@ -2,27 +2,23 @@ import { FC } from "react";
 import classNames from "classnames";
 import styles from "./WheelContainer.module.scss";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
-import { GameCard } from "@/src/lib/widgets/game/GameCard";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
 import { WheelComponent } from "@/src/lib/features/wheel/ui/WheelComponent";
 import { WheelOptions } from "@/src/lib/features/wheel/ui/WheelOptions";
 import { useWheelStore } from "@/src/lib/shared/store/wheel.store";
 import { Box } from "@/src/lib/shared/ui/Box";
-import { ExpandableBlock } from "@/src/lib/shared/ui/ExpandableBlock";
-import { GameMedia } from "@/src/lib/entities/game/ui/GameMedia";
-import { GameStatsBoxes } from "@/src/lib/entities/game/ui/GameStatsBoxes";
-import { useHideAdult } from "@/src/lib/shared/hooks/useHideAdult";
-import { isAdultGame } from "@/src/lib/shared/utils/adult.utils";
-import { dateRegions } from "@/src/lib/shared/constants";
+import { SvgRandom } from "@/src/lib/shared/ui/svg";
+import { SvgCrown } from "@/src/lib/shared/ui/svg/SvgCrown";
 import { useDelayedUnmount } from "@/src/lib/shared/hooks/useDelayedUnmount";
+import { GauntletWinner } from "./GauntletWinner";
 
 export const WheelContainer: FC = () => {
   const winner = useWheelStore((state) => state.winner);
   const timer = useCommonStore((state) => state.timer);
-  const systems = useCommonStore((state) => state.systems);
 
   const { isFinished, isLoading, isMobile } = useStatesStore();
+  const isRoyal = !!useStatesStore((state) => state.isRoyal);
 
   const {
     rendered: shownWinner,
@@ -30,31 +26,12 @@ export const WheelContainer: FC = () => {
     onExitEnd,
   } = useDelayedUnmount(winner);
 
-  const hideMedia = useHideAdult() && !!shownWinner && isAdultGame(shownWinner);
-
-  const releaseDate = shownWinner?.first_release
-    ? new Date(shownWinner.first_release * 1000).getFullYear()
-    : undefined;
-
   return (
     <>
       <ExpandMenu position="bottom-right" titleOpen="Settings">
         <WheelOptions />
       </ExpandMenu>
       <div className={styles.container}>
-        <div
-          className={classNames(styles.container__left, {
-            [styles.container_cardReveal]: !!shownWinner && !isExiting,
-            [styles.container_conceal]: isExiting,
-          })}
-          onAnimationEnd={onExitEnd}
-        >
-          {!!shownWinner && (
-            <div className={styles.stack}>
-              <GameCard game={shownWinner} isInfoDisabled />
-            </div>
-          )}
-        </div>
         <div className={styles.container__wheel}>
           <WheelComponent
             time={timer}
@@ -70,117 +47,38 @@ export const WheelContainer: FC = () => {
           })}
           onAnimationEnd={onExitEnd}
         >
-          {!!shownWinner && (
-            <Box
-              isWithScrollBar={!isMobile}
-              wrapperStyle={
-                isMobile ? undefined : { minHeight: 0, maxHeight: "100%" }
-              }
-              templateStyle={
-                isMobile ? undefined : { minHeight: 0, maxHeight: "100%" }
-              }
-              contentStyle={{
-                maxHeight: isMobile ? "fit-content" : "100%",
-              }}
-              scrollFadeType="both"
-            >
-              <div className={styles.info}>
-                <h2>{shownWinner.name}</h2>
-                <div className={styles.info__row}>
-                  {!!releaseDate && (
-                    <p>
-                      <span>Year: </span>
-                      {releaseDate}
-                    </p>
-                  )}
-                  <p>
-                    <span>Game type: </span>
-                    {shownWinner.type}
-                  </p>
-                </div>
-                <div className={styles.info__row}>
-                  {!!shownWinner.platformIds?.length && (
-                    <p>
-                      <span>Platforms: </span>
-                      {shownWinner.platformIds
-                        .map(
-                          (id) => systems?.find((sys) => sys._id === id)?.name
-                        )
-                        .filter(Boolean)
-                        .join(", ")}
-                    </p>
-                  )}
-                  {!!shownWinner.genres?.length && (
-                    <p>
-                      <span>Genres: </span>
-                      {shownWinner.genres.join(", ")}
-                    </p>
-                  )}
-                  {!!shownWinner.modes?.length && (
-                    <p>
-                      <span>Game modes: </span>
-                      {shownWinner.modes.join(", ")}
-                    </p>
-                  )}
-                  {!!shownWinner.themes?.length && (
-                    <p>
-                      <span>Themes: </span>
-                      {shownWinner.themes.join(", ")}
-                    </p>
-                  )}
-                  {!!shownWinner.languages?.length && (
-                    <p>
-                      <span>Languages: </span>
-                      {shownWinner.languages.join(", ")}
-                    </p>
-                  )}
-                </div>
-                <GameStatsBoxes game={shownWinner} isBoxed={false} />
-                {!!shownWinner.summary && (
-                  <div className={styles.info__text}>
-                    <h4>Summary:</h4>
-                    <ExpandableBlock title="Summary" mode="scroll">
-                      <p>{shownWinner.summary}</p>
-                    </ExpandableBlock>
-                  </div>
-                )}
-                {!!shownWinner.storyline && (
-                  <div className={styles.info__text}>
-                    <h4>Storyline:</h4>
-                    <ExpandableBlock title="Storyline" mode="scroll">
-                      <p>{shownWinner.storyline}</p>
-                    </ExpandableBlock>
-                  </div>
-                )}
-                {!hideMedia && (
-                  <div className={styles.info__text}>
-                    <GameMedia game={shownWinner} isBoxed={false} />
-                  </div>
-                )}
-                {!!shownWinner.release_dates?.length && (
-                  <div className={styles.info__text}>
-                    <h4>Release dates:</h4>
-                    {shownWinner.release_dates
-                      .sort((a, b) => a.date - b.date)
-                      .map((date, i) => {
-                        const platform = systems?.find(
-                          (sys) => sys._id === date.platformId
-                        );
-
-                        return (
-                          <p key={date.date + "_" + i}>
-                            {date.human}: {platform?.name || "Unknown platform"}
-                            {!!dateRegions[+date.region - 1] && (
-                              <span> ({dateRegions[+date.region - 1]})</span>
-                            )}
-                          </p>
-                        );
-                      })}
-                  </div>
-                )}
+          <Box
+            isWithScrollBar={!isMobile}
+            wrapperStyle={
+              isMobile ? undefined : { minHeight: 0, maxHeight: "100%" }
+            }
+            templateStyle={
+              isMobile ? undefined : { minHeight: 0, maxHeight: "100%" }
+            }
+            contentStyle={{
+              maxHeight: isMobile ? "fit-content" : "100%",
+              padding: "var(--padding-x4)",
+            }}
+            scrollFadeType="both"
+          >
+            {shownWinner ? (
+              <GauntletWinner game={shownWinner} isRoyal={isRoyal} />
+            ) : (
+              <div className={styles.idle} data-royal={isRoyal}>
+                {isRoyal ? <SvgCrown /> : <SvgRandom />}
+                <p className={styles.idle__title}>
+                  {isRoyal
+                    ? "Spin to knock out the first game"
+                    : "Spin to get a game"}
+                </p>
+                <p className={styles.idle__text}>
+                  {isRoyal
+                    ? "Every spin removes one game until only the winner is left."
+                    : "Change the filters above first, or spin over everything."}
+                </p>
               </div>
-            </Box>
-          )}
+            )}
+          </Box>
         </div>
       </div>
     </>

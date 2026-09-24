@@ -61,6 +61,9 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   time = 3,
 }) => {
   const setWinner = useWheelStore((state) => state.setWinner);
+  const setRoyalRemainingIds = useWheelStore(
+    (state) => state.setRoyalRemainingIds
+  );
 
   const { addHistoryGame, games } = useGamesStore();
   const { royalGames } = useRoyalGames();
@@ -213,6 +216,10 @@ export const WheelComponent: FC<WheelComponentProps> = ({
   useEffect(() => {
     !isRoyal && setTempGames([]);
   }, [isRoyal]);
+
+  useEffect(() => {
+    setRoyalRemainingIds(tempGames.map((game) => game._id));
+  }, [tempGames, setRoyalRemainingIds]);
 
   useEffect(() => {
     if (skipNextRoyalRedrawRef.current) {

@@ -2,7 +2,7 @@ import { GauntletPage } from "@/src/lib/pages/GauntletPage/GauntletPage";
 import { Metadata } from "next";
 import { Suspense } from "react";
 import styles from "@/src/lib/pages/GauntletPage/GauntletPage.module.scss";
-import { GauntletHeader } from "@/src/lib/widgets/gauntlet/GauntletHeader";
+import { GauntletModePanel } from "@/src/lib/widgets/gauntlet/GauntletModePanel";
 import { PageLoader } from "@/src/lib/shared/ui/PageLoader";
 import { JsonLd } from "@/src/lib/shared/ui/JsonLd";
 import { getBreadcrumbJsonLd } from "@/src/lib/shared/utils/json-ld.utils";
@@ -33,7 +33,7 @@ const GauntletPageIndex = () => {
           { name: "Gauntlet", path: "/gauntlet" },
         ])}
       />
-      <GauntletHeader />
+      <GauntletModePanel />
       <Suspense fallback={<PageLoader />}>
         <GauntletPage />
       </Suspense>

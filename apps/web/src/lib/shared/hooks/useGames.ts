@@ -6,12 +6,14 @@ import { parseQueryFilters } from "@/src/lib/shared/utils/filters.utils";
 import { gamesApi } from "@/src/lib/shared/api";
 import { useFiltersStore } from "@/src/lib/shared/store/filters.store";
 import { shuffle } from "@/src/lib/shared/utils/common.utils";
+import { useWheelStore } from "@/src/lib/shared/store/wheel.store";
 
 export const useGames = () => {
   const { asPath } = useAdvancedRouter();
   const { isRoyal } = useStatesStore();
   const isExcludeHistory = useFiltersStore((state) => state.isExcludeHistory);
   const { setGames, historyGames } = useGamesStore();
+  const setMatchTotal = useWheelStore((state) => state.setMatchTotal);
 
   const getIGDBGames = useCallback(async () => {
     if (isRoyal) return;
@@ -31,9 +33,10 @@ export const useGames = () => {
     const games = shuffle(res.data.results);
 
     setGames(games);
+    setMatchTotal(res.data.total);
 
     return games;
-  }, [isRoyal, isExcludeHistory, historyGames, asPath, setGames]);
+  }, [isRoyal, isExcludeHistory, historyGames, asPath, setGames, setMatchTotal]);
 
   return { getIGDBGames };
 };
