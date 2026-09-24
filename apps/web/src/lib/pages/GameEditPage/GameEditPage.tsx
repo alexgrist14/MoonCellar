@@ -384,6 +384,9 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
       {
         onSuccess: (game) => {
           toast.success({ description: "Game updated" });
+          revalidateGamePage(original.slug as string, game.slug).catch(
+            () => undefined
+          );
           setOriginal((current) => ({
             ...(game as unknown as Record<string, unknown>),
             characters: current.characters,
