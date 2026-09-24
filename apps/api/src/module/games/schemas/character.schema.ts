@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { type HydratedDocument } from "mongoose";
 import {
   type ICharacterIGDBField,
+  type ICharacterTrait,
   type ICharacterVndbField,
 } from "@mooncellar/schemas";
 
@@ -25,6 +26,10 @@ export class Character {
   countryName: string;
   @Prop()
   mugShot: string;
+  @Prop()
+  isExplicitImage: boolean;
+  @Prop({ type: [Object] })
+  traits: ICharacterTrait[];
   @Prop({ ref: "Game" })
   gameIds: mongoose.Types.ObjectId[];
   @Prop({ type: Object })

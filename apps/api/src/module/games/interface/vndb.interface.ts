@@ -276,6 +276,15 @@ export interface IVndbCharacter {
   //  Possible values are null, "m", "f", "o" (non-binary) or "a" (ambiguous).
   gender: [VndbCharacterGender, VndbCharacterGender] | null;
   vns: IVndbCharacterNovel[];
+  traits: IVndbCharacterTrait[];
+}
+
+interface IVndbCharacterTrait {
+  name: string;
+  group_name: string;
+  spoiler: TFieldStatus;
+  lie: boolean;
+  sexual: boolean;
 }
 
 interface IVndbCharacterNovel extends IVndbNovel {

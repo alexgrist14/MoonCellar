@@ -147,6 +147,24 @@ export class VndbController {
   @UseGuards(RolesGuard)
   @Roles(RolesEnum.ADMIN)
   @UseGuards(AuthGuard("jwt"))
+  @Post("characters/refresh")
+  @ApiOperation({
+    summary:
+      "Re-fetch every VNDB character: upload portraits missing from storage and refresh traits",
+  })
+  refreshCharacters() {
+    if (this.vndbService.isRefreshingVndbCharacters) {
+      return { message: "VNDB characters refresh is already running" };
+    }
+
+    this.vndbService.refreshVndbCharacters().catch(() => undefined);
+
+    return { message: "VNDB characters refresh started" };
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(RolesEnum.ADMIN)
+  @UseGuards(AuthGuard("jwt"))
   @Get("candidates")
   @ApiOperation({
     summary:
