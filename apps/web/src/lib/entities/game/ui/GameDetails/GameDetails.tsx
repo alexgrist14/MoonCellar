@@ -99,7 +99,20 @@ export const GameDetails: FC<IGameDetailsProps> = ({ game }) => {
   if (!rows.length) return null;
 
   return (
-    <Box title="Details" isTitleStart classNameContent={styles.details}>
+    <Box
+      title="Details"
+      isTitleStart
+      titleAction={
+        <Link
+          href={`/requests?kind=game&targetId=${game._id}&targetName=${encodeURIComponent(game.name)}`}
+          className={styles.details__suggest}
+          rel="nofollow"
+        >
+          Suggest an edit
+        </Link>
+      }
+      classNameContent={styles.details}
+    >
       {rows.map((row) => (
         <div key={row.label} className={styles.details__row}>
           <p className={styles.details__label}>{row.label}:</p>

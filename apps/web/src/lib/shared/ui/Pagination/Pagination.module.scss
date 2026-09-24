@@ -77,6 +77,11 @@
   width: 100%;
   padding-inline: var(--padding-x3);
 
+  &_compact {
+    grid-template-columns: auto;
+    justify-content: center;
+  }
+
   &__summary {
     font-size: 13px;
     color: var(--color-text-muted);

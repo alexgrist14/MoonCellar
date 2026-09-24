@@ -33,8 +33,15 @@ import { VndbController } from "./controllers/vndb.controller";
 import { ImageDedupeController } from "./controllers/image-dedupe.controller";
 import { ImageDedupeService } from "./services/image-dedupe.service";
 import { ImageOrphansController } from "./controllers/image-orphans.controller";
+import { ContentRequestsController } from "./controllers/content-requests.controller";
+import { ContentRequestsService } from "./services/content-requests.service";
+import {
+  ContentRequest,
+  ContentRequestDatabaseSchema,
+} from "./schemas/content-request.schema";
 import { ImageOrphansService } from "./services/image-orphans.service";
 import { HttpModule } from "@nestjs/axios";
+import { IgdbModule } from "../igdb/igdb.module";
 import { JwtModule } from "@nestjs/jwt";
 import { VndbReviewGateway } from "./gateways/vndb-review.gateway";
 import {
@@ -52,6 +59,7 @@ import {
     VndbController,
     ImageDedupeController,
     ImageOrphansController,
+    ContentRequestsController,
   ],
   providers: [
     GamesService,
@@ -65,12 +73,15 @@ import {
     VndbReviewGateway,
     ImageDedupeService,
     ImageOrphansService,
+    ContentRequestsService,
   ],
   imports: [
+    IgdbModule,
     MongooseModule.forFeature([
       { name: Game.name, schema: GameDatabaseSchema },
       { name: Platform.name, schema: PlatformDatabaseSchema },
       { name: Character.name, schema: CharacterDatabaseSchema },
+      { name: ContentRequest.name, schema: ContentRequestDatabaseSchema },
       { name: Playthrough.name, schema: PlaythroughDatabaseSchema },
       { name: UserLogs.name, schema: UserLogsSchema },
       { name: User.name, schema: UserSchema },

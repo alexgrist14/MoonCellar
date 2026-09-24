@@ -11,3 +11,5 @@ export * from "./comments.api";
 export * from "./comment-reports.api";
 export * from "./vndb-candidates.api";
 export * from "./vndb.api";
+export * from "./characters.api";
+export * from "./content-requests.api";

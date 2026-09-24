@@ -1,0 +1,38 @@
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-x1);
+  flex-shrink: 0;
+  padding: var(--padding-x1) var(--padding-x2);
+  border-radius: var(--radius-x2);
+  white-space: nowrap;
+  @include font(12px, 14px, 600);
+
+  &::before {
+    content: "";
+    width: var(--padding-x1);
+    height: var(--padding-x1);
+    border-radius: 50%;
+    background-color: currentColor;
+  }
+
+  &_pending {
+    color: var(--color-attention);
+    background-color: color-mix(in srgb, var(--color-attention) 16%, transparent);
+  }
+
+  &_approved {
+    color: var(--color-positive);
+    background-color: color-mix(in srgb, var(--color-positive) 16%, transparent);
+  }
+
+  &_rejected {
+    color: var(--color-orange);
+    background-color: color-mix(in srgb, var(--color-negative) 18%, transparent);
+  }
+
+  &_withdrawn {
+    color: var(--color-text-muted);
+    background-color: var(--color-bg-tertiary);
+  }
+}

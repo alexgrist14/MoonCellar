@@ -19,6 +19,7 @@ import { MetricsModule } from "../metrics/metrics.module";
 @Module({
   controllers: [IgdbParserController],
   providers: [IGDBService, FileService],
+  exports: [IGDBService],
   imports: [
     HttpModule,
     MongooseModule.forFeature([

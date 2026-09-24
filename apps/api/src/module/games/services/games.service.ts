@@ -107,8 +107,8 @@ const RELATED_GAMES_PER_RELATION_LIMIT = 24;
 const CHARACTERS_LOOKUP_STAGE = {
   $lookup: {
     from: "characters",
-    localField: "characters",
-    foreignField: "_id",
+    localField: "_id",
+    foreignField: "gameIds",
     as: "characters",
     pipeline: [{ $sort: { name: 1 as const } }],
   },

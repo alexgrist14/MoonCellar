@@ -3,6 +3,7 @@
 import { FC, useState } from "react";
 import classNames from "classnames";
 import styles from "./GameRelated.module.scss";
+import { RELATION_LABELS } from "@/src/lib/shared/constants/related-games.const";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { GamesCards } from "@/src/lib/widgets/game/GamesCards";
@@ -11,28 +12,6 @@ import {
   IRelatedGameKey,
   IRelatedGamesResponse,
 } from "@mooncellar/schemas";
-
-const RELATION_LABELS: Record<IRelatedGameKey, string> = {
-  parent_game: "Main game",
-  prequels: "Prequel",
-  sequels: "Sequel",
-  side_stories: "Side story",
-  parent_stories: "Parent story",
-  dlcs: "DLC",
-  expansions: "Expansion",
-  standalone_expansions: "Standalone expansion",
-  remakes: "Remake",
-  remasters: "Remaster",
-  ports: "Port",
-  forks: "Fork",
-  alternative_versions: "Alternative version",
-  expanded_games: "Expanded game",
-  bundles: "Bundle",
-  same_series: "Same series",
-  same_setting: "Same setting",
-  shared_characters: "Shared characters",
-  similar_games: "Similar",
-};
 
 const RELATED_GROUPS: {
   key: string;

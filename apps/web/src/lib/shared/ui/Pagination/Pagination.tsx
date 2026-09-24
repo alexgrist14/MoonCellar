@@ -19,6 +19,7 @@ interface IPaginationProps {
   page?: number;
   onPageChange?: (page: number) => void;
   scrollTargetRef?: RefObject<HTMLElement | null>;
+  isWithoutSummary?: boolean;
 }
 
 export const Pagination = memo(
@@ -31,6 +32,7 @@ export const Pagination = memo(
     page: controlledPage,
     onPageChange,
     scrollTargetRef,
+    isWithoutSummary,
   }: IPaginationProps) => {
     const { query, setQuery } = useAdvancedRouter();
     const centerRef = useRef<HTMLDivElement>(null);
@@ -157,6 +159,17 @@ export const Pagination = memo(
     const renderInline = () => {
       const from = (page - 1) * take + 1;
       const to = Math.min(page * take, total);
+
+      if (isWithoutSummary) {
+        return (
+          <nav
+            className={classNames(styles.inline, styles.inline_compact)}
+            aria-label="Pagination"
+          >
+            {renderBlock()}
+          </nav>
+        );
+      }
 
       return (
         <nav className={styles.inline} aria-label="Pagination">

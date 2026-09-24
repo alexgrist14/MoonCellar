@@ -1,4 +1,10 @@
-import { memo, ReactNode, ComponentPropsWithRef, isValidElement } from "react";
+import {
+  ComponentPropsWithRef,
+  Fragment,
+  isValidElement,
+  memo,
+  ReactNode,
+} from "react";
 import cl from "classnames";
 import styles from "./Button.module.scss";
 import { Tooltip } from "../Tooltip";
@@ -50,8 +56,18 @@ export const Button = memo(
     ref,
     ...props
   }: IButtonProps) => {
+    const isSingleCharacter =
+      (typeof children === "string" || typeof children === "number") &&
+      [...String(children).trim()].length === 1;
     const isIconOnly =
-      isValidElement(children) && typeof children.type !== "string";
+      (isValidElement(children) && typeof children.type !== "string") ||
+      isSingleCharacter;
+    const isSquare =
+      isSingleCharacter ||
+      (isValidElement<{ children?: unknown }>(children) &&
+        typeof children.type !== "string" &&
+        children.type !== Fragment &&
+        children.props.children === undefined);
 
     const button = (
       <button
@@ -70,6 +86,7 @@ export const Button = memo(
             [styles[`button_${color}Color_active`]]: active,
             [styles.button_compact]: compact,
             [styles.button_icon]: isIconOnly,
+            [styles.button_square]: isSquare,
             [styles.button_hidden]: hidden,
           }
         )}

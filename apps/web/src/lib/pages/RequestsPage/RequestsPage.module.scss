@@ -1,0 +1,27 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x5);
+  padding: var(--padding-x5);
+
+  @include mediaSm {
+    padding: var(--padding-x3);
+  }
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x1);
+}
+
+.title {
+  color: var(--color-text-primary);
+  @include font(24px, 30px, 700);
+}
+
+.lede {
+  max-width: 65ch;
+  color: var(--color-text-secondary);
+  @include font(14px, 20px, 400);
+}

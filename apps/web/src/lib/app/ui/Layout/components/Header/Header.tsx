@@ -13,6 +13,7 @@ import {
   SvgRandom,
   SvgBurger,
   SvgListBullet,
+  SvgInbox,
 } from "@/src/lib/shared/ui/svg";
 import Link from "next/link";
 import { FC, MouseEvent, useCallback, useMemo, useRef, useState } from "react";
@@ -181,7 +182,7 @@ export const Header: FC = () => {
         </div>
       </div>
       <div className={styles.container__right}>
-        {isAdmin && (
+        {isAuth && (
           <ButtonGroup
             wrapperClassName={classNames(
               styles.container__buttons,
@@ -191,14 +192,29 @@ export const Header: FC = () => {
               {
                 title: (
                   <>
-                    <SvgAdmin className={styles.svg} />
-                    <span className={styles.admin__label}>Admin</span>
+                    <SvgInbox className={styles.svg} />
+                    <span className={styles.admin__label}>Requests</span>
                   </>
                 ),
-                link: "/admin",
+                link: "/requests",
                 color: ButtonColor.TRANSPARENT,
                 onClick: closeMenu,
               },
+              ...(isAdmin
+                ? [
+                    {
+                      title: (
+                        <>
+                          <SvgAdmin className={styles.svg} />
+                          <span className={styles.admin__label}>Admin</span>
+                        </>
+                      ),
+                      link: "/admin",
+                      color: ButtonColor.TRANSPARENT,
+                      onClick: closeMenu,
+                    },
+                  ]
+                : []),
             ]}
           />
         )}

@@ -130,6 +130,18 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   is on.** A new `Schema.index(...)` is built on production the first time any local process
   loads that schema. One-off scripts that import schemas connect with `autoIndex: false`.
 
+- **A game's characters are read from `character.gameIds`, never from `game.characters`.**
+  `CHARACTERS_LOOKUP_STAGE` joins on `gameIds` because `linkGameCharacters` (IGDB) and
+  `linkVndbCharacters` rewrite `game.characters` with only their own characters every run, so a
+  character created by an admin or an approved request vanished from its game's page after the
+  next sync. The syncs recompute `gameIds` only for characters that carry their `igdb`/`vndb`
+  field, which leaves manual links alone.
+- **An image URL that came from a user is fetched only through `FileService.uploadRemoteImage`.**
+  It goes through `downloadRemoteImage`, which refuses non-http(s) links, private, loopback and
+  link-local addresses on every redirect hop, non-image content types and bodies over 15 MB. A
+  plain `axios.get` on a request's link lets anyone point the server at the cloud metadata
+  endpoint or the internal network.
+
 ## Tests
 
 - **A spec that imports anything reaching `shared/utils/rich-text.utils` must mock that

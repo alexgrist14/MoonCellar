@@ -94,6 +94,11 @@
     padding: var(--padding-x2);
   }
 
+  &_square {
+    flex-shrink: 0;
+    aspect-ratio: 1;
+  }
+
   &_compact {
     padding: var(--padding-x05) var(--padding-x1);
 

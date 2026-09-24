@@ -1,4 +1,11 @@
-export const ADMIN_TABS = ["users", "games", "reports", "vndb"] as const;
+export const ADMIN_TABS = [
+  "users",
+  "games",
+  "reports",
+  "vndb",
+  "characters",
+  "requests",
+] as const;
 
 export type TAdminTab = (typeof ADMIN_TABS)[number];
 

@@ -38,3 +38,13 @@
     }
   }
 }
+
+.details__suggest {
+  color: var(--color-text-muted);
+  @include font(13px, 17px, 500);
+
+  &:hover {
+    color: var(--color-text-primary);
+    text-decoration: underline;
+  }
+}

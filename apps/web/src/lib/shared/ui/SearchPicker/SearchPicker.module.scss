@@ -1,0 +1,80 @@
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x1);
+  min-width: 0;
+
+  &__label {
+    color: var(--color-text-muted);
+    font-size: 13px;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x05);
+    margin: 0;
+    padding: var(--padding-x1);
+    list-style: none;
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x4);
+    background-color: var(--color-bg-secondary);
+  }
+
+  &__empty {
+    padding: var(--padding-x2);
+    color: var(--color-text-muted);
+    font-size: 13px;
+  }
+
+  &__option {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    width: 100%;
+    padding: var(--padding-x1) var(--padding-x2);
+    border: 0;
+    border-radius: var(--radius-x3);
+    background: none;
+    color: var(--color-text-primary);
+    text-align: left;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background-color: var(--color-bg-hover);
+    }
+  }
+
+  &__thumb {
+    position: relative;
+    flex-shrink: 0;
+    width: var(--padding-x8);
+    aspect-ratio: var(--cover-ratio);
+    border-radius: var(--radius-x1);
+    overflow: hidden;
+    background-color: var(--color-bg-tertiary);
+
+    img {
+      object-fit: cover;
+    }
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__name {
+    font-size: 14px;
+    font-weight: 500;
+    @include textEllipsis;
+  }
+
+  &__meta {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    @include textEllipsis;
+  }
+}

@@ -1,0 +1,37 @@
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-x1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-x1);
+  padding: var(--padding-x1) var(--padding-x2);
+  border-radius: var(--radius-x2);
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  @include font(12px, 16px, 400);
+
+  &__remove {
+    display: grid;
+    place-items: center;
+    width: var(--padding-x5);
+    aspect-ratio: 1;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-x1);
+    background: none;
+    color: var(--color-negative);
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background-color: color-mix(in srgb, var(--color-negative) 18%, transparent);
+    }
+  }
+}

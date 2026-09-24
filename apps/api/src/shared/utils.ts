@@ -63,6 +63,27 @@ export const replaceRomanNumerals = (normalizedName: string) =>
     )
     .join(" ");
 
+export const toSlug = (value: string) =>
+  value
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "untitled";
+
+export const uniqueSlug = async (
+  isTaken: (slug: string) => Promise<unknown>,
+  value: string
+) => {
+  const base = toSlug(value);
+
+  for (let suffix = 1; ; suffix++) {
+    const slug = suffix === 1 ? base : `${base}-${suffix}`;
+
+    if (!(await isTaken(slug))) return slug;
+  }
+};
+
 export const getFormattedTitle = (title: string) => {
   return title
     .replaceAll("The ", "")

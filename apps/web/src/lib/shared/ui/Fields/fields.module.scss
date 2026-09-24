@@ -49,6 +49,40 @@
   border: 1px solid var(--color-border-primary);
   border-radius: var(--radius-x4);
   background: var(--color-bg-tertiary);
+
+  &_added {
+    animation: chipAdded 0.9s var(--easing-out);
+  }
+
+  @include reducedMotion {
+    &_added {
+      animation-duration: var(--duration-instant);
+    }
+  }
+
+  &__remove {
+    display: grid;
+    place-items: center;
+    width: var(--padding-x6);
+    aspect-ratio: 1;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-x2);
+    background: transparent;
+    color: var(--color-negative);
+    cursor: pointer;
+    transition: background-color var(--duration-fast);
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+      background-color: color-mix(in srgb, var(--color-negative) 18%, transparent);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
 }
 
 .objectRow {
@@ -63,6 +97,44 @@
 
   & > .field {
     margin-bottom: 0;
+  }
+
+  &__cell {
+    flex: 1 1 var(--object-field-min-width);
+    min-width: 0;
+  }
+
+  &__flag {
+    flex: 0 0 auto;
+  }
+
+  &__control {
+    height: var(--field-control-height);
+  }
+
+  &__remove {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: var(--field-control-height);
+    aspect-ratio: 1;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-x2);
+    background-color: color-mix(in srgb, var(--color-negative) 12%, transparent);
+    color: var(--color-negative);
+    cursor: pointer;
+    transition: background-color var(--duration-fast);
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+      background-color: color-mix(in srgb, var(--color-negative) 24%, transparent);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
   }
 }
 
@@ -180,5 +252,30 @@
     font-size: 12px;
     line-height: 16px;
     @include lineClamp(2);
+  }
+}
+
+.addButton.addButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-x1);
+  flex-shrink: 0;
+}
+
+@keyframes chipAdded {
+  0% {
+    opacity: 0;
+    transform: scale(var(--reveal-scale));
+    border-color: var(--color-positive);
+  }
+
+  35% {
+    opacity: 1;
+    transform: scale(1);
+    border-color: var(--color-positive);
+  }
+
+  100% {
+    border-color: var(--color-border-primary);
   }
 }

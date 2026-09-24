@@ -18,6 +18,7 @@ import {
   type IGetFileResponse,
 } from "@mooncellar/schemas";
 import { mimeToExt } from "../../../shared/constants";
+import { downloadRemoteImage } from "../../../shared/remote-image";
 import {
   getS3Bucket,
   getS3CdnUrl,
@@ -121,6 +122,19 @@ export class FileService {
     const storedKey = await this.uploadFile(file, key, folder);
 
     if (!storedKey) throw new BadRequestException("No file uploaded");
+
+    return this.getPublicUrl(folder, storedKey);
+  }
+
+  async uploadRemoteImage(url: string, key: string, folder: S3Folder) {
+    const image = await downloadRemoteImage(url);
+    const storedKey = await this.uploadFile(
+      image as Express.Multer.File,
+      key,
+      folder
+    );
+
+    if (!storedKey) throw new BadRequestException("No image uploaded");
 
     return this.getPublicUrl(folder, storedKey);
   }

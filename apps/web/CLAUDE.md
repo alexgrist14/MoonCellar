@@ -72,7 +72,12 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   the 1:2 ratio on the same scale. The only exception is a button that holds a single icon and
   nothing else, which keeps equal padding: `Button` detects that itself (one child that is a
   component element, e.g. `<SvgClose />`) and adds `button_icon`, so do not pass a padding
-  override for it. Native `<button>`s styled in a module follow the same rule. This is the
+  override for it. A button holding nothing but one icon or one character (`+`, `✕`, a digit)
+  is square (`aspect-ratio: 1`): `Button` adds `button_square` only for a single childless
+  element that is not a Fragment, or a one-character string. Keep that check strict —
+  `button_icon`'s older test also matches a Fragment like `<><SvgGames /> Games</>`, and the
+  aspect ratio on it squashed every header button. A native `<button>` holding only an icon
+  sets `aspect-ratio: 1` in its own module. Native `<button>`s styled in a module follow the same rule. This is the
   site's button shape; a text button with a 1:3 ratio reads as a different control next to its
   neighbours.
 - For text colour use the semantic tokens, never a raw `--color-neutral-*`: `--color-text-primary` (headings and main copy), `--color-text-secondary` (body text, intro paragraphs), `--color-text-muted` (captions, notes, metadata, breadcrumbs). Picking neutrals by hand is how text ends up unreadable on a `Box` over `BGImage` — the muted step is deliberately the lightest one that still reads as secondary.
@@ -305,6 +310,12 @@ component needs to build the value itself (a `basePath` string, not a `getHref` 
   field registers. Hiding such a field must not unmount it: `{isShown && <Controller />}` drops
   the registration and locks the button again — keep the `Controller` rendered and hide its
   wrapper with a modifier class, as the modal does with the comment for Wishlist.
+- **The shared `Button` sets no `type`, so inside a `<form>` every button without one submits
+  it.** The request page's Game/Character tabs submitted the form and showed validation errors
+  on every switch. Pass `type="button"` to anything that is not the submit button (`Tabs` does
+  it for its own buttons), or drive the form from the submit button's `onClick` without a native
+  `<form>`, as `RequestForm` does — shared controls like `Dropdown` and `DatePicker` render
+  buttons of their own, and Enter in any input submits a native form too.
 - **The game edit form validates and diffs `pruneEmpty(values)`, never the raw form values.**
   Every `Controller` on a nested path (`igdb.gameId`, `vndb.vnId`, `relatedGames.sequels`)
   creates that key with `undefined`, so a game without IGDB data carried `igdb: {}` and failed

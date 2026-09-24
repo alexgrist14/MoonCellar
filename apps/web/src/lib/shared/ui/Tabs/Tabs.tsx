@@ -69,6 +69,7 @@ export const Tabs: FC<ITabs> = ({
               className={cl(styles.tabs__link, content.className)}
             >
               <Button
+                type="button"
                 color={color}
                 style={content.style}
                 className={cl({
@@ -87,6 +88,7 @@ export const Tabs: FC<ITabs> = ({
             </Link>
           ) : (
             <Button
+              type="button"
               color={color}
               className={cl(styles.tabs__button, content.className, {
                 [styles.tabs__button_adaptive]: isAdaptive,

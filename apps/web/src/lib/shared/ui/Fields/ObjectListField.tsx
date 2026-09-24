@@ -1,9 +1,11 @@
 import { FC, useId, useMemo, useRef } from "react";
+import classNames from "classnames";
 import { DatePicker } from "@/src/lib/shared/ui/DatePicker";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { Checkbox } from "@/src/lib/shared/ui/Checkbox";
 import { dateInputToUnix, unixToDateInput } from "./DateField";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
+import { SvgClose } from "@/src/lib/shared/ui/svg";
 import styles from "./fields.module.scss";
 
 export interface IObjectFieldDescriptor {
@@ -99,7 +101,15 @@ export const ObjectListField: FC<IObjectListFieldProps> = ({
       {items.map((item, index) => (
         <div key={keys[index]} className={styles.objectRow}>
           {fields.map((field) => (
-            <div key={field.key} className={styles.field}>
+            <div
+              key={field.key}
+              className={classNames(
+                styles.field,
+                field.kind === "boolean"
+                  ? styles.objectRow__flag
+                  : styles.objectRow__cell
+              )}
+            >
               <span className={styles.label}>{field.label}</span>
               {field.kind === "boolean" ? (
                 <Checkbox
@@ -117,6 +127,7 @@ export const ObjectListField: FC<IObjectListFieldProps> = ({
                 />
               ) : (
                 <Input
+                  containerClassname={styles.objectRow__control}
                   type={field.kind === "number" ? "number" : "text"}
                   list={
                     field.options?.length
@@ -140,14 +151,15 @@ export const ObjectListField: FC<IObjectListFieldProps> = ({
               )}
             </div>
           ))}
-          <Button
+          <button
             type="button"
-            color={ButtonColor.RED}
+            className={styles.objectRow__remove}
+            aria-label={`Remove row ${index + 1}`}
             disabled={disabled}
             onClick={() => removeRow(index)}
           >
-            Remove
-          </Button>
+            <SvgClose size="16" style={{ color: "inherit" }} />
+          </button>
         </div>
       ))}
       <Button
