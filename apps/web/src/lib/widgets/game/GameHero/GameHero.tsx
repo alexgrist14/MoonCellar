@@ -63,14 +63,6 @@ export const GameHero: FC<IGameHeroProps> = ({ game, stats }) => {
       });
     }
 
-    game.genres?.forEach((genre) =>
-      items.push({
-        key: `genre-${genre}`,
-        label: genre,
-        href: `/games/genre/${toSlug(genre)}`,
-      })
-    );
-
     game.player_perspectives?.forEach((perspective) =>
       items.push({
         key: `perspective-${perspective}`,
@@ -79,20 +71,36 @@ export const GameHero: FC<IGameHeroProps> = ({ game, stats }) => {
       })
     );
 
-    game.platformIds?.forEach((id) => {
-      const platform = systems?.find((sys) => sys._id === id);
-
-      if (!platform) return;
-
-      items.push({
-        key: `platform-${id}`,
-        label: platform.name,
-        href: `/games/platform/${platform.slug}`,
-      });
-    });
-
     return items;
-  }, [game, releaseYear, systems]);
+  }, [game, releaseYear]);
+
+  const genreChips = useMemo(
+    () =>
+      (game.genres ?? []).map((genre) => ({
+        key: `genre-${genre}`,
+        label: genre,
+        href: `/games/genre/${toSlug(genre)}`,
+      })),
+    [game.genres]
+  );
+
+  const platformChips = useMemo(
+    () =>
+      (game.platformIds ?? []).flatMap((id) => {
+        const platform = systems?.find((sys) => sys._id === id);
+
+        return platform
+          ? [
+              {
+                key: `platform-${id}`,
+                label: platform.name,
+                href: `/games/platform/${platform.slug}`,
+              },
+            ]
+          : [];
+      }),
+    [game.platformIds, systems]
+  );
 
   return (
     <Box
@@ -153,18 +161,21 @@ export const GameHero: FC<IGameHeroProps> = ({ game, stats }) => {
             )}
           </div>
 
-          {!!chips.length && (
-            <div className={styles.hero__chips}>
-              {chips.map((chip) => (
-                <Link
-                  key={chip.key}
-                  href={chip.href}
-                  className={styles.hero__chip}
-                >
-                  {chip.label}
-                </Link>
-              ))}
-            </div>
+          {[chips, genreChips, platformChips].map(
+            (row, index) =>
+              !!row.length && (
+                <div key={index} className={styles.hero__chips}>
+                  {row.map((chip) => (
+                    <Link
+                      key={chip.key}
+                      href={chip.href}
+                      className={styles.hero__chip}
+                    >
+                      {chip.label}
+                    </Link>
+                  ))}
+                </div>
+              )
           )}
 
           <GameRating game={game} className={styles.hero__ratingControl} />
