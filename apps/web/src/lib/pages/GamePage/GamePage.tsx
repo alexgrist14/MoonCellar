@@ -6,6 +6,7 @@ import { BGImage } from "@/src/lib/shared/ui/BGImage";
 import {
   IGameResponse,
   IGameStats,
+  IRelatedGamesResponse,
   IReviewsResponse,
 } from "@mooncellar/schemas";
 import { useHideAdult } from "@/src/lib/shared/hooks/useHideAdult";
@@ -19,15 +20,23 @@ import { GameMedia } from "@/src/lib/entities/game/ui/GameMedia";
 import { GameDetails } from "@/src/lib/entities/game/ui/GameDetails";
 import { GameReleaseDates } from "@/src/lib/entities/game/ui/GameReleaseDates";
 import { GameMultiplayer } from "@/src/lib/entities/game/ui/GameMultiplayer";
+import { GameCharacters } from "@/src/lib/widgets/game/GameCharacters";
+import { GameRelated } from "@/src/lib/widgets/game/GameRelated";
 import { GameCommunity } from "@/src/lib/features/game/ui/GameCommunity";
 
 interface IGamePageProps {
   game: IGameResponse;
   stats?: IGameStats;
   reviews?: IReviewsResponse;
+  related?: IRelatedGamesResponse;
 }
 
-export const GamePage: FC<IGamePageProps> = ({ game, stats, reviews }) => {
+export const GamePage: FC<IGamePageProps> = ({
+  game,
+  stats,
+  reviews,
+  related,
+}) => {
   const hideMedia = useHideAdult() && isAdultGame(game);
 
   if (!game) return null;
@@ -42,7 +51,9 @@ export const GamePage: FC<IGamePageProps> = ({ game, stats, reviews }) => {
         <GameSideColumn game={game} className={styles.page__column} />
       </div>
       {!hideMedia && <GameMedia game={game} />}
+      {!hideMedia && <GameCharacters characters={game.characters} />}
       <GameDetails game={game} />
+      <GameRelated related={related} />
       <GameCommunity game={game} initialReviews={reviews} />
       <div className={styles.page__columns}>
         <GameReleaseDates game={game} className={styles.page__column} />

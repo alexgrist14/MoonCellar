@@ -16,6 +16,7 @@ import { useRoyalGames } from "@/src/lib/entities/royal/model/useRoyalGames";
 import { useHideAdult } from "@/src/lib/shared/hooks/useHideAdult";
 import { isAdultGame } from "@/src/lib/shared/utils/adult.utils";
 import { toSlug } from "@/src/lib/shared/utils/slug.utils";
+import { getGameBanner } from "@/src/lib/shared/utils/game-images.utils";
 
 interface IGameHeroProps {
   game: IGameResponse;
@@ -27,9 +28,7 @@ export const GameHero: FC<IGameHeroProps> = ({ game, stats }) => {
   const { royalGames } = useRoyalGames();
   const hideMedia = useHideAdult() && isAdultGame(game);
 
-  const artwork = hideMedia
-    ? undefined
-    : (game.artworks?.[0] ?? game.screenshots?.[0]);
+  const artwork = hideMedia ? undefined : getGameBanner(game);
 
   const releaseYear = game.first_release
     ? new Date(game.first_release * 1000).getFullYear()

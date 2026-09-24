@@ -8,6 +8,7 @@ import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { IGameResponse, DEFAULT_BG_OPACITY } from "@mooncellar/schemas";
 import { useHideAdult } from "@/src/lib/shared/hooks/useHideAdult";
 import { isAdultGame } from "@/src/lib/shared/utils/adult.utils";
+import { getGameBackgrounds } from "@/src/lib/shared/utils/game-images.utils";
 
 const DEFAULT_IMAGE = "/images/moon.jpg";
 
@@ -28,9 +29,9 @@ export const BGImage = memo(({ game, userImage }: IBGImageProps) => {
   const gameImage = useMemo(() => {
     if (!game || hideMedia) return undefined;
 
-    const pictures = game.artworks?.length ? game.artworks : game.screenshots;
+    const pictures = getGameBackgrounds(game);
 
-    if (!pictures?.length) return undefined;
+    if (!pictures.length) return undefined;
 
     return pictures[Math.floor(Math.random() * pictures.length)];
   }, [game, hideMedia]);

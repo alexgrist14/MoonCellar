@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { gamesApi, userAPI } from "@/src/lib/shared/api";
-import { IGameResponse } from "@mooncellar/schemas";
+import { ICharacterResponse, IGameResponse } from "@mooncellar/schemas";
 import { ILogs } from "@/src/lib/shared/types/user.type";
 import { userQueryKeys } from "./user.query-keys";
 
@@ -47,4 +47,17 @@ export const useUserPresetsQuery = (userId: string) =>
       userAPI.getPresets(userId).then(({ data }) => data.presets ?? []),
     enabled: !!userId,
     staleTime: 60000,
+  });
+
+export const useFavoriteCharactersQuery = (
+  userId: string,
+  initialData?: ICharacterResponse[]
+) =>
+  useQuery({
+    queryKey: userQueryKeys.favoriteCharacters(userId),
+    queryFn: () =>
+      userAPI.getFavoriteCharacters(userId).then(({ data }) => data),
+    enabled: !!userId,
+    staleTime: 60000,
+    initialData,
   });

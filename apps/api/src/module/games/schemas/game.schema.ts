@@ -46,6 +46,10 @@ export class Game {
   screenshots: string[];
   @Prop()
   artworks: string[];
+  @Prop({ type: String })
+  backgroundImage: string | null;
+  @Prop({ type: String })
+  bannerImage: string | null;
   @Prop()
   franchises: string[];
   @Prop()

@@ -1,9 +1,11 @@
 import { API_URL } from "@/src/lib/shared/constants";
 import { IUser } from "@/src/lib/shared/types/auth.type";
 import {
+  IGetFavoriteCharactersResponse,
   IGetUserLoginsResponse,
   ISearchUsersRequest,
   ISearchUsersResponse,
+  IUpdateFavoriteCharactersResponse,
   IUpdateFavoritesResponse,
   IUpdateUserSettingsRequest,
 } from "@mooncellar/schemas";
@@ -164,6 +166,19 @@ const updateFavorites = (userId: string, gameIds: string[]) => {
   );
 };
 
+const getFavoriteCharacters = (userId: string) => {
+  return agent.get<IGetFavoriteCharactersResponse>(
+    `${USER_URL}/${userId}/favorite-characters`
+  );
+};
+
+const updateFavoriteCharacters = (userId: string, characterIds: string[]) => {
+  return agent.patch<IUpdateFavoriteCharactersResponse>(
+    `${USER_URL}/${userId}/favorite-characters`,
+    { characterIds }
+  );
+};
+
 const searchUsers = (params: ISearchUsersRequest) => {
   return agent.get<ISearchUsersResponse>(`${API_URL}/users/search`, {
     params,
@@ -199,5 +214,7 @@ export const userAPI = {
   updateSettings,
   getFavorites,
   updateFavorites,
+  getFavoriteCharacters,
+  updateFavoriteCharacters,
   searchUsers,
 };

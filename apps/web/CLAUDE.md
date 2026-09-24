@@ -305,6 +305,12 @@ component needs to build the value itself (a `basePath` string, not a `getHref` 
   field registers. Hiding such a field must not unmount it: `{isShown && <Controller />}` drops
   the registration and locks the button again — keep the `Controller` rendered and hide its
   wrapper with a modifier class, as the modal does with the comment for Wishlist.
+- **The game edit form validates and diffs `pruneEmpty(values)`, never the raw form values.**
+  Every `Controller` on a nested path (`igdb.gameId`, `vndb.vnId`, `relatedGames.sequels`)
+  creates that key with `undefined`, so a game without IGDB data carried `igdb: {}` and failed
+  `igdb.gameId` as required — the same would block every IGDB game once the VNDB section
+  exists. `characters` stays out of the form too: the update response returns them as ids,
+  which fail `CharacterSchema` and lock Save after the first save.
 
 ## Data fetching
 

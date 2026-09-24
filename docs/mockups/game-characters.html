@@ -1,0 +1,861 @@
+<title>Game characters</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* mooncellar-tokens:start */
+/* Generated from apps/web/src/lib/app/styles/vars by
+   `bun --filter web sync:tokens`. Do not edit by hand. */
+:root {
+  /* vars/_colors.scss */
+  --color-neutral-5: #080a0b;
+  --color-neutral-10: #0d1011;
+  --color-neutral-15: #121516;
+  --color-neutral-20: #161b1d;
+  --color-neutral-25: #1a2022;
+  --color-neutral-30: #1f2628;
+  --color-neutral-35: #262d2f;
+  --color-neutral-40: #2f3537;
+  --color-neutral-45: #383e40;
+  --color-neutral-50: #3f4750;
+  --color-neutral-55: #50575d;
+  --color-neutral-60: #5e6a6e;
+  --color-neutral-70: #747d82;
+  --color-neutral-80: #9192a1;
+  --color-neutral-85: #b0b2bc;
+  --color-neutral-90: #d9d9d9;
+  --color-neutral-95: #eaeaea;
+  --color-neutral-100: #ffffff;
+  --color-blue: #3d6bff;
+  --color-blue-light: #00d4ff;
+  --color-cyan: #48cae4;
+  --color-gray: #afb3b9;
+  --color-white: #e8edf5;
+  --color-yellow: #ffc451;
+  --color-yellow-light: #f9f871;
+  --color-orange: #ff8862;
+  --color-pink: #ff4b8f;
+  --color-violet: #9b5de5;
+  --color-green: #2dc653;
+  --color-red: #e5383b;
+  --color-positive: #00c292;
+  --color-negative: #d02729;
+  --color-primary: var(--color-neutral-30);
+  --color-secondary: var(--color-neutral-90);
+  --color-contrast: var(--color-neutral-100);
+  --color-contrast-reverse: var(--color-neutral-5);
+  --color-attention: #ffc451;
+  --color-text-primary: var(--color-neutral-100);
+  --color-text-secondary: var(--color-neutral-90);
+  --color-text-muted: var(--color-neutral-85);
+  --color-accent: #6951ee;
+  --color-bg-primary: #191d24;
+  --color-bg-secondary: #212731;
+  --color-bg-tertiary: #2c3340;
+  --color-bg-accent: #6951ee;
+  --color-bg-hover: #374151;
+  --color-bg-positive: #00c292;
+  --color-bg-primary-tint: #191d24ee;
+  --color-bg-secondary-tint: #212731ee;
+  --color-bg-tertiary-tint: #2c3340ee;
+  --color-bg-accent-tint: #6951eeee;
+  --color-bg-positive-tint: #00c292ee;
+  --color-border-primary: var(--color-neutral-35);
+  --color-scrollbar-track: var(--color-neutral-15);
+  --color-scrollbar-thumb: var(--color-neutral-80);
+  --color-border-secondary: var(--color-neutral-85);
+
+  /* vars/_common.scss */
+  --padding-x05: calc(var(--padding-x1) * 0.5);
+  --padding-x1: 4px;
+  --padding-x2: calc(var(--padding-x1) * 2);
+  --padding-x3: calc(var(--padding-x1) * 3);
+  --padding-x4: calc(var(--padding-x1) * 4);
+  --padding-x5: calc(var(--padding-x1) * 5);
+  --padding-x6: calc(var(--padding-x1) * 6);
+  --padding-x7: calc(var(--padding-x1) * 7);
+  --padding-x8: calc(var(--padding-x1) * 8);
+  --padding-x9: calc(var(--padding-x1) * 9);
+  --padding-x10: calc(var(--padding-x1) * 10);
+  --padding-x11: calc(var(--padding-x1) * 11);
+  --padding-x12: calc(var(--padding-x1) * 12);
+  --padding-x13: calc(var(--padding-x1) * 13);
+  --padding-x14: calc(var(--padding-x1) * 14);
+  --padding-x15: calc(var(--padding-x1) * 15);
+  --padding-x16: calc(var(--padding-x1) * 16);
+  --padding-x17: calc(var(--padding-x1) * 17);
+  --padding-x18: calc(var(--padding-x1) * 18);
+  --padding-x19: calc(var(--padding-x1) * 19);
+  --padding-x20: calc(var(--padding-x1) * 20);
+  --padding-x25: calc(var(--padding-x1) * 25);
+  --radius-x1: 4px;
+  --radius-x2: calc(var(--radius-x1) * 2);
+  --radius-x3: calc(var(--radius-x1) * 3);
+  --radius-x4: calc(var(--radius-x1) * 4);
+  --radius-x5: calc(var(--radius-x1) * 5);
+  --radius-x6: calc(var(--radius-x1) * 6);
+  --radius-x7: calc(var(--radius-x1) * 7);
+  --radius-x8: calc(var(--radius-x1) * 8);
+  --radius-x9: calc(var(--radius-x1) * 9);
+  --radius-x10: calc(var(--radius-x1) * 10);
+  --gap-x05: calc(var(--gap-x1) * 0.5);
+  --gap-x1: 4px;
+  --gap-x2: calc(var(--gap-x1) * 2);
+  --gap-x3: calc(var(--gap-x1) * 3);
+  --gap-x4: calc(var(--gap-x1) * 4);
+  --gap-x5: calc(var(--gap-x1) * 5);
+  --gap-x6: calc(var(--gap-x1) * 6);
+  --gap-x7: calc(var(--gap-x1) * 7);
+  --gap-x8: calc(var(--gap-x1) * 8);
+  --gap-x9: calc(var(--gap-x1) * 9);
+  --gap-x10: calc(var(--gap-x1) * 10);
+  --gap-x11: calc(var(--gap-x1) * 11);
+  --gap-x12: calc(var(--gap-x1) * 12);
+  --blur-x1: 6px;
+  --rich-text-gap: 8px;
+  --duration-instant: 1ms;
+  --duration-fast: 160ms;
+  --duration-base: 280ms;
+  --duration-slow: 400ms;
+  --delay-stagger: 90ms;
+  --easing-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --easing-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --reveal-offset: 12px;
+  --reveal-scale: 0.96;
+  --header-height: 45px;
+  --container-padding-top: calc(var(--header-height) + var(--padding-x3));
+  --container-padding-bottom: var(--padding-x3);
+  --page-height-available: calc(
+    100vh - var(--container-padding-top) - var(--container-padding-bottom)
+  );
+
+  /* vars/_components.scss */
+  --game-completed-color: var(--color-green);
+  --game-dropped-color: var(--color-red);
+  --game-playing-color: var(--color-blue);
+  --game-wishlist-color: var(--color-violet);
+  --game-backlog-color: var(--color-white);
+  --game-played-color: var(--color-cyan);
+  --game-mastered-color: var(--color-yellow);
+  --cover-ratio: 528/704;
+  --shadow-basic: 0px 4px 4px var(--color-neutral-5);
+  --shadow-text: drop-shadow(0 1px 2px var(--color-neutral-5))
+    drop-shadow(0 0 6px var(--color-neutral-5));
+  --glow-accent: 0 0 0.4rem var(--color-accent);
+  --glow-accent-sm: 0 0 0.15rem var(--color-accent);
+  --avatar-size-sm: var(--padding-x6);
+  --navigation-progress-height: 1px;
+  --navigation-progress-z-index: 1002;
+  --bprogress-color: var(--color-accent) !important;
+  --bprogress-height: var(--navigation-progress-height) !important;
+  --bprogress-box-shadow: var(--glow-accent) !important;
+  --bprogress-z-index: var(--navigation-progress-z-index) !important;
+  --modal-text-width: min(720px, calc(100vw - var(--padding-x10)));
+  --rich-editor-image-width: 400px;
+  --playthrough-modal-width: min(80vw, 400px);
+  --playthrough-modal-height: min(70vh, 500px);
+  --playthrough-modal-width-lg: min(88vw, 760px);
+  --playthrough-modal-height-lg: min(86vh, 780px);
+  --games-card-min-width: 180px;
+  --range-track-height: 6px;
+  --range-thumb-size: 20px;
+  --range-thumb-width: 44px;
+  --range-thumb-height: 24px;
+  --scrollbar-horizontal-size: 6px;
+  --scrollbar-arrow-width: 32px;
+  --scrollbar-fade-width: 48px;
+  --game-keywords-collapsed-height: 66px;
+  --game-hero-artwork-height: 300px;
+  --game-hero-artwork-height-sm: 180px;
+  --game-hero-cover-width: 200px;
+  --game-hero-cover-offset: 104px;
+  --game-hero-counters-width: 360px;
+  --game-rating-popover-width: 320px;
+  --popover-width: 320px;
+  --popover-max-height: 320px;
+  --drawer-width: max(20vw, 460px);
+  --drawer-z-index: 5;
+  --expandable-scroll-height: 132px;
+  --expandable-fade-height: 32px;
+  --date-picker-width: 300px;
+  --date-picker-field-min-width: 140px;
+  --date-picker-cell-size: 34px;
+  --date-picker-arrow-size: 28px;
+  --emoji-picker-width: 328px;
+  --emoji-picker-cell-size: 34px;
+  --emoji-picker-group-size: 28px;
+  --emoji-picker-grid-height: 238px;
+  --game-hero-scrim: linear-gradient(
+    180deg,
+    #191d248c 0%,
+    #191d2400 30%,
+    #212731d1 72%,
+    var(--color-bg-secondary) 100%
+  );
+  --spoiler-blur: 7px;
+  --community-avatar-size: 36px;
+  --community-reply-avatar-size: 28px;
+  --community-review-clamp-height: 132px;
+  --community-distribution-height: 8px;
+  --community-distribution-min-width: 240px;
+  --community-dot-size: 7px;
+  --community-empty-text-width: 240px;
+  --community-loading-height: 96px;
+  --user-review-card-width: 170px;
+  --user-review-card-width-sm: 140px;
+  --user-review-rating-filter-width: 260px;
+  --vndb-review-height: max(360px, calc(100vh - 420px));
+  --vndb-cover-width: 120px;
+  --vndb-search-width: 320px;
+  --vndb-candidate-cover-width: 64px;
+  --empty-state-image-size: 180px;
+  --not-found-image-height: 240px;
+  --not-found-backdrop-size: 400px;
+  --not-found-content-width: 420px;
+  --favorite-color: var(--color-pink);
+  --game-controls-icon-size: 24px;
+  --game-controls-icon-size-sm: 20px;
+  --game-controls-badge-size: 15px;
+  --top-ten-cover-width: 44px;
+  --list-card-row-mosaic-size: 44px;
+  --list-card-count-height: 20px;
+  --list-search-width: 320px;
+  --list-row-cover-width: 40px;
+  --profile-hero-height: 168px;
+  --profile-avatar-size: 112px;
+  --profile-avatar-size-sm: 72px;
+  --activity-cover-width: 80px;
+  --activity-dot-size: 12px;
+  --people-avatar-size: 22px;
+  --character-card-width: 128px;
+  --character-card-width-sm: 104px;
+  --character-profile-portrait-width: 200px;
+  --image-picker-thumb-width: 160px;
+  --game-images-modal-width: min(92vw, 960px);
+  --search-modal-width: 900px;
+  --search-tab-height: 36px;
+}
+/* mooncellar-tokens:end */
+
+  :root {
+    color-scheme: dark;
+    --mock-ui: "Hanken Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mock-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --mock-ground: var(--color-neutral-10);
+    --mock-hairline: var(--color-neutral-30);
+    --mock-portrait-width: 128px;
+    --mock-portrait-ratio: 3/4;
+    --mock-avatar-size: 44px;
+    --mock-drawer-width: 340px;
+    --mock-grid-clamp-height: 128px;
+    --mock-md-list-width: 240px;
+    --mock-md-height: 340px;
+    --mock-md-portrait-width: 180px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--mock-ground);
+    color: var(--color-text-primary);
+    font-family: var(--mock-ui);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .shell {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding-inline: var(--padding-x6);
+    padding-block: var(--padding-x14) var(--padding-x20);
+  }
+
+  @media (max-width: 520px) {
+    .shell { padding-inline: var(--padding-x4); padding-block: var(--padding-x9) var(--padding-x14); }
+  }
+
+  h1, h2, h3, h4 { margin: 0; text-wrap: balance; }
+  p { margin: 0; }
+  button { font: inherit; color: inherit; }
+  ul { margin: 0; padding: 0; list-style: none; }
+
+  .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-gray); }
+  .masthead { display: flex; flex-direction: column; gap: var(--gap-x4); }
+  .masthead h1 { font-size: 34px; line-height: 1.15; font-weight: 700; letter-spacing: -0.5px; }
+  .lede { color: var(--color-text-secondary); max-width: 64ch; }
+  code.t { font-family: var(--mock-mono); font-size: 12px; color: var(--color-yellow); }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1px;
+    background: var(--mock-hairline);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x4);
+    overflow: hidden;
+    margin: var(--gap-x2) 0 0;
+  }
+
+  .facts div { background: var(--color-bg-primary); padding: var(--padding-x4); }
+  .facts dt { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-gray); margin-bottom: var(--gap-x1); }
+  .facts dd { margin: 0; font-size: 13px; color: var(--color-text-secondary); }
+
+  .variant { margin-top: var(--padding-x16); }
+  .variant__head { display: flex; align-items: baseline; gap: var(--gap-x3); flex-wrap: wrap; margin-bottom: var(--gap-x2); }
+  .variant__head h2 { font-size: 23px; font-weight: 700; letter-spacing: -0.2px; }
+  .variant__letter { font-family: var(--mock-mono); font-size: 13px; font-weight: 500; color: var(--color-accent); border: 1px solid var(--color-accent); border-radius: var(--radius-x1); padding: 1px 7px; }
+  .variant__thesis { color: var(--color-text-muted); max-width: 66ch; margin-bottom: var(--gap-x5); }
+
+  .box {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x5);
+    padding: var(--padding-x4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x4);
+    min-width: 0;
+  }
+
+  .box__head { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-x3); flex-wrap: wrap; }
+  .box__title { font-size: 18px; font-weight: 700; }
+  .box__title span { font-family: var(--mock-mono); font-size: 12px; font-weight: 400; color: var(--color-gray); margin-left: var(--gap-x2); }
+
+  .seg { display: inline-flex; gap: var(--gap-x05); padding: var(--padding-x05); border-radius: var(--radius-x4); background: var(--color-bg-tertiary); flex-wrap: wrap; }
+
+  .seg button {
+    border: 0;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    padding: var(--padding-x1) var(--padding-x2);
+    border-radius: var(--radius-x3);
+    cursor: pointer;
+  }
+
+  .seg button:hover { color: var(--color-text-primary); }
+  .seg button[aria-pressed="true"] { background: var(--color-accent); color: var(--color-text-primary); }
+
+  .portrait {
+    aspect-ratio: var(--mock-portrait-ratio);
+    max-width: 100%;
+    border-radius: var(--radius-x3);
+    background: linear-gradient(165deg, var(--c1), var(--c2));
+    display: grid;
+    place-items: center;
+    font-size: 30px;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--color-neutral-100) 70%, transparent);
+    letter-spacing: 0.02em;
+    box-shadow: var(--shadow-basic);
+  }
+
+  .avatar {
+    width: var(--mock-avatar-size);
+    height: var(--mock-avatar-size);
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: linear-gradient(165deg, var(--c1), var(--c2));
+    display: grid;
+    place-items: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--color-neutral-100) 75%, transparent);
+  }
+
+  .name { font-size: 13px; font-weight: 600; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .meta { font-size: 12px; color: var(--color-text-muted); line-height: 1.35; }
+
+  .char {
+    border: 0;
+    background: none;
+    padding: 0;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x2);
+    min-width: 0;
+  }
+
+  .char .portrait { transition: transform var(--duration-fast) var(--easing-out), outline-color var(--duration-fast); outline: 2px solid transparent; outline-offset: -2px; }
+  .char:hover .portrait { transform: translateY(-3px); }
+  .char[aria-current="true"] .portrait { outline-color: var(--color-accent); }
+  .char:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; border-radius: var(--radius-x3); }
+
+  .rail {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: var(--mock-portrait-width);
+    gap: var(--gap-x4);
+    overflow-x: auto;
+    padding-block: var(--padding-x1) var(--padding-x3);
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-scrollbar-thumb) var(--color-scrollbar-track);
+  }
+
+  .roster { position: relative; }
+
+  .roster__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: var(--gap-x2);
+    max-height: var(--mock-grid-clamp-height);
+    overflow: hidden;
+    transition: max-height var(--duration-base) var(--easing-out);
+  }
+
+  .roster_open .roster__grid { max-height: 2000px; }
+
+  .roster:not(.roster_open)::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: var(--expandable-fade-height);
+    background: linear-gradient(180deg, transparent, var(--color-bg-primary));
+    pointer-events: none;
+  }
+
+  .person {
+    display: flex;
+    gap: var(--gap-x3);
+    align-items: center;
+    padding: var(--padding-x2);
+    border-radius: var(--radius-x4);
+    border: 0;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    min-width: 0;
+  }
+
+  .person:hover { background: var(--color-bg-hover); }
+  .person > div { min-width: 0; }
+  .person .name { -webkit-line-clamp: 1; }
+
+  .more {
+    align-self: flex-start;
+    background: var(--color-bg-tertiary);
+    border: 0;
+    border-radius: var(--radius-x4);
+    padding: var(--padding-x1) var(--padding-x2);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .more:hover { background: var(--color-bg-hover); }
+
+  .md { display: grid; grid-template-columns: var(--mock-md-list-width) 1fr; gap: var(--gap-x4); height: var(--mock-md-height); }
+
+  .md__list {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x05);
+    padding-right: var(--padding-x1);
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-scrollbar-thumb) var(--color-scrollbar-track);
+  }
+
+  .md__list .person { --mock-avatar-size: 34px; padding: var(--padding-x1) var(--padding-x2); }
+  .md__list .person[aria-current="true"] { background: var(--color-bg-tertiary); box-shadow: inset 2px 0 var(--color-accent); }
+
+  .md__detail {
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-x4);
+    padding: var(--padding-x4);
+    display: grid;
+    grid-template-columns: var(--mock-md-portrait-width) 1fr;
+    gap: var(--gap-x5);
+    overflow-y: auto;
+    min-width: 0;
+  }
+
+  @media (max-width: 760px) {
+    .md { grid-template-columns: 1fr; height: auto; }
+    .md__list { flex-direction: row; overflow-x: auto; overflow-y: hidden; }
+    .md__list .person { flex-direction: column; flex-shrink: 0; width: 84px; text-align: center; }
+    .md__list .person .meta { display: none; }
+    .md__detail { grid-template-columns: 1fr; }
+    .md__detail .portrait { width: var(--mock-portrait-width); }
+  }
+
+  .profile { display: flex; flex-direction: column; gap: var(--gap-x3); min-width: 0; }
+  .profile h4 { font-size: 20px; line-height: 1.2; }
+  .profile .akas { font-size: 13px; color: var(--color-text-muted); }
+  .profile p { font-size: 14px; color: var(--color-text-secondary); max-width: 60ch; }
+  .chips { display: flex; flex-wrap: wrap; gap: var(--gap-x1); }
+  .chip { font-size: 12px; line-height: 1; padding: 5px 8px; border-radius: var(--radius-x2); background: var(--color-bg-tertiary); color: var(--color-text-secondary); }
+  .chip b { font-weight: 500; color: var(--color-text-muted); margin-right: 4px; }
+
+  .page {
+    position: relative;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x4);
+    padding: var(--padding-x5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x7);
+    overflow: hidden;
+  }
+
+  @media (max-width: 520px) { .page { padding: var(--padding-x3); gap: var(--gap-x4); } }
+
+  .page__columns { display: flex; flex-wrap: wrap; gap: var(--gap-x6); align-items: stretch; }
+  .page__column, .page__columnWide { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
+  .page__columnWide { flex-grow: 2; }
+
+  @media (max-width: 760px) {
+    .page__columns { flex-direction: column; }
+    .page__column, .page__columnWide { flex-basis: auto; }
+  }
+
+  .ghost {
+    background: var(--color-bg-primary);
+    border: 1px dashed var(--color-neutral-45);
+    border-radius: var(--radius-x5);
+    min-height: var(--h, 120px);
+    padding: var(--padding-x4);
+    color: var(--color-neutral-60);
+    font-size: 13px;
+    font-weight: 600;
+    flex-grow: 1;
+  }
+
+  .ghost small { display: block; font-weight: 400; color: var(--color-neutral-55); }
+
+  .hero { display: flex; flex-direction: column; }
+  .hero__art { height: 160px; border-radius: var(--radius-x5); background: linear-gradient(120deg, var(--color-neutral-25), var(--color-neutral-35) 60%, var(--color-neutral-20)); border: 1px dashed var(--color-neutral-45); }
+  .hero__body { display: flex; gap: var(--gap-x5); padding-inline: var(--padding-x5); margin-top: -64px; align-items: flex-end; }
+  .hero__cover { width: 110px; flex-shrink: 0; aspect-ratio: var(--cover-ratio); border-radius: var(--radius-x3); background: linear-gradient(160deg, var(--color-bg-accent), var(--color-neutral-15)); box-shadow: var(--shadow-basic); }
+  .hero__title { font-size: 24px; font-weight: 700; line-height: 1.15; padding-bottom: var(--padding-x2); }
+  .hero__title small { display: block; font-size: 13px; font-weight: 400; color: var(--color-text-muted); }
+
+  @media (max-width: 520px) { .hero__cover { width: 72px; } .hero__title { font-size: 18px; } }
+
+  .target { position: relative; }
+  .target::after { content: ""; position: absolute; inset: -6px; border: 2px solid var(--color-accent); border-radius: calc(var(--radius-x5) + 6px); box-shadow: var(--glow-accent); pointer-events: none; }
+  .target__tag { position: absolute; top: -16px; right: var(--padding-x4); z-index: 1; background: var(--color-accent); color: var(--color-neutral-100); font-family: var(--mock-mono); font-size: 11px; padding: 2px 8px; border-radius: var(--radius-x1); }
+
+  .shots { display: grid; grid-auto-flow: column; grid-auto-columns: 280px; gap: var(--gap-x3); overflow: hidden; }
+  .shots div { aspect-ratio: 16/9; border-radius: var(--radius-x3); background: linear-gradient(120deg, var(--color-neutral-25), var(--color-neutral-40)); }
+
+  .drawer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    max-height: 560px;
+    border-radius: var(--radius-x5) 0 0 var(--radius-x5);
+    width: min(var(--mock-drawer-width), 100%);
+    z-index: 2;
+    background: var(--color-bg-primary-tint);
+    backdrop-filter: blur(var(--blur-x1));
+    border-left: 1px solid var(--color-border-primary);
+    box-shadow: var(--shadow-basic);
+    padding: var(--padding-x5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x4);
+    overflow-y: auto;
+    transform: translateX(0);
+    transition: transform var(--duration-base) var(--easing-out);
+  }
+
+  .drawer[hidden] { display: flex !important; transform: translateX(105%); }
+  .drawer__head { display: flex; justify-content: space-between; align-items: center; }
+  .drawer__head span { font-size: 12px; color: var(--color-gray); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; }
+  .drawer__close { border: 0; background: var(--color-bg-tertiary); border-radius: var(--radius-x3); width: 28px; height: 28px; cursor: pointer; }
+  .drawer .portrait { width: 160px; }
+
+  .note {
+    margin-top: var(--padding-x16);
+    font-size: 13px;
+    color: var(--color-gray);
+    border-left: 2px solid var(--color-border-primary);
+    padding-left: var(--padding-x3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x2);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: var(--duration-instant) !important; }
+  }
+</style>
+
+<div class="shell">
+  <header class="masthead">
+    <p class="eyebrow">MoonCellar · game page</p>
+    <h1>Game characters</h1>
+    <p class="lede">
+      <code class="t">getGameBySlug</code> already looks up the game's characters and sends them
+      with the page, sorted by name, but nothing renders them. Four ways to show them, each drawn
+      in place on the game page. Dashed blocks are the existing sections, the outlined one is new.
+      No character page exists yet, so every variant opens the full profile inside the game page.
+    </p>
+    <dl class="facts">
+      <div><dt>Always present</dt><dd><code class="t">name</code> <code class="t">slug</code></dd></div>
+      <div><dt>Usually present</dt><dd><code class="t">mugShot</code> <code class="t">gender</code> <code class="t">species</code></dd></div>
+      <div><dt>Sometimes</dt><dd><code class="t">akas</code> <code class="t">description</code> <code class="t">countryName</code></dd></div>
+      <div><dt>Not stored</dt><dd>Role (main, side), voice actor, spoiler flag</dd></div>
+    </dl>
+  </header>
+
+  <section class="variant">
+    <div class="variant__head"><span class="variant__letter">A</span><h2>Portrait rail and drawer</h2></div>
+    <p class="variant__thesis">
+      A box between Media and Details with one horizontally scrolling row of portraits, the same
+      rhythm as the screenshot rail above it. A click opens the profile in the shared
+      <code class="t">Drawer</code> on the right, so the page stays in place. Height is fixed at one
+      row whatever the cast size. Characters without a mug shot get their initials.
+    </p>
+    <div id="page-a"></div>
+  </section>
+
+  <section class="variant">
+    <div class="variant__head"><span class="variant__letter">B</span><h2>Compact roster with “Show all”</h2></div>
+    <p class="variant__thesis">
+      Round avatars with name and species in a dense grid, clamped to two rows by
+      <code class="t">ExpandableBlock</code>; every name stays in the HTML. The least vertical space
+      for a large visual-novel cast, but faces are small and there is no room for descriptions,
+      so a click still opens the drawer.
+    </p>
+    <div id="page-b"></div>
+  </section>
+
+  <section class="variant">
+    <div class="variant__head"><span class="variant__letter">C</span><h2>A tab inside Media</h2></div>
+    <p class="variant__thesis">
+      No new section: Characters becomes the fourth tab of the existing Media box, next to
+      Screenshots, Artworks and Videos, and uses the same rail. Cheapest on layout, and portraits
+      are pictures of the game like the rest of that box. Hidden by default, so most visitors will
+      not see the cast.
+    </p>
+    <div id="page-c"></div>
+  </section>
+
+  <section class="variant">
+    <div class="variant__head"><span class="variant__letter">D</span><h2>List and profile side by side</h2></div>
+    <p class="variant__thesis">
+      A box after Details with a scrolling list of names on the left and the selected character's
+      portrait, aliases, facts and description on the right. The only variant that shows a
+      description without a click, which suits visual novels where VNDB descriptions are long.
+      The tallest block, and mostly empty for games whose characters carry only a name.
+    </p>
+    <div id="page-d"></div>
+  </section>
+
+  <div class="note">
+    <p>
+      Block order follows <code class="t">GamePage.tsx</code>: Hero, the Overview · Score · Side row,
+      Media, Details, Related games, Community, then Release dates · Multiplayer. Ghost heights are
+      approximate. Character names and data are sample content; portraits are gradient placeholders.
+    </p>
+    <p>
+      VNDB descriptions can contain spoilers and VNDB markup. Whichever variant ships, the text goes
+      through <code class="t">RichText</code>, and spoiler handling needs a flag the import does not
+      store today.
+    </p>
+    <p>
+      Colours, spacing and radii are the project's own tokens, generated from
+      <code class="t">apps/web/src/lib/app/styles/vars</code> by
+      <code class="t">bun --filter web sync:tokens</code>. Hanken Grotesk stands in for ApercuPro.
+    </p>
+  </div>
+</div>
+
+<script>
+  const PALETTE = [
+    ["--color-bg-accent", "--color-neutral-15"],
+    ["--color-blue", "--color-neutral-15"],
+    ["--color-orange", "--color-neutral-20"],
+    ["--color-positive", "--color-neutral-15"],
+    ["--color-violet", "--color-neutral-15"],
+    ["--color-pink", "--color-neutral-20"],
+    ["--color-yellow", "--color-neutral-20"],
+  ];
+
+  const CAST = [
+    { name: "Geralt of Rivia", akas: ["White Wolf", "Butcher of Blaviken"], gender: "Male", species: "Mutant", country: "Kaer Morhen", description: "A witcher trained at Kaer Morhen to hunt monsters for coin. He searches the Continent for Ciri, the girl he raised, ahead of the Wild Hunt." },
+    { name: "Cirilla Fiona Elen Riannon", akas: ["Ciri", "Zireael"], gender: "Female", species: "Human", country: "Cintra", description: "Heir to the throne of Cintra and bearer of the Elder Blood. Trained as a witcher, she is pursued across worlds by the Wild Hunt." },
+    { name: "Yennefer of Vengerberg", akas: ["Yen"], gender: "Female", species: "Human", country: "Vengerberg", description: "A powerful sorceress and Geralt's great love. She joins the search for Ciri, whom she regards as her daughter." },
+    { name: "Triss Merigold", akas: ["Fourteenth of the Hill"], gender: "Female", species: "Human", country: "Maribor", description: "A sorceress hiding in Novigrad while the Church of the Eternal Fire hunts mages." },
+    { name: "Dandelion", akas: ["Julian Alfred Pankratz"], gender: "Male", species: "Human", description: "A bard, poet and Geralt's oldest friend, who runs a cabaret in Novigrad." },
+    { name: "Zoltan Chivay", gender: "Male", species: "Dwarf", description: "A dwarven warrior and loyal companion with a fondness for gwent and strong drink." },
+    { name: "Vesemir", gender: "Male", species: "Mutant", country: "Kaer Morhen", description: "The oldest witcher of Kaer Morhen and mentor to Geralt, Lambert and Eskel." },
+    { name: "Emhyr var Emreis", akas: ["White Flame Dancing on the Graves of His Foes"], gender: "Male", species: "Human", country: "Nilfgaard", description: "Emperor of Nilfgaard and Ciri's father, who hires Geralt to find her." },
+    { name: "Eredin Bréacc Glas", gender: "Male", species: "Elf", description: "King of the Wild Hunt." },
+    { name: "Philip Strenger", akas: ["Bloody Baron"], gender: "Male", species: "Human", country: "Velen", description: "The self-styled ruler of Crow's Perch, searching for his missing wife and daughter." },
+    { name: "Keira Metz", gender: "Female", species: "Human", description: "A sorceress living in exile in a hut in the Velen swamps." },
+    { name: "Lambert", gender: "Male", species: "Mutant", country: "Kaer Morhen" },
+    { name: "Avallac'h", akas: ["Crevan Espane aep Caomhan Macha"], gender: "Male", species: "Elf", description: "An Aen Elle sage who has protected Ciri for his own reasons." },
+    { name: "Crach an Craite", gender: "Male", species: "Human", country: "Skellige" },
+  ].map((c, i) => ({ ...c, id: i, colors: PALETTE[i % PALETTE.length] }));
+
+  const esc = (s) => String(s).replace(/[&<>"]/g, (ch) => `&#${ch.charCodeAt(0)};`);
+  const initials = (name) => name.split(/\s+/).filter((w) => /^[A-Z]/.test(w)).slice(0, 2).map((w) => w[0]).join("");
+  const colorVars = (c) => `--c1: var(${c.colors[0]}); --c2: var(${c.colors[1]})`;
+  const metaLine = (c) => [c.species, c.gender].filter(Boolean).join(" · ");
+
+  const portrait = (c) => `<div class="portrait" style="${colorVars(c)}">${initials(c.name)}</div>`;
+  const avatar = (c) => `<div class="avatar" style="${colorVars(c)}">${initials(c.name)}</div>`;
+
+  const charCard = (c, current) => `
+    <button class="char" data-char="${c.id}" aria-current="${current === c.id}">
+      ${portrait(c)}
+      <span class="name">${esc(c.name)}</span>
+      <span class="meta">${metaLine(c)}</span>
+    </button>`;
+
+  const personRow = (c, current) => `
+    <button class="person" data-char="${c.id}" aria-current="${current === c.id}">
+      ${avatar(c)}
+      <div><div class="name">${esc(c.name)}</div><div class="meta">${c.akas?.[0] ? esc(c.akas[0]) : metaLine(c)}</div></div>
+    </button>`;
+
+  const profile = (c) => `
+    <div class="profile">
+      <h4>${esc(c.name)}</h4>
+      ${c.akas?.length ? `<div class="akas">Also known as ${c.akas.map(esc).join(", ")}</div>` : ""}
+      <div class="chips">
+        ${c.gender ? `<span class="chip"><b>Gender</b>${c.gender}</span>` : ""}
+        ${c.species ? `<span class="chip"><b>Species</b>${c.species}</span>` : ""}
+        ${c.country ? `<span class="chip"><b>From</b>${esc(c.country)}</span>` : ""}
+      </div>
+      ${c.description ? `<p>${esc(c.description)}</p>` : `<p class="meta">No description yet.</p>`}
+    </div>`;
+
+  const drawer = (c) => `
+    <aside class="drawer" ${c ? "" : "hidden"} aria-label="Character">
+      <div class="drawer__head"><span>Character</span><button class="drawer__close" aria-label="Close">✕</button></div>
+      <div class="drawer__body">${c ? portrait(c) + profile(c) : ""}</div>
+    </aside>`;
+
+  const ghost = (label, h, sub = "") => `<div class="ghost" style="--h: ${h}px">${label}${sub ? `<small>${sub}</small>` : ""}</div>`;
+  const target = (html, tag) => `<div class="target"><span class="target__tag">${tag}</span>${html}</div>`;
+
+  const page = ({ media, afterMedia = "", afterDetails = "", overlay = "" }) => `
+    <div class="page">
+      <div class="hero">
+        <div class="hero__art"></div>
+        <div class="hero__body">
+          <div class="hero__cover"></div>
+          <div class="hero__title">The Witcher 3: Wild Hunt<small>2015 · CD Projekt Red · GameHero</small></div>
+        </div>
+      </div>
+      <div class="page__columns">
+        <div class="page__columnWide">${ghost("GameOverview", 240, "Summary, genres, keywords")}</div>
+        <div class="page__column">${ghost("GameScoreColumn", 240, "Ratings, HLTB, stats")}</div>
+        <div class="page__column">${ghost("GameSideColumn", 240, "External pages, friends, links")}</div>
+      </div>
+      ${media || ghost("GameMedia", 170, "Screenshots, artworks, videos")}
+      ${afterMedia}
+      ${ghost("GameDetails", 120, "Companies, franchises, modes, themes")}
+      ${afterDetails}
+      ${ghost("GameRelated", 200, "Related games, tabs by group")}
+      ${ghost("GameCommunity", 200, "Reviews and comments")}
+      <div class="page__columns">
+        <div class="page__column">${ghost("GameReleaseDates", 100)}</div>
+        <div class="page__column">${ghost("GameMultiplayer", 100)}</div>
+      </div>
+      ${overlay}
+    </div>`;
+
+  const rail = (current) => `<div class="rail">${CAST.map((c) => charCard(c, current)).join("")}</div>`;
+
+  const railBox = `
+    <div class="box" data-kind="rail">
+      <div class="box__head"><h3 class="box__title">Characters<span>${CAST.length}</span></h3></div>
+      ${rail(0)}
+    </div>`;
+
+  const rosterBox = `
+    <div class="box" data-kind="roster">
+      <div class="box__head"><h3 class="box__title">Characters<span>${CAST.length}</span></h3></div>
+      <div class="roster"><div class="roster__grid">${CAST.map((c) => personRow(c)).join("")}</div></div>
+      <button class="more" data-more>Show all ${CAST.length}</button>
+    </div>`;
+
+  const MEDIA_TABS = [["Screenshots", 24], ["Artworks", 8], ["Videos", 3], ["Characters", CAST.length]];
+  const mediaBox = `
+    <div class="box" data-kind="media">
+      <div class="box__head">
+        <h3 class="box__title">Media</h3>
+        <div class="seg" role="group" aria-label="Media">${MEDIA_TABS.map(([t, n]) => `<button data-media="${t}" aria-pressed="${t === "Characters"}">${t} ${n}</button>`).join("")}</div>
+      </div>
+      <div data-media-body>${rail()}</div>
+    </div>`;
+
+  const mdBox = `
+    <div class="box" data-kind="md">
+      <div class="box__head"><h3 class="box__title">Characters<span>${CAST.length}</span></h3></div>
+      <div class="md">
+        <div class="md__list">${CAST.map((c) => personRow(c, 0)).join("")}</div>
+        <div class="md__detail">${portrait(CAST[0])}${profile(CAST[0])}</div>
+      </div>
+    </div>`;
+
+  document.getElementById("page-a").innerHTML = page({ afterMedia: target(railBox, "new · A"), overlay: drawer(CAST[0]) });
+  document.getElementById("page-b").innerHTML = page({ afterMedia: target(rosterBox, "new · B"), overlay: drawer() });
+  document.getElementById("page-c").innerHTML = page({ media: target(mediaBox, "changed · C"), overlay: drawer() });
+  document.getElementById("page-d").innerHTML = page({ afterDetails: target(mdBox, "new · D") });
+
+  const placeDrawer = (pageEl) => {
+    const d = pageEl.querySelector(".drawer");
+    const anchor = pageEl.querySelector(".target");
+    if (d && anchor) d.style.top = `${Math.max(anchor.offsetTop - 24, 0)}px`;
+  };
+
+  const openDrawer = (pageEl, c) => {
+    const d = pageEl.querySelector(".drawer");
+    if (!d) return;
+    d.querySelector(".drawer__body").innerHTML = portrait(c) + profile(c);
+    placeDrawer(pageEl);
+    d.hidden = false;
+  };
+
+  document.querySelectorAll(".page").forEach(placeDrawer);
+  window.addEventListener("resize", () => document.querySelectorAll(".page").forEach(placeDrawer));
+
+  document.addEventListener("click", (e) => {
+    const pageEl = e.target.closest(".page");
+    if (!pageEl) return;
+
+    if (e.target.closest(".drawer__close")) {
+      pageEl.querySelector(".drawer").hidden = true;
+      pageEl.querySelectorAll("[aria-current]").forEach((el) => el.setAttribute("aria-current", "false"));
+      return;
+    }
+
+    const more = e.target.closest("[data-more]");
+    if (more) {
+      const roster = more.closest(".box").querySelector(".roster");
+      const open = roster.classList.toggle("roster_open");
+      more.textContent = open ? "Show less" : `Show all ${CAST.length}`;
+      return;
+    }
+
+    const tab = e.target.closest("[data-media]");
+    if (tab) {
+      const box = tab.closest(".box");
+      box.querySelectorAll("[data-media]").forEach((b) => b.setAttribute("aria-pressed", b === tab));
+      box.querySelector("[data-media-body]").innerHTML = tab.dataset.media === "Characters"
+        ? rail()
+        : `<div class="shots">${"<div></div>".repeat(4)}</div>`;
+      return;
+    }
+
+    const item = e.target.closest("[data-char]");
+    if (!item) return;
+    const c = CAST[+item.dataset.char];
+    const box = item.closest(".box");
+    box.querySelectorAll("[data-char]").forEach((el) => el.setAttribute("aria-current", el === item));
+
+    if (box.dataset.kind === "md") {
+      box.querySelector(".md__detail").innerHTML = portrait(c) + profile(c);
+    } else {
+      openDrawer(pageEl, c);
+    }
+  });
+</script>

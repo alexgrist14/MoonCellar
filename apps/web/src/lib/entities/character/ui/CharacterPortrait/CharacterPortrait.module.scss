@@ -1,0 +1,25 @@
+.portrait {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius-x3);
+  overflow: hidden;
+  background: linear-gradient(
+    165deg,
+    var(--color-bg-tertiary),
+    var(--color-bg-primary)
+  );
+  display: grid;
+  place-items: center;
+
+  &__image {
+    object-fit: cover;
+    border-radius: inherit;
+  }
+
+  &__initials {
+    color: var(--color-text-muted);
+    @include font(28px, 32px, 700);
+  }
+}

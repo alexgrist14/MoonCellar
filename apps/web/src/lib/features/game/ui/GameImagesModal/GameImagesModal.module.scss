@@ -1,0 +1,11 @@
+.modal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x4);
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--gap-x2);
+  }
+}

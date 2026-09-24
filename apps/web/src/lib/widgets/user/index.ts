@@ -1,3 +1,4 @@
+export * from "./FavoriteCharacters";
 export * from "./TopTen";
 export * from "./UserGames";
 export * from "./UserInfo";

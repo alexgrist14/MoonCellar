@@ -15,6 +15,7 @@ export interface IUser {
   followings: IFollowings;
   followers: IFollowers;
   favorites?: string[];
+  favoriteCharacters?: string[];
   filters: IUserFilter[];
   presets: IUserPreset[];
   updatedAt: Date;

@@ -7,6 +7,9 @@ import {
   SearchUsersResponseSchema,
   UpdateFavoritesRequestSchema,
   UpdateFavoritesResponseSchema,
+  UpdateFavoriteCharactersRequestSchema,
+  UpdateFavoriteCharactersResponseSchema,
+  GetFavoriteCharactersResponseSchema,
   UpdateDescriptionSchema,
   UpdateSettingsSchema,
   UpdateUserEmailSchema,
@@ -31,6 +34,15 @@ export class UpdateFavoritesDto extends createZodDto(
 ) {}
 export class UpdateFavoritesResponseDto extends createZodDto(
   UpdateFavoritesResponseSchema
+) {}
+export class UpdateFavoriteCharactersDto extends createZodDto(
+  UpdateFavoriteCharactersRequestSchema
+) {}
+export class UpdateFavoriteCharactersResponseDto extends createZodDto(
+  UpdateFavoriteCharactersResponseSchema
+) {}
+export class GetFavoriteCharactersResponseDto extends createZodDto(
+  GetFavoriteCharactersResponseSchema
 ) {}
 export class SearchUsersDto extends createZodDto(SearchUsersRequestSchema) {}
 export class SearchUsersResponseDto extends createZodDto(

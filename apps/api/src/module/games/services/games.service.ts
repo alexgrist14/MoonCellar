@@ -21,6 +21,7 @@ import {
   type IGetGameFollowingsStatusResponse,
   type IGameStats,
   type IGetGamesStatsResponse,
+  type IRelatedGamesResponse,
 } from "@mooncellar/schemas";
 import { Game, type GameDocument } from "../schemas/game.schema";
 import {
@@ -38,7 +39,10 @@ import { Rating } from "../../user/schemas/user-ratings.schema";
 import { UserLogs } from "../../user/schemas/user-logs.schema";
 import { IndexNowService } from "../../indexnow/indexnow.service";
 import { FRONT_URL } from "../../../shared/constants";
-import { normalizeGameName } from "../../../shared/utils";
+import {
+  normalizeGameName,
+  replaceRomanNumerals,
+} from "../../../shared/utils";
 import { pickFollowingsStatus } from "../utils/followings-status.utils";
 import { S3_FOLDERS } from "../../../shared/s3";
 
@@ -98,6 +102,8 @@ const SEARCH_PROJECTION_STAGE = {
   },
 };
 
+const RELATED_GAMES_PER_RELATION_LIMIT = 24;
+
 const CHARACTERS_LOOKUP_STAGE = {
   $lookup: {
     from: "characters",
@@ -126,7 +132,10 @@ type SearchIndexEntry = {
   _id: mongoose.Types.ObjectId;
   name: string;
   nameNormalized: string;
+  nameArabicNumerals?: string;
 };
+
+const SEARCH_KEYS = ["nameNormalized", "nameArabicNumerals"];
 
 @Injectable()
 export class GamesService implements OnModuleInit {
@@ -170,10 +179,19 @@ export class GamesService implements OnModuleInit {
         .select("_id name nameNormalized")
         .lean<SearchIndexEntry[]>()
         .then((docs) => {
-          const entries = docs.map((doc) => ({
-            ...doc,
-            nameNormalized: doc.nameNormalized || normalizeGameName(doc.name),
-          }));
+          const entries = docs.map((doc) => {
+            const nameNormalized =
+              doc.nameNormalized || normalizeGameName(doc.name);
+            const nameArabicNumerals = replaceRomanNumerals(nameNormalized);
+
+            return {
+              ...doc,
+              nameNormalized,
+              ...(nameArabicNumerals !== nameNormalized && {
+                nameArabicNumerals,
+              }),
+            };
+          });
           this.searchIndexCache = entries;
           this.searchIndexCachedAt = Date.now();
           this.searchIndexRefreshPromise = null;
@@ -285,7 +303,7 @@ export class GamesService implements OnModuleInit {
       );
 
       const matches = fuzzysort.go(normalizeGameName(search), candidates, {
-        key: "nameNormalized",
+        keys: SEARCH_KEYS,
         limit: SEARCH_CANDIDATES_LIMIT,
         threshold: SEARCH_SCORE_THRESHOLD,
       });
@@ -341,7 +359,7 @@ export class GamesService implements OnModuleInit {
         const candidates = await this.getSearchIndex();
 
         const matches = fuzzysort.go(normalizeGameName(search), candidates, {
-          key: "nameNormalized",
+          keys: SEARCH_KEYS,
           limit: SEARCH_CANDIDATES_LIMIT,
           threshold: SEARCH_SCORE_THRESHOLD,
         });
@@ -915,5 +933,57 @@ export class GamesService implements OnModuleInit {
     const [stats] = await this.getGamesStats([gameId]);
 
     return stats;
+  }
+
+  async getRelatedGames(gameId: string): Promise<IRelatedGamesResponse> {
+    if (!mongoose.isValidObjectId(gameId)) {
+      throw new BadRequestException(`Invalid game id: ${gameId}`);
+    }
+
+    try {
+      const game = await this.Games.findById(gameId)
+        .select("relatedGames")
+        .lean();
+
+      if (!game) throw new NotFoundException(`Game not found: ${gameId}`);
+
+      const idsByKey = Object.entries(game.relatedGames ?? {})
+        .map(
+          ([key, value]) =>
+            [
+              key,
+              [value]
+                .flat()
+                .filter((id) => !!id && mongoose.isValidObjectId(id))
+                .slice(0, RELATED_GAMES_PER_RELATION_LIMIT)
+                .map(String),
+            ] as const
+        )
+        .filter(([, ids]) => ids.length);
+
+      const ids = [...new Set(idsByKey.flatMap(([, ids]) => ids))];
+
+      if (!ids.length) return {};
+
+      const games = await this.Games.aggregate([
+        {
+          $match: {
+            _id: { $in: ids.map((id) => new mongoose.Types.ObjectId(id)) },
+          },
+        },
+        SEARCH_PROJECTION_STAGE,
+      ]);
+
+      const byId = new Map(games.map((item) => [item._id.toString(), item]));
+
+      return Object.fromEntries(
+        idsByKey
+          .map(([key, ids]) => [key, ids.flatMap((id) => byId.get(id) ?? [])])
+          .filter(([, items]) => items.length)
+      );
+    } catch (err) {
+      this.logger.error(err, `Failed to get related games: ${gameId}`);
+      throw err;
+    }
   }
 }

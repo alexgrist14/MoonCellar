@@ -1,0 +1,15 @@
+.characters {
+  &__rail {
+    display: flex;
+    gap: var(--gap-x4);
+    padding-block: var(--padding-x2);
+  }
+
+  &__card {
+    flex: 0 0 var(--character-card-width);
+
+    @include mediaSm {
+      flex-basis: var(--character-card-width-sm);
+    }
+  }
+}

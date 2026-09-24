@@ -1,5 +1,9 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
+import {
+  Character,
+  CharacterDatabaseSchema,
+} from "../games/schemas/character.schema";
 import { Game, GameDatabaseSchema } from "../games/schemas/game.schema";
 import {
   Platform,
@@ -36,6 +40,7 @@ import { UsersSearchService } from "./services/users-search.service";
       { name: CustomListLike.name, schema: CustomListLikeDatabaseSchema },
       { name: User.name, schema: UserSchema },
       { name: Game.name, schema: GameDatabaseSchema },
+      { name: Character.name, schema: CharacterDatabaseSchema },
       { name: Platform.name, schema: PlatformDatabaseSchema },
       { name: Playthrough.name, schema: PlaythroughDatabaseSchema },
       { name: UserLogs.name, schema: UserLogsSchema },

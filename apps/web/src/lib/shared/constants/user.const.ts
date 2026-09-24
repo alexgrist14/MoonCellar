@@ -25,6 +25,7 @@ export const profileTabs = [
   ...userListCategories,
   "lists",
   "liked",
+  "characters",
   "reviews",
   "settings",
 ];
@@ -40,6 +41,7 @@ export const profileTabLabels: Record<string, string> = {
   dropped: "Dropped",
   lists: "Lists",
   liked: "Liked lists",
+  characters: "Favourite characters",
   reviews: "Reviews",
   settings: "Settings",
 };

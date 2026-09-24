@@ -21,11 +21,12 @@ import {
   useUploadGameImageMutation,
 } from "@/src/lib/entities/game/api/game.mutations";
 import { usePlatformsQuery } from "@/src/lib/entities/platform/api/platform.queries";
-import { hltbApi } from "@/src/lib/shared/api";
+import { hltbApi, igdbApi, vndbApi } from "@/src/lib/shared/api";
 import { revalidateGamePage } from "@/src/lib/entities/game/api/game.actions";
 import {
   AddGameRequestSchema,
   IAddGameRequest,
+  IGameResponse,
   IUpdateGameRequest,
   UpdateGameRequestSchema,
 } from "@mooncellar/schemas";
@@ -41,7 +42,9 @@ import {
   DateField,
   EnumField,
   EnumListField,
+  IImagePickerOption,
   IObjectFieldDescriptor,
+  ImagePickerField,
   NumberField,
   NumberListField,
   ObjectListField,
@@ -99,18 +102,43 @@ const isBlankObjectListRow = (
     return value === undefined || value === "";
   });
 
-const nullifyUndefined = (value: unknown): unknown => {
-  if (value === undefined) return null;
-  if (Array.isArray(value)) return value;
-  if (value && typeof value === "object") {
-    return Object.fromEntries(
-      Object.entries(value as Record<string, unknown>).map(([key, nested]) => [
-        key,
-        nullifyUndefined(nested),
-      ])
-    );
-  }
-  return value;
+const TOP_LEVEL_PATHS = [
+  ...new Set(
+    GAME_SECTIONS.flatMap((section) =>
+      section.fields.map((field) => field.path.split(".")[0])
+    )
+  ),
+];
+
+const isPlainObject = (value: unknown): value is Record<string, unknown> =>
+  !!value && typeof value === "object" && !Array.isArray(value);
+
+const pruneRow = (row: unknown): unknown =>
+  isPlainObject(row)
+    ? Object.fromEntries(
+        Object.entries(row).filter(
+          ([, value]) => value !== null && value !== undefined
+        )
+      )
+    : row;
+
+const pruneEmpty = (value: Record<string, unknown>): Record<string, unknown> =>
+  Object.fromEntries(
+    Object.entries(value).flatMap(([key, nested]) => {
+      if (nested === undefined) return [];
+      if (Array.isArray(nested)) return [[key, nested.map(pruneRow)]];
+      if (!isPlainObject(nested)) return [[key, nested]];
+
+      const pruned = pruneEmpty(nested);
+
+      return Object.keys(pruned).length ? [[key, pruned]] : [];
+    })
+  );
+
+const toFormValues = (game: IGameResponse): IGameFormValues => {
+  const { characters: _characters, ...rest } = game;
+
+  return pruneEmpty(rest as Record<string, unknown>) as IGameFormValues;
 };
 
 const findErrorMessage = (
@@ -165,12 +193,15 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
     path: string;
     submission: number;
   } | null>(null);
-  const [isParsingHltb, setIsParsingHltb] = useState(false);
+  const [parsingSource, setParsingSource] = useState<
+    "igdb" | "vndb" | "hltb" | null
+  >(null);
 
   const {
     data: game,
     isPending: isGamePending,
     isError: isGameError,
+    refetch: refetchGame,
   } = useAdminGameQuery(gameId);
 
   const { data: filters, isPending: isFiltersPending } = useGameFiltersQuery();
@@ -186,13 +217,18 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
     isFiltersPending || isPlatformsPending || Boolean(gameId && isGamePending)
   );
 
-  const resolver = useMemo(
-    () =>
-      zodResolver(
-        isCreate ? AddGameRequestSchema : UpdateGameRequestSchema
-      ) as unknown as Resolver<IGameFormValues>,
-    [isCreate]
-  );
+  const resolver = useMemo<Resolver<IGameFormValues>>(() => {
+    const zod = zodResolver(
+      isCreate ? AddGameRequestSchema : UpdateGameRequestSchema
+    ) as unknown as Resolver<IGameFormValues>;
+
+    return (values, context, options) =>
+      zod(
+        pruneEmpty(values as Record<string, unknown>) as IGameFormValues,
+        context,
+        options
+      );
+  }, [isCreate]);
 
   const {
     control,
@@ -201,14 +237,31 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
     setValue,
     getValues,
     watch,
-    formState: { errors, isSubmitting },
+    formState,
   } = useForm<IGameFormValues>({
     resolver,
     mode: "onBlur",
     defaultValues: isCreate ? CREATE_DEFAULTS : {},
   });
 
+  const { errors, isSubmitting } = formState;
   const hltbId = watch("hltb.hltbId");
+  const artworks = watch("artworks");
+  const screenshots = watch("screenshots");
+
+  const pictureOptions = useMemo<IImagePickerOption[]>(
+    () => [
+      ...(artworks ?? []).map((url, index) => ({
+        url,
+        caption: `Artwork ${index + 1}`,
+      })),
+      ...(screenshots ?? []).map((url, index) => ({
+        url,
+        caption: `Screenshot ${index + 1}`,
+      })),
+    ],
+    [artworks, screenshots]
+  );
 
   const hydratedGameIdRef = useRef<string | undefined>(undefined);
 
@@ -217,7 +270,7 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
     if (hydratedGameIdRef.current === gameId) return;
     hydratedGameIdRef.current = gameId;
     setOriginal(game as unknown as Record<string, unknown>);
-    reset(game as unknown as IGameFormValues);
+    reset(toFormValues(game));
   }, [gameId, game, reset]);
 
   useEffect(() => {
@@ -309,10 +362,14 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
     });
 
     const patch: Record<string, unknown> = {};
-    Object.keys(sanitized).forEach((key) => {
-      if (JSON.stringify(sanitized[key]) === JSON.stringify(original[key]))
-        return;
-      patch[key] = nullifyUndefined(sanitized[key]);
+    new Set([...TOP_LEVEL_PATHS, ...Object.keys(sanitized)]).forEach((key) => {
+      const value = sanitized[key];
+
+      if (JSON.stringify(value) === JSON.stringify(original[key])) return;
+      if ((value ?? null) === null && (original[key] ?? null) === null) return;
+      if (value === undefined && isPlainObject(original[key])) return;
+
+      patch[key] = value === undefined ? null : value;
     });
 
     if (!Object.keys(patch).length) {
@@ -327,8 +384,11 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
       {
         onSuccess: (game) => {
           toast.success({ description: "Game updated" });
-          setOriginal(game as unknown as Record<string, unknown>);
-          reset(game as unknown as IGameFormValues);
+          setOriginal((current) => ({
+            ...(game as unknown as Record<string, unknown>),
+            characters: current.characters,
+          }));
+          reset(toFormValues(game));
         },
       }
     );
@@ -358,35 +418,76 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
     }
   };
 
-  const handleParseHltb = async () => {
-    if (!gameId) return;
+  const originalIgdbId = (original.igdb as IGameResponse["igdb"])?.gameId;
+  const originalVnId = (original.vndb as IGameResponse["vndb"])?.vnId;
+  const isDirty = formState.isDirty;
 
-    setIsParsingHltb(true);
+  const reloadGame = async () => {
+    const { data } = await refetchGame();
+
+    if (!data) return;
+
+    setOriginal(data as unknown as Record<string, unknown>);
+    reset(toFormValues(data));
+  };
+
+  const runParse = async (
+    source: "igdb" | "vndb" | "hltb",
+    parse: () => Promise<{ slug?: string; isFailed?: boolean; message: string }>
+  ) => {
+    if (!gameId || parsingSource) return;
+
+    setParsingSource(source);
 
     try {
+      const { slug, isFailed, message } = await parse();
+
+      if (isFailed) {
+        toast.error({ description: message });
+      } else {
+        toast.success({ description: message });
+      }
+
+      await revalidateGamePage(original.slug as string, slug);
+      await reloadGame();
+    } catch {
+      toast.error({ description: `Failed to parse from ${source.toUpperCase()}` });
+    } finally {
+      setParsingSource(null);
+    }
+  };
+
+  const handleParseIgdb = () =>
+    runParse("igdb", async () => {
+      const { data } = await igdbApi.parseGame(originalIgdbId!);
+
+      return { slug: data?.slug, message: "Parsed from IGDB" };
+    });
+
+  const handleParseVndb = () =>
+    runParse("vndb", async () => {
+      const { data } = await vndbApi.parseGame(gameId!);
+
+      return {
+        slug: data.slug,
+        isFailed: data.status === "failed",
+        message: data.message,
+      };
+    });
+
+  const handleParseHltb = () =>
+    runParse("hltb", async () => {
       const { data } = await hltbApi.parseGame({
-        gameId,
+        gameId: gameId!,
         hltbId: hltbId?.trim() || undefined,
       });
 
-      if (data.status === "not_found") {
-        toast.error({ description: data.message });
-      } else {
-        toast.success({ description: data.message });
-      }
-
-      const hltb = data.hltb ?? undefined;
-
-      setOriginal((current) => ({ ...current, hltb }));
-      setValue("hltb", hltb);
-
-      await revalidateGamePage(data.slug);
-    } catch {
-      toast.error({ description: "Failed to parse from HLTB" });
-    } finally {
-      setIsParsingHltb(false);
-    }
-  };
+      return {
+        slug: data.slug,
+        isFailed: data.status === "not_found",
+        message: data.message,
+      };
+    });
 
   const handleUpload = async (
     path: string,
@@ -695,6 +796,23 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
             )}
           />
         );
+      case "imagePicker":
+        return (
+          <Controller
+            key={field.path}
+            control={control}
+            name={formPath}
+            render={({ field: rhf }) => (
+              <ImagePickerField
+                label={field.label}
+                value={rhf.value as string | null | undefined}
+                options={pictureOptions}
+                autoCaption={field.autoCaption ?? "Automatic"}
+                onChange={rhf.onChange}
+              />
+            )}
+          />
+        );
       default:
         return null;
     }
@@ -728,10 +846,49 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
           {!isCreate && (
             <Button
               color={ButtonColor.DEFAULT}
-              disabled={isParsingHltb}
+              disabled={!!parsingSource || !originalIgdbId || !!originalVnId}
+              tooltip={
+                originalVnId
+                  ? "Linked to VNDB: the IGDB sync does not touch this game"
+                  : !originalIgdbId
+                    ? "Save an IGDB game id first"
+                    : isDirty
+                      ? "Unsaved changes will be replaced by the parsed data"
+                      : undefined
+              }
+              onClick={handleParseIgdb}
+            >
+              {parsingSource === "igdb" ? "Parsing…" : "Parse from IGDB"}
+            </Button>
+          )}
+          {!isCreate && (
+            <Button
+              color={ButtonColor.DEFAULT}
+              disabled={!!parsingSource || !originalVnId}
+              tooltip={
+                !originalVnId
+                  ? "Save a VNDB id first"
+                  : isDirty
+                    ? "Unsaved changes will be replaced by the parsed data"
+                    : undefined
+              }
+              onClick={handleParseVndb}
+            >
+              {parsingSource === "vndb" ? "Parsing…" : "Parse from VNDB"}
+            </Button>
+          )}
+          {!isCreate && (
+            <Button
+              color={ButtonColor.DEFAULT}
+              disabled={!!parsingSource}
+              tooltip={
+                isDirty
+                  ? "Unsaved changes will be replaced by the parsed data"
+                  : undefined
+              }
               onClick={handleParseHltb}
             >
-              {isParsingHltb
+              {parsingSource === "hltb"
                 ? "Parsing…"
                 : hltbId?.trim()
                   ? "Parse HLTB by id"
@@ -755,6 +912,15 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
             <span>updated: {original.updatedAt as string}</span>
             <span>averageRating: {String(original.averageRating ?? "—")}</span>
             <span>isCustom: {String(original.isCustom ?? false)}</span>
+            <span>ratingsCount: {String(original.ratingsCount ?? "—")}</span>
+            <span>
+              characters:{" "}
+              {(original.characters as unknown[] | undefined)?.length ?? 0}
+            </span>
+            <span>
+              source:{" "}
+              {originalVnId ? "VNDB" : originalIgdbId ? "IGDB" : "manual"}
+            </span>
           </div>
         )}
 

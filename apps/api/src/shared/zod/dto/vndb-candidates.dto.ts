@@ -4,6 +4,7 @@ import {
   GetVndbCandidatesRequestSchema,
   VndbCandidatesResponseSchema,
   VndbCandidatesSummarySchema,
+  VndbParseResponseSchema,
   VndbReviewItemResponseSchema,
 } from "@mooncellar/schemas";
 
@@ -25,4 +26,8 @@ export class GetVndbCandidatesRequestDto extends createZodDto(
 
 export class VndbCandidatesResponseDto extends createZodDto(
   VndbCandidatesResponseSchema
+) {}
+
+export class VndbParseResponseDto extends createZodDto(
+  VndbParseResponseSchema
 ) {}

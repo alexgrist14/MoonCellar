@@ -50,6 +50,8 @@ import {
   type IVndbCandidateState,
   type IVndbCandidatesSummary,
   type IVndbReviewItem,
+  type IVndbParseResponse,
+  stripBbcode,
 } from "@mooncellar/schemas";
 import {
   INCOMPATIBLE_GENRES,
@@ -181,14 +183,6 @@ const releaseDateFormats: Record<number, Intl.DateTimeFormat> = {
   }),
 };
 
-const stripBbcode = (value: string) =>
-  value
-    .replace(/\[spoiler\][\s\S]*?\[\/spoiler\]/gi, "")
-    .replace(/\[url=[^\]]*\]([\s\S]*?)\[\/url\]/gi, "$1")
-    .replace(/\[From [^\]]*\]/gi, "")
-    .replace(/\[\/?[a-z]+(?:=[^\]]*)?\]/gi, "")
-    .trim();
-
 const isEmptyValue = (value: unknown) =>
   value == null || value === "" || (Array.isArray(value) && !value.length);
 
@@ -296,6 +290,47 @@ export class VndbService {
       });
       await this.refreshLinkedVns(totals);
     });
+  }
+
+  async parseGame(gameId: string): Promise<IVndbParseResponse> {
+    if (!mongoose.isValidObjectId(gameId)) {
+      throw new BadRequestException(`Invalid game id: ${gameId}`);
+    }
+
+    const game = await this.gamesModel
+      .findById(gameId)
+      .select("slug vndb.vnId")
+      .lean();
+
+    if (!game) throw new NotFoundException(`Game not found: ${gameId}`);
+
+    const vnId = game.vndb?.vnId;
+
+    if (!vnId) {
+      throw new BadRequestException("The game has no VNDB id to parse");
+    }
+
+    if (this.isRunning) {
+      throw new ConflictException("A VNDB sync is running, try again later");
+    }
+
+    const totals = await this.runSync(`parse ${vnId}`, (totals) =>
+      this.processVns("parse", [vnId], totals)
+    );
+
+    const updated = await this.gamesModel
+      .findOne({ "vndb.vnId": vnId })
+      .select("slug")
+      .lean();
+    const slug = updated?.slug ?? game.slug;
+
+    if (!totals || totals.failed) {
+      return { slug, status: "failed", message: `VNDB ${vnId} failed to save` };
+    }
+
+    return totals.created || totals.updated
+      ? { slug, status: "updated", message: `Updated from VNDB ${vnId}` }
+      : { slug, status: "unchanged", message: `VNDB ${vnId} has no changes` };
   }
 
   private async runSync(

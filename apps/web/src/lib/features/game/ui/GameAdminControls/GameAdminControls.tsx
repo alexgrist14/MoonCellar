@@ -8,11 +8,15 @@ import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal/ConfirmModal";
 import { modal } from "@/src/lib/shared/ui/Modal";
-import { gamesApi, hltbApi, igdbApi } from "@/src/lib/shared/api";
+import { gamesApi, hltbApi, igdbApi, vndbApi } from "@/src/lib/shared/api";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { IGameResponse } from "@mooncellar/schemas";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { revalidateGamePage } from "@/src/lib/entities/game/api/game.actions";
+import {
+  GAME_IMAGES_MODAL_ID,
+  GameImagesModal,
+} from "@/src/lib/features/game/ui/GameImagesModal";
 
 interface IGameAdminControlsProps {
   game: IGameResponse;
@@ -24,12 +28,14 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
 
   const [isParsing, setIsParsing] = useState(false);
   const [isParsingHltb, setIsParsingHltb] = useState(false);
+  const [isParsingVndb, setIsParsingVndb] = useState(false);
   const [hltbId, setHltbId] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
 
   if (!isAdmin) return null;
 
-  const igdbId = game.igdb?.gameId;
+  const igdbId = game.vndb ? undefined : game.igdb?.gameId;
+  const vnId = game.vndb?.vnId;
 
   const handleParse = async () => {
     if (!igdbId) return;
@@ -50,6 +56,31 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
       });
     } finally {
       setIsParsing(false);
+    }
+  };
+
+  const handleParseVndb = async () => {
+    setIsParsingVndb(true);
+
+    try {
+      const { data } = await vndbApi.parseGame(game._id);
+
+      if (data.status === "failed") {
+        toast.error({ title: "VNDB parse failed", description: data.message });
+        return;
+      }
+
+      toast.success({ title: "Parsed from VNDB", description: data.message });
+
+      await revalidateGamePage(game.slug, data.slug);
+      router.refresh();
+    } catch {
+      toast.error({
+        title: "Failed to parse from VNDB",
+        description: game.name,
+      });
+    } finally {
+      setIsParsingVndb(false);
     }
   };
 
@@ -78,6 +109,15 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
       });
     } finally {
       setIsParsingHltb(false);
+    }
+  };
+
+  const handleCopyId = async () => {
+    try {
+      await navigator.clipboard.writeText(game._id);
+      toast.success({ title: "Game id copied", description: game._id });
+    } catch {
+      toast.error({ title: "Failed to copy the game id" });
     }
   };
 
@@ -119,12 +159,30 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
   return (
     <ExpandMenu position="bottom-right" titleOpen="Admin">
       <div className={styles.controls}>
+        <div className={styles.id}>
+          <span className={styles.id__value}>{game._id}</span>
+          <Button color={ButtonColor.DEFAULT} compact onClick={handleCopyId}>
+            Copy
+          </Button>
+        </div>
         <Button
           color={ButtonColor.DEFAULT}
           onClick={() => router.push(`/admin/games/${game._id}`)}
         >
           Edit game
         </Button>
+        {!!(game.artworks?.length || game.screenshots?.length) && (
+          <Button
+            color={ButtonColor.DEFAULT}
+            onClick={() =>
+              modal.open(<GameImagesModal game={game} />, {
+                id: GAME_IMAGES_MODAL_ID,
+              })
+            }
+          >
+            Background and banner
+          </Button>
+        )}
         {!!igdbId && (
           <Button
             color={ButtonColor.DEFAULT}
@@ -132,6 +190,15 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
             onClick={handleParse}
           >
             {isParsing ? "Parsing…" : "Parse from IGDB"}
+          </Button>
+        )}
+        {!!vnId && (
+          <Button
+            color={ButtonColor.DEFAULT}
+            disabled={isParsingVndb}
+            onClick={handleParseVndb}
+          >
+            {isParsingVndb ? "Parsing…" : "Parse from VNDB"}
           </Button>
         )}
         <Input

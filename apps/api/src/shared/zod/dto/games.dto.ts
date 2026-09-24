@@ -9,6 +9,7 @@ import {
   GetGameSlugsRequestSchema,
   GetGameSlugsResponseSchema,
   GetRandomGameSlugResponseSchema,
+  GetRelatedGamesResponseSchema,
   UpdateGameRequestSchema,
 } from "@mooncellar/schemas";
 
@@ -28,4 +29,8 @@ export class GetGameSlugsResponseDto extends createZodDto(
 ) {}
 export class GetRandomGameSlugResponseDto extends createZodDto(
   GetRandomGameSlugResponseSchema
+) {}
+
+export class GetRelatedGamesResponseDto extends createZodDto(
+  GetRelatedGamesResponseSchema
 ) {}

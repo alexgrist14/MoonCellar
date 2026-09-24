@@ -35,3 +35,44 @@ export const useUpdateFavoritesMutation = () => {
     },
   });
 };
+
+export const useUpdateFavoriteCharactersMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      userId,
+      characterIds,
+    }: {
+      userId: string;
+      characterIds: string[];
+    }) =>
+      userAPI
+        .updateFavoriteCharacters(userId, characterIds)
+        .then(({ data }) => data),
+    onMutate: ({ characterIds }) => {
+      const { profile, setProfile } = useAuthStore.getState();
+      const previous = profile?.favoriteCharacters ?? [];
+
+      if (profile) setProfile({ ...profile, favoriteCharacters: characterIds });
+
+      return { previous };
+    },
+    onError: (_error, _variables, context) => {
+      const { profile, setProfile } = useAuthStore.getState();
+
+      if (profile && context) {
+        setProfile({ ...profile, favoriteCharacters: context.previous });
+      }
+    },
+    onSuccess: ({ favoriteCharacters }, { userId }) => {
+      const { profile, setProfile } = useAuthStore.getState();
+
+      if (profile?._id === userId) setProfile({ ...profile, favoriteCharacters });
+
+      queryClient.invalidateQueries({
+        queryKey: userQueryKeys.favoriteCharacters(userId),
+      });
+    },
+  });
+};

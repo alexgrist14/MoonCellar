@@ -10,3 +10,4 @@ export * from "./EnumField";
 export * from "./EnumListField";
 export * from "./UploadButton";
 export * from "./CollapsibleSection";
+export * from "./ImagePickerField";

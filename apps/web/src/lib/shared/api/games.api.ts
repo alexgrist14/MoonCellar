@@ -15,6 +15,7 @@ import {
   IGetGameFollowingsStatusResponse,
   IGameStats,
   IGetGamesStatsResponse,
+  IRelatedGamesResponse,
 } from "@mooncellar/schemas";
 import agent from "./agent.api";
 import { filesAPI } from "./files.api";
@@ -43,6 +44,10 @@ export const gamesApi = {
 
   getStats: (gameId: string) => {
     return agent.get<IGameStats>(`${GAMES_URL}/${gameId}/stats`);
+  },
+
+  getRelated: (gameId: string) => {
+    return agent.get<IRelatedGamesResponse>(`${GAMES_URL}/${gameId}/related`);
   },
 
   getStatsByIds: (gameIds: string[]) => {

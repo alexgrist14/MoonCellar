@@ -15,7 +15,11 @@ import { PageLoader } from "@/src/lib/shared/ui/PageLoader";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { ReactNode, Suspense } from "react";
-import { ICustomList, IGameResponse } from "@mooncellar/schemas";
+import {
+  ICharacterResponse,
+  ICustomList,
+  IGameResponse,
+} from "@mooncellar/schemas";
 
 const getFavoriteGames = async (ids?: string[]): Promise<IGameResponse[]> => {
   if (!ids?.length) return [];
@@ -37,6 +41,12 @@ const getPublicLists = (userId: string): Promise<ICustomList[]> =>
 const getLikedLists = (userId: string): Promise<ICustomList[]> =>
   listsAPI
     .getLikedLists(userId)
+    .then(({ data }) => data)
+    .catch(() => []);
+
+const getFavoriteCharacters = (userId: string): Promise<ICharacterResponse[]> =>
+  userAPI
+    .getFavoriteCharacters(userId)
     .then(({ data }) => data)
     .catch(() => []);
 
@@ -112,11 +122,13 @@ export default async function ProfileLayout({
   )?.data;
   const userFollowings = (await userAPI.getUserFollowings(user._id)).data;
   const userFollowers = (await userAPI.getUserFollowers(user._id)).data;
-  const [favoriteGames, lists, likedLists] = await Promise.all([
-    getFavoriteGames(user.favorites),
-    getPublicLists(user._id),
-    getLikedLists(user._id),
-  ]);
+  const [favoriteGames, lists, likedLists, favoriteCharacters] =
+    await Promise.all([
+      getFavoriteGames(user.favorites),
+      getPublicLists(user._id),
+      getLikedLists(user._id),
+      getFavoriteCharacters(user._id),
+    ]);
 
   return (
     <Suspense fallback={<PageLoader />}>
@@ -129,6 +141,7 @@ export default async function ProfileLayout({
         favoriteGames={favoriteGames}
         lists={lists}
         likedLists={likedLists}
+        favoriteCharacters={favoriteCharacters}
       >
         {children}
       </UserProfile>

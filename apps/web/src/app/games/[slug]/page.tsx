@@ -38,6 +38,13 @@ const getStats = cache(async (gameId: string) =>
     .catch(() => undefined)
 );
 
+const getRelated = cache(async (gameId: string) =>
+  gamesApi
+    .getRelated(gameId)
+    .then(({ data }) => data)
+    .catch(() => undefined)
+);
+
 const getReviews = cache(async (gameId: string) =>
   commentsAPI
     .getReviews(gameId, {})
@@ -108,9 +115,10 @@ const GamePageIndex = async ({ params }: { params: any }) => {
     notFound();
   }
 
-  const [stats, reviews] = await Promise.all([
+  const [stats, reviews, related] = await Promise.all([
     getStats(game._id),
     getReviews(game._id),
+    getRelated(game._id),
   ]);
 
   return (
@@ -123,7 +131,12 @@ const GamePageIndex = async ({ params }: { params: any }) => {
           { name: game.name, path: `/games/${game.slug}` },
         ])}
       />
-      <GamePage game={game} stats={stats} reviews={reviews} />
+      <GamePage
+        game={game}
+        stats={stats}
+        reviews={reviews}
+        related={related}
+      />
     </>
   );
 };

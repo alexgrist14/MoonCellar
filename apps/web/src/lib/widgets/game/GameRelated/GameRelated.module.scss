@@ -1,0 +1,16 @@
+.related {
+  &__panel {
+    min-width: 0;
+
+    &_hidden {
+      display: none;
+    }
+  }
+
+  &__relation {
+    display: block;
+    padding-top: var(--padding-x1);
+    color: var(--color-text-muted);
+    @include font(12px, 16px, 500);
+  }
+}

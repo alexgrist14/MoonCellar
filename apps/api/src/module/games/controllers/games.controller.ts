@@ -36,6 +36,7 @@ import {
   GetGameSlugsDto,
   GetGameSlugsResponseDto,
   GetRandomGameSlugResponseDto,
+  GetRelatedGamesResponseDto,
   UpdateGameDto,
 } from "../../../shared/zod/dto/games.dto";
 import {
@@ -114,6 +115,13 @@ export class GamesController {
   @ApiCreatedResponse({ type: GetGameResponseDto })
   async getGameBySlug(@Query() dto: GetGameBySlugDto) {
     return this.games.getGameBySlug(dto);
+  }
+
+  @Get("/:gameId/related")
+  @ApiOperation({ summary: "Get related games grouped by relation" })
+  @ApiCreatedResponse({ type: GetRelatedGamesResponseDto })
+  async getRelatedGames(@Param("gameId") gameId: string) {
+    return this.games.getRelatedGames(gameId);
   }
 
   @Get("/top-rated-random")

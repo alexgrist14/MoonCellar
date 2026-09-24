@@ -24,14 +24,18 @@
   --color-neutral-90: #d9d9d9;
   --color-neutral-95: #eaeaea;
   --color-neutral-100: #ffffff;
-  --color-blue: #00a0ff;
+  --color-blue: #3d6bff;
   --color-blue-light: #00d4ff;
+  --color-cyan: #48cae4;
   --color-gray: #afb3b9;
+  --color-white: #e8edf5;
   --color-yellow: #ffc451;
   --color-yellow-light: #f9f871;
   --color-orange: #ff8862;
   --color-pink: #ff4b8f;
-  --color-violet: #e735c4;
+  --color-violet: #9b5de5;
+  --color-green: #2dc653;
+  --color-red: #e5383b;
   --color-positive: #00c292;
   --color-negative: #d02729;
   --color-primary: var(--color-neutral-30);
@@ -110,6 +114,7 @@
   --duration-instant: 1ms;
   --duration-fast: 160ms;
   --duration-base: 280ms;
+  --duration-slow: 400ms;
   --delay-stagger: 90ms;
   --easing-out: cubic-bezier(0.16, 1, 0.3, 1);
   --easing-in: cubic-bezier(0.7, 0, 0.84, 0);
@@ -123,12 +128,12 @@
   );
 
   /* vars/_components.scss */
-  --game-completed-color: var(--color-positive);
-  --game-dropped-color: var(--color-negative);
-  --game-playing-color: var(--color-accent);
+  --game-completed-color: var(--color-green);
+  --game-dropped-color: var(--color-red);
+  --game-playing-color: var(--color-blue);
   --game-wishlist-color: var(--color-violet);
-  --game-backlog-color: var(--color-pink);
-  --game-played-color: var(--color-blue);
+  --game-backlog-color: var(--color-white);
+  --game-played-color: var(--color-cyan);
   --game-mastered-color: var(--color-yellow);
   --cover-ratio: 528/704;
   --shadow-basic: 0px 4px 4px var(--color-neutral-5);
@@ -139,6 +144,10 @@
   --avatar-size-sm: var(--padding-x6);
   --navigation-progress-height: 1px;
   --navigation-progress-z-index: 1002;
+  --bprogress-color: var(--color-accent) !important;
+  --bprogress-height: var(--navigation-progress-height) !important;
+  --bprogress-box-shadow: var(--glow-accent) !important;
+  --bprogress-z-index: var(--navigation-progress-z-index) !important;
   --modal-text-width: min(720px, calc(100vw - var(--padding-x10)));
   --rich-editor-image-width: 400px;
   --playthrough-modal-width: min(80vw, 400px);
@@ -205,8 +214,7 @@
   --game-controls-icon-size: 24px;
   --game-controls-icon-size-sm: 20px;
   --game-controls-badge-size: 15px;
-  --top-five-cover-width: 44px;
-  --list-card-min-width: 180px;
+  --top-ten-cover-width: 44px;
   --list-card-row-mosaic-size: 44px;
   --list-card-count-height: 20px;
   --list-search-width: 320px;
@@ -217,6 +225,11 @@
   --activity-cover-width: 80px;
   --activity-dot-size: 12px;
   --people-avatar-size: 22px;
+  --character-card-width: 128px;
+  --character-card-width-sm: 104px;
+  --character-profile-portrait-width: 200px;
+  --image-picker-thumb-width: 160px;
+  --game-images-modal-width: min(92vw, 960px);
   --search-modal-width: 900px;
   --search-tab-height: 36px;
 }

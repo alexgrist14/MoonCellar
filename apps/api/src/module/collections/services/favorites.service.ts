@@ -7,9 +7,12 @@ import {
 import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { type Model } from "mongoose";
 import type {
+  IUpdateFavoriteCharactersRequest,
+  IUpdateFavoriteCharactersResponse,
   IUpdateFavoritesRequest,
   IUpdateFavoritesResponse,
 } from "@mooncellar/schemas";
+import { Character } from "../../games/schemas/character.schema";
 import { Game } from "../../games/schemas/game.schema";
 import { User } from "../../user/schemas/user.schema";
 import { UserLogsService } from "../../user/services/user-logs.service";
@@ -22,6 +25,8 @@ export class FavoritesService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Game.name) private readonly gameModel: Model<Game>,
+    @InjectModel(Character.name)
+    private readonly characterModel: Model<Character>,
     private readonly logsService: UserLogsService
   ) {}
 
@@ -86,5 +91,61 @@ export class FavoritesService {
     if (!user) throw new NotFoundException("User not found");
 
     return { favorites: (user.favorites ?? []).map((id) => id.toString()) };
+  }
+
+  async updateFavoriteCharacters(
+    userId: string,
+    { characterIds }: IUpdateFavoriteCharactersRequest
+  ): Promise<IUpdateFavoriteCharactersResponse> {
+    const ownerId = toObjectId(userId, "user id");
+    const ids = characterIds.map((id) => toObjectId(id, "character id"));
+    const found = await this.characterModel.countDocuments({
+      _id: { $in: ids },
+    });
+
+    if (found !== ids.length) {
+      throw new BadRequestException("One of the characters does not exist");
+    }
+
+    try {
+      const { matchedCount } = await this.userModel.updateOne(
+        { _id: ownerId },
+        { $set: { favoriteCharacters: ids } }
+      );
+
+      if (!matchedCount) throw new NotFoundException("User not found");
+
+      return { favoriteCharacters: characterIds };
+    } catch (err) {
+      this.logger.error(
+        err,
+        `Failed to update favourite characters: ${userId}`
+      );
+      throw err;
+    }
+  }
+
+  async getFavoriteCharacters(userId: string) {
+    const user = await this.userModel
+      .findById(toObjectId(userId, "user id"))
+      .select("favoriteCharacters")
+      .lean<{ favoriteCharacters?: mongoose.Types.ObjectId[] }>();
+
+    if (!user) throw new NotFoundException("User not found");
+
+    const ids = user.favoriteCharacters ?? [];
+
+    if (!ids.length) return [];
+
+    const characters = await this.characterModel
+      .find({ _id: { $in: ids } })
+      .select("-igdb -vndb -gameIds -__v")
+      .lean();
+
+    const byId = new Map(
+      characters.map((character) => [character._id.toString(), character])
+    );
+
+    return ids.flatMap((id) => byId.get(id.toString()) ?? []);
   }
 }

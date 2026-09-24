@@ -6,18 +6,22 @@
   width: var(--drawer-width);
   height: calc(100vh - var(--header-height));
   padding: var(--padding-x2);
-  transform: translateX(100%);
+  transform: scaleX(0);
+  transform-origin: right;
+  opacity: 0;
   visibility: hidden;
   transition:
-    transform var(--duration-base) var(--easing-out),
-    visibility var(--duration-base) var(--easing-out);
+    transform var(--duration-slow) ease,
+    opacity var(--duration-slow) ease,
+    visibility var(--duration-slow) ease;
 
   @include mediaSm {
     width: 100vw;
   }
 
   &_open {
-    transform: translateX(0);
+    transform: scaleX(1);
+    opacity: 1;
     visibility: visible;
   }
 

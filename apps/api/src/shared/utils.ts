@@ -32,6 +32,37 @@ export const normalizeGameName = (value: string) =>
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
 
+const ROMAN_NUMERAL_PATTERN =
+  /^m{0,3}(cm|cd|d?c{0,3})(xc|xl|l?x{0,3})(ix|iv|v?i{0,3})$/;
+
+const ROMAN_DIGITS: Record<string, number> = {
+  i: 1,
+  v: 5,
+  x: 10,
+  l: 50,
+  c: 100,
+  d: 500,
+  m: 1000,
+};
+
+const romanToNumber = (token: string) =>
+  [...token].reduce((total, char, index) => {
+    const value = ROMAN_DIGITS[char];
+    const next = ROMAN_DIGITS[token[index + 1]] ?? 0;
+
+    return total + (value < next ? -value : value);
+  }, 0);
+
+export const replaceRomanNumerals = (normalizedName: string) =>
+  normalizedName
+    .split(" ")
+    .map((token) =>
+      token && ROMAN_NUMERAL_PATTERN.test(token)
+        ? String(romanToNumber(token))
+        : token
+    )
+    .join(" ");
+
 export const getFormattedTitle = (title: string) => {
   return title
     .replaceAll("The ", "")

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CharacterSchema } from "./characters.schema";
 import { RaAwardSchema } from "./ra.schema";
 import { RoleSchema } from "./role.schema";
 import { ObjectIdSchema } from "./utils";
@@ -25,6 +26,7 @@ export const UserSchemaZod = z.object({
   followings: z.array(z.string()),
   followers: z.array(z.string()),
   favorites: z.array(z.string()).max(FAVORITES_MAX),
+  favoriteCharacters: z.array(z.string()).optional(),
   filters: z.array(z.object({ name: z.string(), filter: z.string() })),
   presets: z.array(z.object({ name: z.string(), preset: z.string() })),
   description: z.string().max(450).nullable(),
@@ -72,6 +74,18 @@ export const UpdateFavoritesResponseSchema = z.object({
   favorites: z.string().array(),
 });
 
+export const UpdateFavoriteCharactersRequestSchema = z.object({
+  characterIds: ObjectIdSchema.array()
+    .refine((ids) => new Set(ids).size === ids.length, "Duplicate characters")
+    .describe("Favourite character ids in the owner's order"),
+});
+
+export const UpdateFavoriteCharactersResponseSchema = z.object({
+  favoriteCharacters: z.string().array(),
+});
+
+export const GetFavoriteCharactersResponseSchema = CharacterSchema.array();
+
 export const SearchUsersRequestSchema = z.object({
   q: z.string().trim().min(2).max(15).describe("Part of a user name"),
   page: z.coerce.number().int().min(1).default(1),
@@ -116,6 +130,15 @@ export type IUpdateFavoritesRequest = z.infer<
 >;
 export type IUpdateFavoritesResponse = z.infer<
   typeof UpdateFavoritesResponseSchema
+>;
+export type IUpdateFavoriteCharactersRequest = z.infer<
+  typeof UpdateFavoriteCharactersRequestSchema
+>;
+export type IUpdateFavoriteCharactersResponse = z.infer<
+  typeof UpdateFavoriteCharactersResponseSchema
+>;
+export type IGetFavoriteCharactersResponse = z.infer<
+  typeof GetFavoriteCharactersResponseSchema
 >;
 export type ISearchUsersRequest = z.input<typeof SearchUsersRequestSchema>;
 export type ISearchUsersQuery = z.output<typeof SearchUsersRequestSchema>;

@@ -266,6 +266,16 @@ export const GameSchema = z.object({
   themes: z.string().array().optional(),
   screenshots: z.string().array().optional(),
   artworks: z.string().array().optional(),
+  backgroundImage: z
+    .string()
+    .nullable()
+    .optional()
+    .describe("Screenshot or artwork URL used as the page background"),
+  bannerImage: z
+    .string()
+    .nullable()
+    .optional()
+    .describe("Screenshot or artwork URL used as the hero banner"),
   franchises: z.string().array().optional(),
   videos: z.string().array().optional(),
   alternative_names: z.string().array().optional(),
@@ -426,6 +436,13 @@ export const UpdateGameRequestSchema = GameSchema.omit({
 
 export const GetCustomGameResponseSchema = GameSchema.array();
 
+export const RelatedGameKeySchema = RelatedGamesSchema.keyof();
+
+export const GetRelatedGamesResponseSchema = z.partialRecord(
+  RelatedGameKeySchema,
+  GameSchema.array()
+);
+
 export const GetGameSlugsRequestSchema = z.object({
   count: z.coerce
     .number()
@@ -476,6 +493,10 @@ export type IGetGameSlugsRequest = z.infer<typeof GetGameSlugsRequestSchema>;
 export type IGetGamesByIdsRequest = z.infer<typeof GetGamesByIdsSchema>;
 
 export type IGameResponse = z.infer<typeof GameSchema>;
+export type IRelatedGameKey = z.infer<typeof RelatedGameKeySchema>;
+export type IRelatedGamesResponse = z.infer<
+  typeof GetRelatedGamesResponseSchema
+>;
 
 export type IUpcomingReleaseGroup = z.infer<typeof UpcomingReleaseGroupSchema>;
 

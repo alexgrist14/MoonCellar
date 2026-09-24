@@ -17,6 +17,7 @@ import { UserGames } from "@/src/lib/widgets/user/UserGames";
 import { UserReviews } from "@/src/lib/widgets/user/UserReviews";
 import { UserLists } from "@/src/lib/widgets/user/UserLists";
 import { UserInfo } from "@/src/lib/widgets/user/UserInfo";
+import { FavoriteCharacters } from "@/src/lib/widgets/user/FavoriteCharacters";
 import styles from "./UserProfile.module.scss";
 import cn from "classnames";
 import { Box } from "@/src/lib/shared/ui/Box";
@@ -28,6 +29,7 @@ import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { useSelectedLayoutSegment } from "next/navigation";
 import { UserNavigation } from "@/src/lib/features/user/ui/UserNavigation";
 import {
+  ICharacterResponse,
   ICustomList,
   IGameResponse,
   IPlaythrough,
@@ -48,6 +50,7 @@ interface UserProfileProps {
   favoriteGames: IGameResponse[];
   lists: ICustomList[];
   likedLists: ICustomList[];
+  favoriteCharacters: ICharacterResponse[];
   children?: ReactNode;
 }
 
@@ -60,6 +63,7 @@ export const UserProfile: FC<UserProfileProps> = ({
   favoriteGames,
   lists,
   likedLists,
+  favoriteCharacters,
   children,
 }) => {
   const segment = useSelectedLayoutSegment();
@@ -88,6 +92,8 @@ export const UserProfile: FC<UserProfileProps> = ({
             avatar: authProfile.avatar,
             background: authProfile.background,
             favorites: authProfile.favorites ?? user.favorites,
+            favoriteCharacters:
+              authProfile.favoriteCharacters ?? user.favoriteCharacters,
           }
         : user,
     [isAuthedUser, authProfile, user]
@@ -201,6 +207,14 @@ export const UserProfile: FC<UserProfileProps> = ({
               favoriteGames={favoriteGames}
               lists={lists}
               likedLists={likedLists}
+              favoriteCharacters={favoriteCharacters}
+            />
+          )}
+          {tab === "characters" && (
+            <FavoriteCharacters
+              userId={user._id}
+              characters={favoriteCharacters}
+              isOwner={isAuthedUser}
             />
           )}
           {tab === "lists" && (

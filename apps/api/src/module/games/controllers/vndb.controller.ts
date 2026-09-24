@@ -29,6 +29,7 @@ import {
   VndbCandidatesResponseDto,
   VndbReviewItemResponseDto,
   VndbCandidatesSummaryDto,
+  VndbParseResponseDto,
 } from "../../../shared/zod/dto/vndb-candidates.dto";
 
 @ApiTags("VNDB")
@@ -108,6 +109,21 @@ export class VndbController {
     this.vndbService.sync().catch(() => undefined);
 
     return { message: "VNDB sync started" };
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(RolesEnum.ADMIN)
+  @UseGuards(AuthGuard("jwt"))
+  @Post("games/parse")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      "Re-fetch one VNDB-linked game from VNDB by MoonCellar id and link its characters",
+  })
+  @ApiQuery({ name: "gameId", required: true })
+  @ApiOkResponse({ type: VndbParseResponseDto })
+  parseGame(@Query("gameId") gameId: string) {
+    return this.vndbService.parseGame(gameId);
   }
 
   @UseGuards(RolesGuard)

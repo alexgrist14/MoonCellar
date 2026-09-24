@@ -1,7 +1,12 @@
 import { FC, useMemo } from "react";
 import Image from "next/image";
 import Markdown from "react-markdown";
-import { ICustomList, IGameResponse, IPlaythrough } from "@mooncellar/schemas";
+import {
+  ICharacterResponse,
+  ICustomList,
+  IGameResponse,
+  IPlaythrough,
+} from "@mooncellar/schemas";
 import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
 import {
   useLikedListsQuery,
@@ -25,6 +30,7 @@ import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { ActivityTimeline } from "@/src/lib/features/user/ui/ActivityTimeline";
 import { IPeopleTab, PeopleDrawer } from "@/src/lib/features/user/ui/PeopleDrawer";
 import { TopTen } from "@/src/lib/widgets/user/TopTen";
+import { FavoriteCharacters } from "@/src/lib/widgets/user/FavoriteCharacters";
 import { useViewerFollowings } from "@/src/lib/features/user/model/useViewerFollowings";
 import styles from "./UserInfo.module.scss";
 
@@ -37,6 +43,7 @@ interface UserInfoProps {
   favoriteGames: IGameResponse[];
   lists: ICustomList[];
   likedLists: ICustomList[];
+  favoriteCharacters: ICharacterResponse[];
 }
 
 type IPerson = Pick<IUser, "_id" | "userName" | "avatar">;
@@ -66,6 +73,7 @@ export const UserInfo: FC<UserInfoProps> = ({
   favoriteGames,
   lists: initialLists,
   likedLists: initialLikedLists,
+  favoriteCharacters,
 }) => {
   const { _id: id, userName } = user;
   const { router } = useAdvancedRouter();
@@ -276,6 +284,14 @@ export const UserInfo: FC<UserInfoProps> = ({
       </div>
 
       <TopTen userId={id} games={topGames} isOwner={isOwner} />
+
+      <FavoriteCharacters
+        userId={id}
+        characters={favoriteCharacters}
+        isOwner={isOwner}
+        isPreview
+        onShowAll={() => goTo("characters")}
+      />
 
       {isListsVisible && (
         <section className={styles.lists} aria-labelledby="profile-lists">

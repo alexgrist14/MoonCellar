@@ -7,6 +7,9 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 import {
+  GetFavoriteCharactersResponseDto,
+  UpdateFavoriteCharactersDto,
+  UpdateFavoriteCharactersResponseDto,
   UpdateFavoritesDto,
   UpdateFavoritesResponseDto,
 } from "../../../shared/zod/dto/user.dto";
@@ -35,5 +38,26 @@ export class FavoritesController {
     @Body() dto: UpdateFavoritesDto
   ) {
     return this.favorites.updateFavorites(userId, dto);
+  }
+
+  @Get(":userId/favorite-characters")
+  @ApiOperation({ summary: "Favourite characters in the owner's order" })
+  @ApiCreatedResponse({ type: GetFavoriteCharactersResponseDto })
+  async getFavoriteCharacters(@Param("userId") userId: string) {
+    return this.favorites.getFavoriteCharacters(userId);
+  }
+
+  @Patch(":userId/favorite-characters")
+  @ApiOperation({
+    summary: "Replace the favourite characters with an ordered list",
+  })
+  @ApiCreatedResponse({ type: UpdateFavoriteCharactersResponseDto })
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), UserIdGuard)
+  async updateFavoriteCharacters(
+    @Param("userId") userId: string,
+    @Body() dto: UpdateFavoriteCharactersDto
+  ) {
+    return this.favorites.updateFavoriteCharacters(userId, dto);
   }
 }
