@@ -33,8 +33,8 @@ const GauntletPageIndex = () => {
           { name: "Gauntlet", path: "/gauntlet" },
         ])}
       />
-      <GauntletModePanel />
       <Suspense fallback={<PageLoader />}>
+        <GauntletModePanel />
         <GauntletPage />
       </Suspense>
     </div>
