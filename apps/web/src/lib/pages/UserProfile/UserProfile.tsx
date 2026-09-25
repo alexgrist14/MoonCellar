@@ -151,7 +151,7 @@ export const UserProfile: FC<UserProfileProps> = ({
       <div className={cn(styles.container)}>
         {isMobile && (
           <ExpandMenu
-            position="right"
+            position="bottom-right"
             titleClose={
               <span className={styles.button__title}>
                 <SvgBurger
