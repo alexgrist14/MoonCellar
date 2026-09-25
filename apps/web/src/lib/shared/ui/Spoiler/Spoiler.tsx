@@ -7,12 +7,14 @@ interface ISpoilerProps {
   children: ReactNode;
   isActive?: boolean;
   className?: string;
+  label?: string;
 }
 
 export const Spoiler: FC<ISpoilerProps> = ({
   children,
   isActive = true,
   className,
+  label = "Show spoilers",
 }) => {
   const [isRevealed, setIsRevealed] = useState(false);
 
@@ -36,7 +38,7 @@ export const Spoiler: FC<ISpoilerProps> = ({
           onClick={() => setIsRevealed(true)}
         >
           <SvgEye size="16" color="attention" />
-          Show spoilers
+          {label}
         </button>
       )}
     </div>

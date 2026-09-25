@@ -1475,7 +1475,7 @@ export class VndbService {
     const [characters, games] = await Promise.all([
       this.charactersModel
         .find({ "vndb.characterId": { $exists: true } })
-        .select("_id gameIds vndb.vns")
+        .select("_id gameIds spoilerGameIds vndb.vns vndb.spoilerVns")
         .lean(),
       this.gamesModel
         .find({ "vndb.vnId": { $exists: true } })
@@ -1490,10 +1490,14 @@ export class VndbService {
     const now = new Date().toISOString();
     const characterOps = [];
 
-    for (const character of characters) {
-      const gameIds = character.vndb.vns
+    const toGameIds = (vnIds: string[] = []) =>
+      vnIds
         .map((vnId) => gameIdByVnId.get(vnId))
         .filter((id): id is Types.ObjectId => !!id);
+
+    for (const character of characters) {
+      const gameIds = toGameIds(character.vndb.vns);
+      const spoilerGameIds = toGameIds(character.vndb.spoilerVns);
 
       for (const vnId of character.vndb.vns) {
         const bucket = characterIdsByVnId.get(vnId);
@@ -1505,11 +1509,14 @@ export class VndbService {
         }
       }
 
-      if (!isSameObjectIdList(character.gameIds, gameIds)) {
+      if (
+        !isSameObjectIdList(character.gameIds, gameIds) ||
+        !isSameObjectIdList(character.spoilerGameIds, spoilerGameIds)
+      ) {
         characterOps.push({
           updateOne: {
             filter: { _id: character._id },
-            update: { $set: { gameIds, updatedAt: now } },
+            update: { $set: { gameIds, spoilerGameIds, updatedAt: now } },
           },
         });
       }
@@ -1584,6 +1591,8 @@ export class VndbService {
           `VNDB characters refresh: ${Math.min(i + VNDB_PAGE_SIZE, characterIds.length)}/${characterIds.length} | refreshed ${totals.characters} | uploaded ${totals.images} images`
         );
       }
+
+      await this.linkVndbCharacters();
 
       return totals;
     } catch (error) {
@@ -1702,6 +1711,9 @@ export class VndbService {
               vndb: {
                 characterId: character.id,
                 vns: character.vns.map(({ id }) => id),
+                spoilerVns: character.vns
+                  .filter(({ spoiler }) => spoiler > 0)
+                  .map(({ id }) => id),
                 image: character.image?.url ?? null,
               },
               updatedAt: now,

@@ -1,7 +1,7 @@
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FC, useState } from "react";
+import { ChangeEvent, FC, useState } from "react";
 import { Resolver, SubmitHandler, useForm } from "react-hook-form";
 import { useAuth } from "@/src/lib/shared/hooks/auth";
 import { Background } from "../Background";
@@ -25,6 +25,7 @@ export const AuthModal: FC = () => {
     formState: { errors },
     reset,
     clearErrors,
+    setValue,
   } = useForm<AuthSchema>({
     resolver: (async (values, context, options) => {
       return zodResolver(createAuthSchema(isRegister))(
@@ -43,9 +44,18 @@ export const AuthModal: FC = () => {
     reset();
   };
 
+  const onSubmit = (e: ChangeEvent<HTMLFormElement>) => {
+    new FormData(e.currentTarget).forEach((value, key) =>
+      setValue(key as keyof AuthSchema, String(value))
+    );
+    return handleSubmit(isRegister ? handleSignUp : handleLogin)(e);
+  };
+
   const handleLogin: SubmitHandler<AuthSchema> = (data) => {
     setError(null);
     setIsLoading(true);
+
+    console.log(data.password);
 
     login({
       email: data.email,
@@ -76,13 +86,7 @@ export const AuthModal: FC = () => {
 
   return (
     <div className={styles.container}>
-      <form
-        onSubmit={
-          isRegister ? handleSubmit(handleSignUp) : handleSubmit(handleLogin)
-        }
-        className={styles.content}
-        autoComplete="on"
-      >
+      <form onSubmit={onSubmit} className={styles.content} autoComplete="on">
         <div className={styles.content__inputs}>
           {isRegister && (
             <div>

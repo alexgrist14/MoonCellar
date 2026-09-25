@@ -34,6 +34,8 @@ export class Character {
   traits: ICharacterTrait[];
   @Prop({ ref: "Game" })
   gameIds: mongoose.Types.ObjectId[];
+  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: "Game" })
+  spoilerGameIds: mongoose.Types.ObjectId[];
   @Prop({ type: Object })
   igdb: ICharacterIGDBField;
   @Prop({ type: Object })

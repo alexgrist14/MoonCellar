@@ -150,7 +150,7 @@ export class VndbController {
   @Post("characters/refresh")
   @ApiOperation({
     summary:
-      "Re-fetch every VNDB character: upload portraits missing from storage and refresh traits",
+      "Re-fetch every VNDB character: upload portraits missing from storage, refresh traits and spoiler flags, then relink characters to games",
   })
   refreshCharacters() {
     if (this.vndbService.isRefreshingVndbCharacters) {

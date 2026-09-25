@@ -6,6 +6,7 @@ import { GameRatingsBlock } from "@/src/lib/entities/game/ui/GameRatingsBlock";
 import { IGameResponse } from "@mooncellar/schemas";
 import { getHltbTiles } from "@/src/lib/shared/utils/hltb.utils";
 import { getGameRatingRows } from "@/src/lib/shared/utils/rating.utils";
+import { GameVndbBlock } from "@/src/lib/entities/game/ui/GameVndbBlock";
 
 interface IGameScoreColumnProps {
   game: IGameResponse;
@@ -30,6 +31,7 @@ export const GameScoreColumn: FC<IGameScoreColumnProps> = ({
     >
       <GameRatingsBlock game={game} isBoxed={false} />
       <GameHltbBlock game={game} isBoxed={false} />
+      <GameVndbBlock game={game} isBoxed={false} />
     </Box>
   );
 };

@@ -33,7 +33,7 @@ export const Avatar: FC<AvatarProps> = ({
           priority={priority}
         />
       ) : (
-        <div className={styles.placeholder__container}>
+        <div data-prevent-progress className={styles.placeholder__container}>
           <SvgProfile className={styles.placeholder} />
         </div>
       )}
@@ -48,4 +48,3 @@ export const Avatar: FC<AvatarProps> = ({
     </Tooltip>
   );
 };
-

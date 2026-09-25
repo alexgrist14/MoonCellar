@@ -6,10 +6,12 @@
   height: 600px;
   overflow: hidden;
   z-index: 1;
+
   @include mediaMd {
     width: 95vw;
     height: 600px;
   }
+
   .content {
     background-color: rgba($color: #000000, $alpha: 0.4);
     border-radius: var(--radius-x2);
@@ -36,26 +38,32 @@
       flex-direction: column;
       align-items: center;
       gap: var(--gap-x2);
+
       p {
         font-size: 0.9em;
       }
+
       .link {
         color: var(--color-accent);
+
         &:hover {
           cursor: pointer;
         }
       }
+
       .btn {
         position: relative;
         width: 100%;
         max-width: 185px;
-        min-height: 31px;
+        max-height: 31px;
+
         div {
           @include flexCenter;
         }
       }
     }
   }
+
   .close {
     position: absolute;
     right: 0;
@@ -64,11 +72,13 @@
     height: 28px;
     opacity: 0.5;
     cursor: pointer;
+
     .svg {
       width: 100%;
       height: 100%;
       fill: var(--color-neutral-100);
     }
+
     &:hover {
       opacity: 1;
     }

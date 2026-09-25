@@ -51,7 +51,9 @@ export const GamePage: FC<IGamePageProps> = ({
         <GameSideColumn game={game} className={styles.page__column} />
       </div>
       {!hideMedia && <GameMedia game={game} />}
-      {!hideMedia && <GameCharacters characters={game.characters} />}
+      {!hideMedia && (
+        <GameCharacters characters={game.characters} gameId={game._id} />
+      )}
       <GameDetails game={game} />
       <GameRelated related={related} />
       <GameCommunity game={game} initialReviews={reviews} />
