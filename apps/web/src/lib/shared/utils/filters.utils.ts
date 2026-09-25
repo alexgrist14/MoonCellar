@@ -2,11 +2,36 @@ import queryString from "query-string";
 import { IGameFiltersQuery } from "@/src/lib/shared/types/filters.type";
 import { IGetGamesRequest } from "@mooncellar/schemas";
 
+const STRING_LIST_FILTERS = [
+  "Genres",
+  "Modes",
+  "Platforms",
+  "Themes",
+  "Keywords",
+  "GameTypes",
+  "Franchises",
+  "Companies",
+  "GameEngines",
+  "PlayerPerspectives",
+  "Languages",
+  "Status",
+  "AgeRatings",
+];
+
+const STRING_QUERY_TYPES = Object.fromEntries([
+  ["search", "string"],
+  ...STRING_LIST_FILTERS.flatMap((name) => [
+    [`selected${name}`, "string[]"],
+    [`excluded${name}`, "string[]"],
+  ]),
+]);
+
 export const parseQueryFilters = (pathWithQuery: string): IGetGamesRequest => {
   const { query } = queryString.parseUrl(pathWithQuery, {
     arrayFormat: "bracket",
     parseBooleans: true,
     parseNumbers: true,
+    types: STRING_QUERY_TYPES,
   });
 
   const filters = query as IGameFiltersQuery;
