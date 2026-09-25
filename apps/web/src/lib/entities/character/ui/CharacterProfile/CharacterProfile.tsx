@@ -50,9 +50,11 @@ export const CharacterProfile: FC<ICharacterProfileProps> = ({
   ]
     .filter((fact): fact is IFact => !!fact.value)
     .concat(toTraitFacts(traits.filter(({ isSpoiler }) => !isSpoiler)));
-  const spoilerFacts = toTraitFacts(
-    traits.filter(({ isSpoiler }) => isSpoiler)
-  );
+  const spoilerFacts = [
+    { label: "Also known as", value: character.spoilerAkas?.join(", ") },
+  ]
+    .filter((fact): fact is IFact => !!fact.value)
+    .concat(toTraitFacts(traits.filter(({ isSpoiler }) => isSpoiler)));
 
   const description = character.description
     ? stripBbcode(character.description)

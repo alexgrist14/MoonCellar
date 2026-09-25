@@ -17,6 +17,8 @@ export class Character {
   @Prop()
   akas: string[];
   @Prop()
+  spoilerAkas: string[];
+  @Prop()
   description: string;
   @Prop()
   gender: string;
