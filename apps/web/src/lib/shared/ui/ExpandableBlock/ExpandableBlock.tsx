@@ -150,6 +150,7 @@ export const ExpandableBlock: FC<IExpandableBlockProps> = ({
         className={classNames(styles.content, classNameContent, {
           [styles.content_clamped]: !clampHeight,
           [styles.content_limited]: !!clampHeight,
+          [styles.content_faded]: isOverflowing,
         })}
       >
         {children}

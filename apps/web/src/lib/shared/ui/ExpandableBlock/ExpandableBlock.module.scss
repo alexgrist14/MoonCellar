@@ -6,6 +6,14 @@
   &_limited {
     overflow: hidden;
   }
+
+  &_faded {
+    mask-image: linear-gradient(
+      to bottom,
+      #000 calc(100% - var(--expandable-fade-height)),
+      transparent 100%
+    );
+  }
 }
 
 .modal {
