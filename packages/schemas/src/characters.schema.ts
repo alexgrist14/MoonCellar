@@ -27,6 +27,7 @@ export const CharacterSchema = z.object({
   name: z.string(),
   slug: z.string(),
   akas: z.string().array().optional(),
+  spoilerAkas: z.string().array().optional(),
   description: z.string().nullable().optional(),
   gender: z.string().nullable().optional(),
   species: z.string().nullable().optional(),

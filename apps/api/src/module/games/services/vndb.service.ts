@@ -1,4 +1,6 @@
 import { HttpService } from "@nestjs/axios";
+import { pipeline, type Readable } from "node:stream";
+import { createZstdDecompress } from "node:zlib";
 import {
   BadRequestException,
   ConflictException,
@@ -41,6 +43,7 @@ import {
   titleKeyVariants,
   tokenSetFrom,
 } from "../utils/title-match.utils";
+import { readTarEntry } from "../utils/tar.utils";
 import {
   type ICompanyField,
   type IExternalPageField,
@@ -72,6 +75,9 @@ import {
   VISUAL_NOVEL_GENRE,
   VNDB_ANY_COMPANY_SCORE,
   VNDB_CHARACTER_GENDERS,
+  VNDB_DB_DUMP_URL,
+  VNDB_DUMP_ALIASES_ENTRY,
+  VNDB_DUMP_TTL_MS,
   VNDB_IGNORED_LINKS,
   VNDB_LANGUAGE_REGIONS,
   VNDB_WORLDWIDE_REGION,
@@ -199,6 +205,10 @@ export class VndbService {
   private isRunning = false;
   private isLinkingRelated = false;
   private isRefreshingCharacters = false;
+  private spoilerAliases?: {
+    loadedAt: number;
+    aliases: Promise<Map<string, Set<string>> | null>;
+  };
   private lastRequestAt = 0;
   private requestTurn: Promise<void> = Promise.resolve();
   private isApplyingDecisions = false;
@@ -290,6 +300,7 @@ export class VndbService {
         target,
       });
       await this.refreshLinkedVns(totals);
+      await this.linkVndbRelatedGames();
     });
   }
 
@@ -1607,10 +1618,63 @@ export class VndbService {
     return characters;
   }
 
+  private getSpoilerAliases() {
+    if (
+      !this.spoilerAliases ||
+      Date.now() - this.spoilerAliases.loadedAt > VNDB_DUMP_TTL_MS
+    ) {
+      this.spoilerAliases = {
+        loadedAt: Date.now(),
+        aliases: this.fetchSpoilerAliases().catch((error) => {
+          this.logger.error(error, "Failed to load VNDB spoiler aliases");
+          this.spoilerAliases = undefined;
+          return null;
+        }),
+      };
+    }
+
+    return this.spoilerAliases.aliases;
+  }
+
+  private async fetchSpoilerAliases() {
+    const { data } = await this.httpService.axiosRef.get<Readable>(
+      VNDB_DB_DUMP_URL,
+      { responseType: "stream" }
+    );
+    const aliases = await readTarEntry(
+      pipeline(data, createZstdDecompress(), () => undefined),
+      VNDB_DUMP_ALIASES_ENTRY
+    );
+
+    if (!aliases) {
+      throw new Error(`${VNDB_DUMP_ALIASES_ENTRY} is missing in the VNDB dump`);
+    }
+
+    const spoilerAliases = new Map<string, Set<string>>();
+
+    for (const line of aliases.toString("utf8").split("\n")) {
+      const [id, spoil, name, latin] = line.split("\t");
+
+      if (!(Number(spoil) > 0)) continue;
+
+      const names = spoilerAliases.get(id) ?? new Set<string>();
+
+      spoilerAliases.set(id, names.add(name));
+      if (latin !== "\\N") names.add(latin);
+    }
+
+    this.logger.log(
+      `Loaded VNDB spoiler aliases for ${spoilerAliases.size} characters`
+    );
+
+    return spoilerAliases;
+  }
+
   private async saveCharacters(characters: IVndbCharacter[]) {
     if (!characters.length) return 0;
 
     const now = new Date().toISOString();
+    const spoilerAliases = await this.getSpoilerAliases();
 
     await this.charactersModel.bulkWrite(
       characters.map((character) => ({
@@ -1622,13 +1686,8 @@ export class VndbService {
               slug: [toSlug(character.name), character.id]
                 .filter(Boolean)
                 .join("-"),
-              akas: [
-                ...new Set(
-                  [character.original, ...(character.aliases ?? [])].filter(
-                    (aka): aka is string => !!aka
-                  )
-                ),
-              ],
+              ...(spoilerAliases &&
+                this.splitAkas(character, spoilerAliases.get(character.id))),
               description: character.description,
               gender: VNDB_CHARACTER_GENDERS[character.sex?.[0] ?? ""] ?? null,
               isExplicitImage:
@@ -1656,6 +1715,22 @@ export class VndbService {
     );
 
     return this.uploadCharacterImages(characters);
+  }
+
+  private splitAkas(
+    { original, aliases }: IVndbCharacter,
+    spoilers = new Set<string>()
+  ) {
+    const akas = [
+      ...new Set(
+        [original, ...(aliases ?? [])].filter((aka): aka is string => !!aka)
+      ),
+    ];
+
+    return {
+      akas: akas.filter((aka) => !spoilers.has(aka)),
+      spoilerAkas: akas.filter((aka) => spoilers.has(aka)),
+    };
   }
 
   private async uploadCharacterImages(characters: IVndbCharacter[]) {

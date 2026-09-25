@@ -115,6 +115,11 @@ export const VNDB_STORE_NAMES: Record<string, string> = {
   playstation_hk: "PlayStation Store",
 };
 
+export const VNDB_DB_DUMP_URL =
+  "https://dl.vndb.org/dump/vndb-db-latest.tar.zst";
+export const VNDB_DUMP_ALIASES_ENTRY = "db/chars_alias";
+export const VNDB_DUMP_TTL_MS = 24 * 60 * 60 * 1000;
+
 export const VNDB_CHARACTER_GENDERS: Record<string, string> = {
   m: "Male",
   f: "Female",
