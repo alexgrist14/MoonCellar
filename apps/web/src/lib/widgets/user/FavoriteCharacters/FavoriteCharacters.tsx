@@ -93,18 +93,19 @@ export const FavoriteCharacters: FC<IFavoriteCharactersProps> = ({
             <span className={styles.count}>{characters.length}</span>
           )}
         </SectionTitle>
-        {isPreview && !draft && !!characters.length && (
+        {isPreview && !!characters.length && (
           <Button color={ButtonColor.TRANSPARENT} onClick={onShowAll}>
             All characters
           </Button>
         )}
-        {isOwner && !draft && characters.length > 1 && (
+        {!isPreview && isOwner && !draft && characters.length > 1 && (
           <Button
             color={ButtonColor.TRANSPARENT}
+            className={styles.edit}
             onClick={() => setDraft(characters)}
           >
             <SvgPen style={ICON_STYLE} />
-            Edit order
+            Edit
           </Button>
         )}
       </div>

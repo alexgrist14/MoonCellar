@@ -13,6 +13,13 @@
   flex-wrap: wrap;
 }
 
+.edit {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-x2);
+  color: var(--color-text-muted);
+}
+
 .count {
   margin-left: var(--gap-x2);
   font-size: 13px;
