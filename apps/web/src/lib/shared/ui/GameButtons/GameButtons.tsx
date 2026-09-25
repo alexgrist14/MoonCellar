@@ -37,6 +37,12 @@ export const GameButtons: FC<{ game: IGameResponse }> = ({ game }) => {
             ...commonOptions,
           },
           {
+            title: "Open in VNDB",
+            link: `https://vndb.org/${game.vndb?.vnId}`,
+            hidden: !game.vndb?.vnId,
+            ...commonOptions,
+          },
+          {
             title: "Search on Youtube",
             link: `https://www.youtube.com/results?search_query=${game.name}`,
             ...commonOptions,

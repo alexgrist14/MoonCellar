@@ -13,6 +13,7 @@ export const CharacterIGDBSchema = z.object({
 export const CharacterVndbSchema = z.object({
   characterId: z.string(),
   vns: z.string().array(),
+  spoilerVns: z.string().array().optional(),
   image: z.string().nullable().optional(),
 });
 
@@ -36,6 +37,7 @@ export const CharacterSchema = z.object({
   isExplicitImage: z.boolean().optional(),
   traits: CharacterTraitSchema.array().optional(),
   gameIds: z.string().array().optional(),
+  spoilerGameIds: z.string().array().optional(),
   igdb: CharacterIGDBSchema.optional(),
   vndb: CharacterVndbSchema.optional(),
   createdAt: z.string(),

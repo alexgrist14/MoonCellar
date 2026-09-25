@@ -4,6 +4,7 @@ import { FC } from "react";
 import { ICharacterResponse } from "@mooncellar/schemas";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
+import { Spoiler } from "@/src/lib/shared/ui/Spoiler";
 import { DRAWER_TRIGGER_ATTRIBUTE, drawer } from "@/src/lib/shared/ui/Drawer";
 import { CharacterCard } from "@/src/lib/entities/character/ui/CharacterCard";
 import { CharacterDetails } from "@/src/lib/features/favorites/ui/CharacterDetails";
@@ -11,11 +12,15 @@ import styles from "./GameCharacters.module.scss";
 
 interface IGameCharactersProps {
   characters?: ICharacterResponse[];
+  gameId: string;
 }
 
 const TRIGGER_PROPS = { [DRAWER_TRIGGER_ATTRIBUTE]: "" };
 
-export const GameCharacters: FC<IGameCharactersProps> = ({ characters }) => {
+export const GameCharacters: FC<IGameCharactersProps> = ({
+  characters,
+  gameId,
+}) => {
   if (!characters?.length) return null;
 
   return (
@@ -30,17 +35,22 @@ export const GameCharacters: FC<IGameCharactersProps> = ({ characters }) => {
         isWithArrows
       >
         {characters.map((character) => (
-          <CharacterCard
+          <Spoiler
             key={character._id}
-            character={character}
+            isActive={!!character.spoilerGameIds?.includes(gameId)}
+            label="Spoiler"
             className={styles.characters__card}
-            onClick={() =>
-              drawer.open(<CharacterDetails character={character} />, {
-                title: "Character",
-              })
-            }
-            {...TRIGGER_PROPS}
-          />
+          >
+            <CharacterCard
+              character={character}
+              onClick={() =>
+                drawer.open(<CharacterDetails character={character} />, {
+                  title: "Character",
+                })
+              }
+              {...TRIGGER_PROPS}
+            />
+          </Spoiler>
         ))}
       </Scrollbar>
     </Box>
