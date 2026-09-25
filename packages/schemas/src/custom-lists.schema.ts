@@ -48,6 +48,7 @@ export const CustomListSchema = z.object({
   slug: z.string().describe("Current slug, unique per owner"),
   description: z.string().describe("List description"),
   isPrivate: z.boolean().describe("Visible to the owner only"),
+  isRanked: z.boolean().describe("Games show their position in the list"),
   gamesCount: z.number().describe("Games in the list"),
   likesCount: z.number().describe("Likes from other players"),
   isLiked: z
@@ -75,6 +76,7 @@ export const CreateCustomListRequestSchema = z.object({
   name: CustomListNameSchema,
   description: CustomListDescriptionSchema.optional(),
   isPrivate: z.boolean().default(false),
+  isRanked: z.boolean().default(false),
   gameId: ObjectIdSchema.optional().describe("Game to add right away"),
 });
 
@@ -82,6 +84,7 @@ export const UpdateCustomListRequestSchema = z.object({
   name: CustomListNameSchema.optional(),
   description: CustomListDescriptionSchema.optional(),
   isPrivate: z.boolean().optional(),
+  isRanked: z.boolean().optional(),
 });
 
 export const AddCustomListGameRequestSchema = z.object({

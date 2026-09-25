@@ -551,6 +551,21 @@ break silently when ignored:
   shows; a selection in it would turn a shared link into someone else's checkboxes. It lives in
   `games-selection.store`, which is deliberately not persisted, and turning the mode off clears it.
 
+## Reordering
+
+- **Every drag-and-drop reorder editor is `shared/ui/SortableGrid`** — the Top 10, favourite
+  characters and a custom list's Manage mode. The consumer passes the cover (`renderCover`), the
+  caption (`getName`) and keeps the order in a draft that is saved only by its own Save/Done;
+  never write the order on every move.
+- **Set a `SortableGrid`'s columns through `--sortable-grid-columns` on the class you pass, never
+  with `grid-template-columns`.** Both rules would have the same specificity, and the order two
+  CSS modules land in is not guaranteed, so the override wins in development and loses in a
+  production chunk.
+- **A custom list's editor removes a game on the server at once and keeps reorder strict.**
+  `PATCH …/reorder` must receive exactly the list's games, so a draft that drops a game would be
+  rejected, and relaxing it to a subset would let a stale draft delete games added from another
+  tab — the bug favourites had. The search box is hidden while managing for the same reason.
+
 ## Tabs
 
 - **Every row of mutually exclusive switches is the shared `Tabs`** (`shared/ui/Tabs`) — never a

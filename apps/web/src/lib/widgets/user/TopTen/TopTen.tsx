@@ -1,18 +1,13 @@
 import { FC, useState } from "react";
-import Image from "next/image";
 import classNames from "classnames";
 import { FAVORITES_MAX, IGameResponse } from "@mooncellar/schemas";
-import { useDragSort } from "@/src/lib/shared/hooks";
-import { moveItem } from "@/src/lib/shared/utils/common.utils";
 import { useUpdateFavoritesMutation } from "@/src/lib/entities/user/api/favorites.mutations";
+import { GameCoverImage } from "@/src/lib/entities/game/ui/GameCoverImage";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
-import { Cover } from "@/src/lib/shared/ui/Cover";
 import { GameCard } from "@/src/lib/widgets/game/GameCard";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
+import { SortableGrid } from "@/src/lib/shared/ui/SortableGrid";
 import {
-  SvgArrow,
-  SvgClose,
-  SvgGrip,
   SvgHeart,
   SvgListBullet,
   SvgMore,
@@ -36,14 +31,6 @@ const SMALL_ICON_STYLE = {
   minHeight: "var(--padding-x4)",
 };
 
-const ARROW_ICON_STYLE = {
-  ...SMALL_ICON_STYLE,
-  width: "var(--padding-x5)",
-  height: "var(--padding-x5)",
-  minWidth: "var(--padding-x5)",
-  minHeight: "var(--padding-x5)",
-};
-
 const PODIUM_CARD_STYLE = {
   width: "100%",
   minWidth: 0,
@@ -52,28 +39,8 @@ const PODIUM_CARD_STYLE = {
   padding: 0,
 };
 
-const GameCover: FC<{ game: IGameResponse; sizes: string }> = ({
-  game,
-  sizes,
-}) =>
-  game.cover ? (
-    <Image
-      src={game.cover}
-      alt=""
-      fill
-      sizes={sizes}
-      className={styles.image}
-    />
-  ) : (
-    <Cover isWithoutText className={styles.image} />
-  );
-
 export const TopTen: FC<ITopTenProps> = ({ userId, games, isOwner }) => {
   const [draft, setDraft] = useState<IGameResponse[] | null>(null);
-  const { dragIndex, overIndex, getItemProps } = useDragSort(
-    draft ?? [],
-    setDraft
-  );
   const { mutate: updateFavorites, isPending } = useUpdateFavoritesMutation();
 
   const isEditing = !!draft;
@@ -164,68 +131,16 @@ export const TopTen: FC<ITopTenProps> = ({ userId, games, isOwner }) => {
 
       {isEditing && (
         <div className={styles.editor}>
-          <ol className={styles.slots}>
-            {draft.map((game, index) => (
-              <li
-                key={game._id}
-                className={classNames(styles.slot, {
-                  [styles.slot_dragging]: dragIndex === index,
-                  [styles.slot_over]: overIndex === index,
-                })}
-                {...getItemProps(index)}
-              >
-                <div className={styles.cover}>
-                  <GameCover game={game} sizes="160px" />
-                  <span className={styles.grip} aria-hidden="true">
-                    <SvgGrip size="12" style={{ color: "inherit" }} />
-                  </span>
-                </div>
-                <div className={styles.slot__bar}>
-                  <button
-                    type="button"
-                    className={classNames(styles.icon, styles.icon_flip)}
-                    aria-label={`Move ${game.name} left`}
-                    disabled={index === 0}
-                    onClick={() => setDraft(moveItem(draft, index, index - 1))}
-                  >
-                    <SvgArrow style={ARROW_ICON_STYLE} />
-                  </button>
-                  <button
-                    type="button"
-                    className={classNames(styles.icon, styles.icon_danger)}
-                    aria-label={`Remove ${game.name}`}
-                    onClick={() =>
-                      setDraft(draft.filter((item) => item._id !== game._id))
-                    }
-                  >
-                    <SvgClose size="12" style={{ color: "inherit" }} />
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.icon}
-                    aria-label={`Move ${game.name} right`}
-                    disabled={index === draft.length - 1}
-                    onClick={() => setDraft(moveItem(draft, index, index + 1))}
-                  >
-                    <SvgArrow style={ARROW_ICON_STYLE} />
-                  </button>
-                </div>
-                <span className={styles.name} title={game.name}>
-                  {game.name}
-                </span>
-              </li>
-            ))}
-            {Array.from({ length: FAVORITES_MAX - draft.length }, (_, i) => (
-              <li
-                key={`empty-${i}`}
-                className={classNames(styles.slot, styles.slot_empty)}
-              >
-                <div className={styles.cover}>
-                  <span className={styles.empty}>Empty slot</span>
-                </div>
-              </li>
-            ))}
-          </ol>
+          <SortableGrid
+            items={draft}
+            getKey={(game) => game._id}
+            getName={(game) => game.name}
+            renderCover={(game) => <GameCoverImage game={game} sizes="160px" />}
+            onChange={setDraft}
+            coverRatio="var(--cover-ratio)"
+            emptySlots={FAVORITES_MAX - draft.length}
+            className={styles.slots}
+          />
           <div className={styles.footer}>
             <p className={styles.footer__note}>
               Drag or use the arrows to reorder. Add games with the heart on any

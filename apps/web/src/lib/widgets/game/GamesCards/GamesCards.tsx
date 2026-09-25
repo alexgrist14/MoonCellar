@@ -29,6 +29,7 @@ interface IGamesCardsProps {
   columns?: number;
   limit?: number;
   additionalGameNode?: (game: IGameResponse) => ReactNode;
+  getRank?: (game: IGameResponse) => number | undefined;
   isSelectable?: boolean;
   selectedIds?: string[];
   onSelectGame?: (gameId: string) => void;
@@ -43,6 +44,7 @@ export const GamesCards: FC<IGamesCardsProps> = ({
   columns,
   limit,
   additionalGameNode,
+  getRank,
   isSelectable,
   selectedIds,
   onSelectGame,
@@ -67,6 +69,7 @@ export const GamesCards: FC<IGamesCardsProps> = ({
         <div key={game._id} className={gameClassName}>
           <GameCard
             game={game}
+            rank={getRank?.(game)}
             priority={index < PRIORITY_COUNT}
             isWithCombinedRating={isWithCombinedRating}
             isSelectable={isSelectable}

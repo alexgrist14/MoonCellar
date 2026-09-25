@@ -1,26 +1,18 @@
 "use client";
 
 import { FC, useState } from "react";
-import classNames from "classnames";
 import { ICharacterResponse } from "@mooncellar/schemas";
 import { useFavoriteCharactersQuery } from "@/src/lib/entities/user/api/user.queries";
 import { useUpdateFavoriteCharactersMutation } from "@/src/lib/entities/user/api/favorites.mutations";
 import { CharacterCard } from "@/src/lib/entities/character/ui/CharacterCard";
 import { CharacterPortrait } from "@/src/lib/entities/character/ui/CharacterPortrait";
 import { CharacterDetails } from "@/src/lib/features/favorites/ui/CharacterDetails";
-import { useDragSort } from "@/src/lib/shared/hooks";
-import { moveItem } from "@/src/lib/shared/utils/common.utils";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { DRAWER_TRIGGER_ATTRIBUTE, drawer } from "@/src/lib/shared/ui/Drawer";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
-import {
-  SvgArrow,
-  SvgClose,
-  SvgGrip,
-  SvgHeart,
-  SvgPen,
-} from "@/src/lib/shared/ui/svg";
+import { SortableGrid } from "@/src/lib/shared/ui/SortableGrid";
+import { SvgHeart, SvgPen } from "@/src/lib/shared/ui/svg";
 import styles from "./FavoriteCharacters.module.scss";
 
 const FAVORITE_CHARACTERS_PREVIEW_LIMIT = 10;
@@ -55,10 +47,6 @@ export const FavoriteCharacters: FC<IFavoriteCharactersProps> = ({
     initialCharacters
   );
   const [draft, setDraft] = useState<ICharacterResponse[] | null>(null);
-  const { dragIndex, overIndex, getItemProps } = useDragSort(
-    draft ?? [],
-    setDraft
-  );
   const { mutate, isPending } = useUpdateFavoriteCharactersMutation();
 
   if (!characters.length && !isOwner) return null;
@@ -142,58 +130,16 @@ export const FavoriteCharacters: FC<IFavoriteCharactersProps> = ({
 
       {!!draft && (
         <div className={styles.editor}>
-          <ol className={styles.grid}>
-            {draft.map((character, index) => (
-              <li
-                key={character._id}
-                className={classNames(styles.slot, {
-                  [styles.slot_dragging]: dragIndex === index,
-                  [styles.slot_over]: overIndex === index,
-                })}
-                {...getItemProps(index)}
-              >
-                <div className={styles.cover}>
-                  <CharacterPortrait character={character} sizes="128px" />
-                  <span className={styles.grip} aria-hidden="true">
-                    <SvgGrip size="12" style={{ color: "inherit" }} />
-                  </span>
-                </div>
-                <div className={styles.slot__bar}>
-                  <button
-                    type="button"
-                    className={classNames(styles.icon, styles.icon_flip)}
-                    aria-label={`Move ${character.name} left`}
-                    disabled={index === 0}
-                    onClick={() => setDraft(moveItem(draft, index, index - 1))}
-                  >
-                    <SvgArrow style={ICON_STYLE} />
-                  </button>
-                  <button
-                    type="button"
-                    className={classNames(styles.icon, styles.icon_danger)}
-                    aria-label={`Remove ${character.name}`}
-                    onClick={() =>
-                      setDraft(
-                        draft.filter((item) => item._id !== character._id)
-                      )
-                    }
-                  >
-                    <SvgClose size="12" style={{ color: "inherit" }} />
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.icon}
-                    aria-label={`Move ${character.name} right`}
-                    disabled={index === draft.length - 1}
-                    onClick={() => setDraft(moveItem(draft, index, index + 1))}
-                  >
-                    <SvgArrow style={ICON_STYLE} />
-                  </button>
-                </div>
-                <span className={styles.slot__name}>{character.name}</span>
-              </li>
-            ))}
-          </ol>
+          <SortableGrid
+            items={draft}
+            getKey={(character) => character._id}
+            getName={(character) => character.name}
+            renderCover={(character) => (
+              <CharacterPortrait character={character} sizes="128px" />
+            )}
+            onChange={setDraft}
+            className={styles.slots}
+          />
           <div className={styles.footer}>
             <p className={styles.footer__note}>
               Drag or use the arrows to reorder. The first{" "}

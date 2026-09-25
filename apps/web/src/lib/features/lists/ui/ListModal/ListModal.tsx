@@ -52,6 +52,7 @@ const listFormSchema = z.object({
       `Description must be at most ${CUSTOM_LIST_DESCRIPTION_MAX} characters.`
     ),
   isPrivate: z.boolean(),
+  isRanked: z.boolean(),
 });
 
 type IListForm = z.infer<typeof listFormSchema>;
@@ -88,6 +89,7 @@ export const ListModal: FC<IListModalProps> = ({ list, userName, gameId }) => {
       name: list?.name ?? "",
       description: list?.description ?? "",
       isPrivate: list?.isPrivate ?? false,
+      isRanked: list?.isRanked ?? false,
     },
   });
 
@@ -102,6 +104,7 @@ export const ListModal: FC<IListModalProps> = ({ list, userName, gameId }) => {
       name: data.name.trim(),
       description: data.description.trim(),
       isPrivate: data.isPrivate,
+      isRanked: data.isRanked,
     };
 
     if (list) {
@@ -225,6 +228,25 @@ export const ListModal: FC<IListModalProps> = ({ list, userName, gameId }) => {
                   {isEdit && !list?.isPrivate
                     ? "Making it private hides it from your profile and breaks links already shared."
                     : "Only you can open it."}
+                </span>
+              </div>
+              <ToggleSwitch
+                value={field.value ? "right" : "left"}
+                isDisabled={isBusy}
+                clickCallback={(result) => field.onChange(result === "ON")}
+              />
+            </div>
+          )}
+        />
+        <Controller
+          control={control}
+          name="isRanked"
+          render={({ field }) => (
+            <div className={styles.toggle}>
+              <div className={styles.toggle__text}>
+                <span>Ranked list</span>
+                <span className={styles.hint}>
+                  Show each game&apos;s position, like in a top 10.
                 </span>
               </div>
               <ToggleSwitch

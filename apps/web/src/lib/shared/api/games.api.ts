@@ -21,6 +21,7 @@ import agent from "./agent.api";
 import { filesAPI } from "./files.api";
 
 const GAMES_URL = `${API_URL}/games`;
+const GET_BY_IDS_MAX = 100;
 
 export const gamesApi = {
   getSlugs: () => {
@@ -57,9 +58,9 @@ export const gamesApi = {
   },
 
   getByIds: (params: IGetGamesByIdsRequest) => {
-    if (!params.search) {
-      const ids = Array.isArray(params._ids) ? params._ids : [params._ids];
+    const ids = Array.isArray(params._ids) ? params._ids : [params._ids];
 
+    if (!params.search && ids.length <= GET_BY_IDS_MAX) {
       return agent.get<IGameResponse[]>(
         `${GAMES_URL}/by-ids?_ids=${ids.join("&_ids=")}`
       );

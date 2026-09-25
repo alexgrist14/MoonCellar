@@ -34,20 +34,15 @@ import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
 import { GamesCards } from "@/src/lib/widgets/game/GamesCards";
+import { GameCoverImage } from "@/src/lib/entities/game/ui/GameCoverImage";
+import { SortableGrid } from "@/src/lib/shared/ui/SortableGrid";
 import {
   getListHref,
   getProfileHref,
 } from "@/src/lib/shared/utils/links.utils";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
-import {
-  SvgArrow,
-  SvgBurger,
-  SvgClose,
-  SvgLink,
-  SvgLock,
-  SvgPen,
-} from "@/src/lib/shared/ui/svg";
+import { SvgBurger, SvgLink, SvgLock, SvgPen } from "@/src/lib/shared/ui/svg";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import styles from "./CustomListPage.module.scss";
@@ -109,7 +104,8 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
   );
 
   const isOwner = !!viewerId && viewerId === list.userId;
-  const [isManaging, setIsManaging] = useState(false);
+  const [draft, setDraft] = useState<string[] | null>(null);
+  const isManaging = !!draft;
 
   const page = Math.max(1, Number(query.get("page")) || initialPage);
   const lastPage = Math.max(
@@ -145,6 +141,17 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
     });
   }, [fetchedGames, knownGames, pageIds]);
 
+  const listIds = useMemo(
+    () => list.games.map((game) => game.gameId),
+    [list.games]
+  );
+  const { data: allGames, isFetching: isAllGamesFetching } =
+    useGamesByIdsQuery(listIds, undefined, isManaging);
+  const allGamesById = useMemo(
+    () => new Map((allGames ?? []).map((game) => [game._id, game])),
+    [allGames]
+  );
+
   const { mutate: removeGame, isPending: isRemoving } =
     useRemoveListGameMutation();
   const { mutate: reorderGames, isPending: isReordering } =
@@ -162,39 +169,47 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
     [currentPage, list, query]
   );
 
-  const moveGame = (gameId: string, direction: -1 | 1) => {
-    const ids = list.games.map((game) => game.gameId);
-    const from = ids.indexOf(gameId);
-    const to = from + direction;
+  const finishManaging = () => {
+    if (!draft) return;
 
-    if (from < 0 || to < 0 || to >= ids.length) return;
+    const isUnchanged =
+      draft.length === listIds.length &&
+      draft.every((id, index) => id === listIds[index]);
 
-    const nextGames = [...list.games];
+    if (isUnchanged) {
+      setDraft(null);
+      return;
+    }
 
-    [nextGames[from], nextGames[to]] = [nextGames[to], nextGames[from]];
-
-    queryClient.setQueryData<ICustomListDetails>(listKey, {
-      ...list,
-      games: nextGames,
-    });
+    const byId = new Map(list.games.map((game) => [game.gameId, game]));
 
     reorderGames(
-      { id: list._id, gameIds: nextGames.map((game) => game.gameId) },
+      { id: list._id, gameIds: draft },
       {
+        onSuccess: () => {
+          queryClient.setQueryData<ICustomListDetails>(listKey, {
+            ...list,
+            games: draft.flatMap((id) => byId.get(id) ?? []),
+          });
+          setDraft(null);
+          toast.success({ description: "Order saved" });
+        },
         onError: () =>
-          queryClient.invalidateQueries({ queryKey: listQueryKeys.all }),
+          toast.error({ description: "Could not save the order" }),
       }
     );
   };
 
-  const handleRemove = (game: IGameResponse) => {
+  const handleRemove = (gameId: string) => {
+    const name = allGamesById.get(gameId)?.name ?? "the game";
+
     removeGame(
-      { id: list._id, gameId: game._id },
+      { id: list._id, gameId },
       {
-        onSuccess: () =>
-          toast.success({
-            description: `Removed ${game.name} from ${list.name}`,
-          }),
+        onSuccess: () => {
+          setDraft((ids) => ids?.filter((id) => id !== gameId) ?? null);
+          toast.success({ description: `Removed ${name} from ${list.name}` });
+        },
       }
     );
   };
@@ -216,50 +231,8 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
     playthroughs,
   };
 
-  const renderManageControls = (game: IGameResponse) => {
-    if (!isOwner || !isManaging) return null;
-
-    const index = list.games.findIndex((item) => item.gameId === game._id);
-
-    return (
-      <div className={styles.manage}>
-        <span className={styles.manage__position}>#{index + 1}</span>
-        <Button
-          color={ButtonColor.TRANSPARENT}
-          className={styles.manage__button}
-          aria-label={`Move ${game.name} earlier`}
-          tooltip="Move earlier"
-          disabled={index <= 0 || isReordering}
-          onClick={() => moveGame(game._id, -1)}
-        >
-          <SvgArrow
-            size="16"
-            style={{ transform: "rotate(180deg)", color: "inherit" }}
-          />
-        </Button>
-        <Button
-          color={ButtonColor.TRANSPARENT}
-          className={styles.manage__button}
-          aria-label={`Move ${game.name} later`}
-          tooltip="Move later"
-          disabled={index >= list.games.length - 1 || isReordering}
-          onClick={() => moveGame(game._id, 1)}
-        >
-          <SvgArrow size="16" style={{ color: "inherit" }} />
-        </Button>
-        <Button
-          color={ButtonColor.TRANSPARENT}
-          className={cn(styles.manage__button, styles.manage__button_remove)}
-          aria-label={`Remove ${game.name}`}
-          tooltip="Remove from list"
-          disabled={isRemoving}
-          onClick={() => handleRemove(game)}
-        >
-          <SvgClose size="12" style={{ color: "inherit" }} />
-        </Button>
-      </div>
-    );
-  };
+  const getRank = (game: IGameResponse) =>
+    list.games.findIndex((item) => item.gameId === game._id) + 1 || undefined;
 
   const navigation = <UserNavigation {...navigationProps} />;
 
@@ -377,25 +350,46 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
                   Copy link
                 </Button>
               )}
-              {isOwner && !!list.gamesCount && (
+              {isOwner && !isManaging && !!list.gamesCount && (
                 <Button
-                  color={isManaging ? ButtonColor.ACCENT : ButtonColor.DEFAULT}
+                  color={ButtonColor.DEFAULT}
                   className={styles.actions__button}
-                  onClick={() => setIsManaging((value) => !value)}
+                  onClick={() => setDraft(listIds)}
                 >
-                  {isManaging ? "Done" : "Manage"}
+                  Manage
                 </Button>
+              )}
+              {isManaging && (
+                <>
+                  <Button
+                    color={ButtonColor.DEFAULT}
+                    className={styles.actions__button}
+                    disabled={isReordering}
+                    onClick={() => setDraft(null)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    color={ButtonColor.ACCENT}
+                    className={styles.actions__button}
+                    disabled={isReordering || isRemoving}
+                    onClick={finishManaging}
+                  >
+                    Done
+                  </Button>
+                </>
               )}
             </div>
           </header>
           {isOwner && (
             <div className={styles.search}>
-              <ListGameSearch list={list} autoFocus={!list.gamesCount} />
-              {isManaging && (
+              {isManaging ? (
                 <span className={styles.search__hint}>
-                  Move games with the arrows under each cover. The order is
-                  saved as you go.
+                  Drag or use the arrows to reorder. Press Done to save the
+                  order.
                 </span>
+              ) : (
+                <ListGameSearch list={list} autoFocus={!list.gamesCount} />
               )}
             </div>
           )}
@@ -409,6 +403,26 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
                   : `${user.userName} has not added any games yet.`
               }
             />
+          ) : isManaging ? (
+            <SortableGrid
+              items={draft}
+              getKey={(id) => id}
+              getName={(id) => allGamesById.get(id)?.name ?? ""}
+              renderCover={(id) => {
+                const game = allGamesById.get(id);
+
+                return game ? (
+                  <GameCoverImage game={game} sizes="160px" />
+                ) : null;
+              }}
+              onChange={setDraft}
+              onRemove={handleRemove}
+              coverRatio="var(--cover-ratio)"
+              isDisabled={isReordering || isRemoving}
+              className={cn(styles.grid, {
+                [styles.grid_fetching]: isAllGamesFetching && !allGames,
+              })}
+            />
           ) : (
             <div
               className={cn(styles.grid, {
@@ -421,21 +435,23 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
                 isWithCombinedRating
                 isWithoutScroll
                 gameClassName={styles.grid__cell}
-                additionalGameNode={renderManageControls}
+                getRank={list.isRanked ? getRank : undefined}
               />
             </div>
           )}
         </Box>
         <div className={styles.navigation}>{navigation}</div>
       </div>
-      <Pagination
-        take={CUSTOM_LIST_GAMES_PAGE_SIZE}
-        total={list.gamesCount}
-        isFixed
-        isDisabled={isGamesFetching}
-        page={currentPage}
-        onPageChange={changePage}
-      />
+      {!isManaging && (
+        <Pagination
+          take={CUSTOM_LIST_GAMES_PAGE_SIZE}
+          total={list.gamesCount}
+          isFixed
+          isDisabled={isGamesFetching}
+          page={currentPage}
+          onPageChange={changePage}
+        />
+      )}
     </>
   );
 };

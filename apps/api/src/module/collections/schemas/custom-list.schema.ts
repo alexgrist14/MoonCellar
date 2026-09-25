@@ -50,6 +50,9 @@ export class CustomList {
   @Prop({ type: Boolean, default: false })
   isPrivate: boolean;
 
+  @Prop({ type: Boolean, default: false })
+  isRanked: boolean;
+
   @Prop({ type: [CustomListGameDatabaseSchema], default: [] })
   games: CustomListGame[];
 

@@ -165,6 +165,7 @@ export class CustomListsService {
       slug: doc.slug,
       description: doc.description ?? "",
       isPrivate: !!doc.isPrivate,
+      isRanked: !!doc.isRanked,
       gamesCount: doc.gamesCount ?? 0,
       likesCount: Math.max(doc.likesCount ?? 0, 0),
       covers,
@@ -529,6 +530,7 @@ export class CustomListsService {
         slug: await this.getFreeSlug(userId, dto.name),
         description: dto.description?.trim() ?? "",
         isPrivate: !!dto.isPrivate,
+        isRanked: !!dto.isRanked,
         games: gameId ? [{ gameId, addedAt: new Date() }] : [],
         gamesCount: gameId ? 1 : 0,
       });
@@ -579,6 +581,10 @@ export class CustomListsService {
 
       if (dto.isPrivate !== undefined) {
         list.isPrivate = dto.isPrivate;
+      }
+
+      if (dto.isRanked !== undefined) {
+        list.isRanked = dto.isRanked;
       }
 
       await list.save();

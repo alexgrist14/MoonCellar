@@ -130,34 +130,6 @@
   }
 }
 
-.manage {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--gap-x1);
-  padding: var(--padding-x1);
-  border-radius: var(--radius-x3);
-  background: var(--color-bg-secondary);
-
-  &__position {
-    padding-inline: var(--padding-x2);
-    font-size: 12px;
-    color: var(--color-text-muted);
-    font-variant-numeric: tabular-nums;
-  }
-
-  &__button {
-    width: var(--padding-x7);
-    height: var(--padding-x7);
-    padding: 0;
-    border-radius: var(--radius-x2);
-
-    &_remove:hover:not(:disabled) {
-      color: var(--color-negative);
-    }
-  }
-}
-
 .button__title {
   display: flex;
   align-items: center;
