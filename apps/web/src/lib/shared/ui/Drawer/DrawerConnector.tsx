@@ -157,7 +157,7 @@ export const DrawerConnector = () => {
         closeButtonRef={closeButtonRef}
         className={styles.drawer__box}
         wrapperStyle={{ height: "100%" }}
-        templateStyle={{ height: "100%" }}
+        templateStyle={{ height: "100%", minHeight: 0 }}
         contentStyle={{ padding: "var(--padding-x4)" }}
       >
         {content.component}

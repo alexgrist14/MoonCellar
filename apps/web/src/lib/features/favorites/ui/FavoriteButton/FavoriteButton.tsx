@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 import { FAVORITES_MAX, IGameResponse } from "@mooncellar/schemas";
-import { useUpdateFavoritesMutation } from "@/src/lib/entities/user/api/favorites.mutations";
+import { useToggleFavoriteMutation } from "@/src/lib/entities/user/api/favorites.mutations";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { GameControlButton } from "@/src/lib/shared/ui/GameControlButton";
 import { SvgHeart, SvgHeartFilled } from "@/src/lib/shared/ui/svg";
@@ -22,7 +22,7 @@ export const FavoriteButton: FC<{ game: IGameResponse }> = ({ game }) => {
   const profile = useAuthStore((s) => s.profile);
   const anchorRef = useRef<HTMLButtonElement>(null);
   const [isFullOpen, setIsFullOpen] = useState(false);
-  const { mutate, isPending } = useUpdateFavoritesMutation();
+  const { mutate, isPending } = useToggleFavoriteMutation();
 
   const favorites = useMemo(() => profile?.favorites ?? [], [profile]);
   const isFavorite = favorites.includes(game._id);
@@ -30,11 +30,11 @@ export const FavoriteButton: FC<{ game: IGameResponse }> = ({ game }) => {
 
   const closeFull = useCallback(() => setIsFullOpen(false), []);
 
-  const save = (gameIds: string[], title: string) => {
+  const save = (title: string) => {
     if (!userId) return;
 
     mutate(
-      { userId, gameIds },
+      { userId, gameId: game._id, isFavorite },
       { onSuccess: () => toast.success({ title, description: game.name }) }
     );
   };
@@ -43,10 +43,7 @@ export const FavoriteButton: FC<{ game: IGameResponse }> = ({ game }) => {
     if (!userId || isPending) return;
 
     if (isFavorite) {
-      save(
-        favorites.filter((id) => id !== game._id),
-        "Removed from favourites"
-      );
+      save("Removed from favourites");
       return;
     }
 
@@ -55,7 +52,7 @@ export const FavoriteButton: FC<{ game: IGameResponse }> = ({ game }) => {
       return;
     }
 
-    save([...favorites, game._id], "Added to favourites");
+    save("Added to favourites");
   };
 
   const tooltip = !userId

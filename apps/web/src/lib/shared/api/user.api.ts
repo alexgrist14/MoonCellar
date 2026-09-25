@@ -166,6 +166,23 @@ const updateFavorites = (userId: string, gameIds: string[]) => {
   );
 };
 
+const addFavorite = (
+  userId: string,
+  gameId: string,
+  replaceGameId?: string
+) => {
+  return agent.post<IUpdateFavoritesResponse>(
+    `${USER_URL}/${userId}/favorites/${gameId}`,
+    { replaceGameId }
+  );
+};
+
+const removeFavorite = (userId: string, gameId: string) => {
+  return agent.delete<IUpdateFavoritesResponse>(
+    `${USER_URL}/${userId}/favorites/${gameId}`
+  );
+};
+
 const getFavoriteCharacters = (userId: string) => {
   return agent.get<IGetFavoriteCharactersResponse>(
     `${USER_URL}/${userId}/favorite-characters`
@@ -176,6 +193,18 @@ const updateFavoriteCharacters = (userId: string, characterIds: string[]) => {
   return agent.patch<IUpdateFavoriteCharactersResponse>(
     `${USER_URL}/${userId}/favorite-characters`,
     { characterIds }
+  );
+};
+
+const addFavoriteCharacter = (userId: string, characterId: string) => {
+  return agent.post<IUpdateFavoriteCharactersResponse>(
+    `${USER_URL}/${userId}/favorite-characters/${characterId}`
+  );
+};
+
+const removeFavoriteCharacter = (userId: string, characterId: string) => {
+  return agent.delete<IUpdateFavoriteCharactersResponse>(
+    `${USER_URL}/${userId}/favorite-characters/${characterId}`
   );
 };
 
@@ -214,7 +243,11 @@ export const userAPI = {
   updateSettings,
   getFavorites,
   updateFavorites,
+  addFavorite,
+  removeFavorite,
   getFavoriteCharacters,
   updateFavoriteCharacters,
+  addFavoriteCharacter,
+  removeFavoriteCharacter,
   searchUsers,
 };

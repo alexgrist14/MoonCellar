@@ -149,6 +149,13 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   `min-height: 0` declarations; the scroll area's height comes from flex shrinking, not from
   the `max-height: 100%` on the content (that percentage resolves against an indefinite box and
   is ignored).
+- **A `Box` stretched to fill a fixed-height container (`templateStyle={{ height: "100%" }}`)
+  also needs `minHeight: 0` in `templateStyle`.** `.wrapper` is a grid, and the template's
+  default `min-height: auto` sizes the grid row to its content — the title plus a scroll area
+  capped at `90vh` — so whenever the container is shorter than that, the panel grows past it.
+  The symptom is a scroll area that stops short: the panel's bottom corners, the last lines and
+  the bottom padding sit below the screen and cannot be scrolled to (the character drawer on
+  mobile). `DrawerConnector` and `WheelContainer` carry it; any new full-height panel must too.
 - **A row of equal-height `Box` panels needs `height: auto`, not `height: 100%`.** An explicit
   height on a flex item cancels `align-items: stretch`, and a percentage height resolves against
   an indefinite parent and is dropped — so `height: 100%` on the item produces the opposite of
@@ -447,6 +454,9 @@ break silently when ignored:
   mousedown outside it, and mousedown fires before click — without the attribute, clicking
   "Show more" on the next review closes the panel and reopens it with a slide instead of swapping
   the text in place. `ExpandableBlock mode="drawer"` sets it on its own button.
+- **Size a fixed full-height panel (the drawer, `ExpandMenu`) with `100dvh`, never `100vh`.**
+  On mobile `100vh` is the viewport with the browser toolbar collapsed, so the panel's bottom sits
+  under the toolbar and its scroll area cannot reach the last item or the bottom padding.
 
 ## Modals
 

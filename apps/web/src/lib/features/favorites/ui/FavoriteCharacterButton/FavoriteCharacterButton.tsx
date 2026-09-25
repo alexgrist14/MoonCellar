@@ -2,7 +2,7 @@
 
 import { FC } from "react";
 import { ICharacterResponse } from "@mooncellar/schemas";
-import { useUpdateFavoriteCharactersMutation } from "@/src/lib/entities/user/api/favorites.mutations";
+import { useToggleFavoriteCharacterMutation } from "@/src/lib/entities/user/api/favorites.mutations";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { SvgHeart, SvgHeartFilled } from "@/src/lib/shared/ui/svg";
@@ -15,7 +15,7 @@ export const FavoriteCharacterButton: FC<{
   character: ICharacterResponse;
 }> = ({ character }) => {
   const profile = useAuthStore((s) => s.profile);
-  const { mutate, isPending } = useUpdateFavoriteCharactersMutation();
+  const { mutate, isPending } = useToggleFavoriteCharacterMutation();
 
   const userId = profile?._id;
   const favorites = profile?.favoriteCharacters ?? [];
@@ -25,12 +25,7 @@ export const FavoriteCharacterButton: FC<{
     if (!userId || isPending) return;
 
     mutate(
-      {
-        userId,
-        characterIds: isFavorite
-          ? favorites.filter((id) => id !== character._id)
-          : [...favorites, character._id],
-      },
+      { userId, characterId: character._id, isFavorite },
       {
         onSuccess: () =>
           toast.success({

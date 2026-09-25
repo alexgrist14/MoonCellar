@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Patch, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import {
   ApiCookieAuth,
@@ -7,6 +16,7 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 import {
+  AddFavoriteDto,
   GetFavoriteCharactersResponseDto,
   UpdateFavoriteCharactersDto,
   UpdateFavoriteCharactersResponseDto,
@@ -40,6 +50,33 @@ export class FavoritesController {
     return this.favorites.updateFavorites(userId, dto);
   }
 
+  @Post(":userId/favorites/:gameId")
+  @ApiOperation({
+    summary: "Add a game to the favourites, or swap it for replaceGameId",
+  })
+  @ApiCreatedResponse({ type: UpdateFavoritesResponseDto })
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), UserIdGuard)
+  async addFavorite(
+    @Param("userId") userId: string,
+    @Param("gameId") gameId: string,
+    @Body() dto: AddFavoriteDto
+  ) {
+    return this.favorites.addFavorite(userId, gameId, dto);
+  }
+
+  @Delete(":userId/favorites/:gameId")
+  @ApiOperation({ summary: "Remove a game from the favourites" })
+  @ApiCreatedResponse({ type: UpdateFavoritesResponseDto })
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), UserIdGuard)
+  async removeFavorite(
+    @Param("userId") userId: string,
+    @Param("gameId") gameId: string
+  ) {
+    return this.favorites.removeFavorite(userId, gameId);
+  }
+
   @Get(":userId/favorite-characters")
   @ApiOperation({ summary: "Favourite characters in the owner's order" })
   @ApiCreatedResponse({ type: GetFavoriteCharactersResponseDto })
@@ -59,5 +96,29 @@ export class FavoritesController {
     @Body() dto: UpdateFavoriteCharactersDto
   ) {
     return this.favorites.updateFavoriteCharacters(userId, dto);
+  }
+
+  @Post(":userId/favorite-characters/:characterId")
+  @ApiOperation({ summary: "Add a character to the favourites" })
+  @ApiCreatedResponse({ type: UpdateFavoriteCharactersResponseDto })
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), UserIdGuard)
+  async addFavoriteCharacter(
+    @Param("userId") userId: string,
+    @Param("characterId") characterId: string
+  ) {
+    return this.favorites.addFavoriteCharacter(userId, characterId);
+  }
+
+  @Delete(":userId/favorite-characters/:characterId")
+  @ApiOperation({ summary: "Remove a character from the favourites" })
+  @ApiCreatedResponse({ type: UpdateFavoriteCharactersResponseDto })
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), UserIdGuard)
+  async removeFavoriteCharacter(
+    @Param("userId") userId: string,
+    @Param("characterId") characterId: string
+  ) {
+    return this.favorites.removeFavoriteCharacter(userId, characterId);
   }
 }

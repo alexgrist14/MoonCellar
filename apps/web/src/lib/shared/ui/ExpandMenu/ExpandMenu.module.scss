@@ -31,7 +31,7 @@ $border: 2px solid var(--color-bg-hover);
   visibility: hidden;
   width: max(20vw, 460px);
   // max-width: min(50vw, 500px);
-  height: calc(100vh - $headerHeight);
+  height: calc(100dvh - $headerHeight);
   backdrop-filter: blur(6px);
 
   @include mediaSm {

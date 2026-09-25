@@ -17,6 +17,7 @@ import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import {
   SvgArrow,
   SvgClose,
+  SvgGrip,
   SvgHeart,
   SvgPen,
 } from "@/src/lib/shared/ui/svg";
@@ -92,12 +93,12 @@ export const FavoriteCharacters: FC<IFavoriteCharactersProps> = ({
             <span className={styles.count}>{characters.length}</span>
           )}
         </SectionTitle>
-        {isPreview && !!characters.length && (
+        {isPreview && !draft && !!characters.length && (
           <Button color={ButtonColor.TRANSPARENT} onClick={onShowAll}>
             All characters
           </Button>
         )}
-        {!isPreview && isOwner && !draft && characters.length > 1 && (
+        {isOwner && !draft && characters.length > 1 && (
           <Button
             color={ButtonColor.TRANSPARENT}
             onClick={() => setDraft(characters)}
@@ -150,7 +151,12 @@ export const FavoriteCharacters: FC<IFavoriteCharactersProps> = ({
                 })}
                 {...getItemProps(index)}
               >
-                <CharacterPortrait character={character} sizes="128px" />
+                <div className={styles.cover}>
+                  <CharacterPortrait character={character} sizes="128px" />
+                  <span className={styles.grip} aria-hidden="true">
+                    <SvgGrip size="12" style={{ color: "inherit" }} />
+                  </span>
+                </div>
                 <div className={styles.slot__bar}>
                   <button
                     type="button"

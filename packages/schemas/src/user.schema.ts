@@ -74,6 +74,12 @@ export const UpdateFavoritesResponseSchema = z.object({
   favorites: z.string().array(),
 });
 
+export const AddFavoriteRequestSchema = z.object({
+  replaceGameId: ObjectIdSchema.optional().describe(
+    "Favourite game to swap out for the added one"
+  ),
+});
+
 export const UpdateFavoriteCharactersRequestSchema = z.object({
   characterIds: ObjectIdSchema.array()
     .refine((ids) => new Set(ids).size === ids.length, "Duplicate characters")
@@ -131,6 +137,7 @@ export type IUpdateFavoritesRequest = z.infer<
 export type IUpdateFavoritesResponse = z.infer<
   typeof UpdateFavoritesResponseSchema
 >;
+export type IAddFavoriteRequest = z.infer<typeof AddFavoriteRequestSchema>;
 export type IUpdateFavoriteCharactersRequest = z.infer<
   typeof UpdateFavoriteCharactersRequestSchema
 >;

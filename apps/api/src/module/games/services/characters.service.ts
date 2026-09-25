@@ -9,6 +9,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { Model } from "mongoose";
 import { Character, type CharacterDocument } from "../schemas/character.schema";
 import { Game, type GameDocument } from "../schemas/game.schema";
+import { User } from "../../user/schemas/user.schema";
 import {
   type IGetAdminCharactersQuery,
   type IGetAdminCharactersResponse,
@@ -31,6 +32,8 @@ export class CharactersService {
     private Characters: Model<CharacterDocument>,
     @InjectModel(Game.name)
     private Games: Model<GameDocument>,
+    @InjectModel(User.name)
+    private Users: Model<User>,
     private fileService: FileService
   ) {}
 
@@ -206,6 +209,10 @@ export class CharactersService {
       this.Games.updateMany(
         { characters: character._id },
         { $pull: { characters: character._id } }
+      ),
+      this.Users.updateMany(
+        { favoriteCharacters: character._id },
+        { $pull: { favoriteCharacters: character._id } }
       ),
     ]);
 

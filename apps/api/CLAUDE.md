@@ -115,6 +115,13 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   logging every addition buried playthroughs and ratings in the activity feed; the feed records
   what happened to a game, not how it was filed. Favourites do log, through the `favorite`
   segment.
+- **A single favourite is added or removed through `POST`/`DELETE
+  /user/:userId/favorites/:gameId` (and `favorite-characters/:characterId`), never through the
+  `PATCH` that replaces the whole list.** The client builds lists from the persisted auth-store
+  profile, which can be older than the database (another tab or device), and a replace built from
+  it silently deletes favourites added elsewhere. The `PATCH` is for the reorder editors only.
+  Deleting a character must also pull it from `favoriteCharacters`, or every later replace fails
+  with "One of the characters does not exist".
 
 ## Database
 

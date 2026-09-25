@@ -57,7 +57,7 @@ export const WheelContainer: FC = () => {
             }
             contentStyle={{
               maxHeight: isMobile ? "fit-content" : "100%",
-              padding: "var(--padding-x4)",
+              padding: "var(--padding-x6)",
             }}
             scrollFadeType="both"
           >

@@ -102,6 +102,24 @@
   }
 }
 
+.cover {
+  position: relative;
+}
+
+.grip {
+  position: absolute;
+  top: var(--padding-x1);
+  left: var(--padding-x1);
+  z-index: 1;
+  width: var(--padding-x5);
+  height: var(--padding-x5);
+  border-radius: var(--radius-x2);
+  background: var(--color-bg-primary-tint);
+  color: var(--color-text-muted);
+
+  @include flexCenter;
+}
+
 .icon {
   width: var(--padding-x7);
   height: var(--padding-x7);
