@@ -73,7 +73,7 @@ export class CustomListsController {
     @Query() dto: GetCustomListBySlugRequestDto,
     @Req() request: IOptionalViewerRequest
   ) {
-    return this.lists.getBySlug(dto.userName, dto.slug, request.user);
+    return this.lists.getBySlug(dto.userName, dto.slug, request.user, dto);
   }
 
   @Get("mine/game-counts")

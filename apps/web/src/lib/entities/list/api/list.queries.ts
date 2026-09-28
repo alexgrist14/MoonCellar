@@ -1,6 +1,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
   ICustomListDetails,
+  ICustomListSort,
   IGetCustomListsRequest,
   IGetCustomListsResponse,
 } from "@mooncellar/schemas";
@@ -53,11 +54,14 @@ export const useMyListGameCountsQuery = (userId?: string) =>
 export const useListBySlugQuery = (
   userName: string,
   slug: string,
+  sort: ICustomListSort,
   initialData?: ICustomListDetails
 ) =>
   useQuery({
-    queryKey: listQueryKeys.bySlug(userName, slug),
-    queryFn: () => listsAPI.getBySlug(userName, slug).then(({ data }) => data),
+    queryKey: listQueryKeys.bySlug(userName, slug, sort),
+    queryFn: () =>
+      listsAPI.getBySlug(userName, slug, sort).then(({ data }) => data),
     initialData,
+    placeholderData: keepPreviousData,
     staleTime: 60000,
   });

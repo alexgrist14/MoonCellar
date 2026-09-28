@@ -32,6 +32,7 @@ const state = {
   platform: "3DO Interactive Multiplayer",
   date: "2026-09-06",
   time: 5,
+  hasReview: false,
 };
 
 const createService = (playthroughsModel: object) => {
@@ -84,6 +85,26 @@ describe("PlaythroughsService logs", () => {
           before: { ...state, date: undefined, time: 2 },
           after: { ...state, isMastered: true },
         },
+      })
+    );
+  });
+
+  it("marks a public note as a review", async () => {
+    const { service, recordUserLog } = createService({
+      findById: () => ({ orFail: () => Promise.resolve(basePlay) }),
+      findOneAndUpdate: jest.fn(() =>
+        Promise.resolve({ ...basePlay, isPublic: true })
+      ),
+    });
+
+    await service.updatePlaythrough(basePlay._id, basePlay as never);
+
+    expect(recordUserLog).toHaveBeenCalledWith(
+      expect.objectContaining({
+        playthrough: expect.objectContaining({
+          before: state,
+          after: { ...state, hasReview: true },
+        }),
       })
     );
   });

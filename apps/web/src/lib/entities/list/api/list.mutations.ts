@@ -49,14 +49,16 @@ export const useDeleteListMutation = () => {
     onSuccess: (_result, { userName, slug }) => {
       const deletedKey =
         userName && slug
-          ? hashKey(listQueryKeys.bySlug(userName, slug))
+          ? listQueryKeys.bySlug(userName, slug).slice(0, -1)
           : undefined;
 
       void Promise.all([
         queryClient.invalidateQueries({
           queryKey: listQueryKeys.all,
           predicate: (query) =>
-            !deletedKey || hashKey(query.queryKey) !== deletedKey,
+            !deletedKey ||
+            hashKey(query.queryKey.slice(0, deletedKey.length)) !==
+              hashKey(deletedKey),
         }),
         queryClient.invalidateQueries({
           queryKey: [...userQueryKeys.all, "logs"],

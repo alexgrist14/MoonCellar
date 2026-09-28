@@ -72,12 +72,11 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   the 1:2 ratio on the same scale. The only exception is a button that holds a single icon and
   nothing else, which keeps equal padding: `Button` detects that itself (one child that is a
   component element, e.g. `<SvgClose />`) and adds `button_icon`, so do not pass a padding
-  override for it. A button holding nothing but one icon or one character (`+`, `✕`, a digit)
-  is square (`aspect-ratio: 1`): `Button` adds `button_square` only for a single childless
-  element that is not a Fragment, or a one-character string. Keep that check strict —
-  `button_icon`'s older test also matches a Fragment like `<><SvgGames /> Games</>`, and the
-  aspect ratio on it squashed every header button. A native `<button>` holding only an icon
-  sets `aspect-ratio: 1` in its own module. Native `<button>`s styled in a module follow the same rule. This is the
+  override for it. **Squareness is opt-in through `isOnlyIcon`, never detected.** Detecting it
+  from the children put `aspect-ratio: 1` on buttons stretched to their container's width (the
+  sign-in loader, the external pages toggle), and a stretched button with a fixed ratio grows as
+  tall as it is wide. Pass `isOnlyIcon` only where the button is sized by its content. A native
+  `<button>` holding only an icon sets `aspect-ratio: 1` in its own module. Native `<button>`s styled in a module follow the same rule. This is the
   site's button shape; a text button with a 1:3 ratio reads as a different control next to its
   neighbours.
 - For text colour use the semantic tokens, never a raw `--color-neutral-*`: `--color-text-primary` (headings and main copy), `--color-text-secondary` (body text, intro paragraphs), `--color-text-muted` (captions, notes, metadata, breadcrumbs). Picking neutrals by hand is how text ends up unreadable on a `Box` over `BGImage` — the muted step is deliberately the lightest one that still reads as secondary.
@@ -87,8 +86,8 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
 - **User-written HTML renders only through the shared `RichText`** (`shared/ui/RichText`), never
   through `dangerouslySetInnerHTML`. It wraps `Interweave`, which parses the markup into React
   elements and drops `script`/`iframe` outright — a second line of defence behind the API's
-  `sanitizeRichText`. Both places that show a playthrough comment (the profile's playthrough list
-  and the activity log) go through it, which is what keeps their formatting identical.
+  `sanitizeRichText`. Every place that shows a playthrough comment goes through it, which is what
+  keeps their formatting identical.
 - **The look of rendered rich text is defined once, in the `richText` mixin** (`_mixins.scss`),
   and consumed by `RichText` and by `RichEditor`'s content area, so the editor shows what the
   reader gets. Block spacing comes from `--rich-text-gap`. Images are capped there at
@@ -103,15 +102,8 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   mixin sets `p { font-size: inherit; line-height: inherit }` for exactly this reason.
 - **Never collapse `<br>` with `br + br`.** The adjacent-sibling combinator ignores text nodes,
   so in `Status<br/>Console<br/>Date<br/>` every `br` counts as the next one's sibling and the
-  rule hides all but the first — the whole activity feed collapsed into
-  `3DO Interactive MultiplayerDate: 06.09.2026Time: 5h`. Log rows are stored HTML snapshots
-  written at action time, so a rule like this breaks every historical entry at once and no
-  amount of re-saving fixes them.
-- **Log text built by the API must keep block-level content out of `<span>`.** A `<p>` or `<img>`
-  inside a span is invalid nesting and the parser hoists it out, which is how the activity feed
-  ended up with the comment escaping its card. `getPlaythroughDetailsText` wraps the small
-  metadata in a `div` and emits the comment as its own sibling block, so the comment renders at
-  the shared rich-text size rather than inheriting the 12px metadata size.
+  rule hides all but the first — the activity feed once collapsed into
+  `3DO Interactive MultiplayerDate: 06.09.2026Time: 5h`.
 - **The emoji picker hides what the browser cannot draw, and its probe must survive canvas
   noise.** `EmojiPicker/emoji.data.ts` draws one probe emoji per Emoji version to a canvas twice,
   in red and in blue: a colour glyph ignores `fillStyle` and both renders match, while a missing
@@ -169,10 +161,13 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   list's page size.** Pass the page size as `limit` (`takeHubGames`, `takeGames`, …) and the
   component snaps each width tier down to the nearest divisor — with 30 games a 4-column tier
   renders 3 columns. Without `limit` the grid falls back to `auto-fill`, which lands on any
-  count that fits. The `@container` thresholds in `GamesCards.module.scss` are built from
-  `$cardMinWidth`/`$cardsGap`, which duplicate `--games-card-min-width` and `--gap-x2` because a
-  container query cannot read a custom property — change one and change the other, or the grid
-  switches tiers at the wrong width.
+  count that fits. The `@container` thresholds live once, in the `gamesSnappedColumns` mixin
+  (`_mixins.scss`), built from `$gamesCardMinWidth`/`$gamesCardsGap`, which duplicate
+  `--games-card-min-width` and `--gap-x2` because a container query cannot read a custom
+  property — change one and change the other, or the grid switches tiers at the wrong width.
+  A custom list's Manage mode applies the same mixin to `--sortable-grid-columns` inside its own
+  `container-type` wrapper, with `getSnappedColumns` on it, so editing keeps the columns and card
+  size of the normal view.
 
 - **The `/lists` grid has the same container-query duplication as `GamesCards`.**
   `ListsPage.module.scss` copies `--list-card-min-width` and `--gap-x4` into `$listCardMinWidth` and
@@ -291,6 +286,10 @@ component needs to build the value itself (a `basePath` string, not a `getHref` 
   `@keyframes` names per file, so every shared keyframe is emitted once per module in the built
   CSS. Keep keyframes used by one component in that component's own `.module.scss`; move them to
   `_animations.scss` only when a second component needs them.
+- **Nothing inside a card that can be reordered may carry an appear `animation`.** Reordering a
+  keyed list moves the existing DOM nodes, and the browser restarts every CSS animation on a
+  moved node — `GameCard`'s corner badges (rank, rating, status, "…") faded in again on each
+  re-sort of a custom list. A `transition` does not restart on a move.
 - **`Loader`'s `text-align: start` is load-bearing.** `react-spinners`' `PacmanLoader` places
   its two body halves with `position: absolute` and no `left`, so they sit at their inline static
   position; an inherited `text-align: center` (the search modal's empty state has one) pushes the
@@ -343,6 +342,11 @@ component needs to build the value itself (a `basePath` string, not a `getHref` 
   background refetch, so once a query is older than its `staleTime` a remount swaps the cached
   list for the spinner — the `/games` catalogue showed a loader and refetched on every browser
   Back instead of rendering from the cache. Keep `isFetching` for secondary indicators.
+- **A query whose key follows the URL gets `initialData` only for the key the server rendered.**
+  React Query seeds *every* new key with `initialData`, and within `staleTime` it never fetches
+  it — changing a custom list's sort showed the server's order under the new key until a reload.
+  `CustomListPage` keeps the first sort in state and passes `initialList` only while the key
+  still matches it.
 - **Page state of a client page that fetches through React Query goes into the URL with
   `window.history.pushState`, not `router.push`.** `router.push` re-runs the route's server
   component, and `useSearchParams` does not change until that server render finishes, so the
@@ -439,8 +443,9 @@ break silently when ignored:
   `apps/web/.next/dev` and restart — the dev server rebuilds its route table from source.
 - **`curl` cannot see JSON-LD or anything JS injects.** Check structured data with Google's
   Rich Results Test; a "no schema found" conclusion drawn from `curl` is a false finding.
-- Before adding a helper, search for an existing one. `getAverageRating` (the combined
-  IGDB / HowLongToBeat / user rating) already existed in `src/lib/shared/utils/rating.utils.ts`.
+- Before adding a helper, search for an existing one. The combined IGDB / HowLongToBeat / user
+  rating is `getCombinedRating` in `@mooncellar/schemas`, wrapped as `getAverageRating` in
+  `src/lib/shared/utils/rating.utils.ts`.
 
 ## Drawer
 
@@ -557,14 +562,28 @@ break silently when ignored:
   characters and a custom list's Manage mode. The consumer passes the cover (`renderCover`), the
   caption (`getName`) and keeps the order in a draft that is saved only by its own Save/Done;
   never write the order on every move.
-- **Set a `SortableGrid`'s columns through `--sortable-grid-columns` on the class you pass, never
-  with `grid-template-columns`.** Both rules would have the same specificity, and the order two
+- **Set a `SortableGrid`'s columns and gap through `--sortable-grid-columns` and
+  `--sortable-grid-gap` on the class you pass, never with `grid-template-columns` or `gap`.** Both rules would have the same specificity, and the order two
   CSS modules land in is not guaranteed, so the override wins in development and loses in a
   production chunk.
 - **A custom list's editor removes a game on the server at once and keeps reorder strict.**
   `PATCH …/reorder` must receive exactly the list's games, so a draft that drops a game would be
   rejected, and relaxing it to a subset would let a stale draft delete games added from another
   tab — the bug favourites had. The search box is hidden while managing for the same reason.
+
+## Custom list order
+
+- **`by-slug` returns a list's games in the requested order, so neither a rank nor Manage mode
+  may read the array index — both use each game's `position`.** With the index, sorting a ranked
+  list by name renumbered it 1…n in alphabetical order, and pressing Done in Manage mode would
+  have saved the sorted order as the list's own.
+- **The order a visitor picks lives only in the URL (`sort`, `order`); the owner's default is
+  `sortBy`/`sortOrder` on the list.** The page drops both params when the pick equals the default,
+  so a shared link keeps following the owner's setting. The sort is part of the `bySlug` query key,
+  which is why deleting a list excludes every key under the slug by prefix.
+- **Sorting by rating uses `getCombinedRating` from `@mooncellar/schemas`, the number the card
+  shows.** The server sorts, because the page loads only 30 of up to 500 games; a separate formula
+  on either side would sort by a number nobody sees.
 
 ## Tabs
 

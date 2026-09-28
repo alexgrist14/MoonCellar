@@ -100,16 +100,34 @@
   }
 }
 
-.search {
+.toolbar {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: var(--gap-x2) var(--gap-x4);
+  justify-content: space-between;
+  gap: var(--gap-x4);
+
+  @include mediaSm {
+    flex-direction: column;
+    align-items: stretch;
+  }
 
   &__hint {
     font-size: 13px;
     color: var(--color-text-muted);
   }
+
+  &__sort {
+    width: min(100%, var(--list-sort-width));
+    margin-left: auto;
+
+    @include mediaSm {
+      width: 100%;
+    }
+  }
+}
+
+.editor {
+  container-type: inline-size;
 }
 
 .empty {
@@ -121,6 +139,12 @@
 
   &_fetching {
     opacity: 0.6;
+  }
+
+  &_editor {
+    --sortable-grid-gap: var(--gap-x2);
+
+    @include gamesSnappedColumns(--sortable-grid-columns);
   }
 
   &__cell {

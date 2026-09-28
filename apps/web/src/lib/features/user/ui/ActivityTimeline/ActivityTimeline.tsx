@@ -30,6 +30,7 @@ import {
   getPlaythroughDetails,
   getStatusPhrase,
   getTimeLabel,
+  isReviewAdded,
   isStatusChanged,
 } from "./activity.utils";
 import styles from "./ActivityTimeline.module.scss";
@@ -100,6 +101,12 @@ const renderPlaythrough = (
   );
 };
 
+const renderReview = (gameLink: ReactNode, isLead: boolean): ReactNode => (
+  <span className={styles.sentence}>
+    {isLead ? <>Reviewed {gameLink}</> : "Wrote a review"}
+  </span>
+);
+
 const renderRating = (
   rating: ILogRating,
   gameLink: ReactNode,
@@ -149,7 +156,17 @@ const renderLogLines = (log: ILogChanges, game: IGameResponse) => {
   const lines: ((isLead: boolean) => ReactNode)[] = [];
 
   if (playthrough) {
-    lines.push((isLead) => renderPlaythrough(playthrough, gameLink, isLead));
+    const hasReview = isReviewAdded(playthrough);
+    const isOnlyReview =
+      hasReview &&
+      playthrough.action === "updated" &&
+      !isStatusChanged(playthrough.before, playthrough.after) &&
+      !getPlaythroughDetails(playthrough).some(Boolean);
+
+    if (!isOnlyReview) {
+      lines.push((isLead) => renderPlaythrough(playthrough, gameLink, isLead));
+    }
+    if (hasReview) lines.push((isLead) => renderReview(gameLink, isLead));
   }
   if (rating) lines.push((isLead) => renderRating(rating, gameLink, isLead));
   if (favorite !== undefined) {

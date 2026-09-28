@@ -41,6 +41,8 @@ export class PlaythroughsService {
       platform: platform?.name,
       date: play.date || undefined,
       time: play.time || undefined,
+      hasReview:
+        !!play.isPublic && play.category !== "wishlist" && !!play.comment,
     });
   }
 

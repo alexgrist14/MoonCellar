@@ -291,3 +291,16 @@ $fontMain: var(--font-general);
     border-radius: var(--radius-x2);
   }
 }
+
+$gamesCardMinWidth: 180px;
+$gamesCardsGap: 8px;
+
+@mixin gamesSnappedColumns($property) {
+  #{$property}: repeat(var(--games-columns-2), minmax(0, 1fr));
+
+  @for $i from 3 through 6 {
+    @container (min-width: #{$gamesCardMinWidth * $i + $gamesCardsGap * ($i - 1)}) {
+      #{$property}: repeat(var(--games-columns-#{$i}), minmax(0, 1fr));
+    }
+  }
+}

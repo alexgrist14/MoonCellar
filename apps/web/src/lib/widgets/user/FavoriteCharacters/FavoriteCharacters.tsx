@@ -113,6 +113,7 @@ export const FavoriteCharacters: FC<IFavoriteCharactersProps> = ({
           {visible.map((character, index) => (
             <li key={character._id}>
               <CharacterCard
+                className={styles.card}
                 character={character}
                 rank={index + 1}
                 priority={index < 2}

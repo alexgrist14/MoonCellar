@@ -9,7 +9,7 @@ const PRIORITY_COUNT = 6;
 const COLUMN_TIERS = [2, 3, 4, 5, 6];
 const MIN_COLUMNS = 2;
 
-const getSnappedColumns = (limit: number, columns?: number) =>
+export const getSnappedColumns = (limit: number, columns?: number) =>
   COLUMN_TIERS.reduce<Record<string, number>>((vars, tier) => {
     let count = columns ? Math.min(tier, columns) : tier;
 

@@ -61,6 +61,10 @@
   }
 }
 
+.card {
+  padding: 0;
+}
+
 .slots {
   --sortable-grid-columns: repeat(
     auto-fill,

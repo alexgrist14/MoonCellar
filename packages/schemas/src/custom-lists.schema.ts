@@ -22,6 +22,15 @@ export const CustomListsOrderSchema = z.enum(["asc", "desc"]);
 export const CustomListsUpdatedSchema = z.enum(["week", "month", "year"]);
 export const CustomListsGamesModeSchema = z.enum(["any", "all"]);
 export const CustomListGamePositionSchema = z.enum(["start", "end"]);
+export const CustomListGamesSortSchema = z.enum([
+  "position",
+  "addedAt",
+  "name",
+  "release",
+  "rating",
+]);
+export const DEFAULT_CUSTOM_LIST_GAMES_SORT = "position";
+export const DEFAULT_CUSTOM_LIST_GAMES_ORDER = "asc";
 
 export const CustomListNameSchema = z
   .string()
@@ -39,6 +48,7 @@ export const CustomListDescriptionSchema = z
 export const CustomListGameSchema = z.object({
   gameId: z.string().describe("Game id"),
   addedAt: z.string().describe("Date the game was added"),
+  position: z.number().describe("Place in the list order, from 1"),
 });
 
 export const CustomListSchema = z.object({
@@ -49,6 +59,8 @@ export const CustomListSchema = z.object({
   description: z.string().describe("List description"),
   isPrivate: z.boolean().describe("Visible to the owner only"),
   isRanked: z.boolean().describe("Games show their position in the list"),
+  sortBy: CustomListGamesSortSchema.describe("Default order of the games"),
+  sortOrder: CustomListsOrderSchema.describe("Default direction of the order"),
   gamesCount: z.number().describe("Games in the list"),
   likesCount: z.number().describe("Likes from other players"),
   isLiked: z
@@ -69,7 +81,9 @@ export const CustomListSchema = z.object({
 });
 
 export const CustomListDetailsSchema = CustomListSchema.extend({
-  games: CustomListGameSchema.array().describe("Games in list order"),
+  games: CustomListGameSchema.array().describe(
+    "Games in the requested order, or the list's default one"
+  ),
 });
 
 export const CreateCustomListRequestSchema = z.object({
@@ -77,6 +91,8 @@ export const CreateCustomListRequestSchema = z.object({
   description: CustomListDescriptionSchema.optional(),
   isPrivate: z.boolean().default(false),
   isRanked: z.boolean().default(false),
+  sortBy: CustomListGamesSortSchema.default(DEFAULT_CUSTOM_LIST_GAMES_SORT),
+  sortOrder: CustomListsOrderSchema.default(DEFAULT_CUSTOM_LIST_GAMES_ORDER),
   gameId: ObjectIdSchema.optional().describe("Game to add right away"),
 });
 
@@ -85,6 +101,8 @@ export const UpdateCustomListRequestSchema = z.object({
   description: CustomListDescriptionSchema.optional(),
   isPrivate: z.boolean().optional(),
   isRanked: z.boolean().optional(),
+  sortBy: CustomListGamesSortSchema.optional(),
+  sortOrder: CustomListsOrderSchema.optional(),
 });
 
 export const AddCustomListGameRequestSchema = z.object({
@@ -132,6 +150,10 @@ export const GetUserCustomListsResponseSchema = CustomListSchema.array();
 export const GetCustomListBySlugRequestSchema = z.object({
   userName: z.string().min(3).max(15),
   slug: z.string().min(1).max(80),
+  sortBy: CustomListGamesSortSchema.optional().describe(
+    "Order of the games, the list's default when omitted"
+  ),
+  sortOrder: CustomListsOrderSchema.optional(),
 });
 
 export const CustomListLikeResponseSchema = z.object({
@@ -146,6 +168,7 @@ export const CustomListGameCountsResponseSchema = z.record(
 
 export type ICustomListsSort = z.infer<typeof CustomListsSortSchema>;
 export type ICustomListsOrder = z.infer<typeof CustomListsOrderSchema>;
+export type ICustomListGamesSort = z.infer<typeof CustomListGamesSortSchema>;
 export type ICustomListsUpdated = z.infer<typeof CustomListsUpdatedSchema>;
 export type ICustomListsGamesMode = z.infer<typeof CustomListsGamesModeSchema>;
 export type ICustomListGamePosition = z.infer<
@@ -178,6 +201,10 @@ export type IGetUserCustomListsRequest = z.infer<
 >;
 export type IGetCustomListBySlugRequest = z.infer<
   typeof GetCustomListBySlugRequestSchema
+>;
+export type ICustomListSort = Pick<
+  IGetCustomListBySlugRequest,
+  "sortBy" | "sortOrder"
 >;
 export type ICustomListLikeResponse = z.infer<
   typeof CustomListLikeResponseSchema

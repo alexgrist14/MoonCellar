@@ -1,5 +1,10 @@
 import { FC } from "react";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import {
+  Controller,
+  SubmitHandler,
+  useController,
+  useForm,
+} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isAxiosError } from "axios";
 import { useRouter } from "next/navigation";
@@ -8,6 +13,10 @@ import {
   CUSTOM_LIST_DESCRIPTION_MAX,
   CUSTOM_LIST_NAME_MAX,
   CUSTOM_LIST_NAME_MIN,
+  CustomListGamesSortSchema,
+  CustomListsOrderSchema,
+  DEFAULT_CUSTOM_LIST_GAMES_ORDER,
+  DEFAULT_CUSTOM_LIST_GAMES_SORT,
   ICustomList,
 } from "@mooncellar/schemas";
 import {
@@ -25,6 +34,7 @@ import {
 } from "@/src/lib/shared/utils/links.utils";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { Textarea } from "@/src/lib/shared/ui/Textarea";
+import { ListGamesSort } from "../ListGamesSort";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
@@ -53,6 +63,8 @@ const listFormSchema = z.object({
     ),
   isPrivate: z.boolean(),
   isRanked: z.boolean(),
+  sortBy: CustomListGamesSortSchema,
+  sortOrder: CustomListsOrderSchema,
 });
 
 type IListForm = z.infer<typeof listFormSchema>;
@@ -90,7 +102,15 @@ export const ListModal: FC<IListModalProps> = ({ list, userName, gameId }) => {
       description: list?.description ?? "",
       isPrivate: list?.isPrivate ?? false,
       isRanked: list?.isRanked ?? false,
+      sortBy: list?.sortBy ?? DEFAULT_CUSTOM_LIST_GAMES_SORT,
+      sortOrder: list?.sortOrder ?? DEFAULT_CUSTOM_LIST_GAMES_ORDER,
     },
+  });
+
+  const { field: sortByField } = useController({ control, name: "sortBy" });
+  const { field: sortOrderField } = useController({
+    control,
+    name: "sortOrder",
   });
 
   const onFailure = (error: unknown) => {
@@ -105,6 +125,8 @@ export const ListModal: FC<IListModalProps> = ({ list, userName, gameId }) => {
       description: data.description.trim(),
       isPrivate: data.isPrivate,
       isRanked: data.isRanked,
+      sortBy: data.sortBy,
+      sortOrder: data.sortOrder,
     };
 
     if (list) {
@@ -257,6 +279,24 @@ export const ListModal: FC<IListModalProps> = ({ list, userName, gameId }) => {
             </div>
           )}
         />
+        <div className={styles.field}>
+          <span className={styles.field__head}>
+            <span>Default order</span>
+          </span>
+          <ListGamesSort
+            sortBy={sortByField.value}
+            sortOrder={sortOrderField.value}
+            isDisabled={isBusy}
+            onChange={(sortBy, sortOrder) => {
+              sortByField.onChange(sortBy);
+              sortOrderField.onChange(sortOrder);
+            }}
+          />
+          <span className={styles.hint}>
+            How the games are sorted when the list opens. Visitors can pick
+            another order without changing it.
+          </span>
+        </div>
         <div className={styles.actions}>
           {isEdit && (
             <Button

@@ -1,14 +1,23 @@
 "use client";
 
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  CSSProperties,
+  FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { ListLikeButton } from "@/src/lib/features/lists/ui/ListLikeButton";
 import Link from "next/link";
 import cn from "classnames";
 import { useSearchParams } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
+import { hashKey, useQueryClient } from "@tanstack/react-query";
 import {
   CUSTOM_LIST_GAMES_PAGE_SIZE,
   ICustomListDetails,
+  ICustomListGamesSort,
+  ICustomListsOrder,
   IGameResponse,
   IPlaythrough,
 } from "@mooncellar/schemas";
@@ -21,6 +30,12 @@ import {
 import { gameQueryKeys } from "@/src/lib/entities/game/api/game.query-keys";
 import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
 import { ListGameSearch } from "@/src/lib/features/lists/ui/ListGameSearch";
+import { ListGamesSort } from "@/src/lib/features/lists/ui/ListGamesSort";
+import {
+  LIST_ORDER_PARAM,
+  LIST_SORT_PARAM,
+  parseListSortQuery,
+} from "@/src/lib/features/lists/model/list-sort-query.utils";
 import { openListModal } from "@/src/lib/features/lists/ui/ListModal";
 import { UserNavigation } from "@/src/lib/features/user/ui/UserNavigation";
 import { refreshAuth } from "@/src/lib/shared/hooks/useAuthRefresh";
@@ -33,7 +48,10 @@ import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
-import { GamesCards } from "@/src/lib/widgets/game/GamesCards";
+import {
+  GamesCards,
+  getSnappedColumns,
+} from "@/src/lib/widgets/game/GamesCards";
 import { GameCoverImage } from "@/src/lib/entities/game/ui/GameCoverImage";
 import { SortableGrid } from "@/src/lib/shared/ui/SortableGrid";
 import {
@@ -96,12 +114,21 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
     }
   });
 
-  const listKey = listQueryKeys.bySlug(user.userName, initialList.slug);
-  const { data: list = initialList } = useListBySlugQuery(
-    user.userName,
-    initialList.slug,
-    initialList
+  const sort = useMemo(
+    () => parseListSortQuery((key) => query.get(key)),
+    [query]
   );
+  const [initialSort] = useState(sort);
+  const listKey = listQueryKeys.bySlug(user.userName, initialList.slug, sort);
+  const { data: list = initialList, isPlaceholderData: isSorting } =
+    useListBySlugQuery(
+      user.userName,
+      initialList.slug,
+      sort,
+      hashKey([sort]) === hashKey([initialSort]) ? initialList : undefined
+    );
+  const sortBy = sort.sortBy ?? list.sortBy;
+  const sortOrder = sort.sortOrder ?? list.sortOrder;
 
   const isOwner = !!viewerId && viewerId === list.userId;
   const [draft, setDraft] = useState<string[] | null>(null);
@@ -142,7 +169,10 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
   }, [fetchedGames, knownGames, pageIds]);
 
   const listIds = useMemo(
-    () => list.games.map((game) => game.gameId),
+    () =>
+      [...list.games]
+        .sort((a, b) => a.position - b.position)
+        .map((game) => game.gameId),
     [list.games]
   );
   const { data: allGames, isFetching: isAllGamesFetching } =
@@ -169,6 +199,32 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
     [currentPage, list, query]
   );
 
+  const changeSort = (
+    nextSortBy: ICustomListGamesSort,
+    nextSortOrder: ICustomListsOrder
+  ) => {
+    const nextQuery = new URLSearchParams(query.toString());
+    const isDefault =
+      nextSortBy === list.sortBy && nextSortOrder === list.sortOrder;
+
+    nextQuery.delete("page");
+    nextQuery.delete(LIST_SORT_PARAM);
+    nextQuery.delete(LIST_ORDER_PARAM);
+
+    if (!isDefault) {
+      nextQuery.set(LIST_SORT_PARAM, nextSortBy);
+      nextQuery.set(LIST_ORDER_PARAM, nextSortOrder);
+    }
+
+    const search = nextQuery.toString();
+
+    window.history.pushState(
+      null,
+      "",
+      `${getListHref(list)}${search ? `?${search}` : ""}`
+    );
+  };
+
   const finishManaging = () => {
     if (!draft) return;
 
@@ -187,10 +243,18 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
       { id: list._id, gameIds: draft },
       {
         onSuccess: () => {
-          queryClient.setQueryData<ICustomListDetails>(listKey, {
-            ...list,
-            games: draft.flatMap((id) => byId.get(id) ?? []),
-          });
+          if (sortBy === "position") {
+            const games = draft.flatMap((id, index) => {
+              const game = byId.get(id);
+
+              return game ? [{ ...game, position: index + 1 }] : [];
+            });
+
+            queryClient.setQueryData<ICustomListDetails>(listKey, {
+              ...list,
+              games: sortOrder === "asc" ? games : games.reverse(),
+            });
+          }
           setDraft(null);
           toast.success({ description: "Order saved" });
         },
@@ -232,7 +296,7 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
   };
 
   const getRank = (game: IGameResponse) =>
-    list.games.findIndex((item) => item.gameId === game._id) + 1 || undefined;
+    list.games.find((item) => item.gameId === game._id)?.position;
 
   const navigation = <UserNavigation {...navigationProps} />;
 
@@ -381,15 +445,24 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
               )}
             </div>
           </header>
-          {isOwner && (
-            <div className={styles.search}>
-              {isManaging ? (
-                <span className={styles.search__hint}>
-                  Drag or use the arrows to reorder. Press Done to save the
-                  order.
-                </span>
-              ) : (
-                <ListGameSearch list={list} autoFocus={!list.gamesCount} />
+          {(isOwner || (!isManaging && list.gamesCount > 1)) && (
+            <div className={styles.toolbar}>
+              {isOwner &&
+                (isManaging ? (
+                  <span className={styles.toolbar__hint}>
+                    Drag or use the arrows to reorder. Press Done to save the
+                    order.
+                  </span>
+                ) : (
+                  <ListGameSearch list={list} autoFocus={!list.gamesCount} />
+                ))}
+              {!isManaging && list.gamesCount > 1 && (
+                <ListGamesSort
+                  sortBy={sortBy}
+                  sortOrder={sortOrder}
+                  onChange={changeSort}
+                  className={styles.toolbar__sort}
+                />
               )}
             </div>
           )}
@@ -404,29 +477,37 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
               }
             />
           ) : isManaging ? (
-            <SortableGrid
-              items={draft}
-              getKey={(id) => id}
-              getName={(id) => allGamesById.get(id)?.name ?? ""}
-              renderCover={(id) => {
-                const game = allGamesById.get(id);
+            <div
+              className={styles.editor}
+              style={
+                getSnappedColumns(CUSTOM_LIST_GAMES_PAGE_SIZE) as CSSProperties
+              }
+            >
+              <SortableGrid
+                items={draft}
+                getKey={(id) => id}
+                getName={(id) => allGamesById.get(id)?.name ?? ""}
+                renderCover={(id) => {
+                  const game = allGamesById.get(id);
 
-                return game ? (
-                  <GameCoverImage game={game} sizes="160px" />
-                ) : null;
-              }}
-              onChange={setDraft}
-              onRemove={handleRemove}
-              coverRatio="var(--cover-ratio)"
-              isDisabled={isReordering || isRemoving}
-              className={cn(styles.grid, {
-                [styles.grid_fetching]: isAllGamesFetching && !allGames,
-              })}
-            />
+                  return game ? (
+                    <GameCoverImage game={game} sizes="260px" />
+                  ) : null;
+                }}
+                onChange={setDraft}
+                onRemove={handleRemove}
+                coverRatio="var(--cover-ratio)"
+                isDisabled={isReordering || isRemoving}
+                className={cn(styles.grid, styles.grid_editor, {
+                  [styles.grid_fetching]: isAllGamesFetching && !allGames,
+                })}
+              />
+            </div>
           ) : (
             <div
               className={cn(styles.grid, {
-                [styles.grid_fetching]: isGamesFetching && !fetchedGames,
+                [styles.grid_fetching]:
+                  isSorting || (isGamesFetching && !fetchedGames),
               })}
             >
               <GamesCards

@@ -1,15 +1,8 @@
-import { IGameResponse } from "@mooncellar/schemas";
-
-export const normalizeRating = (
-  value?: number | null,
-  maxScale: number = 10
-): number | null => {
-  if (value == null) {
-    return null;
-  }
-
-  return Math.round((value / maxScale) * 100) / 10;
-};
+import {
+  getCombinedRating,
+  IGameResponse,
+  normalizeRating,
+} from "@mooncellar/schemas";
 
 export const formatRating = (
   value?: number | null,
@@ -20,22 +13,8 @@ export const formatRating = (
   return normalized == null ? null : `${normalized}`;
 };
 
-export const getAverageRating = (game: IGameResponse): number | null => {
-  const ratings = [
-    normalizeRating(game.averageRating),
-    normalizeRating(game.igdb?.total_rating, 100),
-    normalizeRating(game.hltb?.reviewScore, 100),
-  ].filter((rating): rating is number => rating != null);
-
-  if (!ratings.length) {
-    return null;
-  }
-
-  const average =
-    ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length;
-
-  return Math.round(average * 10) / 10;
-};
+export const getAverageRating = (game: IGameResponse): number | null =>
+  getCombinedRating(game);
 
 export interface IGameRatingRow {
   key: string;

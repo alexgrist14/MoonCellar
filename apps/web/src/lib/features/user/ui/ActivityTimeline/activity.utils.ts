@@ -70,6 +70,9 @@ export const isStatusChanged = (
   (before?.category !== after?.category ||
     !!before?.isMastered !== !!after?.isMastered);
 
+export const isReviewAdded = ({ action, before, after }: ILogPlaythrough) =>
+  action !== "removed" && !!after?.hasReview && !before?.hasReview;
+
 export const getLogTone = ({
   playthrough,
   rating,

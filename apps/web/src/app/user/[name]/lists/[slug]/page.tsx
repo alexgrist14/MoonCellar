@@ -8,8 +8,15 @@ import {
   GetCustomListBySlugRequestSchema,
   GetUserByStringSchema,
   ICustomListDetails,
+  ICustomListGamesSort,
+  ICustomListsOrder,
   IGameResponse,
 } from "@mooncellar/schemas";
+import {
+  LIST_ORDER_PARAM,
+  LIST_SORT_PARAM,
+  parseListSortQuery,
+} from "@/src/lib/features/lists/model/list-sort-query.utils";
 import { CustomListPage } from "@/src/lib/pages/CustomListPage";
 import {
   agent,
@@ -24,7 +31,7 @@ import { fetchOrNull } from "@/src/lib/shared/utils/not-found.utils";
 
 interface IListRouteProps {
   params: Promise<{ name: string; slug: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<Record<string, string | undefined>>;
 }
 
 const isValidRequest = (userName: string, slug: string) =>
@@ -32,11 +39,17 @@ const isValidRequest = (userName: string, slug: string) =>
   GetCustomListBySlugRequestSchema.safeParse({ userName, slug }).success;
 
 const getList = cache(
-  async (userName: string, slug: string, cookieHeader: string) =>
+  async (
+    userName: string,
+    slug: string,
+    cookieHeader: string,
+    sortBy?: ICustomListGamesSort,
+    sortOrder?: ICustomListsOrder
+  ) =>
     isValidRequest(userName, slug)
       ? fetchOrNull(
           agent.get<ICustomListDetails>(`${API_URL}/lists/by-slug`, {
-            params: { userName, slug },
+            params: { userName, slug, sortBy, sortOrder },
             headers: cookieHeader ? { Cookie: cookieHeader } : undefined,
           })
         )
@@ -51,11 +64,20 @@ const getCookieHeader = async () => (await cookies()).toString();
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: IListRouteProps): Promise<Metadata> {
   const { name, slug } = await params;
+  const query = await searchParams;
+  const { sortBy, sortOrder } = parseListSortQuery((key) => query[key]);
 
   try {
-    const list = await getList(name, slug, await getCookieHeader());
+    const list = await getList(
+      name,
+      slug,
+      await getCookieHeader(),
+      sortBy,
+      sortOrder
+    );
 
     if (!list) {
       return {
@@ -84,19 +106,34 @@ export default async function CustomListRoute({
   searchParams,
 }: IListRouteProps) {
   const { name, slug } = await params;
-  const { page: pageParam } = await searchParams;
+  const query = await searchParams;
+  const { sortBy, sortOrder } = parseListSortQuery((key) => query[key]);
   const cookieStore = await cookies();
 
-  const list = await getList(name, slug, cookieStore.toString());
+  const list = await getList(
+    name,
+    slug,
+    cookieStore.toString(),
+    sortBy,
+    sortOrder
+  );
 
   if (!list) {
     notFound();
   }
 
-  const page = Math.max(1, Number(pageParam) || 1);
+  const page = Math.max(1, Number(query.page) || 1);
 
   if (list.slug !== slug) {
-    permanentRedirect(`${getListHref(list)}${page > 1 ? `?page=${page}` : ""}`);
+    const kept = new URLSearchParams(
+      Object.entries({
+        page: page > 1 ? `${page}` : undefined,
+        [LIST_SORT_PARAM]: sortBy,
+        [LIST_ORDER_PARAM]: sortOrder,
+      }).filter((entry): entry is [string, string] => !!entry[1])
+    ).toString();
+
+    permanentRedirect(`${getListHref(list)}${kept ? `?${kept}` : ""}`);
   }
 
   const user = await getUser(list.author?.userName ?? name);

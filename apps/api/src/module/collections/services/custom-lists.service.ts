@@ -16,6 +16,12 @@ import {
   CUSTOM_LIST_GAMES_MAX,
   CUSTOM_LIST_PREVIEW_COVERS,
   CUSTOM_LISTS_PER_USER_MAX,
+  DEFAULT_CUSTOM_LIST_GAMES_ORDER,
+  DEFAULT_CUSTOM_LIST_GAMES_SORT,
+  getCombinedRating,
+  type ICustomListGamesSort,
+  type ICustomListSort,
+  type IRatedGame,
   type IAddCustomListGameRequest,
   type ICreateCustomListRequest,
   type ICustomList,
@@ -39,6 +45,10 @@ import {
   toObjectId,
 } from "../utils/collections.utils";
 import { findFreeListSlug } from "../utils/list-slug.utils";
+import {
+  type IListGameSortKeys,
+  sortListGames,
+} from "../utils/list-games-sort.utils";
 
 type IAggregatedList = Omit<CustomList, "games"> & {
   _id: mongoose.Types.ObjectId;
@@ -166,6 +176,8 @@ export class CustomListsService {
       description: doc.description ?? "",
       isPrivate: !!doc.isPrivate,
       isRanked: !!doc.isRanked,
+      sortBy: doc.sortBy ?? DEFAULT_CUSTOM_LIST_GAMES_SORT,
+      sortOrder: doc.sortOrder ?? DEFAULT_CUSTOM_LIST_GAMES_ORDER,
       gamesCount: doc.gamesCount ?? 0,
       likesCount: Math.max(doc.likesCount ?? 0, 0),
       covers,
@@ -471,10 +483,40 @@ export class CustomListsService {
     }
   }
 
+  private async getSortKeys(
+    gameIds: mongoose.Types.ObjectId[],
+    sortBy: ICustomListGamesSort
+  ): Promise<Map<string, IListGameSortKeys>> {
+    if (!["name", "release", "rating"].includes(sortBy)) return new Map();
+
+    const games = await this.gameModel
+      .find({ _id: { $in: gameIds } })
+      .select("name first_release averageRating igdb.total_rating hltb.reviewScore")
+      .lean<
+        (IRatedGame & {
+          _id: mongoose.Types.ObjectId;
+          name?: string;
+          first_release?: number | null;
+        })[]
+      >();
+
+    return new Map(
+      games.map((game) => [
+        game._id.toString(),
+        {
+          name: game.name,
+          release: game.first_release,
+          rating: getCombinedRating(game),
+        },
+      ])
+    );
+  }
+
   async getBySlug(
     userName: string,
     slug: string,
-    viewer: ICollectionsViewer
+    viewer: ICollectionsViewer,
+    sort: ICustomListSort = {}
   ): Promise<ICustomListDetails> {
     const owner = await this.userModel
       .findOne({ userName })
@@ -493,13 +535,25 @@ export class CustomListsService {
     }
 
     const [list] = await this.withViewerLikes([this.toList(doc)], viewer);
+    const sortBy = sort.sortBy ?? list.sortBy;
+    const sortOrder = sort.sortOrder ?? list.sortOrder;
+    const games = (doc.games ?? []).map((game, index) => ({
+      gameId: game.gameId.toString(),
+      addedAt: toIsoString(game.addedAt),
+      position: index + 1,
+    }));
 
     return {
       ...list,
-      games: (doc.games ?? []).map((game) => ({
-        gameId: game.gameId.toString(),
-        addedAt: toIsoString(game.addedAt),
-      })),
+      games: sortListGames(
+        games,
+        sortBy,
+        sortOrder,
+        await this.getSortKeys(
+          (doc.games ?? []).map((game) => game.gameId),
+          sortBy
+        )
+      ),
     };
   }
 
@@ -531,6 +585,8 @@ export class CustomListsService {
         description: dto.description?.trim() ?? "",
         isPrivate: !!dto.isPrivate,
         isRanked: !!dto.isRanked,
+        sortBy: dto.sortBy,
+        sortOrder: dto.sortOrder,
         games: gameId ? [{ gameId, addedAt: new Date() }] : [],
         gamesCount: gameId ? 1 : 0,
       });
@@ -586,6 +642,9 @@ export class CustomListsService {
       if (dto.isRanked !== undefined) {
         list.isRanked = dto.isRanked;
       }
+
+      if (dto.sortBy !== undefined) list.sortBy = dto.sortBy;
+      if (dto.sortOrder !== undefined) list.sortOrder = dto.sortOrder;
 
       await list.save();
 

@@ -1,5 +1,11 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { type HydratedDocument } from "mongoose";
+import {
+  DEFAULT_CUSTOM_LIST_GAMES_ORDER,
+  DEFAULT_CUSTOM_LIST_GAMES_SORT,
+  type ICustomListGamesSort,
+  type ICustomListsOrder,
+} from "@mooncellar/schemas";
 
 @Schema({ _id: false })
 export class CustomListGame {
@@ -52,6 +58,12 @@ export class CustomList {
 
   @Prop({ type: Boolean, default: false })
   isRanked: boolean;
+
+  @Prop({ type: String, default: DEFAULT_CUSTOM_LIST_GAMES_SORT })
+  sortBy: ICustomListGamesSort;
+
+  @Prop({ type: String, default: DEFAULT_CUSTOM_LIST_GAMES_ORDER })
+  sortOrder: ICustomListsOrder;
 
   @Prop({ type: [CustomListGameDatabaseSchema], default: [] })
   games: CustomListGame[];

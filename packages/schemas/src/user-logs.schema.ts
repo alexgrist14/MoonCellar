@@ -14,6 +14,10 @@ export const LogPlaythroughStateSchema = z.object({
   platform: z.string().optional().describe("Platform name at the time"),
   date: z.string().optional().describe("Finish date, yyyy-mm-dd"),
   time: z.number().optional().describe("Spent time (hours)"),
+  hasReview: z
+    .boolean()
+    .optional()
+    .describe("The note is public, so it shows as a review"),
 });
 
 export const LogPlaythroughSchema = z.object({

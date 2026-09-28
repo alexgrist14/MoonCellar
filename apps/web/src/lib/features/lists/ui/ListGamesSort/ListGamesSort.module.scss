@@ -1,0 +1,10 @@
+.sort {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-x2);
+
+  & > div:first-child {
+    flex: 1;
+    min-width: 0;
+  }
+}

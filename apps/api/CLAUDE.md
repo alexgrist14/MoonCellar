@@ -86,8 +86,10 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   *first* `before` and the *last* `after`, and drops a part that nets to nothing (added then
   removed, rating set then removed, an update reverted). Replacing the whole part instead is what
   made a repeated save with nothing changed overwrite the recorded update with an empty one.
-- **The playthrough state never includes the comment.** It is a review shown on the game page and
-  the profile; copying it into the log made deleting the log the only way to take it back.
+- **The playthrough state never includes the comment, only `hasReview`.** The comment is a review
+  shown on the game page and the profile; copying it into the log made deleting the log the only
+  way to take it back. `hasReview` must match `PUBLIC_REVIEW_FILTER` in `reviews.service.ts`
+  (public, not wishlist, non-empty), or the feed announces reviews the game page does not show.
 - **The platform name is stored next to `platformId`.** A log is a snapshot of the action, and
   the name saves a platform lookup in every module that provides `UserLogsService`.
 - **A merge writes with the `__v` it read in the filter and retries on a miss.** Two requests

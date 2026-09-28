@@ -1,6 +1,3 @@
-$cardMinWidth: 180px;
-$cardsGap: 8px;
-
 .block {
   display: flex;
   flex-direction: column;
@@ -56,16 +53,7 @@ $cardsGap: 8px;
     }
 
     &_snapped {
-      grid-template-columns: repeat(var(--games-columns-2), minmax(0, 1fr));
-
-      @for $i from 3 through 6 {
-        @container (min-width: #{$cardMinWidth * $i + $cardsGap * ($i - 1)}) {
-          grid-template-columns: repeat(
-            var(--games-columns-#{$i}),
-            minmax(0, 1fr)
-          );
-        }
-      }
+      @include gamesSnappedColumns(grid-template-columns);
     }
 
     @include mediaSm {

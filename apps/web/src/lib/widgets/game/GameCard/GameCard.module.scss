@@ -177,7 +177,6 @@ $statuses: wishlist, backlog, playing, played, completed, mastered, dropped;
     height: 30px;
     flex-shrink: 0;
     border: var(--padding-x05) solid var(--color-bg-secondary);
-    animation: appearOpacity 0.2s ease;
 
     @include flexCenter;
   }
