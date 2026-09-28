@@ -291,6 +291,11 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   oldest `vndb.syncedAt`.** `insertVndbGame` carries the stored `syncedAt` inside the `vndb` value
   it compares; dropping it makes `vndb` differ on every refresh and moves `updatedAt` for every
   refreshed game.
+- **Code that reads a VNDB field must add it to that request's `fields` string.** VNDB returns
+  only the fields asked for, while `IVndbCharacter`, `IVndbNovel` and the rest declare every
+  field, so a missing one type-checks and reads as `undefined` at runtime. `vns.spoiler` was
+  read without being requested, and every character's `vndb.spoilerVns` came out empty — no
+  spoiler character was ever hidden.
 - **A VNDB request that filters by several ids must pass `results`.** VNDB returns 10 items by
   default and reports the rest only through `more: true`; the detail request in `getVnMatches`
   once ran without it and silently processed 10 of every 100 VNs on a page, with no error.

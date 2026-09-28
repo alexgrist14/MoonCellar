@@ -1615,7 +1615,7 @@ export class VndbService {
       }>("/character", {
         filters,
         fields:
-          "name,original,aliases,description,image.id,image.url,image.sexual,image.violence,sex,vns.id,gender,traits.name,traits.group_name,traits.spoiler,traits.lie,traits.sexual",
+          "name,original,aliases,description,image.id,image.url,image.sexual,image.violence,sex,vns.id,vns.spoiler,gender,traits.name,traits.group_name,traits.spoiler,traits.lie,traits.sexual",
         results: 100,
         page,
       });
