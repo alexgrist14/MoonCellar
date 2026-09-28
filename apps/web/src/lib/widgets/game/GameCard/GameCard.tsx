@@ -358,6 +358,7 @@ export const GameCard = memo(
               <Button
                 color="transparent"
                 tooltip={isActive ? "Close" : "Game info"}
+                isOnlyIcon
                 className={classNames(
                   styles.card__more,
                   isActive && styles[`card__more_${status}`]

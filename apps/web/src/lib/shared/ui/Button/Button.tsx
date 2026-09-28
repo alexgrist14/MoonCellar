@@ -1,6 +1,5 @@
 import {
   ComponentPropsWithRef,
-  Fragment,
   isValidElement,
   memo,
   ReactNode,
@@ -41,6 +40,7 @@ export interface IButtonProps extends Pick<
   tooltipAlign?: "left" | "right" | "center";
   compact?: boolean;
   hidden?: boolean;
+  isOnlyIcon?: boolean;
 }
 
 export const Button = memo(
@@ -53,6 +53,7 @@ export const Button = memo(
     tooltipAlign,
     compact,
     hidden,
+    isOnlyIcon,
     ref,
     ...props
   }: IButtonProps) => {
@@ -62,12 +63,6 @@ export const Button = memo(
     const isIconOnly =
       (isValidElement(children) && typeof children.type !== "string") ||
       isSingleCharacter;
-    const isSquare =
-      isSingleCharacter ||
-      (isValidElement<{ children?: unknown }>(children) &&
-        typeof children.type !== "string" &&
-        children.type !== Fragment &&
-        children.props.children === undefined);
 
     const button = (
       <button
@@ -86,7 +81,7 @@ export const Button = memo(
             [styles[`button_${color}Color_active`]]: active,
             [styles.button_compact]: compact,
             [styles.button_icon]: isIconOnly,
-            [styles.button_square]: isSquare,
+            [styles.button_square]: isOnlyIcon,
             [styles.button_hidden]: hidden,
           }
         )}

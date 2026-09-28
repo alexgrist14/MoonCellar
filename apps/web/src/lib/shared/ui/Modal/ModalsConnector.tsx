@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import EventEmitter from "events";
 import { IModal, IModalPropsState } from "./Modal.types";
 import { Modal } from "./Modal";
@@ -17,12 +18,17 @@ export const modal: IModal = {
 
 export const ModalsConnector = () => {
   const [content, setContent] = useState<IModalPropsState[]>([]);
+  const contentRef = useRef(content);
+  const pathname = usePathname();
+
+  contentRef.current = content;
 
   const closeLastModal = useCallback(() => {
     setContent((st) => st.slice(0, -1));
   }, []);
 
   const closeAllModals = useCallback(() => {
+    contentRef.current.forEach(({ props }) => props?.onClose?.());
     setContent((st) => (st.length ? [] : st));
   }, []);
 
@@ -49,6 +55,10 @@ export const ModalsConnector = () => {
 
     return () => window.removeEventListener("popstate", closeAllModals);
   }, [closeAllModals]);
+
+  useEffect(() => {
+    closeAllModals();
+  }, [pathname, closeAllModals]);
 
   useDisableScroll(!!content.length);
 

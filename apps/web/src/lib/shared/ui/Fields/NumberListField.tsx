@@ -35,6 +35,7 @@ export const NumberListField: FC<INumberListFieldProps> = ({
             <Button
               type="button"
               compact
+              isOnlyIcon
               color={ButtonColor.TRANSPARENT}
               disabled={disabled}
               onClick={() => onChange(items.filter((_, i) => i !== index))}

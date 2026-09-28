@@ -136,6 +136,7 @@ export const MobileTable = <T extends object>({
                     )}
                     <Button
                       compact
+                      isOnlyIcon
                       onClick={() =>
                         setActiveIndexes(
                           isActive

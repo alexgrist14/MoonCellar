@@ -38,6 +38,7 @@ export const BoxHead: FC<IBoxHeadProps> = ({
       <Button
         ref={closeButtonRef}
         color={ButtonColor.TRANSPARENT}
+        isOnlyIcon
         className={styles.template__close}
         tooltip="Close"
         onClick={onClose}
