@@ -1,4 +1,4 @@
-import { IGameResponse, ILogSegment } from "@mooncellar/schemas";
+import { IGameResponse, ILog } from "@mooncellar/schemas";
 import { IUser } from "./auth.type";
 
 export type CategoriesType =
@@ -14,15 +14,7 @@ export type CategoriesFilterType = CategoriesType | "all";
 
 export type CategoriesCount = Record<CategoriesType, number>;
 
-export interface ILogs {
-  _id: string;
-  date: string;
-  type: string;
-  text: string;
-  gameId: string;
-  userId: string;
-  segments?: ILogSegment[];
-}
+export type ILogs = Omit<ILog, "date"> & { date: string };
 
 export interface IUserLogs {
   logs: ILogs[];

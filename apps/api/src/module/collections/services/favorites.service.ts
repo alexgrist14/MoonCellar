@@ -158,23 +158,11 @@ export class FavoritesService {
   }
 
   private logFavoriteAdded(userId: string, gameId: string) {
-    return this.logsService.createUserLog({
-      userId,
-      gameId,
-      type: "custom",
-      segment: "favorite",
-      text: "<b>Added to favourites</b>",
-    });
+    return this.logsService.recordUserLog({ userId, gameId, favorite: true });
   }
 
   private logFavoriteRemoved(userId: string, gameId: string) {
-    return this.logsService.removeUserLogSegment({
-      userId,
-      gameId,
-      segment: "favorite",
-      fallbackType: "custom",
-      fallbackText: "<b>Removed from favourites</b>",
-    });
+    return this.logsService.recordUserLog({ userId, gameId, favorite: false });
   }
 
   async getFavoriteIds(userId: string): Promise<IUpdateFavoritesResponse> {

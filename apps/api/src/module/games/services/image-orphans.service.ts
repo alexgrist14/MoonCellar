@@ -24,7 +24,6 @@ const GAME_IMAGE_FOLDERS: S3Folder[] = [
 const RICH_TEXT_SOURCES = [
   { collection: "gamecomments", field: "body" },
   { collection: "playthroughs", field: "comment" },
-  { collection: "userlogs", field: "text" },
 ];
 
 const URL_PATTERN = /https?:\/\/[^\s"'<>)\\]+/g;

@@ -198,15 +198,6 @@
   color: var(--color-text-primary);
 }
 
-.legacy {
-  font-size: 13px;
-  color: var(--color-text-secondary);
-
-  p {
-    font-size: inherit;
-  }
-}
-
 .side {
   display: flex;
   align-items: center;

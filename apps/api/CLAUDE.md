@@ -75,17 +75,24 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
 
 ## User logs
 
-- **A playthrough log records what changed and never the note.** `getPlaythroughMeta` builds the
-  four log fields (Status, Console, Date, Time); adding and removing a playthrough render all of
-  them, an update renders only the ones that differ from the document read before the write, and
-  a field that was cleared shows as `—`. The comment is a review, shown on the game page and on
-  the profile; copying it into the log duplicated it into a place where deleting the log was the
-  only way to take it back.
-- **Old logs are stripped when they are read, not migrated.** `renderLogText` removes both stored
-  shapes per segment — `<div style="font-size: 12px">Comment:</div>` with everything after it, and
-  the older `<br/>Comment: …` that ran to the end of its `<span>` — so historical rows keep their
-  text in the database while the API stops serving it. Log rows are HTML snapshots written at
-  action time, so the rendering step is the only place that can change what they show.
+- **A log stores state, never text: `playthrough` (`action`, `before`, `after`), `rating`
+  (`value`, `previous`) and `favorite`, and the web builds every sentence from them.** The
+  former HTML text was parsed back with regexes on read, so rewording a header silently broke
+  old rows, and a status stored as "Mastered" *or* the category lost that a game was completed.
+  Rows written before the change are converted by `scripts/migrate-user-logs.ts` (dry run unless
+  `--apply`).
+- **Every write goes through `recordUserLog`, which merges into the user's latest log when it is
+  for the same game and the same playthrough, using `mergeLogChanges`.** A merge keeps the
+  *first* `before` and the *last* `after`, and drops a part that nets to nothing (added then
+  removed, rating set then removed, an update reverted). Replacing the whole part instead is what
+  made a repeated save with nothing changed overwrite the recorded update with an empty one.
+- **The playthrough state never includes the comment.** It is a review shown on the game page and
+  the profile; copying it into the log made deleting the log the only way to take it back.
+- **The platform name is stored next to `platformId`.** A log is a snapshot of the action, and
+  the name saves a platform lookup in every module that provides `UserLogsService`.
+- **A merge writes with the `__v` it read in the filter and retries on a miss.** Two requests
+  for the same game (a playthrough save and a rating) otherwise read the same log and the second
+  write drops the first one's change.
 
 ## Custom lists and favourites
 
@@ -214,8 +221,8 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   the scan's start and `now - minAgeDays` (7 by default) and excludes it. Lowering `minAgeDays` to 0
   leaves only the scan-start guard, which is enough for a run nothing else is writing during.
 - **The reference set covers `games.cover`/`screenshots`/`artworks` *and* the rich-text fields
-  `gamecomments.body`, `playthroughs.comment`, `userlogs.text`.** Those hold pasted URLs that can
-  point at a cover or a screenshot; none do today, but the three collections are small enough that
+  `gamecomments.body` and `playthroughs.comment`.** Those hold pasted URLs that can
+  point at a cover or a screenshot; none do today, but the two collections are small enough that
   scanning them costs nothing and a deletion there is not recoverable.
 - **`LastModified` in the Space is the rclone copy time, not the original upload, so a fresh
   `transfer-s3.ts` run hides the whole corpus behind `minAgeDays`.** The objects copied from regru

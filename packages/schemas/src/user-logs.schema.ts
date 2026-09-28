@@ -1,38 +1,57 @@
 import { z } from "zod";
+import { categoriesZod } from "./playthroughs.schema";
 
-const LogTypeSchema = z.enum(["list", "custom", "rating"]);
+export const LogPlaythroughActionSchema = z.enum([
+  "added",
+  "updated",
+  "removed",
+]);
 
-export const UserLogsSchemaZod = z.object({
+export const LogPlaythroughStateSchema = z.object({
+  category: categoriesZod.optional().describe("Playthrough status"),
+  isMastered: z.boolean().optional(),
+  platformId: z.string().optional(),
+  platform: z.string().optional().describe("Platform name at the time"),
+  date: z.string().optional().describe("Finish date, yyyy-mm-dd"),
+  time: z.number().optional().describe("Spent time (hours)"),
+});
+
+export const LogPlaythroughSchema = z.object({
+  playthroughId: z.string().optional(),
+  action: LogPlaythroughActionSchema,
+  before: LogPlaythroughStateSchema.optional().describe(
+    "State before the first change of the log, or the removed state"
+  ),
+  after: LogPlaythroughStateSchema.optional().describe(
+    "State after the last change of the log"
+  ),
+});
+
+export const LogRatingSchema = z.object({
+  value: z.number().nullable().describe("Rating after the action, null when removed"),
+  previous: z
+    .number()
+    .nullable()
+    .optional()
+    .describe("Rating before the first change of the log, null when unrated"),
+});
+
+export const LogChangesSchema = z.object({
+  playthrough: LogPlaythroughSchema.optional(),
+  rating: LogRatingSchema.optional(),
+  favorite: z
+    .boolean()
+    .optional()
+    .describe("true when put in the top 10, false when removed from it"),
+});
+
+export const UserLogsSchemaZod = LogChangesSchema.extend({
   _id: z.string(),
   date: z.date(),
-  type: LogTypeSchema,
-  text: z.string(),
   gameId: z.string(),
   userId: z.string(),
 });
 
-export const LogSegmentKindSchema = z.enum([
-  "added",
-  "updated",
-  "removed",
-  "rating",
-  "favorite",
-  "legacy",
-]);
-
-export const LogSegmentSchema = z.object({
-  kind: LogSegmentKindSchema,
-  title: z.string().describe("Plain-text header of the segment"),
-  status: z.string().optional().describe("Playthrough status"),
-  console: z.string().optional().describe("Platform name"),
-  date: z.string().optional().describe("Finish date, dd.mm.yyyy"),
-  time: z.string().optional().describe("Hours, as stored"),
-  rating: z.number().optional().describe("Rating set by the action"),
-  isRemoval: z.boolean().optional().describe("The action removed something"),
-  html: z.string().describe("Rendered HTML of this segment"),
-});
-
-export const UserLogSchema = UserLogsSchemaZod.omit({ _id: true, date: true });
 export const GetUserLogsSchema = z.object({
   take: z.coerce.number().optional(),
   page: z.coerce.number().optional(),
@@ -45,7 +64,8 @@ export const RemoveUserLogSchema = UserLogsSchemaZod.pick({
 export type IGetUserLogsRequest = z.infer<typeof GetUserLogsSchema>;
 export type IRemoveUserLogRequest = z.infer<typeof RemoveUserLogSchema>;
 export type ILog = z.infer<typeof UserLogsSchemaZod>;
-export type ILogType = z.infer<typeof LogTypeSchema>;
-export type ILogSegmentKind = z.infer<typeof LogSegmentKindSchema>;
-export type ILogSegment = z.infer<typeof LogSegmentSchema>;
-export type IUserLog = z.infer<typeof UserLogSchema>;
+export type ILogChanges = z.infer<typeof LogChangesSchema>;
+export type ILogPlaythrough = z.infer<typeof LogPlaythroughSchema>;
+export type ILogPlaythroughAction = z.infer<typeof LogPlaythroughActionSchema>;
+export type ILogPlaythroughState = z.infer<typeof LogPlaythroughStateSchema>;
+export type ILogRating = z.infer<typeof LogRatingSchema>;

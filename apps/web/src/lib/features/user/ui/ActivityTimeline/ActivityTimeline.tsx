@@ -2,7 +2,12 @@ import { FC, Fragment, ReactNode, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import classNames from "classnames";
-import { IGameResponse, ILogSegment } from "@mooncellar/schemas";
+import {
+  IGameResponse,
+  ILogChanges,
+  ILogPlaythrough,
+  ILogRating,
+} from "@mooncellar/schemas";
 import {
   IUserLogWithGame,
   useUserLogsQuery,
@@ -15,17 +20,17 @@ import { Cover } from "@/src/lib/shared/ui/Cover";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
-import { RichText } from "@/src/lib/shared/ui/RichText";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
-import { StatusBadge, StatusDetails } from "@/src/lib/shared/ui/StatusBadge";
+import { StatusDetails } from "@/src/lib/shared/ui/StatusBadge";
 import { SvgClose, SvgPlay, SvgStar } from "@/src/lib/shared/ui/svg";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import {
-  EMPTY_VALUE,
-  formatHours,
   getDayLabel,
-  getSegmentTone,
+  getLogTone,
+  getPlaythroughDetails,
+  getStatusPhrase,
   getTimeLabel,
+  isStatusChanged,
 } from "./activity.utils";
 import styles from "./ActivityTimeline.module.scss";
 
@@ -34,53 +39,6 @@ interface IActivityTimelineProps {
   isOwner: boolean;
 }
 
-const ADDED_TEMPLATES: Record<string, [string, string]> = {
-  completed: ["Completed", ""],
-  mastered: ["Mastered", ""],
-  played: ["Played", ""],
-  dropped: ["Dropped", ""],
-  playing: ["Started playing", ""],
-  backlog: ["Added", "to the backlog"],
-  wishlist: ["Wishlisted", ""],
-};
-
-const ADDED_SHORT: Record<string, string> = {
-  completed: "Completed",
-  mastered: "Mastered",
-  played: "Played",
-  dropped: "Dropped",
-  playing: "Started playing",
-  backlog: "Added to the backlog",
-  wishlist: "Wishlisted",
-};
-
-const renderDetails = (segment: ILogSegment, isWithStatus: boolean) => {
-  const hours = formatHours(segment.time);
-  const isStatusShown = isWithStatus && !!segment.status;
-  const details = [
-    segment.console &&
-      (segment.console === EMPTY_VALUE
-        ? `Platform ${EMPTY_VALUE}`
-        : segment.console),
-    hours && (hours === EMPTY_VALUE ? `Time ${EMPTY_VALUE}` : hours),
-    segment.date &&
-      (segment.date === EMPTY_VALUE ? `Date ${EMPTY_VALUE}` : segment.date),
-  ];
-
-  if (!isStatusShown && !details.some(Boolean)) return null;
-
-  return (
-    <span className={styles.details}>
-      {isStatusShown && (
-        <StatusBadge status={segment.status}>
-          {segment.status === EMPTY_VALUE ? `Status ${EMPTY_VALUE}` : undefined}
-        </StatusBadge>
-      )}
-      <StatusDetails items={details} />
-    </span>
-  );
-};
-
 const RatingValue: FC<{ value: number }> = ({ value }) => (
   <span className={styles.rating}>
     <SvgStar size="16" fillPercent={100} />
@@ -88,105 +46,117 @@ const RatingValue: FC<{ value: number }> = ({ value }) => (
   </span>
 );
 
-const renderSegment = (
-  segment: ILogSegment,
-  game: IGameResponse,
+const renderPlaythrough = (
+  playthrough: ILogPlaythrough,
+  gameLink: ReactNode,
   isLead: boolean
 ): ReactNode => {
+  const { action, before, after } = playthrough;
+  const phrase =
+    action !== "removed" &&
+    (action === "added" || isStatusChanged(before, after)) &&
+    getStatusPhrase(after);
+  const from = before?.category ?? "playthroughs";
+  const sentence =
+    action === "removed" ? (
+      isLead ? (
+        <>
+          Removed {gameLink} from {from}
+        </>
+      ) : (
+        `Removed from ${from}`
+      )
+    ) : phrase ? (
+      isLead ? (
+        <>
+          {phrase[0]} {gameLink}
+          {phrase[1] && ` ${phrase[1]}`}
+        </>
+      ) : (
+        phrase.filter(Boolean).join(" ")
+      )
+    ) : action === "added" ? (
+      isLead ? (
+        <>Added {gameLink} to playthroughs</>
+      ) : (
+        "Added to playthroughs"
+      )
+    ) : isLead ? (
+      <>Updated {gameLink}</>
+    ) : (
+      "Updated the playthrough"
+    );
+  const details = getPlaythroughDetails(playthrough);
+
+  return (
+    <>
+      <span className={styles.sentence}>{sentence}</span>
+      {details.some(Boolean) && (
+        <span className={styles.details}>
+          <StatusDetails items={details} />
+        </span>
+      )}
+    </>
+  );
+};
+
+const renderRating = (
+  rating: ILogRating,
+  gameLink: ReactNode,
+  isLead: boolean
+): ReactNode => (
+  <span className={styles.sentence}>
+    {rating.value !== null ? (
+      <>
+        {isLead ? <>Rated {gameLink}</> : "Rated"}{" "}
+        <RatingValue value={rating.value} />
+      </>
+    ) : isLead ? (
+      <>Removed rating of {gameLink}</>
+    ) : (
+      "Removed the rating"
+    )}
+  </span>
+);
+
+const renderFavorite = (
+  favorite: boolean,
+  gameLink: ReactNode,
+  isLead: boolean
+): ReactNode => (
+  <span className={styles.sentence}>
+    {favorite ? (
+      isLead ? (
+        <>Put {gameLink} in the top 10</>
+      ) : (
+        "Put in the top 10"
+      )
+    ) : isLead ? (
+      <>Removed {gameLink} from the top 10</>
+    ) : (
+      "Removed from the top 10"
+    )}
+  </span>
+);
+
+const renderLogLines = (log: ILogChanges, game: IGameResponse) => {
   const gameLink = (
     <Link href={`/games/${game.slug}`} className={styles.game}>
       {game.name}
     </Link>
   );
-  const category = segment.status?.trim().toLowerCase() ?? "";
+  const { playthrough, rating, favorite } = log;
+  const lines: ((isLead: boolean) => ReactNode)[] = [];
 
-  switch (segment.kind) {
-    case "added": {
-      const template = ADDED_TEMPLATES[category];
-
-      return (
-        <>
-          <span className={styles.sentence}>
-            {isLead ? (
-              template ? (
-                <>
-                  {template[0]} {gameLink}
-                  {template[1] && ` ${template[1]}`}
-                </>
-              ) : (
-                <>Added {gameLink} to playthroughs</>
-              )
-            ) : (
-              (ADDED_SHORT[category] ?? "Added to playthroughs")
-            )}
-          </span>
-          {renderDetails(segment, false)}
-        </>
-      );
-    }
-    case "updated":
-      return (
-        <>
-          <span className={styles.sentence}>
-            {isLead ? <>Updated {gameLink}</> : "Updated the playthrough"}
-          </span>
-          {renderDetails(segment, true)}
-        </>
-      );
-    case "removed": {
-      const from = segment.status ? category : "playthroughs";
-
-      return (
-        <span className={styles.sentence}>
-          {isLead ? (
-            <>
-              Removed {gameLink} from {from}
-            </>
-          ) : (
-            `Removed from ${from}`
-          )}
-        </span>
-      );
-    }
-    case "rating":
-      return (
-        <span className={styles.sentence}>
-          {segment.rating !== undefined ? (
-            <>
-              {isLead ? <>Rated {gameLink}</> : "Rated"}{" "}
-              <RatingValue value={segment.rating} />
-            </>
-          ) : isLead ? (
-            <>Removed rating of {gameLink}</>
-          ) : (
-            "Removed the rating"
-          )}
-        </span>
-      );
-    case "favorite":
-      return (
-        <span className={styles.sentence}>
-          {segment.isRemoval ? (
-            isLead ? (
-              <>Removed {gameLink} from the top 10</>
-            ) : (
-              "Removed from the top 10"
-            )
-          ) : isLead ? (
-            <>Put {gameLink} in the top 10</>
-          ) : (
-            "Put in the top 10"
-          )}
-        </span>
-      );
-    default:
-      return (
-        <>
-          {isLead && gameLink}
-          <RichText content={segment.html} className={styles.legacy} />
-        </>
-      );
+  if (playthrough) {
+    lines.push((isLead) => renderPlaythrough(playthrough, gameLink, isLead));
   }
+  if (rating) lines.push((isLead) => renderRating(rating, gameLink, isLead));
+  if (favorite !== undefined) {
+    lines.push((isLead) => renderFavorite(favorite, gameLink, isLead));
+  }
+
+  return lines.map((render, index) => render(index === 0));
 };
 
 export const ActivityTimeline: FC<IActivityTimelineProps> = ({
@@ -270,16 +240,9 @@ export const ActivityTimeline: FC<IActivityTimelineProps> = ({
                 const isNewDay =
                   !previous ||
                   getDayLabel(new Date(previous.date), now) !== dayLabel;
-                const segments = log.segments?.length
-                  ? log.segments
-                  : [
-                      {
-                        kind: "legacy",
-                        title: "",
-                        html: log.text,
-                      } satisfies ILogSegment,
-                    ];
-                const [lead, ...rest] = segments;
+                const [lead, ...rest] = renderLogLines(log, log.game);
+
+                if (!lead) return null;
 
                 return (
                   <Fragment key={log._id}>
@@ -291,7 +254,7 @@ export const ActivityTimeline: FC<IActivityTimelineProps> = ({
                     <li
                       className={classNames(
                         styles.entry,
-                        styles[`entry_${getSegmentTone(lead)}`]
+                        styles[`entry_${getLogTone(log)}`]
                       )}
                     >
                       <span className={styles.dot} aria-hidden="true" />
@@ -318,17 +281,17 @@ export const ActivityTimeline: FC<IActivityTimelineProps> = ({
                       </Link>
                       <div className={styles.body}>
                         <div className={styles.line}>
-                          {renderSegment(lead, log.game, true)}
+                          {lead}
                         </div>
-                        {rest.map((segment, segmentIndex) => (
+                        {rest.map((line, lineIndex) => (
                           <div
-                            key={segmentIndex}
+                            key={lineIndex}
                             className={classNames(
                               styles.line,
                               styles.line_secondary
                             )}
                           >
-                            {renderSegment(segment, log.game, false)}
+                            {line}
                           </div>
                         ))}
                       </div>

@@ -55,12 +55,10 @@ export class UserRatingsService {
         gameId: new mongoose.Types.ObjectId(gameId),
       });
       if (userRating) {
-        await this.logsService.createUserLog({
+        await this.logsService.recordUserLog({
           userId,
-          type: "rating",
-          text: `Set rating ${rating}`,
           gameId,
-          segment: "rating",
+          rating: { value: rating, previous: null },
         });
 
         await this.recalculateAverageRating(userRating.gameId);
@@ -75,18 +73,20 @@ export class UserRatingsService {
 
   async updateRating({ rating, _id, userId }: IUpdateUserRatingRequest) {
     try {
+      const previous = await this.userRatings
+        .findById(_id)
+        .select("rating")
+        .lean();
       const userRating = await this.userRatings.findOneAndUpdate(
         { _id },
         { rating },
         { new: true }
       );
       if (userRating) {
-        await this.logsService.createUserLog({
+        await this.logsService.recordUserLog({
           userId,
-          type: "rating",
-          text: `Updated rating to ${rating}`,
           gameId: userRating.gameId.toString(),
-          segment: "rating",
+          rating: { value: rating, previous: previous?.rating ?? null },
         });
 
         await this.recalculateAverageRating(userRating.gameId);
@@ -103,12 +103,10 @@ export class UserRatingsService {
       const userRating = await this.userRatings.findOneAndDelete({ _id });
 
       if (userRating) {
-        await this.logsService.removeUserLogSegment({
+        await this.logsService.recordUserLog({
           userId: userRating.userId.toString(),
           gameId: userRating.gameId.toString(),
-          segment: "rating",
-          fallbackType: "rating",
-          fallbackText: "Removed rating",
+          rating: { value: null, previous: userRating.rating },
         });
 
         await this.recalculateAverageRating(userRating.gameId);

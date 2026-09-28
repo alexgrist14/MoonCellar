@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { type HydratedDocument } from "mongoose";
 import { Game } from "../../games/schemas/game.schema";
-import { type ILogType } from "@mooncellar/schemas";
+import type { ILogPlaythrough, ILogRating } from "@mooncellar/schemas";
 
 export type UserLogsDocument = HydratedDocument<UserLogs>;
 
@@ -9,10 +9,12 @@ export type UserLogsDocument = HydratedDocument<UserLogs>;
 export class UserLogs {
   @Prop()
   date: Date;
-  @Prop({ type: String })
-  type: ILogType;
+  @Prop({ type: Object })
+  playthrough?: ILogPlaythrough;
+  @Prop({ type: Object })
+  rating?: ILogRating;
   @Prop()
-  text: string;
+  favorite?: boolean;
   @Prop({ ref: Game.name })
   gameId: mongoose.Types.ObjectId;
   @Prop({ ref: "User" })

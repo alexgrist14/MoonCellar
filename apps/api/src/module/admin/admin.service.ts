@@ -3,10 +3,16 @@ import { InjectModel } from "@nestjs/mongoose";
 import { type FilterQuery, Model } from "mongoose";
 import { User } from "../user/schemas/user.schema";
 import { UserLogs } from "../user/schemas/user-logs.schema";
+import {
+  isEmptyLog,
+  mergeLogChanges,
+  pickLogChanges,
+  toLogUpdate,
+} from "../user/utils/user-logs.utils";
 import { Rating } from "../user/schemas/user-ratings.schema";
 import { Playthrough } from "../games/schemas/playthroughs.schema";
 import { Game, type GameDocument } from "../games/schemas/game.schema";
-import { type IRole } from "@mooncellar/schemas";
+import { type ILogChanges, type IRole } from "@mooncellar/schemas";
 
 @Injectable()
 export class AdminService {
@@ -145,18 +151,30 @@ export class AdminService {
         const logs = await this.userLogsModel
           .find({ _id: { $in: group.ids } })
           .sort({ date: 1 })
+          .lean()
           .exec();
 
         const [keep, ...duplicates] = logs;
 
         if (!duplicates.length) continue;
 
-        keep.text = logs.map((log) => log.text).join("<br/>");
-        keep.date = logs[logs.length - 1].date;
-        await keep.save();
+        const changes = logs.reduce<ILogChanges>(
+          (merged, log) => mergeLogChanges(merged, pickLogChanges(log)),
+          {}
+        );
+        const removed = isEmptyLog(changes) ? logs : duplicates;
+
+        if (!isEmptyLog(changes)) {
+          const { $set, $unset } = toLogUpdate(changes);
+
+          await this.userLogsModel.updateOne(
+            { _id: keep._id },
+            { $set: { ...$set, date: logs[logs.length - 1].date }, $unset }
+          );
+        }
 
         await this.userLogsModel
-          .deleteMany({ _id: { $in: duplicates.map((log) => log._id) } })
+          .deleteMany({ _id: { $in: removed.map((log) => log._id) } })
           .exec();
 
         mergedGroups += 1;
