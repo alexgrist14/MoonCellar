@@ -6,6 +6,7 @@ import { IAddGameRequest, IGameAiDraftRun } from "@mooncellar/schemas";
 import { useGameAiDraftsQuery } from "@/src/lib/entities/game/api/game.queries";
 import {
   useDeleteGameAiDraftMutation,
+  useRetryGameAiDraftMutation,
   useStartGameAiDraftMutation,
 } from "@/src/lib/entities/game/api/game.mutations";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
@@ -33,6 +34,8 @@ export const AiGameDrafts: FC<IAiGameDraftsProps> = ({
   const { mutate: startDraft, isPending } = useStartGameAiDraftMutation();
   const { mutate: deleteDraft, isPending: isDeleting } =
     useDeleteGameAiDraftMutation();
+  const { mutate: retryDraft, isPending: isRetrying } =
+    useRetryGameAiDraftMutation();
 
   const handleStart = () =>
     startDraft(query.trim(), { onSuccess: () => setQuery("") });
@@ -104,6 +107,14 @@ export const AiGameDrafts: FC<IAiGameDraftsProps> = ({
                   onClick={() => run.draft && onApply(run.draft)}
                 >
                   Apply
+                </Button>
+                <Button
+                  type="button"
+                  color={ButtonColor.DEFAULT}
+                  disabled={run.status === "running" || isRetrying}
+                  onClick={() => retryDraft(run._id)}
+                >
+                  Retry
                 </Button>
                 <Button
                   type="button"

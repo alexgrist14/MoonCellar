@@ -135,6 +135,23 @@ export const useStartGameAiDraftMutation = () => {
   });
 };
 
+export const useRetryGameAiDraftMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) =>
+      gamesApi.retryAiDraft(id).then(({ data }) => data),
+
+    onSuccess: (run) => {
+      queryClient.setQueryData<IGameAiDraftRun[]>(
+        gameQueryKeys.aiDrafts(),
+        (runs) => runs?.map((item) => (item._id === run._id ? run : item))
+      );
+      queryClient.invalidateQueries({ queryKey: gameQueryKeys.aiDrafts() });
+    },
+  });
+};
+
 export const useDeleteGameAiDraftMutation = () => {
   const queryClient = useQueryClient();
 

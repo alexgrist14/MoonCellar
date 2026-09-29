@@ -85,6 +85,10 @@ export const gamesApi = {
     return agent.get<IGameAiDraftRun[]>(`${GAMES_URL}/ai-drafts`);
   },
 
+  retryAiDraft: (id: string) => {
+    return agent.post<IGameAiDraftRun>(`${GAMES_URL}/ai-drafts/${id}/retry`);
+  },
+
   deleteAiDraft: (id: string) => {
     return agent.delete(`${GAMES_URL}/ai-drafts/${id}`);
   },

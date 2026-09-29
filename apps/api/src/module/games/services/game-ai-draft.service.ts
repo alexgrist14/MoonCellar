@@ -8,7 +8,7 @@ import {
   ServiceUnavailableException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { isValidObjectId, type Model } from "mongoose";
+import { isValidObjectId, type Model, type Types } from "mongoose";
 import {
   GAME_STATUSES,
   GAME_TYPES,
@@ -208,33 +208,61 @@ export class GameAiDraftService implements OnModuleInit {
   }
 
   async startRun(query: string) {
-    if (!process.env.OPENAI_API_KEY) {
-      throw new ServiceUnavailableException("OPENAI_API_KEY is not set");
-    }
+    this.assertApiKey();
 
     const run = await this.Drafts.create({ query });
     await this.pruneRuns();
+    this.execute(run._id, query);
+
+    return run.toObject();
+  }
+
+  async retryRun(id: string) {
+    this.assertApiKey();
+
+    const run = isValidObjectId(id)
+      ? await this.Drafts.findOneAndUpdate(
+          { _id: id, status: { $ne: "running" } },
+          { status: "running", steps: [], error: null, draft: null },
+          { new: true }
+        ).lean()
+      : null;
+
+    if (!run) {
+      throw new ConflictException("AI draft run not found or still running");
+    }
+
+    this.execute(run._id, run.query);
+
+    return run;
+  }
+
+  private assertApiKey() {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new ServiceUnavailableException("OPENAI_API_KEY is not set");
+    }
+  }
+
+  private execute(runId: Types.ObjectId, query: string) {
     const addStep = (step: string) =>
       this.Drafts.updateOne(
-        { _id: run._id },
+        { _id: runId },
         { $push: { steps: { $each: [step], $slice: -STEPS_LIMIT } } }
       ).catch((err) => this.logger.error(err, "Failed to save a draft step"));
 
     this.createDraft(query, addStep)
       .then((draft) =>
-        this.Drafts.updateOne({ _id: run._id }, { status: "done", draft })
+        this.Drafts.updateOne({ _id: runId }, { status: "done", draft })
       )
       .catch((err: Error) => {
         this.logger.error(err, `AI draft failed: ${query}`);
 
         return this.Drafts.updateOne(
-          { _id: run._id },
+          { _id: runId },
           { status: "failed", error: err.message }
         );
       })
       .catch((err) => this.logger.error(err, "Failed to save a draft result"));
-
-    return run.toObject();
   }
 
   private async createDraft(

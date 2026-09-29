@@ -245,6 +245,17 @@ export class GamesController {
     return this.gameAiDraft.startRun(dto.query);
   }
 
+  @Post("/ai-drafts/:id/retry")
+  @ApiOperation({ summary: "Run a finished AI game draft again" })
+  @ApiCreatedResponse({ type: GameAiDraftRunDto })
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), RolesGuard)
+  @Roles(RolesEnum.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  async retryAiDraft(@Param("id") id: string) {
+    return this.gameAiDraft.retryRun(id);
+  }
+
   @Delete("/ai-drafts/:id")
   @ApiOperation({ summary: "Delete a finished AI game draft run" })
   @ApiCookieAuth()
