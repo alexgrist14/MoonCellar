@@ -103,6 +103,7 @@ refuses to start rather than fall back to `admin`.
 | `GRAFANA_ADMIN_PASSWORD` | **yes** | Grafana admin password |
 | `PROMETHEUS_DATA_DIR` | no | Host directory bind-mounted as `/prometheus` — `/home/admin/prometheus` on the old host. Seven days of metrics history; losing it is survivable, keeping it is one line |
 | `METRICS_TOKEN` | **yes** | Bearer token Prometheus sends when scraping the API's `/metrics`. Must be byte-identical to the API's own `METRICS_TOKEN`, or every scrape is a 401 |
+| `SEARXNG_SECRET` | **yes** | SearXNG's `server.secret_key` (`openssl rand -hex 32`). `infra/searxng/settings.yml` is committed without it, so the key never lands in git |
 
 `METRICS_TOKEN` is also written to `infra/prometheus/metrics_token`, because a Prometheus
 config file cannot read an environment variable — `prometheus.prod.yml` points

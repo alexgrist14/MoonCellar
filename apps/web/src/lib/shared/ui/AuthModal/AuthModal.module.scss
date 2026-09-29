@@ -60,6 +60,10 @@
         div {
           @include flexCenter;
         }
+
+        &__label_hidden {
+          visibility: hidden;
+        }
       }
     }
   }

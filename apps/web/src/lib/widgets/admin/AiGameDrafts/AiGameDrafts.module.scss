@@ -77,6 +77,13 @@
     word-break: break-all;
   }
 
+  &__actions {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: var(--gap-x3);
+  }
+
   &__status {
     font-size: 12px;
     color: var(--color-neutral-70);

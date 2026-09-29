@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -129,7 +130,14 @@ export const AuthModal: FC = () => {
                 type="submit"
                 disabled={isLoaderShown}
               >
-                {isLoaderShown ? <Loader type="pulse" /> : "Sign up"}
+                {isLoaderShown && <Loader type="pulse" />}
+                <span
+                  className={classNames({
+                    [styles.btn__label_hidden]: isLoaderShown,
+                  })}
+                >
+                  Sign up
+                </span>
               </Button>
               <p>
                 Already have an account?{" "}
@@ -146,7 +154,14 @@ export const AuthModal: FC = () => {
                 type="submit"
                 disabled={isLoaderShown}
               >
-                {isLoaderShown ? <Loader type="pulse" /> : "Sign in"}
+                {isLoaderShown && <Loader type="pulse" />}
+                <span
+                  className={classNames({
+                    [styles.btn__label_hidden]: isLoaderShown,
+                  })}
+                >
+                  Sign in
+                </span>
               </Button>
               <p>
                 Don&apos;t have an account?{" "}

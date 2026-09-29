@@ -83,35 +83,37 @@ export const AiGameDrafts: FC<IAiGameDraftsProps> = ({
                   </ol>
                 </details>
               </div>
-              <span
-                className={classNames(
-                  styles.run__status,
-                  styles[`run__status_${run.status}`]
-                )}
-              >
-                {STATUS_LABELS[run.status]}
-              </span>
-              <Button
-                type="button"
-                color={ButtonColor.DEFAULT}
-                disabled={run.status !== "done" || !run.draft}
-                tooltip={
-                  isReplacing && run.status === "done"
-                    ? "The form will be replaced by the draft"
-                    : undefined
-                }
-                onClick={() => run.draft && onApply(run.draft)}
-              >
-                Apply
-              </Button>
-              <Button
-                type="button"
-                color={ButtonColor.RED}
-                disabled={run.status === "running" || isDeleting}
-                onClick={() => deleteDraft(run._id)}
-              >
-                Delete
-              </Button>
+              <div className={styles.run__actions}>
+                <span
+                  className={classNames(
+                    styles.run__status,
+                    styles[`run__status_${run.status}`]
+                  )}
+                >
+                  {STATUS_LABELS[run.status]}
+                </span>
+                <Button
+                  type="button"
+                  color={ButtonColor.DEFAULT}
+                  disabled={run.status !== "done" || !run.draft}
+                  tooltip={
+                    isReplacing && run.status === "done"
+                      ? "The form will be replaced by the draft"
+                      : undefined
+                  }
+                  onClick={() => run.draft && onApply(run.draft)}
+                >
+                  Apply
+                </Button>
+                <Button
+                  type="button"
+                  color={ButtonColor.RED}
+                  disabled={run.status === "running" || isDeleting}
+                  onClick={() => deleteDraft(run._id)}
+                >
+                  Delete
+                </Button>
+              </div>
             </li>
           ))}
         </ul>

@@ -91,6 +91,8 @@ services:
     image: docker.io/searxng/searxng:latest
     container_name: searxng
     restart: always
+    environment:
+      SEARXNG_SECRET: ${SEARXNG_SECRET:?missing in infra/.env}
     volumes:
       - ./searxng:/etc/searxng:rw
     mem_limit: 256m
