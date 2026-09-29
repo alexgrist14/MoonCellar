@@ -1,0 +1,985 @@
+<title>Profile activity</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* mooncellar-tokens:start */
+/* Generated from apps/web/src/lib/app/styles/vars by
+   `bun --filter web sync:tokens`. Do not edit by hand. */
+:root {
+  /* vars/_colors.scss */
+  --color-neutral-5: #080a0b;
+  --color-neutral-10: #0d1011;
+  --color-neutral-15: #121516;
+  --color-neutral-20: #161b1d;
+  --color-neutral-25: #1a2022;
+  --color-neutral-30: #1f2628;
+  --color-neutral-35: #262d2f;
+  --color-neutral-40: #2f3537;
+  --color-neutral-45: #383e40;
+  --color-neutral-50: #3f4750;
+  --color-neutral-55: #50575d;
+  --color-neutral-60: #5e6a6e;
+  --color-neutral-70: #747d82;
+  --color-neutral-80: #9192a1;
+  --color-neutral-85: #b0b2bc;
+  --color-neutral-90: #d9d9d9;
+  --color-neutral-95: #eaeaea;
+  --color-neutral-100: #ffffff;
+  --color-blue: #3d6bff;
+  --color-blue-light: #00d4ff;
+  --color-cyan: #48cae4;
+  --color-gray: #afb3b9;
+  --color-white: #e8edf5;
+  --color-yellow: #ffc451;
+  --color-yellow-light: #f9f871;
+  --color-orange: #ff8862;
+  --color-pink: #ff4b8f;
+  --color-violet: #9b5de5;
+  --color-green: #2dc653;
+  --color-red: #e5383b;
+  --color-positive: #00c292;
+  --color-negative: #d02729;
+  --color-primary: var(--color-neutral-30);
+  --color-secondary: var(--color-neutral-90);
+  --color-contrast: var(--color-neutral-100);
+  --color-contrast-reverse: var(--color-neutral-5);
+  --color-attention: #ffc451;
+  --color-text-primary: var(--color-neutral-100);
+  --color-text-secondary: var(--color-neutral-90);
+  --color-text-muted: var(--color-neutral-85);
+  --color-accent: #6951ee;
+  --color-bg-primary: #191d24;
+  --color-bg-secondary: #212731;
+  --color-bg-tertiary: #2c3340;
+  --color-bg-accent: #6951ee;
+  --color-bg-hover: #374151;
+  --color-bg-positive: #00c292;
+  --color-bg-primary-tint: #191d24ee;
+  --color-bg-secondary-tint: #212731ee;
+  --color-bg-tertiary-tint: #2c3340ee;
+  --color-bg-accent-tint: #6951eeee;
+  --color-bg-positive-tint: #00c292ee;
+  --color-border-primary: var(--color-neutral-35);
+  --color-scrollbar-track: var(--color-neutral-15);
+  --color-scrollbar-thumb: var(--color-neutral-80);
+  --color-border-secondary: var(--color-neutral-85);
+
+  /* vars/_common.scss */
+  --padding-x05: calc(var(--padding-x1) * 0.5);
+  --padding-x1: 4px;
+  --padding-x2: calc(var(--padding-x1) * 2);
+  --padding-x3: calc(var(--padding-x1) * 3);
+  --padding-x4: calc(var(--padding-x1) * 4);
+  --padding-x5: calc(var(--padding-x1) * 5);
+  --padding-x6: calc(var(--padding-x1) * 6);
+  --padding-x7: calc(var(--padding-x1) * 7);
+  --padding-x8: calc(var(--padding-x1) * 8);
+  --padding-x9: calc(var(--padding-x1) * 9);
+  --padding-x10: calc(var(--padding-x1) * 10);
+  --padding-x11: calc(var(--padding-x1) * 11);
+  --padding-x12: calc(var(--padding-x1) * 12);
+  --padding-x13: calc(var(--padding-x1) * 13);
+  --padding-x14: calc(var(--padding-x1) * 14);
+  --padding-x15: calc(var(--padding-x1) * 15);
+  --padding-x16: calc(var(--padding-x1) * 16);
+  --padding-x17: calc(var(--padding-x1) * 17);
+  --padding-x18: calc(var(--padding-x1) * 18);
+  --padding-x19: calc(var(--padding-x1) * 19);
+  --padding-x20: calc(var(--padding-x1) * 20);
+  --padding-x25: calc(var(--padding-x1) * 25);
+  --radius-x1: 4px;
+  --radius-x2: calc(var(--radius-x1) * 2);
+  --radius-x3: calc(var(--radius-x1) * 3);
+  --radius-x4: calc(var(--radius-x1) * 4);
+  --radius-x5: calc(var(--radius-x1) * 5);
+  --radius-x6: calc(var(--radius-x1) * 6);
+  --radius-x7: calc(var(--radius-x1) * 7);
+  --radius-x8: calc(var(--radius-x1) * 8);
+  --radius-x9: calc(var(--radius-x1) * 9);
+  --radius-x10: calc(var(--radius-x1) * 10);
+  --gap-x05: calc(var(--gap-x1) * 0.5);
+  --gap-x1: 4px;
+  --gap-x2: calc(var(--gap-x1) * 2);
+  --gap-x3: calc(var(--gap-x1) * 3);
+  --gap-x4: calc(var(--gap-x1) * 4);
+  --gap-x5: calc(var(--gap-x1) * 5);
+  --gap-x6: calc(var(--gap-x1) * 6);
+  --gap-x7: calc(var(--gap-x1) * 7);
+  --gap-x8: calc(var(--gap-x1) * 8);
+  --gap-x9: calc(var(--gap-x1) * 9);
+  --gap-x10: calc(var(--gap-x1) * 10);
+  --gap-x11: calc(var(--gap-x1) * 11);
+  --gap-x12: calc(var(--gap-x1) * 12);
+  --blur-x1: 6px;
+  --rich-text-gap: 8px;
+  --duration-instant: 1ms;
+  --duration-fast: 160ms;
+  --duration-base: 280ms;
+  --duration-slow: 400ms;
+  --delay-stagger: 90ms;
+  --easing-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --easing-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --reveal-offset: 12px;
+  --reveal-scale: 0.96;
+  --header-height: 45px;
+  --container-padding-top: calc(var(--header-height) + var(--padding-x3));
+  --container-padding-bottom: var(--padding-x3);
+  --page-height-available: calc(
+    100vh - var(--container-padding-top) - var(--container-padding-bottom)
+  );
+
+  /* vars/_components.scss */
+  --game-completed-color: var(--color-green);
+  --game-dropped-color: var(--color-red);
+  --game-playing-color: var(--color-blue);
+  --game-wishlist-color: var(--color-violet);
+  --game-backlog-color: var(--color-white);
+  --game-played-color: var(--color-cyan);
+  --game-mastered-color: var(--color-yellow);
+  --cover-ratio: 528/704;
+  --shadow-basic: 0px 4px 4px var(--color-neutral-5);
+  --shadow-text: drop-shadow(0 1px 2px var(--color-neutral-5))
+    drop-shadow(0 0 6px var(--color-neutral-5));
+  --glow-accent: 0 0 0.4rem var(--color-accent);
+  --glow-accent-sm: 0 0 0.15rem var(--color-accent);
+  --avatar-size-sm: var(--padding-x6);
+  --navigation-progress-height: 1px;
+  --navigation-progress-z-index: 1002;
+  --bprogress-color: var(--color-accent) !important;
+  --bprogress-height: var(--navigation-progress-height) !important;
+  --bprogress-box-shadow: var(--glow-accent) !important;
+  --bprogress-z-index: var(--navigation-progress-z-index) !important;
+  --modal-text-width: min(720px, calc(100vw - var(--padding-x10)));
+  --rich-editor-image-width: 400px;
+  --playthrough-modal-width: min(80vw, 400px);
+  --playthrough-modal-height: min(70vh, 500px);
+  --playthrough-modal-width-lg: min(88vw, 760px);
+  --playthrough-modal-height-lg: min(86vh, 780px);
+  --games-card-min-width: 180px;
+  --range-track-height: 6px;
+  --range-thumb-size: 20px;
+  --range-thumb-width: 44px;
+  --range-thumb-height: 24px;
+  --scrollbar-horizontal-size: 6px;
+  --scrollbar-arrow-width: 32px;
+  --scrollbar-fade-width: 48px;
+  --game-keywords-collapsed-height: 66px;
+  --game-hero-artwork-height: 300px;
+  --game-hero-artwork-height-sm: 180px;
+  --game-hero-cover-width: 200px;
+  --game-hero-cover-offset: 104px;
+  --game-hero-counters-width: 360px;
+  --game-rating-popover-width: 320px;
+  --popover-width: 320px;
+  --popover-max-height: 320px;
+  --drawer-width: max(20vw, 460px);
+  --drawer-z-index: 5;
+  --expandable-scroll-height: 132px;
+  --expandable-fade-height: 32px;
+  --date-picker-width: 300px;
+  --date-picker-field-min-width: 140px;
+  --date-picker-cell-size: 34px;
+  --date-picker-arrow-size: 28px;
+  --emoji-picker-width: 328px;
+  --emoji-picker-cell-size: 34px;
+  --emoji-picker-group-size: 28px;
+  --emoji-picker-grid-height: 238px;
+  --game-hero-scrim: linear-gradient(
+    180deg,
+    #191d248c 0%,
+    #191d2400 30%,
+    #212731d1 72%,
+    var(--color-bg-secondary) 100%
+  );
+  --spoiler-blur: 7px;
+  --community-avatar-size: 36px;
+  --community-reply-avatar-size: 28px;
+  --community-review-clamp-height: 132px;
+  --community-distribution-height: 8px;
+  --community-distribution-min-width: 240px;
+  --community-dot-size: 7px;
+  --community-empty-text-width: 240px;
+  --community-loading-height: 96px;
+  --user-review-card-width: 170px;
+  --user-review-card-width-sm: 140px;
+  --user-review-rating-filter-width: 260px;
+  --vndb-review-height: max(360px, calc(100vh - 420px));
+  --vndb-cover-width: 120px;
+  --vndb-search-width: 320px;
+  --vndb-candidate-cover-width: 64px;
+  --empty-state-image-size: 180px;
+  --not-found-image-height: 240px;
+  --not-found-backdrop-size: 400px;
+  --not-found-content-width: 420px;
+  --favorite-color: var(--color-pink);
+  --game-controls-icon-size: 24px;
+  --game-controls-icon-size-sm: 20px;
+  --game-controls-badge-size: 15px;
+  --top-ten-cover-width: 44px;
+  --list-card-row-mosaic-size: 44px;
+  --list-card-count-height: 20px;
+  --list-search-width: 320px;
+  --list-row-cover-width: 40px;
+  --profile-hero-height: 168px;
+  --profile-avatar-size: 112px;
+  --profile-avatar-size-sm: 72px;
+  --activity-cover-width: 80px;
+  --activity-entry-min-width: 300px;
+  --people-avatar-size: 22px;
+  --character-card-width: 128px;
+  --character-card-width-sm: 104px;
+  --character-profile-portrait-width: 200px;
+  --image-picker-thumb-width: 160px;
+  --game-images-modal-width: min(92vw, 960px);
+  --requests-queue-width: 440px;
+  --list-sort-width: 280px;
+  --field-control-height: 40px;
+  --gauntlet-mode-cards-width: 300px;
+  --gauntlet-winner-cover-width: 132px;
+  --gauntlet-winner-cover-width-mobile: 220px;
+  --gauntlet-wheel-max-width: 50vw;
+  --gauntlet-fact-label-width: 110px;
+  --object-field-min-width: 160px;
+  --requests-panel-min-height: 240px;
+  --requests-diff-min-width: 560px;
+  --search-modal-width: 900px;
+  --search-tab-height: 36px;
+}
+/* mooncellar-tokens:end */
+
+  :root {
+    --mock-ui: "Hanken Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mock-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --mock-ground: var(--color-neutral-10);
+    --mock-hairline: var(--color-neutral-30);
+    --mock-accent-text: color-mix(in srgb, var(--color-accent) 55%, var(--color-neutral-100));
+    --mock-row-hover: color-mix(in srgb, var(--color-bg-tertiary) 55%, transparent);
+    --mock-cover-sm: 32px;
+    --mock-cover-md: 40px;
+    --mock-cover-lg: 48px;
+    --mock-phone: 375px;
+    --mock-day-rail: 104px;
+    --mock-time-col: 48px;
+    --mock-icon-btn: 28px;
+    --mock-strip-item: 128px;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--mock-ground);
+    color: var(--color-text-primary);
+    font-family: var(--mock-ui);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; }
+
+  .shell {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding-inline: var(--padding-x6);
+    padding-block: var(--padding-x14) var(--padding-x20);
+  }
+
+  @media (max-width: 520px) {
+    .shell {
+      padding-inline: var(--padding-x4);
+      padding-block: var(--padding-x9) var(--padding-x14);
+    }
+  }
+
+  h1, h2, h3, p { margin: 0; }
+  h1, h2 { text-wrap: balance; }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+  }
+
+  .masthead { display: flex; flex-direction: column; gap: var(--gap-x4); }
+  .masthead h1 { font-size: 34px; line-height: 1.15; font-weight: 700; letter-spacing: -0.5px; }
+  .lede { color: var(--color-text-secondary); max-width: 66ch; }
+
+  .problems { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--gap-x3); margin-top: var(--padding-x8); }
+  .problem { padding: var(--padding-x3) var(--padding-x4); border-radius: var(--radius-x4); background: var(--color-bg-secondary); font-size: 13px; color: var(--color-text-muted); }
+  .problem b { display: block; font-size: 14px; color: var(--color-text-primary); margin-bottom: 2px; }
+
+  .variant { margin-top: var(--padding-x14); display: flex; flex-direction: column; gap: var(--gap-x4); }
+  .variant__head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--gap-x3); }
+  .variant__title { display: flex; flex-direction: column; gap: var(--gap-x1); max-width: 64ch; }
+  .variant__title h2 { font-size: 22px; line-height: 1.25; font-weight: 700; }
+  .variant__title p { font-size: 14px; color: var(--color-text-muted); }
+  .tag { font-family: var(--mock-mono); font-size: 12px; color: var(--color-yellow); }
+
+  .controls { display: flex; flex-wrap: wrap; gap: var(--gap-x2); }
+  .seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: var(--radius-x4); background: var(--color-bg-tertiary); }
+  .seg button { border: 0; background: transparent; color: var(--color-text-muted); height: 28px; padding: 0 var(--padding-x3); border-radius: var(--radius-x3); font-size: 13px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--color-bg-accent); color: var(--color-text-primary); }
+
+  .pros { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--gap-x2) var(--gap-x6); font-size: 13px; color: var(--color-text-muted); }
+  .pros ul { margin: 0; padding-left: var(--padding-x4); }
+  .pros h3 { font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-gray); margin-bottom: var(--gap-x1); }
+
+  .box {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x5);
+    padding: var(--padding-x5);
+    width: 100%;
+    margin-inline: auto;
+    container-type: inline-size;
+    transition: max-width var(--duration-base) var(--easing-out);
+  }
+
+  .box.is-phone { max-width: var(--mock-phone); padding: var(--padding-x4); }
+
+  .stitle { font-size: 18px; font-weight: 600; line-height: 1.3; margin-bottom: var(--gap-x4); }
+
+  .cover {
+    display: block;
+    flex-shrink: 0;
+    width: var(--mock-cover-w, var(--mock-cover-md));
+    aspect-ratio: var(--cover-ratio);
+    border-radius: var(--radius-x2);
+    background:
+      linear-gradient(155deg,
+        color-mix(in srgb, var(--mock-art, var(--color-accent)) 78%, var(--color-neutral-5)) 0%,
+        color-mix(in srgb, var(--mock-art, var(--color-accent)) 28%, var(--color-neutral-10)) 70%,
+        var(--color-neutral-10) 100%);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-neutral-100) 8%, transparent);
+  }
+
+  .tone-completed { --mock-tone: var(--game-completed-color); }
+  .tone-playing { --mock-tone: var(--game-playing-color); }
+  .tone-mastered { --mock-tone: var(--game-mastered-color); }
+  .tone-played { --mock-tone: var(--game-played-color); }
+  .tone-wishlist { --mock-tone: var(--game-wishlist-color); }
+  .tone-backlog { --mock-tone: var(--game-backlog-color); }
+  .tone-dropped { --mock-tone: var(--game-dropped-color); }
+  .tone-favorite { --mock-tone: var(--favorite-color); }
+  .tone-accent { --mock-tone: var(--color-accent); }
+  .tone-removed { --mock-tone: var(--color-gray); }
+
+  .sentence { font-size: 14px; line-height: 20px; color: var(--color-text-secondary); overflow-wrap: anywhere; }
+  .sentence--secondary { font-size: 13px; color: var(--color-text-muted); }
+  .game { font-weight: 600; color: var(--color-text-primary); transition: color var(--duration-fast) var(--easing-out); }
+  .game:hover { color: var(--mock-accent-text); }
+  .details { font-size: 12px; line-height: 20px; color: var(--color-text-muted); font-variant-numeric: tabular-nums; }
+  .rating { display: inline-flex; align-items: center; gap: 3px; font-weight: 600; color: var(--color-text-primary); vertical-align: top; }
+  .rating svg { width: 14px; height: 14px; color: var(--color-yellow); }
+  .time { font-size: 12px; line-height: 20px; color: var(--color-text-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .tdot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--mock-tone); flex-shrink: 0; }
+
+  .icon-btn {
+    width: var(--mock-icon-btn);
+    height: var(--mock-icon-btn);
+    border: 0;
+    border-radius: var(--radius-x3);
+    background: transparent;
+    color: var(--color-text-muted);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition:
+      opacity var(--duration-fast) var(--easing-out),
+      background-color var(--duration-fast) var(--easing-out),
+      color var(--duration-fast) var(--easing-out);
+  }
+
+  .icon-btn svg { width: 14px; height: 14px; }
+  .icon-btn:hover, .icon-btn:focus-visible { background: var(--color-bg-hover); color: var(--color-text-primary); }
+  .icon-btn--danger:hover, .icon-btn--danger:focus-visible { color: var(--color-negative); }
+
+  .btn-sm { height: 26px; padding: 0 var(--padding-x2); border: 0; border-radius: var(--radius-x2); font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .btn-sm--danger { background: var(--color-negative); color: var(--color-neutral-100); }
+  .btn-sm--ghost { background: var(--color-bg-tertiary); color: var(--color-text-secondary); }
+
+  .box:not(.is-owner) .owner-only { display: none !important; }
+
+  .pager { display: flex; justify-content: center; margin-top: var(--gap-x4); }
+  .pager span { display: inline-flex; gap: 2px; background: var(--color-bg-tertiary); border-radius: var(--radius-x4); padding: 3px; }
+  .pager b { min-width: 28px; height: 26px; border-radius: var(--radius-x3); display: grid; place-items: center; font-family: var(--mock-mono); font-size: 12px; font-weight: 400; color: var(--color-text-muted); }
+  .pager b:first-child { background: var(--color-bg-accent); color: var(--color-text-primary); }
+
+  .v-now .timeline { position: relative; display: flex; flex-direction: column; gap: var(--gap-x4); padding: 0 0 0 var(--padding-x7); margin: 0; list-style: none; }
+  .v-now .timeline::before { content: ""; position: absolute; left: calc((var(--activity-dot-size) - 2px) / 2); top: var(--padding-x2); bottom: var(--padding-x2); width: 2px; border-radius: var(--radius-x1); background: var(--color-border-primary); }
+  .v-now .day { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-muted); }
+  .v-now .day:not(:first-child) { padding-top: var(--padding-x2); }
+  .v-now .entry { position: relative; display: grid; grid-template-columns: var(--activity-cover-width) minmax(0, 1fr) auto; gap: var(--gap-x3); align-items: start; }
+  .v-now .entry .cover { --mock-cover-w: var(--activity-cover-width); }
+  .v-now .dot { position: absolute; top: var(--padding-x1); left: calc(-1 * var(--padding-x7)); width: var(--activity-dot-size); height: var(--activity-dot-size); border-radius: 50%; background: var(--mock-tone); box-shadow: 0 0 0 3px var(--color-bg-primary); }
+  .v-now .body { display: flex; flex-direction: column; gap: var(--gap-x1); min-width: 0; }
+  .v-now .side { display: flex; align-items: center; gap: var(--gap-x1); }
+  .v-now .del { opacity: 0; }
+  .v-now .entry:hover .del, .v-now .del:focus-visible { opacity: 1; }
+  @media (hover: none) { .v-now .del { opacity: 1; } }
+  @container (max-width: 520px) {
+    .v-now .entry { grid-template-columns: var(--activity-cover-width) minmax(0, 1fr); }
+    .v-now .side { grid-column: 2; }
+  }
+
+  .v-a .feed { display: flex; flex-direction: column; }
+  .v-a .day { display: flex; align-items: center; gap: var(--gap-x3); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-gray); padding: var(--padding-x4) 0 var(--padding-x1); }
+  .v-a .day::after { content: ""; flex: 1; height: 1px; background: var(--color-border-primary); }
+  .v-a .day:first-child { padding-top: 0; }
+  .v-a .row {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--mock-cover-md) minmax(0, 1fr) auto;
+    gap: var(--gap-x3);
+    align-items: center;
+    padding: var(--padding-x2);
+    margin-inline: calc(-1 * var(--padding-x2));
+    border-radius: var(--radius-x3);
+    transition: background-color var(--duration-fast) var(--easing-out);
+  }
+  .v-a .row:hover, .v-a .row:focus-within { background: var(--mock-row-hover); }
+  .v-a .row .cover { --mock-cover-w: var(--mock-cover-md); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-neutral-100) 8%, transparent), -3px 0 0 0 var(--mock-tone); }
+  .v-a .body { display: flex; flex-direction: column; min-width: 0; }
+  .v-a .lead { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: var(--gap-x2); }
+  .v-a .meta { display: flex; align-items: center; gap: var(--gap-x1); }
+  .v-a .del { opacity: 0; }
+  .v-a .row:hover .del, .v-a .row:focus-within .del { opacity: 1; }
+  @media (hover: none) { .v-a .del { opacity: 1; } }
+  .v-a .confirm { display: none; align-items: center; gap: var(--gap-x2); font-size: 12px; color: var(--color-text-muted); }
+  .v-a .row.is-confirming { background: color-mix(in srgb, var(--color-negative) 10%, transparent); }
+  .v-a .row.is-confirming .meta { display: none; }
+  .v-a .row.is-confirming .confirm { display: flex; }
+  @container (max-width: 520px) {
+    .v-a .row { grid-template-columns: var(--mock-cover-md) minmax(0, 1fr) auto; align-items: start; }
+    .v-a .meta .time { display: none; }
+    .v-a .body .time-inline { display: block; }
+    .v-a .confirm span { display: none; }
+  }
+  .v-a .time-inline { display: none; }
+
+  .v-b .day { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-gray); margin: var(--padding-x4) 0 var(--padding-x2); }
+  .v-b .day:first-child { margin-top: 0; }
+  .v-b .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--gap-x2); }
+  .v-b .card {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--mock-cover-lg) minmax(0, 1fr);
+    gap: var(--gap-x3);
+    padding: var(--padding-x2);
+    padding-right: calc(var(--mock-icon-btn) + var(--padding-x2));
+    border-radius: var(--radius-x4);
+    background: var(--color-bg-secondary);
+    border: 1px solid transparent;
+    transition: border-color var(--duration-fast) var(--easing-out);
+  }
+  .v-b .card:hover { border-color: var(--color-border-primary); }
+  .v-b .card .cover { --mock-cover-w: var(--mock-cover-lg); }
+  .v-b .body { display: flex; flex-direction: column; min-width: 0; }
+  .v-b .top { display: flex; align-items: center; gap: var(--gap-x2); }
+  .v-b .more { position: absolute; top: var(--padding-x1); right: var(--padding-x1); }
+  .v-b .menu {
+    position: absolute;
+    top: calc(var(--padding-x1) + var(--mock-icon-btn) + 4px);
+    right: var(--padding-x1);
+    z-index: 2;
+    display: none;
+    flex-direction: column;
+    min-width: 160px;
+    padding: var(--padding-x1);
+    border-radius: var(--radius-x3);
+    background: var(--color-bg-tertiary);
+    box-shadow: var(--shadow-basic);
+  }
+  .v-b .card.is-open .menu { display: flex; }
+  .v-b .card.is-open { z-index: 2; border-color: var(--color-border-primary); }
+  .v-b .menu button { display: flex; align-items: center; gap: var(--gap-x2); height: 32px; padding: 0 var(--padding-x2); border: 0; border-radius: var(--radius-x2); background: transparent; color: var(--color-text-secondary); font-size: 13px; text-align: left; cursor: pointer; }
+  .v-b .menu button:hover { background: var(--color-bg-hover); }
+  .v-b .menu button svg { width: 14px; height: 14px; }
+  .v-b .menu .danger { color: var(--color-negative); }
+  @container (max-width: 520px) { .v-b .cards { grid-template-columns: minmax(0, 1fr); } }
+
+  .v-c .group { display: grid; grid-template-columns: var(--mock-day-rail) minmax(0, 1fr); gap: var(--gap-x4); padding-block: var(--padding-x3); border-top: 1px solid var(--color-border-primary); }
+  .v-c .group:first-child { border-top: 0; padding-top: 0; }
+  .v-c .rail { display: flex; flex-direction: column; gap: 2px; padding-top: var(--padding-x1); }
+  .v-c .rail b { font-size: 13px; font-weight: 600; line-height: 20px; }
+  .v-c .rail span { font-size: 12px; color: var(--color-text-muted); }
+  .v-c .rows { display: flex; flex-direction: column; gap: 2px; }
+  .v-c .row {
+    display: grid;
+    grid-template-columns: var(--mock-time-col) var(--mock-cover-sm) minmax(0, 1fr) var(--mock-icon-btn);
+    gap: var(--gap-x3);
+    align-items: center;
+    padding: var(--padding-x1) var(--padding-x2);
+    border-radius: var(--radius-x3);
+    transition: background-color var(--duration-fast) var(--easing-out), opacity var(--duration-base) var(--easing-out);
+  }
+  .box:not(.is-owner) .v-c .row { grid-template-columns: var(--mock-time-col) var(--mock-cover-sm) minmax(0, 1fr); }
+  .v-c .row:hover, .v-c .row:focus-within { background: var(--mock-row-hover); }
+  .v-c .row .cover { --mock-cover-w: var(--mock-cover-sm); border-radius: var(--radius-x1); }
+  .v-c .time { font-family: var(--mock-mono); font-size: 11px; }
+  .v-c .body { display: flex; flex-direction: column; min-width: 0; }
+  .v-c .lead { display: block; }
+  .v-c .lead .tdot { margin-right: var(--gap-x2); vertical-align: 1px; }
+  .v-c .lead .details { margin-left: var(--gap-x2); }
+  .v-c .del { opacity: 0; }
+  .v-c .row:hover .del, .v-c .row:focus-within .del { opacity: 1; }
+  @media (hover: none) { .v-c .del { opacity: 1; } }
+  .v-c .undo { display: none; grid-column: 1 / -1; align-items: center; justify-content: space-between; gap: var(--gap-x3); min-height: calc(var(--mock-cover-sm) * 4 / 3); font-size: 13px; color: var(--color-text-muted); }
+  .v-c .undo button { border: 0; background: none; color: var(--mock-accent-text); font-weight: 600; font-size: 13px; cursor: pointer; }
+  .v-c .row.is-removed > :not(.undo) { display: none; }
+  .v-c .row.is-removed .undo { display: flex; }
+  .v-c .row.is-removed { background: var(--color-bg-secondary); }
+  @container (max-width: 520px) {
+    .v-c .group { grid-template-columns: minmax(0, 1fr); gap: var(--gap-x2); }
+    .v-c .rail { flex-direction: row; align-items: baseline; gap: var(--gap-x2); padding: 0; }
+    .v-c .row, .box:not(.is-owner) .v-c .row { grid-template-columns: var(--mock-cover-sm) minmax(0, 1fr) auto; padding-inline: 0; }
+    .v-c .row > .time { display: none; }
+    .v-c .time-inline { display: inline; }
+  }
+  .v-c .time-inline { display: none; margin-left: var(--gap-x1); font-family: var(--mock-mono); font-size: 11px; color: var(--color-text-muted); }
+
+  .round { margin-top: var(--padding-x14); display: flex; flex-direction: column; gap: var(--gap-x2); padding-top: var(--padding-x8); border-top: 1px solid var(--mock-hairline); }
+  .round h2 { font-size: 26px; line-height: 1.2; font-weight: 700; }
+  .round p { font-size: 14px; color: var(--color-text-muted); max-width: 66ch; }
+
+  .chip { display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 var(--padding-x2); border-radius: var(--radius-x2); font-size: 12px; font-weight: 600; white-space: nowrap; color: color-mix(in srgb, var(--mock-tone) 62%, var(--color-neutral-100)); background: color-mix(in srgb, var(--mock-tone) 16%, transparent); }
+  .chip svg { width: 12px; height: 12px; }
+  .kv { display: inline-flex; align-items: center; height: 20px; padding: 0 var(--padding-x2); border-radius: var(--radius-x2); font-size: 12px; color: var(--color-text-muted); background: var(--color-bg-tertiary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .kvs { display: flex; flex-wrap: wrap; gap: var(--gap-x1); }
+  .title { font-size: 15px; font-weight: 600; line-height: 20px; color: var(--color-text-primary); overflow-wrap: anywhere; }
+  .title:hover { color: var(--mock-accent-text); }
+  .daylabel { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-gray); margin: var(--padding-x5) 0 var(--padding-x3); }
+  .daylabel:first-child { margin-top: 0; }
+  .daylabel span { margin-left: var(--gap-x2); letter-spacing: 0; text-transform: none; font-weight: 400; color: var(--color-text-muted); }
+
+  .cover-del {
+    position: absolute;
+    top: var(--padding-x1);
+    right: var(--padding-x1);
+    z-index: 1;
+    width: var(--mock-icon-btn);
+    height: var(--mock-icon-btn);
+    border: 0;
+    border-radius: 50%;
+    background: var(--color-bg-primary-tint);
+    color: var(--color-text-secondary);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--easing-out), color var(--duration-fast) var(--easing-out);
+  }
+  .cover-del svg { width: 11px; height: 11px; }
+  .cover-del:hover, .cover-del:focus-visible { color: var(--color-negative); }
+  :is(.v-d .tile, .v-f .item):is(:hover, :focus-within) .cover-del { opacity: 1; }
+  @media (hover: none) { .cover-del { opacity: 1; } }
+  .cover-wrap { position: relative; display: block; }
+
+  .v-d .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: var(--gap-x5) var(--gap-x3); }
+  .v-d .daycell { display: flex; flex-direction: column; justify-content: end; gap: 2px; aspect-ratio: var(--cover-ratio); padding: var(--padding-x3); border-radius: var(--radius-x3); border: 1px dashed var(--color-border-primary); }
+  .v-d .daycell b { font-size: 18px; line-height: 1.2; font-weight: 700; text-wrap: balance; }
+  .v-d .daycell span { font-size: 12px; color: var(--color-text-muted); }
+  .v-d .tile { display: flex; flex-direction: column; gap: var(--gap-x2); min-width: 0; }
+  .v-d .tile .cover { --mock-cover-w: 100%; border-radius: var(--radius-x3); }
+  .v-d .tile .title { font-size: 13px; line-height: 18px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .v-d .foot { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-x2); }
+  .v-d .extra { font-size: 12px; line-height: 16px; color: var(--color-text-muted); }
+  @container (max-width: 520px) { .v-d .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap-x4) var(--gap-x2); } .v-d .foot { flex-direction: column; align-items: start; gap: 2px; } .v-d .daycell { padding: var(--padding-x2); } .v-d .daycell b { font-size: 14px; } }
+
+  .v-e .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--gap-x3); }
+  .v-e .card { position: relative; display: grid; grid-template-columns: var(--activity-cover-width) minmax(0, 1fr); gap: var(--gap-x3); padding: var(--padding-x3); border-radius: var(--radius-x4); background: var(--color-bg-secondary); }
+  .v-e .card .cover { --mock-cover-w: var(--activity-cover-width); }
+  .v-e .body { display: flex; flex-direction: column; gap: var(--gap-x2); min-width: 0; }
+  :is(.v-e, .v-f) .top .time { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .v-e .top { display: flex; align-items: center; gap: var(--gap-x2); padding-right: var(--mock-icon-btn); }
+  .v-e .del { position: absolute; top: var(--padding-x2); right: var(--padding-x2); }
+  .v-e .secondary { display: flex; flex-direction: column; gap: 2px; margin-top: auto; }
+  @container (max-width: 520px) { .v-e .cards { grid-template-columns: minmax(0, 1fr); } }
+
+  .v-f .group { display: grid; grid-template-columns: var(--mock-day-rail) minmax(0, 1fr); gap: var(--gap-x4); padding-block: var(--padding-x4); border-top: 1px solid var(--color-border-primary); }
+  .v-f .group:first-child { padding-top: 0; border-top: 0; }
+  .v-f .rail { display: flex; flex-direction: column; gap: 2px; }
+  .v-f .rail b { font-size: 14px; font-weight: 600; line-height: 20px; }
+  .v-f .rail span { font-size: 12px; color: var(--color-text-muted); }
+  .v-f .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-x3); }
+  .v-f .card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .v-f .card { position: relative; display: grid; grid-template-columns: var(--activity-cover-width) minmax(0, 1fr); gap: var(--gap-x3); padding: var(--padding-x3); border-radius: var(--radius-x4); background: var(--color-bg-secondary); }
+  .v-f .card .cover { --mock-cover-w: var(--activity-cover-width); }
+  .v-f .body { display: flex; flex-direction: column; gap: var(--gap-x2); min-width: 0; }
+  .v-f .top { display: flex; align-items: center; gap: var(--gap-x2); padding-right: var(--mock-icon-btn); }
+  .v-f .del { position: absolute; top: var(--padding-x2); right: var(--padding-x2); }
+  @container (max-width: 760px) { .v-f .cards { grid-template-columns: minmax(0, 1fr); } }
+  @container (max-width: 520px) { .v-f .group { grid-template-columns: minmax(0, 1fr); gap: var(--gap-x2); } .v-f .rail { flex-direction: row; align-items: baseline; gap: var(--gap-x2); } }
+
+  .v-g .list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); column-gap: var(--gap-x6); }
+  @container (max-width: 640px) { .v-g .list { grid-template-columns: minmax(0, 1fr); } }
+  .v-g .entry { display: grid; grid-template-columns: var(--activity-cover-width) minmax(0, 1fr); gap: var(--gap-x4); padding-block: var(--padding-x3); border-bottom: 1px solid color-mix(in srgb, var(--color-border-primary) 60%, transparent); }
+  .v-g .entry .cover { --mock-cover-w: var(--activity-cover-width); }
+  .v-g .body { display: flex; flex-direction: column; gap: var(--gap-x2); min-width: 0; }
+  .v-g .head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap-x1) var(--gap-x2); }
+  .v-g .head .title { font-size: 16px; }
+  .v-g .foot { display: flex; align-items: center; gap: var(--gap-x2); margin-top: auto; font-size: 12px; color: var(--color-text-muted); }
+  .v-g .foot .sep { color: var(--color-border-primary); }
+  .v-g .textdel { padding: 0; border: 0; background: none; font: inherit; color: var(--color-text-muted); cursor: pointer; }
+  .v-g .textdel:hover, .v-g .textdel:focus-visible { color: var(--color-negative); text-decoration: underline; }
+
+  .note {
+    margin-top: var(--padding-x14);
+    font-size: 13px;
+    color: var(--color-gray);
+    border-left: 2px solid var(--color-border-primary);
+    padding-left: var(--padding-x3);
+  }
+
+  code.t { font-family: var(--mock-mono); font-size: 12px; color: var(--color-yellow); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: var(--duration-instant) !important; }
+  }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-close" viewBox="0 0 384 512"><path fill="currentColor" d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path fill="currentColor" d="M10.92 2.868a1.25 1.25 0 0 1 2.16 0l2.795 4.798l5.428 1.176a1.25 1.25 0 0 1 .667 2.054l-3.7 4.141l.56 5.525a1.25 1.25 0 0 1-1.748 1.27L12 19.592l-5.082 2.24a1.25 1.25 0 0 1-1.748-1.27l.56-5.525l-3.7-4.14a1.25 1.25 0 0 1 .667-2.055l5.428-1.176z"/></symbol>
+  <symbol id="i-more" viewBox="0 0 16 16"><path fill="currentColor" d="M3 9.5a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></symbol>
+</svg>
+
+<div class="shell">
+  <header class="masthead">
+    <p class="eyebrow">MoonCellar · profile activity</p>
+    <h1>Profile activity</h1>
+    <p class="lede">
+      The Activity section at the bottom of a profile. Several layouts that cut the empty space of
+      the current timeline and put the delete action next to the entry it removes. Every frame
+      can be switched to phone width and to a visitor's view, where delete is not rendered.
+    </p>
+  </header>
+
+  <div class="problems">
+    <p class="problem"><b>A tall row for one line of text</b>The 80&nbsp;px cover is 107&nbsp;px high, while most entries are a single 20&nbsp;px sentence — four fifths of each row is empty.</p>
+    <p class="problem"><b>Delete lives at the far edge</b>Time and × sit in their own column at the right of a wide panel, detached from the sentence, and × is invisible until hover.</p>
+    <p class="problem"><b>Deleting costs a modal</b>A confirmation dialog for a low-stakes action, then a success toast on top.</p>
+  </div>
+
+  <section class="variant">
+    <div class="variant__head">
+      <div class="variant__title">
+        <span class="tag">Now</span>
+        <h2>Current timeline</h2>
+        <p>For reference: the layout as it ships, with the same entries as the proposals below.</p>
+      </div>
+      <div class="controls" data-controls></div>
+    </div>
+    <div class="box is-owner"><h3 class="stitle">Activity</h3><div class="v-now" data-render="now"></div></div>
+  </section>
+
+  <div class="round">
+    <p class="eyebrow">Round 2 · full-size covers</p>
+    <h2>Keep the 80&nbsp;px cover, fill the row</h2>
+    <p>The covers stay the size they are today. Instead of shrinking the row, these options use the whole width of the panel: the entries flow into a grid or columns, and the text is structured to fill the cover's height.</p>
+  </div>
+
+  <section class="variant">
+    <div class="variant__head">
+      <div class="variant__title">
+        <span class="tag">D</span>
+        <h2>Cover grid</h2>
+        <p>The cover is the entry, and the grid runs continuously across days. A day is a cell of its own, the size of a cover, so a new day never starts a half-empty row. Delete is a round × on the cover's corner.</p>
+      </div>
+      <div class="controls" data-controls></div>
+    </div>
+    <div class="box is-owner"><h3 class="stitle">Activity</h3><div class="v-d" data-render="d"></div></div>
+    <div class="pros">
+      <div><h3>Gains</h3><ul><li>Every row is full: day cells and tiles flow together.</li><li>Six to seven entries per row on desktop, three on a phone.</li><li>× sits on the thing it deletes.</li></ul></div>
+      <div><h3>Costs</h3><ul><li>Platform and hours do not fit a tile and are left out.</li><li>Chronology reads left to right, like a gallery.</li></ul></div>
+    </div>
+  </section>
+
+  <section class="variant">
+    <div class="variant__head">
+      <div class="variant__title">
+        <span class="tag">E</span>
+        <h2>Structured cards</h2>
+        <p>Cards in a continuous grid of two or three columns, without day breaks: the day moves into the time label (Yesterday, 22:14). The text is split into a status chip, the game name as a title, and platform, hours and date as chips, so it is about as tall as the cover. Delete is a × in the card's top right corner.</p>
+      </div>
+      <div class="controls" data-controls></div>
+    </div>
+    <div class="box is-owner"><h3 class="stitle">Activity</h3><div class="v-e" data-render="e"></div></div>
+    <div class="pros">
+      <div><h3>Gains</h3><ul><li>No row is left half-empty, because days no longer break the grid.</li><li>The cover height is filled with content.</li><li>× is at a fixed spot on every card and always visible.</li></ul></div>
+      <div><h3>Costs</h3><ul><li>Days are harder to scan without headers.</li><li>Entries with a single fact (Wishlist) still leave some room inside the card.</li></ul></div>
+    </div>
+  </section>
+
+  <section class="variant">
+    <div class="variant__head">
+      <div class="variant__title">
+        <span class="tag">F</span>
+        <h2>Day rail with cards</h2>
+        <p>Days in a left rail, the entries of each day as cards in two columns to the right of it. An odd last card spans both columns, so each day block closes flush with the right edge.</p>
+      </div>
+      <div class="controls" data-controls></div>
+    </div>
+    <div class="box is-owner"><h3 class="stitle">Activity</h3><div class="v-f" data-render="f"></div></div>
+    <div class="pros">
+      <div><h3>Gains</h3><ul><li>Day grouping stays, and each day block fills the width.</li><li>The rail labels the day once, whatever the number of entries.</li></ul></div>
+      <div><h3>Costs</h3><ul><li>A day with one entry becomes a single wide card with room inside it.</li><li>Below about 760&nbsp;px the cards fall back to one column.</li></ul></div>
+    </div>
+  </section>
+
+  <section class="variant">
+    <div class="variant__head">
+      <div class="variant__title">
+        <span class="tag">G</span>
+        <h2>Headline entries</h2>
+        <p>Entries laid out like small articles in a continuous grid of two or three columns, without card backgrounds. The game name is a headline with the status chip, details are chips, and a footer with the day, time and a Delete text link lines up with the cover's bottom edge.</p>
+      </div>
+      <div class="controls" data-controls></div>
+    </div>
+    <div class="box is-owner"><h3 class="stitle">Activity</h3><div class="v-g" data-render="g"></div></div>
+    <div class="pros">
+      <div><h3>Gains</h3><ul><li>The grid runs across days, so every row is full.</li><li>Lighter than E: hairlines instead of filled cards.</li><li>Delete is a labelled action next to the time, clearly tied to its entry.</li></ul></div>
+      <div><h3>Costs</h3><ul><li>The tallest entries of this round, about 120&nbsp;px each.</li><li>A labelled Delete on every entry adds visual noise for the owner.</li></ul></div>
+    </div>
+  </section>
+
+  <div class="round">
+    <p class="eyebrow">Round 1 · compact</p>
+    <h2>Earlier options</h2>
+    <p>The first set shrinks the covers to save height.</p>
+  </div>
+
+  <section class="variant">
+    <div class="variant__head">
+      <div class="variant__title">
+        <span class="tag">A</span>
+        <h2>Compact rows</h2>
+        <p>The smallest step from today. A 40&nbsp;px cover carries the status as a coloured edge, the row is one hover target, and time and delete sit together at its end. Delete asks for confirmation inside the row.</p>
+      </div>
+      <div class="controls" data-controls></div>
+    </div>
+    <div class="box is-owner"><h3 class="stitle">Activity</h3><div class="v-a" data-render="a"></div></div>
+    <div class="pros">
+      <div><h3>Gains</h3><ul><li>Row height drops from ~107&nbsp;px to ~56&nbsp;px; a page of 20 fits in about one screen.</li><li>Hover lights the whole row, so × clearly belongs to it.</li><li>No modal: Delete / Cancel replace the time in place.</li></ul></div>
+      <div><h3>Costs</h3><ul><li>The vertical timeline line and dots go away.</li><li>On a wide panel the row is still long; time and × stay at the right edge, only closer through the hover band.</li></ul></div>
+    </div>
+  </section>
+
+  <section class="variant">
+    <div class="variant__head">
+      <div class="variant__title">
+        <span class="tag">B</span>
+        <h2>Two-column cards</h2>
+        <p>Each entry is a small card, two or three per row depending on the panel width, which uses the width instead of stretching one line across it. Delete moves into a ⋯ menu in the card's corner, next to room for later actions.</p>
+      </div>
+      <div class="controls" data-controls></div>
+    </div>
+    <div class="box is-owner"><h3 class="stitle">Activity</h3><div class="v-b" data-render="b"></div></div>
+    <div class="pros">
+      <div><h3>Gains</h3><ul><li>Half the height of A on desktop.</li><li>The menu is always visible, so delete is discoverable on touch and with a mouse alike.</li><li>The menu can take "Open game" or "Copy link" later without new layout.</li></ul></div>
+      <div><h3>Costs</h3><ul><li>Two columns read left-to-right, then down — chronology is less obvious than in a single list.</li><li>A menu is one extra click before Delete.</li></ul></div>
+    </div>
+  </section>
+
+  <section class="variant">
+    <div class="variant__head">
+      <div class="variant__title">
+        <span class="tag">C</span>
+        <h2>Day rail</h2>
+        <p>The densest option. Days move into a left rail, time becomes a fixed column, covers shrink to 32&nbsp;px. Delete has a reserved slot at the row end and removes immediately with an Undo in place of the row.</p>
+      </div>
+      <div class="controls" data-controls></div>
+    </div>
+    <div class="box is-owner"><h3 class="stitle">Activity</h3><div class="v-c" data-render="c"></div></div>
+    <div class="pros">
+      <div><h3>Gains</h3><ul><li>Rows of ~44&nbsp;px, and day headers stop costing a line of their own.</li><li>Fixed time and delete columns line up down the whole page — nothing floats at a random distance.</li><li>Undo instead of confirm: one click to delete, one to take it back.</li></ul></div>
+      <div><h3>Costs</h3><ul><li>Undo needs the delete to be deferred until the row is dismissed or the page changes.</li><li>32&nbsp;px covers are hard to recognise; the game name carries the row.</li></ul></div>
+    </div>
+  </section>
+
+  <p class="note">
+    Colours, spacing and radii are the project's own tokens: the <code class="t">:root</code>
+    block above is generated from <code class="t">apps/web/src/lib/app/styles/vars</code> by
+    <code class="t">bun --filter web sync:tokens</code>. Names prefixed <code class="t">--mock-</code>
+    exist only in this proposal. The typeface is substituted — Hanken Grotesk stands in for
+    ApercuPro, whose licensed file cannot be served from a third-party host. Sentences follow
+    <code class="t">ActivityTimeline</code>: the first line names the game, the following lines of
+    the same log drop it.
+  </p>
+</div>
+
+<script>
+  const DAYS = [
+    { label: "Today", sub: "29 September", entries: [
+      { game: "Hades", art: "var(--color-negative)", tone: "completed", chip: "Completed", lead: ["Completed", ""], details: "PC · 42 h · 29.09.2026", more: [{ text: "Rated", rating: 9 }], time: "2 hours ago", clock: "14:02" },
+      { game: "Tunic", art: "var(--color-yellow)", tone: "wishlist", chip: "Wishlist", lead: ["Wishlisted", ""], time: "5 hours ago", clock: "11:15" },
+    ]},
+    { label: "Yesterday", short: "Yesterday", sub: "28 September", entries: [
+      { game: "Outer Wilds", art: "var(--color-orange)", tone: "favorite", chip: "Top 10", lead: ["Put", "in the top 10"], time: "22:14", clock: "22:14" },
+      { game: "Signalis", art: "var(--color-violet)", tone: "dropped", chip: "Dropped", lead: ["Dropped", ""], details: "PC · 6 h", more: [{ text: "Wrote a review" }], time: "19:02", clock: "19:02" },
+      { game: "Elden Ring", art: "var(--color-neutral-60)", tone: "playing", chip: "Playing", lead: ["Started playing", ""], details: "PS5", time: "10:47", clock: "10:47" },
+    ]},
+    { label: "14 September", short: "14 Sep", sub: "Sunday", entries: [
+      { game: "Pentiment", art: "var(--color-yellow-light)", tone: "mastered", chip: "Mastered", lead: ["Completed and mastered", ""], details: "Switch · 21 h · 14.09.2026", time: "11:40", clock: "11:40" },
+      { game: "Celeste", art: "var(--color-blue-light)", tone: "accent", chip: "Rated", chipRating: 8, lead: ["Rated", ""], rating: 8, time: "09:05", clock: "09:05" },
+      { game: "Hollow Knight", art: "var(--color-blue)", tone: "completed", chip: "Updated", lead: ["Updated", ""], details: "38 h", time: "08:30", clock: "08:30" },
+      { game: "Disco Elysium", art: "var(--color-pink)", tone: "removed", chip: "Removed", lead: ["Removed", "from backlog"], time: "08:12", clock: "08:12" },
+    ]},
+  ];
+
+  const icon = (id) => `<svg aria-hidden="true"><use href="#i-${id}"/></svg>`;
+  const cover = (e) => `<a href="#" class="cover" style="--mock-art: ${e.art}" tabindex="-1" aria-hidden="true"></a>`;
+  const rating = (v) => `<span class="rating">${icon("star")}${v}</span>`;
+  const lead = (e) => `<span class="sentence">${e.lead[0]} <a href="#" class="game">${e.game}</a>${e.lead[1] ? " " + e.lead[1] : ""}${e.rating ? " " + rating(e.rating) : ""}</span>`;
+  const details = (e) => e.details ? `<span class="details">${e.details}</span>` : "";
+  const more = (e) => (e.more || []).map((m) => `<span class="sentence sentence--secondary">${m.text}${m.rating ? " " + rating(m.rating) : ""}</span>`).join("");
+  const del = (cls = "") => `<button type="button" class="icon-btn icon-btn--danger del owner-only ${cls}" aria-label="Delete log entry">${icon("close")}</button>`;
+  const chip = (e) => `<span class="chip tone-${e.tone}">${e.chip}${e.chipRating ? ` ${icon("star")}${e.chipRating}` : ""}</span>`;
+  const kvs = (e) => e.details ? `<div class="kvs">${e.details.split(" · ").map((d) => `<span class="kv">${d}</span>`).join("")}</div>` : "";
+  const title = (e) => `<a href="#" class="title">${e.game}</a>`;
+  const coverDel = (e) => `<span class="cover-wrap">${cover(e)}<button type="button" class="cover-del owner-only js-drop" aria-label="Delete log entry">${icon("close")}</button></span>`;
+  const extraLine = (e) => (e.more || []).map((m) => `${m.text}${m.rating ? " " + m.rating : ""}`).join(" · ");
+  const tileBody = (e) => `${title(e)}<div class="foot">${chip(e)}<time class="time">${e.time}</time></div>${extraLine(e) ? `<span class="extra">${extraLine(e)}</span>` : ""}`;
+  const when = (d, e) => d.label === "Today" ? e.time : `${d.short}, ${e.clock}`;
+  const count = (d) => `${d.entries.length} ${d.entries.length === 1 ? "entry" : "entries"}`;
+  const pager = `<div class="pager"><span><b>1</b><b>2</b><b>3</b></span></div>`;
+
+  const renderers = {
+    d: () => `<div class="grid">${DAYS.map((d) => `<div class="daycell"><b>${d.label}</b><span>${d.label === d.sub ? "" : d.sub + " · "}${count(d)}</span></div>${d.entries.map((e) => `
+      <article class="tile tone-${e.tone}">${coverDel(e)}${tileBody(e)}</article>`).join("")}`).join("")}</div>` + pager,
+
+    e: () => `<div class="cards">${DAYS.map((d) => d.entries.map((e) => `
+      <article class="card tone-${e.tone}">
+        ${cover(e)}
+        <div class="body">
+          <div class="top">${chip(e)}<time class="time">${when(d, e)}</time></div>
+          ${title(e)}
+          ${kvs(e)}
+          ${(e.more || []).length ? `<div class="secondary">${more(e)}</div>` : ""}
+        </div>
+        ${del("js-drop")}
+      </article>`).join("")).join("")}</div>` + pager,
+
+    f: () => DAYS.map((d) => `<div class="group"><div class="rail"><b>${d.label}</b><span>${d.sub}</span></div><div class="cards">${d.entries.map((e) => `
+      <article class="card tone-${e.tone}">
+        ${cover(e)}
+        <div class="body">
+          <div class="top">${chip(e)}<time class="time">${e.clock}</time></div>
+          ${title(e)}
+          ${kvs(e)}
+          ${more(e)}
+        </div>
+        ${del("js-drop")}
+      </article>`).join("")}</div></div>`).join("") + pager,
+
+    g: () => `<div class="list">${DAYS.map((d) => d.entries.map((e) => `
+      <article class="entry tone-${e.tone}">
+        ${cover(e)}
+        <div class="body">
+          <div class="head">${title(e)}${chip(e)}</div>
+          ${kvs(e)}
+          ${more(e)}
+          <div class="foot"><time class="time">${when(d, e)}</time><span class="sep owner-only">·</span><button type="button" class="textdel owner-only js-drop">Delete</button></div>
+        </div>
+      </article>`).join("")).join("")}</div>` + pager,
+
+    now: () => `<ol class="timeline">${DAYS.map((d) => `<li class="day">${d.label}</li>${d.entries.map((e) => `
+      <li class="entry tone-${e.tone}">
+        <span class="dot"></span>
+        ${cover(e)}
+        <div class="body"><div>${lead(e)} ${details(e)}</div>${(e.more || []).length ? `<div>${more(e)}</div>` : ""}</div>
+        <div class="side"><time class="time">${e.time}</time>${del()}</div>
+      </li>`).join("")}`).join("")}</ol>${pager}`,
+
+    a: () => `<div class="feed">${DAYS.map((d) => `<p class="day">${d.label}</p>${d.entries.map((e) => `
+      <article class="row tone-${e.tone}">
+        ${cover(e)}
+        <div class="body">
+          <div class="lead">${lead(e)}${details(e)}</div>
+          ${more(e)}
+          <time class="time time-inline">${e.time}</time>
+        </div>
+        <div class="meta"><time class="time">${e.time}</time>${del("js-ask")}</div>
+        <div class="confirm owner-only"><span>Delete this entry?</span><button type="button" class="btn-sm btn-sm--danger js-yes">Delete</button><button type="button" class="btn-sm btn-sm--ghost js-no">Cancel</button></div>
+      </article>`).join("")}`).join("")}</div>${pager}`,
+
+    b: () => DAYS.map((d) => `<p class="day">${d.label}</p><div class="cards">${d.entries.map((e) => `
+      <article class="card tone-${e.tone}">
+        ${cover(e)}
+        <div class="body">
+          <div class="top"><i class="tdot"></i><time class="time">${e.time}</time></div>
+          ${lead(e)}
+          ${details(e)}
+          ${more(e)}
+        </div>
+        <button type="button" class="icon-btn more owner-only js-menu" aria-label="Entry actions" aria-haspopup="menu">${icon("more")}</button>
+        <div class="menu owner-only" role="menu">
+          <button type="button" role="menuitem">${icon("link")}Open game</button>
+          <button type="button" role="menuitem" class="danger js-remove">${icon("trash")}Delete entry</button>
+        </div>
+      </article>`).join("")}</div>`).join("") + pager,
+
+    c: () => DAYS.map((d) => `
+      <div class="group">
+        <div class="rail"><b>${d.label}</b><span>${d.sub}</span></div>
+        <div class="rows">${d.entries.map((e) => `
+          <article class="row tone-${e.tone}">
+            <time class="time">${e.clock}</time>
+            ${cover(e)}
+            <div class="body">
+              <div class="lead"><i class="tdot"></i>${lead(e)}${details(e)}<time class="time-inline">${e.clock}</time></div>
+              ${more(e)}
+            </div>
+            ${del("js-remove")}
+            <div class="undo"><span>Entry deleted</span><button type="button" class="js-undo">Undo</button></div>
+          </article>`).join("")}
+        </div>
+      </div>`).join("") + pager,
+  };
+
+  document.querySelectorAll("[data-render]").forEach((el) => { el.innerHTML = renderers[el.dataset.render](); });
+
+  document.querySelectorAll(".variant").forEach((variant) => {
+    const box = variant.querySelector(".box");
+    const controls = variant.querySelector("[data-controls]");
+    const seg = (options, apply) => {
+      const wrap = document.createElement("div");
+      wrap.className = "seg";
+      options.forEach(([label, value], i) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.textContent = label;
+        b.setAttribute("aria-pressed", String(i === 0));
+        b.addEventListener("click", () => {
+          wrap.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+          apply(value);
+        });
+        wrap.appendChild(b);
+      });
+      controls.appendChild(wrap);
+    };
+    seg([["Desktop", false], ["Phone", true]], (v) => box.classList.toggle("is-phone", v));
+    seg([["Owner", true], ["Visitor", false]], (v) => box.classList.toggle("is-owner", v));
+  });
+
+  document.addEventListener("click", (event) => {
+    const t = event.target.closest("button");
+    document.querySelectorAll(".v-b .card.is-open").forEach((c) => { if (!t || !c.contains(t)) c.classList.remove("is-open"); });
+    if (!t) return;
+    const row = t.closest(".row, .card, article");
+    if (t.classList.contains("js-ask")) row.classList.add("is-confirming");
+    if (t.classList.contains("js-no")) row.classList.remove("is-confirming");
+    if (t.classList.contains("js-yes")) row.remove();
+    if (t.classList.contains("js-menu")) row.classList.toggle("is-open");
+    if (t.classList.contains("js-remove") && row.classList.contains("card")) row.remove();
+    if (t.classList.contains("js-remove") && row.classList.contains("row")) row.classList.add("is-removed");
+    if (t.classList.contains("js-undo")) row.classList.remove("is-removed");
+    if (t.classList.contains("js-drop")) t.closest("article").remove();
+  });
+</script>

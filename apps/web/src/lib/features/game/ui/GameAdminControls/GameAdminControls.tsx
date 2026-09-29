@@ -31,6 +31,7 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
   const [isParsingVndb, setIsParsingVndb] = useState(false);
   const [hltbId, setHltbId] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isRevalidating, setIsRevalidating] = useState(false);
 
   if (!isAdmin) return null;
 
@@ -112,6 +113,23 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
     }
   };
 
+  const handleRevalidate = async () => {
+    setIsRevalidating(true);
+
+    try {
+      await revalidateGamePage(game.slug);
+      toast.success({ title: "Page cache cleared", description: game.name });
+      router.refresh();
+    } catch {
+      toast.error({
+        title: "Failed to clear the page cache",
+        description: game.name,
+      });
+    } finally {
+      setIsRevalidating(false);
+    }
+  };
+
   const handleCopyId = async () => {
     try {
       await navigator.clipboard.writeText(game._id);
@@ -170,6 +188,13 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
           onClick={() => router.push(`/admin/games/${game._id}`)}
         >
           Edit game
+        </Button>
+        <Button
+          color={ButtonColor.DEFAULT}
+          disabled={isRevalidating}
+          onClick={handleRevalidate}
+        >
+          {isRevalidating ? "Revalidating…" : "Revalidate page"}
         </Button>
         {!!(game.artworks?.length || game.screenshots?.length) && (
           <Button

@@ -177,6 +177,12 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   which prefixes the folder — never build a `Bucket`/`Key` pair anywhere else. The one exception is
   the standalone `mcp/game-adder`, which runs outside Nest's DI; it takes the bucket, folders and
   CDN from the same `src/shared/s3`, so the two cannot drift apart.
+- **`mcp/game-adder` runs `sharp` in a `node` subprocess, never in its own Bun process.** Under
+  Bun 1.4 the first `sharp(...)` call (even `.metadata()`) never resolves on the dev machine, while
+  the same call under Node answers in milliseconds, so an in-process call hangs `create_game` with
+  no error. The server also does not rely on `ffprobe`/`ffmpeg`: they were missing locally, and the
+  upload code silently skipped the cover and every artwork, which left the external URLs in the
+  game and made `next/image` fail the game page with 500 on an unconfigured host.
 - **A client-supplied `bucketName` must pass `resolveS3Folder` before it reaches `FileService`.**
   With one bucket the name is only a key prefix, so an empty or unknown value addresses the root:
   `DELETE /file/clear-bucket?bucketName=` would wipe every folder at once, and the unauthenticated

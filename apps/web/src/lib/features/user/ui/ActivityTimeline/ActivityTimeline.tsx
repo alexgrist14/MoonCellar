@@ -1,4 +1,4 @@
-import { FC, Fragment, ReactNode, useRef, useState } from "react";
+import { FC, ReactNode, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import classNames from "classnames";
@@ -15,20 +15,16 @@ import {
 import { useRemoveUserLogMutation } from "@/src/lib/entities/user/api/user.mutations";
 import { takeLogs } from "@/src/lib/shared/constants/user.const";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
-import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal/ConfirmModal";
 import { Cover } from "@/src/lib/shared/ui/Cover";
 import { Loader } from "@/src/lib/shared/ui/Loader";
-import { modal } from "@/src/lib/shared/ui/Modal";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
-import { StatusDetails } from "@/src/lib/shared/ui/StatusBadge";
-import { SvgClose, SvgPlay, SvgStar } from "@/src/lib/shared/ui/svg";
+import { SvgPlay, SvgStar } from "@/src/lib/shared/ui/svg";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import {
-  getDayLabel,
   getLogTone,
   getPlaythroughDetails,
-  getStatusPhrase,
+  getStatusLabel,
   getTimeLabel,
   isReviewAdded,
   isStatusChanged,
@@ -40,6 +36,8 @@ interface IActivityTimelineProps {
   isOwner: boolean;
 }
 
+const UNDO_DELAY_MS = 5000;
+
 const RatingValue: FC<{ value: number }> = ({ value }) => (
   <span className={styles.rating}>
     <SvgStar size="16" fillPercent={100} />
@@ -47,133 +45,55 @@ const RatingValue: FC<{ value: number }> = ({ value }) => (
   </span>
 );
 
-const renderPlaythrough = (
-  playthrough: ILogPlaythrough,
-  gameLink: ReactNode,
-  isLead: boolean
-): ReactNode => {
-  const { action, before, after } = playthrough;
-  const phrase =
-    action !== "removed" &&
-    (action === "added" || isStatusChanged(before, after)) &&
-    getStatusPhrase(after);
-  const from = before?.category ?? "playthroughs";
-  const sentence =
-    action === "removed" ? (
-      isLead ? (
-        <>
-          Removed {gameLink} from {from}
-        </>
-      ) : (
-        `Removed from ${from}`
-      )
-    ) : phrase ? (
-      isLead ? (
-        <>
-          {phrase[0]} {gameLink}
-          {phrase[1] && ` ${phrase[1]}`}
-        </>
-      ) : (
-        phrase.filter(Boolean).join(" ")
-      )
-    ) : action === "added" ? (
-      isLead ? (
-        <>Added {gameLink} to playthroughs</>
-      ) : (
-        "Added to playthroughs"
-      )
-    ) : isLead ? (
-      <>Updated {gameLink}</>
-    ) : (
-      "Updated the playthrough"
-    );
-  const details = getPlaythroughDetails(playthrough);
+const getStatusChange = ({ action, before, after }: ILogPlaythrough) =>
+  action !== "removed" && (action === "added" || isStatusChanged(before, after))
+    ? getStatusLabel(after)
+    : undefined;
 
-  return (
+const getPlaythroughSentence = ({ action, before }: ILogPlaythrough) =>
+  action === "removed"
+    ? `Removed from ${before?.category ?? "playthroughs"}`
+    : action === "added"
+      ? "Added to playthroughs"
+      : "Updated the playthrough";
+
+const getRatingSentence = ({ value }: ILogRating): ReactNode =>
+  value !== null ? (
     <>
-      <span className={styles.sentence}>{sentence}</span>
-      {details.some(Boolean) && (
-        <span className={styles.details}>
-          <StatusDetails items={details} />
-        </span>
-      )}
+      Rated <RatingValue value={value} />
     </>
+  ) : (
+    "Removed the rating"
   );
-};
 
-const renderReview = (gameLink: ReactNode, isLead: boolean): ReactNode => (
-  <span className={styles.sentence}>
-    {isLead ? <>Reviewed {gameLink}</> : "Wrote a review"}
-  </span>
-);
-
-const renderRating = (
-  rating: ILogRating,
-  gameLink: ReactNode,
-  isLead: boolean
-): ReactNode => (
-  <span className={styles.sentence}>
-    {rating.value !== null ? (
-      <>
-        {isLead ? <>Rated {gameLink}</> : "Rated"}{" "}
-        <RatingValue value={rating.value} />
-      </>
-    ) : isLead ? (
-      <>Removed rating of {gameLink}</>
-    ) : (
-      "Removed the rating"
-    )}
-  </span>
-);
-
-const renderFavorite = (
-  favorite: boolean,
-  gameLink: ReactNode,
-  isLead: boolean
-): ReactNode => (
-  <span className={styles.sentence}>
-    {favorite ? (
-      isLead ? (
-        <>Put {gameLink} in the top 10</>
-      ) : (
-        "Put in the top 10"
+const getLogContent = ({ playthrough, rating, favorite }: ILogChanges) => {
+  const lines: ReactNode[] = [];
+  const status = playthrough && getStatusChange(playthrough);
+  const details = playthrough
+    ? getPlaythroughDetails(playthrough).filter(
+        (detail): detail is string => !!detail
       )
-    ) : isLead ? (
-      <>Removed {gameLink} from the top 10</>
-    ) : (
-      "Removed from the top 10"
-    )}
-  </span>
-);
-
-const renderLogLines = (log: ILogChanges, game: IGameResponse) => {
-  const gameLink = (
-    <Link href={`/games/${game.slug}`} className={styles.game}>
-      {game.name}
-    </Link>
-  );
-  const { playthrough, rating, favorite } = log;
-  const lines: ((isLead: boolean) => ReactNode)[] = [];
+    : [];
 
   if (playthrough) {
     const hasReview = isReviewAdded(playthrough);
     const isOnlyReview =
       hasReview &&
       playthrough.action === "updated" &&
-      !isStatusChanged(playthrough.before, playthrough.after) &&
-      !getPlaythroughDetails(playthrough).some(Boolean);
+      !status &&
+      !details.length;
 
-    if (!isOnlyReview) {
-      lines.push((isLead) => renderPlaythrough(playthrough, gameLink, isLead));
+    if (!status && !isOnlyReview) {
+      lines.push(getPlaythroughSentence(playthrough));
     }
-    if (hasReview) lines.push((isLead) => renderReview(gameLink, isLead));
+    if (hasReview) lines.push("Wrote a review");
   }
-  if (rating) lines.push((isLead) => renderRating(rating, gameLink, isLead));
+  if (rating) lines.push(getRatingSentence(rating));
   if (favorite !== undefined) {
-    lines.push((isLead) => renderFavorite(favorite, gameLink, isLead));
+    lines.push(favorite ? "Put in the top 10" : "Removed from the top 10");
   }
 
-  return lines.map((render, index) => render(index === 0));
+  return { status, details, lines };
 };
 
 export const ActivityTimeline: FC<IActivityTimelineProps> = ({
@@ -197,28 +117,44 @@ export const ActivityTimeline: FC<IActivityTimelineProps> = ({
   const total = data?.total ?? 0;
   const now = new Date();
 
-  const handleDelete = (logId: string) => {
-    const modalId = `delete-log-${logId}`;
+  const [pendingIds, setPendingIds] = useState<string[]>([]);
+  const timersRef = useRef(new Map<string, ReturnType<typeof setTimeout>>());
 
-    modal.open(
-      <ConfirmModal
-        title="Delete Log"
-        message="Are you sure you want to delete this log entry?"
-        onConfirm={() =>
-          removeLog(
-            { userId, _id: logId },
-            {
-              onSuccess: () => {
-                modal.close(modalId);
-                toast.success({ description: "Log deleted successfully" });
-              },
-            }
-          )
-        }
-        onCancel={() => modal.close(modalId)}
-      />,
-      { id: modalId }
+  useEffect(() => {
+    const timers = timersRef.current;
+
+    return () => {
+      timers.forEach((timer, logId) => {
+        clearTimeout(timer);
+        removeLog({ userId, _id: logId });
+      });
+      timers.clear();
+    };
+  }, [removeLog, userId]);
+
+  const handleDelete = (logId: string) => {
+    setPendingIds((ids) => [...ids, logId]);
+    timersRef.current.set(
+      logId,
+      setTimeout(() => {
+        timersRef.current.delete(logId);
+        removeLog(
+          { userId, _id: logId },
+          {
+            onError: () => {
+              setPendingIds((ids) => ids.filter((id) => id !== logId));
+              toast.error({ description: "Could not delete the entry" });
+            },
+          }
+        );
+      }, UNDO_DELAY_MS)
     );
+  };
+
+  const handleUndo = (logId: string) => {
+    clearTimeout(timersRef.current.get(logId));
+    timersRef.current.delete(logId);
+    setPendingIds((ids) => ids.filter((id) => id !== logId));
   };
 
   return (
@@ -249,86 +185,96 @@ export const ActivityTimeline: FC<IActivityTimelineProps> = ({
         )}
         {!isLogsLoading && !!logs.length && (
           <>
-            <ol className={styles.timeline}>
-              {logs.map((log, index) => {
-                const date = new Date(log.date);
-                const dayLabel = getDayLabel(date, now);
-                const previous = logs[index - 1];
-                const isNewDay =
-                  !previous ||
-                  getDayLabel(new Date(previous.date), now) !== dayLabel;
-                const [lead, ...rest] = renderLogLines(log, log.game);
+            <ol className={styles.grid}>
+              {logs.map((log) => {
+                const { status, details, lines } = getLogContent(log);
 
-                if (!lead) return null;
+                if (pendingIds.includes(log._id)) {
+                  return (
+                    <li key={log._id} className={styles.removed} role="status">
+                      <span>Entry deleted</span>
+                      <button
+                        type="button"
+                        className={styles.removed__undo}
+                        onClick={() => handleUndo(log._id)}
+                      >
+                        Undo
+                      </button>
+                    </li>
+                  );
+                }
 
                 return (
-                  <Fragment key={log._id}>
-                    {isNewDay && (
-                      <li className={styles.day} aria-hidden="true">
-                        {dayLabel}
-                      </li>
+                  <li
+                    key={log._id}
+                    className={classNames(
+                      styles.entry,
+                      styles[`entry_${getLogTone(log)}`]
                     )}
-                    <li
-                      className={classNames(
-                        styles.entry,
-                        styles[`entry_${getLogTone(log)}`]
-                      )}
+                  >
+                    <Link
+                      href={`/games/${log.game.slug}`}
+                      className={styles.cover}
+                      tabIndex={-1}
+                      aria-hidden="true"
                     >
-                      <span className={styles.dot} aria-hidden="true" />
-                      <Link
-                        href={`/games/${log.game.slug}`}
-                        className={styles.cover}
-                        tabIndex={-1}
-                        aria-hidden="true"
-                      >
-                        {log.game.cover ? (
-                          <Image
-                            src={log.game.cover}
-                            alt=""
-                            fill
-                            sizes="160px"
-                            className={styles.cover__image}
-                          />
-                        ) : (
-                          <Cover
-                            isWithoutText
-                            className={styles.cover__image}
-                          />
+                      {log.game.cover ? (
+                        <Image
+                          src={log.game.cover}
+                          alt=""
+                          fill
+                          sizes="160px"
+                          className={styles.cover__image}
+                        />
+                      ) : (
+                        <Cover isWithoutText className={styles.cover__image} />
+                      )}
+                    </Link>
+                    <div className={styles.content}>
+                      <div className={styles.head}>
+                        <Link
+                          href={`/games/${log.game.slug}`}
+                          className={styles.title}
+                        >
+                          {log.game.name}
+                        </Link>
+                        {status && (
+                          <span className={styles.status}>{status}</span>
                         )}
-                      </Link>
-                      <div className={styles.body}>
-                        <div className={styles.line}>
-                          {lead}
-                        </div>
-                        {rest.map((line, lineIndex) => (
-                          <div
-                            key={lineIndex}
-                            className={classNames(
-                              styles.line,
-                              styles.line_secondary
-                            )}
-                          >
-                            {line}
-                          </div>
-                        ))}
                       </div>
-                      <div className={styles.side}>
-                        <time className={styles.time} dateTime={log.date}>
-                          {getTimeLabel(date, now)}
+                      {!!details.length && (
+                        <div className={styles.details}>
+                          {details.map((detail) => (
+                            <span key={detail} className={styles.detail}>
+                              {detail}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      {lines.map((line, index) => (
+                        <span key={index} className={styles.line}>
+                          {line}
+                        </span>
+                      ))}
+                      <div className={styles.foot}>
+                        <time dateTime={log.date}>
+                          {getTimeLabel(new Date(log.date), now)}
                         </time>
                         {isOwner && (
-                          <button
-                            type="button"
-                            className={styles.delete}
-                            aria-label="Delete log entry"
-                            onClick={() => handleDelete(log._id)}
-                          >
-                            <SvgClose size="12" style={{ color: "inherit" }} />
-                          </button>
+                          <>
+                            <span aria-hidden="true">·</span>
+                            <button
+                              type="button"
+                              className={styles.delete}
+                              onClick={() => handleDelete(log._id)}
+                            >
+                              Delete
+                            </button>
+                          </>
                         )}
                       </div>
-                    </li>
-                  </Fragment>
+                    </div>
+                  </li>
                 );
               })}
             </ol>

@@ -12,9 +12,6 @@ import {
 } from "@aws-sdk/client-s3";
 import { randomBytes } from "crypto";
 import { spawnSync } from "child_process";
-import { writeFileSync, readFileSync, unlinkSync } from "fs";
-import { tmpdir } from "os";
-import { join } from "path";
 import { AddGameRequestSchema } from "@mooncellar/schemas";
 import {
   getS3Bucket,
@@ -80,96 +77,80 @@ const cropPositionToOffsetPercent = (position: CropPosition): number => {
   return position === "left" ? 0 : position === "right" ? 100 : 50;
 };
 
-const getImageDimensions = (filePath: string): { width: number; height: number } => {
-  const result = spawnSync("ffprobe", [
-    "-v",
-    "error",
-    "-select_streams",
-    "v:0",
-    "-show_entries",
-    "stream=width,height",
-    "-of",
-    "csv=p=0",
-    filePath,
-  ]);
-  const [width, height] = result.stdout.toString().trim().split(",").map(Number);
-  return { width, height };
+const SHARP_SCRIPT = `
+const chunks = [];
+process.stdin.on("data", (c) => chunks.push(c));
+process.stdin.on("end", async () => {
+  const sharp = require("sharp");
+  const input = Buffer.concat(chunks);
+  const crop = JSON.parse(process.argv[1]);
+  if (!crop) {
+    const { width = 0, height = 0 } = await sharp(input).metadata();
+    process.stdout.write(JSON.stringify({ width, height }));
+  } else {
+    process.stdout.write(await sharp(input).extract(crop).jpeg({ quality: 92 }).toBuffer());
+  }
+});
+`;
+
+const runSharpInNode = (
+  bytes: Buffer,
+  crop: { left: number; top: number; width: number; height: number } | null
+): Buffer => {
+  const result = spawnSync("node", ["-e", SHARP_SCRIPT, JSON.stringify(crop)], {
+    input: bytes,
+    cwd: __dirname,
+    maxBuffer: 200 * 1024 * 1024,
+    timeout: 60_000,
+  });
+  if (result.status !== 0) {
+    throw new Error(`sharp failed: ${result.stderr?.toString() || result.error}`);
+  }
+  return result.stdout;
 };
+
+const getImageDimensions = (bytes: Buffer): { width: number; height: number } =>
+  JSON.parse(runSharpInNode(bytes, null).toString());
 
 const checkRemoteImageAspectRatio = async (
   url: string
 ): Promise<{ width: number; height: number; ratio: number } | null> => {
-  const tmpIn = join(tmpdir(), `dims-${randomBytes(6).toString("hex")}.img`);
   try {
     const res = await fetch(url);
     if (!res.ok) return null;
-    writeFileSync(tmpIn, Buffer.from(await res.arrayBuffer()));
-    const { width, height } = getImageDimensions(tmpIn);
+    const { width, height } = getImageDimensions(
+      Buffer.from(await res.arrayBuffer())
+    );
     if (!width || !height) return null;
     return { width, height, ratio: width / height };
   } catch {
     return null;
-  } finally {
-    try {
-      unlinkSync(tmpIn);
-    } catch {}
   }
 };
 
 const cropToAspectRatio = (
-  bytes: Buffer<ArrayBuffer>,
+  bytes: Buffer,
   targetRatio: number,
   position: CropPosition
-): Buffer<ArrayBuffer> => {
-  const tmpIn = join(tmpdir(), `crop-in-${randomBytes(6).toString("hex")}.img`);
-  const tmpOut = join(tmpdir(), `crop-out-${randomBytes(6).toString("hex")}.jpg`);
-  writeFileSync(tmpIn, bytes);
+): Buffer => {
+  const { width, height } = getImageDimensions(bytes);
+  const currentRatio = width / height;
+  const offsetPercent = cropPositionToOffsetPercent(position);
 
-  try {
-    const { width, height } = getImageDimensions(tmpIn);
-    if (!width || !height) return bytes;
+  let cropW = width;
+  let cropH = height;
+  let x = 0;
+  let y = 0;
 
-    const currentRatio = width / height;
-    const offsetPercent = cropPositionToOffsetPercent(position);
-
-    let cropW = width;
-    let cropH = height;
-    let x = 0;
-    let y = 0;
-
-    if (currentRatio > targetRatio) {
-      cropW = Math.round(height * targetRatio);
-      x = Math.round((width - cropW) * (offsetPercent / 100));
-    } else if (currentRatio < targetRatio) {
-      cropH = Math.round(width / targetRatio);
-      y = Math.round((height - cropH) * (offsetPercent / 100));
-    } else {
-      return bytes;
-    }
-
-    const result = spawnSync("ffmpeg", [
-      "-y",
-      "-i",
-      tmpIn,
-      "-vf",
-      `crop=${cropW}:${cropH}:${x}:${y}`,
-      tmpOut,
-    ]);
-
-    if (result.status !== 0) {
-      console.error("ffmpeg crop failed:", result.stderr?.toString());
-      return bytes;
-    }
-
-    return readFileSync(tmpOut);
-  } finally {
-    try {
-      unlinkSync(tmpIn);
-    } catch {}
-    try {
-      unlinkSync(tmpOut);
-    } catch {}
+  if (currentRatio > targetRatio) {
+    cropW = Math.round(height * targetRatio);
+    x = Math.round((width - cropW) * (offsetPercent / 100));
+  } else if (currentRatio < targetRatio) {
+    cropH = Math.round(width / targetRatio);
+    y = Math.round((height - cropH) * (offsetPercent / 100));
   }
+
+  return runSharpInNode(bytes, { left: x, top: y, width: cropW, height: cropH });
 };
 
 const uploadImagesToS3 = async (
@@ -178,61 +159,50 @@ const uploadImagesToS3 = async (
   urls: string[],
   cropOptions?: { ratio: number; position: CropPosition },
   minDimension?: number
-): Promise<string[]> => {
+): Promise<Map<string, string>> => {
   await clearExistingImages(folder, slug);
 
-  const links: string[] = [];
+  const links = new Map<string, string>();
 
   for (const url of urls) {
-    try {
-      const res = await fetch(url);
-      if (!res.ok) {
-        console.error(`Image fetch failed (${res.status}): ${url}`);
-        continue;
-      }
-
-      let bytes = Buffer.from(await res.arrayBuffer());
-      if (!bytes.length) continue;
-
-      if (minDimension) {
-        const tmpCheck = join(tmpdir(), `dim-check-${randomBytes(6).toString("hex")}.img`);
-        writeFileSync(tmpCheck, bytes);
-        const { width, height } = getImageDimensions(tmpCheck);
-        try {
-          unlinkSync(tmpCheck);
-        } catch {}
-        if (!width || !height || Math.min(width, height) < minDimension) {
-          console.error(
-            `Skipped ${url}: ${width}x${height} is below the ${minDimension}px minimum`
-          );
-          continue;
-        }
-      }
-
-      let contentType = res.headers.get("content-type")?.split(";")[0].trim();
-      let ext = IMAGE_EXT_BY_CONTENT_TYPE[contentType] || "jpg";
-
-      if (cropOptions) {
-        bytes = cropToAspectRatio(bytes, cropOptions.ratio, cropOptions.position);
-        contentType = "image/jpeg";
-        ext = "jpg";
-      }
-
-      const key = `${slug}/${randomBytes(12).toString("hex")}`;
-      await s3.send(
-        new PutObjectCommand({
-          Bucket: bucket,
-          Key: `${folder}/${key}.${ext}`,
-          Body: bytes,
-          ContentType: contentType || "image/jpeg",
-          ACL: "public-read",
-        })
-      );
-
-      links.push(`${cdnUrl}/${folder}/${key}.${ext}`);
-    } catch (e) {
-      console.error(`Image upload error for ${url}:`, e);
+    const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+    if (!res.ok) {
+      throw new Error(`Image fetch failed (${res.status}): ${url}`);
     }
+
+    let bytes: Buffer = Buffer.from(await res.arrayBuffer());
+    const { width, height } = getImageDimensions(bytes);
+    if (!width || !height) {
+      throw new Error(`Not a readable image: ${url}`);
+    }
+
+    if (minDimension && Math.min(width, height) < minDimension) {
+      throw new Error(
+        `${url}: ${width}x${height} is below the ${minDimension}px minimum`
+      );
+    }
+
+    let contentType = res.headers.get("content-type")?.split(";")[0].trim();
+    let ext = IMAGE_EXT_BY_CONTENT_TYPE[contentType] || "jpg";
+
+    if (cropOptions) {
+      bytes = cropToAspectRatio(bytes, cropOptions.ratio, cropOptions.position);
+      contentType = "image/jpeg";
+      ext = "jpg";
+    }
+
+    const key = `${slug}/${randomBytes(12).toString("hex")}`;
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: bucket,
+        Key: `${folder}/${key}.${ext}`,
+        Body: bytes,
+        ContentType: contentType || "image/jpeg",
+        ACL: "public-read",
+      })
+    );
+
+    links.set(url, `${cdnUrl}/${folder}/${key}.${ext}`);
   }
 
   return links;
@@ -509,7 +479,7 @@ server.registerTool(
       "All text fields (name, storyline, summary, genres, keywords, themes, modes, franchises, alternative_names, companies, release_dates.human, etc.) must be in English, regardless of the language of the sources used to research the game — translate before calling this tool. " +
       "screenshots is capped at 10 entries, artworks at 5 — pick the best if more are available. " +
       "cover/screenshots/artworks should be direct external image URLs found via search_web/search_images — on the real (confirm: true) call, this tool downloads them and re-uploads them to MoonCellar's own S3 buckets, exactly like the IGDB parser does, and stores the resulting S3 CDN links instead of the original external URLs. " +
-      "artworks vs screenshots is ambiguous from search results alone (artwork = promotional/key art, box art, drawn art; screenshot = actual in-game capture). Before including a candidate image in either list, show its URL to the human user in chat and ask them to confirm which of the two it is — do not guess. Artworks additionally require at least 720p quality (shorter side >= 720px, check actual pixel dimensions, not just the URL/thumbnail label) — this tool silently drops any artwork candidate below that on upload, so pick a high-res source upfront rather than relying on the drop as a filter.  " +
+      "artworks vs screenshots is ambiguous from search results alone (artwork = promotional/key art, box art, drawn art; screenshot = actual in-game capture). Before including a candidate image in either list, show its URL to the human user in chat and ask them to confirm which of the two it is — do not guess. Artworks additionally require at least 720p quality (shorter side >= 720px, check actual pixel dimensions, not just the URL/thumbnail label) — the real call fails without creating anything if any artwork is below that, or if any image cannot be downloaded and stored in S3. bannerImage and backgroundImage must each be one of the given screenshots or artworks; they are stored as that image's S3 link.  " +
       "videos should be YouTube links (trailers/gameplay) found via search_youtube. " +
       "The frontend displays cover at a fixed 3:4 portrait aspect ratio and crops anything else with CSS object-fit:cover. If the cover source image doesn't already have roughly that aspect ratio (e.g. a landscape Steam header banner), this tool crops it server-side to 3:4 on the real (confirm: true) call using coverCropPosition. The preview call checks the cover's actual dimensions and will warn if it doesn't match 3:4 and coverCropPosition wasn't given — when that happens, do NOT jump straight to asking for a crop position. " +
       "PREFERRED COVER SOURCE: steamgriddb.com — for any game with a Steam app id, check it FIRST for a portrait \"grid\" asset (they're usually ~600x900, much closer to 3:4 than a Steam header banner). steamgriddb.com itself blocks fetching, so resolve it this way: search_web(\"<game name> steamgriddb\") to find the game/grid page URL, then fetch the grid page's raw HTML with a normal browser user-agent (steamgriddb.com/grid/<id> — the HTML embeds a cdn2.steamgriddb.com/thumb/<hash>.<ext> reference even though it's a JS app) and swap /thumb/ for /grid/ on that same URL to get the full-res image (try .png first, then .jpg/.jpeg/.webp). If no usable SteamGridDB asset exists, fall back to search_images (queries like \"<game name> poster\", \"<game name> box art\", \"<game name> key art vertical\") for some other source already closer to 3:4 portrait — a real poster/box-art loses far less content than cropping a wide banner down to a sliver. Only if nothing reasonably-portrait turns up should you fall back to asking the human user in chat which position/offset to crop the original from (left/center/right, or an exact 0-100 percent), then re-call with their choice. Do not default to \"center\" on your own, and don't crop before checking for a better source.  " +
@@ -526,7 +496,7 @@ server.registerTool(
         .max(5)
         .optional()
         .describe(
-          "At most 5 artwork URLs (promotional/key art, not screenshots). Each candidate must be confirmed with the human user in chat before being included here. Must be at least 720p quality (shorter side >= 720px) — low-res candidates are silently dropped on upload, so check dimensions before picking one."
+          "At most 5 artwork URLs (promotional/key art, not screenshots). Each candidate must be confirmed with the human user in chat before being included here. Must be at least 720p quality (shorter side >= 720px) — a low-res candidate fails the whole call, so check dimensions before picking one."
         ),
       coverCropPosition: z
         .union([z.enum(["left", "center", "right"]), z.number().min(0).max(100)])
@@ -585,34 +555,60 @@ server.registerTool(
 
     const uploaded = { ...input };
 
-    if (uploaded.cover) {
-      const [link] = await uploadImagesToS3(
-        IMAGE_FOLDERS.cover,
-        uploaded.slug,
-        [uploaded.cover],
-        coverCropPosition !== undefined
-          ? { ratio: COVER_ASPECT_RATIO, position: coverCropPosition }
-          : undefined
+    try {
+      const pageImages = [uploaded.bannerImage, uploaded.backgroundImage].filter(
+        (u): u is string => !!u
       );
-      if (link) uploaded.cover = link;
-    }
+      for (const u of pageImages) {
+        if (!uploaded.screenshots?.includes(u) && !uploaded.artworks?.includes(u)) {
+          throw new Error(
+            `bannerImage/backgroundImage must be one of the screenshots or artworks: ${u}`
+          );
+        }
+      }
 
-    if (uploaded.screenshots?.length) {
-      uploaded.screenshots = await uploadImagesToS3(
+      if (uploaded.cover) {
+        const links = await uploadImagesToS3(
+          IMAGE_FOLDERS.cover,
+          uploaded.slug,
+          [uploaded.cover],
+          coverCropPosition !== undefined
+            ? { ratio: COVER_ASPECT_RATIO, position: coverCropPosition }
+            : undefined
+        );
+        uploaded.cover = links.get(uploaded.cover)!;
+      }
+
+      const screenshotLinks = await uploadImagesToS3(
         IMAGE_FOLDERS.screenshots,
         uploaded.slug,
-        uploaded.screenshots
+        uploaded.screenshots ?? []
       );
-    }
-
-    if (uploaded.artworks?.length) {
-      uploaded.artworks = await uploadImagesToS3(
+      const artworkLinks = await uploadImagesToS3(
         IMAGE_FOLDERS.artworks,
         uploaded.slug,
-        uploaded.artworks,
+        uploaded.artworks ?? [],
         undefined,
         ARTWORK_MIN_DIMENSION
       );
+      const s3Link = (u: string) => screenshotLinks.get(u) ?? artworkLinks.get(u)!;
+
+      if (uploaded.screenshots) uploaded.screenshots = uploaded.screenshots.map(s3Link);
+      if (uploaded.artworks) uploaded.artworks = uploaded.artworks.map(s3Link);
+      if (uploaded.bannerImage) uploaded.bannerImage = s3Link(uploaded.bannerImage);
+      if (uploaded.backgroundImage) {
+        uploaded.backgroundImage = s3Link(uploaded.backgroundImage);
+      }
+    } catch (e) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Image upload to S3 failed, the game was NOT created: ${(e as Error).message}`,
+          },
+        ],
+        isError: true,
+      };
     }
 
     const res = await callApi(

@@ -37,29 +37,13 @@ export const toCategoryTone = (status?: string) => {
   return CATEGORY_TONES.find((tone) => tone === key);
 };
 
-const STATUS_PHRASES: Record<string, [string, string?]> = {
-  completed: ["Completed"],
-  mastered: ["Mastered"],
-  played: ["Played"],
-  dropped: ["Dropped"],
-  playing: ["Started playing"],
-  backlog: ["Added", "to the backlog"],
-  wishlist: ["Wishlisted"],
-};
-
 const getStatusKey = (state?: ILogPlaythroughState) =>
   state?.isMastered ? "mastered" : state?.category;
 
-export const getStatusPhrase = (
-  state?: ILogPlaythroughState
-): [string, string?] | undefined => {
-  if (state?.isMastered && state.category === "completed") {
-    return ["Completed and mastered"];
-  }
-
+export const getStatusLabel = (state?: ILogPlaythroughState) => {
   const key = getStatusKey(state);
 
-  return key ? STATUS_PHRASES[key] : undefined;
+  return key ? commonUtils.upFL(key) : undefined;
 };
 
 export const isStatusChanged = (
@@ -130,20 +114,20 @@ const startOfDay = (date: Date) =>
 export const getDayOffset = (date: Date, now: Date) =>
   Math.round((startOfDay(now) - startOfDay(date)) / DAY_MS);
 
-export const getDayLabel = (date: Date, now: Date) => {
+const formatClock = (date: Date) =>
+  date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+
+export const getTimeLabel = (date: Date, now: Date) => {
   const offset = getDayOffset(date, now);
 
-  if (offset === 0) return "Today";
-  if (offset === 1) return "Yesterday";
+  if (offset === 0) return commonUtils.getHumanDate(date);
+  if (offset === 1) return `Yesterday, ${formatClock(date)}`;
 
-  return date.toLocaleDateString("en-GB", {
+  const day = date.toLocaleDateString("en-GB", {
     day: "numeric",
-    month: "long",
+    month: "short",
     ...(date.getFullYear() !== now.getFullYear() ? { year: "numeric" } : {}),
   });
-};
 
-export const getTimeLabel = (date: Date, now: Date) =>
-  getDayOffset(date, now) === 0
-    ? commonUtils.getHumanDate(date)
-    : date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+  return `${day}, ${formatClock(date)}`;
+};
