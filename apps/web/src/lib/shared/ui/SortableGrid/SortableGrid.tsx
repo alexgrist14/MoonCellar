@@ -17,6 +17,7 @@ interface ISortableGridProps<T> {
   coverRatio?: string;
   emptySlots?: number;
   isDisabled?: boolean;
+  isRemovable?: boolean;
   className?: string;
 }
 
@@ -40,6 +41,7 @@ export const SortableGrid = <T,>({
   coverRatio,
   emptySlots = 0,
   isDisabled,
+  isRemovable = true,
   className,
 }: ISortableGridProps<T>) => {
   const { dragIndex, overIndex, getItemProps } = useDragSort(items, onChange);
@@ -78,19 +80,21 @@ export const SortableGrid = <T,>({
               >
                 <SvgArrow style={ARROW_ICON_STYLE} />
               </button>
-              <button
-                type="button"
-                className={classNames(styles.icon, styles.icon_danger)}
-                aria-label={`Remove ${name}`}
-                disabled={isDisabled}
-                onClick={() =>
-                  onRemove
-                    ? onRemove(item)
-                    : onChange(items.filter((_, i) => i !== index))
-                }
-              >
-                <SvgClose size="12" style={ICON_STYLE} />
-              </button>
+              {isRemovable && (
+                <button
+                  type="button"
+                  className={classNames(styles.icon, styles.icon_danger)}
+                  aria-label={`Remove ${name}`}
+                  disabled={isDisabled}
+                  onClick={() =>
+                    onRemove
+                      ? onRemove(item)
+                      : onChange(items.filter((_, i) => i !== index))
+                  }
+                >
+                  <SvgClose size="12" style={ICON_STYLE} />
+                </button>
+              )}
               <button
                 type="button"
                 className={styles.icon}

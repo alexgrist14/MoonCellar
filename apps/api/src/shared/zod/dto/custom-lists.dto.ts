@@ -10,6 +10,7 @@ import {
   GetCustomListsResponseSchema,
   GetUserCustomListsRequestSchema,
   ReorderCustomListRequestSchema,
+  ReorderCustomListsRequestSchema,
   UpdateCustomListRequestSchema,
 } from "@mooncellar/schemas";
 
@@ -53,4 +54,8 @@ export class AddCustomListGameRequestDto extends createZodDto(
 
 export class ReorderCustomListRequestDto extends createZodDto(
   ReorderCustomListRequestSchema
+) {}
+
+export class ReorderCustomListsRequestDto extends createZodDto(
+  ReorderCustomListsRequestSchema
 ) {}

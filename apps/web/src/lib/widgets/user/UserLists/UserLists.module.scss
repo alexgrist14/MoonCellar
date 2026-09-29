@@ -17,6 +17,16 @@
     font-variant-numeric: tabular-nums;
   }
 
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-x2);
+  }
+
+  &__sortable {
+    --sortable-grid-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
   &__create {
     display: inline-flex;
     align-items: center;

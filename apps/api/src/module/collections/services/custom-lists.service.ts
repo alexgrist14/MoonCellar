@@ -31,6 +31,7 @@ import {
   type IGetCustomListsQuery,
   type IGetCustomListsResponse,
   type IReorderCustomListRequest,
+  type IReorderCustomListsRequest,
   type IUpdateCustomListRequest,
 } from "@mooncellar/schemas";
 import { Game } from "../../games/schemas/game.schema";
@@ -399,7 +400,7 @@ export class CustomListsService {
         {
           $match: { userId: ownerId, ...(isOwner ? {} : { isPrivate: false }) },
         },
-        { $sort: { updatedAt: -1, _id: -1 } },
+        { $sort: { position: 1, updatedAt: -1, _id: -1 } },
         ...this.presentationStages(
           gameId ? toObjectId(gameId, "game id") : undefined
         ),
@@ -824,6 +825,39 @@ export class CustomListsService {
       return this.toList(await this.findPresented({ _id: list._id }));
     } catch (err) {
       this.logger.error(err, `Failed to reorder list: ${id}`);
+      throw err;
+    }
+  }
+
+  async reorderLists(dto: IReorderCustomListsRequest, viewer: User) {
+    const userId = new mongoose.Types.ObjectId(viewer._id.toString());
+    const lists = await this.listModel.find({ userId }).select("_id").lean();
+    const ids = new Set(lists.map((list) => list._id.toString()));
+    const isSameSet =
+      dto.listIds.length === ids.size &&
+      new Set(dto.listIds).size === dto.listIds.length &&
+      dto.listIds.every((listId) => ids.has(listId));
+
+    if (!isSameSet) {
+      throw new BadRequestException(
+        "The order must contain exactly your lists"
+      );
+    }
+
+    try {
+      await this.listModel.bulkWrite(
+        dto.listIds.map((listId, index) => ({
+          updateOne: {
+            filter: { _id: new mongoose.Types.ObjectId(listId), userId },
+            update: { $set: { position: index + 1 } },
+            timestamps: false,
+          },
+        }))
+      );
+
+      return { listIds: dto.listIds };
+    } catch (err) {
+      this.logger.error(err, `Failed to reorder lists of: ${viewer._id}`);
       throw err;
     }
   }

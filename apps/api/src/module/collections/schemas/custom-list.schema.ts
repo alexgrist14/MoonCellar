@@ -65,6 +65,9 @@ export class CustomList {
   @Prop({ type: String, default: DEFAULT_CUSTOM_LIST_GAMES_ORDER })
   sortOrder: ICustomListsOrder;
 
+  @Prop({ type: Number, default: 0 })
+  position: number;
+
   @Prop({ type: [CustomListGameDatabaseSchema], default: [] })
   games: CustomListGame[];
 

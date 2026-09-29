@@ -9,6 +9,7 @@ import {
   IGetCustomListsRequest,
   IGetCustomListsResponse,
   IReorderCustomListRequest,
+  IReorderCustomListsRequest,
   IUpdateCustomListRequest,
 } from "@mooncellar/schemas";
 import { API_URL } from "@/src/lib/shared/constants";
@@ -53,6 +54,8 @@ export const listsAPI = {
     agent.post<ICustomList>(`${LISTS_URL}/${id}/games`, dto),
   removeGame: (id: string, gameId: string) =>
     agent.delete<ICustomList>(`${LISTS_URL}/${id}/games/${gameId}`),
+  reorderLists: (dto: IReorderCustomListsRequest) =>
+    agent.patch<IReorderCustomListsRequest>(`${LISTS_URL}/order`, dto),
   reorder: (id: string, dto: IReorderCustomListRequest) =>
     agent.patch<ICustomList>(`${LISTS_URL}/${id}/order`, dto),
 };

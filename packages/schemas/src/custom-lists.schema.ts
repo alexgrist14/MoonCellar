@@ -114,6 +114,10 @@ export const ReorderCustomListRequestSchema = z.object({
   gameIds: ObjectIdSchema.array().max(CUSTOM_LIST_GAMES_MAX),
 });
 
+export const ReorderCustomListsRequestSchema = z.object({
+  listIds: ObjectIdSchema.array().max(CUSTOM_LISTS_PER_USER_MAX),
+});
+
 export const GetCustomListsRequestSchema = z.object({
   search: z.string().trim().max(100).optional().describe("Name or description"),
   author: z.string().trim().max(15).optional().describe("Author user name"),
@@ -188,6 +192,9 @@ export type IAddCustomListGameRequest = z.input<
 >;
 export type IReorderCustomListRequest = z.infer<
   typeof ReorderCustomListRequestSchema
+>;
+export type IReorderCustomListsRequest = z.infer<
+  typeof ReorderCustomListsRequestSchema
 >;
 export type IGetCustomListsRequest = z.input<
   typeof GetCustomListsRequestSchema

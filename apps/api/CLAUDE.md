@@ -110,9 +110,14 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   working only through it.
 - **`likesCount` changes only through `$inc` with `timestamps: false`, and only when the like
   document was actually inserted or deleted.** A like must not move `updatedAt`: "Recently
-  updated", the popularity tie-break and the profile's Lists panel all order by it, so a like that
-  bumps it reshuffles lists nobody edited. The unique `{ listId, userId }` index makes a repeated
+  updated", the popularity tie-break and the profile's Lists panel (after the owner's
+  `position`) all order by it, so a like that bumps it reshuffles lists nobody edited. The unique `{ listId, userId }` index makes a repeated
   like a no-op — keep reading `upsertedCount`/`deletedCount` rather than incrementing blindly.
+- **`PATCH /lists/order` must stay declared above `PATCH /lists/:id` in the controller, and it
+  writes `position` with `timestamps: false`.** Express matches routes in declaration order, so
+  below `:id` the reorder hits `updateList` with `id = "order"` and fails with 400 on the id. A
+  list that was never reordered keeps `position: 0` and sorts first, which is where a new list
+  should appear.
 - **Lists with a `generator` belong to `GeneratedListsService`, never to a person.** They are owned
   by the `MoonCellar` account, rebuilt every Monday (and by `POST /lists/generated/refresh`), and a
   rebuild overwrites their games, name and description — an edit made by hand is lost within a

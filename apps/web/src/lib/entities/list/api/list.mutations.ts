@@ -113,6 +113,16 @@ export const useReorderListMutation = () => {
   });
 };
 
+export const useReorderListsMutation = () => {
+  const invalidate = useInvalidateLists();
+
+  return useMutation({
+    mutationFn: (listIds: string[]) =>
+      listsAPI.reorderLists({ listIds }).then(({ data }) => data),
+    onSuccess: () => invalidate(),
+  });
+};
+
 export const useSetListLikeMutation = () => {
   const invalidate = useInvalidateLists();
 

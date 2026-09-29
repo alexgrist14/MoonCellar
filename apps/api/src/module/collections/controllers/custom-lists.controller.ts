@@ -32,6 +32,7 @@ import {
   GetCustomListsResponseDto,
   GetUserCustomListsRequestDto,
   ReorderCustomListRequestDto,
+  ReorderCustomListsRequestDto,
   UpdateCustomListRequestDto,
 } from "../../../shared/zod/dto/custom-lists.dto";
 import { RolesEnum } from "@mooncellar/schemas";
@@ -140,6 +141,17 @@ export class CustomListsController {
     @Req() request: IViewerRequest
   ) {
     return this.lists.createList(dto, request.user);
+  }
+
+  @Patch("order")
+  @ApiOperation({ summary: "Save the order of the viewer's lists" })
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), UserIdGuard)
+  async reorderLists(
+    @Body() dto: ReorderCustomListsRequestDto,
+    @Req() request: IViewerRequest
+  ) {
+    return this.lists.reorderLists(dto, request.user);
   }
 
   @Patch(":id")
