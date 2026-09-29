@@ -971,7 +971,8 @@ export class GamesService implements OnModuleInit {
             _id: { $in: ids.map((id) => new mongoose.Types.ObjectId(id)) },
           },
         },
-        SEARCH_PROJECTION_STAGE,
+        TRIM_IGDB_STAGE,
+        STRIP_CHARACTERS_STAGE,
       ]);
 
       const byId = new Map(games.map((item) => [item._id.toString(), item]));
