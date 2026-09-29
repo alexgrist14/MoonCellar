@@ -3,6 +3,36 @@ import { CharacterSchema } from "./characters.schema";
 
 export const ADULT_THEME_NAME = "Erotic";
 
+export const GAME_TYPES = [
+  "Main Game",
+  "DLC",
+  "Expansion",
+  "Bundle",
+  "Standalone Expansion",
+  "Mod",
+  "Episode",
+  "Season",
+  "Remake",
+  "Remaster",
+  "Expanded Game",
+  "Port",
+  "Fork",
+  "Pack / Addon",
+  "Update",
+  "Fan Disc",
+] as const;
+
+export const GAME_STATUSES = [
+  "Released",
+  "Alpha",
+  "Beta",
+  "Early Access",
+  "Offline",
+  "Cancelled",
+  "Rumored",
+  "Delisted",
+] as const;
+
 export const RetroachievementsSchema = z.object({
   gameId: z.number(),
   consoleId: z.number(),
@@ -423,16 +453,34 @@ export const AddGameRequestSchema = GameSchema.omit({
   averageRating: true,
   ratingsCount: true,
   isCustom: true,
+}).extend({
+  type: z.enum(GAME_TYPES),
+  status: z.enum(GAME_STATUSES).nullable().optional(),
 });
 
-export const UpdateGameRequestSchema = GameSchema.omit({
-  _id: true,
-  updatedAt: true,
-  createdAt: true,
-  averageRating: true,
-  ratingsCount: true,
-  isCustom: true,
-}).partial();
+export const UpdateGameRequestSchema = AddGameRequestSchema.partial();
+
+export const GameAiDraftRequestSchema = z.object({
+  query: z
+    .string()
+    .trim()
+    .min(1)
+    .max(500)
+    .describe("Game name or a link to a page about the game"),
+});
+
+export const GAME_AI_DRAFT_STATUSES = ["running", "done", "failed"] as const;
+
+export const GameAiDraftRunSchema = z.object({
+  _id: z.string(),
+  query: z.string(),
+  status: z.enum(GAME_AI_DRAFT_STATUSES),
+  steps: z.string().array(),
+  error: z.string().nullable(),
+  draft: AddGameRequestSchema.partial().nullable(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
 
 export const GetCustomGameResponseSchema = GameSchema.array();
 
@@ -447,8 +495,8 @@ export const GetGameSlugsRequestSchema = z.object({
   count: z.coerce
     .number()
     .min(1)
-    .describe("Amount of game slugs to return")
-    .default(10000)
+    .describe("Amount of popular game slugs to return")
+    .default(1000)
     .optional(),
 });
 
@@ -486,6 +534,8 @@ export type IRelatedGamesField = z.infer<typeof RelatedGamesSchema>;
 
 export type IAddGameRequest = z.infer<typeof AddGameRequestSchema>;
 export type IUpdateGameRequest = z.infer<typeof UpdateGameRequestSchema>;
+export type IGameAiDraftRequest = z.infer<typeof GameAiDraftRequestSchema>;
+export type IGameAiDraftRun = z.infer<typeof GameAiDraftRunSchema>;
 export type IGetGamesRequest = z.infer<typeof GetGamesRequestSchema>;
 export type IGetGameByIdRequest = z.infer<typeof GetGameByIdSchema>;
 export type IGetGameBySlugRequest = z.infer<typeof GetGameBySlugSchema>;

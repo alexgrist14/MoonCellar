@@ -104,3 +104,33 @@ export const downloadRemoteImage = async (
 
   throw new Error(`Too many redirects: ${raw}`);
 };
+
+const REMOTE_PAGE_MAX_BYTES = 5 * 1024 * 1024;
+
+export const downloadRemotePage = async (raw: string): Promise<string> => {
+  let url = await assertPublicUrl(raw);
+
+  for (let hop = 0; hop <= REMOTE_IMAGE_MAX_REDIRECTS; hop++) {
+    const response = await axios.get<string>(url.toString(), {
+      responseType: "text",
+      timeout: REMOTE_IMAGE_TIMEOUT_MS,
+      maxRedirects: 0,
+      maxContentLength: REMOTE_PAGE_MAX_BYTES,
+      validateStatus: (status) => status < 400,
+      headers: { "User-Agent": "Mozilla/5.0", "Accept-Language": "en" },
+    });
+
+    if (response.status >= 300) {
+      const location = response.headers.location;
+
+      if (!location) throw new Error(`Redirect without a location: ${url}`);
+
+      url = await assertPublicUrl(new URL(location, url).toString());
+      continue;
+    }
+
+    return response.data;
+  }
+
+  throw new Error(`Too many redirects: ${raw}`);
+};

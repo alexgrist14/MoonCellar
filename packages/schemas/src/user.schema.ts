@@ -13,12 +13,14 @@ export const UserSettingsSchema = z.object({
   bgOpacity: z.number().min(0).max(1).default(DEFAULT_BG_OPACITY),
 });
 
+export const USER_NAME_MAX_LENGTH = 15;
+
 export const UserSchemaZod = z.object({
   _id: z.string(),
   userName: z
     .string()
     .min(3)
-    .max(15)
+    .max(USER_NAME_MAX_LENGTH)
     .regex(/^[a-zA-Z0-9_]+$/),
   email: z.string().email(),
   password: z.string().min(8).max(100),
@@ -48,7 +50,7 @@ export const GetUserByStringSchema = z.object({
     z
       .string()
       .min(3)
-      .max(15)
+      .max(USER_NAME_MAX_LENGTH)
       .regex(/^[a-zA-Z0-9_]+$/),
   ]),
 });
@@ -93,7 +95,12 @@ export const UpdateFavoriteCharactersResponseSchema = z.object({
 export const GetFavoriteCharactersResponseSchema = CharacterSchema.array();
 
 export const SearchUsersRequestSchema = z.object({
-  q: z.string().trim().min(2).max(15).describe("Part of a user name"),
+  q: z
+    .string()
+    .trim()
+    .min(2)
+    .max(USER_NAME_MAX_LENGTH)
+    .describe("Part of a user name"),
   page: z.coerce.number().int().min(1).default(1),
   take: z.coerce.number().int().min(1).max(30).default(USERS_SEARCH_PAGE_SIZE),
 });

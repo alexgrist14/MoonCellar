@@ -1,6 +1,8 @@
 import { createZodDto } from "nestjs-zod";
 import {
   AddGameRequestSchema,
+  GameAiDraftRequestSchema,
+  GameAiDraftRunSchema,
   GameSchema,
   GetGameByIdSchema,
   GetGameBySlugSchema,
@@ -19,6 +21,8 @@ export class GetGamesByIdsDto extends createZodDto(GetGamesByIdsSchema) {}
 export class GetGamesDto extends createZodDto(GetGamesRequestSchema) {}
 export class GetGameSlugsDto extends createZodDto(GetGameSlugsRequestSchema) {}
 export class AddGameDto extends createZodDto(AddGameRequestSchema) {}
+export class GameAiDraftDto extends createZodDto(GameAiDraftRequestSchema) {}
+export class GameAiDraftRunDto extends createZodDto(GameAiDraftRunSchema) {}
 export class UpdateGameDto extends createZodDto(UpdateGameRequestSchema) {}
 
 export class GameResponseDto extends createZodDto(GameSchema) {}

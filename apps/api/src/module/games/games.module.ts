@@ -19,6 +19,11 @@ import { PlatformsService } from "./services/platforms.service";
 import { CharactersController } from "./controllers/characters.controller";
 import { CharactersService } from "./services/characters.service";
 import { GamesService } from "./services/games.service";
+import { GameAiDraftService } from "./services/game-ai-draft.service";
+import {
+  GameAiDraft,
+  GameAiDraftDatabaseSchema,
+} from "./schemas/game-ai-draft.schema";
 import { HltbService } from "./services/hltb.service";
 import { HltbController } from "./controllers/hltb.controller";
 import { MetricsModule } from "../metrics/metrics.module";
@@ -63,6 +68,7 @@ import {
   ],
   providers: [
     GamesService,
+    GameAiDraftService,
     HltbService,
     PlaythroughsService,
     UserLogsService,
@@ -87,6 +93,7 @@ import {
       { name: User.name, schema: UserSchema },
       { name: Rating.name, schema: UserRatingsDatabaseSchema },
       { name: VndbCandidate.name, schema: VndbCandidateSchema },
+      { name: GameAiDraft.name, schema: GameAiDraftDatabaseSchema },
     ]),
     MetricsModule,
     IndexNowModule,

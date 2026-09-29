@@ -21,7 +21,8 @@ import {
   GENERATED_LIST_DECADES,
   GENERATED_LIST_GAME_TYPES,
   GENERATED_LIST_HLTB_WEIGHT,
-  GENERATED_LIST_LAUNCH_WINDOW_SECONDS,
+  GENERATED_LIST_PC_PLATFORM_SLUGS,
+  GENERATED_LIST_PC_SHARING_FAMILIES,
   GENERATED_LIST_PRIOR_MEAN,
   GENERATED_LIST_PRIOR_VOTES,
   GENERATED_LIST_SIZE,
@@ -43,7 +44,7 @@ type IGeneratedListDefinition = {
   name: string;
   scope: string;
   filters: Pick<IGetGamesRequest, "selected" | "years">;
-  launchPlatforms?: { allowed: string[]; current: string[] };
+  allowedPlatformIds?: mongoose.Types.ObjectId[];
 };
 
 export type IGeneratedListsReport = {
@@ -265,23 +266,29 @@ export class GeneratedListsService {
         filters: { selected: { genres: [genre] } },
       }));
 
+    const pcPlatformIds = platforms
+      .filter((item) => GENERATED_LIST_PC_PLATFORM_SLUGS.includes(item.slug))
+      .map((item) => item._id);
+
     const platformLists = FEATURED_PLATFORM_SLUGS.map((slug) =>
       platforms.find((platform) => platform.slug === slug)
     )
       .filter((platform) => !!platform)
       .map((platform): IGeneratedListDefinition => {
-        const relatives = platforms.filter(
-          (item) =>
-            !!platform.family?.slug &&
-            item.family?.slug === platform.family.slug &&
-            typeof item.generation === "number"
-        );
-        const toIds = (generations: number[]) => [
-          platform._id.toString(),
-          ...relatives
-            .filter((item) => generations.includes(item.generation))
-            .map((item) => item._id.toString()),
-        ];
+        const familySlug = platform.family?.slug;
+        const laterGenerations = platforms
+          .filter(
+            (item) =>
+              !!familySlug &&
+              item.family?.slug === familySlug &&
+              typeof item.generation === "number" &&
+              typeof platform.generation === "number" &&
+              item.generation >= platform.generation
+          )
+          .map((item) => item._id);
+        const sharesWithPc =
+          !familySlug ||
+          GENERATED_LIST_PC_SHARING_FAMILIES.includes(familySlug);
 
         return {
           kind: "platform",
@@ -289,85 +296,20 @@ export class GeneratedListsService {
           name: `Best ${platform.name} games`,
           scope: `on ${platform.name}`,
           filters: { selected: { platforms: [platform._id.toString()] } },
-          launchPlatforms: {
-            allowed: toIds([platform.generation, platform.generation - 1]),
-            current: toIds([platform.generation]),
-          },
+          allowedPlatformIds: [
+            platform._id,
+            ...laterGenerations,
+            ...(sharesWithPc ? pcPlatformIds : []),
+          ],
         };
       });
 
     return [...decades, ...genreLists, ...platformLists];
   }
 
-  private launchPlatformsMatch({
-    allowed,
-    current,
-  }: NonNullable<IGeneratedListDefinition["launchPlatforms"]>) {
-    const launchIds = {
-      $let: {
-        vars: {
-          launch: {
-            $filter: {
-              input: { $ifNull: ["$release_dates", []] },
-              as: "release",
-              cond: {
-                $lte: [
-                  "$$release.date",
-                  {
-                    $add: [
-                      "$first_release",
-                      GENERATED_LIST_LAUNCH_WINDOW_SECONDS,
-                    ],
-                  },
-                ],
-              },
-            },
-          },
-        },
-        in: {
-          $cond: [
-            { $gt: [{ $size: "$$launch" }, 0] },
-            {
-              $map: {
-                input: "$$launch",
-                as: "release",
-                in: { $toString: "$$release.platformId" },
-              },
-            },
-            {
-              $map: {
-                input: { $ifNull: ["$platformIds", []] },
-                as: "id",
-                in: { $toString: "$$id" },
-              },
-            },
-          ],
-        },
-      },
-    };
-
-    return {
-      $match: {
-        $expr: {
-          $let: {
-            vars: { ids: launchIds },
-            in: {
-              $and: [
-                { $setIsSubset: ["$$ids", allowed] },
-                {
-                  $gt: [{ $size: { $setIntersection: ["$$ids", current] } }, 0],
-                },
-              ],
-            },
-          },
-        },
-      },
-    };
-  }
-
   private async findTopGameIds({
     filters,
-    launchPlatforms,
+    allowedPlatformIds,
   }: IGeneratedListDefinition) {
     const now = Math.floor(Date.now() / 1000);
     let ids: mongoose.Types.ObjectId[] = [];
@@ -385,8 +327,16 @@ export class GeneratedListsService {
             excluded: { themes: [ADULT_THEME_NAME] },
             votes,
           }),
-          ...(launchPlatforms
-            ? [this.launchPlatformsMatch(launchPlatforms)]
+          ...(allowedPlatformIds
+            ? [
+                {
+                  $match: {
+                    platformIds: {
+                      $not: { $elemMatch: { $nin: allowedPlatformIds } },
+                    },
+                  },
+                },
+              ]
             : []),
           { $match: { first_release: { $lte: now } } },
           { $addFields: { generatedScore: generatedScoreExpr } },

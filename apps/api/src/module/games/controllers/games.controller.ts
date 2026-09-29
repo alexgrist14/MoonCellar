@@ -26,6 +26,8 @@ import {
 import mongoose from "mongoose";
 import {
   AddGameDto,
+  GameAiDraftDto,
+  GameAiDraftRunDto,
   GameResponseDto,
   GetGameByIdDto,
   GetGameBySlugDto,
@@ -49,6 +51,7 @@ import {
   GetGamesStatsResponseDto,
 } from "../../../shared/zod/dto/game-stats.dto";
 import { GamesService } from "../services/games.service";
+import { GameAiDraftService } from "../services/game-ai-draft.service";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { RolesGuard } from "../../roles/roles.guard";
 import { Roles } from "../../roles/roles.decorator";
@@ -58,7 +61,10 @@ import { UserIdGuard } from "../../auth/user.guard";
 @ApiTags("Games")
 @Controller("games")
 export class GamesController {
-  constructor(private readonly games: GamesService) {}
+  constructor(
+    private readonly games: GamesService,
+    private readonly gameAiDraft: GameAiDraftService
+  ) {}
 
   @Get("/:gameId/followings-status")
   @ApiCookieAuth()
@@ -175,7 +181,7 @@ export class GamesController {
   @ApiOperation({
     summary: "Get slugs of all games",
     description:
-      "Returns up to `count` game slugs (default 10000), sorted by IGDB rating count. Used for sitemap generation.",
+      "Returns the `count` most popular game slugs (default 1000) by IGDB rating and rating count, plus the 100 most hyped releases of the next year. Used for sitemap generation.",
   })
   @ApiCreatedResponse({ type: GetGameSlugsResponseDto })
   async getAllSlugs(@Query() dto: GetGameSlugsDto) {
@@ -212,6 +218,41 @@ export class GamesController {
   @HttpCode(HttpStatus.OK)
   async addGame(@Body() dto: AddGameDto) {
     return this.games.addGame(dto);
+  }
+
+  @Get("/ai-drafts")
+  @ApiOperation({ summary: "Get the latest AI game draft runs" })
+  @ApiCreatedResponse({ type: [GameAiDraftRunDto] })
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), RolesGuard)
+  @Roles(RolesEnum.ADMIN)
+  async getAiDrafts() {
+    return this.gameAiDraft.getRuns();
+  }
+
+  @Post("/ai-drafts")
+  @ApiOperation({
+    summary: "Start an AI game draft",
+    description:
+      "Starts researching a game by name or link with OpenAI in the background and returns the run; poll GET /games/ai-drafts for its status and the unsaved add-game payload.",
+  })
+  @ApiCreatedResponse({ type: GameAiDraftRunDto })
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), RolesGuard)
+  @Roles(RolesEnum.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  async startAiDraft(@Body() dto: GameAiDraftDto) {
+    return this.gameAiDraft.startRun(dto.query);
+  }
+
+  @Delete("/ai-drafts/:id")
+  @ApiOperation({ summary: "Delete a finished AI game draft run" })
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), RolesGuard)
+  @Roles(RolesEnum.ADMIN)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteAiDraft(@Param("id") id: string) {
+    return this.gameAiDraft.deleteRun(id);
   }
 
   @Put("/update/:id")

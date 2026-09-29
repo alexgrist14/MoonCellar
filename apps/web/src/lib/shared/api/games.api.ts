@@ -2,6 +2,8 @@ import { API_URL } from "@/src/lib/shared/constants";
 import { IGamesListResponse } from "@/src/lib/shared/types/games.type";
 import {
   IAddGameRequest,
+  IGameAiDraftRequest,
+  IGameAiDraftRun,
   IGameResponse,
   IGenreResponse,
   IGetGameByIdRequest,
@@ -77,6 +79,18 @@ export const gamesApi = {
 
   getAll: async (data: IGetGamesRequest) => {
     return agent.post<IGamesListResponse>(`${GAMES_URL}`, data);
+  },
+
+  getAiDrafts: () => {
+    return agent.get<IGameAiDraftRun[]>(`${GAMES_URL}/ai-drafts`);
+  },
+
+  deleteAiDraft: (id: string) => {
+    return agent.delete(`${GAMES_URL}/ai-drafts/${id}`);
+  },
+
+  startAiDraft: (dto: IGameAiDraftRequest) => {
+    return agent.post<IGameAiDraftRun>(`${GAMES_URL}/ai-drafts`, dto);
   },
 
   add: (dto: IAddGameRequest) => {

@@ -1,6 +1,7 @@
 import { gamesApi } from "@/src/lib/shared/api";
 import {
   IAddGameRequest,
+  IGameAiDraftRun,
   IGameResponse,
   IUpdateGameRequest,
 } from "@mooncellar/schemas";
@@ -117,6 +118,34 @@ export const useCreateGameMutation = () => {
       queryClient.invalidateQueries({
         queryKey: gameQueryKeys.lists(),
       });
+    },
+  });
+};
+
+export const useStartGameAiDraftMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (query: string) =>
+      gamesApi.startAiDraft({ query }).then(({ data }) => data),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: gameQueryKeys.aiDrafts() });
+    },
+  });
+};
+
+export const useDeleteGameAiDraftMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => gamesApi.deleteAiDraft(id),
+
+    onSuccess: (_, id) => {
+      queryClient.setQueryData<IGameAiDraftRun[]>(
+        gameQueryKeys.aiDrafts(),
+        (runs) => runs?.filter((run) => run._id !== id)
+      );
     },
   });
 };

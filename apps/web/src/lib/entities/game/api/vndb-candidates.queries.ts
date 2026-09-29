@@ -1,4 +1,8 @@
-import { keepPreviousData, queryOptions, useQuery } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  queryOptions,
+  useQuery,
+} from "@tanstack/react-query";
 import { IGetVndbCandidatesParams } from "@mooncellar/schemas";
 import { adminVndbCandidatesApi } from "@/src/lib/shared/api";
 import { vndbCandidateQueryKeys } from "./vndb-candidates.query-keys";
@@ -22,8 +26,7 @@ export const useVndbReviewItemQuery = (vnId: string | null) =>
 export const useVndbCandidatesSummaryQuery = () =>
   useQuery({
     queryKey: vndbCandidateQueryKeys.summary(),
-    queryFn: () =>
-      adminVndbCandidatesApi.getSummary().then(({ data }) => data),
+    queryFn: () => adminVndbCandidatesApi.getSummary().then(({ data }) => data),
     refetchInterval: ({ state }) =>
       state.data?.applying ? SUMMARY_REFRESH_MS : false,
   });

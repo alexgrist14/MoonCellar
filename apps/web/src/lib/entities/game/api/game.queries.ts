@@ -109,3 +109,15 @@ export const useGameFiltersQuery = () =>
     },
     staleTime: Infinity,
   });
+
+const AI_DRAFTS_REFRESH_MS = 3000;
+
+export const useGameAiDraftsQuery = () =>
+  useQuery({
+    queryKey: gameQueryKeys.aiDrafts(),
+    queryFn: () => gamesApi.getAiDrafts().then(({ data }) => data),
+    refetchInterval: ({ state }) =>
+      state.data?.some((run) => run.status === "running")
+        ? AI_DRAFTS_REFRESH_MS
+        : false,
+  });

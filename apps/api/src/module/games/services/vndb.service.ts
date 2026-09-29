@@ -1,4 +1,5 @@
 import { HttpService } from "@nestjs/axios";
+import { parsePartialDate, toReleaseDate } from "../../../shared/release-date";
 import { pipeline, type Readable } from "node:stream";
 import { createZstdDecompress } from "node:zlib";
 import {
@@ -173,21 +174,6 @@ const languageNames = new Intl.DisplayNames(["en"], {
   type: "language",
   languageDisplay: "standard",
 });
-
-const releaseDateFormats: Record<number, Intl.DateTimeFormat> = {
-  4: new Intl.DateTimeFormat("en-US", { year: "numeric", timeZone: "UTC" }),
-  7: new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    year: "numeric",
-    timeZone: "UTC",
-  }),
-  10: new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "UTC",
-  }),
-};
 
 const isEmptyValue = (value: unknown) =>
   value == null || value === "" || (Array.isArray(value) && !value.length);
@@ -1943,22 +1929,13 @@ export class VndbService {
     platformIdBySlug: Map<string, Types.ObjectId>
   ): TVndbReleaseDate[] {
     return releases.flatMap(({ released, platform, region }) => {
-      const date = this.parseVndbDate(released);
+      const releaseDate = toReleaseDate(released);
       const [slug] = VNDB_PLATFORM_SLUGS[platform] ?? [];
       const platformId = platformIdBySlug.get(slug);
 
-      if (!date || !platformId) return [];
+      if (!releaseDate || !platformId) return [];
 
-      return [
-        {
-          date: Math.floor(+date / 1000),
-          human: releaseDateFormats[released.length].format(date),
-          month: date.getUTCMonth() + 1,
-          year: date.getUTCFullYear(),
-          platformId,
-          region,
-        },
-      ];
+      return [{ ...releaseDate, platformId, region }];
     });
   }
 
@@ -2451,27 +2428,6 @@ export class VndbService {
     };
   }
 
-  private parseVndbDate(date: string) {
-    if (!date) return null;
-
-    if (/^\d{4}$/.test(date)) {
-      return new Date(Date.UTC(Number(date), 0, 1));
-    }
-
-    if (/^\d{4}-\d{2}$/.test(date)) {
-      const [year, month] = date.split("-").map(Number);
-      return new Date(Date.UTC(year, month - 1, 1));
-    }
-
-    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      const [year, month, day] = date.split("-").map(Number);
-
-      return new Date(Date.UTC(year, month - 1, day));
-    }
-
-    return null;
-  }
-
   private isCloseDate(vndbDate: Date, igdbDate: Date): boolean {
     const diffYears = Math.abs(
       vndbDate.getUTCFullYear() - igdbDate.getUTCFullYear()
@@ -2486,7 +2442,7 @@ export class VndbService {
 
   private compareDates(vndbDates: string[], game: TVndbCandidate): TDateSignal {
     const vndbParsed = vndbDates
-      .map((date) => this.parseVndbDate(date))
+      .map((date) => parsePartialDate(date))
       .filter((date): date is Date => !!date);
 
     const igdbParsed = [
@@ -2524,7 +2480,7 @@ export class VndbService {
       ...vn.titles.flatMap(({ title, latin }) => [title, latin]),
     ].filter((title): title is string => !!title && title !== name);
 
-    const firstRelease = this.parseVndbDate(vn.released);
+    const firstRelease = parsePartialDate(vn.released);
     const hasExplicitImages = [vn.image, ...(vn.screenshots ?? [])].some(
       (image) => image && image.sexual > VNDB_EXPLICIT_SEXUAL_LEVEL
     );

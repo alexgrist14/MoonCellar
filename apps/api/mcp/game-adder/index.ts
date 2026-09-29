@@ -20,9 +20,13 @@ import {
   S3_FOLDERS,
   S3Folder,
 } from "../../src/shared/s3";
+import {
+  searchImages,
+  searchWeb,
+  searchYoutube,
+} from "../../src/shared/searxng";
 
 const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:3228";
-const SEARXNG_URL = process.env.SEARXNG_URL || "http://localhost:8891";
 const FRONT_URL = process.env.FRONT_URL || "https://mooncellar.space";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
@@ -104,7 +108,9 @@ const runSharpInNode = (
     timeout: 60_000,
   });
   if (result.status !== 0) {
-    throw new Error(`sharp failed: ${result.stderr?.toString() || result.error}`);
+    throw new Error(
+      `sharp failed: ${result.stderr?.toString() || result.error}`
+    );
   }
   return result.stdout;
 };
@@ -150,7 +156,12 @@ const cropToAspectRatio = (
     y = Math.round((height - cropH) * (offsetPercent / 100));
   }
 
-  return runSharpInNode(bytes, { left: x, top: y, width: cropW, height: cropH });
+  return runSharpInNode(bytes, {
+    left: x,
+    top: y,
+    width: cropW,
+    height: cropH,
+  });
 };
 
 const uploadImagesToS3 = async (
@@ -284,34 +295,17 @@ server.registerTool(
     },
   },
   async ({ query, count }) => {
-    const url = new URL("/search", SEARXNG_URL);
-    url.searchParams.set("q", query);
-    url.searchParams.set("format", "json");
-
-    const res = await fetch(url);
-    if (!res.ok) {
+    try {
+      const results = await searchWeb(query, count ?? 10);
       return {
-        content: [
-          {
-            type: "text",
-            text: `SearXNG request failed: ${res.status} ${await res.text()}`,
-          },
-        ],
+        content: [{ type: "text", text: JSON.stringify(results, null, 2) }],
+      };
+    } catch (e) {
+      return {
+        content: [{ type: "text", text: (e as Error).message }],
         isError: true,
       };
     }
-
-    const data = (await res.json()) as {
-      results?: { title: string; url: string; content?: string }[];
-    };
-
-    const results = (data.results || [])
-      .slice(0, count ?? 10)
-      .map((r) => ({ title: r.title, url: r.url, content: r.content }));
-
-    return {
-      content: [{ type: "text", text: JSON.stringify(results, null, 2) }],
-    };
   }
 );
 
@@ -332,46 +326,17 @@ server.registerTool(
     },
   },
   async ({ query, count }) => {
-    const url = new URL("/search", SEARXNG_URL);
-    url.searchParams.set("q", query);
-    url.searchParams.set("format", "json");
-    url.searchParams.set("categories", "images");
-
-    const res = await fetch(url);
-    if (!res.ok) {
+    try {
+      const results = await searchImages(query, count ?? 15);
       return {
-        content: [
-          {
-            type: "text",
-            text: `SearXNG request failed: ${res.status} ${await res.text()}`,
-          },
-        ],
+        content: [{ type: "text", text: JSON.stringify(results, null, 2) }],
+      };
+    } catch (e) {
+      return {
+        content: [{ type: "text", text: (e as Error).message }],
         isError: true,
       };
     }
-
-    const data = (await res.json()) as {
-      results?: {
-        title: string;
-        url: string;
-        img_src?: string;
-        source?: string;
-      }[];
-    };
-
-    const results = (data.results || [])
-      .filter((r) => r.img_src)
-      .slice(0, count ?? 15)
-      .map((r) => ({
-        title: r.title,
-        img_src: r.img_src,
-        pageUrl: r.url,
-        source: r.source,
-      }));
-
-    return {
-      content: [{ type: "text", text: JSON.stringify(results, null, 2) }],
-    };
   }
 );
 
@@ -381,7 +346,9 @@ server.registerTool(
     description:
       "Search YouTube for trailers/gameplay/reviews via a local SearXNG instance (video category, filtered to youtube.com/youtu.be links only). Use this to find links for the videos field of create_game.",
     inputSchema: {
-      query: z.string().describe("Video search query, e.g. \"<game name> trailer\""),
+      query: z
+        .string()
+        .describe('Video search query, e.g. "<game name> trailer"'),
       count: z
         .number()
         .int()
@@ -392,39 +359,17 @@ server.registerTool(
     },
   },
   async ({ query, count }) => {
-    const url = new URL("/search", SEARXNG_URL);
-    url.searchParams.set("q", query);
-    url.searchParams.set("format", "json");
-    url.searchParams.set("categories", "videos");
-
-    const res = await fetch(url);
-    if (!res.ok) {
+    try {
+      const results = await searchYoutube(query, count ?? 10);
       return {
-        content: [
-          {
-            type: "text",
-            text: `SearXNG request failed: ${res.status} ${await res.text()}`,
-          },
-        ],
+        content: [{ type: "text", text: JSON.stringify(results, null, 2) }],
+      };
+    } catch (e) {
+      return {
+        content: [{ type: "text", text: (e as Error).message }],
         isError: true,
       };
     }
-
-    const data = (await res.json()) as {
-      results?: { title: string; url: string }[];
-    };
-
-    const isYoutube = (u: string) =>
-      /(^|\.)youtube\.com\/watch|youtu\.be\//.test(u);
-
-    const results = (data.results || [])
-      .filter((r) => isYoutube(r.url))
-      .slice(0, count ?? 10)
-      .map((r) => ({ title: r.title, url: r.url }));
-
-    return {
-      content: [{ type: "text", text: JSON.stringify(results, null, 2) }],
-    };
   }
 );
 
@@ -482,8 +427,8 @@ server.registerTool(
       "artworks vs screenshots is ambiguous from search results alone (artwork = promotional/key art, box art, drawn art; screenshot = actual in-game capture). Before including a candidate image in either list, show its URL to the human user in chat and ask them to confirm which of the two it is — do not guess. Artworks additionally require at least 720p quality (shorter side >= 720px, check actual pixel dimensions, not just the URL/thumbnail label) — the real call fails without creating anything if any artwork is below that, or if any image cannot be downloaded and stored in S3. bannerImage and backgroundImage must each be one of the given screenshots or artworks; they are stored as that image's S3 link.  " +
       "videos should be YouTube links (trailers/gameplay) found via search_youtube. " +
       "The frontend displays cover at a fixed 3:4 portrait aspect ratio and crops anything else with CSS object-fit:cover. If the cover source image doesn't already have roughly that aspect ratio (e.g. a landscape Steam header banner), this tool crops it server-side to 3:4 on the real (confirm: true) call using coverCropPosition. The preview call checks the cover's actual dimensions and will warn if it doesn't match 3:4 and coverCropPosition wasn't given — when that happens, do NOT jump straight to asking for a crop position. " +
-      "PREFERRED COVER SOURCE: steamgriddb.com — for any game with a Steam app id, check it FIRST for a portrait \"grid\" asset (they're usually ~600x900, much closer to 3:4 than a Steam header banner). steamgriddb.com itself blocks fetching, so resolve it this way: search_web(\"<game name> steamgriddb\") to find the game/grid page URL, then fetch the grid page's raw HTML with a normal browser user-agent (steamgriddb.com/grid/<id> — the HTML embeds a cdn2.steamgriddb.com/thumb/<hash>.<ext> reference even though it's a JS app) and swap /thumb/ for /grid/ on that same URL to get the full-res image (try .png first, then .jpg/.jpeg/.webp). If no usable SteamGridDB asset exists, fall back to search_images (queries like \"<game name> poster\", \"<game name> box art\", \"<game name> key art vertical\") for some other source already closer to 3:4 portrait — a real poster/box-art loses far less content than cropping a wide banner down to a sliver. Only if nothing reasonably-portrait turns up should you fall back to asking the human user in chat which position/offset to crop the original from (left/center/right, or an exact 0-100 percent), then re-call with their choice. Do not default to \"center\" on your own, and don't crop before checking for a better source.  " +
-      "Don't stop at the core fields (name/type/cover/summary/genres/companies/release_dates/platformIds) — actively try to research and fill the rest of the schema too when a source has the info: languages (supported/audio languages), status (e.g. \"Released\"), player_perspectives (verify from an actual screenshot when unclear, don't assume \"First person\" by genre alone), game_engines, multiplayer_modes, ageRatings (only from an actual rating board, don't invent one), and especially externalPages — for a Steam-sourced game this should always include {name: \"Steam\", uid: \"<app id>\", url: \"https://store.steampowered.com/app/<app id>\"} (matches the convention IGDB-parsed games in this DB already use), plus any other storefront/service links found (itch.io, DLsite, GOG, Twitch directory, GiantBomb, etc). Leave a field empty rather than guessing when no real source supports it.",
+      'PREFERRED COVER SOURCE: steamgriddb.com — for any game with a Steam app id, check it FIRST for a portrait "grid" asset (they\'re usually ~600x900, much closer to 3:4 than a Steam header banner). steamgriddb.com itself blocks fetching, so resolve it this way: search_web("<game name> steamgriddb") to find the game/grid page URL, then fetch the grid page\'s raw HTML with a normal browser user-agent (steamgriddb.com/grid/<id> — the HTML embeds a cdn2.steamgriddb.com/thumb/<hash>.<ext> reference even though it\'s a JS app) and swap /thumb/ for /grid/ on that same URL to get the full-res image (try .png first, then .jpg/.jpeg/.webp). If no usable SteamGridDB asset exists, fall back to search_images (queries like "<game name> poster", "<game name> box art", "<game name> key art vertical") for some other source already closer to 3:4 portrait — a real poster/box-art loses far less content than cropping a wide banner down to a sliver. Only if nothing reasonably-portrait turns up should you fall back to asking the human user in chat which position/offset to crop the original from (left/center/right, or an exact 0-100 percent), then re-call with their choice. Do not default to "center" on your own, and don\'t crop before checking for a better source.  ' +
+      'Don\'t stop at the core fields (name/type/cover/summary/genres/companies/release_dates/platformIds) — actively try to research and fill the rest of the schema too when a source has the info: languages (supported/audio languages), status (e.g. "Released"), player_perspectives (verify from an actual screenshot when unclear, don\'t assume "First person" by genre alone), game_engines, multiplayer_modes, ageRatings (only from an actual rating board, don\'t invent one), and especially externalPages — for a Steam-sourced game this should always include {name: "Steam", uid: "<app id>", url: "https://store.steampowered.com/app/<app id>"} (matches the convention IGDB-parsed games in this DB already use), plus any other storefront/service links found (itch.io, DLsite, GOG, Twitch directory, GiantBomb, etc). Leave a field empty rather than guessing when no real source supports it.',
     inputSchema: {
       ...AddGameRequestSchema.shape,
       screenshots: AddGameRequestSchema.shape.screenshots
@@ -499,7 +444,10 @@ server.registerTool(
           "At most 5 artwork URLs (promotional/key art, not screenshots). Each candidate must be confirmed with the human user in chat before being included here. Must be at least 720p quality (shorter side >= 720px) — a low-res candidate fails the whole call, so check dimensions before picking one."
         ),
       coverCropPosition: z
-        .union([z.enum(["left", "center", "right"]), z.number().min(0).max(100)])
+        .union([
+          z.enum(["left", "center", "right"]),
+          z.number().min(0).max(100),
+        ])
         .optional()
         .describe(
           "If set, crop cover to the frontend's 3:4 portrait ratio before upload. 'left'/'center'/'right', or a 0-100 percent offset for exactly where the crop window starts along the axis being cut (0 = left/top edge, 100 = right/bottom edge). Omit to upload the cover uncropped."
@@ -520,7 +468,8 @@ server.registerTool(
         const dims = await checkRemoteImageAspectRatio(input.cover);
         if (dims) {
           const mismatch =
-            Math.abs(dims.ratio - COVER_ASPECT_RATIO) / COVER_ASPECT_RATIO > 0.05;
+            Math.abs(dims.ratio - COVER_ASPECT_RATIO) / COVER_ASPECT_RATIO >
+            0.05;
           if (mismatch) {
             coverWarning =
               `\n\nCOVER ASPECT RATIO WARNING: cover is ${dims.width}x${dims.height} ` +
@@ -543,7 +492,11 @@ server.registerTool(
               "Show this to the user and ask them to confirm this is the correct game before proceeding.\n" +
               "If confirmed, call create_game again with the exact same input plus confirm: true.\n\n" +
               JSON.stringify(
-                { ...input, coverCropPosition: coverCropPosition ?? "(none — uploaded uncropped)" },
+                {
+                  ...input,
+                  coverCropPosition:
+                    coverCropPosition ?? "(none — uploaded uncropped)",
+                },
                 null,
                 2
               ) +
@@ -556,11 +509,15 @@ server.registerTool(
     const uploaded = { ...input };
 
     try {
-      const pageImages = [uploaded.bannerImage, uploaded.backgroundImage].filter(
-        (u): u is string => !!u
-      );
+      const pageImages = [
+        uploaded.bannerImage,
+        uploaded.backgroundImage,
+      ].filter((u): u is string => !!u);
       for (const u of pageImages) {
-        if (!uploaded.screenshots?.includes(u) && !uploaded.artworks?.includes(u)) {
+        if (
+          !uploaded.screenshots?.includes(u) &&
+          !uploaded.artworks?.includes(u)
+        ) {
           throw new Error(
             `bannerImage/backgroundImage must be one of the screenshots or artworks: ${u}`
           );
@@ -591,11 +548,14 @@ server.registerTool(
         undefined,
         ARTWORK_MIN_DIMENSION
       );
-      const s3Link = (u: string) => screenshotLinks.get(u) ?? artworkLinks.get(u)!;
+      const s3Link = (u: string) =>
+        screenshotLinks.get(u) ?? artworkLinks.get(u)!;
 
-      if (uploaded.screenshots) uploaded.screenshots = uploaded.screenshots.map(s3Link);
+      if (uploaded.screenshots)
+        uploaded.screenshots = uploaded.screenshots.map(s3Link);
       if (uploaded.artworks) uploaded.artworks = uploaded.artworks.map(s3Link);
-      if (uploaded.bannerImage) uploaded.bannerImage = s3Link(uploaded.bannerImage);
+      if (uploaded.bannerImage)
+        uploaded.bannerImage = s3Link(uploaded.bannerImage);
       if (uploaded.backgroundImage) {
         uploaded.backgroundImage = s3Link(uploaded.backgroundImage);
       }
@@ -626,7 +586,10 @@ server.registerTool(
     if (!res.ok) {
       return {
         content: [
-          { type: "text", text: `Failed to create game: ${res.status} ${text}` },
+          {
+            type: "text",
+            text: `Failed to create game: ${res.status} ${text}`,
+          },
         ],
         isError: true,
       };

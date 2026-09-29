@@ -14,4 +14,5 @@ export const gameQueryKeys = {
     [...gameQueryKeys.all, "followings-status", gameId, profileId] as const,
   stats: (gameId: string) => [...gameQueryKeys.all, "stats", gameId] as const,
   filters: () => [...gameQueryKeys.all, "filters"] as const,
+  aiDrafts: () => [...gameQueryKeys.all, "admin", "ai-drafts"] as const,
 };

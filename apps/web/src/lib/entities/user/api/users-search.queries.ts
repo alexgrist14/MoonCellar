@@ -1,5 +1,8 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { USERS_SEARCH_PAGE_SIZE } from "@mooncellar/schemas";
+import {
+  USER_NAME_MAX_LENGTH,
+  USERS_SEARCH_PAGE_SIZE,
+} from "@mooncellar/schemas";
 import { userAPI } from "@/src/lib/shared/api";
 import { userQueryKeys } from "./user.query-keys";
 
@@ -15,6 +18,9 @@ export const useUsersSearchQuery = (q: string, enabled = true) =>
       pages.length * USERS_SEARCH_PAGE_SIZE < lastPage.total
         ? pages.length + 1
         : undefined,
-    enabled: enabled && q.trim().length >= 2,
+    enabled:
+      enabled &&
+      q.trim().length >= 2 &&
+      q.trim().length <= USER_NAME_MAX_LENGTH,
     staleTime: 60000,
   });

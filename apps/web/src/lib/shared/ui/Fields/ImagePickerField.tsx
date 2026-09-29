@@ -15,6 +15,7 @@ interface IImagePickerFieldProps {
   autoCaption: string;
   onChange: (value: string | null) => void;
   disabled?: boolean;
+  isUnoptimized?: boolean;
 }
 
 export const ImagePickerField: FC<IImagePickerFieldProps> = ({
@@ -24,6 +25,7 @@ export const ImagePickerField: FC<IImagePickerFieldProps> = ({
   autoCaption,
   onChange,
   disabled,
+  isUnoptimized,
 }) => {
   const isAuto = !value || !options.some((option) => option.url === value);
 
@@ -41,9 +43,13 @@ export const ImagePickerField: FC<IImagePickerFieldProps> = ({
             role="radio"
             aria-checked={isAuto}
             disabled={disabled}
-            className={classNames(styles.picker__tile, styles.picker__tile_auto, {
-              [styles.picker__tile_active]: isAuto,
-            })}
+            className={classNames(
+              styles.picker__tile,
+              styles.picker__tile_auto,
+              {
+                [styles.picker__tile_active]: isAuto,
+              }
+            )}
             onClick={() => onChange(null)}
           >
             <span className={styles.picker__preview}>Automatic</span>
@@ -70,6 +76,7 @@ export const ImagePickerField: FC<IImagePickerFieldProps> = ({
                     alt=""
                     fill
                     sizes="160px"
+                    unoptimized={isUnoptimized}
                     className={styles.picker__image}
                   />
                 </span>

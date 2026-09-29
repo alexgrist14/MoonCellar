@@ -9,7 +9,8 @@ export const GENERATED_LIST_GAME_TYPES = ["Main Game"];
 export const GENERATED_LIST_PRIOR_MEAN = 65;
 export const GENERATED_LIST_PRIOR_VOTES = 100;
 export const GENERATED_LIST_HLTB_WEIGHT = 10;
-export const GENERATED_LIST_LAUNCH_WINDOW_SECONDS = 365 * 24 * 60 * 60;
+export const GENERATED_LIST_PC_PLATFORM_SLUGS = ["win", "mac", "linux"];
+export const GENERATED_LIST_PC_SHARING_FAMILIES = ["playstation", "xbox"];
 
 export const GENERATED_LIST_DECADES: [number, number][] = [
   [1990, 2000],

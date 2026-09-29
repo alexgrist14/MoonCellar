@@ -39,7 +39,11 @@ export const useVndbReviewSocket = (openVnId: string | null) => {
         }),
       ]);
 
-    const onDecided = ({ vnId, state, decidedBy }: IVndbCandidateDecidedEvent) => {
+    const onDecided = ({
+      vnId,
+      state,
+      decidedBy,
+    }: IVndbCandidateDecidedEvent) => {
       const queryKey = vndbCandidateQueryKeys.item(vnId);
       const wasWaiting =
         queryClient.getQueryData<IVndbReviewItemResponse>(queryKey)?.item

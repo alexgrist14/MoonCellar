@@ -1,0 +1,49 @@
+const getSearxngUrl = () => process.env.SEARXNG_URL || "http://localhost:8891";
+
+const search = async <T>(query: string, category?: string): Promise<T[]> => {
+  const url = new URL("/search", getSearxngUrl());
+  url.searchParams.set("q", query);
+  url.searchParams.set("format", "json");
+  if (category) url.searchParams.set("categories", category);
+
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(
+      `SearXNG request failed: ${res.status} ${await res.text()}`
+    );
+  }
+
+  return ((await res.json()) as { results?: T[] }).results ?? [];
+};
+
+export const searchWeb = async (query: string, count = 10) =>
+  (await search<{ title: string; url: string; content?: string }>(query))
+    .slice(0, count)
+    .map(({ title, url, content }) => ({ title, url, content }));
+
+export const searchImages = async (query: string, count = 15) =>
+  (
+    await search<{
+      title: string;
+      url: string;
+      img_src?: string;
+      source?: string;
+    }>(query, "images")
+  )
+    .filter((r) => r.img_src)
+    .slice(0, count)
+    .map((r) => ({
+      title: r.title,
+      img_src: r.img_src,
+      pageUrl: r.url,
+      source: r.source,
+    }));
+
+const isYoutube = (url: string) =>
+  /(^|\.)youtube\.com\/watch|youtu\.be\//.test(url);
+
+export const searchYoutube = async (query: string, count = 10) =>
+  (await search<{ title: string; url: string }>(query, "videos"))
+    .filter((r) => isYoutube(r.url))
+    .slice(0, count)
+    .map(({ title, url }) => ({ title, url }));

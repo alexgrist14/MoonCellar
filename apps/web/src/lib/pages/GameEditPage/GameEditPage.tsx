@@ -54,6 +54,7 @@ import {
   ToggleField,
   UploadButton,
 } from "@/src/lib/shared/ui/Fields";
+import { AiGameDrafts } from "@/src/lib/widgets/admin/AiGameDrafts";
 import { GAME_SECTIONS, IFieldDescriptor, IOptionsKey } from "./sections";
 import styles from "./GameEditPage.module.scss";
 
@@ -454,7 +455,9 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
       await revalidateGamePage(original.slug as string, slug);
       await reloadGame();
     } catch {
-      toast.error({ description: `Failed to parse from ${source.toUpperCase()}` });
+      toast.error({
+        description: `Failed to parse from ${source.toUpperCase()}`,
+      });
     } finally {
       setParsingSource(null);
     }
@@ -491,6 +494,16 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
         message: data.message,
       };
     });
+
+  const handleApplyDraft = (draft: Partial<IAddGameRequest>) => {
+    reset({
+      ...CREATE_DEFAULTS,
+      ...(pruneEmpty(draft as Record<string, unknown>) as IGameFormValues),
+    });
+    toast.success({
+      description: "Draft applied. External images are stored on Create",
+    });
+  };
 
   const handleUpload = async (
     path: string,
@@ -748,6 +761,7 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
                     alt="Game cover"
                     width={160}
                     height={224}
+                    unoptimized={isCreate}
                   />
                 )}
                 {isCreate ? (
@@ -811,6 +825,7 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
                 value={rhf.value as string | null | undefined}
                 options={pictureOptions}
                 autoCaption={field.autoCaption ?? "Automatic"}
+                isUnoptimized={isCreate}
                 onChange={rhf.onChange}
               />
             )}
@@ -906,6 +921,10 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
           </Button>
         </div>
       </div>
+
+      {isCreate && (
+        <AiGameDrafts isReplacing={isDirty} onApply={handleApplyDraft} />
+      )}
 
       <form className={styles.form} onSubmit={handleSubmit(onValid, onInvalid)}>
         {!isCreate && (

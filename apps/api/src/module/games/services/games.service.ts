@@ -39,12 +39,9 @@ import { Rating } from "../../user/schemas/user-ratings.schema";
 import { UserLogs } from "../../user/schemas/user-logs.schema";
 import { IndexNowService } from "../../indexnow/indexnow.service";
 import { FRONT_URL } from "../../../shared/constants";
-import {
-  normalizeGameName,
-  replaceRomanNumerals,
-} from "../../../shared/utils";
+import { normalizeGameName, replaceRomanNumerals } from "../../../shared/utils";
 import { pickFollowingsStatus } from "../utils/followings-status.utils";
-import { S3_FOLDERS } from "../../../shared/s3";
+import { parseS3ImageUrl, S3_FOLDERS, type S3Folder } from "../../../shared/s3";
 
 const SEARCH_CANDIDATES_LIMIT = 1000;
 const SEARCH_SCORE_THRESHOLD = 0.3;
@@ -455,9 +452,12 @@ export class GamesService implements OnModuleInit {
       }
 
       const now = new Date().toISOString();
+      const _id = new mongoose.Types.ObjectId();
 
       const game = await this.Games.create({
         ...data,
+        ...(await this.storeRemoteImages(_id, data)),
+        _id,
         nameNormalized: normalizeGameName(data.name),
         isCustom: true,
         createdAt: now,
@@ -471,6 +471,52 @@ export class GamesService implements OnModuleInit {
       this.logger.error(err, `Failed to add game: ${JSON.stringify(data)}`);
       throw err;
     }
+  }
+
+  private async storeRemoteImages(
+    gameId: mongoose.Types.ObjectId,
+    {
+      cover,
+      screenshots,
+      artworks,
+      bannerImage,
+      backgroundImage,
+    }: IAddGameRequest
+  ) {
+    const stored = new Map<string, string>();
+    const store = async (url: string, folder: S3Folder) => {
+      if (parseS3ImageUrl(url)) return url;
+
+      try {
+        const link = await this.fileService.uploadRemoteImage(
+          url,
+          `${gameId.toString()}/${new mongoose.Types.ObjectId().toString()}`,
+          folder
+        );
+        stored.set(url, link);
+
+        return link;
+      } catch (err) {
+        throw new BadRequestException(
+          `Failed to store image ${url}: ${(err as Error).message}`
+        );
+      }
+    };
+    const storeAll = async (urls: string[] | undefined, folder: S3Folder) =>
+      urls && Promise.all(urls.map((url) => store(url, folder)));
+    const pageImage = (url?: string | null) => (url && stored.get(url)) || url;
+
+    const images = {
+      cover: cover && (await store(cover, S3_FOLDERS.covers)),
+      screenshots: await storeAll(screenshots, S3_FOLDERS.screenshots),
+      artworks: await storeAll(artworks, S3_FOLDERS.artworks),
+    };
+
+    return {
+      ...images,
+      bannerImage: pageImage(bannerImage),
+      backgroundImage: pageImage(backgroundImage),
+    };
   }
 
   async updateGame(_id: mongoose.Types.ObjectId, data: IUpdateGameRequest) {
@@ -634,18 +680,51 @@ export class GamesService implements OnModuleInit {
     }
   }
 
-  async getAllSlugs({ count = 10000 }: IGetGameSlugsRequest = {}) {
+  async getAllSlugs({ count = 1000 }: IGetGameSlugsRequest = {}) {
     try {
-      return (
-        await this.Games.find()
-          .select("slug updatedAt cover")
-          .sort({ ["igdb.total_rating_count"]: -1 })
-          .limit(count)
-      ).map((game) => ({
-        slug: game.slug,
-        updatedAt: game.updatedAt,
-        cover: game.cover,
-      }));
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const project = { $project: { _id: 0, slug: 1, updatedAt: 1, cover: 1 } };
+
+      const [popular, upcoming] = await Promise.all([
+        this.Games.aggregate([
+          { $match: { "igdb.total_rating": { $gt: 0 } } },
+          { $sort: { "igdb.total_rating_count": -1 } },
+          { $limit: count * 5 },
+          {
+            $addFields: {
+              _score: {
+                $multiply: [
+                  "$igdb.total_rating",
+                  { $ln: { $add: ["$igdb.total_rating_count", 1] } },
+                ],
+              },
+            },
+          },
+          { $sort: { _score: -1 } },
+          { $limit: count },
+          project,
+        ]),
+        this.Games.aggregate([
+          {
+            $match: {
+              first_release: {
+                $gt: nowSeconds,
+                $lte: nowSeconds + 365 * 86400,
+              },
+              cover: { $ne: null },
+            },
+          },
+          { $sort: { "igdb.hypes": -1, first_release: 1 } },
+          { $limit: 100 },
+          project,
+        ]),
+      ]);
+
+      const seen = new Set<string>();
+
+      return [...popular, ...upcoming].filter(
+        ({ slug }) => !seen.has(slug) && seen.add(slug)
+      );
     } catch (err) {
       this.logger.error(err, `Failed to get all game slugs`);
       throw err;
