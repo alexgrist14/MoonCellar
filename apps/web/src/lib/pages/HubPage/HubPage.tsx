@@ -86,7 +86,7 @@ export const HubPage: FC<IHubPageProps> = ({
             <SectionTitle as="h2">Most popular</SectionTitle>
             <div className={styles.hub__top}>
               <div className={styles.hub__feature}>
-                <GameCard game={hero} priority isWithCombinedRating />
+                <GameCard game={hero} priority />
                 <div className={styles.hub__featureInfo}>
                   <span className={styles.hub__featureRank}>01</span>
                   <Link
@@ -106,7 +106,6 @@ export const HubPage: FC<IHubPageProps> = ({
                   game={game}
                   rank={index + 2}
                   priority
-                  isWithCombinedRating
                 />
               ))}
             </div>
@@ -122,7 +121,6 @@ export const HubPage: FC<IHubPageProps> = ({
               games={recentGames}
               columns={HUB_COLUMNS}
               limit={takeHubRecentGames}
-              isWithCombinedRating
               isWithoutScroll
             />
           )}
@@ -143,7 +141,6 @@ export const HubPage: FC<IHubPageProps> = ({
             games={allGames}
             columns={HUB_COLUMNS}
             limit={takeHubGames}
-            isWithCombinedRating
             isWithoutScroll
           />
           <Link href={moreHref} className={styles.hub__more}>

@@ -154,6 +154,12 @@
   &__cover {
     flex-shrink: 0;
     width: var(--gauntlet-winner-cover-width);
+
+    @include mediaSm {
+      align-self: center;
+      width: var(--gauntlet-winner-cover-width-mobile);
+      max-width: 100%;
+    }
   }
 
   &__title {

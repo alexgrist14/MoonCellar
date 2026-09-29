@@ -214,7 +214,6 @@ export const UserGames: FC<UserGamesProps> = ({
       <GamesCards
         games={games}
         gameClassName={styles.games__game}
-        isWithCombinedRating
         isWithoutScroll
         columns={5}
         additionalGameNode={(game) => {

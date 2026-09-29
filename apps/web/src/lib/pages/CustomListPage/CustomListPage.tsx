@@ -513,7 +513,6 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
               <GamesCards
                 games={games}
                 limit={CUSTOM_LIST_GAMES_PAGE_SIZE}
-                isWithCombinedRating
                 isWithoutScroll
                 gameClassName={styles.grid__cell}
                 getRank={list.isRanked ? getRank : undefined}

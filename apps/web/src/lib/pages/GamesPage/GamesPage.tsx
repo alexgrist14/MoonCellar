@@ -116,7 +116,6 @@ export const GamesPage: FC<IGamesPageProps> = ({
           <GamesCards
             games={games}
             columns={6}
-            isWithCombinedRating
             isWithoutScroll
             isSelectable={isSelectMode}
             selectedIds={selected}

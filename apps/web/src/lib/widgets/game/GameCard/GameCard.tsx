@@ -62,7 +62,6 @@ interface IGameCardProps {
   isInfoDisabled?: boolean;
   priority?: boolean;
   rank?: number;
-  isWithCombinedRating?: boolean;
   isSelectable?: boolean;
   isSelected?: boolean;
   onSelect?: (gameId: string) => void;
@@ -77,7 +76,6 @@ export const GameCard = memo(
     isInfoDisabled,
     priority,
     rank,
-    isWithCombinedRating,
     isSelectable,
     isSelected,
     onSelect,
@@ -89,11 +87,7 @@ export const GameCard = memo(
 
     const hideMedia = useHideAdult() && isAdultGame(game);
 
-    const combinedRating = useMemo(
-      () =>
-        isWithCombinedRating || isInfoDisabled ? getAverageRating(game) : null,
-      [game, isWithCombinedRating, isInfoDisabled]
-    );
+    const combinedRating = useMemo(() => getAverageRating(game), [game]);
 
     const [isLoading, setIsLoading] = useState(!!game.cover && !hideMedia);
     const [isActive, setIsActive] = useState(false);
