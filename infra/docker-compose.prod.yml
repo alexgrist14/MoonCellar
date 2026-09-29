@@ -87,6 +87,16 @@ services:
     networks:
       - mooncellar
 
+  searxng:
+    image: docker.io/searxng/searxng:latest
+    container_name: searxng
+    restart: always
+    volumes:
+      - ./searxng:/etc/searxng:rw
+    mem_limit: 256m
+    networks:
+      - mooncellar
+
 volumes:
   loki_data:
 

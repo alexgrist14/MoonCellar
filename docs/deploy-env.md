@@ -246,6 +246,10 @@ pins the internal API address, so it stays a secret on both counts.
 | `PROMETHEUS_ENABLED` | no | `true` / `false` — switches the `/metrics` endpoint off entirely |
 | `METRICS_TOKEN` | **yes** | Bearer token guarding `/metrics`. Prometheus must be configured with the same value |
 | `INDEXNOW_KEY` | **yes** | IndexNow key used to submit new game pages to search engines |
+| `SEARXNG_URL` | no | SearXNG the admin "Fill with AI" draft searches through — `http://searxng:8080`, the `searxng` service of `infra/docker-compose.prod.yml`. The default, `http://localhost:8891`, is empty inside the container: every search step then fails |
+| `OPENAI_API_KEY` | **yes** | OpenAI key for the admin "Fill with AI" game draft. Without it `POST /games/ai-drafts` answers 503 |
+| `OPENAI_MODEL` | no | Model the draft runs on, `gpt-5-mini` by default |
+| `STEAMGRIDDB_API_KEY` | **yes** | SteamGridDB API key (steamgriddb.com → Preferences → API) the draft takes covers and hero banners from. Without it that step fails and the draft falls back to images found elsewhere |
 
 ---
 
@@ -255,7 +259,7 @@ These exist locally but must never end up in `HOST_ENV_*`:
 
 | Variable | Where it belongs |
 |---|---|
-| `API_BASE_URL`, `SEARXNG_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` | The `game-adder` MCP server — a local development tool. `ADMIN_PASSWORD` is a real account password; keep it out of any shared secret |
+| `API_BASE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` | The `game-adder` MCP server — a local development tool. `ADMIN_PASSWORD` is a real account password; keep it out of any shared secret |
 | `CHROME_PATH`, `CHECK_BASE_URL` | `bun --filter web check:layout`, run on a developer machine |
 | `MONGO_INITDB_ROOT_USERNAME`, `MONGO_INITDB_ROOT_PASSWORD` | `infra/docker-compose.yml`, local MongoDB only |
 | `LEGACY_S3_ID`, `LEGACY_S3_KEY`, `LEGACY_S3_ENDPOINT` | The one-off `apps/api/scripts/transfer-s3.ts` run that copies the regru buckets into the Space. Drop them once the old buckets are deleted |
@@ -388,9 +392,14 @@ METRICS_TOKEN=
 # IndexNow submission key
 INDEXNOW_KEY=
 
+# AI game draft — in production SEARXNG_URL=http://searxng:8080
+SEARXNG_URL=http://localhost:8891
+OPENAI_API_KEY=
+OPENAI_MODEL=gpt-5-mini
+STEAMGRIDDB_API_KEY=
+
 # game-adder MCP server — local tooling, never part of HOST_ENV_API
 API_BASE_URL=http://localhost:3228
-SEARXNG_URL=http://localhost:8891
 ADMIN_EMAIL=
 ADMIN_PASSWORD=
 

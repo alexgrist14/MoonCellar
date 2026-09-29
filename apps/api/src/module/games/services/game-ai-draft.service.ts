@@ -24,13 +24,19 @@ import {
   searchWeb,
   searchYoutube,
 } from "../../../shared/searxng";
-import { downloadRemotePage } from "../../../shared/remote-image";
+import {
+  downloadRemoteImage,
+  downloadRemotePage,
+} from "../../../shared/remote-image";
 import { toReleaseDate } from "../../../shared/release-date";
 import { uniqueSlug } from "../../../shared/utils";
 import { VNDB_WORLDWIDE_REGION } from "../constants/vndb";
 
 const OPENAI_URL = "https://api.openai.com/v1/responses";
-const MAX_TURNS = 15;
+const STEAMGRIDDB_URL = "https://www.steamgriddb.com/api/v2";
+const STEAMGRIDDB_IMAGES_LIMIT = 5;
+const MAX_TURNS = 12;
+const TOOL_FAILED = "Tool failed:";
 const PAGE_TEXT_LIMIT = 30_000;
 const PAGE_IMAGES_LIMIT = 40;
 const RUNS_LIMIT = 20;
@@ -120,6 +126,12 @@ const TOOLS = [
     parameters: QUERY_TOOL,
   },
   {
+    name: "search_steamgriddb",
+    description:
+      "SteamGridDB artwork for a game: portrait covers (grids) and wide banners (heroes). Pass the Steam app id when the game is on Steam, otherwise the game name.",
+    parameters: object({ steam_app_id: nullableStr, name: nullableStr }),
+  },
+  {
     name: "fetch_page",
     description:
       "Fetch a web page and return its title, text and image URLs. Use it on the link the admin gave and on store/wiki pages found by search.",
@@ -137,12 +149,13 @@ Rules:
 - game_engines, languages and company names: prefer the exact spelling from the known lists given below when one matches.
 - platforms and release_dates.platform are platform slugs from the schema enum.
 - Dates are "YYYY-MM-DD", or "YYYY-MM" / "YYYY" when the day or month is unknown. first_release is the earliest release date.
-- cover is a portrait image (box art, poster, Steam library grid from steamgriddb.com); prefer one close to a 3:4 ratio.
-- screenshots are in-game captures, at most 10. artworks are promotional or key art, at least 720px on the short side, at most 5. Do not put the same image in both.
+- Always call search_steamgriddb. cover is its best portrait grid; only when it has none, use another portrait image close to a 3:4 ratio (box art, poster), never a landscape banner. Never build or guess an image URL.
+- artworks are promotional or key art, at most 5: put the best SteamGridDB heroes there first (largest first), then other key art. screenshots are in-game captures, at most 10. Do not put the same image in both.
 - videos are YouTube links to trailers or gameplay.
 - externalPages: for a Steam game always add {name: "Steam", uid: "<app id>", url: "https://store.steampowered.com/app/<app id>"}, plus other store or database pages found (GOG, itch.io, Epic Games, DLsite...).
 - websites are official sites and social pages.
-- Image URLs must be direct links to image files, taken from tool results.`;
+- Image URLs must be direct links to image files, taken from tool results.
+- Research in few rounds: call several tools at once whenever the calls do not depend on each other, and answer as soon as the main fields are covered. You have at most ${MAX_TURNS} rounds of tool calls.`;
 
 @Injectable()
 export class GameAiDraftService implements OnModuleInit {
@@ -259,9 +272,20 @@ export class GameAiDraftService implements OnModuleInit {
       },
     };
 
-    for (let turn = 0; turn < MAX_TURNS; turn++) {
-      await addStep(turn ? "Reading the results" : "Asking OpenAI");
-      const response = await this.callOpenAi(apiKey, body);
+    for (let turn = 0; turn <= MAX_TURNS; turn++) {
+      const isLastTurn = turn === MAX_TURNS;
+
+      await addStep(
+        isLastTurn
+          ? "Out of research rounds, asking for the draft"
+          : turn
+            ? "Reading the results"
+            : "Asking OpenAI"
+      );
+      const response = await this.callOpenAi(apiKey, {
+        ...body,
+        tool_choice: isLastTurn ? "none" : "auto",
+      });
       const calls = response.output.filter(
         (item): item is Extract<IOpenAiOutput, { type: "function_call" }> =>
           item.type === "function_call"
@@ -284,12 +308,19 @@ export class GameAiDraftService implements OnModuleInit {
         previous_response_id: response.id,
         input: await Promise.all(
           calls.map(async (call) => {
-            await addStep(`${call.name} ${this.describeArgs(call.arguments)}`);
+            const step = `${call.name} ${this.describeArgs(call.arguments)}`;
+
+            await addStep(step);
+            const output = await this.runTool(call.name, call.arguments);
+
+            if (output.startsWith(TOOL_FAILED)) {
+              await addStep(`${step}: ${output}`);
+            }
 
             return {
               type: "function_call_output",
               call_id: call.call_id,
-              output: await this.runTool(call.name, call.arguments),
+              output,
             };
           })
         ),
@@ -320,12 +351,14 @@ export class GameAiDraftService implements OnModuleInit {
 
   private describeArgs(rawArgs: string) {
     try {
-      const { query, url } = JSON.parse(rawArgs) as {
+      const { query, url, steam_app_id, name } = JSON.parse(rawArgs) as {
         query?: string;
         url?: string;
+        steam_app_id?: string | null;
+        name?: string | null;
       };
 
-      return query ?? url ?? "";
+      return query ?? url ?? steam_app_id ?? name ?? "";
     } catch {
       return "";
     }
@@ -333,7 +366,12 @@ export class GameAiDraftService implements OnModuleInit {
 
   private async runTool(name: string, rawArgs: string) {
     try {
-      const args = JSON.parse(rawArgs) as { query?: string; url?: string };
+      const args = JSON.parse(rawArgs) as {
+        query?: string;
+        url?: string;
+        steam_app_id?: string | null;
+        name?: string | null;
+      };
       const result =
         name === "search_web"
           ? await searchWeb(args.query)
@@ -341,14 +379,84 @@ export class GameAiDraftService implements OnModuleInit {
             ? await searchImages(args.query)
             : name === "search_youtube"
               ? await searchYoutube(args.query)
-              : name === "fetch_page"
-                ? await this.fetchPage(args.url)
-                : `Unknown tool: ${name}`;
+              : name === "search_steamgriddb"
+                ? await this.searchSteamGridDb(args)
+                : name === "fetch_page"
+                  ? await this.fetchPage(args.url)
+                  : `Unknown tool: ${name}`;
 
       return typeof result === "string" ? result : JSON.stringify(result);
     } catch (err) {
-      return `Tool failed: ${(err as Error).message}`;
+      return `${TOOL_FAILED} ${(err as Error).message}`;
     }
+  }
+
+  private async keepImages(urls: (string | null)[]) {
+    const checked = await Promise.all(
+      urls.map((url) =>
+        url
+          ? downloadRemoteImage(url)
+              .then(() => url)
+              .catch(() => null)
+          : null
+      )
+    );
+
+    return checked.filter((url): url is string => !!url);
+  }
+
+  private async steamGridDb<T>(path: string): Promise<T> {
+    const apiKey = process.env.STEAMGRIDDB_API_KEY;
+
+    if (!apiKey) throw new Error("STEAMGRIDDB_API_KEY is not set");
+
+    const res = await fetch(`${STEAMGRIDDB_URL}${path}`, {
+      headers: { Authorization: `Bearer ${apiKey}` },
+    });
+
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error(`SteamGridDB ${res.status}`);
+
+    return ((await res.json()) as { data: T }).data;
+  }
+
+  private async searchSteamGridDb({
+    steam_app_id,
+    name,
+  }: {
+    steam_app_id?: string | null;
+    name?: string | null;
+  }) {
+    const game = steam_app_id
+      ? await this.steamGridDb<{ id: number; name: string }>(
+          `/games/steam/${encodeURIComponent(steam_app_id)}`
+        )
+      : name
+        ? (
+            await this.steamGridDb<{ id: number; name: string }[]>(
+              `/search/autocomplete/${encodeURIComponent(name)}`
+            )
+          )?.[0]
+        : null;
+
+    if (!game) return "Game not found on SteamGridDB";
+
+    const images = async (kind: "grids" | "heroes", query: string) =>
+      (
+        (await this.steamGridDb<
+          { url: string; width: number; height: number; score: number }[]
+        >(`/${kind}/game/${game.id}?${query}`)) ?? []
+      )
+        .sort((a, b) => b.score - a.score || b.width - a.width)
+        .slice(0, STEAMGRIDDB_IMAGES_LIMIT)
+        .map(({ url, width, height }) => ({ url, width, height }));
+
+    const [covers, heroes] = await Promise.all([
+      images("grids", "dimensions=600x900,660x930&nsfw=any&humor=false"),
+      images("heroes", "nsfw=any&humor=false"),
+    ]);
+
+    return { game: game.name, covers, heroes };
   }
 
   private async fetchPage(url: string) {
@@ -513,9 +621,9 @@ export class GameAiDraftService implements OnModuleInit {
           ? [{ ...releaseDate, platformId: id, region: VNDB_WORLDWIDE_REGION }]
           : [];
       }),
-      cover: draft.cover,
-      screenshots: draft.screenshots.slice(0, 10),
-      artworks: draft.artworks.slice(0, 5),
+      cover: (await this.keepImages([draft.cover]))[0] ?? null,
+      screenshots: await this.keepImages(draft.screenshots.slice(0, 10)),
+      artworks: await this.keepImages(draft.artworks.slice(0, 5)),
       videos: draft.videos,
       websites: draft.websites,
       externalPages: draft.externalPages,

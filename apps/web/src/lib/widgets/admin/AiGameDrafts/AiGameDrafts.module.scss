@@ -35,7 +35,7 @@
 
 .run {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--gap-x3);
   padding: var(--padding-x2) var(--padding-x3);
   border-radius: var(--radius-x2);
@@ -57,10 +57,24 @@
   }
 
   &__details {
+    min-width: 0;
     color: var(--color-neutral-70);
     font-size: 12px;
 
-    @include textEllipsis;
+    summary {
+      cursor: pointer;
+
+      @include textEllipsis;
+    }
+  }
+
+  &__steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x1);
+    margin: var(--padding-x1) 0 0;
+    padding-left: var(--padding-x4);
+    word-break: break-all;
   }
 
   &__status {

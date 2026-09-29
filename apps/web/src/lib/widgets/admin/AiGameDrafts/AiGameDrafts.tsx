@@ -66,13 +66,22 @@ export const AiGameDrafts: FC<IAiGameDraftsProps> = ({
             <li key={run._id} className={styles.run}>
               <div className={styles.run__main}>
                 <span className={styles.run__query}>{run.query}</span>
-                <span className={styles.run__details}>
-                  {commonUtils.formatDate(run.createdAt, { isWithTime: true })}
-                  {" · "}
-                  {run.status === "failed"
-                    ? run.error
-                    : run.steps[run.steps.length - 1]}
-                </span>
+                <details className={styles.run__details}>
+                  <summary>
+                    {commonUtils.formatDate(run.createdAt, {
+                      isWithTime: true,
+                    })}
+                    {" · "}
+                    {run.status === "failed"
+                      ? run.error
+                      : run.steps[run.steps.length - 1]}
+                  </summary>
+                  <ol className={styles.run__steps}>
+                    {run.steps.map((step, index) => (
+                      <li key={index}>{step}</li>
+                    ))}
+                  </ol>
+                </details>
               </div>
               <span
                 className={classNames(
