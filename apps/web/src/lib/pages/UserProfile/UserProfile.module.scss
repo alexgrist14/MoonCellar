@@ -25,6 +25,7 @@
     padding: var(--padding-x5);
     width: 100%;
     min-height: calc(100vh - 155px);
+    min-height: calc(100dvh - 155px);
     position: relative;
 
     @include mediaMd {

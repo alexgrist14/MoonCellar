@@ -480,6 +480,14 @@ break silently when ignored:
   the pushed depth in sync with programmatic closes needs bookkeeping that breaks as soon as
   anything else touches history.
 
+- **A modal's height cap is `dvh`, never plain `vh`.** A modal sits in a `position: fixed`
+  container sized to the visible viewport, while mobile `vh` is the viewport with the browser
+  toolbars hidden. `Box`'s scroll area was capped at `90vh`, so in mobile Brave (toolbars at the
+  top and bottom) the panel stood taller than the screen, both edges were clipped, and the
+  playthrough modal's Save sat below the screen even with its scroll area at the end — which
+  users reported as "scroll does not work". Keep the `vh` line before the `dvh` one as the
+  fallback for engines without the unit.
+
 - **`modal.open` stores the JSX it is given, so props passed at open time never update.**
   `ModalsConnector` keeps the element in state; the component that opened it can re-render all it
   likes and the modal will not see the new values. A modal that needs a pending state owns it —

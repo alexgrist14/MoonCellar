@@ -23,7 +23,7 @@ h3 {
     var(--container-padding-bottom) var(--padding-x5);
 
   --page-height-available: calc(
-    100vh - var(--container-padding-top) - var(--container-padding-bottom)
+    100dvh - var(--container-padding-top) - var(--container-padding-bottom)
   );
 
   &_topMenu {

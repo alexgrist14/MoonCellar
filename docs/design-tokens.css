@@ -121,7 +121,7 @@
   --container-padding-top: calc(var(--header-height) + var(--padding-x3));
   --container-padding-bottom: var(--padding-x3);
   --page-height-available: calc(
-    100vh - var(--container-padding-top) - var(--container-padding-bottom)
+    100dvh - var(--container-padding-top) - var(--container-padding-bottom)
   );
 
   /* vars/_components.scss */
@@ -148,9 +148,9 @@
   --modal-text-width: min(720px, calc(100vw - var(--padding-x10)));
   --rich-editor-image-width: 400px;
   --playthrough-modal-width: min(80vw, 400px);
-  --playthrough-modal-height: min(70vh, 500px);
+  --playthrough-modal-height: min(70dvh, 500px);
   --playthrough-modal-width-lg: min(88vw, 760px);
-  --playthrough-modal-height-lg: min(86vh, 780px);
+  --playthrough-modal-height-lg: min(86dvh, 780px);
   --games-card-min-width: 180px;
   --range-track-height: 6px;
   --range-thumb-size: 20px;

@@ -148,6 +148,7 @@
 
   div &__content {
     max-height: 90vh;
+    max-height: 90dvh;
     padding: var(--padding-x3);
     display: flex;
     flex-direction: column;

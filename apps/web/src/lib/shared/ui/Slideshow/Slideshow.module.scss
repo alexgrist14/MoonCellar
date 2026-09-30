@@ -31,6 +31,7 @@
     @include flexCenter;
     min-height: 50px;
     max-height: 90vh;
+    max-height: 90dvh;
     aspect-ratio: 1920/1080;
     outline: 2px solid var(--color-gray);
     border-radius: var(--radius-x2);
