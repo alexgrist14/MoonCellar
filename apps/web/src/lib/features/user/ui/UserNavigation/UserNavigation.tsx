@@ -78,6 +78,8 @@ export const UserNavigation: FC<{
   const isReviewsTab = currentList === "reviews";
   const isListsTab = currentList === "lists";
   const isLikedTab = currentList === "liked";
+  const isFavoritesTab = currentList === "favorites";
+  const favoritesCount = user.favorites?.length ?? 0;
   const isCharactersTab = currentList === "characters";
   const favoriteCharactersCount = user.favoriteCharacters?.length ?? 0;
 
@@ -194,6 +196,17 @@ export const UserNavigation: FC<{
           >
             <span>Liked lists</span>
             <span>{likedLists.length}</span>
+          </Button>
+        )}
+        {(isAuthedUser || !!favoritesCount) && (
+          <Button
+            className={styles.btn}
+            active={isFavoritesTab}
+            color={ButtonColor.TRANSPARENT}
+            onClick={() => goToTab("favorites")}
+          >
+            <span>Favourites</span>
+            <span>{favoritesCount}</span>
           </Button>
         )}
         {(isAuthedUser || !!favoriteCharactersCount) && (

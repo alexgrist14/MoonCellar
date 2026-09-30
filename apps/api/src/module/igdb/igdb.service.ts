@@ -471,7 +471,7 @@ export class IGDBService {
       const bulkOps = [];
 
       for (const game of games) {
-        if (game.vndb) continue;
+        if (game.vndb?.vnId) continue;
 
         const relatedGames: Record<string, unknown> = {};
         let hasAny = false;
@@ -897,7 +897,7 @@ export class IGDBService {
     >,
     options?: { parseImages?: boolean; field?: string; forceParse?: boolean }
   ) {
-    if (existingGame?.vndb) {
+    if (existingGame?.vndb?.vnId) {
       this.logger.log(`Skipped game with VNDB data: ${existingGame.slug}`);
       return existingGame.slug + " skipped";
     }
@@ -1141,9 +1141,20 @@ export class IGDBService {
         }
       : update;
 
+    const unsetPayload =
+      options?.forceParse && !options.field
+        ? Object.fromEntries(
+            Object.entries(update)
+              .filter(([, value]) => value === undefined)
+              .map(([key]) => [key, ""])
+          )
+        : {};
+
     await this.Games.updateOne(
       { "igdb.gameId": igdbGame.id },
-      { $set: setPayload },
+      Object.keys(unsetPayload).length
+        ? { $set: setPayload, $unset: unsetPayload }
+        : { $set: setPayload },
       { upsert: !options?.field }
     );
 
@@ -1434,7 +1445,7 @@ export class IGDBService {
 
       const games = await this.Games.find({
         "igdb.gameId": { $exists: true },
-        vndb: { $exists: false },
+        "vndb.vnId": { $in: [null, ""] },
       })
         .select("_id characters igdb.gameId")
         .lean();

@@ -1,6 +1,7 @@
-import { FC, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import classNames from "classnames";
-import { FAVORITES_MAX, IGameResponse } from "@mooncellar/schemas";
+import { IGameResponse } from "@mooncellar/schemas";
+import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
 import { useUpdateFavoritesMutation } from "@/src/lib/entities/user/api/favorites.mutations";
 import { GameCoverImage } from "@/src/lib/entities/game/ui/GameCoverImage";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
@@ -15,12 +16,17 @@ import {
   SvgPlay,
 } from "@/src/lib/shared/ui/svg";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
-import styles from "./TopTen.module.scss";
+import styles from "./FavoriteGames.module.scss";
 
-interface ITopTenProps {
+const FAVORITE_GAMES_PREVIEW_LIMIT = 10;
+
+interface IFavoriteGamesProps {
   userId: string;
+  favoriteIds: string[];
   games: IGameResponse[];
   isOwner: boolean;
+  isPreview?: boolean;
+  onShowAll?: () => void;
 }
 
 const SMALL_ICON_STYLE = {
@@ -39,13 +45,44 @@ const PODIUM_CARD_STYLE = {
   padding: 0,
 };
 
-export const TopTen: FC<ITopTenProps> = ({ userId, games, isOwner }) => {
+export const FavoriteGames: FC<IFavoriteGamesProps> = ({
+  userId,
+  favoriteIds,
+  games: initialGames,
+  isOwner,
+  isPreview,
+  onShowAll,
+}) => {
   const [draft, setDraft] = useState<IGameResponse[] | null>(null);
   const { mutate: updateFavorites, isPending } = useUpdateFavoritesMutation();
 
-  const isEditing = !!draft;
+  const isServerOrder =
+    favoriteIds.length === initialGames.length &&
+    favoriteIds.every((gameId, index) => initialGames[index]?._id === gameId);
+
+  const { data: liveGames } = useGamesByIdsQuery(
+    favoriteIds,
+    undefined,
+    isOwner && !isServerOrder
+  );
+
+  const games = useMemo(() => {
+    if (isServerOrder || !isOwner) return initialGames;
+
+    const pool = [...(liveGames ?? []), ...initialGames];
+
+    return favoriteIds.flatMap((gameId) => {
+      const game = pool.find((item) => item._id === gameId);
+
+      return game ? [game] : [];
+    });
+  }, [initialGames, favoriteIds, isOwner, isServerOrder, liveGames]);
 
   if (!games.length && !isOwner) return null;
+
+  const visible = isPreview
+    ? games.slice(0, FAVORITE_GAMES_PREVIEW_LIMIT)
+    : games;
 
   const handleSave = () => {
     if (!draft) return;
@@ -62,17 +99,20 @@ export const TopTen: FC<ITopTenProps> = ({ userId, games, isOwner }) => {
   };
 
   return (
-    <section className={styles.top} aria-labelledby="profile-top-ten">
+    <section className={styles.top} aria-labelledby="profile-favorite-games">
       <div className={styles.head}>
         <SectionTitle as="h3">
-          <span id="profile-top-ten">Top 10</span>
-          {isEditing && (
-            <span className={styles.count}>
-              {draft.length} / {FAVORITES_MAX}
-            </span>
+          <span id="profile-favorite-games">Favourite games</span>
+          {!!games.length && (
+            <span className={styles.count}>{games.length}</span>
           )}
         </SectionTitle>
-        {isOwner && !isEditing && !!games.length && (
+        {isPreview && !!games.length && (
+          <Button color={ButtonColor.TRANSPARENT} onClick={onShowAll}>
+            All favourites
+          </Button>
+        )}
+        {!isPreview && isOwner && !draft && games.length > 1 && (
           <Button
             color={ButtonColor.TRANSPARENT}
             className={styles.edit}
@@ -92,8 +132,7 @@ export const TopTen: FC<ITopTenProps> = ({ userId, games, isOwner }) => {
             style={{ color: "var(--favorite-color)" }}
           />
           <p className={styles.hint__text}>
-            Pick up to ten favourite games — press the heart on any game card
-            or game page.
+            Add favourite games — press the heart on any game card or game page.
           </p>
           <span className={styles.bar} aria-hidden="true">
             <span className={styles.bar__button}>
@@ -114,9 +153,9 @@ export const TopTen: FC<ITopTenProps> = ({ userId, games, isOwner }) => {
         </div>
       )}
 
-      {!!games.length && !isEditing && (
+      {!!games.length && !draft && (
         <ol className={styles.podium}>
-          {games.map((game, index) => (
+          {visible.map((game, index) => (
             <li key={game._id} className={styles.item}>
               <GameCard
                 game={game}
@@ -129,7 +168,7 @@ export const TopTen: FC<ITopTenProps> = ({ userId, games, isOwner }) => {
         </ol>
       )}
 
-      {isEditing && (
+      {!!draft && (
         <div className={styles.editor}>
           <SortableGrid
             items={draft}
@@ -138,13 +177,12 @@ export const TopTen: FC<ITopTenProps> = ({ userId, games, isOwner }) => {
             renderCover={(game) => <GameCoverImage game={game} sizes="160px" />}
             onChange={setDraft}
             coverRatio="var(--cover-ratio)"
-            emptySlots={FAVORITES_MAX - draft.length}
             className={styles.slots}
           />
           <div className={styles.footer}>
             <p className={styles.footer__note}>
-              Drag or use the arrows to reorder. Add games with the heart on any
-              game card.
+              Drag or use the arrows to reorder. The first{" "}
+              {FAVORITE_GAMES_PREVIEW_LIMIT} are shown on your profile.
             </p>
             <div className={styles.footer__actions}>
               <Button

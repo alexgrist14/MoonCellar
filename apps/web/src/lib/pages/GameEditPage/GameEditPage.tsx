@@ -123,14 +123,18 @@ const pruneRow = (row: unknown): unknown =>
       )
     : row;
 
-const pruneEmpty = (value: Record<string, unknown>): Record<string, unknown> =>
+const pruneEmpty = (
+  value: Record<string, unknown>,
+  isNested = false
+): Record<string, unknown> =>
   Object.fromEntries(
     Object.entries(value).flatMap(([key, nested]) => {
       if (nested === undefined) return [];
+      if (isNested && nested === null) return [];
       if (Array.isArray(nested)) return [[key, nested.map(pruneRow)]];
       if (!isPlainObject(nested)) return [[key, nested]];
 
-      const pruned = pruneEmpty(nested);
+      const pruned = pruneEmpty(nested, true);
 
       return Object.keys(pruned).length ? [[key, pruned]] : [];
     })
@@ -470,6 +474,13 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
       return { slug: data?.slug, message: "Parsed from IGDB" };
     });
 
+  const handleFullParseIgdb = () =>
+    runParse("igdb", async () => {
+      const { data } = await igdbApi.parseGame(originalIgdbId!, true, true);
+
+      return { slug: data?.slug, message: "Fully reparsed from IGDB" };
+    });
+
   const handleParseVndb = () =>
     runParse("vndb", async () => {
       const { data } = await vndbApi.parseGame(gameId!);
@@ -562,7 +573,7 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
             render={({ field: rhf }) => (
               <NumberField
                 label={field.label}
-                value={rhf.value as number}
+                value={rhf.value as number | null}
                 error={error}
                 onChange={rhf.onChange}
               />
@@ -877,6 +888,22 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
               onClick={handleParseIgdb}
             >
               {parsingSource === "igdb" ? "Parsing…" : "Parse from IGDB"}
+            </Button>
+          )}
+          {!isCreate && (
+            <Button
+              color={ButtonColor.DEFAULT}
+              disabled={!!parsingSource || !originalIgdbId || !!originalVnId}
+              tooltip={
+                originalVnId
+                  ? "Linked to VNDB: the IGDB sync does not touch this game"
+                  : !originalIgdbId
+                    ? "Save an IGDB game id first"
+                    : "Replaces every IGDB field and re-downloads all images"
+              }
+              onClick={handleFullParseIgdb}
+            >
+              {parsingSource === "igdb" ? "Parsing…" : "Full reparse from IGDB"}
             </Button>
           )}
           {!isCreate && (

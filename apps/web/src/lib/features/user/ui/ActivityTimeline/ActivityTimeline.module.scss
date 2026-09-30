@@ -7,8 +7,12 @@
   scroll-margin-top: var(--container-padding-top);
 }
 
+$activityEntryMinWidth: 300px;
+$activityGap: 24px;
+
 .body {
   position: relative;
+  container-type: inline-size;
   display: flex;
   flex-direction: column;
   gap: var(--gap-x4);
@@ -37,11 +41,15 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(
-    auto-fill,
-    minmax(min(100%, var(--activity-entry-min-width)), 1fr)
-  );
+  grid-template-columns: minmax(0, 1fr);
   column-gap: var(--gap-x6);
+
+  @each $columns in 2, 3, 4, 6 {
+    @container (min-width: #{$activityEntryMinWidth * $columns + $activityGap * ($columns - 1)}) {
+      grid-template-columns: repeat($columns, minmax(0, 1fr));
+    }
+  }
+
   margin: 0;
   padding: 0;
   list-style: none;

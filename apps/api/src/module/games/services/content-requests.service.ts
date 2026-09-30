@@ -535,11 +535,11 @@ export class ContentRequestsService {
   }
 
   private async linkIgdb(
-    game: { _id: mongoose.Types.ObjectId; vndb?: unknown },
+    game: { _id: mongoose.Types.ObjectId; vndb?: { vnId?: string } },
     igdbId: number,
     warnings: string[]
   ) {
-    if (game.vndb) {
+    if (game.vndb?.vnId) {
       warnings.push(
         `IGDB ${igdbId}: the game belongs to VNDB, the IGDB sync never writes it`
       );

@@ -18,6 +18,7 @@ import { UserReviews } from "@/src/lib/widgets/user/UserReviews";
 import { UserLists } from "@/src/lib/widgets/user/UserLists";
 import { UserInfo } from "@/src/lib/widgets/user/UserInfo";
 import { FavoriteCharacters } from "@/src/lib/widgets/user/FavoriteCharacters";
+import { FavoriteGames } from "@/src/lib/widgets/user/FavoriteGames";
 import styles from "./UserProfile.module.scss";
 import cn from "classnames";
 import { Box } from "@/src/lib/shared/ui/Box";
@@ -208,6 +209,14 @@ export const UserProfile: FC<UserProfileProps> = ({
               lists={lists}
               likedLists={likedLists}
               favoriteCharacters={favoriteCharacters}
+            />
+          )}
+          {tab === "favorites" && (
+            <FavoriteGames
+              userId={user._id}
+              favoriteIds={displayUser.favorites ?? []}
+              games={favoriteGames}
+              isOwner={isAuthedUser}
             />
           )}
           {tab === "characters" && (

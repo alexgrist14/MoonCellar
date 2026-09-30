@@ -266,13 +266,14 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   nightly re-run rewrites all ~376k game documents and bumps their `updatedAt`, which
   `getGameSlugs` feeds to the sitemap as `lastmod` — every game would look freshly edited
   every day.
-- **A game with a `vndb` field belongs to VNDB, and no IGDB write may touch it.** VNDB is the
-  priority source: `upsertGameFromIgdb` returns early on `existingGame.vndb`, and
-  `linkRelatedGames` / `linkGameCharacters` skip those games. Every `select` that feeds
-  `upsertGameFromIgdb` must include `vndb`, or the guard sees `undefined` and the nightly sync
-  silently overwrites VNDB data. Do not move the guard into the upsert filter as
-  `vndb: { $exists: false }`: with `upsert: true` a filter that matches nothing inserts a
-  duplicate game.
+- **A game with a non-empty `vndb.vnId` belongs to VNDB, and no IGDB write may touch it.** VNDB
+  is the priority source: `upsertGameFromIgdb` returns early on `existingGame.vndb.vnId`, and
+  `linkRelatedGames` / `linkGameCharacters` skip those games. Check the id, never the presence
+  of the `vndb` object: a leftover `vndb` with `vnId: ""` hid the IGDB parse buttons and made
+  the sync skip an IGDB game. Every `select` that feeds `upsertGameFromIgdb` must include
+  `vndb`, or the guard sees `undefined` and the nightly sync silently overwrites VNDB data. Do
+  not move the guard into the upsert filter: with `upsert: true` a filter that matches nothing
+  inserts a duplicate game.
 - **The unique indexes on `igdb.characterId`, `vndb.characterId` and `vndb.vnId` must stay
   partial (`$exists: true`).** MongoDB indexes a missing field as `null`, so the second document
   without it fails with `E11000 duplicate key ... { igdb.characterId: null }`. Mongoose

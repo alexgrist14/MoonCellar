@@ -5,7 +5,6 @@ import { RoleSchema } from "./role.schema";
 import { ObjectIdSchema } from "./utils";
 
 export const DEFAULT_BG_OPACITY = 0.85;
-export const FAVORITES_MAX = 10;
 export const USERS_SEARCH_PAGE_SIZE = 10;
 
 export const UserSettingsSchema = z.object({
@@ -27,7 +26,7 @@ export const UserSchemaZod = z.object({
   refreshToken: z.string().jwt().nullable(),
   followings: z.array(z.string()),
   followers: z.array(z.string()),
-  favorites: z.array(z.string()).max(FAVORITES_MAX),
+  favorites: z.array(z.string()),
   favoriteCharacters: z.array(z.string()).optional(),
   filters: z.array(z.object({ name: z.string(), filter: z.string() })),
   presets: z.array(z.object({ name: z.string(), preset: z.string() })),
@@ -67,7 +66,6 @@ export const UpdateSettingsSchema = UserSettingsSchema.partial();
 
 export const UpdateFavoritesRequestSchema = z.object({
   gameIds: ObjectIdSchema.array()
-    .max(FAVORITES_MAX)
     .refine((ids) => new Set(ids).size === ids.length, "Duplicate games")
     .describe("Favourite game ids in the owner's order"),
 });

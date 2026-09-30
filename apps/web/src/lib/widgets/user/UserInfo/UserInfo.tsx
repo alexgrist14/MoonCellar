@@ -7,7 +7,6 @@ import {
   IGameResponse,
   IPlaythrough,
 } from "@mooncellar/schemas";
-import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
 import {
   useLikedListsQuery,
   useUserListsQuery,
@@ -28,8 +27,11 @@ import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import { SvgListBullet } from "@/src/lib/shared/ui/svg";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { ActivityTimeline } from "@/src/lib/features/user/ui/ActivityTimeline";
-import { IPeopleTab, PeopleDrawer } from "@/src/lib/features/user/ui/PeopleDrawer";
-import { TopTen } from "@/src/lib/widgets/user/TopTen";
+import {
+  IPeopleTab,
+  PeopleDrawer,
+} from "@/src/lib/features/user/ui/PeopleDrawer";
+import { FavoriteGames } from "@/src/lib/widgets/user/FavoriteGames";
 import { FavoriteCharacters } from "@/src/lib/widgets/user/FavoriteCharacters";
 import { useViewerFollowings } from "@/src/lib/features/user/model/useViewerFollowings";
 import styles from "./UserInfo.module.scss";
@@ -115,29 +117,6 @@ export const UserInfo: FC<UserInfoProps> = ({
 
     return isFollow && viewer ? [viewer, ...withoutViewer] : withoutViewer;
   }, [authUserId, baseFollowers, id, isFollow, viewerProfile]);
-
-  const favoriteIds = useMemo(() => user.favorites ?? [], [user.favorites]);
-  const isServerOrder =
-    favoriteIds.length === favoriteGames.length &&
-    favoriteIds.every((gameId, index) => favoriteGames[index]?._id === gameId);
-
-  const { data: liveFavorites } = useGamesByIdsQuery(
-    favoriteIds,
-    undefined,
-    isOwner && !isServerOrder
-  );
-
-  const topGames = useMemo(() => {
-    if (isServerOrder || !isOwner) return favoriteGames;
-
-    const pool = [...(liveFavorites ?? []), ...favoriteGames];
-
-    return favoriteIds.flatMap((gameId) => {
-      const game = pool.find((item) => item._id === gameId);
-
-      return game ? [game] : [];
-    });
-  }, [favoriteGames, favoriteIds, isOwner, isServerOrder, liveFavorites]);
 
   const { data: liveLists } = useUserListsQuery(id);
   const lists = liveLists ?? initialLists;
@@ -283,7 +262,14 @@ export const UserInfo: FC<UserInfoProps> = ({
         </button>
       </div>
 
-      <TopTen userId={id} games={topGames} isOwner={isOwner} />
+      <FavoriteGames
+        userId={id}
+        favoriteIds={user.favorites ?? []}
+        games={favoriteGames}
+        isOwner={isOwner}
+        isPreview
+        onShowAll={() => goTo("favorites")}
+      />
 
       <FavoriteCharacters
         userId={id}

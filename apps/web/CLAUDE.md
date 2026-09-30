@@ -174,6 +174,11 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   `$listCardsGap` for its `@container` thresholds; change the token and the variable together, and
   keep every column count a divisor of `CUSTOM_LISTS_PAGE_SIZE` (24).
 
+- **The profile activity feed snaps its columns to divisors of `takeLogs` (24): 1, 2, 3, 4, 6.**
+  `ActivityTimeline.module.scss` copies the entry width and `--gap-x6` into
+  `$activityEntryMinWidth`/`$activityGap` for its `@container` thresholds; change the page size
+  and the column list together, or every page but the last ends with empty cells.
+
 - `Box`'s own radius is `var(--radius-x5)`. For structural UI wrapper components rendered directly inside a `Box` (`Button`, `Input`, `Textarea`, `CustomDropdown`, and similar reusable "chrome" primitives — not decorative elements like game covers/posters), the `border-radius` must be exactly one step below its structural parent's on the `--radius-x*` scale (parent `x5` → child `x4` → grandchild `x3`, etc.). This rule applies to structural wrapper nesting only, not to decorative/illustrative radii (e.g. card art, covers), which are a deliberate style choice independent of nesting depth.
 
 - **A rounded image tile needs the radius on the image too, and its hover ring must be an
@@ -189,8 +194,8 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   with `fill`, or a grid of positioned cells, paints above its container's outline, so the ring is
   hidden and shows only through the gaps — the list tile's mosaic showed four accent dots on hover
   instead of a frame. Draw it on `&::after` (`position: absolute; inset: 0; z-index: 1;
-  border-radius: inherit; pointer-events: none`) with the same inset outline, as `ListCard`,
-  `TopFive` and `FavoritesFullPopover` do.
+  border-radius: inherit; pointer-events: none`) with the same inset outline, as `ListCard`
+  and `TopFive` do.
 
 ## Server rendering and SEO
 
@@ -558,7 +563,7 @@ break silently when ignored:
 
 ## Reordering
 
-- **Every drag-and-drop reorder editor is `shared/ui/SortableGrid`** — the Top 10, favourite
+- **Every drag-and-drop reorder editor is `shared/ui/SortableGrid`** — favourite games, favourite
   characters and a custom list's Manage mode. The consumer passes the cover (`renderCover`), the
   caption (`getName`) and keeps the order in a draft that is saved only by its own Save/Done;
   never write the order on every move.

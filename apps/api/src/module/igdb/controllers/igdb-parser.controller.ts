@@ -81,7 +81,7 @@ export class IgdbParserController {
     required: false,
     type: Boolean,
     description:
-      "When field is set, also overwrite the field if it is already filled. For image fields, also re-download images that are already present",
+      "When field is set, also overwrite the field if it is already filled. For image fields, also re-download images that are already present. Without field, re-download every image and clear top-level fields IGDB no longer returns",
   })
   async parseGame(
     @Query("igdbId") igdbIdQuery?: string,

@@ -6,7 +6,6 @@ import {
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { type Model } from "mongoose";
-import { FAVORITES_MAX } from "@mooncellar/schemas";
 import type {
   IAddFavoriteRequest,
   IUpdateFavoriteCharactersRequest,
@@ -98,7 +97,6 @@ export class FavoritesService {
             {
               _id: ownerId,
               favorites: { $ne: id },
-              [`favorites.${FAVORITES_MAX - 1}`]: { $exists: false },
             },
             { $push: { favorites: id } },
             { new: true }
@@ -115,7 +113,7 @@ export class FavoritesService {
         throw new BadRequestException(
           replaceGameId
             ? "The game to replace is not in favourites"
-            : `Favourites are limited to ${FAVORITES_MAX} games`
+            : "User not found"
         );
       }
 

@@ -27,6 +27,7 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
   const isAdmin = useAuthStore((state) => state.isAdmin);
 
   const [isParsing, setIsParsing] = useState(false);
+  const [isFullParsing, setIsFullParsing] = useState(false);
   const [isParsingHltb, setIsParsingHltb] = useState(false);
   const [isParsingVndb, setIsParsingVndb] = useState(false);
   const [hltbId, setHltbId] = useState("");
@@ -35,18 +36,23 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
 
   if (!isAdmin) return null;
 
-  const igdbId = game.vndb ? undefined : game.igdb?.gameId;
   const vnId = game.vndb?.vnId;
+  const igdbId = vnId ? undefined : game.igdb?.gameId;
 
-  const handleParse = async () => {
+  const handleParse = async (forceParse = false) => {
     if (!igdbId) return;
 
-    setIsParsing(true);
+    const setLoading = forceParse ? setIsFullParsing : setIsParsing;
+
+    setLoading(true);
 
     try {
-      const { data } = await igdbApi.parseGame(igdbId);
+      const { data } = await igdbApi.parseGame(igdbId, true, forceParse);
 
-      toast.success({ title: "Parsed from IGDB", description: game.name });
+      toast.success({
+        title: forceParse ? "Fully reparsed from IGDB" : "Parsed from IGDB",
+        description: game.name,
+      });
 
       await revalidateGamePage(game.slug, data?.slug);
       router.refresh();
@@ -56,7 +62,7 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
         description: game.name,
       });
     } finally {
-      setIsParsing(false);
+      setLoading(false);
     }
   };
 
@@ -211,10 +217,20 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
         {!!igdbId && (
           <Button
             color={ButtonColor.DEFAULT}
-            disabled={isParsing}
-            onClick={handleParse}
+            disabled={isParsing || isFullParsing}
+            onClick={() => handleParse()}
           >
             {isParsing ? "Parsing…" : "Parse from IGDB"}
+          </Button>
+        )}
+        {!!igdbId && (
+          <Button
+            color={ButtonColor.DEFAULT}
+            disabled={isParsing || isFullParsing}
+            tooltip="Replaces every IGDB field and re-downloads all images"
+            onClick={() => handleParse(true)}
+          >
+            {isFullParsing ? "Parsing…" : "Full reparse from IGDB"}
           </Button>
         )}
         {!!vnId && (

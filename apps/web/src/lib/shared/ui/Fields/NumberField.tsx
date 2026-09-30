@@ -4,8 +4,8 @@ import styles from "./fields.module.scss";
 
 interface INumberFieldProps {
   label: string;
-  value?: number;
-  onChange: (value: number | undefined) => void;
+  value?: number | null;
+  onChange: (value: number | null) => void;
   error?: string;
   disabled?: boolean;
 }
@@ -24,7 +24,7 @@ export const NumberField: FC<INumberFieldProps> = ({
       value={value ?? ""}
       disabled={disabled}
       onChange={(e) =>
-        onChange(e.target.value === "" ? undefined : Number(e.target.value))
+        onChange(e.target.value === "" ? null : Number(e.target.value))
       }
       error={error ? { type: "manual", message: error } : undefined}
     />

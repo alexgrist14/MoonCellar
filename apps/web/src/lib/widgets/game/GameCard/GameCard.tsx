@@ -8,7 +8,6 @@ import { useUserStore } from "@/src/lib/shared/store/user.store";
 import { GameCardInfo } from "@/src/lib/widgets/game/GameCardInfo";
 import { Tooltip } from "@/src/lib/shared/ui/Tooltip";
 import { IGameResponse } from "@mooncellar/schemas";
-import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
 import { Button } from "@/src/lib/shared/ui/Button";
 import {
   SvgAchievement,
@@ -196,7 +195,9 @@ export const GameCard = memo(
                 isSelected ? `Deselect ${game.name}` : `Select ${game.name}`
               }
               onChange={() => onSelect?.(game._id)}
-              onClick={(event) => event.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
             />
           )}
           <div

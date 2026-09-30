@@ -166,14 +166,10 @@ const updateFavorites = (userId: string, gameIds: string[]) => {
   );
 };
 
-const addFavorite = (
-  userId: string,
-  gameId: string,
-  replaceGameId?: string
-) => {
+const addFavorite = (userId: string, gameId: string) => {
   return agent.post<IUpdateFavoritesResponse>(
     `${USER_URL}/${userId}/favorites/${gameId}`,
-    { replaceGameId }
+    {}
   );
 };
 

@@ -422,7 +422,7 @@ export class VndbService {
 
   private async refreshLinkedVns(totals: TVndbSyncTotals) {
     const games = await this.gamesModel
-      .find({ "vndb.vnId": { $exists: true } })
+      .find({ "vndb.vnId": { $nin: [null, ""] } })
       .sort({ "vndb.syncedAt": 1 })
       .limit(VNDB_SYNC_REFRESH_LIMIT)
       .select("vndb.vnId")

@@ -1,5 +1,5 @@
 export * from "./FavoriteCharacters";
-export * from "./TopTen";
+export * from "./FavoriteGames";
 export * from "./UserGames";
 export * from "./UserInfo";
 export * from "./UserLists";

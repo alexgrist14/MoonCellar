@@ -85,25 +85,21 @@ export const useToggleFavoriteMutation = () => {
       userId,
       gameId,
       isFavorite,
-      replaceGameId,
     }: {
       userId: string;
       gameId: string;
       isFavorite: boolean;
-      replaceGameId?: string;
     }) =>
       (isFavorite
         ? userAPI.removeFavorite(userId, gameId)
-        : userAPI.addFavorite(userId, gameId, replaceGameId)
+        : userAPI.addFavorite(userId, gameId)
       ).then(({ data }) => data),
-    onMutate: ({ gameId, isFavorite, replaceGameId }) => {
+    onMutate: ({ gameId, isFavorite }) => {
       const { profile, setProfile } = useAuthStore.getState();
       const previous = profile?.favorites ?? [];
       const favorites = isFavorite
         ? previous.filter((id) => id !== gameId)
-        : replaceGameId
-          ? previous.map((id) => (id === replaceGameId ? gameId : id))
-          : [...previous, gameId];
+        : [...previous, gameId];
 
       if (profile) setProfile({ ...profile, favorites });
 
