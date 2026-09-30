@@ -8,7 +8,7 @@ import { SvgDoubleArrow } from "../svg/SvgDoubleArrow";
 import { SvgArrow } from "../svg/SvgArrow";
 import { createPortal } from "react-dom";
 import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
-import { commonUtils, scrollPageToTop } from "@/src/lib/shared/utils/common.utils";
+import { scrollPageToTop } from "@/src/lib/shared/utils/common.utils";
 
 interface IPaginationProps {
   total: number;
@@ -38,6 +38,11 @@ export const Pagination = memo(
     const centerRef = useRef<HTMLDivElement>(null);
 
     const [value, setValue] = useState("");
+    const [connector, setConnector] = useState<HTMLElement | null>(null);
+
+    useEffect(() => {
+      setConnector(document.getElementById("pagination-connector"));
+    }, []);
 
     const isControlled = controlledPage !== undefined;
 
@@ -190,10 +195,6 @@ export const Pagination = memo(
     };
 
     if (!isFixed) return renderInline();
-
-    const connector = commonUtils.checkWindow(() =>
-      document.getElementById("pagination-connector")
-    );
 
     return connector ? createPortal(renderBlock(), connector) : null;
   }

@@ -33,7 +33,12 @@ export const BGImage = memo(({ game, userImage }: IBGImageProps) => {
 
     if (!pictures.length) return undefined;
 
-    return pictures[Math.floor(Math.random() * pictures.length)];
+    const seed = [...game._id].reduce(
+      (hash, char) => (hash * 31 + char.charCodeAt(0)) >>> 0,
+      0
+    );
+
+    return pictures[seed % pictures.length];
   }, [game, hideMedia]);
 
   const [lastGameImage, setLastGameImage] = useState<string | undefined>(

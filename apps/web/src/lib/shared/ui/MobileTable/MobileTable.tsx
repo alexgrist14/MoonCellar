@@ -98,6 +98,7 @@ export const MobileTable = <T extends object>({
           {!isWithoutMobileSorting && (
             <div className={styles.table__sorting}>
               <Dropdown
+                isThroughPortal
                 title="Sort by"
                 list={titles.map((title) => title.label)}
                 overwriteValue={
@@ -108,6 +109,7 @@ export const MobileTable = <T extends object>({
                 }
               />
               <Dropdown
+                isThroughPortal
                 title="Sort order"
                 list={["Asc", "Desc"]}
                 overwriteValue={sortingOrder === "asc" ? "Asc" : "Desc"}
@@ -129,11 +131,19 @@ export const MobileTable = <T extends object>({
               return (
                 <div key={i} className={styles.table__row}>
                   <div className={styles.table__header}>
-                    {["string", "number"].includes(typeof header.content) ? (
-                      <p>{header.content}</p>
-                    ) : (
-                      header.content
-                    )}
+                    <div
+                      className={classNames(
+                        styles.table__title,
+                        header.className
+                      )}
+                      onClick={header.onClick}
+                    >
+                      {["string", "number"].includes(typeof header.content) ? (
+                        <p>{header.content}</p>
+                      ) : (
+                        header.content
+                      )}
+                    </div>
                     <Button
                       compact
                       isOnlyIcon
@@ -157,7 +167,7 @@ export const MobileTable = <T extends object>({
                       {keys.map((key, j) => {
                         const rowField = !!row ? row[key] : undefined;
 
-                        if (!rowField) return null;
+                        if (!rowField || key === mobileHeadField) return null;
 
                         return (
                           <div
@@ -169,8 +179,8 @@ export const MobileTable = <T extends object>({
                               (["string", "number"].includes(
                                 typeof rowField.title
                               ) ? (
-                                <p style={{ whiteSpace: "nowrap" }}>
-                                  {rowField.title}:
+                                <p className={styles.table__label}>
+                                  {rowField.title}
                                 </p>
                               ) : (
                                 rowField.title

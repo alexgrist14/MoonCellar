@@ -205,6 +205,7 @@ export const Conflicts: FC = () => {
           <Tabs
             theme="segmented"
             ariaLabel="Source"
+            mobileMenuTitle="Source"
             defaultTabIndex={sourceIndex}
             isUseDefaultIndex
             contents={[

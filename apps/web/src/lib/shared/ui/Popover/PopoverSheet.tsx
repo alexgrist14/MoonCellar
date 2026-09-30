@@ -16,6 +16,7 @@ import classNames from "classnames";
 import styles from "./Popover.module.scss";
 import { Button, ButtonColor } from "../Button";
 import { SvgClose } from "../svg";
+import { EXPAND_KEEP_OPEN_ATTRIBUTE } from "../ExpandMenu";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
 import { useDisableScroll } from "@/src/lib/shared/hooks/useDisableScroll";
@@ -29,6 +30,7 @@ interface IPopoverSheetProps {
   classNameContent?: string;
   contentStyle?: CSSProperties;
   title?: string;
+  sheetRef?: RefObject<HTMLDivElement | null>;
 }
 
 const DISMISS_SHARE = 1 / 3;
@@ -45,8 +47,10 @@ export const PopoverSheet: FC<IPopoverSheetProps> = ({
   classNameContent,
   contentStyle,
   title,
+  sheetRef: externalSheetRef,
 }) => {
-  const sheetRef = useRef<HTMLDivElement>(null);
+  const ownSheetRef = useRef<HTMLDivElement>(null);
+  const sheetRef = externalSheetRef ?? ownSheetRef;
   const drag = useRef({ startY: 0, lastY: 0, lastTime: 0, velocity: 0 });
   const [offset, setOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -128,7 +132,7 @@ export const PopoverSheet: FC<IPopoverSheetProps> = ({
   if (!isOpen || !connector) return null;
 
   return createPortal(
-    <div className={styles.sheetRoot}>
+    <div className={styles.sheetRoot} {...{ [EXPAND_KEEP_OPEN_ATTRIBUTE]: "" }}>
       <div className={styles.sheetRoot__backdrop} />
       <div
         ref={sheetRef}

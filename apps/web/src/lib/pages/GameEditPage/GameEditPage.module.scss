@@ -16,12 +16,21 @@
   gap: var(--gap-x3);
   padding-bottom: var(--padding-x3);
   border-bottom: 1px solid var(--color-border-primary);
+
+  @include mediaMax($screenMd) {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 .actions {
   display: flex;
   align-items: center;
   gap: var(--gap-x2);
+
+  @include mediaMax($screenMd) {
+    flex-wrap: wrap;
+  }
 }
 
 .title {

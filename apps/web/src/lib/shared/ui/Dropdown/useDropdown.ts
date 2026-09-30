@@ -304,10 +304,12 @@ export const useDropdown = ({
     };
   }, [isActive, isThroughPortal]);
 
-  useCloseEvents([dropdownRef, portalRef], () => {
-    isActive && (offset.current = 0);
+  const closeHandler = () => {
+    offset.current = 0;
     setIsActive(false);
-  });
+  };
+
+  useCloseEvents([dropdownRef, portalRef], closeHandler);
 
   return {
     isActive,
@@ -330,6 +332,7 @@ export const useDropdown = ({
     isAllChecked,
     clickHandler,
     fieldClickHandler,
+    closeHandler,
     handleQueryChange,
     handleValueChange,
     handleValueBlur,

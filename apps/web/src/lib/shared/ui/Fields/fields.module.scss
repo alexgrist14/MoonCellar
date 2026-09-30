@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--gap-x1);
+  min-width: 0;
   margin-bottom: var(--gap-x3);
 }
 
@@ -39,6 +40,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--gap-x1);
+  min-width: 0;
 }
 
 .chip {
@@ -49,6 +51,13 @@
   border: 1px solid var(--color-border-primary);
   border-radius: var(--radius-x4);
   background: var(--color-bg-tertiary);
+  max-width: 100%;
+  min-width: 0;
+
+  &__text {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
 
   &_added {
     animation: chipAdded 0.9s var(--easing-out);
@@ -62,6 +71,7 @@
 
   &__remove {
     display: grid;
+    flex-shrink: 0;
     place-items: center;
     width: var(--padding-x6);
     aspect-ratio: 1;

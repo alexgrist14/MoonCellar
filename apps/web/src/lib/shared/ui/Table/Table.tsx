@@ -124,7 +124,7 @@ export const Table = <T extends object>({
     return (
       <MobileTable
         isLoading={isLoading}
-        isWithoutMobileSorting={isWithoutMobileSorting}
+        isWithoutMobileSorting={isWithoutMobileSorting || !!sortingCallback}
         limit={limit}
         initialSortingKey={initialSortingKey}
         mobileHeadField={mobileHeadField}

@@ -310,3 +310,15 @@
     padding-inline: var(--padding-x1);
   }
 }
+
+.dropdown_sheet {
+  .dropdown__inner {
+    position: static;
+    border: none;
+    transform: none !important;
+  }
+
+  .dropdown__placeholder {
+    display: none;
+  }
+}

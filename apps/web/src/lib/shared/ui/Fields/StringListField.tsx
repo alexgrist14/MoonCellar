@@ -54,7 +54,7 @@ export const StringListField: FC<IStringListFieldProps> = ({
               [styles.chip_added]: index === addedIndex,
             })}
           >
-            {item}
+            <span className={styles.chip__text}>{item}</span>
             <button
               type="button"
               className={styles.chip__remove}

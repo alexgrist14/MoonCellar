@@ -1,9 +1,4 @@
-import {
-  ComponentPropsWithRef,
-  isValidElement,
-  memo,
-  ReactNode,
-} from "react";
+import { ComponentPropsWithRef, isValidElement, memo, ReactNode } from "react";
 import cl from "classnames";
 import styles from "./Button.module.scss";
 import { Tooltip } from "../Tooltip";
@@ -33,6 +28,7 @@ export interface IButtonProps extends Pick<
   | "ref"
   | "aria-label"
   | "aria-pressed"
+  | "aria-expanded"
 > {
   color?: IButtonColor;
   active?: boolean;

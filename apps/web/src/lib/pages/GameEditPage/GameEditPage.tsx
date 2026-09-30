@@ -19,12 +19,15 @@ import {
   useCreateGameMutation,
   useFindGameImagesMutation,
   useImportGameImageMutation,
+  useDeleteGameMutation,
   useUpdateGameMutation,
   useUploadGameImageMutation,
 } from "@/src/lib/entities/game/api/game.mutations";
 import { usePlatformsQuery } from "@/src/lib/entities/platform/api/platform.queries";
 import { hltbApi, igdbApi, vndbApi } from "@/src/lib/shared/api";
 import { revalidateGamePage } from "@/src/lib/entities/game/api/game.actions";
+import { modal } from "@/src/lib/shared/ui/Modal";
+import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal/ConfirmModal";
 import {
   AddGameRequestSchema,
   IAddGameRequest,
@@ -274,6 +277,7 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
   >({ cover: [], screenshots: [], artworks: [] });
   const { mutateAsync: findImages } = useFindGameImagesMutation();
   const { mutateAsync: importImage } = useImportGameImageMutation();
+  const { mutateAsync: deleteGame } = useDeleteGameMutation();
   const gameName = watch("name") as string | undefined;
   const externalPages = watch("externalPages") as
     { name?: string; uid?: string }[] | undefined;
@@ -626,6 +630,36 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
 
     const current = (getValues(formPath) as string[] | undefined) || [];
     setValue(formPath, [...current, url], { shouldDirty: true });
+  };
+
+  const handleDelete = () => {
+    if (!gameId) return;
+
+    const modalId = `delete-game-${gameId}`;
+    const name = original.name as string;
+    const slug = original.slug as string;
+
+    modal.open(
+      <ConfirmModal
+        title="Delete game"
+        message={
+          <>
+            Delete <strong>{name}</strong>?
+          </>
+        }
+        warning="This permanently deletes the game."
+        onConfirm={() =>
+          deleteGame(gameId).then(async () => {
+            modal.close(modalId);
+            toast.success({ description: "Game deleted" });
+            await revalidateGamePage(slug).catch(() => undefined);
+            router.push(getAdminHref("games"));
+          })
+        }
+        onCancel={() => modal.close(modalId)}
+      />,
+      { id: modalId }
+    );
   };
 
   const renderImageFinder = (kind: IGameImageKind) => (
@@ -1073,12 +1107,11 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
                   : "Parse from HLTB"}
             </Button>
           )}
-          <Button
-            color={ButtonColor.DEFAULT}
-            onClick={() => router.push(getAdminHref("games"))}
-          >
-            Back to list
-          </Button>
+          {!isCreate && (
+            <Button color={ButtonColor.RED} onClick={handleDelete}>
+              Delete
+            </Button>
+          )}
         </div>
       </div>
 

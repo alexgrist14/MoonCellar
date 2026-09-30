@@ -103,12 +103,6 @@ export const ReportList: FC = () => {
   return (
     <div className={styles.reports}>
       <div className={styles.toolbar}>
-        <span className={styles.count}>
-          {data &&
-            `${total} ${status === "open" ? "open" : "resolved"} ${
-              total === 1 ? "case" : "cases"
-            }`}
-        </span>
         <Tabs
           theme="segmented"
           ariaLabel="Report status"
@@ -121,6 +115,12 @@ export const ReportList: FC = () => {
           )}
           isUseDefaultIndex
         />
+        <span className={styles.count}>
+          {data &&
+            `${total} ${status === "open" ? "open" : "resolved"} ${
+              total === 1 ? "case" : "cases"
+            }`}
+        </span>
       </div>
 
       {isLoaderShown ? (

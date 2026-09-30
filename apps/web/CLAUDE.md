@@ -281,6 +281,14 @@ component gains a hook every page fails with "You're importing a module that dep
 `useState` into a React Server Component module". `getListHref` sat in `ListCard.tsx` and
 broke every route when the card got a loading state; helpers go in `shared/utils`.
 
+**The first client render must match the server's, so never read the DOM or roll a random
+number during render.** A portal target looked up with `document.getElementById` in render is
+`null` on the server and present during hydration, so `ExpandMenu` rendered its portal on the
+client only and failed hydration on every game page ("Hydration failed … id={null}"). Look the
+connector up in `useEffect` and keep it in state, as `ExpandMenu` and `Pagination` do.
+`BGImage` picked the background with `Math.random()` and mismatched `src`; it now derives the
+index from the game id.
+
 Functions cannot be passed from a server component to a client one. Pass the data a client
 component needs to build the value itself (a `basePath` string, not a `getHref` callback).
 

@@ -1,6 +1,5 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 import { gamesApi } from "@/src/lib/shared/api";
@@ -9,6 +8,8 @@ import { IGameResponse, IGetGamesRequest } from "@mooncellar/schemas";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { Table } from "@/src/lib/shared/ui/Table";
+import { ActionsMenu } from "@/src/lib/shared/ui/ActionsMenu";
+import { ITableCell } from "@/src/lib/shared/types/table.type";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { modal } from "@/src/lib/shared/ui/Modal";
@@ -168,69 +169,91 @@ export const GameList: FC = () => {
           isStopParsing: { content: "Stop parsing" },
           actions: { content: "Actions" },
         }}
-        rows={games.map((game) => ({
-          cover: {
-            content: game.cover ? (
-              <Image
-                className={styles.cover}
-                src={game.cover}
-                width={48}
-                height={64}
-                alt={game.name}
-              />
-            ) : (
-              "—"
-            ),
-          },
-          name: {
-            content: (
-              <Link
-                href={`/games/${game.slug}`}
-                target="_blank"
-                className={styles.name}
-              >
-                <span>{game.name}</span>
-                <span className={styles.slug}>{game.slug}</span>
-              </Link>
-            ),
-          },
-          type: { content: game.type || "—" },
-          firstRelease: {
-            content: game.first_release
-              ? new Date(game.first_release * 1000).getFullYear()
-              : "—",
-          },
-          isStopParsing: {
-            content: (
-              <ToggleSwitch
-                leftContent={OFF}
-                rightContent={ON}
-                value={game.isStopParsing ? "right" : "left"}
-                clickCallback={(result) =>
-                  handleStopParsing(game, result === ON)
-                }
-              />
-            ),
-          },
-          actions: {
-            content: (
-              <div className={styles.actions}>
-                <Button
-                  color={ButtonColor.DEFAULT}
-                  onClick={() => openEditor(game._id)}
-                >
-                  Edit
-                </Button>
-                <Button
-                  color={ButtonColor.RED}
-                  onClick={() => handleDelete(game)}
-                >
-                  Delete
-                </Button>
-              </div>
-            ),
-          },
-        }))}
+        rows={games.map((game) => {
+          const cells: Record<string, ITableCell> = {
+            cover: {
+              content: game.cover ? (
+                <Image
+                  className={styles.cover}
+                  src={game.cover}
+                  width={48}
+                  height={64}
+                  alt={game.name}
+                />
+              ) : (
+                "—"
+              ),
+            },
+            name: {
+              content: (
+                <div className={styles.name}>
+                  <span>{game.name}</span>
+                  <span className={styles.slug}>{game.slug}</span>
+                </div>
+              ),
+            },
+            type: { content: game.type || "—" },
+            firstRelease: {
+              content: game.first_release
+                ? new Date(game.first_release * 1000).getFullYear()
+                : "—",
+            },
+            isStopParsing: {
+              content: (
+                <div onClick={(event) => event.stopPropagation()}>
+                  <ToggleSwitch
+                    leftContent={OFF}
+                    rightContent={ON}
+                    value={game.isStopParsing ? "right" : "left"}
+                    clickCallback={(result) =>
+                      handleStopParsing(game, result === ON)
+                    }
+                  />
+                </div>
+              ),
+            },
+            actions: {
+              content: (
+                <ActionsMenu
+                  items={[
+                    { label: "Edit", onClick: () => openEditor(game._id) },
+                    {
+                      label: "Open on the site",
+                      onClick: () =>
+                        window.open(`/games/${game.slug}`, "_blank"),
+                    },
+                    {
+                      label: "Delete",
+                      isDanger: true,
+                      onClick: () => handleDelete(game),
+                    },
+                  ]}
+                />
+              ),
+            },
+          };
+
+          return Object.fromEntries(
+            Object.entries(cells).map(([key, cell]) => [
+              key,
+              ["isStopParsing", "actions"].includes(key)
+                ? cell
+                : {
+                    ...cell,
+                    className: styles.rowClickable,
+                    onClick: () => openEditor(game._id),
+                  },
+            ])
+          ) as Record<
+            | "cover"
+            | "name"
+            | "type"
+            | "firstRelease"
+            | "isStopParsing"
+            | "actions",
+            ITableCell
+          >;
+        })}
       />
 
       <Pagination total={total} take={TAKE} isDisabled={isFetching} />

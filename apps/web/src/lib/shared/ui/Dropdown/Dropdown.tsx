@@ -8,6 +8,8 @@ import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { DropdownControls } from "./components/DropdownControls";
 import { DropdownField } from "./components/DropdownField";
 import { DropdownList } from "./components/DropdownList";
+import { PopoverSheet } from "../Popover/PopoverSheet";
+import { useStatesStore } from "@/src/lib/shared/store/states.store";
 
 export const Dropdown = memo((props: IDropDownListProps) => {
   const {
@@ -52,10 +54,12 @@ export const Dropdown = memo((props: IDropDownListProps) => {
     isAllChecked,
     clickHandler,
     fieldClickHandler,
+    closeHandler,
     handleQueryChange,
     handleValueChange,
     handleValueBlur,
   } = useDropdown(props);
+  const isMobile = useStatesStore((state) => state.isMobile);
 
   if (isLoading) {
     return (
@@ -147,9 +151,22 @@ export const Dropdown = memo((props: IDropDownListProps) => {
           onChange={handleValueChange}
           onBlur={handleValueBlur}
         />
-        {!isThroughPortal && dropdownList}
+        {!isMobile && !isThroughPortal && dropdownList}
       </div>
-      {isThroughPortal &&
+      {isMobile && (
+        <PopoverSheet
+          anchorRef={dropdownRef}
+          sheetRef={portalRef}
+          isOpen={isActive}
+          onClose={closeHandler}
+          title={title || placeholder}
+          classNameContent={styles.dropdown_sheet}
+        >
+          {dropdownList}
+        </PopoverSheet>
+      )}
+      {!isMobile &&
+        isThroughPortal &&
         !!portalCoords &&
         !!dropdownConnector &&
         createPortal(

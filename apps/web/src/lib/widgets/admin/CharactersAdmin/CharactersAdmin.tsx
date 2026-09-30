@@ -58,6 +58,7 @@ export const CharactersAdmin: FC = () => {
         <Tabs
           theme="segmented"
           ariaLabel="Source"
+          mobileMenuTitle="Source"
           contents={SOURCES.map((item) => ({
             tabName: item
               ? item === "manual"

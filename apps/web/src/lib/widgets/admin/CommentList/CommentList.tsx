@@ -89,9 +89,6 @@ export const CommentList: FC = () => {
   return (
     <div className={styles.comments}>
       <div className={styles.toolbar}>
-        <span className={styles.count}>
-          {data && `${total} ${total === 1 ? "comment" : "comments"}`}
-        </span>
         <Tabs
           theme="segmented"
           ariaLabel="Comment status"
@@ -107,6 +104,9 @@ export const CommentList: FC = () => {
           )}
           isUseDefaultIndex
         />
+        <span className={styles.count}>
+          {data && `${total} ${total === 1 ? "comment" : "comments"}`}
+        </span>
       </div>
 
       {isLoaderShown ? (

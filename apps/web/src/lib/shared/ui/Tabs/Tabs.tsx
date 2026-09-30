@@ -4,6 +4,7 @@ import cl from "classnames";
 import styles from "./Tabs.module.scss";
 import Link from "next/link";
 import { ITabContent } from "@/src/lib/shared/types/tabs.type";
+import { TabsMenu } from "../TabsMenu";
 
 interface ITabs {
   contents: ITabContent[];
@@ -19,6 +20,7 @@ interface ITabs {
   theme?: "segmented";
   ariaLabel?: string;
   isHideTabsButtons?: boolean;
+  mobileMenuTitle?: string;
 }
 export const Tabs: FC<ITabs> = ({
   contents,
@@ -34,6 +36,7 @@ export const Tabs: FC<ITabs> = ({
   ariaLabel,
   resetCallback,
   isAdaptive,
+  mobileMenuTitle,
 }) => {
   const isSegmented = theme === "segmented";
   const color =
@@ -51,9 +54,16 @@ export const Tabs: FC<ITabs> = ({
     }
   }, [isUseDefaultIndex, defaultTabIndex]);
 
-  return (
+  const selectTab = (content: ITabContent, index: number) => {
+    !!resetCallback && resetCallback();
+    content.onTabClick && content.onTabClick(content.tabName);
+    !isStopPropagation && setTabIndex(index);
+  };
+
+  const buttons = (
     <div
       className={cl(styles.tabs__buttons, buttonsClassName, {
+        [styles.tabs__buttons_desktop]: !!mobileMenuTitle,
         [styles.tabs__buttons_adaptive]: isAdaptive,
         [styles.tabs__buttons_segmented]: isSegmented,
       })}
@@ -76,11 +86,7 @@ export const Tabs: FC<ITabs> = ({
                   [styles.tabs__button_adaptive]: isAdaptive,
                 })}
                 active={!content.isUnselectable && i === tabIndex}
-                onClick={() => {
-                  !!resetCallback && resetCallback();
-                  content.onTabClick && content.onTabClick(content.tabName);
-                  !isStopPropagation && setTabIndex(i);
-                }}
+                onClick={() => selectTab(content, i)}
               >
                 {content.tabName}
                 {content?.tabNameNode}
@@ -97,11 +103,7 @@ export const Tabs: FC<ITabs> = ({
               style={content.style}
               active={!content.isUnselectable && i === tabIndex}
               aria-pressed={isSegmented ? i === tabIndex : undefined}
-              onClick={() => {
-                !!resetCallback && resetCallback();
-                content.onTabClick && content.onTabClick(content.tabName);
-                !isStopPropagation && setTabIndex(i);
-              }}
+              onClick={() => selectTab(content, i)}
             >
               {content.tabName}
               {content?.tabNameNode}
@@ -109,5 +111,22 @@ export const Tabs: FC<ITabs> = ({
           );
         })}
     </div>
+  );
+
+  if (!mobileMenuTitle) return buttons;
+
+  return (
+    <>
+      {buttons}
+      <TabsMenu
+        className={styles.tabs__menu}
+        title={mobileMenuTitle}
+        activeIndex={tabIndex}
+        tabs={contents.map((content, i) => ({
+          tabName: content.tabName,
+          onTabClick: () => selectTab(content, i),
+        }))}
+      />
+    </>
   );
 };

@@ -63,3 +63,17 @@
     }
   }
 }
+
+.tabs__buttons.tabs__buttons_desktop {
+  @include mediaMax($screenMd) {
+    display: none;
+  }
+}
+
+.tabs__menu {
+  display: none;
+
+  @include mediaMax($screenMd) {
+    display: block;
+  }
+}

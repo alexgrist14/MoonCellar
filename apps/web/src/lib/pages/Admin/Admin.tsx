@@ -84,6 +84,28 @@ export const Admin = ({ tab }: IAdminProps) => {
     </div>
   );
 
+  const mainTabs = [
+    { tabName: "Users", onTabClick: () => selectTab(0) },
+    {
+      tabName: withCount("Games", pendingGames),
+      onTabClick: () => selectTab(1),
+    },
+    {
+      tabName: withCount("Comments", pendingReports),
+      onTabClick: () => selectTab(2),
+    },
+    {
+      tabName: withCount("Conflicts", pendingConflicts),
+      onTabClick: () => selectTab(3),
+    },
+    {
+      tabName: withCount("Characters", pendingCharacters),
+      onTabClick: () => selectTab(4),
+    },
+    { tabName: "Images", onTabClick: () => selectTab(5) },
+    { tabName: "Sites", onTabClick: () => selectTab(6) },
+  ];
+
   return (
     <Box classNameContent={styles.page}>
       <Breadcrumbs
@@ -96,27 +118,8 @@ export const Admin = ({ tab }: IAdminProps) => {
       <Tabs
         defaultTabIndex={tabIndex}
         isUseDefaultIndex
-        contents={[
-          { tabName: "Users", onTabClick: () => selectTab(0) },
-          {
-            tabName: withCount("Games", pendingGames),
-            onTabClick: () => selectTab(1),
-          },
-          {
-            tabName: withCount("Comments", pendingReports),
-            onTabClick: () => selectTab(2),
-          },
-          {
-            tabName: withCount("Conflicts", pendingConflicts),
-            onTabClick: () => selectTab(3),
-          },
-          {
-            tabName: withCount("Characters", pendingCharacters),
-            onTabClick: () => selectTab(4),
-          },
-          { tabName: "Images", onTabClick: () => selectTab(5) },
-          { tabName: "Sites", onTabClick: () => selectTab(6) },
-        ]}
+        contents={mainTabs}
+        mobileMenuTitle="Admin"
       />
       {tabIndex === 0 && <UserList />}
       {tabIndex === 1 &&

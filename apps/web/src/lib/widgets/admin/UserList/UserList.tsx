@@ -5,11 +5,12 @@ import { SvgProfile } from "@/src/lib/shared/ui/svg";
 import Image from "next/image";
 import styles from "./UserList.module.scss";
 import { IUser } from "@/src/lib/shared/types/auth.type";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 import { IRole } from "@mooncellar/schemas";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
+import { ActionsMenu } from "@/src/lib/shared/ui/ActionsMenu";
+import { ITableCell } from "@/src/lib/shared/types/table.type";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { useAdminUsersQuery } from "@/src/lib/entities/user/api/admin-user.queries";
 import {
@@ -23,6 +24,7 @@ const ALL_ROLES: IRole[] = ["user", "admin", "moderator"];
 
 export const UserList: FC = () => {
   const tableId = useId();
+  const router = useRouter();
   const { data: users = [], isLoading } = useAdminUsersQuery();
   const currentUser = useAuthStore((state) => state.profile);
   const { mutate: updateUserRoles, isPending: isUpdatingRoles } =
@@ -92,115 +94,121 @@ export const UserList: FC = () => {
           userName: { content: "User" },
           raUsername: { content: "RA Username" },
           roles: { content: "Roles" },
-          rolesEdit: { content: "Edit Roles" },
           created: { content: "Created" },
           actions: { content: "Actions" },
         }}
-        rows={users?.map((user) => ({
-          userName: {
-            content: (
-              <Link
-                href={`/user/${user.userName}`}
-                className={styles.container}
-                target="_blank"
-              >
-                <div className={styles.avatar}>
-                  {user?.avatar ? (
-                    <Image
-                      className={styles.image}
-                      src={user.avatar}
-                      width={48}
-                      height={48}
-                      alt="profile"
-                    />
-                  ) : (
-                    <div className={styles.placeholder__container}>
-                      <SvgProfile className={styles.placeholder} />
-                    </div>
-                  )}
+        rows={users?.map((user) => {
+          const href = `/user/${user.userName}`;
+          const isCurrentUser = user._id === currentUser?._id;
+          const cells: Record<string, ITableCell> = {
+            userName: {
+              content: (
+                <div className={styles.container}>
+                  <div className={styles.avatar}>
+                    {user?.avatar ? (
+                      <Image
+                        className={styles.image}
+                        src={user.avatar}
+                        width={48}
+                        height={48}
+                        alt="profile"
+                      />
+                    ) : (
+                      <div className={styles.placeholder__container}>
+                        <SvgProfile className={styles.placeholder} />
+                      </div>
+                    )}
+                  </div>
+                  <div className={styles.description}>
+                    <h3>{user.userName}</h3>
+                    <p>{user.email}</p>
+                  </div>
                 </div>
-                <div className={styles.description}>
-                  <h3>{user.userName}</h3>
-                  <p>{user.email}</p>
+              ),
+            },
+            raUsername: { content: user.raUsername || "N/A" },
+
+            roles: {
+              content: (
+                <div
+                  className={styles.fill}
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <Dropdown
+                    list={ALL_ROLES}
+                    placeholder="Select roles"
+                    overwriteValue={
+                      user.roles?.length ? user.roles.join(", ") : "No roles"
+                    }
+                    overflowRootId={tableId}
+                    isWithAll
+                    isMulti
+                    initialMultiValue={
+                      user.roles?.map((role) =>
+                        ALL_ROLES.indexOf(role as IRole)
+                      ) || []
+                    }
+                    getIndexes={(indexes) =>
+                      handleRolesChange(
+                        user._id,
+                        (user.roles as IRole[]) || [],
+                        indexes
+                      )
+                    }
+                    isWithReset
+                    isThroughPortal
+                  />
                 </div>
-              </Link>
-            ),
-          },
-          raUsername: { content: user.raUsername || "N/A" },
+              ),
+            },
+            created: {
+              content: new Intl.DateTimeFormat("ru-RU", {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+                second: "numeric",
+              }).format(new Date(user.createdAt)),
+            },
+            actions: {
+              content: (
+                <ActionsMenu
+                  items={[
+                    {
+                      label: "Open in a new tab",
+                      onClick: () => window.open(href, "_blank"),
+                    },
+                    {
+                      label: isCurrentUser
+                        ? "You cannot delete yourself"
+                        : "Delete",
+                      isDanger: true,
+                      isDisabled: isCurrentUser,
+                      onClick: () => handleDeleteUser(user._id, user.userName),
+                    },
+                  ]}
+                />
+              ),
+            },
+          };
 
-          roles: {
-            content: user.roles?.length ? (
-              <div>
-                {user.roles.map((role) => (
-                  <span
-                    key={role}
-                    className={`${styles.role} ${styles[`role_${role}`] || ""}`}
-                  >
-                    {role}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              "No roles assigned"
-            ),
-          },
-
-          rolesEdit: {
-            content: (
-              <Dropdown
-                list={ALL_ROLES}
-                placeholder="Select roles"
-                overwriteValue={
-                  user.roles?.length
-                    ? `Selected ${user.roles.length} roles`
-                    : "No roles selected"
-                }
-                overflowRootId={tableId}
-                isWithAll
-                isMulti
-                initialMultiValue={
-                  user.roles?.map((role) => ALL_ROLES.indexOf(role as IRole)) ||
-                  []
-                }
-                getIndexes={(indexes) =>
-                  handleRolesChange(
-                    user._id,
-                    (user.roles as IRole[]) || [],
-                    indexes
-                  )
-                }
-                isWithReset
-                isThroughPortal
-              />
-            ),
-          },
-          created: {
-            content: new Intl.DateTimeFormat("ru-RU", {
-              year: "numeric",
-              month: "numeric",
-              day: "numeric",
-              hour: "numeric",
-              minute: "numeric",
-              second: "numeric",
-            }).format(new Date(user.createdAt)),
-          },
-          actions: {
-            content: (
-              <Button
-                color={ButtonColor.RED}
-                onClick={() => handleDeleteUser(user._id, user.userName)}
-                disabled={user._id === currentUser?._id}
-                tooltip={
-                  user._id === currentUser?._id
-                    ? "You cannot delete yourself"
-                    : undefined
-                }
-              >
-                Delete
-              </Button>
-            ),
-          },
-        }))}
+          return Object.fromEntries(
+            Object.entries(cells).map(([key, cell]) => [
+              key,
+              ["roles", "actions"].includes(key)
+                ? cell
+                : {
+                    ...cell,
+                    className: styles.rowClickable,
+                    onClick: () => router.push(href),
+                  },
+            ])
+          ) as Record<
+            "userName" | "raUsername" | "roles" | "created" | "actions",
+            ITableCell
+          >;
+        })}
       />
     </div>
   );

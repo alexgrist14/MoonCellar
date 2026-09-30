@@ -3,8 +3,9 @@ import {
   HTMLAttributes,
   memo,
   ReactNode,
-  useMemo,
+  useEffect,
   useRef,
+  useState,
 } from "react";
 import styles from "./ExpandMenu.module.scss";
 import { Scrollbar } from "../Scrollbar";
@@ -13,7 +14,6 @@ import classNames from "classnames";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { useResizeDetector } from "react-resize-detector";
 import { useExpandStore } from "@/src/lib/shared/store/expand.store";
-import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { createPortal } from "react-dom";
 import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
 
@@ -54,13 +54,11 @@ export const ExpandMenu = memo(
       refreshRate: 200,
     });
 
-    const connector = useMemo(
-      () =>
-        commonUtils.checkWindow(() =>
-          document.getElementById("expand-connector")
-        ),
-      []
-    );
+    const [connector, setConnector] = useState<HTMLElement | null>(null);
+
+    useEffect(() => {
+      setConnector(document.getElementById("expand-connector"));
+    }, []);
 
     const closeHandler = () =>
       isActive &&
