@@ -14,6 +14,7 @@ import {
   Rating,
   UserRatingsDatabaseSchema,
 } from "../user/schemas/user-ratings.schema";
+import { AdminCommentsController } from "./controllers/admin-comments.controller";
 import { CommentReportsController } from "./controllers/comment-reports.controller";
 import { CommentsController } from "./controllers/comments.controller";
 import { ReviewsController } from "./controllers/reviews.controller";
@@ -41,6 +42,7 @@ import { VotesService } from "./services/votes.service";
     CommentsController,
     ReviewsController,
     CommentReportsController,
+    AdminCommentsController,
   ],
   providers: [
     CommentsGateway,

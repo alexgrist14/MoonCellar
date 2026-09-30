@@ -1,9 +1,6 @@
 import { FC } from "react";
 import classNames from "classnames";
-import {
-  ICustomListGamesSort,
-  ICustomListsOrder,
-} from "@mooncellar/schemas";
+import { ICustomListGamesSort, ICustomListsOrder } from "@mooncellar/schemas";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 import { SvgChevron } from "@/src/lib/shared/ui/svg";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
@@ -23,7 +20,10 @@ export const LIST_GAMES_SORT_OPTIONS: {
 interface IListGamesSortProps {
   sortBy: ICustomListGamesSort;
   sortOrder: ICustomListsOrder;
-  onChange: (sortBy: ICustomListGamesSort, sortOrder: ICustomListsOrder) => void;
+  onChange: (
+    sortBy: ICustomListGamesSort,
+    sortOrder: ICustomListsOrder
+  ) => void;
   isDisabled?: boolean;
   className?: string;
 }
@@ -41,8 +41,7 @@ export const ListGamesSort: FC<IListGamesSortProps> = ({
       isDisabled={isDisabled}
       list={LIST_GAMES_SORT_OPTIONS.map((option) => option.label)}
       overwriteValue={
-        LIST_GAMES_SORT_OPTIONS.find((option) => option.value === sortBy)
-          ?.label
+        LIST_GAMES_SORT_OPTIONS.find((option) => option.value === sortBy)?.label
       }
       getIndex={(index) =>
         onChange(LIST_GAMES_SORT_OPTIONS[index]?.value ?? sortBy, sortOrder)

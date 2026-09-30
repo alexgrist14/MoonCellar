@@ -33,7 +33,9 @@ export const CharacterCard: FC<ICharacterCardProps> = ({
           sizes="(max-width: 480px) 104px, 128px"
           priority={priority}
         />
-        {rank !== undefined && <span className={styles.card__rank}>{rank}</span>}
+        {rank !== undefined && (
+          <span className={styles.card__rank}>{rank}</span>
+        )}
       </span>
       <span className={styles.card__name}>{character.name}</span>
       {!!meta && <span className={styles.card__meta}>{meta}</span>}

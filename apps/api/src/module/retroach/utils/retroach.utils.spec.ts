@@ -1,4 +1,8 @@
-import { matchGameByTitle, matchPlatformToConsole } from "./retroach.utils";
+import {
+  matchGameByTitle,
+  matchPlatformToConsole,
+  rankGamesByTitle,
+} from "./retroach.utils";
 
 describe("retroach.utils", () => {
   describe("matchGameByTitle", () => {
@@ -110,5 +114,30 @@ describe("retroach.utils", () => {
 
       expect(matchPlatformToConsole("PlayStation 2", consoles)).toBeNull();
     });
+  });
+});
+
+describe("rankGamesByTitle", () => {
+  it("ranks every close candidate so a tie can be sent to review", () => {
+    const candidates = [
+      { name: "Tetris" },
+      { name: "Tetris" },
+      { name: "Tetris Attack" },
+    ];
+    const ranked = rankGamesByTitle("Tetris", candidates);
+
+    expect(ranked.slice(0, 2).map(({ game }) => game)).toEqual([
+      candidates[0],
+      candidates[1],
+    ]);
+    expect(ranked[0].score - ranked[1].score).toBe(0);
+  });
+
+  it("takes the best score over all the RA title variants", () => {
+    const candidates = [{ name: "Dragon Quest" }];
+
+    expect(rankGamesByTitle("Dragon Warrior|Dragon Quest", candidates)).toEqual(
+      [{ game: candidates[0], score: expect.any(Number) }]
+    );
   });
 });

@@ -147,7 +147,10 @@ describe("RoyalGamesGateway", () => {
   });
 
   it("removes and replaces games for the signed-in user", async () => {
-    service.removeRoyalGames.mockResolvedValue({ royalGames: [], rejected: [] });
+    service.removeRoyalGames.mockResolvedValue({
+      royalGames: [],
+      rejected: [],
+    });
     service.setRoyalGames.mockResolvedValue({
       royalGames: [GAME_ID],
       rejected: [],

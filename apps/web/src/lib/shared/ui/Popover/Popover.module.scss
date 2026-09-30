@@ -4,3 +4,106 @@
   width: var(--popover-width);
   max-width: calc(100vw - var(--padding-x4));
 }
+
+@keyframes sheetIn {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes sheetBackdropIn {
+  from {
+    opacity: 0;
+  }
+}
+
+.sheetRoot {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+
+  &__backdrop {
+    position: absolute;
+    inset: 0;
+    background-color: rgba($neutral-10, 0.8);
+    animation: sheetBackdropIn var(--duration-base) var(--easing-out);
+
+    @include reducedMotion {
+      animation-duration: var(--duration-instant);
+    }
+  }
+}
+
+.sheet {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  max-height: var(--popover-sheet-max-height);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  border: 1px solid var(--color-border-primary);
+  border-bottom: none;
+  border-radius: var(--radius-x6) var(--radius-x6) 0 0;
+  background-color: var(--color-bg-primary);
+  transition: transform var(--duration-slow) var(--easing-out);
+  animation: sheetIn var(--duration-slow) var(--easing-out);
+
+  @include reducedMotion {
+    transition-duration: var(--duration-instant);
+    animation-duration: var(--duration-instant);
+  }
+
+  &_dragging {
+    transition: none;
+  }
+
+  &__handle {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: var(--padding-x2);
+    touch-action: none;
+    cursor: grab;
+    user-select: none;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  &__grabber {
+    width: var(--popover-sheet-grabber-width);
+    height: var(--popover-sheet-grabber-height);
+    border-radius: var(--radius-x10);
+    background-color: var(--color-border-secondary);
+  }
+
+  &__head {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x2);
+    padding: var(--padding-x1) var(--padding-x3) var(--padding-x2)
+      var(--padding-x4);
+  }
+
+  &__title {
+    color: var(--color-text-primary);
+
+    @include font(16px, 24px, 700);
+  }
+
+  &__close {
+    margin-left: auto;
+    color: var(--color-text-secondary);
+  }
+
+  &__body {
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0 var(--padding-x4) var(--padding-x4);
+  }
+}

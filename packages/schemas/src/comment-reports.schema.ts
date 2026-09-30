@@ -70,6 +70,30 @@ export const CommentReportsResponseSchema = z.object({
   total: z.number().describe("Groups matching the status"),
 });
 
+export const GetAdminCommentsRequestSchema = z.object({
+  status: CommentStatusSchema.optional().describe(
+    "Only comments with this moderation status"
+  ),
+  page: z.coerce.number().int().min(1).default(1).describe("Page"),
+  take: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(50)
+    .default(COMMENT_REPORTS_PAGE_SIZE)
+    .describe("Page size"),
+});
+
+export const AdminCommentSchema = ReportedCommentSchema.extend({
+  _id: z.string().describe("Comment id"),
+  reportsCount: z.number().describe("Open reports on the comment"),
+});
+
+export const AdminCommentsResponseSchema = z.object({
+  results: AdminCommentSchema.array().describe("Newest comments first"),
+  total: z.number().describe("Comments matching the filter"),
+});
+
 export const ResolveCommentReportsRequestSchema = z.object({
   action: CommentReportActionSchema.describe(
     "Hide or delete the comment, or dismiss the reports and keep it"
@@ -101,4 +125,14 @@ export type IResolveCommentReportsRequest = z.infer<
 >;
 export type IResolveCommentReportsResponse = z.infer<
   typeof ResolveCommentReportsResponseSchema
+>;
+export type IGetAdminCommentsRequest = z.input<
+  typeof GetAdminCommentsRequestSchema
+>;
+export type IGetAdminCommentsParams = z.infer<
+  typeof GetAdminCommentsRequestSchema
+>;
+export type IAdminComment = z.infer<typeof AdminCommentSchema>;
+export type IAdminCommentsResponse = z.infer<
+  typeof AdminCommentsResponseSchema
 >;

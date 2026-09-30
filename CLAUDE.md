@@ -87,6 +87,14 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
   manifest before `bun install --frozen-lockfile`; a partial copy fails the frozen
   lockfile check.
 
+- **`infra/searxng/` is mounted read-write into the SearXNG container, and the container can
+  chown it to its own user.** A file in the repository that the host user cannot write breaks the
+  `pre-commit` hook: lint-staged hides unstaged changes, fails to restore them, and leaves the
+  working tree reverted to `HEAD` with the real changes only in the index (and in its
+  "lint-staged automatic backup" stash). Keep the folder owned by the host user
+  (`podman exec -u root <container> chown -R 0:0 /etc/searxng` under rootless podman), and
+  recover such a state with `git restore --worktree` from the index, not by committing it.
+
 ## Frontend architecture
 
 - **`apps/web` is Feature-Sliced Design and every component belongs to a layer** —

@@ -1,10 +1,5 @@
 export type CategoriesType =
-  | "completed"
-  | "wishlist"
-  | "dropped"
-  | "playing"
-  | "backlog"
-  | "played";
+  "completed" | "wishlist" | "dropped" | "playing" | "backlog" | "played";
 
 export interface ILogs {
   date: Date;

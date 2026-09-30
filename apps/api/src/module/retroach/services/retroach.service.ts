@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, type OnModuleInit } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import {
   type AuthObject,
@@ -27,19 +27,29 @@ import { User } from "../../user/schemas/user.schema";
 import { RA_MAIN_USER_NAME } from "../../../shared/constants";
 import { RAConsole } from "../schemas/console.schema";
 import { RAGame } from "../schemas/retroach.schema";
+import type { IConflictSubject } from "@mooncellar/schemas";
+import { ConflictsService } from "../../conflicts/services/conflicts.service";
+import type {
+  IConflictDecision,
+  IConflictRecord,
+} from "../../conflicts/types/conflicts.types";
+import type { TMatchCandidate } from "../../games/matching/game-matcher.types";
 import {
+  RA_AMBIGUITY_GAP,
   RA_AWARDS_FETCH_DELAY_MS,
   RA_GAMES_FETCH_DELAY_MS,
   RA_SYNC_CRON,
   RA_SYNC_CRON_OPTIONS,
 } from "../constants/sync";
 import {
-  matchGameByTitle,
   matchPlatformToConsole,
+  rankGamesByTitle,
 } from "../utils/retroach.utils";
 
+const RA_MEDIA_URL = "https://media.retroachievements.org";
+
 @Injectable()
-export class RetroachievementsService {
+export class RetroachievementsService implements OnModuleInit {
   private isSyncRunning = false;
   private readonly userName = RA_MAIN_USER_NAME;
   private readonly apiKey = process.env.RETROACHIEVEMENTS_API_KEY;
@@ -55,7 +65,8 @@ export class RetroachievementsService {
     @InjectModel(User.name)
     private users: Model<User>,
     private readonly logger: PinoLogger,
-    private readonly metrics: BusinessMetricsService
+    private readonly metrics: BusinessMetricsService,
+    private readonly conflicts: ConflictsService
   ) {
     this.logger.setContext(RetroachievementsService.name);
   }
@@ -182,11 +193,119 @@ export class RetroachievementsService {
     }
   }
 
+  onModuleInit() {
+    this.conflicts.register({
+      source: "ra",
+      direction: "games",
+      linkField: "retroachievements.gameId",
+      describe: (raId) => this.describeConflict(raId),
+      apply: (decisions) => this.applyConflictDecisions(decisions),
+    });
+  }
+
+  private toConflictRecord(
+    raGame: Pick<RAGame, "_id" | "title">,
+    ranked: { game: GameDocument; score: number }[]
+  ): IConflictRecord {
+    return {
+      externalId: String(raGame._id),
+      externalName: raGame.title,
+      reason: "competing-candidates",
+      candidates: ranked.map(({ game, score }) => ({
+        game: game as unknown as TMatchCandidate,
+        score: Math.round(score * 100) / 100,
+        dateSignal: "unknown",
+        breakdown: {
+          title: Math.round(score * 100) / 100,
+          companies: 0,
+          date: 0,
+          platforms: 0,
+          genre: 0,
+          type: 0,
+        },
+        isDistinctiveTitle: false,
+        isMainTitleMatch: false,
+        isCorroborated: false,
+        isContradicted: false,
+        hasCompanyMismatch: false,
+        descriptionSignal: "unknown",
+      })),
+    };
+  }
+
+  private async describeConflict(
+    raId: string
+  ): Promise<IConflictSubject | null> {
+    const raGame = await this.gameModel.findById(Number(raId)).lean();
+
+    if (!raGame) return null;
+
+    const platforms = await this.platforms
+      .find({ raId: raGame.consoleId })
+      .select("_id")
+      .lean();
+    const [name, ...alternativeNames] = raGame.title.split("|");
+
+    return {
+      name,
+      originalName: name,
+      alternativeNames,
+      description: `${raGame.consoleName} · ${raGame.numAchievements ?? 0} achievements`,
+      released: null,
+      developers: [],
+      platformIds: platforms.map(({ _id }) => String(_id)),
+      lengthMinutes: null,
+      cover: raGame.imageIcon ? `${RA_MEDIA_URL}${raGame.imageIcon}` : null,
+      isExplicitCover: false,
+      url: `https://retroachievements.org/game/${raGame._id}`,
+    };
+  }
+
+  private async applyConflictDecisions(
+    decisions: IConflictDecision[]
+  ): Promise<Map<string, mongoose.Types.ObjectId | null>> {
+    const applied = new Map<string, mongoose.Types.ObjectId | null>();
+
+    for (const { externalId, decision, winner } of decisions) {
+      const raGame = await this.gameModel
+        .findById(Number(externalId))
+        .select("_id consoleId")
+        .lean();
+
+      if (!raGame) continue;
+
+      if (decision === "skip") {
+        applied.set(externalId, null);
+        continue;
+      }
+
+      if (!winner) continue;
+
+      const { matchedCount } = await this.games.updateOne(
+        { _id: winner },
+        {
+          $addToSet: {
+            retroachievements: {
+              gameId: raGame._id,
+              consoleId: raGame.consoleId,
+            },
+          },
+        }
+      );
+
+      if (matchedCount) applied.set(externalId, winner);
+    }
+
+    return applied;
+  }
+
   async parseRAGames() {
     try {
       const raGames = await this.gameModel.find();
       const platforms = await this.platforms.find();
-      const games = await this.games.find().select("name platformIds");
+      const games = await this.games.find().select("name slug platformIds");
+      const resolutions = await this.conflicts.getResolutions("ra");
+      const ambiguous: IConflictRecord[] = [];
 
       const platformsByRaId = new Map<number, PlatformDocument[]>();
       for (const platform of platforms) {
@@ -229,8 +348,30 @@ export class RetroachievementsService {
           }
         }
 
-        const match = matchGameByTitle(raGame.title, candidates);
-        if (!match) continue;
+        const resolution = resolutions.get(String(raGame._id));
+        let match: { _id: mongoose.Types.ObjectId } | null = null;
+
+        if (resolution) {
+          if (resolution.status !== "resolved" || !resolution.winner) continue;
+
+          match = { _id: resolution.winner };
+        } else {
+          const ranked = rankGamesByTitle(raGame.title, candidates);
+          const [best, runnerUp] = ranked;
+
+          if (!best) continue;
+
+          if (
+            runnerUp &&
+            runnerUp.game._id.toString() !== best.game._id.toString() &&
+            best.score - runnerUp.score < RA_AMBIGUITY_GAP
+          ) {
+            ambiguous.push(this.toConflictRecord(raGame, ranked));
+            continue;
+          }
+
+          match = best.game;
+        }
 
         const id = match._id.toString();
         const value = { gameId: raGame._id, consoleId: raGame.consoleId };
@@ -239,8 +380,10 @@ export class RetroachievementsService {
         list ? list.push(value) : (gameIds[id] = [value]);
       }
 
+      await this.conflicts.record("ra", ambiguous);
+
       this.logger.info(
-        `Matched ${Object.values(gameIds).flat().length} RA games to ${Object.keys(gameIds).length} games`
+        `Matched ${Object.values(gameIds).flat().length} RA games to ${Object.keys(gameIds).length} games, ${ambiguous.length} ambiguous RA games sent to conflicts`
       );
 
       const raSyncResult = await this.games.bulkWrite(
@@ -249,23 +392,7 @@ export class RetroachievementsService {
             filter: {
               _id: key,
             },
-            update: [
-              {
-                $set: {
-                  retroachievements: {
-                    $cond: [
-                      {
-                        $ifNull: ["$raIds", false],
-                      },
-                      {
-                        $setUnion: ["$raIds", gameIds[key]],
-                      },
-                      gameIds[key],
-                    ],
-                  },
-                },
-              },
-            ],
+            update: { $set: { retroachievements: gameIds[key] } },
           },
         }))
       );

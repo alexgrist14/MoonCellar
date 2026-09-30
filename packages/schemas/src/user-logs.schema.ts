@@ -32,7 +32,10 @@ export const LogPlaythroughSchema = z.object({
 });
 
 export const LogRatingSchema = z.object({
-  value: z.number().nullable().describe("Rating after the action, null when removed"),
+  value: z
+    .number()
+    .nullable()
+    .describe("Rating after the action, null when removed"),
   previous: z
     .number()
     .nullable()
@@ -46,7 +49,7 @@ export const LogChangesSchema = z.object({
   favorite: z
     .boolean()
     .optional()
-    .describe("true when put in the top 10, false when removed from it"),
+    .describe("true when added to favourites, false when removed from them"),
 });
 
 export const UserLogsSchemaZod = LogChangesSchema.extend({

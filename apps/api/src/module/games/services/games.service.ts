@@ -33,6 +33,7 @@ import {
   combinedRatingsCountExpr,
   weightedRatingExpr,
 } from "../../../shared/games";
+import { GameMatcherService } from "../matching/game-matcher.service";
 import { FileService } from "../../user/services/file-upload.service";
 import { User } from "../../user/schemas/user.schema";
 import { Rating } from "../../user/schemas/user-ratings.schema";
@@ -153,7 +154,8 @@ export class GamesService implements OnModuleInit {
     @InjectModel(UserLogs.name)
     private userLogs: Model<UserLogs>,
     private fileService: FileService,
-    private indexNow: IndexNowService
+    private indexNow: IndexNowService,
+    private gameMatcher: GameMatcherService
   ) {}
 
   onModuleInit() {
@@ -201,6 +203,33 @@ export class GamesService implements OnModuleInit {
     }
 
     return this.searchIndexCache ?? this.searchIndexRefreshPromise;
+  }
+
+  async importImage(
+    gameId: mongoose.Types.ObjectId,
+    url: string,
+    type: "cover" | "screenshot" | "artwork"
+  ) {
+    if (!(await this.Games.exists({ _id: gameId }))) {
+      throw new NotFoundException("Game not found");
+    }
+
+    try {
+      return await this.fileService.uploadRemoteImage(
+        url,
+        `${gameId.toString()}/${new mongoose.Types.ObjectId().toString()}`,
+        {
+          cover: S3_FOLDERS.covers,
+          screenshot: S3_FOLDERS.screenshots,
+          artwork: S3_FOLDERS.artworks,
+        }[type],
+        { useSessions: true }
+      );
+    } catch (err) {
+      throw new BadRequestException(
+        `Could not copy the image: ${(err as Error).message}`
+      );
+    }
   }
 
   async uploadImage(
@@ -444,12 +473,14 @@ export class GamesService implements OnModuleInit {
     }
   }
 
-  async addGame(data: IAddGameRequest) {
+  async addGame(data: IAddGameRequest, force = false) {
     try {
       const slugTaken = await this.Games.exists({ slug: data.slug });
       if (slugTaken) {
         throw new ConflictException(`Slug already exists: ${data.slug}`);
       }
+
+      if (!force) await this.gameMatcher.assertNoDuplicates(data);
 
       const now = new Date().toISOString();
       const _id = new mongoose.Types.ObjectId();
@@ -491,7 +522,8 @@ export class GamesService implements OnModuleInit {
         const link = await this.fileService.uploadRemoteImage(
           url,
           `${gameId.toString()}/${new mongoose.Types.ObjectId().toString()}`,
-          folder
+          folder,
+          { useSessions: true }
         );
         stored.set(url, link);
 

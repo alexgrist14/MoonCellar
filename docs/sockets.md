@@ -6,7 +6,7 @@ MoonCellar keeps three real-time channels open over Socket.IO, all served by the
 |---|---|---|
 | `/comments` | Anyone with a game's Discussion tab open | **Notifications only.** Tells other readers that a comment was posted, edited, moderated or liked. Every change still goes through REST. |
 | `/royal` | Every signed-in user, on every page | **State.** Royal games — the user's list of games for the royal wheel — are read and changed over this socket and pushed to the user's other tabs and devices. |
-| `/vndb-review` | Admins with the VNDB candidates tab open | **Notifications only.** Tells other admins that a VN was matched or skipped, and when queued decisions were written to games. |
+| `/conflicts` | Admins with the Conflicts tab open | **Notifications only.** Tells other admins that a conflict was matched or skipped, and when queued decisions were written to games. |
 
 This document describes how they work, every event on the wire, what depends on the sockets and
 what deliberately does not.
@@ -21,7 +21,7 @@ Verified on 2026-09-15 with Bun 1.4.2, NestJS 11.2, Socket.IO 4.8.3, MongoDB 8.2
 | Library | Socket.IO 4.8 through `@nestjs/websockets` + `@nestjs/platform-socket.io` 11 |
 | Server | The API process itself, same port (3228), HTTP path `/socket.io/` |
 | Adapter | `SocketIoAdapter` (`apps/api/src/shared/socket-io.adapter.ts`), installed in `main.ts` |
-| Contract | `packages/schemas/src/comments-socket.schema.ts`, `packages/schemas/src/royal-games.schema.ts`, `packages/schemas/src/vndb-review-socket.schema.ts` |
+| Contract | `packages/schemas/src/comments-socket.schema.ts`, `packages/schemas/src/royal-games.schema.ts`, `packages/schemas/src/conflicts-socket.schema.ts` |
 
 - **Transports.** Default Socket.IO behaviour: an HTTP long-polling handshake, then an upgrade to
   WebSocket. If the upgrade is blocked (see [Deployment](#deployment)) the connection keeps
@@ -433,59 +433,63 @@ because `WheelComponent` rebuilds its round from the list whenever the list chan
 
 ---
 
-## `/vndb-review` — VNDB candidate review
+## `/conflicts` — parser conflict review
 
-Admins resolving VNDB candidates see each other's decisions live. When one admin matches or skips a
-VN, every other open VNDB candidates tab marks it as decided, and an admin who has that VN open gets
-a toast and loses the Skip and Match buttons.
+Admins resolving parser conflicts see each other's decisions live. When one admin matches or skips a
+conflict, every other open Conflicts tab marks it as decided, and an admin who has that conflict
+open gets a toast and loses the Skip and Match buttons. A conflict is identified by its `source`
+(`vndb`, `igdb`, `hltb`, `ra`) and its `externalId` — the entry in that source, or for `hltb` the catalogue game.
 
 | | |
 |---|---|
 | Rooms | None — every socket of the namespace belongs to an admin and receives every event |
 | Authentication | Session cookie `accessMoonToken` of a user with the `admin` role, verified when the namespace connects |
-| Server code | `apps/api/src/module/games/gateways/vndb-review.gateway.ts`, emitted from `VndbService` |
-| Client code | `apps/web/src/lib/shared/socket/vndb-review.socket.ts`, `apps/web/src/lib/entities/game/api/vndb-candidates.socket.ts` |
-| Only consumer | `VndbCandidates` (`apps/web/src/lib/widgets/admin/VndbCandidates/VndbCandidates.tsx`) |
+| Server code | `apps/api/src/module/conflicts/gateways/conflicts.gateway.ts`, emitted from `ConflictsService` |
+| Client code | `apps/web/src/lib/shared/socket/conflicts.socket.ts`, `apps/web/src/lib/entities/conflict/api/conflict.socket.ts` |
+| Only consumer | `Conflicts` (`apps/web/src/lib/widgets/admin/Conflicts/Conflicts.tsx`) |
 
-- **The database, not the socket, stops a second decision.** `decideCandidate` writes with one
-  `findOneAndUpdate` whose filter requires `status: "pending"`, `decision: null` and, for a match,
-  the game among the candidates. When two admins decide the same VN at the same moment only one
-  write matches; the other request answers `409` with the name of the admin who decided. The worker
-  writes a batch back only to records still `pending` with the same decision. The socket makes the
-  race rare by telling everyone first; it is not what prevents it.
-- **Decisions still go through REST** (`POST /vndb/candidates/:vnId/decision`). The decider's own tab
-  receives its event too, which keeps its cached item correct if the admin goes back to it.
-- **Lifecycle.** The socket opens when the VNDB candidates tab mounts and closes when it unmounts. It
+- **The database, not the socket, stops a second decision.** `ConflictsService.decide` writes with
+  one `findOneAndUpdate` whose filter requires `status: "pending"`, `decision: null` and, for a
+  match, the game among the candidates. When two admins decide the same conflict at the same moment
+  only one write matches; the other request answers `409` with the name of the admin who decided.
+  The worker writes a batch back only to records still `pending` with the same decision. The
+  socket makes the race rare by telling everyone first; it is not what prevents it.
+- **Decisions still go through REST** (`POST /conflicts/:source/:externalId/decision`). The
+  decider's own tab receives its event too, which keeps its cached item correct if the admin goes
+  back to it.
+- **Lifecycle.** The socket opens when the Conflicts tab mounts and closes when it unmounts. It
   runs on its own `Manager` with credentials and loads `socket.io-client` with a dynamic import, for
   the same reasons as `/royal`. On `Unauthorized` the client refreshes the session once and
-  reconnects; on `reconnect` it refetches every review query to catch up.
+  reconnects; on `reconnect` it refetches every conflicts query to catch up.
 - **The role is checked once, at connect.** An admin whose role is removed keeps receiving events
   until the socket disconnects.
 
 ### Server → client events
 
-#### `candidate:decided`
+#### `conflict:decided`
 
-Emitted by `VndbService.decideCandidate` after the decision is written.
+Emitted by `ConflictsService.decide` after the decision is written.
 
 | Field | Type | Meaning |
 |---|---|---|
-| `vnId` | string | The VN |
+| `source` | `"vndb"` \| `"igdb"` \| `"hltb"` \| `"ra"` | Parser the conflict came from |
+| `externalId` | string | The entry in that source |
 | `state` | `"queued-match"` \| `"queued-new"` | State after the decision |
 | `decidedBy` | string \| null | User name of the admin who decided |
 
-Client: patches `state` and `decidedBy` of the cached review item, refetches the summary and the
-list, and shows a toast when the VN was waiting and is the one open on screen.
+Client: patches `state` and `decidedBy` of the cached conflict item, refetches the summaries and
+the list, and shows a toast when the conflict was waiting and is the one open on screen.
 
-#### `candidates:applied`
+#### `conflicts:applied`
 
-Emitted by `VndbService.applyDecisionBatch` after a batch is written.
+Emitted by `ConflictsService.applyBatch` after a batch is written.
 
 | Field | Type | Meaning |
 |---|---|---|
-| `vnIds` | string[] | VNs of the batch — written to games, or returned to review because nothing could be written |
+| `source` | `"vndb"` \| `"igdb"` \| `"hltb"` \| `"ra"` | Parser the batch belongs to |
+| `externalIds` | string[] | Entries of the batch — written to games, or returned to review because nothing could be written |
 
-Client: invalidates those review items, the summary and the list.
+Client: invalidates those conflict items, the summaries and the list.
 
 ---
 

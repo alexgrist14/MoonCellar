@@ -8,7 +8,7 @@ import { deleteCookie } from "@/src/lib/shared/utils/cookies.utils";
 import { useUserStore } from "@/src/lib/shared/store/user.store";
 
 export const useAuth = () => {
-  const { clear, setProfile, setAuth } = useAuthStore();
+  const { clear, setProfile, setAuth, setIsAdmin } = useAuthStore();
   const { setPlaythroughs } = useUserStore();
   const { push } = useRouter();
 
@@ -29,6 +29,7 @@ export const useAuth = () => {
     setAuth(true);
     userAPI.getById(userId).then((res) => {
       setProfile(res.data);
+      setIsAdmin(!!res.data.roles?.includes("admin"));
       modal.close();
     });
   };

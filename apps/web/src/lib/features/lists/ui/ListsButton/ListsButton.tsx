@@ -4,18 +4,15 @@ import { CSSProperties, FC, useCallback, useRef, useState } from "react";
 import { IGameResponse } from "@mooncellar/schemas";
 import { useMyListGameCountsQuery } from "@/src/lib/entities/list/api/list.queries";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { GameControlButton } from "@/src/lib/shared/ui/GameControlButton";
-import { modal } from "@/src/lib/shared/ui/Modal";
 import { SvgListBullet } from "@/src/lib/shared/ui/svg";
-import { ListsModal, ListsPopover } from "../ListsPopover";
+import { ListsPopover } from "../ListsPopover";
 
 const ICON_STYLE: CSSProperties = { color: "inherit" };
 
 export const ListsButton: FC<{ game: IGameResponse }> = ({ game }) => {
   const profile = useAuthStore((s) => s.profile);
-  const isMobile = useStatesStore((s) => s.isMobile);
   const userId = profile?._id;
   const anchorRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -26,13 +23,6 @@ export const ListsButton: FC<{ game: IGameResponse }> = ({ game }) => {
 
   const handleClick = () => {
     if (!userId) return;
-
-    if (isMobile) {
-      modal.open(<ListsModal game={game} userId={userId} />, {
-        id: "game-lists",
-      });
-      return;
-    }
 
     setIsOpen((current) => !current);
   };

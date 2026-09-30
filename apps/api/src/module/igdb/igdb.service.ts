@@ -3,9 +3,17 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  type OnModuleInit,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import mongoose, { Model } from "mongoose";
+import mongoose, { Model, Types } from "mongoose";
+import type { IConflictSubject } from "@mooncellar/schemas";
+import { ConflictsService } from "../conflicts/services/conflicts.service";
+import type { IConflictDecision } from "../conflicts/types/conflicts.types";
+import { GameMatcherService } from "../games/matching/game-matcher.service";
+import { resolveMatch } from "../games/matching/game-matcher.utils";
+import { IGDB_MATCH_PROFILE } from "../games/matching/match-profiles";
+import type { IMatchSubject } from "../games/matching/game-matcher.types";
 import {
   buildIgdbQueryParams,
   getLink,
@@ -41,7 +49,7 @@ import {
 import { Cron } from "@nestjs/schedule";
 import { PinoLogger } from "nestjs-pino";
 import { runInCronLogContext } from "../../shared/cron-logging";
-import { runCronExclusive } from "../../shared/cron-mutex";
+import { runCronExclusive, withDbLock } from "../../shared/cron-mutex";
 import { BusinessMetricsService } from "../metrics/business-metrics.service";
 import {
   IGDB_CHARACTERS_LINK_GAMES_CRON,
@@ -137,8 +145,27 @@ const ALL_UPDATABLE_CHARACTER_FIELDS = [
 
 type UpdatableCharacterField = (typeof ALL_UPDATABLE_CHARACTER_FIELDS)[number];
 
+const isEmptyValue = (value: unknown) =>
+  value == null || value === "" || (Array.isArray(value) && !value.length);
+
+type TUpsertOptions = {
+  parseImages?: boolean;
+  field?: string;
+  forceParse?: boolean;
+  matchNew?: boolean;
+};
+
+type TIgdbSyncOptions = {
+  limit?: number;
+  delayMs?: number;
+  concurrency?: number;
+  parseImages?: boolean;
+  field?: string;
+  forceParse?: boolean;
+};
+
 @Injectable()
-export class IGDBService {
+export class IGDBService implements OnModuleInit {
   private readonly logger = new Logger(IGDBService.name);
   private isSyncUpdatedGamesCronRunning = false;
   private isSyncUpdatedCharactersCronRunning = false;
@@ -154,8 +181,20 @@ export class IGDBService {
     private fileService: FileService,
     private httpService: HttpService,
     private readonly pino: PinoLogger,
-    private readonly metrics: BusinessMetricsService
+    private readonly metrics: BusinessMetricsService,
+    private readonly conflicts: ConflictsService,
+    private readonly gameMatcher: GameMatcherService
   ) {}
+
+  onModuleInit() {
+    this.conflicts.register({
+      source: "igdb",
+      direction: "games",
+      linkField: "igdb.gameId",
+      describe: (igdbId) => this.describeConflict(igdbId),
+      apply: (decisions) => this.applyConflictDecisions(decisions),
+    });
+  }
 
   async getToken() {
     const { data: authData } = await igdbAuth();
@@ -212,7 +251,7 @@ export class IGDBService {
             "igdb.gameId": { $in: items.map((item) => item.id) },
           })
             .select(
-              "_id slug type createdAt igdb cover screenshots artworks isStopParsingPictures isStopParsing vndb" +
+              "_id slug type createdAt igdb cover screenshots artworks isStopParsingPictures isStopParsing isCustom vndb" +
                 (options?.field ? ` ${options.field}` : "")
             )
             .lean();
@@ -290,14 +329,22 @@ export class IGDBService {
     }
   }
 
-  async syncGamesFromIgdb(options?: {
-    limit?: number;
-    delayMs?: number;
-    concurrency?: number;
-    parseImages?: boolean;
-    field?: string;
-    forceParse?: boolean;
-  }) {
+  async syncGamesFromIgdb(options?: TIgdbSyncOptions) {
+    const lock = await withDbLock(this.Games.db, "igdb-games-sync", () =>
+      this.runGamesSync(options)
+    );
+
+    if (!lock.locked) {
+      this.logger.warn(
+        "IGDB games sync skipped: it is running in another process"
+      );
+      return;
+    }
+
+    return lock.result;
+  }
+
+  private async runGamesSync(options?: TIgdbSyncOptions) {
     try {
       const token = await this.getIgdbToken();
 
@@ -327,7 +374,7 @@ export class IGDBService {
             "igdb.gameId": { $in: items.map((item) => item.id) },
           })
             .select(
-              "_id slug type createdAt igdb cover screenshots artworks isStopParsingPictures isStopParsing vndb"
+              "_id slug type createdAt igdb cover screenshots artworks isStopParsingPictures isStopParsing isCustom vndb"
             )
             .lean();
 
@@ -345,6 +392,7 @@ export class IGDBService {
                   parseImages: options?.parseImages ?? true,
                   field: options?.field,
                   forceParse: options?.forceParse,
+                  matchNew: true,
                 });
                 this.metrics.recordGames(
                   "igdb",
@@ -781,7 +829,7 @@ export class IGDBService {
       "igdb.gameId": igdbGame.id,
     })
       .select(
-        "_id slug type createdAt cover screenshots artworks isStopParsingPictures isStopParsing vndb"
+        "_id slug type createdAt cover screenshots artworks isStopParsingPictures isStopParsing isCustom vndb"
       )
       .lean();
 
@@ -797,10 +845,16 @@ export class IGDBService {
     slug: string,
     existingGame?: Pick<
       GameDocument,
-      "cover" | "screenshots" | "artworks" | "isStopParsingPictures"
+      | "cover"
+      | "screenshots"
+      | "artworks"
+      | "isStopParsingPictures"
+      | "isCustom"
     >,
     options?: { type?: ImageField; forceParse?: boolean }
   ) {
+    const isFillOnly = !!existingGame?.isCustom;
+    const isForced = !!options?.forceParse && !isFillOnly;
     if (existingGame?.isStopParsingPictures) {
       return;
     }
@@ -814,7 +868,7 @@ export class IGDBService {
     if (
       wants("cover") &&
       igdbGame.cover?.url &&
-      (options?.forceParse || !existingGame?.cover)
+      (isForced || !existingGame?.cover)
     ) {
       try {
         await this.clearExistingImages(S3_FOLDERS.covers, slug);
@@ -832,9 +886,10 @@ export class IGDBService {
 
     if (wants("screenshots")) {
       const screenshotsCount = igdbGame.screenshots?.length || 0;
+      const storedCount = existingGame?.screenshots?.length || 0;
       if (
-        options?.forceParse ||
-        (existingGame?.screenshots?.length || 0) !== screenshotsCount
+        isForced ||
+        (isFillOnly ? !storedCount : storedCount !== screenshotsCount)
       ) {
         try {
           await this.clearExistingImages(S3_FOLDERS.screenshots, slug);
@@ -851,9 +906,10 @@ export class IGDBService {
 
     if (wants("artworks")) {
       const artworksCount = igdbGame.artworks?.length || 0;
+      const storedCount = existingGame?.artworks?.length || 0;
       if (
-        options?.forceParse ||
-        (existingGame?.artworks?.length || 0) !== artworksCount
+        isForced ||
+        (isFillOnly ? !storedCount : storedCount !== artworksCount)
       ) {
         try {
           await this.clearExistingImages(S3_FOLDERS.artworks, slug);
@@ -893,9 +949,10 @@ export class IGDBService {
       | "artworks"
       | "isStopParsingPictures"
       | "isStopParsing"
+      | "isCustom"
       | "vndb"
     >,
-    options?: { parseImages?: boolean; field?: string; forceParse?: boolean }
+    options?: TUpsertOptions
   ) {
     if (existingGame?.vndb?.vnId) {
       this.logger.log(`Skipped game with VNDB data: ${existingGame.slug}`);
@@ -905,6 +962,12 @@ export class IGDBService {
     if (existingGame?.isStopParsing) {
       this.logger.log(`Skipped game with isStopParsing: ${existingGame.slug}`);
       return existingGame.slug + " skipped";
+    }
+
+    if (!existingGame && options?.matchNew && !options.field) {
+      const outcome = await this.matchNewIgdbGame(igdbGame);
+
+      if (outcome) return outcome;
     }
 
     if (
@@ -1139,10 +1202,12 @@ export class IGDBService {
           [options.field]: update[options.field as keyof typeof update],
           updatedAt: update.updatedAt,
         }
-      : update;
+      : existingGame?.isCustom
+        ? await this.getFillOnlyPayload(existingGame._id, update)
+        : update;
 
     const unsetPayload =
-      options?.forceParse && !options.field
+      options?.forceParse && !options.field && !existingGame?.isCustom
         ? Object.fromEntries(
             Object.entries(update)
               .filter(([, value]) => value === undefined)
@@ -1159,9 +1224,12 @@ export class IGDBService {
     );
 
     if (options?.parseImages) {
-      await this.parseGameImagesFromIgdb(igdbGame, update.slug, existingGame, {
-        forceParse: options.forceParse,
-      });
+      await this.parseGameImagesFromIgdb(
+        igdbGame,
+        existingGame?.isCustom ? existingGame.slug : update.slug,
+        existingGame,
+        { forceParse: options.forceParse }
+      );
     }
 
     this.logger.log(
@@ -1171,6 +1239,206 @@ export class IGDBService {
     );
 
     return update.slug + " parsed";
+  }
+
+  private toMatchSubject(igdbGame: IGDBExpandedGame, platformSlugs: string[]) {
+    const companies = igdbGame.involved_companies || [];
+    const namesOf = (
+      isRole: (company: (typeof companies)[number]) => boolean
+    ) =>
+      companies
+        .filter(isRole)
+        .map(({ company }) => company?.name)
+        .filter((name): name is string => !!name);
+
+    return {
+      id: String(igdbGame.id),
+      name: igdbGame.name,
+      originalName: igdbGame.name,
+      alternativeNames: (igdbGame.alternative_names || []).map(
+        ({ name }) => name
+      ),
+      type:
+        igdbGame.game_type?.type ||
+        (igdbGame.category !== undefined
+          ? categoryTypeNames[igdbGame.category]
+          : undefined) ||
+        "",
+      releaseDates: igdbGame.first_release_date
+        ? [
+            new Date(igdbGame.first_release_date * 1000)
+              .toISOString()
+              .slice(0, 10),
+          ]
+        : [],
+      developers: namesOf(
+        ({ developer, porting, supporting }) =>
+          !!(developer || porting || supporting)
+      ),
+      publishers: namesOf(({ publisher }) => !!publisher),
+      platformSlugs,
+      description: igdbGame.summary ?? "",
+    } satisfies IMatchSubject;
+  }
+
+  private async matchNewIgdbGame(igdbGame: IGDBExpandedGame) {
+    const [platforms, platformSlugById] = await Promise.all([
+      this.Platforms.find({ igdbId: { $in: igdbGame.platforms || [] } })
+        .select("slug")
+        .lean(),
+      this.gameMatcher.getPlatformSlugById(),
+    ]);
+    const subject = this.toMatchSubject(
+      igdbGame,
+      platforms.map(({ slug }) => slug)
+    );
+    const { candidatesBySubject, sharedTitles } =
+      await this.gameMatcher.findCandidates([subject]);
+    const result = resolveMatch(
+      subject,
+      candidatesBySubject.get(subject.id) ?? [],
+      { platformSlugById, sharedTitles },
+      IGDB_MATCH_PROFILE
+    );
+
+    if (result.verdict === "absent") return null;
+
+    if (
+      result.verdict === "matched" &&
+      result.winner &&
+      process.env.IGDB_AUTO_LINK === "true"
+    ) {
+      await this.Games.updateOne(
+        { _id: result.winner._id },
+        { $set: { "igdb.gameId": igdbGame.id } }
+      );
+      this.logger.log(
+        `Linked IGDB ${igdbGame.id} to existing game: ${result.winner.slug}`
+      );
+
+      return result.winner.slug + " linked";
+    }
+
+    await this.conflicts.record("igdb", [
+      {
+        externalId: String(igdbGame.id),
+        externalName: igdbGame.name,
+        reason: result.reason,
+        candidates: result.candidates,
+      },
+    ]);
+    this.logger.warn(
+      `IGDB ${igdbGame.id} (${igdbGame.slug}) waits in conflicts: ${result.reason ?? "matched, auto-link off"}`
+    );
+
+    return igdbGame.slug + " conflict";
+  }
+
+  private async getFillOnlyPayload(
+    gameId: mongoose.Types.ObjectId,
+    update: Record<string, unknown>
+  ) {
+    const current = await this.Games.findById(gameId).lean();
+
+    return Object.fromEntries(
+      Object.entries(update).filter(
+        ([key]) =>
+          key === "igdb" ||
+          key === "updatedAt" ||
+          (key !== "slug" &&
+            isEmptyValue((current as Record<string, unknown> | null)?.[key]))
+      )
+    );
+  }
+
+  private async describeConflict(
+    externalId: string
+  ): Promise<IConflictSubject | null> {
+    const igdbId = Number(externalId);
+
+    if (!Number.isInteger(igdbId)) return null;
+
+    const token = await this.getIgdbToken();
+    const { data } = await igdbAgent<IGDBExpandedGame[]>(
+      getLink("games"),
+      token,
+      buildIgdbQueryParams(SINGLE_GAME_QUERY_FIELDS, {
+        where: `id = ${igdbId}`,
+        limit: 1,
+      })
+    );
+    const igdbGame = data?.[0];
+
+    if (!igdbGame) return null;
+
+    const platforms = await this.Platforms.find({
+      igdbId: { $in: igdbGame.platforms || [] },
+    })
+      .select("_id")
+      .lean();
+    const subject = this.toMatchSubject(igdbGame, []);
+
+    return {
+      name: igdbGame.name,
+      originalName: igdbGame.name,
+      alternativeNames: subject.alternativeNames,
+      description: subject.description,
+      released: subject.releaseDates[0] ?? null,
+      developers: subject.developers,
+      platformIds: platforms.map(({ _id }) => String(_id)),
+      lengthMinutes: null,
+      cover: igdbGame.cover?.url
+        ? getImageLink(igdbGame.cover.url, "cover_big", 2)
+        : null,
+      isExplicitCover: false,
+      url: igdbGame.url ?? null,
+    };
+  }
+
+  private async applyConflictDecisions(
+    decisions: IConflictDecision[]
+  ): Promise<Map<string, Types.ObjectId>> {
+    const token = await this.getIgdbToken();
+
+    for (const { externalId, decision, winner } of decisions) {
+      const igdbId = Number(externalId);
+
+      try {
+        if (decision === "match") {
+          if (!winner) continue;
+
+          const linked = await this.Games.updateOne(
+            {
+              _id: winner,
+              $or: [
+                { "igdb.gameId": { $exists: false } },
+                { "igdb.gameId": null },
+                { "igdb.gameId": igdbId },
+              ],
+            },
+            { $set: { "igdb.gameId": igdbId } }
+          );
+
+          if (!linked.matchedCount) continue;
+        }
+
+        await this.parseSingleGameFromIgdb({ igdbId }, token, {
+          parseImages: true,
+        });
+      } catch (e) {
+        this.logger.error(e, `Failed to apply IGDB conflict ${externalId}`);
+      }
+    }
+
+    const games = await this.Games.find({
+      "igdb.gameId": {
+        $in: decisions.map(({ externalId }) => Number(externalId)),
+      },
+    })
+      .select("_id igdb.gameId")
+      .lean();
+
+    return new Map(games.map((game) => [String(game.igdb.gameId), game._id]));
   }
 
   private async resolveUniqueSlug(
@@ -1313,14 +1581,22 @@ export class IGDBService {
     }
   }
 
-  async syncCharactersFromIgdb(options?: {
-    limit?: number;
-    delayMs?: number;
-    concurrency?: number;
-    parseImages?: boolean;
-    field?: string;
-    forceParse?: boolean;
-  }) {
+  async syncCharactersFromIgdb(options?: TIgdbSyncOptions) {
+    const lock = await withDbLock(this.Games.db, "igdb-characters-sync", () =>
+      this.runCharactersSync(options)
+    );
+
+    if (!lock.locked) {
+      this.logger.warn(
+        "IGDB characters sync skipped: it is running in another process"
+      );
+      return;
+    }
+
+    return lock.result;
+  }
+
+  private async runCharactersSync(options?: TIgdbSyncOptions) {
     try {
       const token = await this.getIgdbToken();
 

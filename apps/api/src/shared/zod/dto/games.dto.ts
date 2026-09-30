@@ -1,6 +1,9 @@
 import { createZodDto } from "nestjs-zod";
 import {
   AddGameRequestSchema,
+  FindGameImagesRequestSchema,
+  FindGameImagesResponseSchema,
+  ImportGameImageRequestSchema,
   GameAiDraftRequestSchema,
   GameAiDraftRunSchema,
   GameSchema,
@@ -13,6 +16,7 @@ import {
   GetRandomGameSlugResponseSchema,
   GetRelatedGamesResponseSchema,
   UpdateGameRequestSchema,
+  PossibleDuplicatesResponseSchema,
 } from "@mooncellar/schemas";
 
 export class GetGameByIdDto extends createZodDto(GetGameByIdSchema) {}
@@ -21,6 +25,10 @@ export class GetGamesByIdsDto extends createZodDto(GetGamesByIdsSchema) {}
 export class GetGamesDto extends createZodDto(GetGamesRequestSchema) {}
 export class GetGameSlugsDto extends createZodDto(GetGameSlugsRequestSchema) {}
 export class AddGameDto extends createZodDto(AddGameRequestSchema) {}
+
+export class PossibleDuplicatesResponseDto extends createZodDto(
+  PossibleDuplicatesResponseSchema
+) {}
 export class GameAiDraftDto extends createZodDto(GameAiDraftRequestSchema) {}
 export class GameAiDraftRunDto extends createZodDto(GameAiDraftRunSchema) {}
 export class UpdateGameDto extends createZodDto(UpdateGameRequestSchema) {}
@@ -37,4 +45,13 @@ export class GetRandomGameSlugResponseDto extends createZodDto(
 
 export class GetRelatedGamesResponseDto extends createZodDto(
   GetRelatedGamesResponseSchema
+) {}
+export class FindGameImagesDto extends createZodDto(
+  FindGameImagesRequestSchema
+) {}
+export class FindGameImagesResponseDto extends createZodDto(
+  FindGameImagesResponseSchema
+) {}
+export class ImportGameImageDto extends createZodDto(
+  ImportGameImageRequestSchema
 ) {}

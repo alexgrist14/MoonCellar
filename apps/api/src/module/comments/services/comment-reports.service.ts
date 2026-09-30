@@ -2,11 +2,14 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { type FilterQuery, Model } from "mongoose";
 import {
+  type IAdminCommentsResponse,
   type ICommentReportAction,
   type ICommentReportResolution,
   type ICommentReportsResponse,
   type ICommunityAuthor,
+  type IGetAdminCommentsParams,
   type IGetCommentReportsParams,
+  type IReportedComment,
   type IResolveCommentReportsResponse,
 } from "@mooncellar/schemas";
 import { Game, type GameDocument } from "../../games/schemas/game.schema";
@@ -43,6 +46,18 @@ type IReportGroupsFacet = {
 
 const toIsoDate = (date: Date) => new Date(date).toISOString();
 
+const COMMENT_PROJECTION = {
+  gameId: 1,
+  userId: 1,
+  parentId: 1,
+  reviewId: 1,
+  body: 1,
+  isSpoiler: 1,
+  status: 1,
+  createdAt: 1,
+  updatedAt: 1,
+};
+
 @Injectable()
 export class CommentReportsService {
   constructor(
@@ -71,64 +86,25 @@ export class CommentReportsService {
           {
             _id: { $in: groups.map((group) => group.commentId) },
           } as FilterQuery<GameCommentDocument>,
-          {
-            gameId: 1,
-            userId: 1,
-            parentId: 1,
-            reviewId: 1,
-            body: 1,
-            isSpoiler: 1,
-            status: 1,
-            createdAt: 1,
-            updatedAt: 1,
-          }
+          COMMENT_PROJECTION
         ).lean<ILeanComment[]>()
       : [];
     const commentsById = new Map(
       comments.map((comment) => [String(comment._id), comment])
     );
 
-    const gameIds = uniqueIds(comments.map((comment) => comment.gameId));
-    const games = gameIds.length
-      ? await this.Games.find(
-          { _id: { $in: gameIds } } as FilterQuery<GameDocument>,
-          { name: 1, slug: 1 }
-        ).lean()
-      : [];
-    const gamesById = new Map(games.map((game) => [String(game._id), game]));
-
-    const authors = await this.lookup.getAuthors(
-      uniqueIds([
-        ...comments.map((comment) => comment.userId),
-        ...groups.flatMap((group) => group.reporterIds),
-        ...groups.map((group) => group.resolvedBy),
-      ])
-    );
-    const getAuthor = (id?: mongoose.Types.ObjectId | null) =>
-      id ? (authors.get(String(id)) ?? null) : null;
+    const { describe, getAuthor } = await this.describeComments(comments, [
+      ...groups.flatMap((group) => group.reporterIds),
+      ...groups.map((group) => group.resolvedBy),
+    ]);
 
     return {
       results: groups.map((group) => {
         const comment = commentsById.get(String(group.commentId));
-        const game = comment ? gamesById.get(String(comment.gameId)) : undefined;
 
         return {
           commentId: String(group.commentId),
-          comment: comment
-            ? {
-                status: comment.status,
-                body: comment.body,
-                isSpoiler: comment.isSpoiler,
-                createdAt: toIsoDate(comment.createdAt),
-                updatedAt: toIsoDate(comment.updatedAt),
-                isReply: !!comment.parentId,
-                isOnReview: !!comment.reviewId,
-                author: getAuthor(comment.userId),
-                game: game
-                  ? { _id: String(game._id), name: game.name, slug: game.slug }
-                  : null,
-              }
-            : null,
+          comment: comment ? describe(comment) : null,
           reportsCount: group.count,
           firstReportedAt: toIsoDate(group.firstReportedAt),
           lastReportedAt: toIsoDate(group.lastReportedAt),
@@ -143,6 +119,78 @@ export class CommentReportsService {
       }),
       total: facet?.total[0]?.count ?? 0,
     };
+  }
+
+  async getComments({
+    status,
+    page,
+    take,
+  }: IGetAdminCommentsParams): Promise<IAdminCommentsResponse> {
+    const filter = (
+      status ? { status } : {}
+    ) as FilterQuery<GameCommentDocument>;
+    const [comments, total] = await Promise.all([
+      this.Comments.find(filter, { ...COMMENT_PROJECTION, reportsCount: 1 })
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * take)
+        .limit(take)
+        .lean<ILeanComment[]>(),
+      this.Comments.countDocuments(filter),
+    ]);
+
+    const { describe } = await this.describeComments(comments);
+
+    return {
+      results: comments.map((comment) => ({
+        _id: String(comment._id),
+        reportsCount: comment.reportsCount ?? 0,
+        ...describe(comment),
+      })),
+      total,
+    };
+  }
+
+  private async describeComments(
+    comments: ILeanComment[],
+    extraAuthorIds: (mongoose.Types.ObjectId | null | undefined)[] = []
+  ) {
+    const gameIds = uniqueIds(comments.map((comment) => comment.gameId));
+    const games = gameIds.length
+      ? await this.Games.find(
+          { _id: { $in: gameIds } } as FilterQuery<GameDocument>,
+          { name: 1, slug: 1 }
+        ).lean()
+      : [];
+    const gamesById = new Map(games.map((game) => [String(game._id), game]));
+
+    const authors = await this.lookup.getAuthors(
+      uniqueIds([
+        ...comments.map((comment) => comment.userId),
+        ...extraAuthorIds,
+      ])
+    );
+    const getAuthor = (id?: mongoose.Types.ObjectId | null) =>
+      id ? (authors.get(String(id)) ?? null) : null;
+
+    const describe = (comment: ILeanComment): IReportedComment => {
+      const game = gamesById.get(String(comment.gameId));
+
+      return {
+        status: comment.status,
+        body: comment.body,
+        isSpoiler: comment.isSpoiler,
+        createdAt: toIsoDate(comment.createdAt),
+        updatedAt: toIsoDate(comment.updatedAt),
+        isReply: !!comment.parentId,
+        isOnReview: !!comment.reviewId,
+        author: getAuthor(comment.userId),
+        game: game
+          ? { _id: String(game._id), name: game.name, slug: game.slug }
+          : null,
+      };
+    };
+
+    return { describe, getAuthor };
   }
 
   async resolve(

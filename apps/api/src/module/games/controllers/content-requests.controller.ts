@@ -89,7 +89,9 @@ export class ContentRequestsController {
   }
 
   @Get(":id")
-  @ApiOperation({ summary: "One request with the current values of its target" })
+  @ApiOperation({
+    summary: "One request with the current values of its target",
+  })
   @ApiOkResponse({ type: ContentRequestDetailDto })
   @ApiCookieAuth()
   @UseGuards(AuthGuard("jwt"), RolesGuard)

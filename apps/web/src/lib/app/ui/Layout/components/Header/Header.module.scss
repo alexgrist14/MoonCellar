@@ -121,17 +121,13 @@
   .title {
     display: flex;
     align-items: center;
-    font-family: var(--font-pentagra);
+    height: 100%;
     padding-inline: var(--padding-x4);
-    margin-top: var(--padding-x05);
-    background: linear-gradient(
-      30deg,
-      $textSecondary 0%,
-      var(--color-accent) 100%
-    );
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+
+    & img {
+      height: 60%;
+      width: auto;
+    }
 
     @include mediaSm {
       padding-inline: var(--padding-x1);

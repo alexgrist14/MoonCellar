@@ -29,7 +29,11 @@ describe("CreateContentRequestSchema", () => {
       "Fill at least one field",
     ]);
     expect(
-      messages({ kind: "character", action: "update", payload: { gender: "F" } })
+      messages({
+        kind: "character",
+        action: "update",
+        payload: { gender: "F" },
+      })
     ).toEqual(["Pick what to update"]);
   });
 
@@ -66,7 +70,11 @@ describe("CreateContentRequestSchema", () => {
 
 describe("DecideContentRequestSchema", () => {
   it("requires a reason to reject", () => {
-    expect(DecideContentRequestSchema.safeParse({ decision: "reject" }).success).toBe(false);
-    expect(DecideContentRequestSchema.safeParse({ decision: "approve" }).success).toBe(true);
+    expect(
+      DecideContentRequestSchema.safeParse({ decision: "reject" }).success
+    ).toBe(false);
+    expect(
+      DecideContentRequestSchema.safeParse({ decision: "approve" }).success
+    ).toBe(true);
   });
 });

@@ -23,6 +23,11 @@ import { AuthGuard } from "@nestjs/passport";
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
+  @Get("access")
+  checkAccess() {
+    return { isAdmin: true };
+  }
+
   @Get("users")
   async getAll() {
     return this.adminService.getAllUsers();

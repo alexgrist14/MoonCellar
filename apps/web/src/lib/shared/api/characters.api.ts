@@ -1,4 +1,8 @@
 import {
+  IFindCharacterPortraitsRequest,
+  IFindCharacterPortraitsResponse,
+  ICharacterAiDraftRequest,
+  ICharacterAiDraftRun,
   ICharacterResponse,
   IGetAdminCharacters,
   IGetAdminCharactersResponse,
@@ -11,6 +15,19 @@ import agent from "./agent.api";
 const CHARACTERS_URL = `${API_URL}/characters`;
 
 export const charactersApi = {
+  findPortraits: (dto: IFindCharacterPortraitsRequest) =>
+    agent.post<IFindCharacterPortraitsResponse>(
+      `${CHARACTERS_URL}/portraits`,
+      dto
+    ),
+  getAiDrafts: () =>
+    agent.get<ICharacterAiDraftRun[]>(`${CHARACTERS_URL}/ai-drafts`),
+  startAiDraft: (dto: ICharacterAiDraftRequest) =>
+    agent.post<ICharacterAiDraftRun>(`${CHARACTERS_URL}/ai-drafts`, dto),
+  retryAiDraft: (id: string) =>
+    agent.post<ICharacterAiDraftRun>(`${CHARACTERS_URL}/ai-drafts/${id}/retry`),
+  deleteAiDraft: (id: string) =>
+    agent.delete(`${CHARACTERS_URL}/ai-drafts/${id}`),
   search: (params: IGetCharactersRequest) =>
     agent.get<ICharacterResponse[]>(CHARACTERS_URL, { params }),
   getAdminList: (params: IGetAdminCharacters) =>

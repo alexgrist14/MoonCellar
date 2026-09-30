@@ -106,7 +106,9 @@ export class UserFollowingsService {
         );
       }
 
-      this.logger.log(`Recalculated followers for ${followerLists.length} users`);
+      this.logger.log(
+        `Recalculated followers for ${followerLists.length} users`
+      );
 
       return { recalculatedUsers: followerLists.length };
     } catch (err) {

@@ -16,20 +16,33 @@ import {
   ApiBody,
   ApiConsumes,
   ApiCookieAuth,
+  ApiOperation,
   ApiQuery,
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
 import { FileService } from "../services/file-upload.service";
+import {
+  FileOrphansService,
+  ORPHAN_SCAN_FOLDERS,
+} from "../services/file-orphans.service";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { RolesGuard } from "../../roles/roles.guard";
 import { Roles } from "../../roles/roles.decorator";
 import { GetFileRequestDto } from "../../../shared/zod/dto/files.dto";
-import {
-  resolveS3Folder,
-  S3_FOLDERS,
-  type S3Folder,
-} from "../../../shared/s3";
+import { resolveS3Folder, S3_FOLDERS, type S3Folder } from "../../../shared/s3";
+
+const parseNumber = (name: string, value?: string) => {
+  if (value === undefined) return undefined;
+
+  const parsed = Number(value);
+
+  if (!Number.isFinite(parsed)) {
+    throw new BadRequestException(`${name} must be a number`);
+  }
+
+  return parsed;
+};
 
 const COMMENT_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 const COMMENT_IMAGE_MIME_TYPES = [
@@ -42,7 +55,10 @@ const COMMENT_IMAGE_MIME_TYPES = [
 @ApiTags("Files Controller")
 @Controller("file")
 export class FilesController {
-  constructor(private readonly fileService: FileService) {}
+  constructor(
+    private readonly fileService: FileService,
+    private readonly fileOrphansService: FileOrphansService
+  ) {}
 
   private folderOf(bucketName?: string): S3Folder {
     const folder = resolveS3Folder(bucketName);
@@ -110,7 +126,11 @@ export class FilesController {
     @Query("bucketName") bucketName: string,
     @Query("object") object: string
   ) {
-    return this.fileService.uploadObject(object, key, this.folderOf(bucketName));
+    return this.fileService.uploadObject(
+      object,
+      key,
+      this.folderOf(bucketName)
+    );
   }
 
   @Post("/")
@@ -207,5 +227,92 @@ export class FilesController {
     void this.fileService
       .removeDuplicates(this.folderOf(bucketName))
       .catch(() => undefined);
+  }
+
+  @Post("/orphans")
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), RolesGuard)
+  @Roles("admin")
+  @ApiOperation({
+    summary:
+      "Start a background scan for stored files that nothing in the database references any more",
+  })
+  @ApiResponse({ status: 201, description: "Scan started" })
+  @ApiQuery({
+    name: "apply",
+    required: false,
+    type: Boolean,
+    description:
+      "Delete the orphans; without it the scan only counts them. Irreversible",
+  })
+  @ApiQuery({
+    name: "folders",
+    required: false,
+    description: `Comma separated folders to scan (default ${ORPHAN_SCAN_FOLDERS.join(", ")})`,
+  })
+  @ApiQuery({
+    name: "prefix",
+    required: false,
+    description:
+      "Only list keys under this prefix inside each folder; references are still read from the whole database",
+  })
+  @ApiQuery({
+    name: "minAgeDays",
+    required: false,
+    type: Number,
+    description:
+      "Never touch an object modified within this many days, so an upload racing the scan is safe (default 7)",
+  })
+  @ApiQuery({
+    name: "maxDeleteRatio",
+    required: false,
+    type: Number,
+    description:
+      "Refuse to delete when orphans exceed this share of a folder (default 0.2)",
+  })
+  @ApiQuery({
+    name: "sampleLimit",
+    required: false,
+    type: Number,
+    description: "How many orphan keys to keep in the report (default 50)",
+  })
+  startOrphansScan(
+    @Query("apply") apply?: string,
+    @Query("folders") folders?: string,
+    @Query("prefix") prefix?: string,
+    @Query("minAgeDays") minAgeDays?: string,
+    @Query("maxDeleteRatio") maxDeleteRatio?: string,
+    @Query("sampleLimit") sampleLimit?: string
+  ) {
+    return this.fileOrphansService.start({
+      apply: apply === "true",
+      folders: folders
+        ?.split(",")
+        .map((folder) => this.folderOf(folder.trim())),
+      prefix,
+      minAgeDays: parseNumber("minAgeDays", minAgeDays),
+      maxDeleteRatio: parseNumber("maxDeleteRatio", maxDeleteRatio),
+      sampleLimit: parseNumber("sampleLimit", sampleLimit),
+    });
+  }
+
+  @Get("/orphans")
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), RolesGuard)
+  @Roles("admin")
+  @ApiOperation({ summary: "Read the state of the last orphan scan" })
+  @ApiResponse({ status: 200, description: "Current scan state" })
+  getOrphansScan() {
+    return this.fileOrphansService.getState();
+  }
+
+  @Delete("/orphans")
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), RolesGuard)
+  @Roles("admin")
+  @ApiOperation({ summary: "Ask the running orphan scan to stop" })
+  @ApiResponse({ status: 200, description: "Stop requested" })
+  stopOrphansScan() {
+    return this.fileOrphansService.stop();
   }
 }

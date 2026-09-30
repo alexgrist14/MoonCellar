@@ -6,4 +6,5 @@ export const characterQueryKeys = {
     [...characterQueryKeys.all, "search", search] as const,
   admin: (params: IGetAdminCharacters) =>
     [...characterQueryKeys.all, "admin", params] as const,
+  aiDrafts: () => [...characterQueryKeys.all, "ai-drafts"] as const,
 };

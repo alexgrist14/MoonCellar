@@ -415,6 +415,32 @@ server.registerTool(
   }
 );
 
+const findDuplicates = async (
+  input: object
+): Promise<{ name: string; slug: string; score: number }[]> => {
+  const res = await callApi(
+    "/games/add/duplicates",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    true
+  );
+
+  if (!res.ok) {
+    throw new Error(
+      `Duplicate check failed: ${res.status} ${await res.text()}. Nothing was created; retry, or pass force: true to skip the check.`
+    );
+  }
+
+  const { duplicates } = (await res.json()) as {
+    duplicates: { name: string; slug: string; score: number }[];
+  };
+
+  return duplicates;
+};
+
 server.registerTool(
   "create_game",
   {
@@ -458,9 +484,41 @@ server.registerTool(
         .describe(
           "Must be explicitly set to true to actually create the game, after the user confirmed the preview. Omit or false to only get a preview."
         ),
+      force: z
+        .boolean()
+        .optional()
+        .describe(
+          "Create the game even though the preview listed possible duplicates. Set it only after the user opened them and confirmed none is the same game."
+        ),
     },
   },
-  async ({ confirm, coverCropPosition, ...input }) => {
+  async ({ confirm, force, coverCropPosition, ...input }) => {
+    const duplicates = force ? [] : await findDuplicates(input);
+    const duplicatesNote = duplicates.length
+      ? "\n\nPOSSIBLE DUPLICATES — the catalogue already has games that look the same:\n" +
+        duplicates
+          .map(
+            ({ name, slug, score }) =>
+              `- ${name} (${FRONT_URL}/games/${slug}, score ${score})`
+          )
+          .join("\n") +
+        "\nShow them to the user. Create the game only if the user confirms none of them is the same game, by calling again with confirm: true and force: true."
+      : "";
+
+    if (confirm && duplicates.length) {
+      return {
+        content: [
+          {
+            type: "text",
+            text:
+              "The game was NOT created and no image was uploaded." +
+              duplicatesNote,
+          },
+        ],
+        isError: true,
+      };
+    }
+
     if (!confirm) {
       let coverWarning = "";
 
@@ -500,7 +558,8 @@ server.registerTool(
                 null,
                 2
               ) +
-              coverWarning,
+              coverWarning +
+              duplicatesNote,
           },
         ],
       };
@@ -572,7 +631,7 @@ server.registerTool(
     }
 
     const res = await callApi(
-      "/games/add",
+      force ? "/games/add?force=true" : "/games/add",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

@@ -37,22 +37,17 @@ import { VndbService } from "./services/vndb.service";
 import { VndbController } from "./controllers/vndb.controller";
 import { ImageDedupeController } from "./controllers/image-dedupe.controller";
 import { ImageDedupeService } from "./services/image-dedupe.service";
-import { ImageOrphansController } from "./controllers/image-orphans.controller";
 import { ContentRequestsController } from "./controllers/content-requests.controller";
 import { ContentRequestsService } from "./services/content-requests.service";
 import {
   ContentRequest,
   ContentRequestDatabaseSchema,
 } from "./schemas/content-request.schema";
-import { ImageOrphansService } from "./services/image-orphans.service";
 import { HttpModule } from "@nestjs/axios";
 import { IgdbModule } from "../igdb/igdb.module";
 import { JwtModule } from "@nestjs/jwt";
-import { VndbReviewGateway } from "./gateways/vndb-review.gateway";
-import {
-  VndbCandidate,
-  VndbCandidateSchema,
-} from "./schemas/vndb-candidates.schema";
+import { MatchingModule } from "./matching/matching.module";
+import { ConflictsModule } from "../conflicts/conflicts.module";
 
 @Module({
   controllers: [
@@ -63,7 +58,6 @@ import {
     CharactersController,
     VndbController,
     ImageDedupeController,
-    ImageOrphansController,
     ContentRequestsController,
   ],
   providers: [
@@ -76,13 +70,13 @@ import {
     PlatformsService,
     CharactersService,
     VndbService,
-    VndbReviewGateway,
     ImageDedupeService,
-    ImageOrphansService,
     ContentRequestsService,
   ],
   imports: [
     IgdbModule,
+    MatchingModule,
+    ConflictsModule,
     MongooseModule.forFeature([
       { name: Game.name, schema: GameDatabaseSchema },
       { name: Platform.name, schema: PlatformDatabaseSchema },
@@ -92,7 +86,6 @@ import {
       { name: UserLogs.name, schema: UserLogsSchema },
       { name: User.name, schema: UserSchema },
       { name: Rating.name, schema: UserRatingsDatabaseSchema },
-      { name: VndbCandidate.name, schema: VndbCandidateSchema },
       { name: GameAiDraft.name, schema: GameAiDraftDatabaseSchema },
     ]),
     MetricsModule,

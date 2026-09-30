@@ -15,6 +15,7 @@ import { UserLogs, UserLogsSchema } from "./schemas/user-logs.schema";
 import { UserLogsService } from "./services/user-logs.service";
 import { UserLogsController } from "./controllers/user-logs.controller";
 import { FileService } from "./services/file-upload.service";
+import { FileOrphansService } from "./services/file-orphans.service";
 import { FilesController } from "./controllers/files.controller";
 import {
   Rating,
@@ -55,6 +56,7 @@ import { RoyalGamesGateway } from "./gateways/royal-games.gateway";
     UserFiltersService,
     UserPresetsService,
     FileService,
+    FileOrphansService,
     UserFollowingsService,
     UserLogsService,
     UserRatingsService,

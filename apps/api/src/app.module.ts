@@ -6,6 +6,8 @@ import { ConfigModule } from "@nestjs/config";
 import { AuthModule } from "./module/auth/auth.module";
 import { UserModule } from "./module/user/user.module";
 import { IgdbModule } from "./module/igdb/igdb.module";
+import { ImagesModule } from "./module/images/images.module";
+import { SitesModule } from "./module/sites/sites.module";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { RetroachievementsModule } from "./module/retroach/retroach.module";
 import { SteamModule } from "./module/steam/steam.module";
@@ -27,7 +29,7 @@ import { HttpModule } from "@nestjs/axios";
     ConfigModule.forRoot(),
     LoggerModule.forRootAsync(pinoConfig),
     MetricsModule,
-    ScheduleModule.forRoot(),
+    ...(process.env.DISABLE_CRONS === "true" ? [] : [ScheduleModule.forRoot()]),
     MongooseModule.forRoot(process.env.MONGO_CONNECTION_STRING, {
       dbName: "games",
       monitorCommands: true,
@@ -41,6 +43,8 @@ import { HttpModule } from "@nestjs/axios";
     CommentsModule,
     CollectionsModule,
     IgdbModule,
+    ImagesModule,
+    SitesModule,
     RetroachievementsModule,
     SteamModule,
     ServeStaticModule.forRoot({

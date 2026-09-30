@@ -227,12 +227,18 @@ const stripMarkup = (value: string): string =>
     .replace(/\[\/?[a-z]+[^\]]*\]/gi, " ")
     .replace(/<[^>]+>/g, " ");
 
-export const descriptionTokens = (value: string): Set<string> =>
+export const descriptionTokens = (
+  value: string,
+  excluded: Set<string> = new Set()
+): Set<string> =>
   new Set(
     normalizeTitle(stripMarkup(value))
       .split(" ")
       .filter(
-        (token) => token.length >= 4 && !DESCRIPTION_STOP_WORDS.has(token)
+        (token) =>
+          token.length >= 4 &&
+          !DESCRIPTION_STOP_WORDS.has(token) &&
+          !excluded.has(token)
       )
   );
 

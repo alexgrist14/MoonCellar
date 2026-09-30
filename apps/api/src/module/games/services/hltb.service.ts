@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  type OnModuleInit,
 } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { InjectModel } from "@nestjs/mongoose";
@@ -15,7 +16,13 @@ import { sleep } from "../../../shared/utils";
 import { runInCronLogContext } from "../../../shared/cron-logging";
 import { runCronExclusive } from "../../../shared/cron-mutex";
 import { BusinessMetricsService } from "../../metrics/business-metrics.service";
-import { type IHltbField } from "@mooncellar/schemas";
+import {
+  type IConflictEntry,
+  type IConflictSubject,
+  type IHltbField,
+} from "@mooncellar/schemas";
+import { ConflictsService } from "../../conflicts/services/conflicts.service";
+import type { IConflictDecision } from "../../conflicts/types/conflicts.types";
 import { Game, type GameDocument } from "../schemas/game.schema";
 import { Platform, type PlatformDocument } from "../schemas/platform.schema";
 import {
@@ -33,6 +40,7 @@ import {
   buildIncrementalHltbFilter,
   buildMissingHltbFilter,
   buildPlatformKeySet,
+  findAmbiguousHltbEntries,
   hasHltbTimes,
   type HltbMatchContext,
   type HltbSearchEntry,
@@ -75,7 +83,7 @@ export type HltbSyncResult = {
 };
 
 @Injectable()
-export class HltbService {
+export class HltbService implements OnModuleInit {
   private readonly hltbClient = new HowLongToBeatService();
   private isSyncRunning = false;
 
@@ -85,9 +93,120 @@ export class HltbService {
     @InjectModel(Platform.name)
     private readonly platformsModel: Model<PlatformDocument>,
     private readonly logger: PinoLogger,
-    private readonly metrics: BusinessMetricsService
+    private readonly metrics: BusinessMetricsService,
+    private readonly conflicts: ConflictsService
   ) {
     this.logger.setContext(HltbService.name);
+  }
+
+  onModuleInit() {
+    this.conflicts.register({
+      source: "hltb",
+      direction: "entries",
+      linkField: "hltb.hltbId",
+      describe: (gameId) => this.describeConflict(gameId),
+      apply: (decisions) => this.applyConflictDecisions(decisions),
+    });
+  }
+
+  private async recordAmbiguity(
+    game: { _id: unknown; name: string },
+    ambiguous: HltbSearchEntry[]
+  ) {
+    if (!ambiguous.length) return;
+
+    await this.conflicts.record("hltb", [
+      {
+        externalId: String(game._id),
+        externalName: game.name,
+        reason:
+          ambiguous.length > 1 ? "competing-candidates" : "unverified-title",
+        candidates: [],
+        entries: ambiguous.map((entry) => this.toConflictEntry(entry)),
+      },
+    ]);
+  }
+
+  private toConflictEntry(entry: HltbSearchEntry): IConflictEntry {
+    const field = mapHltbEntryToField(entry);
+    const hours = (label: string, value: number | null) =>
+      value ? [`${label} ${value} h`] : [];
+
+    return {
+      id: String(entry.id),
+      name: entry.name,
+      score: entry.similarity ?? null,
+      releaseYear: entry.releaseYear ?? null,
+      platforms: entry.platforms ?? [],
+      cover: null,
+      url: `https://howlongtobeat.com/game/${entry.id}`,
+      details: [
+        ...hours("Main story", field.mainStory),
+        ...hours("Main + extra", field.mainExtra),
+        ...hours("Completionist", field.completionist),
+        ...(entry.alias ? [`Also known as ${entry.alias}`] : []),
+      ],
+    };
+  }
+
+  private async describeConflict(
+    gameId: string
+  ): Promise<IConflictSubject | null> {
+    if (!mongoose.Types.ObjectId.isValid(gameId)) return null;
+
+    const game = await this.gamesModel
+      .findById(gameId)
+      .select(
+        "slug name alternative_names summary first_release companies platformIds cover"
+      )
+      .lean();
+
+    if (!game) return null;
+
+    return {
+      name: game.name,
+      originalName: game.name,
+      alternativeNames: game.alternative_names ?? [],
+      description: game.summary ?? "",
+      released: game.first_release
+        ? new Date(game.first_release * 1000).toISOString().slice(0, 10)
+        : null,
+      developers: (game.companies ?? [])
+        .filter(({ developer }) => developer)
+        .map(({ name }) => name),
+      platformIds: (game.platformIds ?? []).map(String),
+      lengthMinutes: null,
+      cover: game.cover ?? null,
+      isExplicitCover: false,
+      url: `/games/${game.slug}`,
+    };
+  }
+
+  private async applyConflictDecisions(
+    decisions: IConflictDecision[]
+  ): Promise<Map<string, mongoose.Types.ObjectId | null>> {
+    const applied = new Map<string, mongoose.Types.ObjectId | null>();
+
+    for (const { externalId, decision, winnerEntryId } of decisions) {
+      try {
+        const game = await this.gamesModel
+          .findById(externalId)
+          .select("_id slug name hltb platformIds release_dates first_release")
+          .lean();
+
+        if (!game) continue;
+
+        if (decision === "match" && winnerEntryId) {
+          await this.applyHltbEntryById(game, winnerEntryId);
+        }
+
+        applied.set(externalId, game._id);
+      } catch (err) {
+        this.logger.warn(err, `Failed to apply HLTB conflict ${externalId}`);
+      }
+    }
+
+    return applied;
   }
 
   @Cron(HLTB_SYNC_CRON, HLTB_SYNC_CRON_OPTIONS)
@@ -235,10 +354,11 @@ export class HltbService {
 
         try {
           const ctx = this.buildMatchContext(game, platformNames);
-          const hltb = await this.fetchHltbForGame(ctx);
+          const { hltb, ambiguous } = await this.fetchHltbForGame(ctx);
 
           if (!hltb || !hasHltbTimes(hltb)) {
             result.skipped += 1;
+            await this.recordAmbiguity(game, ambiguous);
 
             const now = new Date().toISOString();
             const update: Record<string, unknown> = {
@@ -354,10 +474,12 @@ export class HltbService {
 
     const platformNames = await this.loadPlatformNames();
     const ctx = this.buildMatchContext(game, platformNames);
-    const hltb = await this.fetchHltbForGame(ctx);
+    const { hltb, ambiguous } = await this.fetchHltbForGame(ctx);
     const now = new Date().toISOString();
 
     if (!hltb || !hasHltbTimes(hltb)) {
+      await this.recordAmbiguity(game, ambiguous);
+
       const update: Record<string, unknown> = {
         $set: { hltbNotFoundAt: now, updatedAt: now },
       };
@@ -654,7 +776,7 @@ export class HltbService {
       // stop early; the exact-title fallback waits for all queries so a later
       // query cannot reveal a second exact title that should void it.
       if (match?.tier === "confirmed") {
-        return mapHltbEntryToField(match.entry);
+        return { hltb: mapHltbEntryToField(match.entry), ambiguous: [] };
       }
 
       if (i < queries.length - 1 && HLTB_QUERY_DELAY_MS > 0) {
@@ -662,7 +784,12 @@ export class HltbService {
       }
     }
 
-    return bestMatch ? mapHltbEntryToField(bestMatch) : null;
+    return bestMatch
+      ? { hltb: mapHltbEntryToField(bestMatch), ambiguous: [] }
+      : {
+          hltb: null,
+          ambiguous: findAmbiguousHltbEntries([...pool.values()], ctx),
+        };
   }
 
   private async search(query: string): Promise<HltbSearchEntry[]> {

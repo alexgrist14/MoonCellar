@@ -250,7 +250,11 @@ pins the internal API address, so it stays a secret on both counts.
 | `SEARXNG_URL` | no | SearXNG the admin "Fill with AI" draft searches through — `http://searxng:8080`, the `searxng` service of `infra/docker-compose.prod.yml`. The default, `http://localhost:8891`, is empty inside the container: every search step then fails |
 | `OPENAI_API_KEY` | **yes** | OpenAI key for the admin "Fill with AI" game draft. Without it `POST /games/ai-drafts` answers 503 |
 | `OPENAI_MODEL` | no | Model the draft runs on, `gpt-5-mini` by default |
+| `SITE_SESSIONS_KEY` | no | Any long random string; the cookies of the admin Sites tab are encrypted with its SHA-256. Must be the same wherever the same database is used, or stored cookies cannot be read. Without it saving a site answers 503 |
+| `RECRAFT_API_TOKEN` | no | Recraft API token for the admin Images tab (recraft.ai → Profile → API). Without it generating with a Recraft model answers 503; OpenAI models keep working through `OPENAI_API_KEY` |
 | `STEAMGRIDDB_API_KEY` | **yes** | SteamGridDB API key (steamgriddb.com → Preferences → API) the draft takes covers and hero banners from. Without it that step fails and the draft falls back to images found elsewhere |
+| `IGDB_AUTO_LINK` | no | `true` lets the nightly IGDB sync link a new IGDB game to a parser-created game it matches with confidence. Unset or anything else sends every match to the admin Conflicts tab instead. A game added by hand always goes to Conflicts, whatever the value |
+| `DISABLE_CRONS` | no | `true` stops every `@Cron` job. Local development only, because the local `.env` points at the production database and Space. Never set it in `HOST_ENV_API` |
 
 ---
 
@@ -397,7 +401,12 @@ INDEXNOW_KEY=
 SEARXNG_URL=http://localhost:8891
 OPENAI_API_KEY=
 OPENAI_MODEL=gpt-5-mini
+RECRAFT_API_TOKEN=
+SITE_SESSIONS_KEY=
 STEAMGRIDDB_API_KEY=
+
+# IGDB sync: link confident matches instead of queueing them in Conflicts
+IGDB_AUTO_LINK=false
 
 # game-adder MCP server — local tooling, never part of HOST_ENV_API
 API_BASE_URL=http://localhost:3228

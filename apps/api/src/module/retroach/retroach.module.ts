@@ -11,6 +11,7 @@ import {
 } from "../games/schemas/platform.schema";
 import { User, UserSchema } from "../user/schemas/user.schema";
 import { MetricsModule } from "../metrics/metrics.module";
+import { ConflictsModule } from "../conflicts/conflicts.module";
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { MetricsModule } from "../metrics/metrics.module";
     ]),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MetricsModule,
+    ConflictsModule,
   ],
 
   controllers: [RetroachievementsController],

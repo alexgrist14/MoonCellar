@@ -1,0 +1,14 @@
+.duplicates,
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x1);
+}
+
+.list {
+  gap: var(--gap-x05);
+}
+
+.score {
+  color: var(--color-text-muted);
+}

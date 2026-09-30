@@ -37,6 +37,7 @@ import { normalizeGameName, uniqueSlug } from "../../../shared/utils";
 import { MAIN_GAME_TYPE } from "../constants/vndb";
 import { IGDBService } from "../../igdb/igdb.service";
 import { HltbService } from "./hltb.service";
+import { GameMatcherService } from "../matching/game-matcher.service";
 import { VndbService } from "./vndb.service";
 
 const PENDING_REQUESTS_LIMIT = 20;
@@ -80,7 +81,8 @@ export class ContentRequestsService {
     private readonly indexNow: IndexNowService,
     private readonly igdb: IGDBService,
     private readonly hltb: HltbService,
-    private readonly vndb: VndbService
+    private readonly vndb: VndbService,
+    private readonly gameMatcher: GameMatcherService
   ) {}
 
   async create(userId: string, dto: ICreateContentRequestParsed) {
@@ -183,7 +185,7 @@ export class ContentRequestsService {
   async decide(
     adminId: string,
     id: string,
-    { decision, fields, reason, lockSync }: IDecideContentRequest
+    { decision, fields, reason, lockSync, force }: IDecideContentRequest
   ): Promise<IDecideContentRequestResponse> {
     const request = await this.findRequest(id);
 
@@ -234,7 +236,12 @@ export class ContentRequestsService {
     try {
       const { resultId, failedImages, warnings } =
         request.kind === "game"
-          ? await this.applyGame(request, payload as IGameRequestPayload, lockSync)
+          ? await this.applyGame(
+              request,
+              payload as IGameRequestPayload,
+              lockSync,
+              force
+            )
           : await this.applyCharacter(
               request,
               payload as ICharacterRequestPayload
@@ -359,9 +366,7 @@ export class ContentRequestsService {
     const keys = Object.keys(request.payload);
 
     if (request.kind === "character") {
-      const character = await this.characters
-        .findById(request.targetId)
-        .lean();
+      const character = await this.characters.findById(request.targetId).lean();
 
       if (!character) return null;
 
@@ -445,7 +450,8 @@ export class ContentRequestsService {
   private async applyGame(
     request: ILeanRequest,
     payload: IGameRequestPayload,
-    lockSync?: boolean
+    lockSync?: boolean,
+    force?: boolean
   ) {
     const failedImages: string[] = [];
     const warnings: string[] = [];
@@ -467,6 +473,10 @@ export class ContentRequestsService {
         throw new BadRequestException(
           warnings[0] ?? "A new game needs a name or a working IGDB id"
         );
+      }
+
+      if (!force) {
+        await this.gameMatcher.assertNoDuplicates({ name: payload.name });
       }
 
       const created = await this.games.create({
@@ -679,16 +689,15 @@ export class ContentRequestsService {
         );
         const current = ((related[key] as unknown[]) ?? []).map(String);
 
-        related[key] = [
-          ...new Set([...current, ...known.map(String)]),
-        ].filter((id) => id !== gameId.toString());
+        related[key] = [...new Set([...current, ...known.map(String)])].filter(
+          (id) => id !== gameId.toString()
+        );
       }
 
       if (payload.parentGameId && payload.parentGameId !== gameId.toString()) {
-        const [parent] = await this.existingIds(
-          this.games as Model<unknown>,
-          [payload.parentGameId]
-        );
+        const [parent] = await this.existingIds(this.games as Model<unknown>, [
+          payload.parentGameId,
+        ]);
 
         if (parent) related.parent_game = parent.toString();
       }

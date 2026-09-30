@@ -1,5 +1,7 @@
 import { gamesApi } from "@/src/lib/shared/api";
 import {
+  IFindGameImagesRequest,
+  IImportGameImageRequest,
   IAddGameRequest,
   IGameAiDraftRun,
   IGameResponse,
@@ -110,8 +112,8 @@ export const useCreateGameMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: IAddGameRequest) =>
-      gamesApi.add(data).then(({ data }) => data),
+    mutationFn: ({ data, force }: { data: IAddGameRequest; force?: boolean }) =>
+      gamesApi.add(data, force).then(({ data }) => data),
 
     onSuccess: (data) => {
       queryClient.setQueryData(gameQueryKeys.adminDetail(data._id), data);
@@ -171,4 +173,19 @@ export const useUploadGameImageMutation = () =>
   useMutation({
     mutationFn: ({ gameId, type, file }: IUploadGameImageVariables) =>
       gamesApi.uploadImage(gameId, type, file).then(({ data }) => data),
+  });
+
+export const useFindGameImagesMutation = () =>
+  useMutation({
+    mutationFn: (dto: IFindGameImagesRequest) =>
+      gamesApi.findImageCandidates(dto).then(({ data }) => data.urls),
+  });
+
+export const useImportGameImageMutation = () =>
+  useMutation({
+    mutationFn: ({
+      gameId,
+      ...dto
+    }: IImportGameImageRequest & { gameId: string }) =>
+      gamesApi.importImage(gameId, dto).then(({ data }) => data),
   });

@@ -87,7 +87,10 @@ export class RoyalGamesGateway implements OnGatewayInit, OnGatewayConnection {
         rejected: [],
       };
     } catch (error) {
-      this.logger.error(error, `Failed to load royal games: ${socket.data.userId}`);
+      this.logger.error(
+        error,
+        `Failed to load royal games: ${socket.data.userId}`
+      );
       return { ok: false, error: "Could not load royal games" };
     }
   }

@@ -150,6 +150,14 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
 - **The `.env` connection string points at the production database, and Mongoose `autoIndex`
   is on.** A new `Schema.index(...)` is built on production the first time any local process
   loads that schema. One-off scripts that import schemas connect with `autoIndex: false`.
+- **A local API is a second production instance: keep `DISABLE_CRONS=true` in the local `.env`.**
+  The `.env` also carries the production Space, so every cron a local `bun start:dev` runs writes
+  to both. With the flag set, `ScheduleModule` is not loaded and no `@Cron` fires.
+- **A job that writes games or images guards itself with `withDbLock` (`shared/cron-mutex.ts`),
+  not only with an in-memory flag.** `isRunning` and `runCronExclusive` exist per process. On
+  2026-09-28 two processes ran the VNDB sync at once, and the unique `vndb.vnId` index rejected
+  the loser's games after its images were uploaded, which left about 1,250 orphan folders in the
+  Space. The VNDB sync and the IGDB games and characters syncs take the lock today.
 
 - **A game's characters are read from `character.gameIds`, never from `game.characters`.**
   `CHARACTERS_LOOKUP_STAGE` joins on `gameIds` because `linkGameCharacters` (IGDB) and
@@ -157,6 +165,12 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   character created by an admin or an approved request vanished from its game's page after the
   next sync. The syncs recompute `gameIds` only for characters that carry their `igdb`/`vndb`
   field, which leaves manual links alone.
+- **Stored site cookies (`SitesService`, admin Sites tab) are sent only when a caller passes
+  `{ useSessions: true }` to `downloadRemotePage`/`downloadRemoteImage`/`uploadRemoteImage`,
+  and only admin paths do: AI drafts, portrait search, admin game and character saves.** A link
+  from a user request must never get them, or anyone could make the server fetch a page as the
+  admin's account. The headers are looked up per redirect hop, so a cookie never follows a
+  redirect to another host.
 - **An image URL that came from a user is fetched only through `FileService.uploadRemoteImage`.**
   It goes through `downloadRemoteImage`, which refuses non-http(s) links, private, loopback and
   link-local addresses on every redirect hop, non-image content types and bodies over 15 MB. A
@@ -228,15 +242,18 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   so deleting the dropped one by URL would take the kept one with it. This is also what keeps the
   orphan sweep safe before `migrate-s3-urls.ts --apply` has run: a game still holding regru URLs
   resolves to the same keys, so its objects count as referenced instead of as orphans.
-- **`ImageOrphansService` reads every reference first and only then lists the Space, and it never
+- **`FileOrphansService` (`POST /file/orphans`) reads every reference first and only then lists the Space, and it never
   deletes an object newer than `cutoff`.** An object uploaded between the two steps is in the
   listing but not in the reference set, so it would look like an orphan; `cutoff` is the earlier of
   the scan's start and `now - minAgeDays` (7 by default) and excludes it. Lowering `minAgeDays` to 0
   leaves only the scan-start guard, which is enough for a run nothing else is writing during.
-- **The reference set covers `games.cover`/`screenshots`/`artworks` *and* the rich-text fields
-  `gamecomments.body` and `playthroughs.comment`.** Those hold pasted URLs that can
-  point at a cover or a screenshot; none do today, but the two collections are small enough that
-  scanning them costs nothing and a deletion there is not recoverable.
+- **Every field that stores a Space URL must be listed in `REFERENCE_SOURCES`
+  (`file-orphans.service.ts`), or the sweep deletes its files.** Today that is `games.cover`,
+  `screenshots`, `artworks`, `backgroundImage`, `bannerImage`, `characters.mugShot`,
+  `users.avatar`/`background`, `generatedimages.url` and the rich-text `gamecomments.body` and
+  `playthroughs.comment`.
+  The first version read only the three game image arrays and would have removed every game
+  background and banner. A new image field goes into that list in the same change.
 - **`LastModified` in the Space is the rclone copy time, not the original upload, so a fresh
   `transfer-s3.ts` run hides the whole corpus behind `minAgeDays`.** The objects copied from regru
   all carry the date of the transfer — a cover for `the-fruit-of-grisaia` that no game has
@@ -280,8 +297,84 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   `autoIndex` never changes the options of an existing index, so on an existing database the old
   `igdb.characterId_1` must be dropped by hand before the partial one can be built.
 
+- **The nightly IGDB sync checks a new IGDB game against the catalogue before inserting it;
+  nothing else does.** `syncGamesFromIgdb` passes `matchNew`, and `matchNewIgdbGame` runs the
+  shared matcher with `IGDB_MATCH_PROFILE`. A match goes to Conflicts unless `IGDB_AUTO_LINK` is
+  `true`, and a hand-made game (`isCustom`) always goes to Conflicts. Without this check a game
+  added by hand got a second IGDB copy with a `-2` slug, because `upsertGameFromIgdb` matches
+  only on `igdb.gameId`. An explicit parse by id (admin, content request, backfill) skips the
+  check on purpose.
+- **Adding a game by hand checks the catalogue first and answers `409` with the likely
+  duplicates.** `POST /games/add` and approving a new-game request call
+  `GameMatcherService.assertNoDuplicates`; `force` skips the check once the admin has looked.
+  The game-adder MCP checks `POST /games/add/duplicates` before it uploads anything, because it
+  uploads images to the Space before it calls `/games/add`, and a refusal after the upload
+  leaves orphans in the bucket.
+- **IGDB only fills the empty fields of a hand-made game, and never changes its slug.**
+  `getFillOnlyPayload` keeps every non-empty field; images are fetched only for an empty cover,
+  screenshot or artwork list; `forceParse` is ignored. Once a hand-made game is linked to IGDB
+  the nightly sync reaches it by `igdb.gameId` again, so without this rule the first sync
+  after linking would overwrite everything the admin wrote. To hand a game over to IGDB
+  completely, clear `isCustom`.
+
+## Conflicts
+
+- **Every parser queues its unsure matches in the one `conflicts` collection, keyed by
+  `(source, externalId)`, and applies decisions through its own handler.** A source calls
+  `ConflictsService.register` in `onModuleInit` with `describe` (the live entry shown on the
+  review screen) and `apply` (writes the decided batch, returns the game id per entry).
+  `ConflictsService` owns statuses, the socket and the queue, so it never imports a parser, and
+  a parser can write conflicts without a cycle. A source with no registered handler answers 400.
+- **`scripts/migrate-vndb-candidates-to-conflicts.ts --apply` runs once, right after the API
+  that reads `conflicts` is deployed.** Until then the running API still reads
+  `vndbcandidates`, and the migration only inserts records that are missing, so a decision
+  made on the old API after the copy is lost. Drop `vndbcandidates` only after checking the
+  Conflicts tab on production.
+- **A conflict has a direction, and it decides what the candidates are.** `games` (VNDB, IGDB,
+  RA) lists catalogue games for one source entry, and the decision carries `gameId`. `entries`
+  (HLTB) lists source entries for one catalogue game, so `externalId` is the game's `_id` and the
+  decision carries `entryId`. What Skip means belongs to the source, not the direction: it
+  creates a game for VNDB and IGDB and leaves the entry unlinked for RA and HLTB.
+- **A handler's `apply` returns `null` for an entry it applied without a game.** Leaving an entry
+  out of the map sends the decision back to review, so an RA or HLTB Skip that returned nothing
+  would come back to the queue forever.
+- **`parseRAGames` recomputes every RA link each run, so it must read the RA conflicts first.**
+  A resolved conflict pins its winner, and a pending or skipped one links nothing. Without this
+  the next nightly run replaces an admin's decision with the fuzzy match again. A match counts
+  as ambiguous when the two best fuzzysort scores differ by less than `RA_AMBIGUITY_GAP` (0.05):
+  about 570 of the 10,021 RA games that matched on 2026-09-30.
+- **The matcher lives in `games/matching`, and a profile, not the caller, decides the rules.**
+  `resolveMatch` is the former VNDB scoring unchanged, and the snapshot spec
+  `vndb-match.characterization.spec.ts` pins it. A new source adds a profile. Change VNDB
+  behaviour only on purpose: a changed snapshot is a behaviour change.
+
+## AI drafts
+
+- **An AI draft runs unattended, so its prompt must forbid questions and its schema must let the
+  model say "not found".** `research` returns whatever strict JSON the model fills; with no field
+  for failure, a model that could not identify "SUCCUBUS T.G.D" put "Please provide a link…" into
+  the character list, and the run spawned a draft for a "character" named "Clarification /
+  Request". Keep `identified` on the character schema and `game` on the list schema, and turn a
+  negative answer into a failed run whose error says what to change in the query.
+
 ## VNDB
 
+- **`compareDescriptions` must drop the words of both titles before measuring overlap.** A game
+  and a VN with the same name share those words in almost every description, and the 0.05
+  threshold then reads as "descriptions match" — that is how a fan-made "Mass Effect 3" VN by
+  sqbr was linked to BioWare's shooter with no company in common. It also needs at least
+  `MIN_SHARED_DESCRIPTION_TOKENS` (2) shared words: the overlap divides by the shorter
+  description, so one common word ("high") passed the threshold for "Up & Down".
+- **A title key that several candidate games share is not distinctive.** `resolveMatch` adds
+  those keys to `sharedTitles`; otherwise one of three games named "Up & Down" took the full
+  distinctive-title score.
+- **A candidate with an incompatible IGDB genre and no Visual Novel genre (`breakdown.genre < 0`)
+  is never auto-matched; it goes to review as `genre-mismatch`.** A unique title plus a close
+  date outweigh the genre penalty in the score, so without the veto a platformer or an RTS with
+  the same name as a VN was linked on its own. Existing links are not re-scored.
+- **Only ids of the form `v<digits>` may reach `getLastVnId`.** A game carrying `vndb.vnId: ""`
+  made `$toInt` fail with `Failed to parse number ''`, and every daily sync died on its first
+  step.
 - **`bulkWrite` skips Mongoose middleware, so every VNDB game write sets `nameNormalized`
   itself.** The `name` hook in `game.schema.ts` only runs for `save`/`updateOne`/`updateMany`
   queries; a game written through `bulkWrite` without it is never found by the

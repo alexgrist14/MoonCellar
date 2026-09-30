@@ -41,28 +41,16 @@ describe("pickFollowingsStatus", () => {
       count: 1,
     });
     expect(
-      pickFollowingsStatus([
-        { category: "wishlist" },
-        { category: "dropped" },
-      ])
+      pickFollowingsStatus([{ category: "wishlist" }, { category: "dropped" }])
     ).toEqual({ category: "wishlist", count: 1 });
     expect(
-      pickFollowingsStatus([
-        { category: "backlog" },
-        { category: "wishlist" },
-      ])
+      pickFollowingsStatus([{ category: "backlog" }, { category: "wishlist" }])
     ).toEqual({ category: "backlog", count: 1 });
     expect(
-      pickFollowingsStatus([
-        { category: "played" },
-        { category: "backlog" },
-      ])
+      pickFollowingsStatus([{ category: "played" }, { category: "backlog" }])
     ).toEqual({ category: "played", count: 1 });
     expect(
-      pickFollowingsStatus([
-        { category: "playing" },
-        { category: "played" },
-      ])
+      pickFollowingsStatus([{ category: "playing" }, { category: "played" }])
     ).toEqual({ category: "playing", count: 1 });
   });
 });

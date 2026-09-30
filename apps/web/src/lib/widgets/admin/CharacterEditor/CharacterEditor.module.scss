@@ -1,0 +1,62 @@
+.editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: var(--gap-x4);
+  align-items: start;
+  padding: var(--padding-x4);
+  border-radius: var(--radius-x4);
+  background-color: var(--color-bg-secondary);
+
+  @include mediaMd {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  &__form,
+  &__portrait {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x2);
+    min-width: 0;
+  }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x2);
+
+    h3 {
+      color: var(--color-text-primary);
+      @include font(18px, 24px, 700);
+    }
+  }
+
+  &__portrait h4 {
+    color: var(--color-text-primary);
+    @include font(15px, 20px, 600);
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--gap-x3);
+
+    @include mediaSm {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  &__image {
+    width: var(--character-profile-portrait-width);
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--gap-x2);
+  }
+}
+
+.muted {
+  color: var(--color-text-muted);
+}

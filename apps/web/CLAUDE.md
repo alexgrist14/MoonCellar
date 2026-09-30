@@ -336,6 +336,10 @@ component needs to build the value itself (a `basePath` string, not a `getHref` 
 
 ## Data fetching
 
+- **Never pass an array in axios `params` for a GET.** axios writes `ids: ["a"]` as `ids[]=a`, the
+  API only reads `ids=a`, and the filter is silently dropped: `/admin/characters/<id>` loaded the
+  first character in alphabetical order instead of the requested one. Pass a single id as a
+  string, or build `key=a&key=b` by hand as `gamesApi.getByIds` does.
 - **Never gate a loader on React Query's `isPending`.** A disabled query
   (`enabled: false`, e.g. `useGamesByIdsQuery`'s `ids.length > 0`) never leaves `status:
   "pending"`, so `if (isPending) return <Loader />` renders forever and the empty-state branch
@@ -589,6 +593,20 @@ break silently when ignored:
 - **Sorting by rating uses `getCombinedRating` from `@mooncellar/schemas`, the number the card
   shows.** The server sorts, because the page loads only 30 of up to 500 games; a separate formula
   on either side would sort by a number nobody sees.
+
+## Tables
+
+- **Every table is the shared `Table` (`shared/ui/Table`) — never a hand-written `<table>`.** It
+  is what gives admin lists resizable columns, header sorting, the mobile card layout
+  (`mobileHeadField`) and the shared loader and empty state; the characters list was a raw
+  `<table>` and silently had none of them. Size columns through `columnStyles` (`width` becomes
+  the flex basis, add a `minWidth`) so one long column cannot squeeze the others' headers.
+- **A row that opens a page is clickable as a whole; do not add an "Open"/"Edit" button column.**
+  `Table` takes `onClick` per cell, so give every cell of the row the same handler and a
+  `cursor: pointer` class (`ConflictList`, `CharactersAdmin`), and stop propagation on links
+  inside the row so they keep their own target. Destructive actions such as Delete stay buttons.
+- The field-by-field diff in `RequestReviewPanel` is still a raw `<table>`; move it to `Table`
+  when that file is next touched rather than copying its markup elsewhere.
 
 ## Tabs
 

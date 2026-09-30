@@ -91,7 +91,7 @@ export default function App({ children }: { children: ReactNode }) {
     <html lang="en" data-scroll-behavior="smooth">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+        <link rel="icon" href="/images/logo-icon.png" type="image/png" />
         <JsonLd data={getWebSiteJsonLd()} />
       </head>
       <body style={{ color: "white", background: "#191d24" }}>

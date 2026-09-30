@@ -2,6 +2,7 @@ import { type IHltbField } from "@mooncellar/schemas";
 import {
   HLTB_NOT_FOUND_RETRY_DAYS,
   HLTB_STRONG_TITLE_SIMILARITY,
+  HLTB_CONFLICT_ENTRIES_LIMIT,
 } from "../constants/hltb";
 import {
   jaccard,
@@ -251,6 +252,21 @@ export const selectHltbMatch = (
   }
 
   return null;
+};
+
+export const findAmbiguousHltbEntries = (
+  results: HltbSearchEntry[],
+  ctx: HltbMatchContext,
+  limit = HLTB_CONFLICT_ENTRIES_LIMIT
+): HltbSearchEntry[] => {
+  const isReRelease = normalizeTitle(ctx.name) !== normalizeCoreTitle(ctx.name);
+
+  return results
+    .map((entry) => evaluateEntry(entry, ctx))
+    .filter((item) => item.strongTitle && !(item.yearConflict && !isReRelease))
+    .sort(rankEvaluations)
+    .slice(0, limit)
+    .map(({ entry }) => entry);
 };
 
 /** Thin wrapper kept for callers/tests that only need the entry. */

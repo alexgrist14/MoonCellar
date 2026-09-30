@@ -90,7 +90,7 @@ const getLogContent = ({ playthrough, rating, favorite }: ILogChanges) => {
   }
   if (rating) lines.push(getRatingSentence(rating));
   if (favorite !== undefined) {
-    lines.push(favorite ? "Put in the top 10" : "Removed from the top 10");
+    lines.push(favorite ? "Added to favourites" : "Removed from favourites");
   }
 
   return { status, details, lines };

@@ -12,25 +12,15 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Param,
   Post,
   Query,
-  Req,
   UseGuards,
 } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { RolesEnum } from "@mooncellar/schemas";
 import { RolesGuard } from "../../roles/roles.guard";
 import { Roles } from "../../roles/roles.decorator";
-import type { IAuthorizedRequest } from "../../comments/types/community.type";
-import {
-  DecideVndbCandidateRequestDto,
-  GetVndbCandidatesRequestDto,
-  VndbCandidatesResponseDto,
-  VndbReviewItemResponseDto,
-  VndbCandidatesSummaryDto,
-  VndbParseResponseDto,
-} from "../../../shared/zod/dto/vndb-candidates.dto";
+import { VndbParseResponseDto } from "../../../shared/zod/dto/vndb.dto";
 
 @ApiTags("VNDB")
 @Controller("vndb")
@@ -160,62 +150,5 @@ export class VndbController {
     this.vndbService.refreshVndbCharacters().catch(() => undefined);
 
     return { message: "VNDB characters refresh started" };
-  }
-
-  @UseGuards(RolesGuard)
-  @Roles(RolesEnum.ADMIN)
-  @UseGuards(AuthGuard("jwt"))
-  @Get("candidates")
-  @ApiOperation({
-    summary:
-      "Count VNs waiting for a match decision and decisions not yet written to games",
-  })
-  @ApiOkResponse({ type: VndbCandidatesSummaryDto })
-  getCandidatesSummary() {
-    return this.vndbService.getCandidatesSummary();
-  }
-
-  @UseGuards(RolesGuard)
-  @Roles(RolesEnum.ADMIN)
-  @UseGuards(AuthGuard("jwt"))
-  @Get("candidates/list")
-  @ApiOperation({
-    summary:
-      "List candidate VNs with their state and candidate games, waiting ones first",
-  })
-  @ApiOkResponse({ type: VndbCandidatesResponseDto })
-  getCandidates(@Query() dto: GetVndbCandidatesRequestDto) {
-    return this.vndbService.getCandidates(dto);
-  }
-
-  @UseGuards(RolesGuard)
-  @Roles(RolesEnum.ADMIN)
-  @UseGuards(AuthGuard("jwt"))
-  @Get("candidates/:vnId")
-  @ApiOperation({
-    summary:
-      "Get one candidate VN with its VNDB data, candidate games and the next VN to review",
-  })
-  @ApiOkResponse({ type: VndbReviewItemResponseDto })
-  async getCandidate(@Param("vnId") vnId: string) {
-    return { item: await this.vndbService.getCandidate(vnId) };
-  }
-
-  @UseGuards(RolesGuard)
-  @Roles(RolesEnum.ADMIN)
-  @UseGuards(AuthGuard("jwt"))
-  @Post("candidates/:vnId/decision")
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary:
-      "Update a candidate game from VNDB, or create a new game for the VN; the decision is applied in the background",
-  })
-  @ApiOkResponse({ type: VndbCandidatesSummaryDto })
-  decideCandidate(
-    @Param("vnId") vnId: string,
-    @Body() dto: DecideVndbCandidateRequestDto,
-    @Req() request: IAuthorizedRequest
-  ) {
-    return this.vndbService.decideCandidate(vnId, dto.gameId, request.user);
   }
 }

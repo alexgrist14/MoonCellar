@@ -1,6 +1,12 @@
 import { z } from "zod";
 import { CharacterSchema } from "./characters.schema";
-import { AgeRatingSchema, RelatedGamesSchema } from "./games.schema";
+import {
+  AgeRatingSchema,
+  GameAiDraftRequestSchema,
+  GameAiDraftRunSchema,
+  PAGE_IMAGE_CANDIDATES_MAX,
+  RelatedGamesSchema,
+} from "./games.schema";
 import { ObjectIdSchema } from "./utils";
 
 export const CONTENT_REQUEST_SCREENSHOTS_MAX = 20;
@@ -100,7 +106,10 @@ export const GameRequestPayloadSchema = z
     screenshots: LinkSchema.array().max(CONTENT_REQUEST_SCREENSHOTS_MAX),
     artworks: LinkSchema.array().max(CONTENT_REQUEST_SCREENSHOTS_MAX),
     igdbId: z.number().int().positive(),
-    vndbId: z.string().trim().regex(/^v\d+$/, "A VNDB id looks like v17"),
+    vndbId: z
+      .string()
+      .trim()
+      .regex(/^v\d+$/, "A VNDB id looks like v17"),
     hltbId: z.string().trim().regex(/^\d+$/, "An HLTB id is a number"),
     retroachievements: z
       .object({
@@ -230,6 +239,10 @@ export const DecideContentRequestSchema = z
     fields: z.string().array().optional(),
     reason: z.string().trim().max(1000).optional(),
     lockSync: z.boolean().optional(),
+    force: z
+      .boolean()
+      .optional()
+      .describe("Create the new game even when it looks like a duplicate"),
   })
   .refine((body) => body.decision === "approve" || !!body.reason, {
     path: ["reason"],
@@ -274,6 +287,47 @@ export const SaveCharacterRequestSchema = z
   })
   .partial();
 
+export const CHARACTER_AI_DRAFT_MAX_COUNT = 10;
+export const CHARACTER_PORTRAIT_CANDIDATES_MAX = 8;
+
+export const FindCharacterPortraitsRequestSchema = z.object({
+  query: z
+    .string()
+    .trim()
+    .min(1)
+    .max(2048)
+    .describe(
+      "Character name, usually with the game title, or a page link to take the images from"
+    ),
+});
+
+export const FindCharacterPortraitsResponseSchema = z.object({
+  urls: z
+    .string()
+    .array()
+    .max(PAGE_IMAGE_CANDIDATES_MAX)
+    .describe("Image links that downloaded, best search matches first"),
+});
+
+export const CharacterAiDraftRequestSchema = GameAiDraftRequestSchema.extend({
+  count: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(CHARACTER_AI_DRAFT_MAX_COUNT)
+    .default(1)
+    .describe(
+      "How many characters to research; above 1 the run lists the characters of the game and starts one draft per character"
+    ),
+});
+
+export const CharacterAiDraftRunSchema = GameAiDraftRunSchema.extend({
+  count: z.number().optional().describe("Characters requested by the run"),
+  draft: SaveCharacterRequestSchema.nullable().describe(
+    "Unsaved character payload, filled when the run is done"
+  ),
+});
+
 export type IContentRequestKind = z.infer<typeof ContentRequestKindSchema>;
 export type IContentRequestAction = z.infer<typeof ContentRequestActionSchema>;
 export type IContentRequestStatus = z.infer<typeof ContentRequestStatusSchema>;
@@ -288,7 +342,9 @@ export type ICreateContentRequestParsed = z.output<
 export type IContentRequest = z.infer<typeof ContentRequestSchema>;
 export type IContentRequestDetail = z.infer<typeof ContentRequestDetailSchema>;
 export type IGetContentRequests = z.input<typeof GetContentRequestsSchema>;
-export type IGetContentRequestsQuery = z.output<typeof GetContentRequestsSchema>;
+export type IGetContentRequestsQuery = z.output<
+  typeof GetContentRequestsSchema
+>;
 export type IGetContentRequestsResponse = z.infer<
   typeof GetContentRequestsResponseSchema
 >;
@@ -298,8 +354,20 @@ export type IDecideContentRequestResponse = z.infer<
 >;
 export type ICharacterSource = z.infer<typeof CharacterSourceSchema>;
 export type IGetAdminCharacters = z.input<typeof GetAdminCharactersSchema>;
-export type IGetAdminCharactersQuery = z.output<typeof GetAdminCharactersSchema>;
+export type IGetAdminCharactersQuery = z.output<
+  typeof GetAdminCharactersSchema
+>;
 export type IGetAdminCharactersResponse = z.infer<
   typeof GetAdminCharactersResponseSchema
 >;
 export type ISaveCharacterRequest = z.infer<typeof SaveCharacterRequestSchema>;
+export type ICharacterAiDraftRun = z.infer<typeof CharacterAiDraftRunSchema>;
+export type ICharacterAiDraftRequest = z.input<
+  typeof CharacterAiDraftRequestSchema
+>;
+export type IFindCharacterPortraitsRequest = z.infer<
+  typeof FindCharacterPortraitsRequestSchema
+>;
+export type IFindCharacterPortraitsResponse = z.infer<
+  typeof FindCharacterPortraitsResponseSchema
+>;

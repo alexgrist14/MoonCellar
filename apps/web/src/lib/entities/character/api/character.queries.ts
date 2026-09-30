@@ -15,8 +15,29 @@ export const useCharacterSearchQuery = (search: string, take = 8) =>
 export const useAdminCharactersQuery = (params: IGetAdminCharacters) =>
   useQuery({
     queryKey: characterQueryKeys.admin(params),
-    queryFn: () =>
-      charactersApi.getAdminList(params).then(({ data }) => data),
+    queryFn: () => charactersApi.getAdminList(params).then(({ data }) => data),
     placeholderData: keepPreviousData,
     staleTime: 15000,
+  });
+
+const AI_DRAFTS_REFRESH_MS = 3000;
+
+export const useCharacterAiDraftsQuery = () =>
+  useQuery({
+    queryKey: characterQueryKeys.aiDrafts(),
+    queryFn: () => charactersApi.getAiDrafts().then(({ data }) => data),
+    refetchInterval: ({ state }) =>
+      state.data?.some((run) => run.status === "running")
+        ? AI_DRAFTS_REFRESH_MS
+        : false,
+  });
+
+export const useCharacterByIdQuery = (id?: string) =>
+  useQuery({
+    queryKey: [...characterQueryKeys.all, "by-id", id],
+    queryFn: () =>
+      charactersApi
+        .search({ ids: id!, take: 1 })
+        .then(({ data }) => data.find((item) => item._id === id) ?? null),
+    enabled: !!id,
   });

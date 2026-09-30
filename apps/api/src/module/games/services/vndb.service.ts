@@ -8,73 +8,44 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  type OnModuleInit,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { firstValueFrom } from "rxjs";
 import { Game, type GameDocument } from "../schemas/game.schema";
 import mongoose, { Model, Types } from "mongoose";
 import {
-  type IScoredCandidate,
   type IVndbCharacter,
   type IVndbGameResponse,
   type IVndbNovel,
   type IVndbReleaseEntry,
   type IVndbReleaseResponse,
   type IVnMatch,
-  type IScoreBreakdown,
-  type IScoreContext,
-  type TCandidatesByVn,
-  type TDateSignal,
-  type TDescriptionSignal,
-  type TMatchReason,
   type TReleaseSignalsByVn,
-  type TVndbCandidate,
   type TVndbFilter,
   type TVndbFilters,
   type IVndbImage,
 } from "../interface/vndb.interface";
-import {
-  companySearchPrefix,
-  descriptionOverlap,
-  descriptionTokens,
-  isSameCompanyName,
-  jaccard,
-  normalizeTitle,
-  titleKey,
-  titleKeyVariants,
-  tokenSetFrom,
-} from "../utils/title-match.utils";
+import { normalizeTitle } from "../utils/title-match.utils";
 import { readTarEntry } from "../utils/tar.utils";
 import {
   type ICompanyField,
   type IExternalPageField,
   type IReleaseDate,
-  type IGetVndbCandidatesParams,
-  type IVndbCandidatesResponse,
-  type IVndbCandidateState,
-  type IVndbCandidatesSummary,
-  type IVndbReviewItem,
+  type IConflictSubject,
   type IVndbParseResponse,
   stripBbcode,
 } from "@mooncellar/schemas";
 import {
-  INCOMPATIBLE_GENRES,
   MAIN_GAME_TYPE,
   SINGLE_PLAYER_MODE,
   VNDB_EXPLICIT_IMAGES_KEYWORD,
   VNDB_EXPLICIT_SEXUAL_LEVEL,
   FAN_DISC_GAME_TYPE,
-  FAN_DISC_GAME_TYPES,
   VNDB_ORIGINAL_RELATION,
   VNDB_RELATION_FIELDS,
   VNDB_SHARED_RELATION_FIELDS,
-  MIN_COMPANY_PREFIX_LENGTH,
-  MIN_DESCRIPTION_TOKENS,
-  MIN_STRING_LENGTH,
-  MIN_TITLE_WORDS,
-  REEDITION_TYPES,
   VISUAL_NOVEL_GENRE,
-  VNDB_ANY_COMPANY_SCORE,
   VNDB_CHARACTER_GENDERS,
   VNDB_DB_DUMP_URL,
   VNDB_DUMP_ALIASES_ENTRY,
@@ -87,11 +58,6 @@ import {
   VNDB_STORE_NAMES,
   VNDB_WEBSITE_LINK,
   VNDB_WIKI_LINKS,
-  VNDB_COMPANY_MISMATCH_SCORE,
-  VNDB_DESCRIPTION_SIMILARITY,
-  VNDB_FALLBACK_COMPANY_CHUNK_SIZE,
-  VNDB_FALLBACK_TITLE_SIMILARITY,
-  VNDB_FUZZY_TITLE_SIMILARITY,
   VNDB_MAX_RETRIES,
   VNDB_REQUEST_DELAY_MS,
   VNDB_PAGE_SIZE,
@@ -101,24 +67,10 @@ import {
   VNDB_RETRY_DELAY_MS,
   VNDB_THEME_MIN_LEVEL,
   VNDB_THEME_TAGS,
-  VNDB_DISTINCTIVE_TITLE_SCORE,
-  VNDB_STRONG_TITLE_SCORE,
-  VNDB_WEAK_TITLE_SCORE,
-  VNDB_DATE_CONFIRMS_SCORE,
-  VNDB_DATE_CONTRADICTS_SCORE,
-  VNDB_DATE_MAX_DIFF_DAYS,
-  VNDB_GENRE_SCORE,
-  VNDB_INCOMPATIBLE_GENRE_SCORE,
-  VNDB_PLATFORM_MATCH_SCORE,
-  VNDB_PLATFORM_MISMATCH_SCORE,
   VNDB_PLATFORM_SLUGS,
   VNDB_RELEASE_ID_CHUNK_SIZE,
   VNDB_RELEASE_PAGE_SIZE,
-  VNDB_ROLE_COMPANY_SCORE,
-  VNDB_SCORE_GAP,
-  VNDB_SCORE_THRESHOLD,
 } from "../constants/vndb";
-import { VndbCandidate } from "../schemas/vndb-candidates.schema";
 import { Character } from "../schemas/character.schema";
 import { Platform } from "../schemas/platform.schema";
 import { isSameObjectIdList, sleep } from "../../../shared/utils";
@@ -127,48 +79,19 @@ import { FileService } from "../../user/services/file-upload.service";
 import { Cron } from "@nestjs/schedule";
 import { PinoLogger } from "nestjs-pino";
 import { runInCronLogContext } from "../../../shared/cron-logging";
-import { runCronExclusive } from "../../../shared/cron-mutex";
+import { runCronExclusive, withDbLock } from "../../../shared/cron-mutex";
 import { BusinessMetricsService } from "../../metrics/business-metrics.service";
-import type { User } from "../../user/schemas/user.schema";
-import { VndbReviewGateway } from "../gateways/vndb-review.gateway";
+import { ConflictsService } from "../../conflicts/services/conflicts.service";
+import type { IConflictDecision } from "../../conflicts/types/conflicts.types";
+import { GameMatcherService } from "../matching/game-matcher.service";
+import {
+  MATCH_CANDIDATE_PROJECTION,
+  resolveMatch,
+} from "../matching/game-matcher.utils";
+import { VNDB_MATCH_PROFILE } from "../matching/match-profiles";
+import type { IMatchSubject } from "../matching/game-matcher.types";
 
 const VNDB_API_URL = "https://api.vndb.org/kana";
-
-const isStrongTitle = (normalized: string) =>
-  normalized.length >= MIN_STRING_LENGTH || normalized.split(" ").length > 1;
-
-const CANDIDATE_PROJECTION = {
-  name: 1,
-  slug: 1,
-  nameNormalized: 1,
-  type: 1,
-  genres: 1,
-  first_release: 1,
-  release_dates: 1,
-  alternative_names: 1,
-  companies: 1,
-  platformIds: 1,
-  summary: 1,
-};
-
-const UNDECIDED_FILTER = { status: "pending", decision: null } as const;
-
-const candidateState = ({
-  status,
-  decision,
-}: Pick<VndbCandidate, "status" | "decision">): IVndbCandidateState =>
-  status === "resolved"
-    ? "matched"
-    : status === "absent"
-      ? "new-game"
-      : decision === "match"
-        ? "queued-match"
-        : decision === "skip"
-          ? "queued-new"
-          : "waiting";
-
-const escapeRegExp = (value: string) =>
-  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const languageNames = new Intl.DisplayNames(["en"], {
   type: "language",
@@ -186,7 +109,7 @@ const toSlug = (value: string) =>
     .replace(/^-+|-+$/g, "");
 
 @Injectable()
-export class VndbService {
+export class VndbService implements OnModuleInit {
   private readonly logger = new Logger(VndbService.name);
   private isRunning = false;
   private isLinkingRelated = false;
@@ -197,15 +120,11 @@ export class VndbService {
   };
   private lastRequestAt = 0;
   private requestTurn: Promise<void> = Promise.resolve();
-  private isApplyingDecisions = false;
-  private hasNewDecisions = false;
 
   constructor(
     private readonly httpService: HttpService,
     @InjectModel(Game.name)
     private readonly gamesModel: Model<GameDocument>,
-    @InjectModel(VndbCandidate.name)
-    private readonly vndbCandidatesModel: Model<VndbCandidate>,
     @InjectModel(Platform.name)
     private readonly platformsModel: Model<Platform>,
     @InjectModel(Character.name)
@@ -213,8 +132,19 @@ export class VndbService {
     private readonly fileService: FileService,
     private readonly pino: PinoLogger,
     private readonly metrics: BusinessMetricsService,
-    private readonly reviewEvents: VndbReviewGateway
+    private readonly conflicts: ConflictsService,
+    private readonly gameMatcher: GameMatcherService
   ) {}
+
+  onModuleInit() {
+    this.conflicts.register({
+      source: "vndb",
+      direction: "games",
+      linkField: "vndb.vnId",
+      describe: (vnId) => this.describeConflict(vnId),
+      apply: (decisions) => this.applyConflictDecisions(decisions),
+    });
+  }
 
   async getStats() {
     const { data } = await firstValueFrom(
@@ -341,6 +271,29 @@ export class VndbService {
     }
 
     this.isRunning = true;
+
+    try {
+      const lock = await withDbLock(this.gamesModel.db, "vndb-sync", () =>
+        this.runLockedSync(mode, run)
+      );
+
+      if (!lock.locked) {
+        this.logger.warn(
+          `VNDB ${mode} skipped: a VNDB sync is running in another process`
+        );
+        return;
+      }
+
+      return lock.result;
+    } finally {
+      this.isRunning = false;
+    }
+  }
+
+  private async runLockedSync(
+    mode: string,
+    run: (totals: TVndbSyncTotals) => Promise<void>
+  ) {
     const startedAt = Date.now();
     const totals: TVndbSyncTotals = {
       vns: 0,
@@ -370,8 +323,6 @@ export class VndbService {
     } catch (error) {
       this.logger.error(error, `VNDB ${mode} failed after ${totals.vns} VNs`);
       throw error;
-    } finally {
-      this.isRunning = false;
     }
   }
 
@@ -468,7 +419,7 @@ export class VndbService {
   private async getProcessedVnCount() {
     const [games, candidates] = await Promise.all([
       this.gamesModel.countDocuments({ "vndb.vnId": { $exists: true } }),
-      this.vndbCandidatesModel.countDocuments({}),
+      this.conflicts.count("vndb"),
     ]);
 
     return games + candidates;
@@ -476,7 +427,7 @@ export class VndbService {
 
   private async getLastVnId() {
     const maxVnId = (field: string) => [
-      { $match: { [field]: { $exists: true } } },
+      { $match: { [field]: { $regex: /^v\d+$/ } } },
       {
         $group: {
           _id: null,
@@ -485,11 +436,11 @@ export class VndbService {
       },
     ];
 
-    const [[games], [candidates]] = await Promise.all([
+    const [[games], conflictMax] = await Promise.all([
       this.gamesModel.aggregate<{ max: number }>(maxVnId("vndb.vnId")),
-      this.vndbCandidatesModel.aggregate<{ max: number }>(maxVnId("vnId")),
+      this.conflicts.getMaxExternalNumber("vndb", "v"),
     ]);
-    const max = Math.max(games?.max ?? 0, candidates?.max ?? 0);
+    const max = Math.max(games?.max ?? 0, conflictMax);
 
     return max ? `v${max}` : undefined;
   }
@@ -853,439 +804,106 @@ export class VndbService {
   private async getVnMatches(vnIds: string[]): Promise<IVnMatch[]> {
     const { titles: vndbTitles, platformSlugById } =
       await this.getVndbTitles(vnIds);
-
-    const vnIdsByKey = new Map<string, Set<string>>();
-    const strongKeys: string[] = [];
-    const rawNames: string[] = [];
-
-    for (const vn of vndbTitles) {
-      for (const raw of [vn.name, ...vn.alternativeNames]) {
-        rawNames.push(raw);
-        const key = titleKey(raw);
-        if (!key) continue;
-
-        for (const candidateKey of [key, ...titleKeyVariants(raw)]) {
-          if (isStrongTitle(candidateKey) || raw === vn.name) {
-            strongKeys.push(candidateKey);
-          }
-
-          const set = vnIdsByKey.get(candidateKey) ?? new Set();
-          set.add(vn.id);
-          vnIdsByKey.set(candidateKey, set);
-        }
-      }
-    }
-
-    const existingGames = await this.gamesModel
-      .find(
-        {
-          $or: [
-            {
-              nameNormalized: {
-                $in: [...new Set(strongKeys)],
-              },
-            },
-            {
-              name: {
-                $in: [...new Set(rawNames)],
-              },
-            },
-            {
-              alternative_names: {
-                $in: [...new Set(rawNames)],
-              },
-            },
-          ],
-        },
-        CANDIDATE_PROJECTION
-      )
-      .lean();
-
-    const candidatesByVn: TCandidatesByVn = new Map();
-
-    const addCandidate = (vnId: string, game: TVndbCandidate) => {
-      const list = candidatesByVn.get(vnId) ?? [];
-      if (list.some((g) => String(g._id) === String(game._id))) return;
-      list.push(game);
-      candidatesByVn.set(vnId, list);
-    };
-
-    for (const game of existingGames) {
-      const gameTitles = this.gameTitleKeys(game);
-
-      for (const [key, vnIds] of vnIdsByKey) {
-        if (!gameTitles.has(key)) continue;
-
-        for (const vnId of vnIds) addCandidate(vnId, game);
-      }
-    }
-
-    const fallbackByVn = await this.findCandidatesByCompany(
-      vndbTitles.filter((vn) => !candidatesByVn.has(vn.id))
-    );
-
-    for (const [vnId, games] of fallbackByVn) {
-      for (const game of games) addCandidate(vnId, game);
-    }
-
-    const sharedTitles = new Set(
-      [...vnIdsByKey].filter(([, vnIds]) => vnIds.size > 1).map(([key]) => key)
-    );
+    const subjects = vndbTitles.map(toVndbMatchSubject);
+    const { candidatesBySubject, sharedTitles } =
+      await this.gameMatcher.findCandidates(subjects);
 
     const linkedGames = await this.gamesModel
       .find(
         { "vndb.vnId": { $in: vnIds } },
-        { ...CANDIDATE_PROJECTION, "vndb.vnId": 1 }
+        { ...MATCH_CANDIDATE_PROJECTION, "vndb.vnId": 1 }
       )
       .lean();
     const linkedGameByVnId = new Map(
       linkedGames.map((game) => [game.vndb.vnId, game])
     );
 
-    const matches = this.matchNovels(vndbTitles, candidatesByVn, {
-      platformSlugById,
-      sharedTitles,
-    }).map((match) => {
-      const linkedGame = linkedGameByVnId.get(match.vnId);
+    const matches = vndbTitles
+      .map((vn, index): IVnMatch => ({
+        vnId: vn.id,
+        vnName: vn.name,
+        vndb: { ...vn },
+        ...resolveMatch(
+          subjects[index],
+          candidatesBySubject.get(vn.id) ?? [],
+          { platformSlugById, sharedTitles },
+          VNDB_MATCH_PROFILE
+        ),
+      }))
+      .map((match) => {
+        const linkedGame = linkedGameByVnId.get(match.vnId);
 
-      return linkedGame
-        ? {
-            ...match,
-            verdict: "matched" as const,
-            reason: null,
-            winner: linkedGame,
-          }
-        : match;
-    });
-    const candidatesForMatch = matches.filter(
-      ({ verdict }) => verdict === "ambiguous"
-    );
-
-    try {
-      await this.vndbCandidatesModel.insertMany(
-        candidatesForMatch.map(({ vnId, vnName, reason, candidates }) => ({
-          vnId,
-          vnName,
+        return linkedGame
+          ? {
+              ...match,
+              verdict: "matched" as const,
+              reason: null,
+              winner: linkedGame,
+            }
+          : match;
+      });
+    await this.conflicts.record(
+      "vndb",
+      matches
+        .filter(({ verdict }) => verdict === "ambiguous")
+        .map(({ vnId, vnName, reason, candidates }) => ({
+          externalId: vnId,
+          externalName: vnName,
           reason,
-          candidates: candidates.map((candidate) => ({
-            gameId: new Types.ObjectId(candidate.game._id),
-            slug: candidate.game.slug,
-            name: candidate.game.name,
-            score: candidate.score,
-            breakdown: candidate.breakdown,
-            dateSignal: candidate.dateSignal,
-            descriptionSignal: candidate.descriptionSignal,
-            hasCompanyMismatch: candidate.hasCompanyMismatch,
-          })),
-          status: "pending",
-          winner: null,
-        })),
-        { ordered: false }
-      );
-    } catch (error) {
-      if ((error as { code?: number }).code !== 11000) throw error;
-    }
+          candidates,
+        }))
+    );
 
     return matches;
   }
 
-  async getCandidates({
-    page,
-    take,
-    search,
-  }: IGetVndbCandidatesParams): Promise<IVndbCandidatesResponse> {
-    const filter = search
-      ? {
-          $or: [
-            { vnName: new RegExp(escapeRegExp(search), "i") },
-            { "candidates.name": new RegExp(escapeRegExp(search), "i") },
-          ],
-        }
-      : {};
-
-    const [total, rows] = await Promise.all([
-      this.vndbCandidatesModel.countDocuments(filter),
-      this.vndbCandidatesModel.aggregate<VndbCandidate>([
-        { $match: filter },
-        {
-          $addFields: {
-            isWaiting: {
-              $and: [
-                { $eq: ["$status", "pending"] },
-                { $eq: [{ $ifNull: ["$decision", null] }, null] },
-              ],
-            },
-          },
-        },
-        { $sort: { isWaiting: -1, _id: 1 } },
-        { $skip: (page - 1) * take },
-        { $limit: take },
-      ]),
-    ]);
-
-    const winners = await this.gamesModel
-      .find({
-        _id: { $in: rows.flatMap(({ winner }) => (winner ? [winner] : [])) },
-      })
-      .select("name slug")
-      .lean();
-    const winnerById = new Map(winners.map((game) => [String(game._id), game]));
-
-    return {
-      total,
-      results: rows.map(
-        ({ vnId, vnName, reason, status, decision, winner, candidates }) => {
-          const winnerGame = winner ? winnerById.get(String(winner)) : null;
-
-          return {
-            vnId,
-            vnName,
-            reason: reason ?? null,
-            state: candidateState({ status, decision }),
-            candidates: (candidates ?? []).map(
-              ({ gameId, name, slug, score }) => ({
-                gameId: String(gameId),
-                name,
-                slug,
-                score,
-              })
-            ),
-            winner: winnerGame
-              ? {
-                  _id: String(winnerGame._id),
-                  name: winnerGame.name,
-                  slug: winnerGame.slug,
-                }
-              : null,
-          };
-        }
-      ),
-    };
-  }
-
-  async getCandidatesSummary(): Promise<IVndbCandidatesSummary> {
-    const [pending, applying, first] = await Promise.all([
-      this.vndbCandidatesModel.countDocuments(UNDECIDED_FILTER),
-      this.vndbCandidatesModel.countDocuments({
-        status: "pending",
-        decision: { $ne: null },
+  async describeConflict(vnId: string): Promise<IConflictSubject | null> {
+    const [{ results }, platformSlugById] = await Promise.all([
+      this.post<IVndbGameResponse>("/vn", {
+        filters: ["id", "=", vnId] satisfies TVndbFilter,
+        fields:
+          "title,alttitle,titles.title,titles.lang,titles.latin,titles.official,titles.main,released,platforms,description,developers.name,image.url,image.sexual,length_minutes,rating,votecount",
       }),
-      this.vndbCandidatesModel
-        .findOne(UNDECIDED_FILTER)
-        .sort({ _id: 1 })
-        .select("vnId")
-        .lean(),
+      this.getPlatformSlugs(),
     ]);
-
-    if (applying) this.startApplyingDecisions();
-
-    return { pending, applying, firstVnId: first?.vnId ?? null };
-  }
-
-  async getCandidate(vnId: string): Promise<IVndbReviewItem | null> {
-    const candidate = await this.vndbCandidatesModel.findOne({ vnId }).lean();
-
-    if (!candidate) return null;
-
-    const [remaining, next, games, { results }, platformSlugById] =
-      await Promise.all([
-        this.vndbCandidatesModel.countDocuments({
-          ...UNDECIDED_FILTER,
-          _id: { $gte: candidate._id },
-        }),
-        this.vndbCandidatesModel
-          .findOne({ ...UNDECIDED_FILTER, _id: { $gt: candidate._id } })
-          .sort({ _id: 1 })
-          .select("vnId")
-          .lean(),
-        this.gamesModel
-          .find({
-            _id: { $in: candidate.candidates.map(({ gameId }) => gameId) },
-          })
-          .select(
-            "cover type summary alternative_names companies first_release platformIds vndb.vnId"
-          )
-          .lean(),
-        this.post<IVndbGameResponse>("/vn", {
-          filters: ["id", "=", candidate.vnId] satisfies TVndbFilter,
-          fields:
-            "title,alttitle,titles.title,titles.lang,titles.latin,titles.official,titles.main,released,platforms,description,developers.name,image.url,image.sexual,length_minutes,rating,votecount",
-        }),
-        this.getPlatformSlugs(),
-      ]);
 
     const platformIdBySlug = new Map(
       [...platformSlugById].map(([id, slug]) => [slug, new Types.ObjectId(id)])
     );
-    const gameById = new Map(games.map((game) => [String(game._id), game]));
     const vn = results[0] ? this.getTitles(results[0], [], []) : null;
 
-    return {
-      id: String(candidate._id),
-      vnId: candidate.vnId,
-      reason: candidate.reason ?? null,
-      state: candidateState(candidate),
-      remaining,
-      nextVnId: next?.vnId ?? null,
-      decidedBy: candidate.decidedBy?.userName ?? null,
-      vn: vn
-        ? {
-            name: vn.name,
-            originalName: vn.originalName,
-            alternativeNames: vn.alternativeNames,
-            description: stripBbcode(vn.description),
-            released: vn.released ?? null,
-            developers: vn.companies.map(({ name }) => name),
-            platformIds: this.getPlatformIds(
-              vn.platforms,
-              platformIdBySlug
-            ).map(String),
-            lengthMinutes: vn.length ?? null,
-            cover: vn.cover?.url ?? null,
-            isExplicitCover:
-              (vn.cover?.sexual ?? 0) > VNDB_EXPLICIT_SEXUAL_LEVEL,
-          }
-        : null,
-      candidates: candidate.candidates.map((entry) => {
-        const game = gameById.get(String(entry.gameId));
+    if (!vn) return null;
 
-        return {
-          gameId: String(entry.gameId),
-          slug: entry.slug,
-          name: entry.name,
-          score: entry.score,
-          breakdown: entry.breakdown,
-          dateSignal: entry.dateSignal,
-          descriptionSignal: entry.descriptionSignal,
-          hasCompanyMismatch: entry.hasCompanyMismatch,
-          game: game
-            ? {
-                cover: game.cover ?? null,
-                type: game.type ?? null,
-                summary: game.summary ?? null,
-                alternativeNames: game.alternative_names ?? [],
-                companies: game.companies ?? [],
-                firstRelease: game.first_release ?? null,
-                platformIds: (game.platformIds ?? []).map(String),
-                linkedVnId: game.vndb?.vnId ?? null,
-              }
-            : null,
-        };
-      }),
+    return {
+      name: vn.name,
+      originalName: vn.originalName,
+      alternativeNames: vn.alternativeNames,
+      description: stripBbcode(vn.description),
+      released: vn.released ?? null,
+      developers: vn.companies.map(({ name }) => name),
+      platformIds: this.getPlatformIds(vn.platforms, platformIdBySlug).map(
+        String
+      ),
+      lengthMinutes: vn.length ?? null,
+      cover: vn.cover?.url ?? null,
+      isExplicitCover: (vn.cover?.sexual ?? 0) > VNDB_EXPLICIT_SEXUAL_LEVEL,
+      url: `https://vndb.org/${vnId}`,
     };
   }
 
-  async decideCandidate(
-    vnId: string,
-    gameId: string | null,
-    user: Pick<User, "_id" | "userName">
-  ): Promise<IVndbCandidatesSummary> {
-    const candidate = await this.vndbCandidatesModel
-      .findOneAndUpdate(
-        {
-          vnId,
-          ...UNDECIDED_FILTER,
-          ...(gameId
-            ? { "candidates.gameId": new Types.ObjectId(gameId) }
-            : {}),
-        },
-        {
-          $set: {
-            decision: gameId ? "match" : "skip",
-            winner: gameId ? new Types.ObjectId(gameId) : null,
-            decidedBy: {
-              userId: new Types.ObjectId(String(user._id)),
-              userName: user.userName,
-            },
-          },
-        },
-        { new: true }
-      )
-      .select("status decision")
-      .lean();
-
-    if (!candidate) throw await this.getDecisionError(vnId);
-
-    this.reviewEvents.candidateDecided({
-      vnId,
-      state: candidateState(candidate),
-      decidedBy: user.userName,
-    });
-    this.startApplyingDecisions();
-
-    return this.getCandidatesSummary();
-  }
-
-  private async getDecisionError(vnId: string) {
-    const candidate = await this.vndbCandidatesModel
-      .findOne({ vnId })
-      .select("status decision decidedBy")
-      .lean();
-
-    if (!candidate) {
-      return new NotFoundException(`${vnId} is not in the review queue`);
-    }
-
-    if (candidateState(candidate) !== "waiting") {
-      return new ConflictException(
-        `${candidate.decidedBy?.userName ?? "Another admin"} has already decided ${vnId}`
-      );
-    }
-
-    return new BadRequestException(`The game is not a candidate for ${vnId}`);
-  }
-
-  private startApplyingDecisions() {
-    this.hasNewDecisions = true;
-
-    if (this.isApplyingDecisions) return;
-
-    this.applyDecisions().catch((error) =>
-      this.logger.error(error, "Applying VNDB candidate decisions failed")
-    );
-  }
-
-  private async applyDecisions() {
-    this.isApplyingDecisions = true;
-
-    try {
-      while (this.hasNewDecisions) {
-        this.hasNewDecisions = false;
-        let applied = 0;
-
-        for (;;) {
-          const decided = await this.vndbCandidatesModel
-            .find({ status: "pending", decision: { $ne: null } })
-            .limit(VNDB_PAGE_SIZE)
-            .lean();
-
-          if (!decided.length) break;
-
-          applied += await this.applyDecisionBatch(decided);
-        }
-
-        if (applied) {
-          await this.linkVndbCharacters();
-        }
-      }
-    } finally {
-      this.isApplyingDecisions = false;
-    }
-  }
-
-  private async applyDecisionBatch(
-    decided: (VndbCandidate & { _id: Types.ObjectId })[]
-  ) {
+  private async applyConflictDecisions(
+    decisions: IConflictDecision[]
+  ): Promise<Map<string, Types.ObjectId>> {
     const [{ titles }, winners] = await Promise.all([
-      this.getVndbTitles(decided.map(({ vnId }) => vnId)),
+      this.getVndbTitles(decisions.map(({ externalId }) => externalId)),
       this.gamesModel
         .find(
           {
             _id: {
-              $in: decided.flatMap(({ winner }) => (winner ? [winner] : [])),
+              $in: decisions.flatMap(({ winner }) => (winner ? [winner] : [])),
             },
           },
-          CANDIDATE_PROJECTION
+          MATCH_CANDIDATE_PROJECTION
         )
         .lean(),
     ]);
@@ -1293,17 +911,17 @@ export class VndbService {
     const titleByVnId = new Map(titles.map((vn) => [vn.id, vn]));
     const winnerById = new Map(winners.map((game) => [String(game._id), game]));
 
-    const matches = decided.flatMap(
-      ({ vnId, vnName, decision, winner }): IVnMatch[] => {
-        const vndb = titleByVnId.get(vnId);
+    const matches = decisions.flatMap(
+      ({ externalId, externalName, decision, winner }): IVnMatch[] => {
+        const vndb = titleByVnId.get(externalId);
         const game = winner ? winnerById.get(String(winner)) : undefined;
 
         if (!vndb || (decision === "match" && !game)) return [];
 
         return [
           {
-            vnId,
-            vnName,
+            vnId: externalId,
+            vnName: externalName,
             verdict: game ? "matched" : "absent",
             reason: null,
             winner: game ?? null,
@@ -1321,53 +939,15 @@ export class VndbService {
       .find({ "vndb.vnId": { $in: vnIds } })
       .select("_id vndb.vnId")
       .lean();
-    const gameIdByVnId = new Map(
-      linkedGames.map((game) => [game.vndb.vnId, game._id])
-    );
 
     await this.gamesModel.updateMany(
       { "vndb.vnId": { $in: vnIds } },
       { $set: { "vndb.syncedAt": new Date().toISOString() } }
     );
 
-    await this.vndbCandidatesModel.bulkWrite(
-      decided.map(({ _id, vnId, decision }) => {
-        const gameId = gameIdByVnId.get(vnId);
+    if (linkedGames.length) await this.linkVndbCharacters();
 
-        return {
-          updateOne: {
-            filter: { _id, status: "pending", decision },
-            update: {
-              $set: gameId
-                ? {
-                    status: decision === "match" ? "resolved" : "absent",
-                    winner: gameId,
-                    decision: null,
-                  }
-                : { decision: null, winner: null, decidedBy: null },
-            },
-          },
-        };
-      })
-    );
-
-    this.reviewEvents.candidatesApplied({
-      vnIds: decided.map(({ vnId }) => vnId),
-    });
-
-    const returned = decided.filter(({ vnId }) => !gameIdByVnId.has(vnId));
-
-    if (returned.length) {
-      this.logger.warn(
-        `VNDB decisions returned to review, nothing was written for ${returned.map(({ vnId }) => vnId).join(", ")}`
-      );
-    }
-
-    this.logger.log(
-      `Applied ${decided.length - returned.length}/${decided.length} VNDB candidate decisions`
-    );
-
-    return decided.length - returned.length;
+    return new Map(linkedGames.map((game) => [game.vndb.vnId, game._id]));
   }
 
   get isLinkingRelatedGames() {
@@ -1834,62 +1414,6 @@ export class VndbService {
     }
   }
 
-  private async findCandidatesByCompany(
-    vns: IVndbTitles[]
-  ): Promise<TCandidatesByVn> {
-    const result: TCandidatesByVn = new Map();
-    const prefixes = [
-      ...new Set(
-        vns
-          .flatMap(({ developers }) => developers)
-          .map(companySearchPrefix)
-          .filter((name) => name.length >= MIN_COMPANY_PREFIX_LENGTH)
-      ),
-    ];
-
-    if (!prefixes.length) return result;
-
-    const gamesById = new Map<string, TVndbCandidate>();
-
-    for (
-      let i = 0;
-      i < prefixes.length;
-      i += VNDB_FALLBACK_COMPANY_CHUNK_SIZE
-    ) {
-      const chunk = prefixes.slice(i, i + VNDB_FALLBACK_COMPANY_CHUNK_SIZE);
-
-      const found = await this.gamesModel
-        .find(
-          {
-            "companies.name": {
-              $in: chunk.map(
-                (prefix) => new RegExp(`^${escapeRegExp(prefix)}`, "i")
-              ),
-            },
-          },
-          CANDIDATE_PROJECTION
-        )
-        .lean();
-
-      for (const game of found) gamesById.set(String(game._id), game);
-    }
-
-    for (const game of gamesById.values()) {
-      for (const vn of vns) {
-        const isSameStudio = (game.companies ?? []).some(({ name }) =>
-          vn.developers.some((developer) => isSameCompanyName(developer, name))
-        );
-        if (!isSameStudio) continue;
-        if (!this.isSimilarTitle(vn, game, VNDB_FALLBACK_TITLE_SIMILARITY))
-          continue;
-
-        result.set(vn.id, [...(result.get(vn.id) ?? []), game]);
-      }
-    }
-
-    return result;
-  }
-
   private getPlatformIds(
     platforms: string[],
     platformIdBySlug: Map<string, Types.ObjectId>
@@ -2081,386 +1605,6 @@ export class VndbService {
     );
   }
 
-  private companyMatchScore(vn: IVndbTitles, game: TVndbCandidate): number {
-    const companies = game.companies ?? [];
-    if (!companies.length) return 0;
-
-    const roleScore = (
-      vndbNames: string[],
-      hasRole: (company: ICompanyField) => boolean
-    ) => {
-      if (!vndbNames.length) return 0;
-
-      const matched = companies.filter((company) =>
-        vndbNames.some((name) => isSameCompanyName(name, company.name))
-      );
-      if (!matched.length) return 0;
-
-      return matched.some(hasRole)
-        ? VNDB_ROLE_COMPANY_SCORE
-        : VNDB_ANY_COMPANY_SCORE;
-    };
-
-    return (
-      roleScore(
-        vn.developers,
-        ({ developer, porting, supporting }) =>
-          developer || porting || supporting
-      ) + roleScore(vn.publishers, ({ publisher }) => publisher)
-    );
-  }
-
-  private hasCompanyMismatch(vn: IVndbTitles, game: TVndbCandidate): boolean {
-    const companies = game.companies ?? [];
-    const vndbNames = [...vn.developers, ...vn.publishers];
-
-    if (!companies.length || !vndbNames.length) return false;
-
-    return !companies.some(({ name }) =>
-      vndbNames.some((vndbName) => isSameCompanyName(vndbName, name))
-    );
-  }
-
-  private titleKeyMap(rawTitles: string[]): Map<string, boolean> {
-    const keys = new Map<string, boolean>();
-
-    for (const raw of rawTitles) {
-      const key = titleKey(raw);
-      if (!key) continue;
-
-      keys.set(key, true);
-      for (const variant of titleKeyVariants(raw)) {
-        if (!keys.has(variant)) keys.set(variant, false);
-      }
-    }
-
-    return keys;
-  }
-
-  private gameTitleKeys(game: TVndbCandidate): Set<string> {
-    return new Set(
-      this.titleKeyMap([game.name, ...(game.alternative_names ?? [])]).keys()
-    );
-  }
-
-  private matchedTitles(
-    vn: IVndbTitles,
-    game: TVndbCandidate
-  ): { key: string; isExact: boolean }[] {
-    const gameKeys = this.titleKeyMap([
-      game.name,
-      ...(game.alternative_names ?? []),
-    ]);
-    const vnKeys = this.titleKeyMap([vn.name, ...vn.alternativeNames]);
-
-    const matched: { key: string; isExact: boolean }[] = [];
-
-    for (const [key, isVnPrimary] of vnKeys) {
-      const isGamePrimary = gameKeys.get(key);
-      if (isGamePrimary === undefined) continue;
-
-      matched.push({ key, isExact: isVnPrimary && isGamePrimary });
-    }
-
-    return matched;
-  }
-
-  private isSimilarTitle(
-    vn: IVndbTitles,
-    game: TVndbCandidate,
-    threshold = VNDB_FUZZY_TITLE_SIMILARITY
-  ): boolean {
-    const toTokenSets = (titles: string[]) =>
-      titles
-        .map(normalizeTitle)
-        .filter(Boolean)
-        .map(tokenSetFrom)
-        .filter((set) => set.size);
-
-    const vnTitles = toTokenSets([vn.name, ...vn.alternativeNames]);
-    const gameTitles = toTokenSets([
-      game.name,
-      ...(game.alternative_names ?? []),
-    ]);
-
-    return vnTitles.some((vnTokens) =>
-      gameTitles.some(
-        (gameTokens) => jaccard(vnTokens, gameTokens) >= threshold
-      )
-    );
-  }
-
-  private compareDescriptions(
-    vn: IVndbTitles,
-    game: TVndbCandidate
-  ): TDescriptionSignal {
-    const vnTokens = descriptionTokens(vn.description ?? "");
-    const gameTokens = descriptionTokens(game.summary ?? "");
-
-    if (
-      vnTokens.size < MIN_DESCRIPTION_TOKENS ||
-      gameTokens.size < MIN_DESCRIPTION_TOKENS
-    ) {
-      return "unknown";
-    }
-
-    return descriptionOverlap(vnTokens, gameTokens) >=
-      VNDB_DESCRIPTION_SIMILARITY
-      ? "match"
-      : "mismatch";
-  }
-
-  private isMainTitleMatch(
-    vn: IVndbTitles,
-    game: TVndbCandidate,
-    titles: { key: string; isExact: boolean }[]
-  ): boolean {
-    const vnMainKeys = new Set(
-      [vn.name, vn.originalName].map(titleKey).filter(Boolean)
-    );
-    const gameMainKey = titleKey(game.name);
-
-    return titles.some(
-      ({ key, isExact }) =>
-        isExact && key === gameMainKey && vnMainKeys.has(key)
-    );
-  }
-
-  private isDistinctiveTitle(
-    title: string,
-    sharedTitles: Set<string>
-  ): boolean {
-    return (
-      !sharedTitles.has(title) &&
-      title.length >= MIN_STRING_LENGTH &&
-      title.split(" ").length >= MIN_TITLE_WORDS
-    );
-  }
-
-  private titleMatchScore(
-    titles: { key: string; isExact: boolean }[],
-    sharedTitles: Set<string>
-  ): number {
-    let bestScore = 0;
-
-    for (const { key, isExact } of titles) {
-      const tier = this.isDistinctiveTitle(key, sharedTitles)
-        ? VNDB_DISTINCTIVE_TITLE_SCORE
-        : isStrongTitle(key)
-          ? VNDB_STRONG_TITLE_SCORE
-          : VNDB_WEAK_TITLE_SCORE;
-
-      const points = isExact ? tier : Math.min(tier, VNDB_STRONG_TITLE_SCORE);
-
-      if (points > bestScore) bestScore = points;
-    }
-
-    return bestScore;
-  }
-
-  private platformMatchScore(
-    vn: IVndbTitles,
-    game: TVndbCandidate,
-    platformSlugById: Map<string, string>
-  ): number {
-    const vnSlugs = new Set(
-      vn.platforms.flatMap((platform) => VNDB_PLATFORM_SLUGS[platform] ?? [])
-    );
-    const gameSlugs = (game.platformIds ?? [])
-      .map((id) => platformSlugById.get(String(id)))
-      .filter((slug): slug is string => !!slug);
-
-    if (!vnSlugs.size || !gameSlugs.length) return 0;
-
-    return gameSlugs.some((slug) => vnSlugs.has(slug))
-      ? VNDB_PLATFORM_MATCH_SCORE
-      : VNDB_PLATFORM_MISMATCH_SCORE;
-  }
-
-  private genreMatchScore(game: TVndbCandidate): number {
-    const genres = game.genres ?? [];
-    if (!genres.length) return 0;
-
-    if (genres.includes(VISUAL_NOVEL_GENRE)) return VNDB_GENRE_SCORE;
-
-    return genres.some((genre) => INCOMPATIBLE_GENRES.includes(genre))
-      ? VNDB_INCOMPATIBLE_GENRE_SCORE
-      : 0;
-  }
-
-  private matchNovels(
-    vndbTitles: IVndbTitles[],
-    candidatesByVn: TCandidatesByVn,
-    context: IScoreContext
-  ): IVnMatch[] {
-    return vndbTitles.map((vn) =>
-      this.resolveMatch(vn, candidatesByVn.get(vn.id) ?? [], context)
-    );
-  }
-
-  private typeMatchScore(vn: IVndbTitles, game: TVndbCandidate): number {
-    if (REEDITION_TYPES.includes(game.type)) return -1;
-
-    if (vn.type === FAN_DISC_GAME_TYPE) {
-      return FAN_DISC_GAME_TYPES.includes(game.type) ? 1 : 0;
-    }
-
-    return game.type === MAIN_GAME_TYPE ? 1 : 0;
-  }
-
-  private scoreCandidate(
-    vn: IVndbTitles,
-    game: TVndbCandidate,
-    { platformSlugById, sharedTitles }: IScoreContext
-  ): IScoredCandidate {
-    const dateSignal = this.compareDates(vn.releaseDates, game);
-    const titles = this.matchedTitles(vn, game);
-    const hasCompanyMismatch = this.hasCompanyMismatch(vn, game);
-
-    const breakdown: IScoreBreakdown = {
-      date:
-        dateSignal === "confirms"
-          ? VNDB_DATE_CONFIRMS_SCORE
-          : dateSignal === "contradicts"
-            ? VNDB_DATE_CONTRADICTS_SCORE
-            : 0,
-      genre: this.genreMatchScore(game),
-      type: this.typeMatchScore(vn, game),
-      title: titles.length
-        ? this.titleMatchScore(titles, sharedTitles)
-        : this.isSimilarTitle(vn, game)
-          ? VNDB_WEAK_TITLE_SCORE
-          : 0,
-      companies:
-        this.companyMatchScore(vn, game) +
-        (hasCompanyMismatch ? VNDB_COMPANY_MISMATCH_SCORE : 0),
-      platforms: this.platformMatchScore(vn, game, platformSlugById),
-    };
-
-    const score = Object.values(breakdown).reduce((sum, part) => sum + part, 0);
-
-    return {
-      game,
-      score,
-      dateSignal,
-      breakdown,
-      isDistinctiveTitle: titles.some(
-        ({ key, isExact }) =>
-          isExact && this.isDistinctiveTitle(key, sharedTitles)
-      ),
-      isMainTitleMatch: this.isMainTitleMatch(vn, game, titles),
-      isCorroborated: breakdown.date > 0 || breakdown.companies > 0,
-      isContradicted: dateSignal === "contradicts",
-      hasCompanyMismatch,
-      descriptionSignal: this.compareDescriptions(vn, game),
-    };
-  }
-
-  private getRejectionReason(candidate: IScoredCandidate): TMatchReason | null {
-    if (candidate.breakdown.title < VNDB_STRONG_TITLE_SCORE) {
-      return "weak-title";
-    }
-    if (candidate.isContradicted) return "date-contradicts";
-
-    if (
-      candidate.breakdown.companies <= 0 &&
-      candidate.descriptionSignal !== "match"
-    ) {
-      return candidate.descriptionSignal === "mismatch"
-        ? "description-mismatch"
-        : "no-company-evidence";
-    }
-
-    if (
-      candidate.hasCompanyMismatch &&
-      (!candidate.isDistinctiveTitle || !candidate.isMainTitleMatch)
-    ) {
-      return "company-mismatch";
-    }
-
-    if (candidate.isCorroborated) return null;
-
-    return candidate.isDistinctiveTitle &&
-      candidate.isMainTitleMatch &&
-      !candidate.hasCompanyMismatch
-      ? null
-      : "unverified-title";
-  }
-
-  private resolveMatch(
-    vn: IVndbTitles,
-    candidates: TVndbCandidate[],
-    context: IScoreContext
-  ): IVnMatch {
-    const scored = candidates
-      .map((game) => this.scoreCandidate(vn, game, context))
-      .sort((a, b) => b.score - a.score);
-
-    const viable = scored.filter(({ score }) => score >= VNDB_SCORE_THRESHOLD);
-
-    if (!viable.length) {
-      return {
-        vnId: vn.id,
-        vnName: vn.name,
-        verdict: "absent",
-        reason: scored.length ? "below-threshold" : null,
-        winner: null,
-        vndb: { ...vn },
-        candidates: scored,
-      };
-    }
-
-    const [best, runnerUp] = viable;
-
-    const isUnique = !runnerUp || best.score - runnerUp.score >= VNDB_SCORE_GAP;
-    const reason = isUnique
-      ? this.getRejectionReason(best)
-      : "competing-candidates";
-
-    return {
-      vnId: vn.id,
-      vnName: vn.name,
-      verdict: reason ? "ambiguous" : "matched",
-      reason,
-      winner: reason ? null : best.game,
-      vndb: { ...vn },
-      candidates: scored,
-    };
-  }
-
-  private isCloseDate(vndbDate: Date, igdbDate: Date): boolean {
-    const diffYears = Math.abs(
-      vndbDate.getUTCFullYear() - igdbDate.getUTCFullYear()
-    );
-
-    if (diffYears <= 1) return true;
-
-    const diffDays = Math.abs(+vndbDate - +igdbDate) / (1000 * 60 * 60 * 24);
-
-    return diffDays <= VNDB_DATE_MAX_DIFF_DAYS;
-  }
-
-  private compareDates(vndbDates: string[], game: TVndbCandidate): TDateSignal {
-    const vndbParsed = vndbDates
-      .map((date) => parsePartialDate(date))
-      .filter((date): date is Date => !!date);
-
-    const igdbParsed = [
-      game.first_release,
-      ...(game.release_dates ?? []).map(({ date }) => date),
-    ]
-      .filter((timestamp): timestamp is number => !!timestamp)
-      .map((timestamp) => new Date(timestamp * 1000));
-
-    if (!vndbParsed.length || !igdbParsed.length) return "unknown";
-
-    const isConfirmed = vndbParsed.some((vndbDate) =>
-      igdbParsed.some((igdbDate) => this.isCloseDate(vndbDate, igdbDate))
-    );
-
-    return isConfirmed ? "confirms" : "contradicts";
-  }
-
   private getTitles(
     vn: IVndbNovel,
     themes: string[],
@@ -2574,6 +1718,21 @@ type TVndbSyncTotals = Record<
 type TVndbReleaseDate = Omit<IReleaseDate, "platformId"> & {
   platformId: Types.ObjectId;
 };
+
+export const toVndbMatchSubject = (vn: IVndbTitles): IMatchSubject => ({
+  id: vn.id,
+  name: vn.name,
+  originalName: vn.originalName,
+  alternativeNames: vn.alternativeNames,
+  type: vn.type,
+  releaseDates: vn.releaseDates,
+  developers: vn.developers,
+  publishers: vn.publishers,
+  platformSlugs: vn.platforms.flatMap(
+    (platform) => VNDB_PLATFORM_SLUGS[platform] ?? []
+  ),
+  description: vn.description,
+});
 
 export interface IVndbTitles {
   id: string;

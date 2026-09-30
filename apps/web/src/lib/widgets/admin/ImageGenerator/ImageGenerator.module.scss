@@ -1,0 +1,238 @@
+.generator {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x4);
+  padding-block: var(--padding-x4);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x3);
+
+  &__selects {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-x3);
+
+    > * {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+  }
+
+  &__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x3);
+  }
+
+  &__split {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+
+    @include font(14px, 20px, 400);
+  }
+}
+
+.placeholder {
+  color: var(--color-text-muted);
+  text-align: center;
+
+  @include font(14px, 20px, 400);
+}
+
+.preview {
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  width: var(--image-generator-preview-width);
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  overflow: hidden;
+  border: none;
+  border-radius: var(--radius-x3);
+  background-color: var(--color-bg-tertiary);
+  cursor: zoom-in;
+
+  &:disabled {
+    cursor: progress;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+  }
+
+  &__loader {
+    position: absolute;
+    inset: 0;
+    white-space: nowrap;
+    background-color: var(--color-bg-secondary);
+    opacity: 0.85;
+
+    @include flexCenter;
+  }
+}
+
+.full {
+  display: block;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: zoom-out;
+
+  img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 90vw;
+    max-height: 90dvh;
+    border-radius: var(--radius-x4);
+  }
+}
+
+.prompt {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x1);
+
+  &_element {
+    padding-left: var(--padding-x4);
+    border-left: 2px solid var(--color-border-secondary);
+  }
+
+  &__element {
+    color: var(--color-accent);
+
+    @include font(13px, 18px, 600);
+  }
+
+  &__text {
+    color: var(--color-text-primary);
+
+    @include lineClamp(4);
+  }
+
+  &__model {
+    color: var(--color-text-muted);
+
+    @include font(12px, 18px, 400);
+  }
+}
+
+.link {
+  color: var(--color-text-secondary);
+  word-break: break-all;
+
+  @include lineClamp(2);
+}
+
+.popover {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x3);
+  padding: var(--padding-x2);
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--gap-x2);
+  }
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+
+  &__item {
+    width: 100%;
+    padding: var(--padding-x2) var(--padding-x3);
+    border: none;
+    border-radius: var(--radius-x3);
+    background: none;
+    color: var(--color-text-primary);
+    text-align: left;
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--easing-out);
+
+    @include font(14px, 20px, 500);
+
+    &:hover,
+    &:focus-visible {
+      background-color: var(--color-bg-hover);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: -2px;
+    }
+
+    &_danger {
+      color: var(--color-negative);
+    }
+  }
+}
+
+.elements {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x4);
+
+  &__hint {
+    margin: 0;
+    color: var(--color-text-secondary);
+
+    @include font(14px, 20px, 400);
+  }
+
+  &__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--gap-x2);
+    padding-block: var(--padding-x4);
+    color: var(--color-text-muted);
+
+    @include font(14px, 20px, 400);
+  }
+
+  &__spinner {
+    position: relative;
+    width: 100%;
+    height: var(--padding-x8);
+  }
+
+  &__row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--gap-x3);
+  }
+
+  &__fields {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x2);
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--gap-x2);
+  }
+}

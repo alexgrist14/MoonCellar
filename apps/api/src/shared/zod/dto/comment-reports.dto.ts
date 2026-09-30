@@ -1,6 +1,8 @@
 import { createZodDto } from "nestjs-zod";
 import {
+  AdminCommentsResponseSchema,
   CommentReportsResponseSchema,
+  GetAdminCommentsRequestSchema,
   GetCommentReportsRequestSchema,
   ResolveCommentReportsRequestSchema,
   ResolveCommentReportsResponseSchema,
@@ -20,4 +22,12 @@ export class ResolveCommentReportsRequestDto extends createZodDto(
 
 export class ResolveCommentReportsResponseDto extends createZodDto(
   ResolveCommentReportsResponseSchema
+) {}
+
+export class GetAdminCommentsRequestDto extends createZodDto(
+  GetAdminCommentsRequestSchema
+) {}
+
+export class AdminCommentsResponseDto extends createZodDto(
+  AdminCommentsResponseSchema
 ) {}

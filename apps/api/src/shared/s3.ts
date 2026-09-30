@@ -9,6 +9,7 @@ export const S3_FOLDERS = {
   backgrounds: "backgrounds",
   comments: "comments",
   common: "common",
+  generated: "generated",
 } as const;
 
 export type S3Folder = (typeof S3_FOLDERS)[keyof typeof S3_FOLDERS];

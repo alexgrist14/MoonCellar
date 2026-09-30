@@ -1,7 +1,7 @@
 "use client";
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Controller,
@@ -17,6 +17,8 @@ import {
 } from "@/src/lib/entities/game/api/game.queries";
 import {
   useCreateGameMutation,
+  useFindGameImagesMutation,
+  useImportGameImageMutation,
   useUpdateGameMutation,
   useUploadGameImageMutation,
 } from "@/src/lib/entities/game/api/game.mutations";
@@ -26,12 +28,18 @@ import { revalidateGamePage } from "@/src/lib/entities/game/api/game.actions";
 import {
   AddGameRequestSchema,
   IAddGameRequest,
+  IGameImageKind,
   IGameResponse,
   IUpdateGameRequest,
   UpdateGameRequestSchema,
 } from "@mooncellar/schemas";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { Box } from "@/src/lib/shared/ui/Box";
+import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
+import {
+  ADMIN_HREF,
+  getAdminHref,
+} from "@/src/lib/shared/utils/admin-url.utils";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 import { Loader } from "@/src/lib/shared/ui/Loader";
@@ -55,8 +63,11 @@ import {
   UploadButton,
 } from "@/src/lib/shared/ui/Fields";
 import { AiGameDrafts } from "@/src/lib/widgets/admin/AiGameDrafts";
+import { ImageFinder } from "@/src/lib/shared/ui/ImageFinder";
 import { GAME_SECTIONS, IFieldDescriptor, IOptionsKey } from "./sections";
 import styles from "./GameEditPage.module.scss";
+import { confirmPossibleDuplicates } from "@/src/lib/entities/game/ui/PossibleDuplicates";
+import { getPossibleDuplicates } from "@/src/lib/shared/utils/possible-duplicates.utils";
 
 type IGameFormValues = IUpdateGameRequest;
 type IFormPath = Path<IGameFormValues>;
@@ -83,6 +94,12 @@ const OBJECT_LIST_FIELDS: Record<string, IObjectFieldDescriptor[]> =
     },
     {} as Record<string, IObjectFieldDescriptor[]>
   );
+
+const IMAGE_FINDER_LABELS: Record<IGameImageKind, string> = {
+  cover: "Find cover",
+  screenshots: "Find screenshots",
+  artworks: "Find artworks",
+};
 
 const CREATE_DEFAULTS: Partial<IGameFormValues> = {
   cover: null,
@@ -192,6 +209,7 @@ interface IGameEditPageProps {
 export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
   const router = useRouter();
   const isAdmin = useAuthStore((s) => s.isAdmin);
+  const isAuthChecked = useAuthStore((s) => s.isAuthChecked);
   const isCreate = !gameId;
   const [original, setOriginal] = useState<Record<string, unknown>>({});
   const [invalidField, setInvalidField] = useState<{
@@ -251,6 +269,17 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
 
   const { errors, isSubmitting } = formState;
   const hltbId = watch("hltb.hltbId");
+  const [imagePicks, setImagePicks] = useState<
+    Record<IGameImageKind, string[]>
+  >({ cover: [], screenshots: [], artworks: [] });
+  const { mutateAsync: findImages } = useFindGameImagesMutation();
+  const { mutateAsync: importImage } = useImportGameImageMutation();
+  const gameName = watch("name") as string | undefined;
+  const externalPages = watch("externalPages") as
+    { name?: string; uid?: string }[] | undefined;
+  const steamAppId = externalPages?.find(
+    (page) => page.name === "Steam" && /^\d+$/.test(page.uid ?? "")
+  )?.uid;
   const artworks = watch("artworks");
   const screenshots = watch("screenshots");
 
@@ -287,7 +316,7 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
 
   useEffect(() => {
     if (!gameId || !isGameError) return;
-    router.push("/admin");
+    router.push(getAdminHref("games"));
   }, [gameId, isGameError, router]);
 
   const optionsFor = useCallback(
@@ -343,14 +372,64 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
     [platforms]
   );
 
-  const onValid: SubmitHandler<IGameFormValues> = async (data) => {
+  const applyImagePicks = async (data: IGameFormValues) => {
+    const store = (url: string, type: "cover" | "screenshot" | "artwork") =>
+      isCreate || !gameId
+        ? Promise.resolve(url)
+        : importImage({ gameId, url, type });
+    const values = data as Record<string, unknown>;
+    const [cover, screenshots, artworks] = await Promise.all([
+      Promise.all(imagePicks.cover.map((url) => store(url, "cover"))),
+      Promise.all(
+        imagePicks.screenshots.map((url) => store(url, "screenshot"))
+      ),
+      Promise.all(imagePicks.artworks.map((url) => store(url, "artwork"))),
+    ]);
+
+    return {
+      ...values,
+      ...(cover[0] && { cover: cover[0] }),
+      ...(screenshots.length && {
+        screenshots: [
+          ...((values.screenshots as string[]) ?? []),
+          ...screenshots,
+        ],
+      }),
+      ...(artworks.length && {
+        artworks: [...((values.artworks as string[]) ?? []), ...artworks],
+      }),
+    } as IGameFormValues;
+  };
+
+  const onValid: SubmitHandler<IGameFormValues> = async (formData) => {
+    let data: IGameFormValues;
+
+    try {
+      data = await applyImagePicks(formData);
+    } catch {
+      return;
+    }
+
     if (isCreate) {
-      createGame(data as IAddGameRequest, {
-        onSuccess: (game) => {
-          toast.success({ description: "Game created" });
-          router.push(`/admin/games/${game._id}`);
-        },
-      });
+      const create = (force?: boolean) =>
+        createGame(
+          { data: data as IAddGameRequest, force },
+          {
+            onSuccess: (game) => {
+              toast.success({ description: "Game created" });
+              router.push(`/admin/games/${game._id}`);
+            },
+            onError: (error) => {
+              const duplicates = getPossibleDuplicates(error);
+
+              if (duplicates) {
+                confirmPossibleDuplicates(duplicates, () => create(true));
+              }
+            },
+          }
+        );
+
+      create();
       return;
     }
 
@@ -397,6 +476,7 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
             characters: current.characters,
           }));
           reset(toFormValues(game));
+          setImagePicks({ cover: [], screenshots: [], artworks: [] });
         },
       }
     );
@@ -528,6 +608,15 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
       type: uploadType,
       file,
     });
+
+    addImageUrl(path, uploadType, url);
+  };
+
+  const addImageUrl = (
+    path: string,
+    uploadType: "cover" | "screenshot" | "artwork",
+    url: string
+  ) => {
     const formPath = path as IFormPath;
 
     if (uploadType === "cover") {
@@ -538,6 +627,27 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
     const current = (getValues(formPath) as string[] | undefined) || [];
     setValue(formPath, [...current, url], { shouldDirty: true });
   };
+
+  const renderImageFinder = (kind: IGameImageKind) => (
+    <ImageFinder
+      label={IMAGE_FINDER_LABELS[kind]}
+      isPortrait={kind === "cover"}
+      isMultiple={kind !== "cover"}
+      selected={imagePicks[kind]}
+      onChange={(selected) =>
+        setImagePicks((current) => ({ ...current, [kind]: selected }))
+      }
+      emptyText="Nothing found. Check the game name or add its Steam page."
+      defaultQuery={gameName ?? ""}
+      onSearch={(name) =>
+        findImages({
+          name,
+          kind,
+          ...(steamAppId && { steamAppId }),
+        })
+      }
+    />
+  );
 
   const renderField = (
     field: IFieldDescriptor,
@@ -788,6 +898,7 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
                     }
                   />
                 )}
+                {renderImageFinder("cover")}
               </div>
             )}
           />
@@ -799,28 +910,35 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
             control={control}
             name={formPath}
             render={({ field: rhf }) => (
-              <StringListField
-                label={field.label}
-                value={rhf.value as string[]}
-                onChange={rhf.onChange}
-                isAddDisabled
-                action={
-                  isCreate ? (
-                    <span className={styles.uploadHint}>
-                      Save the game first to upload
-                    </span>
-                  ) : (
-                    <UploadButton
-                      onFile={(file) =>
-                        field.uploadType &&
-                        handleUpload(field.path, field.uploadType, file).catch(
-                          () => undefined
-                        )
-                      }
-                    />
-                  )
-                }
-              />
+              <div>
+                <StringListField
+                  label={field.label}
+                  value={rhf.value as string[]}
+                  onChange={rhf.onChange}
+                  isAddDisabled
+                  action={
+                    isCreate ? (
+                      <span className={styles.uploadHint}>
+                        Save the game first to upload
+                      </span>
+                    ) : (
+                      <UploadButton
+                        onFile={(file) =>
+                          field.uploadType &&
+                          handleUpload(
+                            field.path,
+                            field.uploadType,
+                            file
+                          ).catch(() => undefined)
+                        }
+                      />
+                    )
+                  }
+                />
+                {renderImageFinder(
+                  field.uploadType === "screenshot" ? "screenshots" : "artworks"
+                )}
+              </div>
             )}
           />
         );
@@ -847,6 +965,8 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
     }
   };
 
+  if (isAuthChecked && !isAdmin) notFound();
+
   if (!isAdmin) return;
 
   if (isPageLoading || !filters) {
@@ -859,6 +979,19 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
 
   return (
     <Box className={styles.page} classNameContent={styles.content}>
+      <Breadcrumbs
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Admin", href: ADMIN_HREF },
+          { name: "Games", href: getAdminHref("games") },
+          {
+            name: isCreate ? "Create game" : (original.name as string),
+            href: isCreate
+              ? "/admin/games/new"
+              : `/admin/games/${gameId as string}`,
+          },
+        ]}
+      />
       <div className={styles.header}>
         <h2 className={styles.title}>
           {isCreate ? "Create game" : `Edit: ${original.name as string}`}
@@ -942,7 +1075,7 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
           )}
           <Button
             color={ButtonColor.DEFAULT}
-            onClick={() => router.push("/admin")}
+            onClick={() => router.push(getAdminHref("games"))}
           >
             Back to list
           </Button>

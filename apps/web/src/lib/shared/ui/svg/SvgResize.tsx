@@ -11,7 +11,7 @@ export const SvgResize: FC<ISvgBaseProps> = (props) => {
         height="16"
         rx="1"
         transform="rotate(45 15.9497 5.63599)"
-        fill="white"
+        fill="currentColor"
       />
       <rect
         x="16.4595"
@@ -20,7 +20,7 @@ export const SvgResize: FC<ISvgBaseProps> = (props) => {
         height="8.95655"
         rx="1"
         transform="rotate(45 16.4595 11.1262)"
-        fill="white"
+        fill="currentColor"
       />
     </Svg>
   );

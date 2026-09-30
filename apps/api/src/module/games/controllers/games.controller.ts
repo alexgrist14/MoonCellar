@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -19,13 +20,19 @@ import {
   ApiConsumes,
   ApiCookieAuth,
   ApiCreatedResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiQuery,
   ApiTags,
 } from "@nestjs/swagger";
 import mongoose from "mongoose";
+import { GameMatcherService } from "../matching/game-matcher.service";
 import {
   AddGameDto,
+  FindGameImagesDto,
+  FindGameImagesResponseDto,
+  ImportGameImageDto,
+  PossibleDuplicatesResponseDto,
   GameAiDraftDto,
   GameAiDraftRunDto,
   GameResponseDto,
@@ -63,7 +70,8 @@ import { UserIdGuard } from "../../auth/user.guard";
 export class GamesController {
   constructor(
     private readonly games: GamesService,
-    private readonly gameAiDraft: GameAiDraftService
+    private readonly gameAiDraft: GameAiDraftService,
+    private readonly gameMatcher: GameMatcherService
   ) {}
 
   @Get("/:gameId/followings-status")
@@ -209,6 +217,20 @@ export class GamesController {
     return this.games.getGames(dto);
   }
 
+  @Post("/add/duplicates")
+  @ApiOperation({
+    summary:
+      "List catalogue games that look like the game about to be added, without adding it",
+  })
+  @ApiOkResponse({ type: PossibleDuplicatesResponseDto })
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), RolesGuard)
+  @Roles(RolesEnum.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  async findDuplicates(@Body() dto: AddGameDto) {
+    return { duplicates: await this.gameMatcher.findLikelyDuplicates(dto) };
+  }
+
   @Post("/add")
   @ApiOperation({ summary: "Add game" })
   @ApiCreatedResponse({ type: GameResponseDto })
@@ -216,8 +238,14 @@ export class GamesController {
   @UseGuards(AuthGuard("jwt"), RolesGuard)
   @Roles(RolesEnum.ADMIN)
   @HttpCode(HttpStatus.OK)
-  async addGame(@Body() dto: AddGameDto) {
-    return this.games.addGame(dto);
+  @ApiQuery({
+    name: "force",
+    required: false,
+    type: Boolean,
+    description: "Create the game even when it looks like a duplicate",
+  })
+  async addGame(@Body() dto: AddGameDto, @Query("force") force?: string) {
+    return this.games.addGame(dto, force === "true");
   }
 
   @Get("/ai-drafts")
@@ -292,6 +320,42 @@ export class GamesController {
   @ApiOperation({ summary: "Parse filters" })
   async parseCommon() {
     return this.games.parseFieldsToJson();
+  }
+
+  @Post("/image-candidates")
+  @ApiOperation({
+    summary:
+      "Find cover, screenshot or artwork candidates on Steam, SteamGridDB and image search",
+  })
+  @ApiOkResponse({ type: FindGameImagesResponseDto })
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), RolesGuard)
+  @Roles(RolesEnum.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  async findImageCandidates(@Body() dto: FindGameImagesDto) {
+    return this.gameAiDraft.findImageCandidates(dto);
+  }
+
+  @Post("/import-image/:id")
+  @ApiOperation({
+    summary:
+      "Copy an image from a link into the game's storage and return its URL",
+  })
+  @ApiOkResponse({ type: String })
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), RolesGuard)
+  @Roles(RolesEnum.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  async importImage(@Param("id") id: string, @Body() dto: ImportGameImageDto) {
+    if (!mongoose.isValidObjectId(id)) {
+      throw new BadRequestException(`Invalid game id: ${id}`);
+    }
+
+    return this.games.importImage(
+      new mongoose.Types.ObjectId(id),
+      dto.url,
+      dto.type
+    );
   }
 
   @Post("/upload-image/:id")

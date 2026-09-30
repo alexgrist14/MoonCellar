@@ -55,7 +55,14 @@ const buildService = (
   } as never;
   const metrics = { recordGames: jest.fn() } as never;
 
-  const service = new HltbService(gamesModel, platformsModel, logger, metrics);
+  const conflicts = { record: jest.fn(), register: jest.fn() };
+  const service = new HltbService(
+    gamesModel,
+    platformsModel,
+    logger,
+    metrics,
+    conflicts as never
+  );
 
   const getById = jest.fn().mockResolvedValue(byId);
 

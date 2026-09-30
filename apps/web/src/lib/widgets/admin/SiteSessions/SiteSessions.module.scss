@@ -1,0 +1,44 @@
+.sites {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x4);
+  padding-block: var(--padding-x4);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-x3);
+}
+
+.hint {
+  margin: 0;
+  color: var(--color-text-secondary);
+
+  @include font(14px, 20px, 400);
+}
+
+.error {
+  margin: 0;
+  color: var(--color-negative);
+
+  @include font(14px, 20px, 400);
+}
+
+.rowClickable {
+  cursor: pointer;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x3);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--gap-x2);
+}

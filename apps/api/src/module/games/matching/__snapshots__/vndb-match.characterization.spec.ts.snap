@@ -1,0 +1,390 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`VNDB match characterization descriptions differ and no company evidence 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 0,
+        "date": 3,
+        "genre": 2,
+        "platforms": 1,
+        "title": 4,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "mismatch",
+      "hasCompanyMismatch": false,
+      "name": "Midnight Clocktower Academy",
+      "score": 11,
+    },
+  ],
+  "reason": "description-mismatch",
+  "verdict": "ambiguous",
+  "winner": null,
+}
+`;
+
+exports[`VNDB match characterization developers differ 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": -1,
+        "date": 0,
+        "genre": 2,
+        "platforms": 1,
+        "title": 2,
+        "type": 1,
+      },
+      "dateSignal": "unknown",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": true,
+      "name": "Midnight Clocktower Academy",
+      "score": 5,
+    },
+  ],
+  "reason": "company-mismatch",
+  "verdict": "ambiguous",
+  "winner": null,
+}
+`;
+
+exports[`VNDB match characterization distinctive title without dates or companies 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 0,
+        "date": 0,
+        "genre": 2,
+        "platforms": 1,
+        "title": 4,
+        "type": 1,
+      },
+      "dateSignal": "unknown",
+      "descriptionSignal": "unknown",
+      "hasCompanyMismatch": false,
+      "name": "Midnight Clocktower Academy",
+      "score": 8,
+    },
+  ],
+  "reason": "no-company-evidence",
+  "verdict": "ambiguous",
+  "winner": null,
+}
+`;
+
+exports[`VNDB match characterization exact title confirmed by date and developer 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 2,
+        "platforms": 1,
+        "title": 4,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Midnight Clocktower Academy",
+      "score": 13,
+    },
+  ],
+  "reason": null,
+  "verdict": "matched",
+  "winner": "Midnight Clocktower Academy",
+}
+`;
+
+exports[`VNDB match characterization fan disc against a main game 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 2,
+        "platforms": 1,
+        "title": 4,
+        "type": 0,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Midnight Clocktower Academy",
+      "score": 12,
+    },
+  ],
+  "reason": null,
+  "verdict": "matched",
+  "winner": "Midnight Clocktower Academy",
+}
+`;
+
+exports[`VNDB match characterization fuzzy similar title 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 2,
+        "platforms": 1,
+        "title": 1,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Midnight Clocktower Academy Remastered Edition",
+      "score": 10,
+    },
+  ],
+  "reason": "weak-title",
+  "verdict": "ambiguous",
+  "winner": null,
+}
+`;
+
+exports[`VNDB match characterization incompatible genre 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": -3,
+        "platforms": 1,
+        "title": 4,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Midnight Clocktower Academy",
+      "score": 8,
+    },
+  ],
+  "reason": "genre-mismatch",
+  "verdict": "ambiguous",
+  "winner": null,
+}
+`;
+
+exports[`VNDB match characterization match only through an alternative name 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 2,
+        "platforms": 1,
+        "title": 4,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Clocktower Gakuen",
+      "score": 13,
+    },
+  ],
+  "reason": null,
+  "verdict": "matched",
+  "winner": "Clocktower Gakuen",
+}
+`;
+
+exports[`VNDB match characterization no candidates 1`] = `
+{
+  "candidates": [],
+  "reason": null,
+  "verdict": "absent",
+  "winner": null,
+}
+`;
+
+exports[`VNDB match characterization platform mismatch 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 2,
+        "platforms": -1,
+        "title": 4,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Midnight Clocktower Academy",
+      "score": 11,
+    },
+  ],
+  "reason": null,
+  "verdict": "matched",
+  "winner": "Midnight Clocktower Academy",
+}
+`;
+
+exports[`VNDB match characterization re-edition candidate loses to the original 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 2,
+        "platforms": 1,
+        "title": 2,
+        "type": -1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Midnight Clocktower Academy",
+      "score": 9,
+    },
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 0,
+        "genre": 2,
+        "platforms": 1,
+        "title": 2,
+        "type": 1,
+      },
+      "dateSignal": "unknown",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Midnight Clocktower Academy",
+      "score": 8,
+    },
+  ],
+  "reason": "competing-candidates",
+  "verdict": "ambiguous",
+  "winner": null,
+}
+`;
+
+exports[`VNDB match characterization release dates contradict 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": -4,
+        "genre": 2,
+        "platforms": 1,
+        "title": 4,
+        "type": 1,
+      },
+      "dateSignal": "contradicts",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Midnight Clocktower Academy",
+      "score": 6,
+    },
+  ],
+  "reason": "date-contradicts",
+  "verdict": "ambiguous",
+  "winner": null,
+}
+`;
+
+exports[`VNDB match characterization short title is weak 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 2,
+        "platforms": 1,
+        "title": 1,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Aoi",
+      "score": 10,
+    },
+  ],
+  "reason": "weak-title",
+  "verdict": "ambiguous",
+  "winner": null,
+}
+`;
+
+exports[`VNDB match characterization two identical candidates compete 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 2,
+        "platforms": 1,
+        "title": 2,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Midnight Clocktower Academy",
+      "score": 11,
+    },
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 2,
+        "platforms": 1,
+        "title": 2,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Midnight Clocktower Academy",
+      "score": 11,
+    },
+  ],
+  "reason": "competing-candidates",
+  "verdict": "ambiguous",
+  "winner": null,
+}
+`;
+
+exports[`VNDB match characterization unrelated candidate below threshold 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 0,
+        "date": -4,
+        "genre": -3,
+        "platforms": 1,
+        "title": 0,
+        "type": 1,
+      },
+      "dateSignal": "contradicts",
+      "descriptionSignal": "mismatch",
+      "hasCompanyMismatch": false,
+      "name": "Ocean Pirate Saga",
+      "score": -5,
+    },
+  ],
+  "reason": "below-threshold",
+  "verdict": "absent",
+  "winner": null,
+}
+`;

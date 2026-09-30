@@ -1,3 +1,5 @@
+export const SEARCH_ENGINES_UNAVAILABLE = "Search engines unavailable";
+
 const getSearxngUrl = () => process.env.SEARXNG_URL || "http://localhost:8891";
 
 const search = async <T>(query: string, category?: string): Promise<T[]> => {
@@ -13,7 +15,21 @@ const search = async <T>(query: string, category?: string): Promise<T[]> => {
     );
   }
 
-  return ((await res.json()) as { results?: T[] }).results ?? [];
+  const { results = [], unresponsive_engines: unresponsive = [] } =
+    (await res.json()) as {
+      results?: T[];
+      unresponsive_engines?: [string, string][];
+    };
+
+  if (!results.length && unresponsive.length) {
+    throw new Error(
+      `${SEARCH_ENGINES_UNAVAILABLE}: ${unresponsive
+        .map(([engine, reason]) => `${engine} (${reason})`)
+        .join(", ")}`
+    );
+  }
+
+  return results;
 };
 
 export const searchWeb = async (query: string, count = 10) =>
@@ -30,11 +46,11 @@ export const searchImages = async (query: string, count = 15) =>
       source?: string;
     }>(query, "images")
   )
-    .filter((r) => r.img_src)
+    .filter((r) => r.img_src && !/\.svg(\?|$)/i.test(r.img_src))
     .slice(0, count)
     .map((r) => ({
       title: r.title,
-      img_src: r.img_src,
+      img_src: r.img_src!.startsWith("//") ? `https:${r.img_src}` : r.img_src,
       pageUrl: r.url,
       source: r.source,
     }));

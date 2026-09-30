@@ -18,6 +18,9 @@ import {
   IGameStats,
   IGetGamesStatsResponse,
   IRelatedGamesResponse,
+  IFindGameImagesRequest,
+  IFindGameImagesResponse,
+  IImportGameImageRequest,
 } from "@mooncellar/schemas";
 import agent from "./agent.api";
 import { filesAPI } from "./files.api";
@@ -97,12 +100,25 @@ export const gamesApi = {
     return agent.post<IGameAiDraftRun>(`${GAMES_URL}/ai-drafts`, dto);
   },
 
-  add: (dto: IAddGameRequest) => {
-    return agent.post<IGameResponse>(`${GAMES_URL}/add`, dto);
+  add: (dto: IAddGameRequest, force?: boolean) => {
+    return agent.post<IGameResponse>(`${GAMES_URL}/add`, dto, {
+      params: force ? { force } : undefined,
+    });
   },
 
   update: (id: string, dto: IUpdateGameRequest) => {
     return agent.put<IGameResponse>(`${GAMES_URL}/update/${id}`, dto);
+  },
+
+  findImageCandidates: (dto: IFindGameImagesRequest) => {
+    return agent.post<IFindGameImagesResponse>(
+      `${GAMES_URL}/image-candidates`,
+      dto
+    );
+  },
+
+  importImage: (gameId: string, dto: IImportGameImageRequest) => {
+    return agent.post<string>(`${GAMES_URL}/import-image/${gameId}`, dto);
   },
 
   uploadImage: (

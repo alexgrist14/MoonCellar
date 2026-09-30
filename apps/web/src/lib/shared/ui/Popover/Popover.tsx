@@ -16,6 +16,8 @@ import styles from "./Popover.module.scss";
 import { Box } from "../Box";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
+import { useStatesStore } from "@/src/lib/shared/store/states.store";
+import { PopoverSheet } from "./PopoverSheet";
 
 interface IPopoverProps {
   children: ReactNode;
@@ -33,7 +35,7 @@ interface IPopoverProps {
 const GAP = 8;
 const VIEWPORT_PADDING = 8;
 
-export const Popover: FC<IPopoverProps> = ({
+const AnchoredPopover: FC<IPopoverProps> = ({
   children,
   anchorRef,
   isOpen,
@@ -137,5 +139,15 @@ export const Popover: FC<IPopoverProps> = ({
       </Box>
     </div>,
     connector
+  );
+};
+
+export const Popover: FC<IPopoverProps> = (props) => {
+  const isMobile = useStatesStore((state) => state.isMobile);
+
+  return isMobile ? (
+    <PopoverSheet {...props} />
+  ) : (
+    <AnchoredPopover {...props} />
   );
 };

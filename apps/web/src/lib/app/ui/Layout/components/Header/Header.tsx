@@ -1,4 +1,5 @@
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
+import { useIsAuthHydrated } from "@/src/lib/shared/hooks/useIsAuthHydrated";
 import { AuthModal } from "@/src/lib/shared/ui/AuthModal";
 import { Avatar } from "@/src/lib/shared/ui/Avatar";
 import { Box } from "@/src/lib/shared/ui/Box";
@@ -16,6 +17,7 @@ import {
   SvgInbox,
 } from "@/src/lib/shared/ui/svg";
 import Link from "next/link";
+import Image from "next/image";
 import { FC, MouseEvent, useCallback, useMemo, useRef, useState } from "react";
 import styles from "./Header.module.scss";
 import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
@@ -28,6 +30,7 @@ import classNames from "classnames";
 
 export const Header: FC = () => {
   const { isAuth, isAdmin, profile } = useAuthStore();
+  const isAuthHydrated = useIsAuthHydrated();
 
   const router = useRouter();
 
@@ -128,8 +131,14 @@ export const Header: FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.container__left}>
-        <Link href="/" className={styles.title}>
-          MoonCellar
+        <Link href="/" className={styles.title} aria-label="MoonCellar">
+          <Image
+            src="/images/logo-text.png"
+            alt="MoonCellar"
+            width={747}
+            height={165}
+            priority
+          />
         </Link>
         <Separator />
         <div className={styles.nav_mobile}>
@@ -182,7 +191,7 @@ export const Header: FC = () => {
         </div>
       </div>
       <div className={styles.container__right}>
-        {isAuth && (
+        {isAuthHydrated && isAuth && (
           <ButtonGroup
             wrapperClassName={classNames(
               styles.container__buttons,
@@ -218,13 +227,15 @@ export const Header: FC = () => {
             ]}
           />
         )}
-        <Link
-          href={`/user/${profile?.userName}`}
-          onClick={handleProfileClick}
-          className={styles.profile__link}
-        >
-          <Avatar user={profile} isWithoutTooltip priority />
-        </Link>
+        {isAuthHydrated && (
+          <Link
+            href={`/user/${profile?.userName}`}
+            onClick={handleProfileClick}
+            className={styles.profile__link}
+          >
+            <Avatar user={profile} isWithoutTooltip priority />
+          </Link>
+        )}
       </div>
     </div>
   );

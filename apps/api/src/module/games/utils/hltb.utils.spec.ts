@@ -1,4 +1,5 @@
 import {
+  findAmbiguousHltbEntries,
   buildHltbSearchQueries,
   buildIncrementalHltbFilter,
   buildMissingHltbFilter,
@@ -564,5 +565,36 @@ describe("hltb.utils", () => {
         ],
       });
     });
+  });
+});
+
+describe("findAmbiguousHltbEntries", () => {
+  const ctx = {
+    name: "The Incredible Hulk",
+    platformKeys: new Set<string>(),
+    years: new Set([2008]),
+  };
+
+  it("offers every same-title entry the rules could not tell apart", () => {
+    const entries = [
+      { id: 1, name: "The Incredible Hulk", releaseYear: 2008 },
+      { id: 2, name: "The Incredible Hulk", releaseYear: 2008 },
+      { id: 3, name: "Hulk", releaseYear: 2003 },
+    ];
+
+    expect(findAmbiguousHltbEntries(entries, ctx).map(({ id }) => id)).toEqual([
+      1, 2,
+    ]);
+  });
+
+  it("drops an entry whose release year belongs to a different game", () => {
+    const entries = [
+      { id: 1, name: "The Incredible Hulk", releaseYear: 2008 },
+      { id: 4, name: "The Incredible Hulk", releaseYear: 1994 },
+    ];
+
+    expect(findAmbiguousHltbEntries(entries, ctx).map(({ id }) => id)).toEqual([
+      1,
+    ]);
   });
 });

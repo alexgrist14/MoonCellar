@@ -1,53 +1,52 @@
 .textarea {
+  --textarea-line-height: 18px;
+  --textarea-padding-block: var(--padding-x4);
+  --textarea-padding-inline: var(--padding-x3);
+  --textarea-border: 2px;
+
   width: 100%;
   position: relative;
   display: grid;
   height: fit-content;
 
-  &__replica {
-    @include font(16px, 18px, 400);
-    white-space: pre-wrap;
+  &__field,
+  &__mirror {
+    @include font(16px, var(--textarea-line-height), 400);
+
     width: 100%;
-    height: 100%;
-    height: fit-content;
-    padding: var(--padding-x4) var(--padding-x3);
+    min-height: calc(
+      var(--textarea-rows, 1) * var(--textarea-line-height) + 2 *
+        var(--textarea-padding-block) + 2 * var(--textarea-border)
+    );
+    padding: var(--textarea-padding-block) var(--textarea-padding-inline);
+    border: var(--textarea-border) solid transparent;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+
+  &__mirror {
     position: absolute;
+    top: 0;
+    left: 0;
     visibility: hidden;
-    pointer-events: none;
-    min-height: 48px;
-    max-height: 40vh;
-    overflow: hidden;
-  }
-
-  &__wrapper {
-    @include flexCenter;
-    position: absolute;
-    bottom: 2px;
-    right: 0;
-    width: 20px;
-    height: 20px;
-    cursor: row-resize;
-  }
-
-  &__corner {
     pointer-events: none;
   }
 
   &__field {
-    @include font(16px, 18px, 400);
-    width: 100%;
-    height: 100%;
-    min-height: 48px;
-    max-height: 40vh;
-    padding: var(--padding-x4) var(--padding-x3);
+    max-height: 80vh;
     outline: none;
     border-radius: var(--radius-x2);
     background: var(--color-bg-primary);
-    color: var(--color-neutral-100);
-    border: 2px solid transparent;
-    transition: border 0.15s ease-out;
+    color: var(--color-text-primary);
+    transition:
+      border-color var(--duration-fast) var(--easing-out),
+      height var(--duration-fast) var(--easing-out);
     scrollbar-width: none;
     resize: none;
+
+    @include reducedMotion {
+      transition-duration: var(--duration-instant);
+    }
 
     &::-webkit-scrollbar-track,
     &::-webkit-scrollbar-thumb {
@@ -55,7 +54,7 @@
     }
 
     &::placeholder {
-      color: var(--color-gray);
+      color: var(--color-text-muted);
     }
 
     &:hover {
@@ -69,6 +68,54 @@
     &_error {
       border-color: var(--color-negative);
     }
+
+    &_sized {
+      overflow-y: auto;
+    }
+
+    &_withHandle {
+      padding-bottom: calc(
+        var(--textarea-padding-block) + var(--textarea-handle-size) / 2
+      );
+    }
+
+    &_dragging {
+      transition: border-color var(--duration-fast) var(--easing-out);
+    }
+  }
+
+  &__handle {
+    position: absolute;
+    right: var(--textarea-border);
+    bottom: var(--textarea-border);
+    width: var(--textarea-handle-size);
+    height: var(--textarea-handle-size);
+    border-radius: var(--radius-x2);
+    color: var(--color-text-muted);
+    cursor: ns-resize;
+    touch-action: none;
+    opacity: 0.6;
+    transition:
+      opacity var(--duration-fast) var(--easing-out),
+      color var(--duration-fast) var(--easing-out);
+
+    @include flexCenter;
+
+    &:hover,
+    &:focus-visible,
+    &_active {
+      opacity: 1;
+      color: var(--color-accent);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: -2px;
+    }
+  }
+
+  &__icon {
+    pointer-events: none;
   }
 
   &__error {

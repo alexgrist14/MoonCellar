@@ -1,7 +1,11 @@
 import type { ILogChanges } from "@mooncellar/schemas";
 import { isEmptyLog, mergeLogChanges } from "./user-logs.utils";
 
-const playing = { category: "playing", isMastered: false, platform: "PC" } as const;
+const playing = {
+  category: "playing",
+  isMastered: false,
+  platform: "PC",
+} as const;
 const completed = { ...playing, category: "completed", time: 40 } as const;
 const mastered = { ...completed, isMastered: true } as const;
 
@@ -25,7 +29,9 @@ describe("mergeLogChanges", () => {
   it("drops an update that changes nothing", () => {
     expect(
       isEmptyLog(
-        fold({ playthrough: { action: "updated", before: playing, after: playing } })
+        fold({
+          playthrough: { action: "updated", before: playing, after: playing },
+        })
       )
     ).toBe(true);
   });
@@ -34,7 +40,9 @@ describe("mergeLogChanges", () => {
     expect(
       fold(
         { playthrough: { action: "added", after: playing } },
-        { playthrough: { action: "updated", before: playing, after: completed } }
+        {
+          playthrough: { action: "updated", before: playing, after: completed },
+        }
       )
     ).toEqual({ playthrough: { action: "added", after: completed } });
   });
@@ -54,8 +62,20 @@ describe("mergeLogChanges", () => {
     expect(
       isEmptyLog(
         fold(
-          { playthrough: { action: "updated", before: playing, after: completed } },
-          { playthrough: { action: "updated", before: completed, after: playing } }
+          {
+            playthrough: {
+              action: "updated",
+              before: playing,
+              after: completed,
+            },
+          },
+          {
+            playthrough: {
+              action: "updated",
+              before: completed,
+              after: playing,
+            },
+          }
         )
       )
     ).toBe(true);
@@ -64,7 +84,9 @@ describe("mergeLogChanges", () => {
   it("keeps the removed state of a removal", () => {
     expect(
       fold(
-        { playthrough: { action: "updated", before: playing, after: completed } },
+        {
+          playthrough: { action: "updated", before: playing, after: completed },
+        },
         { playthrough: { action: "removed", before: completed } }
       )
     ).toEqual({ playthrough: { action: "removed", before: completed } });
@@ -84,11 +106,16 @@ describe("mergeLogChanges", () => {
 
   it("keeps the first previous rating across changes", () => {
     expect(
-      fold({ rating: { value: 8, previous: 6 } }, { rating: { value: 9, previous: 8 } })
+      fold(
+        { rating: { value: 8, previous: 6 } },
+        { rating: { value: 9, previous: 8 } }
+      )
     ).toEqual({ rating: { value: 9, previous: 6 } });
   });
 
   it("cancels a favourite added and removed in one log", () => {
-    expect(isEmptyLog(fold({ favorite: true }, { favorite: false }))).toBe(true);
+    expect(isEmptyLog(fold({ favorite: true }, { favorite: false }))).toBe(
+      true
+    );
   });
 });

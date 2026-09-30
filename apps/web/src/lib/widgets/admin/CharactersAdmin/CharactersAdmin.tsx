@@ -2,16 +2,17 @@
 
 import { FC, useState } from "react";
 import { useDebounce } from "use-debounce";
+import { useRouter } from "next/navigation";
 import { ICharacterResponse, ICharacterSource } from "@mooncellar/schemas";
 import { useAdminCharactersQuery } from "@/src/lib/entities/character/api";
 import { CharacterPortrait } from "@/src/lib/entities/character/ui/CharacterPortrait";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Input } from "@/src/lib/shared/ui/Input";
-import { Loader } from "@/src/lib/shared/ui/Loader";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
+import { Table } from "@/src/lib/shared/ui/Table";
+import { ITableCell } from "@/src/lib/shared/types/table.type";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
-import { CharacterEditor } from "./CharacterEditor";
 import styles from "./CharactersAdmin.module.scss";
 
 const TAKE = 30;
@@ -30,7 +31,7 @@ export const CharactersAdmin: FC = () => {
   const [debouncedSearch] = useDebounce(search.trim(), 300);
   const [source, setSource] = useState<ICharacterSource>();
   const [page, setPage] = useState(1);
-  const [selected, setSelected] = useState<ICharacterResponse | "new">();
+  const router = useRouter();
 
   const { data, isLoading, isFetching } = useAdminCharactersQuery({
     search: debouncedSearch || undefined,
@@ -40,7 +41,7 @@ export const CharactersAdmin: FC = () => {
   });
 
   const characters = data?.results ?? [];
-  const selectedId = selected === "new" ? undefined : selected?._id;
+  const openEditor = (id = "new") => router.push(`/admin/characters/${id}`);
 
   return (
     <div className={styles.admin}>
@@ -58,92 +59,104 @@ export const CharactersAdmin: FC = () => {
           theme="segmented"
           ariaLabel="Source"
           contents={SOURCES.map((item) => ({
-            tabName: item ? (item === "manual" ? "Manual" : item.toUpperCase()) : "All",
+            tabName: item
+              ? item === "manual"
+                ? "Manual"
+                : item.toUpperCase()
+              : "All",
             onTabClick: () => {
               setSource(item);
               setPage(1);
             },
           }))}
         />
-        <Button color={ButtonColor.ACCENT} onClick={() => setSelected("new")}>
+        <Button color={ButtonColor.GREEN} onClick={() => openEditor()}>
           New character
         </Button>
       </div>
 
-      {!!selected && (
-        <CharacterEditor
-          key={selectedId ?? "new"}
-          character={selected === "new" ? undefined : selected}
-          onSaved={setSelected}
-          onClose={() => setSelected(undefined)}
-        />
-      )}
+      <Table
+        mobileHeadField="character"
+        isLoading={isLoading}
+        limit={TAKE}
+        columnStyles={{
+          character: { width: "320px", minWidth: "220px" },
+          games: { width: "100px", minWidth: "90px" },
+          portrait: { width: "110px", minWidth: "100px" },
+          source: { width: "110px", minWidth: "100px" },
+          updated: { width: "130px", minWidth: "120px" },
+        }}
+        headers={{
+          character: { content: "Character" },
+          games: { content: "Games" },
+          portrait: { content: "Portrait" },
+          source: { content: "Source" },
+          updated: { content: "Updated" },
+        }}
+        rows={characters.map((character) => {
+          const open = () => openEditor(character._id);
+          const cells: Record<string, ITableCell> = {
+            character: {
+              sortingValue: character.name,
+              content: (
+                <div className={styles.who}>
+                  <CharacterPortrait
+                    character={character}
+                    sizes="40px"
+                    className={styles.who__portrait}
+                  />
+                  <div>
+                    <b>{character.name}</b>
+                    {!!character.akas?.length && (
+                      <span>{character.akas.slice(0, 2).join(", ")}</span>
+                    )}
+                  </div>
+                </div>
+              ),
+            },
+            games: {
+              sortingValue: character.gameIds?.length ?? 0,
+              content: String(character.gameIds?.length ?? 0),
+            },
+            portrait: {
+              sortingValue: character.mugShot ? 1 : 0,
+              content: character.mugShot ? (
+                "Yes"
+              ) : (
+                <span className={styles.muted}>Missing</span>
+              ),
+            },
+            source: {
+              sortingValue: getCharacterSource(character),
+              content: (
+                <span className={styles.source}>
+                  {getCharacterSource(character)}
+                </span>
+              ),
+            },
+            updated: {
+              sortingValue: character.updatedAt ?? "",
+              content: (
+                <span className={styles.muted}>
+                  {character.updatedAt
+                    ? commonUtils.formatDate(character.updatedAt)
+                    : "—"}
+                </span>
+              ),
+            },
+          };
 
-      {isLoading ? (
-        <div className={styles.loading}>
-          <Loader />
-        </div>
-      ) : (
-        <div className={styles.table}>
-          <table>
-            <thead>
-              <tr>
-                <th>Character</th>
-                <th>Games</th>
-                <th>Portrait</th>
-                <th>Source</th>
-                <th>Updated</th>
-              </tr>
-            </thead>
-            <tbody>
-              {characters.map((character) => (
-                <tr
-                  key={character._id}
-                  aria-selected={character._id === selectedId}
-                  tabIndex={0}
-                  onClick={() => setSelected(character)}
-                  onKeyDown={(event) =>
-                    event.key === "Enter" && setSelected(character)
-                  }
-                >
-                  <td>
-                    <div className={styles.who}>
-                      <CharacterPortrait
-                        character={character}
-                        sizes="40px"
-                        className={styles.who__portrait}
-                      />
-                      <div>
-                        <b>{character.name}</b>
-                        {!!character.akas?.length && (
-                          <span>{character.akas.slice(0, 2).join(", ")}</span>
-                        )}
-                      </div>
-                    </div>
-                  </td>
-                  <td>{character.gameIds?.length ?? 0}</td>
-                  <td className={character.mugShot ? undefined : styles.muted}>
-                    {character.mugShot ? "Yes" : "Missing"}
-                  </td>
-                  <td>
-                    <span className={styles.source}>
-                      {getCharacterSource(character)}
-                    </span>
-                  </td>
-                  <td className={styles.muted}>
-                    {character.updatedAt
-                      ? commonUtils.formatDate(character.updatedAt)
-                      : "—"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {!characters.length && (
-            <p className={styles.muted}>No characters match.</p>
-          )}
-        </div>
-      )}
+          return Object.fromEntries(
+            Object.entries(cells).map(([key, cell]) => [
+              key,
+              { ...cell, className: styles.rowClickable, onClick: open },
+            ])
+          ) as Record<
+            "character" | "games" | "portrait" | "source" | "updated",
+            ITableCell
+          >;
+        })}
+      />
 
       <Pagination
         take={TAKE}

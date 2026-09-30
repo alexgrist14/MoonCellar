@@ -1,41 +1,51 @@
 import * as fuzzysort from "fuzzysort";
 import { getFormattedTitle } from "../../../shared/utils";
-import { RA_NAME_MATCH_THRESHOLD } from "../constants/sync";
+import {
+  RA_CONFLICT_CANDIDATES_LIMIT,
+  RA_NAME_MATCH_THRESHOLD,
+} from "../constants/sync";
 
 export type MatchableGame = { name: string };
 
-export const matchGameByTitle = <T extends MatchableGame>(
+export const rankGamesByTitle = <T extends MatchableGame>(
   raTitle: string,
   candidates: T[],
-  threshold = RA_NAME_MATCH_THRESHOLD
-): T | null => {
-  if (!candidates.length) return null;
+  threshold = RA_NAME_MATCH_THRESHOLD,
+  limit = RA_CONFLICT_CANDIDATES_LIMIT
+): { game: T; score: number }[] => {
+  if (!candidates.length) return [];
 
   const targets = candidates.map((game) => ({
     game,
     name: getFormattedTitle(game.name),
   }));
 
-  const titleVariants = raTitle
-    .split("|")
-    .map((title) => getFormattedTitle(title));
+  const best = new Map<T, number>();
 
-  let best: { game: T; score: number } | null = null;
-
-  for (const variant of titleVariants) {
-    const [result] = fuzzysort.go(variant, targets, {
+  for (const variant of raTitle.split("|").map(getFormattedTitle)) {
+    for (const result of fuzzysort.go(variant, targets, {
       key: "name",
-      limit: 1,
+      limit,
       threshold,
-    });
+    })) {
+      const { game } = result.obj;
 
-    if (result && (!best || result.score > best.score)) {
-      best = { game: result.obj.game, score: result.score };
+      if ((best.get(game) ?? -1) < result.score) best.set(game, result.score);
     }
   }
 
-  return best?.game ?? null;
+  return [...best]
+    .map(([game, score]) => ({ game, score }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit);
 };
+
+export const matchGameByTitle = <T extends MatchableGame>(
+  raTitle: string,
+  candidates: T[],
+  threshold = RA_NAME_MATCH_THRESHOLD
+): T | null =>
+  rankGamesByTitle(raTitle, candidates, threshold)[0]?.game ?? null;
 
 export type NamedConsole = { name: string };
 

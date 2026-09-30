@@ -22,15 +22,12 @@ const STATUSES: IContentRequestStatus[] = [
   "rejected",
   "withdrawn",
 ];
-const KINDS: (IContentRequestKind | undefined)[] = [
-  undefined,
-  "game",
-  "character",
-];
+interface IRequestsReviewProps {
+  kind: IContentRequestKind;
+}
 
-export const RequestsReview: FC = () => {
+export const RequestsReview: FC<IRequestsReviewProps> = ({ kind }) => {
   const [status, setStatus] = useState<IContentRequestStatus>("pending");
-  const [kind, setKind] = useState<IContentRequestKind>();
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string>();
 
@@ -63,17 +60,6 @@ export const RequestsReview: FC = () => {
                 },
               }))}
             />
-            <Tabs
-              theme="segmented"
-              ariaLabel="Kind"
-              contents={KINDS.map((item) => ({
-                tabName: item ? `${commonUtils.upFL(item)}s` : "All",
-                onTabClick: () => {
-                  setKind(item);
-                  setPage(1);
-                },
-              }))}
-            />
           </div>
           {isSwitching && (
             <div className={styles.loading}>
@@ -95,9 +81,7 @@ export const RequestsReview: FC = () => {
                   <span className={styles.queue__name}>
                     {getRequestTitle(request)}
                   </span>
-                  <span className={styles.queue__kind}>
-                    {request.kind} · {request.action}
-                  </span>
+                  <span className={styles.queue__kind}>{request.action}</span>
                   <span className={styles.queue__meta}>
                     {request.userName ?? "unknown"} ·{" "}
                     {commonUtils.getHumanDate(request.createdAt)}

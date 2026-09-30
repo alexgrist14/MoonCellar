@@ -13,7 +13,7 @@ export const Cover: FC<CoverProps> = ({ className, isWithoutText, style }) => {
       <div className={styles.cover__image}>
         <Image
           alt=""
-          src={"/images/favicon.ico"}
+          src="/images/logo-full.png"
           fill
           sizes="(max-width: 480px) 140px, 240px"
         />

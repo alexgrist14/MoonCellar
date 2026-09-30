@@ -19,6 +19,8 @@ import { IRelatedGameKey } from "@mooncellar/schemas";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { getRequestTitle } from "@/src/lib/entities/request/model/request.utils";
 import styles from "./RequestsReview.module.scss";
+import { confirmPossibleDuplicates } from "@/src/lib/entities/game/ui/PossibleDuplicates";
+import { getPossibleDuplicates } from "@/src/lib/shared/utils/possible-duplicates.utils";
 
 const FIELD_LABELS: Record<string, string> = {
   name: "Name",
@@ -249,7 +251,7 @@ export const RequestReviewPanel: FC<{ requestId: string }> = ({
     return items.join(", ");
   };
 
-  const handleDecision = (decision: "approve" | "reject") => {
+  const handleDecision = (decision: "approve" | "reject", force?: boolean) => {
     if (decision === "reject" && !reason.trim()) {
       toast.error({ description: "Write a reason for the author first" });
       return;
@@ -263,9 +265,19 @@ export const RequestReviewPanel: FC<{ requestId: string }> = ({
           fields: decision === "approve" ? applied : undefined,
           reason: reason.trim() || undefined,
           lockSync: decision === "approve" && lockSync ? true : undefined,
+          force,
         },
       },
       {
+        onError: (error) => {
+          const duplicates = getPossibleDuplicates(error);
+
+          if (duplicates) {
+            confirmPossibleDuplicates(duplicates, () =>
+              handleDecision("approve", true)
+            );
+          }
+        },
         onSuccess: async ({ request: decided, failedImages, warnings }) => {
           toast.success({
             description:

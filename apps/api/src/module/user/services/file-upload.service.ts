@@ -18,7 +18,10 @@ import {
   type IGetFileResponse,
 } from "@mooncellar/schemas";
 import { mimeToExt } from "../../../shared/constants";
-import { downloadRemoteImage } from "../../../shared/remote-image";
+import {
+  downloadRemoteImage,
+  type IRemoteFetchOptions,
+} from "../../../shared/remote-image";
 import {
   getS3Bucket,
   getS3CdnUrl,
@@ -126,8 +129,13 @@ export class FileService {
     return this.getPublicUrl(folder, storedKey);
   }
 
-  async uploadRemoteImage(url: string, key: string, folder: S3Folder) {
-    const image = await downloadRemoteImage(url);
+  async uploadRemoteImage(
+    url: string,
+    key: string,
+    folder: S3Folder,
+    options?: IRemoteFetchOptions
+  ) {
+    const image = await downloadRemoteImage(url, options);
     const storedKey = await this.uploadFile(
       image as Express.Multer.File,
       key,

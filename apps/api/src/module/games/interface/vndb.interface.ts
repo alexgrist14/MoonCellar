@@ -1,13 +1,9 @@
-import mongoose from "mongoose";
-import {
-  type IExternalPageField,
-  type IVndbDateSignal,
-  type IVndbDescriptionSignal,
-  type IVndbMatchReason,
-  type IVndbScoreBreakdown,
-} from "@mooncellar/schemas";
-import { Game } from "../schemas/game.schema";
+import { type IExternalPageField } from "@mooncellar/schemas";
 import { type IVndbTitles } from "../services/vndb.service";
+import type {
+  IMatchResult,
+  TMatchCandidate,
+} from "../matching/game-matcher.types";
 
 export type TFieldStatus = 0 | 1 | 2;
 
@@ -23,56 +19,21 @@ export type TVndbFilter = [
   value: TVndbFilterValue,
 ];
 export type TVndbFilters = ["or" | "and", ...TVndbFilter[]];
-export type TVndbCandidate = Pick<
-  Game,
-  | "name"
-  | "slug"
-  | "nameNormalized"
-  | "type"
-  | "genres"
-  | "first_release"
-  | "release_dates"
-  | "alternative_names"
-  | "companies"
-  | "platformIds"
-  | "summary"
-> & { _id: mongoose.Types.ObjectId };
+export type {
+  IScoreBreakdown,
+  IScoredCandidate,
+  TDateSignal,
+  TDescriptionSignal,
+  TMatchReason,
+  TMatchVerdict,
+} from "../matching/game-matcher.types";
+export type TVndbCandidate = TMatchCandidate;
 
-export type TDateSignal = IVndbDateSignal;
-export type TDescriptionSignal = IVndbDescriptionSignal;
-export type TMatchReason = IVndbMatchReason;
-export type TMatchVerdict = "matched" | "ambiguous" | "absent";
-export type IScoreBreakdown = IVndbScoreBreakdown;
-
-export interface IScoredCandidate {
-  game: TVndbCandidate;
-  score: number;
-  dateSignal: TDateSignal;
-  breakdown: IScoreBreakdown;
-  isDistinctiveTitle: boolean;
-  isMainTitleMatch: boolean;
-  isCorroborated: boolean;
-  isContradicted: boolean;
-  hasCompanyMismatch: boolean;
-  descriptionSignal: TDescriptionSignal;
-}
-
-export interface IScoreContext {
-  platformSlugById: Map<string, string>;
-  sharedTitles: Set<string>;
-}
-
-export interface IVnMatch {
+export interface IVnMatch extends IMatchResult {
   vnId: string;
   vnName: string;
-  verdict: TMatchVerdict;
-  reason: TMatchReason | null;
-  winner: TVndbCandidate | null;
-  candidates: IScoredCandidate[];
   vndb: IVndbTitles;
 }
-
-export type TCandidatesByVn = Map<string, TVndbCandidate[]>;
 
 export interface IVnReleaseSignals {
   publishers: string[];

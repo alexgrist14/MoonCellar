@@ -37,7 +37,9 @@ export const RoyalGamesSuccessSchema = z.object({
   rejected: z
     .string()
     .array()
-    .describe("Requested games missing from the list: unknown or over the limit"),
+    .describe(
+      "Requested games missing from the list: unknown or over the limit"
+    ),
 });
 
 export const RoyalGamesFailureSchema = z.object({

@@ -4,6 +4,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  ServiceUnavailableException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { Model } from "mongoose";
@@ -11,6 +12,10 @@ import { Character, type CharacterDocument } from "../schemas/character.schema";
 import { Game, type GameDocument } from "../schemas/game.schema";
 import { User } from "../../user/schemas/user.schema";
 import {
+  CHARACTER_PORTRAIT_CANDIDATES_MAX,
+  PAGE_IMAGE_CANDIDATES_MAX,
+  type IFindCharacterPortraitsRequest,
+  type IFindCharacterPortraitsResponse,
   type IGetAdminCharactersQuery,
   type IGetAdminCharactersResponse,
   type IGetCharacterBySlugRequest,
@@ -20,9 +25,18 @@ import {
 import { FileService } from "../../user/services/file-upload.service";
 import { S3_FOLDERS } from "../../../shared/s3";
 import { uniqueSlug } from "../../../shared/utils";
+import { searchImages } from "../../../shared/searxng";
+import {
+  downloadRemoteImage,
+  findPageImages,
+  isHttpUrl,
+} from "../../../shared/remote-image";
 import { escapeRegExp } from "../../collections/utils/collections.utils";
 
 const DEFAULT_CHARACTERS_TAKE = 50;
+
+const PORTRAIT_SEARCH_LIMIT = 20;
+const ADMIN_FETCH = { useSessions: true };
 
 @Injectable()
 export class CharactersService {
@@ -36,6 +50,49 @@ export class CharactersService {
     private Users: Model<User>,
     private fileService: FileService
   ) {}
+
+  async findPortraits({
+    query,
+  }: IFindCharacterPortraitsRequest): Promise<IFindCharacterPortraitsResponse> {
+    if (isHttpUrl(query)) {
+      return {
+        urls: await findPageImages(
+          query,
+          PAGE_IMAGE_CANDIDATES_MAX,
+          ADMIN_FETCH
+        ).catch((err: Error) => {
+          throw new BadRequestException(
+            `Could not read ${query}: ${err.message}`
+          );
+        }),
+      };
+    }
+
+    const results = await searchImages(query, PORTRAIT_SEARCH_LIMIT).catch(
+      (err: Error) => {
+        this.logger.error(err, `Portrait search failed: ${query}`);
+        throw new ServiceUnavailableException(
+          `Image search failed: ${err.message}`
+        );
+      }
+    );
+    const checked = await Promise.all(
+      results.map(({ img_src }) =>
+        img_src
+          ? downloadRemoteImage(img_src, ADMIN_FETCH)
+              .then(() => img_src)
+              .catch(() => null)
+          : null
+      )
+    );
+
+    return {
+      urls: [...new Set(checked.filter((url): url is string => !!url))].slice(
+        0,
+        CHARACTER_PORTRAIT_CANDIDATES_MAX
+      ),
+    };
+  }
 
   async getCharacters(params: IGetCharactersRequest) {
     try {
@@ -148,7 +205,9 @@ export class CharactersService {
 
     if (gameIds) {
       const found = await this.Games.find({
-        _id: { $in: gameIds.map((gameId) => new mongoose.Types.ObjectId(gameId)) },
+        _id: {
+          $in: gameIds.map((gameId) => new mongoose.Types.ObjectId(gameId)),
+        },
       })
         .select("_id")
         .lean();
@@ -161,7 +220,8 @@ export class CharactersService {
         set.mugShot = await this.fileService.uploadRemoteImage(
           mugShotUrl,
           `${characterId}/${new mongoose.Types.ObjectId()}`,
-          S3_FOLDERS.characters
+          S3_FOLDERS.characters,
+          ADMIN_FETCH
         );
       } catch (err) {
         throw new BadRequestException(

@@ -15,6 +15,8 @@ import { FileService } from "../user/services/file-upload.service";
 import { HttpModule } from "@nestjs/axios";
 import { SyncState, SyncStateSchema } from "../games/schemas/sync-state.schema";
 import { MetricsModule } from "../metrics/metrics.module";
+import { ConflictsModule } from "../conflicts/conflicts.module";
+import { MatchingModule } from "../games/matching/matching.module";
 
 @Module({
   controllers: [IgdbParserController],
@@ -29,6 +31,8 @@ import { MetricsModule } from "../metrics/metrics.module";
       { name: SyncState.name, schema: SyncStateSchema },
     ]),
     MetricsModule,
+    ConflictsModule,
+    MatchingModule,
   ],
 })
 export class IgdbModule {}

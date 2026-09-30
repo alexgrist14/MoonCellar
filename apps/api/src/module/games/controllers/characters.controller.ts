@@ -28,7 +28,12 @@ import { RolesEnum } from "@mooncellar/schemas";
 import { RolesGuard } from "../../roles/roles.guard";
 import { Roles } from "../../roles/roles.decorator";
 import { CharactersService } from "../services/characters.service";
+import { GameAiDraftService } from "../services/game-ai-draft.service";
 import {
+  FindCharacterPortraitsDto,
+  FindCharacterPortraitsResponseDto,
+  CharacterAiDraftDto,
+  CharacterAiDraftRunDto,
   CharacterResponseDto,
   GetCharacterBySlugDto,
   GetCharactersDto,
@@ -43,7 +48,10 @@ import {
 @ApiTags("Characters")
 @Controller("characters")
 export class CharactersController {
-  constructor(private readonly characters: CharactersService) {}
+  constructor(
+    private readonly characters: CharactersService,
+    private readonly aiDrafts: GameAiDraftService
+  ) {}
 
   @Get("/")
   @ApiOperation({ summary: "Get characters" })
@@ -60,6 +68,66 @@ export class CharactersController {
   @Roles(RolesEnum.ADMIN)
   async getAdminCharacters(@Query() query: GetAdminCharactersDto) {
     return this.characters.getAdminCharacters(query as never);
+  }
+
+  @Post("/portraits")
+  @ApiOperation({
+    summary:
+      "Search images for a character portrait and return the links that download",
+  })
+  @ApiOkResponse({ type: FindCharacterPortraitsResponseDto })
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), RolesGuard)
+  @Roles(RolesEnum.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  async findPortraits(@Body() dto: FindCharacterPortraitsDto) {
+    return this.characters.findPortraits(dto);
+  }
+
+  @Get("/ai-drafts")
+  @ApiOperation({ summary: "Get the latest AI character draft runs" })
+  @ApiOkResponse({ type: [CharacterAiDraftRunDto] })
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), RolesGuard)
+  @Roles(RolesEnum.ADMIN)
+  async getAiDrafts() {
+    return this.aiDrafts.getRuns("character");
+  }
+
+  @Post("/ai-drafts")
+  @ApiOperation({
+    summary: "Start an AI character draft",
+    description:
+      "Researches a character by name or link with OpenAI in the background and returns the run; poll GET /characters/ai-drafts for its status and the unsaved character payload.",
+  })
+  @ApiOkResponse({ type: CharacterAiDraftRunDto })
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), RolesGuard)
+  @Roles(RolesEnum.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  async startAiDraft(@Body() dto: CharacterAiDraftDto) {
+    return this.aiDrafts.startRun(dto.query, "character", dto.count);
+  }
+
+  @Post("/ai-drafts/:id/retry")
+  @ApiOperation({ summary: "Run a finished AI character draft again" })
+  @ApiOkResponse({ type: CharacterAiDraftRunDto })
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), RolesGuard)
+  @Roles(RolesEnum.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  async retryAiDraft(@Param("id") id: string) {
+    return this.aiDrafts.retryRun(id);
+  }
+
+  @Delete("/ai-drafts/:id")
+  @ApiOperation({ summary: "Delete a finished AI character draft run" })
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), RolesGuard)
+  @Roles(RolesEnum.ADMIN)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteAiDraft(@Param("id") id: string) {
+    return this.aiDrafts.deleteRun(id);
   }
 
   @Post("/")
@@ -79,7 +147,10 @@ export class CharactersController {
   @ApiCookieAuth()
   @UseGuards(AuthGuard("jwt"), RolesGuard)
   @Roles(RolesEnum.ADMIN)
-  async updateCharacter(@Param("id") id: string, @Body() dto: SaveCharacterDto) {
+  async updateCharacter(
+    @Param("id") id: string,
+    @Body() dto: SaveCharacterDto
+  ) {
     return this.characters.saveCharacter(id, dto);
   }
 

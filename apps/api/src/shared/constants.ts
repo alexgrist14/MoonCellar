@@ -19,6 +19,7 @@ export const mimeToExt = {
   'image/png': 'png',
   'image/gif': 'gif',
   'image/webp': 'webp',
+  'image/avif': 'avif',
   'application/pdf': 'pdf',
   'application/msword': 'doc',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',

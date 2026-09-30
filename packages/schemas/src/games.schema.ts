@@ -288,8 +288,8 @@ export const GameSchema = z.object({
   name: z.string(),
   type: z.string(),
   cover: z.string().nullable(),
-  storyline: z.string().optional(),
-  summary: z.string().optional(),
+  storyline: z.string().nullable().optional(),
+  summary: z.string().nullable().optional(),
   modes: z.string().array().optional(),
   genres: z.string().array().optional(),
   keywords: z.string().array().optional(),
@@ -484,6 +484,38 @@ export const GameAiDraftRunSchema = z.object({
 
 export const GetCustomGameResponseSchema = GameSchema.array();
 
+export const GAME_IMAGE_KINDS = ["cover", "screenshots", "artworks"] as const;
+export const GAME_IMAGE_CANDIDATES_MAX = 12;
+export const PAGE_IMAGE_CANDIDATES_MAX = 40;
+
+export const FindGameImagesRequestSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1)
+    .max(2048)
+    .describe("Game name, or a page link to take the images from"),
+  kind: z.enum(GAME_IMAGE_KINDS).describe("What to look for"),
+  steamAppId: z
+    .string()
+    .regex(/^\d+$/)
+    .optional()
+    .describe("Steam app id, when the game is on Steam"),
+});
+
+export const FindGameImagesResponseSchema = z.object({
+  urls: z
+    .string()
+    .array()
+    .max(PAGE_IMAGE_CANDIDATES_MAX)
+    .describe("Image links that downloaded, best sources first"),
+});
+
+export const ImportGameImageRequestSchema = z.object({
+  url: z.string().url().max(2048).describe("Image to copy into storage"),
+  type: z.enum(["cover", "screenshot", "artwork"]),
+});
+
 export const RelatedGameKeySchema = RelatedGamesSchema.keyof();
 
 export const GetRelatedGamesResponseSchema = z.partialRecord(
@@ -557,3 +589,13 @@ export type IGetRandomGameSlugResponse = z.infer<
 >;
 
 export type IGenreResponse = { genre: string; count: number };
+export type IGameImageKind = (typeof GAME_IMAGE_KINDS)[number];
+export type IFindGameImagesRequest = z.infer<
+  typeof FindGameImagesRequestSchema
+>;
+export type IFindGameImagesResponse = z.infer<
+  typeof FindGameImagesResponseSchema
+>;
+export type IImportGameImageRequest = z.infer<
+  typeof ImportGameImageRequestSchema
+>;

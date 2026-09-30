@@ -1,14 +1,11 @@
 import { FC } from "react";
-import Link from "next/link";
-import classNames from "classnames";
 import {
   ICommentReportAction,
   ICommentReportGroup,
   ICommentReportResolution,
-  ICommentStatus,
 } from "@mooncellar/schemas";
+import { ModeratedComment } from "@/src/lib/entities/comment/ui/ModeratedComment";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
-import { RichText } from "@/src/lib/shared/ui/RichText";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import styles from "./ReportList.module.scss";
 
@@ -17,12 +14,6 @@ interface IReportCardProps {
   isBusy: boolean;
   onResolve: (action: ICommentReportAction) => void;
 }
-
-const STATUS_LABELS: Record<ICommentStatus, string> = {
-  visible: "Visible",
-  hidden: "Hidden",
-  deleted: "Deleted",
-};
 
 const RESOLUTION_LABELS: Record<ICommentReportResolution, string> = {
   hidden: "Hidden",
@@ -42,67 +33,14 @@ export const ReportCard: FC<IReportCardProps> = ({
   const isOpen = !resolution;
   const hiddenReporters = report.reportsCount - report.reporters.length;
   const isResolvedByAuthor =
-    !!report.resolvedBy &&
-    report.resolvedBy._id === comment?.author?._id;
+    !!report.resolvedBy && report.resolvedBy._id === comment?.author?._id;
 
   return (
-    <li className={classNames(styles.card, { [styles.busy]: isBusy })}>
-      <div className={styles.card__head}>
-        <div className={styles.card__context}>
-          {comment?.game ? (
-            <Link href={`/games/${comment.game.slug}`} target="_blank">
-              {comment.game.name}
-            </Link>
-          ) : (
-            <span>Unknown game</span>
-          )}
-          {comment?.isReply && <span className={styles.badge}>Reply</span>}
-          {comment?.isOnReview && (
-            <span className={styles.badge}>On a review</span>
-          )}
-          {!!comment && (
-            <span
-              className={classNames(styles.badge, {
-                [styles.badge_attention]: comment.status !== "visible",
-              })}
-            >
-              {STATUS_LABELS[comment.status]}
-            </span>
-          )}
-        </div>
-        <span className={styles.meta}>
-          {pluralize(report.reportsCount, "report")} · last{" "}
-          {commonUtils.getHumanDate(report.lastReportedAt)}
-        </span>
-      </div>
-
-      {comment ? (
-        <div className={styles.card__comment}>
-          <div className={styles.card__author}>
-            {comment.author ? (
-              <Link href={`/user/${comment.author.userName}`} target="_blank">
-                {comment.author.userName}
-              </Link>
-            ) : (
-              <span>Unknown author</span>
-            )}
-            <time dateTime={comment.createdAt} suppressHydrationWarning>
-              {commonUtils.getHumanDate(comment.createdAt)}
-            </time>
-            {comment.isSpoiler && <span className={styles.badge}>Spoiler</span>}
-          </div>
-          {comment.body ? (
-            <RichText content={comment.body} className={styles.card__body} />
-          ) : (
-            <p className={styles.removed}>
-              The comment was deleted and its text is gone.
-            </p>
-          )}
-        </div>
-      ) : (
-        <p className={styles.removed}>This comment no longer exists.</p>
-      )}
-
+    <ModeratedComment
+      comment={comment}
+      isBusy={isBusy}
+      meta={`${pluralize(report.reportsCount, "report")} · last ${commonUtils.getHumanDate(report.lastReportedAt)}`}
+    >
       <p className={styles.meta}>
         Reported by{" "}
         {report.reporters.map((reporter) => reporter.userName).join(", ") ||
@@ -111,7 +49,7 @@ export const ReportCard: FC<IReportCardProps> = ({
       </p>
 
       {isOpen ? (
-        <div className={styles.card__actions}>
+        <div className={styles.actions}>
           <Button
             color={ButtonColor.DEFAULT}
             disabled={isBusy}
@@ -148,6 +86,6 @@ export const ReportCard: FC<IReportCardProps> = ({
             ` · ${commonUtils.getHumanDate(report.resolvedAt)}`}
         </p>
       )}
-    </li>
+    </ModeratedComment>
   );
 };
