@@ -4,7 +4,13 @@ import classNames from "classnames";
 
 interface IRadioProps extends Pick<
   InputHTMLAttributes<HTMLInputElement>,
-  "required" | "disabled" | "onChange" | "id" | "checked" | "className"
+  | "required"
+  | "disabled"
+  | "onChange"
+  | "id"
+  | "checked"
+  | "className"
+  | "value"
 > {
   name?: string;
 }

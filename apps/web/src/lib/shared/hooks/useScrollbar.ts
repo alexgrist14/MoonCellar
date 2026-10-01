@@ -266,7 +266,7 @@ export const useScrollbar = ({
           scrollThumbRef.current.offsetHeight
         );
 
-        !!onScrollBottom && onScrollBottom(scrollTop < scrollOffset - 10);
+        !!onScrollBottom && onScrollBottom(scrollTop >= scrollOffset - 10);
 
         scrollThumbRef.current.style.top = `${thumbOffset}px`;
 

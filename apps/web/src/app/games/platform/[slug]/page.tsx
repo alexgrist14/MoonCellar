@@ -27,10 +27,7 @@ const MIN_GAMES_FOR_INDEX = 100;
 const TOP_COUNT = 5;
 
 const getPlatforms = cache(async () =>
-  platformsAPI
-    .getAll()
-    .then(({ data }) => data)
-    .catch(() => [])
+  platformsAPI.getAll().then(({ data }) => data)
 );
 
 const getPlatform = cache(async (slug: string) => {
@@ -51,16 +48,33 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const platform = await getPlatform(slug);
+  const lookup = await getPlatform(slug)
+    .then(async (platform) => {
+      if (!platform) return null;
 
-  if (!platform) {
+      const { data } = await gamesApi.getAll({
+        selected: { platforms: [platform._id] },
+        take: 1,
+        page: 1,
+      });
+
+      return { platform, total: data.total };
+    })
+    .catch((error: unknown) => {
+      console.error("Failed to load platform hub metadata:", error);
+
+      return undefined;
+    });
+
+  if (lookup === undefined) {
+    return { title: "Games" };
+  }
+
+  if (!lookup) {
     return { title: "Page not found", robots: { index: false, follow: false } };
   }
 
-  const { total } = await gamesApi
-    .getAll({ selected: { platforms: [platform._id] }, take: 1, page: 1 })
-    .then(({ data }) => data)
-    .catch(emptyOnError);
+  const { platform, total } = lookup;
 
   const description = `${total.toLocaleString("en-US")} ${platform.name} games on MoonCellar — ratings from IGDB, HowLongToBeat and players, release years and playthrough tracking.`;
 

@@ -3,11 +3,6 @@
   flex-direction: column;
   gap: var(--gap-x3);
 
-  & h4 {
-    @include font(16px, 20px, 500);
-    color: var(--color-neutral-100);
-  }
-
   &__row {
     display: flex;
     flex-direction: column;

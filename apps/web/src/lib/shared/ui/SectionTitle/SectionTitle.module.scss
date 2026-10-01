@@ -8,6 +8,15 @@
     margin-bottom: var(--padding-x5);
   }
 
+  &__count {
+    align-self: center;
+    color: var(--tab-count-color);
+    font-size: 0.55em;
+    font-weight: 500;
+    font-family: inherit;
+    font-variant-numeric: tabular-nums;
+  }
+
   &_bar {
     &:before {
       content: " ";
@@ -29,5 +38,39 @@
     padding-left: var(--padding-x3);
     padding-top: var(--padding-x1);
     box-shadow: 0 2px 6px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  &_display {
+    display: block;
+    font-family: var(--font-pentagra);
+    font-weight: 800;
+    font-size: clamp(2.25rem, 4vw, 3.5rem);
+    line-height: 1.05;
+    color: var(--color-text-primary);
+
+    .title__count {
+      margin-left: var(--gap-x2);
+      font-size: 0.4em;
+      vertical-align: middle;
+    }
+  }
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--gap-x2) var(--gap-x4);
+
+  .title_pill {
+    flex: 1;
+  }
+
+  &__action {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    margin-left: auto;
   }
 }

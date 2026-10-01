@@ -8,6 +8,7 @@ interface ISpoilerProps {
   isActive?: boolean;
   className?: string;
   label?: string;
+  hideLabel?: string;
 }
 
 export const Spoiler: FC<ISpoilerProps> = ({
@@ -15,6 +16,7 @@ export const Spoiler: FC<ISpoilerProps> = ({
   isActive = true,
   className,
   label = "Show spoilers",
+  hideLabel = "Hide spoilers",
 }) => {
   const [isRevealed, setIsRevealed] = useState(false);
 
@@ -28,7 +30,7 @@ export const Spoiler: FC<ISpoilerProps> = ({
         className
       )}
     >
-      <div className={styles.spoiler__content} aria-hidden={isHidden}>
+      <div className={styles.spoiler__content} inert={isHidden}>
         {children}
       </div>
       {isHidden && (
@@ -39,6 +41,19 @@ export const Spoiler: FC<ISpoilerProps> = ({
         >
           <SvgEye size="16" color="attention" />
           {label}
+        </button>
+      )}
+      {isActive && isRevealed && (
+        <button
+          type="button"
+          className={classNames(
+            styles.spoiler__button,
+            styles.spoiler__button_hide
+          )}
+          onClick={() => setIsRevealed(false)}
+        >
+          <SvgEye size="16" color="attention" />
+          {hideLabel}
         </button>
       )}
     </div>

@@ -1,3 +1,4 @@
+import { AUTH_MODAL_ID } from "@/src/lib/shared/constants";
 import { useRouter } from "next/navigation";
 import { authAPI, userAPI } from "@/src/lib/shared/api";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/src/lib/shared/constants";
@@ -30,7 +31,7 @@ export const useAuth = () => {
     userAPI.getById(userId).then((res) => {
       setProfile(res.data);
       setIsAdmin(!!res.data.roles?.includes("admin"));
-      modal.close();
+      modal.close(AUTH_MODAL_ID);
     });
   };
 

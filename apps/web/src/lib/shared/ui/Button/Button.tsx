@@ -1,7 +1,18 @@
-import { ComponentPropsWithRef, isValidElement, memo, ReactNode } from "react";
+import {
+  ComponentProps,
+  ComponentPropsWithRef,
+  HTMLAttributeAnchorTarget,
+  isValidElement,
+  memo,
+  MouseEventHandler,
+  ReactNode,
+  Ref,
+} from "react";
+import Link from "next/link";
 import cl from "classnames";
 import styles from "./Button.module.scss";
 import { Tooltip } from "../Tooltip";
+import { Loader } from "../Loader";
 
 export enum ButtonColor {
   DEFAULT = "default",
@@ -12,6 +23,7 @@ export enum ButtonColor {
   TRANSPARENT = "transparent",
   FANCY = "fancy",
   SEGMENTED = "segmented",
+  GHOST = "ghost",
 }
 
 type IButtonColor = ButtonColor | `${ButtonColor}`;
@@ -37,6 +49,11 @@ export interface IButtonProps extends Pick<
   compact?: boolean;
   hidden?: boolean;
   isOnlyIcon?: boolean;
+  isLoading?: boolean;
+  href?: ComponentProps<typeof Link>["href"];
+  target?: HTMLAttributeAnchorTarget;
+  rel?: string;
+  prefetch?: ComponentProps<typeof Link>["prefetch"];
 }
 
 export const Button = memo(
@@ -50,7 +67,16 @@ export const Button = memo(
     compact,
     hidden,
     isOnlyIcon,
+    isLoading,
+    href,
+    target,
+    rel,
+    prefetch,
     ref,
+    disabled,
+    type,
+    form,
+    onClick,
     ...props
   }: IButtonProps) => {
     const isSingleCharacter =
@@ -59,32 +85,62 @@ export const Button = memo(
     const isIconOnly =
       (isValidElement(children) && typeof children.type !== "string") ||
       isSingleCharacter;
+    const isDisabled = disabled || isLoading;
 
-    const button = (
-      <button
-        {...props}
-        aria-label={
-          props["aria-label"] ??
-          (typeof tooltip === "string" ? tooltip : undefined)
-        }
-        ref={ref}
-        className={cl(
-          styles.button,
-          styles[`button_${color}Color`],
-          className,
-          {
-            [styles.button_active]: active,
-            [styles[`button_${color}Color_active`]]: active,
-            [styles.button_compact]: compact,
-            [styles.button_icon]: isIconOnly,
-            [styles.button_square]: isOnlyIcon,
-            [styles.button_hidden]: hidden,
-          }
-        )}
-      >
-        {children}
-      </button>
+    const commonProps = {
+      ...props,
+      "aria-label":
+        props["aria-label"] ??
+        (typeof tooltip === "string" ? tooltip : undefined),
+      "aria-busy": isLoading || undefined,
+      className: cl(styles.button, styles[`button_${color}Color`], className, {
+        [styles.button_active]: active,
+        [styles[`button_${color}Color_active`]]: active,
+        [styles.button_compact]: compact,
+        [styles.button_icon]: isIconOnly,
+        [styles.button_square]: isOnlyIcon,
+        [styles.button_hidden]: hidden,
+        [styles.button_loading]: isLoading,
+        [styles.button_disabled]: href !== undefined && isDisabled,
+      }),
+    };
+
+    const content = isLoading ? (
+      <>
+        <Loader type="pulse" color="currentColor" size="0.5em" />
+        <span className={styles.button__label}>{children}</span>
+      </>
+    ) : (
+      children
     );
+
+    const button =
+      href !== undefined ? (
+        <Link
+          {...commonProps}
+          ref={ref as Ref<HTMLAnchorElement>}
+          href={href}
+          target={target}
+          rel={rel}
+          prefetch={prefetch}
+          aria-disabled={isDisabled || undefined}
+          tabIndex={isDisabled ? -1 : undefined}
+          onClick={onClick as unknown as MouseEventHandler<HTMLAnchorElement>}
+        >
+          {content}
+        </Link>
+      ) : (
+        <button
+          {...commonProps}
+          ref={ref}
+          type={type}
+          form={form}
+          disabled={isDisabled}
+          onClick={onClick}
+        >
+          {content}
+        </button>
+      );
 
     if (!tooltip) return button;
 

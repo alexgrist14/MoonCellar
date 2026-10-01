@@ -1,10 +1,5 @@
 .modal {
-  display: grid;
-  gap: var(--gap-x2);
-  padding: var(--padding-x5);
-  background-color: var(--color-bg-secondary);
   width: 85vw;
-  border-radius: var(--radius-x3);
   position: fixed;
   top: 50%;
   left: 50%;
@@ -16,15 +11,26 @@
   &_active {
     height: 90vh;
     height: 90dvh;
-    grid-template-rows: auto auto minmax(0, 1fr) min-content;
   }
 
   @include mediaMax($screenMd) {
     width: 90vw;
   }
 
-  @include mediaSm {
-    padding: var(--padding-x3);
+  &__body {
+    display: grid;
+    gap: var(--gap-x2);
+    flex: 1;
+    min-height: 0;
+    padding: var(--padding-x2);
+
+    @include mediaSm {
+      padding: 0;
+    }
+  }
+
+  &_active &__body {
+    grid-template-rows: auto auto minmax(0, 1fr) min-content;
   }
 
   &__search {
@@ -38,15 +44,10 @@
     max-width: calc(100% - 100px);
   }
 
-  &__more {
+  & &__more {
     width: 100%;
     grid-column: 1 / -1;
-    flex-basis: 100%;
-
-    & button {
-      width: 100%;
-      border-radius: var(--radius-x2);
-    }
+    border-radius: var(--radius-x2);
   }
 
   &__wide {
@@ -55,23 +56,7 @@
   }
 
   &__empty {
-    @include flexColumnCenter;
-    position: absolute;
-    @include positionCenter;
-    gap: var(--gap-x2);
-    width: calc(100% - 2 * var(--padding-x5));
-    padding-top: var(--padding-x5);
-    text-align: center;
     animation: appearOpacity 0.4s ease forwards 1;
-  }
-
-  &__emptyTitle {
-    font-size: 16px;
-    color: var(--color-text-primary);
-  }
-
-  &__emptyText {
-    color: var(--color-text-muted);
   }
 
   &__switch {

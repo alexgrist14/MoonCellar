@@ -1,12 +1,11 @@
 import { FC, useState } from "react";
 import Link from "next/link";
-import classNames from "classnames";
 import { useDebouncedCallback } from "use-debounce";
 import { CONFLICTS_PAGE_SIZE, IConflictSource } from "@mooncellar/schemas";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import { Table } from "@/src/lib/shared/ui/Table";
-import { ITableCell } from "@/src/lib/shared/types/table.type";
+import { Badge } from "@/src/lib/shared/ui/Badge";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { useConflictsQuery } from "@/src/lib/entities/conflict/api";
 import { setAdminQuery } from "@/src/lib/shared/utils/admin-url.utils";
@@ -14,6 +13,7 @@ import {
   REASON_LABELS,
   SOURCE_LABELS,
   stateLabel,
+  stateTone,
   externalUrl,
 } from "./labels";
 import styles from "./Conflicts.module.scss";
@@ -60,18 +60,16 @@ export const ConflictList: FC<IConflictListProps> = ({ source }) => {
             }}
           />
         </div>
-        <div className={styles.toggle}>
-          Hide decided
-          <ToggleSwitch
-            leftContent={OFF}
-            rightContent={ON}
-            value={isWaitingOnly ? "right" : "left"}
-            clickCallback={(result) => {
-              setIsWaitingOnly(result === ON);
-              setPage(1);
-            }}
-          />
-        </div>
+        <ToggleSwitch
+          label="Hide decided"
+          leftContent={OFF}
+          rightContent={ON}
+          value={isWaitingOnly ? "right" : "left"}
+          clickCallback={(result) => {
+            setIsWaitingOnly(result === ON);
+            setPage(1);
+          }}
+        />
       </div>
 
       <Table
@@ -84,75 +82,62 @@ export const ConflictList: FC<IConflictListProps> = ({ source }) => {
           reason: { content: "Why it waits" },
           result: { content: "Result" },
         }}
-        rows={rows.map((row) => {
-          const open = () =>
-            setAdminQuery({ source: row.source, conflict: row.externalId });
-          const cells = {
-            entry: {
-              content: (
-                <div className={styles.rowVn}>
-                  <span className={styles.rowName}>{row.externalName}</span>
-                  {externalUrl(row.source, row.externalId) ? (
-                    <a
-                      className={styles.rowLink}
-                      href={
-                        externalUrl(row.source, row.externalId) ?? undefined
-                      }
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={(event) => event.stopPropagation()}
-                    >
-                      {SOURCE_LABELS[row.source]}{" "}
-                      {row.direction === "games" ? row.externalId : "match"}
-                    </a>
-                  ) : (
-                    <span className={styles.rowLink}>
-                      {SOURCE_LABELS[row.source]}{" "}
-                      {row.direction === "games" ? row.externalId : "match"}
-                    </span>
-                  )}
-                </div>
-              ),
-            },
-            state: {
-              content: (
-                <span
-                  className={classNames(styles.badge, {
-                    [styles.badge_attention]: row.state === "waiting",
-                    [styles.badge_positive]:
-                      row.state === "matched" || row.state === "new-game",
-                  })}
-                >
-                  {stateLabel(row.source, row.state)}
-                </span>
-              ),
-            },
-            reason: {
-              content: row.reason ? REASON_LABELS[row.reason] : "—",
-            },
-            result: {
-              content: row.winner ? (
-                <Link
-                  className={styles.rowCandidate}
-                  href={`/games/${row.winner.slug}`}
-                  target="_blank"
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  {row.winner.name}
-                </Link>
-              ) : (
-                "—"
-              ),
-            },
-          };
-
-          return Object.fromEntries(
-            Object.entries(cells).map(([key, cell]) => [
-              key,
-              { ...cell, className: styles.rowClickable, onClick: open },
-            ])
-          ) as Record<keyof typeof cells, ITableCell>;
-        })}
+        onRowClick={(index) =>
+          setAdminQuery({
+            source: rows[index].source,
+            conflict: rows[index].externalId,
+          })
+        }
+        rows={rows.map((row) => ({
+          entry: {
+            content: (
+              <div className={styles.rowVn}>
+                <span className={styles.rowName}>{row.externalName}</span>
+                {externalUrl(row.source, row.externalId) ? (
+                  <a
+                    className={styles.rowLink}
+                    href={externalUrl(row.source, row.externalId) ?? undefined}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    {SOURCE_LABELS[row.source]}{" "}
+                    {row.direction === "games" ? row.externalId : "match"}
+                  </a>
+                ) : (
+                  <span className={styles.rowLink}>
+                    {SOURCE_LABELS[row.source]}{" "}
+                    {row.direction === "games" ? row.externalId : "match"}
+                  </span>
+                )}
+              </div>
+            ),
+          },
+          state: {
+            content: (
+              <Badge tone={stateTone(row.state)}>
+                {stateLabel(row.source, row.state)}
+              </Badge>
+            ),
+          },
+          reason: {
+            content: row.reason ? REASON_LABELS[row.reason] : "—",
+          },
+          result: {
+            content: row.winner ? (
+              <Link
+                className={styles.rowCandidate}
+                href={`/games/${row.winner.slug}`}
+                target="_blank"
+                onClick={(event) => event.stopPropagation()}
+              >
+                {row.winner.name}
+              </Link>
+            ) : (
+              "—"
+            ),
+          },
+        }))}
       />
 
       <Pagination

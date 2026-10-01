@@ -24,10 +24,6 @@
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
 }
-.pageTitle {
-  font-size: 2rem;
-  margin: 0;
-}
 
 .section {
   display: flex;
@@ -68,7 +64,8 @@
   gap: var(--gap-x2);
   width: 100%;
 
-  label {
+  label,
+  .label {
     color: var(--color-neutral-100);
     font-size: 0.95rem;
   }
@@ -84,26 +81,10 @@
   border-radius: var(--radius-x4);
 }
 
-.backgroundMeta {
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap-x1);
-}
-
-.fileName,
-.helper {
+.fileName {
   color: var(--color-gray);
   font-size: 0.85rem;
   word-break: break-word;
-}
-
-.backgroundBtn {
-  width: fit-content;
-  color: var(--color-neutral-100);
-
-  @include mediaMd {
-    width: 100%;
-  }
 }
 
 .prefRow {
@@ -115,18 +96,6 @@
 
   @include mediaMd {
     flex-wrap: wrap;
-  }
-
-  &__text {
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-x1);
-    min-width: 0;
-
-    label {
-      color: var(--color-neutral-100);
-      font-size: 0.95rem;
-    }
   }
 }
 

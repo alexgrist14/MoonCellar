@@ -16,7 +16,12 @@ import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { RangeSelector } from "@/src/lib/shared/ui/RangeSelector";
-import { SvgChevron, SvgClose } from "@/src/lib/shared/ui/svg";
+import { FilterGroup } from "@/src/lib/shared/ui/FilterGroup";
+import { RemovableChips } from "@/src/lib/shared/ui/RemovableChips";
+import {
+  ISortControlOption,
+  SortControl,
+} from "@/src/lib/shared/ui/SortControl";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import {
   getListsGameIds,
@@ -27,7 +32,7 @@ import styles from "./ListsFilters.module.scss";
 
 const FILTERS_ID = "lists-filters";
 
-export const LIST_SORT_OPTIONS: { value: ICustomListsSort; label: string }[] = [
+export const LIST_SORT_OPTIONS: ISortControlOption<ICustomListsSort>[] = [
   { value: "popular", label: "Popular" },
   { value: "updatedAt", label: "Recently updated" },
   { value: "createdAt", label: "Newest" },
@@ -120,10 +125,6 @@ export const ListsFilters: FC = () => {
     setExpanded(expanded?.filter((position) => position !== "left") || []);
   };
 
-  const sortLabel =
-    LIST_SORT_OPTIONS.find(
-      (option) => option.value === (filters.sortBy ?? "popular")
-    )?.label ?? "";
   const updatedLabel =
     LIST_UPDATED_OPTIONS.find((option) => option.value === filters.updated)
       ?.label ?? "";
@@ -131,38 +132,22 @@ export const ListsFilters: FC = () => {
 
   return (
     <div className={styles.filters} id={FILTERS_ID}>
-      <div className={styles.filters__wrapper}>
-        <h4>Sort by</h4>
-        <div className={styles.filters__sort}>
-          <Dropdown
-            isThroughPortal
-            overflowRootId={FILTERS_ID}
-            list={LIST_SORT_OPTIONS.map((option) => option.label)}
-            overwriteValue={sortLabel}
-            placeholder="Popular"
-            getIndex={(index) =>
-              setFilters((current) => ({
-                ...current,
-                sortBy: LIST_SORT_OPTIONS[index]?.value ?? "popular",
-              }))
-            }
-          />
-          <ToggleSwitch
-            isColorless
-            leftContent={<SvgChevron style={{ transform: "rotate(180deg)" }} />}
-            rightContent={<SvgChevron />}
-            value={filters.sortOrder === "asc" ? "left" : "right"}
-            clickCallback={() =>
-              setFilters((current) => ({
-                ...current,
-                sortOrder: current.sortOrder === "asc" ? "desc" : "asc",
-              }))
-            }
-          />
-        </div>
-      </div>
-      <div className={styles.filters__wrapper}>
-        <h4>List name</h4>
+      <SortControl
+        label="Sort by"
+        options={LIST_SORT_OPTIONS}
+        sortBy={filters.sortBy ?? "popular"}
+        sortOrder={filters.sortOrder ?? "desc"}
+        placeholder="Popular"
+        overflowRootId={FILTERS_ID}
+        onChange={(sortBy, sortOrder) =>
+          setFilters((current) => ({
+            ...current,
+            sortBy: sortBy ?? "popular",
+            sortOrder,
+          }))
+        }
+      />
+      <FilterGroup title="List name">
         <Input
           containerStyles={{ width: "100%" }}
           placeholder="Enter name of the list..."
@@ -172,9 +157,8 @@ export const ListsFilters: FC = () => {
             setFilters((current) => ({ ...current, search: e.target.value }))
           }
         />
-      </div>
-      <div className={styles.filters__wrapper}>
-        <h4>Author</h4>
+      </FilterGroup>
+      <FilterGroup title="Author">
         <Input
           containerStyles={{ width: "100%" }}
           placeholder="Enter user name..."
@@ -184,23 +168,24 @@ export const ListsFilters: FC = () => {
             setFilters((current) => ({ ...current, author: e.target.value }))
           }
         />
-      </div>
-      <div className={styles.filters__wrapper}>
-        <div className={styles.filters__header}>
-          <h4>Contains games</h4>
+      </FilterGroup>
+      <FilterGroup
+        title="Contains games"
+        headerAction={
           <ToggleSwitch
             isColorless
             leftContent="Any"
             rightContent="All"
             value={filters.gamesMode === "all" ? "right" : "left"}
-            clickCallback={(result) =>
+            clickCallback={() =>
               setFilters((current) => ({
                 ...current,
-                gamesMode: result === "All" ? "all" : "any",
+                gamesMode: current.gamesMode === "all" ? "any" : "all",
               }))
             }
           />
-        </div>
+        }
+      >
         <Dropdown
           isMulti
           isWithReset
@@ -222,28 +207,18 @@ export const ListsFilters: FC = () => {
             )
           }
         />
-        {!!selectedGames.length && (
-          <div className={styles.filters__chips}>
-            {selectedGames.map((game) => (
-              <button
-                key={game._id}
-                type="button"
-                className={styles.filters__chip}
-                onClick={() =>
-                  setGames(
-                    selectedGames.filter((item) => item._id !== game._id)
-                  )
-                }
-              >
-                {game.name}
-                <SvgClose size="12" />
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-      <div className={styles.filters__wrapper}>
-        <h4>Last updated</h4>
+        <RemovableChips
+          variant="pill"
+          items={selectedGames.map((game) => ({
+            id: game._id,
+            label: game.name,
+          }))}
+          onRemove={(id) =>
+            setGames(selectedGames.filter((item) => item._id !== id))
+          }
+        />
+      </FilterGroup>
+      <FilterGroup title="Last updated">
         <Dropdown
           isThroughPortal
           overflowRootId={FILTERS_ID}
@@ -257,7 +232,7 @@ export const ListsFilters: FC = () => {
             }))
           }
         />
-      </div>
+      </FilterGroup>
       <div className={styles.filters__range}>
         <RangeSelector
           key={`${queryString}-${resetKey}`}

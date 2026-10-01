@@ -8,7 +8,10 @@ import {
   parseQueryFilters,
   pushFiltersToQuery,
 } from "@/src/lib/shared/utils/filters.utils";
-import { AppliedFilters, IAppliedFilter } from "@/src/lib/shared/ui/AppliedFilters";
+import {
+  AppliedFilters,
+  IAppliedFilter,
+} from "@/src/lib/shared/ui/AppliedFilters";
 
 type TFilterGroup = "selected" | "excluded";
 type TFilterCategory = keyof IGameFilters;

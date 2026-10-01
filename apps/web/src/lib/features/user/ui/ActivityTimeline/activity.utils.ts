@@ -1,41 +1,9 @@
-import {
-  ILogChanges,
-  ILogPlaythrough,
-  ILogPlaythroughState,
-} from "@mooncellar/schemas";
+import { ILogPlaythrough, ILogPlaythroughState } from "@mooncellar/schemas";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
-
-export type IActivityTone =
-  | "completed"
-  | "playing"
-  | "mastered"
-  | "played"
-  | "wishlist"
-  | "backlog"
-  | "dropped"
-  | "favorite"
-  | "accent"
-  | "removed";
-
-const CATEGORY_TONES: IActivityTone[] = [
-  "completed",
-  "playing",
-  "mastered",
-  "played",
-  "wishlist",
-  "backlog",
-  "dropped",
-];
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 export const EMPTY_VALUE = "—";
-
-export const toCategoryTone = (status?: string) => {
-  const key = status?.trim().toLowerCase();
-
-  return CATEGORY_TONES.find((tone) => tone === key);
-};
 
 const getStatusKey = (state?: ILogPlaythroughState) =>
   state?.isMastered ? "mastered" : state?.category;
@@ -56,23 +24,6 @@ export const isStatusChanged = (
 
 export const isReviewAdded = ({ action, before, after }: ILogPlaythrough) =>
   action !== "removed" && !!after?.hasReview && !before?.hasReview;
-
-export const getLogTone = ({
-  playthrough,
-  rating,
-  favorite,
-}: ILogChanges): IActivityTone => {
-  if (playthrough) {
-    if (playthrough.action === "removed") return "removed";
-
-    return toCategoryTone(getStatusKey(playthrough.after)) ?? "accent";
-  }
-
-  if (rating) return rating.value === null ? "removed" : "accent";
-  if (favorite !== undefined) return favorite ? "favorite" : "removed";
-
-  return "accent";
-};
 
 const DETAIL_FIELDS: {
   label: string;

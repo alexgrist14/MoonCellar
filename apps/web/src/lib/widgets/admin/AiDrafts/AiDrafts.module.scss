@@ -4,7 +4,7 @@
   gap: var(--gap-x2);
 
   &__label {
-    color: var(--color-neutral-85);
+    color: var(--color-text-secondary);
     font-size: 14px;
   }
 
@@ -29,12 +29,7 @@
   }
 
   &__hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
+    @include visuallyHidden;
   }
 
   &__list {
@@ -68,7 +63,7 @@
   }
 
   &__query {
-    color: var(--color-neutral-100);
+    color: var(--color-text-primary);
     font-size: 14px;
 
     @include textEllipsis;
@@ -76,7 +71,7 @@
 
   &__details {
     min-width: 0;
-    color: var(--color-neutral-70);
+    color: var(--color-text-muted);
     font-size: 12px;
 
     summary {
@@ -100,18 +95,5 @@
     flex-shrink: 0;
     align-items: center;
     gap: var(--gap-x3);
-  }
-
-  &__status {
-    font-size: 12px;
-    color: var(--color-neutral-70);
-
-    &_done {
-      color: var(--color-positive);
-    }
-
-    &_failed {
-      color: var(--color-negative);
-    }
   }
 }

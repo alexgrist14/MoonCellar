@@ -9,6 +9,7 @@ import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
 import { GameCard } from "@/src/lib/widgets/game/GameCard";
 import { GamesCards } from "@/src/lib/widgets/game/GamesCards";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
+import { Button } from "@/src/lib/shared/ui/Button";
 import { IGameResponse } from "@mooncellar/schemas";
 import {
   takeHubGames,
@@ -30,7 +31,6 @@ interface IHubPageProps {
   middleTitle: string;
   middleHint?: string;
   recentGames?: IGameResponse[];
-  yearLinks?: { name: string; href: string }[];
   allGames: IGameResponse[];
   allTitle: string;
   total: number;
@@ -55,7 +55,6 @@ export const HubPage: FC<IHubPageProps> = ({
   middleTitle,
   middleHint,
   recentGames,
-  yearLinks,
   allGames,
   allTitle,
   total,
@@ -70,7 +69,9 @@ export const HubPage: FC<IHubPageProps> = ({
       <div className={styles.hub}>
         <Box contentStyle={{ gap: "var(--gap-x4)" }}>
           <Breadcrumbs items={breadcrumb} />
-          <h1 className={styles.hub__title}>{title}</h1>
+          <SectionTitle as="h1" variant="display">
+            {title}
+          </SectionTitle>
           <div className={styles.hub__stats}>
             {stats.map(({ value, label }) => (
               <span key={label} className={styles.hub__stat}>
@@ -124,15 +125,6 @@ export const HubPage: FC<IHubPageProps> = ({
               isWithoutScroll
             />
           )}
-          {!!yearLinks?.length && (
-            <div className={styles.hub__chips}>
-              {yearLinks.map(({ name, href }) => (
-                <Link key={href} href={href} className={styles.hub__chip}>
-                  {name}
-                </Link>
-              ))}
-            </div>
-          )}
         </Box>
 
         <Box contentStyle={{ gap: "var(--gap-x5)", position: "relative" }}>
@@ -143,9 +135,9 @@ export const HubPage: FC<IHubPageProps> = ({
             limit={takeHubGames}
             isWithoutScroll
           />
-          <Link href={moreHref} className={styles.hub__more}>
+          <Button href={moreHref} className={styles.hub__more}>
             Show all {total.toLocaleString("en-US")} games
-          </Link>
+          </Button>
         </Box>
 
         <Box contentStyle={{ gap: "var(--gap-x5)" }}>

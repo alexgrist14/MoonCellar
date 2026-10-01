@@ -29,7 +29,7 @@ export const Avatar: FC<AvatarProps> = ({
           src={user.avatar}
           width={90}
           height={90}
-          alt="profile"
+          alt={user.userName ? `${user.userName}'s avatar` : "User avatar"}
           priority={priority}
         />
       ) : (

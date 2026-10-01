@@ -1,0 +1,65 @@
+.burger {
+  &__line {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  &_open &__top {
+    animation: burgerTopOpen var(--burger-animation-duration) ease-out both;
+  }
+
+  &_open &__middle {
+    animation: burgerMiddleOpen var(--burger-animation-duration) ease-out
+      forwards;
+  }
+
+  &_open &__bottom {
+    animation: burgerBottomOpen var(--burger-animation-duration) ease-out both;
+  }
+
+  @include reducedMotion {
+    &_open &__line {
+      animation-duration: var(--duration-instant);
+    }
+  }
+}
+
+@keyframes burgerTopOpen {
+  0% {
+    animation-timing-function: cubic-bezier(0.16, -0.88, 0.97, 0.53);
+    transform: translateY(0px);
+  }
+  30% {
+    animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform: translateY(10px);
+  }
+  100% {
+    transform: translateY(10px) rotate(-45deg) scale(0.9);
+  }
+}
+
+@keyframes burgerMiddleOpen {
+  29% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes burgerBottomOpen {
+  0% {
+    animation-timing-function: cubic-bezier(0.16, -0.88, 0.97, 0.53);
+    transform: translateY(0px);
+  }
+  30% {
+    animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(-10px) rotate(45deg) scale(0.9);
+  }
+}

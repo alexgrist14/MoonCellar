@@ -88,6 +88,11 @@ import {
   UPDATABLE_PLATFORM_FIELDS,
 } from "./constants/igdb";
 import { S3_FOLDERS, type S3Folder } from "../../shared/s3";
+import {
+  IGDB_CONFLICT_CANDIDATES_LIMIT,
+  isConfirmedIgdbMatch,
+  withoutOtherIgdbGames,
+} from "./utils/igdb-match.utils";
 
 type ImageField = (typeof IMAGE_FIELDS)[number];
 
@@ -1288,15 +1293,29 @@ export class IGDBService implements OnModuleInit {
         .lean(),
       this.gameMatcher.getPlatformSlugById(),
     ]);
+    if (!normalizeGameName(igdbGame.name)) return null;
+
     const subject = this.toMatchSubject(
       igdbGame,
       platforms.map(({ slug }) => slug)
     );
     const { candidatesBySubject, sharedTitles } =
       await this.gameMatcher.findCandidates([subject]);
+    const found = candidatesBySubject.get(subject.id) ?? [];
+    const linked = await this.Games.find({
+      _id: { $in: found.map(({ _id }) => _id) },
+      "igdb.gameId": { $exists: true, $ne: null },
+    })
+      .select("igdb.gameId")
+      .lean();
+    const candidates = withoutOtherIgdbGames(
+      found,
+      new Map(linked.map((game) => [String(game._id), game.igdb!.gameId])),
+      igdbGame.id
+    );
     const result = resolveMatch(
       subject,
-      candidatesBySubject.get(subject.id) ?? [],
+      candidates,
       { platformSlugById, sharedTitles },
       IGDB_MATCH_PROFILE
     );
@@ -1306,7 +1325,7 @@ export class IGDBService implements OnModuleInit {
     if (
       result.verdict === "matched" &&
       result.winner &&
-      process.env.IGDB_AUTO_LINK === "true"
+      (process.env.IGDB_AUTO_LINK === "true" || isConfirmedIgdbMatch(result))
     ) {
       await this.Games.updateOne(
         { _id: result.winner._id },
@@ -1324,7 +1343,7 @@ export class IGDBService implements OnModuleInit {
         externalId: String(igdbGame.id),
         externalName: igdbGame.name,
         reason: result.reason,
-        candidates: result.candidates,
+        candidates: result.candidates.slice(0, IGDB_CONFLICT_CANDIDATES_LIMIT),
       },
     ]);
     this.logger.warn(

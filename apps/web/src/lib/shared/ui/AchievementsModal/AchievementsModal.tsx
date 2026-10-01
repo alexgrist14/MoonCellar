@@ -60,7 +60,7 @@ export const AchievementsModal: FC<IAchievementsModalProps> = ({ game }) => {
 
   const fallbackLink = game.retroachievements?.[0]?.gameId
     ? `https://retroachievements.org/game/${game.retroachievements[0].gameId}`
-    : `https://retroachievements.org/searchresults.php?s=${game.name}&t=1`;
+    : `https://retroachievements.org/searchresults.php?s=${encodeURIComponent(game.name)}&t=1`;
 
   return (
     <RowsModal

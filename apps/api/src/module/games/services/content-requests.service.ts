@@ -20,6 +20,9 @@ import {
   type IGameRequestPayload,
   type IGetContentRequestsQuery,
   type IGetContentRequestsResponse,
+  type IGetMyContentRequestsQuery,
+  type IPossibleDuplicate,
+  POSSIBLE_DUPLICATES_MESSAGE,
 } from "@mooncellar/schemas";
 import {
   ContentRequest,
@@ -31,7 +34,7 @@ import { Platform } from "../schemas/platform.schema";
 import { User } from "../../user/schemas/user.schema";
 import { FileService } from "../../user/services/file-upload.service";
 import { IndexNowService } from "../../indexnow/indexnow.service";
-import { S3_FOLDERS, type S3Folder } from "../../../shared/s3";
+import { parseS3ImageUrl, S3_FOLDERS, type S3Folder } from "../../../shared/s3";
 import { FRONT_URL } from "../../../shared/constants";
 import { normalizeGameName, uniqueSlug } from "../../../shared/utils";
 import { MAIN_GAME_TYPE } from "../constants/vndb";
@@ -39,8 +42,20 @@ import { IGDBService } from "../../igdb/igdb.service";
 import { HltbService } from "./hltb.service";
 import { GameMatcherService } from "../matching/game-matcher.service";
 import { VndbService } from "./vndb.service";
+import { escapeRegExp } from "../../collections/utils/collections.utils";
 
 const PENDING_REQUESTS_LIMIT = 20;
+const CLAIM_TTL_MS = 15 * 60 * 1000;
+const ALREADY_DECIDED =
+  "This request has already been decided, or another moderator is deciding it";
+const ROLLBACK_IMAGE_KEYS = [
+  "cover",
+  "screenshots",
+  "artworks",
+  "backgroundImage",
+  "bannerImage",
+  "mugShot",
+];
 const IMAGE_FIELDS = new Set(["mugShot"]);
 const WORLDWIDE_REGION = 8;
 const GAME_SPECIAL_FIELDS = new Set([
@@ -62,8 +77,55 @@ const GAME_SPECIAL_FIELDS = new Set([
 
 type ILeanRequest = ContentRequest & { _id: mongoose.Types.ObjectId };
 
+interface IApproval {
+  createdId: mongoose.Types.ObjectId | null;
+  uploaded: string[];
+  failedImages: string[];
+  warnings: string[];
+}
+
+type IRequestCompany = NonNullable<IGameRequestPayload["companies"]>[number];
+
 const toObjectIds = (ids: string[] = []) =>
   ids.map((id) => new mongoose.Types.ObjectId(id));
+
+const undecided = () => ({
+  status: "pending",
+  $or: [
+    { claimedAt: null },
+    { claimedAt: { $lt: new Date(Date.now() - CLAIM_TTL_MS) } },
+  ],
+});
+
+const withCompanyNames = (
+  base: IRequestCompany[],
+  payload: IGameRequestPayload
+) => {
+  const companies = base.map((company) => ({ ...company }));
+
+  (["developer", "publisher"] as const).forEach((flag) => {
+    const name = payload[flag];
+
+    if (!name) return;
+
+    const match = companies.find((company) => company.name === name);
+
+    if (match) {
+      match[flag] = true;
+      return;
+    }
+
+    companies.push({
+      name,
+      developer: flag === "developer",
+      publisher: flag === "publisher",
+      porting: false,
+      supporting: false,
+    });
+  });
+
+  return companies;
+};
 
 @Injectable()
 export class ContentRequestsService {
@@ -86,16 +148,16 @@ export class ContentRequestsService {
   ) {}
 
   async create(userId: string, dto: ICreateContentRequestParsed) {
-    const pending = await this.requests.countDocuments({
-      userId: new mongoose.Types.ObjectId(userId),
-      status: "pending",
-    });
+    const countPending = () =>
+      this.requests.countDocuments({
+        userId: new mongoose.Types.ObjectId(userId),
+        status: "pending",
+      });
+    const limitReached = new ConflictException(
+      `You already have ${PENDING_REQUESTS_LIMIT} pending requests`
+    );
 
-    if (pending >= PENDING_REQUESTS_LIMIT) {
-      throw new ConflictException(
-        `You already have ${PENDING_REQUESTS_LIMIT} pending requests`
-      );
-    }
+    if ((await countPending()) >= PENDING_REQUESTS_LIMIT) throw limitReached;
 
     if (dto.action === "update") {
       const exists = await this.targetModel(dto.kind).exists({
@@ -116,19 +178,32 @@ export class ContentRequestsService {
       createdAt: new Date().toISOString(),
     });
 
+    if ((await countPending()) > PENDING_REQUESTS_LIMIT) {
+      await this.requests.deleteOne({ _id: request._id });
+      throw limitReached;
+    }
+
     const [decorated] = await this.decorate([request.toObject()]);
 
     return decorated;
   }
 
-  async listMine(userId: string) {
-    const requests = await this.requests
-      .find({ userId: new mongoose.Types.ObjectId(userId) })
-      .sort({ createdAt: -1 })
-      .limit(100)
-      .lean<ILeanRequest[]>();
+  async listMine(
+    userId: string,
+    { page, take }: IGetMyContentRequestsQuery
+  ): Promise<IGetContentRequestsResponse> {
+    const filter = { userId: new mongoose.Types.ObjectId(userId) };
+    const [requests, total] = await Promise.all([
+      this.requests
+        .find(filter)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * take)
+        .limit(take)
+        .lean<ILeanRequest[]>(),
+      this.requests.countDocuments(filter),
+    ]);
 
-    return this.decorate(requests);
+    return { results: await this.decorate(requests), total };
   }
 
   async withdraw(userId: string, id: string) {
@@ -138,14 +213,16 @@ export class ContentRequestsService {
       throw new ForbiddenException("This request belongs to someone else");
     }
 
-    if (request.status !== "pending") {
-      throw new ConflictException("Only a pending request can be withdrawn");
-    }
-
-    await this.requests.updateOne(
-      { _id: request._id },
+    const { matchedCount } = await this.requests.updateOne(
+      { _id: request._id, ...undecided() },
       { $set: { status: "withdrawn", decidedAt: new Date().toISOString() } }
     );
+
+    if (!matchedCount) {
+      throw new ConflictException(
+        "Only a pending request that no moderator is deciding can be withdrawn"
+      );
+    }
 
     return { success: true };
   }
@@ -161,7 +238,7 @@ export class ContentRequestsService {
       ...(kind && { kind }),
     };
 
-    const [requests, total, pending] = await Promise.all([
+    const [requests, total] = await Promise.all([
       this.requests
         .find(filter)
         .sort({ createdAt: status === "pending" ? 1 : -1 })
@@ -169,10 +246,9 @@ export class ContentRequestsService {
         .limit(take)
         .lean<ILeanRequest[]>(),
       this.requests.countDocuments(filter),
-      this.requests.countDocuments({ status: "pending" }),
     ]);
 
-    return { results: await this.decorate(requests), total, pending };
+    return { results: await this.decorate(requests), total };
   }
 
   async get(id: string): Promise<IContentRequestDetail> {
@@ -190,17 +266,19 @@ export class ContentRequestsService {
     const request = await this.findRequest(id);
 
     if (request.status !== "pending") {
-      throw new ConflictException("This request has already been decided");
+      throw new ConflictException(ALREADY_DECIDED);
     }
 
     const decidedAt = new Date().toISOString();
     const decidedBy = new mongoose.Types.ObjectId(adminId);
 
     if (decision === "reject") {
-      await this.requests.updateOne(
-        { _id: request._id, status: "pending" },
+      const { matchedCount } = await this.requests.updateOne(
+        { _id: request._id, ...undecided() },
         { $set: { status: "rejected", reason, decidedAt, decidedBy } }
       );
+
+      if (!matchedCount) throw new ConflictException(ALREADY_DECIDED);
 
       return {
         request: await this.decorateOne(request._id),
@@ -233,22 +311,40 @@ export class ContentRequestsService {
       applied.map((key) => [key, request.payload[key]])
     );
 
+    const claimedAt = new Date();
+    const claimed = await this.requests.findOneAndUpdate(
+      { _id: request._id, ...undecided() },
+      { $set: { claimedAt, claimedBy: decidedBy } }
+    );
+
+    if (!claimed) throw new ConflictException(ALREADY_DECIDED);
+
+    const approval: IApproval = {
+      createdId: null,
+      uploaded: [],
+      failedImages: [],
+      warnings: [],
+    };
+
     try {
-      const { resultId, failedImages, warnings } =
+      const resultId =
         request.kind === "game"
           ? await this.applyGame(
               request,
               payload as IGameRequestPayload,
+              approval,
               lockSync,
               force
             )
           : await this.applyCharacter(
               request,
-              payload as ICharacterRequestPayload
+              payload as ICharacterRequestPayload,
+              approval,
+              force
             );
 
-      await this.requests.updateOne(
-        { _id: request._id },
+      const { matchedCount } = await this.requests.updateOne(
+        { _id: request._id, status: "pending", claimedAt },
         {
           $set: {
             status: "approved",
@@ -257,18 +353,69 @@ export class ContentRequestsService {
             reason: reason || null,
             decidedAt,
             decidedBy,
+            claimedAt: null,
+            claimedBy: null,
           },
         }
       );
 
+      if (!matchedCount) throw new ConflictException(ALREADY_DECIDED);
+
       return {
         request: await this.decorateOne(request._id),
-        failedImages,
-        warnings,
+        failedImages: approval.failedImages,
+        warnings: approval.warnings,
       };
     } catch (err) {
       this.logger.error(err, `Failed to approve content request: ${id}`);
+      await this.rollback(request.kind, approval);
+      await this.requests
+        .updateOne(
+          { _id: request._id, status: "pending", claimedAt },
+          { $set: { claimedAt: null, claimedBy: null } }
+        )
+        .catch((releaseErr: Error) =>
+          this.logger.error(releaseErr, `Failed to release request: ${id}`)
+        );
       throw err;
+    }
+  }
+
+  private async rollback(kind: string, approval: IApproval) {
+    try {
+      const urls = [...approval.uploaded];
+
+      if (approval.createdId) {
+        const entry = await this.targetModel(kind)
+          .findByIdAndDelete(approval.createdId)
+          .lean<Record<string, unknown>>();
+
+        ROLLBACK_IMAGE_KEYS.forEach((key) => {
+          const value = entry?.[key];
+
+          if (typeof value === "string") urls.push(value);
+          if (Array.isArray(value)) urls.push(...value.map(String));
+        });
+      }
+
+      const keysByFolder = new Map<S3Folder, Set<string>>();
+
+      urls.forEach((url) => {
+        const ref = parseS3ImageUrl(url);
+
+        if (!ref) return;
+
+        keysByFolder.set(
+          ref.folder,
+          (keysByFolder.get(ref.folder) ?? new Set()).add(ref.key)
+        );
+      });
+
+      for (const [folder, keys] of keysByFolder) {
+        await this.fileService.deleteFiles([...keys], folder);
+      }
+    } catch (err) {
+      this.logger.error(err, "Failed to roll back a content request approval");
     }
   }
 
@@ -411,24 +558,25 @@ export class ContentRequestsService {
     urls: string[],
     folder: S3Folder,
     ownerId: mongoose.Types.ObjectId,
-    failedImages: string[]
+    approval: IApproval
   ) {
     const uploaded: string[] = [];
 
     for (const url of urls) {
       try {
-        uploaded.push(
-          await this.fileService.uploadRemoteImage(
-            url,
-            `${ownerId}/${new mongoose.Types.ObjectId()}`,
-            folder
-          )
+        const stored = await this.fileService.uploadRemoteImage(
+          url,
+          `${ownerId}/${new mongoose.Types.ObjectId()}`,
+          folder
         );
+
+        uploaded.push(stored);
+        approval.uploaded.push(stored);
       } catch (err) {
         this.logger.warn(
           `Skipped request image ${url}: ${(err as Error).message}`
         );
-        failedImages.push(url);
+        approval.failedImages.push(url);
       }
     }
 
@@ -450,12 +598,13 @@ export class ContentRequestsService {
   private async applyGame(
     request: ILeanRequest,
     payload: IGameRequestPayload,
+    approval: IApproval,
     lockSync?: boolean,
     force?: boolean
   ) {
-    const failedImages: string[] = [];
-    const warnings: string[] = [];
+    const { warnings } = approval;
     const now = new Date().toISOString();
+    let isIgdbParsed = false;
     let game = request.targetId
       ? await this.games.findById(request.targetId).lean()
       : null;
@@ -465,7 +614,14 @@ export class ContentRequestsService {
     }
 
     if (!game && payload.igdbId) {
+      const existed = await this.games.exists({
+        "igdb.gameId": payload.igdbId,
+      });
+
+      isIgdbParsed = true;
       game = await this.parseIgdb(payload.igdbId, warnings);
+
+      if (game && !existed) approval.createdId = game._id;
     }
 
     if (!game) {
@@ -476,7 +632,15 @@ export class ContentRequestsService {
       }
 
       if (!force) {
-        await this.gameMatcher.assertNoDuplicates({ name: payload.name });
+        await this.gameMatcher.assertNoDuplicates({
+          name: payload.name,
+          alternative_names: payload.alternative_names,
+          type: payload.type,
+          first_release: payload.first_release,
+          companies: withCompanyNames(payload.companies ?? [], payload),
+          platformIds: payload.platformIds,
+          summary: payload.summary,
+        });
       }
 
       const created = await this.games.create({
@@ -495,12 +659,17 @@ export class ContentRequestsService {
       });
 
       game = created.toObject();
+      approval.createdId = game._id;
       this.indexNow.submitUrl(`${FRONT_URL}/games/${game.slug}`);
     }
 
     const gameId = game._id;
 
-    if (payload.igdbId && game.igdb?.gameId !== payload.igdbId) {
+    if (
+      payload.igdbId &&
+      !isIgdbParsed &&
+      game.igdb?.gameId !== payload.igdbId
+    ) {
       await this.linkIgdb(game, payload.igdbId, warnings);
     }
 
@@ -517,7 +686,7 @@ export class ContentRequestsService {
     }
 
     const fresh = (await this.games.findById(gameId).lean())!;
-    const set = await this.buildGameSet(fresh, payload, gameId, failedImages);
+    const set = await this.buildGameSet(fresh, payload, gameId, approval);
 
     await this.games.updateOne(
       { _id: gameId },
@@ -530,7 +699,9 @@ export class ContentRequestsService {
       }
     );
 
-    return { resultId: gameId, failedImages, warnings };
+    if (!approval.createdId) approval.uploaded = [];
+
+    return gameId;
   }
 
   private async parseIgdb(igdbId: number, warnings: string[]) {
@@ -608,7 +779,7 @@ export class ContentRequestsService {
     game: GameDocument | (Record<string, unknown> & Partial<Game>),
     payload: IGameRequestPayload,
     gameId: mongoose.Types.ObjectId,
-    failedImages: string[]
+    approval: IApproval
   ) {
     const set: Record<string, unknown> = {};
 
@@ -651,30 +822,10 @@ export class ContentRequestsService {
     }
 
     if (payload.companies || payload.developer || payload.publisher) {
-      const companies = [...(payload.companies ?? game.companies ?? [])];
-
-      (["developer", "publisher"] as const).forEach((flag) => {
-        const name = payload[flag];
-
-        if (!name) return;
-
-        const match = companies.find((company) => company.name === name);
-
-        if (match) {
-          match[flag] = true;
-          return;
-        }
-
-        companies.push({
-          name,
-          developer: flag === "developer",
-          publisher: flag === "publisher",
-          porting: false,
-          supporting: false,
-        });
-      });
-
-      set.companies = companies;
+      set.companies = withCompanyNames(
+        payload.companies ?? game.companies ?? [],
+        payload
+      );
     }
 
     if (payload.relatedGames || payload.parentGameId) {
@@ -726,7 +877,7 @@ export class ContentRequestsService {
         [payload.cover],
         S3_FOLDERS.covers,
         gameId,
-        failedImages
+        approval
       );
 
       if (cover) set.cover = cover;
@@ -740,12 +891,7 @@ export class ContentRequestsService {
 
       if (!urls?.length) continue;
 
-      const uploaded = await this.uploadImages(
-        urls,
-        folder,
-        gameId,
-        failedImages
-      );
+      const uploaded = await this.uploadImages(urls, folder, gameId, approval);
 
       set[key] = [...((game[key] as string[]) ?? []), ...uploaded];
     }
@@ -755,9 +901,10 @@ export class ContentRequestsService {
 
   private async applyCharacter(
     request: ILeanRequest,
-    payload: ICharacterRequestPayload
+    payload: ICharacterRequestPayload,
+    approval: IApproval,
+    force?: boolean
   ) {
-    const failedImages: string[] = [];
     const existing = request.targetId
       ? await this.characters.findById(request.targetId).lean()
       : null;
@@ -766,20 +913,23 @@ export class ContentRequestsService {
       throw new NotFoundException("The character no longer exists");
     }
 
+    const gameIds = await this.existingIds(
+      this.games as Model<unknown>,
+      payload.gameIds
+    );
+
+    if (!existing && !force) {
+      await this.assertNoDuplicateCharacters(payload, gameIds);
+    }
+
     const characterId = existing?._id ?? new mongoose.Types.ObjectId();
     const now = new Date().toISOString();
     const set: Record<string, unknown> = {};
 
     for (const [key, value] of Object.entries(payload)) {
-      if (IMAGE_FIELDS.has(key)) continue;
+      if (IMAGE_FIELDS.has(key) || key === "gameIds") continue;
 
-      set[key] =
-        key === "gameIds"
-          ? await this.existingIds(
-              this.games as Model<unknown>,
-              value as string[]
-            )
-          : value;
+      set[key] = value;
     }
 
     if (payload.mugShot) {
@@ -787,7 +937,7 @@ export class ContentRequestsService {
         [payload.mugShot],
         S3_FOLDERS.characters,
         characterId,
-        failedImages
+        approval
       );
 
       if (mugShot) set.mugShot = mugShot;
@@ -796,14 +946,20 @@ export class ContentRequestsService {
     if (existing) {
       await this.characters.updateOne(
         { _id: characterId },
-        { $set: { ...set, updatedAt: now } }
+        {
+          $set: { ...set, updatedAt: now },
+          ...(payload.gameIds && {
+            $addToSet: { gameIds: { $each: gameIds } },
+          }),
+        }
       );
+      approval.uploaded = [];
     } else {
       await this.characters.create({
         _id: characterId,
         akas: [],
-        gameIds: [],
         ...set,
+        gameIds,
         slug: await uniqueSlug(
           (candidate) => this.characters.exists({ slug: candidate }),
           payload.name!
@@ -811,8 +967,43 @@ export class ContentRequestsService {
         createdAt: now,
         updatedAt: now,
       });
+      approval.createdId = characterId;
     }
 
-    return { resultId: characterId, failedImages, warnings: [] as string[] };
+    return characterId;
+  }
+
+  private async assertNoDuplicateCharacters(
+    payload: ICharacterRequestPayload,
+    gameIds: mongoose.Types.ObjectId[]
+  ) {
+    const patterns = [payload.name, ...(payload.akas ?? [])]
+      .filter((name): name is string => !!name?.trim())
+      .map((name) => new RegExp(`^${escapeRegExp(name.trim())}$`, "i"));
+
+    if (!patterns.length) return;
+
+    const matches = await this.characters
+      .find({
+        $or: [{ name: { $in: patterns } }, { akas: { $in: patterns } }],
+        ...(gameIds.length && { gameIds: { $in: gameIds } }),
+      })
+      .select("_id name slug")
+      .limit(10)
+      .lean<{ _id: mongoose.Types.ObjectId; name: string; slug: string }[]>();
+
+    if (!matches.length) return;
+
+    const duplicates: IPossibleDuplicate[] = matches.map((character) => ({
+      _id: character._id.toString(),
+      name: character.name,
+      slug: character.slug,
+      score: 1,
+    }));
+
+    throw new ConflictException({
+      message: POSSIBLE_DUPLICATES_MESSAGE,
+      duplicates,
+    });
   }
 }

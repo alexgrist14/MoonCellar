@@ -29,13 +29,18 @@ export const GameMedia: FC<IGameMediaProps> = ({ game, isBoxed = true }) => {
     ? activeKey
     : panels[0].key;
 
+  const currentIndex = panels.findIndex((panel) => panel.key === currentKey);
+
   const tabs =
     panels.length > 1 ? (
       <Tabs
         buttonColor="transparent"
         buttonsClassName={styles.mediaTabs}
+        defaultTabIndex={currentIndex}
+        isUseDefaultIndex
         contents={panels.map((panel) => ({
-          tabName: `${panel.label} ${panel.items.length}`,
+          tabName: panel.label,
+          count: panel.items.length,
           className: classNames(styles.mediaTab, {
             [styles.mediaTabActive]: panel.key === currentKey,
           }),

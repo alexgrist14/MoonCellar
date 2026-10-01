@@ -10,6 +10,7 @@ interface ICheckboxProps extends Pick<
   | "onClick"
   | "id"
   | "checked"
+  | "defaultChecked"
   | "className"
   | "aria-label"
 > {
@@ -28,10 +29,12 @@ export const Checkbox: FC<ICheckboxProps> = ({
   return (
     <input
       style={{ borderColor }}
-      className={classNames(styles.checkbox, className, {
-        [styles[`checkbox__border_${colorTheme}`]]: isBorderFromTheme,
-        [styles[`checkbox_${colorTheme}`]]: props.checked,
-      })}
+      className={classNames(
+        styles.checkbox,
+        styles[`checkbox_${colorTheme}`],
+        className,
+        { [styles[`checkbox__border_${colorTheme}`]]: isBorderFromTheme }
+      )}
       type="checkbox"
       {...props}
     />

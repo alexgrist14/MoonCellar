@@ -39,8 +39,6 @@ export const GamePage: FC<IGamePageProps> = ({
 }) => {
   const hideMedia = useHideAdult() && isAdultGame(game);
 
-  if (!game) return null;
-
   return (
     <div className={styles.page}>
       <BGImage game={game} />

@@ -3,13 +3,11 @@
   flex-direction: column;
   gap: var(--gap-x1);
   position: relative;
-  min-height: 110px;
+  min-height: 100px;
   border-radius: var(--radius-x1);
   background-color: var(--color-bg-secondary);
   padding: var(--padding-x1);
   overflow: hidden;
-  position: relative;
-  min-height: 100px;
 
   &__row {
     display: flex;
@@ -38,6 +36,10 @@
 
     & > p {
       @include textEllipsis;
+    }
+
+    &_clickable {
+      cursor: pointer;
     }
   }
 

@@ -72,19 +72,6 @@
     gap: var(--gap-x1);
   }
 
-  &__arrow {
-    @include flexCenter;
-    width: var(--date-picker-arrow-size);
-    height: var(--date-picker-arrow-size);
-    border-radius: var(--radius-x3);
-    background: var(--color-bg-primary);
-    transition: 0.3s;
-
-    &:hover {
-      background: var(--color-bg-hover);
-    }
-  }
-
   &__grid {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -141,21 +128,10 @@
   }
 
   &__control {
-    @include font(13px, 16px, 500);
-    color: var(--color-gray);
-    transition: 0.3s;
-
-    &:hover {
-      color: var(--color-text-primary);
-    }
+    color: var(--color-text-muted);
 
     &_accent {
       color: var(--color-accent);
-
-      &:hover {
-        color: var(--color-accent);
-        opacity: 0.8;
-      }
     }
   }
 }

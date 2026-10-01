@@ -53,3 +53,9 @@
 
   @include font(11px, 14px, 500);
 }
+
+.prefix {
+  display: inline-flex;
+  align-items: center;
+  margin-right: var(--gap-x2);
+}

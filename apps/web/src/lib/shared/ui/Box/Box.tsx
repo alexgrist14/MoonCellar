@@ -9,7 +9,8 @@ import { ResizeHandle } from "../ResizeHandle";
 
 interface IBoxProps {
   children: ReactNode;
-  title?: string;
+  title?: ReactNode;
+  titleCount?: number;
   titleAction?: ReactNode;
   wrapperStyle?: CSSProperties;
   templateStyle?: CSSProperties;

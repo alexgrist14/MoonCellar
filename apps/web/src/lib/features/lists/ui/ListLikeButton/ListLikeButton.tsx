@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from "react";
 import classNames from "classnames";
 import { ICustomList } from "@mooncellar/schemas";
 import { useSetListLikeMutation } from "@/src/lib/entities/list/api/list.mutations";
-import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
+import { ReactionButton } from "@/src/lib/shared/ui/ReactionButton";
 import { SvgHeart, SvgHeartFilled } from "@/src/lib/shared/ui/svg";
 import styles from "./ListLikeButton.module.scss";
 
@@ -28,7 +28,6 @@ export const ListLikeButton: FC<IListLikeButtonProps> = ({
   }, [list.isLiked, list.likesCount]);
 
   const isOwner = !!viewerId && viewerId === list.userId;
-  const isDisabled = !viewerId || isOwner || isPending;
   const tooltip = !viewerId
     ? "You must be logged in to like lists"
     : isOwner
@@ -55,25 +54,18 @@ export const ListLikeButton: FC<IListLikeButtonProps> = ({
   };
 
   return (
-    <Button
-      color={ButtonColor.DEFAULT}
-      className={classNames(styles.like, className, {
-        [styles.like_active]: state.isLiked,
-      })}
+    <ReactionButton
+      variant="boxed"
+      className={classNames(styles.like, className)}
+      icon={<SvgHeart size="16" />}
+      activeIcon={<SvgHeartFilled size="16" />}
+      count={state.likesCount}
+      isActive={state.isLiked}
+      isReadOnly={!viewerId || isOwner}
+      isDisabled={isPending}
       tooltip={tooltip}
-      aria-pressed={state.isLiked}
-      aria-label={`${tooltip} · ${state.likesCount}`}
-      disabled={isDisabled}
+      ariaLabel={`${tooltip} · ${state.likesCount}`}
       onClick={handleClick}
-    >
-      <span className={styles.icon}>
-        {state.isLiked ? (
-          <SvgHeartFilled size="16" style={{ color: "inherit" }} />
-        ) : (
-          <SvgHeart size="16" style={{ color: "inherit" }} />
-        )}
-      </span>
-      <span>{state.likesCount}</span>
-    </Button>
+    />
   );
 };

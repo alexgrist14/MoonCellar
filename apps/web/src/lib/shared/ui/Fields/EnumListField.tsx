@@ -36,9 +36,7 @@ export const EnumListField: FC<IEnumListFieldProps> = ({
       <Dropdown
         list={list}
         placeholder={`Select ${label.toLowerCase()}`}
-        overwriteValue={
-          value?.length ? `Selected ${value.length}` : undefined
-        }
+        overwriteValue={value?.length ? `Selected ${value.length}` : undefined}
         isMulti
         isWithSearch
         isWithReset

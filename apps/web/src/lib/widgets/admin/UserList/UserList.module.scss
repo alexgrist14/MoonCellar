@@ -1,52 +1,30 @@
 .container {
   display: flex;
+  align-items: center;
   gap: var(--gap-x5);
-
-  .avatar {
-    .image {
-      object-fit: cover;
-      border-radius: 50%;
-    }
-  }
-
-  .description {
-    p {
-      color: var(--color-neutral-85);
-    }
-  }
+  min-width: 0;
 }
 
-.role {
-  display: inline-block;
-  padding: var(--padding-x05) var(--padding-x2);
-  border-radius: var(--radius-x1);
-  font-size: 0.95em;
-  margin-right: 6px;
-  background: var(--color-neutral-10);
-  color: var(--color-neutral-85);
-}
-
-.role_admin {
-  background: #ffeaea;
-  color: #d32f2f;
-}
-
-.role_user {
-  background: #eaf7ff;
-  color: #1976d2;
-}
-
-.role_moderator {
-  background: #90f1b8;
-  color: #074d0b;
-}
-
-.placeholder {
+.avatar {
   width: 48px;
   height: 48px;
+  flex-shrink: 0;
 }
-.rowClickable {
-  cursor: pointer;
+
+.description {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.email {
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
 }
 
 .fill {

@@ -102,38 +102,6 @@
   }
 }
 
-.idle {
-  display: grid;
-  place-items: center;
-  gap: var(--gap-x2);
-  min-height: var(--requests-panel-min-height);
-  padding: var(--padding-x6) var(--padding-x4);
-  border: 1px dashed var(--color-border-primary);
-  border-radius: var(--radius-x4);
-  text-align: center;
-
-  svg {
-    width: var(--padding-x7);
-    height: var(--padding-x7);
-    color: var(--color-accent);
-  }
-
-  &[data-royal="true"] svg {
-    color: var(--color-attention);
-  }
-
-  &__title {
-    color: var(--color-text-primary);
-    @include font(16px, 22px, 600);
-  }
-
-  &__text {
-    max-width: 40ch;
-    color: var(--color-text-muted);
-    @include font(13px, 18px, 400);
-  }
-}
-
 .winner {
   display: flex;
   flex-direction: column;
@@ -200,27 +168,6 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--gap-x1);
-
-    span {
-      padding: var(--padding-x1) var(--padding-x2);
-      border-radius: var(--radius-x2);
-      background-color: var(--color-bg-tertiary);
-      color: var(--color-text-secondary);
-      @include font(12px, 16px, 400);
-    }
-  }
-
-  &__chipLink {
-    padding: var(--padding-x1) var(--padding-x2);
-    border-radius: var(--radius-x2);
-    background-color: var(--color-bg-tertiary);
-    color: var(--color-text-primary);
-    transition: background-color var(--duration-fast);
-    @include font(12px, 16px, 400);
-
-    &:hover {
-      background-color: var(--color-bg-hover);
-    }
   }
 
   &__open {

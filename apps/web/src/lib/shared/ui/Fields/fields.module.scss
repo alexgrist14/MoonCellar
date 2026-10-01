@@ -23,6 +23,18 @@
   display: flex;
   align-items: center;
   gap: var(--gap-x2);
+
+  &_fullWidth {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  &_fullWidthMobile {
+    @include mediaMax($screenMd) {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
 }
 
 .fileName {
@@ -44,21 +56,6 @@
 }
 
 .chip {
-  display: flex;
-  align-items: center;
-  gap: var(--gap-x1);
-  padding: var(--padding-x1) var(--padding-x2);
-  border: 1px solid var(--color-border-primary);
-  border-radius: var(--radius-x4);
-  background: var(--color-bg-tertiary);
-  max-width: 100%;
-  min-width: 0;
-
-  &__text {
-    min-width: 0;
-    overflow-wrap: anywhere;
-  }
-
   &_added {
     animation: chipAdded 0.9s var(--easing-out);
   }
@@ -66,31 +63,6 @@
   @include reducedMotion {
     &_added {
       animation-duration: var(--duration-instant);
-    }
-  }
-
-  &__remove {
-    display: grid;
-    flex-shrink: 0;
-    place-items: center;
-    width: var(--padding-x6);
-    aspect-ratio: 1;
-    padding: 0;
-    border: 0;
-    border-radius: var(--radius-x2);
-    background: transparent;
-    color: var(--color-negative);
-    cursor: pointer;
-    transition: background-color var(--duration-fast);
-
-    &:hover:not(:disabled),
-    &:focus-visible {
-      background-color: color-mix(in srgb, var(--color-negative) 18%, transparent);
-    }
-
-    &:disabled {
-      cursor: not-allowed;
-      opacity: 0.5;
     }
   }
 }
@@ -122,28 +94,23 @@
     height: var(--field-control-height);
   }
 
-  &__remove {
-    display: grid;
-    place-items: center;
+  & &__remove {
     flex-shrink: 0;
-    width: var(--field-control-height);
-    aspect-ratio: 1;
-    padding: 0;
-    border: 0;
-    border-radius: var(--radius-x2);
-    background-color: color-mix(in srgb, var(--color-negative) 12%, transparent);
+    height: var(--field-control-height);
+    background-color: color-mix(
+      in srgb,
+      var(--color-negative) 12%,
+      transparent
+    );
     color: var(--color-negative);
-    cursor: pointer;
-    transition: background-color var(--duration-fast);
 
     &:hover:not(:disabled),
     &:focus-visible {
-      background-color: color-mix(in srgb, var(--color-negative) 24%, transparent);
-    }
-
-    &:disabled {
-      cursor: not-allowed;
-      opacity: 0.5;
+      background-color: color-mix(
+        in srgb,
+        var(--color-negative) 24%,
+        transparent
+      );
     }
   }
 }
@@ -166,7 +133,20 @@
   width: 100%;
   padding: var(--padding-x3);
   background: var(--color-bg-secondary);
-  cursor: pointer;
+}
+
+.sectionChevron {
+  flex-shrink: 0;
+  transform: rotate(-90deg);
+  transition: transform var(--duration-fast) var(--easing-out);
+
+  &_open {
+    transform: none;
+  }
+
+  @include reducedMotion {
+    transition-duration: var(--duration-instant);
+  }
 }
 
 .sectionBody {

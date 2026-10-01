@@ -5,12 +5,6 @@
   min-width: 0;
 }
 
-.count {
-  font-size: 12px;
-  color: var(--color-text-muted);
-  font-variant-numeric: tabular-nums;
-}
-
 .empty {
   padding: var(--padding-x4) 0;
   color: var(--color-text-muted);
@@ -25,7 +19,7 @@
 
 .person {
   display: grid;
-  grid-template-columns: var(--community-avatar-size) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: var(--gap-x3);
   align-items: center;
   padding: var(--padding-x2);
@@ -35,6 +29,14 @@
   &:hover {
     background: var(--color-bg-hover);
   }
+}
+
+.link {
+  display: grid;
+  grid-template-columns: var(--community-avatar-size) minmax(0, 1fr);
+  gap: var(--gap-x3);
+  align-items: center;
+  min-width: 0;
 }
 
 .name {

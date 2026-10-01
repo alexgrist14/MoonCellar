@@ -16,6 +16,7 @@ import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { parseQueryFilters } from "@/src/lib/shared/utils/filters.utils";
 import { useWheelStore } from "@/src/lib/shared/store/wheel.store";
 import { Box } from "@/src/lib/shared/ui/Box";
+import { Badge } from "@/src/lib/shared/ui/Badge";
 import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import styles from "./GauntletModePanel.module.scss";
@@ -138,15 +139,24 @@ export const GauntletModePanel: FC = () => {
                 </span>
               )}
               {royalGamesData.map((game) => (
-                <span
+                <Badge
                   key={game._id}
-                  className={classNames(styles.pill, {
-                    [styles.pill_out]: !remaining.has(game._id),
-                    [styles.pill_winner]: winner?._id === game._id,
+                  size="md"
+                  isWrap
+                  tone={
+                    winner?._id === game._id
+                      ? "attention"
+                      : !remaining.has(game._id)
+                        ? "muted"
+                        : "neutral"
+                  }
+                  className={classNames({
+                    [styles.out]:
+                      !remaining.has(game._id) && winner?._id !== game._id,
                   })}
                 >
                   {game.name}
-                </span>
+                </Badge>
               ))}
             </div>
           ) : (

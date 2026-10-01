@@ -84,3 +84,10 @@ const STATE_LABEL_SETS: Record<
 
 export const stateLabel = (source: IConflictSource, state: IConflictState) =>
   STATE_LABEL_SETS[CREATES_GAME[source] ? "create" : "link"][state];
+
+export const stateTone = (state: IConflictState) =>
+  state === "waiting"
+    ? "attention"
+    : state === "matched" || state === "new-game"
+      ? "positive"
+      : "muted";

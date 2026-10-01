@@ -1,11 +1,5 @@
 .page {
-  &__more {
-    border-radius: var(--radius-x2);
-    position: relative;
-  }
-
   &__empty {
-    text-align: center;
     margin-block: auto;
   }
 }

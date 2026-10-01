@@ -31,13 +31,17 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky",
-    "pre-commit": "lint-staged"
+    "pre-commit": "lint-staged",
+    "docs": "vitepress dev docs --port 4333",
+    "docs:build": "vitepress build docs",
+    "storybook": "bun --filter web storybook"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.1",
     "@commitlint/config-conventional": "^21.2.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.1.0",
-    "prettier": "^3.9.5"
+    "prettier": "^3.9.5",
+    "vitepress": "^1.6.4"
   }
 }

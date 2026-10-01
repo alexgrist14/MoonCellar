@@ -5,6 +5,9 @@ import { useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { Badge } from "@/src/lib/shared/ui/Badge";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
+import { pluralize } from "@/src/lib/shared/utils/plural.utils";
 import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { usePlatformsQuery } from "@/src/lib/entities/platform/api/platform.queries";
@@ -29,14 +32,12 @@ import {
   skipCaption,
   isReopenable,
   stateLabel,
+  stateTone,
   parseConflictSource,
 } from "./labels";
 import styles from "./Conflicts.module.scss";
 
 const SCROLL_STYLE = { maxHeight: "var(--vndb-review-height)" };
-
-const pluralize = (count: number, word: string, plural = `${word}s`) =>
-  `${count} ${count === 1 ? word : plural}`;
 
 const formatLength = (minutes: number) => `${Math.round(minutes / 6) / 10} h`;
 
@@ -230,14 +231,12 @@ export const Conflicts: FC = () => {
 
       {!!externalId &&
         (isLoaderShown ? (
-          <div className={styles.loading}>
-            <Loader type="pulse" />
-          </div>
+          <Loader minHeight="var(--community-loading-height)" />
         ) : !item ? (
-          <p className={styles.placeholder}>
-            No conflict record for {externalId}. The queue never held it, or it
-            was removed.
-          </p>
+          <EmptyState
+            title={`No conflict record for ${externalId}.`}
+            description="The queue never held it, or it was removed."
+          />
         ) : (
           <>
             <div className={styles.split}>
@@ -268,16 +267,10 @@ export const Conflicts: FC = () => {
                         </span>
                       )}
                       {!isDecidable && (
-                        <span
-                          className={classNames(styles.badge, {
-                            [styles.badge_positive]:
-                              item.state === "matched" ||
-                              item.state === "new-game",
-                          })}
-                        >
+                        <Badge tone={stateTone(item.state)}>
                           {stateLabel(item.source, item.state)}
                           {item.decidedBy && ` · ${item.decidedBy}`}
-                        </span>
+                        </Badge>
                       )}
                     </div>
 

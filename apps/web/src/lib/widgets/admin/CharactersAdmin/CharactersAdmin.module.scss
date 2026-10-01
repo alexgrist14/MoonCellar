@@ -17,10 +17,6 @@
   }
 }
 
-.rowClickable {
-  cursor: pointer;
-}
-
 .who {
   display: flex;
   align-items: center;
@@ -46,14 +42,6 @@
     flex-shrink: 0;
     width: var(--padding-x10);
   }
-}
-
-.source {
-  padding: 2px var(--padding-x1);
-  border-radius: var(--radius-x1);
-  background-color: var(--color-bg-tertiary);
-  color: var(--color-text-muted);
-  @include font(11px, 14px, 500);
 }
 
 .muted {

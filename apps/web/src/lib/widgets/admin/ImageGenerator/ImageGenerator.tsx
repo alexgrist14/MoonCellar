@@ -11,6 +11,7 @@ import {
 import {
   useDeleteGeneratedImageMutation,
   useGenerateImageMutation,
+  useGeneratedImagesQuery,
   useSaveGeneratedImageMutation,
 } from "@/src/lib/entities/generated-image/api";
 import {
@@ -19,18 +20,21 @@ import {
 } from "@/src/lib/entities/generated-image/model";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Checkbox } from "@/src/lib/shared/ui/Checkbox";
-import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal/ConfirmModal";
+import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { Table } from "@/src/lib/shared/ui/Table";
 import { Textarea } from "@/src/lib/shared/ui/Textarea";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import {
   compressDataUrl,
+  downloadImage,
   pickKeyColor,
   removeKeyColor,
 } from "@/src/lib/shared/utils/image.utils";
+import { toSlug } from "@/src/lib/shared/utils/slug.utils";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { ElementsModal } from "./ElementsModal";
 import { RowActions } from "./RowActions";
@@ -65,6 +69,7 @@ export const ImageGenerator: FC = () => {
 
   const { entries, addEntry, updateEntry, removeEntry } =
     useGeneratedImagesStore();
+  const { data: savedImages = [] } = useGeneratedImagesQuery();
   const { mutateAsync: generateImage } = useGenerateImageMutation();
   const { mutateAsync: saveImage } = useSaveGeneratedImageMutation();
   const { mutateAsync: deleteImage } = useDeleteGeneratedImageMutation();
@@ -272,7 +277,21 @@ export const ImageGenerator: FC = () => {
     );
   };
 
-  const allRows: IRow[] = [...pending, ...entries];
+  const localSavedIds = new Set(entries.map((entry) => entry.savedId));
+  const remoteEntries: IGeneratedImageEntry[] = savedImages
+    .filter((image) => !localSavedIds.has(image._id))
+    .map((image) => ({
+      id: image._id,
+      prompt: image.prompt,
+      provider: image.provider,
+      model: image.model,
+      dataUrl: image.url,
+      createdAt: image.createdAt,
+      savedId: image._id,
+      url: image.url,
+    }));
+  const remoteIds = new Set(remoteEntries.map((entry) => entry.id));
+  const allRows: IRow[] = [...pending, ...entries, ...remoteEntries];
   const rows = allRows
     .filter((row) => !row.parentId)
     .flatMap((row) => [
@@ -332,10 +351,10 @@ export const ImageGenerator: FC = () => {
       </div>
 
       {!rows.length ? (
-        <p className={styles.placeholder}>
-          Generated images appear here. They are kept in this browser until you
-          delete them.
-        </p>
+        <EmptyState
+          title="Generated images appear here."
+          description="Unsaved images are kept in this browser; uploaded ones are listed for every admin."
+        />
       ) : (
         <Table
           mobileHeadField="prompt"
@@ -446,6 +465,7 @@ export const ImageGenerator: FC = () => {
                     busyState={state}
                     isSaved={!!entry.savedId}
                     isElement={!!entry.parentId}
+                    isRemote={remoteIds.has(entry.id)}
                     hasUnsavedSet={hasUnsavedSet}
                     onUploadSet={() => handleSaveSet(entry)}
                     onUpload={() => handleSave(entry)}
@@ -464,6 +484,15 @@ export const ImageGenerator: FC = () => {
                       )
                     }
                     onElements={() => openElements(entry)}
+                    onDownload={() =>
+                      downloadImage(
+                        entry.dataUrl,
+                        toSlug(entry.elementName ?? entry.prompt).slice(
+                          0,
+                          60
+                        ) || "image"
+                      )
+                    }
                     onDelete={() => handleDelete(entry)}
                   />
                 ) : null,

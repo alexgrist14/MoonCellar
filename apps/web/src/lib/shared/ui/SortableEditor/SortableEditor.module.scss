@@ -1,0 +1,24 @@
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x4);
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-x3);
+
+  &__note {
+    font-size: 13px;
+    color: var(--color-text-muted);
+  }
+
+  &__actions {
+    display: flex;
+    gap: var(--gap-x2);
+    margin-left: auto;
+  }
+}

@@ -9,38 +9,48 @@ import {
 import classNames from "classnames";
 import { accentColor } from "@/src/lib/shared/constants";
 
-export const Loader: FC<{
+export interface ILoaderProps {
   type?: "pulse" | "propogate" | "pacman" | "moon";
   color?: string;
+  size?: number | string;
   speedMultiplier?: number;
   className?: string;
-}> = ({ type = "pulse", color, speedMultiplier, className }) => {
+  isBlock?: boolean;
+  minHeight?: string;
+}
+
+export const Loader: FC<ILoaderProps> = ({
+  type = "pulse",
+  color,
+  size,
+  speedMultiplier,
+  className,
+  isBlock,
+  minHeight,
+}) => {
+  const isBlockMode = isBlock || !!minHeight;
+  const spinnerProps = { speedMultiplier, size, color: color || accentColor };
+
+  const loader = (
+    <div className={classNames(styles.loader, !isBlockMode && className)}>
+      {type === "pulse" && <PulseLoader {...spinnerProps} />}
+      {type === "propogate" && <PropagateLoader {...spinnerProps} />}
+      {type === "pacman" && <PacmanLoader {...spinnerProps} />}
+      {type === "moon" && <MoonLoader {...spinnerProps} />}
+    </div>
+  );
+
+  if (!isBlockMode) return loader;
+
   return (
-    <div className={classNames(styles.loader, className)}>
-      {type === "pulse" && (
-        <PulseLoader
-          speedMultiplier={speedMultiplier}
-          color={color || accentColor}
-        />
-      )}
-      {type === "propogate" && (
-        <PropagateLoader
-          speedMultiplier={speedMultiplier}
-          color={color || accentColor}
-        />
-      )}
-      {type === "pacman" && (
-        <PacmanLoader
-          speedMultiplier={speedMultiplier}
-          color={color || accentColor}
-        />
-      )}
-      {type === "moon" && (
-        <MoonLoader
-          speedMultiplier={speedMultiplier}
-          color={color || accentColor}
-        />
-      )}
+    <div
+      className={classNames(styles.block, className)}
+      style={minHeight ? { minHeight } : undefined}
+      role="status"
+      aria-label="Loading"
+      aria-busy
+    >
+      {loader}
     </div>
   );
 };

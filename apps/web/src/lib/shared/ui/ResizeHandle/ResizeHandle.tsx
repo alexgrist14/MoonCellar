@@ -1,4 +1,4 @@
-import { FC, MouseEvent, RefObject, useCallback } from "react";
+import { FC, KeyboardEvent, PointerEvent, RefObject, useRef } from "react";
 import classNames from "classnames";
 import styles from "./ResizeHandle.module.scss";
 import { SvgResize } from "../svg";
@@ -17,7 +17,22 @@ interface IResizeHandleProps {
 
 type IResizeProperty = "--resize-width" | "--resize-height";
 
+interface IResizeStart {
+  width: number;
+  height: number;
+  widthOffset: number;
+  heightOffset: number;
+}
+
 const SIZE_FIT_ATTEMPTS = 3;
+const KEYBOARD_STEP = 24;
+
+const KEYBOARD_DELTAS: Record<string, [number, number]> = {
+  ArrowLeft: [-KEYBOARD_STEP, 0],
+  ArrowRight: [KEYBOARD_STEP, 0],
+  ArrowUp: [0, -KEYBOARD_STEP],
+  ArrowDown: [0, KEYBOARD_STEP],
+};
 
 const getSizeOffset = (
   element: HTMLElement,
@@ -50,6 +65,22 @@ const restoreProperty = (
     ? element.style.setProperty(property, value)
     : element.style.removeProperty(property);
 
+const measure = (element: HTMLElement): IResizeStart => {
+  const { width, height } = element.getBoundingClientRect();
+  const initialWidth = element.style.getPropertyValue("--resize-width");
+  const initialHeight = element.style.getPropertyValue("--resize-height");
+  const widthOffset = getSizeOffset(element, "--resize-width", width);
+  const heightOffset = getSizeOffset(element, "--resize-height", height);
+
+  restoreProperty(element, "--resize-width", initialWidth);
+  restoreProperty(element, "--resize-height", initialHeight);
+
+  return { width, height, widthOffset, heightOffset };
+};
+
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), max);
+
 export const ResizeHandle: FC<IResizeHandleProps> = ({
   targetRef,
   isCentered,
@@ -60,73 +91,91 @@ export const ResizeHandle: FC<IResizeHandleProps> = ({
   size = "16",
   className,
 }) => {
-  const startCallback = useCallback(
-    (e: MouseEvent<HTMLDivElement>) => {
-      const element = targetRef.current;
+  const drag = useRef<(IResizeStart & { x: number; y: number }) | null>(null);
 
-      if (!element) return;
+  const resize = (
+    element: HTMLElement,
+    start: IResizeStart,
+    deltaX: number,
+    deltaY: number
+  ) => {
+    const nextWidth = clamp(
+      start.width + deltaX,
+      Math.min(minWidth, start.width),
+      Math.max(window.innerWidth * maxWidthRatio, start.width)
+    );
+    const nextHeight = clamp(
+      start.height + deltaY,
+      Math.min(minHeight, start.height),
+      Math.max(window.innerHeight * maxHeightRatio, start.height)
+    );
 
-      e.preventDefault();
-      e.stopPropagation();
+    element.style.setProperty(
+      "--resize-width",
+      `${nextWidth - start.widthOffset}px`
+    );
+    element.style.setProperty(
+      "--resize-height",
+      `${nextHeight - start.heightOffset}px`
+    );
+  };
 
-      const { width, height } = element.getBoundingClientRect();
-      const startX = e.clientX;
-      const startY = e.clientY;
-      const speed = isCentered ? 2 : 1;
+  const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    const element = targetRef.current;
 
-      const initialWidth = element.style.getPropertyValue("--resize-width");
-      const initialHeight = element.style.getPropertyValue("--resize-height");
-      const widthOffset = getSizeOffset(element, "--resize-width", width);
-      const heightOffset = getSizeOffset(element, "--resize-height", height);
+    if (!element || event.button !== 0) return;
 
-      restoreProperty(element, "--resize-width", initialWidth);
-      restoreProperty(element, "--resize-height", initialHeight);
+    event.preventDefault();
+    event.stopPropagation();
+    event.currentTarget.setPointerCapture(event.pointerId);
 
-      const move = (event: globalThis.MouseEvent) => {
-        const nextWidth = Math.min(
-          Math.max(
-            width + (event.clientX - startX) * speed,
-            Math.min(minWidth, width)
-          ),
-          Math.max(window.innerWidth * maxWidthRatio, width)
-        );
-        const nextHeight = Math.min(
-          Math.max(
-            height + (event.clientY - startY) * speed,
-            Math.min(minHeight, height)
-          ),
-          Math.max(window.innerHeight * maxHeightRatio, height)
-        );
+    drag.current = { ...measure(element), x: event.clientX, y: event.clientY };
+    document.body.style.setProperty("user-select", "none");
+  };
 
-        element.style.setProperty(
-          "--resize-width",
-          `${nextWidth - widthOffset}px`
-        );
-        element.style.setProperty(
-          "--resize-height",
-          `${nextHeight - heightOffset}px`
-        );
-      };
+  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    const element = targetRef.current;
+    const start = drag.current;
 
-      const stop = () => {
-        document.removeEventListener("mousemove", move);
-        document.removeEventListener("mouseup", stop);
-        document.body.style.removeProperty("user-select");
-      };
+    if (!element || !start) return;
 
-      document.body.style.setProperty("user-select", "none");
-      document.addEventListener("mousemove", move);
-      document.addEventListener("mouseup", stop);
-    },
-    [targetRef, isCentered, minWidth, minHeight, maxWidthRatio, maxHeightRatio]
-  );
+    const speed = isCentered ? 2 : 1;
+
+    resize(
+      element,
+      start,
+      (event.clientX - start.x) * speed,
+      (event.clientY - start.y) * speed
+    );
+  };
+
+  const handlePointerUp = () => {
+    drag.current = null;
+    document.body.style.removeProperty("user-select");
+  };
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const element = targetRef.current;
+    const delta = KEYBOARD_DELTAS[event.key];
+
+    if (!element || !delta) return;
+
+    event.preventDefault();
+    resize(element, measure(element), ...delta);
+  };
 
   return (
     <div
       role="separator"
       aria-label="Resize"
+      aria-orientation="vertical"
+      tabIndex={0}
       className={classNames(styles.handle, className)}
-      onMouseDown={startCallback}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+      onKeyDown={handleKeyDown}
     >
       <SvgResize size={size} />
     </div>

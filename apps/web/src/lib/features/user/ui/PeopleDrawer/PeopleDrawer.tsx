@@ -57,10 +57,13 @@ export const PeopleDrawer: FC<IPeopleDrawerProps> = ({
   return (
     <div className={styles.people}>
       <Tabs
-        contents={tabs.map((tab) => ({
-          tabName: tab.label,
-          onTabClick: () => setTab(tab.key),
+        contents={tabs.map((item) => ({
+          tabName: item.label,
+          count: item.count,
+          onTabClick: () => setTab(item.key),
         }))}
+        defaultTabIndex={tabs.findIndex((item) => item.key === tab)}
+        isUseDefaultIndex
       />
       <Input
         placeholder="Search by name"
@@ -82,31 +85,25 @@ export const PeopleDrawer: FC<IPeopleDrawerProps> = ({
           const isFollowing = followingIds.has(person._id);
 
           return (
-            <li key={person._id}>
+            <li key={person._id} className={styles.person}>
               <Link
                 href={`/user/${person.userName}`}
-                className={styles.person}
+                className={styles.link}
                 onClick={() => drawer.close()}
               >
                 <Avatar user={person} isWithoutTooltip isWithoutHover />
                 <p className={styles.name}>{person.userName}</p>
-                {!!viewerId && viewerId !== person._id && (
-                  <Button
-                    color={
-                      isFollowing ? ButtonColor.DEFAULT : ButtonColor.ACCENT
-                    }
-                    className={styles.follow}
-                    disabled={isBusy}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      toggleFollowing(person._id);
-                    }}
-                  >
-                    {isFollowing ? "Following" : "Follow"}
-                  </Button>
-                )}
               </Link>
+              {!!viewerId && viewerId !== person._id && (
+                <Button
+                  color={isFollowing ? ButtonColor.DEFAULT : ButtonColor.ACCENT}
+                  className={styles.follow}
+                  disabled={isBusy}
+                  onClick={() => toggleFollowing(person._id)}
+                >
+                  {isFollowing ? "Following" : "Follow"}
+                </Button>
+              )}
             </li>
           );
         })}

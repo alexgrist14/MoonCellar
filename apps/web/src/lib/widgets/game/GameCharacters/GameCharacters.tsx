@@ -25,7 +25,8 @@ export const GameCharacters: FC<IGameCharactersProps> = ({
 
   return (
     <Box
-      title={`Characters ${characters.length}`}
+      title="Characters"
+      titleCount={characters.length}
       isTitleStart
       contentStyle={{ padding: "var(--padding-x4)" }}
     >

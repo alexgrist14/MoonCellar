@@ -29,3 +29,35 @@
     }
   }
 }
+
+.chip__link {
+  color: inherit;
+}
+
+.chip__remove {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: var(--padding-x5);
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-x1);
+  background: none;
+  color: var(--color-negative);
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background-color: color-mix(
+      in srgb,
+      var(--color-negative) 18%,
+      transparent
+    );
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.5;
+  }
+}

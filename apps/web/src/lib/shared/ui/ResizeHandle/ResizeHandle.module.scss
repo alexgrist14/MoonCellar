@@ -10,8 +10,14 @@
   touch-action: none;
   transition: color var(--duration-fast) var(--easing-out);
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     color: var(--color-accent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
   }
 
   @include mediaMin($screenMd) {

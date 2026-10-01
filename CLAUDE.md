@@ -18,6 +18,90 @@ one exists — a status code, an error message, a wrong number.
 What does not belong here: anything the code already states plainly, one-off fixes, changelog
 entries, or a summary of work done. Those go in commit messages or `docs/`.
 
+## Reading the other CLAUDE.md files
+
+- **Before touching a folder, read every `CLAUDE.md` on the path from the repository root down to
+  it.** Rules live next to the code they govern: `apps/web/CLAUDE.md` and `apps/api/CLAUDE.md`
+  for each app, one per shared UI component in `apps/web/src/lib/shared/ui/<Name>/CLAUDE.md`,
+  and one per page in `apps/web/src/lib/pages/<Page>/CLAUDE.md`. A rule in a nested file
+  overrides a broader one for that folder only.
+- **A change that alters what a component or page does, accepts or must not do updates its
+  `CLAUDE.md` in the same change.** A stale one documents behaviour the code no longer has, and
+  the next session trusts it.
+
+## Keeping docs and Storybook current
+
+- **Every change to a component, a page, a route, an API contract or a workflow ends with a
+  check of what documents it, and that check is part of the change, not a follow-up.** Before
+  calling the work done, go through:
+  - the `CLAUDE.md` of every component and page you touched, and of the apps above them;
+  - the `.stories.tsx` of every shared UI component you touched — a new prop, variant or state
+    gets a story, a removed one loses its story, and the stories still render
+    (`bun --filter web build-storybook`);
+  - every file in `docs/` that names what you changed — grep `docs/` for the component, hook,
+    route, endpoint, env var or constant you renamed, removed or changed;
+  - this file, when a rule here describes behaviour you changed.
+- **A doc that contradicts the code is a bug.** Fix it in the same change, or delete the stale
+  part; never leave a claim you know is wrong for later. Stale docs cost more than missing ones,
+  because the next session trusts them.
+
+## Shared UI components
+
+- **Build screens from the shared UI kit in `apps/web/src/lib/shared/ui`; never re-create a
+  control that already exists there.** Read the component's `CLAUDE.md` and its Storybook
+  stories first.
+- **When a shared component almost fits, extend it with a generic prop instead of forking it
+  or styling it from outside.** A second copy drifts from the first, and a one-off override
+  breaks the next time the component changes.
+- **A new reusable control goes into `shared/ui` as a universal component**: no domain
+  knowledge, props instead of hard-coded copy or data.
+- **Every new shared UI component ships with its `CLAUDE.md` and its Storybook stories in the
+  same change, and every new page ships with its `CLAUDE.md`.** A component's file covers what it
+  is, when to use it and when not, its props, a usage snippet and its gotchas; its
+  `<Name>.stories.tsx` covers every meaningful state (variants, disabled, loading, empty, long
+  text) with realistic data and no backend. A page's file covers its routes and rendering mode,
+  where its data comes from, which widgets it composes and its gotchas. Existing ones follow the
+  same shape — copy the structure of a neighbour. A component or page without them is unfinished
+  work, not a follow-up.
+
+## Storybook and documentation
+
+- **Storybook runs on port 4222** (`bun run storybook`, or `bun --filter web storybook`) and
+  picks up `apps/web/src/lib/shared/ui/**/*.stories.tsx`. `.storybook/main.ts` repeats the SCSS
+  `additionalData` and `loadPaths` from `next.config.mjs`; change them together, or every
+  component module fails to compile in Storybook with an undefined mixin.
+- **The Storybook canvas is `--color-bg-secondary`, the colour of a `Box` panel, because that is
+  what almost every component sits on in the app;** fields painted in `--color-bg-primary` vanish
+  on a primary-coloured canvas. A modal rendered inline in a story takes the `asModal` decorator
+  from `.storybook/decorators.tsx`, which sizes it to its content as `ModalsConnector` does —
+  without it the `Box` stretches to the canvas and its rows hug the left edge.
+- **The documentation site runs on port 4333** (`bun run docs`, VitePress, config in
+  `docs/.vitepress/config.mts`) and renders the markdown files in `docs/`; the sidebar lists them
+  on start, titled by each file's first `#` heading, so restart it after adding one. Inline code
+  is rendered with `v-pre` because VitePress compiles markdown as Vue, and `style={{ … }}` in a
+  code span otherwise breaks the build.
+
+## Branding
+
+- **`docs/branding.md` is the brand reference** — name spelling, the three logos and what not
+  to do with them, the palette with its roles, the typefaces, the copy in use and where each
+  surface applies the brand. Read it before building anything user-facing outside the app, and
+  add a row to its "Where the brand is applied" table when a new surface ships.
+- **MoonCellar is branded with exactly three images from `apps/web/public/images`, each in one
+  role:**
+  - `logo-icon.png` (the moon mark) is the favicon and any square or small slot: browser tab,
+    avatar placeholder, app icon.
+  - `logo-text.png` (the wordmark) goes in a header or navigation bar, sized by height. The site
+    header and the documentation nav bar use it; the text "MoonCellar" is never typed next to it.
+  - `logo-full.png` (mark above wordmark) is the hero or banner of a landing or home page, such
+    as the documentation home.
+- **Every new surface — a tool, a preview, an e-mail, a generated page — takes its favicon, header
+  and banner from these files, never from a redrawn or recoloured copy,** so the brand looks the
+  same everywhere. The `-black` variants exist for light backgrounds only.
+- `docs/public/images` holds copies of the three for the documentation site, because pointing
+  VitePress at the 37 MB `apps/web/public` would ship all of it in the docs build. Replace them
+  together with the originals when the logo changes.
+
 ## Package manager
 
 This project uses **bun** exclusively. Using `npm` is forbidden.
@@ -83,9 +167,16 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
 - **`apps/web/next.config.mjs` points `turbopack.root` and `outputFileTracingRoot` at
   the monorepo root.** Pinning them to the app directory puts `packages/` outside the
   project root and imports from the shared package stop resolving.
-- Both Dockerfiles build with the repository root as context and copy every workspace
+- Every Dockerfile (`apps/web`, `apps/api`, and `static.Dockerfile` for the documentation and
+  Storybook images) builds with the repository root as context and copies every workspace
   manifest before `bun install --frozen-lockfile`; a partial copy fails the frozen
   lockfile check.
+
+- **The host's nginx site config is `infra/nginx/mooncellar.conf`, installed over
+  `/etc/nginx/conf.d/mooncellar.conf` on every infra deploy.** Edits made on the server are lost
+  on the next deploy, and so are the `ssl_*` lines `certbot --nginx` would write — certificates
+  are issued with `certbot certonly` from the `server_name` list. Details in
+  `docs/deploy-env.md`.
 
 - **`infra/searxng/` is mounted read-write into the SearXNG container, and the container can
   chown it to its own user.** A file in the repository that the host user cannot write breaks the
@@ -112,8 +203,7 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
   there is no build or watcher.** Each consumer compiles it itself — Bun inside the API,
   Turbopack for Next (it transpiles workspace packages on its own, so `transpilePackages`
   stays empty), ts-jest in the API's tests. This holds only while the API runs on Bun (see
-  Monorepo). The measured alternatives, including the compiled CommonJS package this
-  replaced, are in `docs/schemas-package.md`.
+  Monorepo).
 - `zod` is a peer dependency pinned through the root `catalog`. A second copy anywhere
   in the tree silently breaks type inference across the package boundary.
 - `igdb.schema.ts` stays in `apps/web`: it describes an upstream API the frontend reads

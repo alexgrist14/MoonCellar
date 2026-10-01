@@ -65,3 +65,4 @@ export * from "./SvgBookmark";
 export * from "./SvgClock";
 export * from "./SvgTrophy";
 export * from "./SvgPlayTriangle";
+export * from "./SvgCrown";

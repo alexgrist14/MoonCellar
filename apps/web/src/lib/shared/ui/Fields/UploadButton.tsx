@@ -1,4 +1,5 @@
 import { FC, MouseEvent, useRef, useState } from "react";
+import cn from "classnames";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import styles from "./fields.module.scss";
 
@@ -7,6 +8,10 @@ interface IUploadButtonProps {
   disabled?: boolean;
   tooltip?: string;
   label?: string;
+  fileName?: string | null;
+  className?: string;
+  isFullWidth?: boolean;
+  isFullWidthOnMobile?: boolean;
 }
 
 export const UploadButton: FC<IUploadButtonProps> = ({
@@ -14,9 +19,14 @@ export const UploadButton: FC<IUploadButtonProps> = ({
   disabled,
   tooltip,
   label = "Choose file",
+  fileName,
+  className,
+  isFullWidth,
+  isFullWidthOnMobile,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [fileName, setFileName] = useState<string>();
+  const [pickedName, setPickedName] = useState<string>();
+  const shownName = fileName === undefined ? pickedName : fileName;
 
   const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -24,7 +34,12 @@ export const UploadButton: FC<IUploadButtonProps> = ({
   };
 
   return (
-    <div className={styles.uploadRow}>
+    <div
+      className={cn(styles.uploadRow, className, {
+        [styles.uploadRow_fullWidth]: isFullWidth,
+        [styles.uploadRow_fullWidthMobile]: isFullWidthOnMobile,
+      })}
+    >
       <input
         ref={inputRef}
         type="file"
@@ -32,8 +47,9 @@ export const UploadButton: FC<IUploadButtonProps> = ({
         hidden
         onChange={(e) => {
           const file = e.target.files?.[0];
+          e.target.value = "";
           if (!file) return;
-          setFileName(file.name);
+          setPickedName(file.name);
           onFile(file);
         }}
       />
@@ -46,7 +62,7 @@ export const UploadButton: FC<IUploadButtonProps> = ({
       >
         {label}
       </Button>
-      {!!fileName && <span className={styles.fileName}>{fileName}</span>}
+      {!!shownName && <span className={styles.fileName}>{shownName}</span>}
     </div>
   );
 };

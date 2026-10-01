@@ -60,6 +60,14 @@
     }
   }
 
+  &__count {
+    margin-left: var(--gap-x1);
+    color: var(--tab-count-color);
+    font-weight: 500;
+    font-size: 0.75em;
+    font-variant-numeric: tabular-nums;
+  }
+
   &__actions {
     display: flex;
     align-items: center;

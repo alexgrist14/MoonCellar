@@ -1,13 +1,20 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { IGetContentRequests } from "@mooncellar/schemas";
+import {
+  IGetContentRequests,
+  IGetMyContentRequests,
+} from "@mooncellar/schemas";
 import { contentRequestsApi } from "@/src/lib/shared/api";
 import { requestQueryKeys } from "./request.query-keys";
 
-export const useMyRequestsQuery = (enabled = true) =>
+export const useMyRequestsQuery = (
+  params: IGetMyContentRequests,
+  enabled = true
+) =>
   useQuery({
-    queryKey: requestQueryKeys.mine(),
-    queryFn: () => contentRequestsApi.getMine().then(({ data }) => data),
+    queryKey: requestQueryKeys.mine(params),
+    queryFn: () => contentRequestsApi.getMine(params).then(({ data }) => data),
     enabled,
+    placeholderData: keepPreviousData,
     staleTime: 30000,
   });
 

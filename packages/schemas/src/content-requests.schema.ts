@@ -227,10 +227,14 @@ export const GetContentRequestsSchema = z.object({
     .default(CONTENT_REQUESTS_PAGE_SIZE),
 });
 
+export const GetMyContentRequestsSchema = GetContentRequestsSchema.pick({
+  page: true,
+  take: true,
+});
+
 export const GetContentRequestsResponseSchema = z.object({
   results: ContentRequestSchema.array(),
   total: z.number(),
-  pending: z.number(),
 });
 
 export const DecideContentRequestSchema = z
@@ -344,6 +348,10 @@ export type IContentRequestDetail = z.infer<typeof ContentRequestDetailSchema>;
 export type IGetContentRequests = z.input<typeof GetContentRequestsSchema>;
 export type IGetContentRequestsQuery = z.output<
   typeof GetContentRequestsSchema
+>;
+export type IGetMyContentRequests = z.input<typeof GetMyContentRequestsSchema>;
+export type IGetMyContentRequestsQuery = z.output<
+  typeof GetMyContentRequestsSchema
 >;
 export type IGetContentRequestsResponse = z.infer<
   typeof GetContentRequestsResponseSchema

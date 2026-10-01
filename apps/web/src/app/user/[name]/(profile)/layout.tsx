@@ -55,7 +55,17 @@ export async function generateMetadata({
 }: {
   params: any;
 }): Promise<Metadata> {
-  const user = await getProfileUser((await params).name);
+  const user = await getProfileUser((await params).name).catch(
+    (error: unknown) => {
+      console.error("Failed to load profile metadata:", error);
+
+      return undefined;
+    }
+  );
+
+  if (user === undefined) {
+    return { title: "Profile" };
+  }
 
   if (!user) {
     return {
@@ -101,34 +111,36 @@ export default async function ProfileLayout({
     ? jwtDecode(accessToken.value)
     : undefined;
 
-  const authUserFollowings = !!authUserInfo
-    ? (await userAPI.getUserFollowings(authUserInfo.id)).data
-    : undefined;
-
-  const user = await getProfileUser((await params).name);
+  const [authUserFollowings, user] = await Promise.all([
+    authUserInfo
+      ? userAPI.getUserFollowings(authUserInfo.id).then(({ data }) => data)
+      : undefined,
+    getProfileUser((await params).name),
+  ]);
 
   if (!user) {
     notFound();
   }
-  const playthroughs = (
-    await playthroughsAPI.getAll({
-      userId: user._id,
-    })
-  )?.data;
-  const ratings = (
-    await ratingsAPI.getAll({
-      userId: user._id,
-    })
-  )?.data;
-  const userFollowings = (await userAPI.getUserFollowings(user._id)).data;
-  const userFollowers = (await userAPI.getUserFollowers(user._id)).data;
-  const [favoriteGames, lists, likedLists, favoriteCharacters] =
-    await Promise.all([
-      getFavoriteGames(user.favorites),
-      getPublicLists(user._id),
-      getLikedLists(user._id),
-      getFavoriteCharacters(user._id),
-    ]);
+
+  const [
+    playthroughs,
+    ratings,
+    userFollowings,
+    userFollowers,
+    favoriteGames,
+    lists,
+    likedLists,
+    favoriteCharacters,
+  ] = await Promise.all([
+    playthroughsAPI.getAll({ userId: user._id }).then(({ data }) => data),
+    ratingsAPI.getAll({ userId: user._id }).then(({ data }) => data),
+    userAPI.getUserFollowings(user._id).then(({ data }) => data),
+    userAPI.getUserFollowers(user._id).then(({ data }) => data),
+    getFavoriteGames(user.favorites),
+    getPublicLists(user._id),
+    getLikedLists(user._id),
+    getFavoriteCharacters(user._id),
+  ]);
 
   return (
     <Suspense fallback={<PageLoader />}>

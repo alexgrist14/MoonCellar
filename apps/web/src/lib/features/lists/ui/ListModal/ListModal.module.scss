@@ -6,10 +6,6 @@
   max-width: 100%;
 }
 
-.title {
-  margin: 0;
-}
-
 .field {
   display: flex;
   flex-direction: column;
@@ -39,20 +35,6 @@
 .textarea {
   background: var(--color-bg-primary);
   border-radius: var(--radius-x2);
-}
-
-.toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--gap-x4);
-
-  &__text {
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-x1);
-    font-size: 14px;
-  }
 }
 
 .hint {

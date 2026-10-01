@@ -8,8 +8,12 @@ import {
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { TextField, TextareaField } from "@/src/lib/shared/ui/Fields";
+import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
+import { modal } from "@/src/lib/shared/ui/Modal";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import styles from "./SiteSessions.module.scss";
+
+const DELETE_MODAL_ID = "delete-site-session";
 
 interface ISiteSessionModalProps {
   session?: ISiteSession;
@@ -26,7 +30,7 @@ export const SiteSessionModal: FC<ISiteSessionModalProps> = ({
   const [referer, setReferer] = useState(session?.referer ?? "");
 
   const { mutate: save, isPending: isSaving } = useSaveSiteSessionMutation();
-  const { mutate: remove, isPending: isDeleting } =
+  const { mutateAsync: remove, isPending: isDeleting } =
     useDeleteSiteSessionMutation();
   const {
     mutate: test,
@@ -51,6 +55,22 @@ export const SiteSessionModal: FC<ISiteSessionModalProps> = ({
           onClose();
         },
       }
+    );
+
+  const handleDelete = (target: ISiteSession) =>
+    modal.open(
+      <ConfirmModal
+        title="Delete site"
+        message={`Delete the stored session for ${target.domain}?`}
+        onCancel={() => modal.close(DELETE_MODAL_ID)}
+        onConfirm={async () => {
+          await remove(target._id);
+          modal.close(DELETE_MODAL_ID);
+          toast.success({ description: `${target.domain} deleted` });
+          onClose();
+        }}
+      />,
+      { id: DELETE_MODAL_ID }
     );
 
   return (
@@ -104,16 +124,7 @@ export const SiteSessionModal: FC<ISiteSessionModalProps> = ({
               <Button
                 color={ButtonColor.RED}
                 disabled={isDeleting}
-                onClick={() =>
-                  remove(session._id, {
-                    onSuccess: () => {
-                      toast.success({
-                        description: `${session.domain} deleted`,
-                      });
-                      onClose();
-                    },
-                  })
-                }
+                onClick={() => handleDelete(session)}
               >
                 Delete
               </Button>

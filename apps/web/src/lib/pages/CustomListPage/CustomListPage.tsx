@@ -39,6 +39,7 @@ import {
 import { openListModal } from "@/src/lib/features/lists/ui/ListModal";
 import { UserNavigation } from "@/src/lib/features/user/ui/UserNavigation";
 import { refreshAuth } from "@/src/lib/shared/hooks/useAuthRefresh";
+import { useIsAuthHydrated } from "@/src/lib/shared/hooks/useIsAuthHydrated";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { IUser } from "@/src/lib/shared/types/auth.type";
@@ -94,11 +95,10 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
   const queryClient = useQueryClient();
   const { isMobile } = useStatesStore();
   const authProfile = useAuthStore((s) => s.profile);
+  const isAuthHydrated = useIsAuthHydrated();
 
   const viewerId =
-    typeof window === "undefined" || authProfile?._id === authUserId
-      ? authUserId
-      : undefined;
+    !isAuthHydrated || authProfile?._id === authUserId ? authUserId : undefined;
 
   useEffect(() => {
     if (authUserId && !viewerId) {
@@ -175,8 +175,11 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
         .map((game) => game.gameId),
     [list.games]
   );
-  const { data: allGames, isFetching: isAllGamesFetching } =
-    useGamesByIdsQuery(listIds, undefined, isManaging);
+  const { data: allGames, isFetching: isAllGamesFetching } = useGamesByIdsQuery(
+    listIds,
+    undefined,
+    isManaging
+  );
   const allGamesById = useMemo(
     () => new Map((allGames ?? []).map((game) => [game._id, game])),
     [allGames]
@@ -258,8 +261,7 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
           setDraft(null);
           toast.success({ description: "Order saved" });
         },
-        onError: () =>
-          toast.error({ description: "Could not save the order" }),
+        onError: () => toast.error({ description: "Could not save the order" }),
       }
     );
   };
@@ -309,23 +311,13 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
             position="bottom-right"
             titleClose={
               <span className={styles.button__title}>
-                <SvgBurger
-                  size="32"
-                  topId={cn(styles.top, styles.top_active)}
-                  middleId={cn(styles.middle, styles.middle_active)}
-                  bottomId={cn(styles.bottom, styles.bottom_active)}
-                />
+                <SvgBurger size="32" isOpen />
                 Close
               </span>
             }
             titleOpen={
               <span className={styles.button__title}>
-                <SvgBurger
-                  size="32"
-                  topId={cn(styles.top)}
-                  middleId={cn(styles.middle)}
-                  bottomId={cn(styles.bottom)}
-                />
+                <SvgBurger size="32" />
                 Menu
               </span>
             }

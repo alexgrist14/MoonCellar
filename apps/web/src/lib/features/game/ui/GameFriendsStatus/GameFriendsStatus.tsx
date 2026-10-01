@@ -6,8 +6,8 @@ import { Box } from "@/src/lib/shared/ui/Box";
 import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
 import { Avatar } from "@/src/lib/shared/ui/Avatar";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { IGameFollowingsStatusItem } from "@mooncellar/schemas";
 import { StatusBadge, StatusDetails } from "@/src/lib/shared/ui/StatusBadge";
+import { ScoreValue } from "@/src/lib/shared/ui/ScoreValue";
 import styles from "./GameFriendsStatus.module.scss";
 import { useGameFollowingsStatusQuery } from "@/src/lib/entities/game/api/game.queries";
 
@@ -15,11 +15,6 @@ interface IGameFriendsStatusProps {
   gameId: string;
   isBoxed?: boolean;
 }
-
-const getStatusDetails = (item: IGameFollowingsStatusItem) => [
-  item.count > 1 && `×${item.count}`,
-  item.rating != null && `${item.rating} / 10`,
-];
 
 export const useGameFriendsStatus = (gameId: string) => {
   const profile = useAuthStore((s) => s.profile);
@@ -59,7 +54,14 @@ export const GameFriendsStatus: FC<IGameFriendsStatusProps> = ({
           </Link>
           <span className={styles.block__status}>
             <StatusBadge status={item.category} />
-            <StatusDetails items={getStatusDetails(item)} />
+            <StatusDetails
+              items={[
+                item.count > 1 && `×${item.count}`,
+                item.rating != null && (
+                  <ScoreValue value={item.rating} size="inline" />
+                ),
+              ]}
+            />
           </span>
         </div>
       ))}

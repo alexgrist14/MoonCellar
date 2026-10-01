@@ -1,5 +1,13 @@
 import Image from "next/image";
-import { ChangeEvent, Dispatch, FC, SetStateAction, useState } from "react";
+import {
+  ChangeEvent,
+  Dispatch,
+  FC,
+  SetStateAction,
+  useEffect,
+  useId,
+  useState,
+} from "react";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { SvgCamera } from "../svg";
 import styles from "./AvatarSettings.module.scss";
@@ -18,20 +26,30 @@ export const AvatarSettings: FC<AvatarSettingsProps> = ({
   const { profile, setProfile } = useAuthStore();
 
   const [isPictureLarge, setIsPictureLarge] = useState<boolean>(false);
+  const [previewUrl, setPreviewUrl] = useState<string>();
+  const inputId = useId();
 
-  const handleInput = async (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files !== null) {
-      const file = event.target.files[0];
-      const fileSize = Math.round(file.size / 1024);
+  useEffect(() => {
+    if (!tempAvatar) {
+      setPreviewUrl(undefined);
+      return;
+    }
+    const url = URL.createObjectURL(tempAvatar);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [tempAvatar]);
 
-      if (fileSize > 2048) {
-        setIsPictureLarge(true);
-        setTempAvatar && setTempAvatar(undefined);
-      } else {
-        setTempAvatar && setTempAvatar(file);
-        !!profile && setProfile({ ...profile, avatar: "" });
-        setIsPictureLarge(false);
-      }
+  const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2048 * 1024) {
+      setIsPictureLarge(true);
+      setTempAvatar?.(undefined);
+    } else {
+      setTempAvatar?.(file);
+      !!profile && setProfile({ ...profile, avatar: "" });
+      setIsPictureLarge(false);
     }
   };
 
@@ -42,7 +60,7 @@ export const AvatarSettings: FC<AvatarSettingsProps> = ({
   }
 
   return (
-    <label htmlFor="avatar" className={styles.label}>
+    <label htmlFor={inputId} className={styles.label}>
       <div
         className={styles.holder}
         onMouseOut={() => {
@@ -54,8 +72,8 @@ export const AvatarSettings: FC<AvatarSettingsProps> = ({
       >
         <Image
           src={
-            !!tempAvatar
-              ? URL.createObjectURL(tempAvatar)
+            previewUrl
+              ? previewUrl
               : !profile.avatar
                 ? "/images/user.png"
                 : profile.avatar
@@ -73,11 +91,11 @@ export const AvatarSettings: FC<AvatarSettingsProps> = ({
         />
       </div>
       {isPictureLarge && (
-        <p className={styles.error}>Avatar must me smaller than 2mb</p>
+        <p className={styles.error}>Avatar must be smaller than 2 MB</p>
       )}
       <input
         type="file"
-        id="avatar"
+        id={inputId}
         hidden
         onChange={handleInput}
         accept="image/jpeg,image/png,image/jpg,image/webp"

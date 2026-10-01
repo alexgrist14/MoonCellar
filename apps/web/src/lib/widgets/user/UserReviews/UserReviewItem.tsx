@@ -3,12 +3,16 @@ import classNames from "classnames";
 import Link from "next/link";
 import { IGameResponse, IUserReview } from "@mooncellar/schemas";
 import { AuthorStatus } from "@/src/lib/shared/ui/AuthorStatus";
+import { Badge } from "@/src/lib/shared/ui/Badge";
 import { Cover } from "@/src/lib/shared/ui/Cover";
 import { ExpandableBlock } from "@/src/lib/shared/ui/ExpandableBlock";
 import { GameCard } from "@/src/lib/widgets/game/GameCard";
+import { ReactionButton } from "@/src/lib/shared/ui/ReactionButton";
 import { RichText } from "@/src/lib/shared/ui/RichText";
+import { ScoreValue } from "@/src/lib/shared/ui/ScoreValue";
 import { Spoiler } from "@/src/lib/shared/ui/Spoiler";
 import { SvgThumb } from "@/src/lib/shared/ui/svg";
+import { Tooltip } from "@/src/lib/shared/ui/Tooltip";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import styles from "./UserReviews.module.scss";
 
@@ -61,22 +65,16 @@ export const UserReviewItem: FC<IUserReviewItemProps> = ({
             isMastered={review.isMastered}
           />
           {!!meta && <span className={styles.item__meta}>{meta}</span>}
-          {review.isSpoiler && (
-            <span className={styles.item__flag}>Spoilers</span>
-          )}
+          {review.isSpoiler && <Badge tone="attention">Spoilers</Badge>}
           {isOwnProfile && !review.isPublic && (
-            <span
-              className={classNames(styles.item__flag, styles.item__flag_muted)}
-              title="Not shown on the game page"
-            >
-              Not published
-            </span>
+            <Tooltip content="Not shown on the game page">
+              <Badge tone="muted" tabIndex={0}>
+                Not published
+              </Badge>
+            </Tooltip>
           )}
           {review.rating !== null && (
-            <span className={styles.item__score}>
-              {review.rating}
-              <span className={styles.item__scale}> / 10</span>
-            </span>
+            <ScoreValue value={review.rating} className={styles.item__score} />
           )}
         </div>
         <Spoiler isActive={review.isSpoiler}>
@@ -89,31 +87,16 @@ export const UserReviewItem: FC<IUserReviewItemProps> = ({
           </ExpandableBlock>
         </Spoiler>
         <div className={styles.item__actions}>
-          {!!review.isPublic &&
-            (isOwnProfile ? (
-              <span className={styles.item__helpful}>
-                <SvgThumb size="16" style={{ color: "inherit" }} />
-                Helpful
-                <span className={styles.item__count}>
-                  {review.helpfulCount}
-                </span>
-              </span>
-            ) : (
-              <button
-                type="button"
-                aria-pressed={review.isHelpful}
-                className={classNames(styles.action, {
-                  [styles.action_active]: review.isHelpful,
-                })}
-                onClick={() => onHelpful(review)}
-              >
-                <SvgThumb size="16" style={{ color: "inherit" }} />
-                Helpful
-                <span className={styles.item__count}>
-                  {review.helpfulCount}
-                </span>
-              </button>
-            ))}
+          {!!review.isPublic && (
+            <ReactionButton
+              icon={<SvgThumb size="16" style={{ color: "inherit" }} />}
+              tooltip="Helpful"
+              count={review.helpfulCount}
+              isActive={!isOwnProfile && review.isHelpful}
+              isReadOnly={isOwnProfile}
+              onClick={() => onHelpful(review)}
+            />
+          )}
           {review.date ? (
             <span className={classNames(styles.item__meta, styles.item__date)}>
               Finished {formatIsoDate(review.date)}

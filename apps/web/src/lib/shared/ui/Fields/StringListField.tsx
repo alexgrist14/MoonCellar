@@ -2,7 +2,8 @@ import { FC, ReactNode, useEffect, useState } from "react";
 import classNames from "classnames";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
-import { SvgCheck, SvgClose } from "@/src/lib/shared/ui/svg";
+import { Chip } from "@/src/lib/shared/ui/Chip";
+import { SvgCheck } from "@/src/lib/shared/ui/svg";
 import styles from "./fields.module.scss";
 
 interface IStringListFieldProps {
@@ -48,23 +49,18 @@ export const StringListField: FC<IStringListFieldProps> = ({
       <span className={styles.label}>{label}</span>
       <div className={styles.chips}>
         {items.map((item, index) => (
-          <span
+          <Chip
             key={`${item}-${index}`}
+            variant="outlined"
             className={classNames(styles.chip, {
               [styles.chip_added]: index === addedIndex,
             })}
+            removeLabel={`Remove ${item}`}
+            isDisabled={disabled}
+            onRemove={() => onChange(items.filter((_, i) => i !== index))}
           >
-            <span className={styles.chip__text}>{item}</span>
-            <button
-              type="button"
-              className={styles.chip__remove}
-              aria-label={`Remove ${item}`}
-              disabled={disabled}
-              onClick={() => onChange(items.filter((_, i) => i !== index))}
-            >
-              <SvgClose size="12" style={{ color: "inherit" }} />
-            </button>
-          </span>
+            {item}
+          </Chip>
         ))}
       </div>
       {(!isAddDisabled || !!action) && (

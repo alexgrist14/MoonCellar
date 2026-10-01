@@ -1,0 +1,29 @@
+.score {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+
+  &__scale {
+    color: var(--color-text-muted);
+    font-weight: 400;
+  }
+
+  &_md {
+    color: var(--color-text-primary);
+
+    @include font(15px, 20px, 600);
+  }
+
+  &_md &__scale {
+    @include font(12px, 16px, 400);
+  }
+
+  &_lg {
+    color: var(--color-text-primary);
+
+    @include font(30px, 32px, 600);
+  }
+
+  &_lg &__scale {
+    @include font(14px, 18px, 400);
+  }
+}

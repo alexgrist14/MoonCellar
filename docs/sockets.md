@@ -6,7 +6,7 @@ MoonCellar keeps three real-time channels open over Socket.IO, all served by the
 |---|---|---|
 | `/comments` | Anyone with a game's Discussion tab open | **Notifications only.** Tells other readers that a comment was posted, edited, moderated or liked. Every change still goes through REST. |
 | `/royal` | Every signed-in user, on every page | **State.** Royal games — the user's list of games for the royal wheel — are read and changed over this socket and pushed to the user's other tabs and devices. |
-| `/conflicts` | Admins with the Conflicts tab open | **Notifications only.** Tells other admins that a conflict was matched or skipped, and when queued decisions were written to games. |
+| `/conflicts` | Admins with the Conflicts tab open | **Notifications only.** Tells other admins that a conflict was matched, skipped or reopened, and when queued decisions were written to games. |
 
 This document describes how they work, every event on the wire, what depends on the sockets and
 what deliberately does not.
@@ -56,7 +56,7 @@ a comment, every other open Discussion tab of that game reflects it without a re
 | Authentication | None — the socket is anonymous |
 | Server code | `apps/api/src/module/comments/gateways/comments.gateway.ts` |
 | Client code | `apps/web/src/lib/shared/socket/comments.socket.ts`, `socket-id.ts`, `apps/web/src/lib/entities/comment/api/comment.socket.ts` |
-| Only consumer | `DiscussionTab` (`apps/web/src/lib/features/game/GameCommunity/components/DiscussionTab.tsx`) |
+| Only consumer | `DiscussionTab` (`apps/web/src/lib/features/game/ui/GameCommunity/components/DiscussionTab.tsx`) |
 
 ### Flow
 
@@ -245,7 +245,7 @@ in the room.
 | `shared/socket/socket-id.ts` | The current socket id, with no dependencies, so `shared/api` can read it without pulling `socket.io-client` into every bundle |
 | `entities/comment/api/comment.socket.ts` | `useDiscussionSocket(gameId)`: event → React Query cache |
 | `entities/comment/api/comment.cache.ts` | `setCommentInCache` and `invalidateDiscussion`, shared by the mutations and the socket hook |
-| `features/game/GameCommunity/components/DiscussionTab.tsx` | Calls `useDiscussionSocket(game._id)` |
+| `features/game/ui/GameCommunity/components/DiscussionTab.tsx` | Calls `useDiscussionSocket(game._id)` |
 
 Handlers ignore events whose `gameId` differs from their own, so two followed games never write
 into each other's cache.
@@ -266,7 +266,7 @@ account and every change goes through this socket; guests keep a local list in t
 | Authentication | Session cookie `accessMoonToken`, verified when the namespace connects |
 | Server code | `apps/api/src/module/user/gateways/royal-games.gateway.ts`, `services/user-royal-games.service.ts`, `utils/royal-games.utils.ts` |
 | Client code | `apps/web/src/lib/shared/socket/royal.socket.ts`, `shared/store/royal.store.ts`, `entities/royal/` |
-| Consumers | `GameCard`, `GameHero`, `RoyalGamesPanel`, `GamesListMenu`, `ConsolesList`, `WheelComponent` — all through `useRoyalGames` |
+| Consumers | `GameCard`, `GameHero`, `RoyalGamesPanel`, `GamesListMenu`, `ConsolesList`, `GauntletModePanel`, `WheelComponent` — all through `useRoyalGames` |
 
 ### Guests and accounts
 
@@ -468,17 +468,21 @@ open gets a toast and loses the Skip and Match buttons. A conflict is identified
 
 #### `conflict:decided`
 
-Emitted by `ConflictsService.decide` after the decision is written.
+Emitted by `ConflictsService.decide` after the decision is written, and by
+`ConflictsService.reopen` (`POST /conflicts/:source/:externalId/reopen`) when a skipped conflict
+goes back to the queue.
 
 | Field | Type | Meaning |
 |---|---|---|
 | `source` | `"vndb"` \| `"igdb"` \| `"hltb"` \| `"ra"` | Parser the conflict came from |
 | `externalId` | string | The entry in that source |
-| `state` | `"queued-match"` \| `"queued-new"` | State after the decision |
-| `decidedBy` | string \| null | User name of the admin who decided |
+| `state` | `"queued-match"` \| `"queued-new"` \| `"waiting"` | State after the decision; `"waiting"` after a reopen |
+| `decidedBy` | string \| null | User name of the admin who decided or reopened |
 
-Client: patches `state` and `decidedBy` of the cached conflict item, refetches the summaries and
-the list, and shows a toast when the conflict was waiting and is the one open on screen.
+Client: refetches the summaries and the list. For a reopened conflict (`state: "waiting"`) it
+refetches the item, because reopening replaces its candidates; otherwise it patches `state` and
+`decidedBy` of the cached item and shows a toast when the conflict was waiting and is the one
+open on screen.
 
 #### `conflicts:applied`
 
@@ -519,8 +523,8 @@ Client: invalidates those conflict items, the summaries and the list.
   connections between heartbeats. The proxy must also forward the `Cookie` header, which nginx
   does by default; without it every `/royal` connection is `Unauthorized`.
 - **Connection count.** Every signed-in tab holds one `/royal` connection; a tab with the
-  Discussion tab open holds a second one for `/comments`. Guests hold a connection only while a
-  Discussion tab is open.
+  Discussion tab open holds a second one for `/comments`, and an admin tab on Conflicts one for
+  `/conflicts`. Guests hold a connection only while a Discussion tab is open.
 - **One API instance only.** Rooms live in the process's memory. Running a second replica needs a
   shared adapter such as `@socket.io/redis-adapter`, so an emit on one instance reaches sockets on
   the other, plus sticky sessions, because a polling session must keep hitting the instance that
@@ -534,19 +538,22 @@ Client: invalidates those conflict items, the summaries and the list.
    `@SubscribeMessage` handler that validates with the zod schema and answers through the ack.
 3. `/comments`: call the emit from the service after the write, passing the socket id from the
    controller. `/royal`: go through `RoyalGamesGateway.change()`, which pushes `royal:changed`.
+   `/conflicts`: call the gateway from `ConflictsService` after the write.
 4. Handle it on the client — `useDiscussionSocket` for `/comments` (filter by `gameId`),
-   `royal.requests.ts` and `useRoyalGamesSync` for `/royal`.
+   `royal.requests.ts` and `useRoyalGamesSync` for `/royal`, `useConflictsSocket` for `/conflicts`.
 5. `/comments` events carry only public, absolute values; if the reader's view depends on who they
    are, send ids and let the client refetch.
 6. Cover it in the gateway spec and update the tables in this document.
 
 ## Testing and debugging
 
-- **Automated.** `bun run --cwd apps/api test src/module/comments src/module/user/gateways` runs
-  `comments.gateway.spec.ts` and `royal-games.gateway.spec.ts`. Both boot their gateway on a real
-  `IoAdapter` on a random port. The comments spec checks delivery, room isolation, sender
-  exclusion, leaving, validation and the room limit; the royal spec checks cookie authentication,
-  sync, pushes to the same user's other sockets only, validation and failed updates. Jest runs them
+- **Automated.** `bun run --cwd apps/api test src/module/comments src/module/user/gateways
+  src/module/conflicts/gateways` runs `comments.gateway.spec.ts`, `royal-games.gateway.spec.ts`
+  and `conflicts.gateway.spec.ts`. Each boots its gateway on a real `IoAdapter` on a random port.
+  The comments spec checks delivery, room isolation, sender exclusion, leaving, validation and the
+  room limit; the royal spec checks cookie authentication, sync, pushes to the same user's other
+  sockets only, validation and failed updates; the conflicts spec checks that a missing cookie and
+  a non-admin are refused and that every admin receives a decision. Jest runs them
   on Node; the Bun path was checked against the running dev server.
 - **The update pipelines** need a real MongoDB and are not part of the Jest run. They were checked
   against MongoDB 8.2 through `UserRoyalGamesService` with the real models: a user without the

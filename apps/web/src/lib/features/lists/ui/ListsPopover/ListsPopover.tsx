@@ -6,16 +6,11 @@ import { IGameResponse } from "@mooncellar/schemas";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { Popover } from "@/src/lib/shared/ui/Popover";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
-import styles from "./ListsPopover.module.scss";
 
 const ListsPanel = dynamic(
   () => import("./ListsPanel").then((module) => module.ListsPanel),
   {
-    loading: () => (
-      <div className={styles.loading}>
-        <Loader />
-      </div>
-    ),
+    loading: () => <Loader isBlock />,
   }
 );
 

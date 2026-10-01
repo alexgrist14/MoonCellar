@@ -30,6 +30,8 @@ interface IPopoverProps {
   contentStyle?: CSSProperties;
   title?: string;
   width?: string;
+  matchAnchorWidth?: boolean;
+  isSheetDisabled?: boolean;
 }
 
 const GAP = 8;
@@ -46,10 +48,13 @@ const AnchoredPopover: FC<IPopoverProps> = ({
   contentStyle = { padding: "var(--padding-x4)" },
   title,
   width,
+  matchAnchorWidth,
 }) => {
-  const [coords, setCoords] = useState<{ top: number; left: number } | null>(
-    null
-  );
+  const [coords, setCoords] = useState<{
+    top: number;
+    left: number;
+    width: number;
+  } | null>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
 
   useCloseEvents(
@@ -73,7 +78,8 @@ const AnchoredPopover: FC<IPopoverProps> = ({
 
       if (!anchorRect || !popoverRect) return;
 
-      const { width, height } = popoverRect;
+      const width = matchAnchorWidth ? anchorRect.width : popoverRect.width;
+      const { height } = popoverRect;
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
 
@@ -95,6 +101,7 @@ const AnchoredPopover: FC<IPopoverProps> = ({
           VIEWPORT_PADDING,
           Math.min(left, viewportWidth - width - VIEWPORT_PADDING)
         ),
+        width: anchorRect.width,
       });
     };
 
@@ -112,7 +119,7 @@ const AnchoredPopover: FC<IPopoverProps> = ({
       window.removeEventListener("scroll", updateCoords, true);
       window.removeEventListener("resize", updateCoords);
     };
-  }, [isOpen, anchorRef, align]);
+  }, [isOpen, anchorRef, align, matchAnchorWidth]);
 
   if (!isOpen || !connector) return null;
 
@@ -125,6 +132,7 @@ const AnchoredPopover: FC<IPopoverProps> = ({
         left: coords?.left ?? 0,
         visibility: coords ? "visible" : "hidden",
         ...(!!width && { width }),
+        ...(matchAnchorWidth && !!coords && { width: coords.width }),
       }}
       onClick={(event) => event.preventDefault()}
     >
@@ -145,7 +153,7 @@ const AnchoredPopover: FC<IPopoverProps> = ({
 export const Popover: FC<IPopoverProps> = (props) => {
   const isMobile = useStatesStore((state) => state.isMobile);
 
-  return isMobile ? (
+  return isMobile && !props.isSheetDisabled ? (
     <PopoverSheet {...props} />
   ) : (
     <AnchoredPopover {...props} />

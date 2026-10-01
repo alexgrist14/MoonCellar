@@ -68,3 +68,5 @@ export const gameCategoryNames: { [key: string]: string } = {
 };
 
 export const coverRatio = 528 / 704;
+
+export const AUTH_MODAL_ID = "auth";

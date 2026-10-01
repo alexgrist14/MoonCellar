@@ -253,6 +253,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
     >
       <div className={styles.wheel__center}>
         <button
+          type="button"
           disabled={isRoyal && !games?.length}
           id="spin-button"
           onClick={() => {

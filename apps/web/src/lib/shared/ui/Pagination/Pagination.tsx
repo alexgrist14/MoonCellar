@@ -7,7 +7,7 @@ import classNames from "classnames";
 import { SvgDoubleArrow } from "../svg/SvgDoubleArrow";
 import { SvgArrow } from "../svg/SvgArrow";
 import { createPortal } from "react-dom";
-import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
+import { useSearchParams } from "next/navigation";
 import { scrollPageToTop } from "@/src/lib/shared/utils/common.utils";
 
 interface IPaginationProps {
@@ -34,7 +34,7 @@ export const Pagination = memo(
     scrollTargetRef,
     isWithoutSummary,
   }: IPaginationProps) => {
-    const { query, setQuery } = useAdvancedRouter();
+    const query = useSearchParams();
     const centerRef = useRef<HTMLDivElement>(null);
 
     const [value, setValue] = useState("");
@@ -51,7 +51,15 @@ export const Pagination = memo(
     const max = useMemo(() => Math.ceil(total / take), [take, total]);
 
     const setPage = (page: number) => {
-      isControlled ? onPageChange?.(page) : setQuery({ page });
+      if (isControlled) return onPageChange?.(page);
+
+      const params = new URLSearchParams(window.location.search);
+      params.set("page", String(page));
+      window.history.pushState(
+        null,
+        "",
+        `${window.location.pathname}?${params.toString()}`
+      );
     };
 
     const changeCallback = (page: number) => {
@@ -121,8 +129,12 @@ export const Pagination = memo(
               onChange={(e) => setValue(e.target.value)}
               onKeyDown={keyboardUtils.blurOnKey}
               onBlur={(e) => {
-                const value = Number(e.target.value);
-                const nextPage = value > max ? max : value;
+                const value = Number.parseInt(e.target.value, 10);
+                const nextPage = Number.isNaN(value)
+                  ? page
+                  : Math.min(Math.max(value, 1), max);
+
+                if (nextPage === page) return setValue(page.toString());
 
                 setPage(nextPage);
                 changeCallback(nextPage);

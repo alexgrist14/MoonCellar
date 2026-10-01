@@ -26,7 +26,7 @@ import {
 } from "@/src/lib/entities/list/api";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
-import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal/ConfirmModal";
+import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
 import { Input } from "@/src/lib/shared/ui/Input";
 import {
   getListHref,
@@ -191,9 +191,13 @@ export const ListModal: FC<IListModalProps> = ({ list, userName, gameId }) => {
   const isBusy = isCreating || isUpdating || isDeleting;
 
   return (
-    <Box contentStyle={{ padding: "var(--padding-x5)" }}>
+    <Box
+      title={isEdit ? "Edit list" : "New list"}
+      isTitleStart
+      onClose={() => modal.close(LIST_MODAL_ID)}
+      contentStyle={{ padding: "var(--padding-x5)" }}
+    >
       <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
-        <h2 className={styles.title}>{isEdit ? "Edit list" : "New list"}</h2>
         <Controller
           control={control}
           name="name"
@@ -243,40 +247,30 @@ export const ListModal: FC<IListModalProps> = ({ list, userName, gameId }) => {
           control={control}
           name="isPrivate"
           render={({ field }) => (
-            <div className={styles.toggle}>
-              <div className={styles.toggle__text}>
-                <span>Private list</span>
-                <span className={styles.hint}>
-                  {isEdit && !list?.isPrivate
-                    ? "Making it private hides it from your profile and breaks links already shared."
-                    : "Only you can open it."}
-                </span>
-              </div>
-              <ToggleSwitch
-                value={field.value ? "right" : "left"}
-                isDisabled={isBusy}
-                clickCallback={(result) => field.onChange(result === "ON")}
-              />
-            </div>
+            <ToggleSwitch
+              label="Private list"
+              hint={
+                isEdit && !list?.isPrivate
+                  ? "Making it private hides it from your profile and breaks links already shared."
+                  : "Only you can open it."
+              }
+              checked={field.value}
+              isDisabled={isBusy}
+              onChange={field.onChange}
+            />
           )}
         />
         <Controller
           control={control}
           name="isRanked"
           render={({ field }) => (
-            <div className={styles.toggle}>
-              <div className={styles.toggle__text}>
-                <span>Ranked list</span>
-                <span className={styles.hint}>
-                  Show each game&apos;s position, like in a top 10.
-                </span>
-              </div>
-              <ToggleSwitch
-                value={field.value ? "right" : "left"}
-                isDisabled={isBusy}
-                clickCallback={(result) => field.onChange(result === "ON")}
-              />
-            </div>
+            <ToggleSwitch
+              label="Ranked list"
+              hint="Show each game's position, like in a top 10."
+              checked={field.value}
+              isDisabled={isBusy}
+              onChange={field.onChange}
+            />
           )}
         />
         <div className={styles.field}>

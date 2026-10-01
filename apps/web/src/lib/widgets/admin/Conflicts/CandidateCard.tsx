@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import classNames from "classnames";
 import { IConflictCandidate, IScoreBreakdown } from "@mooncellar/schemas";
+import { Badge } from "@/src/lib/shared/ui/Badge";
 import styles from "./Conflicts.module.scss";
 
 const BREAKDOWN_LABELS: Record<keyof IScoreBreakdown, string> = {
@@ -111,22 +112,16 @@ export const CandidateCard: FC<ICandidateCardProps> = ({
           >
             {candidate.name}
           </Link>
-          {game?.type && <span className={styles.badge}>{game.type}</span>}
-          {game?.isCustom && (
-            <span className={classNames(styles.badge, styles.badge_attention)}>
-              Added by hand
-            </span>
+          {game?.type && (
+            <Badge tone="muted" variant="outlined">
+              {game.type}
+            </Badge>
           )}
+          {game?.isCustom && <Badge tone="attention">Added by hand</Badge>}
           {game?.linkedExternalId && (
-            <span className={classNames(styles.badge, styles.badge_attention)}>
-              Linked to {game.linkedExternalId}
-            </span>
+            <Badge tone="attention">Linked to {game.linkedExternalId}</Badge>
           )}
-          {!game && (
-            <span className={classNames(styles.badge, styles.badge_attention)}>
-              Deleted from the catalogue
-            </span>
-          )}
+          {!game && <Badge tone="attention">Deleted from the catalogue</Badge>}
         </div>
 
         {game && (
@@ -153,26 +148,18 @@ export const CandidateCard: FC<ICandidateCardProps> = ({
 
         <ul className={styles.ledger} aria-label="Why the score">
           {points.map((key) => (
-            <li
-              key={key}
-              className={classNames(
-                styles.chip,
-                breakdown[key] > 0 ? styles.chip_positive : styles.chip_negative
-              )}
-            >
-              {BREAKDOWN_LABELS[key]} {formatPoints(breakdown[key])}
+            <li key={key}>
+              <Badge tone={breakdown[key] > 0 ? "positive" : "negative"}>
+                {BREAKDOWN_LABELS[key]} {formatPoints(breakdown[key])}
+              </Badge>
             </li>
           ))}
           {SIGNALS.filter(({ isShown }) => isShown(candidate)).map(
             ({ label, isPositive }) => (
-              <li
-                key={label}
-                className={classNames(styles.chip, styles.chip_signal, {
-                  [styles.chip_positive]: isPositive,
-                  [styles.chip_negative]: !isPositive,
-                })}
-              >
-                {label}
+              <li key={label}>
+                <Badge tone={isPositive ? "positive" : "negative"}>
+                  {label}
+                </Badge>
               </li>
             )
           )}

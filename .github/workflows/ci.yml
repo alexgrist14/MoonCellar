@@ -16,6 +16,8 @@ jobs:
       web: ${{ steps.filter.outputs.web == 'true' || github.event_name == 'workflow_dispatch' }}
       api: ${{ steps.filter.outputs.api == 'true' || github.event_name == 'workflow_dispatch' }}
       infra: ${{ steps.filter.outputs.infra == 'true' || github.event_name == 'workflow_dispatch' }}
+      docs: ${{ steps.filter.outputs.docs == 'true' || github.event_name == 'workflow_dispatch' }}
+      storybook: ${{ steps.filter.outputs.storybook == 'true' || github.event_name == 'workflow_dispatch' }}
 
     steps:
       - name: Checkout code
@@ -41,6 +43,19 @@ jobs:
               - '.github/workflows/ci.yml'
             infra:
               - 'infra/**'
+              - '.github/workflows/ci.yml'
+            docs:
+              - 'docs/**'
+              - 'package.json'
+              - 'bun.lock'
+              - 'static.Dockerfile'
+              - '.github/workflows/ci.yml'
+            storybook:
+              - 'apps/web/**'
+              - 'packages/**'
+              - 'package.json'
+              - 'bun.lock'
+              - 'static.Dockerfile'
               - '.github/workflows/ci.yml'
 
   lint:
@@ -70,13 +85,17 @@ jobs:
       (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
       github.ref == 'refs/heads/main' &&
       (needs.changes.outputs.web == 'true' || needs.changes.outputs.api == 'true' ||
-       needs.changes.outputs.infra == 'true')
+       needs.changes.outputs.infra == 'true' || needs.changes.outputs.docs == 'true' ||
+       needs.changes.outputs.storybook == 'true')
     runs-on: ubuntu-latest
 
     env:
       DEPLOY_WEB: ${{ needs.changes.outputs.web }}
       DEPLOY_API: ${{ needs.changes.outputs.api }}
       DEPLOY_INFRA: ${{ needs.changes.outputs.infra }}
+      DEPLOY_DOCS: ${{ needs.changes.outputs.docs }}
+      DEPLOY_STORYBOOK: ${{ needs.changes.outputs.storybook }}
+      BUILDS_IMAGES: ${{ needs.changes.outputs.web == 'true' || needs.changes.outputs.api == 'true' || needs.changes.outputs.docs == 'true' || needs.changes.outputs.storybook == 'true' }}
 
     steps:
       - name: Checkout code
@@ -94,7 +113,7 @@ jobs:
             docker compose version
 
       - name: Build images
-        if: needs.changes.outputs.web == 'true' || needs.changes.outputs.api == 'true'
+        if: env.BUILDS_IMAGES == 'true'
         run: |
           IMAGES=""
 
@@ -116,10 +135,32 @@ jobs:
             IMAGES="$IMAGES mooncellar-backend:latest"
           fi
 
+          if [ "$DEPLOY_DOCS" = "true" ]; then
+            docker build \
+              -f static.Dockerfile \
+              --build-arg BUILD="bun run docs:build" \
+              --build-arg OUT=docs/.vitepress/dist \
+              --build-arg PORT=4333 \
+              -t mooncellar-docs:latest \
+              .
+            IMAGES="$IMAGES mooncellar-docs:latest"
+          fi
+
+          if [ "$DEPLOY_STORYBOOK" = "true" ]; then
+            docker build \
+              -f static.Dockerfile \
+              --build-arg BUILD="bun --filter web build-storybook" \
+              --build-arg OUT=apps/web/storybook-static \
+              --build-arg PORT=4222 \
+              -t mooncellar-storybook:latest \
+              .
+            IMAGES="$IMAGES mooncellar-storybook:latest"
+          fi
+
           docker save $IMAGES | gzip > images.tar.gz
 
       - name: Copy images to server
-        if: needs.changes.outputs.web == 'true' || needs.changes.outputs.api == 'true'
+        if: env.BUILDS_IMAGES == 'true'
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -151,7 +192,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: DEPLOY_WEB,DEPLOY_API,DEPLOY_INFRA
+          envs: DEPLOY_WEB,DEPLOY_API,DEPLOY_INFRA,DEPLOY_DOCS,DEPLOY_STORYBOOK
           script: |
             set -e
 
@@ -160,6 +201,25 @@ jobs:
 
             if [ "$DEPLOY_INFRA" = "true" ]; then
               docker compose -f /opt/mooncellar/infra/docker-compose.prod.yml up -d
+
+              NGINX_NEW=/opt/mooncellar/infra/nginx/mooncellar.conf
+              NGINX_LIVE=/etc/nginx/conf.d/mooncellar.conf
+              NGINX_PREV=/etc/nginx/mooncellar.conf.prev
+
+              DOMAINS=$(tr '\n' ' ' < "$NGINX_NEW" | grep -oP '\bserver_name\s+\K[^;]+' \
+                | tr -s ' ' '\n' | sort -u | grep . | sed 's/^/-d /' | tr '\n' ' ')
+              certbot certonly --nginx --non-interactive \
+                --cert-name mooncellar.space \
+                --keep-until-expiring --renew-with-new-domains \
+                $DOMAINS
+
+              cp "$NGINX_LIVE" "$NGINX_PREV"
+              cp "$NGINX_NEW" "$NGINX_LIVE"
+              if ! nginx -t; then
+                cp "$NGINX_PREV" "$NGINX_LIVE"
+                exit 1
+              fi
+              systemctl reload nginx
             fi
 
             run_app() {
@@ -185,6 +245,14 @@ jobs:
 
             if [ "$DEPLOY_API" = "true" ]; then
               run_app mooncellar-backend 3228
+            fi
+
+            if [ "$DEPLOY_DOCS" = "true" ]; then
+              run_app mooncellar-docs 4333
+            fi
+
+            if [ "$DEPLOY_STORYBOOK" = "true" ]; then
+              run_app mooncellar-storybook 4222
             fi
 
             docker image prune -f

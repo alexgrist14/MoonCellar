@@ -2,6 +2,7 @@ import { FC, useEffect, useRef } from "react";
 import classNames from "classnames";
 import { IConflictEntry } from "@mooncellar/schemas";
 import { Fact } from "./CandidateCard";
+import { Badge } from "@/src/lib/shared/ui/Badge";
 import styles from "./Conflicts.module.scss";
 
 interface IEntryCardProps {
@@ -58,8 +59,10 @@ export const EntryCard: FC<IEntryCardProps> = ({
         {!!entry.details.length && (
           <ul className={styles.ledger} aria-label="Entry facts">
             {entry.details.map((detail) => (
-              <li key={detail} className={styles.chip}>
-                {detail}
+              <li key={detail}>
+                <Badge tone="muted" variant="outlined">
+                  {detail}
+                </Badge>
               </li>
             ))}
           </ul>

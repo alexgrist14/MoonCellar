@@ -1,0 +1,82 @@
+.reaction {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-x2);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--easing-out),
+    color var(--duration-fast) var(--easing-out),
+    filter var(--duration-fast) var(--easing-out);
+
+  &__icon {
+    display: inline-flex;
+    color: inherit;
+
+    svg {
+      color: inherit;
+    }
+  }
+
+  &__count {
+    font-variant-numeric: tabular-nums;
+  }
+
+  &_ghost {
+    padding: var(--padding-x05) var(--padding-x2);
+    border: 0;
+    border-radius: var(--radius-x3);
+    background-color: transparent;
+
+    @include font(13px, 20px, 400);
+
+    &:is(button):hover:not(:disabled) {
+      background-color: var(--color-bg-hover);
+      color: var(--color-text-primary);
+    }
+  }
+
+  &_boxed {
+    padding: var(--padding-x2) var(--padding-x4);
+    border: 1px solid var(--color-bg-primary);
+    border-radius: var(--radius-x2);
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+    font-size: 14px;
+
+    &:is(button):hover:not(:disabled) {
+      filter: brightness(0.8);
+    }
+  }
+
+  &_boxed &__icon {
+    color: var(--color-text-muted);
+  }
+
+  &_ghost.reaction_active,
+  &_active &__icon {
+    color: var(--reaction-active-color);
+  }
+
+  &_active svg path {
+    fill: currentColor;
+  }
+
+  &_readOnly {
+    cursor: default;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  @include reducedMotion {
+    transition-duration: var(--duration-instant);
+  }
+}

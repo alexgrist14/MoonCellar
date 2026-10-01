@@ -53,7 +53,34 @@
   }
 }
 
-.games__search {
+.games__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-x4);
   margin-bottom: var(--padding-x4);
+
+  @include mediaSm {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.games__search {
+  flex: 1 1 var(--list-sort-width);
   max-width: 320px;
+
+  @include mediaSm {
+    max-width: none;
+  }
+}
+
+.games__sort {
+  width: min(100%, var(--list-sort-width));
+  margin-left: auto;
+
+  @include mediaSm {
+    width: 100%;
+  }
 }

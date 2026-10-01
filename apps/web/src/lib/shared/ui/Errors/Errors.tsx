@@ -10,7 +10,7 @@ export const Errors: FC<IErrorsProps> = ({ errors }) => {
   if (!errors?.length) return null;
 
   return (
-    <div>
+    <div className={styles.errors}>
       {errors.map((error, i) => (
         <p key={i} className={styles.errors__error}>
           <span className={styles.errors__title}>{error.title}: </span>

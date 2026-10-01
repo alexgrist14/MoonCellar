@@ -302,6 +302,12 @@ export class ImagesService {
     return this.toResponse(image);
   }
 
+  async list(): Promise<IGeneratedImage[]> {
+    const images = await this.Images.find().sort({ createdAt: -1 });
+
+    return images.map((image) => this.toResponse(image));
+  }
+
   async remove(id: string) {
     if (!mongoose.isValidObjectId(id)) {
       throw new BadRequestException(`Invalid image id: ${id}`);

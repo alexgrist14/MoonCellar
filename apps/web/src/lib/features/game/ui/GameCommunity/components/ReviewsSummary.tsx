@@ -1,6 +1,7 @@
 import { FC } from "react";
 import classNames from "classnames";
 import { IReviewsSummary } from "@mooncellar/schemas";
+import { ScoreValue } from "@/src/lib/shared/ui/ScoreValue";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import styles from "@/src/lib/features/game/ui/GameCommunity/GameCommunity.module.scss";
 
@@ -10,10 +11,7 @@ export const ReviewsSummary: FC<{ summary: IReviewsSummary }> = ({
   <div className={styles.summary}>
     {summary.averageRating !== null && (
       <div className={styles.summary__score}>
-        <span className={styles.summary__value}>
-          {summary.averageRating}
-          <span className={styles.summary__scale}> / 10</span>
-        </span>
+        <ScoreValue value={summary.averageRating} size="lg" />
         <span className={styles.summary__label}>
           Average from {summary.ratedCount}{" "}
           {summary.ratedCount === 1 ? "player" : "players"}
@@ -25,7 +23,9 @@ export const ReviewsSummary: FC<{ summary: IReviewsSummary }> = ({
         className={styles.distribution__bar}
         role="img"
         aria-label={summary.categories
-          .map(({ category, count }) => `${commonUtils.upFL(category)} ${count}`)
+          .map(
+            ({ category, count }) => `${commonUtils.upFL(category)} ${count}`
+          )
           .join(", ")}
       >
         {summary.categories.map(({ category, count }) => (

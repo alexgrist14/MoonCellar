@@ -39,24 +39,4 @@
       }
     }
   }
-
-  .sort {
-    width: 100%;
-
-    &__icon {
-      transition: transform 0.2s;
-
-      &_active {
-        transform: rotateY(180deg);
-      }
-    }
-
-    &__header {
-      border-radius: var(--radius-x4);
-    }
-
-    &__dropdown {
-      border-radius: var(--radius-x4);
-    }
-  }
 }

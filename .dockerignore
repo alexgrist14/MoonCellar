@@ -12,5 +12,7 @@ apps/api/dist
 apps/api/uploads
 packages/*/dist
 infra
-docs
+docs/.vitepress/cache
+docs/.vitepress/dist
+apps/web/storybook-static
 **/*.tsbuildinfo

@@ -8,7 +8,6 @@
   &_hidden &__content {
     filter: blur(var(--spoiler-blur));
     user-select: none;
-    pointer-events: none;
   }
 
   &__button {
@@ -32,6 +31,11 @@
     &:focus-visible {
       outline: 2px solid var(--color-accent);
       outline-offset: 2px;
+    }
+
+    &_hide {
+      position: static;
+      margin: var(--gap-x2) 0 0;
     }
   }
 

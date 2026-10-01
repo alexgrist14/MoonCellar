@@ -7,7 +7,8 @@ import { GameCoverImage } from "@/src/lib/entities/game/ui/GameCoverImage";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { GameCard } from "@/src/lib/widgets/game/GameCard";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
-import { SortableGrid } from "@/src/lib/shared/ui/SortableGrid";
+import { SortableEditor } from "@/src/lib/shared/ui/SortableEditor";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import {
   SvgHeart,
   SvgListBullet,
@@ -100,57 +101,63 @@ export const FavoriteGames: FC<IFavoriteGamesProps> = ({
 
   return (
     <section className={styles.top} aria-labelledby="profile-favorite-games">
-      <div className={styles.head}>
-        <SectionTitle as="h3">
-          <span id="profile-favorite-games">Favourite games</span>
-          {!!games.length && (
-            <span className={styles.count}>{games.length}</span>
-          )}
-        </SectionTitle>
-        {isPreview && !!games.length && (
-          <Button color={ButtonColor.TRANSPARENT} onClick={onShowAll}>
-            All favourites
-          </Button>
-        )}
-        {!isPreview && isOwner && !draft && games.length > 1 && (
-          <Button
-            color={ButtonColor.TRANSPARENT}
-            className={styles.edit}
-            onClick={() => setDraft(games)}
-          >
-            <SvgPen style={SMALL_ICON_STYLE} />
-            Edit
-          </Button>
-        )}
-      </div>
+      <SectionTitle
+        as="h3"
+        count={games.length || undefined}
+        action={
+          isPreview && !!games.length ? (
+            <Button color={ButtonColor.TRANSPARENT} onClick={onShowAll}>
+              All favourites
+            </Button>
+          ) : (
+            !isPreview &&
+            isOwner &&
+            !draft &&
+            games.length > 1 && (
+              <Button
+                color={ButtonColor.TRANSPARENT}
+                className={styles.edit}
+                onClick={() => setDraft(games)}
+              >
+                <SvgPen style={SMALL_ICON_STYLE} />
+                Edit
+              </Button>
+            )
+          )
+        }
+      >
+        <span id="profile-favorite-games">Favourite games</span>
+      </SectionTitle>
 
       {!games.length && isOwner && (
-        <div className={styles.hint}>
-          <SvgHeart
-            size="24"
-            className={styles.hint__heart}
-            style={{ color: "var(--favorite-color)" }}
-          />
-          <p className={styles.hint__text}>
-            Add favourite games — press the heart on any game card or game page.
-          </p>
-          <span className={styles.bar} aria-hidden="true">
-            <span className={styles.bar__button}>
-              <SvgPlay size="16" style={{ color: "inherit" }} />
+        <EmptyState
+          variant="inline"
+          icon={
+            <SvgHeart size="24" style={{ color: "var(--favorite-color)" }} />
+          }
+          title="Add favourite games — press the heart on any game card or game page."
+          action={
+            <span className={styles.bar} aria-hidden="true">
+              <span className={styles.bar__button}>
+                <SvgPlay size="16" style={{ color: "inherit" }} />
+              </span>
+              <span
+                className={classNames(
+                  styles.bar__button,
+                  styles.bar__button_on
+                )}
+              >
+                <SvgHeart size="16" style={{ color: "inherit" }} />
+              </span>
+              <span className={styles.bar__button}>
+                <SvgListBullet size="16" style={{ color: "inherit" }} />
+              </span>
+              <span className={styles.bar__button}>
+                <SvgMore size="16" style={{ color: "inherit" }} />
+              </span>
             </span>
-            <span
-              className={classNames(styles.bar__button, styles.bar__button_on)}
-            >
-              <SvgHeart size="16" style={{ color: "inherit" }} />
-            </span>
-            <span className={styles.bar__button}>
-              <SvgListBullet size="16" style={{ color: "inherit" }} />
-            </span>
-            <span className={styles.bar__button}>
-              <SvgMore size="16" style={{ color: "inherit" }} />
-            </span>
-          </span>
-        </div>
+          }
+        />
       )}
 
       {!!games.length && !draft && (
@@ -169,39 +176,19 @@ export const FavoriteGames: FC<IFavoriteGamesProps> = ({
       )}
 
       {!!draft && (
-        <div className={styles.editor}>
-          <SortableGrid
-            items={draft}
-            getKey={(game) => game._id}
-            getName={(game) => game.name}
-            renderCover={(game) => <GameCoverImage game={game} sizes="160px" />}
-            onChange={setDraft}
-            coverRatio="var(--cover-ratio)"
-            className={styles.slots}
-          />
-          <div className={styles.footer}>
-            <p className={styles.footer__note}>
-              Drag or use the arrows to reorder. The first{" "}
-              {FAVORITE_GAMES_PREVIEW_LIMIT} are shown on your profile.
-            </p>
-            <div className={styles.footer__actions}>
-              <Button
-                color={ButtonColor.DEFAULT}
-                disabled={isPending}
-                onClick={() => setDraft(null)}
-              >
-                Cancel
-              </Button>
-              <Button
-                color={ButtonColor.ACCENT}
-                disabled={isPending}
-                onClick={handleSave}
-              >
-                Save
-              </Button>
-            </div>
-          </div>
-        </div>
+        <SortableEditor
+          items={draft}
+          getKey={(game) => game._id}
+          getName={(game) => game.name}
+          renderCover={(game) => <GameCoverImage game={game} sizes="160px" />}
+          onChange={setDraft}
+          coverRatio="var(--cover-ratio)"
+          className={styles.slots}
+          note={`Drag or use the arrows to reorder. The first ${FAVORITE_GAMES_PREVIEW_LIMIT} are shown on your profile.`}
+          isBusy={isPending}
+          onCancel={() => setDraft(null)}
+          onSave={handleSave}
+        />
       )}
     </section>
   );

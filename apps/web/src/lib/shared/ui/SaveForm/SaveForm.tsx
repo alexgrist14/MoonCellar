@@ -16,7 +16,7 @@ export const SaveForm: FC<{
         autoFocus
         value={name}
         onChange={(e) => setName(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && saveCallback(name)}
+        onKeyDown={(e) => e.key === "Enter" && !!name && saveCallback(name)}
         placeholder={placeholder || "Enter name..."}
       />
       <Button

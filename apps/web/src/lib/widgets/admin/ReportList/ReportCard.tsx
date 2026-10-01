@@ -7,6 +7,7 @@ import {
 import { ModeratedComment } from "@/src/lib/entities/comment/ui/ModeratedComment";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
+import { pluralize } from "@/src/lib/shared/utils/plural.utils";
 import styles from "./ReportList.module.scss";
 
 interface IReportCardProps {
@@ -20,9 +21,6 @@ const RESOLUTION_LABELS: Record<ICommentReportResolution, string> = {
   deleted: "Deleted",
   dismissed: "Kept, reports dismissed",
 };
-
-const pluralize = (count: number, word: string) =>
-  `${count} ${count === 1 ? word : `${word}s`}`;
 
 export const ReportCard: FC<IReportCardProps> = ({
   report,

@@ -8,7 +8,6 @@ import {
   IUpcomingReleaseGroup,
 } from "@mooncellar/schemas";
 import styles from "./MainPage.module.scss";
-import { Button } from "@/src/lib/shared/ui/Button";
 import Link from "next/link";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { ReleaseRail } from "@/src/lib/widgets/main/ReleaseRail";
@@ -20,6 +19,7 @@ import { IPlatformCount } from "@/src/lib/shared/types/games.type";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { BGImage } from "@/src/lib/shared/ui/BGImage";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
+import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { MAIN_PAGE_DESCRIPTION, MAIN_PAGE_TITLE } from "./MainPage.constants";
 
 interface MainPageProps {
@@ -35,13 +35,34 @@ interface MainPageProps {
 export const MainPage: FC<MainPageProps> = ({ games, platforms }) => {
   const hideAdult = useHideAdult();
 
+  const browseSections = [
+    {
+      title: "Browse By Genre",
+      items: games.genre.slice(0, 10).map((item) => ({
+        name: item.genre,
+        href: `/games/genre/${toSlug(item.genre)}`,
+        count: item.count,
+      })),
+    },
+    {
+      title: "Browse By Platform",
+      items: platforms.map((platform) => ({
+        name: platform.name,
+        href: `/games/platform/${platform.slug}`,
+        count: platform.count,
+      })),
+    },
+  ];
+
   return (
     <>
       <BGImage />
       <div className={styles.container}>
         <Box classNameContent={styles.banner}>
           <div className={styles.banner__text}>
-            <h1 className={styles.title}>{MAIN_PAGE_TITLE}</h1>
+            <SectionTitle as="h1" variant="display">
+              {MAIN_PAGE_TITLE}
+            </SectionTitle>
             <p className={styles.text}>{MAIN_PAGE_DESCRIPTION}</p>
           </div>
           <div className={styles.games}>
@@ -110,49 +131,37 @@ export const MainPage: FC<MainPageProps> = ({ games, platforms }) => {
                   alt="RetroAchievements"
                 />
               </p>
-              <Link href={"/gauntlet"}>
-                <Button className={styles.btn} color="green">
-                  Try it now!
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </Box>
-        <Box classNameContent={styles.browse}>
-          <SectionTitle isWithMarginBottom>Browse By Genre</SectionTitle>
-          <div className={styles.browse__content}>
-            {games.genre.slice(1, 11).map((item) => (
-              <Link
-                href={`/games/genre/${toSlug(item.genre)}`}
-                className={styles.browse__card}
-                key={item.genre}
+              <Button
+                href="/gauntlet"
+                color={ButtonColor.GREEN}
+                className={styles.cta}
               >
-                <h4 className={styles.browse__title}>{item.genre}</h4>
-                <div className={styles.browse__count}>
-                  {">"} {commonUtils.roundToFirstDigit(item.count)}
-                </div>
-              </Link>
-            ))}
+                Try it now!
+              </Button>
+            </div>
           </div>
         </Box>
-        {!!platforms.length && (
-          <Box classNameContent={styles.browse}>
-            <SectionTitle isWithMarginBottom>Browse By Platform</SectionTitle>
-            <div className={styles.browse__content}>
-              {platforms.map((platform) => (
-                <Link
-                  href={`/games/platform/${platform.slug}`}
-                  className={styles.browse__card}
-                  key={platform.slug}
-                >
-                  <h4 className={styles.browse__title}>{platform.name}</h4>
-                  <div className={styles.browse__count}>
-                    {">"} {commonUtils.roundToFirstDigit(platform.count)}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </Box>
+        {browseSections.map(
+          ({ title, items }) =>
+            !!items.length && (
+              <Box classNameContent={styles.browse} key={title}>
+                <SectionTitle isWithMarginBottom>{title}</SectionTitle>
+                <div className={styles.browse__content}>
+                  {items.map(({ name, href, count }) => (
+                    <Link
+                      href={href}
+                      className={styles.browse__card}
+                      key={href}
+                    >
+                      <h4 className={styles.browse__title}>{name}</h4>
+                      <div className={styles.browse__count}>
+                        {">"} {commonUtils.roundToFirstDigit(count)}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </Box>
+            )
         )}
       </div>
     </>

@@ -11,7 +11,6 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Логируем глобальную ошибку в Grafana
     logger.error("Next.js global error", error, {
       digest: error.digest,
       name: error.name,

@@ -8,6 +8,7 @@ import {
   GetAdminCharactersSchema,
   GetContentRequestsResponseSchema,
   GetContentRequestsSchema,
+  GetMyContentRequestsSchema,
   SaveCharacterRequestSchema,
 } from "@mooncellar/schemas";
 
@@ -15,8 +16,8 @@ export class ContentRequestResponseDto extends createZodDto(
   ContentRequestSchema
 ) {}
 
-export class ContentRequestsResponseDto extends createZodDto(
-  ContentRequestSchema.array()
+export class GetMyContentRequestsDto extends createZodDto(
+  GetMyContentRequestsSchema
 ) {}
 
 export class ContentRequestDetailDto extends createZodDto(
@@ -47,4 +48,6 @@ export class GetAdminCharactersResponseDto extends createZodDto(
   GetAdminCharactersResponseSchema
 ) {}
 
-export class SaveCharacterDto extends createZodDto(SaveCharacterRequestSchema) {}
+export class SaveCharacterDto extends createZodDto(
+  SaveCharacterRequestSchema
+) {}

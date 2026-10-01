@@ -32,9 +32,8 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
               },
             },
             {
-              tabName:
-                "Royal" +
-                (!!royalGames?.length ? ` (${royalGames.length})` : ""),
+              tabName: "Royal",
+              count: royalGames?.length,
               style: { flexBasis: "33%" },
               onTabClick: () => {
                 setTabIndex(1);

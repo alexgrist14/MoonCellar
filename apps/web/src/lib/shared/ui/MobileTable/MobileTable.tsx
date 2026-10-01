@@ -1,6 +1,6 @@
-import { ITableRows } from "@/src/lib/shared/types/table.type";
+import { ITableCell, ITableRows } from "@/src/lib/shared/types/table.type";
 import styles from "./MobileTable.module.scss";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/src/lib/shared/ui/Button";
 import { SvgChevron } from "@/src/lib/shared/ui/svg";
 import classNames from "classnames";
@@ -9,6 +9,13 @@ import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { PaginationClient } from "@/src/lib/shared/ui/PaginationClient";
+import { compareTableCells } from "@/src/lib/shared/utils/table.utils";
+
+const getRowKey = (header: ITableCell, index: number) =>
+  header.id ??
+  (["string", "number"].includes(typeof header.content)
+    ? String(header.content)
+    : String(index));
 
 interface ITableProps<T> {
   rows?: ITableRows<T>;
@@ -17,6 +24,11 @@ interface ITableProps<T> {
   mobileHeadField: keyof T;
   limit?: number;
   isWithoutMobileSorting?: boolean;
+  onRowClick?: (rowIndex: number) => void;
+  getRowClassName?: (
+    row: ITableRows<T>[number],
+    index: number
+  ) => string | undefined;
 }
 
 export const MobileTable = <T extends object>({
@@ -26,6 +38,8 @@ export const MobileTable = <T extends object>({
   mobileHeadField,
   isWithoutMobileSorting,
   limit,
+  onRowClick,
+  getRowClassName,
 }: ITableProps<T>) => {
   const keys = useMemo(() => {
     const keys = !!rows?.length ? (Object.keys(rows[0]) as (keyof T)[]) : [];
@@ -48,50 +62,36 @@ export const MobileTable = <T extends object>({
     return titles;
   }, [rows]);
 
+  const rowIndexes = useMemo(
+    () => new Map(rows?.map((row, index) => [row, index])),
+    [rows]
+  );
+
   const [sortingKey, setSortingKey] = useState<keyof T | undefined>(
     initialSortingKey
   );
   const [sortingOrder, setSortingOrder] = useState<"asc" | "desc">("desc");
-  const [sortedRows, setSortedRows] = useState<ITableRows<T>>();
 
   const [page, setPage] = useState(1);
-  const [activeIndexes, setActiveIndexes] = useState<number[]>([]);
+  const [activeKeys, setActiveKeys] = useState<string[]>([]);
 
-  const take = useRef(limit || 20);
+  const take = limit || 20;
 
   const isLoaderShown = useMinimumLoading(!!isLoading);
 
-  const isInactive = useMemo(
-    () => isLoaderShown || sortedRows === undefined,
-    [sortedRows, isLoaderShown]
+  const sortedRows = useMemo(
+    () =>
+      !sortingKey
+        ? rows
+        : rows?.toSorted((a, b) =>
+            compareTableCells(a[sortingKey], b[sortingKey], sortingOrder)
+          ),
+    [rows, sortingKey, sortingOrder]
   );
-
-  useEffect(() => {
-    if (!!sortingKey) {
-      setSortedRows(
-        rows?.toSorted((a, b) => {
-          const first = a[sortingKey];
-          const second = b[sortingKey];
-          const firstValue = first.sortingValue || first.content || 1;
-          const secondValue = second.sortingValue || second.content || 0;
-
-          return firstValue > secondValue
-            ? sortingOrder === "asc"
-              ? 1
-              : -1
-            : sortingOrder === "asc"
-              ? -1
-              : 1;
-        })
-      );
-    } else {
-      setSortedRows(rows);
-    }
-  }, [rows, sortingKey, sortingOrder]);
 
   return (
     <div className={styles.table}>
-      {isInactive ? (
+      {isLoaderShown ? (
         <Loader />
       ) : (
         <>
@@ -122,21 +122,35 @@ export const MobileTable = <T extends object>({
           {!sortedRows?.length ? (
             <p className={styles.table__empty}>List is empty</p>
           ) : (
-            sortedRows.slice(0, page * take.current).map((row, i) => {
-              const isActive = activeIndexes.includes(i);
+            sortedRows.slice(0, page * take).map((row, i) => {
               const header = row[mobileHeadField];
 
               if (!header) return null;
 
+              const rowKey = getRowKey(header, i);
+              const isActive = activeKeys.includes(rowKey);
+              const rowIndex = rowIndexes.get(row);
+
               return (
-                <div key={i} className={styles.table__row}>
+                <div
+                  key={i}
+                  className={classNames(
+                    styles.table__row,
+                    rowIndex !== undefined && getRowClassName?.(row, rowIndex)
+                  )}
+                >
                   <div className={styles.table__header}>
                     <div
                       className={classNames(
                         styles.table__title,
+                        !!onRowClick && styles.table__title_clickable,
                         header.className
                       )}
-                      onClick={header.onClick}
+                      onClick={() => {
+                        header.onClick?.();
+
+                        if (rowIndex !== undefined) onRowClick?.(rowIndex);
+                      }}
                     >
                       {["string", "number"].includes(typeof header.content) ? (
                         <p>{header.content}</p>
@@ -148,10 +162,10 @@ export const MobileTable = <T extends object>({
                       compact
                       isOnlyIcon
                       onClick={() =>
-                        setActiveIndexes(
+                        setActiveKeys(
                           isActive
-                            ? activeIndexes.filter((index) => index !== i)
-                            : [i, ...activeIndexes]
+                            ? activeKeys.filter((key) => key !== rowKey)
+                            : [rowKey, ...activeKeys]
                         )
                       }
                     >
@@ -204,7 +218,7 @@ export const MobileTable = <T extends object>({
           <PaginationClient
             page={page}
             setPage={setPage}
-            take={take.current}
+            take={take}
             length={sortedRows?.length}
           />
         </>

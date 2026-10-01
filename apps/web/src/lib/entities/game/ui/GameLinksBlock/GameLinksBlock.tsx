@@ -1,7 +1,7 @@
 import { FC, useMemo } from "react";
 import classNames from "classnames";
 import styles from "./GameLinksBlock.module.scss";
-import { Box } from "@/src/lib/shared/ui/Box";
+import { InfoBlock } from "@/src/lib/shared/ui/InfoBlock";
 import { Chip } from "@/src/lib/shared/ui/Chip";
 import { IGameResponse } from "@mooncellar/schemas";
 import { getGameLinks } from "@/src/lib/shared/utils/links.utils";
@@ -19,9 +19,8 @@ export const GameLinksBlock: FC<IGameLinksBlockProps> = ({
 
   if (!links.length) return null;
 
-  const content = (
-    <div className={styles.links}>
-      <h4>Links:</h4>
+  return (
+    <InfoBlock title="Links:" isBoxed={isBoxed}>
       <div className={styles.links__chips}>
         {links.map((link) => (
           <Chip
@@ -41,10 +40,6 @@ export const GameLinksBlock: FC<IGameLinksBlockProps> = ({
           </Chip>
         ))}
       </div>
-    </div>
+    </InfoBlock>
   );
-
-  if (!isBoxed) return content;
-
-  return <Box contentStyle={{ padding: "var(--padding-x3)" }}>{content}</Box>;
 };

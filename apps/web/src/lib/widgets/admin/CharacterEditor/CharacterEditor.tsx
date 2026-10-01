@@ -13,9 +13,10 @@ import { CharacterPortrait } from "@/src/lib/entities/character/ui/CharacterPort
 import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
 import { revalidateGamePage } from "@/src/lib/entities/game/api/game.actions";
 import { useEntitySearch } from "@/src/lib/features/requests/model/useEntitySearch";
-import { SelectedChips } from "@/src/lib/features/requests/ui/SelectedChips";
+import { RemovableChips } from "@/src/lib/shared/ui/RemovableChips";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
-import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal/ConfirmModal";
+import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
+import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import {
   StringListField,
@@ -163,12 +164,16 @@ export const CharacterEditor: FC<ICharacterEditorProps> = ({
   return (
     <section className={styles.editor} aria-label="Character editor">
       <div className={styles.editor__form}>
-        <div className={styles.editor__head}>
-          <h3>{character ? character.name : "New character"}</h3>
-          <Button color={ButtonColor.TRANSPARENT} onClick={onClose}>
-            Close
-          </Button>
-        </div>
+        <SectionTitle
+          as="h3"
+          action={
+            <Button color={ButtonColor.TRANSPARENT} onClick={onClose}>
+              Close
+            </Button>
+          }
+        >
+          {character ? character.name : "New character"}
+        </SectionTitle>
         <div className={styles.editor__grid}>
           <TextField label="Name" value={name} onChange={setName} />
           <TextField
@@ -199,7 +204,7 @@ export const CharacterEditor: FC<ICharacterEditorProps> = ({
             gameSearch.setSearch("");
           }}
         />
-        <SelectedChips
+        <RemovableChips
           items={linkedGames}
           onRemove={(id) =>
             setGames(linkedGames.filter((game) => game.id !== id))
@@ -226,7 +231,7 @@ export const CharacterEditor: FC<ICharacterEditorProps> = ({
         </div>
       </div>
       <div className={styles.editor__portrait}>
-        <h4>Portrait</h4>
+        <SectionTitle as="h4">Portrait</SectionTitle>
         {previewUrl ? (
           <Image
             src={previewUrl}

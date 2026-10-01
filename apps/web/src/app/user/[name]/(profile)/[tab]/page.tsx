@@ -13,7 +13,11 @@ export async function generateMetadata({
   params,
 }: ITabPageProps): Promise<Metadata> {
   const { name, tab } = await params;
-  const user = await getProfileUser(name);
+  const user = await getProfileUser(name).catch((error: unknown) => {
+    console.error("Failed to load profile tab metadata:", error);
+
+    return null;
+  });
 
   if (!user || !profileTabs.includes(tab)) return {};
 

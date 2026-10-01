@@ -5,6 +5,10 @@ import { RichText } from "@/src/lib/shared/ui/RichText";
 import { Spoiler } from "@/src/lib/shared/ui/Spoiler";
 import { ExpandableBlock } from "@/src/lib/shared/ui/ExpandableBlock";
 import { SvgReply, SvgThumb } from "@/src/lib/shared/ui/svg";
+import { Badge } from "@/src/lib/shared/ui/Badge";
+import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
+import { ReactionButton } from "@/src/lib/shared/ui/ReactionButton";
+import { ScoreValue } from "@/src/lib/shared/ui/ScoreValue";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import styles from "@/src/lib/features/game/ui/GameCommunity/GameCommunity.module.scss";
 import { AuthorName, CommunityAvatar } from "./CommunityAuthor";
@@ -42,14 +46,9 @@ export const ReviewItem: FC<IReviewItemProps> = ({
             isMastered={review.isMastered}
           />
           {!!meta && <span className={styles.entry__meta}>{meta}</span>}
-          {review.isSpoiler && (
-            <span className={styles.entry__spoiler}>Spoilers</span>
-          )}
+          {review.isSpoiler && <Badge tone="attention">Spoilers</Badge>}
           {review.rating !== null && (
-            <span className={styles.entry__score}>
-              {review.rating}
-              <span className={styles.entry__scale}> / 10</span>
-            </span>
+            <ScoreValue value={review.rating} className={styles.entry__score} />
           )}
         </div>
         <Spoiler isActive={review.isSpoiler}>
@@ -62,26 +61,22 @@ export const ReviewItem: FC<IReviewItemProps> = ({
           </ExpandableBlock>
         </Spoiler>
         <div className={styles.entry__actions}>
-          <button
-            type="button"
-            aria-pressed={review.isHelpful}
-            className={classNames(styles.action, {
-              [styles.action_active]: review.isHelpful,
-            })}
+          <ReactionButton
+            icon={<SvgThumb size="16" style={{ color: "inherit" }} />}
+            tooltip="Helpful"
+            count={review.helpfulCount}
+            isActive={review.isHelpful}
             onClick={() => onHelpful(review)}
-          >
-            <SvgThumb size="16" style={{ color: "inherit" }} />
-            Helpful
-            <span className={styles.action__count}>{review.helpfulCount}</span>
-          </button>
-          <button
+          />
+          <Button
             type="button"
-            className={styles.action}
+            color={ButtonColor.GHOST}
+            compact
             onClick={() => onDiscuss(review)}
           >
             <SvgReply size="16" style={{ color: "inherit" }} />
             Discuss
-          </button>
+          </Button>
           {review.date ? (
             <span
               className={classNames(styles.entry__meta, styles.entry__date)}

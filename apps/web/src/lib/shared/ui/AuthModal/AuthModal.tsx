@@ -1,17 +1,30 @@
-import classNames from "classnames";
+import { AUTH_MODAL_ID } from "@/src/lib/shared/constants";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { isAxiosError } from "axios";
 import { ChangeEvent, FC, useState } from "react";
 import { Resolver, SubmitHandler, useForm } from "react-hook-form";
 import { useAuth } from "@/src/lib/shared/hooks/auth";
 import { Background } from "../Background";
-import { Loader } from "../Loader";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { modal } from "../Modal";
 import { SvgClose } from "../svg";
 import styles from "./AuthModal.module.scss";
 import { AuthSchema, createAuthSchema } from "./auth.schema";
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  const message = isAxiosError(error)
+    ? error.response?.data?.message
+    : undefined;
+
+  if (Array.isArray(message)) return message.join(", ");
+
+  return typeof message === "string" ? message : fallback;
+};
+
+export const openAuthModal = () =>
+  modal.open(<AuthModal />, { id: AUTH_MODAL_ID });
 
 export const AuthModal: FC = () => {
   const { login, signup } = useAuth();
@@ -56,16 +69,13 @@ export const AuthModal: FC = () => {
     setError(null);
     setIsLoading(true);
 
-    console.log(data.password);
-
     login({
       email: data.email,
       password: data.password,
-    })
-      .then(() => {})
-      .catch(() => {
-        setIsLoading(false);
-      });
+    }).catch((err) => {
+      setError(getErrorMessage(err, "Sign in failed"));
+      setIsLoading(false);
+    });
   };
 
   const handleSignUp: SubmitHandler<AuthSchema> = (data) => {
@@ -78,11 +88,10 @@ export const AuthModal: FC = () => {
       userName: data.userName,
       email: data.email,
       password: data.password,
-    })
-      .then(() => {})
-      .catch(() => {
-        setIsLoading(false);
-      });
+    }).catch((err) => {
+      setError(getErrorMessage(err, "Sign up failed"));
+      setIsLoading(false);
+    });
   };
 
   return (
@@ -120,67 +129,40 @@ export const AuthModal: FC = () => {
             />
           </div>
         </div>
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        {error && <p className={styles.error}>{error}</p>}
         <div className={styles.content__buttons}>
-          {isRegister ? (
-            <>
-              <Button
-                color={ButtonColor.ACCENT}
-                className={styles.btn}
-                type="submit"
-                disabled={isLoaderShown}
-              >
-                {isLoaderShown && <Loader type="pulse" />}
-                <span
-                  className={classNames({
-                    [styles.btn__label_hidden]: isLoaderShown,
-                  })}
-                >
-                  Sign up
-                </span>
-              </Button>
-              <p>
-                Already have an account?{" "}
-                <span onClick={() => switchMode(false)} className={styles.link}>
-                  Sign in
-                </span>{" "}
-              </p>
-            </>
-          ) : (
-            <>
-              <Button
-                color={ButtonColor.ACCENT}
-                className={styles.btn}
-                type="submit"
-                disabled={isLoaderShown}
-              >
-                {isLoaderShown && <Loader type="pulse" />}
-                <span
-                  className={classNames({
-                    [styles.btn__label_hidden]: isLoaderShown,
-                  })}
-                >
-                  Sign in
-                </span>
-              </Button>
-              <p>
-                Don&apos;t have an account?{" "}
-                <span onClick={() => switchMode(true)} className={styles.link}>
-                  Sign up
-                </span>{" "}
-              </p>
-            </>
-          )}
+          <Button
+            color={ButtonColor.ACCENT}
+            className={styles.btn}
+            type="submit"
+            isLoading={isLoaderShown}
+          >
+            {isRegister ? "Sign up" : "Sign in"}
+          </Button>
+          <p className={styles.switch}>
+            {isRegister ? "Already have an account?" : "Don't have an account?"}
+            <Button
+              type="button"
+              color={ButtonColor.TRANSPARENT}
+              className={styles.link}
+              compact
+              onClick={() => switchMode(!isRegister)}
+            >
+              {isRegister ? "Sign in" : "Sign up"}
+            </Button>
+          </p>
         </div>
       </form>
-      <div
+      <Button
+        type="button"
+        color={ButtonColor.TRANSPARENT}
         className={styles.close}
-        onClick={() => {
-          modal.close();
-        }}
+        tooltip="Close"
+        tooltipAlign="right"
+        onClick={() => modal.close(AUTH_MODAL_ID)}
       >
-        <SvgClose className={styles.svg} />
-      </div>
+        <SvgClose size="20" />
+      </Button>
       <Background />
     </div>
   );

@@ -3,14 +3,20 @@ import styles from "./GauntletWheel.module.scss";
 import { generateWheelColors } from "@/src/lib/shared/utils/wheel.utils";
 import { Path, Svg } from "@/src/lib/shared/ui/svg/Svg";
 
-const SEGMENT_PATHS = [
-  "M100,100 L100,2 A98,98 0 0,1 184.5,50 Z",
-  "M100,100 L184.5,50 A98,98 0 0,1 184.5,150 Z",
-  "M100,100 L184.5,150 A98,98 0 0,1 100,198 Z",
-  "M100,100 L100,198 A98,98 0 0,1 15.5,150 Z",
-  "M100,100 L15.5,150 A98,98 0 0,1 15.5,50 Z",
-  "M100,100 L15.5,50 A98,98 0 0,1 100,2 Z",
+const SPOKES: [number, number][] = [
+  [100, 2],
+  [184.5, 50],
+  [184.5, 150],
+  [100, 198],
+  [15.5, 150],
+  [15.5, 50],
 ];
+
+const SEGMENT_PATHS = SPOKES.map(([x1, y1], i) => {
+  const [x2, y2] = SPOKES[(i + 1) % SPOKES.length];
+
+  return `M100,100 L${x1},${y1} A98,98 0 0,1 ${x2},${y2} Z`;
+});
 
 export const GauntletWheel: FC = () => {
   const segColors = useMemo(
@@ -23,78 +29,26 @@ export const GauntletWheel: FC = () => {
       <div className={styles.wheel__preview}>
         <div className={styles.wheel__container}>
           <Svg className={styles.wheel__svg} viewBox="0 0 200 200">
-            <circle
-              cx="100"
-              cy="100"
-              r="98"
-              fill="none"
-              stroke="#374151"
-              strokeWidth="2"
-            />
+            <circle cx="100" cy="100" r="98" className={styles.wheel__rim} />
             {SEGMENT_PATHS.map((d, i) => (
               <Path key={d} d={d} color={segColors[i]} />
             ))}
-            <line
-              x1="100"
-              y1="100"
-              x2="100"
-              y2="2"
-              stroke="rgba(255,255,255,0.1)"
-              strokeWidth="1"
-            />
-            <line
-              x1="100"
-              y1="100"
-              x2="184.5"
-              y2="50"
-              stroke="rgba(255,255,255,0.1)"
-              strokeWidth="1"
-            />
-            <line
-              x1="100"
-              y1="100"
-              x2="184.5"
-              y2="150"
-              stroke="rgba(255,255,255,0.1)"
-              strokeWidth="1"
-            />
-            <line
-              x1="100"
-              y1="100"
-              x2="100"
-              y2="198"
-              stroke="rgba(255,255,255,0.1)"
-              strokeWidth="1"
-            />
-            <line
-              x1="100"
-              y1="100"
-              x2="15.5"
-              y2="150"
-              stroke="rgba(255,255,255,0.1)"
-              strokeWidth="1"
-            />
-            <line
-              x1="100"
-              y1="100"
-              x2="15.5"
-              y2="50"
-              stroke="rgba(255,255,255,0.1)"
-              strokeWidth="1"
-            />
-            <circle
-              cx="100"
-              cy="100"
-              r="28"
-              fill="#0d1117"
-              stroke="#fff"
-              strokeWidth="3"
-            />
+            {SPOKES.map(([x, y]) => (
+              <line
+                key={`${x}-${y}`}
+                x1="100"
+                y1="100"
+                x2={x}
+                y2={y}
+                className={styles.wheel__spoke}
+              />
+            ))}
+            <circle cx="100" cy="100" r="28" className={styles.wheel__hub} />
             <text
               x="100"
               y="105"
               textAnchor="middle"
-              fill="#fff"
+              fill="currentColor"
               fontFamily="Rajdhani"
               fontSize="14"
               fontWeight="600"

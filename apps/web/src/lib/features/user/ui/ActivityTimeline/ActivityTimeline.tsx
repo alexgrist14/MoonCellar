@@ -15,14 +15,16 @@ import {
 import { useRemoveUserLogMutation } from "@/src/lib/entities/user/api/user.mutations";
 import { takeLogs } from "@/src/lib/shared/constants/user.const";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
+import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Cover } from "@/src/lib/shared/ui/Cover";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
+import { StatusBadge, StatusDetails } from "@/src/lib/shared/ui/StatusBadge";
 import { SvgPlay, SvgStar } from "@/src/lib/shared/ui/svg";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import {
-  getLogTone,
   getPlaythroughDetails,
   getStatusLabel,
   getTimeLabel,
@@ -174,14 +176,15 @@ export const ActivityTimeline: FC<IActivityTimelineProps> = ({
       >
         {isLogsLoading && <Loader type="moon" />}
         {!isLogsLoading && !logs.length && (
-          <div className={styles.empty}>
-            <SvgPlay size="24" style={{ color: "inherit" }} />
-            <p>
-              {isOwner
+          <EmptyState
+            variant="inline"
+            icon={<SvgPlay size="24" style={{ color: "inherit" }} />}
+            title={
+              isOwner
                 ? "Nothing here yet. Add a game to your playthroughs and it will show up in the activity."
-                : "No activity yet."}
-            </p>
-          </div>
+                : "No activity yet."
+            }
+          />
         )}
         {!isLogsLoading && !!logs.length && (
           <>
@@ -193,25 +196,20 @@ export const ActivityTimeline: FC<IActivityTimelineProps> = ({
                   return (
                     <li key={log._id} className={styles.removed} role="status">
                       <span>Entry deleted</span>
-                      <button
+                      <Button
                         type="button"
-                        className={styles.removed__undo}
+                        color={ButtonColor.GHOST}
+                        compact
                         onClick={() => handleUndo(log._id)}
                       >
                         Undo
-                      </button>
+                      </Button>
                     </li>
                   );
                 }
 
                 return (
-                  <li
-                    key={log._id}
-                    className={classNames(
-                      styles.entry,
-                      styles[`entry_${getLogTone(log)}`]
-                    )}
-                  >
+                  <li key={log._id} className={styles.entry}>
                     <Link
                       href={`/games/${log.game.slug}`}
                       className={styles.cover}
@@ -238,19 +236,9 @@ export const ActivityTimeline: FC<IActivityTimelineProps> = ({
                         >
                           {log.game.name}
                         </Link>
-                        {status && (
-                          <span className={styles.status}>{status}</span>
-                        )}
+                        {status && <StatusBadge status={status} />}
                       </div>
-                      {!!details.length && (
-                        <div className={styles.details}>
-                          {details.map((detail) => (
-                            <span key={detail} className={styles.detail}>
-                              {detail}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                      <StatusDetails items={details} />
                       {lines.map((line, index) => (
                         <span key={index} className={styles.line}>
                           {line}
@@ -263,13 +251,14 @@ export const ActivityTimeline: FC<IActivityTimelineProps> = ({
                         {isOwner && (
                           <>
                             <span aria-hidden="true">·</span>
-                            <button
+                            <Button
                               type="button"
-                              className={styles.delete}
+                              color={ButtonColor.GHOST}
+                              compact
                               onClick={() => handleDelete(log._id)}
                             >
                               Delete
-                            </button>
+                            </Button>
                           </>
                         )}
                       </div>

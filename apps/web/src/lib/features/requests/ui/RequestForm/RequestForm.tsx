@@ -29,7 +29,8 @@ import {
 } from "../../model/game-request.utils";
 import { useEntitySearch } from "../../model/useEntitySearch";
 import { GameRequestFields } from "../GameRequestFields";
-import { SelectedChips } from "../SelectedChips";
+import { RemovableChips } from "@/src/lib/shared/ui/RemovableChips";
+import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import styles from "./RequestForm.module.scss";
 
 const KINDS: IContentRequestKind[] = ["game", "character"];
@@ -246,7 +247,7 @@ export const RequestForm: FC<IRequestFormProps> = ({
       ) : (
         <>
           <section className={styles.group}>
-            <h3 className={styles.group__title}>Character</h3>
+            <SectionTitle as="h3">Character</SectionTitle>
             <div className={styles.grid}>
               <TextField
                 label={isUpdate ? "Name — leave empty to keep" : "Name"}
@@ -289,7 +290,7 @@ export const RequestForm: FC<IRequestFormProps> = ({
                 gameSearch.setSearch("");
               }}
             />
-            <SelectedChips
+            <RemovableChips
               items={characterDraft.games}
               onRemove={(id) =>
                 setCharacter("games")(
@@ -304,13 +305,17 @@ export const RequestForm: FC<IRequestFormProps> = ({
             />
           </section>
           <section className={styles.group}>
-            <h3 className={styles.group__title}>
+            <SectionTitle
+              as="h3"
+              action={
+                <span className={styles.group__note}>
+                  A link to an image on another site. Nothing is stored until a
+                  moderator approves.
+                </span>
+              }
+            >
               Portrait
-              <span>
-                A link to an image on another site. Nothing is stored until a
-                moderator approves.
-              </span>
-            </h3>
+            </SectionTitle>
             <TextField
               label="Portrait link"
               value={characterDraft.mugShot}
@@ -321,10 +326,16 @@ export const RequestForm: FC<IRequestFormProps> = ({
       )}
 
       <section className={styles.group}>
-        <h3 className={styles.group__title}>
+        <SectionTitle
+          as="h3"
+          action={
+            <span className={styles.group__note}>
+              Where a moderator can check the facts
+            </span>
+          }
+        >
           Sources
-          <span>Where a moderator can check the facts</span>
-        </h3>
+        </SectionTitle>
         <StringListField
           label="Source links"
           value={sources}

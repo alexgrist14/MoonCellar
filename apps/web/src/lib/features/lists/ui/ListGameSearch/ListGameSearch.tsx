@@ -3,12 +3,10 @@ import {
   KeyboardEvent,
   useCallback,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
-import { createPortal } from "react-dom";
 import Image from "next/image";
 import classNames from "classnames";
 import { useDebounce } from "use-debounce";
@@ -19,18 +17,19 @@ import {
 } from "@mooncellar/schemas";
 import { useAddListGameMutation } from "@/src/lib/entities/list/api";
 import { useGamesQuery } from "@/src/lib/entities/game/api/game.queries";
-import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Cover } from "@/src/lib/shared/ui/Cover";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { Input } from "@/src/lib/shared/ui/Input";
+import { Loader } from "@/src/lib/shared/ui/Loader";
+import { Popover } from "@/src/lib/shared/ui/Popover";
 import { SvgCheck, SvgSearch } from "@/src/lib/shared/ui/svg";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import styles from "./ListGameSearch.module.scss";
 
 const MIN_SEARCH_LENGTH = 2;
 const RESULTS_TAKE = 8;
-const DROPDOWN_GAP = 8;
 
 interface IListGameSearchProps {
   list: ICustomListDetails;
@@ -44,17 +43,11 @@ export const ListGameSearch: FC<IListGameSearchProps> = ({
   onAdded,
 }) => {
   const fieldRef = useRef<HTMLDivElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const listboxRef = useRef<HTMLDivElement>(null);
 
   const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [coords, setCoords] = useState<{
-    top: number;
-    left: number;
-    width: number;
-  } | null>(null);
-  const [connector, setConnector] = useState<HTMLElement | null>(null);
 
   const normalizedSearch = search.trim();
   const [debouncedSearch] = useDebounce(normalizedSearch, 300);
@@ -85,40 +78,15 @@ export const ListGameSearch: FC<IListGameSearchProps> = ({
 
   const close = useCallback(() => setIsOpen(false), []);
 
-  useCloseEvents([fieldRef, dropdownRef], close);
-
-  useEffect(() => {
-    setConnector(document.getElementById("dropdown-connector"));
-  }, []);
-
   useEffect(() => {
     setActiveIndex(0);
   }, [debouncedSearch]);
 
-  useLayoutEffect(() => {
-    if (!isOpen || !isSearchActive) return;
-
-    const update = () => {
-      const rect = fieldRef.current?.getBoundingClientRect();
-
-      if (!rect) return;
-
-      setCoords({
-        top: rect.bottom + DROPDOWN_GAP,
-        left: rect.left,
-        width: rect.width,
-      });
-    };
-
-    update();
-    window.addEventListener("scroll", update, true);
-    window.addEventListener("resize", update);
-
-    return () => {
-      window.removeEventListener("scroll", update, true);
-      window.removeEventListener("resize", update);
-    };
-  }, [isOpen, isSearchActive]);
+  useEffect(() => {
+    listboxRef.current
+      ?.querySelector('[aria-selected="true"]')
+      ?.scrollIntoView({ block: "nearest" });
+  }, [activeIndex]);
 
   const handleAdd = (game: IGameResponse) => {
     if (addedIds.has(game._id) || isFull || isAdding) return;
@@ -167,90 +135,89 @@ export const ListGameSearch: FC<IListGameSearchProps> = ({
       .filter(Boolean)
       .join(" · ");
 
-  const dropdown =
-    isOpen && isSearchActive && !!coords && !!connector
-      ? createPortal(
-          <div
-            ref={dropdownRef}
-            className={styles.dropdown}
-            style={{ top: coords.top, left: coords.left, width: coords.width }}
-            role="listbox"
-          >
-            {isFull && (
-              <p className={styles.dropdown__note}>
-                This list is full — {CUSTOM_LIST_GAMES_MAX} of{" "}
-                {CUSTOM_LIST_GAMES_MAX} games.
-              </p>
-            )}
-            {isSearching && !games.length && (
-              <p className={styles.dropdown__note}>Searching…</p>
-            )}
-            {!isSearching && !games.length && (
-              <p className={styles.dropdown__note}>
-                Nothing found for “{normalizedSearch}”. Check the spelling or
-                try the original title.
-              </p>
-            )}
-            {games.map((game, index) => {
-              const isAdded = addedIds.has(game._id);
-              const isPendingGame =
-                isAdding && variables?.dto.gameId === game._id;
+  const dropdown = (
+    <Popover
+      anchorRef={fieldRef}
+      isOpen={isOpen && isSearchActive}
+      onClose={close}
+      matchAnchorWidth
+      isSheetDisabled
+      contentStyle={{ padding: 0 }}
+    >
+      <div ref={listboxRef} className={styles.dropdown} role="listbox">
+        {isFull && (
+          <p className={styles.dropdown__note}>
+            This list is full — {CUSTOM_LIST_GAMES_MAX} of{" "}
+            {CUSTOM_LIST_GAMES_MAX} games.
+          </p>
+        )}
+        {isSearching && !games.length && <Loader isBlock />}
+        {!isSearching && !games.length && (
+          <EmptyState
+            variant="compact"
+            isWithoutImage
+            title={`Nothing found for “${normalizedSearch}”`}
+            description="Check the spelling or try the original title."
+          />
+        )}
+        {games.map((game, index) => {
+          const isAdded = addedIds.has(game._id);
+          const isPendingGame = isAdding && variables?.dto.gameId === game._id;
 
-              return (
-                <div
-                  key={game._id}
-                  role="option"
-                  aria-selected={index === activeIndex}
-                  className={classNames(styles.result, {
-                    [styles.result_active]: index === activeIndex,
-                  })}
-                  onMouseEnter={() => setActiveIndex(index)}
+          return (
+            <div
+              key={game._id}
+              role="option"
+              aria-selected={index === activeIndex}
+              className={classNames(styles.result, {
+                [styles.result_active]: index === activeIndex,
+              })}
+              onMouseEnter={() => setActiveIndex(index)}
+            >
+              <span className={styles.result__cover}>
+                {game.cover ? (
+                  <Image
+                    src={game.cover}
+                    alt=""
+                    fill
+                    sizes="32px"
+                    className={styles.result__image}
+                  />
+                ) : (
+                  <Cover isWithoutText className={styles.result__image} />
+                )}
+              </span>
+              <span className={styles.result__body}>
+                <span className={styles.result__name}>{game.name}</span>
+                <span className={styles.result__meta}>{getMeta(game)}</span>
+              </span>
+              {isAdded ? (
+                <span className={styles.result__added}>
+                  <SvgCheck size="16" style={{ color: "inherit" }} />
+                  Added
+                </span>
+              ) : (
+                <Button
+                  type="button"
+                  color={ButtonColor.ACCENT}
+                  compact
+                  disabled={isFull || isAdding}
+                  onClick={() => handleAdd(game)}
                 >
-                  <span className={styles.result__cover}>
-                    {game.cover ? (
-                      <Image
-                        src={game.cover}
-                        alt=""
-                        fill
-                        sizes="32px"
-                        className={styles.result__image}
-                      />
-                    ) : (
-                      <Cover isWithoutText className={styles.result__image} />
-                    )}
-                  </span>
-                  <span className={styles.result__body}>
-                    <span className={styles.result__name}>{game.name}</span>
-                    <span className={styles.result__meta}>{getMeta(game)}</span>
-                  </span>
-                  {isAdded ? (
-                    <span className={styles.result__added}>
-                      <SvgCheck size="16" style={{ color: "inherit" }} />
-                      Added
-                    </span>
-                  ) : (
-                    <Button
-                      type="button"
-                      color={ButtonColor.ACCENT}
-                      compact
-                      disabled={isFull || isAdding}
-                      onClick={() => handleAdd(game)}
-                    >
-                      {isPendingGame ? "Adding…" : "Add"}
-                    </Button>
-                  )}
-                </div>
-              );
-            })}
-            {!!games.length && (
-              <p className={styles.dropdown__hint}>
-                ↑ ↓ to move · Enter adds · Esc closes
-              </p>
-            )}
-          </div>,
-          connector
-        )
-      : null;
+                  {isPendingGame ? "Adding…" : "Add"}
+                </Button>
+              )}
+            </div>
+          );
+        })}
+        {!!games.length && (
+          <p className={styles.dropdown__hint}>
+            ↑ ↓ to move · Enter adds · Esc closes
+          </p>
+        )}
+      </div>
+    </Popover>
+  );
 
   return (
     <div

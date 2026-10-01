@@ -3,31 +3,10 @@ import styles from "./Input.module.scss";
 import classNames from "classnames";
 import type { FieldError } from "react-hook-form";
 
-interface InputProps extends Pick<
-  InputHTMLAttributes<HTMLInputElement>,
-  | "placeholder"
-  | "required"
-  | "type"
-  | "value"
-  | "className"
-  | "style"
-  | "onChange"
-  | "disabled"
-  | "readOnly"
-  | "defaultValue"
-  | "autoFocus"
-  | "autoComplete"
-  | "onKeyDown"
-  | "onBlur"
-  | "onMouseOver"
-  | "onMouseOut"
-  | "id"
-  | "name"
-  | "list"
-> {
+export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   containerStyles?: CSSProperties;
   containerClassname?: string;
-  error?: FieldError;
+  error?: FieldError | string;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -35,11 +14,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     { containerStyles, className, containerClassname, error, ...props },
     ref
   ) => {
+    const errorMessage = typeof error === "string" ? error : error?.message;
+
     return (
       <div className={styles.wrapper}>
         <div
           className={classNames(styles.container, containerClassname, {
-            [styles.container_error]: !!error?.message,
+            [styles.container_error]: !!errorMessage,
           })}
           style={containerStyles}
         >
@@ -49,9 +30,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
         </div>
-        {error?.message && (
-          <span className={styles.error}>{error.message}</span>
-        )}
+        {!!errorMessage && <span className={styles.error}>{errorMessage}</span>}
       </div>
     );
   }

@@ -1,7 +1,6 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import classNames from "classnames";
 import styles from "./GameExternalPages.module.scss";
-import { Box } from "@/src/lib/shared/ui/Box";
+import { InfoBlock } from "@/src/lib/shared/ui/InfoBlock";
 import { Button } from "@/src/lib/shared/ui/Button";
 import { Tooltip } from "@/src/lib/shared/ui/Tooltip";
 import { Popover } from "@/src/lib/shared/ui/Popover";
@@ -71,9 +70,8 @@ export const GameExternalPages: FC<IGameExternalPagesProps> = ({
 
   if (!storeItems.length) return null;
 
-  const content = (
-    <div className={styles.stats}>
-      <h4>External pages:</h4>
+  return (
+    <InfoBlock title="External pages:" isBoxed={isBoxed}>
       <div ref={storeBoxRef} className={styles.stats__stores}>
         {sortedItems.map((store, i) => {
           const StoreIcon = (store.name && storeIcons[store.name]) || SvgStore;
@@ -150,10 +148,6 @@ export const GameExternalPages: FC<IGameExternalPagesProps> = ({
           })}
         </Scrollbar>
       </Popover>
-    </div>
+    </InfoBlock>
   );
-
-  if (!isBoxed) return content;
-
-  return <Box contentStyle={{ padding: "var(--padding-x3)" }}>{content}</Box>;
 };

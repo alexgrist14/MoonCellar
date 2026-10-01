@@ -66,86 +66,90 @@ export const UserLists: FC<IUserListsProps> = ({
 
   return (
     <section className={styles.lists}>
-      <div className={styles.lists__head}>
-        <SectionTitle as="h2">
-          {isLiked ? "Liked lists" : "Lists"}
-          {!!lists.length && (
-            <span className={styles.lists__count}>{lists.length}</span>
-          )}
-        </SectionTitle>
-        {draft ? (
-          <div className={styles.lists__actions}>
-            <Button
-              color={ButtonColor.DEFAULT}
-              className={styles.lists__create}
-              disabled={isReordering}
-              onClick={() => setDraft(null)}
-            >
-              Cancel
-            </Button>
-            <Button
-              color={ButtonColor.ACCENT}
-              className={styles.lists__create}
-              disabled={isReordering}
-              onClick={finishReordering}
-            >
-              Done
-            </Button>
-          </div>
-        ) : (
-          canCreate &&
-          !!lists.length && (
+      <SectionTitle
+        as="h2"
+        count={lists.length || undefined}
+        action={
+          draft ? (
             <div className={styles.lists__actions}>
-              {canReorder && (
+              <Button
+                color={ButtonColor.DEFAULT}
+                className={styles.lists__create}
+                disabled={isReordering}
+                onClick={() => setDraft(null)}
+              >
+                Cancel
+              </Button>
+              <Button
+                color={ButtonColor.ACCENT}
+                className={styles.lists__create}
+                disabled={isReordering}
+                onClick={finishReordering}
+              >
+                Done
+              </Button>
+            </div>
+          ) : (
+            canCreate &&
+            !!lists.length && (
+              <div className={styles.lists__actions}>
+                {canReorder && (
+                  <Button
+                    color={ButtonColor.DEFAULT}
+                    className={styles.lists__create}
+                    onClick={() => setDraft(lists)}
+                  >
+                    Reorder
+                  </Button>
+                )}
                 <Button
-                  color={ButtonColor.DEFAULT}
+                  color={ButtonColor.ACCENT}
                   className={styles.lists__create}
-                  onClick={() => setDraft(lists)}
+                  onClick={handleCreate}
                 >
-                  Reorder
+                  <SvgPlus size="16" style={{ color: "inherit" }} />
+                  New list
                 </Button>
-              )}
+              </div>
+            )
+          )
+        }
+      >
+        {isLiked ? "Liked lists" : "Lists"}
+      </SectionTitle>
+      {isListsLoading ? (
+        <Loader type="moon" />
+      ) : !lists.length ? (
+        <EmptyState
+          title={
+            isLiked
+              ? "No liked lists"
+              : isOwnProfile
+                ? "No lists yet"
+                : "No public lists"
+          }
+          description={
+            isLiked
+              ? isOwnProfile
+                ? "Press the heart on any list to keep it here."
+                : `${userName} has not liked any lists yet.`
+              : isOwnProfile
+                ? "Collect games around any idea — a mood, a ranking, a plan for co-op nights."
+                : `${userName} has not shared any lists yet.`
+          }
+          action={
+            canCreate && (
               <Button
                 color={ButtonColor.ACCENT}
                 className={styles.lists__create}
                 onClick={handleCreate}
               >
                 <SvgPlus size="16" style={{ color: "inherit" }} />
-                New list
+                Create a list
               </Button>
-            </div>
-          )
-        )}
-      </div>
-      {isListsLoading ? (
-        <Loader type="moon" />
-      ) : !lists.length ? (
-        <div className={styles.lists__empty}>
-          <EmptyState
-            title={
-              isLiked
-                ? "No liked lists"
-                : isOwnProfile
-                  ? "No lists yet"
-                  : "No public lists"
-            }
-            description={
-              isLiked
-                ? isOwnProfile
-                  ? "Press the heart on any list to keep it here."
-                  : `${userName} has not liked any lists yet.`
-                : isOwnProfile
-                  ? "Collect games around any idea — a mood, a ranking, a plan for co-op nights."
-                  : `${userName} has not shared any lists yet.`
-            }
-          />
-          {canCreate && (
-            <Button color={ButtonColor.ACCENT} onClick={handleCreate}>
-              <SvgPlus size="16" style={{ color: "inherit" }} />
-              Create a list
-            </Button>
-          )}
-        </div>
+            )
+          }
+        />
       ) : draft ? (
         <SortableGrid
           items={draft}

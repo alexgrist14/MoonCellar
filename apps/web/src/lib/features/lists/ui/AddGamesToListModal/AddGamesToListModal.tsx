@@ -3,23 +3,19 @@
 import { FC, useState } from "react";
 import { isAxiosError } from "axios";
 import {
-  CUSTOM_LIST_NAME_MAX,
-  CUSTOM_LIST_NAME_MIN,
-} from "@mooncellar/schemas";
-import {
   useAddListGamesMutation,
   useCreateListMutation,
 } from "@/src/lib/entities/list/api/list.mutations";
 import { useUserListsQuery } from "@/src/lib/entities/list/api/list.queries";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
-import { Checkbox } from "@/src/lib/shared/ui/Checkbox";
-import { Input } from "@/src/lib/shared/ui/Input";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
 import { modal } from "@/src/lib/shared/ui/Modal";
-import { SvgPlus } from "@/src/lib/shared/ui/svg";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
+import { InlineCreateList } from "../InlineCreateList";
+import { ListCheckRow } from "../ListCheckRow";
 import styles from "./AddGamesToListModal.module.scss";
 
 export const ADD_GAMES_TO_LIST_MODAL_ID = "add-games-to-list";
@@ -46,7 +42,6 @@ export const AddGamesToListModal: FC<IAddGamesToListModalProps> = ({
 
   const [checked, setChecked] = useState<string[]>([]);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [name, setName] = useState("");
 
   const toggle = (id: string) =>
     setChecked((current) =>
@@ -71,16 +66,11 @@ export const AddGamesToListModal: FC<IAddGamesToListModalProps> = ({
     }
   };
 
-  const create = async () => {
-    try {
-      const list = await createList({ name: name.trim() });
+  const create = async (name: string) => {
+    const list = await createList({ name });
 
-      setChecked((current) => [...current, list._id]);
-      setName("");
-      setIsCreateOpen(false);
-    } catch (error) {
-      toast.error({ description: getErrorMessage(error) });
-    }
+    setChecked((current) => [...current, list._id]);
+    setIsCreateOpen(false);
   };
 
   return (
@@ -91,58 +81,40 @@ export const AddGamesToListModal: FC<IAddGamesToListModalProps> = ({
       contentStyle={{ padding: "var(--padding-x4)", gap: "var(--gap-x3)" }}
     >
       {isLoading ? (
-        <Loader type="propogate" />
+        <Loader isBlock />
       ) : !lists?.length ? (
-        <p className={styles.modal__empty}>
-          You have no lists yet. Create one below.
-        </p>
+        <EmptyState
+          variant="compact"
+          title="You have no lists yet. Create one below."
+        />
       ) : (
-        <Scrollbar type="absolute" contentStyle={{ maxHeight: "260px" }}>
+        <Scrollbar
+          type="absolute"
+          contentStyle={{ maxHeight: "var(--popover-max-height)" }}
+        >
           <div className={styles.modal__list}>
             {lists.map((list) => (
-              <label key={list._id} className={styles.modal__row}>
-                <Checkbox
-                  colorTheme="on"
-                  checked={checked.includes(list._id)}
-                  onChange={() => toggle(list._id)}
-                />
-                <span className={styles.modal__name}>{list.name}</span>
-                <span className={styles.modal__count}>{list.gamesCount}</span>
-              </label>
+              <ListCheckRow
+                key={list._id}
+                name={list.name}
+                count={list.gamesCount}
+                isPrivate={list.isPrivate}
+                isChecked={checked.includes(list._id)}
+                onToggle={() => toggle(list._id)}
+              />
             ))}
           </div>
         </Scrollbar>
       )}
 
-      {isCreateOpen ? (
-        <div className={styles.modal__create}>
-          <Input
-            value={name}
-            placeholder="List name"
-            onChange={(event) => setName(event.target.value)}
-          />
-          <Button
-            color={ButtonColor.ACCENT}
-            disabled={
-              isCreating ||
-              name.trim().length < CUSTOM_LIST_NAME_MIN ||
-              name.trim().length > CUSTOM_LIST_NAME_MAX
-            }
-            onClick={create}
-          >
-            Create
-          </Button>
-        </div>
-      ) : (
-        <Button
-          color={ButtonColor.TRANSPARENT}
-          className={styles.modal__createToggle}
-          onClick={() => setIsCreateOpen(true)}
-        >
-          <SvgPlus size="16" />
-          Create a list
-        </Button>
-      )}
+      <InlineCreateList
+        isOpen={isCreateOpen}
+        isCreating={isCreating}
+        openLabel="Create a list"
+        onOpen={() => setIsCreateOpen(true)}
+        onCancel={() => setIsCreateOpen(false)}
+        onCreate={create}
+      />
 
       <Button
         color={ButtonColor.ACCENT}

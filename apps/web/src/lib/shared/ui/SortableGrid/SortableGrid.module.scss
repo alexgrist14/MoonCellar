@@ -103,25 +103,11 @@
 }
 
 .icon {
-  width: var(--padding-x7);
-  height: var(--padding-x7);
-  border: 0;
-  border-radius: var(--radius-x3);
-  background: var(--color-bg-tertiary);
   color: var(--color-text-muted);
-  cursor: pointer;
-
-  @include flexCenter;
 
   &:hover:not(:disabled),
   &:focus-visible {
-    background: var(--color-bg-hover);
     color: var(--color-text-primary);
-  }
-
-  &:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
   }
 
   &_flip svg {

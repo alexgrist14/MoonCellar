@@ -101,21 +101,6 @@
   }
 }
 
-.pill {
-  padding: var(--padding-x1) var(--padding-x2);
-  border-radius: var(--radius-x4);
-  background-color: var(--color-bg-tertiary);
-  color: var(--color-text-secondary);
-  @include font(13px, 17px, 400);
-
-  &_out {
-    color: var(--color-text-muted);
-    text-decoration: line-through;
-  }
-
-  &_winner {
-    background-color: color-mix(in srgb, var(--color-attention) 16%, transparent);
-    color: var(--color-attention);
-    text-decoration: none;
-  }
+.out {
+  text-decoration: line-through;
 }

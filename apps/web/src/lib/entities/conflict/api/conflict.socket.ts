@@ -50,12 +50,18 @@ export const useConflictsSocket = (openExternalId: string | null) => {
         queryClient.getQueryData<IConflictItemResponse>(queryKey)?.item
           ?.state === "waiting";
 
+      refreshOverview();
+
+      if (state === "waiting") {
+        queryClient.invalidateQueries({ queryKey });
+        return;
+      }
+
       queryClient.setQueryData<IConflictItemResponse>(queryKey, (response) =>
         response?.item
           ? { item: { ...response.item, state, decidedBy } }
           : response
       );
-      refreshOverview();
 
       if (wasWaiting && externalId === openExternalIdRef.current) {
         toast.error({

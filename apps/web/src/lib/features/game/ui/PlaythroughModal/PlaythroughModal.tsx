@@ -1,10 +1,11 @@
+import { TextField } from "@/src/lib/shared/ui/Fields";
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 import styles from "./PlaythroughModal.module.scss";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
 import { ButtonColor } from "@/src/lib/shared/ui/Button";
+import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { IRichEditorHandle, RichEditor } from "@/src/lib/shared/ui/RichEditor";
-import { Input } from "@/src/lib/shared/ui/Input";
 import { DatePicker } from "@/src/lib/shared/ui/DatePicker";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
@@ -26,7 +27,6 @@ import {
   useMinimumLoading,
 } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { Errors } from "@/src/lib/shared/ui/Errors";
-import { IButtonGroupItem } from "@/src/lib/shared/types/buttons.type";
 import { SvgPlus } from "@/src/lib/shared/ui/svg";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import classNames from "classnames";
@@ -265,28 +265,31 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
       >
         {!!listedPlaythroughs.length && (
           <div className={styles.modal__top}>
-            <ButtonGroup
-              buttons={[
-                ...listedPlaythroughs.map(
-                  (play) =>
-                    ({
-                      title: commonUtils.upFL(play?.category),
-                      onClick: () => {
-                        const playthrough = playthroughs.find(
-                          (item) => item._id === play._id
-                        );
+            <Tabs
+              buttonsClassName={styles.modal__tabs}
+              defaultTabIndex={
+                playthroughId
+                  ? listedPlaythroughs.findIndex(
+                      (play) => play._id === playthroughId
+                    )
+                  : listedPlaythroughs.length
+              }
+              isUseDefaultIndex
+              isStopPropagation
+              contents={[
+                ...listedPlaythroughs.map((play) => ({
+                  tabName: commonUtils.upFL(play?.category),
+                  onTabClick: () => {
+                    const playthrough = playthroughs.find(
+                      (item) => item._id === play._id
+                    );
 
-                        if (playthrough) selectHandler(playthrough);
-                      },
-                      color: ButtonColor.FANCY,
-                      active: play._id === playthroughId,
-                    }) as IButtonGroupItem
-                ),
+                    if (playthrough) selectHandler(playthrough);
+                  },
+                })),
                 {
-                  title: "New",
-                  color: ButtonColor.FANCY,
-                  active: !playthroughId,
-                  hidden: isPending || !!playthroughId,
+                  tabName: "New",
+                  isHidden: isPending || !!playthroughId,
                 },
               ]}
             />
@@ -354,8 +357,11 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
                   }
                 />
               )}
-              <Input
-                placeholder="Game time (hours)"
+              <TextField
+                label="Game time (hours)"
+                type="text"
+                inputMode="decimal"
+                placeholder="0"
                 {...register("time", {
                   setValueAs: (value) =>
                     value === "" || value == null ? undefined : Number(value),

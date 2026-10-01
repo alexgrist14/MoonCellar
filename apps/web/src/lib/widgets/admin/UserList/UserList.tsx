@@ -1,8 +1,7 @@
 import { adminUsersApi } from "@/src/lib/shared/api";
 import { FC, useCallback, useEffect, useId, useState } from "react";
 import { Table } from "@/src/lib/shared/ui/Table";
-import { SvgProfile } from "@/src/lib/shared/ui/svg";
-import Image from "next/image";
+import { Avatar } from "@/src/lib/shared/ui/Avatar";
 import styles from "./UserList.module.scss";
 import { IUser } from "@/src/lib/shared/types/auth.type";
 import { useRouter } from "next/navigation";
@@ -10,15 +9,15 @@ import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 import { IRole } from "@mooncellar/schemas";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { ActionsMenu } from "@/src/lib/shared/ui/ActionsMenu";
-import { ITableCell } from "@/src/lib/shared/types/table.type";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { useAdminUsersQuery } from "@/src/lib/entities/user/api/admin-user.queries";
 import {
   useDeleteAdminUserMutation,
   useUpdateAdminUserRolesMutation,
 } from "@/src/lib/entities/user/api/admin-user.mutations";
-import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal/ConfirmModal";
+import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
+import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 
 const ALL_ROLES: IRole[] = ["user", "admin", "moderator"];
 
@@ -97,43 +96,31 @@ export const UserList: FC = () => {
           created: { content: "Created" },
           actions: { content: "Actions" },
         }}
-        rows={users?.map((user) => {
+        onRowClick={(index) => router.push(`/user/${users[index].userName}`)}
+        rowClickExcludeKeys={["roles", "actions"]}
+        rows={users.map((user) => {
           const href = `/user/${user.userName}`;
           const isCurrentUser = user._id === currentUser?._id;
-          const cells: Record<string, ITableCell> = {
+          return {
             userName: {
               content: (
                 <div className={styles.container}>
                   <div className={styles.avatar}>
-                    {user?.avatar ? (
-                      <Image
-                        className={styles.image}
-                        src={user.avatar}
-                        width={48}
-                        height={48}
-                        alt="profile"
-                      />
-                    ) : (
-                      <div className={styles.placeholder__container}>
-                        <SvgProfile className={styles.placeholder} />
-                      </div>
-                    )}
+                    <Avatar user={user} isWithoutTooltip />
                   </div>
                   <div className={styles.description}>
-                    <h3>{user.userName}</h3>
-                    <p>{user.email}</p>
+                    <span className={styles.name}>{user.userName}</span>
+                    <span className={styles.email}>{user.email}</span>
                   </div>
                 </div>
               ),
+              sortingValue: user.userName,
             },
             raUsername: { content: user.raUsername || "N/A" },
 
             roles: {
               content: (
-                <div
-                  className={styles.fill}
-                  onClick={(event) => event.stopPropagation()}
-                >
+                <div className={styles.fill}>
                   <Dropdown
                     list={ALL_ROLES}
                     placeholder="Select roles"
@@ -162,14 +149,10 @@ export const UserList: FC = () => {
               ),
             },
             created: {
-              content: new Intl.DateTimeFormat("ru-RU", {
-                year: "numeric",
-                month: "numeric",
-                day: "numeric",
-                hour: "numeric",
-                minute: "numeric",
-                second: "numeric",
-              }).format(new Date(user.createdAt)),
+              content: commonUtils.formatDate(user.createdAt, {
+                isWithTime: true,
+              }),
+              sortingValue: new Date(user.createdAt).getTime(),
             },
             actions: {
               content: (
@@ -192,22 +175,6 @@ export const UserList: FC = () => {
               ),
             },
           };
-
-          return Object.fromEntries(
-            Object.entries(cells).map(([key, cell]) => [
-              key,
-              ["roles", "actions"].includes(key)
-                ? cell
-                : {
-                    ...cell,
-                    className: styles.rowClickable,
-                    onClick: () => router.push(href),
-                  },
-            ])
-          ) as Record<
-            "userName" | "raUsername" | "roles" | "created" | "actions",
-            ITableCell
-          >;
         })}
       />
     </div>

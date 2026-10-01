@@ -6,9 +6,11 @@ import {
   ICommentReportStatus,
 } from "@mooncellar/schemas";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
+import { pluralize } from "@/src/lib/shared/utils/plural.utils";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { modal } from "@/src/lib/shared/ui/Modal";
-import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal/ConfirmModal";
+import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
@@ -116,23 +118,20 @@ export const ReportList: FC = () => {
           isUseDefaultIndex
         />
         <span className={styles.count}>
-          {data &&
-            `${total} ${status === "open" ? "open" : "resolved"} ${
-              total === 1 ? "case" : "cases"
-            }`}
+          {data && pluralize(total, `${status} case`, `${status} cases`)}
         </span>
       </div>
 
       {isLoaderShown ? (
-        <div className={styles.loading}>
-          <Loader type="pulse" />
-        </div>
+        <Loader minHeight="var(--community-loading-height)" />
       ) : !reports.length ? (
-        <p className={styles.placeholder}>
-          {status === "open"
-            ? "No open reports. Nothing waits for a decision."
-            : "No reports have been resolved yet."}
-        </p>
+        <EmptyState
+          title={
+            status === "open"
+              ? "No open reports. Nothing waits for a decision."
+              : "No reports have been resolved yet."
+          }
+        />
       ) : (
         <ul className={styles.list}>
           {reports.map((report) => (

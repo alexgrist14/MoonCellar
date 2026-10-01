@@ -5,9 +5,10 @@ import classNames from "classnames";
 import { useDragSort } from "@/src/lib/shared/hooks";
 import { moveItem } from "@/src/lib/shared/utils/common.utils";
 import { SvgArrow, SvgClose, SvgGrip } from "../svg";
+import { Button, ButtonColor } from "../Button";
 import styles from "./SortableGrid.module.scss";
 
-interface ISortableGridProps<T> {
+export interface ISortableGridProps<T> {
   items: T[];
   getKey: (item: T) => string;
   getName: (item: T) => string;
@@ -71,18 +72,24 @@ export const SortableGrid = <T,>({
               </span>
             </div>
             <div className={styles.bar}>
-              <button
+              <Button
                 type="button"
+                color={ButtonColor.TRANSPARENT}
+                compact
+                isOnlyIcon
                 className={classNames(styles.icon, styles.icon_flip)}
                 aria-label={`Move ${name} left`}
                 disabled={isDisabled || index === 0}
                 onClick={() => onChange(moveItem(items, index, index - 1))}
               >
                 <SvgArrow style={ARROW_ICON_STYLE} />
-              </button>
+              </Button>
               {isRemovable && (
-                <button
+                <Button
                   type="button"
+                  color={ButtonColor.TRANSPARENT}
+                  compact
+                  isOnlyIcon
                   className={classNames(styles.icon, styles.icon_danger)}
                   aria-label={`Remove ${name}`}
                   disabled={isDisabled}
@@ -93,17 +100,20 @@ export const SortableGrid = <T,>({
                   }
                 >
                   <SvgClose size="12" style={ICON_STYLE} />
-                </button>
+                </Button>
               )}
-              <button
+              <Button
                 type="button"
+                color={ButtonColor.TRANSPARENT}
+                compact
+                isOnlyIcon
                 className={styles.icon}
                 aria-label={`Move ${name} right`}
                 disabled={isDisabled || index === items.length - 1}
                 onClick={() => onChange(moveItem(items, index, index + 1))}
               >
                 <SvgArrow style={ARROW_ICON_STYLE} />
-              </button>
+              </Button>
             </div>
             <span className={styles.name} title={name}>
               {name}

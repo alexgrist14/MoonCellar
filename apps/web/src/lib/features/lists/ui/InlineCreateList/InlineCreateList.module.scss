@@ -1,0 +1,29 @@
+.create {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x1);
+
+  &__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--gap-x2);
+    align-items: start;
+
+    & button {
+      border-radius: var(--radius-x4);
+    }
+  }
+
+  & &__open {
+    width: 100%;
+    justify-content: flex-start;
+    gap: var(--gap-x2);
+    border-radius: var(--radius-x4);
+    color: var(--color-text-secondary);
+  }
+
+  &__hint {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+}

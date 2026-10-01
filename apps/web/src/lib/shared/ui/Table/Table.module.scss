@@ -97,6 +97,10 @@
     &_hover {
       background-color: var(--color-bg-hover);
     }
+
+    &_clickable {
+      cursor: pointer;
+    }
   }
 
   &__resize {
@@ -139,5 +143,34 @@
         fill: var(--color-bg-accent);
       }
     }
+  }
+}
+
+.table_rows {
+  display: grid;
+  row-gap: var(--gap-x1);
+  align-items: stretch;
+
+  & .table__row {
+    display: contents;
+
+    & > :first-child {
+      border-radius: var(--radius-x1) 0 0 var(--radius-x1);
+    }
+
+    & > :last-child {
+      border-radius: 0 var(--radius-x1) var(--radius-x1) 0;
+    }
+  }
+
+  & .table__cell {
+    align-items: start;
+    margin-block: 0;
+    min-width: 0;
+  }
+
+  & .table__text > p {
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 }

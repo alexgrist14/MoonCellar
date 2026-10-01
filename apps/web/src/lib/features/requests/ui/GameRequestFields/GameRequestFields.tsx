@@ -21,7 +21,8 @@ import {
 import { SearchPicker } from "@/src/lib/shared/ui/SearchPicker";
 import { IGameDraft, IRelatedEntry } from "../../model/game-request.utils";
 import { useEntitySearch } from "../../model/useEntitySearch";
-import { SelectedChips } from "../SelectedChips";
+import { RemovableChips } from "@/src/lib/shared/ui/RemovableChips";
+import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import styles from "../RequestForm/RequestForm.module.scss";
 
 const RELATION_OPTIONS = (
@@ -134,7 +135,7 @@ export const GameRequestFields: FC<IGameRequestFieldsProps> = ({
   return (
     <>
       <section className={styles.group}>
-        <h3 className={styles.group__title}>Game</h3>
+        <SectionTitle as="h3">Game</SectionTitle>
         <div className={styles.grid}>
           <TextField
             label={isUpdate ? "Name — leave empty to keep" : "Name"}
@@ -182,10 +183,16 @@ export const GameRequestFields: FC<IGameRequestFieldsProps> = ({
       </section>
 
       <section className={styles.group}>
-        <h3 className={styles.group__title}>
+        <SectionTitle
+          as="h3"
+          action={
+            <span className={styles.group__note}>
+              Date and platform of each release
+            </span>
+          }
+        >
           Release dates
-          <span>Date and platform of each release</span>
-        </h3>
+        </SectionTitle>
         <ObjectListField
           label="Release dates"
           isLabelHidden
@@ -196,7 +203,7 @@ export const GameRequestFields: FC<IGameRequestFieldsProps> = ({
       </section>
 
       <section className={styles.group}>
-        <h3 className={styles.group__title}>Classification</h3>
+        <SectionTitle as="h3">Classification</SectionTitle>
         <div className={styles.grid}>
           <EnumListField
             label="Platforms"
@@ -254,7 +261,7 @@ export const GameRequestFields: FC<IGameRequestFieldsProps> = ({
       </section>
 
       <section className={styles.group}>
-        <h3 className={styles.group__title}>Companies</h3>
+        <SectionTitle as="h3">Companies</SectionTitle>
         <ObjectListField
           label="Companies"
           isLabelHidden
@@ -265,7 +272,7 @@ export const GameRequestFields: FC<IGameRequestFieldsProps> = ({
       </section>
 
       <section className={styles.group}>
-        <h3 className={styles.group__title}>Multiplayer</h3>
+        <SectionTitle as="h3">Multiplayer</SectionTitle>
         <ObjectListField
           label="Multiplayer modes"
           isLabelHidden
@@ -276,7 +283,7 @@ export const GameRequestFields: FC<IGameRequestFieldsProps> = ({
       </section>
 
       <section className={styles.group}>
-        <h3 className={styles.group__title}>Age ratings</h3>
+        <SectionTitle as="h3">Age ratings</SectionTitle>
         <ObjectListField
           label="Age ratings"
           isLabelHidden
@@ -287,12 +294,18 @@ export const GameRequestFields: FC<IGameRequestFieldsProps> = ({
       </section>
 
       <section className={styles.group}>
-        <h3 className={styles.group__title}>
+        <SectionTitle
+          as="h3"
+          action={
+            <span className={styles.group__note}>
+              Added to the existing relations
+            </span>
+          }
+        >
           Related games
-          <span>Added to the existing relations</span>
-        </h3>
+        </SectionTitle>
         {draft.parent ? (
-          <SelectedChips
+          <RemovableChips
             items={[
               { ...draft.parent, label: `Main game: ${draft.parent.label}` },
             ]}
@@ -348,7 +361,7 @@ export const GameRequestFields: FC<IGameRequestFieldsProps> = ({
             }}
           />
         </div>
-        <SelectedChips
+        <RemovableChips
           items={draft.related.map((entry) => ({
             id: `${entry.relation}:${entry.game.id}`,
             label: `${RELATION_LABELS[entry.relation]}: ${entry.game.label}`,
@@ -364,13 +377,17 @@ export const GameRequestFields: FC<IGameRequestFieldsProps> = ({
       </section>
 
       <section className={styles.group}>
-        <h3 className={styles.group__title}>
+        <SectionTitle
+          as="h3"
+          action={
+            <span className={styles.group__note}>
+              Links to images on other sites. Nothing is stored until a
+              moderator approves.
+            </span>
+          }
+        >
           Pictures
-          <span>
-            Links to images on other sites. Nothing is stored until a moderator
-            approves.
-          </span>
-        </h3>
+        </SectionTitle>
         <TextField
           label="Cover link"
           value={draft.cover}
@@ -389,7 +406,7 @@ export const GameRequestFields: FC<IGameRequestFieldsProps> = ({
       </section>
 
       <section className={styles.group}>
-        <h3 className={styles.group__title}>Links</h3>
+        <SectionTitle as="h3">Links</SectionTitle>
         <StringListField
           label="Websites"
           value={draft.websites}
@@ -409,10 +426,16 @@ export const GameRequestFields: FC<IGameRequestFieldsProps> = ({
       </section>
 
       <section className={styles.group}>
-        <h3 className={styles.group__title}>
+        <SectionTitle
+          as="h3"
+          action={
+            <span className={styles.group__note}>
+              On approval the game is parsed from these services
+            </span>
+          }
+        >
           Ids on other services
-          <span>On approval the game is parsed from these services</span>
-        </h3>
+        </SectionTitle>
         <div className={styles.grid}>
           <TextField
             label="IGDB game id"

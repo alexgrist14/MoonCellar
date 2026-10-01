@@ -5,7 +5,8 @@ import { Button, ButtonColor } from "../Button";
 import { SvgClose } from "../svg";
 
 interface IBoxHeadProps {
-  title?: string;
+  title?: ReactNode;
+  titleCount?: number;
   titleAction?: ReactNode;
   isHeaderWithoutStyles?: boolean;
   isVerticalActions?: boolean;
@@ -19,6 +20,7 @@ export const BoxHead: FC<IBoxHeadProps> = ({
   isHeaderWithoutStyles,
   isVerticalActions,
   title,
+  titleCount,
   titleAction,
   isTitleStart,
   isExternal,
@@ -63,7 +65,14 @@ export const BoxHead: FC<IBoxHeadProps> = ({
           [styles.template__title_external]: isExternal,
         })}
       >
-        {title}
+        {typeof titleCount === "number" ? (
+          <span>
+            {title}
+            <span className={styles.template__count}>({titleCount})</span>
+          </span>
+        ) : (
+          title
+        )}
       </h2>
       {action}
     </div>

@@ -28,10 +28,7 @@ const LARGE_GENRE_SIZE = 5000;
 const TOP_COUNT = 5;
 
 const getGenres = cache(async () =>
-  gamesApi
-    .getTotalGamesByCount()
-    .then(({ data }) => data)
-    .catch(() => [])
+  gamesApi.getTotalGamesByCount().then(({ data }) => data)
 );
 
 const getGenre = cache(async (slug: string) => {
@@ -52,7 +49,15 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const genre = await getGenre(slug);
+  const genre = await getGenre(slug).catch((error: unknown) => {
+    console.error("Failed to load genre hub metadata:", error);
+
+    return undefined;
+  });
+
+  if (genre === undefined) {
+    return { title: "Games" };
+  }
 
   if (!genre) {
     return { title: "Page not found", robots: { index: false, follow: false } };

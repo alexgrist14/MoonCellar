@@ -16,7 +16,6 @@ export interface ISvgBaseProps {
   size?: ISvgSizes;
   color?: ISvgColors;
   ref?: Ref<SVGSVGElement>;
-  isDisableStyle?: boolean;
 }
 
 export type ISvgColorsProps = Omit<ISvgBaseProps, "color">;
@@ -35,7 +34,6 @@ export const Svg: FC<ISvgProps> = ({
   transform,
   ref,
   viewBox,
-  isDisableStyle,
   ...props
 }) => {
   return (
@@ -53,7 +51,6 @@ export const Svg: FC<ISvgProps> = ({
         minHeight: size,
         ...style,
       }}
-      style-default={isDisableStyle ? "true" : undefined}
       className={cn(styles.icon, className)}
       {...props}
     >

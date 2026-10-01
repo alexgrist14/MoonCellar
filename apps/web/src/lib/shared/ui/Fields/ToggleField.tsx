@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import styles from "./fields.module.scss";
 
@@ -7,25 +7,30 @@ interface IToggleFieldProps {
   value?: boolean;
   onChange: (value: boolean) => void;
   disabled?: boolean;
+  hint?: ReactNode;
+  labelPosition?: "start" | "end";
 }
-
-const ON = "ON";
-const OFF = "OFF";
 
 export const ToggleField: FC<IToggleFieldProps> = ({
   label,
   value,
   onChange,
   disabled,
+  hint,
+  labelPosition,
 }) => (
   <div className={styles.field}>
-    <span className={styles.label}>{label}</span>
+    {!labelPosition && (
+      <>
+        <span className={styles.label}>{label}</span>
+        {!!hint && <span className={styles.hint}>{hint}</span>}
+      </>
+    )}
     <ToggleSwitch
-      leftContent={OFF}
-      rightContent={ON}
-      value={value ? "right" : "left"}
+      checked={!!value}
       isDisabled={disabled}
-      clickCallback={(result) => onChange(result === ON)}
+      onChange={onChange}
+      {...(labelPosition && { label, hint, labelPosition })}
     />
   </div>
 );

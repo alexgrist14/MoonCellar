@@ -20,6 +20,10 @@
     gap: var(--gap-x1);
   }
 
+  &__empty {
+    width: 100%;
+  }
+
   &__remove {
     width: 100%;
   }

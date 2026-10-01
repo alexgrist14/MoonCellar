@@ -180,6 +180,10 @@ The radius stayed at `--radius-x2`.
 - Give the image `border-radius: inherit` — or the token itself if a wrapper is in the way.
 - Prefer `overflow: clip` unless the element genuinely needs to scroll.
 - Keep a `background-color` only if something renders during load.
+- If the content is positioned (`next/image` with `fill`, a mosaic of cells), it paints above
+  the tile's own outline. Draw the ring on an `&::after` overlay instead (`position: absolute;
+  inset: 0; z-index: 1; border-radius: inherit; pointer-events: none` plus the same inset
+  outline), as `ListCard`, `CharacterCard` and the selected `GameCard` do.
 
 ## 7. The rail edge: partially visible tiles
 

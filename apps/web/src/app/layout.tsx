@@ -94,7 +94,12 @@ export default function App({ children }: { children: ReactNode }) {
         <link rel="icon" href="/images/logo-icon.png" type="image/png" />
         <JsonLd data={getWebSiteJsonLd()} />
       </head>
-      <body style={{ color: "white", background: "#191d24" }}>
+      <body
+        style={{
+          color: "var(--color-text-primary)",
+          background: "var(--color-bg-primary)",
+        }}
+      >
         <QueryProvider>
           <FaroInit />
           <GeoInit />

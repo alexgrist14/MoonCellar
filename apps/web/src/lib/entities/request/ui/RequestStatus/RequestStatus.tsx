@@ -1,7 +1,6 @@
 import { FC } from "react";
-import classNames from "classnames";
 import { IContentRequestStatus } from "@mooncellar/schemas";
-import styles from "./RequestStatus.module.scss";
+import { Badge, BadgeTone } from "@/src/lib/shared/ui/Badge";
 
 const LABELS: Record<IContentRequestStatus, string> = {
   pending: "Pending",
@@ -10,10 +9,17 @@ const LABELS: Record<IContentRequestStatus, string> = {
   withdrawn: "Withdrawn",
 };
 
+const TONES: Record<IContentRequestStatus, BadgeTone> = {
+  pending: "attention",
+  approved: "positive",
+  rejected: "negative",
+  withdrawn: "muted",
+};
+
 export const RequestStatus: FC<{ status: IContentRequestStatus }> = ({
   status,
 }) => (
-  <span className={classNames(styles.status, styles[`status_${status}`])}>
+  <Badge tone={TONES[status]} size="md" isWithDot>
     {LABELS[status]}
-  </span>
+  </Badge>
 );

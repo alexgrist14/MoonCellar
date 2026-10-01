@@ -1,27 +1,20 @@
 "use client";
 
-import { FC, KeyboardEvent, useEffect, useRef, useState } from "react";
-import classNames from "classnames";
-import { isAxiosError } from "axios";
-import {
-  CUSTOM_LIST_NAME_MAX,
-  CUSTOM_LIST_NAME_MIN,
-  ICustomList,
-  IGameResponse,
-} from "@mooncellar/schemas";
+import { FC, useEffect, useRef, useState } from "react";
+import { ICustomList, IGameResponse } from "@mooncellar/schemas";
 import {
   useAddListGameMutation,
   useCreateListMutation,
   useRemoveListGameMutation,
 } from "@/src/lib/entities/list/api/list.mutations";
 import { useUserListsQuery } from "@/src/lib/entities/list/api/list.queries";
-import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
-import { Checkbox } from "@/src/lib/shared/ui/Checkbox";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
-import { SvgLock, SvgPlus } from "@/src/lib/shared/ui/svg";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
+import { InlineCreateList } from "../InlineCreateList";
+import { ListCheckRow } from "../ListCheckRow";
 import styles from "./ListsPopover.module.scss";
 
 const FILTER_THRESHOLD = 9;
@@ -32,28 +25,17 @@ interface IListsPanelProps {
   isTouch?: boolean;
 }
 
-const getErrorMessage = (error: unknown) => {
-  const message = isAxiosError(error)
-    ? error.response?.data?.message
-    : undefined;
-
-  return typeof message === "string"
-    ? message
-    : "The list could not be created";
-};
-
 export const ListsPanel: FC<IListsPanelProps> = ({ game, userId, isTouch }) => {
   const { data: lists, isLoading } = useUserListsQuery(userId, game._id);
   const { mutate: addGame } = useAddListGameMutation();
   const { mutate: removeGame } = useRemoveListGameMutation();
-  const { mutate: createList, isPending: isCreating } = useCreateListMutation();
+  const { mutateAsync: createList, isPending: isCreating } =
+    useCreateListMutation();
 
   const [overrides, setOverrides] = useState<Record<string, boolean>>({});
   const [pending, setPending] = useState<Record<string, boolean>>({});
   const [filter, setFilter] = useState("");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [createError, setCreateError] = useState<string>();
 
   const orderRef = useRef<string[]>([]);
   const initialRef = useRef<Record<string, boolean>>({});
@@ -167,69 +149,24 @@ export const ListsPanel: FC<IListsPanelProps> = ({ game, userId, isTouch }) => {
   const hasLists = !!lists?.length;
   const isCreateShown = isCreateOpen || (!isLoading && !hasLists);
 
-  const resetCreate = () => {
+  const create = async (name: string) => {
+    const list = await createList({ name, gameId: game._id });
+
+    initialRef.current[list._id] = false;
+    namesRef.current[list._id] = list.name;
+    changesRef.current[list._id] = true;
+    orderRef.current = [
+      list._id,
+      ...orderRef.current.filter((id) => id !== list._id),
+    ];
+    setOverrides((current) => ({ ...current, [list._id]: true }));
     setIsCreateOpen(false);
-    setName("");
-    setCreateError(undefined);
-  };
-
-  const submitCreate = () => {
-    const trimmed = name.trim();
-
-    if (trimmed.length < CUSTOM_LIST_NAME_MIN) {
-      setCreateError(
-        `Name must be at least ${CUSTOM_LIST_NAME_MIN} characters`
-      );
-      return;
-    }
-
-    if (trimmed.length > CUSTOM_LIST_NAME_MAX) {
-      setCreateError(`Name must be at most ${CUSTOM_LIST_NAME_MAX} characters`);
-      return;
-    }
-
-    createList(
-      { name: trimmed, gameId: game._id },
-      {
-        onSuccess: (list) => {
-          initialRef.current[list._id] = false;
-          namesRef.current[list._id] = list.name;
-          changesRef.current[list._id] = true;
-          orderRef.current = [
-            list._id,
-            ...orderRef.current.filter((id) => id !== list._id),
-          ];
-          setOverrides((current) => ({ ...current, [list._id]: true }));
-          resetCreate();
-        },
-        onError: (error) => setCreateError(getErrorMessage(error)),
-      }
-    );
-  };
-
-  const handleCreateKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      submitCreate();
-    }
-
-    if (event.key === "Escape" && hasLists) {
-      event.stopPropagation();
-      resetCreate();
-    }
   };
 
   return (
-    <div
-      className={classNames(styles.panel, { [styles.panel_touch]: isTouch })}
-      onClick={(event) => event.stopPropagation()}
-    >
+    <div className={styles.panel} onClick={(event) => event.stopPropagation()}>
       <p className={styles.panel__game}>{game.name}</p>
-      {isLoading && (
-        <div className={styles.loading}>
-          <Loader />
-        </div>
-      )}
+      {isLoading && <Loader isBlock />}
       {hasLists && ordered.length >= FILTER_THRESHOLD && (
         <Input
           value={filter}
@@ -244,85 +181,43 @@ export const ListsPanel: FC<IListsPanelProps> = ({ game, userId, isTouch }) => {
           contentStyle={{ maxHeight: "var(--popover-max-height)" }}
         >
           {visible.map((list) => (
-            <label
+            <ListCheckRow
               key={list._id}
-              className={classNames(styles.row, {
-                [styles.row_pending]: pending[list._id],
-              })}
-            >
-              <Checkbox
-                checked={isChecked(list)}
-                disabled={pending[list._id]}
-                onChange={() => toggle(list)}
-              />
-              <span className={styles.row__name}>{list.name}</span>
-              {list.isPrivate && (
-                <SvgLock
-                  size="12"
-                  className={styles.row__lock}
-                  style={{ color: "inherit" }}
-                  aria-label="Private list"
-                />
-              )}
-              <span className={styles.row__count}>{getCount(list)}</span>
-            </label>
+              name={list.name}
+              count={getCount(list)}
+              isChecked={isChecked(list)}
+              isPrivate={list.isPrivate}
+              isPending={pending[list._id]}
+              isTouch={isTouch}
+              onToggle={() => toggle(list)}
+            />
           ))}
           {!visible.length && (
-            <p className={styles.panel__note}>No lists match “{filter}”</p>
+            <EmptyState
+              variant="compact"
+              isWithoutImage
+              title={`No lists match “${filter}”`}
+            />
           )}
         </Scrollbar>
       )}
       {!isLoading && !hasLists && (
-        <div className={styles.empty}>
-          <b>No lists yet</b>
-          <span>
-            Name one after anything — a mood, a ranking, a plan for co-op
-            nights.
-          </span>
-        </div>
+        <EmptyState
+          variant="compact"
+          title="No lists yet"
+          description="Name one after anything — a mood, a ranking, a plan for co-op nights."
+        />
       )}
       {!isLoading && (
         <div className={styles.panel__footer}>
-          {isCreateShown ? (
-            <div className={styles.create}>
-              <div className={styles.create__row}>
-                <Input
-                  autoFocus
-                  value={name}
-                  placeholder="New list name"
-                  disabled={isCreating}
-                  onChange={(event) => {
-                    setName(event.target.value);
-                    setCreateError(undefined);
-                  }}
-                  onKeyDown={handleCreateKeyDown}
-                />
-                <Button
-                  color={ButtonColor.ACCENT}
-                  disabled={isCreating || !name.trim()}
-                  onClick={submitCreate}
-                >
-                  Create
-                </Button>
-              </div>
-              <span
-                className={classNames(styles.create__hint, {
-                  [styles.create__hint_error]: !!createError,
-                })}
-              >
-                {createError ?? `${game.name} goes into the new list.`}
-              </span>
-            </div>
-          ) : (
-            <Button
-              color={ButtonColor.TRANSPARENT}
-              className={styles.panel__new}
-              onClick={() => setIsCreateOpen(true)}
-            >
-              <SvgPlus size="16" style={{ color: "inherit" }} />
-              New list
-            </Button>
-          )}
+          <InlineCreateList
+            isOpen={isCreateShown}
+            isCreating={isCreating}
+            hint={`${game.name} goes into the new list.`}
+            onOpen={() => setIsCreateOpen(true)}
+            onCancel={hasLists ? () => setIsCreateOpen(false) : undefined}
+            onCreate={create}
+          />
         </div>
       )}
     </div>

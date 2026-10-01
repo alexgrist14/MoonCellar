@@ -36,7 +36,7 @@
     max-height: 80vh;
     max-height: 80dvh;
     outline: none;
-    border-radius: var(--radius-x2);
+    border-radius: var(--radius-x4);
     background: var(--color-bg-primary);
     color: var(--color-text-primary);
     transition:
@@ -91,7 +91,7 @@
     bottom: var(--textarea-border);
     width: var(--textarea-handle-size);
     height: var(--textarea-handle-size);
-    border-radius: var(--radius-x2);
+    border-radius: var(--radius-x3);
     color: var(--color-text-muted);
     cursor: ns-resize;
     touch-action: none;

@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import classNames from "classnames";
 import { IGameAiDraftRun } from "@mooncellar/schemas";
+import { Badge } from "@/src/lib/shared/ui/Badge";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { TextField } from "@/src/lib/shared/ui/Fields";
 import { Input } from "@/src/lib/shared/ui/Input";
+import { Tooltip } from "@/src/lib/shared/ui/Tooltip";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import styles from "./AiDrafts.module.scss";
 
@@ -33,6 +34,15 @@ const STATUS_LABELS: Record<IGameAiDraftRun["status"], string> = {
   running: "Running",
   done: "Done",
   failed: "Failed",
+};
+
+const STATUS_TONES: Record<
+  IGameAiDraftRun["status"],
+  "muted" | "positive" | "negative"
+> = {
+  running: "muted",
+  done: "positive",
+  failed: "negative",
 };
 
 export const AiDrafts = <T,>({
@@ -66,22 +76,24 @@ export const AiDrafts = <T,>({
           onChange={setQuery}
         />
         {!!maxCount && (
-          <label className={styles.drafts__count} title={countLabel}>
-            <span className={styles.drafts__hidden}>{countLabel}</span>
-            <Input
-              type="number"
-              value={count}
-              disabled={isStarting}
-              onChange={(event) =>
-                setCount(
-                  Math.min(
-                    maxCount,
-                    Math.max(1, Math.round(Number(event.target.value)) || 1)
+          <Tooltip content={countLabel}>
+            <label className={styles.drafts__count}>
+              <span className={styles.drafts__hidden}>{countLabel}</span>
+              <Input
+                type="number"
+                value={count}
+                disabled={isStarting}
+                onChange={(event) =>
+                  setCount(
+                    Math.min(
+                      maxCount,
+                      Math.max(1, Math.round(Number(event.target.value)) || 1)
+                    )
                   )
-                )
-              }
-            />
-          </label>
+                }
+              />
+            </label>
+          </Tooltip>
         )}
         <Button
           type="button"
@@ -124,14 +136,9 @@ export const AiDrafts = <T,>({
                 </details>
               </div>
               <div className={styles.run__actions}>
-                <span
-                  className={classNames(
-                    styles.run__status,
-                    styles[`run__status_${run.status}`]
-                  )}
-                >
+                <Badge tone={STATUS_TONES[run.status]}>
                   {STATUS_LABELS[run.status]}
-                </span>
+                </Badge>
                 <Button
                   type="button"
                   color={ButtonColor.DEFAULT}

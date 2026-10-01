@@ -4,8 +4,12 @@ import { IComment } from "@mooncellar/schemas";
 import { RichText } from "@/src/lib/shared/ui/RichText";
 import { Spoiler } from "@/src/lib/shared/ui/Spoiler";
 import { modal } from "@/src/lib/shared/ui/Modal";
-import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal/ConfirmModal";
+import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { Badge } from "@/src/lib/shared/ui/Badge";
+import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
+import { ReactionButton } from "@/src/lib/shared/ui/ReactionButton";
+import { ScoreValue } from "@/src/lib/shared/ui/ScoreValue";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import {
   SvgComment,
@@ -179,13 +183,13 @@ export const CommentItem: FC<ICommentItemProps> = ({
                 {commonUtils.getHumanDate(comment.createdAt)}
               </time>
               {comment.status === "hidden" && (
-                <span className={styles.badge}>Hidden</span>
+                <Badge tone="attention">Hidden</Badge>
               )}
               {isAdmin && !!comment.reportsCount && (
-                <span className={styles.badge}>
+                <Badge tone="attention">
                   {comment.reportsCount}{" "}
                   {comment.reportsCount === 1 ? "report" : "reports"}
-                </span>
+                </Badge>
               )}
             </div>
             {!!comment.reviewId && (
@@ -196,8 +200,15 @@ export const CommentItem: FC<ICommentItemProps> = ({
                       On <b>{comment.review.author?.userName ?? "a player"}</b>
                       &apos;s review ·{" "}
                       {commonUtils.upFL(comment.review.category)}
-                      {comment.review.rating !== null &&
-                        ` · ${comment.review.rating} / 10`}
+                      {comment.review.rating !== null && (
+                        <>
+                          {" · "}
+                          <ScoreValue
+                            value={comment.review.rating}
+                            size="inline"
+                          />
+                        </>
+                      )}
                     </>
                   ) : (
                     "On a review that is no longer public"
@@ -231,48 +242,44 @@ export const CommentItem: FC<ICommentItemProps> = ({
             )}
             <div className={styles.entry__actions}>
               {isVisible && (
-                <button
-                  type="button"
-                  aria-pressed={comment.isLiked}
-                  aria-label="Like"
-                  className={classNames(styles.action, {
-                    [styles.action_active]: comment.isLiked,
-                  })}
+                <ReactionButton
+                  icon={<SvgHeart size="16" style={{ color: "inherit" }} />}
+                  count={comment.likesCount}
+                  isActive={comment.isLiked}
+                  ariaLabel="Like"
                   onClick={toggleLike}
-                >
-                  <SvgHeart size="16" style={{ color: "inherit" }} />
-                  <span className={styles.action__count}>
-                    {comment.likesCount}
-                  </span>
-                </button>
+                />
               )}
               {isVisible && (
-                <button
+                <Button
                   type="button"
-                  className={styles.action}
+                  color={ButtonColor.GHOST}
+                  compact
                   onClick={() => requireAuth(() => setIsReplying(true))}
                 >
                   <SvgReply size="16" style={{ color: "inherit" }} />
                   Reply
-                </button>
+                </Button>
               )}
               {isOwn && isVisible && !isEditing && (
-                <button
+                <Button
                   type="button"
-                  className={styles.action}
+                  color={ButtonColor.GHOST}
+                  compact
                   onClick={() => setIsEditing(true)}
                 >
                   Edit
-                </button>
+                </Button>
               )}
               {(isOwn || isAdmin) && (
-                <button
+                <Button
                   type="button"
-                  className={styles.action}
+                  color={ButtonColor.GHOST}
+                  compact
                   onClick={confirmDelete}
                 >
                   Delete
-                </button>
+                </Button>
               )}
               {!!profile &&
                 !isOwn &&
@@ -280,19 +287,21 @@ export const CommentItem: FC<ICommentItemProps> = ({
                 (comment.isReported ? (
                   <span className={styles.entry__meta}>Reported</span>
                 ) : (
-                  <button
+                  <Button
                     type="button"
-                    className={styles.action}
+                    color={ButtonColor.GHOST}
+                    compact
                     onClick={() => reportComment(comment._id)}
                   >
                     <SvgFlag size="16" style={{ color: "inherit" }} />
                     Report
-                  </button>
+                  </Button>
                 ))}
               {isAdmin && (
-                <button
+                <Button
                   type="button"
-                  className={styles.action}
+                  color={ButtonColor.GHOST}
+                  compact
                   onClick={() =>
                     setStatus({
                       commentId: comment._id,
@@ -301,7 +310,7 @@ export const CommentItem: FC<ICommentItemProps> = ({
                   }
                 >
                   {isVisible ? "Hide" : "Restore"}
-                </button>
+                </Button>
               )}
             </div>
           </>
@@ -315,15 +324,16 @@ export const CommentItem: FC<ICommentItemProps> = ({
                 <CommentReplies commentId={comment._id} gameId={gameId} />
               ) : (
                 !!comment.repliesCount && (
-                  <button
+                  <Button
                     type="button"
-                    className={classNames(styles.action, styles.action_link)}
+                    color={ButtonColor.GHOST}
+                    compact
+                    className={styles.threadAction}
                     onClick={() => setIsRepliesOpen(true)}
                   >
                     <SvgComment size="16" style={{ color: "inherit" }} />
-                    {comment.repliesCount}{" "}
-                    {comment.repliesCount === 1 ? "reply" : "replies"}
-                  </button>
+                    {`${comment.repliesCount} ${comment.repliesCount === 1 ? "reply" : "replies"}`}
+                  </Button>
                 )
               )}
             </div>

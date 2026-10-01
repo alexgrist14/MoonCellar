@@ -50,46 +50,15 @@ $categories: completed, playing, mastered, played, backlog, dropped;
     }
   }
 
+  &__sort {
+    flex: 1 1 var(--list-sort-width);
+    min-width: 0;
+  }
+
   &__label {
     color: var(--color-text-muted);
 
     @include font(13px, 20px, 400);
-  }
-}
-
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--gap-x2);
-}
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--gap-x2);
-  padding: var(--padding-x1) var(--padding-x2);
-  border: 1px solid var(--color-border-primary);
-  border-radius: var(--radius-x4);
-  background-color: var(--color-bg-primary);
-  color: var(--color-text-muted);
-  cursor: pointer;
-  transition:
-    border-color var(--duration-fast) var(--easing-out),
-    color var(--duration-fast) var(--easing-out);
-
-  @include font(13px, 17px, 400);
-
-  &:hover,
-  &_active {
-    border-color: var(--color-accent);
-    color: var(--color-text-primary);
-  }
-
-  &__count {
-    color: var(--color-text-muted);
-    font-variant-numeric: tabular-nums;
-
-    @include font(12px, 16px, 400);
   }
 }
 
@@ -189,30 +158,8 @@ $categories: completed, playing, mastered, played, backlog, dropped;
     margin-left: auto;
   }
 
-  &__flag {
-    color: var(--color-attention);
-    white-space: nowrap;
-
-    @include font(12px, 16px, 600);
-
-    &_muted {
-      color: var(--color-text-muted);
-    }
-  }
-
   &__score {
     margin-left: auto;
-    color: var(--color-text-primary);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-
-    @include font(15px, 20px, 600);
-  }
-
-  &__scale {
-    color: var(--color-text-muted);
-
-    @include font(12px, 16px, 400);
   }
 
   &__body {
@@ -225,20 +172,6 @@ $categories: completed, playing, mastered, played, backlog, dropped;
     align-items: center;
     gap: var(--gap-x1) var(--gap-x2);
     margin-left: calc(-1 * var(--padding-x2));
-  }
-
-  &__helpful {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--gap-x2);
-    padding: var(--padding-x1) var(--padding-x2);
-    color: var(--color-text-muted);
-
-    @include font(13px, 20px, 400);
-  }
-
-  &__count {
-    font-variant-numeric: tabular-nums;
   }
 
   @include mediaMax($screenSm) {
@@ -256,36 +189,6 @@ $categories: completed, playing, mastered, played, backlog, dropped;
   }
 }
 
-.action {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--gap-x2);
-  padding: var(--padding-x1) var(--padding-x2);
-  border: 0;
-  border-radius: var(--radius-x3);
-  background-color: transparent;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  transition:
-    background-color var(--duration-fast) var(--easing-out),
-    color var(--duration-fast) var(--easing-out);
-
-  @include font(13px, 20px, 400);
-
-  &:hover {
-    background-color: var(--color-bg-hover);
-    color: var(--color-text-primary);
-  }
-
-  &_active {
-    color: var(--color-accent);
-
-    svg path {
-      fill: currentColor;
-    }
-  }
-}
-
 @each $category in $categories {
   .dot_#{$category} {
     --status-category-color: var(--game-#{$category}-color);
@@ -294,8 +197,6 @@ $categories: completed, playing, mastered, played, backlog, dropped;
 
 @include reducedMotion {
   .busy > *,
-  .chip,
-  .action,
   .item__game {
     transition-duration: var(--duration-instant);
   }

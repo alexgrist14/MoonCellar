@@ -1,15 +1,13 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 import { gamesApi } from "@/src/lib/shared/api";
-import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
 import { IGameResponse, IGetGamesRequest } from "@mooncellar/schemas";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { Table } from "@/src/lib/shared/ui/Table";
 import { ActionsMenu } from "@/src/lib/shared/ui/ActionsMenu";
-import { ITableCell } from "@/src/lib/shared/types/table.type";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { modal } from "@/src/lib/shared/ui/Modal";
@@ -19,7 +17,7 @@ import {
   useDeleteGameMutation,
   useUpdateGameMutation,
 } from "@/src/lib/entities/game/api/game.mutations";
-import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal/ConfirmModal";
+import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
 
 const TAKE = 50;
 const ON = "ON";
@@ -30,10 +28,17 @@ const SORT_BY_MAP: Record<string, IGetGamesRequest["sortBy"]> = {
   firstRelease: "first_release",
 };
 
+const resetPage = () => {
+  const url = new URL(window.location.href);
+
+  url.searchParams.delete("page");
+  window.history.pushState(null, "", url);
+};
+
 export const GameList: FC = () => {
   const router = useRouter();
-  const { query, setQuery } = useAdvancedRouter();
-  const page = Number(query.get("page")) || 1;
+  const searchParams = useSearchParams();
+  const page = Number(searchParams.get("page")) || 1;
 
   const [search, setSearch] = useState("");
   const [inputValue, setInputValue] = useState("");
@@ -60,28 +65,20 @@ export const GameList: FC = () => {
 
   const debouncedSearch = useDebouncedCallback((value: string) => {
     setSearch(value);
-    setQuery({ page: 1 });
+    resetPage();
   }, 300);
 
-  const handleSort = useCallback(
-    (key: string, order: "asc" | "desc") => {
-      const mappedSortBy = SORT_BY_MAP[key];
+  const handleSort = useCallback((key: string, order: "asc" | "desc") => {
+    const mappedSortBy = SORT_BY_MAP[key];
 
-      if (!mappedSortBy) return;
+    if (!mappedSortBy) return;
 
-      setSortBy(mappedSortBy);
-      setSortOrder(order);
-      setQuery({ page: 1 });
-    },
-    [setQuery]
-  );
+    setSortBy(mappedSortBy);
+    setSortOrder(order);
+    resetPage();
+  }, []);
 
-  const openEditor = useCallback(
-    (gameId?: string) => {
-      router.push(gameId ? `/admin/games/${gameId}` : "/admin/games/new");
-    },
-    [router]
-  );
+  const getEditorHref = (gameId: string) => `/admin/games/${gameId}`;
 
   const handleStopParsing = (game: IGameResponse, isStopParsing: boolean) => {
     updateGame({
@@ -107,31 +104,6 @@ export const GameList: FC = () => {
           }
           onCancel={() => modal.close(modalId)}
         />,
-        // <div className={styles.confirmModal}>
-        //   <h3>Delete Game</h3>
-        //   <p>
-        //     Are you sure you want to delete <strong>{game.name}</strong>?
-        //   </p>
-        //   <p className={styles.confirmModal__warning}>
-        //     This permanently deletes the game.
-        //   </p>
-        //   <div className={styles.confirmModal__buttons}>
-        //     <Button
-        //       color={ButtonColor.DEFAULT}
-        //       onClick={() => modal.close(modalId)}
-        //     >
-        //       Cancel
-        //     </Button>
-        //     <Button
-        //       color={ButtonColor.RED}
-        //       onClick={() =>
-        //         deleteGame(game._id, { onSuccess: () => modal.close(modalId) })
-        //       }
-        //     >
-        //       Delete
-        //     </Button>
-        //   </div>
-        // </div>,
         { id: modalId }
       );
     },
@@ -151,7 +123,7 @@ export const GameList: FC = () => {
             }}
           />
         </div>
-        <Button color={ButtonColor.GREEN} onClick={() => openEditor()}>
+        <Button color={ButtonColor.GREEN} href="/admin/games/new">
           Add game
         </Button>
       </div>
@@ -169,91 +141,67 @@ export const GameList: FC = () => {
           isStopParsing: { content: "Stop parsing" },
           actions: { content: "Actions" },
         }}
-        rows={games.map((game) => {
-          const cells: Record<string, ITableCell> = {
-            cover: {
-              content: game.cover ? (
-                <Image
-                  className={styles.cover}
-                  src={game.cover}
-                  width={48}
-                  height={64}
-                  alt={game.name}
-                />
-              ) : (
-                "—"
-              ),
-            },
-            name: {
-              content: (
-                <div className={styles.name}>
-                  <span>{game.name}</span>
-                  <span className={styles.slug}>{game.slug}</span>
-                </div>
-              ),
-            },
-            type: { content: game.type || "—" },
-            firstRelease: {
-              content: game.first_release
-                ? new Date(game.first_release * 1000).getFullYear()
-                : "—",
-            },
-            isStopParsing: {
-              content: (
-                <div onClick={(event) => event.stopPropagation()}>
-                  <ToggleSwitch
-                    leftContent={OFF}
-                    rightContent={ON}
-                    value={game.isStopParsing ? "right" : "left"}
-                    clickCallback={(result) =>
-                      handleStopParsing(game, result === ON)
-                    }
-                  />
-                </div>
-              ),
-            },
-            actions: {
-              content: (
-                <ActionsMenu
-                  items={[
-                    { label: "Edit", onClick: () => openEditor(game._id) },
-                    {
-                      label: "Open on the site",
-                      onClick: () =>
-                        window.open(`/games/${game.slug}`, "_blank"),
-                    },
-                    {
-                      label: "Delete",
-                      isDanger: true,
-                      onClick: () => handleDelete(game),
-                    },
-                  ]}
-                />
-              ),
-            },
-          };
-
-          return Object.fromEntries(
-            Object.entries(cells).map(([key, cell]) => [
-              key,
-              ["isStopParsing", "actions"].includes(key)
-                ? cell
-                : {
-                    ...cell,
-                    className: styles.rowClickable,
-                    onClick: () => openEditor(game._id),
+        onRowClick={(index) => router.push(getEditorHref(games[index]._id))}
+        rowClickExcludeKeys={["isStopParsing", "actions"]}
+        rows={games.map((game) => ({
+          cover: {
+            content: game.cover ? (
+              <Image
+                className={styles.cover}
+                src={game.cover}
+                width={48}
+                height={64}
+                alt={game.name}
+              />
+            ) : (
+              "—"
+            ),
+          },
+          name: {
+            content: (
+              <div className={styles.name}>
+                <span>{game.name}</span>
+                <span className={styles.slug}>{game.slug}</span>
+              </div>
+            ),
+          },
+          type: { content: game.type || "—" },
+          firstRelease: {
+            content: game.first_release
+              ? new Date(game.first_release * 1000).getFullYear()
+              : "—",
+          },
+          isStopParsing: {
+            content: (
+              <ToggleSwitch
+                leftContent={OFF}
+                rightContent={ON}
+                value={game.isStopParsing ? "right" : "left"}
+                clickCallback={(result) =>
+                  handleStopParsing(game, result === ON)
+                }
+              />
+            ),
+          },
+          actions: {
+            content: (
+              <ActionsMenu
+                items={[
+                  { label: "Edit", href: getEditorHref(game._id) },
+                  {
+                    label: "Open on the site",
+                    onClick: () => window.open(`/games/${game.slug}`, "_blank"),
                   },
-            ])
-          ) as Record<
-            | "cover"
-            | "name"
-            | "type"
-            | "firstRelease"
-            | "isStopParsing"
-            | "actions",
-            ITableCell
-          >;
-        })}
+                  {
+                    label: "Delete",
+                    isDanger: true,
+                    onClick: () => handleDelete(game),
+                  },
+                ]}
+              />
+            ),
+          },
+        }))}
       />
 
       <Pagination total={total} take={TAKE} isDisabled={isFetching} />

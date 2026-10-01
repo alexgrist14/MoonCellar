@@ -31,6 +31,10 @@ import { filesAPI } from "@/src/lib/shared/api/files.api";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { Loader } from "../Loader";
 import { EmojiPicker } from "../EmojiPicker";
+import { Tooltip } from "../Tooltip";
+import { Separator } from "../Separator";
+import { Input } from "../Input";
+import { Button, ButtonColor } from "../Button";
 
 export interface IRichEditorHandle {
   flushUploads: () => Promise<string>;
@@ -101,8 +105,7 @@ const blockTools: IToolDef[] = [
     title: "Heading",
     icon: SvgHeading,
     isActive: (editor) => editor.isActive("heading", { level: 3 }),
-    run: (editor) =>
-      editor.chain().focus().toggleHeading({ level: 3 }).run(),
+    run: (editor) => editor.chain().focus().toggleHeading({ level: 3 }).run(),
   },
   {
     key: "bulletList",
@@ -153,7 +156,10 @@ export const RichEditor: FC<IRichEditorProps> = ({
         link: {
           openOnClick: false,
           autolink: true,
-          HTMLAttributes: { rel: "nofollow noopener noreferrer", target: "_blank" },
+          HTMLAttributes: {
+            rel: "nofollow noopener noreferrer",
+            target: "_blank",
+          },
         },
       }),
       Image,
@@ -162,7 +168,8 @@ export const RichEditor: FC<IRichEditorProps> = ({
     ],
     content: value,
     editorProps: { attributes: { class: styles.editor__body } },
-    onUpdate: ({ editor }) => onChange?.(editor.isEmpty ? "" : editor.getHTML()),
+    onUpdate: ({ editor }) =>
+      onChange?.(editor.isEmpty ? "" : editor.getHTML()),
   });
 
   useEffect(() => {
@@ -255,27 +262,38 @@ export const RichEditor: FC<IRichEditorProps> = ({
 
   if (!editor) {
     return (
-      <div className={classNames(styles.editor, styles.editor_loading, className)}>
+      <div
+        className={classNames(styles.editor, styles.editor_loading, className)}
+      >
         <Loader type="pulse" />
       </div>
     );
   }
 
   const renderTool = ({ key, title, icon: Icon, isActive, run }: IToolDef) => (
-    <button
-      key={key}
-      type="button"
-      title={title}
-      aria-label={title}
-      aria-pressed={isActive?.(editor) ?? false}
-      className={classNames(styles.editor__tool, {
-        [styles.editor__tool_active]: isActive?.(editor),
-      })}
-      onMouseDown={(e) => e.preventDefault()}
-      onClick={() => run?.(editor)}
-    >
-      <Icon size="16" />
-    </button>
+    <Tooltip key={key} content={title}>
+      <button
+        type="button"
+        aria-label={title}
+        aria-pressed={isActive?.(editor) ?? false}
+        className={classNames(styles.editor__tool, {
+          [styles.editor__tool_active]: isActive?.(editor),
+        })}
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={() => run?.(editor)}
+      >
+        <Icon size="16" />
+      </button>
+    </Tooltip>
+  );
+
+  const separator = (
+    <Separator
+      style={{
+        height: "var(--rich-editor-separator-height)",
+        marginInline: "var(--gap-x1)",
+      }}
+    />
   );
 
   const used = editor.storage.characterCount.characters();
@@ -290,9 +308,9 @@ export const RichEditor: FC<IRichEditorProps> = ({
     >
       <div className={styles.editor__toolbar}>
         {textTools.map(renderTool)}
-        <span className={styles.editor__separator} />
+        {separator}
         {blockTools.map(renderTool)}
-        <span className={styles.editor__separator} />
+        {separator}
         {renderTool({
           key: "link",
           title: "Link",
@@ -301,65 +319,68 @@ export const RichEditor: FC<IRichEditorProps> = ({
           run: (editor) =>
             setLinkValue(editor.getAttributes("link").href ?? ""),
         })}
-        <button
-          type="button"
-          title="Image"
-          aria-label="Image"
-          className={styles.editor__tool}
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={() => fileRef.current?.click()}
-        >
-          <SvgImage size="16" />
-        </button>
-        <button
-          ref={emojiButtonRef}
-          type="button"
-          title="Emoji"
-          aria-label="Emoji"
-          aria-expanded={isEmojiOpen}
-          className={classNames(styles.editor__tool, {
-            [styles.editor__tool_active]: isEmojiOpen,
-          })}
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={() => setIsEmojiOpen((isOpen) => !isOpen)}
-        >
-          <SvgEmoji size="16" />
-        </button>
+        {renderTool({
+          key: "image",
+          title: "Image",
+          icon: SvgImage,
+          run: () => fileRef.current?.click(),
+        })}
+        <Tooltip content="Emoji">
+          <button
+            ref={emojiButtonRef}
+            type="button"
+            aria-label="Emoji"
+            aria-expanded={isEmojiOpen}
+            className={classNames(styles.editor__tool, {
+              [styles.editor__tool_active]: isEmojiOpen,
+            })}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => setIsEmojiOpen((isOpen) => !isOpen)}
+          >
+            <SvgEmoji size="16" />
+          </button>
+        </Tooltip>
       </div>
 
       {isEmojiOpen && (
         <EmojiPicker
           anchorRef={emojiButtonRef}
-          onSelect={(emoji) => editor.chain().focus().insertContent(emoji).run()}
+          onSelect={(emoji) =>
+            editor.chain().focus().insertContent(emoji).run()
+          }
           onClose={closeEmojiPicker}
         />
       )}
 
       {linkValue !== undefined && (
         <div className={styles.editor__link}>
-          <input
-            autoFocus
-            type="url"
-            placeholder="https://"
-            aria-label="Link address"
-            className={styles.editor__linkField}
-            value={linkValue}
-            onChange={(e) => setLinkValue(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                applyLink();
-              }
-              if (e.key === "Escape") setLinkValue(undefined);
-            }}
-          />
-          <button
+          <div className={styles.editor__linkField}>
+            <Input
+              autoFocus
+              type="url"
+              placeholder="https://"
+              aria-label="Link address"
+              containerStyles={{ background: "var(--color-bg-secondary)" }}
+              value={linkValue}
+              onChange={(e) => setLinkValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  applyLink();
+                }
+                if (e.key === "Escape") setLinkValue(undefined);
+              }}
+            />
+          </div>
+          <Button
             type="button"
+            color={ButtonColor.ACCENT}
+            compact
             className={styles.editor__linkApply}
             onClick={applyLink}
           >
             Apply
-          </button>
+          </Button>
         </div>
       )}
 

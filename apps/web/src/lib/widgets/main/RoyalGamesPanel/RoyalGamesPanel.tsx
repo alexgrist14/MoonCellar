@@ -5,6 +5,7 @@ import styles from "./RoyalGamesPanel.module.scss";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { GamesList } from "@/src/lib/widgets/game/GamesList";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { SavedList } from "@/src/lib/shared/ui/SavedList";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
@@ -120,7 +121,7 @@ export const RoyalGamesPanel: FC = () => {
                   }))}
                 />
               ) : (
-                <p style={{ textAlign: "center" }}>List is empty</p>
+                <EmptyState variant="compact" title="List is empty" />
               )}
             </div>
           ) : (

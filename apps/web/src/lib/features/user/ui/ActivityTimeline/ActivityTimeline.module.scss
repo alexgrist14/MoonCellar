@@ -29,16 +29,6 @@ $activityGap: 24px;
   }
 }
 
-.empty {
-  display: flex;
-  align-items: center;
-  gap: var(--gap-x3);
-  padding: var(--padding-x4);
-  border: 1px dashed var(--color-border-primary);
-  border-radius: var(--radius-x4);
-  color: var(--color-text-muted);
-}
-
 .grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -56,49 +46,11 @@ $activityGap: 24px;
 }
 
 .entry {
-  --activity-tone: var(--color-accent);
-
   display: grid;
   grid-template-columns: var(--activity-cover-width) minmax(0, 1fr);
   gap: var(--gap-x4);
   padding-block: var(--padding-x3);
   border-bottom: 1px solid var(--color-border-primary);
-
-  &_completed {
-    --activity-tone: var(--game-completed-color);
-  }
-
-  &_playing {
-    --activity-tone: var(--game-playing-color);
-  }
-
-  &_mastered {
-    --activity-tone: var(--game-mastered-color);
-  }
-
-  &_played {
-    --activity-tone: var(--game-played-color);
-  }
-
-  &_wishlist {
-    --activity-tone: var(--game-wishlist-color);
-  }
-
-  &_backlog {
-    --activity-tone: var(--game-backlog-color);
-  }
-
-  &_dropped {
-    --activity-tone: var(--game-dropped-color);
-  }
-
-  &_favorite {
-    --activity-tone: var(--favorite-color);
-  }
-
-  &_removed {
-    --activity-tone: var(--color-gray);
-  }
 }
 
 .cover {
@@ -150,38 +102,6 @@ $activityGap: 24px;
   }
 }
 
-.status {
-  padding: 0 var(--padding-x2);
-  border-radius: var(--radius-x2);
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 20px;
-  white-space: nowrap;
-  color: color-mix(
-    in srgb,
-    var(--activity-tone) 62%,
-    var(--color-text-primary)
-  );
-  background: color-mix(in srgb, var(--activity-tone) 16%, transparent);
-}
-
-.details {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--gap-x1);
-}
-
-.detail {
-  padding: 0 var(--padding-x2);
-  border-radius: var(--radius-x2);
-  font-size: 12px;
-  line-height: 20px;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-  color: var(--color-text-muted);
-  background: var(--color-bg-tertiary);
-}
-
 .line {
   font-size: 13px;
   line-height: 20px;
@@ -210,26 +130,6 @@ $activityGap: 24px;
   white-space: nowrap;
 }
 
-.delete {
-  padding: 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-  transition: color var(--duration-fast) var(--easing-out);
-
-  &:hover,
-  &:focus-visible {
-    color: var(--color-negative);
-    text-decoration: underline;
-  }
-
-  @include reducedMotion {
-    transition-duration: var(--duration-instant);
-  }
-}
-
 .removed {
   display: flex;
   align-items: center;
@@ -242,19 +142,4 @@ $activityGap: 24px;
   background: var(--color-bg-secondary);
   font-size: 13px;
   color: var(--color-text-muted);
-
-  &__undo {
-    padding: 0;
-    border: 0;
-    background: none;
-    font: inherit;
-    font-weight: 600;
-    color: var(--color-accent);
-    cursor: pointer;
-
-    &:hover,
-    &:focus-visible {
-      text-decoration: underline;
-    }
-  }
 }

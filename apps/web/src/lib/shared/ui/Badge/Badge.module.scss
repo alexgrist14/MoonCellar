@@ -1,0 +1,91 @@
+.badge {
+  --badge-color: var(--color-text-secondary);
+  --badge-bg: var(--color-bg-tertiary);
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-x1);
+  flex-shrink: 0;
+  border-radius: var(--radius-x2);
+  background-color: var(--badge-bg);
+  color: var(--badge-color);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+
+  &_sm {
+    padding-inline: var(--padding-x2);
+
+    @include font(12px, 18px, 600);
+  }
+
+  &_md {
+    padding: var(--padding-x1) var(--padding-x2);
+
+    @include font(13px, 17px, 600);
+  }
+
+  &_dot::before {
+    content: "";
+    flex-shrink: 0;
+    width: var(--padding-x1);
+    height: var(--padding-x1);
+    border-radius: 50%;
+    background-color: currentColor;
+  }
+
+  &_wrap {
+    flex-shrink: 1;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  &_muted {
+    --badge-color: var(--color-text-muted);
+  }
+
+  &_attention {
+    --badge-color: var(--color-attention);
+    --badge-bg: color-mix(
+      in srgb,
+      var(--color-attention) var(--badge-tint-strength),
+      transparent
+    );
+  }
+
+  &_positive {
+    --badge-color: var(--color-positive);
+    --badge-bg: color-mix(
+      in srgb,
+      var(--color-positive) var(--badge-tint-strength),
+      transparent
+    );
+  }
+
+  &_negative {
+    --badge-color: var(--badge-negative-color);
+    --badge-bg: color-mix(
+      in srgb,
+      var(--color-negative) var(--badge-tint-strength),
+      transparent
+    );
+  }
+
+  &_accent {
+    --badge-color: var(--color-text-primary);
+    --badge-bg: color-mix(
+      in srgb,
+      var(--color-accent) var(--badge-tint-strength),
+      transparent
+    );
+
+    &.badge_dot::before {
+      background-color: var(--color-accent);
+    }
+  }
+
+  &.badge_outlined {
+    background-color: transparent;
+    box-shadow: inset 0 0 0 1px var(--color-border-primary);
+  }
+}

@@ -4,7 +4,11 @@ import { FC } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { Box } from "@/src/lib/shared/ui/Box";
+import { openAuthModal } from "@/src/lib/shared/ui/AuthModal";
 import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
+import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
+import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import { UserRequests } from "@/src/lib/widgets/requests/UserRequests";
 import styles from "./RequestsPage.module.scss";
 
@@ -25,10 +29,10 @@ export const RequestsPage: FC = () => {
         ]}
       />
       <header className={styles.head}>
-        <h1 className={styles.title}>Suggest a game or a character</h1>
+        <SectionTitle as="h1">Suggest a game or a character</SectionTitle>
         <p className={styles.lede}>
-          Something missing or wrong in the catalogue? Send it here. A
-          moderator reviews every request before it reaches the site.
+          Something missing or wrong in the catalogue? Send it here. A moderator
+          reviews every request before it reaches the site.
         </p>
       </header>
       {isAuth ? (
@@ -41,7 +45,16 @@ export const RequestsPage: FC = () => {
           }
         />
       ) : (
-        <p className={styles.lede}>Log in to send a request.</p>
+        <EmptyState
+          variant="compact"
+          isWithoutImage
+          title="Log in to send a request."
+          action={
+            <Button color={ButtonColor.ACCENT} onClick={() => openAuthModal()}>
+              Sign in
+            </Button>
+          }
+        />
       )}
     </Box>
   );

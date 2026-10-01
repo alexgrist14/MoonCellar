@@ -56,6 +56,7 @@ export const useDropdown = ({
   const searchRef = useRef<HTMLInputElement>(null);
 
   const firstActive = useRef(true);
+  const wasActive = useRef(false);
 
   const sortList = useCallback(
     (list: IIndexedItem[]) => {
@@ -139,27 +140,13 @@ export const useDropdown = ({
 
       !!getIndexes && getIndexes(values);
       !!getValues &&
-        getValues(
-          indexedList.reduce(
-            (res: string[], item) =>
-              values.some((value) => value === item.index)
-                ? [...res, item.value]
-                : res,
-            []
-          )
-        );
+        getValues(list.filter((_, index) => values.includes(index)));
 
       if (isWithExclude) {
         !!getExcludeIndexes && getExcludeIndexes(excludedValues);
         !!getExcludeValues &&
           getExcludeValues(
-            indexedList.reduce(
-              (res: string[], item) =>
-                excludedValues.some((value) => value === item.index)
-                  ? [...res, item.value]
-                  : res,
-              []
-            )
+            list.filter((_, index) => excludedValues.includes(index))
           );
       }
     }
@@ -261,12 +248,13 @@ export const useDropdown = ({
   useEffect(() => {
     if (!isActive) {
       setQuery("");
-      onClose?.();
+      wasActive.current && onClose?.();
     } else {
       setIndexedList(
         sortList(list.map((item, i) => ({ value: item, index: i })))
       );
     }
+    wasActive.current = isActive;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive]);
 

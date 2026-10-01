@@ -47,12 +47,33 @@
     width: 100%;
   }
 
+  &__tabs.modal__tabs {
+    width: fit-content;
+    min-width: 0;
+    max-width: none;
+    flex: 0 1 auto;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x1);
+    flex: 1;
+  }
+
+  &__label {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+  }
+
   &__inputs {
     display: flex;
+    align-items: flex-end;
     gap: var(--gap-x2);
 
     @include mediaMax($screenMd) {
       flex-direction: column;
+      align-items: stretch;
     }
   }
 

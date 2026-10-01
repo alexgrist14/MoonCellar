@@ -41,15 +41,3 @@
 
   @include font(13px, 20px, 400);
 }
-
-.placeholder {
-  color: var(--color-text-muted);
-  text-align: center;
-
-  @include font(14px, 20px, 400);
-}
-
-.loading {
-  position: relative;
-  min-height: var(--community-loading-height);
-}

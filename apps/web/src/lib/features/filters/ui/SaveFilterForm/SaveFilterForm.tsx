@@ -33,7 +33,12 @@ export const SaveFilterForm: FC<{
     );
 
   return (
-    <Box classNameContent={styles.form}>
+    <Box
+      title="Save filters"
+      isTitleStart
+      onClose={() => modal.close()}
+      classNameContent={styles.form}
+    >
       <Input
         autoFocus
         value={name}

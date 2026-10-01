@@ -1,0 +1,64 @@
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &_chip {
+    gap: var(--gap-x1);
+  }
+
+  &_pill {
+    gap: var(--gap-x2);
+  }
+
+  &__item {
+    display: flex;
+    max-width: 100%;
+  }
+
+  &__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    padding: var(--padding-x1) var(--padding-x2);
+    border: 0;
+    border-radius: var(--radius-x4);
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--easing-out);
+
+    & svg {
+      color: var(--color-text-muted);
+    }
+
+    &:hover:not(:disabled) {
+      background: var(--color-bg-hover);
+
+      & svg {
+        color: var(--color-negative);
+      }
+    }
+
+    &:disabled {
+      cursor: default;
+    }
+  }
+
+  &__clear {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--color-accent);
+    font-size: 13px;
+    cursor: pointer;
+
+    &:disabled {
+      cursor: default;
+    }
+  }
+}

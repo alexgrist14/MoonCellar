@@ -304,12 +304,34 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   added by hand got a second IGDB copy with a `-2` slug, because `upsertGameFromIgdb` matches
   only on `igdb.gameId`. An explicit parse by id (admin, content request, backfill) skips the
   check on purpose.
+- **A new IGDB game is never matched to a catalogue game that already carries another IGDB id,
+  and only a confirmed match links itself.** `matchNewIgdbGame` drops candidates linked to a
+  different `igdb.gameId` before scoring (`withoutOtherIgdbGames`): an IGDB entry can only be one
+  catalogue game, and without this every edition, bundle and pack ("Premium Box", "Digital Deluxe
+  Edition", "Pack / Addon") went to Conflicts against its own base game — admins skipped all of
+  them. A match links without review when it is the only candidate and title, companies and date
+  all confirm it (`isConfirmedIgdbMatch`), even with `IGDB_AUTO_LINK` off; anything weaker waits
+  in Conflicts. A title that normalises to nothing ("***") gets no candidates, and a conflict keeps
+  at most `IGDB_CONFLICT_CANDIDATES_LIMIT` (10) candidates — one such title once stored 784.
+- **The game schema's name hook must never leave `nameNormalized` in both `$set` and `$unset`.**
+  A symbol-only name normalises to an empty string; the hook unsets the field and removes it from
+  `$set`, or Mongo rejects the write with "Updating the path 'nameNormalized' would create a
+  conflict" and the game cannot be created.
 - **Adding a game by hand checks the catalogue first and answers `409` with the likely
   duplicates.** `POST /games/add` and approving a new-game request call
   `GameMatcherService.assertNoDuplicates`; `force` skips the check once the admin has looked.
+  Approving a new-character request answers the same `409` shape from a name/akas lookup.
   The game-adder MCP checks `POST /games/add/duplicates` before it uploads anything, because it
   uploads images to the Space before it calls `/games/add`, and a refusal after the upload
   leaves orphans in the bucket.
+- **A content request is decided only through its claim.** `decide` claims the request with one
+  `findOneAndUpdate` on `status: "pending"` and no live `claimedAt` before it creates anything,
+  and every other write (reject, withdraw, the final `approved`) filters the same way and answers
+  `409` on `matchedCount: 0`. Reading `pending` and writing later let two admins approve one
+  request at once: two games, two image uploads. A claim older than `CLAIM_TTL_MS` (15 minutes)
+  is taken over, which is the recovery path after a crash. A failed approval deletes the entry
+  it created (and its images) and clears the claim; leaving the entry made every retry fail with
+  the duplicate `409` against it. The flow is in [`docs/requests.md`](../../docs/requests.md).
 - **IGDB only fills the empty fields of a hand-made game, and never changes its slug.**
   `getFillOnlyPayload` keeps every non-empty field; images are fetched only for an empty cover,
   screenshot or artwork list; `forceParse` is ignored. Once a hand-made game is linked to IGDB

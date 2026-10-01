@@ -5,6 +5,7 @@ import { GameCard } from "@/src/lib/widgets/game/GameCard";
 import { GameMedia } from "@/src/lib/entities/game/ui/GameMedia";
 import { GameStatsBoxes } from "@/src/lib/entities/game/ui/GameStatsBoxes";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
+import { Chip } from "@/src/lib/shared/ui/Chip";
 import { ExpandableBlock } from "@/src/lib/shared/ui/ExpandableBlock";
 import { SvgOpenWindow, SvgRandom } from "@/src/lib/shared/ui/svg";
 import { SvgCrown } from "@/src/lib/shared/ui/svg/SvgCrown";
@@ -72,20 +73,19 @@ export const GauntletWinner: FC<IGauntletWinnerProps> = ({ game, isRoyal }) => {
           </p>
           <h2 className={styles.winner__name}>{game.name}</h2>
           <div className={styles.winner__chips}>
-            {!!year && <span>{year}</span>}
-            {!!game.type && <span>{game.type}</span>}
-            {!!game.genres?.[0] && <span>{game.genres[0]}</span>}
+            {!!year && <Chip>{year}</Chip>}
+            {!!game.type && <Chip>{game.type}</Chip>}
+            {!!game.genres?.[0] && <Chip>{game.genres[0]}</Chip>}
           </div>
           {!!platforms.length && (
             <div className={styles.winner__chips}>
               {platforms.map((platform) => (
-                <Link
+                <Chip
                   key={platform._id}
                   href={`/games/platform/${platform.slug}`}
-                  className={styles.winner__chipLink}
                 >
                   {platform.name}
-                </Link>
+                </Chip>
               ))}
             </div>
           )}

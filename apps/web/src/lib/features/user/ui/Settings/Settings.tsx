@@ -2,8 +2,10 @@ import { useUpdateProfileMutation } from "@/src/lib/entities/user/api/user.mutat
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useGeoStore } from "@/src/lib/shared/store/geo.store";
 import { useSettingsStore } from "@/src/lib/shared/store/settings.store";
+import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { AvatarSettings } from "@/src/lib/shared/ui/AvatarSettings";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
+import { UploadButton } from "@/src/lib/shared/ui/Fields";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { RangeSelector } from "@/src/lib/shared/ui/RangeSelector";
 import { Textarea } from "@/src/lib/shared/ui/Textarea";
@@ -11,7 +13,7 @@ import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FC, MouseEvent, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import styles from "./Settings.module.scss";
 import { settingsSchema, SettingsSchema } from "./settings.schema";
@@ -26,6 +28,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
   const { profile } = useAuthStore();
   const { mutate: updateProfile, isPending } = useUpdateProfileMutation();
   const setBgOpacityPreview = useSettingsStore((s) => s.setBgOpacityPreview);
+  const isMobile = useStatesStore((s) => s.isMobile);
 
   const profileBgOpacity = profile?.settings?.bgOpacity ?? DEFAULT_BG_OPACITY;
   const blockedCountry = useGeoStore((s) => s.blockedCountry);
@@ -114,12 +117,6 @@ export const Settings: FC<SettingsProps> = ({}) => {
 
   const [tempAvatar, setTempAvatar] = useState<File>();
   const [background, setBackground] = useState<File>();
-  const bgInputRef = useRef<HTMLInputElement>(null);
-
-  const handleBackgroundChange = (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    bgInputRef.current?.click();
-  };
 
   const backgroundFileName = profile?.background
     ? profile.background.split("/").pop()
@@ -127,7 +124,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
 
   return (
     <form className={styles.container} onSubmit={handleSubmit(onSubmit)}>
-      <h2 className={styles.pageTitle}>Profile Settings</h2>
+      <SectionTitle>Profile Settings</SectionTitle>
 
       <div className={styles.columns}>
         <section className={styles.section}>
@@ -190,33 +187,18 @@ export const Settings: FC<SettingsProps> = ({}) => {
           <section className={styles.section}>
             <SectionTitle as="h3">Appearance</SectionTitle>
             <div className={styles.field}>
-              <label htmlFor="bg">Background</label>
-              <input
-                type="file"
-                id="bg"
-                ref={bgInputRef}
-                hidden
-                onChange={(e) => setBackground(e.target.files?.[0])}
+              <span className={styles.label}>Background</span>
+              {backgroundFileName && (
+                <span className={styles.fileName}>
+                  Current: {backgroundFileName}
+                </span>
+              )}
+              <UploadButton
+                label="Choose background"
+                onFile={setBackground}
+                fileName={background ? `New: ${background.name}` : null}
+                isFullWidthOnMobile
               />
-              <div className={styles.backgroundMeta}>
-                {backgroundFileName && (
-                  <span className={styles.fileName}>
-                    Current: {backgroundFileName}
-                  </span>
-                )}
-                {background && (
-                  <span className={styles.fileName}>
-                    New: {background.name}
-                  </span>
-                )}
-              </div>
-              <Button
-                color={ButtonColor.ACCENT}
-                className={styles.backgroundBtn}
-                onClick={handleBackgroundChange}
-              >
-                Choose background
-              </Button>
             </div>
             <RangeSelector
               defaultValue={bgOpacity}
@@ -237,15 +219,11 @@ export const Settings: FC<SettingsProps> = ({}) => {
             <section className={styles.section}>
               <SectionTitle as="h3">Preferences</SectionTitle>
               <div className={styles.prefRow}>
-                <div className={styles.prefRow__text}>
-                  <label>Show adult content</label>
-                </div>
                 <ToggleSwitch
-                  value={showAdultContent ? "right" : "left"}
-                  clickCallback={(result) =>
-                    setValue("showAdultContent", result === "ON", {
-                      shouldDirty: true,
-                    })
+                  label="Show adult content"
+                  checked={!!showAdultContent}
+                  onChange={(value) =>
+                    setValue("showAdultContent", value, { shouldDirty: true })
                   }
                 />
               </div>

@@ -42,8 +42,8 @@ export const CharacterEditPage: FC<ICharacterEditPageProps> = ({
 
   if (!isCreate && isLoading) {
     return (
-      <Box classNameContent={styles.loading}>
-        <Loader />
+      <Box>
+        <Loader isBlock />
       </Box>
     );
   }

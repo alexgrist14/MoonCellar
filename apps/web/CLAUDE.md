@@ -14,6 +14,9 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   sibling folder like `pages/UserProfile/UserInfo/`, is the violation this rule exists to
   prevent: the second screen that needs the component either imports it out of a page, which
   reverses the layer order, or copies it and the two drift apart.
+- **A new `shared/ui` component is not done without `<Name>/CLAUDE.md` and
+  `<Name>/<Name>.stories.tsx`, and a new page is not done without `pages/<Page>/CLAUDE.md`.** The
+  repository-root `CLAUDE.md` lists what each must contain; Storybook (`bun run storybook`, port 4222) is where the component is checked in every state before it is used on a screen.
 - **`bun run lint` fails on a component inside a page folder and on any import that points up
   a layer** (`scripts/check-fsd.mjs`). It runs after ESLint, needs no dependencies, and there is
   no exception list — a component that has to reach up belongs one layer higher.
@@ -179,7 +182,7 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   `$activityEntryMinWidth`/`$activityGap` for its `@container` thresholds; change the page size
   and the column list together, or every page but the last ends with empty cells.
 
-- `Box`'s own radius is `var(--radius-x5)`. For structural UI wrapper components rendered directly inside a `Box` (`Button`, `Input`, `Textarea`, `CustomDropdown`, and similar reusable "chrome" primitives — not decorative elements like game covers/posters), the `border-radius` must be exactly one step below its structural parent's on the `--radius-x*` scale (parent `x5` → child `x4` → grandchild `x3`, etc.). This rule applies to structural wrapper nesting only, not to decorative/illustrative radii (e.g. card art, covers), which are a deliberate style choice independent of nesting depth.
+- `Box`'s own radius is `var(--radius-x5)`. For structural UI wrapper components rendered directly inside a `Box` (`Button`, `Input`, `Textarea`, `Dropdown`, and similar reusable "chrome" primitives — not decorative elements like game covers/posters), the `border-radius` must be exactly one step below its structural parent's on the `--radius-x*` scale (parent `x5` → child `x4` → grandchild `x3`, etc.). This rule applies to structural wrapper nesting only, not to decorative/illustrative radii (e.g. card art, covers), which are a deliberate style choice independent of nesting depth.
 
 - **A rounded image tile needs the radius on the image too, and its hover ring must be an
   `outline`, not a transparent `border`.** A `border: 2px solid transparent` shrinks the
@@ -245,6 +248,9 @@ before:
   request-shape rule must check that shape itself before calling the API: `/user/[name]` validates
   the name with `GetUserByStringSchema` (an email, or 3–15 chars of `[a-zA-Z0-9_]`) so an
   impossible username is a 404 instead of a 500.
+- **An `error.tsx` never renders `NotFoundPage`.** The game, profile and list segments did, so
+  an API outage showed a "404" body with an error status. Errors bubble to `src/app/error.tsx`
+  (`pages/ErrorPage`); a missing record is `notFound()` in the page component.
 - **Purge a poisoned ISR entry with `POST /api/revalidate`** — header `x-revalidate-secret`
   matching `REVALIDATE_SECRET`, body `{"slugs": [...]}` (max 200). `revalidatePath` inside a Route
   Handler only *marks* the path; the re-render happens on the next visit, so request each page
@@ -570,11 +576,12 @@ break silently when ignored:
 
 ## Selecting several games
 
-- **Select mode pins the Manage drawer open through `isCloseOnOutsideDisabled`.** `ExpandMenu`
-  closes on any outside `mousedown`, and the whole point of the mode is that the count, select-all
-  and the two destinations live in that panel — without the pin, picking the first card collapses
-  the controls you are using. The prop exists only for this; a drawer that is pinned for any other
-  reason traps the user.
+- **Select mode keeps the Manage drawer open by marking each selectable card with
+  `EXPAND_KEEP_OPEN_ATTRIBUTE` (`data-keep-expand-open`).** `ExpandMenu` closes on any outside
+  `mousedown` unless the target sits inside an element carrying that attribute, and the whole point
+  of the mode is that the count, select-all and the two destinations live in that panel — without
+  it, picking the first card collapses the controls you are using. `PopoverSheet` carries it for
+  the same reason; anything else that wears it keeps the drawer from closing.
 - **In select mode the card's `Link` is neutralised and the top-left rail is hidden.**
   `GameCard`'s `onClick` calls `preventDefault` so a pick does not navigate, and
   `wrapper_selectable` hides `card__rail_topLeft` — rank and the per-game royal crown sit exactly
@@ -627,11 +634,15 @@ break silently when ignored:
   `<table>` and silently had none of them. Size columns through `columnStyles` (`width` becomes
   the flex basis, add a `minWidth`) so one long column cannot squeeze the others' headers.
 - **A row that opens a page is clickable as a whole; do not add an "Open"/"Edit" button column.**
-  `Table` takes `onClick` per cell, so give every cell of the row the same handler and a
-  `cursor: pointer` class (`ConflictList`, `CharactersAdmin`), and stop propagation on links
-  inside the row so they keep their own target. Destructive actions such as Delete stay buttons.
-- The field-by-field diff in `RequestReviewPanel` is still a raw `<table>`; move it to `Table`
-  when that file is next touched rather than copying its markup elsewhere.
+  Pass `onRowClick(rowIndex)` to `Table` and list the interactive columns in
+  `rowClickExcludeKeys` (roles dropdown, toggles, the actions menu); the index is the row's
+  position in the `rows` you passed, even after the table sorts. Destructive actions such as
+  Delete stay in the actions menu.
+- **A table whose cells must line up across a row uses `layout="rows"`.** The default layout
+  renders each column as its own flex column, so cells of different heights (URL lists, related
+  games, hints) drift apart; `rows` is one CSS grid with `display: contents` rows. The request
+  field diff (`RequestReviewPanel`) uses it with `isWithoutSorting`, a visually hidden "Apply"
+  header and `getRowClassName` for the skipped (dimmed) rows.
 
 ## Tabs
 
@@ -689,10 +700,13 @@ break silently when ignored:
   the panel hits its end — the game page's Summary and Storyline are 132px tall and sit mid-page,
   and they froze the whole site under the cursor. `Scrollbar` deliberately leaves the property
   unset.
-- **`Scrollbar`'s `fadeType` does nothing on a vertical scroll area.** The mask is applied only
-  with `isHorizontal` and `isWithArrows`; `Box`, `Dropdown` and `GamesCards` pass `fadeType`
-  and get no fade. A vertical scroll with fading edges is `ExpandableBlock mode="scroll"`, which
-  measures the scroll position itself and drives the mask from its own classes.
+- **`Scrollbar`'s `fadeType` is not a fade on a vertical scroll area.** The transparent mask is
+  applied only with `isHorizontal` and `isWithArrows`. On a vertical area `fadeType` renders
+  gradient overlays at the chosen edges, shown while more content lies past that edge, painted
+  from transparent to a solid `--color-bg-primary` — on a translucent `Box` or any other
+  background they read as a dark band, not a fade (`Box`, `Dropdown`, `EmojiPicker` and
+  `GamesCards` pass it). A vertical scroll with fading edges is `ExpandableBlock mode="scroll"`,
+  which measures the scroll position itself and drives the mask from its own classes.
 - Never rely on the browser's default/native scrollbar for a scrollable area. Use the shared `Scrollbar` component from `src/lib/shared/ui/Scrollbar` for any element that needs to scroll (vertically or horizontally via the `isHorizontal` prop).
 - **Measure the scrollbar track with `offsetWidth`/`offsetHeight`, never `clientWidth`/`clientHeight`.**
   The track carries a 1px border, and the client box excludes it — sizing the thumb from the

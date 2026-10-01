@@ -7,7 +7,9 @@
 
 <p align="center">
   <a href="https://mooncellar.space"><b>Live site</b></a> ·
-  <a href="https://api.mooncellar.space/api"><b>API docs</b></a>
+  <a href="https://api.mooncellar.space/api"><b>API docs</b></a> ·
+  <a href="https://docs.mooncellar.space"><b>Documentation</b></a> ·
+  <a href="https://storybook.mooncellar.space"><b>Storybook</b></a>
 </p>
 
 <p align="center">
@@ -32,7 +34,7 @@ with `bun --filter`.
 | `apps/web` | `web` | Next.js 16 App Router frontend — the site itself |
 | `apps/api` | `api` | NestJS 11 service — catalogue, users, scheduled ingestion |
 | `packages/schemas` | `@mooncellar/schemas` | Zod schemas shared by both: one definition, no copies |
-| `infra/` | — | docker-compose stack: MongoDB, Loki, Grafana, Alloy, Prometheus, SearXNG |
+| `infra/` | — | docker-compose stack: MongoDB, Loki, Grafana, Alloy, Prometheus, SearXNG; host nginx config |
 
 ```
 MoonCellar/
@@ -41,10 +43,22 @@ MoonCellar/
 │   └── api/          # NestJS — see the backend section below
 ├── packages/
 │   └── schemas/      # @mooncellar/schemas — request/response contracts
-├── infra/            # docker-compose.yml + grafana, monitoring, prometheus, searxng configs
+├── infra/            # docker-compose.yml + grafana, monitoring, nginx, prometheus, searxng configs
 ├── docs/
 └── package.json      # workspaces, catalog, shared tooling
 ```
+
+---
+
+## Documentation and Storybook
+
+| Site | Hosted | Local | What it holds |
+|---|---|---|---|
+| Documentation | [docs.mooncellar.space](https://docs.mooncellar.space) | `bun run docs` → port 4333 | The guides in `docs/`: architecture, deployment, branding, design system, SEO, sockets, conflicts |
+| Storybook | [storybook.mooncellar.space](https://storybook.mooncellar.space) | `bun run storybook` → port 4222 | Every shared UI component of `apps/web` in each of its states |
+
+Rules for working in the code live next to it, in the `CLAUDE.md` files: the repository root,
+each app, every shared UI component and every page.
 
 ---
 
@@ -454,9 +468,6 @@ bun --filter '@mooncellar/schemas' typecheck
 bun --filter '@mooncellar/schemas' test
 ```
 
-Why it is consumed as source, why that depends on the API running on Bun, and which
-alternatives were measured: [`docs/schemas-package.md`](docs/schemas-package.md).
-
 `zod` is a peer dependency resolved from the root catalog — a second copy in the tree silently
 breaks type inference and `instanceof` checks across package boundaries.
 
@@ -547,22 +558,36 @@ docker build -f apps/web/Dockerfile -t mooncellar-frontend:latest .
 docker build -f apps/api/Dockerfile -t mooncellar-backend:latest .
 ```
 
+The documentation and Storybook are static sites served by nginx from one shared
+`static.Dockerfile`, told what to build through build arguments:
+
+```bash
+docker build -f static.Dockerfile --build-arg BUILD="bun run docs:build" \
+  --build-arg OUT=docs/.vitepress/dist --build-arg PORT=4333 -t mooncellar-docs:latest .
+docker build -f static.Dockerfile --build-arg BUILD="bun --filter web build-storybook" \
+  --build-arg OUT=apps/web/storybook-static --build-arg PORT=4222 -t mooncellar-storybook:latest .
+```
+
 ### CI/CD
 
 One workflow, `.github/workflows/ci.yml`, with three jobs:
 
 | Job | What it does |
 |---|---|
-| `changes` | Decides which workspaces a push touched — `apps/web/**`, `apps/api/**`, `packages/**` or the root manifests |
+| `changes` | Decides which targets a push touched — `apps/web/**`, `apps/api/**`, `packages/**`, `docs/**`, `infra/**` or the root manifests |
 | `lint` | Installs once and lints every workspace, on every push and pull request |
 | `deploy` | On `main` only, and only for the apps — or the infrastructure — `changes` marked |
 
 The deploy job builds just the changed images, packs them into a single archive (both share the
 `oven/bun` base layer, so one archive is smaller than two), copies it over in one transfer and
 replaces only the containers it rebuilt — one SSH session for both apps. The host runs root
-Docker: each app is a `docker run -d --restart always` container named `mooncellar-frontend` /
-`mooncellar-backend`, with no `run.sh` and no systemd unit of its own. Each app's environment
+Docker: each app is a `docker run -d --restart always` container named `mooncellar-frontend`,
+`mooncellar-backend`, `mooncellar-docs` or `mooncellar-storybook`, with no `run.sh` and no systemd unit of its own. Each app's environment
 file comes from its own secret: `HOST_ENV_WEB` and `HOST_ENV_API`.
+
+An infra deploy also installs `infra/nginx/mooncellar.conf` as the host's nginx site
+configuration, issues certificates for every `server_name` in it, and reloads nginx after
+`nginx -t` passes.
 
 Every secret the pipeline needs, the contents of both `HOST_ENV_*` files and a checklist for
 the first deploy are documented in [`docs/deploy-env.md`](docs/deploy-env.md).

@@ -1,8 +1,7 @@
-import { FC, useRef, useState } from "react";
-import cn from "classnames";
+import { FC, useState } from "react";
 import { IMAGE_PROMPT_MAX_LENGTH } from "@mooncellar/schemas";
+import { ActionsMenu, IActionsMenuItem } from "@/src/lib/shared/ui/ActionsMenu";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
-import { Popover } from "@/src/lib/shared/ui/Popover";
 import { Textarea } from "@/src/lib/shared/ui/Textarea";
 import styles from "./ImageGenerator.module.scss";
 
@@ -13,11 +12,13 @@ interface IRowActionsProps {
   busyState?: IBusyState;
   isSaved: boolean;
   isElement: boolean;
+  isRemote: boolean;
   hasUnsavedSet: boolean;
   onUploadSet: () => void;
   onUpload: () => void;
   onRegenerate: (prompt: string) => void;
   onElements: () => void;
+  onDownload: () => void;
   onDelete: () => void;
 }
 
@@ -27,140 +28,86 @@ const BUSY_LABELS: Record<IBusyState, string> = {
   deleting: "Deleting…",
 };
 
+interface IPromptFormProps {
+  prompt: string;
+  onBack: () => void;
+  onSubmit: (prompt: string) => void;
+}
+
+const PromptForm: FC<IPromptFormProps> = ({ prompt, onBack, onSubmit }) => {
+  const [value, setValue] = useState(prompt);
+
+  return (
+    <div className={styles.popover}>
+      <Textarea
+        value={value}
+        rows={5}
+        placeholder="Describe the image"
+        onChange={(event) =>
+          setValue(event.target.value.slice(0, IMAGE_PROMPT_MAX_LENGTH))
+        }
+      />
+      <div className={styles.popover__actions}>
+        <Button color={ButtonColor.DEFAULT} onClick={onBack}>
+          Back
+        </Button>
+        <Button
+          color={ButtonColor.ACCENT}
+          disabled={!value.trim()}
+          onClick={() => onSubmit(value.trim())}
+        >
+          Generate
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 export const RowActions: FC<IRowActionsProps> = ({
   prompt,
   busyState,
   isSaved,
   isElement,
+  isRemote,
   hasUnsavedSet,
   onUploadSet,
   onUpload,
   onRegenerate,
   onElements,
+  onDownload,
   onDelete,
 }) => {
-  const anchorRef = useRef<HTMLButtonElement>(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isRegenerating, setIsRegenerating] = useState(false);
-  const [value, setValue] = useState(prompt);
-
-  const close = () => {
-    setIsOpen(false);
-    setIsRegenerating(false);
-  };
-
-  const run = (action: () => void) => () => {
-    close();
-    action();
-  };
-
-  const submit = () => {
-    if (!value.trim()) return;
-
-    close();
-    onRegenerate(value.trim());
-  };
+  const items: (IActionsMenuItem | false)[] = [
+    hasUnsavedSet && { label: "Upload set to S3", onClick: onUploadSet },
+    !isSaved && { label: "Upload to S3", onClick: onUpload },
+    !isRemote && {
+      label: "Regenerate…",
+      panel: {
+        title: "Regenerate",
+        width: "360px",
+        render: ({ back, close }) => (
+          <PromptForm
+            prompt={prompt}
+            onBack={back}
+            onSubmit={(value) => {
+              close();
+              onRegenerate(value);
+            }}
+          />
+        ),
+      },
+    },
+    !isElement &&
+      !isRemote && { label: "Split into elements…", onClick: onElements },
+    { label: "Download", onClick: onDownload },
+    { label: "Delete", isDanger: true, onClick: onDelete },
+  ];
 
   return (
-    <>
-      <Button
-        ref={anchorRef}
-        color={ButtonColor.DEFAULT}
-        disabled={!!busyState}
-        onClick={() => {
-          setValue(prompt);
-          setIsRegenerating(false);
-          setIsOpen((current) => !current);
-        }}
-      >
-        {busyState ? BUSY_LABELS[busyState] : "Manage"}
-      </Button>
-      <Popover
-        anchorRef={anchorRef}
-        isOpen={isOpen}
-        onClose={close}
-        align="end"
-        title={isRegenerating ? "Regenerate" : undefined}
-        width={isRegenerating ? "360px" : "220px"}
-        contentStyle={{ padding: "var(--padding-x2)" }}
-      >
-        {isRegenerating ? (
-          <div className={styles.popover}>
-            <Textarea
-              value={value}
-              rows={5}
-              placeholder="Describe the image"
-              onChange={(event) =>
-                setValue(event.target.value.slice(0, IMAGE_PROMPT_MAX_LENGTH))
-              }
-            />
-            <div className={styles.popover__actions}>
-              <Button
-                color={ButtonColor.DEFAULT}
-                onClick={() => setIsRegenerating(false)}
-              >
-                Back
-              </Button>
-              <Button
-                color={ButtonColor.ACCENT}
-                disabled={!value.trim()}
-                onClick={submit}
-              >
-                Generate
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className={styles.menu} role="menu">
-            {hasUnsavedSet && (
-              <button
-                type="button"
-                role="menuitem"
-                className={styles.menu__item}
-                onClick={run(onUploadSet)}
-              >
-                Upload set to S3
-              </button>
-            )}
-            {!isSaved && (
-              <button
-                type="button"
-                role="menuitem"
-                className={styles.menu__item}
-                onClick={run(onUpload)}
-              >
-                Upload to S3
-              </button>
-            )}
-            <button
-              type="button"
-              role="menuitem"
-              className={styles.menu__item}
-              onClick={() => setIsRegenerating(true)}
-            >
-              Regenerate…
-            </button>
-            {!isElement && (
-              <button
-                type="button"
-                role="menuitem"
-                className={styles.menu__item}
-                onClick={run(onElements)}
-              >
-                Split into elements…
-              </button>
-            )}
-            <button
-              type="button"
-              role="menuitem"
-              className={cn(styles.menu__item, styles.menu__item_danger)}
-              onClick={run(onDelete)}
-            >
-              Delete
-            </button>
-          </div>
-        )}
-      </Popover>
-    </>
+    <ActionsMenu
+      label={busyState ? BUSY_LABELS[busyState] : "Manage"}
+      isDisabled={!!busyState}
+      items={items.filter((item): item is IActionsMenuItem => !!item)}
+    />
   );
 };

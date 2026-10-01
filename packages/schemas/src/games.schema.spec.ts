@@ -41,8 +41,8 @@ describe("GameSchema isStopParsing", () => {
     const result = AddGameRequestSchema.safeParse({
       slug: "doom",
       name: "Doom",
-      type: "main_game",
-      cover: null,
+      type: "Main Game",
+      cover: "https://example.com/doom.jpg",
       platformIds: [],
       isStopParsing: true,
     });

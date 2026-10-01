@@ -16,6 +16,23 @@
     animation: wheelHover 8s ease-in-out infinite;
   }
 
+  &__rim {
+    fill: none;
+    stroke: var(--color-bg-hover);
+    stroke-width: 2;
+  }
+
+  &__spoke {
+    stroke: color-mix(in srgb, currentColor 10%, transparent);
+    stroke-width: 1;
+  }
+
+  &__hub {
+    fill: var(--color-bg-primary);
+    stroke: currentColor;
+    stroke-width: 3;
+  }
+
   @keyframes wheelHover {
     0%,
     100% {

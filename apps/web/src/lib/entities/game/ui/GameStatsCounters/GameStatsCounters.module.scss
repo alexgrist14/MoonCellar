@@ -12,45 +12,4 @@
   @include mediaSm {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
-  &__item {
-    padding: var(--padding-x2) var(--padding-x3);
-    border: 1px solid var(--color-border-primary);
-    border-radius: var(--radius-x3);
-    background-color: var(--color-bg-primary);
-
-    &_completed {
-      --counter-color: var(--game-completed-color);
-    }
-
-    &_backlog {
-      --counter-color: var(--game-backlog-color);
-    }
-
-    &_playing {
-      --counter-color: var(--game-playing-color);
-    }
-
-    &_mastered {
-      --counter-color: var(--game-mastered-color);
-    }
-
-    &_wishlist {
-      --counter-color: var(--game-wishlist-color);
-    }
-
-    &_dropped {
-      --counter-color: var(--game-dropped-color);
-    }
-  }
-
-  &__label {
-    @include font(12px, 14px, 400);
-    color: var(--color-text-muted);
-  }
-
-  &__value {
-    @include font(20px, 26px, 700);
-    color: var(--counter-color);
-  }
 }

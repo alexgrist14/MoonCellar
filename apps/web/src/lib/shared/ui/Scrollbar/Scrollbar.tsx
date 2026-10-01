@@ -26,7 +26,6 @@ interface IScrollBarProps {
   containerStyle?: CSSProperties;
   initialContentRef?: RefObject<HTMLDivElement | null>;
   children?: React.ReactNode;
-  isWithRadius?: boolean;
   onScroll?: ({
     scrollTop,
     scrollLeft,
@@ -57,7 +56,6 @@ export const Scrollbar: FC<IScrollBarProps> = ({
   contentStyle,
   containerStyle,
   initialContentRef,
-  isWithRadius,
   onScroll,
   onScrollBottom,
 }) => {
@@ -184,7 +182,6 @@ export const Scrollbar: FC<IScrollBarProps> = ({
             styles.scrollbars__line_top,
             {
               [styles.off]: !isVisible,
-              [styles.scrollbars__line_radius]: isWithRadius,
               [styles["scrollbars__line_top--horizontal"]]: isHorizontal,
             }
           )}
@@ -200,7 +197,6 @@ export const Scrollbar: FC<IScrollBarProps> = ({
             styles.scrollbars__line_bottom,
             {
               [styles.off]: !isVisible,
-              [styles.scrollbars__line_radius]: isWithRadius,
               [styles["scrollbars__line_bottom--horizontal"]]: isHorizontal,
             }
           )}

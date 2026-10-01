@@ -8,6 +8,7 @@ import { WheelComponent } from "@/src/lib/features/wheel/ui/WheelComponent";
 import { WheelOptions } from "@/src/lib/features/wheel/ui/WheelOptions";
 import { useWheelStore } from "@/src/lib/shared/store/wheel.store";
 import { Box } from "@/src/lib/shared/ui/Box";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { SvgRandom } from "@/src/lib/shared/ui/svg";
 import { SvgCrown } from "@/src/lib/shared/ui/svg/SvgCrown";
 import { useDelayedUnmount } from "@/src/lib/shared/hooks/useDelayedUnmount";
@@ -64,19 +65,31 @@ export const WheelContainer: FC = () => {
             {shownWinner ? (
               <GauntletWinner game={shownWinner} isRoyal={isRoyal} />
             ) : (
-              <div className={styles.idle} data-royal={isRoyal}>
-                {isRoyal ? <SvgCrown /> : <SvgRandom />}
-                <p className={styles.idle__title}>
-                  {isRoyal
+              <EmptyState
+                icon={
+                  isRoyal ? (
+                    <SvgCrown
+                      size="28"
+                      style={{ color: "var(--color-attention)" }}
+                    />
+                  ) : (
+                    <SvgRandom
+                      size="28"
+                      style={{ color: "var(--color-accent)" }}
+                    />
+                  )
+                }
+                title={
+                  isRoyal
                     ? "Spin to knock out the first game"
-                    : "Spin to get a game"}
-                </p>
-                <p className={styles.idle__text}>
-                  {isRoyal
+                    : "Spin to get a game"
+                }
+                description={
+                  isRoyal
                     ? "Every spin removes one game until only the winner is left."
-                    : "Change the filters above first, or spin over everything."}
-                </p>
-              </div>
+                    : "Change the filters above first, or spin over everything."
+                }
+              />
             )}
           </Box>
         </div>

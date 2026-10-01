@@ -1,0 +1,44 @@
+.row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--gap-x2);
+  padding: var(--padding-x2);
+  border-radius: var(--radius-x3);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--easing-out);
+
+  &:hover {
+    background-color: var(--color-bg-hover);
+  }
+
+  &_pending {
+    cursor: progress;
+    opacity: 0.7;
+  }
+
+  &_touch {
+    min-height: var(--padding-x11);
+  }
+
+  &__name {
+    font-size: 14px;
+    color: var(--color-text-primary);
+
+    @include lineClamp(1);
+  }
+
+  &__lock {
+    color: var(--color-text-muted);
+  }
+
+  &__count {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @include reducedMotion {
+    transition-duration: var(--duration-instant);
+  }
+}

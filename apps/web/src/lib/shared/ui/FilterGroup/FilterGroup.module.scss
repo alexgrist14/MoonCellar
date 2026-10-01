@@ -1,0 +1,11 @@
+.group {
+  display: grid;
+  gap: var(--gap-x1);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x2);
+  }
+}

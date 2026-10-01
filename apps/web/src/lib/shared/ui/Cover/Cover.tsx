@@ -1,6 +1,7 @@
 import { CSSProperties, FC } from "react";
 import styles from "./Cover.module.scss";
 import Image from "next/image";
+import classNames from "classnames";
 
 interface CoverProps {
   className?: string;
@@ -9,7 +10,7 @@ interface CoverProps {
 }
 export const Cover: FC<CoverProps> = ({ className, isWithoutText, style }) => {
   return (
-    <div className={`${styles.cover} ${className}`} style={style}>
+    <div className={classNames(styles.cover, className)} style={style}>
       <div className={styles.cover__image}>
         <Image
           alt=""

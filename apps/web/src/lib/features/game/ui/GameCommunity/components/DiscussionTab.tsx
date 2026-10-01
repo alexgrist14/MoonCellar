@@ -2,6 +2,7 @@ import { FC, useEffect, useState } from "react";
 import { ICommentsSort, IGameResponse, IReview } from "@mooncellar/schemas";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { SvgClose } from "@/src/lib/shared/ui/svg";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import {
@@ -78,14 +79,15 @@ export const DiscussionTab: FC<IDiscussionTabProps> = ({
                 REVIEW_EXCERPT_LENGTH
               )}
               action={
-                <button
+                <Button
                   type="button"
-                  className={styles.action}
-                  aria-label="Stop discussing this review"
+                  color={ButtonColor.GHOST}
+                  compact
+                  tooltip="Stop discussing this review"
                   onClick={onClearReview}
                 >
                   <SvgClose size="16" style={{ color: "inherit" }} />
-                </button>
+                </Button>
               }
             />
           )
@@ -118,17 +120,20 @@ export const DiscussionTab: FC<IDiscussionTabProps> = ({
         />
       </div>
       {isLoaderShown ? (
-        <div className={styles.loading}>
-          <Loader type="pulse" />
-        </div>
+        <Loader type="pulse" isBlock />
       ) : !comments.length ? (
-        <p className={styles.placeholder}>
-          No discussion yet. Start it with a question or a tip.
-        </p>
+        <EmptyState
+          variant="compact"
+          title="No discussion yet. Start it with a question or a tip."
+        />
       ) : (
         <div className={styles.feed}>
           {comments.map((comment) => (
-            <CommentItem key={comment._id} comment={comment} gameId={game._id} />
+            <CommentItem
+              key={comment._id}
+              comment={comment}
+              gameId={game._id}
+            />
           ))}
         </div>
       )}

@@ -15,6 +15,10 @@
   user-select: none;
   background: var(--color-bg-primary);
 
+  &:focus-visible {
+    box-shadow: 0 0 0 6px var(--color-accent);
+  }
+
   & span {
     z-index: 1;
     opacity: 0.7;
@@ -28,6 +32,22 @@
     display: flex;
     align-items: center;
     gap: var(--gap-x1);
+
+    &_withHint {
+      align-items: flex-start;
+    }
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x05);
+    min-width: 0;
+  }
+
+  &__hint {
+    font-size: 12px;
+    color: var(--color-text-muted);
   }
 
   &_left {

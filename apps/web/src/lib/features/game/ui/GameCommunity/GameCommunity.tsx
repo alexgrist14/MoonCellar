@@ -1,9 +1,5 @@
 import { FC, useCallback, useState } from "react";
-import {
-  IGameResponse,
-  IReview,
-  IReviewsResponse,
-} from "@mooncellar/schemas";
+import { IGameResponse, IReview, IReviewsResponse } from "@mooncellar/schemas";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { useReviewsQuery } from "@/src/lib/entities/comment/api/comment.queries";
@@ -67,16 +63,12 @@ export const GameCommunity: FC<IGameCommunityProps> = ({
         contents={[
           {
             tabName: "Reviews",
-            tabNameNode: (
-              <span className={styles.tabCount}>{reviewsTotal}</span>
-            ),
+            count: reviewsTotal,
             onTabClick: () => openTab(REVIEWS_TAB),
           },
           {
             tabName: "Discussion",
-            tabNameNode: discussionTotal !== undefined && (
-              <span className={styles.tabCount}>{discussionTotal}</span>
-            ),
+            count: discussionTotal,
             onTabClick: () => openTab(DISCUSSION_TAB),
           },
         ]}

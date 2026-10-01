@@ -9,9 +9,7 @@ import { TabCount, TabsMenu } from "../TabsMenu";
 interface ITabs {
   contents: ITabContent[];
   defaultTabIndex?: number;
-  wrapperClassName?: string;
   buttonsClassName?: string;
-  tabBodyClassName?: string;
   isUseDefaultIndex?: boolean;
   isStopPropagation?: boolean;
   buttonColor?: IButtonProps["color"];
@@ -21,13 +19,12 @@ interface ITabs {
   ariaLabel?: string;
   isHideTabsButtons?: boolean;
   mobileMenuTitle?: string;
+  isWrap?: boolean;
 }
 export const Tabs: FC<ITabs> = ({
   contents,
   defaultTabIndex = 0,
   buttonsClassName,
-  tabBodyClassName,
-  wrapperClassName,
   isUseDefaultIndex,
   isStopPropagation,
   isHideTabsButtons,
@@ -37,6 +34,7 @@ export const Tabs: FC<ITabs> = ({
   resetCallback,
   isAdaptive,
   mobileMenuTitle,
+  isWrap,
 }) => {
   const isSegmented = theme === "segmented";
   const color =
@@ -66,12 +64,15 @@ export const Tabs: FC<ITabs> = ({
         [styles.tabs__buttons_desktop]: !!mobileMenuTitle,
         [styles.tabs__buttons_adaptive]: isAdaptive,
         [styles.tabs__buttons_segmented]: isSegmented,
+        [styles.tabs__buttons_wrap]: isWrap,
       })}
       role={isSegmented ? "group" : undefined}
       aria-label={ariaLabel}
     >
       {!isHideTabsButtons &&
         contents?.map((content, i) => {
+          if (content.isHidden) return null;
+
           return !!content.tabLink ? (
             <Link
               key={i}
@@ -82,12 +83,18 @@ export const Tabs: FC<ITabs> = ({
                 type="button"
                 color={color}
                 style={content.style}
-                className={cl({
+                className={cl(styles.tabs__button, {
                   [styles.tabs__button_adaptive]: isAdaptive,
                 })}
                 active={!content.isUnselectable && i === tabIndex}
+                aria-pressed={isSegmented ? i === tabIndex : undefined}
+                aria-label={content.ariaLabel}
+                tooltip={content.tooltip}
                 onClick={() => selectTab(content, i)}
               >
+                {!!content.prefix && (
+                  <span className={styles.tabs__prefix}>{content.prefix}</span>
+                )}
                 {content.tabName}
                 <TabCount count={content.count} />
                 {content?.tabNameNode}
@@ -104,8 +111,13 @@ export const Tabs: FC<ITabs> = ({
               style={content.style}
               active={!content.isUnselectable && i === tabIndex}
               aria-pressed={isSegmented ? i === tabIndex : undefined}
+              aria-label={content.ariaLabel}
+              tooltip={content.tooltip}
               onClick={() => selectTab(content, i)}
             >
+              {!!content.prefix && (
+                <span className={styles.tabs__prefix}>{content.prefix}</span>
+              )}
               {content.tabName}
               <TabCount count={content.count} />
               {content?.tabNameNode}
@@ -126,7 +138,10 @@ export const Tabs: FC<ITabs> = ({
         activeIndex={tabIndex}
         tabs={contents.map((content, i) => ({
           tabName: content.tabName,
+          prefix: content.prefix,
           count: content.count,
+          ariaLabel: content.ariaLabel,
+          isHidden: content.isHidden,
           onTabClick: () => selectTab(content, i),
         }))}
       />

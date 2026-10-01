@@ -11,7 +11,9 @@
     "lint:fix": "eslint src --ext js,jsx,ts,tsx --fix",
     "check:layout": "node scripts/check-layout.mjs",
     "sync:tokens": "node scripts/sync-design-tokens.mjs",
-    "check:tokens": "node scripts/sync-design-tokens.mjs --check"
+    "check:tokens": "node scripts/sync-design-tokens.mjs --check",
+    "storybook": "storybook dev -p 4222 --no-open",
+    "build-storybook": "storybook build -o storybook-static"
   },
   "dependencies": {
     "@bprogress/next": "^3.2.12",
@@ -39,7 +41,6 @@
     "react-hook-form": "^7.82.0",
     "react-markdown": "^10.1.0",
     "react-resize-detector": "^12.3.0",
-    "react-scan": "^0.5.7",
     "react-spinners": "^0.17.0",
     "react-virtualized": "^9.22.6",
     "sass": "^1.101.0",
@@ -51,6 +52,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@storybook/nextjs-vite": "^10.6.1",
     "@tanstack/eslint-plugin-query": "^5.101.4",
     "@types/node": "catalog:",
     "@types/react": "^19.2.17",
@@ -61,6 +63,8 @@
     "eslint-plugin-prettier": "catalog:",
     "interweave-ssr": "^2.0.0",
     "playwright-core": "^1.62.1",
-    "typescript": "catalog:"
+    "storybook": "^10.6.1",
+    "typescript": "catalog:",
+    "vite": "^8.3.1"
   }
 }

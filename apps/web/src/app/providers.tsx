@@ -6,7 +6,7 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
     <ProgressProvider
       height="2px"
-      color="#fffd00"
+      color="var(--color-yellow-light)"
       style=""
       delay={150}
       options={{ showSpinner: false }}

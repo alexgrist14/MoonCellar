@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   Post,
   Req,
@@ -11,6 +12,7 @@ import { AuthGuard } from "@nestjs/passport";
 import {
   ApiCookieAuth,
   ApiCreatedResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from "@nestjs/swagger";
@@ -36,6 +38,13 @@ import { ImagesService } from "./images.service";
 @ApiCookieAuth()
 export class ImagesController {
   constructor(private readonly images: ImagesService) {}
+
+  @Get()
+  @ApiOperation({ summary: "List the images saved to the Space, newest first" })
+  @ApiOkResponse({ type: [GeneratedImageDto] })
+  async list() {
+    return this.images.list();
+  }
 
   @Post("generate")
   @ApiOperation({

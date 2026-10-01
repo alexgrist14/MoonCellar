@@ -12,6 +12,9 @@ import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Checkbox } from "@/src/lib/shared/ui/Checkbox";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { Table } from "@/src/lib/shared/ui/Table";
+import { Chip } from "@/src/lib/shared/ui/Chip";
+import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import { TextareaField } from "@/src/lib/shared/ui/Fields";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { RELATION_LABELS } from "@/src/lib/shared/constants/related-games.const";
@@ -76,6 +79,13 @@ const APPENDED_FIELDS = [
   "retroachievements",
 ];
 
+const DIFF_COLUMN_STYLES = {
+  apply: { width: "48px", minWidth: "48px" },
+  field: { width: "max-content", minWidth: "120px" },
+  current: { minWidth: "200px" },
+  proposed: { minWidth: "200px" },
+};
+
 type IRow = Record<string, unknown>;
 
 const relatedIds = (value: unknown) =>
@@ -91,6 +101,23 @@ const toList = (value: unknown): string[] =>
     : value === undefined || value === null || value === ""
       ? []
       : [String(value)];
+
+const UrlList: FC<{ urls: string[] }> = ({ urls }) => (
+  <div className={styles.diff__urls}>
+    {urls.map((url) => (
+      <Chip
+        key={url}
+        href={url}
+        title={url}
+        variant="outlined"
+        isExternal
+        isNoFollow
+      >
+        {url}
+      </Chip>
+    ))}
+  </div>
+);
 
 export const RequestReviewPanel: FC<{ requestId: string }> = ({
   requestId,
@@ -123,11 +150,7 @@ export const RequestReviewPanel: FC<{ requestId: string }> = ({
   );
 
   if (isLoading || !request) {
-    return (
-      <div className={styles.placeholder}>
-        <Loader />
-      </div>
-    );
+    return <Loader minHeight="var(--requests-panel-min-height)" />;
   }
 
   const fields = Object.keys(request.payload);
@@ -136,6 +159,9 @@ export const RequestReviewPanel: FC<{ requestId: string }> = ({
     .filter((field) => IMAGE_FIELDS.includes(field))
     .reduce((sum, field) => sum + toList(request.payload[field]).length, 0);
   const isPending_ = request.status === "pending";
+  const isAppended = (field: string) =>
+    APPENDED_FIELDS.includes(field) ||
+    (field === "gameIds" && request.kind === "character");
 
   const platformName = (id: unknown) =>
     systems?.find((system) => system._id === id)?.name ?? String(id ?? "");
@@ -216,22 +242,7 @@ export const RequestReviewPanel: FC<{ requestId: string }> = ({
     if (!items.length) return <span className={styles.diff__empty}>—</span>;
 
     if (IMAGE_FIELDS.includes(field) || LINK_FIELDS.includes(field)) {
-      return (
-        <ul className={styles.diff__links}>
-          {items.map((url) => (
-            <li key={url}>
-              <a
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer nofollow"
-                className={styles.diff__url}
-              >
-                {url}
-              </a>
-            </li>
-          ))}
-        </ul>
-      );
+      return <UrlList urls={items} />;
     }
 
     if (field === "first_release") {
@@ -273,8 +284,10 @@ export const RequestReviewPanel: FC<{ requestId: string }> = ({
           const duplicates = getPossibleDuplicates(error);
 
           if (duplicates) {
-            confirmPossibleDuplicates(duplicates, () =>
-              handleDecision("approve", true)
+            confirmPossibleDuplicates(
+              duplicates,
+              () => handleDecision("approve", true),
+              request.kind
             );
           }
         },
@@ -315,7 +328,7 @@ export const RequestReviewPanel: FC<{ requestId: string }> = ({
     <article className={styles.panel}>
       <header className={styles.panel__head}>
         <div>
-          <h3 className={styles.panel__title}>{getRequestTitle(request)}</h3>
+          <SectionTitle as="h3">{getRequestTitle(request)}</SectionTitle>
           <p className={styles.panel__by}>
             {request.action === "add" ? "New" : "Update to"} {request.kind} · by{" "}
             <b>{request.userName ?? "unknown"}</b> ·{" "}
@@ -335,88 +348,85 @@ export const RequestReviewPanel: FC<{ requestId: string }> = ({
       {!!request.sources.length && (
         <div className={styles.panel__note}>
           <span>Sources</span>
-          <ul className={styles.diff__links}>
-            {request.sources.map((url) => (
-              <li key={url}>
-                <a
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer nofollow"
-                  className={styles.diff__url}
-                >
-                  {url}
-                </a>
-              </li>
-            ))}
-          </ul>
+          <UrlList urls={request.sources} />
         </div>
       )}
 
-      <div className={styles.diff}>
-        <table className={styles.diff__table}>
-          <thead>
-            <tr>
-              <th>
-                <span className={styles.srOnly}>Apply</span>
-              </th>
-              <th>Field</th>
-              <th>Current</th>
-              <th>Proposed</th>
-            </tr>
-          </thead>
-          <tbody>
-            {fields.map((field) => {
-              const isApplied = applied.includes(field);
-              const wasApplied = request.appliedFields?.includes(field);
+      <Table
+        id="request-diff"
+        layout="rows"
+        isWithoutSorting
+        columnStyles={DIFF_COLUMN_STYLES}
+        getRowClassName={(_, index) =>
+          applied.includes(fields[index]) ? undefined : styles.diff__row_off
+        }
+        headers={{
+          apply: {
+            content: <span className={styles.visuallyHidden}>Apply</span>,
+            isNotResizable: true,
+          },
+          field: { content: "Field" },
+          current: { content: "Current" },
+          proposed: { content: "Proposed" },
+        }}
+        rows={fields.map((field) => {
+          const isApplied = applied.includes(field);
+          const wasApplied = request.appliedFields?.includes(field);
 
-              return (
-                <tr
-                  key={field}
-                  className={isApplied ? undefined : styles.diff__row_off}
-                >
-                  <td>
-                    <Checkbox
-                      checked={isPending_ ? isApplied : !!wasApplied}
-                      disabled={!isPending_ || isPending}
-                      aria-label={`Apply ${FIELD_LABELS[field] ?? field}`}
-                      onChange={(event) =>
-                        setSkipped((current) =>
-                          event.target.checked
-                            ? current.filter((item) => item !== field)
-                            : [...current, field]
-                        )
-                      }
-                    />
-                  </td>
-                  <td className={styles.diff__field}>
-                    {FIELD_LABELS[field] ?? field}
-                  </td>
-                  <td className={styles.diff__old}>
-                    {format(field, request.current?.[field])}
-                    {APPENDED_FIELDS.includes(field) && request.current && (
-                      <span className={styles.diff__hint}>
-                        Proposed values are added to these
-                      </span>
-                    )}
-                  </td>
-                  <td className={styles.diff__new}>
-                    {format(field, request.payload[field])}
-                    {IMAGE_FIELDS.includes(field) && (
-                      <span className={styles.diff__hint}>
-                        Copied to storage on approval
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+          return {
+            apply: {
+              content: (
+                <Checkbox
+                  checked={isPending_ ? isApplied : !!wasApplied}
+                  disabled={!isPending_ || isPending}
+                  aria-label={`Apply ${FIELD_LABELS[field] ?? field}`}
+                  onChange={(event) =>
+                    setSkipped((current) =>
+                      event.target.checked
+                        ? current.filter((item) => item !== field)
+                        : [...current, field]
+                    )
+                  }
+                />
+              ),
+            },
+            field: {
+              content: FIELD_LABELS[field] ?? field,
+              className: styles.diff__field,
+            },
+            current: {
+              content: (
+                <div>
+                  {format(field, request.current?.[field])}
+                  {isAppended(field) && request.current && (
+                    <span className={styles.diff__hint}>
+                      Proposed values are added to these
+                    </span>
+                  )}
+                </div>
+              ),
+              className: styles.diff__old,
+            },
+            proposed: {
+              content: (
+                <div>
+                  {format(field, request.payload[field])}
+                  {IMAGE_FIELDS.includes(field) && (
+                    <span className={styles.diff__hint}>
+                      Copied to storage on approval
+                    </span>
+                  )}
+                </div>
+              ),
+              className: styles.diff__new,
+            },
+          };
+        })}
+      />
 
       {isPending_ ? (
         <div className={styles.decision}>
-          {request.kind === "game" && request.action === "update" && (
+          {request.kind === "game" && (
             <label className={styles.decision__lock}>
               <Checkbox
                 checked={lockSync}

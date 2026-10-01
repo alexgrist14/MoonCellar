@@ -38,6 +38,10 @@ export class ContentRequest {
   createdAt: string;
   @Prop({ type: String, default: null })
   decidedAt: string | null;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "User", default: null })
+  claimedBy: mongoose.Types.ObjectId | null;
+  @Prop({ type: Date, default: null })
+  claimedAt: Date | null;
 }
 
 export const ContentRequestDatabaseSchema =

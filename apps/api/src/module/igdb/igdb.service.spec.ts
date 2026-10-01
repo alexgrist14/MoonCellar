@@ -30,11 +30,12 @@ const found = (value: unknown[]) =>
 const createService = ({
   candidates = [] as unknown[],
   current = null as unknown,
+  linked = [] as unknown[],
 } = {}) => {
   const updateOne = jest.fn().mockResolvedValue({});
   const games = {
     updateOne,
-    find: jest.fn(),
+    find: jest.fn(() => ({ select: () => found(linked) })),
     findOne: jest.fn(),
     findById: jest.fn(() => ({ lean: () => Promise.resolve(current) })),
     exists: jest.fn().mockResolvedValue(null),
@@ -171,6 +172,20 @@ describe("IGDBService conflicts for new games", () => {
 
     expect(updateOne).not.toHaveBeenCalled();
     expect(conflicts.record).toHaveBeenCalled();
+  });
+
+  it("ignores a candidate already linked to another IGDB game and inserts a new one", async () => {
+    const { service, updateOne, conflicts } = createService({
+      candidates: [handMadeDoom],
+      linked: [{ _id: handMadeDoom._id, igdb: { gameId: 999 } }],
+    });
+
+    await service["upsertGameFromIgdb"](syncedDoom, undefined, {
+      matchNew: true,
+    });
+
+    expect(conflicts.record).not.toHaveBeenCalled();
+    expect(updateOne).toHaveBeenCalledTimes(1);
   });
 
   it("inserts a new IGDB game when nothing in the catalogue matches", async () => {

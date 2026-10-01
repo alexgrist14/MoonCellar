@@ -128,21 +128,22 @@ them with `docker run -d --restart always`. Two consequences worth knowing befor
   The deploy creates it before anything starts; `infra/docker-compose.prod.yml` joins it as an
   external network. The old host published every one of these ports and had the apps reach them
   back through the podman gateway; inside the network they reach `mongodb:27017`, `loki:3100`,
-  `alloy:12347` and each other (`mooncellar-backend:3228`) by name, so **none of the
-  infrastructure publishes a port to the host** — a database on a root-Docker box would
-  otherwise be on the public internet, because Docker's iptables rules are not filtered by a
-  host firewall. Only Grafana is published, on `127.0.0.1:3001`; reach it through an SSH tunnel.
+  `alloy:12347`, `searxng:8080` and each other (`mooncellar-backend:3228`) by name, so **no
+  infrastructure port is published on a public interface** — a database on a root-Docker box
+  would otherwise be on the public internet, because Docker's iptables rules are not filtered by
+  a host firewall. Only Grafana (`127.0.0.1:3000`) and MongoDB (`127.0.0.1:27017`) are
+  published, on loopback; reach them through an SSH tunnel.
 - **Because nothing is published, the address variables must be set — the code's fallbacks are
-  wrong here.** `INTERNAL_API_URL`, `LOKI_HOST` (both apps) and `FARO_COLLECTOR_URL` default to
-  `host.containers.internal` / `localhost`, which resolve to the host gateway, where nothing
-  listens any more. The values are in the `HOST_ENV_*` tables below. `--add-host` still maps
+  wrong here.** `INTERNAL_API_URL`, `LOKI_HOST` (web) and `FARO_COLLECTOR_URL` default to
+  `host.containers.internal` / `localhost`, which resolve to the host gateway or the container
+  itself, where nothing listens any more; an unset `LOKI_HOST` in the API ships no logs at all. The values are in the `HOST_ENV_*` tables below. `--add-host` still maps
   `host.containers.internal` and `host.docker.internal` to the gateway, for anything genuinely
   running on the host.
-- **The two app ports are published on all interfaces** (`-p 3111:3111`, `-p 3228:3228`), so a
-  reverse proxy in a container can reach them. If the proxy runs on the host, bind them to
-  `127.0.0.1:3111:3111` instead — same firewall caveat as above.
-- **Infrastructure is deployed only when `infra/**` changes.** The `changes` job has its own
-  `infra` filter; the deploy `scp`s the directory to `/opt/mooncellar/infra` and runs
+- **Every container port is published on loopback only** (`-p 127.0.0.1:3111:3111`,
+  `-p 127.0.0.1:3228:3228`, `4333` for the documentation, `4222` for Storybook), for a reverse proxy running on the host. A proxy in a container
+  cannot reach them there; it has to join the `mooncellar` network instead.
+- **Infrastructure is deployed only when `infra/**` or the workflow file changes.** The
+  `changes` job has its own `infra` filter; the deploy `scp`s the directory to `/opt/mooncellar/infra` and runs
   `docker compose -f docker-compose.prod.yml up -d`, which is idempotent: it starts what is
   missing and leaves what is already running. A push that only touches `apps/**` does not
   restart MongoDB.
@@ -153,14 +154,36 @@ A single `.github/workflows/ci.yml` deploys both apps: a `changes` job decides w
 workspaces were touched, and the deploy job builds only those, ships them in one
 multi-image archive over one SSH session, and restarts only the services it rebuilt.
 
-| Value | Frontend | Backend |
-|---|---|---|
-| Image name | `mooncellar-frontend` | `mooncellar-backend` |
-| Container name | `mooncellar-frontend` | `mooncellar-backend` |
-| Dockerfile | `apps/web/Dockerfile` | `apps/api/Dockerfile` |
-| Exposed port | `3111` | `3228` |
-| Path filter | `apps/web/**`, `packages/**` | `apps/api/**`, `packages/**` |
-| Deploy flag in the SSH script | `DEPLOY_WEB` | `DEPLOY_API` |
+| Value | Frontend | Backend | Documentation | Storybook |
+|---|---|---|---|---|
+| Image and container name | `mooncellar-frontend` | `mooncellar-backend` | `mooncellar-docs` | `mooncellar-storybook` |
+| Dockerfile | `apps/web/Dockerfile` | `apps/api/Dockerfile` | `static.Dockerfile` | `static.Dockerfile` |
+| Exposed port | `3111` | `3228` | `4333` | `4222` |
+| Path filter | `apps/web/**`, `packages/**`, `package.json`, `bun.lock`, `ci.yml` | `apps/api/**`, `packages/**`, `package.json`, `bun.lock`, `ci.yml` | `docs/**`, `package.json`, `bun.lock`, `static.Dockerfile`, `ci.yml` | `apps/web/**`, `packages/**`, `package.json`, `bun.lock`, `static.Dockerfile`, `ci.yml` |
+| Deploy flag in the SSH script | `DEPLOY_WEB` | `DEPLOY_API` | `DEPLOY_DOCS` | `DEPLOY_STORYBOOK` |
+
+Documentation and Storybook are static sites: `static.Dockerfile` runs the build command passed
+as `BUILD`, copies the `OUT` directory into `nginx:alpine` and listens on `PORT`. They take no
+`.env`.
+
+### The reverse proxy lives in the repository
+
+nginx runs on the host, but its site configuration is `infra/nginx/mooncellar.conf`. An infra
+deploy copies it over `/etc/nginx/conf.d/mooncellar.conf` and reloads nginx; never edit the
+file on the server, the next infra deploy overwrites it.
+
+- **A new site is one `server` block plus a name in the port-80 redirect block.** Before
+  swapping the file, the deploy collects every `server_name` and runs `certbot certonly --nginx
+  --cert-name mooncellar.space --keep-until-expiring --renew-with-new-domains` with them: a no-op
+  while the list is unchanged, a reissue of the shared certificate when a domain was added. The
+  DNS record must exist before that deploy, or certbot fails and the deploy stops there.
+- **Use `certbot certonly`, never `certbot --nginx` without it** — the installer writes `ssl_*`
+  lines into the live file, which the next deploy discards.
+- **A config that fails `nginx -t` is rolled back:** the previous file is kept as
+  `/etc/nginx/mooncellar.conf.prev`, copied back, and the deploy goes red with the old
+  configuration still serving.
+- The deploy user must be able to run `certbot`, `nginx` and `systemctl`, which in practice means
+  `root`.
 
 ---
 
@@ -188,8 +211,8 @@ and `INDEXNOW_KEY`.
 | `FRONT_URL` (api) | `https://mooncellar.space` | Correct |
 | `INDEXNOW_KEY` | a key hardcoded in `apps/api/src/shared/constants.ts` | Works; an IndexNow key is public by design, since the host must serve it at `/<key>.txt` |
 
-Two keys are set in production but referenced nowhere in the code — `NEXT_PUBLIC_LOKI_HOST` and
-`NEXT_PUBLIC_S3_HOST`. They can be dropped from `HOST_ENV_WEB`.
+Two keys were set in production but referenced nowhere in the code — `NEXT_PUBLIC_LOKI_HOST` and
+`NEXT_PUBLIC_S3_HOST`. They have been dropped from `HOST_ENV_WEB`.
 
 > **`NEXT_PUBLIC_CORS_SERVER` is unset, and setting it would change nothing.**
 > It is read only by `countVisitors` in `apps/web/src/lib/shared/utils/visitors.utils.ts`,
@@ -217,7 +240,7 @@ Two keys are set in production but referenced nowhere in the code — `NEXT_PUBL
 | `NEXT_PUBLIC_APP_VERSION` | no | Version tag attached to every Faro event, so telemetry can be filtered by release |
 | `NEXT_PUBLIC_FARO_APP_NAME` | no | Application name in Grafana Faro |
 | `LOKI_HOST` | no | Loki push endpoint for the `/api/logs` route handler — `http://loki:3100`. Server-side only — it must not become `NEXT_PUBLIC_*`, or the endpoint ends up in the browser bundle. Must be set: the fallback is `http://host.containers.internal:3100` (`apps/web/src/app/api/logs/route.ts`), and Loki no longer publishes a port on the host |
-| `GEO_BLOCK_COUNTRIES` | no | Comma-separated ISO country codes to block, e.g. `RU,BY`. Empty disables blocking |
+| `GEO_BLOCK_COUNTRIES` | no | Comma-separated ISO country codes for which adult content is hidden, e.g. `RU,BY`. Unset or empty falls back to `RU`; it cannot be switched off this way. The country comes from `/app/geo/GeoLite2-Country.mmdb`, downloaded by the web `Dockerfile`, and the client IP from `X-Real-IP` / `X-Forwarded-For`. Outside `next dev` an unknown country — no IP header, no match, or a missing database — counts as blocked, so a proxy that does not forward the client IP blocks every visitor |
 | `REVALIDATE_SECRET` | **yes** | Shared secret for `POST /api/revalidate`, compared against the `x-revalidate-secret` header. Server-side only — never `NEXT_PUBLIC_*`, or the secret ships in the browser bundle. Unset disables the endpoint: it answers 503 instead of falling back to an unguarded default |
 
 Everything the frontend needs is public by design except `REVALIDATE_SECRET`; the file also
@@ -250,8 +273,8 @@ pins the internal API address, so it stays a secret on both counts.
 | `SEARXNG_URL` | no | SearXNG the admin "Fill with AI" draft searches through — `http://searxng:8080`, the `searxng` service of `infra/docker-compose.prod.yml`. The default, `http://localhost:8891`, is empty inside the container: every search step then fails |
 | `OPENAI_API_KEY` | **yes** | OpenAI key for the admin "Fill with AI" game draft. Without it `POST /games/ai-drafts` answers 503 |
 | `OPENAI_MODEL` | no | Model the draft runs on, `gpt-5-mini` by default |
-| `SITE_SESSIONS_KEY` | no | Any long random string; the cookies of the admin Sites tab are encrypted with its SHA-256. Must be the same wherever the same database is used, or stored cookies cannot be read. Without it saving a site answers 503 |
-| `RECRAFT_API_TOKEN` | no | Recraft API token for the admin Images tab (recraft.ai → Profile → API). Without it generating with a Recraft model answers 503; OpenAI models keep working through `OPENAI_API_KEY` |
+| `SITE_SESSIONS_KEY` | **yes** | Any long random string; the cookies of the admin Sites tab are encrypted with its SHA-256. Must be the same wherever the same database is used, or stored cookies cannot be read. Without it saving a site answers 503 |
+| `RECRAFT_API_TOKEN` | **yes** | Recraft API token for the admin Images tab (recraft.ai → Profile → API). Without it generating with a Recraft model answers 503; OpenAI models keep working through `OPENAI_API_KEY` |
 | `STEAMGRIDDB_API_KEY` | **yes** | SteamGridDB API key (steamgriddb.com → Preferences → API) the draft takes covers and hero banners from. Without it that step fails and the draft falls back to images found elsewhere |
 | `IGDB_AUTO_LINK` | no | `true` lets the nightly IGDB sync link a new IGDB game to a parser-created game it matches with confidence. Unset or anything else sends every match to the admin Conflicts tab instead. A game added by hand always goes to Conflicts, whatever the value |
 | `DISABLE_CRONS` | no | `true` stops every `@Cron` job. Local development only, because the local `.env` points at the production database and Space. Never set it in `HOST_ENV_API` |
@@ -326,7 +349,7 @@ NEXT_PUBLIC_APP_VERSION=dev
 NEXT_PUBLIC_FARO_APP_NAME=mooncellar-web
 # Loki push endpoint for the /api/logs handler (server-side only)
 LOKI_HOST=http://localhost:3100
-# Comma-separated ISO country codes to block; empty disables it
+# Comma-separated ISO country codes that hide adult content; empty falls back to RU
 GEO_BLOCK_COUNTRIES=
 # Shared secret guarding POST /api/revalidate
 REVALIDATE_SECRET=
@@ -356,6 +379,8 @@ GRAFANA_ADMIN_PASSWORD=
 PROMETHEUS_DATA_DIR=
 # Bearer token Prometheus sends to the API's /metrics — identical to the API's METRICS_TOKEN
 METRICS_TOKEN=
+# SearXNG server.secret_key
+SEARXNG_SECRET=
 ```
 
 </details>
@@ -366,6 +391,8 @@ METRICS_TOKEN=
 ```dotenv
 # MongoDB URI including credentials, database `games`
 MONGO_CONNECTION_STRING=mongodb://admin:admin@localhost:27017/games?authSource=admin
+# Stops every @Cron job — local development only, never part of HOST_ENV_API
+DISABLE_CRONS=true
 # Signing key for access and refresh tokens
 JWT_SECRET=
 # Access token lifetime
@@ -401,12 +428,11 @@ INDEXNOW_KEY=
 SEARXNG_URL=http://localhost:8891
 OPENAI_API_KEY=
 OPENAI_MODEL=gpt-5-mini
+# IGDB sync: link confident matches instead of queueing them in Conflicts
+IGDB_AUTO_LINK=false
 RECRAFT_API_TOKEN=
 SITE_SESSIONS_KEY=
 STEAMGRIDDB_API_KEY=
-
-# IGDB sync: link confident matches instead of queueing them in Conflicts
-IGDB_AUTO_LINK=false
 
 # game-adder MCP server — local tooling, never part of HOST_ENV_API
 API_BASE_URL=http://localhost:3228
@@ -474,11 +500,12 @@ What it does need, and what the pipeline will not do for you:
    A carried-over directory keeps its own users. Changing `MONGO_ROOT_PASSWORD` afterwards does
    nothing — the credentials live in the data files, and only `db.changeUserPassword` in a shell
    changes them.
-3. **The reverse proxy and TLS.** Ports `3111` and `3228` are published on the host; nothing else
-   terminates HTTPS or routes `mooncellar.space` / `api.mooncellar.space` to them.
+3. **The reverse proxy and TLS.** Ports `3111` and `3228` are published on `127.0.0.1`; nothing
+   else terminates HTTPS or routes `mooncellar.space` / `api.mooncellar.space` to them. The
+   proxy must pass the client address in `X-Real-IP` or `X-Forwarded-For`: without it the web
+   app cannot resolve a country and treats every visitor as geo-blocked.
 4. **A firewall that understands Docker.** `ufw` filters the `INPUT` chain, while Docker's
-   published ports traverse `FORWARD` through `DOCKER-USER`. The infrastructure publishes
-   nothing, so the exposure is the two app ports — deliberate, if the proxy is containerised;
-   otherwise bind them to `127.0.0.1`.
+   published ports traverse `FORWARD` through `DOCKER-USER`. Everything is published on loopback
+   only, so nothing is exposed until the proxy is — keep it that way when adding a port.
 5. **DNS last.** Deploy, check the new host through a hosts entry, and only then move the A
    records. The old host keeps serving until they propagate.

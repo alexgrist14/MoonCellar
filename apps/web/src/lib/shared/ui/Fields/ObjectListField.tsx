@@ -27,9 +27,6 @@ interface IObjectListFieldProps {
   isLabelHidden?: boolean;
 }
 
-let rowIdCounter = 0;
-const createRowId = () => `object-row-${rowIdCounter++}`;
-
 export const ObjectListField: FC<IObjectListFieldProps> = ({
   label,
   value,
@@ -42,9 +39,15 @@ export const ObjectListField: FC<IObjectListFieldProps> = ({
   const datalistPrefix = useId();
 
   const rowIdsRef = useRef<string[]>([]);
+  const nextRowIdRef = useRef(0);
+  const createRowId = () => `${datalistPrefix}-row-${nextRowIdRef.current++}`;
 
-  if (rowIdsRef.current.length !== items.length) {
-    rowIdsRef.current = items.map(() => createRowId());
+  if (rowIdsRef.current.length > items.length) {
+    rowIdsRef.current = rowIdsRef.current.slice(0, items.length);
+  }
+
+  while (rowIdsRef.current.length < items.length) {
+    rowIdsRef.current = [...rowIdsRef.current, createRowId()];
   }
 
   const keys = rowIdsRef.current;
@@ -151,15 +154,17 @@ export const ObjectListField: FC<IObjectListFieldProps> = ({
               )}
             </div>
           ))}
-          <button
+          <Button
             type="button"
+            color={ButtonColor.TRANSPARENT}
+            isOnlyIcon
             className={styles.objectRow__remove}
             aria-label={`Remove row ${index + 1}`}
             disabled={disabled}
             onClick={() => removeRow(index)}
           >
             <SvgClose size="16" style={{ color: "inherit" }} />
-          </button>
+          </Button>
         </div>
       ))}
       <Button

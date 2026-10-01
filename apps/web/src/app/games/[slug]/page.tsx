@@ -58,7 +58,15 @@ export async function generateMetadata({
   params: any;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const game = await getGame(slug);
+  const game = await getGame(slug).catch((error: unknown) => {
+    console.error("Failed to load game metadata:", error);
+
+    return undefined;
+  });
+
+  if (game === undefined) {
+    return { title: "Game" };
+  }
 
   if (!game) {
     return {
@@ -131,12 +139,7 @@ const GamePageIndex = async ({ params }: { params: any }) => {
           { name: game.name, path: `/games/${game.slug}` },
         ])}
       />
-      <GamePage
-        game={game}
-        stats={stats}
-        reviews={reviews}
-        related={related}
-      />
+      <GamePage game={game} stats={stats} reviews={reviews} related={related} />
     </>
   );
 };

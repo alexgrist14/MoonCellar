@@ -32,11 +32,11 @@ import { ContentRequestsService } from "../services/content-requests.service";
 import {
   ContentRequestDetailDto,
   ContentRequestResponseDto,
-  ContentRequestsResponseDto,
   DecideContentRequestDto,
   DecideContentRequestResponseDto,
   GetContentRequestsDto,
   GetContentRequestsResponseDto,
+  GetMyContentRequestsDto,
 } from "../../../shared/zod/dto/content-requests.dto";
 
 const getUserId = (request: IAuthorizedRequest) =>
@@ -63,11 +63,14 @@ export class ContentRequestsController {
 
   @Get("mine")
   @ApiOperation({ summary: "The signed-in user's requests, newest first" })
-  @ApiOkResponse({ type: ContentRequestsResponseDto })
+  @ApiOkResponse({ type: GetContentRequestsResponseDto })
   @ApiCookieAuth()
   @UseGuards(AuthGuard("jwt"), UserIdGuard)
-  listMine(@Req() request: IAuthorizedRequest) {
-    return this.requests.listMine(getUserId(request));
+  listMine(
+    @Query() query: GetMyContentRequestsDto,
+    @Req() request: IAuthorizedRequest
+  ) {
+    return this.requests.listMine(getUserId(request), query as never);
   }
 
   @Delete(":id")

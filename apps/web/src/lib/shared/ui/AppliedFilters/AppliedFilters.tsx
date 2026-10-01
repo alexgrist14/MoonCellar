@@ -1,9 +1,7 @@
 "use client";
 
 import { FC } from "react";
-import classNames from "classnames";
-import styles from "./AppliedFilters.module.scss";
-import { SvgClose } from "../svg";
+import { RemovableChips } from "@/src/lib/shared/ui/RemovableChips";
 
 export interface IAppliedFilter {
   key: string;
@@ -21,30 +19,13 @@ export const AppliedFilters: FC<IAppliedFiltersProps> = ({
   filters,
   onClearAll,
   className,
-}) => {
-  if (!filters.length) return null;
-
-  return (
-    <div className={classNames(styles.applied, className)}>
-      {filters.map(({ key, label, onRemove }) => (
-        <button
-          key={key}
-          type="button"
-          className={styles.applied__pill}
-          aria-label={`Remove filter ${label}`}
-          onClick={onRemove}
-        >
-          {label}
-          <SvgClose size="12" />
-        </button>
-      ))}
-      <button
-        type="button"
-        className={styles.applied__clear}
-        onClick={onClearAll}
-      >
-        Clear all
-      </button>
-    </div>
-  );
-};
+}) => (
+  <RemovableChips
+    variant="pill"
+    className={className}
+    items={filters.map(({ key, label }) => ({ id: key, label }))}
+    getRemoveLabel={({ label }) => `Remove filter ${label}`}
+    onRemove={(id) => filters.find(({ key }) => key === id)?.onRemove()}
+    onClearAll={onClearAll}
+  />
+);

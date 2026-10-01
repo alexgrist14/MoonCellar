@@ -1,7 +1,5 @@
 import { Dispatch, FC, SetStateAction } from "react";
 import styles from "./PaginationClient.module.scss";
-import { usePathname, useRouter } from "next/navigation";
-import queryString from "query-string";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 
 interface IPaginationClientProps {
@@ -19,32 +17,29 @@ export const PaginationClient: FC<IPaginationClientProps> = ({
   setPage,
   isWithQuery,
 }) => {
-  const { push } = useRouter();
-  const pathname = usePathname();
+  const changePage = (nextPage: number) => {
+    if (isWithQuery) {
+      const params = new URLSearchParams(window.location.search);
+      params.set("page", String(nextPage));
+      window.history.pushState(
+        null,
+        "",
+        `${window.location.pathname}?${params.toString()}`
+      );
+    }
 
-  const nextPage = () => {
-    isWithQuery &&
-      push(pathname + "?" + queryString.stringify({ page: page + 1 }), {
-        scroll: false,
-      });
-    setPage(page + 1);
-  };
-
-  const resetPage = () => {
-    isWithQuery &&
-      push(pathname + "?" + queryString.stringify({ page: 1 }), {
-        scroll: false,
-      });
-    setPage(1);
+    setPage(nextPage);
   };
 
   if (!length) return null;
 
   return (
     <div className={styles.pagination}>
-      {page * take < length && <Button onClick={nextPage}>Show more</Button>}
+      {page * take < length && (
+        <Button onClick={() => changePage(page + 1)}>Show more</Button>
+      )}
       {page > 1 && (
-        <Button color={ButtonColor.FANCY} onClick={resetPage}>
+        <Button color={ButtonColor.FANCY} onClick={() => changePage(1)}>
           Collapse
         </Button>
       )}

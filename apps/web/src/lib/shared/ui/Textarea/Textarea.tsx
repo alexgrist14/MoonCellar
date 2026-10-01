@@ -35,6 +35,7 @@ export const Textarea: FC<ITextareaProps> = ({
   style,
   children,
   onChange,
+  onClick,
   ref,
   isDisableAutoResize,
   rows = 1,
@@ -146,8 +147,9 @@ export const Textarea: FC<ITextareaProps> = ({
             ref.current = node;
           }
         }}
-        onClick={() => {
+        onClick={(event) => {
           if (clearErrors && props.name) clearErrors(props.name);
+          onClick?.(event);
         }}
         onChange={(event) => {
           setOwnValue(event.target.value);

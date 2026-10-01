@@ -11,6 +11,10 @@ import agent from "./agent.api";
 
 const IMAGES_URL = `${API_URL}/admin/images`;
 
+const list = () => {
+  return agent.get<IGeneratedImage[]>(IMAGES_URL);
+};
+
 const generate = (data: IGenerateImageRequest) => {
   return agent.post<IGenerateImageResponse>(`${IMAGES_URL}/generate`, data);
 };
@@ -31,6 +35,7 @@ const remove = (id: string) => {
 };
 
 export const generatedImagesApi = {
+  list,
   generate,
   suggestElements,
   save,

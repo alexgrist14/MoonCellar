@@ -11,7 +11,8 @@ import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { DRAWER_TRIGGER_ATTRIBUTE, drawer } from "@/src/lib/shared/ui/Drawer";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
-import { SortableGrid } from "@/src/lib/shared/ui/SortableGrid";
+import { SortableEditor } from "@/src/lib/shared/ui/SortableEditor";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { SvgHeart, SvgPen } from "@/src/lib/shared/ui/svg";
 import styles from "./FavoriteCharacters.module.scss";
 
@@ -74,38 +75,42 @@ export const FavoriteCharacters: FC<IFavoriteCharactersProps> = ({
       className={styles.characters}
       aria-labelledby="profile-favorite-characters"
     >
-      <div className={styles.head}>
-        <SectionTitle as="h3">
-          <span id="profile-favorite-characters">Favourite characters</span>
-          {!!characters.length && (
-            <span className={styles.count}>{characters.length}</span>
-          )}
-        </SectionTitle>
-        {isPreview && !!characters.length && (
-          <Button color={ButtonColor.TRANSPARENT} onClick={onShowAll}>
-            All characters
-          </Button>
-        )}
-        {!isPreview && isOwner && !draft && characters.length > 1 && (
-          <Button
-            color={ButtonColor.TRANSPARENT}
-            className={styles.edit}
-            onClick={() => setDraft(characters)}
-          >
-            <SvgPen style={ICON_STYLE} />
-            Edit
-          </Button>
-        )}
-      </div>
+      <SectionTitle
+        as="h3"
+        count={characters.length || undefined}
+        action={
+          isPreview && !!characters.length ? (
+            <Button color={ButtonColor.TRANSPARENT} onClick={onShowAll}>
+              All characters
+            </Button>
+          ) : (
+            !isPreview &&
+            isOwner &&
+            !draft &&
+            characters.length > 1 && (
+              <Button
+                color={ButtonColor.TRANSPARENT}
+                className={styles.edit}
+                onClick={() => setDraft(characters)}
+              >
+                <SvgPen style={ICON_STYLE} />
+                Edit
+              </Button>
+            )
+          )
+        }
+      >
+        <span id="profile-favorite-characters">Favourite characters</span>
+      </SectionTitle>
 
       {!characters.length && (
-        <div className={styles.hint}>
-          <SvgHeart size="24" style={{ color: "var(--favorite-color)" }} />
-          <p>
-            No favourite characters yet. Open a character on any game page and
-            add them to favourites.
-          </p>
-        </div>
+        <EmptyState
+          variant="inline"
+          icon={
+            <SvgHeart size="24" style={{ color: "var(--favorite-color)" }} />
+          }
+          title="No favourite characters yet. Open a character on any game page and add them to favourites."
+        />
       )}
 
       {!!characters.length && !draft && (
@@ -130,40 +135,20 @@ export const FavoriteCharacters: FC<IFavoriteCharactersProps> = ({
       )}
 
       {!!draft && (
-        <div className={styles.editor}>
-          <SortableGrid
-            items={draft}
-            getKey={(character) => character._id}
-            getName={(character) => character.name}
-            renderCover={(character) => (
-              <CharacterPortrait character={character} sizes="128px" />
-            )}
-            onChange={setDraft}
-            className={styles.slots}
-          />
-          <div className={styles.footer}>
-            <p className={styles.footer__note}>
-              Drag or use the arrows to reorder. The first{" "}
-              {FAVORITE_CHARACTERS_PREVIEW_LIMIT} are shown on your profile.
-            </p>
-            <div className={styles.footer__actions}>
-              <Button
-                color={ButtonColor.DEFAULT}
-                disabled={isPending}
-                onClick={() => setDraft(null)}
-              >
-                Cancel
-              </Button>
-              <Button
-                color={ButtonColor.ACCENT}
-                disabled={isPending}
-                onClick={handleSave}
-              >
-                Save
-              </Button>
-            </div>
-          </div>
-        </div>
+        <SortableEditor
+          items={draft}
+          getKey={(character) => character._id}
+          getName={(character) => character.name}
+          renderCover={(character) => (
+            <CharacterPortrait character={character} sizes="128px" />
+          )}
+          onChange={setDraft}
+          className={styles.slots}
+          note={`Drag or use the arrows to reorder. The first ${FAVORITE_CHARACTERS_PREVIEW_LIMIT} are shown on your profile.`}
+          isBusy={isPending}
+          onCancel={() => setDraft(null)}
+          onSave={handleSave}
+        />
       )}
     </section>
   );

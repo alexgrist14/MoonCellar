@@ -2,6 +2,7 @@ import { FC, ReactNode, useMemo } from "react";
 import Link from "next/link";
 import styles from "./GameDetails.module.scss";
 import { Box } from "@/src/lib/shared/ui/Box";
+import { Tooltip } from "@/src/lib/shared/ui/Tooltip";
 import { IGameResponse } from "@mooncellar/schemas";
 
 interface IGameDetailsProps {
@@ -117,16 +118,26 @@ export const GameDetails: FC<IGameDetailsProps> = ({ game }) => {
         <div key={row.label} className={styles.details__row}>
           <p className={styles.details__label}>{row.label}:</p>
           <p className={styles.details__value}>
-            {row.values.map<ReactNode>((value, i) => (
-              <span key={value.key + i} title={value.title}>
-                {!value.href ? (
-                  value.label
-                ) : (
-                  <Link href={value.href}>{value.label}</Link>
-                )}
-                {i !== row.values.length - 1 ? ", " : ""}
-              </span>
-            ))}
+            {row.values.map<ReactNode>((value, i) => {
+              const item = (
+                <span key={value.key + i}>
+                  {!value.href ? (
+                    value.label
+                  ) : (
+                    <Link href={value.href}>{value.label}</Link>
+                  )}
+                  {i !== row.values.length - 1 ? ", " : ""}
+                </span>
+              );
+
+              return !value.title ? (
+                item
+              ) : (
+                <Tooltip key={value.key + i} content={value.title}>
+                  {item}
+                </Tooltip>
+              );
+            })}
           </p>
         </div>
       ))}

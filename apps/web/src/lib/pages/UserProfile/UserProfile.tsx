@@ -7,7 +7,6 @@ import {
   userListCategories,
 } from "@/src/lib/shared/constants/user.const";
 import { getProfileHref } from "@/src/lib/shared/utils/links.utils";
-import { ReviewSortType, SortType } from "@/src/lib/shared/types/sort.type";
 import { IUser } from "@/src/lib/shared/types/auth.type";
 import {
   CategoriesFilterType,
@@ -36,7 +35,6 @@ import {
   IGameResponse,
   IPlaythrough,
   IUserRating,
-  IUserReviewsOrder,
 } from "@mooncellar/schemas";
 import { userAPI } from "@/src/lib/shared/api";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
@@ -123,28 +121,10 @@ export const UserProfile: FC<UserProfileProps> = ({
 
   const isGamesTab = userListCategories.some((t) => t === tab) || tab === "all";
 
-  const [selectedSort, setSelectedSort] = useState<SortType>(
-    SortType.DATE_ADDED
-  );
-  const [sortOrder, setSortOrder] = useState("desc");
-  const [reviewSort, setReviewSort] = useState<ReviewSortType>(
-    ReviewSortType.DATE
-  );
-  const [reviewOrder, setReviewOrder] = useState<IUserReviewsOrder>("desc");
-
   const navigationProps = {
     user: displayUser,
     isAuthedUser,
     playthroughs: effectivePlaythroughs,
-    selectedSort,
-    sortOrder,
-    onSortChange: setSelectedSort,
-    onSortOrderChange: setSortOrder,
-    reviewSort,
-    reviewOrder,
-    onReviewSortChange: setReviewSort,
-    onReviewOrderChange: (value: string) =>
-      setReviewOrder(value as IUserReviewsOrder),
   };
 
   return (
@@ -156,23 +136,13 @@ export const UserProfile: FC<UserProfileProps> = ({
             position="bottom-right"
             titleClose={
               <span className={styles.button__title}>
-                <SvgBurger
-                  size="32"
-                  topId={cn(styles.top, styles.top_active)}
-                  middleId={cn(styles.middle, styles.middle_active)}
-                  bottomId={cn(styles.bottom, styles.bottom_active)}
-                />
+                <SvgBurger size="32" isOpen />
                 Close
               </span>
             }
             titleOpen={
               <span className={styles.button__title}>
-                <SvgBurger
-                  size="32"
-                  topId={cn(styles.top)}
-                  middleId={cn(styles.middle)}
-                  bottomId={cn(styles.bottom)}
-                />
+                <SvgBurger size="32" />
                 Menu
               </span>
             }
@@ -251,8 +221,6 @@ export const UserProfile: FC<UserProfileProps> = ({
               userId={user._id}
               userName={displayUser.userName}
               isOwnProfile={isAuthedUser}
-              sort={reviewSort}
-              order={reviewOrder}
             />
           )}
           {isGamesTab && (
@@ -260,8 +228,6 @@ export const UserProfile: FC<UserProfileProps> = ({
               list={tab as CategoriesFilterType}
               playthroughs={effectivePlaythroughs}
               ratings={ratings}
-              selectedSort={selectedSort}
-              sortOrder={sortOrder}
             />
           )}
           {children}

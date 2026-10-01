@@ -59,20 +59,6 @@
   }
 }
 
-.badge {
-  padding-inline: var(--padding-x2);
-  border-radius: var(--radius-x3);
-  background-color: var(--color-bg-tertiary);
-  color: var(--color-text-muted);
-  white-space: nowrap;
-
-  @include font(12px, 18px, 600);
-
-  &_attention {
-    color: var(--color-attention);
-  }
-}
-
 .meta {
   color: var(--color-text-muted);
 

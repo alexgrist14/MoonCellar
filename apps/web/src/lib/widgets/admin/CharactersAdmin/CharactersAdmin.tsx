@@ -10,7 +10,7 @@ import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { Table } from "@/src/lib/shared/ui/Table";
-import { ITableCell } from "@/src/lib/shared/types/table.type";
+import { Badge } from "@/src/lib/shared/ui/Badge";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import styles from "./CharactersAdmin.module.scss";
@@ -41,7 +41,7 @@ export const CharactersAdmin: FC = () => {
   });
 
   const characters = data?.results ?? [];
-  const openEditor = (id = "new") => router.push(`/admin/characters/${id}`);
+  const getEditorHref = (id: string) => `/admin/characters/${id}`;
 
   return (
     <div className={styles.admin}>
@@ -71,7 +71,7 @@ export const CharactersAdmin: FC = () => {
             },
           }))}
         />
-        <Button color={ButtonColor.GREEN} onClick={() => openEditor()}>
+        <Button color={ButtonColor.GREEN} href={getEditorHref("new")}>
           New character
         </Button>
       </div>
@@ -94,69 +94,57 @@ export const CharactersAdmin: FC = () => {
           source: { content: "Source" },
           updated: { content: "Updated" },
         }}
-        rows={characters.map((character) => {
-          const open = () => openEditor(character._id);
-          const cells: Record<string, ITableCell> = {
-            character: {
-              sortingValue: character.name,
-              content: (
-                <div className={styles.who}>
-                  <CharacterPortrait
-                    character={character}
-                    sizes="40px"
-                    className={styles.who__portrait}
-                  />
-                  <div>
-                    <b>{character.name}</b>
-                    {!!character.akas?.length && (
-                      <span>{character.akas.slice(0, 2).join(", ")}</span>
-                    )}
-                  </div>
+        onRowClick={(index) =>
+          router.push(getEditorHref(characters[index]._id))
+        }
+        rows={characters.map((character) => ({
+          character: {
+            sortingValue: character.name,
+            content: (
+              <div className={styles.who}>
+                <CharacterPortrait
+                  character={character}
+                  sizes="40px"
+                  className={styles.who__portrait}
+                />
+                <div>
+                  <b>{character.name}</b>
+                  {!!character.akas?.length && (
+                    <span>{character.akas.slice(0, 2).join(", ")}</span>
+                  )}
                 </div>
-              ),
-            },
-            games: {
-              sortingValue: character.gameIds?.length ?? 0,
-              content: String(character.gameIds?.length ?? 0),
-            },
-            portrait: {
-              sortingValue: character.mugShot ? 1 : 0,
-              content: character.mugShot ? (
-                "Yes"
-              ) : (
-                <span className={styles.muted}>Missing</span>
-              ),
-            },
-            source: {
-              sortingValue: getCharacterSource(character),
-              content: (
-                <span className={styles.source}>
-                  {getCharacterSource(character)}
-                </span>
-              ),
-            },
-            updated: {
-              sortingValue: character.updatedAt ?? "",
-              content: (
-                <span className={styles.muted}>
-                  {character.updatedAt
-                    ? commonUtils.formatDate(character.updatedAt)
-                    : "—"}
-                </span>
-              ),
-            },
-          };
-
-          return Object.fromEntries(
-            Object.entries(cells).map(([key, cell]) => [
-              key,
-              { ...cell, className: styles.rowClickable, onClick: open },
-            ])
-          ) as Record<
-            "character" | "games" | "portrait" | "source" | "updated",
-            ITableCell
-          >;
-        })}
+              </div>
+            ),
+          },
+          games: {
+            sortingValue: character.gameIds?.length ?? 0,
+            content: String(character.gameIds?.length ?? 0),
+          },
+          portrait: {
+            sortingValue: character.mugShot ? 1 : 0,
+            content: character.mugShot ? (
+              "Yes"
+            ) : (
+              <span className={styles.muted}>Missing</span>
+            ),
+          },
+          source: {
+            sortingValue: getCharacterSource(character),
+            content: (
+              <Badge tone="muted">{getCharacterSource(character)}</Badge>
+            ),
+          },
+          updated: {
+            sortingValue: character.updatedAt ?? "",
+            content: (
+              <span className={styles.muted}>
+                {character.updatedAt
+                  ? commonUtils.formatDate(character.updatedAt)
+                  : "—"}
+              </span>
+            ),
+          },
+        }))}
       />
 
       <Pagination

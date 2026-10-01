@@ -1,17 +1,13 @@
 import { FC, useMemo, useState } from "react";
 import styles from "./GameRating.module.scss";
-import { RangeSelector } from "@/src/lib/shared/ui/RangeSelector";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
-import { Box } from "@/src/lib/shared/ui/Box";
-import { useAsyncLoader } from "@/src/lib/shared/hooks/useAsyncLoader";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { IGameResponse } from "@mooncellar/schemas";
-import { ratingsAPI } from "@/src/lib/shared/api/ratings.api";
-import { useUserStore } from "@/src/lib/shared/store/user.store";
 import { SvgNumber } from "@/src/lib/shared/ui/svg";
 import classNames from "classnames";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { ScoreValue } from "@/src/lib/shared/ui/ScoreValue";
 import { useRatingsQuery } from "@/src/lib/entities/rating/api/rating.queries";
 import {
   useCreateRatingMutation,
@@ -96,7 +92,11 @@ export const GameRating: FC<IGameRatingProps> = ({ game, className }) => {
             [styles.rating__value_empty]: currentRating === undefined,
           })}
         >
-          {currentRating === undefined ? "Not rated" : `${currentRating} / 10`}
+          {currentRating === undefined ? (
+            "Not rated"
+          ) : (
+            <ScoreValue value={currentRating} size="inline" />
+          )}
         </p>
       </div>
       <div

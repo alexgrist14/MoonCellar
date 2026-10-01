@@ -8,7 +8,15 @@
   appearance: none;
   transition: 0.3s;
 
+  &:checked {
+    background-color: var(--color-accent);
+  }
+
   &__border {
+    &_accent {
+      border-color: var(--color-accent);
+    }
+
     &_on {
       border-color: var(--color-positive);
     }
@@ -18,22 +26,18 @@
     }
   }
 
-  &_accent {
-    background-color: var(--color-accent);
-  }
-
-  &_on {
+  &_on:checked {
     background-color: var(--color-positive);
     border-color: $textColor;
   }
 
-  &_off {
+  &_off:checked {
     background-color: var(--color-negative);
     border-color: $textColor;
   }
 
-  &:focus,
   &:focus-visible {
-    outline: none;
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
   }
 }

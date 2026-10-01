@@ -12,6 +12,7 @@ import { getRequestTitle } from "@/src/lib/entities/request/model/request.utils"
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { RequestReviewPanel } from "./RequestReviewPanel";
 import styles from "./RequestsReview.module.scss";
@@ -61,13 +62,9 @@ export const RequestsReview: FC<IRequestsReviewProps> = ({ kind }) => {
               }))}
             />
           </div>
-          {isSwitching && (
-            <div className={styles.loading}>
-              <Loader />
-            </div>
-          )}
+          {isSwitching && <Loader isBlock />}
           {!isSwitching && !requests.length && (
-            <p className={styles.empty}>No {status} requests.</p>
+            <EmptyState variant="compact" title={`No ${status} requests.`} />
           )}
           <ul className={styles.queue__list}>
             {requests.map((request) => (
@@ -95,13 +92,17 @@ export const RequestsReview: FC<IRequestsReviewProps> = ({ kind }) => {
           </ul>
         </div>
         {isSwitching ? (
-          <div className={styles.placeholder}>
-            <Loader />
-          </div>
+          <Loader minHeight="var(--requests-panel-min-height)" />
         ) : activeId ? (
           <RequestReviewPanel key={activeId} requestId={activeId} />
         ) : (
-          <div className={styles.placeholder}>Pick a request to review.</div>
+          <div className={styles.placeholder}>
+            <EmptyState
+              variant="compact"
+              isWithoutImage
+              title="Pick a request to review."
+            />
+          </div>
         )}
       </div>
       <Pagination

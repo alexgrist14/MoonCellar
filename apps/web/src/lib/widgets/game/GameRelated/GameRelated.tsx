@@ -93,8 +93,11 @@ export const GameRelated: FC<IGameRelatedProps> = ({ related }) => {
       <Tabs
         theme="segmented"
         ariaLabel="Related games groups"
+        defaultTabIndex={panels.findIndex((panel) => panel.key === currentKey)}
+        isUseDefaultIndex
         contents={panels.map((panel) => ({
-          tabName: `${panel.label} ${panel.games.length}`,
+          tabName: panel.label,
+          count: panel.games.length,
           onTabClick: () => setActiveKey(panel.key),
         }))}
       />

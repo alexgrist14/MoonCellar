@@ -21,9 +21,11 @@ import { Avatar } from "@/src/lib/shared/ui/Avatar";
 import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { DRAWER_TRIGGER_ATTRIBUTE, drawer } from "@/src/lib/shared/ui/Drawer";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { ListCard } from "@/src/lib/shared/ui/ListCard";
 import { ListCardsGrid } from "@/src/lib/shared/ui/ListCardsGrid";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
+import { StatTile } from "@/src/lib/shared/ui/StatTile";
 import { SvgListBullet } from "@/src/lib/shared/ui/svg";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { ActivityTimeline } from "@/src/lib/features/user/ui/ActivityTimeline";
@@ -216,50 +218,32 @@ export const UserInfo: FC<UserInfoProps> = ({
       </header>
 
       <div className={styles.counters}>
-        <button
-          type="button"
-          className={styles.counter}
+        <StatTile
+          label="Games"
+          value={formatCount(gamesCount)}
           onClick={() => goTo("all")}
-        >
-          <span className={styles.counter__label}>Games</span>
-          <span className={styles.counter__value}>
-            {formatCount(gamesCount)}
-          </span>
-        </button>
-        <button
-          type="button"
-          className={styles.counter}
+        />
+        <StatTile
+          label="Reviews"
+          value={formatCount(reviewsCount)}
           onClick={() => goTo("reviews")}
-        >
-          <span className={styles.counter__label}>Reviews</span>
-          <span className={styles.counter__value}>
-            {formatCount(reviewsCount)}
-          </span>
-        </button>
-        <button
-          type="button"
-          className={styles.counter}
+        />
+        <StatTile
+          label="Followers"
+          value={formatCount(followers.length)}
           onClick={() => openPeople("followers")}
           {...triggerProps}
         >
-          <span className={styles.counter__label}>Followers</span>
-          <span className={styles.counter__value}>
-            {formatCount(followers.length)}
-            <PeopleStack people={followers} />
-          </span>
-        </button>
-        <button
-          type="button"
-          className={styles.counter}
+          <PeopleStack people={followers} />
+        </StatTile>
+        <StatTile
+          label="Following"
+          value={formatCount(followings.length)}
           onClick={() => openPeople("followings")}
           {...triggerProps}
         >
-          <span className={styles.counter__label}>Following</span>
-          <span className={styles.counter__value}>
-            {formatCount(followings.length)}
-            <PeopleStack people={followings} />
-          </span>
-        </button>
+          <PeopleStack people={followings} />
+        </StatTile>
       </div>
 
       <FavoriteGames
@@ -281,37 +265,41 @@ export const UserInfo: FC<UserInfoProps> = ({
 
       {isListsVisible && (
         <section className={styles.lists} aria-labelledby="profile-lists">
-          <div className={styles.lists__head}>
-            <SectionTitle as="h3">
-              <span id="profile-lists">Lists</span>
-            </SectionTitle>
-            {!!lists.length && (
-              <Button
-                color={ButtonColor.TRANSPARENT}
-                onClick={() => goTo("lists")}
-              >
-                All lists
-              </Button>
-            )}
-          </div>
+          <SectionTitle
+            as="h3"
+            count={lists.length || undefined}
+            action={
+              !!lists.length && (
+                <Button
+                  color={ButtonColor.TRANSPARENT}
+                  onClick={() => goTo("lists")}
+                >
+                  All lists
+                </Button>
+              )
+            }
+          >
+            <span id="profile-lists">Lists</span>
+          </SectionTitle>
           {!lists.length ? (
-            <div className={styles.hint}>
-              <SvgListBullet
-                size="24"
-                style={{ color: "var(--color-accent)" }}
-              />
-              <p>
-                No lists yet. Collect games around any idea — “Best maps in
-                games”, “Co-op with friends”.
-              </p>
-              <Button
-                color={ButtonColor.ACCENT}
-                className={styles.hint__action}
-                onClick={() => goTo("lists")}
-              >
-                Create a list
-              </Button>
-            </div>
+            <EmptyState
+              variant="inline"
+              icon={
+                <SvgListBullet
+                  size="24"
+                  style={{ color: "var(--color-accent)" }}
+                />
+              }
+              title="No lists yet. Collect games around any idea — “Best maps in games”, “Co-op with friends”."
+              action={
+                <Button
+                  color={ButtonColor.ACCENT}
+                  onClick={() => goTo("lists")}
+                >
+                  Create a list
+                </Button>
+              }
+            />
           ) : (
             <ListCardsGrid>
               {lists.slice(0, LISTS_PREVIEW_LIMIT).map((list) => (
@@ -323,17 +311,20 @@ export const UserInfo: FC<UserInfoProps> = ({
       )}
       {!!likedLists.length && (
         <section className={styles.lists} aria-labelledby="profile-liked-lists">
-          <div className={styles.lists__head}>
-            <SectionTitle as="h3">
-              <span id="profile-liked-lists">Liked lists</span>
-            </SectionTitle>
-            <Button
-              color={ButtonColor.TRANSPARENT}
-              onClick={() => goTo("liked")}
-            >
-              All liked
-            </Button>
-          </div>
+          <SectionTitle
+            as="h3"
+            count={likedLists.length}
+            action={
+              <Button
+                color={ButtonColor.TRANSPARENT}
+                onClick={() => goTo("liked")}
+              >
+                All liked
+              </Button>
+            }
+          >
+            <span id="profile-liked-lists">Liked lists</span>
+          </SectionTitle>
           <ListCardsGrid>
             {likedLists.slice(0, LISTS_PREVIEW_LIMIT).map((list) => (
               <ListCard key={list._id} list={list} />

@@ -1,0 +1,28 @@
+@font-face {
+  font-family: "ApercuPro";
+  src: url("../src/app/ApercuPro.woff2") format("woff2");
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "ApercuPro";
+  src: url("../src/app/ApercuPro-Medium.woff2") format("woff2");
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: "ApercuPro";
+  src: url("../src/app/ApercuPro-Bold.woff2") format("woff2");
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: "Pentagra";
+  src: url("../src/app/Pentagra.ttf") format("truetype");
+  font-weight: 400;
+}
+
+:root {
+  --font-general: "ApercuPro", sans-serif;
+  --font-pentagra: "Pentagra", serif;
+}

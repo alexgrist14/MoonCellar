@@ -27,7 +27,7 @@ import { usePlatformsQuery } from "@/src/lib/entities/platform/api/platform.quer
 import { hltbApi, igdbApi, vndbApi } from "@/src/lib/shared/api";
 import { revalidateGamePage } from "@/src/lib/entities/game/api/game.actions";
 import { modal } from "@/src/lib/shared/ui/Modal";
-import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal/ConfirmModal";
+import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
 import {
   AddGameRequestSchema,
   IAddGameRequest,
@@ -46,6 +46,7 @@ import {
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import {
@@ -67,7 +68,11 @@ import {
 } from "@/src/lib/shared/ui/Fields";
 import { AiGameDrafts } from "@/src/lib/widgets/admin/AiGameDrafts";
 import { ImageFinder } from "@/src/lib/shared/ui/ImageFinder";
-import { GAME_SECTIONS, IFieldDescriptor, IOptionsKey } from "./sections";
+import {
+  GAME_SECTIONS,
+  IFieldDescriptor,
+  IOptionsKey,
+} from "@/src/lib/features/game/model/game-edit-sections";
 import styles from "./GameEditPage.module.scss";
 import { confirmPossibleDuplicates } from "@/src/lib/entities/game/ui/PossibleDuplicates";
 import { getPossibleDuplicates } from "@/src/lib/shared/utils/possible-duplicates.utils";
@@ -1005,8 +1010,8 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
 
   if (isPageLoading || !filters) {
     return (
-      <Box classNameContent={styles.loading}>
-        <Loader className={styles.loader} />
+      <Box>
+        <Loader isBlock />
       </Box>
     );
   }
@@ -1027,14 +1032,14 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
         ]}
       />
       <div className={styles.header}>
-        <h2 className={styles.title}>
+        <SectionTitle as="h1">
           {isCreate ? "Create game" : `Edit: ${original.name as string}`}
-        </h2>
+        </SectionTitle>
         <div className={styles.actions}>
           {!isCreate && (
             <Button
               color={ButtonColor.DEFAULT}
-              onClick={() => router.push(`/games/${original.slug as string}`)}
+              href={`/games/${original.slug as string}`}
             >
               View game
             </Button>

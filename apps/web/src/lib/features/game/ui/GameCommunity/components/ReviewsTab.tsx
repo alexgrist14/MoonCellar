@@ -9,6 +9,7 @@ import {
 } from "@mooncellar/schemas";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import {
   PLAYTHROUGH_MODAL_ID,
@@ -98,26 +99,18 @@ export const ReviewsTab: FC<IReviewsTabProps> = ({
   );
 
   if (isLoaderShown && !summary) {
-    return (
-      <div className={styles.loading}>
-        <Loader type="pulse" />
-      </div>
-    );
+    return <Loader type="pulse" isBlock />;
   }
 
   if (!summary?.total) {
     return (
-      <div className={styles.empty}>
-        <SvgComment size="24" color="secondary" />
-        <div className={styles.empty__text}>
-          <p className={styles.empty__title}>No reviews for {game.name} yet</p>
-          <p className={styles.empty__description}>
-            Finished it or dropped it? Your playthrough note can be the first
-            one here.
-          </p>
-        </div>
-        {writeButton}
-      </div>
+      <EmptyState
+        variant="inline"
+        icon={<SvgComment size="24" color="secondary" />}
+        title={`No reviews for ${game.name} yet`}
+        description="Finished it or dropped it? Your playthrough note can be the first one here."
+        action={writeButton}
+      />
     );
   }
 
@@ -125,37 +118,34 @@ export const ReviewsTab: FC<IReviewsTabProps> = ({
     <div className={styles.tab}>
       <ReviewsSummary summary={summary} />
       <div className={styles.toolbar}>
-        <div
-          className={styles.chips}
-          role="group"
-          aria-label="Filter reviews by status"
-        >
-          <button
-            type="button"
-            aria-pressed={!category}
-            className={classNames(styles.chip, {
-              [styles.chip_active]: !category,
-            })}
-            onClick={() => setCategory(undefined)}
-          >
-            All <span className={styles.count}>{summary.total}</span>
-          </button>
-          {summary.categories.map(({ category: item, count }) => (
-            <button
-              key={item}
-              type="button"
-              aria-pressed={category === item}
-              className={classNames(styles.chip, {
-                [styles.chip_active]: category === item,
-              })}
-              onClick={() => setCategory(item)}
-            >
-              <i className={classNames(styles.dot, styles[`dot_${item}`])} />
-              {commonUtils.upFL(item)}{" "}
-              <span className={styles.count}>{count}</span>
-            </button>
-          ))}
-        </div>
+        <Tabs
+          theme="segmented"
+          ariaLabel="Filter reviews by status"
+          isWrap
+          contents={[
+            {
+              tabName: "All",
+              count: summary.total,
+              onTabClick: () => setCategory(undefined),
+            },
+            ...summary.categories.map(({ category: item, count }) => ({
+              tabName: commonUtils.upFL(item),
+              count,
+              prefix: (
+                <i className={classNames(styles.dot, styles[`dot_${item}`])} />
+              ),
+              onTabClick: () => setCategory(item),
+            })),
+          ]}
+          defaultTabIndex={
+            category
+              ? summary.categories.findIndex(
+                  (item) => item.category === category
+                ) + 1
+              : 0
+          }
+          isUseDefaultIndex
+        />
         <Tabs
           theme="segmented"
           ariaLabel="Sort reviews"
@@ -170,9 +160,7 @@ export const ReviewsTab: FC<IReviewsTabProps> = ({
         />
       </div>
       {isLoaderShown ? (
-        <div className={styles.loading}>
-          <Loader type="pulse" />
-        </div>
+        <Loader type="pulse" isBlock />
       ) : (
         <div className={styles.feed}>
           {reviews.map((review) => (

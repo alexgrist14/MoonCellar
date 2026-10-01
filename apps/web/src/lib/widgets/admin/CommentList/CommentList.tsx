@@ -11,8 +11,10 @@ import {
   useAdminCommentActionMutation,
 } from "@/src/lib/entities/comment/api/comment-reports.mutations";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
-import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal/ConfirmModal";
+import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
+import { pluralize } from "@/src/lib/shared/utils/plural.utils";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
@@ -105,16 +107,14 @@ export const CommentList: FC = () => {
           isUseDefaultIndex
         />
         <span className={styles.count}>
-          {data && `${total} ${total === 1 ? "comment" : "comments"}`}
+          {data && pluralize(total, "comment")}
         </span>
       </div>
 
       {isLoaderShown ? (
-        <div className={styles.loading}>
-          <Loader type="pulse" />
-        </div>
+        <Loader minHeight="var(--community-loading-height)" />
       ) : !comments.length ? (
-        <p className={styles.placeholder}>No comments here.</p>
+        <EmptyState title="No comments here." />
       ) : (
         <ul className={styles.list}>
           {comments.map((comment) => {
@@ -127,7 +127,7 @@ export const CommentList: FC = () => {
                 isBusy={isBusy}
                 meta={
                   comment.reportsCount
-                    ? `${comment.reportsCount} open ${comment.reportsCount === 1 ? "report" : "reports"}`
+                    ? pluralize(comment.reportsCount, "open report")
                     : undefined
                 }
               >

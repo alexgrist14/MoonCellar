@@ -6,10 +6,14 @@ import { Modal } from "./Modal";
 import { useDisableScroll } from "@/src/lib/shared/hooks/useDisableScroll";
 
 const ev = new EventEmitter();
+let lastModalId = 0;
 
 export const modal: IModal = {
   open: (component, props) => {
-    ev.emit("open", { component, props });
+    ev.emit("open", {
+      component,
+      props: { ...props, id: props?.id ?? `modal-${++lastModalId}` },
+    });
   },
   close: (id) => {
     ev.emit("close", id);
@@ -24,6 +28,7 @@ export const ModalsConnector = () => {
   contentRef.current = content;
 
   const closeLastModal = useCallback(() => {
+    contentRef.current.at(-1)?.props.onClose?.();
     setContent((st) => st.slice(0, -1));
   }, []);
 

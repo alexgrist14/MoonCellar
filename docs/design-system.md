@@ -19,6 +19,9 @@ apps/web/src/lib/app/styles/vars/
 └── _components.scss   per-component sizes and per-category colours
 ```
 
+A size or colour that belongs to one component (`--header-logo-height`, `--tab-count-color`,
+`--image-finder-portrait-width`) goes in `_components.scss` under that component's prefix.
+
 `root.scss` forwards all three into the app. **Nothing else declares a token**, and mockups must
 not restate one — they consume the same declarations.
 
@@ -63,21 +66,21 @@ The template is synced like any other mockup, so it never drifts from the tokens
 
 ## Palette
 
-Backgrounds step from dark to light as elements stack. A panel on the page ground uses
-`--color-bg-primary`; something lifted above it uses `--color-bg-secondary`; chips and inputs
-inside that use `--color-bg-tertiary`.
+The page ground is `--color-bg-primary`, and a `Box` panel on it is `--color-bg-secondary` at 90%
+opacity. Inside a panel, fields and floating menus step back down to `--color-bg-primary`, while
+chips, tabs and table headers step up to `--color-bg-tertiary`.
 
 | Token | Value | Use |
 |---|---|---|
-| `--color-bg-primary` | `#191d24` | Panel surface — `Box` sits on this |
-| `--color-bg-secondary` | `#212731` | Raised surface — modals, popovers, table headers |
-| `--color-bg-tertiary` | `#2c3340` | Chips, inline code, controls inside a panel |
+| `--color-bg-primary` | `#191d24` | Page ground; inputs, dropdowns, popovers, tooltips, toasts |
+| `--color-bg-secondary` | `#212731` | Panel surface — `Box`, table bodies, the Storybook canvas |
+| `--color-bg-tertiary` | `#2c3340` | Chips, tabs, table headers, controls inside a panel |
 | `--color-bg-hover` | `#374151` | Hover fill for ghost/icon buttons |
 | `--color-bg-accent` | `#6951ee` | Primary action fill |
 | `--color-border-primary` | `#262d2f` | Every hairline and panel edge |
 
-Each background has a `-tint` variant (`#…ee`) for surfaces that sit over artwork —
-that is what keeps text legible above `BGImage`.
+The primary, secondary, tertiary, accent and positive backgrounds each have a `-tint` variant
+(`#…ee`) for surfaces that sit over artwork — badges and labels on covers and tiles.
 
 Text takes semantic tokens, never a raw neutral:
 
@@ -144,6 +147,13 @@ A mockup that ignores these produces a design that cannot be built as drawn:
 - **Scrollable areas use the shared `Scrollbar`,** date fields use `DatePicker`, multi-line
   truncation uses the `lineClamp` mixin. Native scrollbars and `<input type="date">` do not
   match the theme.
+- **Controls look the way Storybook shows them.** Every `shared/ui` component has a
+  `<Name>.stories.tsx` and a `CLAUDE.md`; `bun --filter web storybook` (port 4222) renders each
+  state on a `--color-bg-secondary` canvas, the colour of a `Box`. Draw a control from there,
+  not from memory.
+- **The logo comes from the three branding images** in `apps/web/public/images`:
+  `logo-icon.png` for the favicon and small square slots, `logo-text.png` in a header (never
+  with "MoonCellar" typed beside it), `logo-full.png` for a banner. No redrawn or recoloured copy.
 - **Page content must survive server rendering.** A mockup that only works after a measurement
   pass or a client-only flag describes something `docs/seo.md` forbids on game pages.
 

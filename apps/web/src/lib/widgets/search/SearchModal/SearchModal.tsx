@@ -1,7 +1,8 @@
 import { FC, ReactNode, useEffect, useState } from "react";
-import Link from "next/link";
 import classNames from "classnames";
 import { useDebounce } from "use-debounce";
+import { Box } from "@/src/lib/shared/ui/Box";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { Button } from "@/src/lib/shared/ui/Button";
 import { Loader } from "@/src/lib/shared/ui/Loader";
@@ -15,8 +16,12 @@ import { SvgGames, SvgListBullet, SvgProfile } from "@/src/lib/shared/ui/svg";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { useExpandStore } from "@/src/lib/shared/store/expand.store";
 import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
-import { ISearchTab, useSearchStore } from "@/src/lib/shared/store/search.store";
+import {
+  ISearchTab,
+  useSearchStore,
+} from "@/src/lib/shared/store/search.store";
 import { takeGames } from "@/src/lib/shared/constants/games.const";
+import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { SearchUsers } from "./SearchUsers";
 import {
   ISearchCount,
@@ -62,9 +67,6 @@ const EMPTY_TITLES: Record<ISearchTab, (query: string) => string> = {
   users: (query) => `No users named “${query}”`,
   lists: (query) => `No lists match “${query}”`,
 };
-
-const pluralize = (count: number, word: string) =>
-  `${count} ${count === 1 ? word : `${word}s`}`;
 
 const renderCount = (count: ISearchCount, isReady: boolean) => {
   if (!isReady) return null;
@@ -137,29 +139,35 @@ export const SearchModal: FC = () => {
         : undefined;
 
   const renderEmpty = () => (
-    <div className={styles.modal__empty}>
-      <p className={styles.modal__emptyTitle}>
-        {EMPTY_TITLES[tab](debouncedSearch)}
-      </p>
-      {!!otherMatches.length && (
-        <p className={styles.modal__emptyText}>
-          Found{" "}
-          {otherMatches.map(({ key, noun }, i) => (
-            <span key={key}>
-              {i > 0 && " and "}
-              <button
-                type="button"
-                className={styles.modal__switch}
-                onClick={() => setTab(key)}
-              >
-                {pluralize(counts[key].value ?? 0, noun)}
-              </button>
-            </span>
-          ))}
-          .
-        </p>
-      )}
-    </div>
+    <EmptyState
+      className={styles.modal__empty}
+      isCentered
+      title={EMPTY_TITLES[tab](debouncedSearch)}
+      description={
+        !!otherMatches.length && (
+          <>
+            Found{" "}
+            {otherMatches.map(({ key, noun }, i) => {
+              const count = counts[key].value ?? 0;
+
+              return (
+                <span key={key}>
+                  {i > 0 && " and "}
+                  <button
+                    type="button"
+                    className={styles.modal__switch}
+                    onClick={() => setTab(key)}
+                  >
+                    {count} {commonUtils.addLastS(noun, count)}
+                  </button>
+                </span>
+              );
+            })}
+            .
+          </>
+        )
+      }
+    />
   );
 
   const renderResults = () => {
@@ -172,11 +180,7 @@ export const SearchModal: FC = () => {
     }
 
     if (isSearching) {
-      return (
-        <div className={styles.modal__empty}>
-          <Loader type="pacman" />
-        </div>
-      );
+      return <Loader type="pacman" minHeight="100%" />;
     }
 
     if (!activeResultsCount) return renderEmpty();
@@ -235,62 +239,70 @@ export const SearchModal: FC = () => {
         [styles.modal_active]: isSearchActive,
       })}
     >
-      <div className={styles.modal__search}>
-        <Input
-          value={searchQuery}
-          placeholder="Search games, users and lists"
-          autoFocus
-          containerClassname={classNames({
-            [styles.modal__input_withButton]: !!advancedLink,
-          })}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        {!!advancedLink && (
-          <ButtonGroup
-            wrapperClassName={styles.modal__buttons}
-            buttons={[
-              {
-                title: "Advanced",
-                link: advancedLink,
-                onClick: () => {
-                  closeModal();
-                  setExpanded(["left"]);
-                },
-              },
-            ]}
+      <Box
+        isWithBlur
+        wrapperStyle={{ height: "100%" }}
+        templateStyle={{ height: "100%", minHeight: 0 }}
+      >
+        <div className={styles.modal__body}>
+          <div className={styles.modal__search}>
+            <Input
+              value={searchQuery}
+              placeholder="Search games, users and lists"
+              autoFocus
+              containerClassname={classNames({
+                [styles.modal__input_withButton]: !!advancedLink,
+              })}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {!!advancedLink && (
+              <ButtonGroup
+                wrapperClassName={styles.modal__buttons}
+                buttons={[
+                  {
+                    title: "Advanced",
+                    link: advancedLink,
+                    onClick: () => {
+                      closeModal();
+                      setExpanded(["left"]);
+                    },
+                  },
+                ]}
+              />
+            )}
+          </div>
+          <Tabs
+            isUseDefaultIndex
+            defaultTabIndex={TABS.findIndex(({ key }) => key === tab)}
+            buttonsClassName={styles.tabs}
+            contents={TABS.map(({ key, label, icon }) => ({
+              tabName: "",
+              className: classNames(styles.tab, {
+                [styles.tab_empty]:
+                  isReady && !counts[key].isPending && counts[key].value === 0,
+              }),
+              tabNameNode: (
+                <span className={styles.tab__label}>
+                  <span className={styles.tab__icon}>{icon}</span>
+                  {label}
+                  {renderCount(counts[key], isReady && isSearchActive)}
+                </span>
+              ),
+              onTabClick: () => setTab(key),
+            }))}
           />
-        )}
-      </div>
-      <Tabs
-        isUseDefaultIndex
-        defaultTabIndex={TABS.findIndex(({ key }) => key === tab)}
-        buttonsClassName={styles.tabs}
-        contents={TABS.map(({ key, label, icon }) => ({
-          tabName: "",
-          className: classNames(styles.tab, {
-            [styles.tab_empty]:
-              isReady && !counts[key].isPending && counts[key].value === 0,
-          }),
-          tabNameNode: (
-            <span className={styles.tab__label}>
-              <span className={styles.tab__icon}>{icon}</span>
-              {label}
-              {renderCount(counts[key], isReady && isSearchActive)}
-            </span>
-          ),
-          onTabClick: () => setTab(key),
-        }))}
-      />
-      {renderResults()}
-      {!!moreLink && (
-        <Link
-          className={styles.modal__more}
-          href={moreLink.href}
-          onClick={closeModal}
-        >
-          <Button>{moreLink.title}</Button>
-        </Link>
-      )}
+          {renderResults()}
+          {!!moreLink && (
+            <Button
+              className={styles.modal__more}
+              href={moreLink.href}
+              onClick={closeModal}
+            >
+              {moreLink.title}
+            </Button>
+          )}
+        </div>
+      </Box>
     </div>
   );
 };

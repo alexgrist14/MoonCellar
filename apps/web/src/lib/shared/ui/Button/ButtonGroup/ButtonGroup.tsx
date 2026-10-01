@@ -1,7 +1,6 @@
 import { CSSProperties, FC } from "react";
 import { Button } from "../Button";
 import styles from "./ButtonGroup.module.scss";
-import Link from "next/link";
 import classNames from "classnames";
 import { IButtonGroupItem } from "@/src/lib/shared/types/buttons.type";
 
@@ -21,18 +20,11 @@ export const ButtonGroup: FC<IButtonGroupProps> = ({
       style={wrapperStyle}
       className={classNames(styles.group, wrapperClassName)}
     >
-      {buttons.map((button, i) => {
-        const { title, link, target, ...data } = button;
-        return !!link ? (
-          <Link key={i} href={link} target={target}>
-            <Button {...data}>{title}</Button>
-          </Link>
-        ) : (
-          <Button key={i} {...data}>
-            {title}
-          </Button>
-        );
-      })}
+      {buttons.map(({ title, link, ...data }, i) => (
+        <Button key={i} {...data} href={link || data.href}>
+          {title}
+        </Button>
+      ))}
     </div>
   );
 };

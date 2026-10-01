@@ -19,25 +19,37 @@ import { Button } from "@/src/lib/shared/ui/Button";
 import { RatingStars } from "@/src/lib/shared/ui/RatingStars";
 import { SvgComment } from "@/src/lib/shared/ui/svg";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
+import {
+  ISortControlOption,
+  ISortOrder,
+  SortControl,
+} from "@/src/lib/shared/ui/SortControl";
 import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
 
 const MIN_SEARCH_LENGTH = 2;
 
+const GAME_SORT_OPTIONS: ISortControlOption<SortType>[] = [
+  { value: SortType.DATE_ADDED, label: "Date added" },
+  { value: SortType.RATING, label: "Rating" },
+  { value: SortType.PLAYTHROUGHS, label: "Playthroughs" },
+  { value: SortType.COMMENTS, label: "Comments" },
+];
+
 interface UserGamesProps {
   playthroughs: IPlaythrough[];
   ratings: IUserRating[];
-  selectedSort: SortType;
-  sortOrder: string;
   list: CategoriesFilterType;
 }
 
 export const UserGames: FC<UserGamesProps> = ({
   playthroughs,
   ratings,
-  selectedSort,
-  sortOrder,
   list,
 }) => {
+  const [selectedSort, setSelectedSort] = useState<SortType>(
+    SortType.DATE_ADDED
+  );
+  const [sortOrder, setSortOrder] = useState<ISortOrder>("desc");
   const query = useSearchParams();
   const page = Number(query.get("page"));
 
@@ -139,8 +151,11 @@ export const UserGames: FC<UserGamesProps> = ({
   const [debouncedSearch] = useDebounce(normalizedSearch, 500);
   const isSearchActive = debouncedSearch.length >= MIN_SEARCH_LENGTH;
 
-  const { data: searchedGames = [], isFetching: isSearching } =
-    useGamesByIdsQuery(gameIds, debouncedSearch, isSearchActive);
+  const {
+    data: searchedGames = [],
+    isLoading: isSearchLoading,
+    isFetching: isSearching,
+  } = useGamesByIdsQuery(gameIds, debouncedSearch, isSearchActive);
 
   const visibleIds = useMemo(
     () => (isSearchActive ? searchedGames.map((game) => game._id) : gameIds),
@@ -156,8 +171,11 @@ export const UserGames: FC<UserGamesProps> = ({
     [visibleIds, currentPage]
   );
 
-  const { data: pageGames = [], isFetching: isPageFetching } =
-    useGamesByIdsQuery(pageGameIds, undefined, !isSearchActive);
+  const {
+    data: pageGames = [],
+    isLoading: isPageLoading,
+    isFetching: isPageFetching,
+  } = useGamesByIdsQuery(pageGameIds, undefined, !isSearchActive);
 
   const games = useMemo(
     () =>
@@ -170,22 +188,36 @@ export const UserGames: FC<UserGamesProps> = ({
     [isSearchActive, searchedGames, pageGames, currentPage]
   );
 
-  const isFetching = useMinimumLoading(
-    isSearchActive ? isSearching : isPageFetching
+  const isLoading = useMinimumLoading(
+    isSearchActive ? isSearchLoading : isPageLoading
   );
+  const isFetching = isSearchActive ? isSearching : isPageFetching;
 
   const total = visibleIds.length;
 
   const searchField = (
-    <Input
-      containerClassname={styles.games__search}
-      placeholder="Search by name"
-      value={searchQuery}
-      onChange={(e) => setSearchQuery(e.target.value)}
-    />
+    <div className={styles.games__toolbar}>
+      <div className={styles.games__search}>
+        <Input
+          placeholder="Search by name"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+      <SortControl
+        className={styles.games__sort}
+        options={GAME_SORT_OPTIONS}
+        sortBy={selectedSort}
+        sortOrder={sortOrder}
+        onChange={(nextSort, nextOrder) => {
+          setSelectedSort(nextSort ?? selectedSort);
+          setSortOrder(nextOrder);
+        }}
+      />
+    </div>
   );
 
-  if (isFetching)
+  if (isLoading)
     return (
       <>
         {searchField}

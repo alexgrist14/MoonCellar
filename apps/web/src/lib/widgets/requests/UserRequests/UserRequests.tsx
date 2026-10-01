@@ -1,8 +1,12 @@
 "use client";
 
-import { FC } from "react";
+import { FC, useState } from "react";
 import Link from "next/link";
-import { IContentRequest, IContentRequestKind } from "@mooncellar/schemas";
+import {
+  CONTENT_REQUESTS_PAGE_SIZE,
+  IContentRequest,
+  IContentRequestKind,
+} from "@mooncellar/schemas";
 import {
   useMyRequestsQuery,
   useWithdrawRequestMutation,
@@ -11,11 +15,18 @@ import { RequestStatus } from "@/src/lib/entities/request/ui/RequestStatus";
 import { getRequestTitle } from "@/src/lib/entities/request/model/request.utils";
 import { RequestForm } from "@/src/lib/features/requests/ui/RequestForm";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
+import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { modal } from "@/src/lib/shared/ui/Modal";
+import { Pagination } from "@/src/lib/shared/ui/Pagination";
+import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import { ISearchPickerOption } from "@/src/lib/shared/ui/SearchPicker";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import styles from "./UserRequests.module.scss";
+
+const WITHDRAW_MODAL_ID = "withdraw-request";
 
 const describe = (request: IContentRequest) => {
   const noun = request.kind === "game" ? "game" : "character";
@@ -41,27 +52,45 @@ export const UserRequests: FC<IUserRequestsProps> = ({
   initialKind,
   initialTarget,
 }) => {
-  const { data: requests = [], isLoading } = useMyRequestsQuery();
-  const { mutate: withdraw, isPending } = useWithdrawRequestMutation();
+  const [page, setPage] = useState(1);
+  const { data, isLoading, isFetching } = useMyRequestsQuery({
+    page,
+    take: CONTENT_REQUESTS_PAGE_SIZE,
+  });
+  const requests = data?.results ?? [];
+  const total = data?.total ?? 0;
+  const { mutateAsync: withdraw, isPending } = useWithdrawRequestMutation();
+
+  const confirmWithdraw = (request: IContentRequest) =>
+    modal.open(
+      <ConfirmModal
+        title="Withdraw request"
+        message={`Withdraw “${getRequestTitle(request)}”? Moderators will no longer see it.`}
+        confirmText="Withdraw"
+        onCancel={() => modal.close(WITHDRAW_MODAL_ID)}
+        onConfirm={async () => {
+          await withdraw(request._id);
+          modal.close(WITHDRAW_MODAL_ID);
+          toast.success({ description: "Request withdrawn" });
+        }}
+      />,
+      { id: WITHDRAW_MODAL_ID }
+    );
 
   return (
     <div className={styles.layout}>
       <RequestForm initialKind={initialKind} initialTarget={initialTarget} />
       <aside className={styles.mine} aria-labelledby="my-requests">
-        <h3 id="my-requests" className={styles.mine__title}>
-          My requests
-          {!!requests.length && <span>{requests.length}</span>}
-        </h3>
-        {isLoading && (
-          <div className={styles.loading}>
-            <Loader />
-          </div>
-        )}
+        <SectionTitle as="h3" count={total || undefined}>
+          <span id="my-requests">My requests</span>
+        </SectionTitle>
+        {isLoading && <Loader isBlock />}
         {!isLoading && !requests.length && (
-          <p className={styles.empty}>
-            Nothing sent yet. Requests you send appear here with the
-            moderator&apos;s decision.
-          </p>
+          <EmptyState
+            variant="compact"
+            title="Nothing sent yet"
+            description="Requests you send appear here with the moderator's decision."
+          />
         )}
         <ul className={styles.list}>
           {requests.map((request) => {
@@ -94,12 +123,7 @@ export const UserRequests: FC<IUserRequestsProps> = ({
                     color={ButtonColor.TRANSPARENT}
                     className={styles.item__withdraw}
                     disabled={isPending}
-                    onClick={() =>
-                      withdraw(request._id, {
-                        onSuccess: () =>
-                          toast.success({ description: "Request withdrawn" }),
-                      })
-                    }
+                    onClick={() => confirmWithdraw(request)}
                   >
                     Withdraw
                   </Button>
@@ -108,6 +132,16 @@ export const UserRequests: FC<IUserRequestsProps> = ({
             );
           })}
         </ul>
+        {total > CONTENT_REQUESTS_PAGE_SIZE && (
+          <Pagination
+            take={CONTENT_REQUESTS_PAGE_SIZE}
+            total={total}
+            page={page}
+            onPageChange={setPage}
+            isDisabled={isFetching}
+            isWithoutSummary
+          />
+        )}
       </aside>
     </div>
   );

@@ -165,10 +165,9 @@ export const ListsPage: FC<IListsPageProps> = ({
             { name: "Lists", href: "/lists" },
           ]}
         />
-        <div className={styles.page__heading}>
-          <SectionTitle as="h1">Lists</SectionTitle>
-          {!isLoading && <span className={styles.page__total}>{total}</span>}
-        </div>
+        <SectionTitle as="h1" count={isLoading ? undefined : total}>
+          Lists
+        </SectionTitle>
         <AppliedFilters
           filters={applied}
           onClearAll={() =>

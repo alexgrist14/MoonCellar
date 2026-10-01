@@ -27,10 +27,6 @@
   @include font(14px, 20px, 400);
 }
 
-.rowClickable {
-  cursor: pointer;
-}
-
 .form {
   display: flex;
   flex-direction: column;

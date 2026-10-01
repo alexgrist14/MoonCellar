@@ -106,7 +106,6 @@ export const GamesCards: FC<IGamesCardsProps> = ({
         classNameLine={styles.block__line}
         contentStyle={{ maxHeight: "100%" }}
         fadeType="both"
-        isWithRadius
       >
         {grid}
       </Scrollbar>

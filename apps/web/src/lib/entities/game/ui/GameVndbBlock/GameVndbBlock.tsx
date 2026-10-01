@@ -1,8 +1,8 @@
-import { FC, useMemo } from "react";
+import { FC } from "react";
 import styles from "./GameVndbBlock.module.scss";
-import { Box } from "@/src/lib/shared/ui/Box";
+import { InfoBlock } from "@/src/lib/shared/ui/InfoBlock";
+import { StatTile } from "@/src/lib/shared/ui/StatTile";
 import { IGameResponse } from "@mooncellar/schemas";
-import { getHltbTiles } from "@/src/lib/shared/utils/hltb.utils";
 
 interface IGameVndbBlockProps {
   game: IGameResponse;
@@ -15,21 +15,16 @@ export const GameVndbBlock: FC<IGameVndbBlockProps> = ({
 }) => {
   const vndbTime = game.vndb?.lengthMinutes;
 
-  console.log(vndbTime);
-
   if (!vndbTime) return null;
 
-  const content = (
-    <div className={styles.vndb}>
-      <h4>VNDB:</h4>
-      <div className={styles.vndb__tile}>
-        {Math.floor(vndbTime / 60)}h{" "}
-        <span className={styles.vndb__minutes}>{vndbTime % 60}m</span>
+  return (
+    <InfoBlock title="VNDB:" isBoxed={isBoxed}>
+      <div className={styles.tiles}>
+        <StatTile
+          value={`${Math.floor(vndbTime / 60)}h ${vndbTime % 60}m`}
+          align="center"
+        />
       </div>
-    </div>
+    </InfoBlock>
   );
-
-  if (!isBoxed) return content;
-
-  return <Box contentStyle={{ padding: "var(--padding-x3)" }}>{content}</Box>;
 };

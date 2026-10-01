@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import classNames from "classnames";
 import styles from "./DatePicker.module.scss";
 import { SvgCalendar, SvgChevron } from "../svg";
+import { Button, ButtonColor } from "../Button";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
 
@@ -178,28 +179,30 @@ export const DatePicker: FC<IDatePickerProps> = ({
                 {viewDate.getFullYear()}
               </p>
               <div className={styles.picker__arrows}>
-                <button
+                <Button
                   type="button"
                   aria-label="Previous month"
-                  className={styles.picker__arrow}
+                  compact
+                  isOnlyIcon
                   onClick={() => shiftMonth(-1)}
                 >
                   <SvgChevron
                     size="16"
                     style={{ transform: "rotate(90deg)" }}
                   />
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   aria-label="Next month"
-                  className={styles.picker__arrow}
+                  compact
+                  isOnlyIcon
                   onClick={() => shiftMonth(1)}
                 >
                   <SvgChevron
                     size="16"
                     style={{ transform: "rotate(-90deg)" }}
                   />
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -229,8 +232,10 @@ export const DatePicker: FC<IDatePickerProps> = ({
             </div>
 
             <div className={styles.picker__controls}>
-              <button
+              <Button
                 type="button"
+                color={ButtonColor.TRANSPARENT}
+                compact
                 className={styles.picker__control}
                 onClick={() => {
                   onChange("");
@@ -238,17 +243,16 @@ export const DatePicker: FC<IDatePickerProps> = ({
                 }}
               >
                 Clear
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
-                className={classNames(
-                  styles.picker__control,
-                  styles.picker__control_accent
-                )}
+                color={ButtonColor.TRANSPARENT}
+                compact
+                className={styles.picker__control_accent}
                 onClick={() => selectDate(toIso(new Date()))}
               >
                 Today
-              </button>
+              </Button>
             </div>
           </div>,
           connector

@@ -4,6 +4,7 @@ import { FC } from "react";
 import classNames from "classnames";
 import styles from "./GameStatsCounters.module.scss";
 import { IGameStats } from "@mooncellar/schemas";
+import { StatTile } from "@/src/lib/shared/ui/StatTile";
 import { useGameStatsQuery } from "@/src/lib/entities/game/api/game.queries";
 
 interface IGameStatsCountersProps {
@@ -37,16 +38,12 @@ export const GameStatsCounters: FC<IGameStatsCountersProps> = ({
   return (
     <div className={classNames(styles.counters, className)}>
       {counters.map((counter) => (
-        <div
+        <StatTile
           key={counter.key}
-          className={classNames(
-            styles.counters__item,
-            styles[`counters__item_${counter.key}`]
-          )}
-        >
-          <p className={styles.counters__label}>{counter.label}</p>
-          <p className={styles.counters__value}>{formatCount(counter.value)}</p>
-        </div>
+          label={counter.label}
+          value={formatCount(counter.value)}
+          valueColor={`var(--game-${counter.key}-color)`}
+        />
       ))}
     </div>
   );

@@ -161,3 +161,22 @@ export const removeKeyColor = async (dataUrl: string, keyColor: string) => {
 
   return context.canvas.toDataURL("image/png");
 };
+
+export const downloadImage = async (src: string, name: string) => {
+  const blob = await fetch(src)
+    .then((response) => (response.ok ? response.blob() : null))
+    .catch(() => null);
+
+  if (!blob) {
+    window.open(src, "_blank", "noopener");
+    return;
+  }
+
+  const href = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = href;
+  link.download = `${name}.${blob.type.split("/")[1] ?? "png"}`;
+  link.click();
+  URL.revokeObjectURL(href);
+};

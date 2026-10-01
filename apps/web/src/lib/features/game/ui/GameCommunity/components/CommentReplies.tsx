@@ -1,6 +1,6 @@
 import { FC } from "react";
-import classNames from "classnames";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import {
   flattenPages,
@@ -25,11 +25,7 @@ export const CommentReplies: FC<ICommentRepliesProps> = ({
   const replies = flattenPages(data?.pages);
 
   if (isLoaderShown) {
-    return (
-      <div className={styles.loading}>
-        <Loader type="pulse" />
-      </div>
-    );
+    return <Loader type="pulse" isBlock />;
   }
 
   return (
@@ -38,14 +34,16 @@ export const CommentReplies: FC<ICommentRepliesProps> = ({
         <CommentItem key={reply._id} comment={reply} gameId={gameId} isReply />
       ))}
       {hasNextPage && (
-        <button
+        <Button
           type="button"
-          className={classNames(styles.action, styles.action_link)}
+          color={ButtonColor.GHOST}
+          compact
+          className={styles.threadAction}
           disabled={isFetchingNextPage}
           onClick={() => fetchNextPage()}
         >
           Show more replies
-        </button>
+        </Button>
       )}
     </>
   );

@@ -162,22 +162,3 @@
   gap: var(--gap-x1);
   width: 100px;
 }
-
-.top_active {
-  animation: down-rotate 0.6s ease-out both;
-}
-
-.middle_active {
-  animation: hide 0.6s ease-out forwards;
-}
-
-.bottom_active {
-  animation: up-rotate 0.6s ease-out both;
-}
-
-.top,
-.middle,
-.bottom {
-  transform-box: fill-box;
-  transform-origin: center;
-}

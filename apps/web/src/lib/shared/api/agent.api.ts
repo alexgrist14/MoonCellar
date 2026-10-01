@@ -15,8 +15,14 @@ agent.interceptors.response.use(
   (err: AxiosError<{ message: string }>) => {
     const { config } = err;
     const isRefreshRequest = !!err.config?.url?.includes("/refresh");
+    const isCredentialsRequest = /\/auth\/(login|signup)$/.test(
+      err.config?.url ?? ""
+    );
 
-    if (err.response?.status === 401 && isRefreshRequest) {
+    if (
+      err.response?.status === 401 &&
+      (isRefreshRequest || isCredentialsRequest)
+    ) {
       return Promise.reject(err);
     }
 

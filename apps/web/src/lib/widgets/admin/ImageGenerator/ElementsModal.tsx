@@ -72,9 +72,7 @@ export const ElementsModal: FC<IElementsModalProps> = ({
 
         {isPending && (
           <div className={styles.elements__loading}>
-            <span className={styles.elements__spinner}>
-              <Loader />
-            </span>
+            <Loader minHeight="var(--padding-x8)" />
             <span>Looking at the image…</span>
           </div>
         )}

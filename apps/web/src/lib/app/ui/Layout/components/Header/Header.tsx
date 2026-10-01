@@ -22,7 +22,6 @@ import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { gamesApi } from "@/src/lib/shared/api";
 import { useRouter } from "next/navigation";
 import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
-import classNames from "classnames";
 
 export const Header: FC = () => {
   const isAuthHydrated = useIsAuthHydrated();
@@ -137,19 +136,7 @@ export const Header: FC = () => {
               tooltip="Menu"
               onClick={() => setIsMenuOpen((prev) => !prev)}
             >
-              <SvgBurger
-                size="24"
-                className={styles.svg}
-                topId={classNames(styles.burgerTop, {
-                  [styles.burgerTop_active]: isMenuOpen,
-                })}
-                middleId={classNames(styles.burgerMiddle, {
-                  [styles.burgerMiddle_active]: isMenuOpen,
-                })}
-                bottomId={classNames(styles.burgerBottom, {
-                  [styles.burgerBottom_active]: isMenuOpen,
-                })}
-              />
+              <SvgBurger size="24" className={styles.svg} isOpen={isMenuOpen} />
             </Button>
             {isMenuOpen && (
               <div className={styles.burger__dropdown}>

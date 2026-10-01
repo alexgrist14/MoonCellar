@@ -1,0 +1,65 @@
+@import "../../design-tokens.css";
+
+:root,
+.dark {
+  --vp-c-brand-1: var(--color-accent);
+  --vp-c-brand-2: var(--color-accent);
+  --vp-c-brand-3: var(--color-accent);
+  --vp-c-bg: var(--color-bg-primary);
+  --vp-c-bg-alt: var(--color-bg-secondary);
+  --vp-c-bg-elv: var(--color-bg-secondary);
+  --vp-nav-logo-height: 32px;
+  --vp-home-hero-image-background-image: none;
+}
+
+.VPHero .image-src {
+  max-width: min(100%, 420px);
+}
+
+.docs-index {
+  max-width: 1152px;
+  margin: 0 auto;
+  padding: 48px 24px 96px;
+}
+
+.docs-index__title {
+  margin-bottom: 24px;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+}
+
+.docs-index__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  gap: 16px;
+}
+
+.vp-doc a.docs-index__card,
+.docs-index__card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px 24px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 12px;
+  background-color: var(--vp-c-bg-alt);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.2s;
+}
+
+.docs-index__card:hover {
+  border-color: var(--vp-c-brand-1);
+}
+
+.docs-index__name {
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+}
+
+.docs-index__text {
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--vp-c-text-2);
+}

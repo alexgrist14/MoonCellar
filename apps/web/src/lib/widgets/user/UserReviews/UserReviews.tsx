@@ -17,8 +17,12 @@ import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
+import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { IRangeValue, RangeSelector } from "@/src/lib/shared/ui/RangeSelector";
-import { ReviewSortType } from "@/src/lib/shared/types/sort.type";
+import {
+  ISortControlOption,
+  SortControl,
+} from "@/src/lib/shared/ui/SortControl";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { UserReviewItem } from "./UserReviewItem";
 import styles from "./UserReviews.module.scss";
@@ -28,27 +32,25 @@ const MIN_RATING = 1;
 const MAX_RATING = 10;
 const RATING_DEBOUNCE = 400;
 
-const REVIEW_SORT_VALUES: Record<ReviewSortType, IUserReviewsSort> = {
-  [ReviewSortType.DATE]: "date",
-  [ReviewSortType.RATING]: "rating",
-  [ReviewSortType.HELPFUL]: "helpful",
-};
+const REVIEW_SORT_OPTIONS: ISortControlOption<IUserReviewsSort>[] = [
+  { value: "date", label: "Date" },
+  { value: "rating", label: "Rating" },
+  { value: "helpful", label: "Helpful votes" },
+];
 
 interface IUserReviewsProps {
   userId: string;
   userName: string;
   isOwnProfile: boolean;
-  sort: ReviewSortType;
-  order: IUserReviewsOrder;
 }
 
 export const UserReviews: FC<IUserReviewsProps> = ({
   userId,
   userName,
   isOwnProfile,
-  sort,
-  order,
 }) => {
+  const [sort, setSort] = useState<IUserReviewsSort>("date");
+  const [order, setOrder] = useState<IUserReviewsOrder>("desc");
   const [status, setStatus] = useState<IUserReviewStatus>();
   const [gameIds, setGameIds] = useState<string[]>([]);
   const [ratingMin, setRatingMin] = useState<number>();
@@ -67,7 +69,7 @@ export const UserReviews: FC<IUserReviewsProps> = ({
 
   const params: IGetUserReviewsRequest = useMemo(
     () => ({
-      sort: REVIEW_SORT_VALUES[sort],
+      sort,
       order,
       status,
       ...(!!gameIds.length && { gameIds }),
@@ -181,35 +183,44 @@ export const UserReviews: FC<IUserReviewsProps> = ({
             callback={setRating}
           />
         </div>
+        <SortControl
+          className={styles.filters__sort}
+          options={REVIEW_SORT_OPTIONS}
+          sortBy={sort}
+          sortOrder={order}
+          onChange={(nextSort, nextOrder) => {
+            setSort(nextSort ?? sort);
+            setOrder(nextOrder);
+          }}
+        />
       </div>
 
-      <div className={styles.chips} role="group" aria-label="Filter by status">
-        <button
-          type="button"
-          aria-pressed={!status}
-          className={classNames(styles.chip, {
-            [styles.chip_active]: !status,
-          })}
-          onClick={() => setStatus(undefined)}
-        >
-          All <span className={styles.chip__count}>{summary.total}</span>
-        </button>
-        {summary.statuses.map(({ status: item, count }) => (
-          <button
-            key={item}
-            type="button"
-            aria-pressed={status === item}
-            className={classNames(styles.chip, {
-              [styles.chip_active]: status === item,
-            })}
-            onClick={() => setStatus(item)}
-          >
-            <i className={classNames(styles.dot, styles[`dot_${item}`])} />
-            {commonUtils.upFL(item)}{" "}
-            <span className={styles.chip__count}>{count}</span>
-          </button>
-        ))}
-      </div>
+      <Tabs
+        theme="segmented"
+        ariaLabel="Filter by status"
+        isWrap
+        contents={[
+          {
+            tabName: "All",
+            count: summary.total,
+            onTabClick: () => setStatus(undefined),
+          },
+          ...summary.statuses.map(({ status: item, count }) => ({
+            tabName: commonUtils.upFL(item),
+            count,
+            prefix: (
+              <i className={classNames(styles.dot, styles[`dot_${item}`])} />
+            ),
+            onTabClick: () => setStatus(item),
+          })),
+        ]}
+        defaultTabIndex={
+          status
+            ? summary.statuses.findIndex((item) => item.status === status) + 1
+            : 0
+        }
+        isUseDefaultIndex
+      />
 
       <div
         className={classNames(styles.results, {

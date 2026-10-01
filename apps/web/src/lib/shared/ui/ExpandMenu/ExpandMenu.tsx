@@ -3,7 +3,9 @@ import {
   HTMLAttributes,
   memo,
   ReactNode,
+  useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -19,13 +21,12 @@ import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
 
 interface IExpandMenuProps extends Pick<
   HTMLAttributes<HTMLDivElement>,
-  "children" | "id"
+  "children"
 > {
   position?: IExpandPosition;
   titleOpen?: string | ReactNode;
   titleClose?: string | ReactNode;
   titleClassName?: string;
-  menuStyle?: CSSProperties;
   titleStyle?: CSSProperties;
 }
 
@@ -38,9 +39,7 @@ export const ExpandMenu = memo(
     titleClose,
     titleOpen,
     titleClassName,
-    menuStyle,
     titleStyle,
-    ...props
   }: IExpandMenuProps) => {
     const { expanded, setExpanded } = useExpandStore();
     const { isMobile } = useStatesStore();
@@ -60,17 +59,27 @@ export const ExpandMenu = memo(
       setConnector(document.getElementById("expand-connector"));
     }, []);
 
-    const closeHandler = () =>
-      isActive &&
-      setExpanded(expanded?.filter((pos) => pos !== position) || []);
+    const closeHandler = useCallback(
+      () =>
+        isActive &&
+        setExpanded(expanded?.filter((pos) => pos !== position) || []),
+      [isActive, expanded, position, setExpanded]
+    );
 
-    useCloseEvents([expandRef], (event) => {
-      const target = event?.target as HTMLElement | null;
+    const closeRefs = useMemo(() => [expandRef], []);
 
-      if (target?.closest(`[${EXPAND_KEEP_OPEN_ATTRIBUTE}]`)) return;
+    const onCloseEvent = useCallback(
+      (event?: Event) => {
+        const target = event?.target as HTMLElement | null;
 
-      closeHandler();
-    });
+        if (target?.closest(`[${EXPAND_KEEP_OPEN_ATTRIBUTE}]`)) return;
+
+        closeHandler();
+      },
+      [closeHandler]
+    );
+
+    useCloseEvents(closeRefs, onCloseEvent);
 
     if (!connector) return null;
 
@@ -83,10 +92,11 @@ export const ExpandMenu = memo(
           [styles.wrapper_right]: position.includes("right"),
           [styles.wrapper_active]: isActive,
         })}
-        style={{
-          ...(position.includes("bottom") && { top: "unset", bottom: "0" }),
-          ...menuStyle,
-        }}
+        style={
+          position.includes("bottom")
+            ? { top: "unset", bottom: "0" }
+            : undefined
+        }
       >
         <div
           className={classNames(styles.menu, {
@@ -94,8 +104,6 @@ export const ExpandMenu = memo(
             [styles.menu_disabled]: isMobile && !isActive,
             [styles.menu_active]: isActive,
           })}
-          style={menuStyle}
-          {...props}
         >
           <Scrollbar
             type="absolute"

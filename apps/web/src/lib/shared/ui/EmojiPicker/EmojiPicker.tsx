@@ -1,16 +1,10 @@
-import {
-  FC,
-  RefObject,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { FC, RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import classNames from "classnames";
 import { Input } from "../Input";
 import { Loader } from "../Loader";
 import { Scrollbar } from "../Scrollbar";
+import { Tooltip } from "../Tooltip";
 import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
 import { useSettingsStore } from "@/src/lib/shared/store/settings.store";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
@@ -179,34 +173,25 @@ export const EmojiPicker: FC<IEmojiPickerProps> = ({
           role="group"
           aria-label="Emoji categories"
         >
-          {!!recentGroup.length && (
-            <button
-              type="button"
-              title="Recently used"
-              aria-label="Recently used"
-              aria-pressed={isRecentShown}
-              className={classNames(styles.picker__group, {
-                [styles.picker__group_active]: isRecentShown,
-              })}
-              onClick={() => setActiveGroup(RECENT_GROUP)}
-            >
-              🕘
-            </button>
-          )}
-          {EMOJI_GROUPS.map((group) => (
-            <button
-              key={group.key}
-              type="button"
-              title={group.label}
-              aria-label={group.label}
-              aria-pressed={activeGroup === group.key}
-              className={classNames(styles.picker__group, {
-                [styles.picker__group_active]: activeGroup === group.key,
-              })}
-              onClick={() => setActiveGroup(group.key)}
-            >
-              {group.icon}
-            </button>
+          {[
+            ...(recentGroup.length
+              ? [{ key: RECENT_GROUP, label: "Recently used", icon: "🕘" }]
+              : []),
+            ...EMOJI_GROUPS,
+          ].map((group) => (
+            <Tooltip key={group.key} content={group.label}>
+              <button
+                type="button"
+                aria-label={group.label}
+                aria-pressed={activeGroup === group.key}
+                className={classNames(styles.picker__group, {
+                  [styles.picker__group_active]: activeGroup === group.key,
+                })}
+                onClick={() => setActiveGroup(group.key)}
+              >
+                {group.icon}
+              </button>
+            </Tooltip>
           ))}
         </div>
       )}

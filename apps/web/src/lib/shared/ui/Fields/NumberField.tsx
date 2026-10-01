@@ -26,7 +26,7 @@ export const NumberField: FC<INumberFieldProps> = ({
       onChange={(e) =>
         onChange(e.target.value === "" ? null : Number(e.target.value))
       }
-      error={error ? { type: "manual", message: error } : undefined}
+      error={error}
     />
   </div>
 );

@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import styles from "./GameAdminControls.module.scss";
 import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
-import { Input } from "@/src/lib/shared/ui/Input";
-import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal/ConfirmModal";
+import { TextField } from "@/src/lib/shared/ui/Fields";
+import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { gamesApi, hltbApi, igdbApi, vndbApi } from "@/src/lib/shared/api";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
@@ -189,10 +189,7 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
             Copy
           </Button>
         </div>
-        <Button
-          color={ButtonColor.DEFAULT}
-          onClick={() => router.push(`/admin/games/${game._id}`)}
-        >
+        <Button color={ButtonColor.DEFAULT} href={`/admin/games/${game._id}`}>
           Edit game
         </Button>
         <Button
@@ -242,16 +239,15 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
             {isParsingVndb ? "Parsing…" : "Parse from VNDB"}
           </Button>
         )}
-        <Input
-          containerClassname={styles.input}
-          value={hltbId}
-          placeholder={
+        <TextField
+          label={
             game.hltb?.hltbId
               ? `HLTB id (current: ${game.hltb.hltbId})`
               : "HLTB id (optional)"
           }
+          value={hltbId}
           disabled={isParsingHltb}
-          onChange={(event) => setHltbId(event.target.value)}
+          onChange={setHltbId}
         />
         <Button
           color={ButtonColor.DEFAULT}

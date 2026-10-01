@@ -9,6 +9,8 @@ export const GameButtons: FC<{ game: IGameResponse }> = ({ game }) => {
     target: "_blank",
   };
 
+  const encodedName = encodeURIComponent(game.name);
+
   const steamStore = game.externalPages?.find(
     (store) => store.name === "Steam"
   );
@@ -26,7 +28,9 @@ export const GameButtons: FC<{ game: IGameResponse }> = ({ game }) => {
           },
           {
             title: "Open in IGDB",
-            link: "https://www.igdb.com/games/" + game.slug,
+            link:
+              game.igdb?.url ||
+              `https://www.igdb.com/search?type=1&q=${encodedName}`,
             hidden: !game.igdb?.gameId,
             ...commonOptions,
           },
@@ -44,22 +48,22 @@ export const GameButtons: FC<{ game: IGameResponse }> = ({ game }) => {
           },
           {
             title: "Search on Youtube",
-            link: `https://www.youtube.com/results?search_query=${game.name}`,
+            link: `https://www.youtube.com/results?search_query=${encodedName}`,
             ...commonOptions,
           },
           {
             title: "Search on RetroAchievements",
-            link: `https://retroachievements.org/searchresults.php?s=${game.name}&t=1`,
+            link: `https://retroachievements.org/searchresults.php?s=${encodedName}&t=1`,
             ...commonOptions,
           },
           {
             title: "Search on HowLongToBeat",
-            link: `https://howlongtobeat.com/?q=${encodeURI(game.name)}`,
+            link: `https://howlongtobeat.com/?q=${encodedName}`,
             ...commonOptions,
           },
           {
             title: "Search on vndb",
-            link: `https://vndb.org/v?sq=${encodeURI(game.name)}`,
+            link: `https://vndb.org/v?sq=${encodedName}`,
             ...commonOptions,
           },
         ]}

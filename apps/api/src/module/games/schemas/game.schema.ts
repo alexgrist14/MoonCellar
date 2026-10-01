@@ -166,6 +166,8 @@ GameDatabaseSchema.pre(
         (update as Record<string, unknown>).nameNormalized = normalized;
       }
     } else {
+      delete update.$set?.nameNormalized;
+      delete (update as Record<string, unknown>).nameNormalized;
       update.$unset = { ...update.$unset, nameNormalized: "" };
     }
 

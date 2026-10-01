@@ -9,7 +9,6 @@ import {
   useState,
 } from "react";
 import ReactDOM from "react-dom";
-import cn from "classnames";
 import styles from "./Toast.module.scss";
 import { TOAST_SETTINGS } from "./toast.const";
 import classNames from "classnames";
@@ -84,17 +83,7 @@ export const Toast: FC<IToastProps> = ({
   useEffect(() => {
     if (progress >= 100) {
       !!setToasters &&
-        setToasters((prev) => {
-          const copy = [...prev];
-          const currentToast = copy.find((item) => item.id === toasterId);
-
-          if (currentToast?.timeout) {
-            clearTimeout(currentToast?.timeout);
-          }
-
-          const filteredCopy = copy.filter((item) => item.id !== toasterId);
-          return filteredCopy;
-        });
+        setToasters((prev) => prev.filter((item) => item.id !== toasterId));
     }
   }, [progress, setToasters, toasterId]);
 
@@ -102,7 +91,7 @@ export const Toast: FC<IToastProps> = ({
 
   return ReactDOM.createPortal(
     <div
-      className={cn(styles.toast, styles[`toast_${type}`], className)}
+      className={classNames(styles.toast, className)}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >

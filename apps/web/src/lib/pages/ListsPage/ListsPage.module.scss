@@ -1,16 +1,4 @@
 .page {
-  &__heading {
-    display: flex;
-    align-items: baseline;
-    gap: var(--gap-x3);
-  }
-
-  &__total {
-    font-size: 14px;
-    color: var(--color-text-muted);
-    font-variant-numeric: tabular-nums;
-  }
-
   &__empty {
     margin-block: auto;
   }

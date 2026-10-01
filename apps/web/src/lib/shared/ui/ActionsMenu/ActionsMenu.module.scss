@@ -3,6 +3,7 @@
   flex-direction: column;
 
   &__item {
+    display: block;
     width: 100%;
     padding: var(--padding-x2) var(--padding-x3);
     border: none;
@@ -10,6 +11,7 @@
     background: none;
     color: var(--color-text-primary);
     text-align: left;
+    text-decoration: none;
     cursor: pointer;
     transition: background-color var(--duration-fast) var(--easing-out);
 

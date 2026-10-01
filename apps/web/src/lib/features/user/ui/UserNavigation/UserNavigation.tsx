@@ -1,4 +1,4 @@
-import { FC, useMemo, useRef, useState } from "react";
+import { FC, useMemo } from "react";
 import styles from "./UserNavigation.module.scss";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
@@ -6,14 +6,10 @@ import { Avatar } from "@/src/lib/shared/ui/Avatar";
 import { IUser } from "@/src/lib/shared/types/auth.type";
 import { userListCategories } from "@/src/lib/shared/constants/user.const";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
-import classNames from "classnames";
-import { SvgSettings, SvgSort } from "@/src/lib/shared/ui/svg";
+import { SvgSettings } from "@/src/lib/shared/ui/svg";
 import { IPlaythrough } from "@mooncellar/schemas";
 import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
 import { useExpandStore } from "@/src/lib/shared/store/expand.store";
-import { ReviewSortType, SortType } from "@/src/lib/shared/types/sort.type";
-import { CustomDropdown } from "@/src/lib/shared/ui/CustomDropdown";
-import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
 import {
   getProfileHref,
   getProfileTab,
@@ -23,50 +19,14 @@ import {
   useUserListsQuery,
 } from "@/src/lib/entities/list/api";
 
-const sortOptions = [
-  { label: SortType.DATE_ADDED },
-  { label: SortType.RATING },
-  { label: SortType.PLAYTHROUGHS },
-  { label: SortType.COMMENTS },
-];
-const reviewSortOptions = Object.values(ReviewSortType).map((label) => ({
-  label,
-}));
-const sortOrderOptions = [{ label: "asc" }, { label: "desc" }];
-
 export const UserNavigation: FC<{
   isAuthedUser: boolean;
   user: IUser;
   playthroughs: IPlaythrough[];
-  selectedSort?: SortType;
-  sortOrder?: string;
-  onSortChange?: (value: SortType) => void;
-  onSortOrderChange?: (value: string) => void;
-  reviewSort?: ReviewSortType;
-  reviewOrder?: string;
-  onReviewSortChange?: (value: ReviewSortType) => void;
-  onReviewOrderChange?: (value: string) => void;
-}> = ({
-  isAuthedUser,
-  user,
-  playthroughs,
-  selectedSort,
-  sortOrder,
-  onSortChange,
-  onSortOrderChange,
-  reviewSort,
-  reviewOrder,
-  onReviewSortChange,
-  onReviewOrderChange,
-}) => {
-  const { pathname, router } = useAdvancedRouter();
+}> = ({ isAuthedUser, user, playthroughs }) => {
+  const { pathname } = useAdvancedRouter();
 
   const { setExpanded } = useExpandStore();
-
-  const sortRef = useRef<HTMLDivElement>(null);
-  const [isSortOpen, setIsSortOpen] = useState(false);
-
-  useCloseEvents([sortRef], () => setIsSortOpen(false));
 
   const currentList = getProfileTab(pathname, user.userName);
 
@@ -92,10 +52,7 @@ export const UserNavigation: FC<{
     [isAuthedUser, userLists]
   );
 
-  const goToTab = (tab: string) => {
-    setExpanded([]);
-    router.push(getProfileHref(user.userName, tab));
-  };
+  const closeMenu = () => setExpanded([]);
 
   const reviewsCount = playthroughs?.filter(
     (play) => !!play.comment && play.category !== "wishlist"
@@ -108,15 +65,6 @@ export const UserNavigation: FC<{
     return res;
   }, []);
 
-  const renderSortIcon = (order: string) => (
-    <SvgSort
-      size="24"
-      className={classNames(styles.sort__icon, {
-        [styles.sort__icon_active]: order === "desc",
-      })}
-    />
-  );
-
   return (
     <div className={styles.panel}>
       {!isProfileTab && (
@@ -124,7 +72,8 @@ export const UserNavigation: FC<{
           <Button
             className={styles.btn}
             color={ButtonColor.TRANSPARENT}
-            onClick={() => goToTab("profile")}
+            href={getProfileHref(user.userName, "profile")}
+            onClick={closeMenu}
           >
             <div>
               <div className={styles.avatar}>
@@ -144,7 +93,8 @@ export const UserNavigation: FC<{
           className={styles.btn}
           active={currentList === "all"}
           color={ButtonColor.TRANSPARENT}
-          onClick={() => goToTab("all")}
+          href={getProfileHref(user.userName, "all")}
+          onClick={closeMenu}
         >
           <span>All</span>
           <span>{allPlays.length}</span>
@@ -167,7 +117,8 @@ export const UserNavigation: FC<{
               className={styles.btn}
               active={currentList === category}
               color={ButtonColor.TRANSPARENT}
-              onClick={() => goToTab(category.toLowerCase())}
+              href={getProfileHref(user.userName, category.toLowerCase())}
+              onClick={closeMenu}
             >
               <span>{commonUtils.upFL(category)}</span>
               <span>{plays.length}</span>
@@ -181,7 +132,8 @@ export const UserNavigation: FC<{
             className={styles.btn}
             active={isListsTab}
             color={ButtonColor.TRANSPARENT}
-            onClick={() => goToTab("lists")}
+            href={getProfileHref(user.userName, "lists")}
+            onClick={closeMenu}
           >
             <span>Lists</span>
             <span>{visibleLists.length}</span>
@@ -192,7 +144,8 @@ export const UserNavigation: FC<{
             className={styles.btn}
             active={isLikedTab}
             color={ButtonColor.TRANSPARENT}
-            onClick={() => goToTab("liked")}
+            href={getProfileHref(user.userName, "liked")}
+            onClick={closeMenu}
           >
             <span>Liked lists</span>
             <span>{likedLists.length}</span>
@@ -203,7 +156,8 @@ export const UserNavigation: FC<{
             className={styles.btn}
             active={isFavoritesTab}
             color={ButtonColor.TRANSPARENT}
-            onClick={() => goToTab("favorites")}
+            href={getProfileHref(user.userName, "favorites")}
+            onClick={closeMenu}
           >
             <span>Favourites</span>
             <span>{favoritesCount}</span>
@@ -214,7 +168,8 @@ export const UserNavigation: FC<{
             className={styles.btn}
             active={isCharactersTab}
             color={ButtonColor.TRANSPARENT}
-            onClick={() => goToTab("characters")}
+            href={getProfileHref(user.userName, "characters")}
+            onClick={closeMenu}
           >
             <span>Characters</span>
             <span>{favoriteCharactersCount}</span>
@@ -224,7 +179,8 @@ export const UserNavigation: FC<{
           className={styles.btn}
           active={isReviewsTab}
           color={ButtonColor.TRANSPARENT}
-          onClick={() => goToTab("reviews")}
+          href={getProfileHref(user.userName, "reviews")}
+          onClick={closeMenu}
         >
           <span>Reviews</span>
           <span>{reviewsCount}</span>
@@ -236,52 +192,14 @@ export const UserNavigation: FC<{
             className={styles.btn}
             active={currentList === "settings"}
             color={ButtonColor.TRANSPARENT}
-            onClick={() => goToTab("settings")}
+            href={getProfileHref(user.userName, "settings")}
+            onClick={closeMenu}
           >
             <div>
               <SvgSettings size="24" />
               <span>Settings</span>
             </div>
           </Button>
-        </Box>
-      )}
-      {((isReviewsTab && !!reviewSort && !!onReviewSortChange) ||
-        (isGamesTab && !!selectedSort && !!onSortChange)) && (
-        <Box>
-          <div className={styles.sort} ref={sortRef}>
-            {isReviewsTab && !!reviewSort && !!onReviewSortChange ? (
-              <CustomDropdown
-                isOpen={isSortOpen}
-                setIsOpen={setIsSortOpen}
-                onSelect={onReviewSortChange}
-                onExtendedSelect={onReviewOrderChange}
-                extendedSelected={reviewOrder}
-                options={reviewSortOptions}
-                selected={reviewSort}
-                extendedOptions={sortOrderOptions}
-                headerClassName={styles.sort__header}
-                className={styles.sort__dropdown}
-                icon={renderSortIcon(reviewOrder ?? "desc")}
-              />
-            ) : (
-              !!selectedSort &&
-              !!onSortChange && (
-                <CustomDropdown
-                  isOpen={isSortOpen}
-                  setIsOpen={setIsSortOpen}
-                  onSelect={onSortChange}
-                  onExtendedSelect={onSortOrderChange}
-                  extendedSelected={sortOrder}
-                  options={sortOptions}
-                  selected={selectedSort}
-                  extendedOptions={sortOrderOptions}
-                  headerClassName={styles.sort__header}
-                  className={styles.sort__dropdown}
-                  icon={renderSortIcon(sortOrder ?? "desc")}
-                />
-              )
-            )}
-          </div>
         </Box>
       )}
     </div>

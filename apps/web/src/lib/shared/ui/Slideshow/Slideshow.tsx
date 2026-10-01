@@ -1,4 +1,12 @@
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  FC,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import styles from "./Slideshow.module.scss";
 import { Scrollbar } from "../Scrollbar";
 import { modal } from "../Modal";
@@ -13,6 +21,7 @@ interface ISlideshowProps {
 const SWIPE_THRESHOLD = 50;
 
 export const Slideshow: FC<ISlideshowProps> = ({ pictures }) => {
+  const modalId = useId();
   const [screenshotIndex, setScreenshotIndex] = useState<number>();
   const touchStartX = useRef<number | null>(null);
   const isSwipe = useRef(false);
@@ -55,76 +64,76 @@ export const Slideshow: FC<ISlideshowProps> = ({ pictures }) => {
   }, [screenshotIndex, shift]);
 
   useEffect(() => {
-    modal.close();
+    if (screenshotIndex === undefined) return;
 
-    screenshotIndex !== undefined &&
-      modal.open(
-        <div
-          className={styles.slideshow__wrapper}
-          onClick={() => {
-            if (isSwipe.current) {
-              isSwipe.current = false;
-              return;
-            }
-
-            modal.close();
-            setScreenshotIndex(undefined);
-          }}
-          onTouchStart={(e) => {
-            touchStartX.current = e.touches[0].clientX;
+    modal.open(
+      <div
+        className={styles.slideshow__wrapper}
+        onClick={() => {
+          if (isSwipe.current) {
             isSwipe.current = false;
-          }}
-          onTouchMove={(e) => {
-            if (
-              touchStartX.current !== null &&
-              Math.abs(e.touches[0].clientX - touchStartX.current) > 10
-            ) {
-              isSwipe.current = true;
-            }
-          }}
-          onTouchEnd={(e) => {
-            if (touchStartX.current === null) return;
+            return;
+          }
 
-            const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+          setScreenshotIndex(undefined);
+        }}
+        onTouchStart={(e) => {
+          touchStartX.current = e.touches[0].clientX;
+          isSwipe.current = false;
+        }}
+        onTouchMove={(e) => {
+          if (
+            touchStartX.current !== null &&
+            Math.abs(e.touches[0].clientX - touchStartX.current) > 10
+          ) {
+            isSwipe.current = true;
+          }
+        }}
+        onTouchEnd={(e) => {
+          if (touchStartX.current === null) return;
 
-            touchStartX.current = null;
+          const deltaX = e.changedTouches[0].clientX - touchStartX.current;
 
-            if (deltaX > SWIPE_THRESHOLD) {
-              shift(-1);
-            } else if (deltaX < -SWIPE_THRESHOLD) {
-              shift(1);
-            }
+          touchStartX.current = null;
+
+          if (deltaX > SWIPE_THRESHOLD) {
+            shift(-1);
+          } else if (deltaX < -SWIPE_THRESHOLD) {
+            shift(1);
+          }
+        }}
+      >
+        <Button
+          color={ButtonColor.TRANSPARENT}
+          className={styles.slideshow__prev}
+          tooltip="Previous screenshot"
+          disabled={screenshots.length < 2}
+          onClick={(e) => {
+            e.stopPropagation();
+            shift(-1);
           }}
         >
-          <Button
-            color={ButtonColor.TRANSPARENT}
-            className={styles.slideshow__prev}
-            tooltip="Previous screenshot"
-            disabled={screenshots.length < 2}
-            onClick={(e) => {
-              e.stopPropagation();
-              shift(-1);
-            }}
-          >
-            <SvgChevron style={{ transform: "rotate(90deg)" }} />
-          </Button>
-          {screenshots[screenshotIndex]}
-          <Button
-            color={ButtonColor.TRANSPARENT}
-            className={styles.slideshow__next}
-            tooltip="Next screenshot"
-            disabled={screenshots.length < 2}
-            onClick={(e) => {
-              e.stopPropagation();
-              shift(1);
-            }}
-          >
-            <SvgChevron style={{ transform: "rotate(-90deg)" }} />
-          </Button>
-        </div>,
-        { onClose: () => setScreenshotIndex(undefined) }
-      );
-  }, [screenshotIndex, screenshots, shift]);
+          <SvgChevron style={{ transform: "rotate(90deg)" }} />
+        </Button>
+        {screenshots[screenshotIndex]}
+        <Button
+          color={ButtonColor.TRANSPARENT}
+          className={styles.slideshow__next}
+          tooltip="Next screenshot"
+          disabled={screenshots.length < 2}
+          onClick={(e) => {
+            e.stopPropagation();
+            shift(1);
+          }}
+        >
+          <SvgChevron style={{ transform: "rotate(-90deg)" }} />
+        </Button>
+      </div>,
+      { id: modalId, onClose: () => setScreenshotIndex(undefined) }
+    );
+
+    return () => modal.close(modalId);
+  }, [modalId, screenshotIndex, screenshots, shift]);
 
   return (
     <Scrollbar

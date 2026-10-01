@@ -15,11 +15,6 @@
   gap: var(--gap-x1);
 }
 
-.title {
-  color: var(--color-text-primary);
-  @include font(24px, 30px, 700);
-}
-
 .lede {
   max-width: 65ch;
   color: var(--color-text-secondary);

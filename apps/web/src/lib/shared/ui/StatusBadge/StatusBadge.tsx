@@ -1,4 +1,4 @@
-import { FC, ReactNode } from "react";
+import { FC, Fragment, ReactNode } from "react";
 import classNames from "classnames";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import styles from "./StatusBadge.module.scss";
@@ -10,7 +10,7 @@ interface IStatusBadgeProps {
 }
 
 interface IStatusDetailsProps {
-  items: (string | false | null | undefined)[];
+  items: ReactNode[];
   className?: string;
 }
 
@@ -34,9 +34,16 @@ export const StatusDetails: FC<IStatusDetailsProps> = ({
   items,
   className,
 }) => {
-  const text = items.filter(Boolean).join(" · ");
+  const parts = items.filter(Boolean);
 
-  return text ? (
-    <span className={classNames(styles.details, className)}>{text}</span>
+  return parts.length ? (
+    <span className={classNames(styles.details, className)}>
+      {parts.map((part, index) => (
+        <Fragment key={index}>
+          {index > 0 && " · "}
+          {part}
+        </Fragment>
+      ))}
+    </span>
   ) : null;
 };

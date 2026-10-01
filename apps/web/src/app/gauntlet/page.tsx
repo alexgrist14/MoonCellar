@@ -1,9 +1,5 @@
-import { GauntletPage } from "@/src/lib/pages/GauntletPage/GauntletPage";
+import { GauntletPage } from "@/src/lib/pages/GauntletPage";
 import { Metadata } from "next";
-import { Suspense } from "react";
-import styles from "@/src/lib/pages/GauntletPage/GauntletPage.module.scss";
-import { GauntletModePanel } from "@/src/lib/widgets/gauntlet/GauntletModePanel";
-import { PageLoader } from "@/src/lib/shared/ui/PageLoader";
 import { JsonLd } from "@/src/lib/shared/ui/JsonLd";
 import { getBreadcrumbJsonLd } from "@/src/lib/shared/utils/json-ld.utils";
 
@@ -26,18 +22,15 @@ export const metadata: Metadata = {
 
 const GauntletPageIndex = () => {
   return (
-    <div className={styles.wrapper}>
+    <>
       <JsonLd
         data={getBreadcrumbJsonLd([
           { name: "Home", path: "/" },
           { name: "Gauntlet", path: "/gauntlet" },
         ])}
       />
-      <Suspense fallback={<PageLoader />}>
-        <GauntletModePanel />
-        <GauntletPage />
-      </Suspense>
-    </div>
+      <GauntletPage />
+    </>
   );
 };
 

@@ -22,32 +22,6 @@
 }
 
 .slug {
-  color: var(--color-neutral-70);
+  color: var(--color-text-muted);
   font-size: 12px;
-}
-
-.actions {
-  display: flex;
-  gap: var(--gap-x2);
-}
-
-.confirmModal {
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap-x3);
-  max-width: 420px;
-}
-
-.confirmModal__warning {
-  color: var(--color-negative);
-}
-
-.confirmModal__buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--gap-x2);
-}
-
-.rowClickable {
-  cursor: pointer;
 }

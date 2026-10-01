@@ -15,34 +15,53 @@ An inventory of the search-related functionality in `apps/web`: what exists and 
 
 Each route adds its own metadata on top:
 
-| Route                    | Title                                       | Canonical                | Other                                                                                                                                                           |
-| ------------------------ | ------------------------------------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/`                      | `MAIN_PAGE_META_TITLE` via `title.absolute` | `/`                      | own `keywords`; the template does not apply to the root segment                                                                                                 |
-| `/games`                 | `Games`                                     | `/games`                 | own `keywords`                                                                                                                                                  |
-| `/games/[slug]`          | game name                                   | `/games/<slug>`          | description from `game.summary`, keywords from name + genres + themes + IGDB keywords, Open Graph block restated in full with the cover as `og:image` (200×266) |
-| `/games/genre/[slug]`    | `<Genre> Games`                             | `/games/genre/<slug>`    | description carries the game count; `robots: { index: false, follow: true }` when the genre has fewer than 100 games                                            |
-| `/games/platform/[slug]` | `<Platform> Games`                          | `/games/platform/<slug>` | same shape as the genre hub, count fetched with a `take: 1` query                                                                                               |
-| `/gauntlet`              | `Gauntlet`                                  | `/gauntlet`              | own `keywords`                                                                                                                                                  |
-| `/user/[name]`           | `Profile: <name>`                           | `/user/<name>`           | description from the user's own bio when set                                                                                                                    |
-| `not-found`              | `Page not found`                            | —                        | `robots: { index: false, follow: false }`                                                                                                                       |
+| Route                       | Title                                       | Canonical                   | Other                                                                                                                                                           |
+| --------------------------- | ------------------------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`                         | `MAIN_PAGE_META_TITLE` via `title.absolute` | `/`                         | own `keywords`; the template does not apply to the root segment                                                                                                 |
+| `/games`                    | `Games`                                     | `/games`                    | own `keywords`                                                                                                                                                  |
+| `/games/[slug]`             | game name                                   | `/games/<slug>`             | description from `game.summary`, keywords from name + genres + themes + IGDB keywords, Open Graph block restated in full with the cover as `og:image` (200×266) |
+| `/games/genre/[slug]`       | `<Genre> Games`                             | `/games/genre/<slug>`       | description carries the game count; `robots: { index: false, follow: true }` when the genre has fewer than 100 games                                            |
+| `/games/platform/[slug]`    | `<Platform> Games`                          | `/games/platform/<slug>`    | same shape as the genre hub, count fetched with a `take: 1` query                                                                                               |
+| `/gauntlet`                 | `Gauntlet`                                  | `/gauntlet`                 | own `keywords`                                                                                                                                                  |
+| `/user/[name]`              | `Profile: <name>`                           | `/user/<name>`              | description from the user's own bio when set                                                                                                                    |
+| `/user/[name]/[tab]`        | `<Tab label>: <name>`                       | `/user/<name>/<tab>`        | one route per `profileTabs` entry; `robots: { index: false, follow: false }` on `settings`; an unknown tab is a 404 from the page component                     |
+| `/user/[name]/lists/[slug]` | `<List> — a list by <author>`               | `/user/<name>/lists/<slug>` | description from the list's own text or its game count; `robots: { index: false, follow: false }` for a private list                                            |
+| `/lists`                    | `Lists`                                     | `/lists`                    | own `keywords`                                                                                                                                                  |
+| `/requests`                 | `Requests`                                  | —                           | `robots: { index: false, follow: true }`                                                                                                                        |
+| `not-found`                 | `Page not found`                            | —                           | `robots: { index: false, follow: false }`                                                                                                                       |
 
 A page-level `openGraph` object replaces the parent's rather than merging with it, which is why
 the game and hub routes repeat `siteName`, `type` and `locale`.
 
-When `generateMetadata` cannot find the entity (game, hub, user) it returns
-`title: "Page not found"` with `robots: { index: false, follow: false }`.
+When `generateMetadata` cannot find the entity (game, hub, user, list) it returns
+`title: "Page not found"` with `robots: { index: false, follow: false }`. When the lookup fails
+for any other reason (an API outage, a 5xx) it returns neutral metadata without `robots` —
+`Game`, `Games`, `Profile`, `List`, or `{}` on a profile tab — and the page component's own
+throw renders `src/app/error.tsx` (`ErrorPage`), which is never cached.
 
 ## Status codes
 
-`fetchOrNull` (`src/lib/shared/utils/not-found.utils.ts`) turns a 400 or 404 from the API into
-`null` and rethrows anything else. Routes with a dynamic segment wrap their lookup in
+`fetchOrNull` (`src/lib/shared/utils/not-found.utils.ts`) turns a 404 from the API into `null`
+and rethrows anything else, a 400 included. Routes with a dynamic segment wrap their lookup in
 `React.cache`, call it from both `generateMetadata` and the page component, and call
 `notFound()` only from the page component — so a missing entity answers with a real 404 rather
 than a 200 carrying the not-found page.
 
-The root layout keeps its `Suspense` boundary around `NavigationProgress` only; routes that need
-one (`/games`, `/gauntlet`, `/user/[name]`) declare it inside the route, below the page
-component.
+The hubs resolve their slug against the full genre or platform list, which is not a
+`fetchOrNull` lookup: the list request throws on failure, and the slug is a 404 only when the
+list loaded and does not contain it. The three game blocks below the lookup fall back to an
+empty list on error, so one failing query does not take the hub down.
+
+Two routes answer with a permanent redirect (308) instead of a duplicate page: the legacy
+`/user/<name>?list=<tab>` goes to `/user/<name>/<tab>` with the rest of the query kept, and a
+list opened by an outdated slug goes to its current `/user/<name>/lists/<slug>`.
+
+No route segment has its own `error.tsx`: every error reaches `src/app/error.tsx`, which renders
+`ErrorPage`, never `NotFoundPage`.
+
+The root layout has no `Suspense` boundary; routes that need one (`/games`, `/lists`,
+`/requests`, and `/user/[name]` in its profile layout) declare it inside the route, and
+`GauntletPage` declares its own.
 
 ## Rendering
 
@@ -58,25 +77,27 @@ Everything a crawler needs is in the server response.
 - The game page, both hubs and the homepage fetch their data in the server component and render
   it directly.
 
-`<h1>` per page: the homepage banner title, `Games` on the catalogue, `Gauntlet`, the game name
-on a game page, the hub title on both hubs, and the 404 page. Both catalogue and Gauntlet render
-theirs through `SectionTitle as="h1"`.
+`<h1>` per page: the homepage banner title, `Games` on the catalogue, `Lists`, `Gauntlet`, the
+game name on a game page, the hub title on both hubs, the user name on a profile, the list name
+on a list page, the Requests heading, and the 404 and error pages. The catalogue, `Lists`, the
+list page and the Gauntlet render theirs through `SectionTitle as="h1"`.
 
 Visible breadcrumbs (`src/lib/shared/ui/Breadcrumbs`) appear on the game page, the catalogue,
-both hubs, the Gauntlet and user profiles.
+both hubs, the Gauntlet, `Lists`, list pages, `Requests` and user profiles.
 
 ## Structured data
 
 `src/lib/shared/ui/JsonLd` renders a `<script type="application/ld+json">` with `<` escaped;
 the builders live in `src/lib/shared/utils/json-ld.utils.ts`.
 
-| Type                       | Where                                     | Contents                                                                    |
-| -------------------------- | ----------------------------------------- | --------------------------------------------------------------------------- |
-| `WebSite` + `SearchAction` | root layout, every page                   | search endpoint `/games?search={search_term_string}`                        |
-| `VideoGame`                | game page                                 | name, url, description, cover, genres, `datePublished` from `first_release` |
-| `AggregateRating`          | inside `VideoGame`                        | only when the game has at least 10 MoonCellar ratings; scale 1–10           |
-| `BreadcrumbList`           | game page, catalogue, both hubs, Gauntlet | the same trail as the visible breadcrumbs                                   |
-| `ItemList`                 | catalogue, both hubs                      | the games rendered on the page, with position, url and name                 |
+| Type                       | Where                                              | Contents                                                                       |
+| -------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `WebSite` + `SearchAction` | root layout, every page                            | search endpoint `/games?search={search_term_string}`                           |
+| `VideoGame`                | game page                                          | name, url, description, cover, genres, `datePublished` from `first_release`    |
+| `AggregateRating`          | inside `VideoGame`                                 | only when the game has at least 10 MoonCellar ratings; scale 1–10              |
+| `Review`                   | inside `VideoGame`                                 | the loaded reviews that have a rating, an author and text and are not spoilers |
+| `BreadcrumbList`           | game page, catalogue, both hubs, Gauntlet, `Lists` | the same trail as the visible breadcrumbs                                      |
+| `ItemList`                 | catalogue, both hubs                               | the games rendered on the page, with position, url and name                    |
 
 ## Hub pages
 
@@ -103,16 +124,25 @@ not its release on that platform.
 
 ## Caching
 
-| Route                      | Strategy                                                                                                                                                              |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/games/[slug]`, both hubs | ISR: `export const revalidate = 3600` together with `generateStaticParams()` returning `[]` — nothing is prerendered at build time, and the route is cached on demand |
-| `/`                        | `force-dynamic`; featured platforms come from `unstable_cache` with a 3600 s revalidate                                                                               |
-| `/games`                   | dynamic, it reads `searchParams`                                                                                                                                      |
-| `sitemap.xml`              | `force-dynamic`, with each upstream call wrapped in `unstable_cache` at 3600 s                                                                                        |
-| `/img/image-proxy`         | `force-dynamic`; the upstream fetch revalidates hourly and the response carries `public, max-age=3600, s-maxage=86400`                                                |
+| Route                                | Strategy                                                                                                                                                              |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/games/[slug]`, both hubs           | ISR: `export const revalidate = 3600` together with `generateStaticParams()` returning `[]` — nothing is prerendered at build time, and the route is cached on demand |
+| `/`                                  | `force-dynamic`; featured platforms come from `unstable_cache` with a 3600 s revalidate                                                                               |
+| `/games`                             | dynamic, it reads `searchParams`                                                                                                                                      |
+| `/lists`                             | dynamic, it reads `searchParams` and passes page 1 to the client as `initialData`                                                                                     |
+| `/user/[name]`, `/user/[name]/[tab]` | dynamic: the profile layout reads `cookies()` to decide who is viewing                                                                                                |
+| `/user/[name]/lists/[slug]`          | dynamic: it reads `cookies()` (forwarded to `by-slug` for private lists) and `searchParams` (`page`, sort)                                                            |
+| `/requests`, `/gauntlet`             | static: no server fetch, no `revalidate`; the client page reads the query string inside its `Suspense`                                                                |
+| `sitemap.xml`                        | `force-dynamic`, with each upstream call wrapped in `unstable_cache` at 3600 s                                                                                        |
+| `/img/image-proxy`                   | `force-dynamic`; the upstream fetch revalidates hourly and the response carries `public, max-age=3600, s-maxage=86400`                                                |
 
 A route that reads `searchParams` cannot be statically cached, which is why the two hubs take no
 query parameters.
+
+A cached game page is purged on demand by `revalidateGamePage`
+(`src/lib/entities/game/api/game.actions.ts`), called after admin edits and by
+`POST /api/revalidate` (header `x-revalidate-secret` matching `REVALIDATE_SECRET`, body
+`{ slugs: string[] }`, up to 200).
 
 ## robots.txt and sitemap
 
@@ -139,7 +169,7 @@ list on error, so one failing endpoint does not empty the whole sitemap.
   or 502 otherwise. It sits outside `/api` so that `robots.txt` does not block the images the
   sitemap and Open Graph tags reference.
 - `next.config.mjs` lists the same hosts in `images.remotePatterns` for `next/image`, plus
-  RetroAchievements, YouTube thumbnails and the API host.
+  RetroAchievements, YouTube thumbnails, VNDB, Alphacoders, the API host and `localhost`.
 - `/_next/static/media/*` is served with `X-Robots-Tag: noindex`.
 - Game covers use ``alt={`${game.name} cover`}``; decorative images carry an empty `alt`.
 
@@ -154,5 +184,5 @@ on every path.
 - `public/74a6b85cd7164d77a0cccb5baae3d563.txt` — a key file in the IndexNow format, its body
   repeating its own name.
 
-`meta keywords` are declared on the root layout, the homepage, the catalogue, the Gauntlet, game
-pages and user profiles.
+`meta keywords` are declared on the root layout, the homepage, the catalogue, `Lists`, the
+Gauntlet, game pages and user profiles.

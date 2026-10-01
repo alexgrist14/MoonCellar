@@ -1,7 +1,6 @@
 import { FC } from "react";
 import { ISiteSession } from "@mooncellar/schemas";
 import { useSiteSessionsQuery } from "@/src/lib/entities/site-session/api";
-import { ITableCell } from "@/src/lib/shared/types/table.type";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { Table } from "@/src/lib/shared/ui/Table";
@@ -51,32 +50,20 @@ export const SiteSessions: FC = () => {
           referer: { content: "Referer" },
           updated: { content: "Updated" },
         }}
-        rows={sessions.map((session) => {
-          const cells = {
-            domain: { content: session.domain, sortingValue: session.domain },
-            cookie: {
-              content: session.hasCookie ? "Stored" : "—",
-              sortingValue: session.hasCookie ? 1 : 0,
-            },
-            userAgent: { content: session.userAgent ?? "—" },
-            referer: { content: session.referer ?? "—" },
-            updated: {
-              content: commonUtils.formatDate(session.updatedAt),
-              sortingValue: session.updatedAt,
-            },
-          };
-
-          return Object.fromEntries(
-            Object.entries(cells).map(([key, cell]) => [
-              key,
-              {
-                ...cell,
-                className: styles.rowClickable,
-                onClick: () => openModal(session),
-              },
-            ])
-          ) as Record<keyof typeof cells, ITableCell>;
-        })}
+        onRowClick={(index) => openModal(sessions[index])}
+        rows={sessions.map((session) => ({
+          domain: { content: session.domain, sortingValue: session.domain },
+          cookie: {
+            content: session.hasCookie ? "Stored" : "—",
+            sortingValue: session.hasCookie ? 1 : 0,
+          },
+          userAgent: { content: session.userAgent ?? "—" },
+          referer: { content: session.referer ?? "—" },
+          updated: {
+            content: commonUtils.formatDate(session.updatedAt),
+            sortingValue: session.updatedAt,
+          },
+        }))}
       />
     </div>
   );

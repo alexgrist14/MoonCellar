@@ -2,10 +2,11 @@
 
 import { FC, useMemo } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import styles from "./GameHero.module.scss";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
+import { Badge } from "@/src/lib/shared/ui/Badge";
+import { Chip } from "@/src/lib/shared/ui/Chip";
 import { GameCard } from "@/src/lib/widgets/game/GameCard";
 import { GameRating } from "@/src/lib/features/game/ui/GameRating";
 import { SvgCrown } from "@/src/lib/shared/ui/svg/SvgCrown";
@@ -139,10 +140,10 @@ export const GameHero: FC<IGameHeroProps> = ({ game, stats }) => {
           ]}
         />
         {isRoyal && (
-          <span className={styles.hero__royal}>
+          <Badge size="md" className={styles.hero__royal}>
             <SvgCrown size="16" />
             In royal games
-          </span>
+          </Badge>
         )}
       </div>
 
@@ -166,13 +167,9 @@ export const GameHero: FC<IGameHeroProps> = ({ game, stats }) => {
               !!row.length && (
                 <div key={index} className={styles.hero__chips}>
                   {row.map((chip) => (
-                    <Link
-                      key={chip.key}
-                      href={chip.href}
-                      className={styles.hero__chip}
-                    >
+                    <Chip key={chip.key} href={chip.href}>
                       {chip.label}
-                    </Link>
+                    </Chip>
                   ))}
                 </div>
               )

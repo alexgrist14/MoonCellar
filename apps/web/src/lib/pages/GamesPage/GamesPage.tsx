@@ -4,13 +4,17 @@ import { FC, useCallback, useMemo } from "react";
 import { hashKey } from "@tanstack/react-query";
 import styles from "./GamesPage.module.scss";
 import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
-import { AppliedGameFilters, Filters } from "@/src/lib/features/filters/ui/Filters";
+import {
+  AppliedGameFilters,
+  Filters,
+} from "@/src/lib/features/filters/ui/Filters";
 import { Loader } from "@/src/lib/shared/ui/Loader";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { parseQueryFilters } from "@/src/lib/shared/utils/filters.utils";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { BGImage } from "@/src/lib/shared/ui/BGImage";
 import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { useGamesSelectionStore } from "@/src/lib/shared/store/games-selection.store";
@@ -111,7 +115,11 @@ export const GamesPage: FC<IGamesPageProps> = ({
         {isLoading ? (
           <Loader type="pacman" />
         ) : !games?.length ? (
-          <h2 className={styles.page__empty}>Games not found</h2>
+          <EmptyState
+            as="h2"
+            className={styles.page__empty}
+            title="Games not found"
+          />
         ) : (
           <GamesCards
             games={games}

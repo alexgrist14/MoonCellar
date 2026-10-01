@@ -1,6 +1,7 @@
 import { FC } from "react";
 import styles from "./GamesList.module.scss";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
+import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { GameCard } from "@/src/lib/widgets/game/GameCard";
 import { IGameResponse } from "@mooncellar/schemas";
 
@@ -22,9 +23,11 @@ export const GamesList: FC<IGamesListProps> = ({
       {(!games?.length || !!saveCallback || !!getGames) && (
         <div className={styles.consoles__title}>
           {!games?.length && (
-            <h3 style={{ width: "100%", textAlign: "center" }}>
-              List is empty
-            </h3>
+            <EmptyState
+              as="h3"
+              title="List is empty"
+              className={styles.consoles__empty}
+            />
           )}
           {!!games?.length && !!saveCallback && (
             <Button color={ButtonColor.ACCENT} onClick={() => saveCallback()}>
