@@ -58,6 +58,64 @@ const idleModel = {
 };
 
 describe("ConflictsService", () => {
+  it("refuses to reopen a source without a rematch", async () => {
+    const service = createService({ conflictsModel: idleModel });
+
+    await expect(service.reopen("vndb", "v1", ADMIN)).rejects.toBeInstanceOf(
+      BadRequestException
+    );
+  });
+
+  it("reopens only a skipped conflict, with fresh candidates", async () => {
+    const gameId = new Types.ObjectId();
+    const findOneAndUpdate = jest.fn().mockResolvedValue({ _id: "c1" });
+    const events = createEvents();
+    const service = createService({
+      events,
+      conflictsModel: { ...idleModel, findOneAndUpdate },
+      handler: {
+        ...createHandler(),
+        rematch: jest.fn().mockResolvedValue([
+          {
+            game: { _id: String(gameId), slug: "dyna", name: "Dyna" },
+            score: 1,
+            breakdown: {},
+          },
+        ]),
+      },
+    });
+
+    await service.reopen("vndb", "v1", ADMIN);
+
+    const [filter, update] = findOneAndUpdate.mock.calls[0];
+
+    expect(filter).toEqual({
+      source: "vndb",
+      externalId: "v1",
+      status: "absent",
+      decision: null,
+    });
+    expect(update.$set.status).toBe("pending");
+    expect(update.$set.candidates[0].gameId).toEqual(gameId);
+    expect(events.conflictDecided).toHaveBeenCalledWith(
+      expect.objectContaining({ state: "waiting" })
+    );
+  });
+
+  it("answers 409 when the conflict was not skipped", async () => {
+    const service = createService({
+      conflictsModel: {
+        ...idleModel,
+        findOneAndUpdate: jest.fn().mockResolvedValue(null),
+      },
+      handler: { ...createHandler(), rematch: jest.fn().mockResolvedValue([]) },
+    });
+
+    await expect(service.reopen("vndb", "v1", ADMIN)).rejects.toBeInstanceOf(
+      ConflictException
+    );
+  });
+
   it("records a decision only on an undecided conflict among its candidates", async () => {
     const gameId = String(new Types.ObjectId());
     const findOneAndUpdate = jest.fn(() =>

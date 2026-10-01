@@ -36,9 +36,16 @@ const decide = (
   );
 };
 
+const reopen = (source: IConflictSource, externalId: string) => {
+  return agent.post<IConflictsSummary>(
+    `${CONFLICTS_URL}/${source}/${encodeURIComponent(externalId)}/reopen`
+  );
+};
+
 export const adminConflictsApi = {
   getSummary,
   getList,
   getItem,
   decide,
+  reopen,
 };

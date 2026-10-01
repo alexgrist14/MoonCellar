@@ -108,4 +108,23 @@ export class ConflictsController {
       request.user
     );
   }
+
+  @Post(":source/:externalId/reopen")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      "Put a skipped conflict back in the queue with freshly matched candidates",
+  })
+  @ApiOkResponse({ type: ConflictsSummaryDto })
+  reopen(
+    @Param("source") source: string,
+    @Param("externalId") externalId: string,
+    @Req() request: IAuthorizedRequest
+  ) {
+    return this.conflictsService.reopen(
+      parseSource(source),
+      externalId,
+      request.user
+    );
+  }
 }

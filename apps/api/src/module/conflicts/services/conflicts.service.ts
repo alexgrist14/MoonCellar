@@ -24,6 +24,7 @@ import type {
   IConflictRecord,
   IConflictSourceHandler,
 } from "../types/conflicts.types";
+import type { IScoredCandidate } from "../../games/matching/game-matcher.types";
 
 const APPLY_BATCH_SIZE = 100;
 
@@ -45,6 +46,17 @@ const conflictState = ({
         : decision === "skip"
           ? "queued-new"
           : "waiting";
+
+const toCandidateEntry = (candidate: IScoredCandidate) => ({
+  gameId: new Types.ObjectId(candidate.game._id),
+  slug: candidate.game.slug,
+  name: candidate.game.name,
+  score: candidate.score,
+  breakdown: candidate.breakdown,
+  dateSignal: candidate.dateSignal,
+  descriptionSignal: candidate.descriptionSignal,
+  hasCompanyMismatch: candidate.hasCompanyMismatch,
+});
 
 const readPath = (value: unknown, path: string): unknown =>
   path
@@ -87,16 +99,7 @@ export class ConflictsService {
             externalName,
             reason,
             entries: entries ?? [],
-            candidates: candidates.map((candidate) => ({
-              gameId: new Types.ObjectId(candidate.game._id),
-              slug: candidate.game.slug,
-              name: candidate.game.name,
-              score: candidate.score,
-              breakdown: candidate.breakdown,
-              dateSignal: candidate.dateSignal,
-              descriptionSignal: candidate.descriptionSignal,
-              hasCompanyMismatch: candidate.hasCompanyMismatch,
-            })),
+            candidates: candidates.map(toCandidateEntry),
             status: "pending",
             winner: null,
           })
@@ -404,6 +407,53 @@ export class ConflictsService {
       decidedBy: user.userName,
     });
     this.startApplying(source);
+
+    return this.getSummary(source);
+  }
+
+  async reopen(
+    source: IConflictSource,
+    externalId: string,
+    user: Pick<User, "_id" | "userName">
+  ): Promise<IConflictsSummary> {
+    const handler = this.getHandler(source);
+
+    if (!handler.rematch) {
+      throw new BadRequestException(`${source} conflicts cannot be reopened`);
+    }
+
+    const candidates = await handler.rematch(externalId);
+
+    if (!candidates) {
+      throw new NotFoundException(`${source} ${externalId} no longer exists`);
+    }
+
+    const conflict = await this.conflictsModel.findOneAndUpdate(
+      { source, externalId, status: "absent", decision: null },
+      {
+        $set: {
+          status: "pending",
+          candidates: candidates.map(toCandidateEntry),
+          winner: null,
+          winnerEntryId: null,
+          decision: null,
+          decidedBy: null,
+        },
+      }
+    );
+
+    if (!conflict) {
+      throw new ConflictException(
+        `${externalId} is not a skipped ${source} conflict`
+      );
+    }
+
+    this.events.conflictDecided({
+      source,
+      externalId,
+      state: "waiting",
+      decidedBy: user.userName,
+    });
 
     return this.getSummary(source);
   }

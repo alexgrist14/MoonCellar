@@ -338,6 +338,12 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
 - **A handler's `apply` returns `null` for an entry it applied without a game.** Leaving an entry
   out of the map sends the decision back to review, so an RA or HLTB Skip that returned nothing
   would come back to the queue forever.
+- **Only a source whose Skip creates nothing may implement `rematch`, and only `absent`
+  conflicts are reopened.** `POST /conflicts/:source/:externalId/reopen` puts a skipped conflict
+  back to `pending` with candidates rebuilt by the handler's `rematch`, so a game added to the
+  catalogue after the Skip shows up. A VNDB or IGDB Skip has already created a game; reopening it
+  would leave that game behind and let a Match link the entry a second time. RA implements it;
+  HLTB does not yet.
 - **`parseRAGames` recomputes every RA link each run, so it must read the RA conflicts first.**
   A resolved conflict pins its winner, and a pending or skipped one links nothing. Without this
   the next nightly run replaces an admin's decision with the fuzzy match again. A match counts

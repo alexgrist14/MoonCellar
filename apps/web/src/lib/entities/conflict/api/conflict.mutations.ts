@@ -36,3 +36,25 @@ export const useDecideConflictMutation = () => {
     onError: (_error, { source, externalId }) => invalidate(source, externalId),
   });
 };
+
+export const useReopenConflictMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      source,
+      externalId,
+    }: Omit<IDecideConflictVariables, "choice">) =>
+      adminConflictsApi.reopen(source, externalId).then(({ data }) => data),
+    onSuccess: (summary, { source, externalId }) => {
+      queryClient.setQueryData(conflictQueryKeys.summary(source), summary);
+      queryClient.invalidateQueries({
+        queryKey: conflictQueryKeys.item(source, externalId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: conflictQueryKeys.summaryAll(),
+      });
+      queryClient.invalidateQueries({ queryKey: conflictQueryKeys.listAll() });
+    },
+  });
+};

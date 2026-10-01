@@ -16,6 +16,7 @@ import {
   useConflictsSocket,
   useConflictsSummaryQuery,
   useDecideConflictMutation,
+  useReopenConflictMutation,
 } from "@/src/lib/entities/conflict/api";
 import { setAdminQuery } from "@/src/lib/shared/utils/admin-url.utils";
 import { CandidateCard, Fact } from "./CandidateCard";
@@ -26,6 +27,7 @@ import {
   REASON_LABELS,
   SOURCE_LABELS,
   skipCaption,
+  isReopenable,
   stateLabel,
   parseConflictSource,
 } from "./labels";
@@ -61,6 +63,8 @@ export const Conflicts: FC = () => {
     externalId
   );
   const { mutate: decide } = useDecideConflictMutation();
+  const { mutate: reopen, isPending: isReopening } =
+    useReopenConflictMutation();
   const { data: platforms } = usePlatformsQuery();
   const isLoaderShown = useMinimumLoading(isLoading);
 
@@ -423,17 +427,33 @@ export const Conflicts: FC = () => {
                     </Button>
                   </>
                 ) : (
-                  !!item.nextExternalId && (
-                    <Button
-                      className={styles.actionButton}
-                      color={ButtonColor.ACCENT}
-                      onClick={() =>
-                        openConflict(item.source, item.nextExternalId, true)
-                      }
-                    >
-                      Open the next waiting conflict
-                    </Button>
-                  )
+                  <>
+                    {isReopenable(item.source, item.state) && (
+                      <Button
+                        className={styles.actionButton}
+                        disabled={isReopening}
+                        onClick={() =>
+                          reopen({
+                            source: item.source,
+                            externalId: item.externalId,
+                          })
+                        }
+                      >
+                        {isReopening ? "Reopening…" : "Reopen"}
+                      </Button>
+                    )}
+                    {!!item.nextExternalId && (
+                      <Button
+                        className={styles.actionButton}
+                        color={ButtonColor.ACCENT}
+                        onClick={() =>
+                          openConflict(item.source, item.nextExternalId, true)
+                        }
+                      >
+                        Open the next waiting conflict
+                      </Button>
+                    )}
+                  </>
                 )}
               </div>
             </div>

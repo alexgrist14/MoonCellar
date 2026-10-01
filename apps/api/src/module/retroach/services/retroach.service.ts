@@ -201,6 +201,7 @@ export class RetroachievementsService implements OnModuleInit {
       linkField: "retroachievements.gameId",
       describe: (raId) => this.describeConflict(raId),
       apply: (decisions) => this.applyConflictDecisions(decisions),
+      rematch: (raId) => this.rematchConflict(raId),
     });
   }
 
@@ -232,6 +233,29 @@ export class RetroachievementsService implements OnModuleInit {
         descriptionSignal: "unknown",
       })),
     };
+  }
+
+  private async rematchConflict(raId: string) {
+    const raGame = await this.gameModel
+      .findById(Number(raId))
+      .select("_id title consoleId")
+      .lean();
+
+    if (!raGame) return null;
+
+    const platforms = await this.platforms
+      .find({ raId: raGame.consoleId })
+      .select("_id")
+      .lean();
+    const candidates = await this.games
+      .find({ platformIds: { $in: platforms.map(({ _id }) => _id) } })
+      .select("name slug")
+      .lean();
+
+    return this.toConflictRecord(
+      raGame,
+      rankGamesByTitle(raGame.title, candidates as GameDocument[])
+    ).candidates;
   }
 
   private async describeConflict(

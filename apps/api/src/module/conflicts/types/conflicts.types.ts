@@ -32,4 +32,5 @@ export interface IConflictSourceHandler {
   apply(
     decisions: IConflictDecision[]
   ): Promise<Map<string, Types.ObjectId | null>>;
+  rematch?(externalId: string): Promise<IScoredCandidate[] | null>;
 }

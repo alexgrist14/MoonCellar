@@ -49,6 +49,16 @@ const CREATES_GAME: Record<IConflictSource, boolean> = {
   ra: false,
 };
 
+const REOPENABLE: Record<IConflictSource, boolean> = {
+  vndb: false,
+  igdb: false,
+  hltb: false,
+  ra: true,
+};
+
+export const isReopenable = (source: IConflictSource, state: string) =>
+  REOPENABLE[source] && state === "new-game";
+
 export const skipCaption = (source: IConflictSource) =>
   CREATES_GAME[source] ? "Adds it as a new game" : "Leaves it without a match";
 
