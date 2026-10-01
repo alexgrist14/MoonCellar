@@ -33,20 +33,6 @@
     }
   }
 
-  .admin {
-    @include mediaMd {
-      & button {
-        padding: var(--padding-x05);
-      }
-    }
-
-    &__label {
-      @include mediaMd {
-        display: none;
-      }
-    }
-  }
-
   .nav_desktop {
     display: flex;
     align-items: center;
@@ -110,27 +96,25 @@
     display: flex;
     align-items: center;
     gap: var(--gap-x2);
-
-    .profile {
-      &__link {
-        height: 36px;
-      }
-    }
   }
 
   .title {
     display: flex;
     align-items: center;
     height: 100%;
-    padding-inline: var(--padding-x4);
+    padding-inline: var(--padding-x2);
 
     & img {
-      height: 60%;
+      height: var(--header-logo-height);
       width: auto;
     }
 
     @include mediaSm {
-      padding-inline: var(--padding-x1);
+      padding-inline: 0;
+
+      & img {
+        height: var(--header-logo-height-sm);
+      }
     }
   }
 

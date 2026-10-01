@@ -18,7 +18,7 @@ export const GeoInit = () => {
           });
       })
       .catch(() => {
-        if (active) setGeo({ country: null, blockedCountry: false });
+        if (active) setGeo({ country: null, blockedCountry: true });
       });
     return () => {
       active = false;

@@ -1,24 +1,20 @@
-import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useIsAuthHydrated } from "@/src/lib/shared/hooks/useIsAuthHydrated";
-import { AuthModal } from "@/src/lib/shared/ui/AuthModal";
-import { Avatar } from "@/src/lib/shared/ui/Avatar";
+import { UserMenu } from "@/src/lib/features/user/ui/UserMenu";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { SearchModal } from "@/src/lib/widgets/search/SearchModal";
 import { Separator } from "@/src/lib/shared/ui/Separator";
 import {
-  SvgAdmin,
   SvgSearch,
   SvgGames,
   SvgGauntlet,
   SvgRandom,
   SvgBurger,
   SvgListBullet,
-  SvgInbox,
 } from "@/src/lib/shared/ui/svg";
 import Link from "next/link";
 import Image from "next/image";
-import { FC, MouseEvent, useCallback, useMemo, useRef, useState } from "react";
+import { FC, useCallback, useMemo, useRef, useState } from "react";
 import styles from "./Header.module.scss";
 import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
 import { IButtonGroupItem } from "@/src/lib/shared/types/buttons.type";
@@ -29,7 +25,6 @@ import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
 import classNames from "classnames";
 
 export const Header: FC = () => {
-  const { isAuth, isAdmin, profile } = useAuthStore();
   const isAuthHydrated = useIsAuthHydrated();
 
   const router = useRouter();
@@ -38,13 +33,6 @@ export const Header: FC = () => {
   const menuRef = useRef<HTMLDivElement>(null);
 
   useCloseEvents([menuRef], () => setIsMenuOpen(false));
-
-  const handleProfileClick = (e: MouseEvent<HTMLAnchorElement>) => {
-    if (!isAuth || !profile) {
-      e.preventDefault();
-      modal.open(<AuthModal />);
-    }
-  };
 
   const closeMenu = useCallback(() => setIsMenuOpen(false), []);
 
@@ -191,51 +179,7 @@ export const Header: FC = () => {
         </div>
       </div>
       <div className={styles.container__right}>
-        {isAuthHydrated && isAuth && (
-          <ButtonGroup
-            wrapperClassName={classNames(
-              styles.container__buttons,
-              styles.admin
-            )}
-            buttons={[
-              {
-                title: (
-                  <>
-                    <SvgInbox className={styles.svg} />
-                    <span className={styles.admin__label}>Requests</span>
-                  </>
-                ),
-                link: "/requests",
-                color: ButtonColor.TRANSPARENT,
-                onClick: closeMenu,
-              },
-              ...(isAdmin
-                ? [
-                    {
-                      title: (
-                        <>
-                          <SvgAdmin className={styles.svg} />
-                          <span className={styles.admin__label}>Admin</span>
-                        </>
-                      ),
-                      link: "/admin",
-                      color: ButtonColor.TRANSPARENT,
-                      onClick: closeMenu,
-                    },
-                  ]
-                : []),
-            ]}
-          />
-        )}
-        {isAuthHydrated && (
-          <Link
-            href={`/user/${profile?.userName}`}
-            onClick={handleProfileClick}
-            className={styles.profile__link}
-          >
-            <Avatar user={profile} isWithoutTooltip priority />
-          </Link>
-        )}
+        {isAuthHydrated && <UserMenu />}
       </div>
     </div>
   );

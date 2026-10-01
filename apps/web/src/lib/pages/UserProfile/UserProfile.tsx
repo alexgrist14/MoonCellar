@@ -1,5 +1,6 @@
 "use client";
 
+import classNames from "classnames";
 import { FC, ReactNode, useEffect, useMemo, useState } from "react";
 import {
   profileTabLabels,
@@ -75,9 +76,7 @@ export const UserProfile: FC<UserProfileProps> = ({
   const isAuthHydrated = useIsAuthHydrated();
 
   const viewerId =
-    !isAuthHydrated || authProfile?._id === authUserId
-      ? authUserId
-      : undefined;
+    !isAuthHydrated || authProfile?._id === authUserId ? authUserId : undefined;
 
   const isAuthedUser = useMemo(() => viewerId === user._id, [viewerId, user]);
 
@@ -182,7 +181,11 @@ export const UserProfile: FC<UserProfileProps> = ({
             <UserNavigation {...navigationProps} />
           </ExpandMenu>
         )}
-        <Box classNameContent={styles.content}>
+        <Box
+          classNameContent={classNames(styles.content, {
+            [styles.content_auto]: tab === "settings",
+          })}
+        >
           {tab !== "profile" && (
             <Breadcrumbs
               className={styles.crumbs}

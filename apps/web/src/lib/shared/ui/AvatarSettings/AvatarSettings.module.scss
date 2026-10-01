@@ -43,3 +43,13 @@
   max-height: 160px;
   gap: var(--gap-x5);
 }
+
+.skeleton {
+  cursor: default;
+  background-color: var(--color-bg-primary);
+  animation: skeletonPulse 0.9s var(--easing-in) infinite alternate;
+
+  @include reducedMotion {
+    animation: none;
+  }
+}

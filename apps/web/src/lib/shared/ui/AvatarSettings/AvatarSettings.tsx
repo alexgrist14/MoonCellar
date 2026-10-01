@@ -35,7 +35,11 @@ export const AvatarSettings: FC<AvatarSettingsProps> = ({
     }
   };
 
-  if (!profile) return null;
+  if (!profile) {
+    return (
+      <div className={`${styles.holder} ${styles.skeleton}`} aria-busy="true" />
+    );
+  }
 
   return (
     <label htmlFor="avatar" className={styles.label}>
@@ -81,4 +85,3 @@ export const AvatarSettings: FC<AvatarSettingsProps> = ({
     </label>
   );
 };
-

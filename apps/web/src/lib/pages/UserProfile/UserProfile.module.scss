@@ -28,6 +28,10 @@
     min-height: calc(100dvh - 155px);
     position: relative;
 
+    &_auto {
+      min-height: 0;
+    }
+
     @include mediaMd {
       padding: var(--padding-x3);
     }

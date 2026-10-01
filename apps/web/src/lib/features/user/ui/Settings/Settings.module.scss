@@ -2,14 +2,28 @@
   display: flex;
   flex-direction: column;
   gap: var(--gap-x8);
-  max-width: 720px;
   width: 100%;
-
-  @include mediaMd {
-    max-width: 100%;
-  }
+  container-type: inline-size;
 }
 
+.columns {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x8);
+}
+
+.side {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--gap-x8) var(--gap-x10);
+  align-items: start;
+}
+
+@container (min-width: 700px) {
+  .side {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
 .pageTitle {
   font-size: 2rem;
   margin: 0;
@@ -119,7 +133,7 @@
 .actions {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: var(--gap-x4);
   padding-top: var(--padding-x2);
 

@@ -10,6 +10,8 @@ const BLOCKED = new Set(
     .filter(Boolean)
 );
 
+const IS_UNKNOWN_BLOCKED = process.env.NODE_ENV !== "development";
+
 let readerPromise: Promise<Reader<CountryResponse>> | null = null;
 
 function getReader(): Promise<Reader<CountryResponse>> {
@@ -36,7 +38,7 @@ export async function getClientGeo(): Promise<{
   try {
     const h = await headers();
     const ip = extractClientIp(h.get("x-real-ip"), h.get("x-forwarded-for"));
-    if (!ip) return { country: null, blockedCountry: false };
+    if (!ip) return { country: null, blockedCountry: IS_UNKNOWN_BLOCKED };
 
     const reader = await getReader();
     const result = reader.get(ip);
@@ -44,9 +46,11 @@ export async function getClientGeo(): Promise<{
 
     return {
       country,
-      blockedCountry: country ? BLOCKED.has(country.toUpperCase()) : false,
+      blockedCountry: country
+        ? BLOCKED.has(country.toUpperCase())
+        : IS_UNKNOWN_BLOCKED,
     };
   } catch {
-    return { country: null, blockedCountry: false };
+    return { country: null, blockedCountry: IS_UNKNOWN_BLOCKED };
   }
 }

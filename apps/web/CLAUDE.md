@@ -504,6 +504,15 @@ break silently when ignored:
 
 - Before building a new modal that shows a title plus a list of "row" blocks (an icon/content on one side, text on the other — e.g. `AchievementsModal`, `GamePlaysInfo`), ask the user whether the shared `RowsModal` component (`src/lib/shared/ui/RowsModal`) should be used instead of a bespoke layout. Do not silently assume either way.
 
+## Adult content
+
+- **An unknown country counts as blocked everywhere except `next dev`.** `getClientGeo` and
+  `GeoInit` fail closed: no client IP, a missing `GeoLite2-Country.mmdb` or a failed `/api/geo`
+  all hide adult media and the "Show adult content" setting, because the blocked region
+  (`GEO_BLOCK_COUNTRIES`, `RU` by default) must stay filtered even when the lookup breaks.
+  Local development is exempt so the setting can be tested without the GeoIP file; a production
+  build without that file hides adult content from everyone.
+
 ## Data fetching failures
 
 - **Every failed request already shows a toast**, from the response interceptor in
