@@ -1,6 +1,7 @@
 export * from "./characters.schema";
 export * from "./comment-reports.schema";
 export * from "./generated-images.schema";
+export * from "./igdb-orphans.schema";
 export * from "./site-sessions.schema";
 export * from "./comments-socket.schema";
 export * from "./comments.schema";

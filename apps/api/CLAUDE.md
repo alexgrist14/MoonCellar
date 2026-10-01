@@ -338,6 +338,21 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   the nightly sync reaches it by `igdb.gameId` again, so without this rule the first sync
   after linking would overwrite everything the admin wrote. To hand a game over to IGDB
   completely, clear `isCustom`.
+- **`IgdbOrphansService` removes games whose `igdb.gameId` IGDB no longer returns, and it never
+  deletes a game anyone owns or uses.** `POST /igdb/orphans` (`{ apply?, limit? }`, a dry run by
+  default) answers 202 and runs in the background; `GET /igdb/orphans` reads the report. The
+  same job runs every Monday at 02:00 Moscow time (`IGDB_ORPHANS_CRON`) in apply mode with the
+  default delete limit (500); both take the `igdb-orphans` `withDbLock`, so a manual run and the
+  cron never overlap. Games with `isStopParsing` are not scanned. A VNDB-owned (`vndb.vnId`) or
+  hand-made (`isCustom`) game only loses its dead `igdb` field; a game referenced by playthroughs,
+  ratings, user logs, comments, custom lists, favourites or royal games is kept and reported for
+  the admin to decide. The rest goes through `GamesService.deleteGame`, which also removes the
+  game's images from the Space and pulls it from `characters.gameIds`/`spoilerGameIds`.
+- **The orphan run writes nothing when the IGDB answer looks wrong.** A batch that still fails
+  after three attempts, more than `IGDB_ORPHANS_MAX_MISSING` (5000) missing games, or more than
+  `IGDB_ORPHANS_MAX_RATIO` (2%) of the scanned games missing sets `refusedReason`, and the run
+  only reports. An IGDB outage that answers with empty arrays would otherwise read as "every
+  game is gone" and wipe the catalogue. An unknown answer counts as present, never as missing.
 
 ## Conflicts
 

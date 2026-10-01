@@ -598,7 +598,18 @@ export class GamesService implements OnModuleInit {
           { "presets.preset": _id.toString() },
           { $pull: { "presets.$[].preset": _id.toString() } }
         ),
+        this.Games.db
+          .collection<{
+            gameIds: mongoose.Types.ObjectId[];
+            spoilerGameIds: mongoose.Types.ObjectId[];
+          }>("characters")
+          .updateMany(
+            { $or: [{ gameIds: _id }, { spoilerGameIds: _id }] },
+            { $pull: { gameIds: _id, spoilerGameIds: _id } }
+          ),
       ]);
+
+      await this.deleteGameImages(game);
 
       this.indexNow.submitUrl(`${FRONT_URL}/games/${game.slug}`);
 
@@ -606,6 +617,35 @@ export class GamesService implements OnModuleInit {
     } catch (err) {
       this.logger.error(err, `Failed to delete game: ${_id}`);
       throw err;
+    }
+  }
+
+  private async deleteGameImages(game: Game) {
+    const keysByFolder = new Map<S3Folder, Set<string>>();
+
+    [
+      game.cover,
+      game.backgroundImage,
+      game.bannerImage,
+      ...(game.screenshots ?? []),
+      ...(game.artworks ?? []),
+    ].forEach((url) => {
+      const ref = parseS3ImageUrl(url);
+
+      if (!ref) return;
+
+      keysByFolder.set(
+        ref.folder,
+        (keysByFolder.get(ref.folder) ?? new Set()).add(ref.key)
+      );
+    });
+
+    for (const [folder, keys] of keysByFolder) {
+      await this.fileService
+        .deleteFiles([...keys], folder)
+        .catch((err: Error) =>
+          this.logger.error(err, `Failed to delete images of ${game.slug}`)
+        );
     }
   }
 

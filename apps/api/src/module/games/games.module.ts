@@ -45,6 +45,8 @@ import {
 } from "./schemas/content-request.schema";
 import { HttpModule } from "@nestjs/axios";
 import { IgdbModule } from "../igdb/igdb.module";
+import { IgdbOrphansController } from "../igdb/controllers/igdb-orphans.controller";
+import { IgdbOrphansService } from "../igdb/igdb-orphans.service";
 import { JwtModule } from "@nestjs/jwt";
 import { MatchingModule } from "./matching/matching.module";
 import { ConflictsModule } from "../conflicts/conflicts.module";
@@ -59,6 +61,7 @@ import { ConflictsModule } from "../conflicts/conflicts.module";
     VndbController,
     ImageDedupeController,
     ContentRequestsController,
+    IgdbOrphansController,
   ],
   providers: [
     GamesService,
@@ -72,6 +75,7 @@ import { ConflictsModule } from "../conflicts/conflicts.module";
     VndbService,
     ImageDedupeService,
     ContentRequestsService,
+    IgdbOrphansService,
   ],
   imports: [
     IgdbModule,
