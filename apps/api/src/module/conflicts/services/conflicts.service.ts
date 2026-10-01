@@ -154,9 +154,11 @@ export class ConflictsService {
     take,
     search,
     source,
+    isWaitingOnly,
   }: IGetConflictsParams): Promise<IConflictsResponse> {
     const filter = {
       ...(source ? { source } : {}),
+      ...(isWaitingOnly ? UNDECIDED_FILTER : {}),
       ...(search
         ? {
             $or: [

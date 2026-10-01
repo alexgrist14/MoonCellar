@@ -27,9 +27,6 @@ import {
 } from "@/src/lib/shared/utils/admin-url.utils";
 import styles from "./Admin.module.scss";
 
-const withCount = (name: string, count?: number) =>
-  count ? `${name} ${count}` : name;
-
 interface IAdminProps {
   tab: TAdminTab;
 }
@@ -66,7 +63,7 @@ export const Admin = ({ tab }: IAdminProps) => {
 
   const renderSection = (
     list: ReactNode,
-    extra: { view: string; label: string; content: ReactNode }
+    extra: { view: string; label: string; count?: number; content: ReactNode }
   ) => (
     <div className={styles.section}>
       <Tabs
@@ -76,6 +73,7 @@ export const Admin = ({ tab }: IAdminProps) => {
           { tabName: "List", onTabClick: () => setAdminQuery({ view: null }) },
           {
             tabName: extra.label,
+            count: extra.count,
             onTabClick: () => setAdminQuery({ view: extra.view }),
           },
         ]}
@@ -87,19 +85,23 @@ export const Admin = ({ tab }: IAdminProps) => {
   const mainTabs = [
     { tabName: "Users", onTabClick: () => selectTab(0) },
     {
-      tabName: withCount("Games", pendingGames),
+      tabName: "Games",
+      count: pendingGames,
       onTabClick: () => selectTab(1),
     },
     {
-      tabName: withCount("Comments", pendingReports),
+      tabName: "Comments",
+      count: pendingReports,
       onTabClick: () => selectTab(2),
     },
     {
-      tabName: withCount("Conflicts", pendingConflicts),
+      tabName: "Conflicts",
+      count: pendingConflicts,
       onTabClick: () => selectTab(3),
     },
     {
-      tabName: withCount("Characters", pendingCharacters),
+      tabName: "Characters",
+      count: pendingCharacters,
       onTabClick: () => selectTab(4),
     },
     { tabName: "Images", onTabClick: () => selectTab(5) },
@@ -125,20 +127,23 @@ export const Admin = ({ tab }: IAdminProps) => {
       {tabIndex === 1 &&
         renderSection(<GameList />, {
           view: "requests",
-          label: withCount("Requests", pendingGames),
+          label: "Requests",
+          count: pendingGames,
           content: <RequestsReview kind="game" />,
         })}
       {tabIndex === 2 &&
         renderSection(<CommentList />, {
           view: "reports",
-          label: withCount("Reports", pendingReports),
+          label: "Reports",
+          count: pendingReports,
           content: <ReportList />,
         })}
       {tabIndex === 3 && <Conflicts />}
       {tabIndex === 4 &&
         renderSection(<CharactersAdmin />, {
           view: "requests",
-          label: withCount("Requests", pendingCharacters),
+          label: "Requests",
+          count: pendingCharacters,
           content: <RequestsReview kind="character" />,
         })}
       {tabIndex === 5 && <ImageGenerator />}

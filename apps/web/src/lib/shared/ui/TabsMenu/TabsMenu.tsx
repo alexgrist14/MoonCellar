@@ -7,8 +7,11 @@ import { Popover } from "../Popover";
 import { SvgBurger } from "../svg";
 import styles from "./TabsMenu.module.scss";
 
+export const TabCount: FC<{ count?: number }> = ({ count }) =>
+  count ? <span className={styles.count}>({count})</span> : null;
+
 interface ITabsMenuProps {
-  tabs: { tabName: string; onTabClick: () => void }[];
+  tabs: { tabName: string; count?: number; onTabClick: () => void }[];
   activeIndex: number;
   title?: string;
   className?: string;
@@ -35,6 +38,7 @@ export const TabsMenu: FC<ITabsMenuProps> = ({
       >
         <SvgBurger className={styles.trigger__icon} />
         {tabs[activeIndex]?.tabName}
+        <TabCount count={tabs[activeIndex]?.count} />
       </Button>
       <Popover
         anchorRef={anchorRef}
@@ -58,6 +62,7 @@ export const TabsMenu: FC<ITabsMenuProps> = ({
               }}
             >
               {tab.tabName}
+              <TabCount count={tab.count} />
             </button>
           ))}
         </nav>

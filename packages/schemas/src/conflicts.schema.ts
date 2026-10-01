@@ -161,6 +161,10 @@ export const GetConflictsRequestSchema = z.object({
     .optional()
     .describe("Match an entry title or a candidate game name"),
   source: ConflictSourceSchema.optional(),
+  isWaitingOnly: z
+    .stringbool()
+    .optional()
+    .describe("Hide conflicts that already have a decision"),
 });
 
 export const ConflictCandidateGameSchema = z.object({

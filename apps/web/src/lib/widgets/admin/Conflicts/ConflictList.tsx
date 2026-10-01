@@ -4,6 +4,7 @@ import classNames from "classnames";
 import { useDebouncedCallback } from "use-debounce";
 import { CONFLICTS_PAGE_SIZE, IConflictSource } from "@mooncellar/schemas";
 import { Input } from "@/src/lib/shared/ui/Input";
+import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import { Table } from "@/src/lib/shared/ui/Table";
 import { ITableCell } from "@/src/lib/shared/types/table.type";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
@@ -18,6 +19,8 @@ import {
 import styles from "./Conflicts.module.scss";
 
 const SEARCH_DELAY_MS = 300;
+const ON = "ON";
+const OFF = "OFF";
 
 interface IConflictListProps {
   source?: IConflictSource;
@@ -27,12 +30,14 @@ export const ConflictList: FC<IConflictListProps> = ({ source }) => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [inputValue, setInputValue] = useState("");
+  const [isWaitingOnly, setIsWaitingOnly] = useState(true);
 
   const { data, isLoading, isFetching } = useConflictsQuery({
     page,
     take: CONFLICTS_PAGE_SIZE,
     search: search || undefined,
     source,
+    isWaitingOnly,
   });
 
   const debouncedSearch = useDebouncedCallback((value: string) => {
@@ -44,15 +49,29 @@ export const ConflictList: FC<IConflictListProps> = ({ source }) => {
 
   return (
     <div className={styles.list}>
-      <div className={styles.search}>
-        <Input
-          value={inputValue}
-          placeholder="Search an entry or a candidate name"
-          onChange={(event) => {
-            setInputValue(event.target.value);
-            debouncedSearch(event.target.value);
-          }}
-        />
+      <div className={styles.filters}>
+        <div className={styles.search}>
+          <Input
+            value={inputValue}
+            placeholder="Search an entry or a candidate name"
+            onChange={(event) => {
+              setInputValue(event.target.value);
+              debouncedSearch(event.target.value);
+            }}
+          />
+        </div>
+        <div className={styles.toggle}>
+          Hide decided
+          <ToggleSwitch
+            leftContent={OFF}
+            rightContent={ON}
+            value={isWaitingOnly ? "right" : "left"}
+            clickCallback={(result) => {
+              setIsWaitingOnly(result === ON);
+              setPage(1);
+            }}
+          />
+        </div>
       </div>
 
       <Table

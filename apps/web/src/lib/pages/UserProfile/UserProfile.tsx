@@ -41,6 +41,7 @@ import { userAPI } from "@/src/lib/shared/api";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { usePlaythroughsStore } from "@/src/lib/shared/store/playthroughs.store";
 import { refreshAuth } from "@/src/lib/shared/hooks/useAuthRefresh";
+import { useIsAuthHydrated } from "@/src/lib/shared/hooks/useIsAuthHydrated";
 
 interface UserProfileProps {
   user: IUser;
@@ -71,9 +72,10 @@ export const UserProfile: FC<UserProfileProps> = ({
   const { isMobile } = useStatesStore();
 
   const authProfile = useAuthStore((s) => s.profile);
+  const isAuthHydrated = useIsAuthHydrated();
 
   const viewerId =
-    typeof window === "undefined" || authProfile?._id === authUserId
+    !isAuthHydrated || authProfile?._id === authUserId
       ? authUserId
       : undefined;
 

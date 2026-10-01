@@ -4,7 +4,7 @@ import cl from "classnames";
 import styles from "./Tabs.module.scss";
 import Link from "next/link";
 import { ITabContent } from "@/src/lib/shared/types/tabs.type";
-import { TabsMenu } from "../TabsMenu";
+import { TabCount, TabsMenu } from "../TabsMenu";
 
 interface ITabs {
   contents: ITabContent[];
@@ -89,6 +89,7 @@ export const Tabs: FC<ITabs> = ({
                 onClick={() => selectTab(content, i)}
               >
                 {content.tabName}
+                <TabCount count={content.count} />
                 {content?.tabNameNode}
               </Button>
             </Link>
@@ -106,6 +107,7 @@ export const Tabs: FC<ITabs> = ({
               onClick={() => selectTab(content, i)}
             >
               {content.tabName}
+              <TabCount count={content.count} />
               {content?.tabNameNode}
             </Button>
           );
@@ -124,6 +126,7 @@ export const Tabs: FC<ITabs> = ({
         activeIndex={tabIndex}
         tabs={contents.map((content, i) => ({
           tabName: content.tabName,
+          count: content.count,
           onTabClick: () => selectTab(content, i),
         }))}
       />

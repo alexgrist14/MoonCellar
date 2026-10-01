@@ -44,3 +44,12 @@
     }
   }
 }
+
+.count {
+  margin-left: var(--gap-x1);
+  color: var(--tab-count-color);
+  font-variant-numeric: tabular-nums;
+  vertical-align: 1px;
+
+  @include font(11px, 14px, 500);
+}

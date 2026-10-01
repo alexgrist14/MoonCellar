@@ -214,9 +214,8 @@ export const Conflicts: FC = () => {
                 onTabClick: () => openConflict(null, null, true),
               },
               ...CONFLICT_SOURCES.map((name) => ({
-                tabName: summary?.bySource[name]
-                  ? `${SOURCE_LABELS[name]} ${summary.bySource[name]}`
-                  : SOURCE_LABELS[name],
+                tabName: SOURCE_LABELS[name],
+                count: summary?.bySource[name],
                 onTabClick: () => openConflict(name, null, true),
               })),
             ]}
@@ -398,7 +397,7 @@ export const Conflicts: FC = () => {
               </div>
 
               {isDecidable ? (
-                <p className={styles.hint}>
+                <p className={classNames(styles.hint, styles.hint_keys)}>
                   <kbd className={styles.key}>↑</kbd>
                   <kbd className={styles.key}>↓</kbd>
                   choose a candidate

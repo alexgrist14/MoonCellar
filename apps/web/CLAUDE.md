@@ -418,7 +418,7 @@ break silently when ignored:
   still carrying a live cookie got the owner's profile: `PATCH profile-time` fired on open, log
   deletion was offered, and every such request died with `400 Wrong user` from `UserIdGuard`.
   `UserProfile` accepts the server's `authUserId` only when the store's profile has the same id
-  (the server render, which has no store, keeps the cookie's answer), and on disagreement calls
+  (the server render, which has no store, keeps the cookie's answer, and so does the hydration render through `useIsAuthHydrated` — a `typeof window` check there made the owner's Lists tab exist only on the server and failed hydration), and on disagreement calls
   `refreshAuth`, which either restores the session or gets the stale cookies cleared.
 
 ## Sockets
