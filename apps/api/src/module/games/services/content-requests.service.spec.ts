@@ -135,7 +135,8 @@ const createService = ({
     {
       assertNoDuplicates: jest.fn().mockResolvedValue(undefined),
       ...gameMatcher,
-    } as never
+    } as never,
+    { pin: jest.fn().mockResolvedValue(undefined) } as never
   );
 
   return { service, requests, charactersModel, gamesModel, files };

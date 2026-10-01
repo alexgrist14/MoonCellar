@@ -137,11 +137,12 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   happens with a fixed `height` the content can outgrow.
 - **Clamping `Box`'s height is not the same as clamping its content.** `.template` is a column
   flex container; its child is the resize-observer wrapper (`.template__resizer`), which carries
-  `min-height: 0` so it can shrink below its content, and `Scrollbar`'s container gets
-  `min-height: 0` too. Without both, `max-height` on `.template` shrinks only the panel's own
-  background while the text keeps flowing past the rounded border — the symptom is release
-  dates spilling out of the gauntlet winner panel and down the page. Do not remove those two
-  `min-height: 0` declarations; the scroll area's height comes from flex shrinking, not from
+  `min-height: 0` so it can shrink below its content, as does the non-scrolling content element
+  (`.template__content`) inside it, and `Scrollbar`'s container gets `min-height: 0` too.
+  Without them, `max-height` on `.template` shrinks only the panel's own background while the
+  text keeps flowing past the rounded border — the symptom is release dates spilling out of
+  the gauntlet winner panel and down the page. Do not remove those `min-height: 0`
+  declarations; the scroll area's height comes from flex shrinking, not from
   the `max-height: 100%` on the content (that percentage resolves against an indefinite box and
   is ignored).
 - **A `Box` stretched to fill a fixed-height container (`templateStyle={{ height: "100%" }}`)

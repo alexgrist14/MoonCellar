@@ -4,6 +4,7 @@ import Link from "next/link";
 import classNames from "classnames";
 import { IConflictCandidate, IScoreBreakdown } from "@mooncellar/schemas";
 import { Badge } from "@/src/lib/shared/ui/Badge";
+import { Checkbox } from "@/src/lib/shared/ui/Checkbox";
 import styles from "./Conflicts.module.scss";
 
 const BREAKDOWN_LABELS: Record<keyof IScoreBreakdown, string> = {
@@ -67,15 +68,19 @@ export const Fact: FC<{ label: string; value?: string | null }> = ({
 interface ICandidateCardProps {
   candidate: IConflictCandidate;
   isSelected: boolean;
+  isChosen?: boolean;
   platformNames: (ids: string[]) => string;
   onSelect: () => void;
+  onToggle?: () => void;
 }
 
 export const CandidateCard: FC<ICandidateCardProps> = ({
   candidate,
   isSelected,
+  isChosen,
   platformNames,
   onSelect,
+  onToggle,
 }) => {
   const ref = useRef<HTMLLIElement>(null);
   const { game, breakdown } = candidate;
@@ -93,6 +98,7 @@ export const CandidateCard: FC<ICandidateCardProps> = ({
       aria-current={isSelected}
       className={classNames(styles.candidate, {
         [styles.candidate_selected]: isSelected,
+        [styles.candidate_chosen]: isChosen,
       })}
       onClick={onSelect}
     >
@@ -147,6 +153,13 @@ export const CandidateCard: FC<ICandidateCardProps> = ({
         {game?.summary && <p className={styles.summary}>{game.summary}</p>}
 
         <ul className={styles.ledger} aria-label="Why the score">
+          {candidate.matchedTitle && (
+            <li>
+              <Badge tone="muted" variant="outlined">
+                Matches “{candidate.matchedTitle}”
+              </Badge>
+            </li>
+          )}
           {points.map((key) => (
             <li key={key}>
               <Badge tone={breakdown[key] > 0 ? "positive" : "negative"}>
@@ -167,6 +180,15 @@ export const CandidateCard: FC<ICandidateCardProps> = ({
       </div>
 
       <div className={styles.candidate__side}>
+        {onToggle && (
+          <Checkbox
+            checked={!!isChosen}
+            aria-label={`Link ${candidate.name} too`}
+            disabled={!game}
+            onClick={(event) => event.stopPropagation()}
+            onChange={onToggle}
+          />
+        )}
         <span className={styles.score}>
           {candidate.score}
           <small>score</small>

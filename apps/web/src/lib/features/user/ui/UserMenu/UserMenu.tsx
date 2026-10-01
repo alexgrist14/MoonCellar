@@ -28,7 +28,6 @@ export const UserMenu: FC = () => {
 
   return (
     <ActionsMenu
-      title={profile.userName}
       isNavigation
       renderTrigger={({ ref, isOpen, toggle }) => (
         <button

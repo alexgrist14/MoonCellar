@@ -163,7 +163,35 @@ describe("rankGamesByTitle", () => {
     const candidates = [{ name: "Dragon Quest" }];
 
     expect(rankGamesByTitle("Dragon Warrior|Dragon Quest", candidates)).toEqual(
-      [{ game: candidates[0], score: expect.any(Number) }]
+      [
+        {
+          game: candidates[0],
+          score: expect.any(Number),
+          matchedTitle: "Dragon Quest",
+        },
+      ]
+    );
+  });
+
+  it("names the RA title each candidate matched", () => {
+    const candidates = [
+      { name: "Jennifer Capriati Tennis" },
+      { name: "GrandSlam: The Tennis Tournament" },
+    ];
+
+    expect(
+      rankGamesByTitle(
+        "Jennifer Capriati Tennis | GrandSlam: The Tennis Tournament",
+        candidates
+      ).map(({ game, matchedTitle }) => [game.name, matchedTitle])
+    ).toEqual(
+      expect.arrayContaining([
+        ["Jennifer Capriati Tennis", "Jennifer Capriati Tennis"],
+        [
+          "GrandSlam: The Tennis Tournament",
+          "GrandSlam: The Tennis Tournament",
+        ],
+      ])
     );
   });
 });

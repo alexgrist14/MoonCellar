@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Button, ButtonColor } from "../Button";
+import { Scrollbar } from "../Scrollbar";
 import { Box } from "./Box";
 
 const paragraph =
@@ -65,6 +66,30 @@ export const Scrollable: Story = {
     isWithScrollBar: true,
     contentStyle: { maxHeight: 160 },
     children: Array.from({ length: 6 }, (_, i) => <p key={i}>{paragraph}</p>),
+  },
+};
+
+export const FillsContainer: Story = {
+  decorators: [
+    (Story) => (
+      <div style={{ maxWidth: 480, height: 280 }}>
+        <Story />
+      </div>
+    ),
+  ],
+  args: {
+    title: "Search results",
+    wrapperStyle: { height: "100%" },
+    templateStyle: { height: "100%", minHeight: 0 },
+    children: (
+      <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
+        <Scrollbar type="absolute" contentStyle={{ maxHeight: "100%" }}>
+          {Array.from({ length: 6 }, (_, i) => (
+            <p key={i}>{paragraph}</p>
+          ))}
+        </Scrollbar>
+      </div>
+    ),
   },
 };
 

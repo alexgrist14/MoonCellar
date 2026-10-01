@@ -32,6 +32,8 @@ import { DatePicker } from "@/src/lib/shared/ui/DatePicker";
 
 ## Rules and gotchas
 
+- The field's radius is `--radius-x4`, the same as `Input` and `Dropdown`, so the three line up
+  in one form.
 - **The popover is portalled into `#dropdown-connector`** (falls back to `document.body`), so a
   field inside a modal or a clipped panel is never cut off. It flips above the field when there
   is no room below and follows scroll and resize.

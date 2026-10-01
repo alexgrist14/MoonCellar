@@ -72,6 +72,10 @@ import { Box } from "@/src/lib/shared/ui/Box";
   `templateStyle={{ height: "100%" }}`; `height: 100%` on the wrapper cancels the flex stretch.
 - Do not remove the `min-height: 0` on `.template__resizer` and on the `Scrollbar` container:
   without them `max-height` clamps only the background while the text flows past the border.
+- The same goes for `min-height: 0` on `.template__content`: a `Box` filling a fixed-height
+  container without `isWithScrollBar` (the search modal) hands the scroll to a child with
+  `flex: 1` and `min-height: 0`; without it the content grows to the full result list, no
+  scrollbar appears and the cards run past the panel's bottom border.
 - A child of a scrolling `Box` with its own `min-height` (or fixed `height`) needs
   `flex-shrink: 0`, or it shrinks to the cap and its last row sits on the bottom padding.
 - Do not put a new element between a grid cell and the `Box` to animate it; animate the cell,
@@ -83,4 +87,4 @@ import { Box } from "@/src/lib/shared/ui/Box";
 ## Storybook
 
 `Shared/Box`: Default, WithTitle, WithTitleCount, WithNodeTitle, WithClose, WithTitleAction,
-HeaderOutside, Scrollable, Borderless.
+HeaderOutside, Scrollable, FillsContainer, Borderless.

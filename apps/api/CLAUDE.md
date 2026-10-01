@@ -382,10 +382,25 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   would leave that game behind and let a Match link the entry a second time. RA implements it;
   HLTB does not yet.
 - **`parseRAGames` recomputes every RA link each run, so it must read the RA conflicts first.**
-  A resolved conflict pins its winner, and a pending or skipped one links nothing. Without this
-  the next nightly run replaces an admin's decision with the fuzzy match again. A match counts
-  as ambiguous when the two best fuzzysort scores differ by less than `RA_AMBIGUITY_GAP` (0.05):
-  about 570 of the 10,021 RA games that matched on 2026-09-30.
+  A resolved conflict pins its winners, and a pending or skipped one links nothing. Without this
+  the next nightly run replaces an admin's decision with the fuzzy match again. The run also
+  pulls an RA set from every game it did not match when the run gave that set to another game, so
+  one set never stays on two games after a conflict or a better title match moved it. It never
+  clears a link just because nothing matched it: on 2026-10-01 that would have removed 561 correct
+  links (localised titles such as "Wipeout 2097" on Wipeout XL, consoles whose platform mapping
+  changed, sets waiting in a conflict) next to 78 stale ones. A match counts as ambiguous when the two best fuzzysort scores
+  differ by less than `RA_AMBIGUITY_GAP` (0.05): about 570 of the 10,021 RA games that matched on
+  2026-09-30.
+- **An RA link written outside the sync must be pinned with `ConflictsService.pin`, or the next
+  nightly run removes it.** Approving a request with RA ids does this: `pin` upserts a resolved
+  `ra` conflict and adds the game to its `winners`, which `parseRAGames` then keeps.
+- **A conflict stores every game it links in `winners`; `winner` is the first of them.** Only a
+  handler with `isMultiMatch` (RA) accepts `gameIds` with several games — one RA achievement set
+  often covers two games ("Pokémon HeartGold | SoulSilver"), and with one winner the second game
+  never got its set. Other sources answer 400, since a VNDB or IGDB entry is one game. Records
+  decided before `winners` existed carry only `winner`; read them through `winnerIds`. An RA
+  candidate also stores `matchedTitle`, the part of a `|` title it matched, so equal scores on two
+  different games read as two different titles rather than a broken scorer.
 - **The matcher lives in `games/matching`, and a profile, not the caller, decides the rules.**
   `resolveMatch` is the former VNDB scoring unchanged, and the snapshot spec
   `vndb-match.characterization.spec.ts` pins it. A new source adds a profile. Change VNDB

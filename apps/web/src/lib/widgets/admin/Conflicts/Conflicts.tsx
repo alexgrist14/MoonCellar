@@ -57,6 +57,10 @@ export const Conflicts: FC = () => {
   const source = parseConflictSource(searchParams.get("source"));
   const externalId = source ? searchParams.get("conflict") : null;
   const [selection, setSelection] = useState({ externalId: "", index: 0 });
+  const [chosen, setChosen] = useState<{ externalId: string; ids: string[] }>({
+    externalId: "",
+    ids: [],
+  });
 
   const { data: summary } = useConflictsSummaryQuery(source);
   const { data, isLoading } = useConflictItemQuery(
@@ -86,6 +90,14 @@ export const Conflicts: FC = () => {
         }));
   const selected = options[selectedIndex];
   const optionsCount = options.length;
+  const isMultiMatch = !!item?.isMultiMatch;
+  const chosenIds =
+    item && chosen.externalId === item.externalId ? chosen.ids : [];
+  const matchOptions = chosenIds.length
+    ? options.filter(({ id }) => chosenIds.includes(id))
+    : selected?.isUsable
+      ? [selected]
+      : [];
   const isDecidable = item?.state === "waiting";
   const subject = item?.subject;
   const sourceName = item ? SOURCE_LABELS[item.source] : "";
@@ -105,14 +117,35 @@ export const Conflicts: FC = () => {
     [item]
   );
 
+  const toggle = useCallback(
+    (id: string) =>
+      item &&
+      setChosen((previous) => {
+        const ids = previous.externalId === item.externalId ? previous.ids : [];
+
+        return {
+          externalId: item.externalId,
+          ids: ids.includes(id)
+            ? ids.filter((chosenId) => chosenId !== id)
+            : [...ids, id],
+        };
+      }),
+    [item]
+  );
+
   const resolve = useCallback(
-    (id: string | null) => {
+    (ids: string[]) => {
       if (!item || item.state !== "waiting") return;
 
       decide({
         source: item.source,
         externalId: item.externalId,
-        choice: item.direction === "entries" ? { entryId: id } : { gameId: id },
+        choice:
+          item.direction === "entries"
+            ? { entryId: ids[0] ?? null }
+            : ids.length > 1
+              ? { gameIds: ids }
+              : { gameId: ids[0] ?? null },
       });
       openConflict(item.source, item.nextExternalId, true);
     },
@@ -147,10 +180,15 @@ export const Conflicts: FC = () => {
         select(Math.min(Math.max(selectedIndex + step, 0), options.length - 1));
       } else if (event.key === "ArrowLeft") {
         event.preventDefault();
-        if (!event.repeat) resolve(null);
+        if (!event.repeat) resolve([]);
       } else if (event.key === "ArrowRight") {
         event.preventDefault();
-        if (!event.repeat && selected?.isUsable) resolve(selected.id);
+        if (!event.repeat && matchOptions.length) {
+          resolve(matchOptions.map(({ id }) => id));
+        }
+      } else if (event.code === "KeyA" && isMultiMatch) {
+        event.preventDefault();
+        if (!event.repeat && selected?.isUsable) toggle(selected.id);
       }
     };
 
@@ -163,7 +201,10 @@ export const Conflicts: FC = () => {
     selectedIndex,
     selected,
     optionsCount,
+    matchOptions,
+    isMultiMatch,
     select,
+    toggle,
     resolve,
   ]);
 
@@ -365,8 +406,14 @@ export const Conflicts: FC = () => {
                         key={candidate.gameId}
                         candidate={candidate}
                         isSelected={index === selectedIndex}
+                        isChosen={chosenIds.includes(candidate.gameId)}
                         platformNames={platformNames}
                         onSelect={() => select(index)}
+                        onToggle={
+                          isMultiMatch && isDecidable
+                            ? () => toggle(candidate.gameId)
+                            : undefined
+                        }
                       />
                     ))}
                   </ul>
@@ -379,7 +426,7 @@ export const Conflicts: FC = () => {
                 <Button
                   className={styles.actionButton}
                   disabled={!isDecidable}
-                  onClick={() => resolve(null)}
+                  onClick={() => resolve([])}
                 >
                   <kbd className={styles.key}>←</kbd>
                   Skip
@@ -394,6 +441,12 @@ export const Conflicts: FC = () => {
                   <kbd className={styles.key}>↑</kbd>
                   <kbd className={styles.key}>↓</kbd>
                   choose a candidate
+                  {isMultiMatch && (
+                    <>
+                      <kbd className={styles.key}>A</kbd>
+                      link several
+                    </>
+                  )}
                 </p>
               ) : (
                 <p className={styles.hint}>
@@ -407,15 +460,19 @@ export const Conflicts: FC = () => {
                 {isDecidable ? (
                   <>
                     <span className={styles.caption}>
-                      {selected ? `Links it to ${selected.name}` : ""}
+                      {matchOptions.length
+                        ? `Links it to ${matchOptions.map(({ name }) => name).join(" and ")}`
+                        : ""}
                     </span>
                     <Button
                       className={styles.actionButton}
                       color={ButtonColor.GREEN}
-                      disabled={!selected?.isUsable}
-                      onClick={() => selected && resolve(selected.id)}
+                      disabled={!matchOptions.length}
+                      onClick={() => resolve(matchOptions.map(({ id }) => id))}
                     >
-                      Match
+                      {matchOptions.length > 1
+                        ? `Match ${matchOptions.length}`
+                        : "Match"}
                       <kbd className={styles.key}>→</kbd>
                     </Button>
                   </>

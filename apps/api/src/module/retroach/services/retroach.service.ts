@@ -198,6 +198,7 @@ export class RetroachievementsService implements OnModuleInit {
     this.conflicts.register({
       source: "ra",
       direction: "games",
+      isMultiMatch: true,
       linkField: "retroachievements.gameId",
       describe: (raId) => this.describeConflict(raId),
       apply: (decisions) => this.applyConflictDecisions(decisions),
@@ -207,14 +208,17 @@ export class RetroachievementsService implements OnModuleInit {
 
   private toConflictRecord(
     raGame: Pick<RAGame, "_id" | "title">,
-    ranked: { game: GameDocument; score: number }[]
+    ranked: { game: GameDocument; score: number; matchedTitle: string }[]
   ): IConflictRecord {
+    const hasSeveralTitles = raGame.title.includes("|");
+
     return {
       externalId: String(raGame._id),
       externalName: raGame.title,
       reason: "competing-candidates",
-      candidates: ranked.map(({ game, score }) => ({
+      candidates: ranked.map(({ game, score, matchedTitle }) => ({
         game: game as unknown as TMatchCandidate,
+        matchedTitle: hasSeveralTitles ? matchedTitle : null,
         score: Math.round(score * 100) / 100,
         dateSignal: "unknown",
         breakdown: {
@@ -291,7 +295,7 @@ export class RetroachievementsService implements OnModuleInit {
   ): Promise<Map<string, mongoose.Types.ObjectId | null>> {
     const applied = new Map<string, mongoose.Types.ObjectId | null>();
 
-    for (const { externalId, decision, winner } of decisions) {
+    for (const { externalId, decision, winners } of decisions) {
       const raGame = await this.gameModel
         .findById(Number(externalId))
         .select("_id consoleId")
@@ -304,10 +308,10 @@ export class RetroachievementsService implements OnModuleInit {
         continue;
       }
 
-      if (!winner) continue;
+      if (!winners.length) continue;
 
-      const { matchedCount } = await this.games.updateOne(
-        { _id: winner },
+      const { matchedCount } = await this.games.updateMany(
+        { _id: { $in: winners } },
         {
           $addToSet: {
             retroachievements: {
@@ -318,7 +322,7 @@ export class RetroachievementsService implements OnModuleInit {
         }
       );
 
-      if (matchedCount) applied.set(externalId, winner);
+      if (matchedCount) applied.set(externalId, winners[0]);
     }
 
     return applied;
@@ -374,12 +378,12 @@ export class RetroachievementsService implements OnModuleInit {
         }
 
         const resolution = resolutions.get(String(raGame._id));
-        let match: { _id: mongoose.Types.ObjectId } | null = null;
+        let matches: { _id: mongoose.Types.ObjectId }[] = [];
 
         if (resolution) {
-          if (resolution.status !== "resolved" || !resolution.winner) continue;
+          if (resolution.status !== "resolved") continue;
 
-          match = { _id: resolution.winner };
+          matches = resolution.winners.map((_id) => ({ _id }));
         } else {
           const ranked = rankGamesByTitle(raGame.title, candidates);
           const [best, runnerUp] = ranked;
@@ -398,17 +402,19 @@ export class RetroachievementsService implements OnModuleInit {
               continue;
             }
 
-            match = exact;
+            matches = [exact];
           } else {
-            match = best.game;
+            matches = [best.game];
           }
         }
 
-        const id = match._id.toString();
-        const value = { gameId: raGame._id, consoleId: raGame.consoleId };
-        const list = gameIds[id];
+        for (const match of matches) {
+          const id = match._id.toString();
+          const value = { gameId: raGame._id, consoleId: raGame.consoleId };
+          const list = gameIds[id];
 
-        list ? list.push(value) : (gameIds[id] = [value]);
+          list ? list.push(value) : (gameIds[id] = [value]);
+        }
       }
 
       await this.conflicts.record("ra", ambiguous);
@@ -428,10 +434,29 @@ export class RetroachievementsService implements OnModuleInit {
         }))
       );
 
+      const linkedRaIds = Object.values(gameIds)
+        .flat()
+        .map(({ gameId }) => gameId);
+      const unlinked = await this.games.updateMany(
+        {
+          "retroachievements.gameId": { $in: linkedRaIds },
+          _id: {
+            $nin: Object.keys(gameIds).map(
+              (id) => new mongoose.Types.ObjectId(id)
+            ),
+          },
+        },
+        { $pull: { retroachievements: { gameId: { $in: linkedRaIds } } } }
+      );
+
+      this.logger.info(
+        `Removed RA links now owned by other games from ${unlinked.modifiedCount} games`
+      );
+
       this.metrics.recordGames(
         "ra",
         "updated",
-        raSyncResult.modifiedCount ?? 0
+        (raSyncResult.modifiedCount ?? 0) + unlinked.modifiedCount
       );
 
       this.logger.info("RA games parsing finished");

@@ -50,7 +50,6 @@ import { ActionsMenu } from "@/src/lib/shared/ui/ActionsMenu";
 />;
 
 <ActionsMenu
-  title={profile.userName}
   isNavigation
   renderTrigger={({ ref, isOpen, toggle }) => (
     <button

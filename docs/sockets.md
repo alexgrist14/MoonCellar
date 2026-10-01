@@ -450,7 +450,7 @@ open gets a toast and loses the Skip and Match buttons. A conflict is identified
 
 - **The database, not the socket, stops a second decision.** `ConflictsService.decide` writes with
   one `findOneAndUpdate` whose filter requires `status: "pending"`, `decision: null` and, for a
-  match, the game among the candidates. When two admins decide the same conflict at the same moment
+  match, every chosen game among the candidates. When two admins decide the same conflict at the same moment
   only one write matches; the other request answers `409` with the name of the admin who decided.
   The worker writes a batch back only to records still `pending` with the same decision. The
   socket makes the race rare by telling everyone first; it is not what prevents it.

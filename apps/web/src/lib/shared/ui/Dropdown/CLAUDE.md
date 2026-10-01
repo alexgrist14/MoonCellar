@@ -62,6 +62,9 @@ import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 
 ## Rules and gotchas
 
+- The field, the open list and the loading skeleton use `--radius-x4`, the same as `Input`, one
+  step below the `Box` they sit in; the search box inside the open list is `--radius-x3`. A
+  different radius here makes a dropdown and an input stacked in one form look unrelated.
 - The list renders inline unless `isThroughPortal` is set: it is an absolutely positioned
   child of the field, so any ancestor with `overflow` (a modal's scroll area, a `Box` with
   `isWithScrollBar`) clips it. Pass `isThroughPortal` for every dropdown inside a modal or a

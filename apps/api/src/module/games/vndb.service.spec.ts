@@ -57,6 +57,7 @@ describe("VndbService", () => {
         externalName: "Visual novel",
         decision: "match",
         winner: new Types.ObjectId(),
+        winners: [],
         winnerEntryId: null,
       },
     ]);

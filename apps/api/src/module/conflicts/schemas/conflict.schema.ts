@@ -18,6 +18,7 @@ export interface IConflictCandidateEntry {
   dateSignal: IDateSignal;
   descriptionSignal: IDescriptionSignal;
   hasCompanyMismatch: boolean;
+  matchedTitle?: string | null;
 }
 
 @Schema({ timestamps: true })
@@ -40,6 +41,8 @@ export class Conflict {
   status: "resolved" | "pending" | "absent";
   @Prop({ type: Types.ObjectId, default: null })
   winner: Types.ObjectId | null;
+  @Prop({ type: [Types.ObjectId], default: [] })
+  winners: Types.ObjectId[];
   @Prop({ type: String, default: null })
   decision: "match" | "skip" | null;
   @Prop({ type: Object, default: null })

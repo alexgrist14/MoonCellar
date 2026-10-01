@@ -117,6 +117,7 @@
     flex-grow: 1;
     gap: var(--gap-x1);
     min-width: 0;
+    min-height: 0;
 
     @include mediaMaxHeight($screenHeightSm) {
       padding: var(--padding-x2);

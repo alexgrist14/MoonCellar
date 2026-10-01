@@ -62,6 +62,7 @@
 }
 
 .rowCandidate {
+  display: block;
   color: var(--color-text-secondary);
 
   @include font(13px, 18px, 400);
@@ -254,6 +255,14 @@ a.eyebrow:hover {
     &:hover {
       text-decoration: underline;
     }
+  }
+
+  &_chosen {
+    outline-color: var(--color-accent);
+  }
+
+  &_chosen.candidate_selected {
+    outline-color: var(--color-positive);
   }
 
   &__side {

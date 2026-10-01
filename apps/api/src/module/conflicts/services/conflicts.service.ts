@@ -24,7 +24,6 @@ import type {
   IConflictRecord,
   IConflictSourceHandler,
 } from "../types/conflicts.types";
-import type { IScoredCandidate } from "../../games/matching/game-matcher.types";
 
 const APPLY_BATCH_SIZE = 100;
 
@@ -47,7 +46,15 @@ const conflictState = ({
           ? "queued-new"
           : "waiting";
 
-const toCandidateEntry = (candidate: IScoredCandidate) => ({
+const winnerIds = ({
+  winner,
+  winners,
+}: Pick<Conflict, "winner" | "winners">): Types.ObjectId[] =>
+  winners?.length ? winners : winner ? [winner] : [];
+
+const toCandidateEntry = (
+  candidate: IConflictRecord["candidates"][number]
+) => ({
   gameId: new Types.ObjectId(candidate.game._id),
   slug: candidate.game.slug,
   name: candidate.game.name,
@@ -56,6 +63,7 @@ const toCandidateEntry = (candidate: IScoredCandidate) => ({
   dateSignal: candidate.dateSignal,
   descriptionSignal: candidate.descriptionSignal,
   hasCompanyMismatch: candidate.hasCompanyMismatch,
+  matchedTitle: candidate.matchedTitle ?? null,
 });
 
 const readPath = (value: unknown, path: string): unknown =>
@@ -114,15 +122,60 @@ export class ConflictsService {
   async getResolutions(source: IConflictSource) {
     const conflicts = await this.conflictsModel
       .find({ source })
-      .select("externalId status winner")
+      .select("externalId status winner winners")
       .lean();
 
     return new Map(
-      conflicts.map(({ externalId, status, winner }) => [
-        externalId,
-        { status, winner },
+      conflicts.map((conflict) => [
+        conflict.externalId,
+        { status: conflict.status, winners: winnerIds(conflict) },
       ])
     );
+  }
+
+  async pin(
+    source: IConflictSource,
+    externalIds: string[],
+    gameId: Types.ObjectId
+  ) {
+    const handler = this.getHandler(source);
+
+    for (const externalId of externalIds) {
+      const subject = await handler.describe(externalId);
+
+      await this.conflictsModel.updateOne(
+        { source, externalId },
+        [
+          {
+            $set: {
+              externalName: {
+                $ifNull: ["$externalName", subject?.name ?? externalId],
+              },
+              candidates: { $ifNull: ["$candidates", []] },
+              entries: { $ifNull: ["$entries", []] },
+              status: "resolved",
+              decision: null,
+              winnerEntryId: null,
+              winner: { $ifNull: ["$winner", gameId] },
+              winners: {
+                $setUnion: [
+                  { $ifNull: ["$winners", []] },
+                  {
+                    $cond: [
+                      { $eq: [{ $type: "$winner" }, "objectId"] },
+                      ["$winner"],
+                      [],
+                    ],
+                  },
+                  [gameId],
+                ],
+              },
+            },
+          },
+        ],
+        { upsert: true }
+      );
+    }
   }
 
   count(source: IConflictSource) {
@@ -193,45 +246,37 @@ export class ConflictsService {
     ]);
 
     const winners = await this.gamesModel
-      .find({
-        _id: { $in: rows.flatMap(({ winner }) => (winner ? [winner] : [])) },
-      })
+      .find({ _id: { $in: rows.flatMap(winnerIds) } })
       .select("name slug")
       .lean();
     const winnerById = new Map(winners.map((game) => [String(game._id), game]));
 
     return {
       total,
-      results: rows.map((row) => {
-        const winnerGame = row.winner
-          ? winnerById.get(String(row.winner))
-          : null;
+      results: rows.map((row) => ({
+        source: row.source,
+        direction: this.handlers.get(row.source)?.direction ?? "games",
+        externalId: row.externalId,
+        externalName: row.externalName,
+        reason: row.reason ?? null,
+        state: conflictState(row),
+        candidates: (row.candidates ?? []).map(
+          ({ gameId, name, slug, score }) => ({
+            gameId: String(gameId),
+            name,
+            slug,
+            score,
+          })
+        ),
+        entries: (row.entries ?? []).map(({ id, name }) => ({ id, name })),
+        winners: winnerIds(row).flatMap((id) => {
+          const game = winnerById.get(String(id));
 
-        return {
-          source: row.source,
-          direction: this.handlers.get(row.source)?.direction ?? "games",
-          externalId: row.externalId,
-          externalName: row.externalName,
-          reason: row.reason ?? null,
-          state: conflictState(row),
-          candidates: (row.candidates ?? []).map(
-            ({ gameId, name, slug, score }) => ({
-              gameId: String(gameId),
-              name,
-              slug,
-              score,
-            })
-          ),
-          entries: (row.entries ?? []).map(({ id, name }) => ({ id, name })),
-          winner: winnerGame
-            ? {
-                _id: String(winnerGame._id),
-                name: winnerGame.name,
-                slug: winnerGame.slug,
-              }
-            : null,
-        };
-      }),
+          return game
+            ? [{ _id: String(game._id), name: game.name, slug: game.slug }]
+            : [];
+        }),
+      })),
     };
   }
 
@@ -321,6 +366,7 @@ export class ConflictsService {
       id: String(conflict._id),
       source,
       direction: handler.direction,
+      isMultiMatch: !!handler.isMultiMatch,
       externalId,
       reason: conflict.reason ?? null,
       state: conflictState(conflict),
@@ -341,6 +387,7 @@ export class ConflictsService {
           dateSignal: entry.dateSignal,
           descriptionSignal: entry.descriptionSignal,
           hasCompanyMismatch: entry.hasCompanyMismatch,
+          matchedTitle: entry.matchedTitle ?? null,
           game: game
             ? {
                 cover: game.cover ?? null,
@@ -363,13 +410,32 @@ export class ConflictsService {
   async decide(
     source: IConflictSource,
     externalId: string,
-    choice: { gameId?: string | null; entryId?: string | null },
+    choice: {
+      gameId?: string | null;
+      gameIds?: string[];
+      entryId?: string | null;
+    },
     user: Pick<User, "_id" | "userName">
   ): Promise<IConflictsSummary> {
-    const { direction } = this.getHandler(source);
-    const gameId = direction === "games" ? (choice.gameId ?? null) : null;
+    const { direction, isMultiMatch } = this.getHandler(source);
+    const gameIds =
+      direction !== "games"
+        ? []
+        : [
+            ...new Set(
+              choice.gameIds ?? (choice.gameId ? [choice.gameId] : [])
+            ),
+          ];
+
+    if (gameIds.length > 1 && !isMultiMatch) {
+      throw new BadRequestException(
+        `A ${source} entry can only be linked to one game`
+      );
+    }
+
+    const winners = gameIds.map((id) => new Types.ObjectId(id));
     const entryId = direction === "entries" ? (choice.entryId ?? null) : null;
-    const isMatch = !!(gameId || entryId);
+    const isMatch = !!(winners.length || entryId);
 
     const conflict = await this.conflictsModel
       .findOneAndUpdate(
@@ -377,15 +443,14 @@ export class ConflictsService {
           source,
           externalId,
           ...UNDECIDED_FILTER,
-          ...(gameId
-            ? { "candidates.gameId": new Types.ObjectId(gameId) }
-            : {}),
+          ...(winners.length ? { "candidates.gameId": { $all: winners } } : {}),
           ...(entryId ? { "entries.id": entryId } : {}),
         },
         {
           $set: {
             decision: isMatch ? "match" : "skip",
-            winner: gameId ? new Types.ObjectId(gameId) : null,
+            winner: winners[0] ?? null,
+            winners,
             winnerEntryId: entryId,
             decidedBy: {
               userId: new Types.ObjectId(String(user._id)),
@@ -435,6 +500,7 @@ export class ConflictsService {
           status: "pending",
           candidates: candidates.map(toCandidateEntry),
           winner: null,
+          winners: [],
           winnerEntryId: null,
           decision: null,
           decidedBy: null,
@@ -529,15 +595,14 @@ export class ConflictsService {
     decided: ConflictDocument[]
   ) {
     const gameIdByExternalId = await handler.apply(
-      decided.map(
-        ({ externalId, externalName, decision, winner, winnerEntryId }) => ({
-          externalId,
-          externalName,
-          decision,
-          winner,
-          winnerEntryId: winnerEntryId ?? null,
-        })
-      )
+      decided.map((conflict) => ({
+        externalId: conflict.externalId,
+        externalName: conflict.externalName,
+        decision: conflict.decision,
+        winner: conflict.winner,
+        winners: winnerIds(conflict),
+        winnerEntryId: conflict.winnerEntryId ?? null,
+      }))
     );
 
     await this.conflictsModel.bulkWrite(
@@ -557,6 +622,7 @@ export class ConflictsService {
                 : {
                     decision: null,
                     winner: null,
+                    winners: [],
                     winnerEntryId: null,
                     decidedBy: null,
                   },

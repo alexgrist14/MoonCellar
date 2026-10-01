@@ -40,6 +40,7 @@ import { normalizeGameName, uniqueSlug } from "../../../shared/utils";
 import { MAIN_GAME_TYPE } from "../constants/vndb";
 import { IGDBService } from "../../igdb/igdb.service";
 import { HltbService } from "./hltb.service";
+import { ConflictsService } from "../../conflicts/services/conflicts.service";
 import { GameMatcherService } from "../matching/game-matcher.service";
 import { VndbService } from "./vndb.service";
 import { escapeRegExp } from "../../collections/utils/collections.utils";
@@ -144,7 +145,8 @@ export class ContentRequestsService {
     private readonly igdb: IGDBService,
     private readonly hltb: HltbService,
     private readonly vndb: VndbService,
-    private readonly gameMatcher: GameMatcherService
+    private readonly gameMatcher: GameMatcherService,
+    private readonly conflicts: ConflictsService
   ) {}
 
   async create(userId: string, dto: ICreateContentRequestParsed) {
@@ -698,6 +700,14 @@ export class ContentRequestsService {
         },
       }
     );
+
+    if (payload.retroachievements?.length) {
+      await this.conflicts.pin(
+        "ra",
+        payload.retroachievements.map(({ gameId: raId }) => String(raId)),
+        gameId
+      );
+    }
 
     if (!approval.createdId) approval.uploaded = [];
 

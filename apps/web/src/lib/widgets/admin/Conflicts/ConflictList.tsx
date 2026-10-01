@@ -124,18 +124,19 @@ export const ConflictList: FC<IConflictListProps> = ({ source }) => {
             content: row.reason ? REASON_LABELS[row.reason] : "—",
           },
           result: {
-            content: row.winner ? (
-              <Link
-                className={styles.rowCandidate}
-                href={`/games/${row.winner.slug}`}
-                target="_blank"
-                onClick={(event) => event.stopPropagation()}
-              >
-                {row.winner.name}
-              </Link>
-            ) : (
-              "—"
-            ),
+            content: row.winners.length
+              ? row.winners.map((winner) => (
+                  <Link
+                    key={winner._id}
+                    className={styles.rowCandidate}
+                    href={`/games/${winner.slug}`}
+                    target="_blank"
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    {winner.name}
+                  </Link>
+                ))
+              : "—",
           },
         }))}
       />

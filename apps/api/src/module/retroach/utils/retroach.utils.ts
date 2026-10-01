@@ -12,7 +12,7 @@ export const rankGamesByTitle = <T extends MatchableGame>(
   candidates: T[],
   threshold = RA_NAME_MATCH_THRESHOLD,
   limit = RA_CONFLICT_CANDIDATES_LIMIT
-): { game: T; score: number }[] => {
+): { game: T; score: number; matchedTitle: string }[] => {
   if (!candidates.length) return [];
 
   const targets = candidates.map((game) => ({
@@ -20,22 +20,24 @@ export const rankGamesByTitle = <T extends MatchableGame>(
     name: getFormattedTitle(game.name),
   }));
 
-  const best = new Map<T, number>();
+  const best = new Map<T, { score: number; matchedTitle: string }>();
 
-  for (const variant of raTitle.split("|").map(getFormattedTitle)) {
-    for (const result of fuzzysort.go(variant, targets, {
+  for (const title of raTitle.split("|").map((part) => part.trim())) {
+    for (const result of fuzzysort.go(getFormattedTitle(title), targets, {
       key: "name",
       limit,
       threshold,
     })) {
       const { game } = result.obj;
 
-      if ((best.get(game) ?? -1) < result.score) best.set(game, result.score);
+      if ((best.get(game)?.score ?? -1) < result.score) {
+        best.set(game, { score: result.score, matchedTitle: title });
+      }
     }
   }
 
   return [...best]
-    .map(([game, score]) => ({ game, score }))
+    .map(([game, match]) => ({ game, ...match }))
     .sort((a, b) => b.score - a.score)
     .slice(0, limit);
 };

@@ -135,7 +135,7 @@ describe("ConflictsService", () => {
         externalId: "v1",
         status: "pending",
         decision: null,
-        "candidates.gameId": new Types.ObjectId(gameId),
+        "candidates.gameId": { $all: [new Types.ObjectId(gameId)] },
       },
       expect.anything(),
       { new: true }
@@ -196,6 +196,46 @@ describe("ConflictsService", () => {
     );
   });
 
+  it("refuses several games for a source that links an entry to one game", async () => {
+    const service = createService({ conflictsModel: idleModel });
+
+    await expect(
+      service.decide(
+        "vndb",
+        "v1",
+        {
+          gameIds: [String(new Types.ObjectId()), String(new Types.ObjectId())],
+        },
+        ADMIN
+      )
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it("records every game of a multi-match decision", async () => {
+    const gameIds = [new Types.ObjectId(), new Types.ObjectId()];
+    const findOneAndUpdate = jest.fn(() =>
+      query({ status: "pending", decision: "match" })
+    );
+    const service = createService({
+      conflictsModel: { ...idleModel, findOneAndUpdate },
+      handler: { ...createHandler(), isMultiMatch: true },
+    });
+
+    await service.decide("vndb", "v1", { gameIds: gameIds.map(String) }, ADMIN);
+
+    expect(findOneAndUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ "candidates.gameId": { $all: gameIds } }),
+      {
+        $set: expect.objectContaining({
+          decision: "match",
+          winner: gameIds[0],
+          winners: gameIds,
+        }),
+      },
+      { new: true }
+    );
+  });
+
   it("returns a decision the source could not apply to review", async () => {
     const bulkWrite = jest.fn();
     const events = createEvents();
@@ -224,6 +264,7 @@ describe("ConflictsService", () => {
         $set: {
           decision: null,
           winner: null,
+          winners: [],
           winnerEntryId: null,
           decidedBy: null,
         },

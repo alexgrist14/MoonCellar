@@ -90,6 +90,12 @@ export const ConflictCandidateSchema = z.object({
   dateSignal: DateSignalSchema,
   descriptionSignal: DescriptionSignalSchema,
   hasCompanyMismatch: z.boolean(),
+  matchedTitle: z
+    .string()
+    .nullable()
+    .describe(
+      "Title of the source entry the candidate matched, when the entry has several"
+    ),
   game: ConflictGameSchema.nullable().describe(
     "The game as stored now, null if it was deleted"
   ),
@@ -110,6 +116,9 @@ export const ConflictItemSchema = z.object({
   id: z.string().describe("Conflict record id"),
   source: ConflictSourceSchema,
   direction: ConflictDirectionSchema,
+  isMultiMatch: z
+    .boolean()
+    .describe("One entry may be linked to several candidate games at once"),
   externalId: z.string(),
   reason: MatchReasonSchema.nullable(),
   state: ConflictStateSchema.describe("Where the conflict stands"),
@@ -183,10 +192,10 @@ export const ConflictRowSchema = z.object({
   state: ConflictStateSchema.describe("Where the conflict stands"),
   candidates: ConflictCandidateGameSchema.array(),
   entries: z.object({ id: z.string(), name: z.string() }).array(),
-  winner: z
+  winners: z
     .object({ _id: z.string(), name: z.string(), slug: z.string() })
-    .nullable()
-    .describe("Game the entry ended up in"),
+    .array()
+    .describe("Games the entry ended up in"),
 });
 
 export const ConflictsResponseSchema = z.object({
@@ -203,6 +212,12 @@ export const DecideConflictRequestSchema = z.object({
     .optional()
     .describe(
       "games direction: candidate game the entry is the same as, or null to create a new game"
+    ),
+  gameIds: ObjectIdSchema.array()
+    .min(1)
+    .optional()
+    .describe(
+      "games direction, multi-match sources only: every candidate game the entry belongs to"
     ),
   entryId: z
     .string()
