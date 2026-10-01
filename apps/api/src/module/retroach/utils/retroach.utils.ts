@@ -40,6 +40,21 @@ export const rankGamesByTitle = <T extends MatchableGame>(
     .slice(0, limit);
 };
 
+const toTitleKey = (title: string) =>
+  getFormattedTitle(title).trim().toLowerCase();
+
+export const pickExactTitleMatch = <T extends MatchableGame>(
+  raTitle: string,
+  ranked: { game: T }[]
+): T | null => {
+  const variants = new Set(raTitle.split("|").map(toTitleKey));
+  const exact = ranked.filter(({ game }) =>
+    variants.has(toTitleKey(game.name))
+  );
+
+  return exact.length === 1 ? exact[0].game : null;
+};
+
 export const matchGameByTitle = <T extends MatchableGame>(
   raTitle: string,
   candidates: T[],

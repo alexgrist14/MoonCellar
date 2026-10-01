@@ -1,6 +1,7 @@
 import {
   matchGameByTitle,
   matchPlatformToConsole,
+  pickExactTitleMatch,
   rankGamesByTitle,
 } from "./retroach.utils";
 
@@ -41,6 +42,31 @@ describe("retroach.utils", () => {
 
     it("returns null for an empty candidate list", () => {
       expect(matchGameByTitle("Anything", [])).toBeNull();
+    });
+  });
+
+  describe("pickExactTitleMatch", () => {
+    it("picks the only candidate whose title equals the RA title", () => {
+      const candidates = [
+        { name: "Dyna Brothers" },
+        { name: "Dyna Brothers 2" },
+      ];
+      const ranked = rankGamesByTitle("Dyna Brothers", candidates);
+
+      expect(ranked[0].score - ranked[1].score).toBeLessThan(0.05);
+      expect(pickExactTitleMatch("Dyna Brothers", ranked)).toBe(candidates[0]);
+    });
+
+    it("leaves a shared set ambiguous when both titles match exactly", () => {
+      const candidates = [
+        { name: "Pokémon HeartGold Version" },
+        { name: "Pokémon SoulSilver Version" },
+      ];
+      const title = "Pokémon HeartGold Version | Pokémon SoulSilver Version";
+
+      expect(
+        pickExactTitleMatch(title, rankGamesByTitle(title, candidates))
+      ).toBeNull();
     });
   });
 

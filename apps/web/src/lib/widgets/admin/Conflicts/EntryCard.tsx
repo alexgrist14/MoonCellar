@@ -1,24 +1,19 @@
 import { FC, useEffect, useRef } from "react";
 import classNames from "classnames";
 import { IConflictEntry } from "@mooncellar/schemas";
-import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Fact } from "./CandidateCard";
 import styles from "./Conflicts.module.scss";
 
 interface IEntryCardProps {
   entry: IConflictEntry;
   isSelected: boolean;
-  isMatchShown: boolean;
   onSelect: () => void;
-  onMatch: () => void;
 }
 
 export const EntryCard: FC<IEntryCardProps> = ({
   entry,
   isSelected,
-  isMatchShown,
   onSelect,
-  onMatch,
 }) => {
   const ref = useRef<HTMLLIElement>(null);
 
@@ -77,18 +72,6 @@ export const EntryCard: FC<IEntryCardProps> = ({
             {Math.round(entry.score * 100) / 100}
             <small>similarity</small>
           </span>
-        )}
-        {isMatchShown && (
-          <Button
-            color={ButtonColor.GREEN}
-            className={styles.matchButton}
-            onClick={(event) => {
-              event.stopPropagation();
-              onMatch();
-            }}
-          >
-            Match
-          </Button>
         )}
       </div>
     </li>

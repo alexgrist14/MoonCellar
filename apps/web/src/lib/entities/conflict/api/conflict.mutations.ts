@@ -31,7 +31,7 @@ export const useDecideConflictMutation = () => {
     onSuccess: (summary, { source, externalId }) => {
       queryClient.setQueryData(conflictQueryKeys.summary(source), summary);
 
-      return invalidate(source, externalId);
+      invalidate(source, externalId);
     },
     onError: (_error, { source, externalId }) => invalidate(source, externalId),
   });

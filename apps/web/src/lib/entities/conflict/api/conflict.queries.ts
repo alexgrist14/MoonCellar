@@ -9,6 +9,8 @@ import { conflictQueryKeys } from "./conflict.query-keys";
 
 const SUMMARY_REFRESH_MS = 5000;
 
+const LIST_STALE_MS = 5 * 60 * 1000;
+
 export const conflictItemQueryOptions = (
   source: IConflictSource,
   externalId: string
@@ -47,4 +49,5 @@ export const useConflictsQuery = (params: IGetConflictsParams) =>
     queryKey: conflictQueryKeys.list(params),
     queryFn: () => adminConflictsApi.getList(params).then(({ data }) => data),
     placeholderData: keepPreviousData,
+    staleTime: LIST_STALE_MS,
   });

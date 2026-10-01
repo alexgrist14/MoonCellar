@@ -360,9 +360,7 @@ export const Conflicts: FC = () => {
                         key={entry.id}
                         entry={entry}
                         isSelected={index === selectedIndex}
-                        isMatchShown={isDecidable && options.length > 1}
                         onSelect={() => select(index)}
-                        onMatch={() => resolve(entry.id)}
                       />
                     ))}
                     {item.candidates.map((candidate, index) => (
@@ -370,10 +368,8 @@ export const Conflicts: FC = () => {
                         key={candidate.gameId}
                         candidate={candidate}
                         isSelected={index === selectedIndex}
-                        isMatchShown={isDecidable && options.length > 1}
                         platformNames={platformNames}
                         onSelect={() => select(index)}
-                        onMatch={() => resolve(candidate.gameId)}
                       />
                     ))}
                   </ul>

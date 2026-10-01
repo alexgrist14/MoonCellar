@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import classNames from "classnames";
 import { IConflictCandidate, IScoreBreakdown } from "@mooncellar/schemas";
-import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import styles from "./Conflicts.module.scss";
 
 const BREAKDOWN_LABELS: Record<keyof IScoreBreakdown, string> = {
@@ -67,19 +66,15 @@ export const Fact: FC<{ label: string; value?: string | null }> = ({
 interface ICandidateCardProps {
   candidate: IConflictCandidate;
   isSelected: boolean;
-  isMatchShown: boolean;
   platformNames: (ids: string[]) => string;
   onSelect: () => void;
-  onMatch: () => void;
 }
 
 export const CandidateCard: FC<ICandidateCardProps> = ({
   candidate,
   isSelected,
-  isMatchShown,
   platformNames,
   onSelect,
-  onMatch,
 }) => {
   const ref = useRef<HTMLLIElement>(null);
   const { game, breakdown } = candidate;
@@ -189,19 +184,6 @@ export const CandidateCard: FC<ICandidateCardProps> = ({
           {candidate.score}
           <small>score</small>
         </span>
-        {isMatchShown && (
-          <Button
-            color={ButtonColor.GREEN}
-            className={styles.matchButton}
-            disabled={!game}
-            onClick={(event) => {
-              event.stopPropagation();
-              onMatch();
-            }}
-          >
-            Match
-          </Button>
-        )}
       </div>
     </li>
   );

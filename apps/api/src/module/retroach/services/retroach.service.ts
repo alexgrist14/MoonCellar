@@ -43,6 +43,7 @@ import {
 } from "../constants/sync";
 import {
   matchPlatformToConsole,
+  pickExactTitleMatch,
   rankGamesByTitle,
 } from "../utils/retroach.utils";
 
@@ -366,11 +367,17 @@ export class RetroachievementsService implements OnModuleInit {
             runnerUp.game._id.toString() !== best.game._id.toString() &&
             best.score - runnerUp.score < RA_AMBIGUITY_GAP
           ) {
-            ambiguous.push(this.toConflictRecord(raGame, ranked));
-            continue;
-          }
+            const exact = pickExactTitleMatch(raGame.title, ranked);
 
-          match = best.game;
+            if (!exact) {
+              ambiguous.push(this.toConflictRecord(raGame, ranked));
+              continue;
+            }
+
+            match = exact;
+          } else {
+            match = best.game;
+          }
         }
 
         const id = match._id.toString();
