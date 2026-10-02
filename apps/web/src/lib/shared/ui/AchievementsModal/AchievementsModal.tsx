@@ -8,6 +8,7 @@ import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { IGameResponse } from "@mooncellar/schemas";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
+import { IRAAward } from "@/src/lib/shared/types/retroachievements.type";
 
 interface IAchievementsModalProps {
   game: IGameResponse;
@@ -23,20 +24,11 @@ export const AchievementsModal: FC<IAchievementsModalProps> = ({ game }) => {
   const profile = useAuthStore((s) => s.profile);
   const systems = useCommonStore((s) => s.systems);
 
-  const gameAwards = useMemo(() => {
-    if (!profile?.raAwards?.length || !game.retroachievements?.length) {
-      return [];
-    }
+  const awardsByRaId = useMemo(() => {
+    const byRaId = new Map<number, IRAAward>();
 
-    const raIds = new Set(game.retroachievements.map((item) => item.gameId));
-    const matched = profile.raAwards.filter((award) =>
-      raIds.has(award.awardData)
-    );
-
-    const byConsole = new Map<number, (typeof matched)[number]>();
-
-    matched.forEach((award) => {
-      const existing = byConsole.get(award.awardData);
+    profile?.raAwards?.forEach((award) => {
+      const existing = byRaId.get(award.awardData);
       const priority = AWARD_PRIORITY.indexOf(award.awardType);
       const existingPriority = existing
         ? AWARD_PRIORITY.indexOf(existing.awardType)
@@ -47,60 +39,63 @@ export const AchievementsModal: FC<IAchievementsModalProps> = ({ game }) => {
         (priority !== -1 &&
           (existingPriority === -1 || priority < existingPriority))
       ) {
-        byConsole.set(award.awardData, award);
+        byRaId.set(award.awardData, award);
       }
     });
 
-    return Array.from(byConsole.values());
-  }, [profile, game.retroachievements]);
+    return byRaId;
+  }, [profile]);
 
-  const fallbackConsoleName = systems?.find(
-    (sys) => sys.raId === game.retroachievements?.[0]?.consoleId
-  )?.name;
-
-  const fallbackLink = game.retroachievements?.[0]?.gameId
-    ? `https://retroachievements.org/game/${game.retroachievements[0].gameId}`
-    : `https://retroachievements.org/searchresults.php?s=${encodeURIComponent(game.name)}&t=1`;
+  const getConsoleName = (consoleId: number) =>
+    systems?.find((sys) => sys.raId === consoleId)?.name;
 
   return (
     <RowsModal
       title="RetroAchievements"
-      rows={gameAwards.map((award) => (
-        <Fragment key={award.title + award.awardType}>
-          <Image
-            alt={award.title}
-            src={getAwardIconSrc(award.imageIcon)}
-            width={40}
-            height={40}
-            className={styles.row__icon}
-          />
-          <div className={styles.row__info}>
-            <p className={styles.row__title}>{award.title}</p>
-            <div className={styles.row__meta}>
-              <span>{commonUtils.formatDate(award.awardedAt)}</span>
-              <span className={styles.row__dot} />
-              <span>{award.awardType}</span>
+      rows={(game.retroachievements ?? []).map(({ gameId, consoleId }) => {
+        const award = awardsByRaId.get(gameId);
+
+        return (
+          <Fragment key={gameId}>
+            {award && (
+              <Image
+                alt={award.title}
+                src={getAwardIconSrc(award.imageIcon)}
+                width={40}
+                height={40}
+                className={styles.row__icon}
+              />
+            )}
+            <div className={styles.row__info}>
+              <p className={styles.row__title}>{award?.title ?? game.name}</p>
+              {award && (
+                <div className={styles.row__meta}>
+                  <span>{commonUtils.formatDate(award.awardedAt)}</span>
+                  <span className={styles.row__dot} />
+                  <span>{award.awardType}</span>
+                </div>
+              )}
+              <Link
+                href={`https://retroachievements.org/game/${gameId}`}
+                target="_blank"
+                className={styles.row__link}
+              >
+                <Button color={ButtonColor.DEFAULT}>
+                  {award?.consoleName || getConsoleName(consoleId) || "Open"}
+                </Button>
+              </Link>
             </div>
-            <Link
-              href={`https://retroachievements.org/game/${award.awardData}`}
-              target="_blank"
-              className={styles.row__link}
-            >
-              <Button color={ButtonColor.DEFAULT}>
-                {award.consoleName || "Open"}
-              </Button>
-            </Link>
-          </div>
-        </Fragment>
-      ))}
+          </Fragment>
+        );
+      })}
       emptyState={
         <Link
-          href={fallbackLink}
+          href={`https://retroachievements.org/searchresults.php?s=${encodeURIComponent(game.name)}&t=1`}
           target="_blank"
           className={styles.fullButtonLink}
         >
           <Button color={ButtonColor.DEFAULT} className={styles.fullButton}>
-            {fallbackConsoleName || "Open on RetroAchievements"}
+            Open on RetroAchievements
           </Button>
         </Link>
       }

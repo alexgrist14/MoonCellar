@@ -35,7 +35,10 @@ const setStores = (raAwards: IRAAward[]) => {
     profile: { _id: "1", userName: "MoonWalker", raAwards } as IUser,
   });
   useCommonStore.setState({
-    systems: [{ name: "SNES/Super Famicom", raId: 3 } as IPlatform],
+    systems: [
+      { name: "SNES/Super Famicom", raId: 3 } as IPlatform,
+      { name: "Wii U", raId: 76 } as IPlatform,
+    ],
   });
 };
 
@@ -56,6 +59,21 @@ export const WithAwards: Story = {
       createAward("Mastery/Completion", "2026-03-14T18:20:00Z"),
       createAward("Game Beaten", "2026-03-02T21:05:00Z"),
     ]);
+  },
+};
+
+export const AwardOnOneOfSeveralConsoles: Story = {
+  args: {
+    game: {
+      ...game,
+      retroachievements: [
+        { gameId: RA_GAME_ID, consoleId: 3 },
+        { gameId: 26000, consoleId: 76 },
+      ],
+    },
+  },
+  beforeEach: () => {
+    setStores([createAward("Game Beaten", "2026-03-02T21:05:00Z")]);
   },
 };
 

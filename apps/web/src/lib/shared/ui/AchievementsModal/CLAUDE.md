@@ -1,8 +1,10 @@
 # AchievementsModal
 
-Modal content listing the RetroAchievements awards the signed-in user holds for one game
-(mastery, beaten, …). It is built on `RowsModal`: each award becomes a row with its badge, title,
-award date, award type and a link to the game on retroachievements.org.
+Modal content listing every RetroAchievements game linked to one game (one per console) and the
+award the signed-in user holds for each (mastery, beaten, …). It is built on `RowsModal`: every
+`game.retroachievements` entry becomes a row with a link to that RA game, named after its console.
+A row with an award is filled with its badge, title, award date and award type; a row without one
+shows the game name only.
 
 ## When to use
 
@@ -19,7 +21,7 @@ award date, award type and a link to the game on retroachievements.org.
 Data it reads on its own:
 
 - `useAuthStore().profile.raAwards` — the viewer's awards.
-- `useCommonStore().systems` — to name the console in the fallback button.
+- `useCommonStore().systems` — to name the console on a row without an award.
 
 ## Usage
 
@@ -36,15 +38,18 @@ modal.open(<AchievementsModal game={game} />, { id: "game-achievements" });
   overlay or close handling of its own; `ModalsConnector` supplies both.
 - **Props are frozen at open time.** `modal.open` stores the JSX, so a game updated afterwards
   does not reach the open modal; reopen it instead.
+- **Every linked RA game gets a row, awarded or not;** never filter rows down to awards, or a
+  console the user has not played vanishes from the modal.
 - **Only one award per RA game id is shown,** chosen by `AWARD_PRIORITY`
   (`Mastery/Completion` over `Game Beaten` over anything else).
 - **Award icons load from `media.retroachievements.org`** unless `imageIcon` is already an
   absolute URL, so the host must stay allowed in `next.config.mjs` `images.remotePatterns`.
-- **With no matching award (or no signed-in user) the empty state is a single link button** to
-  the game on RetroAchievements, or to a site search by name when the game has no RA id.
+- **The empty state appears only when the game has no RA id:** a single button searching
+  RetroAchievements for the game name.
 - This component carries domain knowledge (game, user awards, stores) although it sits in
   `shared/ui`; do not add more store reads here.
 
 ## Storybook
 
-`Shared/AchievementsModal` — `WithAwards`, `NoAwards`, `NoRetroAchievementsId`.
+`Shared/AchievementsModal` — `WithAwards`, `AwardOnOneOfSeveralConsoles`, `NoAwards`,
+`NoRetroAchievementsId`.
