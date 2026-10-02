@@ -106,6 +106,19 @@ adb install -r mooncellar.apk
 - Push notifications arrive; Android 13+ asks for the permission once.
 - Links to other sites (Steam, YouTube) open in a Custom Tab.
 
+## Browsers other than Chrome
+
+The APK opens in the default browser when that browser supports TWAs. Chrome hides the address
+bar once Asset Links verify; Firefox claims TWA support but keeps the bar, and there is nothing in
+`assetlinks.json` or the APK that changes that. People with Firefox (or a similar default) install
+the site from their browser's menu instead — the web manifest makes it a full-screen app there,
+with that browser's session and push. `RELEASE.md` says so, and the profile settings carry an
+"App" section built on `useInstallApp` (`shared/hooks`): an Install button where the browser fires
+`beforeinstallprompt` (Chromium), menu instructions everywhere else, and a link to the releases.
+
+`beforeinstallprompt` fires once, early, so `listenInstallPrompt` runs from
+`src/app/providers.tsx` on every page; a listener added when Settings mounts would miss it.
+
 ## Requirements to watch
 
 - **`targetSdk`.** Bubblewrap 1.25 targets API 36. Google Play raises its minimum every August;

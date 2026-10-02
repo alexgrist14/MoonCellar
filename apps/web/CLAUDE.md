@@ -472,6 +472,10 @@ break silently when ignored:
   Keep "push" and "notification" out of the worker's file name: annoyance filter lists block
   scripts such as `push-sw.js`, and registration then fails with "An unknown error occurred when
   fetching the script" while the server answers 200.
+- **`listenInstallPrompt` runs from `src/app/providers.tsx`, never from the component that shows
+  the Install button.** `beforeinstallprompt` fires once, right after the page loads; a listener
+  added when Settings mounts misses it and the button never appears. Read it through
+  `useInstallApp`.
 - **Read and change royal games only through `useRoyalGames`.** The list has two sources — the
   persisted `games` store for guests, `royal.store` (filled over `/royal`) for a signed-in user —
   and the hook picks the side and routes writes to it. Reading `useGamesStore().royalGames`

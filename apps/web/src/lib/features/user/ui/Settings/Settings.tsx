@@ -3,6 +3,8 @@ import { usePushSubscription } from "@/src/lib/entities/notification/model/usePu
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useGeoStore } from "@/src/lib/shared/store/geo.store";
 import { useSettingsStore } from "@/src/lib/shared/store/settings.store";
+import { useInstallApp } from "@/src/lib/shared/hooks/useInstallApp";
+import { ANDROID_APK_URL } from "@/src/lib/shared/utils/install.utils";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { AvatarSettings } from "@/src/lib/shared/ui/AvatarSettings";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
@@ -39,6 +41,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
   const setBgOpacityPreview = useSettingsStore((s) => s.setBgOpacityPreview);
   const isMobile = useStatesStore((s) => s.isMobile);
   const push = usePushSubscription();
+  const installApp = useInstallApp();
 
   const profileBgOpacity = profile?.settings?.bgOpacity ?? DEFAULT_BG_OPACITY;
   const blockedCountry = useGeoStore((s) => s.blockedCountry);
@@ -278,6 +281,38 @@ export const Settings: FC<SettingsProps> = ({}) => {
                 formatValue={(value) => `${value}%`}
                 step={1}
               />
+            </section>
+
+            <section className={styles.section}>
+              <SectionTitle as="h3">App</SectionTitle>
+              {installApp.isInstalled ? (
+                <span className={styles.note}>
+                  You are using the installed MoonCellar app.
+                </span>
+              ) : installApp.canInstall ? (
+                <div className={styles.prefRow}>
+                  <span className={styles.note}>
+                    Install MoonCellar as an app on this device.
+                  </span>
+                  <Button type="button" onClick={installApp.install}>
+                    Install
+                  </Button>
+                </div>
+              ) : (
+                <span className={styles.note}>
+                  To install MoonCellar as an app, open the browser menu and
+                  choose Install or Add to Home screen. In Firefox this is the
+                  way to get it without an address bar.
+                </span>
+              )}
+              <span className={styles.note}>
+                On Android you can also{" "}
+                <a href={ANDROID_APK_URL} target="_blank" rel="noreferrer">
+                  download the APK
+                </a>
+                . Chrome opens it without an address bar; if your default
+                browser is Firefox, install from Firefox instead.
+              </span>
             </section>
 
             {isAdultSettingShown && (

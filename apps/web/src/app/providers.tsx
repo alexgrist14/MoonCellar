@@ -3,9 +3,12 @@
 import { useEffect } from "react";
 import { ProgressProvider } from "@bprogress/next/app";
 import { SERVICE_WORKER_URL } from "@/src/lib/shared/utils/push.utils";
+import { listenInstallPrompt } from "@/src/lib/shared/utils/install.utils";
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
+    listenInstallPrompt();
+
     if (!("serviceWorker" in navigator)) return;
 
     navigator.serviceWorker

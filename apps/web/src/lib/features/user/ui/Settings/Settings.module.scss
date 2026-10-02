@@ -93,6 +93,17 @@
   word-break: break-word;
 }
 
+.note {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+
+  a {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+}
+
 .prefRow {
   display: flex;
   align-items: center;

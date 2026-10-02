@@ -363,6 +363,7 @@ a.eyebrow:hover {
 }
 
 .actions .actionButton {
+  flex-shrink: 0;
   gap: var(--gap-x2);
 }
 

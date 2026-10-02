@@ -8,4 +8,6 @@ MoonCellar for Android opens [mooncellar.space](https://mooncellar.space) as a f
 
 Updating: install the new APK over the old one. Your account and data stay, they live on the server.
 
-Requirements: Android 5.0 or newer with Chrome. Without a browser that supports Trusted Web Activities the site opens in a regular browser tab.
+**Default browser is not Chrome?** The app opens in your default browser. Chrome hides the address bar; Firefox and some other browsers keep it. With such a browser as the default, skip the APK: open [mooncellar.space](https://mooncellar.space) in that browser, open its menu and choose **Install** or **Add to Home screen**. You get the same full-screen app, signed in with that browser's session and with push notifications.
+
+Requirements: Android 5.0 or newer.
