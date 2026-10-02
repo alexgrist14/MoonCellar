@@ -51,6 +51,19 @@ export const useUpdateProfileMutation = () =>
     },
   });
 
+export const useDeleteAccountMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ userId, password }: { userId: string; password: string }) =>
+      userAPI.deleteAccount(userId, { password }),
+    onSuccess: () => {
+      useAuthStore.getState().clear();
+      queryClient.clear();
+    },
+  });
+};
+
 export const useAddUserFollowingMutation = () =>
   useMutation({
     mutationFn: ({

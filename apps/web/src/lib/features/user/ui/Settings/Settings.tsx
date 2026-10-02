@@ -13,6 +13,11 @@ import { Textarea } from "@/src/lib/shared/ui/Textarea";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
+import { modal } from "@/src/lib/shared/ui/Modal";
+import {
+  DELETE_ACCOUNT_MODAL_ID,
+  DeleteAccountModal,
+} from "@/src/lib/features/user/ui/DeleteAccountModal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FC, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -303,6 +308,26 @@ export const Settings: FC<SettingsProps> = ({}) => {
           Save
         </Button>
       </div>
+
+      <section className={styles.danger}>
+        <SectionTitle as="h3">Danger zone</SectionTitle>
+        <div className={styles.prefRow}>
+          <span className={styles.label}>
+            Delete your account and everything in it.
+          </span>
+          <Button
+            type="button"
+            color={ButtonColor.RED}
+            onClick={() =>
+              modal.open(<DeleteAccountModal />, {
+                id: DELETE_ACCOUNT_MODAL_ID,
+              })
+            }
+          >
+            Delete account
+          </Button>
+        </div>
+      </section>
     </form>
   );
 };

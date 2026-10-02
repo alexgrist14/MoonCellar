@@ -195,6 +195,20 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
   (`podman exec -u root <container> chown -R 0:0 /etc/searxng` under rootless podman), and
   recover such a state with `git restore --worktree` from the index, not by committing it.
 
+## Android app
+
+- **The APK is a Trusted Web Activity built by `.github/workflows/android.yml` from
+  `apps/android/twa-manifest.json` on an `android-v*` tag;** the release flow, the signing key and
+  the secrets are in [`docs/android-app.md`](docs/android-app.md).
+- **`apps/web/public/.well-known/assetlinks.json` must list the SHA-256 of every key the app is
+  signed with.** A mismatch shows no error anywhere: the app silently opens with Chrome's address
+  bar, as a plain Custom Tab.
+- **Raise `appVersionCode` and set `appVersion` in `twa-manifest.json` before tagging,** and tag
+  `android-v<appVersion>`. The workflow refuses a tag that differs, and Android refuses an APK whose
+  version code is not higher than the installed one.
+- **Deploy the site before building an APK whose icons or manifest changed.** Bubblewrap downloads
+  them from `mooncellar.space`, not from the repository.
+
 ## Frontend architecture
 
 - **`apps/web` is Feature-Sliced Design and every component belongs to a layer** —

@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "space.mooncellar.app",
+      "sha256_cert_fingerprints": [
+        "6F:7A:C9:CA:8D:3E:0C:E5:22:A2:73:BC:06:C5:7B:6D:E2:2D:EA:0D:7A:67:34:29:27:C1:AE:37:B6:D5:84:AB"
+      ]
+    }
+  }
+]

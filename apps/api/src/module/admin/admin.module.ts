@@ -13,6 +13,7 @@ import {
   PlaythroughDatabaseSchema,
 } from "../games/schemas/playthroughs.schema";
 import { Game, GameDatabaseSchema } from "../games/schemas/game.schema";
+import { UserModule } from "../user/user.module";
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { Game, GameDatabaseSchema } from "../games/schemas/game.schema";
       { name: Playthrough.name, schema: PlaythroughDatabaseSchema },
       { name: Game.name, schema: GameDatabaseSchema },
     ]),
+    UserModule,
   ],
   controllers: [AdminController],
   providers: [AdminService],

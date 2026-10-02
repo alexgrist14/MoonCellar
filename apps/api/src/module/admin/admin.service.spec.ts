@@ -6,9 +6,8 @@ const createService = (findById: jest.Mock) => {
   return new AdminService(
     {} as never,
     {} as never,
-    {} as never,
-    {} as never,
-    games as never
+    games as never,
+    {} as never
   );
 };
 

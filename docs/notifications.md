@@ -101,7 +101,7 @@ follows never push.
 | Keys | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` in the API env (`docs/deploy-env.md`). Without them `GET /notifications/push/public-key` answers `null` and the toggle is hidden |
 | Subscriptions | `pushsubscriptions`: `userId`, `endpoint` (unique), `keys`. `POST` / `DELETE /notifications/push/subscriptions` |
 | Sending | `PushService.sendToUser`, called by `notify()` for an alert type. A push service answering 404 or 410 deletes that subscription |
-| Worker | `apps/web/public/worker.js`: shows the notification with the MoonCellar icon and opens its link on click. Not `sw.js`, which stays the old kill switch |
+| Worker | `apps/web/public/worker.js`, registered on every page load from `src/app/providers.tsx`: shows the notification with the MoonCellar icon and opens its link on click, and serves `offline.html` when a page navigation fails. Not `sw.js`, which stays the old kill switch |
 | Toggle | Settings → Notifications → "Push notifications on this device" (`usePushSubscription`): registers the worker, asks for permission, subscribes |
 
 - **The endpoint is checked against known push services** (`PUSH_SERVICE_HOSTS`: FCM, Mozilla,

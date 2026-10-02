@@ -123,6 +123,24 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   for the same game (a playthrough save and a rating) otherwise read the same log and the second
   write drops the first one's change.
 
+## Account deletion
+
+- **A new collection that stores a user id must be cleaned up in `AccountDeletionService`
+  (`module/user/services/account-deletion.service.ts`).** It is the only path that deletes a
+  user — `DELETE /user/account/:userId` (password re-entered) and the admin
+  `DELETE /admin/users/:userId` both call it — so a collection it does not know keeps orphaned
+  personal data after the account is gone, and a counter it does not repair (`likesCount`,
+  `helpfulCount`, `repliesCount`, game ratings) stays inflated forever.
+- **It matches `Rating`, `UserLogs` and `Playthrough` by `{ $in: [ObjectId, string] }`.** Their
+  `userId` is a bare `@Prop({ ref })`, i.e. `Mixed`, and older rows hold either form; the admin
+  delete it replaced passed the string alone and left ObjectId rows behind.
+- **The user's comments are soft-deleted (`status: "deleted"`, empty body), never removed,** so
+  reply threads keep their structure; content requests, conflicts and comment reports keep the
+  dangling `userId`, which resolves to no author.
+- **A wrong password answers 403, not 401.** The web `agent` treats every 401 as an expired
+  session and retries after a refresh, which would loop on a wrong password and then log the
+  user out.
+
 ## Custom lists and favourites
 
 - **Public user search is `GET /users/search`; never point a search box at `GET /user/search`.**

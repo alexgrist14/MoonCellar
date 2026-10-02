@@ -1,6 +1,7 @@
 import { API_URL } from "@/src/lib/shared/constants";
 import { IUser } from "@/src/lib/shared/types/auth.type";
 import {
+  IDeleteAccountRequest,
   IGetFavoriteCharactersResponse,
   IGetUserLoginsResponse,
   ISearchUsersRequest,
@@ -214,6 +215,12 @@ const updateUserTime = (userId: string) => {
   return agent.patch<IUser>(`${USER_URL}/profile-time/${userId}`);
 };
 
+const deleteAccount = (userId: string, body: IDeleteAccountRequest) => {
+  return agent.delete<{ success: boolean }>(`${USER_URL}/account/${userId}`, {
+    data: body,
+  });
+};
+
 export const userAPI = {
   getById,
   getByString,
@@ -246,4 +253,5 @@ export const userAPI = {
   addFavoriteCharacter,
   removeFavoriteCharacter,
   searchUsers,
+  deleteAccount,
 };

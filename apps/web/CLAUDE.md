@@ -460,10 +460,15 @@ break silently when ignored:
   disconnect on sign-out, or the engine connection stays open with the old session. The dynamic import keeps the client out of guests' bundles:
   `useRoyalGames` is reached from every `GameCard`, so a static import ships it on every page.
 - **Push lives in `public/worker.js`; `public/sw.js` stays the kill switch.** `sw.js` unregisters
-  itself for browsers that still run an old service worker from that path. The push worker caches
-  nothing and handles only `push` and `notificationclick`; add a `fetch` handler only on purpose,
-  since it would put every request of the site behind it. Subscribing goes through
-  `usePushSubscription`, and `logout` calls `unsubscribePush` before the session is cleared.
+  itself for browsers that still run an old service worker from that path. `worker.js` is
+  registered on every page load from `src/app/providers.tsx` (`SERVICE_WORKER_URL`), because the
+  installed app needs its offline fallback before anyone subscribes to push. Its `fetch` handler
+  answers page navigations only and caches nothing but `offline.html` and the icon; never widen it
+  to other requests, since every request of the site would then go through the worker. Its
+  `install` fails if `offline.html` or `logo-icon.png` is missing, and a worker that does not
+  install delivers no push either — rename or move them together with `worker.js`. Subscribing
+  goes through `usePushSubscription`, and `logout` calls `unsubscribePush` before the session is
+  cleared.
   Keep "push" and "notification" out of the worker's file name: annoyance filter lists block
   scripts such as `push-sw.js`, and registration then fails with "An unknown error occurred when
   fetching the script" while the server answers 200.

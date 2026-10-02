@@ -1,8 +1,18 @@
 "use client";
 
+import { useEffect } from "react";
 import { ProgressProvider } from "@bprogress/next/app";
+import { SERVICE_WORKER_URL } from "@/src/lib/shared/utils/push.utils";
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) return;
+
+    navigator.serviceWorker
+      .register(SERVICE_WORKER_URL, { scope: "/" })
+      .catch(() => undefined);
+  }, []);
+
   return (
     <ProgressProvider
       height="2px"

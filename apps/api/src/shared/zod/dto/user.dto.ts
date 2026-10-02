@@ -1,6 +1,7 @@
 import { createZodDto } from "nestjs-zod";
 import {
   AddFavoriteRequestSchema,
+  DeleteAccountSchema,
   GetUserByIdSchema,
   GetUserByStringSchema,
   GetUserLoginsResponseSchema,
@@ -19,6 +20,7 @@ import {
 
 export class GetUserByStringDto extends createZodDto(GetUserByStringSchema) {}
 export class GetUserByIdDto extends createZodDto(GetUserByIdSchema) {}
+export class DeleteAccountDto extends createZodDto(DeleteAccountSchema) {}
 export class UpdateUserEmailDto extends createZodDto(UpdateUserEmailSchema) {}
 export class UpdateUserPasswordDto extends createZodDto(
   UpdateUserPasswordSchema

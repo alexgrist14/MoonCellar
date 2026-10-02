@@ -8,7 +8,7 @@ import {
   isNotificationSupported,
   isPushSupported,
   isTabNotificationsOn,
-  PUSH_WORKER_URL,
+  SERVICE_WORKER_URL,
   setTabNotifications,
   unsubscribePush,
 } from "@/src/lib/shared/utils/push.utils";
@@ -18,7 +18,7 @@ export type IPushState =
   "checking" | "unavailable" | "denied" | "off" | "on" | "tab" | "busy";
 
 const subscribe = async (publicKey: string) => {
-  await navigator.serviceWorker.register(PUSH_WORKER_URL, { scope: "/" });
+  await navigator.serviceWorker.register(SERVICE_WORKER_URL, { scope: "/" });
 
   const registration = await navigator.serviceWorker.ready;
   const subscription =

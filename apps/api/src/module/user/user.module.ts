@@ -29,6 +29,40 @@ import { JwtModule } from "@nestjs/jwt";
 import { UserRoyalGamesService } from "./services/user-royal-games.service";
 import { RoyalGamesGateway } from "./gateways/royal-games.gateway";
 import { NotificationsModule } from "../notifications/notifications.module";
+import { AccountDeletionService } from "./services/account-deletion.service";
+import { UserAccountController } from "./controllers/user-account.controller";
+import {
+  Playthrough,
+  PlaythroughDatabaseSchema,
+} from "../games/schemas/playthroughs.schema";
+import {
+  GameComment,
+  GameCommentDatabaseSchema,
+} from "../comments/schemas/game-comment.schema";
+import {
+  CommentVote,
+  CommentVoteDatabaseSchema,
+} from "../comments/schemas/comment-vote.schema";
+import {
+  CommentReport,
+  CommentReportDatabaseSchema,
+} from "../comments/schemas/comment-report.schema";
+import {
+  CustomList,
+  CustomListDatabaseSchema,
+} from "../collections/schemas/custom-list.schema";
+import {
+  CustomListLike,
+  CustomListLikeDatabaseSchema,
+} from "../collections/schemas/custom-list-like.schema";
+import {
+  Notification,
+  NotificationDatabaseSchema,
+} from "../notifications/schemas/notification.schema";
+import {
+  PushSubscription,
+  PushSubscriptionDatabaseSchema,
+} from "../notifications/schemas/push-subscription.schema";
 
 @Module({
   imports: [
@@ -37,6 +71,14 @@ import { NotificationsModule } from "../notifications/notifications.module";
       { name: UserLogs.name, schema: UserLogsSchema },
       { name: Rating.name, schema: UserRatingsDatabaseSchema },
       { name: Game.name, schema: GameDatabaseSchema },
+      { name: Playthrough.name, schema: PlaythroughDatabaseSchema },
+      { name: GameComment.name, schema: GameCommentDatabaseSchema },
+      { name: CommentVote.name, schema: CommentVoteDatabaseSchema },
+      { name: CommentReport.name, schema: CommentReportDatabaseSchema },
+      { name: CustomList.name, schema: CustomListDatabaseSchema },
+      { name: CustomListLike.name, schema: CustomListLikeDatabaseSchema },
+      { name: Notification.name, schema: NotificationDatabaseSchema },
+      { name: PushSubscription.name, schema: PushSubscriptionDatabaseSchema },
     ]),
     MetricsModule,
     NotificationsModule,
@@ -45,6 +87,7 @@ import { NotificationsModule } from "../notifications/notifications.module";
 
   controllers: [
     UserProfileController,
+    UserAccountController,
     UserFiltersController,
     UserPresetsController,
     UserFollowingsController,
@@ -65,6 +108,8 @@ import { NotificationsModule } from "../notifications/notifications.module";
     UserRAService,
     UserRoyalGamesService,
     RoyalGamesGateway,
+    AccountDeletionService,
   ],
+  exports: [AccountDeletionService],
 })
 export class UserModule {}

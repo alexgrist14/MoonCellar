@@ -1,18 +1,48 @@
 const DEFAULT_URL = "/notifications";
 const ICON = "/images/logo-icon.png";
+const OFFLINE_CACHE = "offline-v1";
+const OFFLINE_URL = "/offline.html";
 
-self.addEventListener("install", () => {
-  self.skipWaiting();
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches
+      .open(OFFLINE_CACHE)
+      .then((cache) => cache.addAll([OFFLINE_URL, ICON]))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     Promise.all([
       self.clients.claim(),
+      self.registration.navigationPreload &&
+        self.registration.navigationPreload.enable(),
       caches
         .keys()
-        .then((keys) => Promise.all(keys.map((key) => caches.delete(key)))),
+        .then((keys) =>
+          Promise.all(
+            keys
+              .filter((key) => key !== OFFLINE_CACHE)
+              .map((key) => caches.delete(key))
+          )
+        ),
     ])
+  );
+});
+
+self.addEventListener("fetch", (event) => {
+  if (event.request.mode !== "navigate") return;
+
+  event.respondWith(
+    Promise.resolve(event.preloadResponse)
+      .then((preloaded) => preloaded || fetch(event.request))
+      .catch(() =>
+        caches
+          .open(OFFLINE_CACHE)
+          .then((cache) => cache.match(OFFLINE_URL))
+          .then((response) => response || Response.error())
+      )
   );
 });
 

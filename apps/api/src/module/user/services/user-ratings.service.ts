@@ -22,7 +22,7 @@ export class UserRatingsService {
     private readonly logsService: UserLogsService
   ) {}
 
-  private async recalculateAverageRating(
+  async recalculateAverageRating(
     gameId: mongoose.Types.ObjectId
   ): Promise<void> {
     const [result] = await this.userRatings.aggregate([

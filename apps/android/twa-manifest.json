@@ -1,0 +1,68 @@
+{
+  "packageId": "space.mooncellar.app",
+  "host": "mooncellar.space",
+  "name": "MoonCellar",
+  "launcherName": "MoonCellar",
+  "display": "standalone",
+  "themeColor": "#191D24",
+  "themeColorDark": "#191D24",
+  "navigationColor": "#191D24",
+  "navigationColorDark": "#191D24",
+  "navigationDividerColor": "#191D24",
+  "navigationDividerColorDark": "#191D24",
+  "backgroundColor": "#191D24",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://mooncellar.space/images/icon-512.png",
+  "maskableIconUrl": "https://mooncellar.space/images/icon-maskable-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "mooncellar"
+  },
+  "appVersionCode": 1,
+  "appVersion": "1.0.0",
+  "shortcuts": [
+    {
+      "name": "Games",
+      "shortName": "Games",
+      "url": "https://mooncellar.space/games",
+      "chosenIconUrl": "https://mooncellar.space/images/icon-192.png"
+    },
+    {
+      "name": "Gauntlet",
+      "shortName": "Gauntlet",
+      "url": "https://mooncellar.space/gauntlet",
+      "chosenIconUrl": "https://mooncellar.space/images/icon-192.png"
+    },
+    {
+      "name": "Notifications",
+      "shortName": "Notifications",
+      "url": "https://mooncellar.space/notifications",
+      "chosenIconUrl": "https://mooncellar.space/images/icon-192.png"
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://mooncellar.space/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://mooncellar.space/",
+  "minSdkVersion": 21,
+  "orientation": "portrait",
+  "fingerprints": [
+    {
+      "name": "mooncellar",
+      "value": "6F:7A:C9:CA:8D:3E:0C:E5:22:A2:73:BC:06:C5:7B:6D:E2:2D:EA:0D:7A:67:34:29:27:C1:AE:37:B6:D5:84:AB"
+    }
+  ],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "protocolHandlers": [],
+  "fileHandlers": []
+}

@@ -66,6 +66,9 @@ export const UpdateUserPasswordSchema = z.object({
   oldPassword: z.string().min(8).max(100),
   newPassword: z.string().min(8).max(100),
 });
+export const DeleteAccountSchema = z.object({
+  password: z.string().min(1).max(100),
+});
 export const UpdateDescriptionSchema = UserSchemaZod.pick({
   description: true,
 });
@@ -145,6 +148,7 @@ export type IUpdateUserEmailRequest = z.infer<typeof UpdateUserEmailSchema>;
 export type IUpdateUserPasswordRequest = z.infer<
   typeof UpdateUserPasswordSchema
 >;
+export type IDeleteAccountRequest = z.infer<typeof DeleteAccountSchema>;
 export type IUpdateUserDescriptionRequest = z.infer<
   typeof UpdateDescriptionSchema
 >;

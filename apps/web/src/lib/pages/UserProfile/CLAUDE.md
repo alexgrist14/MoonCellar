@@ -61,7 +61,7 @@ editing controls.
      tab and "All" on the Profile tab opens the right one. The navigation has a single Favourites
      entry, active on both, counting both lists.
    - `reviews` → `widgets/user/UserReviews`
-   - `settings` → `features/user/ui/Settings`, owner only
+   - `settings` → `features/user/ui/Settings`, owner only; its "Danger zone" opens `features/user/ui/DeleteAccountModal`, which asks for the password, calls `DELETE /user/account/:userId`, clears the auth store and the React Query cache and goes home
 4. Desktop column: `features/user/ui/UserNavigation` (tabs and counts; sorting lives in `UserGames` and `UserReviews`, above their content).
    Its first block — avatar and name, linking to Profile and active there — is shown on every
    tab. Settings is not a tab in it: the owner reaches it from the gear icon at the right of

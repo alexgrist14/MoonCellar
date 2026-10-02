@@ -1,6 +1,6 @@
 import { notificationsApi } from "@/src/lib/shared/api";
 
-export const PUSH_WORKER_URL = "/worker.js";
+export const SERVICE_WORKER_URL = "/worker.js";
 
 const TAB_NOTIFICATIONS_KEY = "tab-notifications";
 

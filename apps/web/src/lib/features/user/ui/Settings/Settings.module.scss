@@ -118,6 +118,18 @@
   }
 }
 
+.danger {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x3);
+  padding-top: var(--padding-x5);
+  border-top: 1px solid var(--color-bg-hover);
+
+  .label {
+    color: var(--color-text-muted);
+  }
+}
+
 .btn {
   font-size: 1rem;
   width: 100px;

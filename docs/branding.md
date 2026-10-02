@@ -121,6 +121,7 @@ page that has no image of its own; game pages use the game's cover instead.
 | Site (`apps/web`)        | `logo-icon.png` | `logo-text.png` | —               |
 | Documentation (port 4333)| `logo-icon.png` | `logo-text.png` | `logo-full.png` |
 | Storybook (port 4222)    | `logo-icon.png` | `logo-text.png` | —               |
+| Installed app (PWA and Android APK) | `icon-192.png`, `icon-512.png`, `icon-maskable-512.png` — `logo-icon.png` placed on a square, generated, never redrawn | — | — |
 
 A new surface gets a row here when it ships.
 

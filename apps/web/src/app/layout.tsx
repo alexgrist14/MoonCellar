@@ -3,7 +3,7 @@ import localFont from "next/font/local";
 import classNames from "classnames";
 import { ReactNode } from "react";
 import { polyfill } from "interweave-ssr";
-import { Metadata } from "next";
+import { Metadata, Viewport } from "next";
 import { FaroInit } from "@/src/lib/shared/ui/FaroInit";
 import { FaroRouteTracker } from "@/src/lib/shared/ui/FaroRouteTracker";
 import { GeoInit } from "@/src/lib/shared/ui/GeoInit";
@@ -53,6 +53,12 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#191d24",
+};
+
 const general = localFont({
   variable: "--font-general",
   src: [
@@ -90,7 +96,6 @@ export default function App({ children }: { children: ReactNode }) {
   return (
     <html lang="en" data-scroll-behavior="smooth">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/images/logo-icon.png" type="image/png" />
         <JsonLd data={getWebSiteJsonLd()} />
       </head>
