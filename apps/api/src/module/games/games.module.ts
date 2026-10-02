@@ -50,6 +50,7 @@ import { IgdbOrphansService } from "../igdb/igdb-orphans.service";
 import { JwtModule } from "@nestjs/jwt";
 import { MatchingModule } from "./matching/matching.module";
 import { ConflictsModule } from "../conflicts/conflicts.module";
+import { NotificationsModule } from "../notifications/notifications.module";
 
 @Module({
   controllers: [
@@ -81,6 +82,7 @@ import { ConflictsModule } from "../conflicts/conflicts.module";
     IgdbModule,
     MatchingModule,
     ConflictsModule,
+    NotificationsModule,
     MongooseModule.forFeature([
       { name: Game.name, schema: GameDatabaseSchema },
       { name: Platform.name, schema: PlatformDatabaseSchema },

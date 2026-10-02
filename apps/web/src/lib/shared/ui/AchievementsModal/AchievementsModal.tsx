@@ -52,6 +52,7 @@ export const AchievementsModal: FC<IAchievementsModalProps> = ({ game }) => {
   return (
     <RowsModal
       title="RetroAchievements"
+      className={styles.list}
       rows={(game.retroachievements ?? []).map(({ gameId, consoleId }) => {
         const award = awardsByRaId.get(gameId);
 

@@ -6,6 +6,7 @@ import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { IAuth } from "@/src/lib/shared/types/auth.type";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { deleteCookie } from "@/src/lib/shared/utils/cookies.utils";
+import { unsubscribePush } from "@/src/lib/shared/utils/push.utils";
 import { useUserStore } from "@/src/lib/shared/store/user.store";
 
 export const useAuth = () => {
@@ -14,8 +15,8 @@ export const useAuth = () => {
   const { push } = useRouter();
 
   const logout = (id: string) => {
-    authAPI
-      .logout(id)
+    unsubscribePush()
+      .then(() => authAPI.logout(id))
       .then(() => {})
       .catch(() => {})
       .finally(() => {

@@ -1,4 +1,5 @@
 import { useUpdateProfileMutation } from "@/src/lib/entities/user/api/user.mutations";
+import { usePushSubscription } from "@/src/lib/entities/notification/model/usePushSubscription";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useGeoStore } from "@/src/lib/shared/store/geo.store";
 import { useSettingsStore } from "@/src/lib/shared/store/settings.store";
@@ -19,7 +20,10 @@ import styles from "./Settings.module.scss";
 import { settingsSchema, SettingsSchema } from "./settings.schema";
 import {
   DEFAULT_BG_OPACITY,
+  IMutableNotificationType,
   IUpdateUserSettingsRequest,
+  MUTABLE_NOTIFICATION_TYPES,
+  NOTIFICATION_SETTING_LABELS,
 } from "@mooncellar/schemas";
 
 interface SettingsProps {}
@@ -29,6 +33,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
   const { mutate: updateProfile, isPending } = useUpdateProfileMutation();
   const setBgOpacityPreview = useSettingsStore((s) => s.setBgOpacityPreview);
   const isMobile = useStatesStore((s) => s.isMobile);
+  const push = usePushSubscription();
 
   const profileBgOpacity = profile?.settings?.bgOpacity ?? DEFAULT_BG_OPACITY;
   const blockedCountry = useGeoStore((s) => s.blockedCountry);
@@ -52,6 +57,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
       raUsername: profile?.raUsername,
       showAdultContent: !!profile?.settings?.showAdultContent,
       bgOpacity: Math.round(profileBgOpacity * 100),
+      mutedNotifications: profile?.settings?.mutedNotifications ?? [],
     },
   });
 
@@ -68,11 +74,25 @@ export const Settings: FC<SettingsProps> = ({}) => {
       bgOpacity: Math.round(
         (profile.settings?.bgOpacity ?? DEFAULT_BG_OPACITY) * 100
       ),
+      mutedNotifications: profile.settings?.mutedNotifications ?? [],
     });
   }, [profile, reset]);
 
   const showAdultContent = watch("showAdultContent");
   const bgOpacity = watch("bgOpacity");
+  const mutedNotifications = watch("mutedNotifications");
+
+  const toggleNotification = (
+    type: IMutableNotificationType,
+    isEnabled: boolean
+  ) =>
+    setValue(
+      "mutedNotifications",
+      isEnabled
+        ? mutedNotifications.filter((muted) => muted !== type)
+        : [...mutedNotifications, type],
+      { shouldDirty: true }
+    );
 
   const onSubmit: SubmitHandler<SettingsSchema> = (data) => {
     if (!profile) return;
@@ -88,6 +108,15 @@ export const Settings: FC<SettingsProps> = ({}) => {
 
     if (data.bgOpacity / 100 !== profileBgOpacity) {
       settings.bgOpacity = data.bgOpacity / 100;
+    }
+
+    const savedMuted = profile.settings?.mutedNotifications ?? [];
+
+    if (
+      data.mutedNotifications.length !== savedMuted.length ||
+      data.mutedNotifications.some((type) => !savedMuted.includes(type))
+    ) {
+      settings.mutedNotifications = data.mutedNotifications;
     }
 
     updateProfile(
@@ -185,50 +214,82 @@ export const Settings: FC<SettingsProps> = ({}) => {
 
         <div className={styles.side}>
           <section className={styles.section}>
-            <SectionTitle as="h3">Appearance</SectionTitle>
-            <div className={styles.field}>
-              <span className={styles.label}>Background</span>
-              {backgroundFileName && (
-                <span className={styles.fileName}>
-                  Current: {backgroundFileName}
-                </span>
-              )}
-              <UploadButton
-                label="Choose background"
-                onFile={setBackground}
-                fileName={background ? `New: ${background.name}` : null}
-                isFullWidthOnMobile
-              />
-            </div>
-            <RangeSelector
-              defaultValue={bgOpacity}
-              callback={(val) => setBgOpacityPreview(val / 100)}
-              finalCallback={(val) =>
-                setValue("bgOpacity", val, { shouldDirty: true })
-              }
-              min={0}
-              max={100}
-              text="Background dim"
-              isWithValue
-              formatValue={(value) => `${value}%`}
-              step={1}
-            />
-          </section>
-
-          {isAdultSettingShown && (
-            <section className={styles.section}>
-              <SectionTitle as="h3">Preferences</SectionTitle>
+            <SectionTitle as="h3">Notifications</SectionTitle>
+            {push.state !== "unavailable" && push.state !== "checking" && (
               <div className={styles.prefRow}>
                 <ToggleSwitch
-                  label="Show adult content"
-                  checked={!!showAdultContent}
-                  onChange={(value) =>
-                    setValue("showAdultContent", value, { shouldDirty: true })
+                  label="Push notifications on this device"
+                  hint={
+                    push.state === "denied"
+                      ? "Blocked in the browser settings for this site."
+                      : push.state === "tab"
+                        ? "This browser has no push service: notifications arrive only while a MoonCellar tab is open."
+                        : "Replies, comments on your reviews, request decisions and wishlist releases."
                   }
+                  checked={push.state === "on" || push.state === "tab"}
+                  isDisabled={push.state === "busy" || push.state === "denied"}
+                  onChange={(value) => (value ? push.enable() : push.disable())}
                 />
               </div>
+            )}
+            {MUTABLE_NOTIFICATION_TYPES.map((type) => (
+              <div key={type} className={styles.prefRow}>
+                <ToggleSwitch
+                  label={NOTIFICATION_SETTING_LABELS[type]}
+                  checked={!mutedNotifications.includes(type)}
+                  onChange={(value) => toggleNotification(type, value)}
+                />
+              </div>
+            ))}
+          </section>
+
+          <div className={styles.stack}>
+            <section className={styles.section}>
+              <SectionTitle as="h3">Appearance</SectionTitle>
+              <div className={styles.field}>
+                <span className={styles.label}>Background</span>
+                {backgroundFileName && (
+                  <span className={styles.fileName}>
+                    Current: {backgroundFileName}
+                  </span>
+                )}
+                <UploadButton
+                  label="Choose background"
+                  onFile={setBackground}
+                  fileName={background ? `New: ${background.name}` : null}
+                  isFullWidthOnMobile
+                />
+              </div>
+              <RangeSelector
+                defaultValue={bgOpacity}
+                callback={(val) => setBgOpacityPreview(val / 100)}
+                finalCallback={(val) =>
+                  setValue("bgOpacity", val, { shouldDirty: true })
+                }
+                min={0}
+                max={100}
+                text="Background dim"
+                isWithValue
+                formatValue={(value) => `${value}%`}
+                step={1}
+              />
             </section>
-          )}
+
+            {isAdultSettingShown && (
+              <section className={styles.section}>
+                <SectionTitle as="h3">Preferences</SectionTitle>
+                <div className={styles.prefRow}>
+                  <ToggleSwitch
+                    label="Show adult content"
+                    checked={!!showAdultContent}
+                    onChange={(value) =>
+                      setValue("showAdultContent", value, { shouldDirty: true })
+                    }
+                  />
+                </div>
+              </section>
+            )}
+          </div>
         </div>
       </div>
 

@@ -32,6 +32,7 @@ import { CustomListsService } from "./services/custom-lists.service";
 import { FavoritesService } from "./services/favorites.service";
 import { GeneratedListsService } from "./services/generated-lists.service";
 import { UsersSearchService } from "./services/users-search.service";
+import { NotificationsModule } from "../notifications/notifications.module";
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { UsersSearchService } from "./services/users-search.service";
       { name: UserLogs.name, schema: UserLogsSchema },
     ]),
     MetricsModule,
+    NotificationsModule,
   ],
   controllers: [
     CustomListsController,

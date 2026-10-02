@@ -144,6 +144,10 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
   assign.** `updateSettings` takes a partial payload and spreads it over the stored object
   (with the schema defaults underneath, for accounts created before a key existed), then calls
   `markModified("settings")`. Assigning only the changed key wipes the rest.
+- **`UpdateSettingsSchema` lists its fields without defaults; never derive it with
+  `UserSettingsSchema.partial()`.** Zod 4 still applies a `.default()` inside `.partial()`, so a
+  payload carrying only `showAdultContent` parsed as `bgOpacity: 0.85, mutedNotifications: []`
+  and every save reset the background dim and the muted notifications.
 - The background dim lives there as `bgOpacity` (0–1, default `DEFAULT_BG_OPACITY` in the
   shared user schema), not in the client's persisted `settings` store — that store keeps only
   `bgOpacityPreview`, a non-persisted override so the slider previews live before Save.

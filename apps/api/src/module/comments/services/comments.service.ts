@@ -49,6 +49,7 @@ import {
 import { CommentsGateway } from "../gateways/comments.gateway";
 import { VotesService } from "./votes.service";
 import { CommunityLookupService } from "./community-lookup.service";
+import { NotificationsService } from "../../notifications/services/notifications.service";
 
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_COMMENTS = 5;
@@ -67,7 +68,8 @@ export class CommentsService {
     private Playthroughs: Model<IPlaythroughDocument>,
     private readonly votes: VotesService,
     private readonly lookup: CommunityLookupService,
-    private readonly events: CommentsGateway
+    private readonly events: CommentsGateway,
+    private readonly notifications: NotificationsService
   ) {}
 
   private readableStatuses(viewer: IViewer): ICommentStatus[] {
@@ -140,9 +142,11 @@ export class CommentsService {
     const userId = getViewerId(viewer);
     const gameId = toObjectId(data.gameId, "game id");
 
-    if (!(await this.Games.exists({ _id: gameId }))) {
-      throw new NotFoundException("Game not found");
-    }
+    const game = await this.Games.findById(gameId)
+      .select("slug name")
+      .lean<{ slug: string; name: string }>();
+
+    if (!game) throw new NotFoundException("Game not found");
 
     const recentCount = await this.Comments.countDocuments({
       userId,
@@ -163,6 +167,7 @@ export class CommentsService {
     let parentId: mongoose.Types.ObjectId | null = null;
     let replyToId: mongoose.Types.ObjectId | null = null;
     let reviewId: mongoose.Types.ObjectId | null = null;
+    let notifiedUserId: mongoose.Types.ObjectId | null = null;
 
     if (data.parentId) {
       const parent = await this.Comments.findOne({
@@ -178,16 +183,23 @@ export class CommentsService {
 
       parentId = parent.parentId ?? parent._id;
       replyToId = parent._id;
+      notifiedUserId = parent.userId;
     } else if (data.reviewId) {
-      const review = await this.Playthroughs.exists({
+      const review = await this.Playthroughs.findOne({
         _id: toObjectId(data.reviewId, "review id"),
         gameId,
         isPublic: true,
-      } as FilterQuery<IPlaythroughDocument>);
+      } as FilterQuery<IPlaythroughDocument>)
+        .select("userId")
+        .lean<{
+          _id: mongoose.Types.ObjectId;
+          userId: mongoose.Types.ObjectId;
+        }>();
 
       if (!review) throw new NotFoundException("Review not found");
 
       reviewId = review._id;
+      notifiedUserId = review.userId;
     }
 
     const comment = await this.Comments.create({
@@ -213,6 +225,16 @@ export class CommentsService {
       },
       socketId
     );
+
+    if (notifiedUserId) {
+      void this.notifications.notify({
+        userId: notifiedUserId,
+        actorId: userId,
+        type: reviewId ? "review-comment" : "comment-reply",
+        subjectId: reviewId ?? comment._id,
+        payload: { gameSlug: game.slug, gameName: game.name },
+      });
+    }
 
     return this.decorateOne(comment, viewer);
   }
@@ -285,12 +307,7 @@ export class CommentsService {
     return this.decorateOne(comment, viewer);
   }
 
-  async setLike(
-    id: string,
-    viewer: User,
-    isLiked: boolean,
-    socketId?: string
-  ) {
+  async setLike(id: string, viewer: User, isLiked: boolean, socketId?: string) {
     const userId = getViewerId(viewer);
     const comment = await this.findExisting(id);
 
@@ -317,6 +334,8 @@ export class CommentsService {
           { new: true, timestamps: false, projection: { likesCount: 1 } }
         ).lean<ILeanComment>()
       : comment;
+
+    if (isChanged) void this.notifyLike(comment, userId, isLiked);
 
     if (isChanged && updated) {
       this.events.commentLikesChanged(
@@ -407,6 +426,7 @@ export class CommentsService {
 
     if (status !== "visible") {
       await this.resolveReports(comment._id, status, getViewerId(moderator));
+      void this.notifyModerated(comment, status, moderator);
     }
 
     const parentRepliesCount =
@@ -424,6 +444,54 @@ export class CommentsService {
       },
       socketId
     );
+  }
+
+  private async notifyModerated(
+    comment: GameCommentDocument,
+    status: Exclude<ICommentStatus, "visible">,
+    moderator: User
+  ) {
+    await this.notifications.removeBySubject(comment._id);
+
+    if (isSameId(comment.userId, getViewerId(moderator))) return;
+
+    await this.notifications.notify({
+      userId: comment.userId,
+      type: "comment-moderated",
+      subjectId: comment._id,
+      payload: { ...(await this.getGamePayload(comment.gameId)), status },
+    });
+  }
+
+  private async notifyLike(
+    comment: GameCommentDocument,
+    userId: mongoose.Types.ObjectId | null,
+    isLiked: boolean
+  ) {
+    if (!userId) return;
+
+    const target = {
+      userId: comment.userId,
+      actorId: userId,
+      type: "comment-like" as const,
+      subjectId: comment._id,
+    };
+
+    if (!isLiked) return this.notifications.retract(target);
+
+    return this.notifications.notify({
+      ...target,
+      payload: await this.getGamePayload(comment.gameId),
+    });
+  }
+
+  private async getGamePayload(gameId: mongoose.Types.ObjectId) {
+    const game = await this.Games.findById(gameId)
+      .select("slug name")
+      .lean<{ slug: string; name: string }>()
+      .catch(() => null);
+
+    return game ? { gameSlug: game.slug, gameName: game.name } : {};
   }
 
   private async incrementReplies(
@@ -512,18 +580,17 @@ export class CommentsService {
       ...reviewAuthorIds,
     ]);
 
-    const [authors, playthroughs, ratings, liked, reported] =
-      await Promise.all([
+    const [authors, playthroughs, ratings, liked, reported] = await Promise.all(
+      [
         this.lookup.getAuthors(authorIds),
         this.lookup.getAuthorPlaythroughs(gameId, commentAuthorIds),
         this.lookup.getRatings(gameId, reviewAuthorIds),
         viewerId
           ? this.votes.findActiveTargets("comment", viewerId, commentIds)
           : new Set<string>(),
-        viewerId
-          ? this.findReported(viewerId, commentIds)
-          : new Set<string>(),
-      ]);
+        viewerId ? this.findReported(viewerId, commentIds) : new Set<string>(),
+      ]
+    );
 
     return comments.map((comment) => {
       const id = String(comment._id);

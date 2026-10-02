@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import { IGameResponse, IReview, IReviewsResponse } from "@mooncellar/schemas";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
@@ -14,6 +14,11 @@ interface IGameCommunityProps {
 
 const REVIEWS_TAB = 0;
 const DISCUSSION_TAB = 1;
+const COMMUNITY_ID = "community";
+const TABS_BY_HASH: Record<string, number> = {
+  "#reviews": REVIEWS_TAB,
+  "#discussion": DISCUSSION_TAB,
+};
 
 export const GameCommunity: FC<IGameCommunityProps> = ({
   game,
@@ -39,6 +44,26 @@ export const GameCommunity: FC<IGameCommunityProps> = ({
     if (index === DISCUSSION_TAB) setIsDiscussionOpened(true);
   }, []);
 
+  useEffect(() => {
+    const openFromHash = () => {
+      const tab = TABS_BY_HASH[window.location.hash];
+
+      if (tab === undefined) return;
+
+      openTab(tab);
+      requestAnimationFrame(() =>
+        document
+          .getElementById(COMMUNITY_ID)
+          ?.scrollIntoView({ behavior: "smooth", block: "start" })
+      );
+    };
+
+    openFromHash();
+    window.addEventListener("hashchange", openFromHash);
+
+    return () => window.removeEventListener("hashchange", openFromHash);
+  }, [openTab]);
+
   const discussReview = useCallback(
     (review: IReview) => {
       setDiscussedReview(review);
@@ -54,6 +79,7 @@ export const GameCommunity: FC<IGameCommunityProps> = ({
 
   return (
     <Box
+      id={COMMUNITY_ID}
       contentStyle={{ padding: "var(--padding-x4)" }}
       classNameContent={styles.community}
     >

@@ -38,6 +38,7 @@ import { Game } from "../../games/schemas/game.schema";
 import { User } from "../../user/schemas/user.schema";
 import { CustomList } from "../schemas/custom-list.schema";
 import { CustomListLike } from "../schemas/custom-list-like.schema";
+import { NotificationsService } from "../../notifications/services/notifications.service";
 import type { ICollectionsViewer } from "../types/collections.type";
 import {
   escapeRegExp,
@@ -82,7 +83,8 @@ export class CustomListsService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Game.name) private readonly gameModel: Model<Game>,
     @InjectModel(CustomListLike.name)
-    private readonly likeModel: Model<CustomListLike>
+    private readonly likeModel: Model<CustomListLike>,
+    private readonly notifications: NotificationsService
   ) {}
 
   private async withViewerLikes<T extends ICustomList>(
@@ -492,7 +494,9 @@ export class CustomListsService {
 
     const games = await this.gameModel
       .find({ _id: { $in: gameIds } })
-      .select("name first_release averageRating igdb.total_rating hltb.reviewScore")
+      .select(
+        "name first_release averageRating igdb.total_rating hltb.reviewScore"
+      )
       .lean<
         (IRatedGame & {
           _id: mongoose.Types.ObjectId;
@@ -677,7 +681,7 @@ export class CustomListsService {
   ): Promise<ICustomListLikeResponse> {
     const list = await this.listModel
       .findById(toObjectId(id, "list id"))
-      .select("userId isPrivate likesCount")
+      .select("userId isPrivate likesCount name slug")
       .lean();
 
     if (!list || list.isPrivate) {
@@ -725,6 +729,22 @@ export class CustomListsService {
             )
             .lean()
         : list;
+
+      if (isChanged) {
+        const target = {
+          userId: list.userId,
+          actorId: key.userId,
+          type: "list-like" as const,
+          subjectId: list._id,
+        };
+
+        void (isLiked
+          ? this.notifications.notify({
+              ...target,
+              payload: { listSlug: list.slug, listName: list.name },
+            })
+          : this.notifications.retract(target));
+      }
 
       return {
         likesCount: Math.max(updated?.likesCount ?? 0, 0),

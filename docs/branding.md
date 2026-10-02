@@ -123,3 +123,8 @@ page that has no image of its own; game pages use the game's cover instead.
 | Storybook (port 4222)    | `logo-icon.png` | `logo-text.png` | —               |
 
 A new surface gets a row here when it ships.
+
+The system account (`MoonCellar`, owner of the generated lists) and notifications without a person
+behind them (moderation, request decisions, wishlist releases) use `logo-icon.png` as the avatar:
+`SYSTEM_USER_AVATAR` in `@mooncellar/schemas`, the site-relative path `/images/logo-icon.png`,
+stored as is in `users.avatar`.

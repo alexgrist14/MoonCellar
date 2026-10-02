@@ -11,6 +11,7 @@ import { ToastConnector } from "@/src/lib/shared/ui/Toast";
 import { useMediaStore } from "@/src/lib/shared/hooks/useMediaStore";
 import { useAuthRefresh } from "@/src/lib/shared/hooks/useAuthRefresh";
 import { useRoyalGamesSync } from "@/src/lib/entities/royal/model/useRoyalGamesSync";
+import { useNotificationsSync } from "@/src/lib/entities/notification/model/useNotificationsSync";
 import { useGetUserInfo } from "@/src/lib/features/user/model/user.hooks";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { gamesApi, userAPI } from "@/src/lib/shared/api";
@@ -76,6 +77,7 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
   useMediaStore();
   useGetUserInfo();
   useRoyalGamesSync();
+  useNotificationsSync();
 
   useEffect(() => {
     if (!profile?._id) return;

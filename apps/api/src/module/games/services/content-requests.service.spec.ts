@@ -121,6 +121,7 @@ const createService = ({
     deleteFiles: jest.fn().mockResolvedValue([]),
     ...fileService,
   };
+  const notifications = { notify: jest.fn().mockResolvedValue(undefined) };
   const service = new ContentRequestsService(
     requests as never,
     gamesModel as never,
@@ -136,10 +137,18 @@ const createService = ({
       assertNoDuplicates: jest.fn().mockResolvedValue(undefined),
       ...gameMatcher,
     } as never,
-    { pin: jest.fn().mockResolvedValue(undefined) } as never
+    { pin: jest.fn().mockResolvedValue(undefined) } as never,
+    notifications as never
   );
 
-  return { service, requests, charactersModel, gamesModel, files };
+  return {
+    service,
+    requests,
+    charactersModel,
+    gamesModel,
+    files,
+    notifications,
+  };
 };
 
 describe("ContentRequestsService.decide", () => {
@@ -170,7 +179,7 @@ describe("ContentRequestsService.decide", () => {
 
   it("answers 409 to the reject that loses the race", async () => {
     const request = createRequest();
-    const { service } = createService({ request });
+    const { service, notifications } = createService({ request });
 
     const results = await Promise.allSettled([
       service.decide(ADMIN_ID, String(request._id), {
@@ -188,6 +197,14 @@ describe("ContentRequestsService.decide", () => {
       "rejected",
     ]);
     expect(request.status).toBe("rejected");
+    expect(notifications.notify).toHaveBeenCalledTimes(1);
+    expect(notifications.notify).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId: request.userId,
+        type: "request-decided",
+        payload: expect.objectContaining({ decision: "rejected" }),
+      })
+    );
   });
 
   it("refuses to reject a request another admin is approving", async () => {

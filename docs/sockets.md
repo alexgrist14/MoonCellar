@@ -1,11 +1,12 @@
 # Sockets
 
-MoonCellar keeps three real-time channels open over Socket.IO, all served by the API process:
+MoonCellar keeps four real-time channels open over Socket.IO, all served by the API process:
 
 | Namespace | Who connects | What it does |
 |---|---|---|
 | `/comments` | Anyone with a game's Discussion tab open | **Notifications only.** Tells other readers that a comment was posted, edited, moderated or liked. Every change still goes through REST. |
 | `/royal` | Every signed-in user, on every page | **State.** Royal games — the user's list of games for the royal wheel — are read and changed over this socket and pushed to the user's other tabs and devices. |
+| `/notifications` | Every signed-in user, on every page | **Notifications only.** Pushes a new or regrouped notification and the unread count to the user's tabs. The list and every change go through REST. |
 | `/conflicts` | Admins with the Conflicts tab open | **Notifications only.** Tells other admins that a conflict was matched, skipped or reopened, and when queued decisions were written to games. |
 
 This document describes how they work, every event on the wire, what depends on the sockets and
@@ -21,7 +22,7 @@ Verified on 2026-09-15 with Bun 1.4.2, NestJS 11.2, Socket.IO 4.8.3, MongoDB 8.2
 | Library | Socket.IO 4.8 through `@nestjs/websockets` + `@nestjs/platform-socket.io` 11 |
 | Server | The API process itself, same port (3228), HTTP path `/socket.io/` |
 | Adapter | `SocketIoAdapter` (`apps/api/src/shared/socket-io.adapter.ts`), installed in `main.ts` |
-| Contract | `packages/schemas/src/comments-socket.schema.ts`, `packages/schemas/src/royal-games.schema.ts`, `packages/schemas/src/conflicts-socket.schema.ts` |
+| Contract | `packages/schemas/src/comments-socket.schema.ts`, `packages/schemas/src/royal-games.schema.ts`, `packages/schemas/src/notifications.schema.ts`, `packages/schemas/src/conflicts-socket.schema.ts` |
 
 - **Transports.** Default Socket.IO behaviour: an HTTP long-polling handshake, then an upgrade to
   WebSocket. If the upgrade is blocked (see [Deployment](#deployment)) the connection keeps
@@ -318,13 +319,15 @@ sequenceDiagram
 ### Connection and authentication
 
 - **URL.** `${NEXT_PUBLIC_API_URL}/royal`, same bare-origin rule as `/comments`.
-- **Its own `Manager`.** `royal.socket.ts` creates a dedicated `Manager` with
-  `withCredentials: true` instead of calling `io()`. `io()` caches one manager per origin and keeps
-  the options of whoever created it first — the anonymous `/comments` socket, without credentials.
-  And the server reads cookies from the handshake of the underlying engine connection, not of the
-  namespace: a namespace opened over a connection made before sign-in would find no session. A
-  separate manager opens a fresh connection, with the current cookies, every time `/royal`
-  connects.
+- **The account `Manager`, shared with `/notifications`.** `account.socket.ts` creates one
+  dedicated `Manager` with `withCredentials: true` instead of calling `io()`, and `royal.socket.ts`
+  and `notifications.socket.ts` open their namespaces on it. `io()` caches one manager per origin
+  and keeps the options of whoever created it first — the anonymous `/comments` socket, without
+  credentials. And the server reads cookies from the handshake of the underlying engine
+  connection, not of the namespace: a namespace opened over a connection made before sign-in would
+  find no session. Both namespaces disconnect on sign-out, the manager closes the engine
+  connection once neither is open, and the next sign-in opens a fresh one with the current
+  cookies — one connection per tab for both namespaces.
 - **Loaded on demand.** `socket.io-client` is imported dynamically for `/royal`, because
   `useRoyalGames` is reached from every `GameCard`; a static import would put the client into
   every page bundle, guests included.
@@ -425,11 +428,58 @@ because `WheelComponent` rebuilds its round from the list whenever the list chan
 
 | File | Role |
 |---|---|
-| `shared/socket/royal.socket.ts` | `getRoyalSocket()`: dynamic import of `socket.io-client`, a dedicated `Manager` with credentials, the `/royal` socket (cached promise, reset if the import fails) |
+| `shared/socket/account.socket.ts` | `getAccountManager()`: dynamic import of `socket.io-client` and the `Manager` with credentials shared by `/royal` and `/notifications` (cached promise, reset if the import fails) |
+| `shared/socket/royal.socket.ts` | `getRoyalSocket()`: the `/royal` socket on the account manager |
 | `shared/store/royal.store.ts` | `accountRoyalGames` — the signed-in user's list, not persisted |
 | `entities/royal/api/royal.requests.ts` | `syncRoyalGames`, `addAccountRoyalGames`, `removeAccountRoyalGames`, `replaceAccountRoyalGames`: optimistic update, ack with timeout, the ack's list as the result, a toast for `rejected`, a toast and a resync on failure |
 | `entities/royal/model/useRoyalGames.ts` | The list and the four actions, guest or account |
 | `entities/royal/model/useRoyalGamesSync.ts` | Mounted once in `Layout`: connects for a signed-in user, moves the guest list, syncs on `connect`, applies `royal:changed`, refreshes the session once on `Unauthorized`, disconnects and clears on sign-out |
+
+---
+
+## `/notifications` — user notifications
+
+A signed-in user's notifications — new followers, replies, comments on their review, likes,
+decisions on their requests, moderation of their comments — are written by
+`NotificationsService.notify()` and pushed here. The list, marking as read and removal are REST
+(`GET /notifications`, `GET /notifications/unread-count`, `PATCH /notifications/read`,
+`DELETE /notifications/:id`); the socket only tells the open tabs that something changed.
+What each notification is and when it is written is in [`notifications.md`](./notifications.md).
+
+| | |
+|---|---|
+| Rooms | `user:<userId>` — every socket of one user |
+| Authentication | Session cookie `accessMoonToken`, verified when the namespace connects; the user must exist |
+| Server code | `apps/api/src/module/notifications/gateways/notifications.gateway.ts`, emitted from `NotificationsService` |
+| Client code | `apps/web/src/lib/shared/socket/notifications.socket.ts`, `entities/notification/model/useNotificationsSync.ts` |
+| Consumers | `NotificationsBell` in the header, `NotificationsPage` — through the React Query cache |
+
+- **Lifecycle.** `useNotificationsSync` runs in `Layout` next to `useRoyalGamesSync`, opens the
+  namespace on the account manager for a signed-in user and closes it on sign-out, dropping the
+  cached notifications. On `Unauthorized` it refreshes the session once and reconnects, as `/royal`
+  does. On every `connect` (including a reconnect) it refetches the unread count and the lists.
+- **No client → server events.** Everything the client does goes through REST.
+
+### Server → client events
+
+#### `notification:new`
+
+| Field | Type | Meaning |
+|---|---|---|
+| `notification` | `INotification` | The notification as `GET /notifications` returns it — a new one, or a group that just gained an actor |
+| `unreadCount` | number | Unread notifications after the change |
+
+Client: sets the unread count, invalidates the lists, and shows a toast for a reply, a comment on
+the user's review and a request decision. Likes and follows only move the counter.
+
+#### `notifications:count`
+
+| Field | Type | Meaning |
+|---|---|---|
+| `unreadCount` | number | Unread notifications after a read, a removal, a retracted like or follow, or a moderated comment |
+
+Sent to every socket of the user, including the tab that marked them read. Client: sets the count
+and invalidates the lists.
 
 ---
 
@@ -522,7 +572,8 @@ Client: invalidates those conflict items, the summaries and the list.
   Keep the read timeout above `pingInterval + pingTimeout` (25 s + 20 s), or the proxy drops idle
   connections between heartbeats. The proxy must also forward the `Cookie` header, which nginx
   does by default; without it every `/royal` connection is `Unauthorized`.
-- **Connection count.** Every signed-in tab holds one `/royal` connection; a tab with the
+- **Connection count.** Every signed-in tab holds one engine connection carrying `/royal` and
+  `/notifications`; a tab with the
   Discussion tab open holds a second one for `/comments`, and an admin tab on Conflicts one for
   `/conflicts`. Guests hold a connection only while a Discussion tab is open.
 - **One API instance only.** Rooms live in the process's memory. Running a second replica needs a
@@ -538,9 +589,11 @@ Client: invalidates those conflict items, the summaries and the list.
    `@SubscribeMessage` handler that validates with the zod schema and answers through the ack.
 3. `/comments`: call the emit from the service after the write, passing the socket id from the
    controller. `/royal`: go through `RoyalGamesGateway.change()`, which pushes `royal:changed`.
-   `/conflicts`: call the gateway from `ConflictsService` after the write.
+   `/conflicts`: call the gateway from `ConflictsService` after the write. `/notifications`: call
+   `NotificationsService.notify()` / `retract()` / `removeBySubject()`, never the gateway.
 4. Handle it on the client — `useDiscussionSocket` for `/comments` (filter by `gameId`),
-   `royal.requests.ts` and `useRoyalGamesSync` for `/royal`, `useConflictsSocket` for `/conflicts`.
+   `royal.requests.ts` and `useRoyalGamesSync` for `/royal`, `useNotificationsSync` for
+   `/notifications`, `useConflictsSocket` for `/conflicts`.
 5. `/comments` events carry only public, absolute values; if the reader's view depends on who they
    are, send ids and let the client refetch.
 6. Cover it in the gateway spec and update the tables in this document.
@@ -548,8 +601,8 @@ Client: invalidates those conflict items, the summaries and the list.
 ## Testing and debugging
 
 - **Automated.** `bun run --cwd apps/api test src/module/comments src/module/user/gateways
-  src/module/conflicts/gateways` runs `comments.gateway.spec.ts`, `royal-games.gateway.spec.ts`
-  and `conflicts.gateway.spec.ts`. Each boots its gateway on a real `IoAdapter` on a random port.
+  src/module/conflicts/gateways src/module/notifications` runs `comments.gateway.spec.ts`,
+  `royal-games.gateway.spec.ts`, `conflicts.gateway.spec.ts` and `notifications.gateway.spec.ts`. Each boots its gateway on a real `IoAdapter` on a random port.
   The comments spec checks delivery, room isolation, sender exclusion, leaving, validation and the
   room limit; the royal spec checks cookie authentication, sync, pushes to the same user's other
   sockets only, validation and failed updates; the conflicts spec checks that a missing cookie and

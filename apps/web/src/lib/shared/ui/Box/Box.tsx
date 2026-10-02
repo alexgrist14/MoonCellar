@@ -18,6 +18,7 @@ interface IBoxProps {
   isHeaderWithoutStyles?: boolean;
   isVerticalActions?: boolean;
   isTitleStart?: boolean;
+  id?: string;
   className?: string;
   classNameContent?: string;
   isWithScrollBar?: boolean;
@@ -34,6 +35,7 @@ export const Box: FC<IBoxProps> = ({
   contentStyle,
   templateStyle,
   wrapperStyle,
+  id,
   className,
   classNameContent,
   isWithScrollBar,
@@ -51,6 +53,7 @@ export const Box: FC<IBoxProps> = ({
 
   return (
     <div
+      id={id}
       ref={wrapperRef}
       className={cn(
         styles.wrapper,

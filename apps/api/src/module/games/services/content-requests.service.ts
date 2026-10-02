@@ -40,6 +40,7 @@ import { normalizeGameName, uniqueSlug } from "../../../shared/utils";
 import { MAIN_GAME_TYPE } from "../constants/vndb";
 import { IGDBService } from "../../igdb/igdb.service";
 import { HltbService } from "./hltb.service";
+import { NotificationsService } from "../../notifications/services/notifications.service";
 import { ConflictsService } from "../../conflicts/services/conflicts.service";
 import { GameMatcherService } from "../matching/game-matcher.service";
 import { VndbService } from "./vndb.service";
@@ -146,7 +147,8 @@ export class ContentRequestsService {
     private readonly hltb: HltbService,
     private readonly vndb: VndbService,
     private readonly gameMatcher: GameMatcherService,
-    private readonly conflicts: ConflictsService
+    private readonly conflicts: ConflictsService,
+    private readonly notifications: NotificationsService
   ) {}
 
   async create(userId: string, dto: ICreateContentRequestParsed) {
@@ -282,11 +284,11 @@ export class ContentRequestsService {
 
       if (!matchedCount) throw new ConflictException(ALREADY_DECIDED);
 
-      return {
-        request: await this.decorateOne(request._id),
-        failedImages: [],
-        warnings: [],
-      };
+      const decided = await this.decorateOne(request._id);
+
+      this.notifyDecision(request, decided);
+
+      return { request: decided, failedImages: [], warnings: [] };
     }
 
     const allowed = (
@@ -363,8 +365,12 @@ export class ContentRequestsService {
 
       if (!matchedCount) throw new ConflictException(ALREADY_DECIDED);
 
+      const decided = await this.decorateOne(request._id);
+
+      this.notifyDecision(request, decided);
+
       return {
-        request: await this.decorateOne(request._id),
+        request: decided,
         failedImages: approval.failedImages,
         warnings: approval.warnings,
       };
@@ -381,6 +387,23 @@ export class ContentRequestsService {
         );
       throw err;
     }
+  }
+
+  private notifyDecision(request: ILeanRequest, decided: IContentRequest) {
+    const name = request.payload.name;
+
+    void this.notifications.notify({
+      userId: request.userId,
+      type: "request-decided",
+      subjectId: request._id,
+      payload: {
+        decision: decided.status === "approved" ? "approved" : "rejected",
+        requestKind: request.kind,
+        requestName:
+          decided.targetName ?? (typeof name === "string" ? name : null),
+        reason: decided.reason ?? null,
+      },
+    });
   }
 
   private async rollback(kind: string, approval: IApproval) {

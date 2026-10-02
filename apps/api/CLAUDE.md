@@ -68,10 +68,37 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   verifies `accessMoonToken` from `socket.handshake.headers.cookie` in namespace middleware; a
   rejected socket gets `connect_error` with `Unauthorized`, and Socket.IO does not retry it. The
   handshake belongs to the underlying engine connection, not the namespace, which is why the web
-  client keeps `/royal` on its own `Manager`.
+  client opens `/royal` and `/notifications` on their own account `Manager`.
 - **Pass `ObjectId`s into the `royalGames` update pipelines.** Mongoose casts ordinary updates but
   not aggregation-pipeline updates, so a string id would be stored as a string next to ObjectIds
   and the `$in` checks that deduplicate the list would never match it.
+
+## Notifications
+
+- **A module whose provider injects `NotificationsService` must import `NotificationsModule`, and
+  so must every other module that lists the same provider.** `AuthModule` provides its own
+  `UserFollowingsService` next to `UserModule`'s, so importing the module into `UserModule` alone
+  failed `check:boot` with "Nest can't resolve dependencies of the UserFollowingsService (UserModel,
+  ?) … in the AuthModule module". Grep `providers:` for the service before wiring it.
+- **Call `notify()`, `retract()` and `removeBySubject()` after the write and never `await` them
+  in the request path.** They log and swallow their own errors, so a failed notification never
+  fails the like, reply or decision behind it. The flow is in
+  [`docs/notifications.md`](../../docs/notifications.md).
+- **The upsert is an aggregation-pipeline update, so every id in it is an `ObjectId` and every
+  stored string goes through `$literal`.** Mongoose casts neither, and a list or game name that
+  starts with `$` would otherwise be read as a field path.
+- **Grouping relies on the unique partial index `{ userId, groupKey }` where `isRead: false`.**
+  Two events at the same moment race on the upsert; the loser gets `E11000` and `notify()`
+  retries once, which then joins the winner's group. Do not drop the index or switch the filter
+  to `readAt: null`.
+
+- **A push endpoint is accepted only from `PUSH_SERVICE_HOSTS` over https.** `PushService` POSTs
+  to the stored endpoint, so dropping the check lets any user point the server at an internal
+  address. Extend the list when a browser ships a new push service, never replace it with a bare
+  URL check.
+- **`VAPID_*` must be one pair across every process on the same database.** A subscription is
+  bound to the public key it was made with; a second pair makes the push services answer 403, and a
+  new pair orphans every stored subscription.
 
 ## User logs
 

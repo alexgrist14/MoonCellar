@@ -4,6 +4,8 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
+import { Game, type GameDocument } from "../../games/schemas/game.schema";
+import { NotificationsService } from "../../notifications/services/notifications.service";
 import mongoose, { type FilterQuery, Model } from "mongoose";
 import {
   type IGetReviewsParams,
@@ -86,8 +88,11 @@ export class ReviewsService {
   constructor(
     @InjectModel(Playthrough.name)
     private Playthroughs: Model<IPlaythroughDocument>,
+    @InjectModel(Game.name)
+    private Games: Model<GameDocument>,
     private readonly votes: VotesService,
-    private readonly lookup: CommunityLookupService
+    private readonly lookup: CommunityLookupService,
+    private readonly notifications: NotificationsService
   ) {}
 
   async getReviews(
@@ -417,7 +422,34 @@ export class ReviewsService {
         ).lean<ILeanPlaythrough>()
       : review;
 
+    if (isChanged && userId) void this.notifyHelpful(review, userId, isHelpful);
+
     return { count: updated?.helpfulCount ?? 0, isActive: isHelpful };
+  }
+
+  private async notifyHelpful(
+    review: ILeanPlaythrough,
+    userId: mongoose.Types.ObjectId,
+    isHelpful: boolean
+  ) {
+    const target = {
+      userId: String(review.userId),
+      actorId: userId,
+      type: "review-helpful" as const,
+      subjectId: review._id,
+    };
+
+    if (!isHelpful) return this.notifications.retract(target);
+
+    const game = await this.Games.findById(review.gameId)
+      .select("slug name")
+      .lean<{ slug: string; name: string }>()
+      .catch(() => null);
+
+    return this.notifications.notify({
+      ...target,
+      payload: game ? { gameSlug: game.slug, gameName: game.name } : {},
+    });
   }
 
   private async getSummary(

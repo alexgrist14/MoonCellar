@@ -49,6 +49,9 @@ import { SvgThumb } from "@/src/lib/shared/ui/svg";
   A heart that should turn pink sets it on the button's `className` or any ancestor:
   `--reaction-active-color: var(--favorite-color)`. Do not override `color` directly — in the
   `boxed` variant only the icon takes the active colour.
+- **`boxed` takes `--radius-button`, the token `Button` uses, never a radius of its own.** It sits
+  in a row of `Button`s (the custom list actions), and a hard-coded `--radius-x2` left the like
+  button visibly squarer than Edit and Copy link next to it.
 - In `ghost` the whole button turns the active colour; in `boxed` the text stays primary and
   only the icon changes, as the list like button did.
 - Without `activeIcon` the active state fills the icon's paths with `currentColor`

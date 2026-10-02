@@ -42,6 +42,22 @@ export const Default: Story = {};
 
 export const Empty: Story = { args: { rows: [] } };
 
+export const Wider: Story = {
+  args: { className: "storybook-rows-modal-wider" },
+  decorators: [
+    (Story) => (
+      <>
+        <style>
+          {
+            ".storybook-rows-modal-wider { --rows-modal-max-width: 520px; --rows-modal-row-gap: var(--gap-x6); }"
+          }
+        </style>
+        <Story />
+      </>
+    ),
+  ],
+};
+
 export const ManyRows: Story = {
   args: {
     rows: renderRows([...PLAYTHROUGHS, ...PLAYTHROUGHS, ...PLAYTHROUGHS]),

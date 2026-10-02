@@ -38,6 +38,8 @@ modal.open(<AchievementsModal game={game} />, { id: "game-achievements" });
   overlay or close handling of its own; `ModalsConnector` supplies both.
 - **Props are frozen at open time.** `modal.open` stores the JSX, so a game updated afterwards
   does not reach the open modal; reopen it instead.
+- **It is wider than a plain `RowsModal` (420–520px) with `--gap-x6` between the badge and the
+  text,** set through the `RowsModal` variables in `.list`.
 - **Every linked RA game gets a row, awarded or not;** never filter rows down to awards, or a
   console the user has not played vanishes from the modal.
 - **Only one award per RA game id is shown,** chosen by `AWARD_PRIORITY`

@@ -277,6 +277,9 @@ pins the internal API address, so it stays a secret on both counts.
 | `RECRAFT_API_TOKEN` | **yes** | Recraft API token for the admin Images tab (recraft.ai → Profile → API). Without it generating with a Recraft model answers 503; OpenAI models keep working through `OPENAI_API_KEY` |
 | `STEAMGRIDDB_API_KEY` | **yes** | SteamGridDB API key (steamgriddb.com → Preferences → API) the draft takes covers and hero banners from. Without it that step fails and the draft falls back to images found elsewhere |
 | `IGDB_AUTO_LINK` | no | `true` lets the nightly IGDB sync link a new IGDB game to a parser-created game it matches with confidence. Unset or anything else sends every match to the admin Conflicts tab instead. A game added by hand always goes to Conflicts, whatever the value |
+| `VAPID_PUBLIC_KEY` | no | Web push public key. Generate the pair once with `bunx web-push generate-vapid-keys`. Every instance on the same database (production and a local `dev:api`) must use the same pair: a browser subscribes to one public key, and a push signed with another pair is refused. Replacing the pair silently invalidates every existing subscription. Without it the push toggle is hidden and nothing is sent |
+| `VAPID_PRIVATE_KEY` | **yes** | Web push private key of the same pair |
+| `VAPID_SUBJECT` | no | Contact the push services see, `mailto:admin@mooncellar.space` by default |
 | `DISABLE_CRONS` | no | `true` stops every `@Cron` job. Local development only, because the local `.env` points at the production database and Space. Never set it in `HOST_ENV_API` |
 
 ---

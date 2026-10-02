@@ -1,4 +1,5 @@
 import z from "zod";
+import { MutableNotificationTypeSchema } from "@mooncellar/schemas";
 
 export const settingsSchema = z.object({
   userName: z
@@ -13,6 +14,7 @@ export const settingsSchema = z.object({
   raUsername: z.string().optional(),
   showAdultContent: z.boolean().optional(),
   bgOpacity: z.number().min(0).max(100),
+  mutedNotifications: MutableNotificationTypeSchema.array(),
 });
 
 export type SettingsSchema = z.infer<typeof settingsSchema>;

@@ -71,6 +71,7 @@
     "sharp": "^0.35.4",
     "socket.io": "^4.8.3",
     "uuid": "^14.0.1",
+    "web-push": "^3.6.7",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -88,6 +89,7 @@
     "@types/passport-local": "^1.0.38",
     "@types/sanitize-html": "^2.16.1",
     "@types/supertest": "^7.2.1",
+    "@types/web-push": "^3.6.4",
     "@typescript-eslint/eslint-plugin": "^8.64.0",
     "@typescript-eslint/parser": "^8.64.0",
     "eslint": "catalog:",

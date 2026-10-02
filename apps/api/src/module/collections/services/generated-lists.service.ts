@@ -228,6 +228,7 @@ export class GeneratedListsService {
       const created = await this.userModel.create({
         userName: GENERATED_LISTS_OWNER.userName,
         email: GENERATED_LISTS_OWNER.email,
+        avatar: GENERATED_LISTS_OWNER.avatar,
         password: await bcrypt.hash(randomBytes(32).toString("hex"), 10),
         roles: ["user"],
       });
@@ -287,7 +288,7 @@ export class GeneratedListsService {
       ({ key, name, developers }): IGeneratedListDefinition => ({
         kind: "company",
         key,
-        name: `Best ${name} games`,
+        name: `Best games by ${name}`,
         scope: `developed by ${name}`,
         filters: {},
         developers,

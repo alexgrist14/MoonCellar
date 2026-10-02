@@ -36,6 +36,7 @@ import { CommentsService } from "./services/comments.service";
 import { CommunityLookupService } from "./services/community-lookup.service";
 import { ReviewsService } from "./services/reviews.service";
 import { VotesService } from "./services/votes.service";
+import { NotificationsModule } from "../notifications/notifications.module";
 
 @Module({
   controllers: [
@@ -53,6 +54,7 @@ import { VotesService } from "./services/votes.service";
     CommunityLookupService,
   ],
   imports: [
+    NotificationsModule,
     MongooseModule.forFeature([
       { name: GameComment.name, schema: GameCommentDatabaseSchema },
       { name: CommentVote.name, schema: CommentVoteDatabaseSchema },

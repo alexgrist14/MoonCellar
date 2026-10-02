@@ -225,12 +225,16 @@ export class UserProfileService {
       user.settings = {
         showAdultContent: false,
         bgOpacity: DEFAULT_BG_OPACITY,
+        mutedNotifications: [],
         ...(user.settings ?? {}),
         ...(settings.showAdultContent !== undefined && {
           showAdultContent: settings.showAdultContent,
         }),
         ...(settings.bgOpacity !== undefined && {
           bgOpacity: settings.bgOpacity,
+        }),
+        ...(settings.mutedNotifications !== undefined && {
+          mutedNotifications: [...new Set(settings.mutedNotifications)],
         }),
       };
 

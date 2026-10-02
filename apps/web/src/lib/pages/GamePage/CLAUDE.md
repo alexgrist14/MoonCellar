@@ -28,7 +28,9 @@ landing page — there are about 10 000 of them.
 - The page receives `game`, `stats`, `reviews`, `related` as props and renders them directly.
   Widgets below may run their own client queries (reviews paging, discussion), but the
   first render needs none.
-- No URL state.
+- No URL state in the route. The `#reviews` and `#discussion` hashes (notification links) open
+  that community tab and scroll to it; `GameCommunity` reads `window.location.hash` in an effect, never during
+  render.
 
 ## Composition
 

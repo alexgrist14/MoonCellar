@@ -8,11 +8,15 @@ import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { Model } from "mongoose";
 import { User } from "../schemas/user.schema";
 import { followListLookup } from "../../../shared/utils";
+import { NotificationsService } from "../../notifications/services/notifications.service";
 
 @Injectable()
 export class UserFollowingsService {
   private readonly logger = new Logger(UserFollowingsService.name);
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<User>,
+    private readonly notifications: NotificationsService
+  ) {}
   async addUserFollowing(userId: string, followingId: string) {
     const user = await this.userModel.findById(userId);
     const followingUser = await this.userModel.findById(followingId);
@@ -23,6 +27,12 @@ export class UserFollowingsService {
       user.followings.push(new mongoose.Types.ObjectId(followingId));
       followingUser.followers.push(new mongoose.Types.ObjectId(userId));
       await Promise.all([user.save(), followingUser.save()]);
+      void this.notifications.notify({
+        userId: followingId,
+        actorId: userId,
+        type: "follow",
+        subjectId: followingId,
+      });
       return (
         await this.userModel.aggregate([
           {
@@ -49,6 +59,12 @@ export class UserFollowingsService {
         (follower) => follower.toString() !== userId
       );
       await Promise.all([user.save(), followingUser.save()]);
+      void this.notifications.retract({
+        userId: followingId,
+        actorId: userId,
+        type: "follow",
+        subjectId: followingId,
+      });
       return (
         await this.userModel.aggregate([
           {

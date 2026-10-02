@@ -1,3 +1,9 @@
+.list {
+  --rows-modal-min-width: 420px;
+  --rows-modal-max-width: 520px;
+  --rows-modal-row-gap: var(--gap-x6);
+}
+
 .row {
   &__icon {
     flex-shrink: 0;

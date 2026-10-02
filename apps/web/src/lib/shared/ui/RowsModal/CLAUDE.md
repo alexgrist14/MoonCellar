@@ -13,12 +13,13 @@ no rows. `AchievementsModal` and `GamePlaysInfo` are built on it.
 
 ## API
 
-| Prop           | Type          | Default | Purpose                                           |
-| -------------- | ------------- | ------- | ------------------------------------------------- |
-| `rows`         | `ReactNode[]` | —       | One node per row; each is wrapped in a row `div`  |
-| `title`        | `string`      | —       | `Box` title                                       |
-| `emptyState`   | `ReactNode`   | —       | Rendered instead of the rows when `rows` is empty |
-| `classNameRow` | `string`      | —       | Extra class on every row wrapper                  |
+| Prop           | Type          | Default | Purpose                                                |
+| -------------- | ------------- | ------- | ------------------------------------------------------ |
+| `rows`         | `ReactNode[]` | —       | One node per row; each is wrapped in a row `div`       |
+| `title`        | `string`      | —       | `Box` title                                            |
+| `emptyState`   | `ReactNode`   | —       | Rendered instead of the rows when `rows` is empty      |
+| `classNameRow` | `string`      | —       | Extra class on every row wrapper                       |
+| `className`    | `string`      | —       | Extra class on the list; set the variables below on it |
 
 ## Usage
 
@@ -41,6 +42,12 @@ modal.open(
 ```
 
 ## Rules and gotchas
+
+- **Size the list and the row gap through `--rows-modal-min-width` (320px),
+  `--rows-modal-max-width` (420px) and `--rows-modal-row-gap` (`--gap-x3`), declared on the
+  `className` you pass — never by overriding `.list`/`.row` from outside.** A caller's class has
+  the same specificity as the component's, so which one wins depends on the order the CSS chunks
+  load. `AchievementsModal` sets 420–520px and `--gap-x6`.
 
 - **Rows are keyed by index inside the component;** the key on the node you pass is not used for
   the wrapper, so do not rely on row state surviving a reorder.

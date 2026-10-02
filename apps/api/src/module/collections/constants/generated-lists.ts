@@ -1,6 +1,9 @@
+import { SYSTEM_USER_AVATAR, SYSTEM_USER_NAME } from "@mooncellar/schemas";
+
 export const GENERATED_LISTS_OWNER = {
-  userName: "MoonCellar",
+  userName: SYSTEM_USER_NAME,
   email: "lists@mooncellar.space",
+  avatar: SYSTEM_USER_AVATAR,
 };
 
 export const GENERATED_LIST_SIZE = 100;

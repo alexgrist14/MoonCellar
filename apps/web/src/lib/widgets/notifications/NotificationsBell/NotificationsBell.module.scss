@@ -1,0 +1,40 @@
+.trigger {
+  @include flexCenter;
+  position: relative;
+  aspect-ratio: 1;
+  height: 32px;
+  padding: var(--padding-x05);
+  border-radius: var(--radius-x2);
+}
+
+.count {
+  @include font(10px, 14px, 600);
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 14px;
+  padding-inline: var(--padding-x05);
+  border-radius: var(--radius-x5);
+  background-color: var(--color-accent);
+  color: var(--color-contrast-reverse);
+  text-align: center;
+  pointer-events: none;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x3);
+
+  &__list {
+    max-height: min(420px, 60dvh);
+    overflow-y: auto;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--gap-x2);
+  }
+}

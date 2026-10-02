@@ -452,12 +452,21 @@ break silently when ignored:
   given as the namespace, so `https://api.mooncellar.space/v1` would ask for namespace
   `/v1/comments` and the connection fails with `Invalid namespace`. The full contract is in
   [`docs/sockets.md`](../../docs/sockets.md).
-- **`/royal` runs on its own `Manager`, and `socket.io-client` is loaded for it with a dynamic
-  `import()`.** `io()` caches one manager per origin and keeps the first caller's options, and
-  the API authenticates from the cookies of that manager's handshake — sharing it with the
-  anonymous `/comments` socket would send no credentials over polling and keep a pre-login
-  handshake after sign-in. The dynamic import keeps the client out of guests' bundles:
+- **`/royal` and `/notifications` share the account `Manager` (`shared/socket/account.socket.ts`),
+  and `socket.io-client` is loaded for it with a dynamic `import()`.** `io()` caches one manager
+  per origin and keeps the first caller's options, and the API authenticates from the cookies of
+  that manager's handshake — sharing it with the anonymous `/comments` socket would send no
+  credentials over polling and keep a pre-login handshake after sign-in. Both namespaces must
+  disconnect on sign-out, or the engine connection stays open with the old session. The dynamic import keeps the client out of guests' bundles:
   `useRoyalGames` is reached from every `GameCard`, so a static import ships it on every page.
+- **Push lives in `public/worker.js`; `public/sw.js` stays the kill switch.** `sw.js` unregisters
+  itself for browsers that still run an old service worker from that path. The push worker caches
+  nothing and handles only `push` and `notificationclick`; add a `fetch` handler only on purpose,
+  since it would put every request of the site behind it. Subscribing goes through
+  `usePushSubscription`, and `logout` calls `unsubscribePush` before the session is cleared.
+  Keep "push" and "notification" out of the worker's file name: annoyance filter lists block
+  scripts such as `push-sw.js`, and registration then fails with "An unknown error occurred when
+  fetching the script" while the server answers 200.
 - **Read and change royal games only through `useRoyalGames`.** The list has two sources — the
   persisted `games` store for guests, `royal.store` (filled over `/royal`) for a signed-in user —
   and the hook picks the side and routes writes to it. Reading `useGamesStore().royalGames`

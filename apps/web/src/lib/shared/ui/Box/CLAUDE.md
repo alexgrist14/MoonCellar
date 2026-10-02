@@ -24,6 +24,7 @@ close button, custom scroll area, blur and resize handle. Every content block on
 | `isHeaderWithoutStyles` | `boolean`                     | –        | Renders the title outside the panel, above it                                 |
 | `isVerticalActions`     | `boolean`                     | –        | Stacks the title and its action vertically                                    |
 | `isTitleStart`          | `boolean`                     | –        | Aligns the title to the start                                                 |
+| `id`                    | `string`                      | –        | `id` on the outer wrapper, e.g. a `#hash` link target                         |
 | `className`             | `string`                      | –        | Class on the outer wrapper                                                    |
 | `classNameContent`      | `string`                      | –        | Class on the content element (or the scroll content)                          |
 | `wrapperStyle`          | `CSSProperties`               | –        | Inline style on the outer wrapper                                             |

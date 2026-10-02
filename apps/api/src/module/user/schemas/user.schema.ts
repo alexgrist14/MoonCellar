@@ -43,7 +43,11 @@ export class User extends Document {
   background: string;
   @Prop({
     type: Object,
-    default: { showAdultContent: false, bgOpacity: DEFAULT_BG_OPACITY },
+    default: {
+      showAdultContent: false,
+      bgOpacity: DEFAULT_BG_OPACITY,
+      mutedNotifications: [],
+    },
   })
   settings: IUserSettings;
   @Prop({

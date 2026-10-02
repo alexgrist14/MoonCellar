@@ -28,6 +28,7 @@ import { Game, GameDatabaseSchema } from "../games/schemas/game.schema";
 import { JwtModule } from "@nestjs/jwt";
 import { UserRoyalGamesService } from "./services/user-royal-games.service";
 import { RoyalGamesGateway } from "./gateways/royal-games.gateway";
+import { NotificationsModule } from "../notifications/notifications.module";
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { RoyalGamesGateway } from "./gateways/royal-games.gateway";
       { name: Game.name, schema: GameDatabaseSchema },
     ]),
     MetricsModule,
+    NotificationsModule,
     JwtModule.register({}),
   ],
 

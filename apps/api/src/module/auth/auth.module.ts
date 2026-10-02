@@ -11,6 +11,7 @@ import { UserProfileController } from "../user/controllers/user-profile.controll
 import { UserProfileService } from "../user/services/user-profile.service";
 import { UserFiltersService } from "../user/services/user-filters.service";
 import { UserFollowingsService } from "../user/services/user-followings.service";
+import { NotificationsModule } from "../notifications/notifications.module";
 import { UserLogsService } from "../user/services/user-logs.service";
 import { UserLogs, UserLogsSchema } from "../user/schemas/user-logs.schema";
 import { JwtRefreshStrategy } from "./jwt-refresh.strategy";
@@ -27,6 +28,7 @@ import { IndexNowModule } from "../indexnow/indexnow.module";
 
     MetricsModule,
     IndexNowModule,
+    NotificationsModule,
     PassportModule.register({ defaultStrategy: "jwt" }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

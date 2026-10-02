@@ -25,6 +25,12 @@
   }
 }
 
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x8);
+}
+
 .section {
   display: flex;
   flex-direction: column;

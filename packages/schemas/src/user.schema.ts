@@ -1,15 +1,21 @@
 import { z } from "zod";
 import { CharacterSchema } from "./characters.schema";
+import { MutableNotificationTypeSchema } from "./notifications.schema";
 import { RaAwardSchema } from "./ra.schema";
 import { RoleSchema } from "./role.schema";
 import { ObjectIdSchema } from "./utils";
 
 export const DEFAULT_BG_OPACITY = 0.85;
+export const SYSTEM_USER_NAME = "MoonCellar";
+export const SYSTEM_USER_AVATAR = "/images/logo-icon.png";
 export const USERS_SEARCH_PAGE_SIZE = 10;
 
 export const UserSettingsSchema = z.object({
   showAdultContent: z.boolean(),
   bgOpacity: z.number().min(0).max(1).default(DEFAULT_BG_OPACITY),
+  mutedNotifications: MutableNotificationTypeSchema.array()
+    .default([])
+    .describe("Notification types the user turned off"),
 });
 
 export const USER_NAME_MAX_LENGTH = 15;
@@ -39,6 +45,7 @@ export const UserSchemaZod = z.object({
   settings: UserSettingsSchema.default({
     showAdultContent: false,
     bgOpacity: DEFAULT_BG_OPACITY,
+    mutedNotifications: [],
   }),
   updatedAt: z.date(),
 });
@@ -62,7 +69,13 @@ export const UpdateUserPasswordSchema = z.object({
 export const UpdateDescriptionSchema = UserSchemaZod.pick({
   description: true,
 });
-export const UpdateSettingsSchema = UserSettingsSchema.partial();
+export const UpdateSettingsSchema = z
+  .object({
+    showAdultContent: z.boolean(),
+    bgOpacity: z.number().min(0).max(1),
+    mutedNotifications: MutableNotificationTypeSchema.array(),
+  })
+  .partial();
 
 export const UpdateFavoritesRequestSchema = z.object({
   gameIds: ObjectIdSchema.array()

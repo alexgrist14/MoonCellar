@@ -1,5 +1,7 @@
 import { useIsAuthHydrated } from "@/src/lib/shared/hooks/useIsAuthHydrated";
 import { UserMenu } from "@/src/lib/features/user/ui/UserMenu";
+import { NotificationsBell } from "@/src/lib/widgets/notifications/NotificationsBell";
+import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { SearchModal } from "@/src/lib/widgets/search/SearchModal";
@@ -25,6 +27,7 @@ import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
 
 export const Header: FC = () => {
   const isAuthHydrated = useIsAuthHydrated();
+  const isAuth = useAuthStore((state) => state.isAuth);
 
   const router = useRouter();
 
@@ -166,6 +169,7 @@ export const Header: FC = () => {
         </div>
       </div>
       <div className={styles.container__right}>
+        {isAuthHydrated && isAuth && <NotificationsBell />}
         {isAuthHydrated && <UserMenu />}
       </div>
     </div>

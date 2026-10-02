@@ -8,6 +8,7 @@ interface IRowsModalProps {
   rows: ReactNode[];
   emptyState?: ReactNode;
   classNameRow?: string;
+  className?: string;
 }
 
 export const RowsModal: FC<IRowsModalProps> = ({
@@ -15,13 +16,14 @@ export const RowsModal: FC<IRowsModalProps> = ({
   rows,
   emptyState,
   classNameRow,
+  className,
 }) => {
   return (
     <Box
       title={title}
       isWithScrollBar
       contentStyle={{ padding: "var(--padding-x4)" }}
-      classNameContent={styles.list}
+      classNameContent={classNames(styles.list, className)}
     >
       {rows.length
         ? rows.map((row, i) => (
