@@ -53,4 +53,7 @@ for adding games to lists and selecting several at once. Public.
 - **Platform filters hold platform `_id`s.** Anything that displays them maps back through
   `useCommonStore().systems`.
 - **Select mode pins the Manage drawer open (`isCloseOnOutsideDisabled`)** and neutralises card
-  links; turning it off clears the selection.
+  links; turning it off clears the selection. A selectable card's link carries `data-prevent-progress="true"`:
+  `@bprogress` listens to every anchor's click in the capture phase, before the card's
+  `preventDefault`, so without it each selection started the top progress bar. The selected
+  card is outlined in its status colour (`--card-status-color`), accent when it has no status.

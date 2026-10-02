@@ -51,6 +51,17 @@
     flex: 1;
   }
 
+  &__link {
+    display: flex;
+    flex: 1;
+    margin-left: -1px;
+
+    & > button {
+      width: 100%;
+      margin-left: 0;
+    }
+  }
+
   &__button {
     height: fit-content;
 

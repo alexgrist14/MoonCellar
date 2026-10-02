@@ -51,7 +51,7 @@ import { Input } from "@/src/lib/shared/ui/Input";
 - Placeholder text is styled with `--color-gray` and long values are truncated with an ellipsis.
 - There is no label element. Pair it with a visible label, give it an `id` referenced by a
   `<label htmlFor>`, or pass `aria-label`.
-- The container's radius is `--radius-x4`, one step below the `Box` it normally sits in.
+- The container's radius is `--radius-control`, the one radius of every form field.
 
 ## Storybook
 

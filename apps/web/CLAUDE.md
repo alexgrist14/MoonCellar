@@ -183,7 +183,16 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   `$activityEntryMinWidth`/`$activityGap` for its `@container` thresholds; change the page size
   and the column list together, or every page but the last ends with empty cells.
 
-- `Box`'s own radius is `var(--radius-x5)`. For structural UI wrapper components rendered directly inside a `Box` (`Button`, `Input`, `Textarea`, `Dropdown`, and similar reusable "chrome" primitives — not decorative elements like game covers/posters), the `border-radius` must be exactly one step below its structural parent's on the `--radius-x*` scale (parent `x5` → child `x4` → grandchild `x3`, etc.). This rule applies to structural wrapper nesting only, not to decorative/illustrative radii (e.g. card art, covers), which are a deliberate style choice independent of nesting depth.
+- **Form fields and buttons have one radius each, wherever they sit: `--radius-control` (`Input`,
+  `Textarea`, `Dropdown`, `DatePicker`) and `--radius-button` (`Button`).** A field in the middle of
+  a form shares no corner with the panel around it, so a radius derived from nesting depth only
+  made a dropdown and an input stacked in one `Box`, a modal and a sheet look different from each
+  other. Do not override either from a consumer.
+- **Derive a radius from the parent only for an element pressed against the parent's rounded
+  edge** — closer than the parent's padding, such as a full-bleed card in a `Box`, the segments of
+  `Tabs`, the "Advanced" button inside the search input. Its corner is read together with the
+  parent's, so it takes the parent's radius minus the gap, rounded to the `--radius-x*` scale
+  (`Box` is `--radius-x5`). Decorative radii (covers, artwork) are a style choice and exempt.
 
 - **A rounded image tile needs the radius on the image too, and its hover ring must be an
   `outline`, not a transparent `border`.** A `border: 2px solid transparent` shrinks the

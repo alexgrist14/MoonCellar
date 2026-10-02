@@ -106,6 +106,18 @@ export const Default: Story = {
   ),
 };
 
+export const Paginated: Story = {
+  render: () => (
+    <Table
+      headers={headers}
+      rows={buildRows()}
+      columnStyles={columnStyles}
+      initialSortingKey="rating"
+      limit={3}
+    />
+  ),
+};
+
 export const ClickableRows: Story = {
   render: () => (
     <Table

@@ -159,7 +159,7 @@ export const Dropdown = memo((props: IDropDownListProps) => {
           sheetRef={portalRef}
           isOpen={isActive}
           onClose={closeHandler}
-          title={title || placeholder}
+          title={title}
           classNameContent={styles.dropdown_sheet}
         >
           {dropdownList}

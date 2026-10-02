@@ -887,18 +887,22 @@ export class GameAiDraftService implements OnModuleInit {
     name,
     kind,
     steamAppId,
+    page = 1,
   }: IFindGameImagesRequest): Promise<IFindGameImagesResponse> {
     if (isHttpUrl(name)) {
+      if (page > 1) return { urls: [] };
+
       return {
         urls: await this.pageImages(name),
       };
     }
 
+    const isFirstPage = page === 1;
     const [steam, steamGridDb, search] = await Promise.all([
-      steamAppId
+      steamAppId && isFirstPage
         ? this.steamImages(steamAppId, kind).catch(() => [])
         : Promise.resolve([]),
-      kind === "screenshots"
+      kind === "screenshots" || !isFirstPage
         ? Promise.resolve([])
         : this.searchSteamGridDb({ steam_app_id: steamAppId, name })
             .then((result) =>
@@ -909,7 +913,11 @@ export class GameAiDraftService implements OnModuleInit {
                   )
             )
             .catch(() => []),
-      searchImages(`${name} ${IMAGE_SEARCH_SUFFIX[kind]}`, IMAGE_SEARCH_LIMIT)
+      searchImages(
+        `${name} ${IMAGE_SEARCH_SUFFIX[kind]}`,
+        IMAGE_SEARCH_LIMIT,
+        page
+      )
         .then((results) =>
           results.flatMap(({ img_src }) => (img_src ? [img_src] : []))
         )

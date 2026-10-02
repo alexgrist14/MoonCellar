@@ -78,6 +78,7 @@ export const CharactersAdmin: FC = () => {
 
       <Table
         mobileHeadField="character"
+        initialSortingKey="updated"
         isLoading={isLoading}
         limit={TAKE}
         columnStyles={{

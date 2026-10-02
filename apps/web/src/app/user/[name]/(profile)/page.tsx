@@ -1,5 +1,8 @@
 import { permanentRedirect } from "next/navigation";
-import { profileTabs } from "@/src/lib/shared/constants/user.const";
+import {
+  legacyProfileTabs,
+  profileTabs,
+} from "@/src/lib/shared/constants/user.const";
 import { getProfileHref } from "@/src/lib/shared/utils/links.utils";
 
 export default async function ProfilePage({
@@ -9,7 +12,11 @@ export default async function ProfilePage({
   params: Promise<{ name: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const { list, ...rest } = await searchParams;
+  const { list: rawList, ...rest } = await searchParams;
+  const list =
+    typeof rawList === "string"
+      ? (legacyProfileTabs[rawList] ?? rawList)
+      : rawList;
 
   if (typeof list === "string" && profileTabs.includes(list)) {
     const query = new URLSearchParams(

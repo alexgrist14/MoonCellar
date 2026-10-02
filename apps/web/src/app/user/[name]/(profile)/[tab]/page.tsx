@@ -1,11 +1,11 @@
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import {
-  profileTabLabels,
+  legacyProfileTabs,
   profileTabs,
 } from "@/src/lib/shared/constants/user.const";
 import { getProfileHref } from "@/src/lib/shared/utils/links.utils";
-import { getProfileUser } from "../profile.data";
+import { getProfileTabMetadata } from "../profile.data";
 
 type ITabPageProps = { params: Promise<{ name: string; tab: string }> };
 
@@ -13,23 +13,18 @@ export async function generateMetadata({
   params,
 }: ITabPageProps): Promise<Metadata> {
   const { name, tab } = await params;
-  const user = await getProfileUser(name).catch((error: unknown) => {
-    console.error("Failed to load profile tab metadata:", error);
 
-    return null;
-  });
-
-  if (!user || !profileTabs.includes(tab)) return {};
-
-  return {
-    title: `${profileTabLabels[tab]}: ${user.userName}`,
-    alternates: { canonical: getProfileHref(user.userName, tab) },
-    ...(tab === "settings" && { robots: { index: false, follow: false } }),
-  };
+  return getProfileTabMetadata(name, tab);
 }
 
 export default async function ProfileTabPage({ params }: ITabPageProps) {
-  if (!profileTabs.includes((await params).tab)) notFound();
+  const { name, tab } = await params;
+
+  if (legacyProfileTabs[tab]) {
+    permanentRedirect(getProfileHref(name, legacyProfileTabs[tab]));
+  }
+
+  if (!profileTabs.includes(tab)) notFound();
 
   return null;
 }

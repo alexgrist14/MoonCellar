@@ -4,7 +4,11 @@ import { Box } from "@/src/lib/shared/ui/Box";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Avatar } from "@/src/lib/shared/ui/Avatar";
 import { IUser } from "@/src/lib/shared/types/auth.type";
-import { userListCategories } from "@/src/lib/shared/constants/user.const";
+import {
+  FAVOURITE_CHARACTERS_TAB,
+  FAVOURITE_GAMES_TAB,
+  userListCategories,
+} from "@/src/lib/shared/constants/user.const";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { SvgSettings } from "@/src/lib/shared/ui/svg";
 import { IPlaythrough } from "@mooncellar/schemas";
@@ -38,9 +42,8 @@ export const UserNavigation: FC<{
   const isReviewsTab = currentList === "reviews";
   const isListsTab = currentList === "lists";
   const isLikedTab = currentList === "liked";
-  const isFavoritesTab = currentList === "favorites";
+  const isFavoritesTab = currentList === "favourites";
   const favoritesCount = user.favorites?.length ?? 0;
-  const isCharactersTab = currentList === "characters";
   const favoriteCharactersCount = user.favoriteCharacters?.length ?? 0;
 
   const { data: userLists = [] } = useUserListsQuery(user._id);
@@ -67,27 +70,38 @@ export const UserNavigation: FC<{
 
   return (
     <div className={styles.panel}>
-      {!isProfileTab && (
-        <Box>
+      <Box classNameContent={styles.identity}>
+        <Button
+          className={styles.btn}
+          active={isProfileTab}
+          color={ButtonColor.TRANSPARENT}
+          href={getProfileHref(user.userName, "profile")}
+          onClick={closeMenu}
+        >
+          <div>
+            <div className={styles.avatar}>
+              <Avatar
+                user={user}
+                isWithoutTooltip={true}
+                isWithoutHover={true}
+              />
+            </div>
+            <span>{user.userName}</span>
+          </div>
+        </Button>
+        {isAuthedUser && (
           <Button
-            className={styles.btn}
             color={ButtonColor.TRANSPARENT}
-            href={getProfileHref(user.userName, "profile")}
+            active={currentList === "settings"}
+            href={getProfileHref(user.userName, "settings")}
+            tooltip="Settings"
+            isOnlyIcon
             onClick={closeMenu}
           >
-            <div>
-              <div className={styles.avatar}>
-                <Avatar
-                  user={user}
-                  isWithoutTooltip={true}
-                  isWithoutHover={true}
-                />
-              </div>
-              <span>{user.userName}</span>
-            </div>
+            <SvgSettings size="20" />
           </Button>
-        </Box>
-      )}
+        )}
+      </Box>
       <Box>
         <Button
           className={styles.btn}
@@ -151,28 +165,21 @@ export const UserNavigation: FC<{
             <span>{likedLists.length}</span>
           </Button>
         )}
-        {(isAuthedUser || !!favoritesCount) && (
+        {(isAuthedUser || !!favoritesCount || !!favoriteCharactersCount) && (
           <Button
             className={styles.btn}
             active={isFavoritesTab}
             color={ButtonColor.TRANSPARENT}
-            href={getProfileHref(user.userName, "favorites")}
+            href={getProfileHref(
+              user.userName,
+              !favoritesCount && favoriteCharactersCount
+                ? FAVOURITE_CHARACTERS_TAB
+                : FAVOURITE_GAMES_TAB
+            )}
             onClick={closeMenu}
           >
             <span>Favourites</span>
-            <span>{favoritesCount}</span>
-          </Button>
-        )}
-        {(isAuthedUser || !!favoriteCharactersCount) && (
-          <Button
-            className={styles.btn}
-            active={isCharactersTab}
-            color={ButtonColor.TRANSPARENT}
-            href={getProfileHref(user.userName, "characters")}
-            onClick={closeMenu}
-          >
-            <span>Characters</span>
-            <span>{favoriteCharactersCount}</span>
+            <span>{favoritesCount + favoriteCharactersCount}</span>
           </Button>
         )}
         <Button
@@ -186,22 +193,6 @@ export const UserNavigation: FC<{
           <span>{reviewsCount}</span>
         </Button>
       </Box>
-      {isAuthedUser && (
-        <Box>
-          <Button
-            className={styles.btn}
-            active={currentList === "settings"}
-            color={ButtonColor.TRANSPARENT}
-            href={getProfileHref(user.userName, "settings")}
-            onClick={closeMenu}
-          >
-            <div>
-              <SvgSettings size="24" />
-              <span>Settings</span>
-            </div>
-          </Button>
-        </Box>
-      )}
     </div>
   );
 };

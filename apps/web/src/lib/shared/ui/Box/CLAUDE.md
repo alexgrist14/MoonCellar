@@ -80,7 +80,8 @@ import { Box } from "@/src/lib/shared/ui/Box";
   `flex-shrink: 0`, or it shrinks to the cap and its last row sits on the bottom padding.
 - Do not put a new element between a grid cell and the `Box` to animate it; animate the cell,
   and only `opacity`/`transform` (height animation fires the resize detector every frame).
-- Children's structural radius is one step below the panel's `--radius-x5` (`x4`, then `x3`).
+- Fields and buttons inside keep their own `--radius-control` / `--radius-button`; only a child
+  pressed against the panel's edge takes `--radius-x5` minus the gap.
 - No `"use client"`: import it from a client component, never directly into a route under
   `src/app/` (it fails with `useRef is not a function`).
 

@@ -501,6 +501,15 @@ export const FindGameImagesRequestSchema = z.object({
     .regex(/^\d+$/)
     .optional()
     .describe("Steam app id, when the game is on Steam"),
+  page: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(10)
+    .default(1)
+    .describe(
+      "Result page; 2 and later return only further image search results"
+    ),
 });
 
 export const FindGameImagesResponseSchema = z.object({

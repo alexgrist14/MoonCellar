@@ -245,7 +245,7 @@ export const CharacterEditor: FC<ICharacterEditorProps> = ({
           character && (
             <CharacterPortrait
               character={character}
-              sizes="160px"
+              sizes="150px"
               className={styles.editor__image}
             />
           )
@@ -264,7 +264,7 @@ export const CharacterEditor: FC<ICharacterEditorProps> = ({
           defaultQuery={[name.trim(), linkedGames[0]?.label]
             .filter(Boolean)
             .join(" ")}
-          onSearch={findPortraits}
+          onSearch={(query, page) => findPortraits({ query, page })}
         />
         {character ? (
           <UploadButton

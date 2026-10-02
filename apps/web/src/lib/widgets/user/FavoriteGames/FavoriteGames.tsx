@@ -106,8 +106,12 @@ export const FavoriteGames: FC<IFavoriteGamesProps> = ({
         count={games.length || undefined}
         action={
           isPreview && !!games.length ? (
-            <Button color={ButtonColor.TRANSPARENT} onClick={onShowAll}>
-              All favourites
+            <Button
+              color={ButtonColor.TRANSPARENT}
+              onClick={onShowAll}
+              aria-label="All favourite games"
+            >
+              All
             </Button>
           ) : (
             !isPreview &&

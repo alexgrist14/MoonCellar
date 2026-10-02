@@ -68,7 +68,8 @@ import { Tabs } from "@/src/lib/shared/ui/Tabs";
   `nowrap` and runs past a narrow container.
 - Its buttons carry `type="button"`, so it is safe inside a `<form>`.
 - A tab with `tabLink` is wrapped in `Link` (which takes the tab's `className`); its button gets
-  the same `tabs__button` class and `aria-pressed` as a plain tab.
+  the same `tabs__button` class and `aria-pressed` as a plain tab. The `Link` itself takes `flex: 1`;
+  stretching only the button inside left link tabs at their content width.
 - No `"use client"`: import it from a client component, never directly into a route file.
 
 ## Storybook

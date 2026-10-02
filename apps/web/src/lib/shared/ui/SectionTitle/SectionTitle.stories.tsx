@@ -26,7 +26,11 @@ export const WithAction: Story = {
   args: {
     children: "Lists",
     count: 12,
-    action: <Button color={ButtonColor.TRANSPARENT}>All lists</Button>,
+    action: (
+      <Button color={ButtonColor.TRANSPARENT} aria-label="All lists">
+        All
+      </Button>
+    ),
   },
 };
 

@@ -74,6 +74,7 @@ export const ConflictList: FC<IConflictListProps> = ({ source }) => {
 
       <Table
         mobileHeadField="entry"
+        isWithoutSorting
         isLoading={isLoading}
         limit={CONFLICTS_PAGE_SIZE}
         headers={{

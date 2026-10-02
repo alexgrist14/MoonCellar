@@ -2,11 +2,16 @@ export const SEARCH_ENGINES_UNAVAILABLE = "Search engines unavailable";
 
 const getSearxngUrl = () => process.env.SEARXNG_URL || "http://localhost:8891";
 
-const search = async <T>(query: string, category?: string): Promise<T[]> => {
+const search = async <T>(
+  query: string,
+  category?: string,
+  page = 1
+): Promise<T[]> => {
   const url = new URL("/search", getSearxngUrl());
   url.searchParams.set("q", query);
   url.searchParams.set("format", "json");
   if (category) url.searchParams.set("categories", category);
+  if (page > 1) url.searchParams.set("pageno", String(page));
 
   const res = await fetch(url);
   if (!res.ok) {
@@ -37,14 +42,14 @@ export const searchWeb = async (query: string, count = 10) =>
     .slice(0, count)
     .map(({ title, url, content }) => ({ title, url, content }));
 
-export const searchImages = async (query: string, count = 15) =>
+export const searchImages = async (query: string, count = 15, page = 1) =>
   (
     await search<{
       title: string;
       url: string;
       img_src?: string;
       source?: string;
-    }>(query, "images")
+    }>(query, "images", page)
   )
     .filter((r) => r.img_src && !/\.svg(\?|$)/i.test(r.img_src))
     .slice(0, count)

@@ -17,6 +17,11 @@ const searchImages = async () => {
   return IMAGES;
 };
 
+const searchPaged = async (_query: string, page: number) => {
+  await delay(600);
+  return page > 3 ? [] : IMAGES.map((url) => `${url}?page=${page}`);
+};
+
 const searchNothing = async () => {
   await delay(600);
   return [];
@@ -29,7 +34,7 @@ const ImageFinderDemo = ({
 }: {
   isMultiple?: boolean;
   isPortrait?: boolean;
-  onSearch?: (query: string) => Promise<string[]>;
+  onSearch?: (query: string, page: number) => Promise<string[]>;
 }) => {
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -71,6 +76,10 @@ export const Multiple: Story = {
 
 export const Portrait: Story = {
   render: () => <ImageFinderDemo isPortrait />,
+};
+
+export const ShowMore: Story = {
+  render: () => <ImageFinderDemo onSearch={searchPaged} />,
 };
 
 export const NothingFound: Story = {

@@ -303,6 +303,15 @@ export const FindCharacterPortraitsRequestSchema = z.object({
     .describe(
       "Character name, usually with the game title, or a page link to take the images from"
     ),
+  page: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(10)
+    .default(1)
+    .describe(
+      "Result page; 2 and later return only further image search results"
+    ),
 });
 
 export const FindCharacterPortraitsResponseSchema = z.object({

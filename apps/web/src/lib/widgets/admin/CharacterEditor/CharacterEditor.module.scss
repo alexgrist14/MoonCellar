@@ -30,7 +30,12 @@
   }
 
   &__image {
-    width: var(--character-profile-portrait-width);
+    width: var(--character-editor-portrait-width);
+    height: auto;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    object-position: top;
+    border-radius: var(--radius-x3);
   }
 
   &__actions {

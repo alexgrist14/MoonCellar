@@ -92,6 +92,8 @@ export const useDeleteCharacterAiDraftMutation = () => {
 
 export const useFindCharacterPortraitsMutation = () =>
   useMutation({
-    mutationFn: (query: string) =>
-      charactersApi.findPortraits({ query }).then(({ data }) => data.urls),
+    mutationFn: ({ query, page }: { query: string; page: number }) =>
+      charactersApi
+        .findPortraits({ query, page })
+        .then(({ data }) => data.urls),
   });

@@ -678,10 +678,11 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
       }
       emptyText="Nothing found. Check the game name or add its Steam page."
       defaultQuery={gameName ?? ""}
-      onSearch={(name) =>
+      onSearch={(name, page) =>
         findImages({
           name,
           kind,
+          page,
           ...(steamAppId && { steamAppId }),
         })
       }
@@ -1017,7 +1018,7 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
   }
 
   return (
-    <Box className={styles.page} classNameContent={styles.content}>
+    <Box classNameContent={styles.content}>
       <Breadcrumbs
         items={[
           { name: "Home", href: "/" },

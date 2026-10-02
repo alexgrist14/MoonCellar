@@ -2,7 +2,7 @@
   text-align: center;
   border-width: 1px;
   border-style: solid;
-  border-radius: var(--radius-x2);
+  border-radius: var(--radius-button);
   border-color: var(--color-bg-primary);
   font-size: 14px;
   padding: var(--padding-x2) var(--padding-x4);
@@ -84,7 +84,6 @@
     gap: var(--gap-x2);
     padding: var(--padding-x05) var(--padding-x1);
     border-color: transparent;
-    border-radius: var(--radius-x3);
     background-color: transparent;
     color: var(--color-text-muted);
 

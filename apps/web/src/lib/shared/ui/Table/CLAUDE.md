@@ -67,7 +67,13 @@ import { Table } from "@/src/lib/shared/ui/Table";
   from `columnStyles` as `minmax(minWidth ?? 80px, width ?? 1fr)` (any track size works for
   `width`, e.g. `48px` or `max-content`; other `columnStyles` keys are ignored), each row a
   `display: contents` wrapper with ARIA table roles, cells stretched to the row height with
-  content at the top, and string content wrapping instead of being cut with an ellipsis.
+  content at the top, and a cell's string content wrapping instead of being cut with an
+  ellipsis. Header labels never wrap: a header shares its track with the sort arrow and the
+  resize handle, and a wrapped "Cover" in a 64px track broke into one letter per line and
+  stretched the whole header row.
+- A header reserves 24px for the sort arrow and 24px for the resize handle (drawn in the
+  bottom-right corner); `isNotResizable` drops the second slot, so a narrow fixed column such as
+  a cover keeps room for its label.
   Resizing, hover, loader, empty state, pagination and the mobile layout work as in `columns`.
 - `getRowClassName`'s class lands on each cell, not on a row element (in `rows` the row wrapper
   is `display: contents` and draws nothing), so target one column with a compound selector:
@@ -92,8 +98,15 @@ import { Table } from "@/src/lib/shared/ui/Table";
 - With `sortingCallback`, the table does not sort locally — the caller must refetch.
 - Pass `isLoading` while the rows are being fetched: `rows={undefined}` alone renders the empty
   state, not the loader.
-- Pagination is client-side over `rows`; for a server-paginated list pass one page of rows
-  and render the shared `Pagination` beside it, as `ConflictList` does.
+- **A sortable table sets `initialSortingKey` (and `initialSortingOrder` when it is not
+  `desc`).** Without it the mobile sort control reads "Select..." and the arrow shows nothing.
+  Pick the order the rows already arrive in, so the first render does not reshuffle them. When
+  the row order is meaningful on its own (Conflicts: waiting first; Images: children under their
+  parent), pass `isWithoutSorting` instead.
+- Over `limit` rows the table pages them itself with the shared `Pagination` (inline, without
+  the summary lines); at `limit` or fewer it renders no pager. For a server-paginated list pass
+  one page of rows, no more than `limit`, and render `Pagination` beside it, as `ConflictList`
+  does — the two pagers never appear together. The former "Show more" `PaginationClient` is gone.
 - The mobile layout is chosen from `useStatesStore().isMobile`, set by the app's layout; it
   passes `MobileTable` copies of the row cells with each header's `content` as their `title`,
   and leaves the objects you pass untouched.
@@ -102,5 +115,5 @@ import { Table } from "@/src/lib/shared/ui/Table";
 
 ## Storybook
 
-`Shared/Table`: `Default`, `ClickableRows`, `RowClick`, `ServerSorting`, `Loading`, `Empty`, `WithoutRows`,
+`Shared/Table`: `Default`, `Paginated`, `ClickableRows`, `RowClick`, `ServerSorting`, `Loading`, `Empty`, `WithoutRows`,
 `ZeroAndMissingValues`, `Mobile`, `WithoutSorting`, `DimmedRows`, `RowLayout`.

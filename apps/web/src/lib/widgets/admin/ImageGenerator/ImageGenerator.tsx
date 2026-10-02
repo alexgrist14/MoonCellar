@@ -358,6 +358,7 @@ export const ImageGenerator: FC = () => {
       ) : (
         <Table
           mobileHeadField="prompt"
+          isWithoutSorting
           columnStyles={{
             preview: { width: "176px" },
             prompt: { width: "280px", minWidth: "200px" },

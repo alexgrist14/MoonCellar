@@ -7,14 +7,14 @@ import { Loader } from "@/src/lib/shared/ui/Loader";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { MobileTable } from "@/src/lib/shared/ui/MobileTable";
-import { PaginationClient } from "@/src/lib/shared/ui/PaginationClient";
+import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { compareTableCells } from "@/src/lib/shared/utils/table.utils";
 
 interface ITableProps<T> {
   id?: string;
   headers: ITableHeaders<T>;
   rows?: ITableRows<T>;
-  columnStyles?: Partial<Record<keyof T, CSSProperties>>;
+  columnStyles?: Partial<Record<NoInfer<keyof T>, CSSProperties>>;
   initialSortingKey?: keyof T;
   initialSortingOrder?: "asc" | "desc";
   isLoading?: boolean;
@@ -186,6 +186,7 @@ export const Table = <T extends object>({
         className={classNames(
           !isHeader && hoveredRowIndex === j && styles.table__cell_hover,
           isHeader ? styles.table__header : styles.table__cell,
+          isHeader && cell.isNotResizable && styles.table__header_fixed,
           isSortable && sortingKey === key && styles.table__header_active,
           dragIndex.current !== undefined && styles.table__header_drag,
           rowIndex !== undefined && getRowClassName?.(row, rowIndex),
@@ -263,7 +264,12 @@ export const Table = <T extends object>({
     );
   };
 
-  const shownRows = [headers, ...(sortedRows?.slice(0, page * take) || [])];
+  const pageCount = Math.max(1, Math.ceil((sortedRows?.length ?? 0) / take));
+  const currentPage = Math.min(page, pageCount);
+  const shownRows = [
+    headers,
+    ...(sortedRows?.slice((currentPage - 1) * take, currentPage * take) || []),
+  ];
 
   return (
     <div key={Object.keys(headers).join("_")} className={styles.wrapper}>
@@ -314,12 +320,13 @@ export const Table = <T extends object>({
           ))}
         </div>
       )}
-      {!isLoaderShown && (
-        <PaginationClient
-          page={page}
-          setPage={setPage}
+      {!isLoaderShown && pageCount > 1 && (
+        <Pagination
+          total={sortedRows?.length ?? 0}
           take={take}
-          length={sortedRows?.length}
+          page={currentPage}
+          onPageChange={setPage}
+          isWithoutSummary
         />
       )}
     </div>

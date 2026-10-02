@@ -177,6 +177,7 @@ export const GameCard = memo(
             isSelected && styles.card_selected
           )}
           draggable={false}
+          data-prevent-progress={isSelectable ? "true" : undefined}
           onClick={
             isSelectable
               ? (event) => {

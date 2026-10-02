@@ -91,7 +91,8 @@ import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
   is wide.
 - Any padding override keeps inline padding at twice the block padding on the same scale; a 1:3
   button reads as a different control next to its neighbours.
-- Inside a `Box`, a button's radius is one `--radius-x*` step below the panel's (`x5` → `x4`).
+- Every button is `--radius-button`, wherever it sits. Override it only for a button pressed
+  against the edge of a rounded parent (the "Advanced" button inside the search input).
 - Give an icon-only button an accessible name: `tooltip` as a string or `aria-label`.
 - **Icon plus text goes in as siblings, never wrapped in a fragment.** A single child whose type
   is not a string counts as an icon, and a `<>…</>` is such a child — it gets `button_icon`'s
@@ -104,7 +105,7 @@ import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
 - **`isLoading` shows the loader in `currentColor`,** so it stays visible on the accent and green
   themes, and keeps full opacity while disabled. The label stays in the DOM (`visibility:
 hidden`), which is what keeps the width.
-- `GHOST` has its own padding (`x05`/`x1`), 13px/20px type and `--radius-x3`; `active` turns the
+- `GHOST` has its own padding (`x05`/`x1`), 13px/20px type and the shared `--radius-button`; `active` turns the
   text and any filled icon path accent. It skips the global hover dimming like `transparent`.
 
 ## Storybook

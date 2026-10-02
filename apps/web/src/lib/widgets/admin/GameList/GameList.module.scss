@@ -21,6 +21,10 @@
   flex-direction: column;
 }
 
+.title {
+  @include lineClamp(3);
+}
+
 .slug {
   color: var(--color-text-muted);
   font-size: 12px;

@@ -3,7 +3,7 @@
 A controlled floating panel anchored to an element. On desktop it is a blurred `Box` positioned
 below (or, without room, above) the anchor and clamped to the viewport; on mobile
 (`useStatesStore().isMobile`) the same props render `PopoverSheet`, a bottom sheet with a
-backdrop, a drag handle, a title and a close button. Both portal into `#dropdown-connector`.
+backdrop, a drag handle and, when `title` is set, a heading. Both portal into `#dropdown-connector`.
 
 ## When to use
 
@@ -81,6 +81,11 @@ const [isOpen, setIsOpen] = useState(false);
 - Desktop and mobile differ: `width`, `align` and the default padding apply only to the anchored
   panel; the sheet is full-width with its own padding.
 
+- **The sheet has no visible close button.** It closes by dragging down, tapping the backdrop or
+  Escape; a visible ✕ duplicated those and, without a `title`, left an empty header row above the
+  content. A visually hidden "Close" button stays as the first control for screen readers, which
+  cannot drag. Pass `title` only when the content does not explain itself (a sub-panel, the
+  options of a field), not to repeat the trigger's label.
 - Untitled, the anchored panel has no title chrome (`Box` renders no head without `title`).
 - The anchored mode never takes focus: keyboard navigation stays with the anchor (handle
   arrows/Enter on the input, keep the active option in state), and Escape or an outside
@@ -89,5 +94,5 @@ const [isOpen, setIsOpen] = useState(false);
 
 ## Storybook
 
-`Shared/Popover` — `Default`, `AlignEnd`, `WithTitle`, `MobileSheet`, `AnchoredSearch`,
+`Shared/Popover` — `Default`, `AlignEnd`, `WithTitle`, `MobileSheet`, `MobileSheetUntitled`, `AnchoredSearch`,
 `AnchoredSearchOnMobile`.

@@ -108,9 +108,10 @@ All three scales are multiples of 4px, so `x3` is 12px everywhere.
 
 - **Spacing** — `--padding-x1` … `--padding-x25` and `--gap-x05` … `--gap-x12`. Use `gap` on a
   flex or grid parent, not margins on children.
-- **Radius** — `--radius-x1` (4px) … `--radius-x10`. `Box` is `--radius-x5`; a structural
-  wrapper nested inside it steps down one level per depth, so a `Button` in a `Box` is
-  `--radius-x4`. Decorative radii (covers, artwork) are exempt.
+- **Radius** — `--radius-x1` (4px) … `--radius-x10`. `Box` is `--radius-x5`. Every form field is
+  `--radius-control` (x4) and every button `--radius-button` (x3), wherever they sit. Only an
+  element pressed against a rounded parent's edge takes the parent's radius minus the gap.
+  Decorative radii (covers, artwork) are exempt.
 - **Motion** — `--duration-fast` 160ms, `--duration-base` 280ms, `--easing-out`. Under
   `prefers-reduced-motion` set `--duration-instant`, never `animation: none`: exit animations
   that unmount a node depend on `animationend` firing.

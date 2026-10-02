@@ -10,7 +10,6 @@
     align-items: start;
 
     & button {
-      border-radius: var(--radius-x4);
     }
   }
 
@@ -18,7 +17,6 @@
     width: 100%;
     justify-content: flex-start;
     gap: var(--gap-x2);
-    border-radius: var(--radius-x4);
     color: var(--color-text-secondary);
   }
 

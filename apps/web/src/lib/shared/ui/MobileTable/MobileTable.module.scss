@@ -4,7 +4,7 @@
   gap: var(--gap-x1);
   position: relative;
   min-height: 100px;
-  border-radius: var(--radius-x1);
+  border-radius: var(--radius-x4);
   background-color: var(--color-bg-secondary);
   padding: var(--padding-x1);
   overflow: hidden;
@@ -16,7 +16,7 @@
     border: 2px solid var(--color-border-primary);
     padding: var(--padding-x2);
     background-color: var(--color-bg-primary);
-    border-radius: var(--radius-x1);
+    border-radius: var(--radius-x3);
     width: 100%;
     animation: appearOpacity 0.3s ease 1 forwards;
     /* max-width: calc(100vw - var(--padding-x6) * 2) */

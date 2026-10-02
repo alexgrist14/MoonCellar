@@ -8,10 +8,21 @@
   position: sticky;
   top: 70px;
 
+  .identity {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--gap-x2);
+
+    .btn {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+
   .btn {
     display: flex;
     justify-content: space-between;
-    border-radius: var(--radius-x4);
     gap: var(--gap-x2);
     color: var(--color-neutral-90);
 

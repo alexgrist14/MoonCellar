@@ -133,13 +133,19 @@ export const GameList: FC = () => {
         isLoading={isPending || isFetching}
         limit={TAKE}
         sortingCallback={handleSort}
+        layout="rows"
+        columnStyles={{
+          cover: { minWidth: "100px", width: "100px" },
+          name: { minWidth: "160px", width: "250px" },
+          actions: { width: "max-content" },
+        }}
         headers={{
-          cover: { content: "Cover" },
+          cover: { content: "Cover", isNotResizable: true },
           name: { content: "Name" },
           type: { content: "Type" },
           firstRelease: { content: "Released" },
           isStopParsing: { content: "Stop parsing" },
-          actions: { content: "Actions" },
+          actions: { content: "Actions", isNotResizable: true },
         }}
         onRowClick={(index) => router.push(getEditorHref(games[index]._id))}
         rowClickExcludeKeys={["isStopParsing", "actions"]}
@@ -160,7 +166,7 @@ export const GameList: FC = () => {
           name: {
             content: (
               <div className={styles.name}>
-                <span>{game.name}</span>
+                <span className={styles.title}>{game.name}</span>
                 <span className={styles.slug}>{game.slug}</span>
               </div>
             ),

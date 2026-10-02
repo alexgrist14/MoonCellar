@@ -8,7 +8,7 @@ import { Loader } from "@/src/lib/shared/ui/Loader";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
-import { PaginationClient } from "@/src/lib/shared/ui/PaginationClient";
+import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { compareTableCells } from "@/src/lib/shared/utils/table.utils";
 
 const getRowKey = (header: ITableCell, index: number) =>
@@ -75,7 +75,7 @@ export const MobileTable = <T extends object>({
   const [page, setPage] = useState(1);
   const [activeKeys, setActiveKeys] = useState<string[]>([]);
 
-  const take = limit || 20;
+  const take = limit || 50;
 
   const isLoaderShown = useMinimumLoading(!!isLoading);
 
@@ -88,6 +88,9 @@ export const MobileTable = <T extends object>({
           ),
     [rows, sortingKey, sortingOrder]
   );
+
+  const pageCount = Math.max(1, Math.ceil((sortedRows?.length ?? 0) / take));
+  const currentPage = Math.min(page, pageCount);
 
   return (
     <div className={styles.table}>
@@ -122,105 +125,111 @@ export const MobileTable = <T extends object>({
           {!sortedRows?.length ? (
             <p className={styles.table__empty}>List is empty</p>
           ) : (
-            sortedRows.slice(0, page * take).map((row, i) => {
-              const header = row[mobileHeadField];
+            sortedRows
+              .slice((currentPage - 1) * take, currentPage * take)
+              .map((row, i) => {
+                const header = row[mobileHeadField];
 
-              if (!header) return null;
+                if (!header) return null;
 
-              const rowKey = getRowKey(header, i);
-              const isActive = activeKeys.includes(rowKey);
-              const rowIndex = rowIndexes.get(row);
+                const rowKey = getRowKey(header, i);
+                const isActive = activeKeys.includes(rowKey);
+                const rowIndex = rowIndexes.get(row);
 
-              return (
-                <div
-                  key={i}
-                  className={classNames(
-                    styles.table__row,
-                    rowIndex !== undefined && getRowClassName?.(row, rowIndex)
-                  )}
-                >
-                  <div className={styles.table__header}>
-                    <div
-                      className={classNames(
-                        styles.table__title,
-                        !!onRowClick && styles.table__title_clickable,
-                        header.className
-                      )}
-                      onClick={() => {
-                        header.onClick?.();
+                return (
+                  <div
+                    key={i}
+                    className={classNames(
+                      styles.table__row,
+                      rowIndex !== undefined && getRowClassName?.(row, rowIndex)
+                    )}
+                  >
+                    <div className={styles.table__header}>
+                      <div
+                        className={classNames(
+                          styles.table__title,
+                          !!onRowClick && styles.table__title_clickable,
+                          header.className
+                        )}
+                        onClick={() => {
+                          header.onClick?.();
 
-                        if (rowIndex !== undefined) onRowClick?.(rowIndex);
-                      }}
-                    >
-                      {["string", "number"].includes(typeof header.content) ? (
-                        <p>{header.content}</p>
-                      ) : (
-                        header.content
-                      )}
-                    </div>
-                    <Button
-                      compact
-                      isOnlyIcon
-                      onClick={() =>
-                        setActiveKeys(
-                          isActive
-                            ? activeKeys.filter((key) => key !== rowKey)
-                            : [rowKey, ...activeKeys]
-                        )
-                      }
-                    >
-                      <SvgChevron
-                        style={{
-                          transform: isActive ? "rotate(180deg)" : "none",
+                          if (rowIndex !== undefined) onRowClick?.(rowIndex);
                         }}
-                      />
-                    </Button>
-                  </div>
-                  {isActive && (
-                    <div className={classNames(styles.table__content)}>
-                      {keys.map((key, j) => {
-                        const rowField = !!row ? row[key] : undefined;
-
-                        if (!rowField || key === mobileHeadField) return null;
-
-                        return (
-                          <div
-                            key={j + (rowField.id || "")}
-                            id={rowField.id}
-                            className={styles.table__item}
-                          >
-                            {rowField.title &&
-                              (["string", "number"].includes(
-                                typeof rowField.title
-                              ) ? (
-                                <p className={styles.table__label}>
-                                  {rowField.title}
-                                </p>
-                              ) : (
-                                rowField.title
-                              ))}
-                            {["string", "number"].includes(
-                              typeof rowField.content
-                            ) ? (
-                              <p>{rowField.content}</p>
-                            ) : (
-                              rowField.content
-                            )}
-                          </div>
-                        );
-                      })}
+                      >
+                        {["string", "number"].includes(
+                          typeof header.content
+                        ) ? (
+                          <p>{header.content}</p>
+                        ) : (
+                          header.content
+                        )}
+                      </div>
+                      <Button
+                        isOnlyIcon
+                        onClick={() =>
+                          setActiveKeys(
+                            isActive
+                              ? activeKeys.filter((key) => key !== rowKey)
+                              : [rowKey, ...activeKeys]
+                          )
+                        }
+                      >
+                        <SvgChevron
+                          style={{
+                            transform: isActive ? "rotate(180deg)" : "none",
+                          }}
+                        />
+                      </Button>
                     </div>
-                  )}
-                </div>
-              );
-            })
+                    {isActive && (
+                      <div className={classNames(styles.table__content)}>
+                        {keys.map((key, j) => {
+                          const rowField = !!row ? row[key] : undefined;
+
+                          if (!rowField || key === mobileHeadField) return null;
+
+                          return (
+                            <div
+                              key={j + (rowField.id || "")}
+                              id={rowField.id}
+                              className={styles.table__item}
+                            >
+                              {rowField.title &&
+                                (["string", "number"].includes(
+                                  typeof rowField.title
+                                ) ? (
+                                  <p className={styles.table__label}>
+                                    {rowField.title}
+                                  </p>
+                                ) : (
+                                  rowField.title
+                                ))}
+                              {["string", "number"].includes(
+                                typeof rowField.content
+                              ) ? (
+                                <p>{rowField.content}</p>
+                              ) : (
+                                rowField.content
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
           )}
-          <PaginationClient
-            page={page}
-            setPage={setPage}
-            take={take}
-            length={sortedRows?.length}
-          />
+          {pageCount > 1 && (
+            <Pagination
+              total={sortedRows?.length ?? 0}
+              take={take}
+              page={currentPage}
+              onPageChange={setPage}
+              isWithoutSummary
+            />
+          )}
         </>
       )}
     </div>

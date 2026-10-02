@@ -171,6 +171,11 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
   Storybook images) builds with the repository root as context and copies every workspace
   manifest before `bun install --frozen-lockfile`; a partial copy fails the frozen
   lockfile check.
+- **The static images serve HTML with `Cache-Control: no-cache` and only `/assets/` as
+  `immutable`** (`static.Dockerfile`). Storybook and VitePress chunks are hashed and every deploy
+  removes the old ones; without the header browsers cached `iframe.html` heuristically and kept
+  requesting the previous build's chunks, which failed with "Failed to fetch dynamically
+  imported module" (404).
 
 - **The host's nginx site config is `infra/nginx/mooncellar.conf`, installed over
   `/etc/nginx/conf.d/mooncellar.conf` on every infra deploy.** Edits made on the server are lost

@@ -35,6 +35,8 @@ export const SiteSessions: FC = () => {
       </div>
       <Table
         mobileHeadField="domain"
+        initialSortingKey="domain"
+        initialSortingOrder="asc"
         isLoading={isLoading}
         columnStyles={{
           domain: { width: "240px", minWidth: "180px" },

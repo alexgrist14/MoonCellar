@@ -53,8 +53,11 @@ export class CharactersService {
 
   async findPortraits({
     query,
+    page = 1,
   }: IFindCharacterPortraitsRequest): Promise<IFindCharacterPortraitsResponse> {
     if (isHttpUrl(query)) {
+      if (page > 1) return { urls: [] };
+
       return {
         urls: await findPageImages(
           query,
@@ -68,14 +71,16 @@ export class CharactersService {
       };
     }
 
-    const results = await searchImages(query, PORTRAIT_SEARCH_LIMIT).catch(
-      (err: Error) => {
-        this.logger.error(err, `Portrait search failed: ${query}`);
-        throw new ServiceUnavailableException(
-          `Image search failed: ${err.message}`
-        );
-      }
-    );
+    const results = await searchImages(
+      query,
+      PORTRAIT_SEARCH_LIMIT,
+      page
+    ).catch((err: Error) => {
+      this.logger.error(err, `Portrait search failed: ${query}`);
+      throw new ServiceUnavailableException(
+        `Image search failed: ${err.message}`
+      );
+    });
     const checked = await Promise.all(
       results.map(({ img_src }) =>
         img_src

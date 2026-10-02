@@ -13,6 +13,15 @@ editing controls.
     `?list=<tab>` to `/user/<name>/<tab>`, keeping the other params.
   - `(profile)/[tab]/page.tsx` — `notFound()` for a tab outside `profileTabs`; metadata
     `<Tab label>: <name>`, canonical per tab, `noindex` for `settings`.
+  - `(profile)/favourites/[kind]/page.tsx` — `favourites/games` and `favourites/characters`, the
+    only two-segment tabs; same metadata through `getProfileTabMetadata`. The layout reads the
+    tab with `useSelectedLayoutSegments()` joined by `/`, since a single segment would read
+    "favourites" for both.
+  - The former `/favorites`, `/characters` and a bare `/favourites` (and `?list=` with those
+    names) `permanentRedirect` through `legacyProfileTabs`. They were public URLs; drop an entry
+    only once nothing links to it.
+- **User-facing text and URLs spell it "favourite(s)".** Code identifiers, the `user.favorites`
+  field and the API routes keep `favorites`; renaming those is a data migration, not a copy fix.
 - Dynamic (cookies). `getProfileUser` (`profile.data.ts`) is `React.cache`d: it validates the
   name with `GetUserByStringSchema` before calling `userAPI.getByString` through `fetchOrNull`,
   so an impossible username is a 404, not a 500.
@@ -46,10 +55,17 @@ editing controls.
    - `profile` → `widgets/user/UserInfo`
    - `all` and each status → `widgets/user/UserGames`
    - `lists` / `liked` → `widgets/user/UserLists` (`kind="liked"`)
-   - `favorites` → `widgets/user/FavoriteGames`; `characters` → `FavoriteCharacters`
+   - `favourites/games` → `widgets/user/FavoriteGames`; `favourites/characters` →
+     `FavoriteCharacters`. They are one Favourites page: both routes render a `Tabs` row
+     (Games / Characters) whose tabs are `tabLink`s to the two routes, so the URL is the selected
+     tab and "All" on the Profile tab opens the right one. The navigation has a single Favourites
+     entry, active on both, counting both lists.
    - `reviews` → `widgets/user/UserReviews`
    - `settings` → `features/user/ui/Settings`, owner only
 4. Desktop column: `features/user/ui/UserNavigation` (tabs and counts; sorting lives in `UserGames` and `UserReviews`, above their content).
+   Its first block — avatar and name, linking to Profile and active there — is shown on every
+   tab. Settings is not a tab in it: the owner reaches it from the gear icon at the right of
+   that block, and from the account menu in the header.
 
 ## Rules and gotchas
 

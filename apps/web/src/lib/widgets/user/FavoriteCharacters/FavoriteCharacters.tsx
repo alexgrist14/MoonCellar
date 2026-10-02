@@ -80,8 +80,12 @@ export const FavoriteCharacters: FC<IFavoriteCharactersProps> = ({
         count={characters.length || undefined}
         action={
           isPreview && !!characters.length ? (
-            <Button color={ButtonColor.TRANSPARENT} onClick={onShowAll}>
-              All characters
+            <Button
+              color={ButtonColor.TRANSPARENT}
+              onClick={onShowAll}
+              aria-label="All favourite characters"
+            >
+              All
             </Button>
           ) : (
             !isPreview &&

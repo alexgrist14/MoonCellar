@@ -2,7 +2,7 @@
 
 The phone layout of `Table`: every row becomes a card that shows one head field and expands to
 list the remaining fields as label/value pairs. It adds its own "Sort by"/"Sort order" dropdowns,
-client-side pagination through `PaginationClient`, a loader and a "List is empty" state.
+client-side pagination through the shared `Pagination` (only over `limit` cards), a loader and a "List is empty" state.
 
 ## When to use
 
@@ -12,16 +12,16 @@ client-side pagination through `PaginationClient`, a loader and a "List is empty
 
 ## API
 
-| Prop                     | Type                                  | Default | Purpose                                                                           |
-| ------------------------ | ------------------------------------- | ------- | --------------------------------------------------------------------------------- |
-| `mobileHeadField`        | `keyof T`                             | —       | Cell shown in the collapsed card header; rows without it are skipped.             |
-| `rows`                   | `ITableRows<T>`                       | —       | Rows of `ITableCell`s; `undefined` and `[]` show "List is empty".                 |
-| `isLoading`              | `boolean`                             | —       | Shows the loader (held for a minimum time by `useMinimumLoading`).                |
-| `initialSortingKey`      | `keyof T`                             | —       | Field sorted by on mount; without it rows keep their order.                       |
-| `limit`                  | `number`                              | `20`    | Cards per page.                                                                   |
-| `isWithoutMobileSorting` | `boolean`                             | —       | Hides the two sort dropdowns.                                                     |
-| `onRowClick`             | `(rowIndex: number) => void`          | —       | Called with the row's index in `rows` when a card head is clicked.                |
-| `getRowClassName`        | `(row, index) => string \| undefined` | —       | Class added to a row's card; `index` is the row's in `rows`. `Table` forwards it. |
+| Prop                     | Type                                  | Default | Purpose                                                                               |
+| ------------------------ | ------------------------------------- | ------- | ------------------------------------------------------------------------------------- |
+| `mobileHeadField`        | `keyof T`                             | —       | Cell shown in the collapsed card header; rows without it are skipped.                 |
+| `rows`                   | `ITableRows<T>`                       | —       | Rows of `ITableCell`s; `undefined` and `[]` show "List is empty".                     |
+| `isLoading`              | `boolean`                             | —       | Shows the loader (held for a minimum time by `useMinimumLoading`).                    |
+| `initialSortingKey`      | `keyof T`                             | —       | Field sorted by on mount; without it rows keep their order.                           |
+| `limit`                  | `number`                              | `50`    | Cards per page; the same default as `Table`, so a server page never gets a 2nd pager. |
+| `isWithoutMobileSorting` | `boolean`                             | —       | Hides the two sort dropdowns.                                                         |
+| `onRowClick`             | `(rowIndex: number) => void`          | —       | Called with the row's index in `rows` when a card head is clicked.                    |
+| `getRowClassName`        | `(row, index) => string \| undefined` | —       | Class added to a row's card; `index` is the row's in `rows`. `Table` forwards it.     |
 
 Per cell (`ITableCell`), the mobile layout reads `content`, `title` (the field label; `Table`
 copies the header content into it), `sortingValue`, `className`, `onClick` and `id`.
@@ -56,8 +56,8 @@ import { Table } from "@/src/lib/shared/ui/Table";
   `content`, so an open card stays open across a re-sort. A head cell whose `content` is a node
   and has no `id` falls back to the row's position — give such cells an `id`, and keep head texts
   unique or the duplicates open and close together.
-- The sort dropdowns use `isThroughPortal`, so they need `#dropdown-connector`; the pagination
-  button needs nothing extra.
+- The sort dropdowns use `isThroughPortal`, so they need `#dropdown-connector`; the pager needs
+  nothing extra.
 
 ## Storybook
 

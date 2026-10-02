@@ -3,6 +3,8 @@
 import classNames from "classnames";
 import { FC, ReactNode, useEffect, useMemo, useState } from "react";
 import {
+  FAVOURITE_CHARACTERS_TAB,
+  FAVOURITE_GAMES_TAB,
   profileTabLabels,
   userListCategories,
 } from "@/src/lib/shared/constants/user.const";
@@ -24,10 +26,11 @@ import cn from "classnames";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { BGImage } from "@/src/lib/shared/ui/BGImage";
 import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
+import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
 import { SvgBurger } from "@/src/lib/shared/ui/svg";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
-import { useSelectedLayoutSegment } from "next/navigation";
+import { useSelectedLayoutSegments } from "next/navigation";
 import { UserNavigation } from "@/src/lib/features/user/ui/UserNavigation";
 import {
   ICharacterResponse,
@@ -67,7 +70,9 @@ export const UserProfile: FC<UserProfileProps> = ({
   favoriteCharacters,
   children,
 }) => {
-  const segment = useSelectedLayoutSegment();
+  const segments = useSelectedLayoutSegments().filter(
+    (part) => !part.startsWith("(")
+  );
   const { isMobile } = useStatesStore();
 
   const authProfile = useAuthStore((s) => s.profile);
@@ -117,7 +122,7 @@ export const UserProfile: FC<UserProfileProps> = ({
   const effectivePlaythroughs =
     isAuthedUser && storePlaythroughs ? storePlaythroughs : playthroughs;
 
-  const tab = segment ?? "profile";
+  const tab = segments.join("/") || "profile";
 
   const isGamesTab = userListCategories.some((t) => t === tab) || tab === "all";
 
@@ -186,7 +191,33 @@ export const UserProfile: FC<UserProfileProps> = ({
               favoriteCharacters={favoriteCharacters}
             />
           )}
-          {tab === "favorites" && (
+          {(tab === FAVOURITE_GAMES_TAB ||
+            tab === FAVOURITE_CHARACTERS_TAB) && (
+            <Tabs
+              ariaLabel="Favourites"
+              contents={[
+                {
+                  tabName: "Games",
+                  count: displayUser.favorites?.length ?? 0,
+                  tabLink: getProfileHref(
+                    displayUser.userName,
+                    FAVOURITE_GAMES_TAB
+                  ),
+                },
+                {
+                  tabName: "Characters",
+                  count: favoriteCharacters.length,
+                  tabLink: getProfileHref(
+                    displayUser.userName,
+                    FAVOURITE_CHARACTERS_TAB
+                  ),
+                },
+              ]}
+              defaultTabIndex={tab === FAVOURITE_CHARACTERS_TAB ? 1 : 0}
+              isUseDefaultIndex
+            />
+          )}
+          {tab === FAVOURITE_GAMES_TAB && (
             <FavoriteGames
               userId={user._id}
               favoriteIds={displayUser.favorites ?? []}
@@ -194,7 +225,7 @@ export const UserProfile: FC<UserProfileProps> = ({
               isOwner={isAuthedUser}
             />
           )}
-          {tab === "characters" && (
+          {tab === FAVOURITE_CHARACTERS_TAB && (
             <FavoriteCharacters
               userId={user._id}
               characters={favoriteCharacters}

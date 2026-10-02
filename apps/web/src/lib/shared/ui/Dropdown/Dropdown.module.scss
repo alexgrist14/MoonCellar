@@ -9,7 +9,7 @@
 .skeleton {
   width: 100%;
   height: 40px;
-  border-radius: var(--radius-x4);
+  border-radius: var(--radius-control);
   background-color: var(--color-bg-primary);
   animation: skeletonPulse 0.9s var(--easing-in) infinite alternate;
 
@@ -25,7 +25,7 @@
 .dropdown {
   display: flex;
   position: relative;
-  border-radius: var(--radius-x4);
+  border-radius: var(--radius-control);
   height: 40px;
   user-select: none;
   width: 100%;
@@ -46,7 +46,7 @@
   }
 
   &_active {
-    border-radius: var(--radius-x4) var(--radius-x4) 0 0;
+    border-radius: var(--radius-control) var(--radius-control) 0 0;
     overflow: visible;
   }
 
@@ -104,7 +104,7 @@
     display: grid;
     align-items: center;
     width: 100%;
-    border-radius: var(--radius-x4);
+    border-radius: var(--radius-control);
     border-bottom: 2px solid $blackBorderColor;
     padding-left: var(--padding-x3);
     font-size: 15px;
@@ -139,7 +139,7 @@
     }
 
     &_overflow {
-      border-radius: var(--radius-x4);
+      border-radius: var(--radius-control);
       z-index: unset;
     }
 
@@ -197,7 +197,7 @@
     overflow: hidden;
     transform-origin: top;
     pointer-events: none;
-    border-radius: var(--radius-x4);
+    border-radius: var(--radius-control);
     z-index: 2;
     border: 2px solid var(--color-accent);
 
@@ -211,7 +211,7 @@
 
     &_overflow {
       border-width: 2px;
-      border-radius: var(--radius-x4);
+      border-radius: var(--radius-control);
     }
 
     &_active {

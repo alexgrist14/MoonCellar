@@ -89,6 +89,7 @@ export const UserReviewItem: FC<IUserReviewItemProps> = ({
         <div className={styles.item__actions}>
           {!!review.isPublic && (
             <ReactionButton
+              className={styles.item__helpful}
               icon={<SvgThumb size="16" style={{ color: "inherit" }} />}
               tooltip="Helpful"
               count={review.helpfulCount}

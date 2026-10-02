@@ -5,7 +5,7 @@ import { getBreadcrumbJsonLd } from "@/src/lib/shared/utils/json-ld.utils";
 
 export const metadata: Metadata = {
   title: "Gauntlet",
-  description: "Spin the wheel and find your new favorite game",
+  description: "Spin the wheel and find your new favourite game",
   keywords: [
     "game picker",
     "games picker",

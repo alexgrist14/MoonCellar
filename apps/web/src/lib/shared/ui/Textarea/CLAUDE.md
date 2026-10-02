@@ -55,8 +55,7 @@ import { Textarea } from "@/src/lib/shared/ui/Textarea";
 - **Auto-growth stops at 40% of the viewport, a manual drag at 80%;** past that the field
   scrolls. Escape or a double-click on the handle drops the manual height.
 - A consumer's `onClick` runs after the built-in `clearErrors` call; both fire.
-- The field's radius is `--radius-x4` (one step below `Box`, same as `Input`), the handle's
-  `--radius-x3`.
+- The field's radius is `--radius-control` (same as `Input`), the handle's `--radius-x3`.
 - **`clearErrors` needs `name`;** without it the click does nothing.
 - Wire it to react-hook-form through `Controller` or `register`, not `setValue` alone, or
   `formState.isValid` never recomputes.

@@ -63,7 +63,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: var(--padding-x2);
+    padding: var(--padding-x2) 0 var(--padding-x3);
     touch-action: none;
     cursor: grab;
     user-select: none;
@@ -80,25 +80,16 @@
     background-color: var(--color-border-secondary);
   }
 
-  &__head {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--gap-x2);
-    padding: var(--padding-x1) var(--padding-x3) var(--padding-x2)
-      var(--padding-x4);
-  }
-
   &__title {
+    align-self: stretch;
+    padding: var(--padding-x2) var(--padding-x4) 0;
     color: var(--color-text-primary);
 
     @include font(16px, 24px, 700);
   }
 
   &__close {
-    margin-left: auto;
-    color: var(--color-text-secondary);
+    @include visuallyHidden;
   }
 
   &__body {

@@ -34,7 +34,7 @@ export const Success: Story = {
       onClick={() =>
         toast.success({
           title: "Added to list",
-          description: "Hollow Knight was added to Favorites",
+          description: "Hollow Knight was added to Favourites",
         })
       }
     />

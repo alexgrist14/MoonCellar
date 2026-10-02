@@ -14,8 +14,6 @@ import {
 import { createPortal } from "react-dom";
 import classNames from "classnames";
 import styles from "./Popover.module.scss";
-import { Button, ButtonColor } from "../Button";
-import { SvgClose } from "../svg";
 import { EXPAND_KEEP_OPEN_ATTRIBUTE } from "../ExpandMenu";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
@@ -156,18 +154,14 @@ export const PopoverSheet: FC<IPopoverSheetProps> = ({
           onPointerCancel={handlePointerUp}
         >
           <span className={styles.sheet__grabber} aria-hidden="true" />
-          <div className={styles.sheet__head}>
-            {title && <h3 className={styles.sheet__title}>{title}</h3>}
-            <Button
-              className={styles.sheet__close}
-              color={ButtonColor.TRANSPARENT}
-              aria-label="Close"
-              isOnlyIcon
-              onClick={onClose}
-            >
-              <SvgClose />
-            </Button>
-          </div>
+          {title && <h3 className={styles.sheet__title}>{title}</h3>}
+          <button
+            type="button"
+            className={styles.sheet__close}
+            onClick={onClose}
+          >
+            Close
+          </button>
         </div>
         <div
           className={classNames(styles.sheet__body, classNameContent)}

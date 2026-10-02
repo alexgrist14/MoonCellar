@@ -10,7 +10,7 @@ does not dictate the document outline.
 - The heading of a page or of a `Box` section ("Games", "Upcoming Releases", settings groups).
 - `display` — the large headline of a landing block (the home banner, a hub page title).
 - `count` — the number of items in the section ("Reviews (37)"), styled like `TabsMenu`'s count.
-- `action` — one control that belongs to the heading row ("All lists", "Edit").
+- `action` — one control that belongs to the heading row ("All", "Edit").
 - For a `Box` with a built-in title, prefer `Box`'s own `title` prop.
 
 ## API
@@ -37,7 +37,11 @@ import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 <SectionTitle
   as="h3"
   count={lists.length}
-  action={<Button color={ButtonColor.TRANSPARENT}>All lists</Button>}
+  action={
+    <Button color={ButtonColor.TRANSPARENT} aria-label="All lists">
+      All
+    </Button>
+  }
 >
   Lists
 </SectionTitle>

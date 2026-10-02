@@ -105,6 +105,15 @@ export const MobileSheet: Story = {
   render: () => <PopoverDemo title="Manage list" />,
 };
 
+export const MobileSheetUntitled: Story = {
+  beforeEach: () => {
+    useStatesStore.setState({ isMobile: true });
+
+    return () => useStatesStore.setState({ isMobile: false });
+  },
+  render: () => <PopoverDemo />,
+};
+
 const results = [
   "Hollow Knight",
   "Hollow Knight: Silksong",

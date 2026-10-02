@@ -72,6 +72,7 @@
   max-width: 320px;
 
   @include mediaSm {
+    flex: none;
     max-width: none;
   }
 }

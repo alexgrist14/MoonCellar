@@ -32,6 +32,8 @@
   --radius-x8: calc(var(--radius-x1) * 8);
   --radius-x9: calc(var(--radius-x1) * 9);
   --radius-x10: calc(var(--radius-x1) * 10);
+  --radius-control: var(--radius-x4);
+  --radius-button: var(--radius-x3);
 
   --gap-x05: calc(var(--gap-x1) * 0.5);
   --gap-x1: 4px;

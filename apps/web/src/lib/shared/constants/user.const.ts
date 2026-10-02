@@ -20,13 +20,22 @@ export const playthroughPriorityOrder: CategoriesType[] = [
   "mastered",
 ];
 
+export const FAVOURITE_GAMES_TAB = "favourites/games";
+export const FAVOURITE_CHARACTERS_TAB = "favourites/characters";
+
+export const legacyProfileTabs: Record<string, string> = {
+  favorites: FAVOURITE_GAMES_TAB,
+  characters: FAVOURITE_CHARACTERS_TAB,
+  favourites: FAVOURITE_GAMES_TAB,
+};
+
 export const profileTabs = [
   "all",
   ...userListCategories,
   "lists",
   "liked",
-  "favorites",
-  "characters",
+  FAVOURITE_GAMES_TAB,
+  FAVOURITE_CHARACTERS_TAB,
   "reviews",
   "settings",
 ];
@@ -42,8 +51,8 @@ export const profileTabLabels: Record<string, string> = {
   dropped: "Dropped",
   lists: "Lists",
   liked: "Liked lists",
-  favorites: "Favourite games",
-  characters: "Favourite characters",
+  [FAVOURITE_GAMES_TAB]: "Favourite games",
+  [FAVOURITE_CHARACTERS_TAB]: "Favourite characters",
   reviews: "Reviews",
   settings: "Settings",
 };

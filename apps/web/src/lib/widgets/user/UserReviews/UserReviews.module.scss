@@ -171,6 +171,9 @@ $categories: completed, playing, mastered, played, backlog, dropped;
     flex-wrap: wrap;
     align-items: center;
     gap: var(--gap-x1) var(--gap-x2);
+  }
+
+  &__helpful {
     margin-left: calc(-1 * var(--padding-x2));
   }
 

@@ -1,4 +1,8 @@
 import { FC, useMemo } from "react";
+import {
+  FAVOURITE_CHARACTERS_TAB,
+  FAVOURITE_GAMES_TAB,
+} from "@/src/lib/shared/constants/user.const";
 import Image from "next/image";
 import Markdown from "react-markdown";
 import {
@@ -252,7 +256,7 @@ export const UserInfo: FC<UserInfoProps> = ({
         games={favoriteGames}
         isOwner={isOwner}
         isPreview
-        onShowAll={() => goTo("favorites")}
+        onShowAll={() => goTo(FAVOURITE_GAMES_TAB)}
       />
 
       <FavoriteCharacters
@@ -260,7 +264,7 @@ export const UserInfo: FC<UserInfoProps> = ({
         characters={favoriteCharacters}
         isOwner={isOwner}
         isPreview
-        onShowAll={() => goTo("characters")}
+        onShowAll={() => goTo(FAVOURITE_CHARACTERS_TAB)}
       />
 
       {isListsVisible && (
@@ -273,8 +277,9 @@ export const UserInfo: FC<UserInfoProps> = ({
                 <Button
                   color={ButtonColor.TRANSPARENT}
                   onClick={() => goTo("lists")}
+                  aria-label="All lists"
                 >
-                  All lists
+                  All
                 </Button>
               )
             }
@@ -318,8 +323,9 @@ export const UserInfo: FC<UserInfoProps> = ({
               <Button
                 color={ButtonColor.TRANSPARENT}
                 onClick={() => goTo("liked")}
+                aria-label="All liked lists"
               >
-                All liked
+                All
               </Button>
             }
           >

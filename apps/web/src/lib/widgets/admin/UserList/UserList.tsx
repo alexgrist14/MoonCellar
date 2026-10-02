@@ -88,6 +88,7 @@ export const UserList: FC = () => {
     <div id={tableId}>
       <Table
         mobileHeadField="userName"
+        initialSortingKey="created"
         isLoading={isLoading}
         headers={{
           userName: { content: "User" },

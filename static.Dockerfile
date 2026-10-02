@@ -16,6 +16,6 @@ FROM nginx:alpine
 ARG OUT
 ARG PORT
 COPY --from=build /app/${OUT} /usr/share/nginx/html
-RUN printf 'server {\n  listen %s;\n  root /usr/share/nginx/html;\n  location / { try_files $uri $uri.html $uri/ =404; }\n}\n' "$PORT" \
+RUN printf 'server {\n  listen %s;\n  root /usr/share/nginx/html;\n  location / { add_header Cache-Control "no-cache"; try_files $uri $uri.html $uri/ =404; }\n  location /assets/ { add_header Cache-Control "public, max-age=31536000, immutable"; try_files $uri =404; }\n}\n' "$PORT" \
   > /etc/nginx/conf.d/default.conf
 EXPOSE ${PORT}

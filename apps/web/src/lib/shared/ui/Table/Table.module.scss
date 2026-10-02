@@ -54,7 +54,11 @@
     user-select: none;
     position: relative;
     padding: var(--padding-x1);
-    grid-template-columns: 1fr 24px 24px;
+    grid-template-columns: minmax(0, 1fr) 24px 24px;
+
+    &_fixed {
+      grid-template-columns: minmax(0, 1fr) 24px;
+    }
 
     &_clickable {
       cursor: pointer;
@@ -169,7 +173,7 @@
     min-width: 0;
   }
 
-  & .table__text > p {
+  & .table__cell .table__text > p {
     white-space: normal;
     overflow-wrap: anywhere;
   }
