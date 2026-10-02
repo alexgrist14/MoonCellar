@@ -5,24 +5,21 @@ import { Cron } from "@nestjs/schedule";
 import * as bcrypt from "bcryptjs";
 import mongoose, { type Model } from "mongoose";
 import { PinoLogger } from "nestjs-pino";
-import {
-  ADULT_THEME_NAME,
-  FEATURED_PLATFORM_SLUGS,
-  type IGetGamesRequest,
-} from "@mooncellar/schemas";
+import { ADULT_THEME_NAME, type IGetGamesRequest } from "@mooncellar/schemas";
 import { gamesFilters } from "../../../shared/games";
 import { runCronExclusive } from "../../../shared/cron-mutex";
 import { runInCronLogContext } from "../../../shared/cron-logging";
 import { Game } from "../../games/schemas/game.schema";
 import { BusinessMetricsService } from "../../metrics/business-metrics.service";
-import { Platform } from "../../games/schemas/platform.schema";
 import { User } from "../../user/schemas/user.schema";
 import {
+  GENERATED_LIST_COMPANIES,
   GENERATED_LIST_DECADES,
+  GENERATED_LIST_KEYWORDS,
+  GENERATED_LIST_RECENT_YEARS,
+  GENERATED_LIST_STANDALONE_EXPANSION_TYPES,
   GENERATED_LIST_GAME_TYPES,
   GENERATED_LIST_HLTB_WEIGHT,
-  GENERATED_LIST_PC_PLATFORM_SLUGS,
-  GENERATED_LIST_PC_SHARING_FAMILIES,
   GENERATED_LIST_PRIOR_MEAN,
   GENERATED_LIST_PRIOR_VOTES,
   GENERATED_LIST_SIZE,
@@ -35,6 +32,7 @@ import {
   CustomList,
   type ICustomListGeneratorKind,
 } from "../schemas/custom-list.schema";
+import { CustomListLike } from "../schemas/custom-list-like.schema";
 import { normalizeListName } from "../utils/collections.utils";
 import { findFreeListSlug } from "../utils/list-slug.utils";
 
@@ -43,14 +41,16 @@ type IGeneratedListDefinition = {
   key: string;
   name: string;
   scope: string;
-  filters: Pick<IGetGamesRequest, "selected" | "years">;
-  allowedPlatformIds?: mongoose.Types.ObjectId[];
+  filters: Pick<IGetGamesRequest, "years" | "selected">;
+  types?: string[];
+  developers?: RegExp[];
 };
 
 export type IGeneratedListsReport = {
   created: number;
   updated: number;
   unchanged: number;
+  removed: number;
   skipped: string[];
   failed: string[];
 };
@@ -115,10 +115,10 @@ export class GeneratedListsService {
   constructor(
     @InjectModel(CustomList.name)
     private readonly listModel: Model<CustomList>,
+    @InjectModel(CustomListLike.name)
+    private readonly likeModel: Model<CustomListLike>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Game.name) private readonly gameModel: Model<Game>,
-    @InjectModel(Platform.name)
-    private readonly platformModel: Model<Platform>,
     private readonly pino: PinoLogger,
     private readonly metrics: BusinessMetricsService
   ) {}
@@ -142,7 +142,14 @@ export class GeneratedListsService {
     if (this.isRunning) {
       this.logger.warn("Generated lists refresh is already running, skipped");
 
-      return { created: 0, updated: 0, unchanged: 0, skipped: [], failed: [] };
+      return {
+        created: 0,
+        updated: 0,
+        unchanged: 0,
+        removed: 0,
+        skipped: [],
+        failed: [],
+      };
     }
 
     this.isRunning = true;
@@ -151,13 +158,14 @@ export class GeneratedListsService {
       created: 0,
       updated: 0,
       unchanged: 0,
+      removed: 0,
       skipped: [],
       failed: [],
     };
 
     try {
       const owner = await this.ensureOwner();
-      const definitions = await this.getDefinitions();
+      const definitions = this.getDefinitions();
 
       this.logger.log(
         `Refreshing generated lists: ${definitions.length} lists to build`
@@ -193,8 +201,10 @@ export class GeneratedListsService {
         }
       }
 
+      report.removed = await this.removeStaleLists(definitions);
+
       this.logger.log(
-        `Generated lists refreshed: ${report.created} created, ${report.updated} updated, ${report.unchanged} unchanged, ${report.skipped.length} skipped, ${report.failed.length} failed`
+        `Generated lists refreshed: ${report.created} created, ${report.updated} updated, ${report.unchanged} unchanged, ${report.removed} removed, ${report.skipped.length} skipped, ${report.failed.length} failed`
       );
 
       return report;
@@ -236,14 +246,8 @@ export class GeneratedListsService {
     }
   }
 
-  private async getDefinitions(): Promise<IGeneratedListDefinition[]> {
-    const [genres, platforms] = await Promise.all([
-      this.gameModel.distinct("genres"),
-      this.platformModel
-        .find()
-        .select("_id name slug family generation")
-        .lean(),
-    ]);
+  private getDefinitions(): IGeneratedListDefinition[] {
+    const currentYear = new Date().getFullYear();
 
     const decades = GENERATED_LIST_DECADES.map(
       ([start, end]): IGeneratedListDefinition => ({
@@ -255,61 +259,88 @@ export class GeneratedListsService {
       })
     );
 
-    const genreLists = (genres as string[])
-      .filter((genre) => typeof genre === "string" && !!genre.trim())
-      .sort((a, b) => a.localeCompare(b))
-      .map((genre): IGeneratedListDefinition => ({
-        kind: "genre",
-        key: genre,
-        name: `Best ${genre} games`,
-        scope: `in ${genre} of all time`,
-        filters: { selected: { genres: [genre] } },
-      }));
-
-    const pcPlatformIds = platforms
-      .filter((item) => GENERATED_LIST_PC_PLATFORM_SLUGS.includes(item.slug))
-      .map((item) => item._id);
-
-    const platformLists = FEATURED_PLATFORM_SLUGS.map((slug) =>
-      platforms.find((platform) => platform.slug === slug)
-    )
-      .filter((platform) => !!platform)
-      .map((platform): IGeneratedListDefinition => {
-        const familySlug = platform.family?.slug;
-        const laterGenerations = platforms
-          .filter(
-            (item) =>
-              !!familySlug &&
-              item.family?.slug === familySlug &&
-              typeof item.generation === "number" &&
-              typeof platform.generation === "number" &&
-              item.generation >= platform.generation
-          )
-          .map((item) => item._id);
-        const sharesWithPc =
-          !familySlug ||
-          GENERATED_LIST_PC_SHARING_FAMILIES.includes(familySlug);
+    const years = Array.from(
+      { length: GENERATED_LIST_RECENT_YEARS },
+      (_, index): IGeneratedListDefinition => {
+        const year = currentYear - index;
 
         return {
-          kind: "platform",
-          key: platform.slug,
-          name: `Best ${platform.name} games`,
-          scope: `on ${platform.name}`,
-          filters: { selected: { platforms: [platform._id.toString()] } },
-          allowedPlatformIds: [
-            platform._id,
-            ...laterGenerations,
-            ...(sharesWithPc ? pcPlatformIds : []),
-          ],
+          kind: "year",
+          key: String(year),
+          name: `Best games of ${year}`,
+          scope: `released in ${year}`,
+          filters: { years: [year, year] },
         };
-      });
+      }
+    );
 
-    return [...decades, ...genreLists, ...platformLists];
+    const standaloneExpansions: IGeneratedListDefinition = {
+      kind: "type",
+      key: "standalone-expansion",
+      name: "Best standalone expansions",
+      scope: "among standalone expansions",
+      filters: {},
+      types: GENERATED_LIST_STANDALONE_EXPANSION_TYPES,
+    };
+
+    const companies = GENERATED_LIST_COMPANIES.map(
+      ({ key, name, developers }): IGeneratedListDefinition => ({
+        kind: "company",
+        key,
+        name: `Best ${name} games`,
+        scope: `developed by ${name}`,
+        filters: {},
+        developers,
+      })
+    );
+
+    const keywords = GENERATED_LIST_KEYWORDS.map(
+      ({ key, name, keywords }): IGeneratedListDefinition => ({
+        kind: "keyword",
+        key,
+        name: `Best ${name} games`,
+        scope: `tagged ${name}`,
+        filters: { selected: { keywords } },
+      })
+    );
+
+    return [
+      ...decades,
+      ...years,
+      standaloneExpansions,
+      ...companies,
+      ...keywords,
+    ];
+  }
+
+  private async removeStaleLists(definitions: IGeneratedListDefinition[]) {
+    const stale = await this.listModel
+      .find({
+        "generator.kind": { $exists: true },
+        $nor: definitions.map(({ kind, key }) => ({
+          "generator.kind": kind,
+          "generator.key": key,
+        })),
+      })
+      .select("_id")
+      .lean();
+
+    if (!stale.length) return 0;
+
+    const ids = stale.map(({ _id }) => _id);
+
+    await this.likeModel.deleteMany({ listId: { $in: ids } });
+    const { deletedCount } = await this.listModel.deleteMany({
+      _id: { $in: ids },
+    });
+
+    return deletedCount;
   }
 
   private async findTopGameIds({
     filters,
-    allowedPlatformIds,
+    types,
+    developers,
   }: IGeneratedListDefinition) {
     const now = Math.floor(Date.now() / 1000);
     let ids: mongoose.Types.ObjectId[] = [];
@@ -322,17 +353,20 @@ export class GeneratedListsService {
             ...filters,
             selected: {
               ...filters.selected,
-              types: GENERATED_LIST_GAME_TYPES,
+              types: types ?? GENERATED_LIST_GAME_TYPES,
             },
             excluded: { themes: [ADULT_THEME_NAME] },
             votes,
           }),
-          ...(allowedPlatformIds
+          ...(developers
             ? [
                 {
                   $match: {
-                    platformIds: {
-                      $not: { $elemMatch: { $nin: allowedPlatformIds } },
+                    companies: {
+                      $elemMatch: {
+                        name: { $in: developers },
+                        developer: true,
+                      },
                     },
                   },
                 },

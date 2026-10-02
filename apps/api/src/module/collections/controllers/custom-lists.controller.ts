@@ -113,7 +113,7 @@ export class CustomListsController {
   @Post("generated/refresh")
   @ApiOperation({
     summary:
-      "Rebuild the MoonCellar lists by decade, genre and platform in the background. Runs every Monday at 05:00 (Europe/Moscow); use this to re-run it manually",
+      "Rebuild the MoonCellar lists by decade, by each of the last five years, of standalone expansions, by company and by keyword in the background. Runs every Monday at 05:00 (Europe/Moscow); use this to re-run it manually",
   })
   @ApiResponse({ status: 200, description: "Successfully started" })
   @ApiCookieAuth()

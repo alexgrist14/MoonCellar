@@ -123,8 +123,17 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   rebuild overwrites their games, name and description — an edit made by hand is lost within a
   week. The unique partial index on `generator.kind` + `generator.key` is what stops two API
   processes (the server and a local `dev:api` on the same database) from creating a list twice;
-  keep it. The platform set is `FEATURED_PLATFORM_SLUGS` from `@mooncellar/schemas`, shared with
-  the home page's "Browse By Platform", so changing one changes both.
+  keep it. The set is decades, each of the last `GENERATED_LIST_RECENT_YEARS` years, the
+  standalone expansions, `GENERATED_LIST_COMPANIES` and `GENERATED_LIST_KEYWORDS`; the genre and
+  platform lists were dropped on purpose. A refresh deletes every generated list (and its likes)
+  whose `kind` + `key` is no longer defined, so the year window rolls forward without leaving a
+  frozen list behind — and renaming a `key` deletes the old list with its likes instead of
+  renaming it.
+- **A company list matches the developer role only, by name pattern.** IGDB records regional
+  publishers, so a publisher match put Warcraft III and GTA III into "Best Capcom games"; the
+  patterns are prefixes so a family's studios (Rockstar North, Nintendo EAD, Ubisoft Montreal)
+  count. Companies are chosen by popularity — the IGDB votes of their ten most-voted games — not
+  by how many games they have, which would rank Konami above FromSoftware.
 - **Adding or removing a game in a list never writes a user log.** Lists are edited in bulk, and
   logging every addition buried playthroughs and ratings in the activity feed; the feed records
   what happened to a game, not how it was filed. Favourites do log, through the `favorite`

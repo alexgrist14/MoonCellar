@@ -19,7 +19,8 @@ export class CustomListGame {
 export const CustomListGameDatabaseSchema =
   SchemaFactory.createForClass(CustomListGame);
 
-export type ICustomListGeneratorKind = "decade" | "genre" | "platform";
+export type ICustomListGeneratorKind =
+  "decade" | "year" | "type" | "company" | "keyword";
 
 @Schema({ _id: false })
 export class CustomListGenerator {
