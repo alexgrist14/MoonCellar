@@ -29,6 +29,11 @@
         border-radius: var(--radius-x3);
       }
 
+      .tabs__group .tabs__button {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+
       &.tabs__buttons_wrap {
         flex-wrap: wrap;
         max-width: 100%;
@@ -83,6 +88,21 @@
 
   @include mediaMax($screenMd) {
     display: block;
+  }
+}
+
+.tabs__group {
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.tabs__buttons .tabs__addon {
+  display: inline-flex;
+
+  & > * {
+    height: 100%;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
   }
 }
 

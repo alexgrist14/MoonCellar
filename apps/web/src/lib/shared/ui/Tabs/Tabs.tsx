@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, ReactNode, useEffect, useState } from "react";
 import { Button, ButtonColor, IButtonProps } from "../Button";
 import cl from "classnames";
 import styles from "./Tabs.module.scss";
@@ -21,6 +21,19 @@ interface ITabs {
   mobileMenuTitle?: string;
   isWrap?: boolean;
 }
+const TabGroup: FC<{ addon?: ReactNode; children: ReactNode }> = ({
+  addon,
+  children,
+}) =>
+  addon ? (
+    <span className={styles.tabs__group}>
+      {children}
+      <span className={styles.tabs__addon}>{addon}</span>
+    </span>
+  ) : (
+    children
+  );
+
 export const Tabs: FC<ITabs> = ({
   contents,
   defaultTabIndex = 0,
@@ -101,27 +114,28 @@ export const Tabs: FC<ITabs> = ({
               </Button>
             </Link>
           ) : (
-            <Button
-              type="button"
-              color={color}
-              className={cl(styles.tabs__button, content.className, {
-                [styles.tabs__button_adaptive]: isAdaptive,
-              })}
-              key={i}
-              style={content.style}
-              active={!content.isUnselectable && i === tabIndex}
-              aria-pressed={isSegmented ? i === tabIndex : undefined}
-              aria-label={content.ariaLabel}
-              tooltip={content.tooltip}
-              onClick={() => selectTab(content, i)}
-            >
-              {!!content.prefix && (
-                <span className={styles.tabs__prefix}>{content.prefix}</span>
-              )}
-              {content.tabName}
-              <TabCount count={content.count} />
-              {content?.tabNameNode}
-            </Button>
+            <TabGroup key={i} addon={content.addon}>
+              <Button
+                type="button"
+                color={color}
+                className={cl(styles.tabs__button, content.className, {
+                  [styles.tabs__button_adaptive]: isAdaptive,
+                })}
+                style={content.style}
+                active={!content.isUnselectable && i === tabIndex}
+                aria-pressed={isSegmented ? i === tabIndex : undefined}
+                aria-label={content.ariaLabel}
+                tooltip={content.tooltip}
+                onClick={() => selectTab(content, i)}
+              >
+                {!!content.prefix && (
+                  <span className={styles.tabs__prefix}>{content.prefix}</span>
+                )}
+                {content.tabName}
+                <TabCount count={content.count} />
+                {content?.tabNameNode}
+              </Button>
+            </TabGroup>
           );
         })}
     </div>

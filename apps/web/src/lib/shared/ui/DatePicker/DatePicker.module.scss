@@ -12,15 +12,21 @@
     border-radius: var(--radius-control);
     border: 2px solid transparent;
     padding: var(--padding-x2);
-    cursor: pointer;
     transition: 0.3s;
 
     &:hover {
       border-color: var(--color-bg-hover);
     }
 
-    &_active {
+    &_active,
+    &:focus-within {
       border-color: var(--color-accent);
+    }
+
+    &_invalid,
+    &_invalid:hover,
+    &_invalid:focus-within {
+      border-color: var(--color-negative);
     }
 
     &_disabled {
@@ -33,11 +39,49 @@
     }
   }
 
-  &__value {
-    @include textEllipsis;
+  &__input {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    font-variant-numeric: tabular-nums;
 
-    &_empty {
+    &::placeholder {
       color: var(--color-gray);
+      letter-spacing: 0.06em;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  &__error {
+    display: flex;
+    flex-shrink: 0;
+    border-radius: 50%;
+    cursor: help;
+
+    &:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 2px;
+    }
+  }
+
+  &__toggle {
+    display: flex;
+    flex-shrink: 0;
+    padding: 0;
+    background: transparent;
+    border-radius: var(--radius-x2);
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
     }
   }
 

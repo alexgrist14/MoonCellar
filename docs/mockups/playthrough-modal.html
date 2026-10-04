@@ -1,0 +1,1345 @@
+<title>Playthrough modal</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* mooncellar-tokens:start */
+/* Generated from apps/web/src/lib/app/styles/vars by
+   `bun --filter web sync:tokens`. Do not edit by hand. */
+:root {
+  /* vars/_colors.scss */
+  --color-neutral-5: #080a0b;
+  --color-neutral-10: #0d1011;
+  --color-neutral-15: #121516;
+  --color-neutral-20: #161b1d;
+  --color-neutral-25: #1a2022;
+  --color-neutral-30: #1f2628;
+  --color-neutral-35: #262d2f;
+  --color-neutral-40: #2f3537;
+  --color-neutral-45: #383e40;
+  --color-neutral-50: #3f4750;
+  --color-neutral-55: #50575d;
+  --color-neutral-60: #5e6a6e;
+  --color-neutral-70: #747d82;
+  --color-neutral-80: #9192a1;
+  --color-neutral-85: #b0b2bc;
+  --color-neutral-90: #d9d9d9;
+  --color-neutral-95: #eaeaea;
+  --color-neutral-100: #ffffff;
+  --color-blue: #3d6bff;
+  --color-blue-light: #00d4ff;
+  --color-cyan: #48cae4;
+  --color-gray: #afb3b9;
+  --color-white: #e8edf5;
+  --color-yellow: #ffc451;
+  --color-yellow-light: #f9f871;
+  --color-orange: #ff8862;
+  --color-pink: #ff4b8f;
+  --color-violet: #9b5de5;
+  --color-green: #2dc653;
+  --color-red: #e5383b;
+  --color-positive: #00c292;
+  --color-negative: #d02729;
+  --color-primary: var(--color-neutral-30);
+  --color-secondary: var(--color-neutral-90);
+  --color-contrast: var(--color-neutral-100);
+  --color-contrast-reverse: var(--color-neutral-5);
+  --color-attention: #ffc451;
+  --color-text-primary: var(--color-neutral-100);
+  --color-text-secondary: var(--color-neutral-90);
+  --color-text-muted: var(--color-neutral-85);
+  --color-accent: #6951ee;
+  --color-bg-primary: #191d24;
+  --color-bg-secondary: #212731;
+  --color-bg-tertiary: #2c3340;
+  --color-bg-accent: #6951ee;
+  --color-bg-hover: #374151;
+  --color-bg-positive: #00c292;
+  --color-bg-primary-tint: #191d24ee;
+  --color-bg-secondary-tint: #212731ee;
+  --color-bg-tertiary-tint: #2c3340ee;
+  --color-bg-accent-tint: #6951eeee;
+  --color-bg-positive-tint: #00c292ee;
+  --color-border-primary: var(--color-neutral-35);
+  --color-scrollbar-track: var(--color-neutral-15);
+  --color-scrollbar-thumb: var(--color-neutral-80);
+  --color-border-secondary: var(--color-neutral-85);
+
+  /* vars/_common.scss */
+  --padding-x05: calc(var(--padding-x1) * 0.5);
+  --padding-x1: 4px;
+  --padding-x2: calc(var(--padding-x1) * 2);
+  --padding-x3: calc(var(--padding-x1) * 3);
+  --padding-x4: calc(var(--padding-x1) * 4);
+  --padding-x5: calc(var(--padding-x1) * 5);
+  --padding-x6: calc(var(--padding-x1) * 6);
+  --padding-x7: calc(var(--padding-x1) * 7);
+  --padding-x8: calc(var(--padding-x1) * 8);
+  --padding-x9: calc(var(--padding-x1) * 9);
+  --padding-x10: calc(var(--padding-x1) * 10);
+  --padding-x11: calc(var(--padding-x1) * 11);
+  --padding-x12: calc(var(--padding-x1) * 12);
+  --padding-x13: calc(var(--padding-x1) * 13);
+  --padding-x14: calc(var(--padding-x1) * 14);
+  --padding-x15: calc(var(--padding-x1) * 15);
+  --padding-x16: calc(var(--padding-x1) * 16);
+  --padding-x17: calc(var(--padding-x1) * 17);
+  --padding-x18: calc(var(--padding-x1) * 18);
+  --padding-x19: calc(var(--padding-x1) * 19);
+  --padding-x20: calc(var(--padding-x1) * 20);
+  --padding-x25: calc(var(--padding-x1) * 25);
+  --radius-x1: 4px;
+  --radius-x2: calc(var(--radius-x1) * 2);
+  --radius-x3: calc(var(--radius-x1) * 3);
+  --radius-x4: calc(var(--radius-x1) * 4);
+  --radius-x5: calc(var(--radius-x1) * 5);
+  --radius-x6: calc(var(--radius-x1) * 6);
+  --radius-x7: calc(var(--radius-x1) * 7);
+  --radius-x8: calc(var(--radius-x1) * 8);
+  --radius-x9: calc(var(--radius-x1) * 9);
+  --radius-x10: calc(var(--radius-x1) * 10);
+  --radius-control: var(--radius-x4);
+  --radius-button: var(--radius-x3);
+  --gap-x05: calc(var(--gap-x1) * 0.5);
+  --gap-x1: 4px;
+  --gap-x2: calc(var(--gap-x1) * 2);
+  --gap-x3: calc(var(--gap-x1) * 3);
+  --gap-x4: calc(var(--gap-x1) * 4);
+  --gap-x5: calc(var(--gap-x1) * 5);
+  --gap-x6: calc(var(--gap-x1) * 6);
+  --gap-x7: calc(var(--gap-x1) * 7);
+  --gap-x8: calc(var(--gap-x1) * 8);
+  --gap-x9: calc(var(--gap-x1) * 9);
+  --gap-x10: calc(var(--gap-x1) * 10);
+  --gap-x11: calc(var(--gap-x1) * 11);
+  --gap-x12: calc(var(--gap-x1) * 12);
+  --blur-x1: 6px;
+  --rich-text-gap: 8px;
+  --duration-instant: 1ms;
+  --duration-fast: 160ms;
+  --duration-base: 280ms;
+  --duration-slow: 400ms;
+  --delay-stagger: 90ms;
+  --easing-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --easing-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --reveal-offset: 12px;
+  --reveal-scale: 0.96;
+  --header-height: 45px;
+  --container-padding-top: calc(var(--header-height) + var(--padding-x3));
+  --container-padding-bottom: var(--padding-x3);
+  --page-height-available: calc(
+    100dvh - var(--container-padding-top) - var(--container-padding-bottom)
+  );
+
+  /* vars/_components.scss */
+  --game-completed-color: var(--color-green);
+  --game-dropped-color: var(--color-red);
+  --game-playing-color: var(--color-blue);
+  --game-wishlist-color: var(--color-violet);
+  --game-backlog-color: var(--color-white);
+  --game-played-color: var(--color-cyan);
+  --game-mastered-color: var(--color-yellow);
+  --cover-ratio: 528/704;
+  --shadow-basic: 0px 4px 4px var(--color-neutral-5);
+  --shadow-text: drop-shadow(0 1px 2px var(--color-neutral-5))
+    drop-shadow(0 0 6px var(--color-neutral-5));
+  --glow-accent: 0 0 0.4rem var(--color-accent);
+  --glow-accent-sm: 0 0 0.15rem var(--color-accent);
+  --avatar-size-sm: var(--padding-x6);
+  --navigation-progress-height: 1px;
+  --navigation-progress-z-index: 1002;
+  --bprogress-color: var(--color-accent) !important;
+  --bprogress-height: var(--navigation-progress-height) !important;
+  --bprogress-box-shadow: var(--glow-accent) !important;
+  --bprogress-z-index: var(--navigation-progress-z-index) !important;
+  --modal-text-width: min(720px, calc(100vw - var(--padding-x10)));
+  --rich-editor-image-width: 400px;
+  --rich-editor-separator-height: 18px;
+  --playthrough-modal-width: min(80vw, 400px);
+  --header-logo-height: 85%;
+  --header-logo-height-sm: 72%;
+  --tab-count-color: var(--color-neutral-70);
+  --playthrough-modal-height: min(70dvh, 500px);
+  --playthrough-modal-width-lg: min(88vw, 760px);
+  --playthrough-modal-height-lg: min(86dvh, 780px);
+  --games-card-min-width: 180px;
+  --range-track-height: 6px;
+  --range-thumb-size: 20px;
+  --range-thumb-width: 44px;
+  --range-thumb-height: 24px;
+  --scrollbar-horizontal-size: 6px;
+  --scrollbar-arrow-width: 32px;
+  --scrollbar-fade-width: 48px;
+  --game-keywords-collapsed-height: 66px;
+  --game-hero-artwork-height: 300px;
+  --game-hero-artwork-height-sm: 180px;
+  --game-hero-cover-width: 200px;
+  --game-hero-cover-offset: 104px;
+  --game-hero-counters-width: 360px;
+  --game-rating-popover-width: 320px;
+  --popover-width: 320px;
+  --popover-max-height: 320px;
+  --popover-sheet-max-height: 85dvh;
+  --textarea-handle-size: 20px;
+  --image-generator-preview-width: 160px;
+  --ai-drafts-count-width: 88px;
+  --image-finder-portrait-width: 216px;
+  --image-finder-landscape-width: 320px;
+  --site-sessions-modal-width: min(560px, calc(100vw - var(--padding-x8)));
+  --image-generator-elements-width: min(640px, calc(100vw - var(--padding-x8)));
+  --popover-sheet-grabber-width: 40px;
+  --popover-sheet-grabber-height: 5px;
+  --drawer-width: max(20vw, 460px);
+  --drawer-z-index: 5;
+  --expandable-scroll-height: 132px;
+  --expandable-fade-height: 32px;
+  --date-picker-width: 300px;
+  --date-picker-field-min-width: 140px;
+  --playthrough-platform-min-width: 200px;
+  --playthrough-time-min-width: 120px;
+  --date-picker-cell-size: 34px;
+  --emoji-picker-width: 328px;
+  --emoji-picker-cell-size: 34px;
+  --emoji-picker-group-size: 28px;
+  --emoji-picker-grid-height: 238px;
+  --game-hero-scrim: linear-gradient(
+    180deg,
+    #191d248c 0%,
+    #191d2400 30%,
+    #212731d1 72%,
+    var(--color-bg-secondary) 100%
+  );
+  --spoiler-blur: 7px;
+  --community-avatar-size: 36px;
+  --community-reply-avatar-size: 28px;
+  --community-review-clamp-height: 132px;
+  --community-distribution-height: 8px;
+  --community-distribution-min-width: 240px;
+  --community-dot-size: 7px;
+  --community-loading-height: 96px;
+  --user-review-card-width: 170px;
+  --user-review-card-width-sm: 140px;
+  --user-review-rating-filter-width: 260px;
+  --vndb-review-height: max(360px, calc(100vh - 420px));
+  --vndb-cover-width: 120px;
+  --vndb-search-width: 320px;
+  --vndb-candidate-cover-width: 64px;
+  --empty-state-image-size: 180px;
+  --empty-state-image-size-sm: 96px;
+  --empty-state-inline-text-min-width: 200px;
+  --empty-state-page-content-width: 420px;
+  --badge-negative-color: var(--color-orange);
+  --badge-tint-strength: 16%;
+  --stat-tile-bg: var(--color-bg-primary);
+  --not-found-image-height: 240px;
+  --not-found-backdrop-size: 400px;
+  --favorite-color: var(--color-pink);
+  --game-controls-icon-size: 24px;
+  --game-controls-icon-size-sm: 20px;
+  --game-controls-badge-size: 15px;
+  --list-card-row-mosaic-size: 44px;
+  --list-card-count-height: 20px;
+  --list-search-width: 320px;
+  --list-row-cover-width: 40px;
+  --profile-hero-height: 168px;
+  --profile-avatar-size: 112px;
+  --profile-avatar-size-sm: 72px;
+  --activity-cover-width: 80px;
+  --people-avatar-size: 22px;
+  --character-card-width: 128px;
+  --character-card-width-sm: 104px;
+  --character-profile-portrait-width: 200px;
+  --character-editor-portrait-width: 150px;
+  --image-picker-thumb-width: 160px;
+  --game-images-modal-width: min(92vw, 960px);
+  --requests-queue-width: 440px;
+  --list-sort-width: 280px;
+  --field-control-height: 40px;
+  --gauntlet-mode-cards-width: 300px;
+  --gauntlet-winner-cover-width: 132px;
+  --gauntlet-winner-cover-width-mobile: 220px;
+  --gauntlet-wheel-max-width: 50vw;
+  --gauntlet-fact-label-width: 110px;
+  --object-field-min-width: 160px;
+  --requests-panel-min-height: 240px;
+  --search-modal-width: 900px;
+  --search-tab-height: 36px;
+  --reaction-active-color: var(--color-accent);
+  --loader-block-min-height: 96px;
+  --burger-animation-duration: 600ms;
+}
+/* mooncellar-tokens:end */
+
+  :root {
+    color-scheme: dark;
+    --mock-ui: "Hanken Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mock-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --mock-ground: var(--color-neutral-10);
+    --mock-hairline: var(--color-neutral-30);
+    --mock-field-height: 52px;
+    --mock-modal-width: 640px;
+    --mock-split-aside: 260px;
+    --mock-phone-width: 360px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--mock-ground);
+    color: var(--color-text-primary);
+    font-family: var(--mock-ui);
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .shell {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding-inline: var(--padding-x6);
+    padding-block: var(--padding-x14) var(--padding-x20);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x12);
+  }
+
+  @media (max-width: 520px) {
+    .shell {
+      padding-inline: var(--padding-x4);
+      padding-block: var(--padding-x9) var(--padding-x14);
+    }
+  }
+
+  h1, h2, h3, p { margin: 0; }
+  h1, h2 { text-wrap: balance; }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+  }
+
+  .masthead { display: flex; flex-direction: column; gap: var(--gap-x4); }
+  .masthead h1 { font-size: 34px; line-height: 1.15; font-weight: 700; letter-spacing: -0.5px; }
+  .lede { color: var(--color-text-secondary); max-width: 66ch; }
+
+  .variant {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--mock-modal-width));
+    gap: var(--gap-x8);
+    align-items: start;
+  }
+
+  .variant_wide { grid-template-columns: minmax(0, 1fr); }
+
+  @media (max-width: 960px) {
+    .variant { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  .variant__text { display: flex; flex-direction: column; gap: var(--gap-x3); min-width: 0; }
+  .variant__text h2 { font-size: 22px; font-weight: 600; }
+  .variant__text p { color: var(--color-text-secondary); }
+  .variant__text ul {
+    margin: 0;
+    padding-left: var(--padding-x5);
+    color: var(--color-text-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x1);
+  }
+
+  .tag {
+    align-self: flex-start;
+    font-family: var(--mock-mono);
+    font-size: 12px;
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-x2);
+    padding: 0 var(--padding-x2);
+  }
+
+  .modal {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x5);
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .modal__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--padding-x4) var(--padding-x5);
+    border-bottom: 1px solid var(--mock-hairline);
+  }
+
+  .modal__head h3 { font-size: 22px; font-weight: 500; }
+
+  .modal__body {
+    padding: var(--padding-x5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x5);
+  }
+
+  .close {
+    width: 32px;
+    height: 32px;
+    border: 0;
+    background: transparent;
+    color: var(--color-text-primary);
+    font-size: 22px;
+    cursor: pointer;
+    border-radius: var(--radius-x2);
+  }
+
+  .tabs { display: flex; align-items: center; gap: var(--gap-x3); flex-wrap: wrap; }
+
+  .tab {
+    border: 0;
+    background: transparent;
+    color: var(--color-text-muted);
+    font: inherit;
+    padding: var(--padding-x2) var(--padding-x4);
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+  }
+
+  .tab_active { color: var(--color-text-primary); border-bottom-color: var(--color-accent); }
+
+  .add {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 0;
+    background: var(--color-accent);
+    color: var(--color-white);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .grid2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gap-x3);
+  }
+
+  .grid-date { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+
+  @media (max-width: 520px) {
+    .grid-date { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  .field { display: flex; flex-direction: column; gap: var(--gap-x1); min-width: 0; }
+
+  .label { font-size: 14px; color: var(--color-text-muted); }
+
+  .control {
+    height: var(--mock-field-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x2);
+    padding-inline: var(--padding-x4);
+    background: var(--color-bg-primary);
+    border-radius: var(--radius-control, var(--radius-x5));
+    border: 0;
+    border-bottom: 2px solid var(--color-neutral-5);
+    color: var(--color-text-primary);
+    font: inherit;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .control_active { border-bottom-color: var(--color-accent); }
+
+  .control__value { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .control__placeholder { color: var(--color-text-muted); }
+  .control__mask { font-family: var(--mock-mono); font-size: 14px; letter-spacing: 0.06em; color: var(--color-text-muted); }
+
+  .control__input { flex: 1; min-width: 0; border: 0; background: transparent; color: inherit; font: inherit; padding: 0; }
+  .control__input::placeholder { color: var(--color-text-muted); font-family: var(--mock-mono); font-size: 14px; letter-spacing: 0.06em; }
+  .control:focus-within { border-bottom-color: var(--color-accent); }
+  .control__input:focus-visible { outline: none; }
+  .control:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+
+  .control__suffix { color: var(--color-text-muted); font-size: 14px; flex-shrink: 0; }
+
+  .chev { flex-shrink: 0; color: var(--color-text-secondary); }
+
+  .switch-row { display: flex; flex-wrap: wrap; gap: var(--gap-x5); align-items: center; }
+
+  .switch {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    font-size: 15px;
+  }
+
+  .toggle {
+    flex-shrink: 0;
+    width: 60px;
+    height: 30px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    border-radius: var(--radius-x6);
+    border: 4px solid transparent;
+    outline: 3px solid var(--color-negative);
+    background: var(--color-bg-primary);
+    font-size: 10px;
+    font-weight: 600;
+    position: relative;
+    text-align: center;
+  }
+
+  .toggle span { position: relative; z-index: 1; opacity: 0.85; }
+
+  .toggle::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 50%;
+    border-radius: var(--radius-x4);
+    background: var(--color-negative);
+  }
+
+  .toggle_on { outline-color: var(--color-positive); }
+  .toggle_on::before { left: 50%; background: var(--color-positive); }
+
+  .editor {
+    background: var(--color-bg-primary);
+    border-radius: var(--radius-x4);
+    display: flex;
+    flex-direction: column;
+    min-height: 220px;
+  }
+
+  .editor__bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-x4);
+    padding: var(--padding-x3) var(--padding-x4);
+    border-bottom: 1px solid var(--mock-hairline);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+  }
+
+  .editor__bar i { font-style: normal; }
+  .editor__bar .sep { width: 1px; background: var(--color-border-primary); }
+
+  .editor__area {
+    flex: 1;
+    padding: var(--padding-x4);
+    color: var(--color-text-muted);
+  }
+
+  .editor__foot {
+    padding: var(--padding-x2) var(--padding-x4);
+    border-top: 1px solid var(--mock-hairline);
+    font-size: 13px;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .actions { display: flex; gap: var(--gap-x2); align-items: center; flex-wrap: wrap; }
+  .actions_split { justify-content: space-between; }
+
+  .btn {
+    border: 0;
+    font: inherit;
+    font-size: 16px;
+    padding: var(--padding-x2) var(--padding-x4);
+    border-radius: var(--radius-button, var(--radius-x4));
+    cursor: pointer;
+    color: var(--color-white);
+  }
+
+  .btn_green { background: var(--color-positive); color: var(--color-neutral-5); }
+  .btn_red { background: var(--color-negative); }
+  .btn_ghost { background: transparent; color: var(--color-negative); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: var(--gap-x2); }
+
+  .status-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: var(--gap-x3);
+    align-items: end;
+  }
+
+  .status-row__mastered {
+    height: var(--mock-field-height);
+    display: flex;
+    align-items: center;
+  }
+
+  @media (max-width: 560px) {
+    .status-row { grid-template-columns: minmax(0, 1fr) auto; }
+    .status-row > :last-child { grid-column: 1 / -1; }
+  }
+
+  .chip-pair { display: inline-flex; }
+  .chip-pair .chip { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+
+  .chip-star {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x1);
+    padding: var(--padding-x2) var(--padding-x3);
+    border: 1px solid var(--game-mastered-color);
+    border-left: 0;
+    border-radius: 0 var(--radius-x6) var(--radius-x6) 0;
+    background: var(--color-bg-primary);
+    color: var(--game-mastered-color);
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .chip-star_off { border-color: var(--color-border-primary); color: var(--color-text-muted); }
+
+  .status-group { display: flex; flex-direction: column; }
+  .status-group .control { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+
+  .status-group__extra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x2);
+    padding: var(--padding-x2) var(--padding-x4);
+    background: var(--color-bg-primary);
+    border-top: 1px solid var(--mock-hairline);
+    border-radius: 0 0 var(--radius-control, var(--radius-x5)) var(--radius-control, var(--radius-x5));
+    font-size: 14px;
+    color: var(--color-text-secondary);
+  }
+
+  .star-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x1);
+    border: 0;
+    background: transparent;
+    color: var(--game-mastered-color);
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    padding: var(--padding-x2) var(--padding-x4);
+    border-radius: var(--radius-x6);
+    border: 1px solid var(--color-border-primary);
+    background: var(--color-bg-primary);
+    color: var(--color-text-secondary);
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .chip::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--dot);
+  }
+
+  .chip_active {
+    color: var(--color-text-primary);
+    border-color: var(--dot);
+    box-shadow: inset 0 0 0 1px var(--dot);
+  }
+
+  .chip_flat::before { display: none; }
+
+  .dot-wishlist { --dot: var(--game-wishlist-color); }
+  .dot-playing { --dot: var(--game-playing-color); }
+  .dot-completed { --dot: var(--game-completed-color); }
+  .dot-played { --dot: var(--game-played-color); }
+  .dot-backlog { --dot: var(--game-backlog-color); }
+  .dot-dropped { --dot: var(--game-dropped-color); }
+  .dot-mastered { --dot: var(--game-mastered-color); }
+
+  .inline-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto;
+    gap: var(--gap-x3);
+    align-items: end;
+  }
+
+  @media (max-width: 560px) {
+    .inline-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .inline-row > :last-child { grid-column: 1 / -1; }
+  }
+
+  .mastered {
+    height: var(--mock-field-height);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    padding-inline: var(--padding-x4);
+    border-radius: var(--radius-control, var(--radius-x5));
+    border: 1px dashed var(--color-border-secondary);
+    background: transparent;
+    color: var(--color-text-secondary);
+    font: inherit;
+    font-size: 14px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .mastered_on {
+    border: 1px solid var(--game-mastered-color);
+    color: var(--game-mastered-color);
+  }
+
+  .footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-x4);
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--padding-x4) var(--padding-x5);
+    border-top: 1px solid var(--mock-hairline);
+    background: var(--color-bg-primary-tint);
+  }
+
+  .split {
+    display: grid;
+    grid-template-columns: var(--mock-split-aside) minmax(0, 1fr);
+    gap: var(--gap-x5);
+    align-items: stretch;
+  }
+
+  @media (max-width: 720px) {
+    .split { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  .aside {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x4);
+    padding: var(--padding-x4);
+    background: var(--color-bg-tertiary);
+    border-radius: var(--radius-x4);
+  }
+
+  .aside__title { font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-muted); }
+
+  .aside hr { border: 0; border-top: 1px solid var(--color-border-primary); margin: 0; width: 100%; }
+
+  .aside .switch { justify-content: space-between; width: 100%; }
+
+  .summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-x2);
+    align-items: center;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+  }
+
+  .summary b { color: var(--color-text-primary); font-weight: 500; }
+  .summary .sep { color: var(--color-neutral-55); }
+
+  .modal_split { max-width: 980px; }
+
+  .datehint { font-size: 12px; color: var(--color-text-muted); }
+
+  .notes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--gap-x5);
+  }
+
+  .notes article {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x5);
+    padding: var(--padding-x5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x2);
+  }
+
+  .notes h3 { font-size: 16px; font-weight: 600; }
+  .notes p { color: var(--color-text-secondary); font-size: 14px; }
+
+  .note {
+    font-size: 13px;
+    color: var(--color-gray);
+    border-left: 2px solid var(--color-border-primary);
+    padding-left: var(--padding-x3);
+  }
+
+  code.t { font-family: var(--mock-mono); font-size: 12px; color: var(--color-yellow); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: var(--duration-instant) !important; }
+  }
+
+  .phones {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--gap-x6);
+  }
+
+  .phone {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x3);
+    min-width: 0;
+  }
+
+  .phone__screen {
+    width: 100%;
+    max-width: var(--mock-phone-width);
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x5);
+    padding: var(--padding-x5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x4);
+  }
+
+  .phone h3 { font-size: 17px; font-weight: 600; }
+  .phone p { color: var(--color-text-secondary); font-size: 14px; }
+
+  .seg {
+    background: var(--color-bg-tertiary);
+    border-radius: var(--radius-x4);
+    padding: var(--padding-x05);
+  }
+
+  .seg__item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    min-width: 0;
+    padding: var(--padding-x2) var(--padding-x3);
+    border: 0;
+    border-radius: var(--radius-x3);
+    background: transparent;
+    color: var(--color-text-muted);
+    font: inherit;
+    font-size: 13px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .seg__item::before {
+    content: "";
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--dot);
+  }
+
+  .seg__item_active { background: var(--color-bg-primary); color: var(--color-text-primary); }
+  .seg__item_star::before { display: none; }
+  .seg__item_star.seg__item_active { color: var(--game-mastered-color); }
+
+  .seg_grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gap-x05);
+  }
+
+  .seg_grid .seg__item { justify-content: flex-start; }
+
+  .seg__strip {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .seg__strip .seg__item {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  .seg__pair {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    border-radius: var(--radius-x3);
+    background: var(--color-bg-primary);
+  }
+
+  .seg__pair .seg__item_active { background: transparent; }
+
+  .seg_scroll {
+    display: flex;
+    gap: var(--gap-x05);
+    overflow-x: auto;
+    scrollbar-width: none;
+    mask-image: linear-gradient(to right, #000 85%, transparent);
+  }
+
+  .seg_scroll .seg__pair { display: inline-flex; flex-shrink: 0; }
+
+  .seg_two {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gap-x05);
+  }
+
+  .star-icon {
+    border: 0;
+    background: transparent;
+    color: var(--game-mastered-color);
+    font-size: 16px;
+    padding: 0 var(--padding-x3);
+    cursor: pointer;
+    border-left: 1px solid var(--mock-hairline);
+  }
+
+  .row-select {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--gap-x2);
+    align-items: stretch;
+  }
+
+  .row-select .control { height: auto; min-height: var(--mock-field-height); }
+
+  .dotted { display: inline-flex; align-items: center; gap: var(--gap-x2); }
+  .dotted::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--dot); }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x1);
+    padding-inline: var(--padding-x4);
+    border: 0;
+    border-radius: var(--radius-control, var(--radius-x5));
+    background: var(--color-bg-primary);
+    color: var(--game-mastered-color);
+    font: inherit;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .verdict { font-size: 13px; color: var(--color-text-muted); }
+  .verdict b { color: var(--color-text-secondary); font-weight: 600; }
+</style>
+
+<div class="shell">
+  <header class="masthead">
+    <p class="eyebrow">MoonCellar · playthrough modal</p>
+    <h1>Playthrough modal</h1>
+    <p class="lede">
+      Three ways to lay out the modal where a player records a playthrough: its category,
+      platform, finish date, hours, the Mastered flag (shown only for Completed, always next to the category), a comment and who can see it. All three
+      keep a visible label on every field and share the new date field, which shows a
+      <code class="t">DD.MM.YYYY</code> mask and accepts typed input as well as the calendar.
+    </p>
+  </header>
+
+  <section class="variant">
+    <div class="variant__text">
+      <span class="tag">A · Labelled form</span>
+      <h2>The current form, tidied</h2>
+      <p>Same order and controls as today, so it is the smallest change to build.</p>
+      <ul>
+        <li>Category and Platform share one row; Date and Game time share the next.</li>
+        <li>Hours carry a unit suffix instead of putting it in the label.</li>
+        <li>Mastered is a labelled switch between Category and Platform, in the same row, and the slot closes when the category is not Completed.</li>
+        <li>Show on the game page and Contains spoilers sit under a "Visibility" heading.</li>
+        <li>Delete moves to the right edge, away from Save, as a text button.</li>
+      </ul>
+    </div>
+
+    <div class="modal" role="dialog" aria-labelledby="a-title">
+      <div class="modal__head">
+        <h3 id="a-title">Playthroughs</h3>
+        <button class="close" aria-label="Close">×</button>
+      </div>
+      <div class="modal__body">
+        <div class="tabs">
+          <button class="tab tab_active">Completed</button>
+          <button class="tab">Playing</button>
+          <button class="add" aria-label="Add playthrough">+</button>
+        </div>
+
+        <div class="status-row">
+          <div class="field">
+            <span class="label">Category</span>
+            <div class="control control_active">
+              <span class="control__value">Completed</span>
+              <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="field">
+            <span class="label">Mastered</span>
+            <div class="status-row__mastered"><span class="toggle"><span>No</span><span>Yes</span></span></div>
+          </div>
+          <div class="field">
+            <span class="label">Platform</span>
+            <div class="control">
+              <span class="control__value control__placeholder">Select...</span>
+              <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid2 grid-date">
+          <div class="field">
+            <label class="label" for="a-date">Finished on</label>
+            <div class="control">
+              <input id="a-date" class="control__input" placeholder="DD.MM.YYYY" inputmode="numeric">
+              <svg class="chev" width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="3.5" width="13" height="12" rx="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 7.5h13M6 2v3M12 2v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label" for="a-time">Game time</label>
+            <div class="control">
+              <input id="a-time" class="control__input" placeholder="0" inputmode="decimal">
+              <span class="control__suffix">hours</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label">Comment</span>
+          <div class="editor">
+            <div class="editor__bar"><i>B</i><i>I</i><i>S</i><i>&lt;/&gt;</i><span class="sep"></span><i>H3</i><i>•≡</i><i>1≡</i><i>❝</i><span class="sep"></span><i>🔗</i><i>▣</i><i>☺</i></div>
+            <div class="editor__area">What stood out on this run?</div>
+            <div class="editor__foot">0 / 4000</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label">Visibility</span>
+          <div class="switch-row">
+            <span class="switch">Show on the game page <span class="toggle toggle_on"><span>No</span><span>Yes</span></span></span>
+            <span class="switch">Contains spoilers <span class="toggle"><span>No</span><span>Yes</span></span></span>
+          </div>
+        </div>
+
+        <div class="actions actions_split">
+          <button class="btn btn_green">Save</button>
+          <button class="btn btn_ghost">Delete playthrough</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="variant">
+    <div class="variant__text">
+      <span class="tag">B · Status chips</span>
+      <h2>Category as chips</h2>
+      <p>The six categories are always visible as chips in the site's status colours, so switching is one tap instead of opening a list.</p>
+      <ul>
+        <li>The chip colours match the status badges on game cards.</li>
+        <li>Mastered is a half-chip welded to the selected Completed chip, in the mastered yellow; it only grows out of Completed and disappears with any other choice.</li>
+        <li>Off, the half-chip turns grey and keeps the star, so it still reads as something to turn on.</li>
+        <li>Visibility toggles and the buttons live in a footer that stays pinned while the comment scrolls.</li>
+        <li>Fits a phone: the chips wrap and the date row folds to two columns.</li>
+      </ul>
+    </div>
+
+    <div class="modal" role="dialog" aria-labelledby="b-title">
+      <div class="modal__head">
+        <h3 id="b-title">Playthroughs</h3>
+        <button class="close" aria-label="Close">×</button>
+      </div>
+      <div class="modal__body">
+        <div class="tabs">
+          <button class="tab tab_active">Completed</button>
+          <button class="add" aria-label="Add playthrough">+</button>
+        </div>
+
+        <div class="field">
+          <span class="label">Category</span>
+          <div class="chips" role="radiogroup" aria-label="Category">
+            <button class="chip dot-wishlist" role="radio" aria-checked="false">Wishlist</button>
+            <button class="chip dot-playing" role="radio" aria-checked="false">Playing</button>
+            <span class="chip-pair">
+              <button class="chip dot-completed chip_active" role="radio" aria-checked="true">Completed</button>
+              <button class="chip-star" aria-pressed="true" aria-label="Mastered">★ Mastered</button>
+            </span>
+            <button class="chip dot-played" role="radio" aria-checked="false">Played</button>
+            <button class="chip dot-backlog" role="radio" aria-checked="false">Backlog</button>
+            <button class="chip dot-dropped" role="radio" aria-checked="false">Dropped</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label">Platform</span>
+          <div class="control">
+            <span class="control__value">PlayStation 5</span>
+            <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+
+        <div class="grid2 grid-date">
+          <div class="field">
+            <label class="label" for="b-date">Finished on</label>
+            <div class="control">
+              <input id="b-date" class="control__input" value="14.09.2026" inputmode="numeric">
+              <svg class="chev" width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="3.5" width="13" height="12" rx="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 7.5h13M6 2v3M12 2v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label" for="b-time">Game time</label>
+            <div class="control">
+              <input id="b-time" class="control__input" value="42.5" inputmode="decimal">
+              <span class="control__suffix">h</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label">Comment</span>
+          <div class="editor">
+            <div class="editor__bar"><i>B</i><i>I</i><i>S</i><i>&lt;/&gt;</i><span class="sep"></span><i>H3</i><i>•≡</i><i>1≡</i><i>❝</i><span class="sep"></span><i>🔗</i><i>▣</i><i>☺</i></div>
+            <div class="editor__area" style="color:var(--color-text-secondary)">Platinum on the second run. The last chapter drags, but the boss rush makes up for it.</div>
+            <div class="editor__foot">86 / 4000</div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="switch-row">
+          <span class="switch">Show on the game page <span class="toggle toggle_on"><span>No</span><span>Yes</span></span></span>
+          <span class="switch">Spoilers <span class="toggle"><span>No</span><span>Yes</span></span></span>
+        </div>
+        <div class="actions">
+          <button class="btn btn_red">Delete</button>
+          <button class="btn btn_green">Save</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="variant variant_wide">
+    <div class="variant__text">
+      <span class="tag">C · Details and notes</span>
+      <h2>Two columns on desktop</h2>
+      <p>
+        The resizable desktop modal is wide enough for a details column beside the comment, so
+        the editor gets the full height instead of sitting under the fields. On a phone the
+        column stacks above the editor and the layout matches A.
+      </p>
+      <ul>
+        <li>A one-line summary under the tabs reads back what is saved: status, platform, date, hours.</li>
+        <li>Mastered is a strip attached under the Category field, a star button that fills when on; the strip is part of the field and folds away for any category but Completed.</li>
+        <li>The details column holds every short field and the visibility switches.</li>
+        <li>The comment area grows with the modal when it is resized.</li>
+      </ul>
+    </div>
+
+    <div class="modal modal_split" role="dialog" aria-labelledby="c-title">
+      <div class="modal__head">
+        <h3 id="c-title">Playthroughs</h3>
+        <button class="close" aria-label="Close">×</button>
+      </div>
+      <div class="modal__body">
+        <div class="tabs">
+          <button class="tab tab_active">Completed</button>
+          <button class="tab">Dropped</button>
+          <button class="add" aria-label="Add playthrough">+</button>
+        </div>
+
+        <p class="summary">
+          <b>Completed</b><span class="sep">·</span>Nintendo Switch<span class="sep">·</span>03.08.2026<span class="sep">·</span>31 h<span class="sep">·</span>Public
+        </p>
+
+        <div class="split">
+          <div class="aside">
+            <span class="aside__title">Details</span>
+            <div class="field">
+              <span class="label">Category</span>
+              <div class="status-group">
+                <div class="control"><span class="control__value">Completed</span><svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+                <div class="status-group__extra">
+                  <span>All achievements</span>
+                  <button class="star-btn" aria-pressed="false">☆ Mastered</button>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <span class="label">Platform</span>
+              <div class="control"><span class="control__value">Nintendo Switch</span><svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+            </div>
+            <div class="field">
+              <label class="label" for="c-date">Finished on</label>
+              <div class="control">
+                <input id="c-date" class="control__input" value="03.08.2026" inputmode="numeric">
+                <svg class="chev" width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="3.5" width="13" height="12" rx="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 7.5h13M6 2v3M12 2v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label" for="c-time">Game time</label>
+              <div class="control">
+                <input id="c-time" class="control__input" value="31" inputmode="decimal">
+                <span class="control__suffix">hours</span>
+              </div>
+            </div>
+            <hr>
+            <span class="switch">Show on the game page <span class="toggle toggle_on"><span>No</span><span>Yes</span></span></span>
+            <span class="switch">Contains spoilers <span class="toggle"><span>No</span><span>Yes</span></span></span>
+          </div>
+
+          <div class="field">
+            <span class="label">Comment</span>
+            <div class="editor" style="flex:1;min-height:360px">
+              <div class="editor__bar"><i>B</i><i>I</i><i>S</i><i>&lt;/&gt;</i><span class="sep"></span><i>H3</i><i>•≡</i><i>1≡</i><i>❝</i><span class="sep"></span><i>🔗</i><i>▣</i><i>☺</i></div>
+              <div class="editor__area">What stood out on this run?</div>
+              <div class="editor__foot">0 / 4000</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions actions_split">
+          <button class="btn btn_green">Save</button>
+          <button class="btn btn_ghost">Delete playthrough</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="variant variant_wide" aria-labelledby="mobile-title">
+    <div class="variant__text">
+      <span class="tag">B on a phone</span>
+      <h2 id="mobile-title">Category on a phone</h2>
+      <p>
+        At 360px the seven pills wrap into three ragged rows: the Completed and Mastered pair is
+        wider than its neighbours, so each row ends at a different place and the right side of
+        the panel stays empty. Four ways to keep the category and Mastered together without the
+        ragged edge.
+      </p>
+    </div>
+
+    <div class="phones">
+      <article class="phone">
+        <div class="phone__screen">
+          <div class="field">
+            <span class="label">Category</span>
+            <div class="seg seg_grid" role="radiogroup" aria-label="Category">
+              <button class="seg__item dot-wishlist">Wishlist</button>
+              <button class="seg__item dot-playing">Playing</button>
+              <button class="seg__item seg__item_active dot-completed">Completed</button>
+              <div class="seg__strip">
+                <button class="seg__item seg__item_star seg__item_active" style="background:var(--color-bg-primary)">★ Mastered</button>
+              </div>
+              <button class="seg__item dot-played">Played</button>
+              <button class="seg__item dot-backlog">Backlog</button>
+              <button class="seg__item dot-dropped">Dropped</button>
+            </div>
+          </div>
+        </div>
+        <h3>1 · Even grid</h3>
+        <p>Three equal columns, two rows, so every row ends at the same edge. Completed sits at the end of the first row and Mastered hangs under it as a tab, between the rows.</p>
+        <p class="verdict"><b>Fits:</b> all six visible, no empty space. <b>Cost:</b> the grid gets a third row only while Completed is picked.</p>
+      </article>
+
+      <article class="phone">
+        <div class="phone__screen">
+          <div class="field">
+            <span class="label">Category</span>
+            <div class="seg seg_two" role="radiogroup" aria-label="Category">
+              <button class="seg__item dot-wishlist">Wishlist</button>
+              <button class="seg__item dot-playing">Playing</button>
+              <div class="seg__pair">
+                <button class="seg__item seg__item_active dot-completed">Completed</button>
+                <button class="star-icon" aria-label="Mastered" aria-pressed="true">★</button>
+              </div>
+              <button class="seg__item dot-played">Played</button>
+              <button class="seg__item dot-backlog">Backlog</button>
+              <button class="seg__item dot-dropped">Dropped</button>
+            </div>
+          </div>
+        </div>
+        <h3>2 · Two columns, star inside</h3>
+        <p>Two equal columns, three rows. Mastered shrinks to a star at the right end of the Completed cell, so the cell keeps its size whether the star is there or not.</p>
+        <p class="verdict"><b>Fits:</b> nothing moves when Completed is picked. <b>Cost:</b> the star has no text; it needs a tooltip and an <code class="t">aria-label</code>.</p>
+      </article>
+
+      <article class="phone">
+        <div class="phone__screen">
+          <div class="field">
+            <span class="label">Category</span>
+            <div class="seg seg_scroll" role="radiogroup" aria-label="Category">
+              <button class="seg__item dot-wishlist">Wishlist</button>
+              <button class="seg__item dot-playing">Playing</button>
+              <span class="seg__pair">
+                <button class="seg__item seg__item_active dot-completed">Completed</button>
+                <button class="seg__item seg__item_star seg__item_active">★ Mastered</button>
+              </span>
+              <button class="seg__item dot-played">Played</button>
+              <button class="seg__item dot-backlog">Backlog</button>
+              <button class="seg__item dot-dropped">Dropped</button>
+            </div>
+          </div>
+        </div>
+        <h3>3 · One scrolling line</h3>
+        <p>The desktop row, kept on one line and scrolled sideways, with the right edge fading out. The picked category scrolls into view when the modal opens.</p>
+        <p class="verdict"><b>Fits:</b> one line of height, same look as desktop. <b>Cost:</b> Played, Backlog and Dropped are off screen until the row is swiped.</p>
+      </article>
+
+      <article class="phone">
+        <div class="phone__screen">
+          <div class="field">
+            <span class="label">Category</span>
+            <div class="row-select">
+              <div class="control">
+                <span class="dotted dot-completed">Completed</span>
+                <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </div>
+              <button class="pill" aria-pressed="true">★ Mastered</button>
+            </div>
+          </div>
+        </div>
+        <h3>4 · Dropdown below 520px</h3>
+        <p>Under the phone breakpoint the pills become a dropdown with the status dot, and Mastered becomes a button beside it in the same row. Desktop keeps the pills.</p>
+        <p class="verdict"><b>Fits:</b> the smallest block, matches Platform below it. <b>Cost:</b> two renders of one field, and changing the category takes two taps.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="notes" aria-label="Date field">
+    <article>
+      <h3>Date field: empty</h3>
+      <div class="control">
+        <span class="control__mask">DD.MM.YYYY</span>
+        <svg class="chev" width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="3.5" width="13" height="12" rx="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 7.5h13M6 2v3M12 2v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <p>The placeholder spells the format in letters, so it never reads as a real date.</p>
+    </article>
+    <article>
+      <h3>Date field: typing</h3>
+      <div class="control control_active">
+        <span><span>14.09</span><span class="control__mask">.YYYY</span></span>
+        <svg class="chev" width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="3.5" width="13" height="12" rx="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 7.5h13M6 2v3M12 2v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <p>Digits fill the mask from the left and the dots are inserted for you. The calendar opens from the icon only.</p>
+    </article>
+    <article>
+      <h3>Date field: invalid</h3>
+      <div class="control" style="border-bottom-color:var(--color-negative)">
+        <span>31.02.2026</span>
+        <svg class="chev" width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="3.5" width="13" height="12" rx="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 7.5h13M6 2v3M12 2v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <p class="datehint" style="color:var(--color-negative)">February 2026 has 28 days.</p>
+    </article>
+  </section>
+
+  <p class="note">
+    Colours, spacing and radii are the project's own tokens: the <code class="t">:root</code>
+    block above is generated from <code class="t">apps/web/src/lib/app/styles/vars</code> by
+    <code class="t">bun --filter web sync:tokens</code>. Names starting with
+    <code class="t">--mock-</code> exist only in this proposal. The typeface is substituted:
+    Hanken Grotesk stands in for ApercuPro, whose licensed file cannot be served from a
+    third-party host.
+  </p>
+</div>

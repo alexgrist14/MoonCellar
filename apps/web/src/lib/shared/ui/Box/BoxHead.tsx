@@ -1,4 +1,4 @@
-import { FC, ReactNode, Ref } from "react";
+import { CSSProperties, FC, ReactNode, Ref } from "react";
 import classNames from "classnames";
 import styles from "./Box.module.scss";
 import { Button, ButtonColor } from "../Button";
@@ -14,6 +14,7 @@ interface IBoxHeadProps {
   isExternal?: boolean;
   onClose?: () => void;
   closeButtonRef?: Ref<HTMLButtonElement>;
+  headStyle?: CSSProperties;
 }
 
 export const BoxHead: FC<IBoxHeadProps> = ({
@@ -26,6 +27,7 @@ export const BoxHead: FC<IBoxHeadProps> = ({
   isExternal,
   onClose,
   closeButtonRef,
+  headStyle,
 }) => {
   if (
     !title ||
@@ -52,13 +54,15 @@ export const BoxHead: FC<IBoxHeadProps> = ({
     titleAction
   );
 
+  const isHeadPadded = !!action && !isExternal;
+
   return (
     <div
-      className={
-        !!action && !isExternal ? styles.template__head_action : undefined
-      }
+      className={isHeadPadded ? styles.template__head_action : undefined}
+      style={isHeadPadded ? headStyle : undefined}
     >
       <h2
+        style={isHeadPadded || isExternal ? undefined : headStyle}
         className={classNames(styles.template__title, {
           [styles.template__title_vertical]: isVerticalActions,
           [styles.template__title_start]: isTitleStart,

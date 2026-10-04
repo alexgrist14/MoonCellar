@@ -2,12 +2,15 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { ReactNode, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "../Button";
+import { DatePicker } from "../DatePicker";
+import { Dropdown } from "../Dropdown";
 import {
   CollapsibleSection,
   DateField,
   deriveReleaseDateFields,
   EnumField,
   EnumListField,
+  Field,
   IObjectFieldDescriptor,
   ImagePickerField,
   NumberField,
@@ -337,3 +340,27 @@ export const UploadResettable: Story = {
 export const Registered: Story = { render: () => <RegisteredDemo /> };
 
 export const ToggleWithHint: Story = { render: () => <ToggleWithHintDemo /> };
+
+const AnyControlDemo = () => {
+  const [platform, setPlatform] = useState("");
+  const [date, setDate] = useState("");
+
+  return (
+    <Column>
+      <Field label="Platform">
+        <Dropdown
+          isThroughPortal
+          placeholder="Select platform..."
+          list={["PC", "PlayStation 5", "Nintendo Switch"]}
+          overwriteValue={platform}
+          getValue={(value) => setPlatform(value ?? "")}
+        />
+      </Field>
+      <Field label="Date" error={date ? undefined : "Pick a date"}>
+        <DatePicker value={date} onChange={setDate} />
+      </Field>
+    </Column>
+  );
+};
+
+export const AnyControl: Story = { render: () => <AnyControlDemo /> };

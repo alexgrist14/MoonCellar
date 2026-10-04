@@ -19,6 +19,12 @@
     border-color: var(--color-accent);
   }
 
+  &_withHelp {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x2);
+  }
+
   &_error {
     border-color: var(--color-negative);
 
@@ -39,6 +45,13 @@
       color: var(--color-gray);
     }
   }
+}
+
+.help {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  pointer-events: none;
 }
 
 .error {

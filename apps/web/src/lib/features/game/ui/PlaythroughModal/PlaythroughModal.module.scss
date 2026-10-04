@@ -1,3 +1,12 @@
+$categories: wishlist, playing, completed, played, backlog, dropped;
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(var(--reveal-offset));
+  }
+}
+
 .wrapper {
   display: grid;
   gap: var(--gap-x5) !important;
@@ -12,6 +21,14 @@
   min-height: max(320px, var(--playthrough-modal-height));
   min-width: 300px;
   flex-shrink: 0;
+  interpolate-size: allow-keywords;
+  transition:
+    height var(--duration-base) var(--easing-out),
+    min-height var(--duration-base) var(--easing-out);
+
+  :global([data-resizing]) & {
+    transition: none;
+  }
 
   @include mediaMin($screenMd) {
     width: var(--resize-width, var(--playthrough-modal-width-lg));
@@ -47,33 +64,78 @@
     width: 100%;
   }
 
+  &__tabsScroll {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+
   &__tabs.modal__tabs {
     width: fit-content;
     min-width: 0;
     max-width: none;
-    flex: 0 1 auto;
+    flex-wrap: nowrap;
+    overflow: visible;
+
+    & > * {
+      flex: 0 0 auto;
+    }
   }
 
-  &__field {
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-x1);
-    flex: 1;
+  &__categoryTabs {
+    @include mediaMax($screenMd) {
+      display: none;
+    }
+  }
+
+  &__categorySelect {
+    display: none;
+
+    @include mediaMax($screenMd) {
+      display: flex;
+      align-items: stretch;
+      gap: var(--gap-x2);
+
+      & > :first-child {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+    }
+  }
+
+  &__dot {
+    width: var(--community-dot-size);
+    height: var(--community-dot-size);
+    border-radius: 50%;
+    background-color: var(--playthrough-category-color);
+  }
+
+  &__mastered_active.modal__mastered_active,
+  &__mastered_active.modal__mastered_active:hover {
+    color: var(--game-mastered-color);
   }
 
   &__label {
-    color: var(--color-text-secondary);
+    color: var(--color-text-muted);
     font-size: 14px;
   }
 
   &__inputs {
     display: flex;
+    flex-wrap: wrap;
     align-items: flex-end;
     gap: var(--gap-x2);
 
-    @include mediaMax($screenMd) {
-      flex-direction: column;
-      align-items: stretch;
+    & > * {
+      flex: 1 1 var(--date-picker-field-min-width);
+      min-width: 0;
+    }
+
+    & > :first-child {
+      flex: 2 1 var(--playthrough-platform-min-width);
+    }
+
+    & > :last-child:not(:first-child) {
+      flex: 0 0 var(--playthrough-time-min-width);
     }
   }
 
@@ -84,7 +146,9 @@
   &__comment {
     display: flex;
     flex-direction: column;
+    gap: var(--gap-x1);
     flex: 1;
+    animation: reveal var(--duration-base) var(--easing-out);
 
     &_hidden {
       display: none;
@@ -99,10 +163,42 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--gap-x5);
-    margin-top: var(--gap-x3);
+
+    &_hidden {
+      display: none;
+    }
   }
 
   &__controls {
-    margin-top: auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x8) var(--gap-x4);
+    margin: auto calc(-1 * var(--padding-x5)) calc(-1 * var(--padding-x5));
+    padding: var(--padding-x4) var(--padding-x7);
+    border-top: 1px solid var(--color-border-primary);
+    border-radius: 0 0 var(--radius-x5) var(--radius-x5);
+    background-color: var(--color-bg-primary-tint);
+
+    & > :last-child {
+      margin-left: auto;
+    }
+  }
+}
+
+@each $category in $categories {
+  .modal__dot_#{$category} {
+    --playthrough-category-color: var(--game-#{$category}-color);
+  }
+}
+
+@include reducedMotion {
+  .modal {
+    transition: none;
+  }
+
+  .modal__comment {
+    animation-duration: var(--duration-instant);
   }
 }

@@ -45,6 +45,16 @@ export const WithClose: Story = {
   args: { title: "Characters", onClose: () => {} },
 };
 
+export const WithHeadStyle: Story = {
+  args: {
+    title: "Playthroughs",
+    isTitleStart: true,
+    onClose: () => {},
+    headStyle: { padding: "var(--padding-x4) var(--padding-x5)" },
+    contentStyle: { padding: "var(--padding-x5)" },
+  },
+};
+
 export const WithTitleAction: Story = {
   args: {
     title: "Reviews",

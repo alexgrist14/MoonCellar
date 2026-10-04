@@ -64,6 +64,8 @@ import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
   visible caption.
 - Inside a native `<form>` it does not submit (no button involved), but it is not a form
   field either — wire it through `Controller` or `setValue`.
+- The switch is a fixed 60×30px with `flex-shrink: 0`; a long label or hint wraps instead of
+  squeezing it. Do not override its width from outside.
 
 ## Storybook
 

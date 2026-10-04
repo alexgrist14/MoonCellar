@@ -9,7 +9,7 @@ const DatePickerDemo = ({ initial }: { initial?: string }) => {
     <div style={{ maxWidth: "260px" }}>
       <DatePicker
         value={value}
-        placeholder="Completion date"
+        ariaLabel="Completion date"
         onChange={setValue}
       />
     </div>

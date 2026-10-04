@@ -28,6 +28,7 @@ interface IBoxProps {
   scrollFadeType?: "both" | "top" | "bottom";
   onClose?: () => void;
   closeButtonRef?: Ref<HTMLButtonElement>;
+  headStyle?: CSSProperties;
 }
 
 export const Box: FC<IBoxProps> = ({

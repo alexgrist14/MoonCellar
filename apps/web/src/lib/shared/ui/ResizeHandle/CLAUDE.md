@@ -59,6 +59,12 @@ const panelRef = useRef<HTMLDivElement>(null);
 - The measured size includes padding and borders; before the drag it probes the target to find
   the offset between the variable and the rendered box, so the edge follows the cursor whatever
   `box-sizing` the target uses. Keep that probe if you touch the logic.
+- **While a resize runs, the target carries `data-resizing` (`RESIZING_ATTRIBUTE`)** — from the
+  measurement before a drag or a key press until pointerup, pointercancel or the end of the key
+  step. A target that transitions its size must switch the transition off under it
+  (`:global([data-resizing]) & { transition: none; }`): the probe reads `getBoundingClientRect`
+  right after writing the variables, and a running transition hands it an in-between size, so
+  the edge stops following the cursor. The playthrough modal's height transition relies on it.
 - While dragging, `user-select: none` is set on `body` and removed on pointerup or
   pointercancel.
 - It is `role="separator"` with `aria-label="Resize"` and `aria-orientation="vertical"`.

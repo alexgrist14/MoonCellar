@@ -21,6 +21,7 @@ close button, custom scroll area, blur and resize handle. Every content block on
 | `titleAction`           | `ReactNode`                   | –        | Element rendered next to the title                                            |
 | `onClose`               | `() => void`                  | –        | Adds a transparent close button with a "Close" tooltip to the header          |
 | `closeButtonRef`        | `Ref<HTMLButtonElement>`      | –        | Ref to that close button (focus management in modals)                         |
+| `headStyle`             | `CSSProperties`               | –        | Inline style on the padded header row; match a custom `contentStyle` padding  |
 | `isHeaderWithoutStyles` | `boolean`                     | –        | Renders the title outside the panel, above it                                 |
 | `isVerticalActions`     | `boolean`                     | –        | Stacks the title and its action vertically                                    |
 | `isTitleStart`          | `boolean`                     | –        | Aligns the title to the start                                                 |
@@ -88,5 +89,5 @@ import { Box } from "@/src/lib/shared/ui/Box";
 
 ## Storybook
 
-`Shared/Box`: Default, WithTitle, WithTitleCount, WithNodeTitle, WithClose, WithTitleAction,
+`Shared/Box`: Default, WithTitle, WithTitleCount, WithNodeTitle, WithClose, WithHeadStyle, WithTitleAction,
 HeaderOutside, Scrollable, FillsContainer, Borderless.

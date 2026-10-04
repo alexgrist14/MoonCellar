@@ -1,10 +1,11 @@
-import { TextField } from "@/src/lib/shared/ui/Fields";
+import { Field, TextField } from "@/src/lib/shared/ui/Fields";
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 import styles from "./PlaythroughModal.module.scss";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
-import { ButtonColor } from "@/src/lib/shared/ui/Button";
+import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
+import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
 import { IRichEditorHandle, RichEditor } from "@/src/lib/shared/ui/RichEditor";
 import { DatePicker } from "@/src/lib/shared/ui/DatePicker";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
@@ -56,6 +57,8 @@ const playthroughCategories: IPlaythroughMinimal["category"][] = [
   "backlog",
   "dropped",
 ];
+
+const PLAYTHROUGH_TABS_SCROLL_ID = "playthrough-tabs";
 
 const categoriesWithDate: IPlaythroughMinimal["category"][] = ["completed"];
 
@@ -249,12 +252,38 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
   const isWithoutComment =
     !category || categoriesWithoutComment.includes(category);
 
+  const isCompleted = watch("category") === "completed";
+
+  useEffect(() => {
+    if (playthroughId) return;
+
+    const tabs = document.getElementById(PLAYTHROUGH_TABS_SCROLL_ID);
+
+    tabs?.scrollTo({ left: tabs.scrollWidth, behavior: "smooth" });
+  }, [playthroughId, listedPlaythroughs.length]);
+
+  const masteredButton = (
+    <Button
+      type="button"
+      color={ButtonColor.SEGMENTED}
+      active={!!watch("isMastered")}
+      aria-pressed={!!watch("isMastered")}
+      className={classNames({
+        [styles.modal__mastered_active]: watch("isMastered"),
+      })}
+      onClick={() => setValue("isMastered", !watch("isMastered"))}
+    >
+      {watch("isMastered") ? "★" : "☆"} Mastered
+    </Button>
+  );
+
   return (
     <Box
       title="Playthroughs"
       isTitleStart
       onClose={() => modal.close(PLAYTHROUGH_MODAL_ID)}
       isWithScrollBar
+      headStyle={{ padding: "var(--padding-x4) var(--padding-x5)" }}
       contentStyle={{ padding: "var(--padding-x5)" }}
       classNameContent={styles.wrapper}
     >
@@ -265,34 +294,41 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
       >
         {!!listedPlaythroughs.length && (
           <div className={styles.modal__top}>
-            <Tabs
-              buttonsClassName={styles.modal__tabs}
-              defaultTabIndex={
-                playthroughId
-                  ? listedPlaythroughs.findIndex(
-                      (play) => play._id === playthroughId
-                    )
-                  : listedPlaythroughs.length
-              }
-              isUseDefaultIndex
-              isStopPropagation
-              contents={[
-                ...listedPlaythroughs.map((play) => ({
-                  tabName: commonUtils.upFL(play?.category),
-                  onTabClick: () => {
-                    const playthrough = playthroughs.find(
-                      (item) => item._id === play._id
-                    );
+            <Scrollbar
+              id={PLAYTHROUGH_TABS_SCROLL_ID}
+              isHorizontal
+              classNameContainer={styles.modal__tabsScroll}
+              contentStyle={{ paddingInline: 0 }}
+            >
+              <Tabs
+                buttonsClassName={styles.modal__tabs}
+                defaultTabIndex={
+                  playthroughId
+                    ? listedPlaythroughs.findIndex(
+                        (play) => play._id === playthroughId
+                      )
+                    : listedPlaythroughs.length
+                }
+                isUseDefaultIndex
+                isStopPropagation
+                contents={[
+                  ...listedPlaythroughs.map((play) => ({
+                    tabName: commonUtils.upFL(play?.category),
+                    onTabClick: () => {
+                      const playthrough = playthroughs.find(
+                        (item) => item._id === play._id
+                      );
 
-                    if (playthrough) selectHandler(playthrough);
+                      if (playthrough) selectHandler(playthrough);
+                    },
+                  })),
+                  {
+                    tabName: "New",
+                    isHidden: isPending || !!playthroughId,
                   },
-                })),
-                {
-                  tabName: "New",
-                  isHidden: isPending || !!playthroughId,
-                },
-              ]}
-            />
+                ]}
+              />
+            </Scrollbar>
             <ButtonGroup
               buttons={[
                 {
@@ -324,66 +360,99 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
                 : []
             }
           />
-          <Dropdown
-            isThroughPortal
-            placeholder="Select category..."
-            getIndex={categoryHandler}
-            overwriteValue={commonUtils.upFL(watch("category") || "")}
-            list={playthroughCategories.map((item) => commonUtils.upFL(item))}
-          />
-          <Dropdown
-            isThroughPortal
-            placeholder="Select platform..."
-            getIndex={(index) =>
-              setValue("platformId", game.platformIds[index])
-            }
-            overwriteValue={
-              systems?.find((item) => item._id === watch("platformId"))?.name ||
-              ""
-            }
-            list={
-              systems
-                ?.filter((sys) => game.platformIds.includes(sys._id))
-                .map((item) => item.name) || []
-            }
-          />
-          {["completed", "played", "dropped"].includes(watch("category")) && (
-            <div className={styles.modal__inputs}>
-              {categoriesWithDate.includes(watch("category")) && (
-                <DatePicker
-                  value={watch("date") || ""}
-                  onChange={(value) =>
-                    setValue("date", value, { shouldValidate: true })
-                  }
+          <Field label="Category">
+            <div className={styles.modal__categoryTabs}>
+              <Scrollbar isHorizontal contentStyle={{ paddingInline: 0 }}>
+                <Tabs
+                  theme="segmented"
+                  ariaLabel="Category"
+                  isUseDefaultIndex
+                  defaultTabIndex={playthroughCategories.indexOf(
+                    watch("category")
+                  )}
+                  contents={playthroughCategories.map((item, index) => ({
+                    tabName: commonUtils.upFL(item),
+                    prefix: (
+                      <i
+                        className={classNames(
+                          styles.modal__dot,
+                          styles[`modal__dot_${item}`]
+                        )}
+                      />
+                    ),
+                    onTabClick: () => categoryHandler(index),
+                    addon:
+                      item === "completed" && isCompleted && masteredButton,
+                  }))}
                 />
-              )}
-              <TextField
-                label="Game time (hours)"
-                type="text"
-                inputMode="decimal"
-                placeholder="0"
-                {...register("time", {
-                  setValueAs: (value) =>
-                    value === "" || value == null ? undefined : Number(value),
-                })}
-                value={watch("time") || ""}
-              />
+              </Scrollbar>
             </div>
-          )}
-          {watch("category") === "completed" && (
-            <ToggleSwitch
-              label="Mastered?"
-              leftContent="No"
-              rightContent="Yes"
-              value={watch("isMastered") ? "right" : "left"}
-              clickCallback={() => setValue("isMastered", !watch("isMastered"))}
-            />
-          )}
+            <div className={styles.modal__categorySelect}>
+              <Dropdown
+                isThroughPortal
+                placeholder="Select..."
+                getIndex={categoryHandler}
+                overwriteValue={commonUtils.upFL(watch("category") || "")}
+                list={playthroughCategories.map((item) =>
+                  commonUtils.upFL(item)
+                )}
+              />
+              {isCompleted && masteredButton}
+            </div>
+          </Field>
+          <div className={styles.modal__inputs}>
+            <Field label="Platform">
+              <Dropdown
+                isThroughPortal
+                isWithReset
+                placeholder="Select..."
+                getIndex={(index) =>
+                  setValue("platformId", game.platformIds[index])
+                }
+                overwriteValue={
+                  systems?.find((item) => item._id === watch("platformId"))
+                    ?.name || ""
+                }
+                list={
+                  systems
+                    ?.filter((sys) => game.platformIds.includes(sys._id))
+                    .map((item) => item.name) || []
+                }
+              />
+            </Field>
+            {["completed", "played", "dropped"].includes(watch("category")) && (
+              <>
+                {categoriesWithDate.includes(watch("category")) && (
+                  <Field label="Date">
+                    <DatePicker
+                      value={watch("date") || ""}
+                      onChange={(value) =>
+                        setValue("date", value, { shouldValidate: true })
+                      }
+                    />
+                  </Field>
+                )}
+                <TextField
+                  label="Game time"
+                  helpText="h"
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="0"
+                  {...register("time", {
+                    setValueAs: (value) =>
+                      value === "" || value == null ? undefined : Number(value),
+                  })}
+                  value={watch("time") || ""}
+                />
+              </>
+            )}
+          </div>
           <div
             className={classNames(styles.modal__comment, {
               [styles.modal__comment_hidden]: isWithoutComment,
             })}
           >
+            <span className={styles.modal__label}>Comment</span>
             <Controller
               control={control}
               name="comment"
@@ -398,7 +467,13 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
                 />
               )}
             />
-            <div className={styles.modal__toggles}>
+          </div>
+          <div className={styles.modal__controls}>
+            <div
+              className={classNames(styles.modal__toggles, {
+                [styles.modal__toggles_hidden]: isWithoutComment,
+              })}
+            >
               <Controller
                 control={control}
                 name="isPublic"
@@ -426,8 +501,6 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
                 )}
               />
             </div>
-          </div>
-          <div className={styles.modal__controls}>
             <ButtonGroup
               buttons={[
                 {

@@ -1,3 +1,4 @@
+export * from "./Field";
 export * from "./TextField";
 export * from "./DateField";
 export * from "./NumberField";

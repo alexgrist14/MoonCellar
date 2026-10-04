@@ -1,10 +1,19 @@
 "use client";
 
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import classNames from "classnames";
 import styles from "./DatePicker.module.scss";
-import { SvgCalendar, SvgChevron } from "../svg";
+import { SvgCalendar, SvgChevron, SvgInfo } from "../svg";
+import { Tooltip } from "../Tooltip";
 import { Button, ButtonColor } from "../Button";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
@@ -12,6 +21,7 @@ import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
 interface IDatePickerProps {
   value?: string;
   placeholder?: string;
+  ariaLabel?: string;
   className?: string;
   isDisabled?: boolean;
   onChange: (value: string) => void;
@@ -23,6 +33,51 @@ const OFFSET = 8;
 const OFFSET_FALLBACK_WIDTH = 300;
 
 const toIso = (date: Date) => commonUtils.formatDate(date, { isISO: true });
+
+const TYPED_LENGTH = 8;
+
+const toDigits = (text: string) =>
+  text.replace(/\D/g, "").slice(0, TYPED_LENGTH);
+
+const maskDigits = (digits: string) =>
+  [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4)]
+    .filter(Boolean)
+    .join(".");
+
+const getTypedError = (digits: string) => {
+  if (digits.length !== TYPED_LENGTH || parseTyped(digits)) return undefined;
+
+  const day = Number(digits.slice(0, 2));
+  const month = Number(digits.slice(2, 4));
+  const year = Number(digits.slice(4));
+
+  if (year < 1000) return "Enter the year with four digits.";
+  if (month < 1 || month > 12) return "The month must be from 01 to 12.";
+
+  const monthName = new Date(year, month - 1, 1).toLocaleString("en-US", {
+    month: "long",
+  });
+  const daysInMonth = new Date(year, month, 0).getDate();
+
+  return day < 1
+    ? "The day cannot be 00."
+    : `${monthName} ${year} has ${daysInMonth} days.`;
+};
+
+const parseTyped = (digits: string) => {
+  if (digits.length !== TYPED_LENGTH) return undefined;
+
+  const day = Number(digits.slice(0, 2));
+  const month = Number(digits.slice(2, 4));
+  const year = Number(digits.slice(4));
+  const date = new Date(year, month - 1, day);
+
+  return date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day
+    ? date
+    : undefined;
+};
 
 const parseValue = (value?: string) => {
   if (!value) return undefined;
@@ -38,12 +93,32 @@ const parseValue = (value?: string) => {
 
 export const DatePicker: FC<IDatePickerProps> = ({
   value,
-  placeholder = "Date",
+  placeholder = "DD.MM.YYYY",
+  ariaLabel = "Date",
   className,
   isDisabled,
   onChange,
 }) => {
   const selected = useMemo(() => parseValue(value), [value]);
+  const formatted = selected ? commonUtils.formatDate(selected) : "";
+
+  const [text, setText] = useState(formatted);
+
+  useEffect(() => setText(formatted), [formatted]);
+
+  const typedDigits = toDigits(text);
+  const typedError = getTypedError(typedDigits);
+  const isInvalid = !!typedError;
+
+  const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
+    const digits = toDigits(event.target.value);
+    const typed = parseTyped(digits);
+
+    setText(maskDigits(digits));
+
+    if (!digits) onChange("");
+    if (typed) onChange(toIso(typed));
+  };
 
   const [isOpen, setIsOpen] = useState(false);
   const [viewDate, setViewDate] = useState(() => selected ?? new Date());
@@ -146,22 +221,46 @@ export const DatePicker: FC<IDatePickerProps> = ({
     <div className={classNames(styles.picker, className)}>
       <div
         ref={fieldRef}
-        role="button"
-        aria-label={placeholder}
         className={classNames(styles.picker__field, {
           [styles.picker__field_active]: isOpen,
+          [styles.picker__field_invalid]: isInvalid,
           [styles.picker__field_disabled]: isDisabled,
         })}
-        onClick={() => !isDisabled && setIsOpen((current) => !current)}
       >
-        <span
-          className={classNames(styles.picker__value, {
-            [styles.picker__value_empty]: !selected,
-          })}
+        <input
+          className={styles.picker__input}
+          value={text}
+          placeholder={placeholder}
+          aria-label={ariaLabel}
+          aria-invalid={isInvalid}
+          inputMode="numeric"
+          autoComplete="off"
+          disabled={isDisabled}
+          onChange={handleInput}
+          onBlur={() => !isInvalid && setText(formatted)}
+        />
+        {!!typedError && (
+          <Tooltip content={typedError}>
+            <span
+              role="img"
+              aria-label={typedError}
+              tabIndex={0}
+              className={styles.picker__error}
+            >
+              <SvgInfo size="20" color="negative" />
+            </span>
+          </Tooltip>
+        )}
+        <button
+          type="button"
+          className={styles.picker__toggle}
+          aria-label="Open calendar"
+          aria-expanded={isOpen}
+          disabled={isDisabled}
+          onClick={() => setIsOpen((current) => !current)}
         >
-          {selected ? commonUtils.formatDate(selected) : placeholder}
-        </span>
-        <SvgCalendar size="20" color="secondary" />
+          <SvgCalendar size="20" color="secondary" />
+        </button>
       </div>
 
       {isOpen &&

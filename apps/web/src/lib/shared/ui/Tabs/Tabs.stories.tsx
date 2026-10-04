@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Tabs } from "./Tabs";
+import { Button, ButtonColor } from "../Button";
 
 const meta = {
   title: "Shared/Tabs",
@@ -101,6 +102,40 @@ export const SegmentedWrap: Story = {
     ),
   ],
 };
+
+const AddonDemo = () => {
+  const [isMastered, setIsMastered] = useState(false);
+
+  return (
+    <Tabs
+      theme="segmented"
+      ariaLabel="Category"
+      isWrap
+      defaultTabIndex={1}
+      contents={[
+        { tabName: "Playing", prefix: dot("var(--color-blue)") },
+        {
+          tabName: "Completed",
+          prefix: dot("var(--color-green)"),
+          addon: (
+            <Button
+              type="button"
+              color={ButtonColor.SEGMENTED}
+              active={isMastered}
+              aria-pressed={isMastered}
+              onClick={() => setIsMastered((current) => !current)}
+            >
+              {isMastered ? "★" : "☆"} Mastered
+            </Button>
+          ),
+        },
+        { tabName: "Dropped", prefix: dot("var(--color-red)") },
+      ]}
+    />
+  );
+};
+
+export const WithAddon: Story = { render: () => <AddonDemo /> };
 
 export const WithHiddenTab: Story = {
   args: {

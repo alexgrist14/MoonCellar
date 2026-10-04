@@ -19,6 +19,7 @@ the control where listed (`TextField` and `TextareaField` also take a react-hook
 
 | Export               | Value type                  | Other props                                                                                       | Notes                                                                                                               |
 | -------------------- | --------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `Field`              | —                           | `children`, `error`                                                                               | Label above any control; for one the kit has no field for (a `Dropdown` driven by index, an ISO `DatePicker`)       |
 | `TextField`          | `string`                    | `error`, `isLabelHidden`, `ref`, every `Input` prop                                               | `Input`; label tied by `htmlFor`/`useId`; `name` switches `onChange` to the native event (see below)                |
 | `NumberField`        | `number \| null`            | `error`                                                                                           | Empty input emits `null`                                                                                            |
 | `TextareaField`      | `string`                    | `error`, `ref`, every `Textarea` prop                                                             | `Textarea`; same two modes as `TextField`                                                                           |
@@ -50,8 +51,7 @@ import { StringListField, TextField } from "@/src/lib/shared/ui/Fields";
 />
 ```
 
-`TextField` with `register` — the playthrough modal's game time, today a hand-made
-`<label>` around an `Input`, becomes:
+`TextField` with `register`, as the playthrough modal's game time does:
 
 ```tsx
 <TextField
@@ -122,4 +122,4 @@ uncontrolled.
 
 `Shared/Fields` — `TextFields`, `WithErrors`, `Disabled`, `ListFields`, `ObjectList`,
 `ImagePicker`, `ImagePickerEmpty`, `Collapsible`, `CollapsibleStatic`, `Upload`,
-`UploadResettable`, `Registered`, `ToggleWithHint`.
+`UploadResettable`, `Registered`, `ToggleWithHint`, `AnyControl`.

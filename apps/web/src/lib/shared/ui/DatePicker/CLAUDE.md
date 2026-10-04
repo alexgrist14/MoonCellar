@@ -1,7 +1,7 @@
 # DatePicker
 
-The site's date field: a clickable field showing `dd.mm.yyyy` and a month calendar popover with
-Clear and Today. It replaces the native date input everywhere.
+The site's date field: a text input that takes a typed `dd.mm.yyyy` date, and a calendar button
+that opens a month popover with Clear and Today. It replaces the native date input everywhere.
 
 ## When to use
 
@@ -11,13 +11,14 @@ Clear and Today. It replaces the native date input everywhere.
 
 ## API
 
-| Prop          | Type                      | Default  | Purpose                                                    |
-| ------------- | ------------------------- | -------- | ---------------------------------------------------------- |
-| `value`       | `string`                  | —        | ISO `yyyy-mm-dd` (longer ISO strings are cut to the date). |
-| `onChange`    | `(value: string) => void` | —        | Receives ISO `yyyy-mm-dd`, or `""` on Clear.               |
-| `placeholder` | `string`                  | `"Date"` | Shown when empty; also the field's `aria-label`.           |
-| `className`   | `string`                  | —        | Class on the wrapper.                                      |
-| `isDisabled`  | `boolean`                 | —        | Blocks opening the popover.                                |
+| Prop          | Type                      | Default        | Purpose                                                    |
+| ------------- | ------------------------- | -------------- | ---------------------------------------------------------- |
+| `value`       | `string`                  | —              | ISO `yyyy-mm-dd` (longer ISO strings are cut to the date). |
+| `onChange`    | `(value: string) => void` | —              | Receives ISO `yyyy-mm-dd`, or `""` on Clear.               |
+| `placeholder` | `string`                  | `"DD.MM.YYYY"` | Shown when empty; spells the format in letters.            |
+| `ariaLabel`   | `string`                  | `"Date"`       | Accessible name of the input.                              |
+| `className`   | `string`                  | —              | Class on the wrapper.                                      |
+| `isDisabled`  | `boolean`                 | —              | Blocks opening the popover.                                |
 
 ## Usage
 
@@ -31,6 +32,15 @@ import { DatePicker } from "@/src/lib/shared/ui/DatePicker";
 ```
 
 ## Rules and gotchas
+
+- **Typing is masked and emits only whole dates.** The input keeps digits only (up to eight) and
+  inserts the dots itself; `onChange` fires with the ISO date once all eight digits form a real
+  date, and with `""` when the input is emptied. A partial or impossible date (`31.02.2026`)
+  never reaches `onChange`: an impossible one turns the border red, sets `aria-invalid` and shows
+  an info icon whose tooltip (and `aria-label`) names the problem ("February 2026 has 28 days."), a
+  partial one is replaced by the last valid value on blur.
+- **The calendar opens from the icon button only;** clicking the text puts the caret there. A
+  new `value` from outside (a picked day, Today, a form reset) overwrites the typed text.
 
 - The field's radius is `--radius-control`, like `Input` and `Dropdown`, so they line up in one
   form.

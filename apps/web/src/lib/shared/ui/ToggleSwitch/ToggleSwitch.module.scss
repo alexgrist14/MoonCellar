@@ -4,6 +4,7 @@
   align-items: center;
   cursor: pointer;
   width: 60px;
+  flex-shrink: 0;
   height: 30px;
   border-radius: var(--radius-x6);
   border: 4px solid transparent;

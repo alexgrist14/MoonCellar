@@ -6,8 +6,9 @@
   width: var(--drawer-width);
   height: calc(100dvh - var(--header-height));
   padding: var(--padding-x2);
-  transform: scaleX(0);
+  transform: translateX(var(--drawer-offset, 0px)) scaleX(0);
   transform-origin: right;
+  touch-action: pan-y;
   opacity: 0;
   visibility: hidden;
   transition:
@@ -20,9 +21,17 @@
   }
 
   &_open {
-    transform: scaleX(1);
+    transform: translateX(var(--drawer-offset, 0px)) scaleX(1);
     opacity: 1;
     visibility: visible;
+  }
+
+  &_dragging {
+    transition: none;
+  }
+
+  &__content {
+    touch-action: pan-y;
   }
 
   &__box {

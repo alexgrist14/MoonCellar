@@ -80,6 +80,15 @@ export const Numeric: Story = {
   },
 };
 
+export const WithHelpText: Story = {
+  args: {
+    inputMode: "decimal",
+    defaultValue: "42.5",
+    helpText: "h",
+    "aria-label": "Game time",
+  },
+};
+
 export const Controlled: Story = {
   render: () => <ControlledInput />,
 };

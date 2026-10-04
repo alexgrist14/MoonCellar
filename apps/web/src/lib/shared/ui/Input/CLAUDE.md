@@ -17,6 +17,7 @@ the `<input>`, so it works with react-hook-form's `register`.
 | Prop                 | Type                    | Default | Purpose                                                                        |
 | -------------------- | ----------------------- | ------- | ------------------------------------------------------------------------------ |
 | `error`              | `FieldError \| string`  | —       | A react-hook-form error or a plain message; turns the border red, shown below. |
+| `helpText`           | `ReactNode`             | —       | Always-visible text on the right edge inside the field, e.g. a unit (`h`).     |
 | `containerStyles`    | `CSSProperties`         | —       | Inline style on the bordered container.                                        |
 | `containerClassname` | `string`                | —       | Class on the bordered container.                                               |
 | `className`          | `string`                | —       | Class on the `<input>` itself.                                                 |
@@ -51,9 +52,12 @@ import { Input } from "@/src/lib/shared/ui/Input";
 - Placeholder text is styled with `--color-gray` and long values are truncated with an ellipsis.
 - There is no label element. Pair it with a visible label, give it an `id` referenced by a
   `<label htmlFor>`, or pass `aria-label`.
+- `helpText` turns the container into a flex row and sits after the input, so a long value
+  ellipsises before it instead of running under it. It ignores the pointer; a click on it does
+  not focus the input.
 - The container's radius is `--radius-control`, the one radius of every form field.
 
 ## Storybook
 
 `Shared/Input` — `Default`, `WithValue`, `Password`, `WithError`, `WithStringError`, `Disabled`,
-`Controlled`, `Numeric`.
+`Controlled`, `Numeric`, `WithHelpText`.

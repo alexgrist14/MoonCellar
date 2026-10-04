@@ -34,6 +34,8 @@ const KEYBOARD_DELTAS: Record<string, [number, number]> = {
   ArrowDown: [0, KEYBOARD_STEP],
 };
 
+export const RESIZING_ATTRIBUTE = "data-resizing";
+
 const getSizeOffset = (
   element: HTMLElement,
   property: IResizeProperty,
@@ -66,6 +68,8 @@ const restoreProperty = (
     : element.style.removeProperty(property);
 
 const measure = (element: HTMLElement): IResizeStart => {
+  element.toggleAttribute(RESIZING_ATTRIBUTE, true);
+
   const { width, height } = element.getBoundingClientRect();
   const initialWidth = element.style.getPropertyValue("--resize-width");
   const initialHeight = element.style.getPropertyValue("--resize-height");
@@ -76,6 +80,11 @@ const measure = (element: HTMLElement): IResizeStart => {
   restoreProperty(element, "--resize-height", initialHeight);
 
   return { width, height, widthOffset, heightOffset };
+};
+
+const finishResize = (element: HTMLElement | null) => {
+  element?.getBoundingClientRect();
+  element?.removeAttribute(RESIZING_ATTRIBUTE);
 };
 
 const clamp = (value: number, min: number, max: number) =>
@@ -150,6 +159,7 @@ export const ResizeHandle: FC<IResizeHandleProps> = ({
   };
 
   const handlePointerUp = () => {
+    finishResize(targetRef.current);
     drag.current = null;
     document.body.style.removeProperty("user-select");
   };
@@ -162,6 +172,7 @@ export const ResizeHandle: FC<IResizeHandleProps> = ({
 
     event.preventDefault();
     resize(element, measure(element), ...delta);
+    finishResize(element);
   };
 
   return (

@@ -4,6 +4,7 @@ export interface ITabContent {
   tabName: string;
   tabNameNode?: ReactNode;
   prefix?: ReactNode;
+  addon?: ReactNode;
   count?: number;
   onTabClick?: (...args: any[]) => void;
   tabLink?: string;
