@@ -121,7 +121,7 @@ const results = [
   "Celeste",
 ];
 
-const AnchoredListbox = () => {
+const AnchoredListbox = ({ reservedHeight }: { reservedHeight?: number }) => {
   const anchorRef = useRef<HTMLDivElement>(null);
   const [search, setSearch] = useState("");
   const matches = results.filter((name) =>
@@ -143,6 +143,7 @@ const AnchoredListbox = () => {
         onClose={() => setSearch("")}
         matchAnchorWidth
         isSheetDisabled
+        reservedHeight={reservedHeight}
         contentStyle={{ padding: "var(--padding-x1)" }}
       >
         <div role="listbox">
@@ -159,6 +160,14 @@ const AnchoredListbox = () => {
 
 export const AnchoredSearch: Story = {
   render: () => <AnchoredListbox />,
+};
+
+export const AnchoredSearchReservedHeight: Story = {
+  render: () => (
+    <div style={{ paddingTop: "320px" }}>
+      <AnchoredListbox reservedHeight={2000} />
+    </div>
+  ),
 };
 
 export const AnchoredSearchOnMobile: Story = {

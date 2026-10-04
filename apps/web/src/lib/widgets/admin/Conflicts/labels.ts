@@ -1,5 +1,6 @@
 import {
   ConflictSourceSchema,
+  ConflictStateSchema,
   IConflictSource,
   IConflictState,
   IMatchReason,
@@ -84,6 +85,21 @@ const STATE_LABEL_SETS: Record<
 
 export const stateLabel = (source: IConflictSource, state: IConflictState) =>
   STATE_LABEL_SETS[CREATES_GAME[source] ? "create" : "link"][state];
+
+export const CONFLICT_STATES = ConflictStateSchema.options;
+
+export const stateFilterLabel = (
+  source: IConflictSource | undefined,
+  state: IConflictState
+) => {
+  if (source) return stateLabel(source, state);
+
+  const { create, link } = STATE_LABEL_SETS;
+
+  return create[state] === link[state]
+    ? create[state]
+    : `${create[state]} / ${link[state]}`;
+};
 
 export const stateTone = (state: IConflictState) =>
   state === "waiting"

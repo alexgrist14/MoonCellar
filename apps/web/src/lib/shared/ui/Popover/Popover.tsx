@@ -32,6 +32,7 @@ interface IPopoverProps {
   width?: string;
   matchAnchorWidth?: boolean;
   isSheetDisabled?: boolean;
+  reservedHeight?: number;
 }
 
 const GAP = 8;
@@ -49,9 +50,11 @@ const AnchoredPopover: FC<IPopoverProps> = ({
   title,
   width,
   matchAnchorWidth,
+  reservedHeight = 0,
 }) => {
   const [coords, setCoords] = useState<{
-    top: number;
+    top?: number;
+    bottom?: number;
     left: number;
     width: number;
   } | null>(null);
@@ -85,18 +88,33 @@ const AnchoredPopover: FC<IPopoverProps> = ({
 
       const spaceBelow = viewportHeight - anchorRect.bottom - GAP;
       const spaceAbove = anchorRect.top - GAP;
-      const isFlipped = height > spaceBelow && spaceAbove > spaceBelow;
+      const isFlipped =
+        Math.max(height, reservedHeight) > spaceBelow &&
+        spaceAbove > spaceBelow;
 
-      const top = isFlipped
-        ? anchorRect.top - GAP - height
-        : anchorRect.bottom + GAP;
       const left = align === "end" ? anchorRect.right - width : anchorRect.left;
+      const vertical = isFlipped
+        ? {
+            bottom: Math.max(
+              VIEWPORT_PADDING,
+              Math.min(
+                viewportHeight - anchorRect.top + GAP,
+                viewportHeight - height - VIEWPORT_PADDING
+              )
+            ),
+          }
+        : {
+            top: Math.max(
+              VIEWPORT_PADDING,
+              Math.min(
+                anchorRect.bottom + GAP,
+                viewportHeight - height - VIEWPORT_PADDING
+              )
+            ),
+          };
 
       setCoords({
-        top: Math.max(
-          VIEWPORT_PADDING,
-          Math.min(top, viewportHeight - height - VIEWPORT_PADDING)
-        ),
+        ...vertical,
         left: Math.max(
           VIEWPORT_PADDING,
           Math.min(left, viewportWidth - width - VIEWPORT_PADDING)
@@ -119,7 +137,7 @@ const AnchoredPopover: FC<IPopoverProps> = ({
       window.removeEventListener("scroll", updateCoords, true);
       window.removeEventListener("resize", updateCoords);
     };
-  }, [isOpen, anchorRef, align, matchAnchorWidth]);
+  }, [isOpen, anchorRef, align, matchAnchorWidth, reservedHeight]);
 
   if (!isOpen || !connector) return null;
 
@@ -128,7 +146,8 @@ const AnchoredPopover: FC<IPopoverProps> = ({
       ref={popoverRef}
       className={classNames(styles.popover, className)}
       style={{
-        top: coords?.top ?? 0,
+        top: coords ? coords.top : 0,
+        bottom: coords?.bottom,
         left: coords?.left ?? 0,
         visibility: coords ? "visible" : "hidden",
         ...(!!width && { width }),

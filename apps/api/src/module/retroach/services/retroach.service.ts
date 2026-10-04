@@ -37,6 +37,7 @@ import type { TMatchCandidate } from "../../games/matching/game-matcher.types";
 import {
   RA_AMBIGUITY_GAP,
   RA_AWARDS_FETCH_DELAY_MS,
+  RA_CONSOLE_BY_PLATFORM_SLUG,
   RA_GAMES_FETCH_DELAY_MS,
   RA_SYNC_CRON,
   RA_SYNC_CRON_OPTIONS,
@@ -145,7 +146,11 @@ export class RetroachievementsService implements OnModuleInit {
       const platformOps = [];
 
       for (const platform of platforms) {
-        const match = matchPlatformToConsole(platform.name, consoles);
+        const slugConsoleId = RA_CONSOLE_BY_PLATFORM_SLUG[platform.slug];
+        const match =
+          slugConsoleId == null
+            ? matchPlatformToConsole(platform.name, consoles)
+            : consoles.find(({ _id }) => _id === slugConsoleId);
         if (!match) continue;
 
         const moonIdList = moonIdsByConsoleId.get(match._id);

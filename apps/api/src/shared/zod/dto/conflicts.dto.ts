@@ -1,5 +1,6 @@
 import { createZodDto } from "nestjs-zod";
 import {
+  AddConflictCandidateRequestSchema,
   ConflictItemResponseSchema,
   ConflictsResponseSchema,
   ConflictsSummaryRequestSchema,
@@ -14,6 +15,10 @@ export class ConflictItemResponseDto extends createZodDto(
 
 export class DecideConflictRequestDto extends createZodDto(
   DecideConflictRequestSchema
+) {}
+
+export class AddConflictCandidateRequestDto extends createZodDto(
+  AddConflictCandidateRequestSchema
 ) {}
 
 export class ConflictsSummaryRequestDto extends createZodDto(

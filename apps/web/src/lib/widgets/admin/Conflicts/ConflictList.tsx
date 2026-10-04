@@ -1,9 +1,13 @@
 import { FC, useState } from "react";
 import Link from "next/link";
 import { useDebouncedCallback } from "use-debounce";
-import { CONFLICTS_PAGE_SIZE, IConflictSource } from "@mooncellar/schemas";
+import {
+  CONFLICTS_PAGE_SIZE,
+  IConflictSource,
+  IConflictState,
+} from "@mooncellar/schemas";
 import { Input } from "@/src/lib/shared/ui/Input";
-import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
+import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 import { Table } from "@/src/lib/shared/ui/Table";
 import { Badge } from "@/src/lib/shared/ui/Badge";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
@@ -13,14 +17,15 @@ import {
   REASON_LABELS,
   SOURCE_LABELS,
   stateLabel,
+  stateFilterLabel,
+  CONFLICT_STATES,
   stateTone,
   externalUrl,
 } from "./labels";
 import styles from "./Conflicts.module.scss";
 
 const SEARCH_DELAY_MS = 300;
-const ON = "ON";
-const OFF = "OFF";
+const ALL_STATES = "All states";
 
 interface IConflictListProps {
   source?: IConflictSource;
@@ -30,14 +35,14 @@ export const ConflictList: FC<IConflictListProps> = ({ source }) => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [inputValue, setInputValue] = useState("");
-  const [isWaitingOnly, setIsWaitingOnly] = useState(true);
+  const [state, setState] = useState<IConflictState | undefined>("waiting");
 
   const { data, isLoading, isFetching } = useConflictsQuery({
     page,
     take: CONFLICTS_PAGE_SIZE,
     search: search || undefined,
     source,
-    isWaitingOnly,
+    state,
   });
 
   const debouncedSearch = useDebouncedCallback((value: string) => {
@@ -60,16 +65,21 @@ export const ConflictList: FC<IConflictListProps> = ({ source }) => {
             }}
           />
         </div>
-        <ToggleSwitch
-          label="Hide decided"
-          leftContent={OFF}
-          rightContent={ON}
-          value={isWaitingOnly ? "right" : "left"}
-          clickCallback={(result) => {
-            setIsWaitingOnly(result === ON);
-            setPage(1);
-          }}
-        />
+        <div className={styles.stateFilter}>
+          <Dropdown
+            list={[
+              ALL_STATES,
+              ...CONFLICT_STATES.map((name) => stateFilterLabel(source, name)),
+            ]}
+            overwriteValue={
+              state ? stateFilterLabel(source, state) : ALL_STATES
+            }
+            getIndex={(index) => {
+              setState(index > 0 ? CONFLICT_STATES[index - 1] : undefined);
+              setPage(1);
+            }}
+          />
+        </div>
       </div>
 
       <Table

@@ -37,6 +37,28 @@ export const useDecideConflictMutation = () => {
   });
 };
 
+export const useAddConflictCandidateMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      source,
+      externalId,
+      gameId,
+    }: Omit<IDecideConflictVariables, "choice"> & { gameId: string }) =>
+      adminConflictsApi.addCandidate(source, externalId, { gameId }),
+    onSettled: (_data, _error, { source, externalId }) =>
+      Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: conflictQueryKeys.item(source, externalId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: conflictQueryKeys.listAll(),
+        }),
+      ]),
+  });
+};
+
 export const useReopenConflictMutation = () => {
   const queryClient = useQueryClient();
 

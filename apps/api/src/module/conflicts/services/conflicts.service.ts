@@ -18,7 +18,11 @@ import {
 } from "@mooncellar/schemas";
 import { Game, type GameDocument } from "../../games/schemas/game.schema";
 import type { User } from "../../user/schemas/user.schema";
-import { Conflict, type ConflictDocument } from "../schemas/conflict.schema";
+import {
+  Conflict,
+  type ConflictDocument,
+  type IConflictCandidateEntry,
+} from "../schemas/conflict.schema";
 import { ConflictsGateway } from "../gateways/conflicts.gateway";
 import type {
   IConflictRecord,
@@ -28,6 +32,14 @@ import type {
 const APPLY_BATCH_SIZE = 100;
 
 const UNDECIDED_FILTER = { status: "pending", decision: null } as const;
+
+const STATE_FILTERS: Record<IConflictState, object> = {
+  waiting: UNDECIDED_FILTER,
+  "queued-match": { status: "pending", decision: "match" },
+  "queued-new": { status: "pending", decision: "skip" },
+  matched: { status: "resolved" },
+  "new-game": { status: "absent" },
+};
 
 const escapeRegExp = (value: string) =>
   value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -210,11 +222,11 @@ export class ConflictsService {
     take,
     search,
     source,
-    isWaitingOnly,
+    state,
   }: IGetConflictsParams): Promise<IConflictsResponse> {
     const filter = {
       ...(source ? { source } : {}),
-      ...(isWaitingOnly ? UNDECIDED_FILTER : {}),
+      ...(state ? STATE_FILTERS[state] : {}),
       ...(search
         ? {
             $or: [
@@ -388,6 +400,7 @@ export class ConflictsService {
           descriptionSignal: entry.descriptionSignal,
           hasCompanyMismatch: entry.hasCompanyMismatch,
           matchedTitle: entry.matchedTitle ?? null,
+          isManual: !!entry.isManual,
           game: game
             ? {
                 cover: game.cover ?? null,
@@ -474,6 +487,66 @@ export class ConflictsService {
     this.startApplying(source);
 
     return this.getSummary(source);
+  }
+
+  async addCandidate(
+    source: IConflictSource,
+    externalId: string,
+    gameId: string
+  ): Promise<void> {
+    if (this.getHandler(source).direction !== "games") {
+      throw new BadRequestException(
+        `${source} conflicts list source entries, not games`
+      );
+    }
+
+    const game = await this.gamesModel
+      .findById(gameId)
+      .select("name slug")
+      .lean();
+
+    if (!game) throw new NotFoundException(`Game ${gameId} does not exist`);
+
+    const candidate: IConflictCandidateEntry = {
+      gameId: game._id,
+      slug: game.slug,
+      name: game.name,
+      score: 0,
+      breakdown: {
+        title: 0,
+        companies: 0,
+        date: 0,
+        platforms: 0,
+        genre: 0,
+        type: 0,
+      },
+      dateSignal: "unknown",
+      descriptionSignal: "unknown",
+      hasCompanyMismatch: false,
+      matchedTitle: null,
+      isManual: true,
+    };
+
+    const conflict = await this.conflictsModel.findOneAndUpdate(
+      {
+        source,
+        externalId,
+        ...UNDECIDED_FILTER,
+        "candidates.gameId": { $ne: game._id },
+      },
+      { $push: { candidates: { $each: [candidate], $position: 0 } } }
+    );
+
+    if (!conflict) {
+      const existing = await this.conflictsModel
+        .findOne({ source, externalId, "candidates.gameId": game._id })
+        .select("_id")
+        .lean();
+
+      throw existing
+        ? new ConflictException(`${game.name} is already a candidate`)
+        : await this.getDecisionError(source, externalId);
+    }
   }
 
   async reopen(

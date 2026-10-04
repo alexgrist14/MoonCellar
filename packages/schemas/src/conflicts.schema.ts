@@ -96,6 +96,9 @@ export const ConflictCandidateSchema = z.object({
     .describe(
       "Title of the source entry the candidate matched, when the entry has several"
     ),
+  isManual: z
+    .boolean()
+    .describe("Added by an admin through search, not found by the matcher"),
   game: ConflictGameSchema.nullable().describe(
     "The game as stored now, null if it was deleted"
   ),
@@ -170,10 +173,9 @@ export const GetConflictsRequestSchema = z.object({
     .optional()
     .describe("Match an entry title or a candidate game name"),
   source: ConflictSourceSchema.optional(),
-  isWaitingOnly: z
-    .stringbool()
-    .optional()
-    .describe("Hide conflicts that already have a decision"),
+  state: ConflictStateSchema.optional().describe(
+    "Only conflicts in this state"
+  ),
 });
 
 export const ConflictCandidateGameSchema = z.object({
@@ -228,6 +230,12 @@ export const DecideConflictRequestSchema = z.object({
     ),
 });
 
+export const AddConflictCandidateRequestSchema = z.object({
+  gameId: ObjectIdSchema.describe(
+    "Catalogue game to add to the candidates of a waiting games-direction conflict"
+  ),
+});
+
 export const POSSIBLE_DUPLICATES_MESSAGE =
   "This game may already exist in the catalogue";
 
@@ -267,6 +275,9 @@ export type IConflictSubject = z.infer<typeof ConflictSubjectSchema>;
 export type IConflictGame = z.infer<typeof ConflictGameSchema>;
 export type IConflictCandidate = z.infer<typeof ConflictCandidateSchema>;
 export type IConflictItem = z.infer<typeof ConflictItemSchema>;
+export type IAddConflictCandidateRequest = z.infer<
+  typeof AddConflictCandidateRequestSchema
+>;
 export type IConflictsSummaryRequest = z.infer<
   typeof ConflictsSummaryRequestSchema
 >;

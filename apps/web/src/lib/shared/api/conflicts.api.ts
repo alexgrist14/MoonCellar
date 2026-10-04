@@ -1,4 +1,5 @@
 import {
+  IAddConflictCandidateRequest,
   IConflictItemResponse,
   IConflictSource,
   IConflictsResponse,
@@ -36,6 +37,17 @@ const decide = (
   );
 };
 
+const addCandidate = (
+  source: IConflictSource,
+  externalId: string,
+  dto: IAddConflictCandidateRequest
+) => {
+  return agent.post<void>(
+    `${CONFLICTS_URL}/${source}/${encodeURIComponent(externalId)}/candidates`,
+    dto
+  );
+};
+
 const reopen = (source: IConflictSource, externalId: string) => {
   return agent.post<IConflictsSummary>(
     `${CONFLICTS_URL}/${source}/${encodeURIComponent(externalId)}/reopen`
@@ -47,5 +59,6 @@ export const adminConflictsApi = {
   getList,
   getItem,
   decide,
+  addCandidate,
   reopen,
 };

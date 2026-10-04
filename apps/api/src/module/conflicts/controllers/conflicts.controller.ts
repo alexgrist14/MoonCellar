@@ -22,6 +22,7 @@ import { RolesGuard } from "../../roles/roles.guard";
 import { Roles } from "../../roles/roles.decorator";
 import type { IAuthorizedRequest } from "../../comments/types/community.type";
 import {
+  AddConflictCandidateRequestDto,
   ConflictItemResponseDto,
   ConflictsResponseDto,
   ConflictsSummaryDto,
@@ -106,6 +107,24 @@ export class ConflictsController {
       externalId,
       dto,
       request.user
+    );
+  }
+
+  @Post(":source/:externalId/candidates")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary:
+      "Add a catalogue game found by hand to the candidates of a waiting conflict",
+  })
+  addCandidate(
+    @Param("source") source: string,
+    @Param("externalId") externalId: string,
+    @Body() dto: AddConflictCandidateRequestDto
+  ) {
+    return this.conflictsService.addCandidate(
+      parseSource(source),
+      externalId,
+      dto.gameId
     );
   }
 

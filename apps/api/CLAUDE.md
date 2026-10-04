@@ -435,6 +435,12 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   catalogue after the Skip shows up. A VNDB or IGDB Skip has already created a game; reopening it
   would leave that game behind and let a Match link the entry a second time. RA implements it;
   HLTB does not yet.
+- **A game the matcher missed is matched by adding it to the candidates first, never by passing
+  its id to `decision`.** `decide` only accepts winners that are already among `candidates`
+  (otherwise `400 The game is not a candidate`), so `POST /conflicts/:source/:externalId/candidates`
+  prepends the game an admin found by search, unscored (`score: 0`, an all-zero breakdown,
+  `isManual: true`), to a waiting `games`-direction conflict; the admin then matches or skips as
+  usual. The list filters by `state`, each mapped onto `status`/`decision` in `STATE_FILTERS`.
 - **`parseRAGames` recomputes every RA link each run, so it must read the RA conflicts first.**
   A resolved conflict pins its winners, and a pending or skipped one links nothing. Without this
   the next nightly run replaces an admin's decision with the fuzzy match again. The run also
@@ -445,6 +451,12 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   changed, sets waiting in a conflict) next to 78 stale ones. A match counts as ambiguous when the two best fuzzysort scores
   differ by less than `RA_AMBIGUITY_GAP` (0.05): about 570 of the 10,021 RA games that matched on
   2026-09-30.
+- **RA candidates come only from platforms whose `raId` is the set's console, so a platform the
+  name matcher misses hides all its games.** `matchConsolesToPlatforms` needs an exact shared name
+  segment, and IGDB names regional and revision variants differently ("Family Computer" against RA's
+  "NES/Famicom", "MSX2", "WonderSwan Color", "Pokémon mini"); Akira on the Famicom never reached its
+  RA conflict. Map such a platform in `RA_CONSOLE_BY_PLATFORM_SLUG` (`constants/sync.ts`) instead of
+  loosening the matcher, then run `POST /ra/match-platforms` or wait for the sync.
 - **An RA link written outside the sync must be pinned with `ConflictsService.pin`, or the next
   nightly run removes it.** Approving a request with RA ids does this: `pin` upserts a resolved
   `ra` conflict and adds the game to its `winners`, which `parseRAGames` then keeps.

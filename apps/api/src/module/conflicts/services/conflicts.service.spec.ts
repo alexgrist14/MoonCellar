@@ -320,4 +320,42 @@ describe("ConflictsService", () => {
       $set: { status: "absent", winner: null, decision: null },
     });
   });
+
+  it("prepends a game found by hand as a manual candidate", async () => {
+    const gameId = new Types.ObjectId();
+    const findOneAndUpdate = jest.fn().mockResolvedValue({ _id: "c1" });
+    const service = createService({
+      conflictsModel: { ...idleModel, findOneAndUpdate },
+      gamesModel: {
+        findById: () => query({ _id: gameId, name: "Dyna", slug: "dyna" }),
+      },
+    });
+
+    await service.addCandidate("vndb", "v1", String(gameId));
+
+    const [filter, update] = findOneAndUpdate.mock.calls[0];
+    expect(filter).toMatchObject({
+      status: "pending",
+      decision: null,
+      "candidates.gameId": { $ne: gameId },
+    });
+    expect(update.$push.candidates.$position).toBe(0);
+    expect(update.$push.candidates.$each[0]).toMatchObject({
+      gameId,
+      name: "Dyna",
+      score: 0,
+      isManual: true,
+    });
+  });
+
+  it("refuses a manual candidate on an entries-direction source", async () => {
+    const service = createService({
+      conflictsModel: idleModel,
+      handler: { ...createHandler(), direction: "entries" },
+    });
+
+    await expect(
+      service.addCandidate("vndb", "v1", String(new Types.ObjectId()))
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
 });

@@ -123,6 +123,7 @@ export const CandidateCard: FC<ICandidateCardProps> = ({
               {game.type}
             </Badge>
           )}
+          {candidate.isManual && <Badge tone="muted">Found by search</Badge>}
           {game?.isCustom && <Badge tone="attention">Added by hand</Badge>}
           {game?.linkedExternalId && (
             <Badge tone="attention">Linked to {game.linkedExternalId}</Badge>

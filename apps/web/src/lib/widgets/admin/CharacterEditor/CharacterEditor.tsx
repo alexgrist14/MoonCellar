@@ -12,7 +12,7 @@ import {
 import { CharacterPortrait } from "@/src/lib/entities/character/ui/CharacterPortrait";
 import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
 import { revalidateGamePage } from "@/src/lib/entities/game/api/game.actions";
-import { useEntitySearch } from "@/src/lib/features/requests/model/useEntitySearch";
+import { useGameSearch } from "@/src/lib/entities/game/model";
 import { RemovableChips } from "@/src/lib/shared/ui/RemovableChips";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
@@ -70,7 +70,7 @@ export const CharacterEditor: FC<ICharacterEditorProps> = ({
     : undefined;
   const [games, setGames] = useState<ISearchPickerOption[]>();
 
-  const gameSearch = useEntitySearch("game");
+  const gameSearch = useGameSearch();
   const [pickedPortrait, setPickedPortrait] = useState<string[]>([]);
   const { mutateAsync: findPortraits } = useFindCharacterPortraitsMutation();
   const { mutate: save, isPending: isSaving } = useSaveCharacterMutation();

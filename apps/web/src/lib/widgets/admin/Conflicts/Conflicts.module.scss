@@ -38,6 +38,10 @@
   max-width: var(--vndb-search-width);
 }
 
+.stateFilter {
+  flex: 0 1 var(--conflicts-state-filter-width);
+}
+
 .rowVn {
   display: flex;
   flex-direction: column;
@@ -322,11 +326,21 @@ a.eyebrow:hover {
   gap: var(--gap-x3);
 
   @include mediaMax(560px) {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
 
     .hint {
-      grid-column: 1 / -1;
-      grid-row: 1;
+      flex-basis: 100%;
+      order: -1;
+    }
+
+    .action_end {
+      display: contents;
+    }
+
+    .nextButton {
+      flex-basis: 100%;
     }
 
     .caption {
@@ -394,4 +408,8 @@ a.eyebrow:hover {
   border-radius: var(--radius-x1);
 
   @include font(12px, 16px, 600);
+}
+
+.manualSearch {
+  margin-top: var(--gap-x3);
 }

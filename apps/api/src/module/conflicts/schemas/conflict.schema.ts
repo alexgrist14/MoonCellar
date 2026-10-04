@@ -19,6 +19,7 @@ export interface IConflictCandidateEntry {
   descriptionSignal: IDescriptionSignal;
   hasCompanyMismatch: boolean;
   matchedTitle?: string | null;
+  isManual?: boolean;
 }
 
 @Schema({ timestamps: true })

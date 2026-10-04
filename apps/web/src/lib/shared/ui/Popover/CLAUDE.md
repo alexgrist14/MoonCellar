@@ -33,6 +33,7 @@ backdrop, a drag handle and, when `title` is set, a heading. Both portal into `#
 | `contentStyle`     | `CSSProperties`                  | `{ padding: "var(--padding-x4)" }` on desktop | Style on the content element.                                            |
 | `matchAnchorWidth` | `boolean`                        | —                                             | Panel width follows the anchor's width (overrides `width`).              |
 | `isSheetDisabled`  | `boolean`                        | —                                             | Never switch to the bottom sheet: stays anchored on mobile, no backdrop. |
+| `reservedHeight`   | `number`                         | `0`                                           | Height in px the below/above choice assumes, if larger than the panel.   |
 
 `PopoverSheet` takes the same props minus `align`/`width`, plus `sheetRef`; import it from
 `./PopoverSheet` only to force the sheet regardless of `isMobile`, as `Dropdown` does.
@@ -67,6 +68,15 @@ const [isOpen, setIsOpen] = useState(false);
 
 ## Rules and gotchas
 
+- **Content that grows while open (search results) passes `reservedHeight` with its largest
+  height.** The side is picked from the panel's current height and re-checked on every resize, so
+  a "Searching…" line fits below and the full result list then flips the panel above the anchor —
+  a visible jump on every search. With the reserve the side is chosen once for the biggest state;
+  the panel still renders at its real height. `SearchPicker` reserves 440px, eight result rows.
+- **A panel opened above the anchor is positioned by `bottom`, never by a computed `top`.** With
+  `top = anchor.top - height` the panel grew downward over the anchor for one frame whenever its
+  content grew, until `ResizeObserver` recomputed it — a flash below, then a jump up. Pinned by
+  `bottom`, the browser grows it upward in the same layout pass.
 - Toggle from the anchor's `onClick` and pass the same element as `anchorRef`; the anchor is
   excluded from outside clicks, so toggling does not close and immediately reopen it.
 - The root calls `preventDefault` on every click inside it, because a portal still bubbles React
@@ -95,4 +105,5 @@ const [isOpen, setIsOpen] = useState(false);
 ## Storybook
 
 `Shared/Popover` — `Default`, `AlignEnd`, `WithTitle`, `MobileSheet`, `MobileSheetUntitled`, `AnchoredSearch`,
+`AnchoredSearchReservedHeight` (opens above even for one short result),
 `AnchoredSearchOnMobile`.

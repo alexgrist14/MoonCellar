@@ -23,6 +23,7 @@ import {
 } from "@/src/lib/entities/conflict/api";
 import { setAdminQuery } from "@/src/lib/shared/utils/admin-url.utils";
 import { CandidateCard, Fact } from "./CandidateCard";
+import { CandidateSearch } from "./CandidateSearch";
 import { ConflictList } from "./ConflictList";
 import { EntryCard } from "./EntryCard";
 import {
@@ -417,6 +418,13 @@ export const Conflicts: FC = () => {
                       />
                     ))}
                   </ul>
+                  {!isEntries && isDecidable && (
+                    <CandidateSearch
+                      key={item.id}
+                      item={item}
+                      onAdded={() => select(0)}
+                    />
+                  )}
                 </Scrollbar>
               </section>
             </div>
@@ -494,7 +502,10 @@ export const Conflicts: FC = () => {
                     )}
                     {!!item.nextExternalId && (
                       <Button
-                        className={styles.actionButton}
+                        className={classNames(
+                          styles.actionButton,
+                          styles.nextButton
+                        )}
                         color={ButtonColor.ACCENT}
                         onClick={() =>
                           openConflict(item.source, item.nextExternalId, true)
