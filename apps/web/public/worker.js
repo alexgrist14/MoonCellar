@@ -32,6 +32,20 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
+  const url = new URL(event.request.url);
+
+  if (url.origin === self.location.origin && url.pathname === ICON) {
+    event.respondWith(
+      fetch(event.request).catch(() =>
+        caches
+          .open(OFFLINE_CACHE)
+          .then((cache) => cache.match(ICON))
+          .then((response) => response || Response.error())
+      )
+    );
+    return;
+  }
+
   if (event.request.mode !== "navigate") return;
 
   event.respondWith(

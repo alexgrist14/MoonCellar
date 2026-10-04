@@ -463,8 +463,9 @@ break silently when ignored:
   itself for browsers that still run an old service worker from that path. `worker.js` is
   registered on every page load from `src/app/providers.tsx` (`SERVICE_WORKER_URL`), because the
   installed app needs its offline fallback before anyone subscribes to push. Its `fetch` handler
-  answers page navigations only and caches nothing but `offline.html` and the icon; never widen it
-  to other requests, since every request of the site would then go through the worker. Its
+  answers page navigations and `logo-icon.png` only (network first, the cached copy offline, so
+  `offline.html` can show the logo) and caches nothing but those two; never widen it to other
+  requests, since every request of the site would then go through the worker. Its
   `install` fails if `offline.html` or `logo-icon.png` is missing, and a worker that does not
   install delivers no push either — rename or move them together with `worker.js`. Subscribing
   goes through `usePushSubscription`, and `logout` calls `unsubscribePush` before the session is

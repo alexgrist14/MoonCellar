@@ -1,5 +1,9 @@
 import type { ILogChanges } from "@mooncellar/schemas";
-import { isEmptyLog, mergeLogChanges } from "./user-logs.utils";
+import {
+  getFollowingActivity,
+  isEmptyLog,
+  mergeLogChanges,
+} from "./user-logs.utils";
 
 const playing = {
   category: "playing",
@@ -117,5 +121,51 @@ describe("mergeLogChanges", () => {
     expect(isEmptyLog(fold({ favorite: true }, { favorite: false }))).toBe(
       true
     );
+  });
+});
+
+describe("getFollowingActivity", () => {
+  it("names what happened and skips removals", () => {
+    expect(getFollowingActivity({ rating: { value: 8, previous: 7 } })).toEqual(
+      {
+        activity: "rated",
+        rating: 8,
+      }
+    );
+    expect(getFollowingActivity({ rating: { value: null, previous: 8 } })).toBe(
+      undefined
+    );
+    expect(getFollowingActivity({ favorite: true })).toEqual({
+      activity: "favorited",
+    });
+    expect(getFollowingActivity({ favorite: false })).toBe(undefined);
+    expect(
+      getFollowingActivity({
+        playthrough: { action: "added", after: { category: "completed" } },
+      })
+    ).toEqual({ activity: "status", category: "completed" });
+    expect(
+      getFollowingActivity({
+        playthrough: {
+          action: "updated",
+          before: { category: "completed" },
+          after: { category: "completed", isMastered: true },
+        },
+      })
+    ).toEqual({ activity: "mastered" });
+    expect(
+      getFollowingActivity({
+        playthrough: {
+          action: "updated",
+          before: { category: "completed", time: 10 },
+          after: { category: "completed", time: 12 },
+        },
+      })
+    ).toEqual({ activity: "updated" });
+    expect(
+      getFollowingActivity({
+        playthrough: { action: "removed", before: { category: "completed" } },
+      })
+    ).toBe(undefined);
   });
 });

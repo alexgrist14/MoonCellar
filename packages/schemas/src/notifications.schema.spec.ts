@@ -1,6 +1,14 @@
 import { describe, expect, it } from "bun:test";
-import { PushEndpointSchema, UpdateSettingsSchema } from "./index";
-import { getActorsLabel } from "./notifications.utils";
+import {
+  type INotification,
+  PushEndpointSchema,
+  UpdateSettingsSchema,
+} from "./index";
+import {
+  getActorsLabel,
+  getNotificationHref,
+  getNotificationSentence,
+} from "./notifications.utils";
 
 const actors = (names: string[]) =>
   names.map((userName, index) => ({ _id: String(index), userName }));
@@ -50,5 +58,45 @@ describe("UpdateSettingsSchema", () => {
     expect(UpdateSettingsSchema.parse({ showAdultContent: true })).toEqual({
       showAdultContent: true,
     });
+  });
+});
+
+describe("following-activity", () => {
+  const notification = {
+    _id: "n1",
+    type: "following-activity",
+    actors: [{ _id: "u1", userName: "anna" }],
+    actorsCount: 1,
+    payload: { gameSlug: "portal-2", gameName: "Portal 2" },
+    isRead: false,
+    createdAt: "2026-10-04T00:00:00.000Z",
+    updatedAt: "2026-10-04T00:00:00.000Z",
+  } as INotification;
+
+  const sentence = (payload: Partial<INotification["payload"]>) =>
+    getNotificationSentence({
+      ...notification,
+      payload: { ...notification.payload, ...payload },
+    });
+
+  it("says what the person did, and links to their profile", () => {
+    expect(sentence({ activity: "rated", rating: 8 })).toBe(
+      "anna rated Portal 2 8/10"
+    );
+    expect(sentence({ activity: "favorited" })).toBe(
+      "anna added Portal 2 to favourites"
+    );
+    expect(sentence({ activity: "status", category: "completed" })).toBe(
+      "anna completed Portal 2"
+    );
+    expect(sentence({ activity: "status", category: "wishlist" })).toBe(
+      "anna added Portal 2 to their wishlist"
+    );
+    expect(sentence({ activity: "mastered" })).toBe("anna mastered Portal 2");
+    expect(sentence({ activity: "updated" })).toBe(
+      "anna updated their playthrough of Portal 2"
+    );
+    expect(sentence({})).toBe("anna added to their activity: Portal 2");
+    expect(getNotificationHref(notification)).toBe("/user/anna");
   });
 });

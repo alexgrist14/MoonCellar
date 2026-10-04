@@ -14,6 +14,7 @@ import { UserFollowingsService } from "../user/services/user-followings.service"
 import { NotificationsModule } from "../notifications/notifications.module";
 import { UserLogsService } from "../user/services/user-logs.service";
 import { UserLogs, UserLogsSchema } from "../user/schemas/user-logs.schema";
+import { Game, GameDatabaseSchema } from "../games/schemas/game.schema";
 import { JwtRefreshStrategy } from "./jwt-refresh.strategy";
 import { FileService } from "../user/services/file-upload.service";
 import { MetricsModule } from "../metrics/metrics.module";
@@ -24,6 +25,7 @@ import { IndexNowModule } from "../indexnow/indexnow.module";
     MongooseModule.forFeature([
       { name: "User", schema: UserSchema },
       { name: UserLogs.name, schema: UserLogsSchema },
+      { name: Game.name, schema: GameDatabaseSchema },
     ]),
 
     MetricsModule,
@@ -36,7 +38,8 @@ import { IndexNowModule } from "../indexnow/indexnow.module";
         return {
           secret: config.get<string>("JWT_SECRET"),
           signOptions: {
-            expiresIn: config.get("JWT_EXPIRE") as number | `${number}${"s" | "m" | "h" | "d"}`,
+            expiresIn: config.get("JWT_EXPIRE") as
+              number | `${number}${"s" | "m" | "h" | "d"}`,
           },
         };
       },

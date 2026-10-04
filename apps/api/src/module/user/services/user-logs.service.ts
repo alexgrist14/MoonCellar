@@ -9,8 +9,12 @@ import {
   type IRemoveUserLogRequest,
 } from "@mooncellar/schemas";
 import { UserLogs } from "../schemas/user-logs.schema";
+import { User } from "../schemas/user.schema";
+import { Game } from "../../games/schemas/game.schema";
+import { NotificationsService } from "../../notifications/services/notifications.service";
 import {
   canMergeLog,
+  getFollowingActivity,
   isEmptyLog,
   isSameLogValue,
   mergeLogChanges,
@@ -35,7 +39,10 @@ const MAX_WRITE_ATTEMPTS = 3;
 export class UserLogsService {
   private readonly logger = new Logger(UserLogsService.name);
   constructor(
-    @InjectModel(UserLogs.name) private userLogsModel: Model<UserLogs>
+    @InjectModel(UserLogs.name) private userLogsModel: Model<UserLogs>,
+    @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(Game.name) private gameModel: Model<Game>,
+    private readonly notifications: NotificationsService
   ) {}
 
   async recordUserLog({ userId, gameId, ...change }: IRecordUserLogParams) {
@@ -59,12 +66,15 @@ export class UserLogsService {
 
           if (isEmptyLog(changes)) return;
 
-          return await this.userLogsModel.create({
+          const log = await this.userLogsModel.create({
             ...changes,
             date: new Date(),
             gameId: gameObjectId,
             userId: userObjectId,
           });
+
+          void this.notifyFollowers(userId, gameId, change);
+          return log;
         }
 
         const changes = mergeLogChanges(current, change);
@@ -90,7 +100,10 @@ export class UserLogsService {
           $inc: { __v: 1 },
         });
 
-        if (matchedCount) return;
+        if (matchedCount) {
+          void this.notifyFollowers(userId, gameId, change);
+          return;
+        }
       }
 
       this.logger.warn(
@@ -99,6 +112,37 @@ export class UserLogsService {
     } catch (err) {
       this.logger.error(err, `Failed to record user log: ${userId}`);
       throw err;
+    }
+  }
+
+  private async notifyFollowers(
+    userId: string,
+    gameId: string,
+    change: ILogChanges
+  ) {
+    const activity = getFollowingActivity(change);
+
+    if (!activity) return;
+
+    try {
+      const [user, game] = await Promise.all([
+        this.userModel.findById(userId).select("followers").lean(),
+        this.gameModel.findById(gameId).select("slug name").lean(),
+      ]);
+
+      if (!user?.followers?.length || !game) return;
+
+      for (const followerId of user.followers) {
+        void this.notifications.notify({
+          userId: followerId,
+          actorId: userId,
+          type: "following-activity",
+          subjectId: userId,
+          payload: { ...activity, gameSlug: game.slug, gameName: game.name },
+        });
+      }
+    } catch (err) {
+      this.logger.error(err, `Failed to notify followers of ${userId}`);
     }
   }
 

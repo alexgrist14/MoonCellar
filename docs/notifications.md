@@ -2,8 +2,7 @@
 
 A signed-in user gets a notification when something happens to them or to what they wrote: a new
 follower, a reply, a comment on their review, a like, a decision on their request, a moderator
-acting on their comment. Activity of the people they follow is not a notification; it stays in the
-profile activity feed.
+acting on their comment, or new activity of someone they follow.
 
 The bell in the header shows the unread count and the latest 20; `/notifications` lists them all.
 Opening the bell always refetches and holds a loader (at least 400 ms) until the fresh list
@@ -24,10 +23,21 @@ yet. Each user can turn types off under Settings → Notifications.
 | `list-like` | Owner of the list | `CustomListsService.setLike` | The list | The list |
 | `request-decided` | Author of the request | `ContentRequestsService.decide` | Nothing | `/requests` |
 | `wishlist-release` | Everyone with the game in `wishlist` | `WishlistReleasesService`, daily at 09:00 Moscow | Nothing: one per game | The game page |
+| `following-activity` | Every follower of the user | `UserLogsService.recordUserLog`, when a log entry is created or changed (a playthrough, a rating, a favourite) | The followed user: one unread notification per person, its game is the latest one | That user's profile, where the activity feed is |
 | `comment-moderated` | Author of the comment | `CommentsService.changeStatus` (hide or delete by someone else) | The comment | `/games/<slug>#discussion` |
 
 `#discussion` opens the game page's Discussion tab and `#reviews` its Reviews tab, and both
 scroll to the block (`GameCommunity`).
+
+`following-activity` says what happened, from `payload.activity` (`getFollowingActivity` in
+`apps/api/src/module/user/utils/user-logs.utils.ts`): a rating ("rated Portal 2 8/10"), a
+favourite, a new status ("completed", "added … to their wishlist"), mastering, or any other edit of
+a playthrough. Removals (a cleared rating, an unfavourite, a deleted playthrough) notify nobody.
+The group keeps only the latest event, so its sentence always describes the last thing the person
+did. It is not an alert, so it never pushes, and it is not retracted: removing a log entry leaves
+an unread notification about it in place. It fans out with one `notify()` per
+follower, each with its own mute check and upsert; a user with thousands of followers would need a
+bulk write instead.
 
 ## Settings
 

@@ -3,6 +3,7 @@ import type {
   ILogPlaythrough,
   ILogPlaythroughState,
   ILogRating,
+  INotificationPayload,
 } from "@mooncellar/schemas";
 
 export const LOG_FIELDS = ["playthrough", "rating", "favorite"] as const;
@@ -114,3 +115,27 @@ export function toLogUpdate(changes: ILogChanges) {
 
   return { $set, $unset };
 }
+
+export const getFollowingActivity = ({
+  rating,
+  favorite,
+  playthrough,
+}: ILogChanges): INotificationPayload | undefined => {
+  if (typeof rating?.value === "number") {
+    return { activity: "rated", rating: rating.value };
+  }
+
+  if (favorite) return { activity: "favorited" };
+
+  if (!playthrough || playthrough.action === "removed") return undefined;
+
+  const { before, after } = playthrough;
+
+  if (after?.isMastered && !before?.isMastered) return { activity: "mastered" };
+
+  if (after?.category && after.category !== before?.category) {
+    return { activity: "status", category: after.category };
+  }
+
+  return { activity: "updated" };
+};

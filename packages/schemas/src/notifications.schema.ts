@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { CommunityAuthorSchema } from "./comments.schema";
 import { ObjectIdSchema } from "./utils";
+import { categoriesZod } from "./playthroughs.schema";
 
 export const NOTIFICATION_TYPES = [
   "follow",
@@ -12,6 +13,7 @@ export const NOTIFICATION_TYPES = [
   "request-decided",
   "comment-moderated",
   "wishlist-release",
+  "following-activity",
 ] as const;
 
 export const MUTABLE_NOTIFICATION_TYPES = [
@@ -23,6 +25,7 @@ export const MUTABLE_NOTIFICATION_TYPES = [
   "list-like",
   "request-decided",
   "wishlist-release",
+  "following-activity",
 ] as const satisfies readonly (typeof NOTIFICATION_TYPES)[number][];
 
 export const NOTIFICATIONS_PAGE_SIZE = 20;
@@ -30,6 +33,14 @@ export const NOTIFICATION_ACTORS_SHOWN = 3;
 
 export const NotificationTypeSchema = z.enum(NOTIFICATION_TYPES);
 export const MutableNotificationTypeSchema = z.enum(MUTABLE_NOTIFICATION_TYPES);
+
+export const FOLLOWING_ACTIVITIES = [
+  "rated",
+  "favorited",
+  "status",
+  "mastered",
+  "updated",
+] as const;
 
 export const NotificationPayloadSchema = z.object({
   gameSlug: z.string().optional().describe("Game the comment belongs to"),
@@ -43,6 +54,14 @@ export const NotificationPayloadSchema = z.object({
   requestKind: z.enum(["game", "character"]).optional(),
   requestName: z.string().nullable().optional(),
   reason: z.string().nullable().optional().describe("Moderator's note"),
+  activity: z
+    .enum(FOLLOWING_ACTIVITIES)
+    .optional()
+    .describe("What a followed user did to the game"),
+  rating: z.number().optional().describe("The followed user's new rating"),
+  category: categoriesZod
+    .optional()
+    .describe("The followed user's new playthrough status"),
   status: z
     .enum(["hidden", "deleted"])
     .optional()

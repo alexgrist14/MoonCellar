@@ -15,13 +15,48 @@ export const NOTIFICATION_SETTING_LABELS: Record<
   "list-like": "Likes on my lists",
   "request-decided": "Decisions on my requests",
   "wishlist-release": "Releases of games on my wishlist",
+  "following-activity": "Activity of people I follow",
 };
 
 export interface INotificationText {
   actors: string | null;
   action: string;
   subject: string | null;
+  detail?: string | null;
 }
+
+const STATUS_TEXT: Record<
+  NonNullable<INotification["payload"]["category"]>,
+  Pick<INotificationText, "action" | "detail">
+> = {
+  completed: { action: "completed" },
+  played: { action: "played" },
+  dropped: { action: "dropped" },
+  playing: { action: "started playing" },
+  wishlist: { action: "added", detail: "to their wishlist" },
+  backlog: { action: "added", detail: "to their backlog" },
+};
+
+const getFollowingActivityText = ({
+  activity,
+  rating,
+  category,
+}: INotification["payload"]): Pick<INotificationText, "action" | "detail"> => {
+  switch (activity) {
+    case "rated":
+      return { action: "rated", detail: `${rating}/10` };
+    case "favorited":
+      return { action: "added", detail: "to favourites" };
+    case "mastered":
+      return { action: "mastered" };
+    case "status":
+      return category ? STATUS_TEXT[category] : { action: "updated" };
+    case "updated":
+      return { action: "updated their playthrough of" };
+    default:
+      return { action: "added to their activity:" };
+  }
+};
 
 export const ALERT_NOTIFICATION_TYPES: INotification["type"][] = [
   "comment-reply",
@@ -96,6 +131,12 @@ export const getNotificationText = (
         action: "A game on your wishlist is out today:",
         subject: game,
       };
+    case "following-activity":
+      return {
+        actors,
+        subject: game,
+        ...getFollowingActivityText(payload),
+      };
     case "comment-moderated":
       return {
         actors: null,
@@ -115,6 +156,7 @@ export const getNotificationHref = (
 
   switch (notification.type) {
     case "follow":
+    case "following-activity":
       return notification.actors[0]
         ? `/user/${notification.actors[0].userName}`
         : null;
@@ -134,7 +176,7 @@ export const getNotificationHref = (
 };
 
 export const getNotificationSentence = (notification: INotification) => {
-  const { actors, action, subject } = getNotificationText(notification);
+  const { actors, action, subject, detail } = getNotificationText(notification);
 
-  return [actors, action, subject].filter(Boolean).join(" ");
+  return [actors, action, subject, detail].filter(Boolean).join(" ");
 };

@@ -33,7 +33,7 @@ export const NotificationItem: FC<INotificationItemProps> = ({
   onOpen,
   onRemove,
 }) => {
-  const { actors, action, subject } = getNotificationText(notification);
+  const { actors, action, subject, detail } = getNotificationText(notification);
   const href = getNotificationHref(notification, viewerName);
   const body = (
     <>
@@ -58,6 +58,7 @@ export const NotificationItem: FC<INotificationItemProps> = ({
           {actors && <b>{actors} </b>}
           {action}
           {subject && <b> {subject}</b>}
+          {detail && ` ${detail}`}
         </span>
         {notification.payload.reason && (
           <span className={styles.item__reason}>
