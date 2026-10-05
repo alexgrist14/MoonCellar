@@ -551,9 +551,13 @@ break silently when ignored:
 ## Data fetching failures
 
 - **Every failed request already shows a toast**, from the response interceptor in
-  `shared/api/agent.api.ts`. Nothing else needs to report an API error, and anything that makes a
-  request the user did not ask for — a background refetch above all — turns a routine failure into
-  a notification they cannot explain.
+  `shared/api/agent.api.ts`, so never call `toast.error` for an `agent` request yourself — not in a
+  mutation's `onError`, not in a `catch` around `mutateAsync`. The API's message then appears
+  twice, once under the interceptor's "Error" title and once without it ("Steam import is not
+  configured" stacked twice). Handle the failure without a toast — re-enable a button, keep a modal
+  open (`ConfirmModal` already does when `onConfirm` rejects) — and keep `toast.error` for failures
+  that never reached `agent`. Anything that makes a request the user did not ask for — a background
+  refetch above all — turns a routine failure into a notification they cannot explain.
 - **A mutation that deletes a resource must not leave a query for that resource to refetch.**
   Deleting a list used to invalidate `listQueryKeys.all`, which included the `bySlug` query the open
   list page was still rendering: it refetched, got `404 List not found`, and the interceptor toasted

@@ -1,6 +1,5 @@
 import { FC, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { isAxiosError } from "axios";
 import { ISteamSyncResponse } from "@mooncellar/schemas";
 import { useUserListsQuery } from "@/src/lib/entities/list/api";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
@@ -21,9 +20,6 @@ import {
 import styles from "./SteamAccount.module.scss";
 
 const UNLINK_STEAM_MODAL_ID = "unlink-steam";
-
-const getErrorMessage = (error: unknown, fallback: string) =>
-  (isAxiosError(error) ? error.response?.data?.message : undefined) ?? fallback;
 
 const takeOpenIdParams = () => {
   const search = new URLSearchParams(window.location.search);
@@ -79,20 +75,10 @@ export const SteamAccount: FC = () => {
           description: `${matchedCount} of ${ownedCount} games imported`,
         });
       },
-      onError: (error) =>
-        toast.error({
-          description: getErrorMessage(error, "Steam account was not linked"),
-        }),
     });
   }, [linkAccount]);
 
-  const handleLogin = () =>
-    login.mutate(undefined, {
-      onError: (error) =>
-        toast.error({
-          description: getErrorMessage(error, "Steam sign-in is unavailable"),
-        }),
-    });
+  const handleLogin = () => login.mutate();
 
   const handleSync = () =>
     sync.mutate(undefined, {
@@ -103,10 +89,6 @@ export const SteamAccount: FC = () => {
           description: `${matchedCount} of ${ownedCount} games imported`,
         });
       },
-      onError: (error) =>
-        toast.error({
-          description: getErrorMessage(error, "Steam library was not updated"),
-        }),
     });
 
   const handleUnlink = () =>
@@ -119,16 +101,9 @@ export const SteamAccount: FC = () => {
         warning="Likes on the list and links to it are lost."
         onCancel={() => modal.close(UNLINK_STEAM_MODAL_ID)}
         onConfirm={async () => {
-          try {
-            await unlink.mutateAsync();
-            toast.success({ description: "Steam account unlinked" });
-          } catch (error) {
-            toast.error({
-              description: getErrorMessage(error, "Steam was not unlinked"),
-            });
-          }
-
+          await unlink.mutateAsync();
           modal.close(UNLINK_STEAM_MODAL_ID);
+          toast.success({ description: "Steam account unlinked" });
         }}
       />,
       { id: UNLINK_STEAM_MODAL_ID }

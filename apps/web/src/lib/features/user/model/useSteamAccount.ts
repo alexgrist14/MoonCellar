@@ -31,7 +31,9 @@ export const useSteamLinkMutation = () => {
   return useMutation({
     mutationFn: (params: Record<string, string>) =>
       steamAPI.link({ params }).then(({ data }) => data),
-    onSuccess: refresh,
+    onSuccess: () => {
+      void refresh();
+    },
   });
 };
 
@@ -40,7 +42,9 @@ export const useSteamSyncMutation = () => {
 
   return useMutation({
     mutationFn: () => steamAPI.sync().then(({ data }) => data),
-    onSuccess: refresh,
+    onSuccess: () => {
+      void refresh();
+    },
   });
 };
 
@@ -49,6 +53,8 @@ export const useSteamUnlinkMutation = () => {
 
   return useMutation({
     mutationFn: () => steamAPI.unlink().then(({ data }) => data),
-    onSuccess: refresh,
+    onSuccess: () => {
+      void refresh();
+    },
   });
 };

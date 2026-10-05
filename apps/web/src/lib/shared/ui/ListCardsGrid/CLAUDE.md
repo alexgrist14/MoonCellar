@@ -1,7 +1,8 @@
 # ListCardsGrid
 
-Responsive grid for custom-list tiles (`ListCard`). It is a container-query grid: 2 columns by
-default, 3 from `$screenSm` and 6 from 960px of its own width.
+Responsive grid for custom-list tiles (`ListCard`). It fits as many columns of at least
+`--list-card-min-width` (180px, the size of a game card) as its own width allows, and never fewer
+than two, so a tile is the same size in the profile's narrow column and on the wide `/lists` page.
 
 ## When to use
 
@@ -31,12 +32,12 @@ import { ListCard } from "@/src/lib/shared/ui/ListCard";
 
 ## Rules and gotchas
 
-- **The column count follows the wrapper's width, not the viewport.** The wrapper sets
-  `container-type: inline-size`, so in a narrow column it stays at 2 columns on a wide screen.
-- **Keep the paged list size divisible by every column count (2, 3, 6).** A page size that is not
-  (the lists page uses 24) leaves a ragged last row.
-- The thresholds are literal values in the module because a container query cannot read a CSS
-  custom property; change them together with the card width.
+- **The column count follows the grid's width, not the viewport**, through `auto-fill` and
+  `--list-card-min-width`. Breakpoints on the container width made the profile's lists tab three
+  columns wide while `/lists` had six, so the same tile was half again as large on the profile.
+- **The minimum is `min(--list-card-min-width, half the row)`,** which keeps two columns on a
+  phone, where two 180px tiles do not fit.
+- The column count is not fixed, so a paged list can end in a short last row; that is expected.
 
 ## Storybook
 
