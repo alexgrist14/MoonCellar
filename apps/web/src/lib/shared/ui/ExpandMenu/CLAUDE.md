@@ -58,6 +58,12 @@ import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
   never overlap. Do not set the store from elsewhere without keeping that contract.
 - A full-height panel is sized with `100dvh`, never `100vh`, or its bottom sits under the mobile
   browser toolbar.
+- **On touch it closes with a swipe toward its own edge** (left for `left`/`bottom-left`, right
+  for `right`/`bottom-right`), through `shared/hooks/useSwipeDismiss` — the same hook and rule
+  as the drawer. `touch-action: pan-y` sits on both `.menu` and `scrollbars__content` — the element
+  `Scrollbar` actually scrolls (`overflow: auto`), not its container; with it anywhere above that, the browser takes the sideways swipe as its own pan and cancels the pointer.
+  The offset lives in `--expand-offset`, which both `transform`s read; never set `transform`
+  inline, or the open/close `scaleX` stops working.
 
 ## Storybook
 

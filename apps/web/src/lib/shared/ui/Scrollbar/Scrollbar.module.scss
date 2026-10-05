@@ -16,6 +16,11 @@
         overscroll-behavior: auto;
       }
 
+      &.scrollbars__container--idle {
+        grid-template-rows: 1fr 0;
+        row-gap: 0;
+      }
+
       &.scrollbars__container_absolute {
         grid-template: none;
 

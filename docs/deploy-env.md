@@ -134,7 +134,7 @@ them with `docker run -d --restart always`. Two consequences worth knowing befor
   a host firewall. Only Grafana (`127.0.0.1:3000`) and MongoDB (`127.0.0.1:27017`) are
   published, on loopback; reach them through an SSH tunnel.
 - **Because nothing is published, the address variables must be set — the code's fallbacks are
-  wrong here.** `INTERNAL_API_URL`, `LOKI_HOST` (web) and `FARO_COLLECTOR_URL` default to
+  wrong here.** `INTERNAL_API_URL` and `LOKI_HOST` (web) default to
   `host.containers.internal` / `localhost`, which resolve to the host gateway or the container
   itself, where nothing listens any more; an unset `LOKI_HOST` in the API ships no logs at all. The values are in the `HOST_ENV_*` tables below. `--add-host` still maps
   `host.containers.internal` and `host.docker.internal` to the gateway, for anything genuinely
@@ -239,7 +239,8 @@ Two keys were set in production but referenced nowhere in the code — `NEXT_PUB
 | `NEXT_PUBLIC_CORS_SERVER` | no | Origin sent as the CORS credentials target; must match the API's `FRONT_URL` |
 | `NEXT_PUBLIC_APP_VERSION` | no | Version tag attached to every Faro event, so telemetry can be filtered by release |
 | `NEXT_PUBLIC_FARO_APP_NAME` | no | Application name in Grafana Faro |
-| `LOKI_HOST` | no | Loki push endpoint for the `/api/logs` route handler — `http://loki:3100`. Server-side only — it must not become `NEXT_PUBLIC_*`, or the endpoint ends up in the browser bundle. Must be set: the fallback is `http://host.containers.internal:3100` (`apps/web/src/app/api/logs/route.ts`), and Loki no longer publishes a port on the host |
+| `NEXT_PUBLIC_FARO_ENABLED` | no | `true` turns Faro on under `next dev`. A production build always starts it; in development it stays off by default, so a machine without the API's `FARO_COLLECTOR_URL` sends no telemetry at all |
+| `LOKI_HOST` | no | Loki push endpoint for the `/api/logs` route handler — `http://loki:3100`. Server-side only — it must not become `NEXT_PUBLIC_*`, or the endpoint ends up in the browser bundle. Must be set: in a production build the fallback is `http://host.containers.internal:3100` (`LOKI_HOST` in `apps/web/src/lib/shared/utils/logger.utils.ts`), and Loki no longer publishes a port on the host. In development there is no fallback: unset, the server logger and `/api/logs` ship nothing and the logs stay in the console |
 | `GEO_BLOCK_COUNTRIES` | no | Comma-separated ISO country codes for which adult content is hidden, e.g. `RU,BY`. Unset or empty falls back to `RU`; it cannot be switched off this way. The country comes from `/app/geo/GeoLite2-Country.mmdb`, downloaded by the web `Dockerfile`, and the client IP from `X-Real-IP` / `X-Forwarded-For`. Outside `next dev` an unknown country — no IP header, no match, or a missing database — counts as blocked, so a proxy that does not forward the client IP blocks every visitor |
 | `REVALIDATE_SECRET` | **yes** | Shared secret for `POST /api/revalidate`, compared against the `x-revalidate-secret` header. Server-side only — never `NEXT_PUBLIC_*`, or the secret ships in the browser bundle. Unset disables the endpoint: it answers 503 instead of falling back to an unguarded default |
 
@@ -265,8 +266,8 @@ pins the internal API address, so it stays a secret on both counts.
 | `S3_ENDPOINT` | no | Spaces API endpoint, `https://sfo3.digitaloceanspaces.com` (the default). The Space name goes in `S3_BUCKET`, never in this host. Replaces `S3_HOST`; `S3_HOST`, `S3_HOST_CDN` and `S3_REGION` are no longer read |
 | `S3_CDN_URL` | no | CDN origin stored URLs are built from, `https://mooncellar.sfo3.cdn.digitaloceanspaces.com` (the default). Must stay allowed by the frontend's `images.remotePatterns` and the image proxy allowlist |
 | `S3_BUCKET` | no | The single Space every upload goes to, `mooncellar` (the default). The former buckets are its top-level folders: `covers/`, `screenshots/`, `artworks/`, `characters/`, `avatars/`, `backgrounds/`, `comments/`, `common/` |
-| `LOKI_HOST` | no | Loki endpoint for `pino-loki` — `http://loki:3100` |
-| `FARO_COLLECTOR_URL` | no | Grafana Alloy endpoint the `faro` module forwards browser telemetry to — `http://alloy:12347/collect`. The browser never reaches Alloy itself; it posts to the API's `/faro`, which is why Alloy needs no published port. Keep the `/collect` path, it is part of the default |
+| `LOKI_HOST` | no | Loki endpoint for `pino-loki` — `http://loki:3100`. Set, the API logs **only** to Loki; unset, it logs to the console through `pino-pretty`. Leave it unset in local development unless Loki is running, or a 500 leaves no trace anywhere |
+| `FARO_COLLECTOR_URL` | no | Grafana Alloy endpoint the `faro` module forwards browser telemetry to — `http://alloy:12347/collect`. The browser never reaches Alloy itself; it posts to the API's `/faro`, which is why Alloy needs no published port. Keep the `/collect` path. Unset, the API drops the telemetry instead of forwarding it — there is no default, so local development without Alloy logs no "Failed to reach Faro collector" errors |
 | `PROMETHEUS_ENABLED` | no | `true` / `false` — switches the `/metrics` endpoint off entirely |
 | `METRICS_TOKEN` | **yes** | Bearer token guarding `/metrics`. Prometheus must be configured with the same value |
 | `INDEXNOW_KEY` | **yes** | IndexNow key used to submit new game pages to search engines |
@@ -351,8 +352,11 @@ NEXT_PUBLIC_CORS_SERVER=http://localhost:3000
 NEXT_PUBLIC_APP_VERSION=dev
 # Application name in Grafana Faro
 NEXT_PUBLIC_FARO_APP_NAME=mooncellar-web
-# Loki push endpoint for the /api/logs handler (server-side only)
-LOKI_HOST=http://localhost:3100
+# Start Faro under next dev as well (a production build always does)
+# NEXT_PUBLIC_FARO_ENABLED=true
+# Loki push endpoint for the /api/logs handler (server-side only); leave unset locally
+# unless Loki is running — the logs then stay in the console
+# LOKI_HOST=http://localhost:3100
 # Comma-separated ISO country codes that hide adult content; empty falls back to RU
 GEO_BLOCK_COUNTRIES=
 # Shared secret guarding POST /api/revalidate
@@ -419,9 +423,10 @@ S3_ENDPOINT=https://sfo3.digitaloceanspaces.com
 S3_BUCKET=mooncellar
 S3_CDN_URL=https://mooncellar.sfo3.cdn.digitaloceanspaces.com
 
-# Observability
-LOKI_HOST=http://localhost:3100
-FARO_COLLECTOR_URL=http://localhost:12347
+# Observability — leave LOKI_HOST unset locally: with it set the API logs only to Loki,
+# and without a running Loki every log line, errors included, is lost
+# LOKI_HOST=http://localhost:3100
+# FARO_COLLECTOR_URL=http://localhost:12347/collect
 PROMETHEUS_ENABLED=false
 METRICS_TOKEN=
 

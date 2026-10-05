@@ -31,13 +31,13 @@ export class PlaythroughsService {
     play: IPlaythroughDocument
   ): Promise<ILogPlaythroughState> {
     const platform = play.platformId
-      ? await this.Platforms.findById(play.platformId).orFail()
+      ? await this.Platforms.findById(play.platformId)
       : undefined;
 
     return compact({
       category: play.category,
       isMastered: !!play.isMastered,
-      platformId: platform?._id.toString(),
+      platformId: play.platformId?.toString(),
       platform: platform?.name,
       date: play.date || undefined,
       time: play.time || undefined,

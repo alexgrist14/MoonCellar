@@ -4,6 +4,7 @@
   gap: var(--gap-x2);
   height: fit-content;
   width: 100%;
+  max-width: var(--game-rating-popover-width);
 
   &__head {
     display: flex;

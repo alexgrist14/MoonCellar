@@ -175,7 +175,7 @@ export const GameHero: FC<IGameHeroProps> = ({ game, stats }) => {
               )
           )}
 
-          <GameRating game={game} className={styles.hero__ratingControl} />
+          <GameRating game={game} />
         </div>
 
         <GameStatsCounters

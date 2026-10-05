@@ -7,7 +7,7 @@
   background: var(--color-bg-primary);
   border-radius: var(--radius-control);
   border: 2px solid transparent;
-  padding: var(--padding-x2);
+  padding: var(--padding-x2) var(--padding-x3);
   transition: 0.3s;
 
   &:hover {

@@ -2,7 +2,6 @@
 
 import {
   CSSProperties,
-  PointerEvent,
   TransitionEvent,
   useCallback,
   useEffect,
@@ -16,6 +15,7 @@ import { IDrawerParams, IDrawerState } from "./Drawer.types";
 import { DRAWER_TRIGGER_ATTRIBUTE, drawerEvents } from "./drawer.api";
 import { Box } from "../Box";
 import { useExpandStore } from "@/src/lib/shared/store/expand.store";
+import { useSwipeDismiss } from "@/src/lib/shared/hooks/useSwipeDismiss";
 
 const IGNORED_CLICK_TARGETS = [
   `[${DRAWER_TRIGGER_ATTRIBUTE}]`,
@@ -24,25 +24,9 @@ const IGNORED_CLICK_TARGETS = [
   "#tooltip-connector",
 ].join(", ");
 
-const DISMISS_SHARE = 1 / 3;
-const DISMISS_VELOCITY = 0.5;
-const SWIPE_THRESHOLD = 10;
-
-interface ISwipe {
-  startX: number;
-  startY: number;
-  lastX: number;
-  lastTime: number;
-  velocity: number;
-  isHorizontal?: boolean;
-}
-
 export const DrawerConnector = () => {
   const [content, setContent] = useState<IDrawerState | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [offset, setOffset] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const swipe = useRef<ISwipe | null>(null);
 
   const panelRef = useRef<HTMLElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -71,12 +55,18 @@ export const DrawerConnector = () => {
     onCloseRef.current?.();
   }, []);
 
+  const { offset, isDragging, resetOffset, swipeHandlers } = useSwipeDismiss({
+    ref: panelRef,
+    direction: "right",
+    onDismiss: closeDrawer,
+  });
+
   const openDrawer = useCallback(
     ({ component, params }: IDrawerState) => {
       onCloseRef.current = params.onClose;
       isOpenRef.current = true;
       setContent({ component, params });
-      setOffset(0);
+      resetOffset();
       setExpanded([]);
 
       cancelOpenFrame();
@@ -87,7 +77,7 @@ export const DrawerConnector = () => {
         });
       });
     },
-    [setExpanded]
+    [setExpanded, resetOffset]
   );
 
   useEffect(() => cancelOpenFrame, []);
@@ -156,71 +146,6 @@ export const DrawerConnector = () => {
     }
   };
 
-  const handlePointerDown = (event: PointerEvent<HTMLElement>) => {
-    if (event.pointerType === "mouse") return;
-
-    swipe.current = {
-      startX: event.clientX,
-      startY: event.clientY,
-      lastX: event.clientX,
-      lastTime: performance.now(),
-      velocity: 0,
-    };
-  };
-
-  const handlePointerMove = (event: PointerEvent<HTMLElement>) => {
-    const state = swipe.current;
-
-    if (!state) return;
-
-    const deltaX = event.clientX - state.startX;
-    const deltaY = event.clientY - state.startY;
-
-    if (state.isHorizontal === undefined) {
-      if (Math.max(Math.abs(deltaX), Math.abs(deltaY)) < SWIPE_THRESHOLD) {
-        return;
-      }
-
-      state.isHorizontal = deltaX > 0 && Math.abs(deltaX) > Math.abs(deltaY);
-
-      if (!state.isHorizontal) return;
-
-      event.currentTarget.setPointerCapture(event.pointerId);
-      setIsDragging(true);
-    }
-
-    if (!state.isHorizontal) return;
-
-    const now = performance.now();
-
-    state.velocity =
-      (event.clientX - state.lastX) / Math.max(now - state.lastTime, 1);
-    state.lastX = event.clientX;
-    state.lastTime = now;
-
-    setOffset(Math.max(deltaX, 0));
-  };
-
-  const handlePointerUp = () => {
-    const state = swipe.current;
-
-    swipe.current = null;
-
-    if (!state?.isHorizontal) return;
-
-    setIsDragging(false);
-
-    const width = panelRef.current?.offsetWidth ?? 0;
-
-    if (state.velocity > DISMISS_VELOCITY || offset > width * DISMISS_SHARE) {
-      setOffset(width);
-      closeDrawer();
-      return;
-    }
-
-    setOffset(0);
-  };
-
   if (!content) return null;
 
   return (
@@ -235,10 +160,7 @@ export const DrawerConnector = () => {
       })}
       style={{ "--drawer-offset": `${offset}px` } as CSSProperties}
       onTransitionEnd={handleTransitionEnd}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
+      {...swipeHandlers}
     >
       <Box
         title={content.params.title}

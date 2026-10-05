@@ -52,9 +52,12 @@ import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
 ## Rules and gotchas
 
 - `isHorizontal` reserves a track row below the content (`--scrollbar-horizontal-size` plus
-  `--gap-x2`) even when nothing overflows, so a sibling centred against it with
-  `align-items: center` sits half a row too low. Pass `type="absolute"` there: the track then
-  hangs below the content without taking layout height, so leave that much room under it.
+  `--gap-x2`) only while the content overflows; with nothing to scroll the row collapses
+  (`scrollbars__container--idle`). Before that, a segmented `Tabs` row that fit its width still
+  left 14px of empty space under it, which read as a stray gap in the playthrough modal. The
+  row appears when the content starts to overflow, so the block grows by 14px at that moment;
+  where that jump or an `align-items: center` sibling matters, pass `type="absolute"`: the track
+  then hangs below the content without taking layout height, so leave that much room under it.
 - The page itself scrolls inside `#page-scroll` (the `Scrollbar` that `Layout` wraps around
   `main`, id `PAGE_SCROLL_ID`), while `html`/`body` are `overflow: hidden`. Read or move page
   scroll through that element; `window.scrollY` is always 0.

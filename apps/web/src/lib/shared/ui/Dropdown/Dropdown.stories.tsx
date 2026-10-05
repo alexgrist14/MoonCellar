@@ -83,6 +83,15 @@ export const WithSearch: Story = {
   args: { title: "Genre", list: genres, isWithSearch: true },
 };
 
+export const WithSearchAutoFocus: Story = {
+  args: {
+    title: "Genre",
+    list: genres,
+    isWithSearch: true,
+    isSearchAutoFocus: true,
+  },
+};
+
 export const WithInput: Story = {
   args: {
     title: "Developer",

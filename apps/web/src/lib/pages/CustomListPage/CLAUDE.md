@@ -43,7 +43,7 @@ private ones only to their owner.
 
 1. `BGImage` with the author's background, and a left `ExpandMenu` "Filters" with
    `Filters isSortHidden` (hidden while managing).
-2. Mobile only: `ExpandMenu` (bottom-right, burger) holding `UserNavigation`.
+2. Mobile only: `UserNavigationMenu` (`features/user/ui/UserNavigation`) — the shared icon-only burger `ExpandMenu`, bottom-right, holding `UserNavigation`. Never inline the menu here; the profile uses the same component.
 3. `Box`: `Breadcrumbs` (Home / user / Lists / list), header with `SectionTitle as="h1"`,
    `AppliedGameFilters` chips, description, meta (author, count, updated, privacy) and actions — `ListLikeButton` (public),
    Edit (owner), Copy link (public), Manage / Cancel / Done (owner, not an imported list).

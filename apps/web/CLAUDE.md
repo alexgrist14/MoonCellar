@@ -82,6 +82,12 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   `<button>` holding only an icon sets `aspect-ratio: 1` in its own module. Native `<button>`s styled in a module follow the same rule. This is the
   site's button shape; a text button with a 1:3 ratio reads as a different control next to its
   neighbours.
+- **A text field's inline padding is one or two steps of the `--padding-x*` scale larger than
+  its block padding** — the dropdown search box is `var(--padding-x2) var(--padding-x3)`. This
+  covers every place the user types: `Input`, `Textarea`, `DatePicker`'s field, `Dropdown`'s
+  field and search, `RichEditor`'s body. Equal padding pushes the caret and placeholder against
+  the rounded border, and a larger block padding makes a field read as a card rather than a
+  control. A field with a leading icon may raise only the side the icon sits on.
 - For text colour use the semantic tokens, never a raw `--color-neutral-*`: `--color-text-primary` (headings and main copy), `--color-text-secondary` (body text, intro paragraphs), `--color-text-muted` (captions, notes, metadata, breadcrumbs). Picking neutrals by hand is how text ends up unreadable on a `Box` over `BGImage` — the muted step is deliberately the lightest one that still reads as secondary.
 
 ## Rich text

@@ -5,6 +5,12 @@ let initialized = false;
 
 export function initFaro(): void {
   if (initialized || typeof window === "undefined") return;
+  if (
+    process.env.NODE_ENV !== "production" &&
+    process.env.NEXT_PUBLIC_FARO_ENABLED !== "true"
+  ) {
+    return;
+  }
   initialized = true;
 
   initializeFaro({

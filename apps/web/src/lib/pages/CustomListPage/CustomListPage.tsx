@@ -42,11 +42,13 @@ import {
   parseListSortQuery,
 } from "@/src/lib/features/lists/model/list-sort-query.utils";
 import { openListModal } from "@/src/lib/features/lists/ui/ListModal";
-import { UserNavigation } from "@/src/lib/features/user/ui/UserNavigation";
+import {
+  UserNavigation,
+  UserNavigationMenu,
+} from "@/src/lib/features/user/ui/UserNavigation";
 import { refreshAuth } from "@/src/lib/shared/hooks/useAuthRefresh";
 import { useIsAuthHydrated } from "@/src/lib/shared/hooks/useIsAuthHydrated";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { IUser } from "@/src/lib/shared/types/auth.type";
 import { BGImage } from "@/src/lib/shared/ui/BGImage";
 import { Box } from "@/src/lib/shared/ui/Box";
@@ -66,7 +68,7 @@ import {
 } from "@/src/lib/shared/utils/links.utils";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
-import { SvgBurger, SvgLink, SvgLock, SvgPen } from "@/src/lib/shared/ui/svg";
+import { SvgLink, SvgLock, SvgPen } from "@/src/lib/shared/ui/svg";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import {
   hasGameFilters,
@@ -102,7 +104,6 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
 }) => {
   const query = useSearchParams();
   const queryClient = useQueryClient();
-  const { isMobile } = useStatesStore();
   const authProfile = useAuthStore((s) => s.profile);
   const isAuthHydrated = useIsAuthHydrated();
 
@@ -357,26 +358,7 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
         </ExpandMenu>
       )}
       <div className={styles.container}>
-        {isMobile && (
-          <ExpandMenu
-            position="bottom-right"
-            titleClose={
-              <span className={styles.button__title}>
-                <SvgBurger size="32" isOpen />
-                Close
-              </span>
-            }
-            titleOpen={
-              <span className={styles.button__title}>
-                <SvgBurger size="32" />
-                Menu
-              </span>
-            }
-            titleStyle={{ width: "fit-content" }}
-          >
-            {navigation}
-          </ExpandMenu>
-        )}
+        <UserNavigationMenu {...navigationProps} />
         <Box classNameContent={styles.content}>
           <Breadcrumbs
             items={[

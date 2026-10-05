@@ -27,11 +27,11 @@ import { Box } from "@/src/lib/shared/ui/Box";
 import { BGImage } from "@/src/lib/shared/ui/BGImage";
 import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
-import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
-import { SvgBurger } from "@/src/lib/shared/ui/svg";
-import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { useSelectedLayoutSegments } from "next/navigation";
-import { UserNavigation } from "@/src/lib/features/user/ui/UserNavigation";
+import {
+  UserNavigation,
+  UserNavigationMenu,
+} from "@/src/lib/features/user/ui/UserNavigation";
 import {
   ICharacterResponse,
   ICustomList,
@@ -73,7 +73,6 @@ export const UserProfile: FC<UserProfileProps> = ({
   const segments = useSelectedLayoutSegments().filter(
     (part) => !part.startsWith("(")
   );
-  const { isMobile } = useStatesStore();
 
   const authProfile = useAuthStore((s) => s.profile);
   const isAuthHydrated = useIsAuthHydrated();
@@ -136,26 +135,7 @@ export const UserProfile: FC<UserProfileProps> = ({
     <>
       <BGImage userImage={displayUser.background} />
       <div className={cn(styles.container)}>
-        {isMobile && (
-          <ExpandMenu
-            position="bottom-right"
-            titleClose={
-              <span className={styles.button__title}>
-                <SvgBurger size="32" isOpen />
-                Close
-              </span>
-            }
-            titleOpen={
-              <span className={styles.button__title}>
-                <SvgBurger size="32" />
-                Menu
-              </span>
-            }
-            titleStyle={{ width: "fit-content" }}
-          >
-            <UserNavigation {...navigationProps} />
-          </ExpandMenu>
-        )}
+        <UserNavigationMenu {...navigationProps} />
         <Box
           classNameContent={classNames(styles.content, {
             [styles.content_auto]: tab === "settings",

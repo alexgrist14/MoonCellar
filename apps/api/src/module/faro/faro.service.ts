@@ -3,10 +3,11 @@ import { Injectable, Logger } from "@nestjs/common";
 @Injectable()
 export class FaroService {
   private readonly logger = new Logger(FaroService.name);
-  private readonly collectorUrl =
-    process.env.FARO_COLLECTOR_URL || "http://localhost:12347/collect";
+  private readonly collectorUrl = process.env.FARO_COLLECTOR_URL;
 
   async forward(body: unknown): Promise<void> {
+    if (!this.collectorUrl) return;
+
     try {
       const response = await fetch(this.collectorUrl, {
         method: "POST",

@@ -50,7 +50,7 @@ editing controls.
 ## Composition
 
 1. `BGImage` with the user's background (the store's copy for the owner).
-2. Mobile only: `ExpandMenu` (bottom-right, burger) with `UserNavigation`.
+2. Mobile only: `UserNavigationMenu` (`features/user/ui/UserNavigation`) — the shared icon-only burger `ExpandMenu`, bottom-right, holding `UserNavigation`. A custom list page uses the same component; never inline a copy.
 3. `Box`: `Breadcrumbs` on every tab except Profile, then the tab:
    - `profile` → `widgets/user/UserInfo`
    - `all` and each status → `widgets/user/UserGames`

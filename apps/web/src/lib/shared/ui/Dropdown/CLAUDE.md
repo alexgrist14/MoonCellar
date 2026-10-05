@@ -35,6 +35,7 @@ the list opens in a bottom `PopoverSheet` instead.
 | `isWithAll`                                        | `boolean`                         | —                                         | Select-all checkbox in the field (multi only).                                                                                                            |
 | `isWithReset`                                      | `boolean`                         | —                                         | Red "Reset" button while a value is set.                                                                                                                  |
 | `isWithSearch`                                     | `boolean`                         | `list.length > 10`                        | Search box at the top of the list.                                                                                                                        |
+| `isSearchAutoFocus`                                | `boolean`                         | `false`                                   | Focuses the search box when the list opens. Off by default: on a phone the focus pops up the keyboard over the list.                                      |
 | `isWithInput`                                      | `boolean`                         | —                                         | The field becomes a text input that also accepts free values.                                                                                             |
 | `isThroughPortal`                                  | `boolean`                         | —                                         | Render the list into `#dropdown-connector`.                                                                                                               |
 | `isCompact`                                        | `boolean`                         | —                                         | Smaller field.                                                                                                                                            |
@@ -88,5 +89,5 @@ import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 ## Storybook
 
 `Shared/Dropdown`: `Default`, `WithTitle`, `Selected`, `WithReset`, `Multi`, `WithExclude`,
-`WithSearch`, `WithInput`, `Compact`, `BorderThemes`, `Disabled`, `Loading`, `Empty`,
+`WithSearch`, `WithSearchAutoFocus`, `WithInput`, `Compact`, `BorderThemes`, `Disabled`, `Loading`, `Empty`,
 `ThroughPortal`.

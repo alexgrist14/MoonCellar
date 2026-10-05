@@ -44,7 +44,7 @@ $categories: wishlist, playing, completed, played, backlog, dropped;
   &__bottom {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-x5);
+    gap: var(--gap-x2);
     transition: opacity 0.3s;
     opacity: 0;
     pointer-events: none;

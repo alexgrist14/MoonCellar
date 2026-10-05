@@ -31,6 +31,7 @@ export const useDropdown = ({
   isWithInput,
   isWithExclude,
   isThroughPortal,
+  isSearchAutoFocus,
 }: IDropDownListProps) => {
   const [isActive, setIsActive] = useState(false);
   const [value, setValue] = useState(overwriteValue ?? initialValue);
@@ -228,6 +229,7 @@ export const useDropdown = ({
 
   useEffect(() => {
     isActive &&
+      isSearchAutoFocus &&
       setTimeout(
         () =>
           isActive &&
@@ -236,7 +238,7 @@ export const useDropdown = ({
           searchRef.current.focus(),
         220
       );
-  }, [isActive, isWithInput]);
+  }, [isActive, isWithInput, isSearchAutoFocus]);
 
   useEffect(() => {
     if (isActive && firstActive.current === true) {

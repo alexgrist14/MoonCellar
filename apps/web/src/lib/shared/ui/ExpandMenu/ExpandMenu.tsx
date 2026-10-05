@@ -18,6 +18,7 @@ import { useResizeDetector } from "react-resize-detector";
 import { useExpandStore } from "@/src/lib/shared/store/expand.store";
 import { createPortal } from "react-dom";
 import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
+import { useSwipeDismiss } from "@/src/lib/shared/hooks/useSwipeDismiss";
 
 interface IExpandMenuProps extends Pick<
   HTMLAttributes<HTMLDivElement>,
@@ -45,6 +46,7 @@ export const ExpandMenu = memo(
     const { isMobile } = useStatesStore();
 
     const expandRef = useRef<HTMLDivElement>(null);
+    const menuRef = useRef<HTMLDivElement>(null);
 
     const isActive = expanded?.includes(position);
 
@@ -81,6 +83,16 @@ export const ExpandMenu = memo(
 
     useCloseEvents(closeRefs, onCloseEvent);
 
+    const { offset, isDragging, resetOffset, swipeHandlers } = useSwipeDismiss({
+      ref: menuRef,
+      direction: position.includes("right") ? "right" : "left",
+      onDismiss: closeHandler,
+    });
+
+    useEffect(() => {
+      if (isActive) resetOffset();
+    }, [isActive, resetOffset]);
+
     if (!connector) return null;
 
     return createPortal(
@@ -99,11 +111,15 @@ export const ExpandMenu = memo(
         }
       >
         <div
+          ref={menuRef}
           className={classNames(styles.menu, {
             [styles.menu_right]: position.includes("right"),
             [styles.menu_disabled]: isMobile && !isActive,
             [styles.menu_active]: isActive,
+            [styles.menu_dragging]: isDragging,
           })}
+          style={{ "--expand-offset": `${offset}px` } as CSSProperties}
+          {...swipeHandlers}
         >
           <Scrollbar
             type="absolute"

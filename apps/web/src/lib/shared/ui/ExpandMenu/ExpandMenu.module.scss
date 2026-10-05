@@ -26,7 +26,8 @@ $border: 2px solid var(--color-bg-hover);
   outline: $border;
   transform-origin: left;
   pointer-events: all;
-  transform: scaleX(0);
+  transform: translateX(var(--expand-offset, 0px)) scaleX(0);
+  touch-action: pan-y;
   opacity: 0;
   visibility: hidden;
   width: max(20vw, 460px);
@@ -44,13 +45,17 @@ $border: 2px solid var(--color-bg-hover);
   }
 
   &_active {
-    transform: scaleX(1);
+    transform: translateX(var(--expand-offset, 0px)) scaleX(1);
     opacity: 1;
     visibility: visible;
   }
 
   &_disabled {
     opacity: 0;
+  }
+
+  &_dragging {
+    transition: none;
   }
 }
 
@@ -121,6 +126,7 @@ $border: 2px solid var(--color-bg-hover);
   }
 
   div &__content {
+    touch-action: pan-y;
     display: grid;
     margin: 0;
     padding: var(--padding-x5);

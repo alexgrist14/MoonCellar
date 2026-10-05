@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const LOKI_HOST =
-  process.env.LOKI_HOST || "http://host.containers.internal:3100";
+import { LOKI_HOST } from "@/src/lib/shared/utils/logger.utils";
 
 export async function POST(request: NextRequest) {
+  if (!LOKI_HOST) return new NextResponse(null, { status: 204 });
+
   try {
     const body = await request.text();
 

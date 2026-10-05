@@ -64,7 +64,8 @@ import { DRAWER_TRIGGER_ATTRIBUTE, drawer } from "@/src/lib/shared/ui/Drawer";
   that needs live data must read it itself (a query hook or store inside the component).
 - The panel is sized with `100dvh` and its `Box` gets
   `templateStyle={{ height: "100%", minHeight: 0 }}`; keep both, or on mobile the bottom of the scroll area sits below the screen.
-- **On touch it closes with a swipe to the right**, by the same rule as `PopoverSheet`'s drag
+- **On touch it closes with a swipe to the right** (`shared/hooks/useSwipeDismiss`, shared with
+  `ExpandMenu`), by the same rule as `PopoverSheet`'s drag
   down: released past a third of its width or flicked faster than 0.5px/ms. The gesture only
   starts once the finger has moved 10px and more sideways than vertically. **`touch-action: pan-y`
   must sit on the scroll content (`drawer__content`), not only on the panel:** the browser reads

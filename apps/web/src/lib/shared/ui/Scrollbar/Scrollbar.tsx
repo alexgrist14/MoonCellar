@@ -92,6 +92,7 @@ export const Scrollbar: FC<IScrollBarProps> = ({
         classNameContainer,
         styles.scrollbars__container,
         isHorizontal && styles["scrollbars__container--horizontal"],
+        isHorizontal && !isVisible && styles["scrollbars__container--idle"],
         {
           [styles.scrollbars__container_absolute]: type === "absolute",
         }

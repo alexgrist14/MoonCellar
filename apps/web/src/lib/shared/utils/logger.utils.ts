@@ -11,8 +11,14 @@ interface LogEntry {
   userId?: string;
 }
 
+export const LOKI_HOST =
+  process.env.LOKI_HOST ||
+  (process.env.NODE_ENV === "production"
+    ? "http://host.containers.internal:3100"
+    : undefined);
+
 class Logger {
-  private lokiEndpoint: string;
+  private lokiEndpoint: string | undefined;
   private appName: string;
   private batch: LogEntry[] = [];
   private batchTimeout: NodeJS.Timeout | null = null;
@@ -21,9 +27,9 @@ class Logger {
 
   constructor() {
     this.lokiEndpoint =
-      typeof window === "undefined"
-        ? `${process.env.LOKI_HOST || "http://host.containers.internal:3100"}/loki/api/v1/push`
-        : "/api/logs";
+      typeof window !== "undefined"
+        ? "/api/logs"
+        : LOKI_HOST && `${LOKI_HOST}/loki/api/v1/push`;
     this.appName = "mooncellar-frontend";
 
     // Отправляем накопленные логи при разгрузке страницы
@@ -99,7 +105,7 @@ class Logger {
   }
 
   private async sendToLoki(entries: LogEntry[]): Promise<void> {
-    if (entries.length === 0) return;
+    if (entries.length === 0 || !this.lokiEndpoint) return;
 
     try {
       // Группируем логи по stream labels для оптимизации

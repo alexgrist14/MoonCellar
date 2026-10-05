@@ -152,3 +152,9 @@
   --loader-block-min-height: 96px;
   --burger-animation-duration: 600ms;
 }
+
+@media (max-width: 768px) {
+  :root {
+    --popover-max-height: 60dvh;
+  }
+}

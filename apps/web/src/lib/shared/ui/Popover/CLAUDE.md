@@ -99,7 +99,7 @@ const [isOpen, setIsOpen] = useState(false);
 - Untitled, the anchored panel has no title chrome (`Box` renders no head without `title`).
 - The anchored mode never takes focus: keyboard navigation stays with the anchor (handle
   arrows/Enter on the input, keep the active option in state), and Escape or an outside
-  mousedown calls `onClose`. Give long content a `max-height` (`var(--popover-max-height)`)
+  mousedown calls `onClose`. Give long content a `max-height` (`var(--popover-max-height)`: 320px, 60dvh at 768px and below, where the popover is a sheet)
   and scroll; a panel taller than the space on both sides is clamped and covers the anchor.
 
 ## Storybook
