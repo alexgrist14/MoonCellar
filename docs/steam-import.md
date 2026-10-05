@@ -41,7 +41,9 @@ is unlinked.
 ## Rules
 
 - An imported list cannot be deleted, and its games cannot be added, removed or reordered: the
-  API answers 403 and the web hides those controls. Name, description, privacy, ranking and sort
+  API answers 403 and the web hides those controls. The lists popover of a game and the
+  bulk "Add to list" modal still show the Steam list, with a disabled checkbox
+  (`ListCheckRow isDisabled`), so the player sees whether the game is in their library. Name, description, privacy, ranking and sort
   stay editable.
 - The Steam profile must show **Game details** publicly. Otherwise Steam answers an empty
   `response`, and the API refuses with 422 instead of creating an empty list.

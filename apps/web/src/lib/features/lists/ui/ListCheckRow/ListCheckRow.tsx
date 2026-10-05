@@ -12,6 +12,8 @@ interface IListCheckRowProps {
   isPrivate?: boolean;
   isPending?: boolean;
   isTouch?: boolean;
+  isDisabled?: boolean;
+  disabledHint?: string;
 }
 
 export const ListCheckRow: FC<IListCheckRowProps> = ({
@@ -22,14 +24,22 @@ export const ListCheckRow: FC<IListCheckRowProps> = ({
   isPrivate,
   isPending,
   isTouch,
+  isDisabled,
+  disabledHint,
 }) => (
   <label
     className={classNames(styles.row, {
       [styles.row_pending]: isPending,
       [styles.row_touch]: isTouch,
+      [styles.row_disabled]: isDisabled,
     })}
+    title={isDisabled ? disabledHint : undefined}
   >
-    <Checkbox checked={isChecked} disabled={isPending} onChange={onToggle} />
+    <Checkbox
+      checked={isChecked}
+      disabled={isPending || isDisabled}
+      onChange={onToggle}
+    />
     <span className={styles.row__name}>{name}</span>
     {isPrivate && (
       <SvgLock

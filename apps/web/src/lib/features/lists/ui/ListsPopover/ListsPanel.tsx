@@ -89,7 +89,7 @@ export const ListsPanel: FC<IListsPanelProps> = ({ game, userId, isTouch }) => {
 
   const ordered = orderRef.current
     .map((id) => lists?.find((list) => list._id === id))
-    .filter((list): list is ICustomList => !!list && !list.source);
+    .filter((list): list is ICustomList => !!list);
 
   const needle = filter.trim().toLowerCase();
   const visible = needle
@@ -121,7 +121,7 @@ export const ListsPanel: FC<IListsPanelProps> = ({ game, userId, isTouch }) => {
     setPending((current) => ({ ...current, [listId]: value }));
 
   const toggle = (list: ICustomList) => {
-    if (pending[list._id]) return;
+    if (pending[list._id] || list.source) return;
 
     const next = !isChecked(list);
     const options = {
@@ -189,6 +189,8 @@ export const ListsPanel: FC<IListsPanelProps> = ({ game, userId, isTouch }) => {
               isPrivate={list.isPrivate}
               isPending={pending[list._id]}
               isTouch={isTouch}
+              isDisabled={!!list.source}
+              disabledHint="Synced from Steam"
               onToggle={() => toggle(list)}
             />
           ))}

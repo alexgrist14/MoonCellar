@@ -35,8 +35,7 @@ export const AddGamesToListModal: FC<IAddGamesToListModalProps> = ({
   gameIds,
   onDone,
 }) => {
-  const { data: userLists, isLoading } = useUserListsQuery(userId);
-  const lists = userLists?.filter((list) => !list.source);
+  const { data: lists, isLoading } = useUserListsQuery(userId);
   const { mutateAsync: addGames, isPending } = useAddListGamesMutation();
   const { mutateAsync: createList, isPending: isCreating } =
     useCreateListMutation();
@@ -101,6 +100,8 @@ export const AddGamesToListModal: FC<IAddGamesToListModalProps> = ({
                 count={list.gamesCount}
                 isPrivate={list.isPrivate}
                 isChecked={checked.includes(list._id)}
+                isDisabled={!!list.source}
+                disabledHint="Synced from Steam"
                 onToggle={() => toggle(list._id)}
               />
             ))}
