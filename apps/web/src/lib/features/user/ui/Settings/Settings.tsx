@@ -20,6 +20,7 @@ import {
   DELETE_ACCOUNT_MODAL_ID,
   DeleteAccountModal,
 } from "@/src/lib/features/user/ui/DeleteAccountModal";
+import { SteamAccount } from "@/src/lib/features/user/ui/SteamAccount";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FC, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -252,6 +253,11 @@ export const Settings: FC<SettingsProps> = ({}) => {
           </section>
 
           <div className={styles.stack}>
+            <section className={styles.section}>
+              <SectionTitle as="h3">Steam</SectionTitle>
+              <SteamAccount />
+            </section>
+
             <section className={styles.section}>
               <SectionTitle as="h3">Appearance</SectionTitle>
               <div className={styles.field}>

@@ -292,7 +292,7 @@ export const ListModal: FC<IListModalProps> = ({ list, userName, gameId }) => {
           </span>
         </div>
         <div className={styles.actions}>
-          {isEdit && (
+          {isEdit && !list?.source && (
             <Button
               type="button"
               color={ButtonColor.RED}

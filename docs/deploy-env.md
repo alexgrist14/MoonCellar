@@ -196,8 +196,8 @@ deployment those fallbacks happen to be the production values.
 **Frontend — two keys set:** `NEXT_PUBLIC_API_URL` and `REVALIDATE_SECRET`. The two dead keys
 noted below, `NEXT_PUBLIC_LOKI_HOST` and `NEXT_PUBLIC_S3_HOST`, have since been dropped.
 
-**Backend — fifteen keys set:** everything in its table except `FRONT_URL`, `LOCAL_CONNECTION`
-and `INDEXNOW_KEY`.
+**Backend — fifteen keys set:** everything in its table except `FRONT_URL`, `LOCAL_CONNECTION`,
+`INDEXNOW_KEY` and `STEAM_API_KEY` (added with the Steam import, not set on the host yet).
 
 | Unset in production | Falls back to | Verdict |
 |---|---|---|
@@ -276,6 +276,7 @@ pins the internal API address, so it stays a secret on both counts.
 | `SITE_SESSIONS_KEY` | **yes** | Any long random string; the cookies of the admin Sites tab are encrypted with its SHA-256. Must be the same wherever the same database is used, or stored cookies cannot be read. Without it saving a site answers 503 |
 | `RECRAFT_API_TOKEN` | **yes** | Recraft API token for the admin Images tab (recraft.ai → Profile → API). Without it generating with a Recraft model answers 503; OpenAI models keep working through `OPENAI_API_KEY` |
 | `STEAMGRIDDB_API_KEY` | **yes** | SteamGridDB API key (steamgriddb.com → Preferences → API) the draft takes covers and hero banners from. Without it that step fails and the draft falls back to images found elsewhere |
+| `STEAM_API_KEY` | **yes** | Steam Web API key (steamcommunity.com/dev/apikey) the Steam library import reads owned games with. Without it linking Steam answers 503 |
 | `IGDB_AUTO_LINK` | no | `true` lets the nightly IGDB sync link a new IGDB game to a parser-created game it matches with confidence. Unset or anything else sends every match to the admin Conflicts tab instead. A game added by hand always goes to Conflicts, whatever the value |
 | `VAPID_PUBLIC_KEY` | no | Web push public key. Generate the pair once with `bunx web-push generate-vapid-keys`. Every instance on the same database (production and a local `dev:api`) must use the same pair: a browser subscribes to one public key, and a push signed with another pair is refused. Replacing the pair silently invalidates every existing subscription. Without it the push toggle is hidden and nothing is sent |
 | `VAPID_PRIVATE_KEY` | **yes** | Web push private key of the same pair |

@@ -20,6 +20,7 @@ export * from "./playthroughs.schema";
 export * from "./ra.schema";
 export * from "./role.schema";
 export * from "./royal-games.schema";
+export * from "./steam.schema";
 export * from "./user-logs.schema";
 export * from "./user-ratings.schema";
 export * from "./user.schema";

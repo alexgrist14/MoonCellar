@@ -20,6 +20,15 @@ export const UserSettingsSchema = z.object({
 
 export const USER_NAME_MAX_LENGTH = 15;
 
+export const SteamAccountSchema = z.object({
+  steamId: z.string().describe("SteamID64 of the linked account"),
+  linkedAt: z.string().describe("Date the account was linked"),
+  syncedAt: z
+    .string()
+    .nullable()
+    .describe("Date the library was last imported"),
+});
+
 export const UserSchemaZod = z.object({
   _id: z.string(),
   userName: z
@@ -39,6 +48,7 @@ export const UserSchemaZod = z.object({
   description: z.string().max(450).nullable(),
   raUsername: z.string().nullable(),
   raAwards: RaAwardSchema.array(),
+  steam: SteamAccountSchema.nullable().optional(),
   roles: RoleSchema.array().default(["user"]),
   avatar: z.string().url().nullable(),
   background: z.string().url().nullable(),
@@ -141,6 +151,7 @@ export const GetUserLoginsResponseSchema = z
   .array();
 
 export type IUser = z.infer<typeof UserSchemaZod>;
+export type ISteamAccount = z.infer<typeof SteamAccountSchema>;
 export type IUserSettings = z.infer<typeof UserSettingsSchema>;
 export type IGetUserByStringRequest = z.infer<typeof GetUserByStringSchema>;
 export type IGetUserByIdRequest = z.infer<typeof GetUserByIdSchema>;

@@ -15,6 +15,16 @@
       .scrollbars__content {
         overscroll-behavior: auto;
       }
+
+      &.scrollbars__container_absolute {
+        grid-template: none;
+
+        .scrollbars__scrollbar_absolute {
+          inset: auto 0 calc(-1 * (var(--scrollbar-horizontal-size) + var(--gap-x2)));
+          height: var(--scrollbar-horizontal-size);
+          margin-block: 0;
+        }
+      }
     }
   }
 

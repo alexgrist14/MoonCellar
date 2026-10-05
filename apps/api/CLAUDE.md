@@ -191,6 +191,20 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   Deleting a character must also pull it from `favoriteCharacters`, or every later replace fails
   with "One of the characters does not exist".
 
+## Steam import
+
+- **A list with a `source` belongs to the linked account, and `CustomListsService` refuses to
+  delete it or change its games (403).** Only `syncSourceList` (import) and `deleteSourceList`
+  (unlink) write it; a manual edit would be overwritten by the next import anyway. The flow and
+  the endpoints are in [`docs/steam-import.md`](../../docs/steam-import.md).
+- **The OpenID `return_to` is compared exactly with `<FRONT_URL>/user/<name>/settings` of the
+  signed-in user, and the assertion is linked only after Steam answers `is_valid:true` to
+  `check_authentication`.** Skipping either lets anyone post a forged or replayed claimed id and
+  import someone else's library.
+- **`GetOwnedGames` answers `{ response: {} }` for a profile whose game details are private.**
+  It is not an error status; treat a missing `games` array as "private" (422), never as an
+  empty library, or the import replaces a full list with nothing.
+
 ## Database
 
 - **Declare reference paths as `@Prop({ type: mongoose.Schema.Types.ObjectId, ref })`; a bare

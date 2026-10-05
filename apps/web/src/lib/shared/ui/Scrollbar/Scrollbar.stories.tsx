@@ -74,6 +74,10 @@ export const Horizontal: Story = {
   },
 };
 
+export const HorizontalAbsoluteTrack: Story = {
+  args: { ...Horizontal.args, type: "absolute" },
+};
+
 export const HorizontalWithArrows: Story = {
   args: { ...Horizontal.args, isWithArrows: true },
 };

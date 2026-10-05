@@ -49,10 +49,7 @@ export class SteamService {
             filter: { _id: game._id },
             update: {
               $set: {
-                externalPages: mergeSteamStore(
-                  game.externalPages,
-                  steamInfo
-                ),
+                externalPages: mergeSteamStore(game.externalPages, steamInfo),
                 updatedAt: now,
               },
             },

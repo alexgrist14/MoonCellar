@@ -14,15 +14,16 @@ swaps the popover's content for a small inline form.
 
 ## API
 
-| Prop            | Type                                             | Default    | Purpose                                                                        |
-| --------------- | ------------------------------------------------ | ---------- | ------------------------------------------------------------------------------ |
-| `items`         | `IActionsMenuItem[]`                             | —          | Menu entries, see below.                                                       |
-| `label`         | `string`                                         | `"Manage"` | Text of the default trigger button.                                            |
-| `isDisabled`    | `boolean`                                        | —          | Disables the default trigger.                                                  |
-| `renderTrigger` | `(props: IActionsMenuTriggerProps) => ReactNode` | —          | Replaces the default trigger; gets `{ ref, isOpen, toggle }`.                  |
-| `title`         | `string`                                         | —          | Popover title (shown on the mobile sheet and above the list).                  |
-| `width`         | `string`                                         | `"220px"`  | Popover width.                                                                 |
-| `isNavigation`  | `boolean`                                        | —          | Renders the list as `<nav>` without `menu`/`menuitem` roles (site navigation). |
+| Prop                | Type                                             | Default    | Purpose                                                                        |
+| ------------------- | ------------------------------------------------ | ---------- | ------------------------------------------------------------------------------ |
+| `items`             | `IActionsMenuItem[]`                             | —          | Menu entries, see below.                                                       |
+| `label`             | `string`                                         | `"Manage"` | Text of the default trigger button.                                            |
+| `isDisabled`        | `boolean`                                        | —          | Disables the default trigger.                                                  |
+| `renderTrigger`     | `(props: IActionsMenuTriggerProps) => ReactNode` | —          | Replaces the default trigger; gets `{ ref, isOpen, toggle }`.                  |
+| `title`             | `string`                                         | —          | Popover title (shown on the mobile sheet and above the list).                  |
+| `width`             | `string`                                         | `"220px"`  | Popover width.                                                                 |
+| `isNavigation`      | `boolean`                                        | —          | Renders the list as `<nav>` without `menu`/`menuitem` roles (site navigation). |
+| `searchPlaceholder` | `string`                                         | —          | Adds a search field over the items (filters by label) and scrolls a long list. |
 
 Every item has `label`, optional `isDanger` and `isDisabled`, and exactly one of:
 
@@ -112,8 +113,11 @@ import { ActionsMenu } from "@/src/lib/shared/ui/ActionsMenu";
   props, and a component returned from it mounts each time the panel opens — that is what resets
   the field to its initial value without an `onOpen` hook.
 - A disabled link item renders as a disabled button, since an `<a>` cannot be disabled.
+- **A long list (a dozen items or more) passes `searchPlaceholder`.** The field filters by
+  `label`, case-insensitively, and the items scroll inside `--popover-max-height`; closing the
+  menu clears the query. Without it a long list grows the popover past the viewport.
 
 ## Storybook
 
 `Shared/ActionsMenu`: `Default`, `CustomLabel`, `WithDisabledItem`, `Disabled`, `WithLinks`,
-`CustomTrigger`, `WithPanel`.
+`CustomTrigger`, `WithPanel`, `WithSearch`.

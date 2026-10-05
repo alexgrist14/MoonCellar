@@ -61,5 +61,6 @@ import { NotificationsModule } from "../notifications/notifications.module";
     UsersSearchService,
     UserLogsService,
   ],
+  exports: [CustomListsService],
 })
 export class CollectionsModule {}

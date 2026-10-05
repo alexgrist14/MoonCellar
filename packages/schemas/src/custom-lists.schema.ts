@@ -45,6 +45,8 @@ export const CustomListDescriptionSchema = z
   .max(CUSTOM_LIST_DESCRIPTION_MAX)
   .describe("List description");
 
+export const CustomListSourceSchema = z.enum(["steam"]);
+
 export const CustomListGameSchema = z.object({
   gameId: z.string().describe("Game id"),
   addedAt: z.string().describe("Date the game was added"),
@@ -62,6 +64,9 @@ export const CustomListSchema = z.object({
   sortBy: CustomListGamesSortSchema.describe("Default order of the games"),
   sortOrder: CustomListsOrderSchema.describe("Default direction of the order"),
   gamesCount: z.number().describe("Games in the list"),
+  source: CustomListSourceSchema.optional().describe(
+    "Imported from an account; the games follow it and the list goes when it is unlinked"
+  ),
   likesCount: z.number().describe("Likes from other players"),
   isLiked: z
     .boolean()
@@ -180,6 +185,7 @@ export type ICustomListGamePosition = z.infer<
 >;
 export type ICustomListGame = z.infer<typeof CustomListGameSchema>;
 export type ICustomList = z.infer<typeof CustomListSchema>;
+export type ICustomListSource = z.infer<typeof CustomListSourceSchema>;
 export type ICustomListDetails = z.infer<typeof CustomListDetailsSchema>;
 export type ICreateCustomListRequest = z.input<
   typeof CreateCustomListRequestSchema

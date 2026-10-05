@@ -39,8 +39,10 @@ private ones only to their owner.
 2. Mobile only: `ExpandMenu` (bottom-right, burger) holding `UserNavigation`.
 3. `Box`: `Breadcrumbs` (Home / user / Lists / list), header with `SectionTitle as="h1"`,
    description, meta (author, count, updated, privacy) and actions — `ListLikeButton` (public),
-   Edit (owner), Copy link (public), Manage / Cancel / Done (owner).
-4. Toolbar: `ListGameSearch` (owner, not managing) and `ListGamesSort` (more than one game).
+   Edit (owner), Copy link (public), Manage / Cancel / Done (owner, not an imported list).
+   An imported list (`source: "steam"`) shows a note that it comes from a Steam library.
+4. Toolbar: `ListGameSearch` (owner, not managing, not an imported list) and `ListGamesSort`
+   (more than one game).
 5. Body: `EmptyState`, or `SortableGrid` in Manage mode, or `GamesCards` with `getRank` for a
    ranked list.
 6. Desktop `UserNavigation` column.
@@ -70,3 +72,6 @@ private ones only to their owner.
   the column count and card size of the normal view.
 - Never show a loader that replaces the grid on `isFetching`; the page only dims the grid
   (`grid_fetching`) during a refetch.
+- **An imported list (`list.source`) gets no add, remove, reorder or delete controls** —
+  `canEditGames` is `isOwner && !list.source`. The API refuses those writes with 403; the games
+  follow the Steam account (`docs/steam-import.md`).

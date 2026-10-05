@@ -4,7 +4,10 @@ import { FC, ReactNode, RefObject, useRef, useState } from "react";
 import Link from "next/link";
 import classNames from "classnames";
 import { Button, ButtonColor } from "../Button";
+import { EmptyState } from "../EmptyState";
+import { Input } from "../Input";
 import { Popover } from "../Popover";
+import { Scrollbar } from "../Scrollbar";
 import styles from "./ActionsMenu.module.scss";
 
 export interface IActionsMenuPanel {
@@ -40,6 +43,7 @@ interface IActionsMenuProps {
   title?: string;
   width?: string;
   isNavigation?: boolean;
+  searchPlaceholder?: string;
 }
 
 export const ActionsMenu: FC<IActionsMenuProps> = ({
@@ -50,22 +54,31 @@ export const ActionsMenu: FC<IActionsMenuProps> = ({
   title,
   width = "220px",
   isNavigation,
+  searchPlaceholder,
 }) => {
   const anchorRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [panelLabel, setPanelLabel] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
 
   const panel = items.find((item) => item.label === panelLabel)?.panel;
 
   const close = () => {
     setIsOpen(false);
     setPanelLabel(null);
+    setSearch("");
   };
 
   const toggle = () => {
     setPanelLabel(null);
+    setSearch("");
     setIsOpen((current) => !current);
   };
+
+  const needle = search.trim().toLowerCase();
+  const visibleItems = needle
+    ? items.filter((item) => item.label.toLowerCase().includes(needle))
+    : items;
 
   const itemRole = isNavigation ? undefined : "menuitem";
 
@@ -140,6 +153,36 @@ export const ActionsMenu: FC<IActionsMenuProps> = ({
       >
         {panel ? (
           panel.render({ back: () => setPanelLabel(null), close })
+        ) : searchPlaceholder !== undefined ? (
+          <div className={styles.search}>
+            <Input
+              value={search}
+              placeholder={searchPlaceholder}
+              aria-label={searchPlaceholder}
+              onChange={(event) => setSearch(event.target.value)}
+            />
+            <Scrollbar
+              type="absolute"
+              contentStyle={{
+                maxHeight: "var(--popover-max-height)",
+                paddingLeft: 0,
+              }}
+            >
+              <List
+                className={styles.menu}
+                role={isNavigation ? undefined : "menu"}
+              >
+                {visibleItems.map(renderItem)}
+              </List>
+              {!visibleItems.length && (
+                <EmptyState
+                  variant="compact"
+                  isWithoutImage
+                  title={`Nothing matches “${search}”`}
+                />
+              )}
+            </Scrollbar>
+          </div>
         ) : (
           <List
             className={styles.menu}

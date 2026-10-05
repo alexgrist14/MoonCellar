@@ -30,7 +30,7 @@
   --playthrough-modal-width: min(80vw, 400px);
   --header-logo-height: 85%;
   --header-logo-height-sm: 72%;
-  --tab-count-color: var(--color-neutral-70);
+  --tab-count-color: color-mix(in srgb, currentColor 60%, transparent);
   --playthrough-modal-height: min(70dvh, 500px);
   --playthrough-modal-width-lg: min(88vw, 760px);
   --playthrough-modal-height-lg: min(86dvh, 780px);

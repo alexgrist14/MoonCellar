@@ -21,6 +21,7 @@ import {
   getCombinedRating,
   type ICustomListGamesSort,
   type ICustomListSort,
+  type ICustomListSource,
   type IRatedGame,
   type IAddCustomListGameRequest,
   type ICreateCustomListRequest,
@@ -182,6 +183,7 @@ export class CustomListsService {
       sortBy: doc.sortBy ?? DEFAULT_CUSTOM_LIST_GAMES_SORT,
       sortOrder: doc.sortOrder ?? DEFAULT_CUSTOM_LIST_GAMES_ORDER,
       gamesCount: doc.gamesCount ?? 0,
+      ...(doc.source ? { source: doc.source } : {}),
       likesCount: Math.max(doc.likesCount ?? 0, 0),
       covers,
       author: author
@@ -221,6 +223,14 @@ export class CustomListsService {
     }
 
     return list;
+  }
+
+  private assertManualGames(list: Pick<CustomList, "source">) {
+    if (list.source) {
+      throw new ForbiddenException(
+        "The games of an imported list follow the linked account"
+      );
+    }
   }
 
   private async assertGameExists(gameId: mongoose.Types.ObjectId) {
@@ -663,6 +673,12 @@ export class CustomListsService {
   async deleteList(id: string, viewer: User) {
     const list = await this.getOwnedList(id, viewer);
 
+    if (list.source) {
+      throw new ForbiddenException(
+        "An imported list is deleted by unlinking its account"
+      );
+    }
+
     try {
       await this.listModel.deleteOne({ _id: list._id });
       await this.likeModel.deleteMany({ listId: list._id });
@@ -672,6 +688,82 @@ export class CustomListsService {
       this.logger.error(err, `Failed to delete list: ${id}`);
       throw err;
     }
+  }
+
+  async syncSourceList(
+    userId: mongoose.Types.ObjectId,
+    source: ICustomListSource,
+    name: string,
+    gameIds: mongoose.Types.ObjectId[]
+  ): Promise<ICustomList> {
+    const existing = await this.listModel.findOne({ userId, source });
+    const addedAt = new Map(
+      (existing?.games ?? []).map((game) => [
+        game.gameId.toString(),
+        game.addedAt,
+      ])
+    );
+    const now = new Date();
+    const games = [
+      ...new Map(gameIds.map((id) => [id.toString(), id])).values(),
+    ].map((gameId) => ({
+      gameId,
+      addedAt: addedAt.get(gameId.toString()) ?? now,
+    }));
+
+    try {
+      if (existing) {
+        existing.games = games;
+        existing.gamesCount = games.length;
+        await existing.save();
+
+        return this.toList(await this.findPresented({ _id: existing._id }));
+      }
+
+      let freeName = name;
+
+      for (let index = 2; ; index++) {
+        const clash = await this.listModel.exists({
+          userId,
+          nameNormalized: normalizeListName(freeName),
+        });
+
+        if (!clash) break;
+        freeName = `${name} ${index}`;
+      }
+
+      const list = await this.listModel.create({
+        userId,
+        source,
+        name: freeName,
+        nameNormalized: normalizeListName(freeName),
+        slug: await this.getFreeSlug(userId, freeName),
+        games,
+        gamesCount: games.length,
+      });
+
+      return this.toList(await this.findPresented({ _id: list._id }));
+    } catch (err) {
+      this.logger.error(err, `Failed to sync ${source} list of: ${userId}`);
+      throw err;
+    }
+  }
+
+  async deleteSourceList(
+    userId: mongoose.Types.ObjectId,
+    source: ICustomListSource
+  ) {
+    const list = await this.listModel
+      .findOne({ userId, source })
+      .select("_id")
+      .lean();
+
+    if (!list) return null;
+
+    await this.listModel.deleteOne({ _id: list._id });
+    await this.likeModel.deleteMany({ listId: list._id });
+
+    return list._id.toString();
   }
 
   async setLike(
@@ -762,6 +854,8 @@ export class CustomListsService {
     viewer: User
   ): Promise<ICustomList> {
     const list = await this.getOwnedList(id, viewer);
+
+    this.assertManualGames(list);
     const gameId = toObjectId(dto.gameId, "game id");
 
     if (list.games.some((game) => game.gameId.equals(gameId))) {
@@ -799,6 +893,8 @@ export class CustomListsService {
     viewer: User
   ): Promise<ICustomList> {
     const list = await this.getOwnedList(id, viewer);
+
+    this.assertManualGames(list);
     const objectId = toObjectId(gameId, "game id");
     const games = list.games.filter((game) => !game.gameId.equals(objectId));
 
@@ -824,6 +920,8 @@ export class CustomListsService {
     viewer: User
   ): Promise<ICustomList> {
     const list = await this.getOwnedList(id, viewer);
+
+    this.assertManualGames(list);
     const byId = new Map(
       list.games.map((game) => [game.gameId.toString(), game])
     );

@@ -131,6 +131,7 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
   const sortOrder = sort.sortOrder ?? list.sortOrder;
 
   const isOwner = !!viewerId && viewerId === list.userId;
+  const canEditGames = isOwner && !list.source;
   const [draft, setDraft] = useState<string[] | null>(null);
   const isManaging = !!draft;
 
@@ -369,6 +370,21 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
                   )}
                 </span>
               </p>
+              {list.source && (
+                <p className={styles.note}>
+                  Imported from {isOwner ? "your" : `${user.userName}’s`} Steam
+                  library.{" "}
+                  {isOwner && (
+                    <>
+                      Update it or unlink Steam in{" "}
+                      <Link href={getProfileHref(user.userName, "settings")}>
+                        Settings
+                      </Link>
+                      .
+                    </>
+                  )}
+                </p>
+              )}
               {list.isPrivate && isOwner && (
                 <p className={styles.note}>
                   Only you can see this list. Anyone else opening its link gets
@@ -406,7 +422,7 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
                   Copy link
                 </Button>
               )}
-              {isOwner && !isManaging && !!list.gamesCount && (
+              {canEditGames && !isManaging && !!list.gamesCount && (
                 <Button
                   color={ButtonColor.DEFAULT}
                   className={styles.actions__button}
@@ -437,9 +453,9 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
               )}
             </div>
           </header>
-          {(isOwner || (!isManaging && list.gamesCount > 1)) && (
+          {(canEditGames || (!isManaging && list.gamesCount > 1)) && (
             <div className={styles.toolbar}>
-              {isOwner &&
+              {canEditGames &&
                 (isManaging ? (
                   <span className={styles.toolbar__hint}>
                     Drag or use the arrows to reorder. Press Done to save the
@@ -463,9 +479,11 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
               className={styles.empty}
               title="This list is empty"
               description={
-                isOwner
-                  ? "Search for a game to add the first one. You can also add games from any game card."
-                  : `${user.userName} has not added any games yet.`
+                list.source
+                  ? "None of the games in this Steam library are in the catalogue yet."
+                  : isOwner
+                    ? "Search for a game to add the first one. You can also add games from any game card."
+                    : `${user.userName} has not added any games yet.`
               }
             />
           ) : isManaging ? (

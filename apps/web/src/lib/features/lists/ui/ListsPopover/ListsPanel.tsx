@@ -89,7 +89,7 @@ export const ListsPanel: FC<IListsPanelProps> = ({ game, userId, isTouch }) => {
 
   const ordered = orderRef.current
     .map((id) => lists?.find((list) => list._id === id))
-    .filter((list): list is ICustomList => !!list);
+    .filter((list): list is ICustomList => !!list && !list.source);
 
   const needle = filter.trim().toLowerCase();
   const visible = needle

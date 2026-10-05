@@ -297,6 +297,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
             <Scrollbar
               id={PLAYTHROUGH_TABS_SCROLL_ID}
               isHorizontal
+              type="absolute"
               classNameContainer={styles.modal__tabsScroll}
               contentStyle={{ paddingInline: 0 }}
             >

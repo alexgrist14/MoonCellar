@@ -8,6 +8,19 @@ import {
   type IUserSettings,
 } from "@mooncellar/schemas";
 
+@Schema({ _id: false })
+export class UserSteamAccount {
+  @Prop({ type: String, required: true })
+  steamId: string;
+  @Prop({ type: Date, required: true })
+  linkedAt: Date;
+  @Prop({ type: Date, default: null })
+  syncedAt: Date | null;
+}
+
+export const UserSteamAccountSchema =
+  SchemaFactory.createForClass(UserSteamAccount);
+
 @Schema({
   timestamps: true,
 })
@@ -35,6 +48,8 @@ export class User extends Document {
   raUsername?: string;
   @Prop({ type: [Object] })
   raAwards: IRAAward[];
+  @Prop({ type: UserSteamAccountSchema, required: false })
+  steam?: UserSteamAccount;
   @Prop({ type: [String], default: ["user"] })
   roles: IRole[];
   @Prop()
@@ -70,3 +85,11 @@ export class User extends Document {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.index(
+  { "steam.steamId": 1 },
+  {
+    unique: true,
+    partialFilterExpression: { "steam.steamId": { $exists: true } },
+  }
+);

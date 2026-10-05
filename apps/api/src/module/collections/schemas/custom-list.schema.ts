@@ -4,6 +4,7 @@ import {
   DEFAULT_CUSTOM_LIST_GAMES_ORDER,
   DEFAULT_CUSTOM_LIST_GAMES_SORT,
   type ICustomListGamesSort,
+  type ICustomListSource,
   type ICustomListsOrder,
 } from "@mooncellar/schemas";
 
@@ -81,6 +82,9 @@ export class CustomList {
   @Prop({ type: CustomListGeneratorDatabaseSchema, required: false })
   generator?: CustomListGenerator;
 
+  @Prop({ type: String, required: false })
+  source?: ICustomListSource;
+
   createdAt: Date;
 
   updatedAt: Date;
@@ -101,4 +105,8 @@ CustomListDatabaseSchema.index(
     unique: true,
     partialFilterExpression: { "generator.kind": { $exists: true } },
   }
+);
+CustomListDatabaseSchema.index(
+  { userId: 1, source: 1 },
+  { unique: true, partialFilterExpression: { source: { $exists: true } } }
 );

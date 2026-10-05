@@ -20,7 +20,7 @@ buttons with a masked fade at the cut edges. It also wraps the whole page as `#p
 | `containerStyle`                                                             | `CSSProperties`                         | —       | Style of the outer grid container.                                                                                           |
 | `classNameContent` / `classNameContainer`                                    | `string`                                | —       | Classes for the scrolling element / outer container.                                                                         |
 | `classNameScrollbar` / `classNameTrack` / `classNameThumb` / `classNameLine` | `string`                                | —       | Classes for the scrollbar column, track, thumb, and fade lines.                                                              |
-| `type`                                                                       | `"absolute"`                            | —       | Overlay the scrollbar on the content instead of reserving a 12px grid column.                                                |
+| `type`                                                                       | `"absolute"`                            | —       | Overlay the track instead of reserving space: a 12px column, or the row under horizontal content.                                                |
 | `isHorizontal`                                                               | `boolean`                               | —       | Horizontal scrolling.                                                                                                        |
 | `isWithArrows`                                                               | `boolean`                               | —       | With `isHorizontal`: arrow buttons plus a masked fade at the edges.                                                          |
 | `fadeType`                                                                   | `"both" \| "top" \| "bottom"`           | —       | Renders gradient line overlays at those edges.                                                                               |
@@ -51,6 +51,10 @@ import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
 
 ## Rules and gotchas
 
+- `isHorizontal` reserves a track row below the content (`--scrollbar-horizontal-size` plus
+  `--gap-x2`) even when nothing overflows, so a sibling centred against it with
+  `align-items: center` sits half a row too low. Pass `type="absolute"` there: the track then
+  hangs below the content without taking layout height, so leave that much room under it.
 - The page itself scrolls inside `#page-scroll` (the `Scrollbar` that `Layout` wraps around
   `main`, id `PAGE_SCROLL_ID`), while `html`/`body` are `overflow: hidden`. Read or move page
   scroll through that element; `window.scrollY` is always 0.

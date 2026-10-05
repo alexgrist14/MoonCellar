@@ -118,3 +118,32 @@ export const WithPanel: Story = {
     ],
   },
 };
+
+export const WithSearch: Story = {
+  args: {
+    label: "27 games not in the catalogue",
+    width: "320px",
+    searchPlaceholder: "Search games",
+    items: [
+      "Starbound - Unstable",
+      "Pirates of Black Cove Gold",
+      "Battlerite Public Test",
+      "The Ship Tutorial",
+      "Grand Theft Auto: Vice City",
+      "Skullgirls ∞Endless Beta∞",
+      "Arma 2: Operation Arrowhead Beta (Obsolete)",
+      "Commander: Conquest of the Americas Gold",
+      "Wreckfest Throw-A-Santa + Sneak Peek 2.0",
+      "Magicka 2: Spell Balance Beta",
+      "Steep Open Beta",
+      "Rust - Staging Branch",
+      "Miscreated: Experimental Server",
+      "Lossless Scaling",
+      "Vindictus: Defying Fate Playtest",
+    ].map((label, index) => ({
+      label,
+      href: `https://store.steampowered.com/app/${index + 1}`,
+      isExternal: true,
+    })),
+  },
+};

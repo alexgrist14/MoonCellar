@@ -1,4 +1,4 @@
-import { IRole, IUserSettings } from "@mooncellar/schemas";
+import { IRole, ISteamAccount, IUserSettings } from "@mooncellar/schemas";
 import { IRAAward } from "./retroachievements.type";
 import { IFollowers, IFollowings, IUserFilter, IUserPreset } from "./user.type";
 
@@ -27,6 +27,7 @@ export interface IUser {
   avatar: string;
   background?: string;
   settings?: Partial<IUserSettings>;
+  steam?: ISteamAccount | null;
 }
 
 export interface IAuthToken {

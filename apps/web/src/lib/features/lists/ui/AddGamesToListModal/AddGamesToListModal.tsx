@@ -35,7 +35,8 @@ export const AddGamesToListModal: FC<IAddGamesToListModalProps> = ({
   gameIds,
   onDone,
 }) => {
-  const { data: lists, isLoading } = useUserListsQuery(userId);
+  const { data: userLists, isLoading } = useUserListsQuery(userId);
+  const lists = userLists?.filter((list) => !list.source);
   const { mutateAsync: addGames, isPending } = useAddListGamesMutation();
   const { mutateAsync: createList, isPending: isCreating } =
     useCreateListMutation();
