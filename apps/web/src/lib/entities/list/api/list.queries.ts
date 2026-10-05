@@ -1,6 +1,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
   ICustomListDetails,
+  ICustomListGamesFilters,
   ICustomListSort,
   IGetCustomListsRequest,
   IGetCustomListsResponse,
@@ -55,12 +56,15 @@ export const useListBySlugQuery = (
   userName: string,
   slug: string,
   sort: ICustomListSort,
-  initialData?: ICustomListDetails
+  initialData?: ICustomListDetails,
+  filters?: ICustomListGamesFilters
 ) =>
   useQuery({
-    queryKey: listQueryKeys.bySlug(userName, slug, sort),
+    queryKey: listQueryKeys.bySlug(userName, slug, sort, filters),
     queryFn: () =>
-      listsAPI.getBySlug(userName, slug, sort).then(({ data }) => data),
+      listsAPI
+        .getBySlug(userName, slug, sort, filters)
+        .then(({ data }) => data),
     initialData,
     placeholderData: keepPreviousData,
     staleTime: 60000,

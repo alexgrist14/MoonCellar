@@ -27,6 +27,7 @@ import {
   CustomListDetailsResponseDto,
   CustomListLikeResponseDto,
   CustomListResponseDto,
+  FilterCustomListBySlugRequestDto,
   GetCustomListBySlugRequestDto,
   GetCustomListsRequestDto,
   GetCustomListsResponseDto,
@@ -75,6 +76,26 @@ export class CustomListsController {
     @Req() request: IOptionalViewerRequest
   ) {
     return this.lists.getBySlug(dto.userName, dto.slug, request.user, dto);
+  }
+
+  @Post("by-slug")
+  @ApiOperation({
+    summary: "Get a list with only its games that match catalogue filters",
+  })
+  @ApiCreatedResponse({ type: CustomListDetailsResponseDto })
+  @UseGuards(OptionalJwtGuard)
+  @HttpCode(HttpStatus.OK)
+  async filterBySlug(
+    @Body() dto: FilterCustomListBySlugRequestDto,
+    @Req() request: IOptionalViewerRequest
+  ) {
+    return this.lists.getBySlug(
+      dto.userName,
+      dto.slug,
+      request.user,
+      dto,
+      dto.filters
+    );
   }
 
   @Get("mine/game-counts")

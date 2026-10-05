@@ -19,7 +19,9 @@ import {
   DEFAULT_CUSTOM_LIST_GAMES_ORDER,
   DEFAULT_CUSTOM_LIST_GAMES_SORT,
   getCombinedRating,
+  type ICustomListGamesFilters,
   type ICustomListGamesSort,
+  type IGetGamesRequest,
   type ICustomListSort,
   type ICustomListSource,
   type IRatedGame,
@@ -48,6 +50,8 @@ import {
   toObjectId,
 } from "../utils/collections.utils";
 import { findFreeListSlug } from "../utils/list-slug.utils";
+import { gamesFilters } from "../../../shared/games";
+import { normalizeTitle } from "../../games/utils/title-match.utils";
 import {
   type IListGameSortKeys,
   sortListGames,
@@ -531,7 +535,8 @@ export class CustomListsService {
     userName: string,
     slug: string,
     viewer: ICollectionsViewer,
-    sort: ICustomListSort = {}
+    sort: ICustomListSort = {},
+    filters?: ICustomListGamesFilters
   ): Promise<ICustomListDetails> {
     const owner = await this.userModel
       .findOne({ userName })
@@ -552,11 +557,17 @@ export class CustomListsService {
     const [list] = await this.withViewerLikes([this.toList(doc)], viewer);
     const sortBy = sort.sortBy ?? list.sortBy;
     const sortOrder = sort.sortOrder ?? list.sortOrder;
-    const games = (doc.games ?? []).map((game, index) => ({
-      gameId: game.gameId.toString(),
-      addedAt: toIsoString(game.addedAt),
-      position: index + 1,
-    }));
+    const matching = await this.findMatchingGames(
+      (doc.games ?? []).map((game) => game.gameId),
+      filters
+    );
+    const games = (doc.games ?? [])
+      .map((game, index) => ({
+        gameId: game.gameId.toString(),
+        addedAt: toIsoString(game.addedAt),
+        position: index + 1,
+      }))
+      .filter((game) => !matching || matching.has(game.gameId));
 
     return {
       ...list,
@@ -570,6 +581,30 @@ export class CustomListsService {
         )
       ),
     };
+  }
+
+  private async findMatchingGames(
+    gameIds: mongoose.Types.ObjectId[],
+    filters?: ICustomListGamesFilters
+  ) {
+    const { search, ...rest } = filters ?? {};
+    const match = gamesFilters(rest as IGetGamesRequest).$match;
+    const name = normalizeTitle(search ?? "");
+
+    if (!Object.keys(match).length && !name) return null;
+
+    const games = await this.gameModel
+      .find({
+        $and: [
+          { _id: { $in: gameIds } },
+          ...(Object.keys(match).length ? [match] : []),
+          ...(name ? [{ nameNormalized: { $regex: escapeRegExp(name) } }] : []),
+        ],
+      })
+      .select("_id")
+      .lean();
+
+    return new Set(games.map((game) => game._id.toString()));
   }
 
   async createList(

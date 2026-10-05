@@ -40,6 +40,13 @@ import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
 
 ## Rules and gotchas
 
+- **A page with a `left` or `right` menu must be listed in `Layout`'s `TOP_MENU_ROUTES` (exact
+  path) or `TOP_MENU_PATTERNS` (a dynamic route such as `/user/<name>/lists/<slug>`).** The
+  buttons are `position: fixed` under the header, and only `container_topMenu` pushes the page
+  down below them on screens up to `$screenExpandOverlap` (1759px); without it the "Filters"
+  button sits on top of the breadcrumbs and the title. The list is matched on the server, so the
+  offset is right from the first paint — do not replace it with a flag the menu sets on mount,
+  which would shift the content after hydration.
 - `#expand-connector` must exist (it is in `Layout`). The component looks it up in `useEffect`
   and renders nothing until then; looking it up during render failed hydration on every game page.
 - Use each `position` once per page: two menus on the same edge share one store key and open

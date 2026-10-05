@@ -5,6 +5,7 @@ import {
   CustomListDetailsSchema,
   CustomListLikeResponseSchema,
   CustomListSchema,
+  FilterCustomListBySlugRequestSchema,
   GetCustomListBySlugRequestSchema,
   GetCustomListsRequestSchema,
   GetCustomListsResponseSchema,
@@ -28,6 +29,10 @@ export class GetUserCustomListsRequestDto extends createZodDto(
 
 export class GetCustomListBySlugRequestDto extends createZodDto(
   GetCustomListBySlugRequestSchema
+) {}
+
+export class FilterCustomListBySlugRequestDto extends createZodDto(
+  FilterCustomListBySlugRequestSchema
 ) {}
 
 export class CustomListResponseDto extends createZodDto(CustomListSchema) {}

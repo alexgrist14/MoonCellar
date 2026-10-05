@@ -49,7 +49,8 @@ const sortOptions: ISortControlOption<
 export const Filters: FC<{
   callback?: (filters?: IGameFilters) => void;
   isGauntlet?: boolean;
-}> = ({ isGauntlet, callback }) => {
+  isSortHidden?: boolean;
+}> = ({ isGauntlet, isSortHidden, callback }) => {
   const { asPath } = useAdvancedRouter();
   const { profile, isAuth } = useAuthStore();
 
@@ -278,7 +279,7 @@ export const Filters: FC<{
       )}
       {tab === "filters" && (
         <>
-          {!isGauntlet && (
+          {!isGauntlet && !isSortHidden && (
             <SortControl
               label="Sort by"
               options={sortOptions}

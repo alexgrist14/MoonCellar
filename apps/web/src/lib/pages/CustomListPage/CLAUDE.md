@@ -26,19 +26,26 @@ private ones only to their owner.
   `playthroughsAPI.getAll({ userId })` for the navigation; `gamesApi.getByIds` for the games of
   the requested page (`CUSTOM_LIST_GAMES_PAGE_SIZE`). `authUserId` is decoded from
   `accessMoonToken`.
-- Client: `useListBySlugQuery(userName, slug, sort, initialData)`, `useGamesByIdsQuery(pageIds)`
+- Client: `useListBySlugQuery(userName, slug, sort, initialData, gameFilters)`,
+  `useGamesByIdsQuery(pageIds)`
   for the visible page, and `useGamesByIdsQuery(listIds, …, isManaging)` for all games in Manage
   mode. The server's page of games is seeded into `gameQueryKeys.byIds(ids)` once.
 - Mutations: `useRemoveListGameMutation`, `useReorderListMutation`; editing opens `ListModal`.
-- URL state: `page`, `sort`, `order`, all written with `window.history.pushState`. The sort
+- Catalogue filters from the URL (`parseQueryFilters`, the same params as `/games`) become
+  `gameFilters`; with any set, the query goes to `POST /lists/by-slug`, which returns only the
+  matching games, still with their list `position`. `list.gamesCount` stays the full count;
+  pagination and the empty state use `list.games.length`.
+- URL state: `page`, `sort`, `order` and the catalogue filters, all written with
+  `window.history.pushState`. The sort
   params are dropped when the pick equals the list's own `sortBy`/`sortOrder`.
 
 ## Composition
 
-1. `BGImage` with the author's background.
+1. `BGImage` with the author's background, and a left `ExpandMenu` "Filters" with
+   `Filters isSortHidden` (hidden while managing).
 2. Mobile only: `ExpandMenu` (bottom-right, burger) holding `UserNavigation`.
 3. `Box`: `Breadcrumbs` (Home / user / Lists / list), header with `SectionTitle as="h1"`,
-   description, meta (author, count, updated, privacy) and actions — `ListLikeButton` (public),
+   `AppliedGameFilters` chips, description, meta (author, count, updated, privacy) and actions — `ListLikeButton` (public),
    Edit (owner), Copy link (public), Manage / Cancel / Done (owner, not an imported list).
    An imported list (`source: "steam"`) shows a note that it comes from a Steam library.
 4. Toolbar: `ListGameSearch` (owner, not managing, not an imported list) and `ListGamesSort`
@@ -75,3 +82,9 @@ private ones only to their owner.
 - **An imported list (`list.source`) gets no add, remove, reorder or delete controls** —
   `canEditGames` is `isOwner && !list.source`. The API refuses those writes with 403; the games
   follow the Steam account (`docs/steam-import.md`).
+- **Manage is unavailable while filters are applied, and the filters menu is hidden while
+  managing.** Reordering sends the whole list (`ReorderCustomListRequest` must hold exactly its
+  games), and a filtered `list.games` is only part of it — the API would refuse it with 400.
+- **The server render ignores filters and seeds `initialList` only without them.** A filtered
+  first load fetches on the client; seeding the unfiltered list under a filtered key would show
+  every game until the next refetch.

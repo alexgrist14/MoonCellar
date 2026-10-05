@@ -4,6 +4,7 @@ import {
   ICustomList,
   ICustomListDetails,
   ICustomListGameCountsResponse,
+  ICustomListGamesFilters,
   ICustomListLikeResponse,
   ICustomListSort,
   IGetCustomListsRequest,
@@ -37,10 +38,22 @@ export const listsAPI = {
     agent.get<ICustomList[]>(`${LISTS_URL}/liked/${userId}`),
   getMyGameCounts: () =>
     agent.get<ICustomListGameCountsResponse>(`${LISTS_URL}/mine/game-counts`),
-  getBySlug: (userName: string, slug: string, sort: ICustomListSort = {}) =>
-    agent.get<ICustomListDetails>(`${LISTS_URL}/by-slug`, {
-      params: { userName, slug, ...sort },
-    }),
+  getBySlug: (
+    userName: string,
+    slug: string,
+    sort: ICustomListSort = {},
+    filters?: ICustomListGamesFilters
+  ) =>
+    filters
+      ? agent.post<ICustomListDetails>(`${LISTS_URL}/by-slug`, {
+          userName,
+          slug,
+          ...sort,
+          filters,
+        })
+      : agent.get<ICustomListDetails>(`${LISTS_URL}/by-slug`, {
+          params: { userName, slug, ...sort },
+        }),
   create: (dto: ICreateCustomListRequest) =>
     agent.post<ICustomList>(LISTS_URL, dto),
   update: (id: string, dto: IUpdateCustomListRequest) =>

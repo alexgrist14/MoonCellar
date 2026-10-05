@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { CommunityAuthorSchema } from "./comments.schema";
+import { GetGamesRequestSchema } from "./games.schema";
 import { ObjectIdSchema } from "./utils";
 
 export const CUSTOM_LIST_NAME_MIN = 3;
@@ -165,6 +166,24 @@ export const GetCustomListBySlugRequestSchema = z.object({
   sortOrder: CustomListsOrderSchema.optional(),
 });
 
+export const CustomListGamesFiltersSchema = GetGamesRequestSchema.pick({
+  selected: true,
+  excluded: true,
+  mode: true,
+  years: true,
+  rating: true,
+  votes: true,
+  search: true,
+  isOnlyWithAchievements: true,
+});
+
+export const FilterCustomListBySlugRequestSchema =
+  GetCustomListBySlugRequestSchema.extend({
+    filters: CustomListGamesFiltersSchema.optional().describe(
+      "Catalogue filters applied to the games of the list"
+    ),
+  });
+
 export const CustomListLikeResponseSchema = z.object({
   likesCount: z.number().describe("Likes after the change"),
   isLiked: z.boolean().describe("Whether the viewer's like is set"),
@@ -214,6 +233,12 @@ export type IGetUserCustomListsRequest = z.infer<
 >;
 export type IGetCustomListBySlugRequest = z.infer<
   typeof GetCustomListBySlugRequestSchema
+>;
+export type ICustomListGamesFilters = z.infer<
+  typeof CustomListGamesFiltersSchema
+>;
+export type IFilterCustomListBySlugRequest = z.infer<
+  typeof FilterCustomListBySlugRequestSchema
 >;
 export type ICustomListSort = Pick<
   IGetCustomListBySlugRequest,

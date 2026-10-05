@@ -179,6 +179,10 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   patterns are prefixes so a family's studios (Rockstar North, Nintendo EAD, Ubisoft Montreal)
   count. Companies are chosen by popularity — the IGDB votes of their ten most-voted games — not
   by how many games they have, which would rank Konami above FromSoftware.
+- **`POST /lists/by-slug` filters a list's games with the catalogue's `gamesFilters`, restricted
+  to the list's ids, and searches names by substring of `nameNormalized`.** The GET stays for the
+  server render and the unfiltered page. The response keeps `gamesCount` as the full count and
+  each game's list `position`, so ranks stay true inside a filtered view.
 - **Adding or removing a game in a list never writes a user log.** Lists are edited in bulk, and
   logging every addition buried playthroughs and ratings in the activity feed; the feed records
   what happened to a game, not how it was filed. Favourites do log, through the `favorite`

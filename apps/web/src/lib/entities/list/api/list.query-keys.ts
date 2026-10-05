@@ -1,4 +1,8 @@
-import { ICustomListSort, IGetCustomListsRequest } from "@mooncellar/schemas";
+import {
+  ICustomListGamesFilters,
+  ICustomListSort,
+  IGetCustomListsRequest,
+} from "@mooncellar/schemas";
 
 export const listQueryKeys = {
   all: ["lists"] as const,
@@ -10,6 +14,18 @@ export const listQueryKeys = {
   likedBy: (userId: string) => [...listQueryKeys.all, "liked", userId] as const,
   gameCounts: (userId: string) =>
     [...listQueryKeys.all, "game-counts", userId] as const,
-  bySlug: (userName: string, slug: string, sort: ICustomListSort = {}) =>
-    [...listQueryKeys.all, "slug", userName, slug, sort] as const,
+  bySlug: (
+    userName: string,
+    slug: string,
+    sort: ICustomListSort = {},
+    filters?: ICustomListGamesFilters
+  ) =>
+    [
+      ...listQueryKeys.all,
+      "slug",
+      userName,
+      slug,
+      sort,
+      ...(filters ? [filters] : []),
+    ] as const,
 };

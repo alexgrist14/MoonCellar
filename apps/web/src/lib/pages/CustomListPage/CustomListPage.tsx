@@ -16,6 +16,7 @@ import { hashKey, useQueryClient } from "@tanstack/react-query";
 import {
   CUSTOM_LIST_GAMES_PAGE_SIZE,
   ICustomListDetails,
+  ICustomListGamesFilters,
   ICustomListGamesSort,
   ICustomListsOrder,
   IGameResponse,
@@ -29,6 +30,10 @@ import {
 } from "@/src/lib/entities/list/api";
 import { gameQueryKeys } from "@/src/lib/entities/game/api/game.query-keys";
 import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
+import {
+  AppliedGameFilters,
+  Filters,
+} from "@/src/lib/features/filters/ui/Filters";
 import { ListGameSearch } from "@/src/lib/features/lists/ui/ListGameSearch";
 import { ListGamesSort } from "@/src/lib/features/lists/ui/ListGamesSort";
 import {
@@ -63,6 +68,10 @@ import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import { SvgBurger, SvgLink, SvgLock, SvgPen } from "@/src/lib/shared/ui/svg";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
+import {
+  hasGameFilters,
+  parseQueryFilters,
+} from "@/src/lib/shared/utils/filters.utils";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import styles from "./CustomListPage.module.scss";
 
@@ -119,14 +128,50 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
     [query]
   );
   const [initialSort] = useState(sort);
-  const listKey = listQueryKeys.bySlug(user.userName, initialList.slug, sort);
+  const gameFilters = useMemo((): ICustomListGamesFilters | undefined => {
+    const parsed = parseQueryFilters(`?${query.toString()}`);
+
+    if (!hasGameFilters(parsed)) return undefined;
+
+    const {
+      selected,
+      excluded,
+      mode,
+      years,
+      rating,
+      votes,
+      search,
+      isOnlyWithAchievements,
+    } = parsed;
+
+    return {
+      selected,
+      excluded,
+      mode,
+      years,
+      rating,
+      votes,
+      search,
+      isOnlyWithAchievements,
+    };
+  }, [query]);
+  const listKey = listQueryKeys.bySlug(
+    user.userName,
+    initialList.slug,
+    sort,
+    gameFilters
+  );
   const { data: list = initialList, isPlaceholderData: isSorting } =
     useListBySlugQuery(
       user.userName,
       initialList.slug,
       sort,
-      hashKey([sort]) === hashKey([initialSort]) ? initialList : undefined
+      !gameFilters && hashKey([sort]) === hashKey([initialSort])
+        ? initialList
+        : undefined,
+      gameFilters
     );
+  const shownCount = list.games.length;
   const sortBy = sort.sortBy ?? list.sortBy;
   const sortOrder = sort.sortOrder ?? list.sortOrder;
 
@@ -138,7 +183,7 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
   const page = Math.max(1, Number(query.get("page")) || initialPage);
   const lastPage = Math.max(
     1,
-    Math.ceil(list.gamesCount / CUSTOM_LIST_GAMES_PAGE_SIZE)
+    Math.ceil(shownCount / CUSTOM_LIST_GAMES_PAGE_SIZE)
   );
   const currentPage = Math.min(page, lastPage);
 
@@ -306,6 +351,11 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
   return (
     <>
       <BGImage userImage={user.background} />
+      {!isManaging && (
+        <ExpandMenu position="left" titleOpen="Filters">
+          <Filters isSortHidden />
+        </ExpandMenu>
+      )}
       <div className={styles.container}>
         {isMobile && (
           <ExpandMenu
@@ -341,6 +391,7 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
               <SectionTitle as="h1" className={styles.title}>
                 {list.name}
               </SectionTitle>
+              <AppliedGameFilters />
               {!!list.description && (
                 <p className={styles.description}>{list.description}</p>
               )}
@@ -422,15 +473,18 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
                   Copy link
                 </Button>
               )}
-              {canEditGames && !isManaging && !!list.gamesCount && (
-                <Button
-                  color={ButtonColor.DEFAULT}
-                  className={styles.actions__button}
-                  onClick={() => setDraft(listIds)}
-                >
-                  Manage
-                </Button>
-              )}
+              {canEditGames &&
+                !gameFilters &&
+                !isManaging &&
+                !!list.gamesCount && (
+                  <Button
+                    color={ButtonColor.DEFAULT}
+                    className={styles.actions__button}
+                    onClick={() => setDraft(listIds)}
+                  >
+                    Manage
+                  </Button>
+                )}
               {isManaging && (
                 <>
                   <Button
@@ -474,7 +528,13 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
               )}
             </div>
           )}
-          {!list.gamesCount ? (
+          {!!list.gamesCount && !shownCount ? (
+            <EmptyState
+              className={styles.empty}
+              title="No games match the filters"
+              description="Change or clear the filters to see the rest of the list."
+            />
+          ) : !list.gamesCount ? (
             <EmptyState
               className={styles.empty}
               title="This list is empty"
@@ -535,7 +595,7 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
       {!isManaging && (
         <Pagination
           take={CUSTOM_LIST_GAMES_PAGE_SIZE}
-          total={list.gamesCount}
+          total={shownCount}
           isFixed
           isDisabled={isGamesFetching}
           page={currentPage}

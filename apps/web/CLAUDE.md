@@ -606,6 +606,13 @@ break silently when ignored:
   is used.
 - **"Clear all" keeps `sortBy`/`sortOrder`.** Sorting is not a filter, and dropping it resets
   the catalogue to its default order, which reads as the page losing the user's place.
+- **`pushFiltersToQuery` replaces only the filter keys (and drops `page`); every other query
+  param stays.** The custom list page keeps its own `sort`/`order` next to the catalogue filters,
+  and writing the filter string over the whole query reset the list's order on every apply. A
+  new filter param must be added to `FILTER_QUERY_KEYS`, or it piles up instead of being
+  replaced.
+- **A page that has its own sort renders `Filters isSortHidden`.** The catalogue's "Sort by"
+  writes `sortBy` with catalogue values (`total_rating`, …) that mean nothing to a list.
 
 ## Selecting several games
 

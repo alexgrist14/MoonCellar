@@ -150,6 +150,48 @@ export const getFiltersForQuery = (filters: IGetGamesRequest) => {
   );
 };
 
+const FILTER_QUERY_KEYS = new Set([
+  "search",
+  "years",
+  "isOnlyWithAchievements",
+  "rating",
+  "votes",
+  "sortBy",
+  "sortOrder",
+  "excludeGames",
+  "take",
+  "page",
+  ...STRING_LIST_FILTERS.flatMap((name) => [
+    `selected${name}`,
+    `excluded${name}`,
+    `mode${name}`,
+  ]),
+]);
+
 export const pushFiltersToQuery = (filters: IGetGamesRequest) => {
-  window.history.pushState(null, "", `?${getFiltersForQuery(filters)}`);
+  const kept = new URLSearchParams(window.location.search);
+
+  [...kept.keys()].forEach((key) => {
+    if (FILTER_QUERY_KEYS.has(key.replace(/\[\]$/, ""))) kept.delete(key);
+  });
+
+  const query = [kept.toString(), getFiltersForQuery(filters)]
+    .filter(Boolean)
+    .join("&");
+
+  window.history.pushState(null, "", `?${query}`);
 };
+
+export const hasGameFilters = (filters: IGetGamesRequest) =>
+  !!filters.search ||
+  !!filters.isOnlyWithAchievements ||
+  filters.rating !== undefined ||
+  filters.votes !== undefined ||
+  !!filters.years?.some((year) => year !== null && year !== undefined) ||
+  [filters.selected, filters.excluded].some(
+    (group) =>
+      !!group &&
+      Object.values(group).some((values) =>
+        Array.isArray(values) ? values.length > 0 : !!values
+      )
+  );
