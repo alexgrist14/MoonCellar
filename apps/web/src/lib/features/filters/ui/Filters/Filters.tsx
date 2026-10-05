@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, Fragment, useEffect, useState } from "react";
 import styles from "./Filters.module.scss";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
@@ -27,6 +27,7 @@ import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
 import { IGameFilters, IGetGamesRequest } from "@mooncellar/schemas";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import {
+  getFiltersForQuery,
   parseQueryFilters,
   pushFiltersToQuery,
 } from "@/src/lib/shared/utils/filters.utils";
@@ -58,6 +59,19 @@ export const Filters: FC<{
     parseQueryFilters(asPath)
   );
   const [tab, setTab] = useState<"filters" | "saved">("filters");
+  const urlFiltersKey = getFiltersForQuery(parseQueryFilters(asPath));
+  const [appliedFiltersKey, setAppliedFiltersKey] = useState(urlFiltersKey);
+  const [resetCount, setResetCount] = useState(0);
+
+  if (urlFiltersKey !== appliedFiltersKey) {
+    setAppliedFiltersKey(urlFiltersKey);
+    setFilters(parseQueryFilters(asPath));
+  }
+
+  const resetFields = (next: IGetGamesRequest) => {
+    setFilters(next);
+    setResetCount((count) => count + 1);
+  };
 
   const { data: savedFilters } = useUserFiltersQuery(
     isAuth ? (profile?._id ?? "") : ""
@@ -278,7 +292,7 @@ export const Filters: FC<{
         />
       )}
       {tab === "filters" && (
-        <>
+        <Fragment key={`${appliedFiltersKey}:${resetCount}`}>
           {!isGauntlet && !isSortHidden && (
             <SortControl
               label="Sort by"
@@ -498,11 +512,11 @@ export const Filters: FC<{
               {
                 title: "Clear filters",
                 color: ButtonColor.RED,
-                onClick: () => setFilters({}),
+                onClick: () => resetFields({}),
               },
             ]}
           />
-        </>
+        </Fragment>
       )}
       {tab === "saved" && (
         <div>
@@ -513,7 +527,7 @@ export const Filters: FC<{
                   items={savedFilters.map((filter) => ({
                     name: filter.name,
                     onApply: () => {
-                      setFilters(parseQueryFilters(`?${filter.filter}`));
+                      resetFields(parseQueryFilters(`?${filter.filter}`));
                       setTab("filters");
                     },
                     onRemove: () =>

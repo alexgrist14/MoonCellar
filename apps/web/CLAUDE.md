@@ -611,6 +611,13 @@ break silently when ignored:
   and writing the filter string over the whole query reset the list's order on every apply. A
   new filter param must be added to `FILTER_QUERY_KEYS`, or it piles up instead of being
   replaced.
+- **`Filters` re-reads its draft from the URL whenever the filter part of the query changes, and
+  remounts its fields with that string as the `key`.** The category `Dropdown`s
+  (`initialMultiValue`) and the `RangeSelector`s (`defaultValue`) read their value only on mount,
+  so "Clear all" or a chip removed on the page cleared the URL and the results while the menu kept
+  showing the old selection — and the next "Filter games" put it back. The draft is replaced
+  during render, not in an effect, so the remounted fields never see the old values; "Clear
+  filters" and a saved filter go through `resetFields` for the same reason.
 - **A page that has its own sort renders `Filters isSortHidden`.** The catalogue's "Sort by"
   writes `sortBy` with catalogue values (`total_rating`, …) that mean nothing to a list.
 
