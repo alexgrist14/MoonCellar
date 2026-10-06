@@ -16,6 +16,7 @@ interface IFact {
 interface ICharacterProfileProps {
   character: ICharacterResponse;
   action?: ReactNode;
+  games: ReactNode;
 }
 
 const toTraitFacts = (traits: ICharacterTrait[]): IFact[] =>
@@ -41,7 +42,9 @@ const Facts: FC<{ facts: IFact[] }> = ({ facts }) => (
 export const CharacterProfile: FC<ICharacterProfileProps> = ({
   character,
   action,
+  games,
 }) => {
+  console.log(character.gameIds);
   const traits = character.traits ?? [];
   const facts = [
     { label: "Gender", value: character.gender },
@@ -60,6 +63,7 @@ export const CharacterProfile: FC<ICharacterProfileProps> = ({
     ? stripBbcode(character.description)
     : "";
 
+  console.log(character.gameIds);
   return (
     <article className={styles.profile}>
       <CharacterPortrait
@@ -79,13 +83,18 @@ export const CharacterProfile: FC<ICharacterProfileProps> = ({
       {action}
       {!!facts.length && <Facts facts={facts} />}
       {!!spoilerFacts.length && (
-        <Spoiler className={styles.profile__spoiler}>
+        <Spoiler className={styles.profile__spoiler} key={character._id}>
           <Facts facts={spoilerFacts} />
         </Spoiler>
       )}
       <p className={styles.profile__description}>
         {description || "No description yet."}
       </p>
+
+      <div>
+        <h3>Appears in:</h3>
+        {games}
+      </div>
     </article>
   );
 };

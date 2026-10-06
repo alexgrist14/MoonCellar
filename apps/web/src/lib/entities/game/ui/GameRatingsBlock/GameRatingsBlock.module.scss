@@ -19,6 +19,10 @@
     &_hltb {
       --rating-color: var(--color-positive);
     }
+
+    &_vndb {
+      --rating-color: var(--color-cyan)
+    }
   }
 
   &__head {

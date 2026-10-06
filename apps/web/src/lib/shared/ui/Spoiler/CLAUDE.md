@@ -36,7 +36,7 @@ import { Spoiler } from "@/src/lib/shared/ui/Spoiler";
 - **The hidden content stays in the DOM** (blurred and `inert`), so it is still in the
   server-rendered HTML and indexable, while links inside it are neither focusable nor clickable
   and screen readers skip it until it is revealed.
-- **The reveal and hide controls stay native `<button>`s, not `Button`.** They are absolutely positioned attention-toned pills centred over the blurred content, and no `ButtonColor` has the attention outline; overriding a theme from outside would fight `Button`'s own border and background.
+- **The reveal and hide controls are `SpoilerButton`, not `Button`.** `SpoilerButton` owns the attention-toned pill look; `Spoiler` only positions it — centred over the blurred content to reveal, static under the content to hide.
 
 ## Storybook
 

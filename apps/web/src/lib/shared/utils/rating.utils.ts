@@ -47,6 +47,13 @@ export const getGameRatingRows = (game: IGameResponse): IGameRatingRow[] => {
       rating: normalizeRating(game.hltb?.reviewScore, 100),
       count: undefined,
     },
+    {
+      key: "vndb",
+      label: "VNDB",
+      value: formatRating(game.vndb?.rating, 100),
+      rating: normalizeRating(game.vndb?.rating, 100),
+      count: game.vndb?.votecount,
+    },
   ];
 
   return rows.filter(

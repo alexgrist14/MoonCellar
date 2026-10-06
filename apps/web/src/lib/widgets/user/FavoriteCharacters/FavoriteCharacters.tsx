@@ -7,7 +7,7 @@ import { useFavoriteCharactersQuery } from "@/src/lib/entities/user/api/user.que
 import { useUpdateFavoriteCharactersMutation } from "@/src/lib/entities/user/api/favorites.mutations";
 import { CharacterCard } from "@/src/lib/entities/character/ui/CharacterCard";
 import { CharacterPortrait } from "@/src/lib/entities/character/ui/CharacterPortrait";
-import { CharacterDetails } from "@/src/lib/features/favorites/ui/CharacterDetails";
+import { CharacterDetails } from "@/src/lib/widgets/characters/CharacterDetails";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { DRAWER_TRIGGER_ATTRIBUTE, drawer } from "@/src/lib/shared/ui/Drawer";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";

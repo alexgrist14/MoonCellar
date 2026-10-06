@@ -11,6 +11,7 @@ import {
   type FetchedSystem,
   type GameList,
   getConsoleIds,
+  getGame,
   getGameExtended,
   getGameList,
   getUserAwards,
@@ -60,8 +61,8 @@ const RA_MISSING_SET_LOOKUPS = 300;
 
 type TRaSet = Pick<
   GameList[number],
-  "id" | "title" | "consoleId" | "consoleName" | "imageIcon" | "numAchievements"
->;
+  "id" | "title" | "consoleId" | "consoleName" | "numAchievements"
+> & { imageIcon?: string; imageBoxArt?: string };
 
 @Injectable()
 export class RetroachievementsService implements OnModuleInit {
@@ -109,7 +110,7 @@ export class RetroachievementsService implements OnModuleInit {
       title: raGame.title,
       consoleId: raGame.consoleId,
       consoleName: raGame.consoleName,
-      imageIcon: raGame.imageIcon,
+      ...(raGame.imageBoxArt && { cover: raGame.imageBoxArt }),
       numAchievements: raGame.numAchievements,
     };
   }
@@ -125,7 +126,7 @@ export class RetroachievementsService implements OnModuleInit {
       title: data.title,
       consoleId: Number(data.consoleId),
       consoleName: String(data.consoleName ?? ""),
-      imageIcon: String(data.imageIcon ?? ""),
+      imageBoxArt: typeof data.cover === "string" ? data.cover : undefined,
       numAchievements: Number(data.numAchievements ?? 0),
     };
   }
@@ -292,7 +293,7 @@ export class RetroachievementsService implements OnModuleInit {
       developers: [],
       platformIds: platforms.map(({ _id }) => String(_id)),
       lengthMinutes: null,
-      cover: raGame.imageIcon ? `${RA_MEDIA_URL}${raGame.imageIcon}` : null,
+      cover: raGame.imageBoxArt ? `${RA_MEDIA_URL}${raGame.imageBoxArt}` : null,
       isExplicitCover: false,
       url: `https://retroachievements.org/game/${raGame.id}`,
     };
@@ -430,7 +431,7 @@ export class RetroachievementsService implements OnModuleInit {
       const consoles = await getConsoleIds(authorization);
       const matchedConsoles = await this.matchConsolesToPlatforms(consoles);
       const raGames = await this.fetchAllGames(authorization, matchedConsoles);
-      const result = await this.matchGames(raGames);
+      const result = await this.matchGames(authorization, raGames);
 
       await this.fillMissingSetData(authorization, raGames);
 
@@ -500,7 +501,7 @@ export class RetroachievementsService implements OnModuleInit {
     );
   }
 
-  private async matchGames(raGames: TRaSet[]) {
+  private async matchGames(authorization: AuthObject, raGames: TRaSet[]) {
     const platforms = await this.platforms.find();
     const games = await this.games
       .find()
@@ -620,6 +621,25 @@ export class RetroachievementsService implements OnModuleInit {
           list.push(entry);
         }
       }
+    }
+
+    for (const record of ambiguous) {
+      try {
+        const { imageBoxArt } = await getGame(authorization, {
+          gameId: Number(record.externalId),
+        });
+
+        if (imageBoxArt) {
+          record.externalData = { ...record.externalData, cover: imageBoxArt };
+        }
+      } catch (err) {
+        this.logger.warn(
+          err,
+          `Failed to fetch RA box art for ${record.externalId}`
+        );
+      }
+
+      await sleep(RA_GAMES_FETCH_DELAY_MS);
     }
 
     await this.conflicts.record("ra", ambiguous);
