@@ -24,6 +24,22 @@ handled as follows:
 | Several games share the name, or the only one is not on PC or has another Steam app | A `steam` conflict in the admin Conflicts tab |
 | No game has the name | Nothing; the app is not imported as a new game |
 
+A game can carry several Steam pages (an edition, an expansion or a re-release on its own app).
+Every one of them counts as linked; `steam` takes the app whose name equals the game's, or the
+first one still on Steam. Each run deletes the undecided conflicts of apps that turned out to be
+linked already.
+
+**Store page check.** After the weekly run, `verifyConflicts` reads the store page (`appdetails`)
+of up to 1,000 undecided conflicts that were never checked, one every 1.6 seconds (the store API
+allows about 200 requests per 5 minutes), and scores the candidates with the shared matcher
+(`resolveMatch`, the IGDB profile): title, developers and publishers, release date, platforms and
+description. A confident match links the game and removes the conflict; the rest stay for review
+and are marked `externalData.verifiedAt` so they are not read again. A 429 from the store stops
+the run. By hand: `POST /steam/games/verify?limit=&dryRun=true` (admin); a dry run answers with
+the counts and the first links it would make. The conflict card reads the same store page, so it
+shows the release date, companies, platforms, description and cover (the 600×900 poster, the
+header image when the app has none).
+
 **Resolving a `steam` conflict**
 - **Match** links the chosen games and adds their Steam page.
 - **Skip** adds the app as a new game, built from its store page (`appdetails`):
@@ -169,6 +185,7 @@ Under "Filters" on the Games page, in Gauntlet, on lists and on the Steam tab:
 | `DELETE` | `/steam/account` | Unlink and delete the stored library |
 | `POST` | `/steam/library` | A user's library games with progress, sorted and filtered (public) |
 | `POST` | `/steam/games/sync` | Link Steam apps to catalogue games (admin) |
+| `POST` | `/steam/games/verify` | Check undecided conflicts against the store page (admin) |
 | `POST` | `/steam/achievements/sync` | Read achievement counts (admin) |
 | `POST` | `/steam/achievements/games/:gameId` | Read one game's achievement count (admin) |
 

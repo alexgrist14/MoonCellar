@@ -8,6 +8,7 @@ import { SteamGamesService } from "./services/steam-games.service";
 import { SteamLibraryService } from "./services/steam-library.service";
 import { ConflictsModule } from "../conflicts/conflicts.module";
 import { GamesModule } from "../games/games.module";
+import { MatchingModule } from "../games/matching/matching.module";
 import {
   Platform,
   PlatformDatabaseSchema,
@@ -51,6 +52,7 @@ import { CollectionsModule } from "../collections/collections.module";
     CollectionsModule,
     ConflictsModule,
     GamesModule,
+    MatchingModule,
   ],
 })
 export class SteamModule {}

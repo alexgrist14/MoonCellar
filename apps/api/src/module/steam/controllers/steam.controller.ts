@@ -71,6 +71,33 @@ export class SteamController {
   @UseGuards(RolesGuard)
   @Roles(RolesEnum.ADMIN)
   @UseGuards(AuthGuard("jwt"))
+  @Post("/games/verify")
+  @ApiOperation({
+    summary:
+      "Check pending Steam conflicts against the Steam store page and link the confident ones",
+  })
+  @ApiQuery({ name: "limit", required: false, type: Number })
+  @ApiQuery({ name: "dryRun", required: false, type: Boolean })
+  verifySteamConflicts(
+    @Query("limit") limitQuery?: string,
+    @Query("dryRun") dryRun?: string
+  ) {
+    const options = {
+      limit: limitQuery ? Number(limitQuery) : undefined,
+      isDryRun: dryRun === "true",
+    };
+
+    if (options.isDryRun) return this.steamGames.verifyConflicts(options);
+
+    void this.steamGames.verifyConflicts(options).catch(() => undefined);
+
+    return { message: "Steam conflicts check started" };
+  }
+
+  @ApiCookieAuth()
+  @UseGuards(RolesGuard)
+  @Roles(RolesEnum.ADMIN)
+  @UseGuards(AuthGuard("jwt"))
   @Post("/achievements/sync")
   @ApiOperation({
     summary:

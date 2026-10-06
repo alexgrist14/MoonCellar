@@ -14,7 +14,16 @@ import {
   type PlatformDocument,
 } from "../../games/schemas/platform.schema";
 import { normalizeTitle } from "../../games/utils/title-match.utils";
-import type { TMatchCandidate } from "../../games/matching/game-matcher.types";
+import type {
+  IMatchSubject,
+  TMatchCandidate,
+} from "../../games/matching/game-matcher.types";
+import {
+  MATCH_CANDIDATE_PROJECTION,
+  resolveMatch,
+} from "../../games/matching/game-matcher.utils";
+import { IGDB_MATCH_PROFILE } from "../../games/matching/match-profiles";
+import { GameMatcherService } from "../../games/matching/game-matcher.service";
 import { ConflictsService } from "../../conflicts/services/conflicts.service";
 import type {
   IConflictDecision,
@@ -26,16 +35,20 @@ import { runCronExclusive, withDbLock } from "../../../shared/cron-mutex";
 import { mergeSteamStore } from "../utils/steam.utils";
 import {
   buildSteamGamePayload,
+  decodeHtml,
+  parseSteamDate,
   STEAM_PLATFORM_SLUGS,
   type ISteamAppDetails,
 } from "../utils/steam-game-payload.utils";
 import { GamesService } from "../../games/services/games.service";
-import { uniqueSlug } from "../../../shared/utils";
+import { sleep, uniqueSlug } from "../../../shared/utils";
 import {
   STEAM_GAMES_CRON,
   STEAM_GAMES_CRON_OPTIONS,
   STEAM_GAMES_PAGE_SIZE,
   STEAM_PC_PLATFORM_SLUGS,
+  STEAM_STORE_DELAY_MS,
+  STEAM_VERIFY_LIMIT,
 } from "../constants/steam-games";
 import { STEAM_ACHIEVEMENTS_TIMEOUT_MS } from "../constants/steam-achievements";
 
@@ -57,10 +70,55 @@ type TCatalogueGame = {
   steam?: ISteamGameField;
 };
 
+export const getSteamUids = (game: Pick<TCatalogueGame, "externalPages">) =>
+  (game.externalPages ?? [])
+    .filter((page) => page.name === "Steam" && /^\d+$/.test(page.uid ?? ""))
+    .map((page) => page.uid);
+
 export const getSteamUid = (game: Pick<TCatalogueGame, "externalPages">) =>
-  game.externalPages?.find(
-    (page) => page.name === "Steam" && /^\d+$/.test(page.uid ?? "")
-  )?.uid;
+  getSteamUids(game)[0];
+
+export const pickOwnApp = <T extends { appid: number; name: string }>(
+  game: Pick<TCatalogueGame, "name" | "externalPages">,
+  appById: Map<string, T>
+) => {
+  const apps = getSteamUids(game).flatMap((uid) => {
+    const app = appById.get(uid);
+
+    return app ? [app] : [];
+  });
+  const name = normalizeTitle(game.name ?? "");
+
+  return apps.find((app) => normalizeTitle(app.name) === name) ?? apps[0];
+};
+
+export const toSteamMatchSubject = (
+  app: { appid: number; name: string },
+  details: ISteamAppDetails
+): IMatchSubject => {
+  const released = parseSteamDate(details.release_date?.date);
+
+  return {
+    id: String(app.appid),
+    name: app.name,
+    originalName: details.name ?? app.name,
+    alternativeNames: [],
+    type: details.type === "dlc" ? "DLC" : "Main Game",
+    releaseDates: released
+      ? [new Date(released * 1000).toISOString().slice(0, 10)]
+      : [],
+    developers: details.developers ?? [],
+    publishers: details.publishers ?? [],
+    platformSlugs: (
+      Object.keys(STEAM_PLATFORM_SLUGS) as (keyof typeof STEAM_PLATFORM_SLUGS)[]
+    )
+      .filter((key) => details.platforms?.[key])
+      .map((key) => STEAM_PLATFORM_SLUGS[key]),
+    description: details.short_description
+      ? decodeHtml(details.short_description)
+      : "",
+  };
+};
 
 export const isAutoLinkable = (
   candidates: Pick<TCatalogueGame, "externalPages" | "platformIds">[],
@@ -80,6 +138,7 @@ export class SteamGamesService implements OnModuleInit {
     private readonly platforms: Model<PlatformDocument>,
     private readonly conflicts: ConflictsService,
     private readonly gamesService: GamesService,
+    private readonly matcher: GameMatcherService,
     private readonly metrics: BusinessMetricsService,
     private readonly logger: PinoLogger
   ) {
@@ -100,7 +159,13 @@ export class SteamGamesService implements OnModuleInit {
   async syncCron() {
     return runCronExclusive(() =>
       runInCronLogContext(this.logger, "steam-games-sync", () =>
-        this.metrics.trackSync("steam-games-sync", () => this.sync())
+        this.metrics.trackSync("steam-games-sync", async () => {
+          const result = await this.sync();
+
+          await this.verifyConflicts();
+
+          return result;
+        })
       )
     );
   }
@@ -210,6 +275,15 @@ export class SteamGamesService implements OnModuleInit {
     };
   }
 
+  private async getPlatformIdBySlug() {
+    const platforms = await this.platforms
+      .find({ slug: { $in: Object.values(STEAM_PLATFORM_SLUGS) } })
+      .select("_id slug")
+      .lean();
+
+    return new Map(platforms.map(({ _id, slug }) => [slug, String(_id)]));
+  }
+
   private async getPcPlatformIds() {
     const platforms = await this.platforms
       .find({ slug: { $in: STEAM_PC_PLATFORM_SLUGS } })
@@ -237,16 +311,12 @@ export class SteamGamesService implements OnModuleInit {
     let autoLinked = 0;
 
     for (const game of games) {
-      const uid = getSteamUid(game);
+      getSteamUids(game).forEach((uid) => linkedUids.add(uid));
 
-      if (uid) {
-        linkedUids.add(uid);
-        const app = appById.get(uid);
+      const app = pickOwnApp(game, appById);
 
-        if (
-          app &&
-          (game.steam?.appId !== app.appid || game.steam?.name !== app.name)
-        ) {
+      if (app) {
+        if (game.steam?.appId !== app.appid || game.steam?.name !== app.name) {
           directOps.push({
             updateOne: {
               filter: { _id: game._id },
@@ -284,7 +354,7 @@ export class SteamGamesService implements OnModuleInit {
         for (const winnerId of resolution.winners) {
           const game = gameById.get(String(winnerId));
 
-          if (game && getSteamUid(game) !== appId) {
+          if (game && !getSteamUids(game).includes(appId)) {
             bulkOps.push(this.linkUpdate(game, app));
           }
         }
@@ -309,6 +379,10 @@ export class SteamGamesService implements OnModuleInit {
     if (directOps.length) await this.games.bulkWrite(directOps);
     if (bulkOps.length) await this.games.bulkWrite(bulkOps);
     await this.conflicts.record("steam", ambiguous);
+    const dismissed = await this.conflicts.dismissUndecided(
+      "steam",
+      [...linkedUids].filter((uid) => appById.has(uid))
+    );
 
     this.metrics.recordGames(
       "steam",
@@ -322,6 +396,7 @@ export class SteamGamesService implements OnModuleInit {
       autoLinked,
       pinned: bulkOps.length - autoLinked,
       conflicts: ambiguous.length,
+      dismissed,
     };
 
     this.logger.info(`Steam games sync finished: ${JSON.stringify(summary)}`);
@@ -338,6 +413,104 @@ export class SteamGamesService implements OnModuleInit {
     return { appid: Number(appId), name: data.name };
   }
 
+  async verifyConflicts({
+    limit = STEAM_VERIFY_LIMIT,
+    isDryRun = false,
+  }: { limit?: number; isDryRun?: boolean } = {}) {
+    const pending = await this.conflicts.findUndecided("steam", {
+      limit,
+      unverifiedOnly: true,
+    });
+    const platformSlugById = await this.matcher.getPlatformSlugById();
+    const summary = { checked: 0, linked: 0, kept: 0, failed: 0 };
+    const examples: { game: string; app: string }[] = [];
+    const linkOps: ReturnType<SteamGamesService["linkUpdate"]>[] = [];
+    const dismissed: string[] = [];
+    const verified: {
+      externalId: string;
+      externalData: Record<string, unknown>;
+    }[] = [];
+
+    for (const conflict of pending) {
+      const app = this.fromSnapshot(
+        conflict.externalId,
+        (conflict.externalData ?? null) as Record<string, unknown> | null
+      );
+
+      if (!app) continue;
+
+      let details: ISteamAppDetails | null;
+
+      try {
+        details = await this.fetchDetails(app.appid);
+      } catch (err) {
+        summary.failed += 1;
+        this.logger.warn(
+          `Steam store details failed for app ${app.appid}: ${(err as Error).message}`
+        );
+
+        if ((err as Error).message.includes("429")) break;
+
+        await sleep(STEAM_STORE_DELAY_MS);
+        continue;
+      }
+
+      summary.checked += 1;
+
+      const games = (await this.games
+        .find({
+          _id: {
+            $in: (conflict.candidates ?? []).map(({ gameId }) => gameId),
+          },
+        })
+        .select({ ...MATCH_CANDIDATE_PROJECTION, externalPages: 1, steam: 1 })
+        .lean()) as unknown as (TMatchCandidate & TCatalogueGame)[];
+      const result = details
+        ? resolveMatch(
+            toSteamMatchSubject(app, details),
+            games,
+            { platformSlugById, sharedTitles: new Set() },
+            IGDB_MATCH_PROFILE
+          )
+        : null;
+      const winner = result?.verdict === "matched" ? result.winner : null;
+      const game =
+        winner && games.find(({ _id }) => String(_id) === String(winner._id));
+
+      if (game) {
+        linkOps.push(this.linkUpdate(game, app));
+        dismissed.push(conflict.externalId);
+        examples.push({ game: game.name, app: app.name });
+        summary.linked += 1;
+      } else {
+        verified.push({
+          externalId: conflict.externalId,
+          externalData: {
+            ...((conflict.externalData ?? {}) as Record<string, unknown>),
+            appId: app.appid,
+            name: app.name,
+            verifiedAt: new Date().toISOString(),
+          },
+        });
+        summary.kept += 1;
+      }
+
+      await sleep(STEAM_STORE_DELAY_MS);
+    }
+
+    if (!isDryRun) {
+      if (linkOps.length) await this.games.bulkWrite(linkOps);
+      await this.conflicts.dismissUndecided("steam", dismissed);
+      await this.conflicts.setExternalData("steam", verified);
+    }
+
+    this.logger.info(
+      `Steam conflicts verified${isDryRun ? " (dry run)" : ""}: ${JSON.stringify(summary)}`
+    );
+
+    return { ...summary, isDryRun, examples: examples.slice(0, 30) };
+  }
+
   private async describeConflict(
     appId: string,
     data: Record<string, unknown> | null
@@ -346,16 +519,48 @@ export class SteamGamesService implements OnModuleInit {
 
     if (!app) return null;
 
+    const [details, poster] = await Promise.all([
+      this.fetchDetails(app.appid).catch(() => null),
+      this.findImage(app.appid, "library_600x900.jpg"),
+    ]);
+    const released = parseSteamDate(details?.release_date?.date);
+    const platformIdBySlug = await this.getPlatformIdBySlug();
+    const platformIds = details?.platforms
+      ? (
+          Object.keys(
+            STEAM_PLATFORM_SLUGS
+          ) as (keyof typeof STEAM_PLATFORM_SLUGS)[]
+        )
+          .filter((key) => details.platforms?.[key])
+          .flatMap((key) => {
+            const id = platformIdBySlug.get(STEAM_PLATFORM_SLUGS[key]);
+
+            return id ? [id] : [];
+          })
+      : [...(await this.getPcPlatformIds())];
+
     return {
       name: app.name,
-      originalName: app.name,
+      originalName: details?.name ?? app.name,
       alternativeNames: [],
-      description: "",
-      released: null,
-      developers: [],
-      platformIds: [...(await this.getPcPlatformIds())],
+      description: details?.short_description
+        ? decodeHtml(details.short_description)
+        : "",
+      released: released
+        ? new Date(released * 1000).toISOString().slice(0, 10)
+        : null,
+      developers: [
+        ...new Set([
+          ...(details?.developers ?? []),
+          ...(details?.publishers ?? []),
+        ]),
+      ],
+      platformIds,
       lengthMinutes: null,
-      cover: `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${app.appid}/header.jpg`,
+      cover:
+        poster ??
+        details?.header_image ??
+        `${STEAM_ASSETS_URL}/${app.appid}/header.jpg`,
       isExplicitCover: false,
       url: `https://store.steampowered.com/app/${app.appid}`,
     };
