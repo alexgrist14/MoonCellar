@@ -17,7 +17,7 @@ RA data is never stored in collections of its own; it lives on the records that 
 |---|---|---|
 | Game | `retroachievements[]` | One entry per linked set: `gameId` (RA set id), `consoleId`, `consoleName`, `imageIcon` (absolute URL), `numAchievements` |
 | Platform | `raId` | The RA console the platform maps to |
-| Conflict (`source: "ra"`) | `externalData` | A snapshot of an ambiguous RA set, since it has no game to live on |
+| Conflict (`source: "ra"`) | `externalData` | A snapshot of an ambiguous RA set, since it has no game to live on: `id`, `title`, `consoleId`, `consoleName`, `cover` (box art path from `getGame`), `numAchievements` |
 
 ### Nightly sync
 

@@ -150,7 +150,15 @@ export class ConflictsService {
       items.map(({ externalId, externalData }) => ({
         updateOne: {
           filter: { source, externalId },
-          update: { $set: { externalData } },
+          update: [
+            {
+              $set: {
+                externalData: {
+                  $mergeObjects: ["$externalData", { $literal: externalData }],
+                },
+              },
+            },
+          ],
         },
       })),
       { ordered: false }

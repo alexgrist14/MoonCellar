@@ -87,20 +87,21 @@ export class FavoritesService {
     }
 
     try {
-      const updated = await (replaceId
-        ? this.userModel.findOneAndUpdate(
-            { _id: ownerId, favorites: { $all: [replaceId], $ne: id } },
-            { $set: { "favorites.$[old]": id } },
-            { new: true, arrayFilters: [{ old: replaceId }] }
-          )
-        : this.userModel.findOneAndUpdate(
-            {
-              _id: ownerId,
-              favorites: { $ne: id },
-            },
-            { $push: { favorites: id } },
-            { new: true }
-          )
+      const updated = await (
+        replaceId
+          ? this.userModel.findOneAndUpdate(
+              { _id: ownerId, favorites: { $all: [replaceId], $ne: id } },
+              { $set: { "favorites.$[old]": id } },
+              { new: true, arrayFilters: [{ old: replaceId }] }
+            )
+          : this.userModel.findOneAndUpdate(
+              {
+                _id: ownerId,
+                favorites: { $ne: id },
+              },
+              { $push: { favorites: id } },
+              { new: true }
+            )
       )
         .select("favorites")
         .lean<{ favorites: mongoose.Types.ObjectId[] }>();
@@ -272,7 +273,7 @@ export class FavoritesService {
 
     const characters = await this.characterModel
       .find({ _id: { $in: ids } })
-      .select("-igdb -vndb -gameIds -__v")
+      .select("-igdb -vndb -__v")
       .lean();
 
     const byId = new Map(

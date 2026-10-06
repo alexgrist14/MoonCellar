@@ -1,7 +1,7 @@
-import { FC, ReactNode, useState } from "react";
+import { FC, ReactNode, useEffect, useState } from "react";
 import classNames from "classnames";
 import styles from "./Spoiler.module.scss";
-import { SvgEye } from "../svg";
+import { SpoilerButton } from "../SpoilerButton";
 
 interface ISpoilerProps {
   children: ReactNode;
@@ -34,27 +34,23 @@ export const Spoiler: FC<ISpoilerProps> = ({
         {children}
       </div>
       {isHidden && (
-        <button
-          type="button"
+        <SpoilerButton
           className={styles.spoiler__button}
           onClick={() => setIsRevealed(true)}
         >
-          <SvgEye size="16" color="attention" />
           {label}
-        </button>
+        </SpoilerButton>
       )}
       {isActive && isRevealed && (
-        <button
-          type="button"
+        <SpoilerButton
           className={classNames(
             styles.spoiler__button,
             styles.spoiler__button_hide
           )}
           onClick={() => setIsRevealed(false)}
         >
-          <SvgEye size="16" color="attention" />
           {hideLabel}
-        </button>
+        </SpoilerButton>
       )}
     </div>
   );

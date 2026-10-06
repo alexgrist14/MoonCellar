@@ -8,6 +8,7 @@ interface ICharacterCardProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   character: ICharacterResponse;
   rank?: number;
   priority?: boolean;
+  isSpoiler?: boolean;
 }
 
 export const CharacterCard: FC<ICharacterCardProps> = ({
@@ -15,11 +16,14 @@ export const CharacterCard: FC<ICharacterCardProps> = ({
   rank,
   priority,
   className,
+  isSpoiler = false,
   ...buttonProps
 }) => {
   const meta = [character.species, character.gender]
     .filter(Boolean)
     .join(" · ");
+
+  console.log(isSpoiler);
 
   return (
     <button
@@ -37,7 +41,11 @@ export const CharacterCard: FC<ICharacterCardProps> = ({
           <span className={styles.card__rank}>{rank}</span>
         )}
       </span>
-      <span className={styles.card__name}>{character.name}</span>
+      <span className={styles.card__name}>
+        {" "}
+        {isSpoiler && <span className={styles.card__spoiler}>(S) </span>}
+        {character.name}
+      </span>
       {!!meta && <span className={styles.card__meta}>{meta}</span>}
     </button>
   );

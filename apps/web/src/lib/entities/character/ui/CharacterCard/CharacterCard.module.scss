@@ -62,4 +62,8 @@
     @include font(12px, 16px, 400);
     @include lineClamp(1);
   }
+
+  &__spoiler {
+    color: var(--color-attention);
+  }
 }
