@@ -133,7 +133,7 @@ describe("ConflictsService", () => {
       {
         source: "vndb",
         externalId: "v1",
-        status: "pending",
+        status: { $in: ["pending", "postponed", "dismissed"] },
         decision: null,
         "candidates.gameId": { $all: [new Types.ObjectId(gameId)] },
       },

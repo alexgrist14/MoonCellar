@@ -406,3 +406,23 @@ const AnyControlDemo = () => {
 };
 
 export const AnyControl: Story = { render: () => <AnyControlDemo /> };
+
+const EnumPlaceholderDemo = () => {
+  const [role, setRole] = useState<string>();
+
+  return (
+    <Column>
+      <EnumField
+        label="Tsukihime"
+        value={role}
+        options={["Protagonist", "Main", "Side", "Appears"]}
+        placeholder="Auto (VNDB: Main)"
+        onChange={setRole}
+      />
+    </Column>
+  );
+};
+
+export const EnumWithPlaceholder: Story = {
+  render: () => <EnumPlaceholderDemo />,
+};

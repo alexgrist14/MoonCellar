@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { type HydratedDocument } from "mongoose";
 import {
+  type ICharacterGameRole,
   type ICharacterIGDBField,
   type ICharacterTrait,
   type ICharacterVndbField,
@@ -36,6 +37,8 @@ export class Character {
   gameIds: mongoose.Types.ObjectId[];
   @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: "Game" })
   spoilerGameIds: mongoose.Types.ObjectId[];
+  @Prop({ type: [Object], default: undefined })
+  roles?: ICharacterGameRole[];
   @Prop({ type: Object })
   igdb: ICharacterIGDBField;
   @Prop({ type: Object })

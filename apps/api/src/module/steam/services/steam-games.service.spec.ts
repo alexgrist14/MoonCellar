@@ -4,6 +4,7 @@ import {
   getSteamUids,
   isAutoLinkable,
   pickOwnApp,
+  pickSameCompanyCandidate,
   toSteamMatchSubject,
 } from "./steam-games.service";
 
@@ -136,5 +137,48 @@ describe("toSteamMatchSubject", () => {
       platformSlugs: ["win"],
       description: "WTCC & more",
     });
+  });
+});
+
+describe("pickSameCompanyCandidate", () => {
+  const candidate = (name: string, companies: number) => ({
+    game: { name },
+    breakdown: { companies },
+  });
+
+  it("links the only candidate with the same title and a shared company", () => {
+    expect(
+      pickSameCompanyCandidate("Poetry in Purgatory", [
+        candidate("Poetry in Purgatory", 4),
+        candidate("Poetry", 4),
+      ])?.name
+    ).toBe("Poetry in Purgatory");
+  });
+
+  it("keeps every letter of the title, so an add-on pack is not its game", () => {
+    expect(
+      pickSameCompanyCandidate("ATLAS レジェンドパック", [
+        candidate("Atlas", 4),
+      ])
+    ).toBeNull();
+    expect(
+      pickSameCompanyCandidate("Atlas: Legend", [candidate("Atlas Legend", 4)])
+        ?.name
+    ).toBe("Atlas Legend");
+  });
+
+  it("does nothing without a shared company", () => {
+    expect(
+      pickSameCompanyCandidate("Pyramids", [candidate("Pyramids", -1)])
+    ).toBeNull();
+  });
+
+  it("does nothing when two candidates qualify", () => {
+    expect(
+      pickSameCompanyCandidate("Hush", [
+        candidate("Hush", 2),
+        candidate("Hush", 4),
+      ])
+    ).toBeNull();
   });
 });

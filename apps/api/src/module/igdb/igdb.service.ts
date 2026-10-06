@@ -93,6 +93,7 @@ import {
   isConfirmedIgdbMatch,
   withoutOtherIgdbGames,
 } from "./utils/igdb-match.utils";
+import { buildEditionLinks } from "./utils/edition-links.utils";
 
 type ImageField = (typeof IMAGE_FIELDS)[number];
 
@@ -511,7 +512,7 @@ export class IGDBService implements OnModuleInit {
         "igdb.gameId": { $exists: true },
       })
         .select(
-          "_id vndb igdb.gameId igdb.parent_game " +
+          "_id vndb igdb.gameId igdb.parent_game igdb.version_parent " +
             RELATED_GAME_ARRAY_FIELDS.map((field) => `igdb.${field}`).join(" ")
         )
         .lean();
@@ -519,6 +520,7 @@ export class IGDBService implements OnModuleInit {
       const idByIgdbId = new Map(
         games.map((game) => [game.igdb.gameId, game._id])
       );
+      const editionLinks = buildEditionLinks(games);
 
       const now = new Date().toISOString();
       const bulkOps = [];
@@ -549,6 +551,18 @@ export class IGDBService implements OnModuleInit {
             relatedGames.parent_game = parentId;
             hasAny = true;
           }
+        }
+
+        const editionLink = editionLinks.get(String(game._id));
+
+        if (editionLink?.version_parent) {
+          relatedGames.version_parent = editionLink.version_parent;
+          hasAny = true;
+        }
+
+        if (editionLink?.editions.length) {
+          relatedGames.editions = editionLink.editions;
+          hasAny = true;
         }
 
         if (hasAny) {

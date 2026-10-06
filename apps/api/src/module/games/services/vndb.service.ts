@@ -1217,7 +1217,7 @@ export class VndbService implements OnModuleInit {
       }>("/character", {
         filters,
         fields:
-          "name,original,aliases,description,image.id,image.url,image.sexual,image.violence,sex,vns.id,vns.spoiler,gender,traits.name,traits.group_name,traits.spoiler,traits.lie,traits.sexual",
+          "name,original,aliases,description,image.id,image.url,image.sexual,image.violence,sex,vns.id,vns.spoiler,vns.role,gender,traits.name,traits.group_name,traits.spoiler,traits.lie,traits.sexual",
         results: 100,
         page,
       });
@@ -1317,6 +1317,11 @@ export class VndbService implements OnModuleInit {
                   .filter(({ spoiler }) => spoiler > 0)
                   .map(({ id }) => id),
                 image: character.image?.url ?? null,
+                roles: Object.fromEntries(
+                  character.vns
+                    .filter(({ role }) => !!role)
+                    .map(({ id, role }) => [id, role])
+                ),
               },
               updatedAt: now,
             },

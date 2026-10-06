@@ -40,6 +40,8 @@ const STATE_FILTERS: Record<IConflictState, object> = {
   "queued-new": { status: "pending", decision: "skip" },
   matched: { status: "resolved" },
   "new-game": { status: "absent" },
+  postponed: { status: "postponed" },
+  dismissed: { status: "dismissed" },
 };
 
 const escapeRegExp = (value: string) =>
@@ -53,11 +55,13 @@ const conflictState = ({
     ? "matched"
     : status === "absent"
       ? "new-game"
-      : decision === "match"
-        ? "queued-match"
-        : decision === "skip"
-          ? "queued-new"
-          : "waiting";
+      : status === "postponed" || status === "dismissed"
+        ? status
+        : decision === "match"
+          ? "queued-match"
+          : decision === "skip"
+            ? "queued-new"
+            : "waiting";
 
 const winnerIds = ({
   winner,
@@ -183,20 +187,58 @@ export class ConflictsService {
 
   async findUndecided(
     source: IConflictSource,
-    { limit, unverifiedOnly }: { limit: number; unverifiedOnly?: boolean }
+    {
+      limit,
+      unverifiedOnly,
+      dueBefore,
+    }: { limit: number; unverifiedOnly?: boolean; dueBefore?: Date }
   ) {
     return this.conflictsModel
       .find({
         source,
-        ...UNDECIDED_FILTER,
-        ...(unverifiedOnly && {
-          "externalData.verifiedAt": { $exists: false },
-        }),
+        $or: [
+          {
+            ...UNDECIDED_FILTER,
+            ...(unverifiedOnly && {
+              "externalData.verifiedAt": { $exists: false },
+            }),
+          },
+          ...(dueBefore
+            ? [
+                {
+                  status: "postponed",
+                  "externalData.recheckAfter": {
+                    $lte: dueBefore.toISOString(),
+                  },
+                },
+              ]
+            : []),
+        ],
       })
       .select("externalId externalData candidates.gameId")
       .sort({ _id: 1 })
       .limit(limit)
       .lean();
+  }
+
+  async setStatus(
+    source: IConflictSource,
+    externalIds: string[],
+    status: "pending" | "postponed" | "dismissed"
+  ) {
+    if (!externalIds.length) return 0;
+
+    const { modifiedCount } = await this.conflictsModel.updateMany(
+      {
+        source,
+        externalId: { $in: externalIds },
+        status: { $in: ["pending", "postponed", "dismissed"] },
+        decision: null,
+      },
+      { $set: { status } }
+    );
+
+    return modifiedCount;
   }
 
   async dismissUndecided(source: IConflictSource, externalIds: string[]) {
@@ -205,7 +247,8 @@ export class ConflictsService {
     const { deletedCount } = await this.conflictsModel.deleteMany({
       source,
       externalId: { $in: externalIds },
-      ...UNDECIDED_FILTER,
+      status: { $in: ["pending", "postponed", "dismissed"] },
+      decision: null,
     });
 
     return deletedCount;
@@ -562,12 +605,14 @@ export class ConflictsService {
         {
           source,
           externalId,
-          ...UNDECIDED_FILTER,
+          status: { $in: ["pending", "postponed", "dismissed"] },
+          decision: null,
           ...(winners.length ? { "candidates.gameId": { $all: winners } } : {}),
           ...(entryId ? { "entries.id": entryId } : {}),
         },
         {
           $set: {
+            status: "pending",
             decision: isMatch ? "match" : "skip",
             winner: winners[0] ?? null,
             winners,

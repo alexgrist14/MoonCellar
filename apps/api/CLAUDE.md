@@ -403,6 +403,12 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
 
 ## IGDB
 
+- **Editions are linked from IGDB `version_parent`, which no array field mirrors.** IGDB leaves an
+  edition's `dlcs`, `remakes`, `similar_games` and the rest empty and builds its "Editions" block
+  from `version_parent` alone, so `linkRelatedGames` reading only the arrays gave the 8,046 editions
+  no related games at all. `buildEditionLinks` sets `relatedGames.version_parent` (the original)
+  and `relatedGames.editions` (the original's other editions, or on the original every edition);
+  the web shows both in the Versions tab. Requests cannot set either: the nightly run recomputes them.
 - `linkGameCharacters()` loads every game to reconcile both sides, so it must only write rows
   that actually changed — `isSameObjectIdList` guards each `bulkWrite` op. Without that guard a
   nightly re-run rewrites all ~376k game documents and bumps their `updatedAt`, which

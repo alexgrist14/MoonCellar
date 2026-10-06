@@ -27,7 +27,10 @@ import styles from "../RequestForm/RequestForm.module.scss";
 
 const RELATION_OPTIONS = (
   Object.keys(RELATION_LABELS) as IRelatedGameKey[]
-).filter((key): key is IRelatedEntry["relation"] => key !== "parent_game");
+).filter(
+  (key): key is IRelatedEntry["relation"] =>
+    !["parent_game", "version_parent", "editions"].includes(key)
+);
 
 const MULTIPLAYER_FLAGS: [string, string][] = [
   ["campaignCoop", "Campaign coop"],

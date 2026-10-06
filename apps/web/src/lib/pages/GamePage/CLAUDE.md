@@ -38,7 +38,7 @@ landing page — there are about 10 000 of them.
 2. `widgets/game/GameHero` — cover, name (`h1`), stats, controls.
 3. Three columns: `entities/game/ui/GameOverview` (summary, storyline, keywords), `widgets/game/GameScoreColumn`,
    `widgets/game/GameSideColumn`.
-4. `entities/game/ui/GameMedia` and `widgets/game/GameCharacters` — hidden for adult games
+4. `entities/game/ui/GameMedia` and `widgets/game/GameCharacters` (`game.characters`, ordered by role in `getGameBySlug` / `getGameById` with `sortCharactersByRole`: an admin's role, else VNDB's, else Protagonist from the description; `GET /characters?gameId=` uses the same order) — hidden for adult games
    when `useHideAdult()` is true.
 5. `entities/game/ui/GameDetails` — the remaining catalogue facts.
 6. `widgets/game/GameRelated`.

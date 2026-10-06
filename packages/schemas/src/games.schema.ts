@@ -140,6 +140,16 @@ export const ExternalPageSchema = z.object({
 
 export const RelatedGamesSchema = z.object({
   parent_game: z.string().nullable().optional(),
+  version_parent: z
+    .string()
+    .nullable()
+    .optional()
+    .describe("The game this edition is a version of (IGDB version_parent)"),
+  editions: z
+    .string()
+    .array()
+    .optional()
+    .describe("Editions of the same game: its versions, or its siblings"),
   dlcs: z.string().array().optional(),
   expansions: z.string().array().optional(),
   standalone_expansions: z.string().array().optional(),

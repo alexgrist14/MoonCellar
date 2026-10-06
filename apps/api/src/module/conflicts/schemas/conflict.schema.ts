@@ -41,7 +41,7 @@ export class Conflict {
   @Prop({ type: String, default: null })
   winnerEntryId: string | null;
   @Prop({ type: String })
-  status: "resolved" | "pending" | "absent";
+  status: "resolved" | "pending" | "absent" | "postponed" | "dismissed";
   @Prop({ type: Types.ObjectId, default: null })
   winner: Types.ObjectId | null;
   @Prop({ type: [Types.ObjectId], default: [] })

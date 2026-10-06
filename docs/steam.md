@@ -33,15 +33,29 @@ linked already.
 of up to 1,000 undecided conflicts that were never checked, one every 1.6 seconds (the store API
 allows about 200 requests per 5 minutes), and scores the candidates with the shared matcher
 (`resolveMatch`, the IGDB profile): title, developers and publishers, release date, platforms and
-description. A confident match links the game and removes the conflict; the rest stay for review
-and are marked `externalData.verifiedAt` so they are not read again. A 429 from the store stops
-the run. By hand: `POST /steam/games/verify?limit=&dryRun=true` (admin); a dry run answers with
+description. What happens to each conflict:
+
+| Store page says | Result |
+|---|---|
+| No page (`success: false`) — a hidden, legacy or bundle app | **Dismissed**: closed for good, the weekly run does not bring it back |
+| `coming_soon` — not released yet | **Waits for release**: out of the queue, checked again after 30 days (`externalData.recheckAfter`) |
+| The matcher is confident | Linked, data copied into empty fields, conflict removed |
+| One candidate has the same title (or alternative name) and a shared company | Linked the same way, even when the dates differ or the title is short — a re-release on Steam |
+| Anything else | Stays waiting, marked `externalData.verifiedAt` so it is not read again |
+
+An admin can still match or skip a dismissed or postponed conflict by hand; it then goes through
+the normal flow. Results are written every 50 conflicts
+with a progress line in the log, so a stopped run keeps what it checked. A 429 from the store stops
+the run. By hand: `POST /steam/games/verify?limit=&dryRun=true&all=true` (admin; `all` re-checks conflicts that were checked before); a dry run answers with
 the counts and the first links it would make. The conflict card reads the same store page, so it
 shows the release date, companies, platforms, description and cover (the 600×900 poster, the
 header image when the app has none).
 
 **Resolving a `steam` conflict**
-- **Match** links the chosen games and adds their Steam page.
+- **Match** links the chosen games, adds their Steam page and fills every field the game still
+  lacks from the store page: cover, description, release date, companies, platforms, genres,
+  modes, screenshots, background and website (`fillFromStore` → `GamesService.fillEmptyFields`).
+  A filled field is never replaced. The store page check does the same for the games it links.
 - **Skip** adds the app as a new game, built from its store page (`appdetails`):
   - name, short description, developers and publishers, release date;
   - PC / Mac / Linux platforms;

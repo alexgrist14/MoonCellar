@@ -40,3 +40,7 @@ drafts. Reached from the Characters tab of the admin panel.
   server layout lets a refreshable session through, so the client check is the second gate.
 - Never put an array into axios `params` for a single id lookup — the API reads `ids=a`, not
   `ids[]=a`, and `/admin/characters/<id>` once loaded the alphabetically first character.
+- **The editor's "Role in each game" sets `roles` (one role per linked game).** An empty field
+  means Auto: the VNDB role for that game's VN, else Protagonist when the description says so.
+  A manual role wins over both, and roles for games that are no longer linked are dropped on
+  save. The game page lists characters by role: Protagonist, Main, the rest, Side, Appears.

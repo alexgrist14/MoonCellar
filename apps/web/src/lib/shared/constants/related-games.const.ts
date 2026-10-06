@@ -2,6 +2,8 @@ import { IRelatedGameKey } from "@mooncellar/schemas";
 
 export const RELATION_LABELS: Record<IRelatedGameKey, string> = {
   parent_game: "Main game",
+  version_parent: "Original",
+  editions: "Edition",
   prequels: "Prequel",
   sequels: "Sequel",
   side_stories: "Side story",

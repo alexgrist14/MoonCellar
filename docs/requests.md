@@ -65,7 +65,7 @@ The payload schemas are `.partial().strict()`: every field is optional, an unkno
 | Companies      | `companies` (name + developer/publisher/porting/supporting flags), shortcut `developer` / `publisher` names                                  |
 | Details        | `multiplayer_modes`, `ageRatings`                                                                                                            |
 | Links          | `websites`, `videos`, `externalPages` (`uid`, optional `name`, `url`)                                                                        |
-| Relations      | `relatedGames` (any relation except `parent_game`, game ids), `parentGameId`                                                                 |
+| Relations      | `relatedGames` (any relation except `parent_game`, `version_parent` and `editions`, game ids), `parentGameId`                                                                 |
 | Images         | `cover`, `screenshots`, `artworks` — links to images on other sites, up to `CONTENT_REQUEST_SCREENSHOTS_MAX` (20) each                       |
 | Source ids     | `igdbId` (positive integer), `vndbId` (`v17` form), `hltbId` (digits), `retroachievements` (`gameId` + `consoleId`, up to 10)                |
 

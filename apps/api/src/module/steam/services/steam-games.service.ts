@@ -48,6 +48,8 @@ import {
   STEAM_GAMES_PAGE_SIZE,
   STEAM_PC_PLATFORM_SLUGS,
   STEAM_STORE_DELAY_MS,
+  STEAM_RELEASE_RECHECK_DAYS,
+  STEAM_VERIFY_BATCH_SIZE,
   STEAM_VERIFY_LIMIT,
 } from "../constants/steam-games";
 import { STEAM_ACHIEVEMENTS_TIMEOUT_MS } from "../constants/steam-achievements";
@@ -118,6 +120,30 @@ export const toSteamMatchSubject = (
       ? decodeHtml(details.short_description)
       : "",
   };
+};
+
+export const pickSameCompanyCandidate = <
+  T extends { name: string; alternative_names?: string[] | null },
+>(
+  appName: string,
+  candidates: { game: T; breakdown: { companies: number } }[]
+) => {
+  const toKey = (name: string) =>
+    name
+      .normalize("NFKC")
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}]+/gu, " ")
+      .trim();
+  const title = toKey(appName);
+  const sameCompany = candidates.filter(
+    ({ game, breakdown }) =>
+      breakdown.companies > 0 &&
+      [game.name, ...(game.alternative_names ?? [])].some(
+        (name) => toKey(name) === title
+      )
+  );
+
+  return sameCompany.length === 1 ? sameCompany[0].game : null;
 };
 
 export const isAutoLinkable = (
@@ -416,26 +442,59 @@ export class SteamGamesService implements OnModuleInit {
   async verifyConflicts({
     limit = STEAM_VERIFY_LIMIT,
     isDryRun = false,
-  }: { limit?: number; isDryRun?: boolean } = {}) {
+    includeVerified = false,
+  }: { limit?: number; isDryRun?: boolean; includeVerified?: boolean } = {}) {
+    const now = new Date();
     const pending = await this.conflicts.findUndecided("steam", {
       limit,
-      unverifiedOnly: true,
+      unverifiedOnly: !includeVerified,
+      dueBefore: now,
     });
     const platformSlugById = await this.matcher.getPlatformSlugById();
-    const summary = { checked: 0, linked: 0, kept: 0, failed: 0 };
-    const examples: { game: string; app: string }[] = [];
-    const linkOps: ReturnType<SteamGamesService["linkUpdate"]>[] = [];
-    const dismissed: string[] = [];
-    const verified: {
+    const summary = {
+      checked: 0,
+      linked: 0,
+      kept: 0,
+      postponed: 0,
+      dismissed: 0,
+      failed: 0,
+    };
+    const examples: { game: string; app: string; rule: string }[] = [];
+    let linkOps: ReturnType<SteamGamesService["linkUpdate"]>[] = [];
+    let linked: string[] = [];
+    let snapshots: {
       externalId: string;
       externalData: Record<string, unknown>;
     }[] = [];
+    let byStatus: Record<"pending" | "postponed" | "dismissed", string[]> = {
+      pending: [],
+      postponed: [],
+      dismissed: [],
+    };
+    let processed = 0;
+    const flush = async () => {
+      if (!isDryRun) {
+        if (linkOps.length) await this.games.bulkWrite(linkOps);
+        await this.conflicts.dismissUndecided("steam", linked);
+        await this.conflicts.setExternalData("steam", snapshots);
+
+        for (const status of ["pending", "postponed", "dismissed"] as const) {
+          await this.conflicts.setStatus("steam", byStatus[status], status);
+        }
+      }
+
+      linkOps = [];
+      linked = [];
+      snapshots = [];
+      byStatus = { pending: [], postponed: [], dismissed: [] };
+      this.logger.info(
+        `Steam conflicts verify progress: ${processed}/${pending.length} ${JSON.stringify(summary)}`
+      );
+    };
 
     for (const conflict of pending) {
-      const app = this.fromSnapshot(
-        conflict.externalId,
-        (conflict.externalData ?? null) as Record<string, unknown> | null
-      );
+      const data = (conflict.externalData ?? {}) as Record<string, unknown>;
+      const app = this.fromSnapshot(conflict.externalId, data);
 
       if (!app) continue;
 
@@ -457,52 +516,92 @@ export class SteamGamesService implements OnModuleInit {
 
       summary.checked += 1;
 
-      const games = (await this.games
-        .find({
-          _id: {
-            $in: (conflict.candidates ?? []).map(({ gameId }) => gameId),
-          },
-        })
-        .select({ ...MATCH_CANDIDATE_PROJECTION, externalPages: 1, steam: 1 })
-        .lean()) as unknown as (TMatchCandidate & TCatalogueGame)[];
-      const result = details
-        ? resolveMatch(
-            toSteamMatchSubject(app, details),
-            games,
-            { platformSlugById, sharedTitles: new Set() },
-            IGDB_MATCH_PROFILE
-          )
-        : null;
-      const winner = result?.verdict === "matched" ? result.winner : null;
-      const game =
-        winner && games.find(({ _id }) => String(_id) === String(winner._id));
+      const snapshot = {
+        ...data,
+        appId: app.appid,
+        name: app.name,
+        verifiedAt: now.toISOString(),
+      };
 
-      if (game) {
-        linkOps.push(this.linkUpdate(game, app));
-        dismissed.push(conflict.externalId);
-        examples.push({ game: game.name, app: app.name });
-        summary.linked += 1;
-      } else {
-        verified.push({
+      if (!details) {
+        byStatus.dismissed.push(conflict.externalId);
+        snapshots.push({
+          externalId: conflict.externalId,
+          externalData: { ...snapshot, dismissedReason: "no-store-page" },
+        });
+        summary.dismissed += 1;
+      } else if (details.release_date?.coming_soon) {
+        byStatus.postponed.push(conflict.externalId);
+        snapshots.push({
           externalId: conflict.externalId,
           externalData: {
-            ...((conflict.externalData ?? {}) as Record<string, unknown>),
-            appId: app.appid,
-            name: app.name,
-            verifiedAt: new Date().toISOString(),
+            ...snapshot,
+            recheckAfter: new Date(
+              now.getTime() + STEAM_RELEASE_RECHECK_DAYS * 24 * 60 * 60 * 1000
+            ).toISOString(),
           },
         });
-        summary.kept += 1;
+        summary.postponed += 1;
+      } else {
+        const games = (await this.games
+          .find({
+            _id: {
+              $in: (conflict.candidates ?? []).map(({ gameId }) => gameId),
+            },
+          })
+          .select({ ...MATCH_CANDIDATE_PROJECTION, externalPages: 1, steam: 1 })
+          .lean()) as unknown as (TMatchCandidate & TCatalogueGame)[];
+        const result = resolveMatch(
+          toSteamMatchSubject(app, details),
+          games,
+          { platformSlugById, sharedTitles: new Set() },
+          IGDB_MATCH_PROFILE
+        );
+        const matched = result.verdict === "matched" ? result.winner : null;
+        const sameCompany =
+          matched || details.type !== "game"
+            ? null
+            : pickSameCompanyCandidate(app.name, result.candidates);
+        const winner = matched ?? sameCompany;
+        const game =
+          winner && games.find(({ _id }) => String(_id) === String(winner._id));
+
+        if (game) {
+          if (!isDryRun) {
+            await this.fillFromStore(game._id, app, details).catch(
+              (err: Error) =>
+                this.logger.warn(
+                  `Steam data was not copied to ${game.name}: ${err.message}`
+                )
+            );
+          }
+
+          linkOps.push(this.linkUpdate(game, app));
+          linked.push(conflict.externalId);
+          examples.push({
+            game: game.name,
+            app: app.name,
+            rule: matched ? "matcher" : "same-company",
+          });
+          summary.linked += 1;
+        } else {
+          byStatus.pending.push(conflict.externalId);
+          snapshots.push({
+            externalId: conflict.externalId,
+            externalData: { ...snapshot, recheckAfter: null },
+          });
+          summary.kept += 1;
+        }
       }
+
+      processed += 1;
+
+      if (processed % STEAM_VERIFY_BATCH_SIZE === 0) await flush();
 
       await sleep(STEAM_STORE_DELAY_MS);
     }
 
-    if (!isDryRun) {
-      if (linkOps.length) await this.games.bulkWrite(linkOps);
-      await this.conflicts.dismissUndecided("steam", dismissed);
-      await this.conflicts.setExternalData("steam", verified);
-    }
+    await flush();
 
     this.logger.info(
       `Steam conflicts verified${isDryRun ? " (dry run)" : ""}: ${JSON.stringify(summary)}`
@@ -600,6 +699,52 @@ export class SteamGamesService implements OnModuleInit {
     }
   }
 
+  async fillFromStore(
+    gameId: mongoose.Types.ObjectId,
+    app: TSteamApp,
+    known?: ISteamAppDetails | null
+  ) {
+    const details = known ?? (await this.fetchDetails(app.appid));
+
+    if (!details?.name) return [];
+
+    const [poster, hero, platformIdBySlug] = await Promise.all([
+      this.findImage(app.appid, "library_600x900_2x.jpg").then(
+        async (url) =>
+          url ?? (await this.findImage(app.appid, "library_600x900.jpg"))
+      ),
+      this.findImage(app.appid, "library_hero.jpg"),
+      this.getPlatformIdBySlug(),
+    ]);
+    const payload = buildSteamGamePayload(app.appid, details, {
+      slug: "",
+      platformIdBySlug,
+      cover: poster ?? details.header_image ?? null,
+      hero,
+    });
+    const filled = await this.gamesService.fillEmptyFields(gameId, {
+      cover: payload.cover,
+      summary: payload.summary,
+      first_release: payload.first_release,
+      companies: payload.companies,
+      genres: payload.genres,
+      modes: payload.modes,
+      platformIds: payload.platformIds,
+      screenshots: payload.screenshots,
+      artworks: payload.artworks,
+      backgroundImage: payload.backgroundImage,
+      websites: payload.websites,
+    });
+
+    if (filled.length) {
+      this.logger.info(
+        `Filled ${filled.join(", ")} of game ${String(gameId)} from Steam app ${app.appid}`
+      );
+    }
+
+    return filled;
+  }
+
   async createGame(app: TSteamApp) {
     const existing = await this.games
       .findOne({ "steam.appId": app.appid })
@@ -684,6 +829,14 @@ export class SteamGamesService implements OnModuleInit {
         games.map((game) => this.linkUpdate(game, app))
       );
       applied.set(externalId, winners[0]);
+
+      for (const game of games) {
+        await this.fillFromStore(game._id, app).catch((err: Error) =>
+          this.logger.warn(
+            `Steam data was not copied to ${game.name}: ${err.message}`
+          )
+        );
+      }
     }
 
     return applied;

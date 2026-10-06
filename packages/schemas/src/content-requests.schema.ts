@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CharacterSchema } from "./characters.schema";
+import { CharacterRoleSchema, CharacterSchema } from "./characters.schema";
 import {
   AgeRatingSchema,
   GameAiDraftRequestSchema,
@@ -68,7 +68,11 @@ const RequestExternalPageSchema = z.object({
 });
 
 const RequestRelatedGamesSchema = z.partialRecord(
-  RelatedGamesSchema.keyof().exclude(["parent_game"]),
+  RelatedGamesSchema.keyof().exclude([
+    "parent_game",
+    "version_parent",
+    "editions",
+  ]),
   ObjectIdSchema.array().max(50)
 );
 
@@ -287,6 +291,13 @@ export const SaveCharacterRequestSchema = z
     countryName: z.string().trim().max(120).nullable(),
     description: z.string().trim().max(10000).nullable(),
     gameIds: ObjectIdSchema.array().max(200),
+    roles: z
+      .object({ gameId: ObjectIdSchema, role: CharacterRoleSchema })
+      .array()
+      .max(200)
+      .describe(
+        "Role in each linked game; a game left out keeps the automatic role"
+      ),
     mugShotUrl: LinkSchema,
   })
   .partial();

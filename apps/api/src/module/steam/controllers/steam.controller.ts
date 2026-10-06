@@ -78,13 +78,21 @@ export class SteamController {
   })
   @ApiQuery({ name: "limit", required: false, type: Number })
   @ApiQuery({ name: "dryRun", required: false, type: Boolean })
+  @ApiQuery({
+    name: "all",
+    required: false,
+    type: Boolean,
+    description: "Check conflicts that were already checked too",
+  })
   verifySteamConflicts(
     @Query("limit") limitQuery?: string,
-    @Query("dryRun") dryRun?: string
+    @Query("dryRun") dryRun?: string,
+    @Query("all") all?: string
   ) {
     const options = {
       limit: limitQuery ? Number(limitQuery) : undefined,
       isDryRun: dryRun === "true",
+      includeVerified: all === "true",
     };
 
     if (options.isDryRun) return this.steamGames.verifyConflicts(options);

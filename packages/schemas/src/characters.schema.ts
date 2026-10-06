@@ -10,11 +10,26 @@ export const CharacterIGDBSchema = z.object({
   checksum: z.string().nullable().optional(),
 });
 
+export const CHARACTER_ROLES = ["main", "primary", "side", "appears"] as const;
+
+export const CharacterRoleSchema = z
+  .enum(CHARACTER_ROLES)
+  .describe("main is the protagonist, primary a main character");
+
+export const CharacterGameRoleSchema = z.object({
+  gameId: z.string(),
+  role: CharacterRoleSchema,
+});
+
 export const CharacterVndbSchema = z.object({
   characterId: z.string(),
   vns: z.string().array(),
   spoilerVns: z.string().array().optional(),
   image: z.string().nullable().optional(),
+  roles: z
+    .record(z.string(), CharacterRoleSchema)
+    .optional()
+    .describe("Role in each VN by VNDB id: main is the protagonist"),
 });
 
 export const CharacterTraitSchema = z.object({
@@ -38,6 +53,9 @@ export const CharacterSchema = z.object({
   traits: CharacterTraitSchema.array().optional(),
   gameIds: z.string().array().optional(),
   spoilerGameIds: z.string().array().optional(),
+  roles: CharacterGameRoleSchema.array()
+    .optional()
+    .describe("Roles set by an admin, by game; they win over VNDB roles"),
   igdb: CharacterIGDBSchema.optional(),
   vndb: CharacterVndbSchema.optional(),
   createdAt: z.string(),
@@ -78,3 +96,6 @@ export type IGetCharacterBySlugRequest = z.infer<
 export type IGetCharactersResponse = z.infer<
   typeof GetCharactersResponseSchema
 >;
+
+export type ICharacterRole = z.infer<typeof CharacterRoleSchema>;
+export type ICharacterGameRole = z.infer<typeof CharacterGameRoleSchema>;

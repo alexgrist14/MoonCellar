@@ -1,3 +1,5 @@
+import { sortCharactersByRole } from "../utils/character-order.utils";
+import { pickEmptyFields } from "../utils/fill-fields.utils";
 import {
   BadRequestException,
   ConflictException,
@@ -113,6 +115,23 @@ const CHARACTERS_LOOKUP_STAGE = {
 };
 
 const STRIP_CHARACTERS_STAGE = { $unset: "characters" };
+
+const withOrderedCharacters = <
+  T extends {
+    _id: unknown;
+    vndb?: { vnId?: string | null } | null;
+    characters?: Parameters<typeof sortCharactersByRole>[0];
+  },
+>(
+  game: T
+) => ({
+  ...game,
+  characters: sortCharactersByRole(
+    game.characters ?? [],
+    game.vndb?.vnId,
+    String(game._id)
+  ),
+});
 
 const TRIM_IGDB_STAGE = {
   $addFields: {
@@ -276,7 +295,7 @@ export class GamesService implements OnModuleInit {
 
       if (!game) throw new NotFoundException(`Game not found: ${slug}`);
 
-      return game;
+      return withOrderedCharacters(game);
     } catch (err) {
       this.logger.error(err, `Failed to get game by slug: ${slug}`);
       throw err;
@@ -295,7 +314,7 @@ export class GamesService implements OnModuleInit {
 
       if (!game) throw new NotFoundException(`Game not found: ${_id}`);
 
-      return game;
+      return withOrderedCharacters(game);
     } catch (err) {
       this.logger.error(err, `Failed to get game by id: ${_id}`);
       throw err;
@@ -508,6 +527,44 @@ export class GamesService implements OnModuleInit {
       this.logger.error(err, `Failed to add game: ${JSON.stringify(data)}`);
       throw err;
     }
+  }
+
+  async fillEmptyFields(
+    gameId: mongoose.Types.ObjectId,
+    data: Partial<IAddGameRequest>
+  ): Promise<string[]> {
+    const game = await this.Games.findById(gameId).lean();
+
+    if (!game) return [];
+
+    const fill = pickEmptyFields(
+      game as unknown as Record<string, unknown>,
+      data
+    );
+    const keys = Object.keys(fill);
+
+    if (!keys.length) return [];
+
+    const images = await this.storeRemoteImages(
+      gameId,
+      fill as IAddGameRequest
+    );
+
+    await this.Games.updateOne(
+      { _id: gameId },
+      {
+        $set: {
+          ...fill,
+          ...Object.fromEntries(
+            Object.entries(images).filter(([key]) => key in fill)
+          ),
+          updatedAt: new Date().toISOString(),
+        },
+      }
+    );
+    this.indexNow.submitUrl(`${FRONT_URL}/games/${game.slug}`);
+
+    return keys;
   }
 
   private async storeRemoteImages(

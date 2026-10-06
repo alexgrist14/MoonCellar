@@ -32,6 +32,7 @@ import {
   isHttpUrl,
 } from "../../../shared/remote-image";
 import { escapeRegExp } from "../../collections/utils/collections.utils";
+import { sortCharactersByRole } from "../utils/character-order.utils";
 
 const DEFAULT_CHARACTERS_TAKE = 50;
 
@@ -121,10 +122,23 @@ export class CharactersService {
       }
 
       const limit = take || DEFAULT_CHARACTERS_TAKE;
+      const skip = ((page || 1) - 1) * limit;
+
+      if (gameId) {
+        const [game, characters] = await Promise.all([
+          this.Games.findById(gameId).select("vndb.vnId").lean(),
+          this.Characters.find(filter),
+        ]);
+
+        return sortCharactersByRole(characters, game?.vndb?.vnId, gameId).slice(
+          skip,
+          skip + limit
+        );
+      }
 
       return await this.Characters.find(filter)
         .sort({ name: 1 })
-        .skip(((page || 1) - 1) * limit)
+        .skip(skip)
         .limit(limit);
     } catch (err) {
       this.logger.error(err, "Failed to get characters");
@@ -182,7 +196,7 @@ export class CharactersService {
   async saveCharacter(id: string | undefined, dto: ISaveCharacterRequest) {
     const existing = id ? await this.findCharacter(id) : null;
     const characterId = existing?._id ?? new mongoose.Types.ObjectId();
-    const { mugShotUrl, gameIds, slug, ...fields } = dto;
+    const { mugShotUrl, gameIds, slug, roles, ...fields } = dto;
 
     if (!existing && !fields.name) {
       throw new BadRequestException("A name is required");
@@ -218,6 +232,18 @@ export class CharactersService {
         .lean();
 
       set.gameIds = found.map(({ _id }) => _id);
+    }
+
+    if (roles) {
+      const linked = new Set(
+        (
+          (set.gameIds as mongoose.Types.ObjectId[] | undefined) ??
+          existing?.gameIds ??
+          []
+        ).map(String)
+      );
+
+      set.roles = roles.filter(({ gameId }) => linked.has(gameId));
     }
 
     if (mugShotUrl) {

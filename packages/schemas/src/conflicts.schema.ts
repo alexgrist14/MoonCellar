@@ -50,6 +50,8 @@ export const ConflictStateSchema = z.enum([
   "queued-new",
   "matched",
   "new-game",
+  "postponed",
+  "dismissed",
 ]);
 
 export const ConflictSubjectSchema = z.object({

@@ -2,7 +2,12 @@
 
 import { FC, useMemo, useState } from "react";
 import Image from "next/image";
-import { ICharacterResponse, ISaveCharacterRequest } from "@mooncellar/schemas";
+import {
+  ICharacterGameRole,
+  ICharacterResponse,
+  ICharacterRole,
+  ISaveCharacterRequest,
+} from "@mooncellar/schemas";
 import {
   useDeleteCharacterMutation,
   useFindCharacterPortraitsMutation,
@@ -19,6 +24,7 @@ import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import {
+  EnumField,
   StringListField,
   TextField,
   TextareaField,
@@ -31,6 +37,20 @@ import {
 import { ImageFinder } from "@/src/lib/shared/ui/ImageFinder";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import styles from "./CharacterEditor.module.scss";
+
+const ROLE_LABELS: Record<ICharacterRole, string> = {
+  main: "Protagonist",
+  primary: "Main",
+  side: "Side",
+  appears: "Appears",
+};
+
+const ROLE_OPTIONS = Object.values(ROLE_LABELS);
+
+const toRole = (label?: string) =>
+  (Object.keys(ROLE_LABELS) as ICharacterRole[]).find(
+    (role) => ROLE_LABELS[role] === label
+  );
 
 interface ICharacterEditorProps {
   character?: ICharacterResponse;
@@ -69,6 +89,9 @@ export const CharacterEditor: FC<ICharacterEditorProps> = ({
     ? mugShotUrl.trim()
     : undefined;
   const [games, setGames] = useState<ISearchPickerOption[]>();
+  const [roles, setRoles] = useState<ICharacterGameRole[]>(
+    character?.roles ?? []
+  );
 
   const gameSearch = useGameSearch();
   const [pickedPortrait, setPickedPortrait] = useState<string[]>([]);
@@ -110,6 +133,9 @@ export const CharacterEditor: FC<ICharacterEditorProps> = ({
           countryName: countryName.trim() || null,
           description: description.trim() || null,
           gameIds: linkedGames.map((game) => game.id),
+          roles: roles.filter(({ gameId }) =>
+            linkedGames.some((game) => game.id === gameId)
+          ),
           ...((pickedPortrait[0] || mugShotUrl.trim()) && {
             mugShotUrl: pickedPortrait[0] || mugShotUrl.trim(),
           }),
@@ -210,6 +236,47 @@ export const CharacterEditor: FC<ICharacterEditorProps> = ({
             setGames(linkedGames.filter((game) => game.id !== id))
           }
         />
+        {!!linkedGames.length && (
+          <div className={styles.editor__roles}>
+            <SectionTitle as="h4">Role in each game</SectionTitle>
+            {linkedGames.map((game) => {
+              const vnId = initialGames.find(({ _id }) => _id === game.id)?.vndb
+                ?.vnId;
+              const vndbRole = vnId
+                ? (character?.vndb?.roles?.[vnId] as ICharacterRole | undefined)
+                : undefined;
+
+              return (
+                <EnumField
+                  key={game.id}
+                  label={game.label}
+                  options={ROLE_OPTIONS}
+                  placeholder={
+                    vndbRole ? `Auto (VNDB: ${ROLE_LABELS[vndbRole]})` : "Auto"
+                  }
+                  value={
+                    ROLE_LABELS[
+                      roles.find(({ gameId }) => gameId === game.id)
+                        ?.role as ICharacterRole
+                    ]
+                  }
+                  onChange={(label) => {
+                    const role = toRole(label);
+
+                    setRoles([
+                      ...roles.filter(({ gameId }) => gameId !== game.id),
+                      ...(role ? [{ gameId: game.id, role }] : []),
+                    ]);
+                  }}
+                />
+              );
+            })}
+            <p className={styles.muted}>
+              Auto takes the role from VNDB, or Protagonist when the description
+              says so. Characters are listed on the game page by role.
+            </p>
+          </div>
+        )}
         <TextareaField
           label="Description"
           value={description}

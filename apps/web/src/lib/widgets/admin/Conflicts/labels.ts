@@ -77,6 +77,8 @@ const STATE_LABEL_SETS: Record<
     "queued-new": "New game queued",
     matched: "Matched",
     "new-game": "New game",
+    postponed: "Waits for release",
+    dismissed: "Dismissed",
   },
   link: {
     waiting: "Waiting",
@@ -84,6 +86,8 @@ const STATE_LABEL_SETS: Record<
     "queued-new": "No match queued",
     matched: "Matched",
     "new-game": "No match",
+    postponed: "Waits for release",
+    dismissed: "Dismissed",
   },
 };
 

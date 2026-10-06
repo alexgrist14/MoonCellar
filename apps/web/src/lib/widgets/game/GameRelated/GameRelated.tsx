@@ -38,6 +38,8 @@ const RELATED_GROUPS: {
     key: "versions",
     label: "Versions",
     relations: [
+      "version_parent",
+      "editions",
       "remakes",
       "remasters",
       "ports",

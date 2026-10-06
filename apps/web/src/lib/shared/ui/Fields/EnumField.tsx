@@ -6,6 +6,7 @@ interface IEnumFieldProps {
   label: string;
   value?: string;
   options: string[];
+  placeholder?: string;
   onChange: (value: string | undefined) => void;
   error?: string;
   disabled?: boolean;
@@ -15,6 +16,7 @@ export const EnumField: FC<IEnumFieldProps> = ({
   label,
   value,
   options,
+  placeholder,
   onChange,
   error,
   disabled,
@@ -30,7 +32,7 @@ export const EnumField: FC<IEnumFieldProps> = ({
       <span className={styles.label}>{label}</span>
       <Dropdown
         list={list}
-        placeholder={`Select ${label.toLowerCase()}`}
+        placeholder={placeholder ?? `Select ${label.toLowerCase()}`}
         isWithSearch
         isWithReset
         isThroughPortal

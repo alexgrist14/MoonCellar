@@ -38,6 +38,12 @@
     border-radius: var(--radius-x3);
   }
 
+  &__roles {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x2);
+  }
+
   &__actions {
     display: flex;
     justify-content: space-between;

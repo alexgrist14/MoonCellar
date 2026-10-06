@@ -8,4 +8,6 @@ export const STEAM_GAMES_PAGE_SIZE = 50000;
 export const STEAM_PC_PLATFORM_SLUGS = ["win", "mac", "linux"];
 
 export const STEAM_VERIFY_LIMIT = 1000;
+export const STEAM_VERIFY_BATCH_SIZE = 50;
+export const STEAM_RELEASE_RECHECK_DAYS = 30;
 export const STEAM_STORE_DELAY_MS = 1600;
