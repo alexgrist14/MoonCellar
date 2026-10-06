@@ -569,6 +569,13 @@ break silently when ignored:
   Local development is exempt so the setting can be tested without the GeoIP file; a production
   build without that file hides adult content from everyone.
 
+## Remote images
+
+- **Every host a `next/image` loads from must be listed in `images.remotePatterns` in
+  `next.config.mjs`.** An unlisted host shows no error in the UI: the image request fails and the
+  `<img>` stays empty. Steam conflicts rendered no covers until `shared.akamai.steamstatic.com` was
+  added. A new data source with remote images adds its host in the same change.
+
 ## Data fetching failures
 
 - **Every failed request already shows a toast**, from the response interceptor in

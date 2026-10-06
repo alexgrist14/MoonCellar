@@ -244,6 +244,10 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   `RA_MISSING_SET_LOOKUPS` per run. A link the run did not match again — kept on purpose — or a set
   on a console no platform maps to would otherwise stay without its icon and count forever.
 
+- **Read every Steam page of a game (`getSteamUids`), never only the first.** A game often carries
+  two (an expansion or a re-release on its own app); reading the first one alone sent 1,031 apps
+  that were already linked to their game into conflicts as "another Steam app" (RACE On, app 8780,
+  next to 8640). `steam` holds one app (`pickOwnApp`: the same name first).
 - **A game's Steam link lives in `steam` (`appId`, `name`, `updatedAt`), filled by
   `SteamGamesService` from `IStoreService/GetAppList` (all ~190,000 Steam games, 50,000 per
   request).** A game whose `externalPages` already carries a Steam id is linked directly (~143,000).

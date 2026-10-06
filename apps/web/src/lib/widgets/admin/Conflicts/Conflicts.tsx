@@ -57,6 +57,9 @@ export const Conflicts: FC = () => {
   const searchParams = useSearchParams();
   const source = parseConflictSource(searchParams.get("source"));
   const externalId = source ? searchParams.get("conflict") : null;
+  const [failedCovers, setFailedCovers] = useState<Set<string>>(
+    () => new Set()
+  );
   const [selection, setSelection] = useState({ externalId: "", index: 0 });
   const [chosen, setChosen] = useState<{ externalId: string; ids: string[] }>({
     externalId: "",
@@ -319,18 +322,24 @@ export const Conflicts: FC = () => {
                     {subject ? (
                       <>
                         <div className={styles.vn__title}>
-                          {subject.cover && (
-                            <Image
-                              className={classNames(styles.vn__cover, {
-                                [styles.vn__cover_explicit]:
-                                  subject.isExplicitCover,
-                              })}
-                              src={subject.cover}
-                              width={120}
-                              height={160}
-                              alt={subject.name}
-                            />
-                          )}
+                          {subject.cover &&
+                            !failedCovers.has(subject.cover) && (
+                              <Image
+                                className={classNames(styles.vn__cover, {
+                                  [styles.vn__cover_explicit]:
+                                    subject.isExplicitCover,
+                                })}
+                                src={subject.cover}
+                                width={120}
+                                height={160}
+                                alt={subject.name}
+                                onError={() =>
+                                  setFailedCovers((covers) =>
+                                    new Set(covers).add(subject.cover!)
+                                  )
+                                }
+                              />
+                            )}
                           <div>
                             <h3 className={styles.vn__name}>{subject.name}</h3>
                             {subject.originalName !== subject.name && (

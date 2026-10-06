@@ -181,6 +181,36 @@ export class ConflictsService {
     }));
   }
 
+  async findUndecided(
+    source: IConflictSource,
+    { limit, unverifiedOnly }: { limit: number; unverifiedOnly?: boolean }
+  ) {
+    return this.conflictsModel
+      .find({
+        source,
+        ...UNDECIDED_FILTER,
+        ...(unverifiedOnly && {
+          "externalData.verifiedAt": { $exists: false },
+        }),
+      })
+      .select("externalId externalData candidates.gameId")
+      .sort({ _id: 1 })
+      .limit(limit)
+      .lean();
+  }
+
+  async dismissUndecided(source: IConflictSource, externalIds: string[]) {
+    if (!externalIds.length) return 0;
+
+    const { deletedCount } = await this.conflictsModel.deleteMany({
+      source,
+      externalId: { $in: externalIds },
+      ...UNDECIDED_FILTER,
+    });
+
+    return deletedCount;
+  }
+
   async removeForGame(
     source: IConflictSource,
     gameId: Types.ObjectId,

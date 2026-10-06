@@ -83,6 +83,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "t.vndb.org",
       },
+      {
+        protocol: "https",
+        hostname: "shared.akamai.steamstatic.com",
+      },
     ],
   },
 };
