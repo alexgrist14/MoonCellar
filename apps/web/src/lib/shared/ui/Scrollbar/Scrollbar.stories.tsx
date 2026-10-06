@@ -82,4 +82,8 @@ export const HorizontalWithArrows: Story = {
   args: { ...Horizontal.args, isWithArrows: true },
 };
 
+export const HorizontalFaded: Story = {
+  args: { ...Horizontal.args, isFaded: true },
+};
+
 export const ShortContent: Story = { args: { children: rows.slice(0, 3) } };

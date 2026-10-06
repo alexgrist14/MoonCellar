@@ -12,4 +12,46 @@
     )
   );
   gap: var(--gap-x4);
+
+  &_gameSized {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: var(--gap-x3);
+
+    @include mediaMax($screenLaptop) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    @include mediaLg {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    @include mediaSm {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--gap-x2);
+    }
+  }
+
+  &_twoRows {
+    & > :nth-child(n + 13) {
+      display: none;
+    }
+
+    @include mediaMax($screenLaptop) {
+      & > :nth-child(n + 9) {
+        display: none;
+      }
+    }
+
+    @include mediaLg {
+      & > :nth-child(n + 7) {
+        display: none;
+      }
+    }
+
+    @include mediaSm {
+      & > :nth-child(n + 5) {
+        display: none;
+      }
+    }
+  }
 }

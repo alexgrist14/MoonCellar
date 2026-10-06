@@ -10,12 +10,29 @@ export const SYSTEM_USER_NAME = "MoonCellar";
 export const SYSTEM_USER_AVATAR = "/images/logo-icon.png";
 export const USERS_SEARCH_PAGE_SIZE = 10;
 
+export const ProfileBlockSchema = z.enum([
+  "counters",
+  "favoriteGames",
+  "favoriteCharacters",
+  "retroachievements",
+  "lists",
+  "likedLists",
+  "activity",
+]);
+
 export const UserSettingsSchema = z.object({
   showAdultContent: z.boolean(),
   bgOpacity: z.number().min(0).max(1).default(DEFAULT_BG_OPACITY),
   mutedNotifications: MutableNotificationTypeSchema.array()
     .default([])
     .describe("Notification types the user turned off"),
+  raSyncPlaythroughs: z
+    .boolean()
+    .default(false)
+    .describe("Create playthroughs from RetroAchievements awards"),
+  hiddenProfileBlocks: ProfileBlockSchema.array()
+    .default([])
+    .describe("Blocks hidden from the Profile tab"),
 });
 
 export const USER_NAME_MAX_LENGTH = 15;
@@ -53,6 +70,7 @@ export const UserSchemaZod = z.object({
   raSyncedAt: z.string().nullable().optional(),
   raPending: RaPendingSchema.nullable().optional(),
   raAwards: RaAwardSchema.array(),
+  raIgnoredSets: z.number().array().optional(),
   steam: SteamAccountSchema.nullable().optional(),
   roles: RoleSchema.array().default(["user"]),
   avatar: z.string().url().nullable(),
@@ -61,6 +79,8 @@ export const UserSchemaZod = z.object({
     showAdultContent: false,
     bgOpacity: DEFAULT_BG_OPACITY,
     mutedNotifications: [],
+    raSyncPlaythroughs: false,
+    hiddenProfileBlocks: [],
   }),
   updatedAt: z.date(),
 });
@@ -92,6 +112,8 @@ export const UpdateSettingsSchema = z
     showAdultContent: z.boolean(),
     bgOpacity: z.number().min(0).max(1),
     mutedNotifications: MutableNotificationTypeSchema.array(),
+    raSyncPlaythroughs: z.boolean(),
+    hiddenProfileBlocks: ProfileBlockSchema.array(),
   })
   .partial();
 
@@ -192,3 +214,5 @@ export type ISearchUsersResponse = z.infer<typeof SearchUsersResponseSchema>;
 export type IGetUserLoginsResponse = z.infer<
   typeof GetUserLoginsResponseSchema
 >;
+
+export type IProfileBlock = z.infer<typeof ProfileBlockSchema>;

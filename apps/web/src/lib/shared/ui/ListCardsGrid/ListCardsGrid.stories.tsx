@@ -46,3 +46,11 @@ export const FewItems: Story = {
     )),
   },
 };
+
+export const TwoRows: Story = {
+  args: { maxRows: 2 },
+};
+
+export const GameSized: Story = {
+  args: { isGameSized: true, maxRows: 2 },
+};

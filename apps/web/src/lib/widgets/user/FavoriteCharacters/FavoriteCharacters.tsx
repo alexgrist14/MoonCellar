@@ -1,5 +1,6 @@
 "use client";
 
+import { useGridRows } from "@/src/lib/shared/hooks/useGridRows";
 import { FC, useState } from "react";
 import { ICharacterResponse } from "@mooncellar/schemas";
 import { useFavoriteCharactersQuery } from "@/src/lib/entities/user/api/user.queries";
@@ -16,7 +17,8 @@ import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { SvgHeart, SvgPen } from "@/src/lib/shared/ui/svg";
 import styles from "./FavoriteCharacters.module.scss";
 
-const FAVORITE_CHARACTERS_PREVIEW_LIMIT = 10;
+const FAVORITE_CHARACTERS_PREVIEW_LIMIT = 20;
+const PREVIEW_ROWS = 2;
 
 interface IFavoriteCharactersProps {
   userId: string;
@@ -50,11 +52,15 @@ export const FavoriteCharacters: FC<IFavoriteCharactersProps> = ({
   const [draft, setDraft] = useState<ICharacterResponse[] | null>(null);
   const { mutate, isPending } = useUpdateFavoriteCharactersMutation();
 
-  if (!characters.length && !isOwner) return null;
-
   const visible = isPreview
     ? characters.slice(0, FAVORITE_CHARACTERS_PREVIEW_LIMIT)
     : characters;
+  const { ref: gridRef, visibleCount } = useGridRows<HTMLOListElement>(
+    visible.length,
+    isPreview ? PREVIEW_ROWS : undefined
+  );
+
+  if (!characters.length && !isOwner) return null;
 
   const handleSave = () => {
     if (!draft) return;
@@ -117,9 +123,9 @@ export const FavoriteCharacters: FC<IFavoriteCharactersProps> = ({
       )}
 
       {!!characters.length && !draft && (
-        <ol className={styles.grid}>
+        <ol ref={gridRef} className={styles.grid}>
           {visible.map((character, index) => (
-            <li key={character._id}>
+            <li key={character._id} hidden={index >= visibleCount}>
               <CharacterCard
                 className={styles.card}
                 character={character}
@@ -147,7 +153,7 @@ export const FavoriteCharacters: FC<IFavoriteCharactersProps> = ({
           )}
           onChange={setDraft}
           className={styles.slots}
-          note={`Drag or use the arrows to reorder. The first ${FAVORITE_CHARACTERS_PREVIEW_LIMIT} are shown on your profile.`}
+          note="Drag or use the arrows to reorder. Your profile shows the first characters that fit in two rows."
           isBusy={isPending}
           onCancel={() => setDraft(null)}
           onSave={handleSave}

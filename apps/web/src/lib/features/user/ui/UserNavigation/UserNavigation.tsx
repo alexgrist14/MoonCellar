@@ -7,8 +7,11 @@ import { IUser } from "@/src/lib/shared/types/auth.type";
 import {
   FAVOURITE_CHARACTERS_TAB,
   FAVOURITE_GAMES_TAB,
+  ACTIVITY_TAB,
+  RETROACHIEVEMENTS_TAB,
   userListCategories,
 } from "@/src/lib/shared/constants/user.const";
+import { useUserRaGamesQuery } from "@/src/lib/entities/user/api/user.queries";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { SvgSettings } from "@/src/lib/shared/ui/svg";
 import { IPlaythrough } from "@mooncellar/schemas";
@@ -48,6 +51,10 @@ export const UserNavigation: FC<{
 
   const { data: userLists = [] } = useUserListsQuery(user._id);
   const { data: likedLists = [] } = useLikedListsQuery(user._id);
+  const { data: raGames = [] } = useUserRaGamesQuery(
+    user._id,
+    !!user.raUsername
+  );
 
   const visibleLists = useMemo(
     () =>
@@ -142,6 +149,47 @@ export const UserNavigation: FC<{
         })}
       </Box>
       <Box>
+        <Button
+          className={styles.btn}
+          active={isReviewsTab}
+          color={ButtonColor.TRANSPARENT}
+          href={getProfileHref(user.userName, "reviews")}
+          onClick={closeMenu}
+        >
+          <span className={styles.label}>Reviews</span>
+          <span className={styles.count}>{reviewsCount}</span>
+        </Button>
+        {(isAuthedUser || !!favoritesCount || !!favoriteCharactersCount) && (
+          <Button
+            className={styles.btn}
+            active={isFavoritesTab}
+            color={ButtonColor.TRANSPARENT}
+            href={getProfileHref(
+              user.userName,
+              !favoritesCount && favoriteCharactersCount
+                ? FAVOURITE_CHARACTERS_TAB
+                : FAVOURITE_GAMES_TAB
+            )}
+            onClick={closeMenu}
+          >
+            <span className={styles.label}>Favourites</span>
+            <span className={styles.count}>
+              {favoritesCount + favoriteCharactersCount}
+            </span>
+          </Button>
+        )}
+        {!!user.raUsername && (
+          <Button
+            className={styles.btn}
+            active={currentList === RETROACHIEVEMENTS_TAB}
+            color={ButtonColor.TRANSPARENT}
+            href={getProfileHref(user.userName, RETROACHIEVEMENTS_TAB)}
+            onClick={closeMenu}
+          >
+            <span className={styles.label}>RetroAchievements</span>
+            <span className={styles.count}>{raGames.length}</span>
+          </Button>
+        )}
         {(isAuthedUser || !!visibleLists.length) && (
           <Button
             className={styles.btn}
@@ -166,34 +214,14 @@ export const UserNavigation: FC<{
             <span className={styles.count}>{likedLists.length}</span>
           </Button>
         )}
-        {(isAuthedUser || !!favoritesCount || !!favoriteCharactersCount) && (
-          <Button
-            className={styles.btn}
-            active={isFavoritesTab}
-            color={ButtonColor.TRANSPARENT}
-            href={getProfileHref(
-              user.userName,
-              !favoritesCount && favoriteCharactersCount
-                ? FAVOURITE_CHARACTERS_TAB
-                : FAVOURITE_GAMES_TAB
-            )}
-            onClick={closeMenu}
-          >
-            <span className={styles.label}>Favourites</span>
-            <span className={styles.count}>
-              {favoritesCount + favoriteCharactersCount}
-            </span>
-          </Button>
-        )}
         <Button
           className={styles.btn}
-          active={isReviewsTab}
+          active={currentList === ACTIVITY_TAB}
           color={ButtonColor.TRANSPARENT}
-          href={getProfileHref(user.userName, "reviews")}
+          href={getProfileHref(user.userName, ACTIVITY_TAB)}
           onClick={closeMenu}
         >
-          <span className={styles.label}>Reviews</span>
-          <span className={styles.count}>{reviewsCount}</span>
+          <span className={styles.label}>Activity</span>
         </Button>
       </Box>
     </div>

@@ -8,5 +8,7 @@ export const userQueryKeys = {
     [...userQueryKeys.all, "presets", userId] as const,
   favoriteCharacters: (userId: string) =>
     [...userQueryKeys.all, "favorite-characters", userId] as const,
+  raGames: (userId: string) =>
+    [...userQueryKeys.all, "ra-games", userId] as const,
   search: (q: string) => [...userQueryKeys.all, "search", q] as const,
 };

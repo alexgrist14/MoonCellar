@@ -24,6 +24,7 @@ import type { IViewerRequest } from "../../collections/types/collections.type";
 import {
   RaConnectRequestDto,
   RaConnectResponseDto,
+  RaUserGamesResponseDto,
 } from "../../../shared/zod/dto/user.dto";
 import { UserRAService } from "../services/user-ra.service";
 
@@ -40,6 +41,16 @@ export class UserRAController {
   })
   async getAchievements(@Param("raUsername") raUsername: string) {
     return this.userRAService.getUserAchievements(raUsername);
+  }
+
+  @Get("/ra/:userId/games")
+  @ApiOperation({
+    summary:
+      "Catalogue games the user has a RetroAchievements award for, with the best status",
+  })
+  @ApiOkResponse({ type: RaUserGamesResponseDto })
+  getUserGames(@Param("userId") userId: string) {
+    return this.userRAService.getUserGames(userId);
   }
 
   @Post("/ra/connect")
@@ -84,6 +95,20 @@ export class UserRAController {
   @HttpCode(HttpStatus.OK)
   syncAwards(@Req() request: IViewerRequest) {
     return this.userRAService.syncAwards(
+      request.user._id as mongoose.Types.ObjectId
+    );
+  }
+
+  @Post("/ra/playthroughs/sync")
+  @ApiOperation({
+    summary:
+      "Create playthroughs from the stored RetroAchievements awards, if the user turned it on",
+  })
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), UserIdGuard)
+  @HttpCode(HttpStatus.OK)
+  syncPlaythroughs(@Req() request: IViewerRequest) {
+    return this.userRAService.syncPlaythroughs(
       request.user._id as mongoose.Types.ObjectId
     );
   }

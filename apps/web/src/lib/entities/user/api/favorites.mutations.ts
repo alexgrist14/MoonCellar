@@ -68,7 +68,8 @@ export const useUpdateFavoriteCharactersMutation = () => {
     onSuccess: ({ favoriteCharacters }, { userId }) => {
       const { profile, setProfile } = useAuthStore.getState();
 
-      if (profile?._id === userId) setProfile({ ...profile, favoriteCharacters });
+      if (profile?._id === userId)
+        setProfile({ ...profile, favoriteCharacters });
 
       queryClient.invalidateQueries({
         queryKey: userQueryKeys.favoriteCharacters(userId),

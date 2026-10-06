@@ -61,13 +61,40 @@ editing controls.
      tab and "All" on the Profile tab opens the right one. The navigation has a single Favourites
      entry, active on both, counting both lists.
    - `reviews` → `widgets/user/UserReviews`
-   - `settings` → `features/user/ui/Settings`, owner only; its "Danger zone" opens `features/user/ui/DeleteAccountModal`, which asks for the password, calls `DELETE /user/account/:userId`, clears the auth store and the React Query cache and goes home; its "App" section installs the PWA through `useInstallApp` (the browser's install prompt where there is one, menu instructions otherwise) and links the APK releases
+   - `activity` → `features/user/ui/ActivityTimeline`, the whole feed with pagination
+     (`takeLogs` per page). The Profile tab shows the same component with `isPreview`: the first
+     12 entries, no pagination, and "All" leading here.
+   - `retroachievements` → `widgets/user/UserRaGames`: every catalogue game the user has an RA
+     award for, from `GET /user/ra/:userId/games`, each card captioned with its best RA status
+     (Mastered, Completed, Beaten, Beaten (softcore)) and the award date, sorted by that status
+     and, within it, newest award first (`getUserGames` on the API). The navigation shows the
+     tab only when the user has an `raUsername`.
+   - `settings` → `features/user/ui/Settings`, owner only: one column of `CollapsibleSection`s,
+     Account always open (`isStatic`) and every other section collapsed until clicked; Steam is
+     `isKeptMounted` because `SteamAccount` finishes the Steam sign-in on mount and must run while
+     its section is closed. Its "Danger zone" opens `features/user/ui/DeleteAccountModal`, which asks for the password, calls `DELETE /user/account/:userId`, clears the auth store and the React Query cache and goes home; its "App" section installs the PWA through `useInstallApp` (the browser's install prompt where there is one, menu instructions otherwise) and links the APK releases
 4. Desktop column: `features/user/ui/UserNavigation` (tabs and counts; sorting lives in `UserGames` and `UserReviews`, above their content).
    Its first block — avatar and name, linking to Profile and active there — is shown on every
    tab. Settings is not a tab in it: the owner reaches it from the gear icon at the right of
    that block, and from the account menu in the header.
 
 ## Rules and gotchas
+
+- **The owner hides Profile-tab blocks in Settings → Profile page, stored as
+  `settings.hiddenProfileBlocks` (`ProfileBlockSchema`).** `UserInfo` drops a hidden block for every
+  viewer, the owner included; the block's own tab stays reachable. A new Profile-tab block gets an
+  entry in `ProfileBlockSchema` and `PROFILE_BLOCK_LABELS`, or it cannot be hidden. The activity
+  preview takes 12 entries because that fills whole rows at every column count the feed snaps to
+  (divisors of `takeLogs`).
+
+- **Every card block on the Profile tab shows at most two whole rows, never a fixed number of
+  cards** — favourite games, favourite characters, RetroAchievements, lists and liked lists; the
+  activity feed is the exception and keeps its 12 entries. `useGridRows` (`shared/hooks`) reads the
+  grid's column count and hides the cards past the second row (they stay in the HTML), so a
+  block shows 12, 8, 6 or 4 cards depending on the width; `ListCardsGrid` takes it as `maxRows`.
+  A block renders a cap (12 games, 20 characters, 12 lists) so the first paint is not a full list.
+  Favourite games and RetroAchievements use fixed columns: 6, 4 up to `$screenLaptop` (1250px),
+  3 up to `mediaLg`, 2 up to `mediaSm`. Never write "the first N" in copy: N depends on the screen.
 
 - **Trust the cookie's `authUserId` only when the store's profile has the same id.** A browser
   logged out in the store but holding a live cookie got owner controls, and every owner request

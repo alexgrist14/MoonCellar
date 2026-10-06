@@ -99,10 +99,7 @@ export const UserLists: FC<IUserListsProps> = ({
                     Reorder
                   </Button>
                 )}
-                <Button
-                  color={ButtonColor.ACCENT}
-                  onClick={handleCreate}
-                >
+                <Button color={ButtonColor.ACCENT} onClick={handleCreate}>
                   <SvgPlus size="16" style={{ color: "inherit" }} />
                   New list
                 </Button>
@@ -135,10 +132,7 @@ export const UserLists: FC<IUserListsProps> = ({
           }
           action={
             canCreate && (
-              <Button
-                color={ButtonColor.ACCENT}
-                onClick={handleCreate}
-              >
+              <Button color={ButtonColor.ACCENT} onClick={handleCreate}>
                 <SvgPlus size="16" style={{ color: "inherit" }} />
                 Create a list
               </Button>

@@ -12,6 +12,7 @@ import { UserLogs } from "../schemas/user-logs.schema";
 import { User } from "../schemas/user.schema";
 import { Game } from "../../games/schemas/game.schema";
 import { NotificationsService } from "../../notifications/services/notifications.service";
+import { ActivityGateway } from "../../activity/activity.gateway";
 import {
   canMergeLog,
   getFollowingActivity,
@@ -42,7 +43,8 @@ export class UserLogsService {
     @InjectModel(UserLogs.name) private userLogsModel: Model<UserLogs>,
     @InjectModel(User.name) private userModel: Model<User>,
     @InjectModel(Game.name) private gameModel: Model<Game>,
-    private readonly notifications: NotificationsService
+    private readonly notifications: NotificationsService,
+    private readonly activity: ActivityGateway
   ) {}
 
   async recordUserLog({ userId, gameId, ...change }: IRecordUserLogParams) {
@@ -74,6 +76,7 @@ export class UserLogsService {
           });
 
           void this.notifyFollowers(userId, gameId, change);
+          this.activity.changed(userId);
           return log;
         }
 
@@ -89,7 +92,10 @@ export class UserLogsService {
         if (isEmptyLog(changes)) {
           const { deletedCount } = await this.userLogsModel.deleteOne(filter);
 
-          if (deletedCount) return;
+          if (deletedCount) {
+            this.activity.changed(userId);
+            return;
+          }
           continue;
         }
 
@@ -102,6 +108,7 @@ export class UserLogsService {
 
         if (matchedCount) {
           void this.notifyFollowers(userId, gameId, change);
+          this.activity.changed(userId);
           return;
         }
       }
@@ -149,10 +156,14 @@ export class UserLogsService {
   async removeUserLog({ _id, userId }: IRemoveUserLogRequest) {
     try {
       const userObjectId = new mongoose.Types.ObjectId(userId);
-      return await this.userLogsModel.deleteOne({
+      const result = await this.userLogsModel.deleteOne({
         _id,
         userId: userObjectId,
       });
+
+      if (result.deletedCount) this.activity.changed(userId);
+
+      return result;
     } catch (err) {
       this.logger.error(err, `Failed to remove user log: ${_id}`);
       throw err;

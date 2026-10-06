@@ -29,6 +29,10 @@ export const PlaythroughSchema = z.object({
     .describe("Show the note as a review on the game page")
     .optional(),
   isSpoiler: z.boolean().describe("The note contains spoilers").optional(),
+  raGameId: z
+    .number()
+    .describe("RetroAchievements set the playthrough was created from")
+    .optional(),
   helpfulCount: z
     .number()
     .describe("Players who found the review helpful")
@@ -42,6 +46,7 @@ export const PlaythroughEditSchema = PlaythroughSchema.omit({
   createdAt: true,
   updatedAt: true,
   helpfulCount: true,
+  raGameId: true,
 });
 
 export const PlaythroughFullResponseSchema = PlaythroughSchema;

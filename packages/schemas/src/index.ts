@@ -6,6 +6,7 @@ export * from "./notifications.utils";
 export * from "./igdb-orphans.schema";
 export * from "./site-sessions.schema";
 export * from "./comments-socket.schema";
+export * from "./activity-socket.schema";
 export * from "./comments.schema";
 export * from "./conflicts-socket.schema";
 export * from "./conflicts.schema";

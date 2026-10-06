@@ -17,19 +17,58 @@ import mongoose, { Model } from "mongoose";
 import {
   RA_CONNECT_CODE_TTL_MINUTES,
   type IRaConnectResponse,
+  type IRaGameStatus,
+  type IRaUserGame,
 } from "@mooncellar/schemas";
+import { Game, type GameDocument } from "../../games/schemas/game.schema";
 import { User } from "../schemas/user.schema";
 import { RA_MAIN_USER_NAME } from "../../../shared/constants";
 import { BusinessMetricsService } from "../../metrics/business-metrics.service";
+import {
+  RaPlaythroughsService,
+  pickGamesForSets,
+} from "../../retroach/services/ra-playthroughs.service";
+import {
+  Playthrough,
+  type IPlaythroughDocument,
+} from "../../games/schemas/playthroughs.schema";
+import { Rating } from "../schemas/user-ratings.schema";
 
 const RA_SYNC_COOLDOWN_MS = 60 * 1000;
+
+const RA_STATUS_RANK: IRaGameStatus[] = [
+  "mastered",
+  "completed",
+  "beaten",
+  "beaten-softcore",
+];
+
+const toRaStatus = (
+  awardType: string,
+  isHardcore: boolean
+): IRaGameStatus | null => {
+  if (awardType === "Mastery/Completion") {
+    return isHardcore ? "mastered" : "completed";
+  }
+
+  if (awardType === "Game Beaten") {
+    return isHardcore ? "beaten" : "beaten-softcore";
+  }
+
+  return null;
+};
 
 @Injectable()
 export class UserRAService {
   private readonly logger = new Logger(UserRAService.name);
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
-    private readonly metrics: BusinessMetricsService
+    @InjectModel(Game.name) private gameModel: Model<GameDocument>,
+    @InjectModel(Playthrough.name)
+    private playthroughModel: Model<IPlaythroughDocument>,
+    @InjectModel(Rating.name) private ratingModel: Model<Rating>,
+    private readonly metrics: BusinessMetricsService,
+    private readonly raPlaythroughs: RaPlaythroughsService
   ) {}
   private readonly username = RA_MAIN_USER_NAME;
   private readonly webApiKey = process.env.RETROACHIEVEMENTS_API_KEY;
@@ -37,6 +76,81 @@ export class UserRAService {
     username: this.username,
     webApiKey: this.webApiKey,
   });
+
+  async getUserGames(userId: string): Promise<IRaUserGame[]> {
+    if (!mongoose.isValidObjectId(userId)) {
+      throw new BadRequestException(`Invalid user id: ${userId}`);
+    }
+
+    const user = await this.userModel
+      .findById(userId)
+      .select("raAwards")
+      .lean();
+
+    if (!user) throw new NotFoundException("User not found");
+
+    const bySet = new Map<number, { status: IRaGameStatus; date: string }>();
+
+    for (const award of user.raAwards ?? []) {
+      const status = toRaStatus(award.awardType, award.awardDataExtra === 1);
+
+      if (!status) continue;
+
+      const current = bySet.get(award.awardData);
+
+      if (
+        !current ||
+        RA_STATUS_RANK.indexOf(status) < RA_STATUS_RANK.indexOf(current.status)
+      ) {
+        bySet.set(award.awardData, { status, date: award.awardedAt });
+      }
+    }
+
+    if (!bySet.size) return [];
+
+    const games = await this.gameModel
+      .find({ "retroachievements.gameId": { $in: [...bySet.keys()] } })
+      .select("_id retroachievements ratingsCount")
+      .lean();
+    const gameIds = games.map(({ _id }) => _id);
+    const anyId = (ids: unknown[]) => ({ $in: [...ids, ...ids.map(String)] });
+    const [plays, ratings] = await Promise.all([
+      this.playthroughModel
+        .find({ userId: anyId([user._id]), gameId: anyId(gameIds) })
+        .select("gameId")
+        .lean(),
+      this.ratingModel
+        .find({ userId: anyId([user._id]), gameId: anyId(gameIds) })
+        .select("gameId")
+        .lean(),
+    ]);
+    const pickedBySet = pickGamesForSets(
+      games,
+      bySet.keys(),
+      new Set(plays.map(({ gameId }) => String(gameId))),
+      new Set(ratings.map(({ gameId }) => String(gameId)))
+    );
+    const bestByGame = new Map<string, IRaUserGame>();
+
+    for (const [raGameId, game] of pickedBySet) {
+      const { status, date } = bySet.get(raGameId)!;
+      const gameId = String(game._id);
+      const current = bestByGame.get(gameId);
+
+      if (
+        !current ||
+        RA_STATUS_RANK.indexOf(status) < RA_STATUS_RANK.indexOf(current.status)
+      ) {
+        bestByGame.set(gameId, { gameId, raGameId, status, awardedAt: date });
+      }
+    }
+
+    return [...bestByGame.values()].sort(
+      (a, b) =>
+        RA_STATUS_RANK.indexOf(a.status) - RA_STATUS_RANK.indexOf(b.status) ||
+        b.awardedAt.localeCompare(a.awardedAt)
+    );
+  }
 
   async getUserAchievements(raUsername: string) {
     try {
@@ -180,6 +294,7 @@ export class UserRAService {
     user.raAwards = awards.visibleUserAwards;
 
     await user.save();
+    await this.raPlaythroughs.sync(user._id as mongoose.Types.ObjectId);
 
     return { username: profile.username };
   }
@@ -219,7 +334,19 @@ export class UserRAService {
 
     await user.save();
 
-    return { awards: user.raAwards.length, syncedAt: user.raSyncedAt };
+    const playthroughs = await this.raPlaythroughs.sync(
+      user._id as mongoose.Types.ObjectId
+    );
+
+    return {
+      awards: user.raAwards.length,
+      syncedAt: user.raSyncedAt,
+      ...playthroughs,
+    };
+  }
+
+  syncPlaythroughs(userId: mongoose.Types.ObjectId) {
+    return this.raPlaythroughs.sync(userId);
   }
 
   async disconnect(userId: mongoose.Types.ObjectId) {

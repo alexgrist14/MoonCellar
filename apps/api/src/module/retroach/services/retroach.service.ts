@@ -35,6 +35,7 @@ import type {
   IRetroachievementsField,
 } from "@mooncellar/schemas";
 import { ConflictsService } from "../../conflicts/services/conflicts.service";
+import { RaPlaythroughsService } from "./ra-playthroughs.service";
 import type {
   IConflictDecision,
   IConflictRecord,
@@ -76,7 +77,8 @@ export class RetroachievementsService implements OnModuleInit {
     private users: Model<User>,
     private readonly logger: PinoLogger,
     private readonly metrics: BusinessMetricsService,
-    private readonly conflicts: ConflictsService
+    private readonly conflicts: ConflictsService,
+    private readonly raPlaythroughs: RaPlaythroughsService
   ) {
     this.logger.setContext(RetroachievementsService.name);
   }
@@ -652,6 +654,7 @@ export class RetroachievementsService implements OnModuleInit {
           user.raAwards = userAwards.visibleUserAwards;
           user.raSyncedAt = new Date().toISOString();
           await user.save();
+          await this.raPlaythroughs.sync(user._id as mongoose.Types.ObjectId);
           updated++;
         } catch (err) {
           this.logger.error(

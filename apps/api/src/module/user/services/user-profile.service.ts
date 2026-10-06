@@ -226,6 +226,8 @@ export class UserProfileService {
         showAdultContent: false,
         bgOpacity: DEFAULT_BG_OPACITY,
         mutedNotifications: [],
+        raSyncPlaythroughs: false,
+        hiddenProfileBlocks: [],
         ...(user.settings ?? {}),
         ...(settings.showAdultContent !== undefined && {
           showAdultContent: settings.showAdultContent,
@@ -235,6 +237,12 @@ export class UserProfileService {
         }),
         ...(settings.mutedNotifications !== undefined && {
           mutedNotifications: [...new Set(settings.mutedNotifications)],
+        }),
+        ...(settings.raSyncPlaythroughs !== undefined && {
+          raSyncPlaythroughs: settings.raSyncPlaythroughs,
+        }),
+        ...(settings.hiddenProfileBlocks !== undefined && {
+          hiddenProfileBlocks: [...new Set(settings.hiddenProfileBlocks)],
         }),
       };
 

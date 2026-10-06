@@ -8,11 +8,9 @@ import { WheelComponent } from "@/src/lib/features/wheel/ui/WheelComponent";
 import { WheelOptions } from "@/src/lib/features/wheel/ui/WheelOptions";
 import { useWheelStore } from "@/src/lib/shared/store/wheel.store";
 import { Box } from "@/src/lib/shared/ui/Box";
-import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
-import { SvgRandom } from "@/src/lib/shared/ui/svg";
-import { SvgCrown } from "@/src/lib/shared/ui/svg/SvgCrown";
 import { useDelayedUnmount } from "@/src/lib/shared/hooks/useDelayedUnmount";
 import { GauntletWinner } from "./GauntletWinner";
+import { GauntletIntro } from "./GauntletIntro";
 
 export const WheelContainer: FC = () => {
   const winner = useWheelStore((state) => state.winner);
@@ -50,11 +48,9 @@ export const WheelContainer: FC = () => {
         >
           <Box
             isWithScrollBar={!isMobile}
-            wrapperStyle={
-              isMobile ? undefined : { minHeight: 0, maxHeight: "100%" }
-            }
+            wrapperStyle={isMobile ? undefined : { flex: 1, minHeight: 0 }}
             templateStyle={
-              isMobile ? undefined : { minHeight: 0, maxHeight: "100%" }
+              isMobile ? undefined : { height: "100%", minHeight: 0 }
             }
             contentStyle={{
               maxHeight: isMobile ? "fit-content" : "100%",
@@ -65,31 +61,7 @@ export const WheelContainer: FC = () => {
             {shownWinner ? (
               <GauntletWinner game={shownWinner} isRoyal={isRoyal} />
             ) : (
-              <EmptyState
-                icon={
-                  isRoyal ? (
-                    <SvgCrown
-                      size="28"
-                      style={{ color: "var(--color-attention)" }}
-                    />
-                  ) : (
-                    <SvgRandom
-                      size="28"
-                      style={{ color: "var(--color-accent)" }}
-                    />
-                  )
-                }
-                title={
-                  isRoyal
-                    ? "Spin to knock out the first game"
-                    : "Spin to get a game"
-                }
-                description={
-                  isRoyal
-                    ? "Every spin removes one game until only the winner is left."
-                    : "Change the filters above first, or spin over everything."
-                }
-              />
+              <GauntletIntro isRoyal={isRoyal} />
             )}
           </Box>
         </div>

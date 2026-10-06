@@ -5,6 +5,8 @@ import { FC, ReactNode, useEffect, useMemo, useState } from "react";
 import {
   FAVOURITE_CHARACTERS_TAB,
   FAVOURITE_GAMES_TAB,
+  ACTIVITY_TAB,
+  RETROACHIEVEMENTS_TAB,
   profileTabLabels,
   userListCategories,
 } from "@/src/lib/shared/constants/user.const";
@@ -17,6 +19,8 @@ import {
 import { Settings } from "@/src/lib/features/user/ui/Settings";
 import { UserGames } from "@/src/lib/widgets/user/UserGames";
 import { UserReviews } from "@/src/lib/widgets/user/UserReviews";
+import { UserRaGames } from "@/src/lib/widgets/user/UserRaGames";
+import { ActivityTimeline } from "@/src/lib/features/user/ui/ActivityTimeline";
 import { UserLists } from "@/src/lib/widgets/user/UserLists";
 import { UserInfo } from "@/src/lib/widgets/user/UserInfo";
 import { FavoriteCharacters } from "@/src/lib/widgets/user/FavoriteCharacters";
@@ -225,6 +229,15 @@ export const UserProfile: FC<UserProfileProps> = ({
               userName={displayUser.userName}
               isOwnProfile={isAuthedUser}
               kind="liked"
+            />
+          )}
+          {tab === ACTIVITY_TAB && (
+            <ActivityTimeline userId={user._id} isOwner={isAuthedUser} />
+          )}
+          {tab === RETROACHIEVEMENTS_TAB && (
+            <UserRaGames
+              userId={user._id}
+              raUsername={displayUser.raUsername}
             />
           )}
           {tab === "reviews" && (

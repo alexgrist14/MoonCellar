@@ -15,6 +15,7 @@ import {
   Playthrough,
 } from "../schemas/playthroughs.schema";
 import { sanitizeRichText } from "../../../shared/utils/rich-text.utils";
+import { User } from "../../user/schemas/user.schema";
 
 @Injectable()
 export class PlaythroughsService {
@@ -24,7 +25,9 @@ export class PlaythroughsService {
     private GamesPlaythrouhgs: Model<IPlaythroughDocument>,
     @InjectModel(Platform.name)
     private Platforms: Model<PlatformDocument>,
-    private readonly logsService: UserLogsService
+    private readonly logsService: UserLogsService,
+    @InjectModel(User.name)
+    private readonly users: Model<User>
   ) {}
 
   private async getLogState(
@@ -137,6 +140,15 @@ export class PlaythroughsService {
           new: true,
         }
       );
+
+      if (play?.raGameId != null) {
+        await this.users.updateOne(
+          { _id: play.userId },
+          { $addToSet: { raIgnoredSets: play.raGameId } }
+        );
+
+        return play;
+      }
 
       await this.logsService.recordUserLog({
         userId: play.userId.toString(),

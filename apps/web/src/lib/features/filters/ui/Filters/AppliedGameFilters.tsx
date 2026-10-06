@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useMemo } from "react";
+import { FC, ReactNode, useMemo } from "react";
 import { IGameFilters, IGetGamesRequest } from "@mooncellar/schemas";
 import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
@@ -37,9 +37,11 @@ const CATEGORIES = Object.keys(CATEGORY_LABELS) as TFilterCategory[];
 const toArray = (value?: string[] | string | null) =>
   Array.isArray(value) ? value : value ? [value] : [];
 
-export const AppliedGameFilters: FC<{ className?: string }> = ({
-  className,
-}) => {
+export const AppliedGameFilters: FC<{
+  className?: string;
+  isSingleLine?: boolean;
+  summary?: ReactNode;
+}> = ({ className, isSingleLine, summary }) => {
   const { asPath } = useAdvancedRouter();
   const systems = useCommonStore((state) => state.systems);
 
@@ -131,6 +133,8 @@ export const AppliedGameFilters: FC<{ className?: string }> = ({
   return (
     <AppliedFilters
       className={className}
+      isSingleLine={isSingleLine}
+      summary={summary}
       filters={applied}
       onClearAll={() =>
         pushFiltersToQuery({

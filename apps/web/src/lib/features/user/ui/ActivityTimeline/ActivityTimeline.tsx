@@ -1,3 +1,4 @@
+import { useActivitySocket } from "@/src/lib/entities/user/api/user.socket";
 import { FC, ReactNode, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -36,7 +37,11 @@ import styles from "./ActivityTimeline.module.scss";
 interface IActivityTimelineProps {
   userId: string;
   isOwner: boolean;
+  isPreview?: boolean;
+  onShowAll?: () => void;
 }
+
+const PREVIEW_TAKE = 12;
 
 const UNDO_DELAY_MS = 5000;
 
@@ -101,14 +106,17 @@ const getLogContent = ({ playthrough, rating, favorite }: ILogChanges) => {
 export const ActivityTimeline: FC<IActivityTimelineProps> = ({
   userId,
   isOwner,
+  isPreview,
+  onShowAll,
 }) => {
   const [page, setPage] = useState(1);
+  useActivitySocket(userId);
   const sectionRef = useRef<HTMLElement>(null);
 
   const { data, isLoading, isFetching, isPlaceholderData } = useUserLogsQuery(
     userId,
-    page,
-    takeLogs
+    isPreview ? 1 : page,
+    isPreview ? PREVIEW_TAKE : takeLogs
   );
   const isLogsLoading = useMinimumLoading(isLoading);
   const { mutate: removeLog } = useRemoveUserLogMutation();
@@ -165,7 +173,21 @@ export const ActivityTimeline: FC<IActivityTimelineProps> = ({
       className={styles.activity}
       aria-labelledby="profile-activity"
     >
-      <SectionTitle as="h3">
+      <SectionTitle
+        as="h3"
+        action={
+          isPreview &&
+          total > logs.length && (
+            <Button
+              color={ButtonColor.TRANSPARENT}
+              onClick={onShowAll}
+              aria-label="All activity"
+            >
+              All
+            </Button>
+          )
+        }
+      >
         <span id="profile-activity">Activity</span>
       </SectionTitle>
       <div
@@ -267,14 +289,17 @@ export const ActivityTimeline: FC<IActivityTimelineProps> = ({
                 );
               })}
             </ol>
-            <Pagination
-              take={takeLogs}
-              total={total}
-              isDisabled={isFetching}
-              page={page}
-              onPageChange={setPage}
-              scrollTargetRef={sectionRef}
-            />
+            {!isPreview && (
+              <Pagination
+                take={takeLogs}
+                total={total}
+                isDisabled={isFetching}
+                page={page}
+                onPageChange={setPage}
+                scrollTargetRef={sectionRef}
+                isFixed
+              />
+            )}
           </>
         )}
       </div>

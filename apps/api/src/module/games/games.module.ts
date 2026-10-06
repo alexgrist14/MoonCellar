@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { ActivityModule } from "../activity/activity.module";
 import { MongooseModule } from "@nestjs/mongoose";
 
 import { UserLogsService } from "../user/services/user-logs.service";
@@ -79,6 +80,7 @@ import { NotificationsModule } from "../notifications/notifications.module";
     IgdbOrphansService,
   ],
   imports: [
+    ActivityModule,
     IgdbModule,
     MatchingModule,
     ConflictsModule,

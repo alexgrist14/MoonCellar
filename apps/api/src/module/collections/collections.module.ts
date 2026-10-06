@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { ActivityModule } from "../activity/activity.module";
 import { MongooseModule } from "@nestjs/mongoose";
 import {
   Character,
@@ -36,6 +37,7 @@ import { NotificationsModule } from "../notifications/notifications.module";
 
 @Module({
   imports: [
+    ActivityModule,
     MongooseModule.forFeature([
       { name: CustomList.name, schema: CustomListDatabaseSchema },
       { name: CustomListLike.name, schema: CustomListLikeDatabaseSchema },

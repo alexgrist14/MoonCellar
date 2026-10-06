@@ -22,6 +22,7 @@ interface IScrollBarProps {
   isResetScrollPosition?: boolean;
   isHorizontal?: boolean;
   isWithArrows?: boolean;
+  isFaded?: boolean;
   contentStyle?: CSSProperties;
   containerStyle?: CSSProperties;
   initialContentRef?: RefObject<HTMLDivElement | null>;
@@ -53,6 +54,7 @@ export const Scrollbar: FC<IScrollBarProps> = ({
   isResetScrollPosition,
   isHorizontal,
   isWithArrows,
+  isFaded,
   contentStyle,
   containerStyle,
   initialContentRef,
@@ -104,7 +106,8 @@ export const Scrollbar: FC<IScrollBarProps> = ({
         <div
           id={id}
           className={cl(classNameContent, styles.scrollbars__content, {
-            [styles.scrollbars__content_faded]: isHorizontal && isWithArrows,
+            [styles.scrollbars__content_faded]:
+              isHorizontal && (isWithArrows || isFaded),
           })}
           style={contentStyle}
           ref={contentRef}

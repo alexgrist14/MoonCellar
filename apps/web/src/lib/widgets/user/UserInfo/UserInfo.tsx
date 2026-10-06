@@ -1,6 +1,8 @@
 import { FC, useMemo } from "react";
 import {
   FAVOURITE_CHARACTERS_TAB,
+  ACTIVITY_TAB,
+  RETROACHIEVEMENTS_TAB,
   FAVOURITE_GAMES_TAB,
 } from "@/src/lib/shared/constants/user.const";
 import Image from "next/image";
@@ -39,6 +41,7 @@ import {
 } from "@/src/lib/features/user/ui/PeopleDrawer";
 import { FavoriteGames } from "@/src/lib/widgets/user/FavoriteGames";
 import { FavoriteCharacters } from "@/src/lib/widgets/user/FavoriteCharacters";
+import { UserRaGames } from "@/src/lib/widgets/user/UserRaGames";
 import { useViewerFollowings } from "@/src/lib/features/user/model/useViewerFollowings";
 import styles from "./UserInfo.module.scss";
 
@@ -56,7 +59,8 @@ interface UserInfoProps {
 
 type IPerson = Pick<IUser, "_id" | "userName" | "avatar">;
 
-const LISTS_PREVIEW_LIMIT = 6;
+const LISTS_PREVIEW_LIMIT = 12;
+const PREVIEW_ROWS = 2;
 const STACK_LIMIT = 3;
 
 const formatCount = new Intl.NumberFormat("en-US").format;
@@ -141,7 +145,9 @@ export const UserInfo: FC<UserInfoProps> = ({
     [playthroughs]
   );
 
-  const isListsVisible = isOwner || !!lists.length;
+  const hiddenBlocks = new Set(user.settings?.hiddenProfileBlocks ?? []);
+  const isListsVisible =
+    !hiddenBlocks.has("lists") && (isOwner || !!lists.length);
 
   const openPeople = (initialTab: IPeopleTab) =>
     drawer.open(
@@ -221,51 +227,66 @@ export const UserInfo: FC<UserInfoProps> = ({
         )}
       </header>
 
-      <div className={styles.counters}>
-        <StatTile
-          label="Games"
-          value={formatCount(gamesCount)}
-          onClick={() => goTo("all")}
-        />
-        <StatTile
-          label="Reviews"
-          value={formatCount(reviewsCount)}
-          onClick={() => goTo("reviews")}
-        />
-        <StatTile
-          label="Followers"
-          value={formatCount(followers.length)}
-          onClick={() => openPeople("followers")}
-          {...triggerProps}
-        >
-          <PeopleStack people={followers} />
-        </StatTile>
-        <StatTile
-          label="Following"
-          value={formatCount(followings.length)}
-          onClick={() => openPeople("followings")}
-          {...triggerProps}
-        >
-          <PeopleStack people={followings} />
-        </StatTile>
-      </div>
+      {!hiddenBlocks.has("counters") && (
+        <div className={styles.counters}>
+          <StatTile
+            label="Games"
+            value={formatCount(gamesCount)}
+            onClick={() => goTo("all")}
+          />
+          <StatTile
+            label="Reviews"
+            value={formatCount(reviewsCount)}
+            onClick={() => goTo("reviews")}
+          />
+          <StatTile
+            label="Followers"
+            value={formatCount(followers.length)}
+            onClick={() => openPeople("followers")}
+            {...triggerProps}
+          >
+            <PeopleStack people={followers} />
+          </StatTile>
+          <StatTile
+            label="Following"
+            value={formatCount(followings.length)}
+            onClick={() => openPeople("followings")}
+            {...triggerProps}
+          >
+            <PeopleStack people={followings} />
+          </StatTile>
+        </div>
+      )}
 
-      <FavoriteGames
-        userId={id}
-        favoriteIds={user.favorites ?? []}
-        games={favoriteGames}
-        isOwner={isOwner}
-        isPreview
-        onShowAll={() => goTo(FAVOURITE_GAMES_TAB)}
-      />
+      {!hiddenBlocks.has("favoriteGames") && (
+        <FavoriteGames
+          userId={id}
+          favoriteIds={user.favorites ?? []}
+          games={favoriteGames}
+          isOwner={isOwner}
+          isPreview
+          onShowAll={() => goTo(FAVOURITE_GAMES_TAB)}
+        />
+      )}
 
-      <FavoriteCharacters
-        userId={id}
-        characters={favoriteCharacters}
-        isOwner={isOwner}
-        isPreview
-        onShowAll={() => goTo(FAVOURITE_CHARACTERS_TAB)}
-      />
+      {!hiddenBlocks.has("favoriteCharacters") && (
+        <FavoriteCharacters
+          userId={id}
+          characters={favoriteCharacters}
+          isOwner={isOwner}
+          isPreview
+          onShowAll={() => goTo(FAVOURITE_CHARACTERS_TAB)}
+        />
+      )}
+
+      {!hiddenBlocks.has("retroachievements") && (
+        <UserRaGames
+          userId={id}
+          raUsername={user.raUsername}
+          isPreview
+          onShowAll={() => goTo(RETROACHIEVEMENTS_TAB)}
+        />
+      )}
 
       {isListsVisible && (
         <section className={styles.lists} aria-labelledby="profile-lists">
@@ -306,7 +327,7 @@ export const UserInfo: FC<UserInfoProps> = ({
               }
             />
           ) : (
-            <ListCardsGrid>
+            <ListCardsGrid maxRows={PREVIEW_ROWS} isGameSized>
               {lists.slice(0, LISTS_PREVIEW_LIMIT).map((list) => (
                 <ListCard key={list._id} list={list} isWithAuthor={false} />
               ))}
@@ -314,7 +335,7 @@ export const UserInfo: FC<UserInfoProps> = ({
           )}
         </section>
       )}
-      {!!likedLists.length && (
+      {!hiddenBlocks.has("likedLists") && !!likedLists.length && (
         <section className={styles.lists} aria-labelledby="profile-liked-lists">
           <SectionTitle
             as="h3"
@@ -331,14 +352,21 @@ export const UserInfo: FC<UserInfoProps> = ({
           >
             <span id="profile-liked-lists">Liked lists</span>
           </SectionTitle>
-          <ListCardsGrid>
+          <ListCardsGrid maxRows={PREVIEW_ROWS} isGameSized>
             {likedLists.slice(0, LISTS_PREVIEW_LIMIT).map((list) => (
               <ListCard key={list._id} list={list} />
             ))}
           </ListCardsGrid>
         </section>
       )}
-      <ActivityTimeline userId={id} isOwner={isOwner} />
+      {!hiddenBlocks.has("activity") && (
+        <ActivityTimeline
+          userId={id}
+          isOwner={isOwner}
+          isPreview
+          onShowAll={() => goTo(ACTIVITY_TAB)}
+        />
+      )}
     </div>
   );
 };

@@ -59,6 +59,8 @@ export class User extends Document {
   raPending?: IRaPending | null;
   @Prop({ type: [Object] })
   raAwards: IRAAward[];
+  @Prop({ type: [Number], default: [] })
+  raIgnoredSets: number[];
   @Prop({ type: UserSteamAccountSchema, required: false })
   steam?: UserSteamAccount;
   @Prop({ type: [String], default: ["user"] })
@@ -73,6 +75,8 @@ export class User extends Document {
       showAdultContent: false,
       bgOpacity: DEFAULT_BG_OPACITY,
       mutedNotifications: [],
+      raSyncPlaythroughs: false,
+      hiddenProfileBlocks: [],
     },
   })
   settings: IUserSettings;

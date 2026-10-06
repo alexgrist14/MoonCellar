@@ -1,12 +1,13 @@
 # Sockets
 
-MoonCellar keeps four real-time channels open over Socket.IO, all served by the API process:
+MoonCellar keeps five real-time channels open over Socket.IO, all served by the API process:
 
 | Namespace | Who connects | What it does |
 |---|---|---|
 | `/comments` | Anyone with a game's Discussion tab open | **Notifications only.** Tells other readers that a comment was posted, edited, moderated or liked. Every change still goes through REST. |
 | `/royal` | Every signed-in user, on every page | **State.** Royal games — the user's list of games for the royal wheel — are read and changed over this socket and pushed to the user's other tabs and devices. |
 | `/notifications` | Every signed-in user, on every page | **Notifications only.** Pushes a new or regrouped notification and the unread count to the user's tabs. The list and every change go through REST. |
+| `/activity` | Anyone with a profile's activity feed open | **Notifications only.** Tells open feeds that the user's activity log changed, so they refetch it. |
 | `/conflicts` | Admins with the Conflicts tab open | **Notifications only.** Tells other admins that a conflict was matched, skipped or reopened, and when queued decisions were written to games. |
 
 This document describes how they work, every event on the wire, what depends on the sockets and
@@ -22,7 +23,7 @@ Verified on 2026-09-15 with Bun 1.4.2, NestJS 11.2, Socket.IO 4.8.3, MongoDB 8.2
 | Library | Socket.IO 4.8 through `@nestjs/websockets` + `@nestjs/platform-socket.io` 11 |
 | Server | The API process itself, same port (3228), HTTP path `/socket.io/` |
 | Adapter | `SocketIoAdapter` (`apps/api/src/shared/socket-io.adapter.ts`), installed in `main.ts` |
-| Contract | `packages/schemas/src/comments-socket.schema.ts`, `packages/schemas/src/royal-games.schema.ts`, `packages/schemas/src/notifications.schema.ts`, `packages/schemas/src/conflicts-socket.schema.ts` |
+| Contract | `packages/schemas/src/comments-socket.schema.ts`, `packages/schemas/src/royal-games.schema.ts`, `packages/schemas/src/notifications.schema.ts`, `packages/schemas/src/conflicts-socket.schema.ts`, `packages/schemas/src/activity-socket.schema.ts` |
 
 - **Transports.** Default Socket.IO behaviour: an HTTP long-polling handshake, then an upgrade to
   WebSocket. If the upgrade is blocked (see [Deployment](#deployment)) the connection keeps
@@ -482,6 +483,33 @@ Sent to every socket of the user, including the tab that marked them read. Clien
 and invalidates the lists.
 
 ---
+
+## `/activity` — live activity feed
+
+A profile's activity feed (the preview on the Profile tab and the Activity tab) updates as soon as
+the user's log changes: a playthrough or rating recorded or merged into the latest entry, a merge
+that cancels out and deletes it, or a log removed by its owner.
+
+| | |
+|---|---|
+| Rooms | `activity:<userId>`, one per profile |
+| Authentication | None — the feed is public |
+| Server code | `apps/api/src/module/activity/activity.gateway.ts`, provided by `ActivityModule` |
+| Client code | `apps/web/src/lib/shared/socket/activity.socket.ts`, `apps/web/src/lib/entities/user/api/user.socket.ts` |
+| Only consumer | `ActivityTimeline` (`apps/web/src/lib/features/user/ui/ActivityTimeline`) |
+
+- **Client → server:** `activity:follow` and `activity:unfollow`, both `{ userId }` (24 hex
+  characters), acked with `{ ok: true }` or `{ ok: false, error }`. One socket may follow at most
+  `ACTIVITY_ROOMS_LIMIT` (10) feeds.
+- **Server → client:** `activity:changed` `{ userId }`, emitted by `UserLogsService` after every
+  write that changed the log. It carries nothing else on purpose: the client invalidates the
+  user's `logs` queries and refetches through REST, which decides what the viewer may see.
+- **Every module that provides `UserLogsService` imports `ActivityModule`** (user, games,
+  collections, auth). The service injects the gateway, so a module providing it without the import
+  fails `check:boot`.
+- The socket opens when the first feed mounts and closes with the last one, re-follows on
+  `connect`, and refetches on `reconnect` to pick up what changed while it was offline. There is
+  no sender exclusion: the author's own tab refetches too, which is one cheap request.
 
 ## `/conflicts` — parser conflict review
 

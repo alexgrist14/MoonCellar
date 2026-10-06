@@ -9,6 +9,7 @@ interface ICollapsibleSectionProps {
   isDefaultOpen?: boolean;
   isStatic?: boolean;
   hasError?: boolean;
+  isKeptMounted?: boolean;
   children: ReactNode;
 }
 
@@ -18,6 +19,7 @@ export const CollapsibleSection: FC<ICollapsibleSectionProps> = ({
   isDefaultOpen,
   isStatic,
   hasError,
+  isKeptMounted,
   children,
 }) => {
   const [isOpen, setIsOpen] = useState(Boolean(isDefaultOpen));
@@ -50,8 +52,8 @@ export const CollapsibleSection: FC<ICollapsibleSectionProps> = ({
           />
         </button>
       )}
-      {isBodyShown && (
-        <div className={styles.sectionBody}>
+      {(isBodyShown || isKeptMounted) && (
+        <div className={styles.sectionBody} hidden={!isBodyShown}>
           {note && <p className={styles.note}>{note}</p>}
           {children}
         </div>

@@ -37,13 +37,15 @@ const state = {
 
 const createService = (playthroughsModel: object) => {
   const recordUserLog = jest.fn();
+  const users = { updateOne: jest.fn() };
   const service = new PlaythroughsService(
     playthroughsModel as never,
     platformsModel() as never,
-    { recordUserLog } as never
+    { recordUserLog } as never,
+    users as never
   );
 
-  return { service, recordUserLog };
+  return { service, recordUserLog, users };
 };
 
 describe("PlaythroughsService logs", () => {

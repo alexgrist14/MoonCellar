@@ -1,6 +1,10 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { gamesApi, userAPI } from "@/src/lib/shared/api";
-import { ICharacterResponse, IGameResponse } from "@mooncellar/schemas";
+import {
+  ICharacterResponse,
+  IGameResponse,
+  IRaUserGame,
+} from "@mooncellar/schemas";
 import { ILogs } from "@/src/lib/shared/types/user.type";
 import { userQueryKeys } from "./user.query-keys";
 
@@ -60,4 +64,31 @@ export const useFavoriteCharactersQuery = (
     enabled: !!userId,
     staleTime: 60000,
     initialData,
+  });
+
+export interface IUserRaGame extends IRaUserGame {
+  game: IGameResponse;
+}
+
+export const useUserRaGamesQuery = (userId: string, enabled = true) =>
+  useQuery({
+    queryKey: userQueryKeys.raGames(userId),
+    queryFn: async (): Promise<IUserRaGame[]> => {
+      const { data } = await userAPI.getRaGames(userId);
+
+      if (!data.length) return [];
+
+      const games = await gamesApi
+        .getByIds({ _ids: data.map(({ gameId }) => gameId) })
+        .then((res) => res.data);
+      const gameById = new Map(games.map((game) => [game._id, game]));
+
+      return data.flatMap((entry) => {
+        const game = gameById.get(entry.gameId);
+
+        return game ? [{ ...entry, game }] : [];
+      });
+    },
+    enabled: enabled && !!userId,
+    staleTime: 60000,
   });

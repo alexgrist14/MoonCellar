@@ -13,11 +13,12 @@ what removing one means.
 
 ## API
 
-| Prop         | Type               | Default | Purpose                                           |
-| ------------ | ------------------ | ------- | ------------------------------------------------- |
-| `filters`    | `IAppliedFilter[]` | —       | Pills to render, each `{ key, label, onRemove }`. |
-| `onClearAll` | `() => void`       | —       | Called by the "Clear all" button.                 |
-| `className`  | `string`           | —       | Extra class on the row.                           |
+| Prop           | Type               | Default | Purpose                                                                                                      |
+| -------------- | ------------------ | ------- | ------------------------------------------------------------------------------------------------------------ |
+| `filters`      | `IAppliedFilter[]` | —       | Pills to render, each `{ key, label, onRemove }`.                                                            |
+| `onClearAll`   | `() => void`       | —       | Called by the "Clear all" button.                                                                            |
+| `isSingleLine` | `boolean`          | —       | One scrolling row with Clear all on the right (`RemovableChips isSingleLine`); the Gauntlet toolbar uses it. |
+| `className`    | `string`           | —       | Extra class on the row.                                                                                      |
 
 `IAppliedFilter` is exported from the barrel: `key` is the React key, `label` the visible text,
 `onRemove` runs when the pill is clicked.

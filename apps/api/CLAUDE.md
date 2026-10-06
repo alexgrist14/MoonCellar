@@ -514,6 +514,21 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   `raUlid` (the API accepts it wherever it takes a username), as the nightly awards refresh does.
   One RA account belongs to one verified MoonCellar user. `POST /user/ra/sync` reloads the awards
   on demand, at most once a minute per user (`raSyncedAt`); the nightly run sets `raSyncedAt` too.
+- **RA awards become playthroughs only for a user who turned on `settings.raSyncPlaythroughs`,
+  and only through `RaPlaythroughsService.sync`.** It reads the stored `raAwards` (no RA call), so it
+  runs after verify, after `POST /user/ra/sync`, in the nightly awards refresh and from
+  `POST /user/ra/playthroughs/sync` when the toggle is switched on. Mastery or Completion makes a
+  `completed` playthrough with `isMastered`, Game Beaten a plain `completed` one, dated by the
+  award. A game with any playthrough the user made is never touched; an automatic playthrough
+  carries `raGameId`, is only ever upgraded to mastered, and writes no user log, so a first import
+  of dozens of awards does not flood the feed. Deleting it adds the set to `raIgnoredSets`, which
+  stops the next sync from creating it again.
+- **One RA award stands for one game, even when its set is linked to several.** 32 sets belong to
+  more than one catalogue game (multi-match, or two IGDB entries of one release such as the 1988
+  and the 1992 Snatcher), and reading every linked game showed one award twice on the profile and
+  would have created two playthroughs. `pickGamesForSets` (`ra-playthroughs.service.ts`) gives each
+  set to the game the user has a playthrough of, then the one they rated, then the most rated one;
+  both `getUserGames` and `RaPlaythroughsService.sync` go through it.
 - **An RA link written outside the sync must be pinned with `ConflictsService.pin`, or the next
   nightly run removes it.** Approving a request with RA ids does this: `pin` upserts a resolved
   `ra` conflict and adds the game to its `winners`, which `matchGames` then keeps.

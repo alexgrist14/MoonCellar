@@ -10,6 +10,7 @@ import {
   IUpdateFavoritesResponse,
   IUpdateUserSettingsRequest,
   IRaConnectResponse,
+  IRaUserGame,
 } from "@mooncellar/schemas";
 import {
   CategoriesType,
@@ -160,7 +161,20 @@ const verifyRa = () =>
   agent.post<{ username: string }>(`${USER_URL}/ra/verify`);
 
 const syncRa = () =>
-  agent.post<{ awards: number; syncedAt: string }>(`${USER_URL}/ra/sync`);
+  agent.post<{
+    awards: number;
+    syncedAt: string;
+    created: number;
+    upgraded: number;
+  }>(`${USER_URL}/ra/sync`);
+
+const getRaGames = (userId: string) =>
+  agent.get<IRaUserGame[]>(`${USER_URL}/ra/${userId}/games`);
+
+const syncRaPlaythroughs = () =>
+  agent.post<{ created: number; upgraded: number }>(
+    `${USER_URL}/ra/playthroughs/sync`
+  );
 
 const disconnectRa = () => agent.delete(`${USER_URL}/ra`);
 
@@ -249,6 +263,8 @@ export const userAPI = {
   connectRa,
   verifyRa,
   syncRa,
+  getRaGames,
+  syncRaPlaythroughs,
   disconnectRa,
   addPreset,
   removePreset,

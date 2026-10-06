@@ -26,19 +26,28 @@ viewer.
 
 Everything sits in `.wrapper` inside one `Suspense`:
 
-1. `widgets/gauntlet/GauntletModePanel` — breadcrumbs, `SectionTitle as="h1"` "Gauntlet", mode
-   copy and switch (`ModeCards`, built on the shared `ChoiceCards`), match counts,
-   `AppliedGameFilters`.
+1. `widgets/gauntlet/GauntletModePanel` — a one-row toolbar: breadcrumbs, `SectionTitle as="h1"`
+   "Gauntlet", the mode switch (`ModeCards`, the shared segmented `Tabs` "Catalogue" / "Royal" — the
+   first is not called "Gauntlet", which would repeat the `<h1>` right above it; only Royal shows a count,
+   the crowned games, which is known at once — a Gauntlet match count arrives after loading and
+   made the tab widths and the text jump) and `AppliedGameFilters` (or the crowned games in Royal mode).
 
 Then, in `.page`:
 
 2. Left `ExpandMenu` "Filters" → `Filters isGauntlet` — hidden in Royal mode.
 3. Right `ExpandMenu` "Lists" → `widgets/main/ConsolesList` (Gauntlet games, Royal list, History tabs).
 4. `BGImage` of the current winner.
-5. `widgets/wheel/WheelContainer` — the wheel.
+5. `widgets/wheel/WheelContainer` — the wheel, as tall as the space under the toolbar, and beside
+   it the winner block, which always reaches the bottom of the page and scrolls inside. Before a
+   spin the block shows `GauntletIntro`: the mode's title, lede and three steps, which used to
+   take half the height above the wheel.
 
 ## Rules and gotchas
 
+- **The toolbar stays one row on desktop; never put the mode copy back above the wheel.** The wheel
+  takes whatever height the toolbar leaves, and the former two-column panel with cards, lede and
+  steps left a ~400px wheel at 1280×800. Explanations belong in `GauntletIntro`, the winner block's
+  empty state. Mockup: `docs/mockups/gauntlet-responsive.html` (option A).
 - **Read and change royal games only through `useRoyalGames`.** Reading
   `useGamesStore().royalGames` directly shows a signed-in user the leftover guest list, and
   writing to it changes nothing on the account.
@@ -54,3 +63,6 @@ Then, in `.page`:
 - **A full-height wheel panel needs `minHeight: 0` in `templateStyle`.** `WheelContainer`
   carries it; without it the panel grows past a short container.
 - Royal mode hides the Filters menu on purpose: the crowned list is the filter.
+- **Switching the mode clears the winner and the royal round** (`ModeCards.switchMode`). The
+  winner lives in `useWheelStore` for both modes, so without the reset a Gauntlet result stayed on
+  screen in Royal mode, captioned "Last one standing" and highlighted in the crowned list.

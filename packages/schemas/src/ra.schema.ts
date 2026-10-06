@@ -45,3 +45,22 @@ export const RaConnectResponseSchema = RaPendingSchema;
 export type IRaPending = z.infer<typeof RaPendingSchema>;
 export type IRaConnectRequest = z.infer<typeof RaConnectRequestSchema>;
 export type IRaConnectResponse = z.infer<typeof RaConnectResponseSchema>;
+
+export const RaGameStatusSchema = z.enum([
+  "mastered",
+  "completed",
+  "beaten",
+  "beaten-softcore",
+]);
+
+export const RaUserGameSchema = z.object({
+  gameId: z.string(),
+  raGameId: z.number(),
+  status: RaGameStatusSchema,
+  awardedAt: z.string(),
+});
+
+export const RaUserGamesResponseSchema = RaUserGameSchema.array();
+
+export type IRaGameStatus = z.infer<typeof RaGameStatusSchema>;
+export type IRaUserGame = z.infer<typeof RaUserGameSchema>;

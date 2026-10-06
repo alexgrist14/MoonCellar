@@ -12,10 +12,11 @@ than two, so a tile is the same size in the profile's narrow column and on the w
 
 ## API
 
-| Prop        | Type        | Default | Purpose                          |
-| ----------- | ----------- | ------- | -------------------------------- |
-| `children`  | `ReactNode` | —       | The tiles                        |
-| `className` | `string`    | —       | Extra class on the outer wrapper |
+| Prop        | Type        | Default | Purpose                                                                                                                     |
+| ----------- | ----------- | ------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `children`  | `ReactNode` | —       | The tiles                                                                                                                   |
+| `maxRows`   | `number`    | —       | Shows only that many whole rows at the current column count; the rest stay in the DOM, `hidden` (a profile preview shows 2) |
+| `className` | `string`    | —       | Extra class on the outer wrapper                                                                                            |
 
 ## Usage
 

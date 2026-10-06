@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { ActivityModule } from "../activity/activity.module";
 import { MongooseModule } from "@nestjs/mongoose";
 import { UserSchema } from "./schemas/user.schema";
 import { UserProfileController } from "./controllers/user-profile.controller";
@@ -29,6 +30,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { UserRoyalGamesService } from "./services/user-royal-games.service";
 import { RoyalGamesGateway } from "./gateways/royal-games.gateway";
 import { NotificationsModule } from "../notifications/notifications.module";
+import { RetroachievementsModule } from "../retroach/retroach.module";
 import { AccountDeletionService } from "./services/account-deletion.service";
 import { UserAccountController } from "./controllers/user-account.controller";
 import {
@@ -66,6 +68,7 @@ import {
 
 @Module({
   imports: [
+    ActivityModule,
     MongooseModule.forFeature([
       { name: "User", schema: UserSchema },
       { name: UserLogs.name, schema: UserLogsSchema },
@@ -82,6 +85,7 @@ import {
     ]),
     MetricsModule,
     NotificationsModule,
+    RetroachievementsModule,
     JwtModule.register({}),
   ],
 

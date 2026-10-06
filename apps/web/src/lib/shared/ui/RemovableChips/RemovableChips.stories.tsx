@@ -92,3 +92,21 @@ export const LongLabels: Story = {
 };
 
 export const Empty: Story = {};
+
+export const SingleLine: Story = {
+  args: {
+    variant: "pill",
+    isSingleLine: true,
+    onClearAll: () => {},
+    summary: "1,620 games match",
+    items: [
+      { id: "1", label: "Without platform: Family Computer" },
+      { id: "2", label: "Without platform: Nintendo Entertainment System" },
+      { id: "3", label: "Without genre: Arcade" },
+      { id: "4", label: "Without genre: Fighting" },
+      { id: "5", label: "Rating from 60" },
+      { id: "6", label: "Votes from 10" },
+      { id: "7", label: "Only with achievements" },
+    ],
+  },
+};

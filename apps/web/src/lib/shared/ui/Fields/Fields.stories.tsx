@@ -347,6 +347,16 @@ export const Collapsible: Story = {
   ),
 };
 
+export const CollapsibleKeptMounted: Story = {
+  render: () => (
+    <Column>
+      <CollapsibleSection title="Steam" isKeptMounted>
+        <TextField label="Steam profile" value="" onChange={() => {}} />
+      </CollapsibleSection>
+    </Column>
+  ),
+};
+
 export const CollapsibleStatic: Story = {
   render: () => (
     <Column>

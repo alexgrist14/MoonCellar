@@ -29,6 +29,8 @@ export class Playthrough {
   isPublic: boolean;
   @Prop()
   isSpoiler: boolean;
+  @Prop()
+  raGameId?: number;
   @Prop({ default: 0 })
   helpfulCount: number;
   @Prop()

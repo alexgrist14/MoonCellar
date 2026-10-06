@@ -1,4 +1,5 @@
 import { FC, useMemo, useState } from "react";
+import { useGridRows } from "@/src/lib/shared/hooks/useGridRows";
 import classNames from "classnames";
 import { IGameResponse } from "@mooncellar/schemas";
 import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
@@ -19,7 +20,8 @@ import {
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import styles from "./FavoriteGames.module.scss";
 
-const FAVORITE_GAMES_PREVIEW_LIMIT = 10;
+const FAVORITE_GAMES_PREVIEW_LIMIT = 12;
+const PREVIEW_ROWS = 2;
 
 interface IFavoriteGamesProps {
   userId: string;
@@ -79,11 +81,15 @@ export const FavoriteGames: FC<IFavoriteGamesProps> = ({
     });
   }, [initialGames, favoriteIds, isOwner, isServerOrder, liveGames]);
 
-  if (!games.length && !isOwner) return null;
-
   const visible = isPreview
     ? games.slice(0, FAVORITE_GAMES_PREVIEW_LIMIT)
     : games;
+  const { ref: podiumRef, visibleCount } = useGridRows<HTMLOListElement>(
+    visible.length,
+    isPreview ? PREVIEW_ROWS : undefined
+  );
+
+  if (!games.length && !isOwner) return null;
 
   const handleSave = () => {
     if (!draft) return;
@@ -118,10 +124,7 @@ export const FavoriteGames: FC<IFavoriteGamesProps> = ({
             isOwner &&
             !draft &&
             games.length > 1 && (
-              <Button
-                color={ButtonColor.GHOST}
-                onClick={() => setDraft(games)}
-              >
+              <Button color={ButtonColor.GHOST} onClick={() => setDraft(games)}>
                 <SvgPen style={SMALL_ICON_STYLE} />
                 Edit
               </Button>
@@ -164,9 +167,19 @@ export const FavoriteGames: FC<IFavoriteGamesProps> = ({
       )}
 
       {!!games.length && !draft && (
-        <ol className={styles.podium}>
+        <ol
+          ref={podiumRef}
+          className={classNames(styles.podium, {
+            [styles.podium_preview]: isPreview,
+          })}
+        >
           {visible.map((game, index) => (
-            <li key={game._id} className={styles.item}>
+            <li
+              key={game._id}
+              className={classNames(styles.item, {
+                [styles.item_hidden]: index >= visibleCount,
+              })}
+            >
               <GameCard
                 game={game}
                 rank={index + 1}
@@ -187,7 +200,7 @@ export const FavoriteGames: FC<IFavoriteGamesProps> = ({
           onChange={setDraft}
           coverRatio="var(--cover-ratio)"
           className={styles.slots}
-          note={`Drag or use the arrows to reorder. The first ${FAVORITE_GAMES_PREVIEW_LIMIT} are shown on your profile.`}
+          note="Drag or use the arrows to reorder. Your profile shows the first games that fit in two rows."
           isBusy={isPending}
           onCancel={() => setDraft(null)}
           onSave={handleSave}

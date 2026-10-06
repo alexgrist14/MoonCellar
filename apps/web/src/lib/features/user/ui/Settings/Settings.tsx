@@ -27,9 +27,12 @@ import { FC, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import styles from "./Settings.module.scss";
 import { settingsSchema, SettingsSchema } from "./settings.schema";
+import { PROFILE_BLOCK_LABELS } from "@/src/lib/shared/constants/user.const";
+import { CollapsibleSection } from "@/src/lib/shared/ui/Fields";
 import {
   DEFAULT_BG_OPACITY,
   IMutableNotificationType,
+  IProfileBlock,
   IUpdateUserSettingsRequest,
   MUTABLE_NOTIFICATION_TYPES,
   NOTIFICATION_SETTING_LABELS,
@@ -67,6 +70,7 @@ export const Settings: FC<SettingsProps> = ({}) => {
       showAdultContent: !!profile?.settings?.showAdultContent,
       bgOpacity: Math.round(profileBgOpacity * 100),
       mutedNotifications: profile?.settings?.mutedNotifications ?? [],
+      hiddenProfileBlocks: profile?.settings?.hiddenProfileBlocks ?? [],
     },
   });
 
@@ -83,12 +87,23 @@ export const Settings: FC<SettingsProps> = ({}) => {
         (profile.settings?.bgOpacity ?? DEFAULT_BG_OPACITY) * 100
       ),
       mutedNotifications: profile.settings?.mutedNotifications ?? [],
+      hiddenProfileBlocks: profile.settings?.hiddenProfileBlocks ?? [],
     });
   }, [profile, reset]);
 
   const showAdultContent = watch("showAdultContent");
   const bgOpacity = watch("bgOpacity");
   const mutedNotifications = watch("mutedNotifications");
+  const hiddenProfileBlocks = watch("hiddenProfileBlocks");
+
+  const toggleProfileBlock = (block: IProfileBlock, isVisible: boolean) =>
+    setValue(
+      "hiddenProfileBlocks",
+      isVisible
+        ? hiddenProfileBlocks.filter((hidden) => hidden !== block)
+        : [...hiddenProfileBlocks, block],
+      { shouldDirty: true }
+    );
 
   const toggleNotification = (
     type: IMutableNotificationType,
@@ -116,6 +131,15 @@ export const Settings: FC<SettingsProps> = ({}) => {
 
     if (data.bgOpacity / 100 !== profileBgOpacity) {
       settings.bgOpacity = data.bgOpacity / 100;
+    }
+
+    const savedHidden = profile.settings?.hiddenProfileBlocks ?? [];
+
+    if (
+      data.hiddenProfileBlocks.length !== savedHidden.length ||
+      data.hiddenProfileBlocks.some((block) => !savedHidden.includes(block))
+    ) {
+      settings.hiddenProfileBlocks = data.hiddenProfileBlocks;
     }
 
     const savedMuted = profile.settings?.mutedNotifications ?? [];
@@ -159,55 +183,55 @@ export const Settings: FC<SettingsProps> = ({}) => {
     <form className={styles.container} onSubmit={handleSubmit(onSubmit)}>
       <SectionTitle>Profile Settings</SectionTitle>
 
-      <div className={styles.columns}>
-        <section className={styles.section}>
-          <SectionTitle as="h3">Account</SectionTitle>
-          <div className={styles.identity}>
-            <div className={styles.identity__avatar}>
-              <AvatarSettings
-                tempAvatar={tempAvatar}
-                setTempAvatar={setTempAvatar}
+      <div className={styles.sections}>
+        <CollapsibleSection title="Account" isStatic>
+          <div className={styles.section}>
+            <div className={styles.identity}>
+              <div className={styles.identity__avatar}>
+                <AvatarSettings
+                  tempAvatar={tempAvatar}
+                  setTempAvatar={setTempAvatar}
+                />
+              </div>
+              <div className={styles.identity__fields}>
+                <div className={styles.field}>
+                  <label htmlFor="userName">User Name</label>
+                  <Input
+                    id="userName"
+                    className={styles.input}
+                    containerClassname={styles.input}
+                    {...register("userName")}
+                    error={errors.userName}
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label htmlFor="email">Email</label>
+                  <Input
+                    type="email"
+                    id="email"
+                    className={styles.input}
+                    containerClassname={styles.input}
+                    {...register("email")}
+                    error={errors.email}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className={styles.field}>
+              <label htmlFor="description">Description</label>
+              <Textarea
+                id="description"
+                className={styles.input}
+                classNameField={styles.input}
+                error={errors.description}
+                {...register("description")}
               />
             </div>
-            <div className={styles.identity__fields}>
-              <div className={styles.field}>
-                <label htmlFor="userName">User Name</label>
-                <Input
-                  id="userName"
-                  className={styles.input}
-                  containerClassname={styles.input}
-                  {...register("userName")}
-                  error={errors.userName}
-                />
-              </div>
-              <div className={styles.field}>
-                <label htmlFor="email">Email</label>
-                <Input
-                  type="email"
-                  id="email"
-                  className={styles.input}
-                  containerClassname={styles.input}
-                  {...register("email")}
-                  error={errors.email}
-                />
-              </div>
-            </div>
           </div>
-          <div className={styles.field}>
-            <label htmlFor="description">Description</label>
-            <Textarea
-              id="description"
-              className={styles.input}
-              classNameField={styles.input}
-              error={errors.description}
-              {...register("description")}
-            />
-          </div>
-        </section>
+        </CollapsibleSection>
 
-        <div className={styles.side}>
-          <section className={styles.section}>
-            <SectionTitle as="h3">Notifications</SectionTitle>
+        <CollapsibleSection title="Notifications">
+          <div className={styles.toggles}>
             {push.state !== "unavailable" && push.state !== "checking" && (
               <div className={styles.prefRow}>
                 <ToggleSwitch
@@ -234,98 +258,117 @@ export const Settings: FC<SettingsProps> = ({}) => {
                 />
               </div>
             ))}
-          </section>
+          </div>
+        </CollapsibleSection>
 
-          <div className={styles.stack}>
-            <section className={styles.section}>
-              <SectionTitle as="h3">Steam</SectionTitle>
-              <SteamAccount />
-            </section>
+        <CollapsibleSection title="Steam" isKeptMounted>
+          <div className={styles.section}>
+            <SteamAccount />
+          </div>
+        </CollapsibleSection>
 
-            <section className={styles.section}>
-              <SectionTitle as="h3">RetroAchievements</SectionTitle>
-              <RaAccount />
-            </section>
+        <CollapsibleSection title="RetroAchievements">
+          <div className={styles.section}>
+            <RaAccount />
+          </div>
+        </CollapsibleSection>
 
-            <section className={styles.section}>
-              <SectionTitle as="h3">Appearance</SectionTitle>
-              <div className={styles.field}>
-                <span className={styles.label}>Background</span>
-                {backgroundFileName && (
-                  <span className={styles.fileName}>
-                    Current: {backgroundFileName}
-                  </span>
-                )}
-                <UploadButton
-                  label="Choose background"
-                  onFile={setBackground}
-                  fileName={background ? `New: ${background.name}` : null}
-                  isFullWidthOnMobile
-                />
-              </div>
-              <RangeSelector
-                defaultValue={bgOpacity}
-                callback={(val) => setBgOpacityPreview(val / 100)}
-                finalCallback={(val) =>
-                  setValue("bgOpacity", val, { shouldDirty: true })
-                }
-                min={0}
-                max={100}
-                text="Background dim"
-                isWithValue
-                formatValue={(value) => `${value}%`}
-                step={1}
-              />
-            </section>
-
-            <section className={styles.section}>
-              <SectionTitle as="h3">App</SectionTitle>
-              {installApp.isInstalled ? (
-                <span className={styles.note}>
-                  You are using the installed MoonCellar app.
-                </span>
-              ) : installApp.canInstall ? (
-                <div className={styles.prefRow}>
-                  <span className={styles.note}>
-                    Install MoonCellar as an app on this device.
-                  </span>
-                  <Button type="button" onClick={installApp.install}>
-                    Install
-                  </Button>
-                </div>
-              ) : (
-                <span className={styles.note}>
-                  To install MoonCellar as an app, open the browser menu and
-                  choose Install or Add to Home screen. In Firefox this is the
-                  way to get it without an address bar.
-                </span>
-              )}
-              <span className={styles.note}>
-                On Android you can also{" "}
-                <a href={ANDROID_APK_URL} target="_blank" rel="noreferrer">
-                  download the APK
-                </a>
-                . Chrome opens it without an address bar; if your default
-                browser is Firefox, install from Firefox instead.
-              </span>
-            </section>
-
-            {isAdultSettingShown && (
-              <section className={styles.section}>
-                <SectionTitle as="h3">Preferences</SectionTitle>
-                <div className={styles.prefRow}>
+        <CollapsibleSection title="Profile page">
+          <div className={styles.toggles}>
+            {(Object.keys(PROFILE_BLOCK_LABELS) as IProfileBlock[]).map(
+              (block) => (
+                <div key={block} className={styles.prefRow}>
                   <ToggleSwitch
-                    label="Show adult content"
-                    checked={!!showAdultContent}
-                    onChange={(value) =>
-                      setValue("showAdultContent", value, { shouldDirty: true })
-                    }
+                    label={PROFILE_BLOCK_LABELS[block]}
+                    checked={!hiddenProfileBlocks.includes(block)}
+                    onChange={(value) => toggleProfileBlock(block, value)}
                   />
                 </div>
-              </section>
+              )
             )}
           </div>
-        </div>
+        </CollapsibleSection>
+
+        <CollapsibleSection title="Appearance">
+          <div className={styles.section}>
+            <div className={styles.field}>
+              <span className={styles.label}>Background</span>
+              {backgroundFileName && (
+                <span className={styles.fileName}>
+                  Current: {backgroundFileName}
+                </span>
+              )}
+              <UploadButton
+                label="Choose background"
+                onFile={setBackground}
+                fileName={background ? `New: ${background.name}` : null}
+                isFullWidthOnMobile
+              />
+            </div>
+            <RangeSelector
+              defaultValue={bgOpacity}
+              callback={(val) => setBgOpacityPreview(val / 100)}
+              finalCallback={(val) =>
+                setValue("bgOpacity", val, { shouldDirty: true })
+              }
+              min={0}
+              max={100}
+              text="Background dim"
+              isWithValue
+              formatValue={(value) => `${value}%`}
+              step={1}
+            />
+          </div>
+        </CollapsibleSection>
+
+        <CollapsibleSection title="App">
+          <div className={styles.section}>
+            {installApp.isInstalled ? (
+              <span className={styles.note}>
+                You are using the installed MoonCellar app.
+              </span>
+            ) : installApp.canInstall ? (
+              <div className={styles.prefRow}>
+                <span className={styles.note}>
+                  Install MoonCellar as an app on this device.
+                </span>
+                <Button type="button" onClick={installApp.install}>
+                  Install
+                </Button>
+              </div>
+            ) : (
+              <span className={styles.note}>
+                To install MoonCellar as an app, open the browser menu and
+                choose Install or Add to Home screen. In Firefox this is the way
+                to get it without an address bar.
+              </span>
+            )}
+            <span className={styles.note}>
+              On Android you can also{" "}
+              <a href={ANDROID_APK_URL} target="_blank" rel="noreferrer">
+                download the APK
+              </a>
+              . Chrome opens it without an address bar; if your default browser
+              is Firefox, install from Firefox instead.
+            </span>
+          </div>
+        </CollapsibleSection>
+
+        {isAdultSettingShown && (
+          <CollapsibleSection title="Preferences">
+            <div className={styles.toggles}>
+              <div className={styles.prefRow}>
+                <ToggleSwitch
+                  label="Show adult content"
+                  checked={!!showAdultContent}
+                  onChange={(value) =>
+                    setValue("showAdultContent", value, { shouldDirty: true })
+                  }
+                />
+              </div>
+            </div>
+          </CollapsibleSection>
+        )}
       </div>
 
       <div className={styles.actions}>
@@ -339,25 +382,26 @@ export const Settings: FC<SettingsProps> = ({}) => {
         </Button>
       </div>
 
-      <section className={styles.danger}>
-        <SectionTitle as="h3">Danger zone</SectionTitle>
-        <div className={styles.prefRow}>
-          <span className={styles.label}>
-            Delete your account and everything in it.
-          </span>
-          <Button
-            type="button"
-            color={ButtonColor.RED}
-            onClick={() =>
-              modal.open(<DeleteAccountModal />, {
-                id: DELETE_ACCOUNT_MODAL_ID,
-              })
-            }
-          >
-            Delete account
-          </Button>
+      <CollapsibleSection title="Danger zone">
+        <div className={styles.section}>
+          <div className={styles.prefRow}>
+            <span className={styles.label}>
+              Delete your account and everything in it.
+            </span>
+            <Button
+              type="button"
+              color={ButtonColor.RED}
+              onClick={() =>
+                modal.open(<DeleteAccountModal />, {
+                  id: DELETE_ACCOUNT_MODAL_ID,
+                })
+              }
+            >
+              Delete account
+            </Button>
+          </div>
         </div>
-      </section>
+      </CollapsibleSection>
     </form>
   );
 };

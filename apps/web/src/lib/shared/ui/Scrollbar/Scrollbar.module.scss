@@ -25,7 +25,8 @@
         grid-template: none;
 
         .scrollbars__scrollbar_absolute {
-          inset: auto 0 calc(-1 * (var(--scrollbar-horizontal-size) + var(--gap-x2)));
+          inset: auto 0
+            calc(-1 * (var(--scrollbar-horizontal-size) + var(--gap-x2)));
           height: var(--scrollbar-horizontal-size);
           margin-block: 0;
         }

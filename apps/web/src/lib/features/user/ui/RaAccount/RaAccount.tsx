@@ -4,12 +4,14 @@ import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
 import { TextField } from "@/src/lib/shared/ui/Fields";
+import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import {
   useRaConnectMutation,
   useRaDisconnectMutation,
+  useRaPlaythroughsToggleMutation,
   useRaSyncMutation,
   useRaVerifyMutation,
 } from "../../model/useRaAccount";
@@ -23,11 +25,13 @@ export const RaAccount: FC = () => {
   const connect = useRaConnectMutation();
   const verify = useRaVerifyMutation();
   const sync = useRaSyncMutation();
+  const playthroughsToggle = useRaPlaythroughsToggleMutation();
   const disconnect = useRaDisconnectMutation();
   const isBusy =
     connect.isPending ||
     verify.isPending ||
     sync.isPending ||
+    playthroughsToggle.isPending ||
     disconnect.isPending;
 
   const [username, setUsername] = useState(profile?.raUsername ?? "");
@@ -57,10 +61,29 @@ export const RaAccount: FC = () => {
 
   const handleSync = () =>
     sync.mutate(undefined, {
-      onSuccess: ({ awards }) =>
+      onSuccess: ({ awards, created, upgraded }) =>
         toast.success({
           title: "RetroAchievements updated",
-          description: `${awards} ${commonUtils.addLastS("award", awards)}`,
+          description: [
+            `${awards} ${commonUtils.addLastS("award", awards)}`,
+            created
+              ? `${created} ${commonUtils.addLastS("playthrough", created)} added`
+              : "",
+            upgraded ? `${upgraded} marked mastered` : "",
+          ]
+            .filter(Boolean)
+            .join(", "),
+        }),
+    });
+
+  const handlePlaythroughsToggle = (isOn: boolean) =>
+    playthroughsToggle.mutate(isOn, {
+      onSuccess: (result) =>
+        result &&
+        toast.success({
+          description: result.created
+            ? `${result.created} ${commonUtils.addLastS("playthrough", result.created)} added from RetroAchievements`
+            : "Playthroughs are up to date",
         }),
     });
 
@@ -117,6 +140,13 @@ export const RaAccount: FC = () => {
               : "."}
           </span>
         </div>
+        <ToggleSwitch
+          label="Mark playthroughs from awards"
+          hint="Mastered and completed sets add a Mastered playthrough, beaten ones a Completed playthrough. Games you already have a playthrough for are left alone, and a deleted one is not added again."
+          checked={!!profile.settings?.raSyncPlaythroughs}
+          isDisabled={isBusy}
+          onChange={handlePlaythroughsToggle}
+        />
         <div className={styles.ra__actions}>
           <Button
             type="button"

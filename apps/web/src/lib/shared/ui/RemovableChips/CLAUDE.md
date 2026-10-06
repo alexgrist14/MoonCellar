@@ -14,16 +14,18 @@ the end. It holds no state: the caller owns the list and decides what removing a
 
 ## API
 
-| Prop             | Type                               | Default                      | Purpose                                                                   |
-| ---------------- | ---------------------------------- | ---------------------------- | ------------------------------------------------------------------------- |
-| `items`          | `IRemovableChip[]`                 | —                            | Chips to render, each `{ id, label, href? }`.                             |
-| `onRemove`       | `(id: string) => void`             | —                            | Called with the item's `id` when it is removed.                           |
-| `variant`        | `"chip" \| "pill"`                 | `"chip"`                     | `chip`: `Chip` with a red × button. `pill`: the whole pill is the button. |
-| `clearAllLabel`  | `string`                           | `"Clear all"`                | Text of the clear button.                                                 |
-| `onClearAll`     | `() => void`                       | —                            | Shows the clear button after the last chip.                               |
-| `getRemoveLabel` | `(item: IRemovableChip) => string` | `` `Remove ${item.label}` `` | `aria-label` of each remove button.                                       |
-| `isDisabled`     | `boolean`                          | —                            | Disables every remove button and the clear button (e.g. while saving).    |
-| `className`      | `string`                           | —                            | Extra class on the `<ul>`.                                                |
+| Prop             | Type                               | Default                      | Purpose                                                                                                                                                                          |
+| ---------------- | ---------------------------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `items`          | `IRemovableChip[]`                 | —                            | Chips to render, each `{ id, label, href? }`.                                                                                                                                    |
+| `onRemove`       | `(id: string) => void`             | —                            | Called with the item's `id` when it is removed.                                                                                                                                  |
+| `variant`        | `"chip" \| "pill"`                 | `"chip"`                     | `chip`: `Chip` with a red × button. `pill`: the whole pill is the button.                                                                                                        |
+| `clearAllLabel`  | `string`                           | `"Clear all"`                | Text of the clear button.                                                                                                                                                        |
+| `onClearAll`     | `() => void`                       | —                            | Shows the clear button after the last chip.                                                                                                                                      |
+| `getRemoveLabel` | `(item: IRemovableChip) => string` | `` `Remove ${item.label}` `` | `aria-label` of each remove button.                                                                                                                                              |
+| `isDisabled`     | `boolean`                          | —                            | Disables every remove button and the clear button (e.g. while saving).                                                                                                           |
+| `isSingleLine`   | `boolean`                          | —                            | One row: the chips scroll sideways in a horizontal `Scrollbar` and Clear all stays outside it, on the right; on phones (`mediaSm`) Clear all and `summary` move to a second row. |
+| `summary`        | `ReactNode`                        | —                            | With `isSingleLine`: text after Clear all, such as a result count; it wraps with Clear all on phones.                                                                            |
+| `className`      | `string`                           | —                            | Extra class on the `<ul>` (on the row wrapper with `isSingleLine`).                                                                                                              |
 
 `IRemovableChip` is exported from the barrel. `href` makes the label a link (`chip` variant
 only; a `pill` is a single button and ignores it).

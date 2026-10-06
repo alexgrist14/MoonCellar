@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { ActivityModule } from "../activity/activity.module";
 import { AuthService } from "./auth.service";
 import { AuthController } from "./auth.controller";
 import { MongooseModule } from "@nestjs/mongoose";
@@ -22,6 +23,7 @@ import { IndexNowModule } from "../indexnow/indexnow.module";
 
 @Module({
   imports: [
+    ActivityModule,
     MongooseModule.forFeature([
       { name: "User", schema: UserSchema },
       { name: UserLogs.name, schema: UserLogsSchema },
