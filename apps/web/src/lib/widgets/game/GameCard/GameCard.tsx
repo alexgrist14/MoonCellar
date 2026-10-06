@@ -163,6 +163,9 @@ export const GameCard = memo(
         ),
       [game._id, profile]
     );
+    const steamTotal =
+      steamProgress?.total ?? game.steamAchievements?.total ?? 0;
+    const steamAppId = steamProgress?.appId ?? game.steamAchievements?.appId;
     const isSteamMastered =
       !!steamProgress && steamProgress.unlocked >= steamProgress.total;
 
@@ -318,19 +321,21 @@ export const GameCard = memo(
               </Tooltip>
             </div>
           )}
-          {(!!game.retroachievements?.length || !!steamProgress) && (
+          {(!!game.retroachievements?.length || !!steamTotal) && (
             <div
               className={classNames(
                 styles.card__rail,
                 styles.card__rail_bottomRight
               )}
             >
-              {!!steamProgress && (
+              {!!steamTotal && (
                 <Tooltip
                   content={
                     isSteamMastered
                       ? "Steam: mastered"
-                      : `Steam: ${steamProgress.unlocked} / ${steamProgress.total}`
+                      : steamProgress
+                        ? `Steam: ${steamProgress.unlocked} / ${steamProgress.total}`
+                        : `Steam: ${steamTotal} achievements`
                   }
                 >
                   <div
@@ -460,10 +465,12 @@ export const GameCard = memo(
           isOpen={isRatingOpen}
           onClose={() => setIsRatingOpen(false)}
         />
-        {!!steamProgress && !!profile?.steam?.steamId && (
+        {!!steamTotal && !!steamAppId && (
           <GameSteamPopover
+            appId={steamAppId}
+            total={steamTotal}
             progress={steamProgress}
-            steamId={profile.steam.steamId}
+            steamId={profile?.steam?.steamId}
             anchorRef={steamRef}
             isOpen={isSteamOpen}
             onClose={() => setIsSteamOpen(false)}

@@ -121,10 +121,12 @@ library from that old list and the stored achievement progress, without playtime
   - **Filters:** the catalogue filters from the left "Filters" menu. Sort and filters live in
     the URL (`sort`, `order` and the `/games` filter params).
 - **Profile → main tab.** A two-row Steam block, in the default order.
-- **Game cards.** A card shows a Steam logo in the bottom-right corner when the viewer has
-  progress in that game: grey while in progress, yellow when mastered. It opens
-  `GameSteamPopover` with the unlocked count, a progress bar, and buttons to the Steam
-  achievements page and the store page.
+- **Game cards.** Every game with Steam achievements shows a Steam logo in the bottom-right
+  corner, as every game with an RA set shows the medal: yellow when the viewer mastered it, grey
+  otherwise. It opens `GameSteamPopover`: the viewer's unlocked count and a progress bar when they
+  have progress, or the game's achievement count when they have none (with a hint to link Steam
+  when no account is linked), and buttons to the achievements page (the viewer's own, or Steam's
+  global one) and the store page.
 - **Settings.** Counts and the playthrough toggle.
 
 ## Filters
