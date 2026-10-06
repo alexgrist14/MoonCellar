@@ -5,6 +5,7 @@ import {
   IConflictsResponse,
   IConflictsSummary,
   IDecideConflictRequest,
+  IGameConflict,
   IGetConflictsParams,
 } from "@mooncellar/schemas";
 import { API_URL } from "@/src/lib/shared/constants";
@@ -54,8 +55,12 @@ const reopen = (source: IConflictSource, externalId: string) => {
   );
 };
 
+const getByGame = (gameId: string) =>
+  agent.get<IGameConflict[]>(`${CONFLICTS_URL}/by-game/${gameId}`);
+
 export const adminConflictsApi = {
   getSummary,
+  getByGame,
   getList,
   getItem,
   decide,

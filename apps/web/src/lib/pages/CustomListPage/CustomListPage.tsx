@@ -430,13 +430,11 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
                 <ListLikeButton
                   list={list}
                   viewerId={viewerId}
-                  className={styles.actions__button}
                 />
               )}
               {isOwner && (
                 <Button
                   color={ButtonColor.DEFAULT}
-                  className={styles.actions__button}
                   onClick={() =>
                     openListModal({ list, userName: user.userName })
                   }
@@ -448,7 +446,6 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
               {!list.isPrivate && (
                 <Button
                   color={ButtonColor.DEFAULT}
-                  className={styles.actions__button}
                   onClick={handleCopyLink}
                 >
                   <SvgLink size="16" style={{ color: "inherit" }} />
@@ -461,7 +458,6 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
                 !!list.gamesCount && (
                   <Button
                     color={ButtonColor.DEFAULT}
-                    className={styles.actions__button}
                     onClick={() => setDraft(listIds)}
                   >
                     Manage
@@ -471,7 +467,6 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
                 <>
                   <Button
                     color={ButtonColor.DEFAULT}
-                    className={styles.actions__button}
                     disabled={isReordering}
                     onClick={() => setDraft(null)}
                   >
@@ -479,7 +474,6 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
                   </Button>
                   <Button
                     color={ButtonColor.ACCENT}
-                    className={styles.actions__button}
                     disabled={isReordering || isRemoving}
                     onClick={finishManaging}
                   >

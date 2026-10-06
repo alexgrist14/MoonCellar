@@ -55,7 +55,11 @@ const buildService = (
   } as never;
   const metrics = { recordGames: jest.fn() } as never;
 
-  const conflicts = { record: jest.fn(), register: jest.fn() };
+  const conflicts = {
+    record: jest.fn(),
+    register: jest.fn(),
+    removeForGame: jest.fn().mockResolvedValue(0),
+  };
   const service = new HltbService(
     gamesModel,
     platformsModel,
@@ -74,7 +78,7 @@ const buildService = (
     getById,
   };
 
-  return { service, findOne, updateOne, getById };
+  return { service, findOne, updateOne, getById, conflicts };
 };
 
 describe("HltbService.syncGame", () => {
@@ -148,10 +152,14 @@ describe("HltbService.syncGame", () => {
 
 describe("HltbService.syncGame with an explicit HLTB id", () => {
   it("stores the requested entry without running the matcher", async () => {
-    const { service, updateOne, getById } = buildService(buildGame(), [], {
-      success: true,
-      data: buildEntry({ id: 4242, name: "Akumajou Dracula" }),
-    });
+    const { service, updateOne, getById, conflicts } = buildService(
+      buildGame(),
+      [],
+      {
+        success: true,
+        data: buildEntry({ id: 4242, name: "Akumajou Dracula" }),
+      }
+    );
 
     const result = await service.syncGame({ gameId: GAME_ID, hltbId: "4242" });
 
@@ -163,6 +171,11 @@ describe("HltbService.syncGame with an explicit HLTB id", () => {
     const [, update] = updateOne.mock.calls[0];
     expect(update.$set.hltb.hltbId).toBe("4242");
     expect(update.$unset).toEqual({ hltbNotFoundAt: "" });
+    expect(conflicts.removeForGame).toHaveBeenCalledWith(
+      "hltb",
+      new mongoose.Types.ObjectId(GAME_ID),
+      { externalIds: [GAME_ID] }
+    );
   });
 
   it("leaves the stored times untouched when the id is unknown", async () => {

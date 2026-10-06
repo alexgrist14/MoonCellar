@@ -69,18 +69,6 @@ $categories: wishlist, playing, completed, played, backlog, dropped;
     min-width: 0;
   }
 
-  &__tabs.modal__tabs {
-    width: fit-content;
-    min-width: 0;
-    max-width: none;
-    flex-wrap: nowrap;
-    overflow: visible;
-
-    & > * {
-      flex: 0 0 auto;
-    }
-  }
-
   &__categoryTabs {
     @include mediaMax($screenMd) {
       display: none;
@@ -109,9 +97,8 @@ $categories: wishlist, playing, completed, played, backlog, dropped;
     background-color: var(--playthrough-category-color);
   }
 
-  &__mastered_active.modal__mastered_active,
-  &__mastered_active.modal__mastered_active:hover {
-    color: var(--game-mastered-color);
+  &__mastered {
+    --button-active-color: var(--game-mastered-color);
   }
 
   &__label {

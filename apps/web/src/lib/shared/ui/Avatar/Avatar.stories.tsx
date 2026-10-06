@@ -29,3 +29,5 @@ export const Placeholder: Story = {
 export const WithoutTooltip: Story = { args: { isWithoutTooltip: true } };
 
 export const WithoutHover: Story = { args: { isWithoutHover: true } };
+
+export const Rounded: Story = { args: { shape: "rounded" } };

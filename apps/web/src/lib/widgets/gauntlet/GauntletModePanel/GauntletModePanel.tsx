@@ -150,10 +150,9 @@ export const GauntletModePanel: FC = () => {
                         ? "muted"
                         : "neutral"
                   }
-                  className={classNames({
-                    [styles.out]:
-                      !remaining.has(game._id) && winner?._id !== game._id,
-                  })}
+                  isStruck={
+                    !remaining.has(game._id) && winner?._id !== game._id
+                  }
                 >
                   {game.name}
                 </Badge>

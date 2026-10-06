@@ -177,6 +177,8 @@
   --game-hero-counters-width: 360px;
   --game-rating-popover-width: 320px;
   --popover-width: 320px;
+  --achievements-icon-size: 44px;
+  --achievements-icon-size-sm: 48px;
   --popover-max-height: 320px;
   --popover-sheet-max-height: 85dvh;
   --textarea-handle-size: 20px;
@@ -194,6 +196,7 @@
   --expandable-fade-height: 32px;
   --date-picker-width: 300px;
   --date-picker-field-min-width: 140px;
+  --game-card-min-width: 160px;
   --playthrough-platform-min-width: 200px;
   --playthrough-time-min-width: 120px;
   --date-picker-cell-size: 34px;
@@ -265,6 +268,7 @@
   --search-modal-width: 900px;
   --search-tab-height: 36px;
   --reaction-active-color: var(--color-accent);
+  --tabs-muted-opacity: 0.55;
   --loader-block-min-height: 96px;
   --burger-animation-duration: 600ms;
 }
@@ -340,7 +344,7 @@
     border: 1px solid var(--color-border-primary);
     border-radius: var(--radius-x4);
     overflow: hidden;
-    margin: var(--gap-x2) 0 0;
+    margin: var(--padding-x2) 0 0;
   }
 
   .brief div { background: var(--color-bg-primary); padding: var(--padding-x4); }
@@ -350,7 +354,7 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--color-gray);
-    margin-bottom: var(--gap-x1);
+    margin-bottom: var(--padding-x1);
   }
 
   .brief dd { margin: 0; font-size: 14px; color: var(--color-text-secondary); }
@@ -364,7 +368,7 @@
     align-items: baseline;
     gap: var(--gap-x3);
     flex-wrap: wrap;
-    margin-bottom: var(--gap-x2);
+    margin-bottom: var(--padding-x2);
   }
 
   .variant__letter {
@@ -383,7 +387,7 @@
   .variant__thesis {
     color: var(--color-text-muted);
     max-width: 66ch;
-    margin-bottom: var(--gap-x5);
+    margin-bottom: var(--padding-x5);
   }
 
   .stage {
@@ -459,7 +463,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: var(--gap-x4) var(--gap-x6);
-    margin-top: var(--gap-x5);
+    margin-top: var(--padding-x5);
   }
 
   .hints h4 {
@@ -468,7 +472,7 @@
     text-transform: uppercase;
     color: var(--color-gray);
     font-weight: 600;
-    margin-bottom: var(--gap-x2);
+    margin-bottom: var(--padding-x2);
   }
 
   .hints ul {
@@ -831,7 +835,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--gap-x3);
-    margin-top: var(--gap-x2);
+    margin-top: var(--padding-x2);
     padding-left: var(--padding-x4);
     border-left: 2px solid var(--color-border-primary);
   }
@@ -989,7 +993,7 @@
 
   .section { margin-top: var(--padding-x20); display: flex; flex-direction: column; gap: var(--gap-x5); }
   .section > h2 { font-size: 23px; font-weight: 700; letter-spacing: -0.2px; }
-  .section > .lede { margin-top: calc(-1 * var(--gap-x3)); }
+  .section > .lede { margin-top: calc(-1 * var(--padding-x3)); }
 
   .table-wrap {
     overflow-x: auto;

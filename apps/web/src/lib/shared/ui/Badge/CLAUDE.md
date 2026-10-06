@@ -21,6 +21,7 @@ Small non-interactive pill that labels a status or a short attribute: "Pending",
 | `isWithDot` | `boolean`                                                                     | `false`     | Small dot in the text colour before the label                                 |
 | `variant`   | `"soft" \| "outlined"`                                                        | `"soft"`    | `outlined`: transparent background with a `--color-border-primary` inset ring |
 | `isWrap`    | `boolean`                                                                     | `false`     | Allows the label to wrap and the badge to shrink (long game names)            |
+| `isStruck`  | `boolean`                                                                     | `false`     | Strikes the label through (an eliminated gauntlet entry)                      |
 | `ref`       | `Ref<HTMLSpanElement>`                                                        | —           | Forwarded to the `span`, so a `Badge` can be a `Tooltip` trigger              |
 | `className` | `string`                                                                      | —           | Extra class                                                                   |
 | `...rest`   | `HTMLAttributes<HTMLSpanElement>`                                             | —           | `title`, `aria-*`, `data-*` reach the `span`                                  |
@@ -60,4 +61,4 @@ import { Badge } from "@/src/lib/shared/ui/Badge";
 ## Storybook
 
 `Shared/Badge` — `Default`, `Medium`, `WithDot`, `AllTones`, `AllTonesWithDot`, `InText`,
-`Outlined`, `Wrapping`, `WithTooltip`.
+`Outlined`, `Wrapping`, `WithTooltip`, `Struck`.

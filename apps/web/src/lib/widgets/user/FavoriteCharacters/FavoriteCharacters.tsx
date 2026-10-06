@@ -93,8 +93,7 @@ export const FavoriteCharacters: FC<IFavoriteCharactersProps> = ({
             !draft &&
             characters.length > 1 && (
               <Button
-                color={ButtonColor.TRANSPARENT}
-                className={styles.edit}
+                color={ButtonColor.GHOST}
                 onClick={() => setDraft(characters)}
               >
                 <SvgPen style={ICON_STYLE} />

@@ -34,16 +34,13 @@ export const GameMedia: FC<IGameMediaProps> = ({ game, isBoxed = true }) => {
   const tabs =
     panels.length > 1 ? (
       <Tabs
-        buttonColor="transparent"
-        buttonsClassName={styles.mediaTabs}
+        theme="segmented"
+        ariaLabel="Media types"
         defaultTabIndex={currentIndex}
         isUseDefaultIndex
         contents={panels.map((panel) => ({
           tabName: panel.label,
           count: panel.items.length,
-          className: classNames(styles.mediaTab, {
-            [styles.mediaTabActive]: panel.key === currentKey,
-          }),
           onTabClick: () => setActiveKey(panel.key),
         }))}
       />

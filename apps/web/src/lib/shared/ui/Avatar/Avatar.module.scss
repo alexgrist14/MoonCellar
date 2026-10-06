@@ -18,6 +18,10 @@
     &_static:hover {
       outline: 2px solid transparent;
     }
+
+    &_rounded {
+      border-radius: var(--radius-x3);
+    }
   }
 }
 

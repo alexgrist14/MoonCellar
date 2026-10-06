@@ -10,6 +10,7 @@ export interface ITabContent {
   tabLink?: string;
   isUnselectable?: boolean;
   isHidden?: boolean;
+  isMuted?: boolean;
   ariaLabel?: string;
   tooltip?: ReactNode;
   className?: string;

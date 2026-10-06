@@ -1,0 +1,809 @@
+<title>RetroAchievements Modal</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* mooncellar-tokens:start */
+/* Generated from apps/web/src/lib/app/styles/vars by
+   `bun --filter web sync:tokens`. Do not edit by hand. */
+:root {
+  /* vars/_colors.scss */
+  --color-neutral-5: #080a0b;
+  --color-neutral-10: #0d1011;
+  --color-neutral-15: #121516;
+  --color-neutral-20: #161b1d;
+  --color-neutral-25: #1a2022;
+  --color-neutral-30: #1f2628;
+  --color-neutral-35: #262d2f;
+  --color-neutral-40: #2f3537;
+  --color-neutral-45: #383e40;
+  --color-neutral-50: #3f4750;
+  --color-neutral-55: #50575d;
+  --color-neutral-60: #5e6a6e;
+  --color-neutral-70: #747d82;
+  --color-neutral-80: #9192a1;
+  --color-neutral-85: #b0b2bc;
+  --color-neutral-90: #d9d9d9;
+  --color-neutral-95: #eaeaea;
+  --color-neutral-100: #ffffff;
+  --color-blue: #3d6bff;
+  --color-blue-light: #00d4ff;
+  --color-cyan: #48cae4;
+  --color-gray: #afb3b9;
+  --color-white: #e8edf5;
+  --color-yellow: #ffc451;
+  --color-yellow-light: #f9f871;
+  --color-orange: #ff8862;
+  --color-pink: #ff4b8f;
+  --color-violet: #9b5de5;
+  --color-green: #2dc653;
+  --color-red: #e5383b;
+  --color-positive: #00c292;
+  --color-negative: #d02729;
+  --color-primary: var(--color-neutral-30);
+  --color-secondary: var(--color-neutral-90);
+  --color-contrast: var(--color-neutral-100);
+  --color-contrast-reverse: var(--color-neutral-5);
+  --color-attention: #ffc451;
+  --color-text-primary: var(--color-neutral-100);
+  --color-text-secondary: var(--color-neutral-90);
+  --color-text-muted: var(--color-neutral-85);
+  --color-accent: #6951ee;
+  --color-bg-primary: #191d24;
+  --color-bg-secondary: #212731;
+  --color-bg-tertiary: #2c3340;
+  --color-bg-accent: #6951ee;
+  --color-bg-hover: #374151;
+  --color-bg-positive: #00c292;
+  --color-bg-primary-tint: #191d24ee;
+  --color-bg-secondary-tint: #212731ee;
+  --color-bg-tertiary-tint: #2c3340ee;
+  --color-bg-accent-tint: #6951eeee;
+  --color-bg-positive-tint: #00c292ee;
+  --color-border-primary: var(--color-neutral-35);
+  --color-scrollbar-track: var(--color-neutral-15);
+  --color-scrollbar-thumb: var(--color-neutral-80);
+  --color-border-secondary: var(--color-neutral-85);
+
+  /* vars/_common.scss */
+  --padding-x05: calc(var(--padding-x1) * 0.5);
+  --padding-x1: 4px;
+  --padding-x2: calc(var(--padding-x1) * 2);
+  --padding-x3: calc(var(--padding-x1) * 3);
+  --padding-x4: calc(var(--padding-x1) * 4);
+  --padding-x5: calc(var(--padding-x1) * 5);
+  --padding-x6: calc(var(--padding-x1) * 6);
+  --padding-x7: calc(var(--padding-x1) * 7);
+  --padding-x8: calc(var(--padding-x1) * 8);
+  --padding-x9: calc(var(--padding-x1) * 9);
+  --padding-x10: calc(var(--padding-x1) * 10);
+  --padding-x11: calc(var(--padding-x1) * 11);
+  --padding-x12: calc(var(--padding-x1) * 12);
+  --padding-x13: calc(var(--padding-x1) * 13);
+  --padding-x14: calc(var(--padding-x1) * 14);
+  --padding-x15: calc(var(--padding-x1) * 15);
+  --padding-x16: calc(var(--padding-x1) * 16);
+  --padding-x17: calc(var(--padding-x1) * 17);
+  --padding-x18: calc(var(--padding-x1) * 18);
+  --padding-x19: calc(var(--padding-x1) * 19);
+  --padding-x20: calc(var(--padding-x1) * 20);
+  --padding-x25: calc(var(--padding-x1) * 25);
+  --radius-x1: 4px;
+  --radius-x2: calc(var(--radius-x1) * 2);
+  --radius-x3: calc(var(--radius-x1) * 3);
+  --radius-x4: calc(var(--radius-x1) * 4);
+  --radius-x5: calc(var(--radius-x1) * 5);
+  --radius-x6: calc(var(--radius-x1) * 6);
+  --radius-x7: calc(var(--radius-x1) * 7);
+  --radius-x8: calc(var(--radius-x1) * 8);
+  --radius-x9: calc(var(--radius-x1) * 9);
+  --radius-x10: calc(var(--radius-x1) * 10);
+  --radius-control: var(--radius-x4);
+  --radius-button: var(--radius-x3);
+  --gap-x05: calc(var(--gap-x1) * 0.5);
+  --gap-x1: 4px;
+  --gap-x2: calc(var(--gap-x1) * 2);
+  --gap-x3: calc(var(--gap-x1) * 3);
+  --gap-x4: calc(var(--gap-x1) * 4);
+  --gap-x5: calc(var(--gap-x1) * 5);
+  --gap-x6: calc(var(--gap-x1) * 6);
+  --gap-x7: calc(var(--gap-x1) * 7);
+  --gap-x8: calc(var(--gap-x1) * 8);
+  --gap-x9: calc(var(--gap-x1) * 9);
+  --gap-x10: calc(var(--gap-x1) * 10);
+  --gap-x11: calc(var(--gap-x1) * 11);
+  --gap-x12: calc(var(--gap-x1) * 12);
+  --blur-x1: 6px;
+  --rich-text-gap: 8px;
+  --duration-instant: 1ms;
+  --duration-fast: 160ms;
+  --duration-base: 280ms;
+  --duration-slow: 400ms;
+  --delay-stagger: 90ms;
+  --easing-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --easing-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --reveal-offset: 12px;
+  --reveal-scale: 0.96;
+  --header-height: 45px;
+  --container-padding-top: calc(var(--header-height) + var(--padding-x3));
+  --container-padding-bottom: var(--padding-x3);
+  --page-height-available: calc(
+    100dvh - var(--container-padding-top) - var(--container-padding-bottom)
+  );
+
+  /* vars/_components.scss */
+  --game-completed-color: var(--color-green);
+  --game-dropped-color: var(--color-red);
+  --game-playing-color: var(--color-blue);
+  --game-wishlist-color: var(--color-violet);
+  --game-backlog-color: var(--color-white);
+  --game-played-color: var(--color-cyan);
+  --game-mastered-color: var(--color-yellow);
+  --cover-ratio: 528/704;
+  --shadow-basic: 0px 4px 4px var(--color-neutral-5);
+  --shadow-text: drop-shadow(0 1px 2px var(--color-neutral-5))
+    drop-shadow(0 0 6px var(--color-neutral-5));
+  --glow-accent: 0 0 0.4rem var(--color-accent);
+  --glow-accent-sm: 0 0 0.15rem var(--color-accent);
+  --avatar-size-sm: var(--padding-x6);
+  --navigation-progress-height: 1px;
+  --navigation-progress-z-index: 1002;
+  --bprogress-color: var(--color-accent) !important;
+  --bprogress-height: var(--navigation-progress-height) !important;
+  --bprogress-box-shadow: var(--glow-accent) !important;
+  --bprogress-z-index: var(--navigation-progress-z-index) !important;
+  --modal-text-width: min(720px, calc(100vw - var(--padding-x10)));
+  --rich-editor-image-width: 400px;
+  --rich-editor-separator-height: 18px;
+  --playthrough-modal-width: min(80vw, 400px);
+  --header-logo-height: 85%;
+  --header-logo-height-sm: 72%;
+  --tab-count-color: color-mix(in srgb, currentColor 60%, transparent);
+  --playthrough-modal-height: min(70dvh, 500px);
+  --playthrough-modal-width-lg: min(88vw, 760px);
+  --playthrough-modal-height-lg: min(86dvh, 780px);
+  --games-card-min-width: 180px;
+  --list-card-min-width: 180px;
+  --range-track-height: 6px;
+  --range-thumb-size: 20px;
+  --range-thumb-width: 44px;
+  --range-thumb-height: 24px;
+  --scrollbar-horizontal-size: 6px;
+  --scrollbar-arrow-width: 32px;
+  --scrollbar-fade-width: 48px;
+  --game-keywords-collapsed-height: 66px;
+  --game-hero-artwork-height: 300px;
+  --game-hero-artwork-height-sm: 180px;
+  --game-hero-cover-width: 200px;
+  --game-hero-cover-offset: 104px;
+  --game-hero-counters-width: 360px;
+  --game-rating-popover-width: 320px;
+  --popover-width: 320px;
+  --achievements-icon-size: 44px;
+  --achievements-icon-size-sm: 48px;
+  --popover-max-height: 320px;
+  --popover-sheet-max-height: 85dvh;
+  --textarea-handle-size: 20px;
+  --image-generator-preview-width: 160px;
+  --ai-drafts-count-width: 88px;
+  --image-finder-portrait-width: 216px;
+  --image-finder-landscape-width: 320px;
+  --site-sessions-modal-width: min(560px, calc(100vw - var(--padding-x8)));
+  --image-generator-elements-width: min(640px, calc(100vw - var(--padding-x8)));
+  --popover-sheet-grabber-width: 40px;
+  --popover-sheet-grabber-height: 5px;
+  --drawer-width: max(20vw, 460px);
+  --drawer-z-index: 5;
+  --expandable-scroll-height: 132px;
+  --expandable-fade-height: 32px;
+  --date-picker-width: 300px;
+  --date-picker-field-min-width: 140px;
+  --game-card-min-width: 160px;
+  --playthrough-platform-min-width: 200px;
+  --playthrough-time-min-width: 120px;
+  --date-picker-cell-size: 34px;
+  --emoji-picker-width: 328px;
+  --emoji-picker-cell-size: 34px;
+  --emoji-picker-group-size: 28px;
+  --emoji-picker-grid-height: 238px;
+  --game-hero-scrim: linear-gradient(
+    180deg,
+    #191d248c 0%,
+    #191d2400 30%,
+    #212731d1 72%,
+    var(--color-bg-secondary) 100%
+  );
+  --spoiler-blur: 7px;
+  --community-avatar-size: 36px;
+  --community-reply-avatar-size: 28px;
+  --community-review-clamp-height: 132px;
+  --community-distribution-height: 8px;
+  --community-distribution-min-width: 240px;
+  --community-dot-size: 7px;
+  --community-loading-height: 96px;
+  --user-review-card-width: 170px;
+  --user-review-card-width-sm: 140px;
+  --user-review-rating-filter-width: 260px;
+  --vndb-review-height: max(360px, calc(100vh - 420px));
+  --vndb-cover-width: 120px;
+  --vndb-search-width: 320px;
+  --conflicts-state-filter-width: 240px;
+  --vndb-candidate-cover-width: 64px;
+  --empty-state-image-size: 180px;
+  --empty-state-image-size-sm: 96px;
+  --empty-state-inline-text-min-width: 200px;
+  --empty-state-page-content-width: 420px;
+  --badge-negative-color: var(--color-orange);
+  --badge-tint-strength: 16%;
+  --stat-tile-bg: var(--color-bg-primary);
+  --not-found-image-height: 240px;
+  --not-found-backdrop-size: 400px;
+  --favorite-color: var(--color-pink);
+  --game-controls-icon-size: 24px;
+  --game-controls-icon-size-sm: 20px;
+  --game-controls-badge-size: 15px;
+  --list-card-row-mosaic-size: 44px;
+  --list-card-count-height: 20px;
+  --list-search-width: 320px;
+  --list-row-cover-width: 40px;
+  --profile-hero-height: 168px;
+  --profile-avatar-size: 112px;
+  --profile-avatar-size-sm: 72px;
+  --activity-cover-width: 80px;
+  --people-avatar-size: 22px;
+  --character-card-width: 128px;
+  --character-card-width-sm: 104px;
+  --character-profile-portrait-width: 200px;
+  --character-editor-portrait-width: 150px;
+  --image-picker-thumb-width: 160px;
+  --game-images-modal-width: min(92vw, 960px);
+  --requests-queue-width: 440px;
+  --list-sort-width: 280px;
+  --field-control-height: 40px;
+  --gauntlet-mode-cards-width: 300px;
+  --gauntlet-winner-cover-width: 132px;
+  --gauntlet-winner-cover-width-mobile: 220px;
+  --gauntlet-wheel-max-width: 50vw;
+  --gauntlet-fact-label-width: 110px;
+  --object-field-min-width: 160px;
+  --requests-panel-min-height: 240px;
+  --search-modal-width: 900px;
+  --search-tab-height: 36px;
+  --reaction-active-color: var(--color-accent);
+  --tabs-muted-opacity: 0.55;
+  --loader-block-min-height: 96px;
+  --burger-animation-duration: 600ms;
+}
+/* mooncellar-tokens:end */
+
+  :root {
+    color-scheme: dark;
+    --mock-ui: "Hanken Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mock-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --mock-ground: var(--color-neutral-10);
+    --mock-modal-width: 460px;
+    --mock-icon-ps2: linear-gradient(135deg, #2b4c8c 0%, #1b2f5c 55%, #c8462f 56%, #8e2b1d 100%);
+    --mock-icon-gc: linear-gradient(135deg, #5b3fa6 0%, #36246a 60%, #8f78d8 61%, #5b3fa6 100%);
+    --mock-icon-ps1: linear-gradient(135deg, #6a6f78 0%, #3c4048 50%, #d9a441 51%, #9a6f22 100%);
+    --mock-icon-gba: linear-gradient(135deg, #3a2f7a 0%, #241c4e 58%, #43b38f 59%, #2a7a60 100%);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--mock-ground);
+    color: var(--color-text-primary);
+    font-family: var(--mock-ui);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .shell {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding-inline: var(--padding-x6);
+    padding-block: var(--padding-x14) var(--padding-x20);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x10);
+  }
+
+  @media (max-width: 520px) {
+    .shell {
+      padding-inline: var(--padding-x4);
+      padding-block: var(--padding-x9) var(--padding-x14);
+    }
+  }
+
+  h1, h2, h3, p { margin: 0; }
+  h1, h2 { text-wrap: balance; }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+  }
+
+  .masthead { display: flex; flex-direction: column; gap: var(--gap-x4); }
+  .masthead h1 { font-size: 34px; line-height: 1.15; font-weight: 700; letter-spacing: -0.5px; }
+  .lede { color: var(--color-text-secondary); max-width: 66ch; }
+
+  code.t { font-family: var(--mock-mono); font-size: 12px; color: var(--color-yellow); }
+
+  .variant {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 300px);
+    gap: var(--gap-x6);
+    align-items: start;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x5);
+    padding: var(--padding-x5);
+  }
+
+  @media (max-width: 860px) {
+    .variant { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  .stage {
+    display: flex;
+    justify-content: center;
+    padding: var(--padding-x8) var(--padding-x4);
+    border-radius: var(--radius-x4);
+    background:
+      linear-gradient(color-mix(in srgb, var(--color-neutral-10) 80%, transparent), color-mix(in srgb, var(--color-neutral-10) 80%, transparent)),
+      repeating-linear-gradient(45deg, var(--color-neutral-25) 0 18px, var(--color-neutral-20) 18px 36px);
+    min-width: 0;
+  }
+
+  .spec { display: flex; flex-direction: column; gap: var(--gap-x3); min-width: 0; }
+  .spec h2 { font-size: 22px; line-height: 1.25; }
+  .spec .tag { font-family: var(--mock-mono); font-size: 12px; color: var(--color-accent); }
+  .spec p, .spec li { color: var(--color-text-secondary); font-size: 14px; }
+  .spec ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: var(--gap-x1); }
+  .spec .api {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    border-left: 2px solid var(--color-yellow);
+    padding-left: var(--padding-x3);
+  }
+
+  .modal {
+    width: 100%;
+    max-width: var(--mock-modal-width);
+    background: color-mix(in srgb, var(--color-bg-secondary) 96%, transparent);
+    border-radius: var(--radius-x5);
+    box-shadow: 0 0 0 1px var(--color-border-primary), 0 24px 48px rgba(0, 0, 0, 0.45);
+    overflow: hidden;
+  }
+
+  .modal__title {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 500;
+    padding: var(--padding-x3) var(--padding-x4);
+    border-bottom: 1px solid var(--color-bg-primary);
+  }
+
+  .modal__body {
+    padding: var(--padding-x4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x3);
+  }
+
+  .icon {
+    flex-shrink: 0;
+    border-radius: var(--radius-x2);
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    font-family: var(--mock-mono);
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  }
+
+  .icon_ps2 { background: var(--mock-icon-ps2); }
+  .icon_gc { background: var(--mock-icon-gc); }
+  .icon_ps1 { background: var(--mock-icon-ps1); }
+  .icon_gba { background: var(--mock-icon-gba); }
+  .icon_dim { filter: grayscale(1) brightness(0.55); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap-x2);
+    font: inherit;
+    font-size: 15px;
+    color: var(--color-text-primary);
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-neutral-45);
+    border-radius: var(--radius-button);
+    padding: var(--padding-x2) var(--padding-x4);
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .btn:hover { background: var(--color-bg-hover); }
+  .btn:focus-visible, .link-row:focus-visible, .tile:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x1);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    padding: 5px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .pill_mastered { color: var(--color-attention); background: color-mix(in srgb, var(--color-attention) 14%, transparent); }
+  .pill_beaten { color: var(--color-positive); background: color-mix(in srgb, var(--color-positive) 14%, transparent); }
+  .pill_none { color: var(--color-text-muted); background: var(--color-bg-tertiary); }
+
+  .meta { font-size: 12px; color: var(--color-gray); font-variant-numeric: tabular-nums; }
+
+  .a-row {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x6);
+    padding: var(--padding-x3);
+    background: var(--color-bg-hover);
+    border-radius: var(--radius-x2);
+  }
+
+  .a-row .icon { align-self: stretch; width: auto; height: auto; min-height: 72px; font-size: 13px; }
+  .a-row__info { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: var(--gap-x1); text-align: center; }
+  .a-row__title { font-size: 14px; font-weight: 500; }
+  .a-row__info .btn { margin-top: var(--padding-x1); }
+
+  .link-row {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--gap-x3);
+    padding: var(--padding-x2);
+    padding-right: var(--padding-x3);
+    border-radius: var(--radius-x3);
+    background: var(--color-bg-primary);
+    color: inherit;
+    text-decoration: none;
+    transition: background var(--duration-fast) var(--easing-out);
+  }
+
+  .link-row:hover { background: var(--color-bg-tertiary); }
+  .link-row .icon { width: 56px; font-size: 11px; }
+  .link-row__text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .link-row__console { font-size: 15px; font-weight: 600; }
+  .link-row__sub { font-size: 12px; color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .link-row__end { display: flex; align-items: center; gap: var(--gap-x2); }
+  .arrow { color: var(--color-gray); font-size: 14px; }
+
+  .summary {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x3);
+    padding: var(--padding-x3) var(--padding-x4);
+    border-radius: var(--radius-x3);
+    background: var(--color-bg-primary);
+  }
+
+  .summary__count { font-size: 28px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+  .summary__count span { color: var(--color-gray); font-weight: 500; font-size: 18px; }
+  .summary__label { font-size: 13px; color: var(--color-text-muted); line-height: 1.35; }
+  .summary__bar { flex: 1; display: flex; gap: 4px; justify-content: flex-end; }
+  .summary__seg { width: 22px; height: 6px; border-radius: 3px; background: var(--color-bg-tertiary); }
+  .summary__seg_mastered { background: var(--color-attention); }
+  .summary__seg_beaten { background: var(--color-positive); }
+
+  .group-label { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-gray); padding-inline: var(--padding-x1); }
+
+  .award-card {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: var(--gap-x4);
+    padding: var(--padding-x3);
+    border-radius: var(--radius-x3);
+    background: var(--color-bg-primary);
+    position: relative;
+  }
+
+  .award-card .icon { width: 88px; font-size: 13px; box-shadow: 0 0 0 2px var(--mock-ring, transparent); }
+  .award-card_mastered { --mock-ring: var(--color-attention); }
+  .award-card_beaten { --mock-ring: var(--color-positive); }
+  .award-card__info { display: flex; flex-direction: column; gap: var(--gap-x1); min-width: 0; justify-content: center; }
+  .award-card__console { font-size: 17px; font-weight: 600; }
+  .award-card__row { display: flex; flex-wrap: wrap; gap: var(--gap-x2); align-items: center; }
+  .award-card__progress { height: 4px; border-radius: 2px; background: var(--color-bg-tertiary); overflow: hidden; margin-top: var(--padding-x1); }
+  .award-card__progress i { display: block; height: 100%; background: var(--mock-ring, var(--color-accent)); }
+
+  .mini-list { display: flex; flex-wrap: wrap; gap: var(--gap-x2); }
+  .mini {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    padding: 4px 12px 4px 4px;
+    border-radius: var(--radius-x3);
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    text-decoration: none;
+  }
+  .mini:hover { background: var(--color-bg-hover); color: var(--color-text-primary); }
+  .mini .icon { width: 32px; font-size: 0; }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: var(--gap-x3); }
+  .tile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x2);
+    padding: var(--padding-x2);
+    border-radius: var(--radius-x3);
+    background: var(--color-bg-primary);
+    color: inherit;
+    text-decoration: none;
+    position: relative;
+    transition: background var(--duration-fast) var(--easing-out);
+  }
+  .tile:hover { background: var(--color-bg-tertiary); }
+  .tile .icon { width: 100%; border-radius: var(--radius-x2); font-size: 14px; }
+  .tile__console { font-size: 13px; font-weight: 600; text-align: center; line-height: 1.25; }
+  .tile__date { font-size: 11px; color: var(--color-gray); text-align: center; font-variant-numeric: tabular-nums; min-height: 1.3em; }
+  .tile__badge { position: absolute; top: 14px; right: 14px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; background: color-mix(in srgb, var(--color-neutral-10) 85%, transparent); }
+  .tile__badge_mastered { color: var(--color-attention); box-shadow: inset 0 0 0 2px var(--color-attention); }
+  .tile__badge_beaten { color: var(--color-positive); box-shadow: inset 0 0 0 2px var(--color-positive); }
+
+  .legend { display: flex; flex-wrap: wrap; gap: var(--gap-x2); justify-content: center; }
+
+  .note {
+    font-size: 13px;
+    color: var(--color-gray);
+    border-left: 2px solid var(--color-border-primary);
+    padding-left: var(--padding-x3);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: var(--duration-instant) !important; }
+  }
+</style>
+
+<div class="shell">
+  <header class="masthead">
+    <p class="eyebrow">MoonCellar · RetroAchievements modal</p>
+    <h1>RetroAchievements Modal</h1>
+    <p class="lede">
+      The modal opens from the trophy on a game card and lists every RetroAchievements set the
+      game is linked to, one per console. Today only the sets the viewer has an award for show an
+      icon and a date. The four directions below use the same data: Tony Hawk's Pro Skater 4 on
+      four consoles, mastered on PlayStation 2, beaten on PlayStation, nothing yet on the other two.
+    </p>
+  </header>
+
+  <section class="variant" aria-labelledby="v0">
+    <div class="stage">
+      <div class="modal" role="dialog" aria-label="RetroAchievements, current">
+        <h3 class="modal__title">RetroAchievements</h3>
+        <div class="modal__body">
+          <div class="a-row">
+            <div class="icon icon_ps2">PS2</div>
+            <div class="a-row__info">
+              <p class="a-row__title">Tony Hawk's Pro Skater 4</p>
+              <p class="meta">27.09.2026 • Mastery/Completion</p>
+              <a class="btn" href="#v0">PlayStation 2</a>
+            </div>
+          </div>
+          <div class="a-row">
+            <div class="a-row__info">
+              <p class="a-row__title">Tony Hawk's Pro Skater 4</p>
+              <a class="btn" href="#v0">Nintendo GameCube</a>
+            </div>
+          </div>
+          <div class="a-row">
+            <div class="icon icon_ps1">PS1</div>
+            <div class="a-row__info">
+              <p class="a-row__title">Tony Hawk's Pro Skater 4</p>
+              <p class="meta">02.03.2025 • Game Beaten</p>
+              <a class="btn" href="#v0">PlayStation</a>
+            </div>
+          </div>
+          <div class="a-row">
+            <div class="a-row__info">
+              <p class="a-row__title">Tony Hawk's Pro Skater 4</p>
+              <a class="btn" href="#v0">Game Boy Advance</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="spec">
+      <span class="tag">Baseline</span>
+      <h2 id="v0">Current</h2>
+      <p>What ships now, for comparison.</p>
+      <ul>
+        <li>The game name repeats on every row and carries no information.</li>
+        <li>The console is a button, so the most useful word looks like an action.</li>
+        <li>Rows without an award have no icon, so the column jumps.</li>
+        <li>Mastered and beaten look the same apart from the text.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="variant" aria-labelledby="v1">
+    <div class="stage">
+      <div class="modal" role="dialog" aria-label="RetroAchievements, compact list">
+        <h3 class="modal__title">RetroAchievements</h3>
+        <div class="modal__body">
+          <a class="link-row" href="#v1">
+            <div class="icon icon_ps2">PS2</div>
+            <div class="link-row__text">
+              <span class="link-row__console">PlayStation 2</span>
+              <span class="link-row__sub">Mastered on 27.09.2026</span>
+            </div>
+            <span class="link-row__end"><span class="pill pill_mastered">★ Mastered</span><span class="arrow">↗</span></span>
+          </a>
+          <a class="link-row" href="#v1">
+            <div class="icon icon_ps1">PS1</div>
+            <div class="link-row__text">
+              <span class="link-row__console">PlayStation</span>
+              <span class="link-row__sub">Beaten on 02.03.2025</span>
+            </div>
+            <span class="link-row__end"><span class="pill pill_beaten">✓ Beaten</span><span class="arrow">↗</span></span>
+          </a>
+          <a class="link-row" href="#v1">
+            <div class="icon icon_gc icon_dim">GC</div>
+            <div class="link-row__text">
+              <span class="link-row__console">Nintendo GameCube</span>
+              <span class="link-row__sub">42 achievements</span>
+            </div>
+            <span class="link-row__end"><span class="pill pill_none">No award</span><span class="arrow">↗</span></span>
+          </a>
+          <a class="link-row" href="#v1">
+            <div class="icon icon_gba icon_dim">GBA</div>
+            <div class="link-row__text">
+              <span class="link-row__console">Game Boy Advance</span>
+              <span class="link-row__sub">37 achievements</span>
+            </div>
+            <span class="link-row__end"><span class="pill pill_none">No award</span><span class="arrow">↗</span></span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="spec">
+      <span class="tag">Option A</span>
+      <h2 id="v1">Compact list</h2>
+      <p>A plain list where the console is the row's title and the whole row opens the set on retroachievements.org.</p>
+      <ul>
+        <li>The game name is dropped: the modal is opened from that game's card.</li>
+        <li>Every row has a 56px icon, greyed out without an award.</li>
+        <li>The award reads as a coloured pill in the card's trophy colours: yellow for mastered, green for beaten.</li>
+        <li>Earned sets sort first, newest award on top.</li>
+        <li>Four rows fit in about the height the current design needs for two.</li>
+      </ul>
+      <p class="api">Needs the API to send each set's <code class="t">imageIcon</code> and <code class="t">numAchievements</code>. Both are already stored in the RetroAchievements games collection.</p>
+    </div>
+  </section>
+
+  <section class="variant" aria-labelledby="v2">
+    <div class="stage">
+      <div class="modal" role="dialog" aria-label="RetroAchievements, awards first">
+        <h3 class="modal__title">RetroAchievements</h3>
+        <div class="modal__body">
+          <div class="summary">
+            <p class="summary__count">2<span>/4</span></p>
+            <p class="summary__label">sets with an award</p>
+            <div class="summary__bar" aria-hidden="true">
+              <i class="summary__seg summary__seg_mastered"></i>
+              <i class="summary__seg summary__seg_beaten"></i>
+              <i class="summary__seg"></i>
+              <i class="summary__seg"></i>
+            </div>
+          </div>
+          <div class="award-card award-card_mastered">
+            <div class="icon icon_ps2">PS2</div>
+            <div class="award-card__info">
+              <p class="award-card__console">PlayStation 2</p>
+              <div class="award-card__row">
+                <span class="pill pill_mastered">★ Mastered</span>
+                <span class="meta">27.09.2026</span>
+              </div>
+              <div class="award-card__progress" aria-label="48 of 48 achievements"><i style="width: 100%"></i></div>
+              <p class="meta">48 / 48 achievements</p>
+            </div>
+          </div>
+          <div class="award-card award-card_beaten">
+            <div class="icon icon_ps1">PS1</div>
+            <div class="award-card__info">
+              <p class="award-card__console">PlayStation</p>
+              <div class="award-card__row">
+                <span class="pill pill_beaten">✓ Beaten</span>
+                <span class="meta">02.03.2025</span>
+              </div>
+              <div class="award-card__progress" aria-label="21 of 33 achievements"><i style="width: 64%"></i></div>
+              <p class="meta">21 / 33 achievements</p>
+            </div>
+          </div>
+          <p class="group-label">Also on</p>
+          <div class="mini-list">
+            <a class="mini" href="#v2"><span class="icon icon_gc icon_dim">GC</span>Nintendo GameCube</a>
+            <a class="mini" href="#v2"><span class="icon icon_gba icon_dim">GBA</span>Game Boy Advance</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="spec">
+      <span class="tag">Option B</span>
+      <h2 id="v2">Awards first</h2>
+      <p>Built for the profile: what the viewer has earned comes first, and sets without an award shrink to chips.</p>
+      <ul>
+        <li>A summary line counts the sets with an award.</li>
+        <li>An earned set is a card with an 88px icon ringed in the award colour, plus the date.</li>
+        <li>Sets without an award become small chips under "Also on".</li>
+        <li>A guest sees only the chips row, under the heading "Available on".</li>
+      </ul>
+      <p class="api">The progress bar needs the viewer's unlocked count per set, which the site does not store today. Without it the bar and the "48 / 48" line are dropped and the rest still works.</p>
+    </div>
+  </section>
+
+  <section class="variant" aria-labelledby="v3">
+    <div class="stage">
+      <div class="modal" role="dialog" aria-label="RetroAchievements, tiles">
+        <h3 class="modal__title">RetroAchievements</h3>
+        <div class="modal__body">
+          <div class="tiles">
+            <a class="tile" href="#v3">
+              <div class="icon icon_ps2">PS2</div>
+              <span class="tile__badge tile__badge_mastered" aria-label="Mastered">★</span>
+              <p class="tile__console">PlayStation 2</p>
+              <p class="tile__date">27.09.2026</p>
+            </a>
+            <a class="tile" href="#v3">
+              <div class="icon icon_ps1">PS1</div>
+              <span class="tile__badge tile__badge_beaten" aria-label="Beaten">✓</span>
+              <p class="tile__console">PlayStation</p>
+              <p class="tile__date">02.03.2025</p>
+            </a>
+            <a class="tile" href="#v3">
+              <div class="icon icon_gc icon_dim">GC</div>
+              <p class="tile__console">Nintendo GameCube</p>
+              <p class="tile__date"></p>
+            </a>
+            <a class="tile" href="#v3">
+              <div class="icon icon_gba icon_dim">GBA</div>
+              <p class="tile__console">Game Boy Advance</p>
+              <p class="tile__date"></p>
+            </a>
+          </div>
+          <div class="legend">
+            <span class="pill pill_mastered">★ Mastered</span>
+            <span class="pill pill_beaten">✓ Beaten</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="spec">
+      <span class="tag">Option C</span>
+      <h2 id="v3">Icon tiles</h2>
+      <p>A grid of set icons, the way RetroAchievements shows them on a profile.</p>
+      <ul>
+        <li>The icon is the largest element, so sets are told apart by their art.</li>
+        <li>The award is a corner badge on the tile, and a legend underneath explains the two marks.</li>
+        <li>Holds six to eight sets without scrolling, which suits games with many regional releases.</li>
+        <li>With a single set, the grid would look empty. Option A works better there.</li>
+      </ul>
+      <p class="api">Needs <code class="t">imageIcon</code> for every set, the same API change as Option A.</p>
+    </div>
+  </section>
+
+  <p class="note">
+    Icons are placeholders. The real ones are 96px images from <code class="t">media.retroachievements.org</code>,
+    which a published mockup cannot load. Colours, spacing and radii are the project's own tokens: the
+    <code class="t">:root</code> block above is generated from <code class="t">apps/web/src/lib/app/styles/vars</code>
+    by <code class="t">bun --filter web sync:tokens</code>. Hanken Grotesk stands in for ApercuPro, whose
+    licensed file cannot be served from a third-party host.
+  </p>
+</div>

@@ -8,7 +8,9 @@ import {
   hasHltbTimes,
   HltbMatchContext,
   mapHltbEntryToField,
+  normalizeHltbTitle,
   pickBestHltbMatch,
+  selectHltbMatch,
 } from "./hltb.utils";
 import { HLTB_NOT_FOUND_RETRY_DAYS, HLTB_STALE_DAYS } from "../constants/hltb";
 import { normalizeCoreTitle, titleSimilarity } from "./title-match.utils";
@@ -587,14 +589,62 @@ describe("findAmbiguousHltbEntries", () => {
     ]);
   });
 
-  it("drops an entry whose release year belongs to a different game", () => {
+  it("offers an entry with a different release year after the matching ones", () => {
     const entries = [
-      { id: 1, name: "The Incredible Hulk", releaseYear: 2008 },
       { id: 4, name: "The Incredible Hulk", releaseYear: 1994 },
+      { id: 1, name: "The Incredible Hulk", releaseYear: 2008 },
     ];
 
     expect(findAmbiguousHltbEntries(entries, ctx).map(({ id }) => id)).toEqual([
-      1,
+      1, 4,
     ]);
+  });
+});
+
+describe("HLTB title comparison", () => {
+  it("treats Roman and Arabic numerals as the same title", () => {
+    const match = selectHltbMatch(
+      [
+        {
+          id: 68033,
+          name: "Baldur's Gate 3",
+          releaseYear: 2023,
+          platforms: ["PC"],
+        },
+      ],
+      {
+        name: "Baldur's Gate III",
+        platformKeys: new Set(["pc"]),
+        years: new Set([2023]),
+      }
+    );
+
+    expect(match?.entry.id).toBe(68033);
+  });
+
+  it("matches the game against the entry's alternative name", () => {
+    const match = selectHltbMatch(
+      [
+        {
+          id: 1,
+          name: "Biohazard 4",
+          alias: "Resident Evil 4",
+          releaseYear: 2005,
+          platforms: ["GameCube"],
+        },
+      ],
+      {
+        name: "Resident Evil 4",
+        platformKeys: new Set(["gamecube"]),
+        years: new Set([2005]),
+      }
+    );
+
+    expect(match?.entry.id).toBe(1);
+  });
+
+  it("keeps a single-letter X as a word, not a numeral", () => {
+    expect(normalizeHltbTitle("Mega Man X")).toBe("mega man x");
+    expect(normalizeHltbTitle("Final Fantasy VII")).toBe("final fantasy 7");
   });
 });

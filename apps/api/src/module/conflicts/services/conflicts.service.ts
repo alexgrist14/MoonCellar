@@ -14,6 +14,7 @@ import {
   type IConflictState,
   type IConflictsResponse,
   type IConflictsSummary,
+  type IGameConflict,
   type IGetConflictsParams,
 } from "@mooncellar/schemas";
 import { Game, type GameDocument } from "../../games/schemas/game.schema";
@@ -113,10 +114,18 @@ export class ConflictsService {
     try {
       await this.conflictsModel.insertMany(
         records.map(
-          ({ externalId, externalName, reason, candidates, entries }) => ({
+          ({
+            externalId,
+            externalName,
+            externalData,
+            reason,
+            candidates,
+            entries,
+          }) => ({
             source,
             externalId,
             externalName,
+            externalData: externalData ?? null,
             reason,
             entries: entries ?? [],
             candidates: candidates.map(toCandidateEntry),
@@ -129,6 +138,67 @@ export class ConflictsService {
     } catch (error) {
       if ((error as { code?: number }).code !== 11000) throw error;
     }
+  }
+
+  async setExternalData(
+    source: IConflictSource,
+    items: { externalId: string; externalData: Record<string, unknown> }[]
+  ) {
+    if (!items.length) return;
+
+    await this.conflictsModel.bulkWrite(
+      items.map(({ externalId, externalData }) => ({
+        updateOne: {
+          filter: { source, externalId },
+          update: { $set: { externalData } },
+        },
+      })),
+      { ordered: false }
+    );
+  }
+
+  async getForGame(gameId: string): Promise<IGameConflict[]> {
+    if (!Types.ObjectId.isValid(gameId)) {
+      throw new BadRequestException(`Invalid game id: ${gameId}`);
+    }
+
+    const conflicts = await this.conflictsModel
+      .find({
+        ...UNDECIDED_FILTER,
+        $or: [
+          { "candidates.gameId": new Types.ObjectId(gameId) },
+          { source: "hltb", externalId: gameId },
+        ],
+      })
+      .select("source externalId externalName")
+      .sort({ _id: 1 })
+      .lean();
+
+    return conflicts.map(({ source, externalId, externalName }) => ({
+      source,
+      externalId,
+      externalName: externalName ?? externalId,
+    }));
+  }
+
+  async removeForGame(
+    source: IConflictSource,
+    gameId: Types.ObjectId,
+    {
+      externalIds = [],
+      keepExternalIds = [],
+    }: { externalIds?: string[]; keepExternalIds?: string[] } = {}
+  ) {
+    const { deletedCount } = await this.conflictsModel.deleteMany({
+      source,
+      externalId: { $nin: keepExternalIds },
+      $or: [
+        { externalId: { $in: externalIds } },
+        { "candidates.gameId": gameId, status: "pending", decision: null },
+      ],
+    });
+
+    return deletedCount;
   }
 
   async getResolutions(source: IConflictSource) {
@@ -153,7 +223,14 @@ export class ConflictsService {
     const handler = this.getHandler(source);
 
     for (const externalId of externalIds) {
-      const subject = await handler.describe(externalId);
+      const existing = await this.conflictsModel
+        .findOne({ source, externalId })
+        .select("externalData")
+        .lean();
+      const subject = await handler.describe(
+        externalId,
+        existing?.externalData ?? null
+      );
 
       await this.conflictsModel.updateOne(
         { source, externalId },
@@ -369,7 +446,7 @@ export class ConflictsService {
           `cover type summary alternative_names companies first_release platformIds isCustom ${handler.linkField}`
         )
         .lean(),
-      handler.describe(externalId),
+      handler.describe(externalId, conflict.externalData ?? null),
     ]);
 
     const gameById = new Map(games.map((game) => [String(game._id), game]));
@@ -560,7 +637,14 @@ export class ConflictsService {
       throw new BadRequestException(`${source} conflicts cannot be reopened`);
     }
 
-    const candidates = await handler.rematch(externalId);
+    const existing = await this.conflictsModel
+      .findOne({ source, externalId })
+      .select("externalData")
+      .lean();
+    const candidates = await handler.rematch(
+      externalId,
+      existing?.externalData ?? null
+    );
 
     if (!candidates) {
       throw new NotFoundException(`${source} ${externalId} no longer exists`);
@@ -671,6 +755,7 @@ export class ConflictsService {
       decided.map((conflict) => ({
         externalId: conflict.externalId,
         externalName: conflict.externalName,
+        externalData: conflict.externalData ?? null,
         decision: conflict.decision,
         winner: conflict.winner,
         winners: winnerIds(conflict),

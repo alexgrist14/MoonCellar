@@ -14,11 +14,13 @@ export interface IConflictRecord {
   reason: IMatchReason | null;
   candidates: (IScoredCandidate & { matchedTitle?: string | null })[];
   entries?: IConflictEntry[];
+  externalData?: Record<string, unknown>;
 }
 
 export interface IConflictDecision {
   externalId: string;
   externalName: string;
+  externalData: Record<string, unknown> | null;
   decision: "match" | "skip";
   winner: Types.ObjectId | null;
   winners: Types.ObjectId[];
@@ -30,9 +32,15 @@ export interface IConflictSourceHandler {
   direction: IConflictDirection;
   isMultiMatch?: boolean;
   linkField: string;
-  describe(externalId: string): Promise<IConflictSubject | null>;
+  describe(
+    externalId: string,
+    externalData: Record<string, unknown> | null
+  ): Promise<IConflictSubject | null>;
   apply(
     decisions: IConflictDecision[]
   ): Promise<Map<string, Types.ObjectId | null>>;
-  rematch?(externalId: string): Promise<IConflictRecord["candidates"] | null>;
+  rematch?(
+    externalId: string,
+    externalData: Record<string, unknown> | null
+  ): Promise<IConflictRecord["candidates"] | null>;
 }

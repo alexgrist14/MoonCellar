@@ -8,16 +8,11 @@
     grid-template-columns: minmax(0, 1fr) auto;
     gap: var(--gap-x2);
     align-items: start;
-
-    & button {
-    }
   }
 
-  & &__open {
+  &__open {
     width: 100%;
     justify-content: flex-start;
-    gap: var(--gap-x2);
-    color: var(--color-text-secondary);
   }
 
   &__hint {

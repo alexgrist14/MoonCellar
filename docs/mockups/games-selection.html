@@ -177,6 +177,8 @@
   --game-hero-counters-width: 360px;
   --game-rating-popover-width: 320px;
   --popover-width: 320px;
+  --achievements-icon-size: 44px;
+  --achievements-icon-size-sm: 48px;
   --popover-max-height: 320px;
   --popover-sheet-max-height: 85dvh;
   --textarea-handle-size: 20px;
@@ -194,6 +196,7 @@
   --expandable-fade-height: 32px;
   --date-picker-width: 300px;
   --date-picker-field-min-width: 140px;
+  --game-card-min-width: 160px;
   --playthrough-platform-min-width: 200px;
   --playthrough-time-min-width: 120px;
   --date-picker-cell-size: 34px;
@@ -265,6 +268,7 @@
   --search-modal-width: 900px;
   --search-tab-height: 36px;
   --reaction-active-color: var(--color-accent);
+  --tabs-muted-opacity: 0.55;
   --loader-block-min-height: 96px;
   --burger-animation-duration: 600ms;
 }
@@ -309,16 +313,16 @@
   code.t { font-family: var(--mock-mono); font-size: 12px; color: var(--color-yellow); }
 
   .variant, .section { margin-top: var(--padding-x16); }
-  .variant__head { display: flex; align-items: baseline; gap: var(--gap-x3); flex-wrap: wrap; margin-bottom: var(--gap-x2); }
+  .variant__head { display: flex; align-items: baseline; gap: var(--gap-x3); flex-wrap: wrap; margin-bottom: var(--padding-x2); }
   .variant__letter { font-family: var(--mock-mono); font-size: 13px; font-weight: 500; color: var(--color-accent); border: 1px solid var(--color-accent); border-radius: var(--radius-x1); padding: 1px 7px; flex-shrink: 0; }
   .variant__head h2, .section > h2 { font-size: 23px; font-weight: 700; letter-spacing: -0.2px; }
-  .variant__thesis, .section > h2 + p { color: var(--color-text-muted); max-width: 72ch; margin: var(--gap-x2) 0 var(--gap-x5); }
+  .variant__thesis, .section > h2 + p { color: var(--color-text-muted); max-width: 72ch; margin: var(--padding-x2) 0 var(--padding-x5); }
   .variant__thesis { margin-top: 0; }
-  .caption { font-size: 12px; color: var(--color-gray); margin-top: var(--gap-x2); }
+  .caption { font-size: 12px; color: var(--color-gray); margin-top: var(--padding-x2); }
   .caption b { color: var(--color-text-muted); font-weight: 600; }
-  ul.plain { margin: var(--gap-x4) 0 0; padding-left: var(--padding-x4); color: var(--color-text-muted); font-size: 13px; list-style: disc; }
-  ul.plain li + li { margin-top: var(--gap-x1); }
-  .note { margin-top: var(--gap-x6); font-size: 13px; color: var(--color-gray); border-left: 2px solid var(--color-border-primary); padding-left: var(--padding-x3); }
+  ul.plain { margin: var(--padding-x4) 0 0; padding-left: var(--padding-x4); color: var(--color-text-muted); font-size: 13px; list-style: disc; }
+  ul.plain li + li { margin-top: var(--padding-x1); }
+  .note { margin-top: var(--padding-x6); font-size: 13px; color: var(--color-gray); border-left: 2px solid var(--color-border-primary); padding-left: var(--padding-x3); }
 
   /* ------------------------------------------------------------------ *
    * Replicas of the shipped components. Class names follow the module   *
@@ -504,7 +508,7 @@
   .stage_rail { grid-template-columns: var(--mock-rail-width) minmax(0, 1fr); align-items: stretch; }
   .stage_solo { grid-template-columns: minmax(0, 1fr); place-items: center; align-content: center; }
 
-  table.compare { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: var(--gap-x4); }
+  table.compare { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: var(--padding-x4); }
   table.compare th, table.compare td { text-align: left; padding: var(--padding-x2) var(--padding-x3); border-bottom: 1px solid var(--color-border-primary); vertical-align: top; }
   table.compare th { color: var(--color-gray); font-weight: 600; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; }
   table.compare td:first-child { color: var(--color-text-muted); width: 22%; }
@@ -600,7 +604,7 @@
       Controls is the first tab of <code class="t">GamesListMenu</code>, inside the right-hand
       <code class="t">ExpandMenu</code> titled Manage. It holds exactly one button today.
     </p>
-    <div class="box" style="max-width: 320px; margin-top: var(--gap-x5)">
+    <div class="box" style="max-width: 320px; margin-top: var(--padding-x5)">
       <div class="tabs">
         <button class="btn btn_tabActive" type="button">Controls</button>
         <button class="btn" type="button">Royal</button>
@@ -674,7 +678,7 @@
     </div>
     <p class="caption"><b>Select mode on.</b> The bar is a <code class="t">Box</code> on the page background; the corner marks are the real <code class="t">Checkbox</code>, which is round and turns <code class="t">--color-positive</code> when checked.</p>
 
-    <div class="box" style="max-width: 340px; margin-top: var(--gap-x5)">
+    <div class="box" style="max-width: 340px; margin-top: var(--padding-x5)">
       <div class="tabs">
         <button class="btn btn_tabActive" type="button">Controls</button>
         <button class="btn" type="button">Royal</button>
@@ -839,7 +843,7 @@
       shape: the user's lists with a <code class="t">Checkbox</code> each, a filter once there are
       more than nine, and inline creation.
     </p>
-    <div class="box" style="max-width: 360px; margin-top: var(--gap-x5)">
+    <div class="box" style="max-width: 360px; margin-top: var(--padding-x5)">
       <div class="box__title"><span style="flex: 1">Add 4 games to</span></div>
       <div class="box__content">
         <label class="queue__row"><span class="checkbox checkbox_on"><svg class="icon icon_sm"><use href="#i-check"/></svg></span> Backlog 2026</label>

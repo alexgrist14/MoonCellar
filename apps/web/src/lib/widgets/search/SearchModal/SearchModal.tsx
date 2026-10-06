@@ -277,10 +277,9 @@ export const SearchModal: FC = () => {
             buttonsClassName={styles.tabs}
             contents={TABS.map(({ key, label, icon }) => ({
               tabName: "",
-              className: classNames(styles.tab, {
-                [styles.tab_empty]:
-                  isReady && !counts[key].isPending && counts[key].value === 0,
-              }),
+              className: styles.tab,
+              isMuted:
+                isReady && !counts[key].isPending && counts[key].value === 0,
               tabNameNode: (
                 <span className={styles.tab__label}>
                   <span className={styles.tab__icon}>{icon}</span>

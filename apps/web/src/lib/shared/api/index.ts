@@ -17,3 +17,4 @@ export * from "./notifications.api";
 export * from "./generated-images.api";
 export * from "./site-sessions.api";
 export * from "./steam.api";
+export * from "./ra.api";

@@ -6,6 +6,7 @@ import {
   ConflictsSummaryRequestSchema,
   ConflictsSummarySchema,
   DecideConflictRequestSchema,
+  GameConflictsResponseSchema,
   GetConflictsRequestSchema,
 } from "@mooncellar/schemas";
 
@@ -33,4 +34,8 @@ export class GetConflictsRequestDto extends createZodDto(
 
 export class ConflictsResponseDto extends createZodDto(
   ConflictsResponseSchema
+) {}
+
+export class GameConflictsResponseDto extends createZodDto(
+  GameConflictsResponseSchema
 ) {}

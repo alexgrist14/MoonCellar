@@ -6,6 +6,7 @@
   border-color: var(--color-bg-primary);
   font-size: 14px;
   padding: var(--padding-x2) var(--padding-x4);
+  gap: var(--gap-x2);
   transition: 0.2s;
 
   @include textEllipsis;
@@ -22,7 +23,7 @@
     color: var(--color-neutral-100);
 
     &_active {
-      color: var(--color-accent);
+      color: var(--button-active-color, var(--color-accent));
       background-color: var(--color-bg-secondary);
     }
   }
@@ -74,14 +75,14 @@
       color: var(--color-text-primary);
     }
 
-    &_active {
+    &_active,
+    &_active:hover {
       background-color: var(--color-bg-primary);
-      color: var(--color-text-primary);
+      color: var(--button-active-color, var(--color-text-primary));
     }
   }
 
   &_ghostColor {
-    gap: var(--gap-x2);
     padding: var(--padding-x05) var(--padding-x1);
     border-color: transparent;
     background-color: transparent;
@@ -96,7 +97,7 @@
 
     &_active,
     &_active:hover {
-      color: var(--color-accent);
+      color: var(--button-active-color, var(--color-accent));
 
       svg path {
         fill: currentColor;
@@ -161,6 +162,11 @@
 
   &_hidden {
     display: none;
+  }
+
+  &_accentText,
+  &_accentText:hover {
+    color: var(--color-accent);
   }
 }
 

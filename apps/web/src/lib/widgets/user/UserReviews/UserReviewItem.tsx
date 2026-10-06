@@ -83,7 +83,7 @@ export const UserReviewItem: FC<IUserReviewItemProps> = ({
             title={game?.name ?? "Review"}
             mode="drawer"
           >
-            <RichText content={review.comment} className={styles.item__body} />
+            <RichText content={review.comment} />
           </ExpandableBlock>
         </Spoiler>
         <div className={styles.item__actions}>

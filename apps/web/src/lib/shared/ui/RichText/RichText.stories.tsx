@@ -42,3 +42,11 @@ export const WithImage: Story = {
 };
 
 export const Empty: Story = { args: { content: "" } };
+
+export const PrimaryTone: Story = {
+  args: {
+    tone: "primary",
+    content:
+      "<p>Beat it on hard, every optional boss down. Took the true ending route.</p>",
+  },
+};

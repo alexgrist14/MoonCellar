@@ -119,8 +119,7 @@ export const FavoriteGames: FC<IFavoriteGamesProps> = ({
             !draft &&
             games.length > 1 && (
               <Button
-                color={ButtonColor.TRANSPARENT}
-                className={styles.edit}
+                color={ButtonColor.GHOST}
                 onClick={() => setDraft(games)}
               >
                 <SvgPen style={SMALL_ICON_STYLE} />

@@ -69,7 +69,7 @@ const meta = {
     onClose: () => {},
   },
   beforeEach: () => {
-    useStatesStore.setState({ isMobile: false });
+    useStatesStore.setState({ isSmall: false });
   },
 } satisfies Meta<typeof Popover>;
 
@@ -98,18 +98,18 @@ export const WithTitle: Story = {
 
 export const MobileSheet: Story = {
   beforeEach: () => {
-    useStatesStore.setState({ isMobile: true });
+    useStatesStore.setState({ isSmall: true });
 
-    return () => useStatesStore.setState({ isMobile: false });
+    return () => useStatesStore.setState({ isSmall: false });
   },
   render: () => <PopoverDemo title="Manage list" />,
 };
 
 export const MobileSheetUntitled: Story = {
   beforeEach: () => {
-    useStatesStore.setState({ isMobile: true });
+    useStatesStore.setState({ isSmall: true });
 
-    return () => useStatesStore.setState({ isMobile: false });
+    return () => useStatesStore.setState({ isSmall: false });
   },
   render: () => <PopoverDemo />,
 };
@@ -172,9 +172,9 @@ export const AnchoredSearchReservedHeight: Story = {
 
 export const AnchoredSearchOnMobile: Story = {
   beforeEach: () => {
-    useStatesStore.setState({ isMobile: true });
+    useStatesStore.setState({ isSmall: true });
 
-    return () => useStatesStore.setState({ isMobile: false });
+    return () => useStatesStore.setState({ isSmall: false });
   },
   render: () => <AnchoredListbox />,
 };

@@ -1,44 +1,52 @@
-import { Controller, Post, Query } from "@nestjs/common";
+import {
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Query,
+  UseGuards,
+} from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { RolesEnum } from "@mooncellar/schemas";
+import { RolesGuard } from "../../roles/roles.guard";
+import { Roles } from "../../roles/roles.decorator";
 import { RetroachievementsService } from "../services/retroach.service";
 
 @ApiTags("RetroAchievements")
+@UseGuards(AuthGuard("jwt"), RolesGuard)
+@Roles(RolesEnum.ADMIN)
 @Controller("/ra")
 export class RetroachievementsController {
   constructor(
     private readonly retroachievementsService: RetroachievementsService
   ) {}
 
-  @Post("/parse")
-  @ApiOperation({ summary: "Parse from RA" })
-  @ApiResponse({
-    status: 200,
-    description: "Successfully started",
-  })
-  @ApiQuery({ name: "type", enum: ["consoles", "games", "both"] })
-  parse(@Query("type") type: "consoles" | "games" | "both") {
-    return this.retroachievementsService.parse(type);
-  }
-
-  @Post("/match-platforms")
-  @ApiOperation({ summary: "Match RA consoles to IGDB platforms by name" })
-  @ApiResponse({ status: 200, description: "Successfully started" })
-  matchPlatforms() {
-    return this.retroachievementsService.matchConsolesToPlatforms();
-  }
-
   @Post("/sync")
-  @ApiOperation({ summary: "Sync RA ids to IGDB games" })
+  @ApiOperation({
+    summary: "Match RA consoles to platforms and RA games to games",
+  })
   @ApiResponse({ status: 200, description: "Successfully started" })
-  raParse() {
-    return this.retroachievementsService.parseRAGames();
+  sync() {
+    return this.retroachievementsService.sync();
   }
 
-  @Post("/unrecognised")
-  @ApiOperation({ summary: "Get unrecognised RA games" })
-  @ApiResponse({ status: 200, description: "Successfully started" })
-  raUnrecognised() {
-    return this.retroachievementsService.getUnrecognised();
+  @Post("/games/parse")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      "Link a game to a RetroAchievements set by id, or refresh the sets it already has",
+  })
+  @ApiQuery({ name: "gameId", required: true })
+  @ApiQuery({
+    name: "raId",
+    required: false,
+    description:
+      "RetroAchievements game id to link; without it the linked sets are refreshed",
+  })
+  @ApiResponse({ status: 200, description: "Successfully parsed" })
+  parseGame(@Query("gameId") gameId: string, @Query("raId") raId?: string) {
+    return this.retroachievementsService.parseGame(gameId, raId);
   }
 
   @Post("/awards/parse")

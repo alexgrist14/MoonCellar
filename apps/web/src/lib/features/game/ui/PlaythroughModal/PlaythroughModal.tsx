@@ -268,9 +268,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
       color={ButtonColor.SEGMENTED}
       active={!!watch("isMastered")}
       aria-pressed={!!watch("isMastered")}
-      className={classNames({
-        [styles.modal__mastered_active]: watch("isMastered"),
-      })}
+      className={styles.modal__mastered}
       onClick={() => setValue("isMastered", !watch("isMastered"))}
     >
       {watch("isMastered") ? "★" : "☆"} Mastered
@@ -302,7 +300,7 @@ export const PlaythroughModal: FC<IPlaythroughModalProps> = ({
               contentStyle={{ paddingInline: 0 }}
             >
               <Tabs
-                buttonsClassName={styles.modal__tabs}
+                isFit
                 defaultTabIndex={
                   playthroughId
                     ? listedPlaythroughs.findIndex(

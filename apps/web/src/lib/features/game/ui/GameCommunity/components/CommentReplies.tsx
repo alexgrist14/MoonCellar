@@ -6,7 +6,6 @@ import {
   flattenPages,
   useRepliesQuery,
 } from "@/src/lib/entities/comment/api/comment.queries";
-import styles from "@/src/lib/features/game/ui/GameCommunity/GameCommunity.module.scss";
 import { CommentItem } from "./CommentItem";
 
 interface ICommentRepliesProps {
@@ -38,7 +37,7 @@ export const CommentReplies: FC<ICommentRepliesProps> = ({
           type="button"
           color={ButtonColor.GHOST}
           compact
-          className={styles.threadAction}
+          isAccentText
           disabled={isFetchingNextPage}
           onClick={() => fetchNextPage()}
         >

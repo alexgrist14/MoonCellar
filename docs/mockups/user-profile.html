@@ -177,6 +177,8 @@
   --game-hero-counters-width: 360px;
   --game-rating-popover-width: 320px;
   --popover-width: 320px;
+  --achievements-icon-size: 44px;
+  --achievements-icon-size-sm: 48px;
   --popover-max-height: 320px;
   --popover-sheet-max-height: 85dvh;
   --textarea-handle-size: 20px;
@@ -194,6 +196,7 @@
   --expandable-fade-height: 32px;
   --date-picker-width: 300px;
   --date-picker-field-min-width: 140px;
+  --game-card-min-width: 160px;
   --playthrough-platform-min-width: 200px;
   --playthrough-time-min-width: 120px;
   --date-picker-cell-size: 34px;
@@ -265,6 +268,7 @@
   --search-modal-width: 900px;
   --search-tab-height: 36px;
   --reaction-active-color: var(--color-accent);
+  --tabs-muted-opacity: 0.55;
   --loader-block-min-height: 96px;
   --burger-animation-duration: 600ms;
 }
@@ -355,7 +359,7 @@
     align-items: baseline;
     gap: var(--gap-x3);
     flex-wrap: wrap;
-    margin-bottom: var(--gap-x2);
+    margin-bottom: var(--padding-x2);
   }
 
   .variant__letter {
@@ -374,10 +378,10 @@
   .variant__thesis {
     color: var(--color-text-muted);
     max-width: 70ch;
-    margin-bottom: var(--gap-x5);
+    margin-bottom: var(--padding-x5);
   }
 
-  .section > h2 + p { color: var(--color-text-muted); max-width: 70ch; margin: var(--gap-x2) 0 var(--gap-x5); }
+  .section > h2 + p { color: var(--color-text-muted); max-width: 70ch; margin: var(--padding-x2) 0 var(--padding-x5); }
 
   .stage {
     background: var(--color-bg-secondary);
@@ -415,7 +419,7 @@
     color: var(--color-text-muted);
   }
 
-  .pros h3 { font-size: 12px; font-weight: 600; color: var(--color-text-primary); margin-bottom: var(--gap-x1); }
+  .pros h3 { font-size: 12px; font-weight: 600; color: var(--color-text-primary); margin-bottom: var(--padding-x1); }
   .pros ul { margin: 0; padding-left: 18px; display: grid; gap: var(--gap-x1); }
 
   @media (max-width: 520px) { .stage { padding: var(--padding-x3); } }
@@ -769,7 +773,7 @@
   }
 
   .who__main { display: flex; flex-direction: column; gap: var(--gap-x1); min-width: 0; }
-  .who__main .bio { margin-top: var(--gap-x2); }
+  .who__main .bio { margin-top: var(--padding-x2); }
   .who__side { display: flex; flex-direction: column; align-items: flex-end; gap: var(--gap-x2); }
 
   @media (max-width: 640px) {
@@ -1517,7 +1521,7 @@
             </div>
             <button type="button" class="btn btn--primary" data-follow aria-pressed="false">Follow</button>
           </div>
-          <div class="bio" style="margin-top:calc(-1 * var(--gap-x2))">
+          <div class="bio" style="margin-top:calc(-1 * var(--padding-x2))">
             <p>Slow player. Metroidvanias, survival horror and anything with a good map. Currently 100%-ing the Souls series on original hardware — progress in <a href="#">my list</a>.</p>
           </div>
           <div class="counters">

@@ -84,7 +84,6 @@
 
 .input {
   width: 100%;
-  border-radius: var(--radius-x4);
 }
 
 .fileName {
@@ -142,10 +141,7 @@
 }
 
 .btn {
-  font-size: 1rem;
   width: 100px;
-  height: 40px;
-  color: var(--color-neutral-100);
 
   @include mediaMd {
     width: 100%;

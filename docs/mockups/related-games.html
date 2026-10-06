@@ -177,6 +177,8 @@
   --game-hero-counters-width: 360px;
   --game-rating-popover-width: 320px;
   --popover-width: 320px;
+  --achievements-icon-size: 44px;
+  --achievements-icon-size-sm: 48px;
   --popover-max-height: 320px;
   --popover-sheet-max-height: 85dvh;
   --textarea-handle-size: 20px;
@@ -194,6 +196,7 @@
   --expandable-fade-height: 32px;
   --date-picker-width: 300px;
   --date-picker-field-min-width: 140px;
+  --game-card-min-width: 160px;
   --playthrough-platform-min-width: 200px;
   --playthrough-time-min-width: 120px;
   --date-picker-cell-size: 34px;
@@ -265,6 +268,7 @@
   --search-modal-width: 900px;
   --search-tab-height: 36px;
   --reaction-active-color: var(--color-accent);
+  --tabs-muted-opacity: 0.55;
   --loader-block-min-height: 96px;
   --burger-animation-duration: 600ms;
 }
@@ -334,17 +338,17 @@
     border: 1px solid var(--color-border-primary);
     border-radius: var(--radius-x4);
     overflow: hidden;
-    margin: var(--gap-x2) 0 0;
+    margin: var(--padding-x2) 0 0;
   }
 
   .groups div { background: var(--color-bg-primary); padding: var(--padding-x4); }
-  .groups dt { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-gray); margin-bottom: var(--gap-x1); }
+  .groups dt { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-gray); margin-bottom: var(--padding-x1); }
   .groups dd { margin: 0; font-size: 13px; color: var(--color-text-secondary); }
 
   code.t { font-family: var(--mock-mono); font-size: 12px; color: var(--color-yellow); }
 
   .variant { margin-top: var(--padding-x16); }
-  .variant__head { display: flex; align-items: baseline; gap: var(--gap-x3); flex-wrap: wrap; margin-bottom: var(--gap-x2); }
+  .variant__head { display: flex; align-items: baseline; gap: var(--gap-x3); flex-wrap: wrap; margin-bottom: var(--padding-x2); }
   .variant__head h2 { font-size: 23px; font-weight: 700; letter-spacing: -0.2px; }
 
   .variant__letter {
@@ -357,7 +361,7 @@
     padding: 1px 7px;
   }
 
-  .variant__thesis { color: var(--color-text-muted); max-width: 66ch; margin-bottom: var(--gap-x5); }
+  .variant__thesis { color: var(--color-text-muted); max-width: 66ch; margin-bottom: var(--padding-x5); }
 
   .box {
     background: var(--color-bg-primary);

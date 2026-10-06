@@ -16,6 +16,7 @@ when there is none. By default it is wrapped in a `Tooltip` showing the user nam
 | `isWithoutTooltip` | `boolean`                                      | `false` | Skip the user-name tooltip (when the name is shown next to it) |
 | `isWithoutHover`   | `boolean`                                      | `false` | Disable the image hover effect                                 |
 | `priority`         | `boolean`                                      | `false` | Passed to `next/image` for above-the-fold avatars              |
+| `shape`            | `"circle" \| "rounded"`                        | `"circle"` | `rounded` gives the image `--radius-x3` corners instead of a circle |
 
 ## Usage
 
@@ -34,10 +35,11 @@ import { Avatar } from "@/src/lib/shared/ui/Avatar";
 - The image `alt` is `"<userName>'s avatar"` (`"User avatar"` without a name); the placeholder
   icon has no text, so a link whose only content is a placeholder avatar still needs its own
   `aria-label`.
+- The corner shape is the `shape` prop; never reach into the `img` from a parent stylesheet.
 - **Size comes from the container**, not from the 90×90 `next/image` intrinsic size; control it
   through the parent's CSS.
 - Avatar URLs are remote; their hosts must be allowed in `next.config.mjs` `images.remotePatterns`.
 
 ## Storybook
 
-`Shared/Avatar` — `WithImage`, `Placeholder`, `WithoutTooltip`, `WithoutHover`.
+`Shared/Avatar` — `WithImage`, `Placeholder`, `WithoutTooltip`, `WithoutHover`, `Rounded`.

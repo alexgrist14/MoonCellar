@@ -13,6 +13,7 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   containerClassname?: string;
   error?: FieldError | string;
   helpText?: ReactNode;
+  icon?: ReactNode;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -23,6 +24,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       containerClassname,
       error,
       helpText,
+      icon,
       ...props
     },
     ref
@@ -35,9 +37,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           className={classNames(styles.container, containerClassname, {
             [styles.container_error]: !!errorMessage,
             [styles.container_withHelp]: !!helpText,
+            [styles.container_withIcon]: !!icon,
           })}
           style={containerStyles}
         >
+          {!!icon && <span className={styles.icon}>{icon}</span>}
           <input
             ref={ref}
             className={classNames(styles.input, className)}

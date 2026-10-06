@@ -16,7 +16,7 @@ const dot = (color: string) => (
       height: "var(--people-avatar-size)",
       borderRadius: "50%",
       background: color,
-      marginLeft: "calc(var(--gap-x2) * -1)",
+      marginLeft: "calc(var(--padding-x2) * -1)",
       outline: "2px solid var(--color-bg-primary)",
     }}
   />

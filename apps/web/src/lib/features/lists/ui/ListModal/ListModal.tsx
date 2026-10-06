@@ -238,7 +238,6 @@ export const ListModal: FC<IListModalProps> = ({ list, userName, gameId }) => {
                 placeholder="What ties these games together?"
                 error={errors.description}
                 disabled={isBusy}
-                classNameField={styles.textarea}
               />
             </label>
           )}

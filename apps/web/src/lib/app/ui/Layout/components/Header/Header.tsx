@@ -54,45 +54,37 @@ export const Header: FC = () => {
     () =>
       [
         {
-          title: (
-            <>
-              <SvgGames className={styles.svg} />
-              <span>Games</span>
-            </>
-          ),
+          title: [
+            <SvgGames key="icon" className={styles.svg} />,
+            <span key="label">Games</span>,
+          ],
           link: "/games",
           color: ButtonColor.TRANSPARENT,
           onClick: closeMenu,
         },
         {
-          title: (
-            <>
-              <SvgListBullet className={styles.svg} />
-              <span>Lists</span>
-            </>
-          ),
+          title: [
+            <SvgListBullet key="icon" className={styles.svg} />,
+            <span key="label">Lists</span>,
+          ],
           link: "/lists",
           color: ButtonColor.TRANSPARENT,
           onClick: closeMenu,
         },
         {
-          title: (
-            <>
-              <SvgGauntlet className={styles.svg} />
-              <span>Gauntlet</span>
-            </>
-          ),
+          title: [
+            <SvgGauntlet key="icon" className={styles.svg} />,
+            <span key="label">Gauntlet</span>,
+          ],
           link: "/gauntlet",
           color: ButtonColor.TRANSPARENT,
           onClick: closeMenu,
         },
         {
-          title: (
-            <>
-              <SvgRandom className={styles.svg} />
-              <span>Random</span>
-            </>
-          ),
+          title: [
+            <SvgRandom key="icon" className={styles.svg} />,
+            <span key="label">Random</span>,
+          ],
           onClick: randomClickHandler,
           color: ButtonColor.TRANSPARENT,
         },
@@ -105,16 +97,14 @@ export const Header: FC = () => {
       [
         ...menuButtons,
         {
-          title: (
-            <>
-              <SvgSearch className={styles.svg} />
-              <span>Search</span>
-            </>
-          ),
+          title: [
+            <SvgSearch key="icon" className={styles.svg} />,
+            <span key="label">Search</span>,
+          ],
           onClick: searchClickHandler,
           color: ButtonColor.TRANSPARENT,
         },
-      ] as IButtonGroupItem[],
+      ].map((button) => ({ ...button, compact: true })) as IButtonGroupItem[],
     [menuButtons, searchClickHandler]
   );
 
@@ -134,7 +124,7 @@ export const Header: FC = () => {
         <div className={styles.nav_mobile}>
           <div className={styles.burger} ref={menuRef}>
             <Button
-              className={styles.burger__toggle}
+              compact
               color={ButtonColor.TRANSPARENT}
               tooltip="Menu"
               onClick={() => setIsMenuOpen((prev) => !prev)}
@@ -153,7 +143,7 @@ export const Header: FC = () => {
             )}
           </div>
           <Button
-            className={styles.burger__toggle}
+            compact
             color={ButtonColor.TRANSPARENT}
             tooltip="Search"
             onClick={searchClickHandler}
@@ -162,10 +152,7 @@ export const Header: FC = () => {
           </Button>
         </div>
         <div className={styles.nav_desktop}>
-          <ButtonGroup
-            wrapperClassName={styles.container__buttons}
-            buttons={buttons}
-          />
+          <ButtonGroup buttons={buttons} />
         </div>
       </div>
       <div className={styles.container__right}>

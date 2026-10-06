@@ -12,6 +12,7 @@ interface IBadgeProps extends HTMLAttributes<HTMLSpanElement> {
   variant?: "soft" | "outlined";
   isWithDot?: boolean;
   isWrap?: boolean;
+  isStruck?: boolean;
   ref?: Ref<HTMLSpanElement>;
 }
 
@@ -22,6 +23,7 @@ export const Badge: FC<IBadgeProps> = ({
   variant = "soft",
   isWithDot,
   isWrap,
+  isStruck,
   className,
   ref,
   ...rest
@@ -36,6 +38,7 @@ export const Badge: FC<IBadgeProps> = ({
         [styles.badge_dot]: isWithDot,
         [styles.badge_outlined]: variant === "outlined",
         [styles.badge_wrap]: isWrap,
+        [styles.badge_struck]: isStruck,
       },
       className
     )}

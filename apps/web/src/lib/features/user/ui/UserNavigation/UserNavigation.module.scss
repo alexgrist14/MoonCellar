@@ -21,34 +21,26 @@
   }
 
   .btn {
-    display: flex;
     justify-content: space-between;
-    gap: var(--gap-x2);
-    color: var(--color-neutral-90);
+  }
 
-    & > span:nth-child(2) {
-      color: var(--color-neutral-80);
-    }
+  .profile {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x5);
+  }
 
-    div {
-      display: flex;
-      align-items: center;
-      gap: var(--gap-x5);
+  .avatar {
+    width: 24px;
+    height: 24px;
+  }
 
-      .avatar {
-        width: 24px;
-        height: 24px;
+  .label {
+    color: var(--color-text-secondary);
+  }
 
-        div {
-          img {
-            border-radius: var(--radius-x3);
-          }
-        }
-      }
-      svg {
-        color: var(--color-neutral-80);
-      }
-    }
+  .count {
+    color: var(--color-text-muted);
   }
 }
 

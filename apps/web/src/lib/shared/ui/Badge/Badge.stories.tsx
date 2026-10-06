@@ -107,3 +107,7 @@ export const WithTooltip: Story = {
     </Tooltip>
   ),
 };
+
+export const Struck: Story = {
+  args: { tone: "muted", isStruck: true, children: "Hollow Knight" },
+};

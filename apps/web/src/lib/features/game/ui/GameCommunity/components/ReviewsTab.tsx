@@ -90,7 +90,6 @@ export const ReviewsTab: FC<IReviewsTabProps> = ({
   const writeButton = (
     <Button
       color={ButtonColor.ACCENT}
-      className={styles.iconButton}
       onClick={openReviewModal}
     >
       <SvgPen size="16" style={{ color: "inherit" }} />

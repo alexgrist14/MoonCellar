@@ -20,6 +20,7 @@ interface ITabs {
   isHideTabsButtons?: boolean;
   mobileMenuTitle?: string;
   isWrap?: boolean;
+  isFit?: boolean;
 }
 const TabGroup: FC<{ addon?: ReactNode; children: ReactNode }> = ({
   addon,
@@ -48,6 +49,7 @@ export const Tabs: FC<ITabs> = ({
   isAdaptive,
   mobileMenuTitle,
   isWrap,
+  isFit,
 }) => {
   const isSegmented = theme === "segmented";
   const color =
@@ -78,6 +80,7 @@ export const Tabs: FC<ITabs> = ({
         [styles.tabs__buttons_adaptive]: isAdaptive,
         [styles.tabs__buttons_segmented]: isSegmented,
         [styles.tabs__buttons_wrap]: isWrap,
+        [styles.tabs__buttons_fit]: isFit,
       })}
       role={isSegmented ? "group" : undefined}
       aria-label={ariaLabel}
@@ -98,6 +101,7 @@ export const Tabs: FC<ITabs> = ({
                 style={content.style}
                 className={cl(styles.tabs__button, {
                   [styles.tabs__button_adaptive]: isAdaptive,
+                  [styles.tabs__button_muted]: content.isMuted,
                 })}
                 active={!content.isUnselectable && i === tabIndex}
                 aria-pressed={isSegmented ? i === tabIndex : undefined}
@@ -120,6 +124,7 @@ export const Tabs: FC<ITabs> = ({
                 color={color}
                 className={cl(styles.tabs__button, content.className, {
                   [styles.tabs__button_adaptive]: isAdaptive,
+                  [styles.tabs__button_muted]: content.isMuted,
                 })}
                 style={content.style}
                 active={!content.isUnselectable && i === tabIndex}

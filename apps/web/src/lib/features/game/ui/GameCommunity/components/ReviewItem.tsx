@@ -57,7 +57,7 @@ export const ReviewItem: FC<IReviewItemProps> = ({
             title={`${review.author?.userName ?? "Player"}'s review`}
             mode="drawer"
           >
-            <RichText content={review.comment} className={styles.entry__body} />
+            <RichText content={review.comment} />
           </ExpandableBlock>
         </Spoiler>
         <div className={styles.entry__actions}>

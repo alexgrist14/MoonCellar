@@ -74,7 +74,6 @@ export const UserLists: FC<IUserListsProps> = ({
             <div className={styles.lists__actions}>
               <Button
                 color={ButtonColor.DEFAULT}
-                className={styles.lists__create}
                 disabled={isReordering}
                 onClick={() => setDraft(null)}
               >
@@ -82,7 +81,6 @@ export const UserLists: FC<IUserListsProps> = ({
               </Button>
               <Button
                 color={ButtonColor.ACCENT}
-                className={styles.lists__create}
                 disabled={isReordering}
                 onClick={finishReordering}
               >
@@ -96,7 +94,6 @@ export const UserLists: FC<IUserListsProps> = ({
                 {canReorder && (
                   <Button
                     color={ButtonColor.DEFAULT}
-                    className={styles.lists__create}
                     onClick={() => setDraft(lists)}
                   >
                     Reorder
@@ -104,7 +101,6 @@ export const UserLists: FC<IUserListsProps> = ({
                 )}
                 <Button
                   color={ButtonColor.ACCENT}
-                  className={styles.lists__create}
                   onClick={handleCreate}
                 >
                   <SvgPlus size="16" style={{ color: "inherit" }} />
@@ -141,7 +137,6 @@ export const UserLists: FC<IUserListsProps> = ({
             canCreate && (
               <Button
                 color={ButtonColor.ACCENT}
-                className={styles.lists__create}
                 onClick={handleCreate}
               >
                 <SvgPlus size="16" style={{ color: "inherit" }} />

@@ -3,7 +3,26 @@
   flex-direction: column;
   gap: var(--gap-x1);
   min-width: 0;
-  margin-bottom: var(--gap-x3);
+  margin-bottom: var(--padding-x3);
+
+  &_flush {
+    margin-bottom: 0;
+  }
+
+  &__row {
+    display: flex;
+    align-items: stretch;
+    gap: var(--gap-x2);
+
+    & > :first-child {
+      flex: 1;
+      min-width: 0;
+    }
+
+    & > :not(:first-child) {
+      flex-shrink: 0;
+    }
+  }
 }
 
 .label {
@@ -75,7 +94,7 @@
   padding: var(--padding-x2);
   border: 1px solid var(--color-border-primary);
   border-radius: var(--radius-x4);
-  margin-bottom: var(--gap-x2);
+  margin-bottom: var(--padding-x2);
 
   & > .field {
     margin-bottom: 0;
@@ -118,7 +137,7 @@
 .section {
   border: 1px solid var(--color-border-primary);
   border-radius: var(--radius-x4);
-  margin-bottom: var(--gap-x3);
+  margin-bottom: var(--padding-x3);
   overflow: hidden;
 
   &_error {
@@ -156,7 +175,7 @@
 .note {
   color: var(--color-attention);
   font-size: 12px;
-  margin-bottom: var(--gap-x2);
+  margin-bottom: var(--padding-x2);
 }
 
 .hint {

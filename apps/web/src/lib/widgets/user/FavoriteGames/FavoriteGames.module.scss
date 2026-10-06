@@ -5,13 +5,6 @@
   min-width: 0;
 }
 
-.edit {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--gap-x2);
-  color: var(--color-text-muted);
-}
-
 .bar {
   display: inline-flex;
   gap: var(--gap-x1);
@@ -36,13 +29,12 @@
 
 .podium {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(var(--game-card-min-width), 1fr));
   gap: var(--gap-x3);
   align-items: end;
   list-style: none;
 
   @include mediaSm {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--gap-x2);
   }
 }
@@ -52,10 +44,12 @@
 }
 
 .slots {
-  --sortable-grid-columns: repeat(5, minmax(0, 1fr));
+  --sortable-grid-columns: repeat(
+    auto-fill,
+    minmax(var(--game-card-min-width), 1fr)
+  );
 
   @include mediaSm {
-    --sortable-grid-columns: repeat(2, minmax(0, 1fr));
     --sortable-grid-gap: var(--gap-x2);
   }
 }

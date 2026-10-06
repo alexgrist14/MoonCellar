@@ -46,7 +46,7 @@
     justify-content: center;
     align-items: center;
     gap: var(--gap-x3);
-    margin-top: var(--gap-x2);
+    margin-top: var(--padding-x2);
   }
 
   &_centered {
@@ -72,7 +72,7 @@
     }
 
     .empty__action {
-      margin-top: var(--gap-x1);
+      margin-top: var(--padding-x1);
     }
   }
 
@@ -103,7 +103,7 @@
 
     .empty__action {
       justify-content: flex-start;
-      margin-top: var(--gap-x1);
+      margin-top: var(--padding-x1);
     }
   }
 
@@ -145,7 +145,7 @@
 
     .empty__action {
       justify-content: flex-start;
-      margin-top: var(--gap-x3);
+      margin-top: var(--padding-x3);
 
       @include media960 {
         justify-content: center;

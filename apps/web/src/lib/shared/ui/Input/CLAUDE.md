@@ -18,6 +18,7 @@ the `<input>`, so it works with react-hook-form's `register`.
 | -------------------- | ----------------------- | ------- | ------------------------------------------------------------------------------ |
 | `error`              | `FieldError \| string`  | —       | A react-hook-form error or a plain message; turns the border red, shown below. |
 | `helpText`           | `ReactNode`             | —       | Always-visible text on the right edge inside the field, e.g. a unit (`h`).     |
+| `icon`               | `ReactNode`             | —       | Leading icon inside the field, before the input, in `--color-text-muted`.      |
 | `containerStyles`    | `CSSProperties`         | —       | Inline style on the bordered container.                                        |
 | `containerClassname` | `string`                | —       | Class on the bordered container.                                               |
 | `className`          | `string`                | —       | Class on the `<input>` itself.                                                 |
@@ -56,8 +57,11 @@ import { Input } from "@/src/lib/shared/ui/Input";
   ellipsises before it instead of running under it. It ignores the pointer; a click on it does
   not focus the input.
 - The container's radius is `--radius-control`, the one radius of every form field.
+- A leading icon is the `icon` prop: it turns the container into a flex row and the icon ignores
+  the pointer. Pass the svg with `style={{ color: "inherit" }}` so it takes the muted colour.
+  Never position an icon over the field by hand and pad the input to make room for it.
 
 ## Storybook
 
 `Shared/Input` — `Default`, `WithValue`, `Password`, `WithError`, `WithStringError`, `Disabled`,
-`Controlled`, `Numeric`, `WithHelpText`.
+`Controlled`, `Numeric`, `WithHelpText`, `WithIcon`.

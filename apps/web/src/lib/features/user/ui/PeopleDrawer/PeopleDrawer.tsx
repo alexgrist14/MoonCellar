@@ -97,7 +97,6 @@ export const PeopleDrawer: FC<IPeopleDrawerProps> = ({
               {!!viewerId && viewerId !== person._id && (
                 <Button
                   color={isFollowing ? ButtonColor.DEFAULT : ButtonColor.ACCENT}
-                  className={styles.follow}
                   disabled={isBusy}
                   onClick={() => toggleFollowing(person._id)}
                 >

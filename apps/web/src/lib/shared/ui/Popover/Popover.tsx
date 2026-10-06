@@ -153,7 +153,7 @@ const AnchoredPopover: FC<IPopoverProps> = ({
         ...(!!width && { width }),
         ...(matchAnchorWidth && !!coords && { width: coords.width }),
       }}
-      onClick={(event) => event.preventDefault()}
+      onClick={(event) => event.stopPropagation()}
     >
       <Box
         isWithBlur
@@ -170,9 +170,9 @@ const AnchoredPopover: FC<IPopoverProps> = ({
 };
 
 export const Popover: FC<IPopoverProps> = (props) => {
-  const isMobile = useStatesStore((state) => state.isMobile);
+  const isSmall = useStatesStore((state) => state.isSmall);
 
-  return isMobile && !props.isSheetDisabled ? (
+  return isSmall && !props.isSheetDisabled ? (
     <PopoverSheet {...props} />
   ) : (
     <AnchoredPopover {...props} />

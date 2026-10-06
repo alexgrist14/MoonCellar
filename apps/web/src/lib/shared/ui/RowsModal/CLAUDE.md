@@ -2,7 +2,7 @@
 
 Modal body made of a titled `Box` with a scroll area and a vertical list of "rows" — each row a
 two-sided block (icon or meta on one side, text on the other). Shows `emptyState` when there are
-no rows. `AchievementsModal` and `GamePlaysInfo` are built on it.
+no rows. `GamePlaysInfo` is built on it.
 
 ## When to use
 
@@ -47,7 +47,11 @@ modal.open(
   `--rows-modal-max-width` (420px) and `--rows-modal-row-gap` (`--gap-x3`), declared on the
   `className` you pass — never by overriding `.list`/`.row` from outside.** A caller's class has
   the same specificity as the component's, so which one wins depends on the order the CSS chunks
-  load. `AchievementsModal` sets 420–520px and `--gap-x6`.
+  load.
+- **The min and max width are applied through the inline `contentStyle`, not `.list`.** Box
+  resets its scroll content with `div .scrollbars__content { min-width: 0 }`, which outranks a
+  single class, so a min-width in the module was silently dropped and the modal shrank to its
+  text. The min width is capped at `100vw - 40px` so it never overflows a phone.
 
 - **Rows are keyed by index inside the component;** the key on the node you pass is not used for
   the wrapper, so do not rely on row state surviving a reorder.

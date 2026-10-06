@@ -202,7 +202,7 @@ a.eyebrow:hover {
   display: flex;
   flex-direction: column;
   gap: var(--gap-x2);
-  margin: var(--gap-x3) 0 0;
+  margin: var(--padding-x3) 0 0;
   padding: 0;
   list-style: none;
 }
@@ -378,7 +378,6 @@ a.eyebrow:hover {
 
 .actions .actionButton {
   flex-shrink: 0;
-  gap: var(--gap-x2);
 }
 
 .caption {
@@ -411,5 +410,5 @@ a.eyebrow:hover {
 }
 
 .manualSearch {
-  margin-top: var(--gap-x3);
+  margin-top: var(--padding-x3);
 }

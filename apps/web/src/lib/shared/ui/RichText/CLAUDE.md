@@ -15,14 +15,16 @@ it with the shared `richText` mixin. Renders nothing when `content` is empty.
 | Prop        | Type     | Default | Purpose                                      |
 | ----------- | -------- | ------- | -------------------------------------------- |
 | `content`   | `string` | –       | HTML string; empty or missing renders `null` |
-| `className` | `string` | –       | Extra class on the wrapper                   |
+| `className` | `string` | –       | Extra class on the wrapper, for layout only  |
+| `tone`      | `"primary" \| "secondary"` | `"secondary"` | Text colour: `--color-text-secondary` for body copy, `--color-text-primary` where the text is the main content (a playthrough comment) |
 
 ## Usage
 
 ```tsx
 import { RichText } from "@/src/lib/shared/ui/RichText";
 
-<RichText content={review.text} className={styles.entry__text} />;
+<RichText content={review.text} />;
+<RichText content={play.comment} tone="primary" />;
 ```
 
 ## Rules and gotchas
@@ -32,6 +34,7 @@ import { RichText } from "@/src/lib/shared/ui/RichText";
 - The look lives once in the `richText` mixin (`_mixins.scss`). Do not restyle paragraphs,
   images or spacing from a consumer; block spacing is `--rich-text-gap`, and images are capped
   at `min(100%, var(--rich-editor-image-width))`.
+- The text colour is `tone`; never set `color` through `className`.
 - A `font-size` on `className` reaches paragraphs only because the mixin sets
   `p { font-size: inherit }`; `root.scss` has a bare `p { font-size: 14px }` that would win
   otherwise. Keep that line if the mixin is edited.
@@ -40,4 +43,4 @@ import { RichText } from "@/src/lib/shared/ui/RichText";
 
 ## Storybook
 
-`Shared/RichText`: Paragraphs, Formatting, WithImage, Empty.
+`Shared/RichText`: Paragraphs, Formatting, WithImage, Empty, PrimaryTone.

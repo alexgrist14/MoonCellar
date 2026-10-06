@@ -225,12 +225,8 @@ export const ListGameSearch: FC<IListGameSearchProps> = ({
       className={styles.search}
       onClick={() => setIsOpen(true)}
     >
-      <SvgSearch
-        size="20"
-        className={styles.search__icon}
-        style={{ color: "var(--color-text-muted)" }}
-      />
       <Input
+        icon={<SvgSearch size="20" style={{ color: "inherit" }} />}
         value={search}
         autoFocus={autoFocus}
         placeholder={
@@ -240,7 +236,6 @@ export const ListGameSearch: FC<IListGameSearchProps> = ({
         }
         aria-label="Search for a game to add"
         autoComplete="off"
-        className={styles.search__input}
         onChange={(event) => {
           setSearch(event.target.value);
           setIsOpen(true);

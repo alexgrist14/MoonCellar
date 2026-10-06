@@ -35,12 +35,6 @@
     @include mediaMd {
       padding: var(--padding-x3);
     }
-
-    .tabs {
-      &__button {
-        height: 50px;
-      }
-    }
   }
 }
 

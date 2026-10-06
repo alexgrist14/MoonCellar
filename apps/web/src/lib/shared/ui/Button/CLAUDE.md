@@ -15,7 +15,8 @@ loading state and an optional `Tooltip`. The folder also exports `ButtonGroup`
   `onClick` that calls the router.
 - A pending submit is `isLoading`, not a hand-placed `Loader` plus a hidden label span.
 - A quiet inline action in a metadata row (Reply, Like with a count, Report) is
-  `ButtonColor.GHOST`, with `active` for the toggled-on state.
+  `ButtonColor.GHOST`, with `active` for the toggled-on state, and `isAccentText` for one that
+  opens more content rather than toggling ("3 replies", "Show more replies").
 
 ## API
 
@@ -31,11 +32,18 @@ loading state and an optional `Tooltip`. The folder also exports `ButtonGroup`
 | `compact`      | `boolean`                         | –                     | Smaller padding (`x05`/`x1`)                                                                            |
 | `hidden`       | `boolean`                         | –                     | Hides the button through a class, keeping it mounted                                                    |
 | `isOnlyIcon`   | `boolean`                         | –                     | Forces a square (`aspect-ratio: 1`) button                                                              |
+| `isAccentText` | `boolean`                         | –                     | Accent text that stays accent on hover, for a ghost/transparent action that is not a toggle             |
 | `isLoading`    | `boolean`                         | –                     | Disables the button, sets `aria-busy`, shows a pulse `Loader` over the hidden label (width kept)        |
 | `href`         | `LinkProps["href"]`               | –                     | Link mode: renders a `next/link` `Link` with the same classes instead of a `<button>`                   |
 | `target`       | `HTMLAttributeAnchorTarget`       | –                     | Link mode only                                                                                          |
 | `rel`          | `string`                          | –                     | Link mode only                                                                                          |
 | `prefetch`     | `LinkProps["prefetch"]`           | –                     | Link mode only, passed to `Link`                                                                        |
+
+The active colour of `default`, `segmented` and `ghost` reads `--button-active-color`, falling
+back to the theme's own (`--color-accent`, `--color-text-primary`, `--color-accent`). Set it on
+the button through a class in the consumer's module (`.mastered { --button-active-color:
+var(--game-mastered-color); }`) to give one toggle a domain colour; it is the only property a
+consumer sets on a `Button`, the way `ReactionButton` takes `--reaction-active-color`.
 
 `ButtonGroup` props: `buttons: IButtonGroupItem[]` (every `Button` prop plus `title` and an
 optional `link`, which is an alias of `href`), `wrapperStyle`, `wrapperClassName`. Items with a
@@ -91,8 +99,12 @@ import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
   is wide.
 - Any padding override keeps inline padding at twice the block padding on the same scale; a 1:3
   button reads as a different control next to its neighbours.
-- Every button is `--radius-button`, wherever it sits. Override it only for a button pressed
-  against the edge of a rounded parent (the "Advanced" button inside the search input).
+- Every button is `--radius-button`, wherever it sits, with no exceptions.
+- **A consumer's `className` on `Button` is for layout only** — margin, grid placement, width or
+  flex sizing, `align-self`, `justify-content` of its content. Colour, radius, padding, font and
+  gap come from the component; a missing look is a new prop here, not a doubled selector in the
+  consumer.
+- Icon and label are spaced by the button's own `gap: var(--gap-x2)`; never restate it.
 - Give an icon-only button an accessible name: `tooltip` as a string or `aria-label`.
 - **Icon plus text goes in as siblings, never wrapped in a fragment.** A single child whose type
   is not a string counts as an icon, and a `<>…</>` is such a child — it gets `button_icon`'s
@@ -106,9 +118,9 @@ import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
   themes, and keeps full opacity while disabled. The label stays in the DOM (`visibility:
 hidden`), which is what keeps the width.
 - `GHOST` has its own padding (`x05`/`x1`), 13px/20px type and the shared `--radius-button`; `active` turns the
-  text and any filled icon path accent. It skips the global hover dimming like `transparent`.
+  text and any filled icon path accent (or `--button-active-color`). It skips the global hover dimming like `transparent`.
 
 ## Storybook
 
 `Shared/Button`: Default, Accent, Danger, Compact, Disabled, IconOnly, Ghost, GhostActive,
-Loading, LoadingCompact, AsLink, AsExternalLink, AsLinkActive, AsLinkIconOnly, AsLinkDisabled.
+GhostAccentText, SegmentedActiveColor, IconAndLabel, Loading, LoadingCompact, AsLink, AsExternalLink, AsLinkActive, AsLinkIconOnly, AsLinkDisabled.

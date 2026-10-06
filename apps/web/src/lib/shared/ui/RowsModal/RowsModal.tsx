@@ -22,7 +22,11 @@ export const RowsModal: FC<IRowsModalProps> = ({
     <Box
       title={title}
       isWithScrollBar
-      contentStyle={{ padding: "var(--padding-x4)" }}
+      contentStyle={{
+        padding: "var(--padding-x4)",
+        minWidth: "min(var(--rows-modal-min-width, 320px), calc(100vw - 40px))",
+        maxWidth: "var(--rows-modal-max-width, 420px)",
+      }}
       classNameContent={classNames(styles.list, className)}
     >
       {rows.length

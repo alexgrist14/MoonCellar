@@ -274,6 +274,38 @@ type Story = StoryObj<typeof meta>;
 
 export const TextFields: Story = { render: () => <BasicFieldsDemo /> };
 
+const WithActionDemo = () => {
+  const [value, setValue] = useState("");
+
+  return (
+    <div
+      style={{ display: "flex", flexDirection: "column", gap: "var(--gap-x2)" }}
+    >
+      <TextField
+        label="HLTB id"
+        value={value}
+        placeholder="68033"
+        onChange={setValue}
+        isFlush
+        action={<Button type="button">Parse</Button>}
+      />
+      <TextField
+        label="VNDB id (current: v17)"
+        value="v17"
+        onChange={() => {}}
+        isFlush
+        action={
+          <Button type="button" disabled>
+            Parsing…
+          </Button>
+        }
+      />
+    </div>
+  );
+};
+
+export const WithAction: Story = { render: () => <WithActionDemo /> };
+
 export const WithErrors: Story = {
   render: () => <BasicFieldsDemo isWithErrors />,
 };

@@ -177,6 +177,8 @@
   --game-hero-counters-width: 360px;
   --game-rating-popover-width: 320px;
   --popover-width: 320px;
+  --achievements-icon-size: 44px;
+  --achievements-icon-size-sm: 48px;
   --popover-max-height: 320px;
   --popover-sheet-max-height: 85dvh;
   --textarea-handle-size: 20px;
@@ -194,6 +196,7 @@
   --expandable-fade-height: 32px;
   --date-picker-width: 300px;
   --date-picker-field-min-width: 140px;
+  --game-card-min-width: 160px;
   --playthrough-platform-min-width: 200px;
   --playthrough-time-min-width: 120px;
   --date-picker-cell-size: 34px;
@@ -265,6 +268,7 @@
   --search-modal-width: 900px;
   --search-tab-height: 36px;
   --reaction-active-color: var(--color-accent);
+  --tabs-muted-opacity: 0.55;
   --loader-block-min-height: 96px;
   --burger-animation-duration: 600ms;
 }
@@ -334,7 +338,7 @@
   code.t { font-family: var(--mock-mono); font-size: 12px; color: var(--color-yellow); }
 
   .variant, .section { margin-top: var(--padding-x16); }
-  .variant__head { display: flex; align-items: baseline; gap: var(--gap-x3); flex-wrap: wrap; margin-bottom: var(--gap-x2); }
+  .variant__head { display: flex; align-items: baseline; gap: var(--gap-x3); flex-wrap: wrap; margin-bottom: var(--padding-x2); }
 
   .variant__letter {
     font-family: var(--mock-mono);
@@ -348,7 +352,7 @@
   }
 
   .variant__head h2, .section > h2 { font-size: 23px; font-weight: 700; letter-spacing: -0.2px; }
-  .variant__thesis, .section > h2 + p { color: var(--color-text-muted); max-width: 70ch; margin: var(--gap-x2) 0 var(--gap-x5); }
+  .variant__thesis, .section > h2 + p { color: var(--color-text-muted); max-width: 70ch; margin: var(--padding-x2) 0 var(--padding-x5); }
   .variant__thesis { margin-top: 0; }
 
   .stage {
@@ -362,7 +366,7 @@
     min-width: 0;
   }
 
-  .stage + .stage { margin-top: var(--gap-x4); }
+  .stage + .stage { margin-top: var(--padding-x4); }
 
   @media (max-width: 520px) { .stage { padding: var(--padding-x3); } }
 
@@ -370,7 +374,7 @@
   .stage__context::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--color-accent); flex-shrink: 0; }
 
   .pros { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--gap-x3) var(--gap-x6); font-size: 14px; color: var(--color-text-muted); }
-  .pros h3 { font-size: 12px; font-weight: 600; color: var(--color-text-primary); margin-bottom: var(--gap-x1); }
+  .pros h3 { font-size: 12px; font-weight: 600; color: var(--color-text-primary); margin-bottom: var(--padding-x1); }
   .pros ul { margin: 0; padding-left: 18px; display: grid; gap: var(--gap-x1); }
 
   .scene {
@@ -713,7 +717,7 @@
   .build ul { margin: 0; padding-left: 18px; display: grid; gap: var(--gap-x2); font-size: 14px; color: var(--color-text-secondary); }
   .build pre { margin: 0; overflow-x: auto; font-family: var(--mock-mono); font-size: 12px; line-height: 1.7; color: var(--color-text-secondary); background: var(--color-bg-secondary); border-radius: var(--radius-x4); padding: var(--padding-x3); }
 
-  .reco { margin-top: var(--gap-x4); border-left: 2px solid var(--color-accent); padding: var(--padding-x2) var(--padding-x4); display: grid; gap: var(--gap-x2); max-width: 75ch; }
+  .reco { margin-top: var(--padding-x4); border-left: 2px solid var(--color-accent); padding: var(--padding-x2) var(--padding-x4); display: grid; gap: var(--gap-x2); max-width: 75ch; }
   .reco h3 { font-size: 17px; }
   .reco p { color: var(--color-text-secondary); font-size: 14px; }
 

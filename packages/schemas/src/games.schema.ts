@@ -36,6 +36,9 @@ export const GAME_STATUSES = [
 export const RetroachievementsSchema = z.object({
   gameId: z.number(),
   consoleId: z.number(),
+  consoleName: z.string().optional(),
+  imageIcon: z.string().url().optional(),
+  numAchievements: z.number().optional(),
 });
 
 export const VndbSchema = z.object({

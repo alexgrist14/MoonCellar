@@ -12,11 +12,4 @@
   &__sortable {
     --sortable-grid-columns: repeat(auto-fill, minmax(140px, 1fr));
   }
-
-  &__create {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--gap-x2);
-    border-radius: var(--radius-x4);
-  }
 }

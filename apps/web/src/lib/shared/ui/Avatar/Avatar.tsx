@@ -11,6 +11,7 @@ interface AvatarProps {
   isWithoutTooltip?: boolean;
   isWithoutHover?: boolean;
   priority?: boolean;
+  shape?: "circle" | "rounded";
 }
 
 export const Avatar: FC<AvatarProps> = ({
@@ -18,6 +19,7 @@ export const Avatar: FC<AvatarProps> = ({
   isWithoutTooltip,
   isWithoutHover,
   priority,
+  shape = "circle",
 }) => {
   const avatar = (
     <div className={styles.container}>
@@ -25,6 +27,7 @@ export const Avatar: FC<AvatarProps> = ({
         <Image
           className={classNames(styles.image, {
             [styles.image_static]: isWithoutHover,
+            [styles.image_rounded]: shape === "rounded",
           })}
           src={user.avatar}
           width={90}

@@ -15,7 +15,7 @@ the default `fancy` full-width tabs, and `theme="segmented"`, the compact pill s
 
 | Prop                | Type            | Default               | Purpose                                                                                                                                                                                                                                                                                                |
 | ------------------- | --------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `contents`          | `ITabContent[]` | required              | Tabs: `tabName`, optional `prefix` (node before the name, e.g. a status dot — spacing included), `addon` (node welded after the button), `tabNameNode` (node after the name), `count`, `onTabClick`, `tabLink`, `isUnselectable`, `isHidden`, `ariaLabel`, `tooltip`, `className`, `style` (see below) |
+| `contents`          | `ITabContent[]` | required              | Tabs: `tabName`, optional `prefix` (node before the name, e.g. a status dot — spacing included), `addon` (node welded after the button), `tabNameNode` (node after the name), `count`, `onTabClick`, `tabLink`, `isUnselectable`, `isHidden`, `isMuted`, `ariaLabel`, `tooltip`, `className`, `style` (see below) |
 | `defaultTabIndex`   | `number`        | `0`                   | Initially selected tab (clamped to the last one)                                                                                                                                                                                                                                                       |
 | `isUseDefaultIndex` | `boolean`       | –                     | Re-syncs the selection whenever `defaultTabIndex` changes (controlled-ish use)                                                                                                                                                                                                                         |
 | `isStopPropagation` | `boolean`       | –                     | Clicks call `onTabClick` but do not change the selection                                                                                                                                                                                                                                               |
@@ -28,6 +28,7 @@ the default `fancy` full-width tabs, and `theme="segmented"`, the compact pill s
 | `isHideTabsButtons` | `boolean`       | –                     | Renders the row without buttons                                                                                                                                                                                                                                                                        |
 | `mobileMenuTitle`   | `string`        | –                     | Below `$screenMd` hides the row and shows a `TabsMenu` with this title                                                                                                                                                                                                                                 |
 | `isWrap`            | `boolean`       | –                     | Lets a `segmented` row wrap onto several lines instead of overflowing its container                                                                                                                                                                                                                    |
+| `isFit`             | `boolean`       | –                     | Content-width row that never wraps: every tab keeps its label width (`flex: 0 0 auto`). Put it in a horizontal `Scrollbar` when it can outgrow its container                                                                                                                                          |
 
 Per-tab fields beyond the label:
 
@@ -40,6 +41,8 @@ Per-tab fields beyond the label:
   control that belongs to one option; it cannot go in `tabNameNode`, because that sits inside
   the button and a button may not contain another. Not rendered for `tabLink` tabs or in
   `TabsMenu`.
+- `isMuted` — the tab is dimmed (`--tabs-muted-opacity`) but stays clickable and selectable. The
+  search modal mutes a result tab whose count is zero.
 - `ariaLabel` — accessible name of the button, for a tab whose `tabName` is an icon or emoji.
 - `tooltip` — hover/focus hint passed to `Button`'s `tooltip`; a string one also becomes the
   accessible name when `ariaLabel` is not set.
@@ -67,6 +70,9 @@ import { Tabs } from "@/src/lib/shared/ui/Tabs";
   group is meaningless to a screen reader.
 - The segmented look depends on `.tabs__buttons_segmented .tabs__button` out-specifying the base
   rules; a single-class modifier loses and the pills weld into one bar.
+- Size the row with `isFit`, dim a tab with `isMuted`; never through `buttonsClassName` or a tab
+  `className` that reaches into the buttons (the playthrough modal's doubled-class override is
+  what `isFit` replaced).
 - Hide a tab with `isHidden`, never with a `className` that sets `display: none`: the class has to
   out-specify `Button`'s own `display`, which is what forced the doubled-class hacks this prop
   replaced.
@@ -81,4 +87,4 @@ import { Tabs } from "@/src/lib/shared/ui/Tabs";
 ## Storybook
 
 `Shared/Tabs`: Default, WithCounts, WithPrefix, Segmented, SegmentedWrap, WithHiddenTab,
-IconOnly, WithMobileMenu, WithAddon.
+IconOnly, WithMobileMenu, WithAddon, Fit, WithMutedTab.

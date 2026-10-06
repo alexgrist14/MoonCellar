@@ -459,7 +459,7 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   prepends the game an admin found by search, unscored (`score: 0`, an all-zero breakdown,
   `isManual: true`), to a waiting `games`-direction conflict; the admin then matches or skips as
   usual. The list filters by `state`, each mapped onto `status`/`decision` in `STATE_FILTERS`.
-- **`parseRAGames` recomputes every RA link each run, so it must read the RA conflicts first.**
+- **`matchGames` recomputes every RA link each run, so it must read the RA conflicts first.**
   A resolved conflict pins its winners, and a pending or skipped one links nothing. Without this
   the next nightly run replaces an admin's decision with the fuzzy match again. The run also
   pulls an RA set from every game it did not match when the run gave that set to another game, so
@@ -474,10 +474,40 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   segment, and IGDB names regional and revision variants differently ("Family Computer" against RA's
   "NES/Famicom", "MSX2", "WonderSwan Color", "Pokémon mini"); Akira on the Famicom never reached its
   RA conflict. Map such a platform in `RA_CONSOLE_BY_PLATFORM_SLUG` (`constants/sync.ts`) instead of
-  loosening the matcher, then run `POST /ra/match-platforms` or wait for the sync.
+  loosening the matcher, then run `POST /ra/sync` or wait for the nightly run.
+- **RetroAchievements data is never stored in collections of its own; it lives on the records
+  that use it.** The sync downloads RA's consoles and game lists on every run, matches them in
+  memory, writes `raId` into `platforms` and the set's `consoleName`, `imageIcon` (absolute URL)
+  and `numAchievements` into each game's `retroachievements` entry. A set that matched nothing is
+  not kept. An ambiguous set has no game to live on, so its RA record is snapshotted into the
+  conflict's `externalData`, and the RA handler's `describe`, `rematch` and `apply` read that
+  snapshot instead of asking RA again; each run refreshes the snapshot of every RA set that has a
+  conflict. A link added by hand (a content request) has only `gameId` and `consoleId` until the
+  next sync fills in the rest, so the web must render an entry without them.
+- **A failed HLTB search is never "not on HLTB".** `howlongtobeat-ts` answers `success: false`
+  when the request fails, and `HltbService.search` throws `HltbSearchFailedError` for it: the game
+  is counted as failed, keeps its data and gets no `hltbNotFoundAt`, and a run stops after
+  `HLTB_MAX_CONSECUTIVE_FAILURES` failures in a row. Treating a failure as an empty result marked
+  about 60,000 games "not found" between 2026-08-30 and 2026-10-04 (two in three of them were on
+  HLTB), hid them from every sync for the 90-day retry window, wiped the times of games that already
+  had them and produced no conflicts at all. A search that succeeds with no results does not clear
+  stored times either; only a non-empty result with no acceptable entry does.
+- **HLTB titles compare with Roman numerals as digits and against the entry's alias too**
+  (`normalizeHltbTitle`, `evaluateEntry`), so "Baldur's Gate III" meets HLTB's "Baldur's Gate 3".
+  Single-letter numerals (I, V, X) stay words — "Mega Man X" is not "Mega Man 10". Every
+  strong-title candidate the rules could not accept goes to the conflict, a different release year
+  included; the year vetoes only the automatic match.
+- **An id set by hand ends the source's open conflicts for that game, never its decided ones.**
+  `POST /hltb/games/parse?hltbId`, `POST /vndb/games/parse?vnId` and `POST /ra/games/parse?raId`
+  call `ConflictsService.removeForGame`: it deletes the conflict of the linked id itself and every
+  pending, undecided conflict that lists the game as a candidate. A decided conflict for another id
+  stays, because deleting it drops the admin's decision and the next sync re-matches that id. RA
+  keeps the pinned conflict of the linked set (`keepExternalIds`): the pin is what stops the nightly
+  run from removing the link, and `matchGames` keeps a pinned set on its game even when the set's
+  console is not downloaded.
 - **An RA link written outside the sync must be pinned with `ConflictsService.pin`, or the next
   nightly run removes it.** Approving a request with RA ids does this: `pin` upserts a resolved
-  `ra` conflict and adds the game to its `winners`, which `parseRAGames` then keeps.
+  `ra` conflict and adds the game to its `winners`, which `matchGames` then keeps.
 - **A conflict stores every game it links in `winners`; `winner` is the first of them.** Only a
   handler with `isMultiMatch` (RA) accepts `gameIds` with several games — one RA achievement set
   often covers two games ("Pokémon HeartGold | SoulSilver"), and with one winner the second game

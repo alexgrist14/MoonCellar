@@ -12,6 +12,18 @@
       justify-content: center;
     }
 
+    &_fit {
+      width: fit-content;
+      min-width: 0;
+      max-width: none;
+      flex-wrap: nowrap;
+      overflow: visible;
+
+      & > * {
+        flex: 0 0 auto;
+      }
+    }
+
     &_segmented {
       display: inline-flex;
       width: fit-content;
@@ -74,6 +86,10 @@
       height: max(1.8vw, 18px);
       font-size: max(0.8vw, 12px);
     }
+
+    &_muted {
+      opacity: var(--tabs-muted-opacity);
+    }
   }
 }
 
@@ -109,5 +125,5 @@
 .tabs__prefix {
   display: inline-flex;
   align-items: center;
-  margin-right: var(--gap-x2);
+  margin-right: var(--padding-x2);
 }

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
+import { SvgSearch } from "../svg";
 import { Input } from "./Input";
 
 const ControlledInput = () => {
@@ -91,4 +92,12 @@ export const WithHelpText: Story = {
 
 export const Controlled: Story = {
   render: () => <ControlledInput />,
+};
+
+export const WithIcon: Story = {
+  args: {
+    icon: <SvgSearch size="20" style={{ color: "inherit" }} />,
+    placeholder: "Search for a game to add…",
+    "aria-label": "Search for a game to add",
+  },
 };

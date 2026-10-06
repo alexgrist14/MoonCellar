@@ -91,7 +91,7 @@ export const InlineCreateList: FC<IInlineCreateListProps> = ({
       <div className={styles.create}>
         <Button
           type="button"
-          color={ButtonColor.TRANSPARENT}
+          color={ButtonColor.GHOST}
           className={styles.create__open}
           onClick={onOpen}
         >

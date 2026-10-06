@@ -78,15 +78,16 @@ export const UserNavigation: FC<{
           href={getProfileHref(user.userName, "profile")}
           onClick={closeMenu}
         >
-          <div>
+          <div className={styles.profile}>
             <div className={styles.avatar}>
               <Avatar
                 user={user}
+                shape="rounded"
                 isWithoutTooltip={true}
                 isWithoutHover={true}
               />
             </div>
-            <span>{user.userName}</span>
+            <span className={styles.label}>{user.userName}</span>
           </div>
         </Button>
         {isAuthedUser && (
@@ -110,8 +111,8 @@ export const UserNavigation: FC<{
           href={getProfileHref(user.userName, "all")}
           onClick={closeMenu}
         >
-          <span>All</span>
-          <span>{allPlays.length}</span>
+          <span className={styles.label}>All</span>
+          <span className={styles.count}>{allPlays.length}</span>
         </Button>
         {userListCategories.map((category, i) => {
           const plays = playthroughs?.reduce((res: IPlaythrough[], play) => {
@@ -134,8 +135,8 @@ export const UserNavigation: FC<{
               href={getProfileHref(user.userName, category.toLowerCase())}
               onClick={closeMenu}
             >
-              <span>{commonUtils.upFL(category)}</span>
-              <span>{plays.length}</span>
+              <span className={styles.label}>{commonUtils.upFL(category)}</span>
+              <span className={styles.count}>{plays.length}</span>
             </Button>
           );
         })}
@@ -149,8 +150,8 @@ export const UserNavigation: FC<{
             href={getProfileHref(user.userName, "lists")}
             onClick={closeMenu}
           >
-            <span>Lists</span>
-            <span>{visibleLists.length}</span>
+            <span className={styles.label}>Lists</span>
+            <span className={styles.count}>{visibleLists.length}</span>
           </Button>
         )}
         {!!likedLists.length && (
@@ -161,8 +162,8 @@ export const UserNavigation: FC<{
             href={getProfileHref(user.userName, "liked")}
             onClick={closeMenu}
           >
-            <span>Liked lists</span>
-            <span>{likedLists.length}</span>
+            <span className={styles.label}>Liked lists</span>
+            <span className={styles.count}>{likedLists.length}</span>
           </Button>
         )}
         {(isAuthedUser || !!favoritesCount || !!favoriteCharactersCount) && (
@@ -178,8 +179,8 @@ export const UserNavigation: FC<{
             )}
             onClick={closeMenu}
           >
-            <span>Favourites</span>
-            <span>{favoritesCount + favoriteCharactersCount}</span>
+            <span className={styles.label}>Favourites</span>
+            <span className={styles.count}>{favoritesCount + favoriteCharactersCount}</span>
           </Button>
         )}
         <Button
@@ -189,8 +190,8 @@ export const UserNavigation: FC<{
           href={getProfileHref(user.userName, "reviews")}
           onClick={closeMenu}
         >
-          <span>Reviews</span>
-          <span>{reviewsCount}</span>
+          <span className={styles.label}>Reviews</span>
+          <span className={styles.count}>{reviewsCount}</span>
         </Button>
       </Box>
     </div>

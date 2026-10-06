@@ -102,11 +102,11 @@ export const GameExternalPages: FC<IGameExternalPagesProps> = ({
       {isMore && (
         <Button
           ref={moreRef}
+          compact
           color="transparent"
           tooltip={isPopoverOpen ? undefined : "All external pages"}
           active={isPopoverOpen}
           aria-expanded={isPopoverOpen}
-          className={styles.stats__more}
           onClick={() => setIsPopoverOpen((isOpen) => !isOpen)}
         >
           <SvgMore />

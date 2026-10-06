@@ -2,20 +2,6 @@
   position: relative;
   width: 100%;
   max-width: var(--list-search-width);
-
-  &__icon {
-    position: absolute;
-    top: 50%;
-    left: var(--padding-x3);
-    transform: translateY(-50%);
-    color: var(--color-text-muted);
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  &__input {
-    padding-left: var(--padding-x7);
-  }
 }
 
 .dropdown {

@@ -44,15 +44,13 @@
     max-width: calc(100% - 100px);
   }
 
-  & &__more {
+  &__more {
     width: 100%;
     grid-column: 1 / -1;
-    border-radius: var(--radius-x2);
   }
 
   &__wide {
     width: 100%;
-    border-radius: var(--radius-x2);
   }
 
   &__empty {
@@ -79,10 +77,6 @@
   &__buttons {
     position: absolute;
     right: 5px;
-
-    & button {
-      border-radius: var(--radius-x2);
-    }
   }
 }
 
@@ -92,10 +86,6 @@
 
 .tab {
   min-height: var(--search-tab-height);
-
-  &_empty {
-    opacity: 0.55;
-  }
 
   &__label {
     display: inline-flex;
@@ -250,10 +240,6 @@
       object-fit: cover;
       border-radius: inherit;
     }
-  }
-
-  &__follow {
-    border-radius: var(--radius-x1);
   }
 
   @include mediaSm {

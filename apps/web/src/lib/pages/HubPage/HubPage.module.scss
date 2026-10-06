@@ -84,11 +84,8 @@
     line-height: 1.5;
   }
 
-  & &__more {
+  &__more {
     width: 100%;
-    height: 42px;
-    border-radius: var(--radius-x4);
-    font-weight: 700;
   }
 
   &__links {

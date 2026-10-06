@@ -92,6 +92,7 @@ export const NotificationItem: FC<INotificationItemProps> = ({
       {onRemove && (
         <Button
           className={styles.item__remove}
+          compact
           color={ButtonColor.TRANSPARENT}
           isOnlyIcon
           tooltip="Remove"

@@ -291,7 +291,7 @@ export const RichEditor: FC<IRichEditorProps> = ({
     <Separator
       style={{
         height: "var(--rich-editor-separator-height)",
-        marginInline: "var(--gap-x1)",
+        marginInline: "var(--padding-x1)",
       }}
     />
   );

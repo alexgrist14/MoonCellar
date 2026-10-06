@@ -49,6 +49,7 @@ export interface IButtonProps extends Pick<
   compact?: boolean;
   hidden?: boolean;
   isOnlyIcon?: boolean;
+  isAccentText?: boolean;
   isLoading?: boolean;
   href?: ComponentProps<typeof Link>["href"];
   target?: HTMLAttributeAnchorTarget;
@@ -67,6 +68,7 @@ export const Button = memo(
     compact,
     hidden,
     isOnlyIcon,
+    isAccentText,
     isLoading,
     href,
     target,
@@ -99,6 +101,7 @@ export const Button = memo(
         [styles.button_compact]: compact,
         [styles.button_icon]: isIconOnly,
         [styles.button_square]: isOnlyIcon,
+        [styles.button_accentText]: isAccentText,
         [styles.button_hidden]: hidden,
         [styles.button_loading]: isLoading,
         [styles.button_disabled]: href !== undefined && isDisabled,

@@ -100,7 +100,6 @@ const SearchUserRow: FC<ISearchUserRowProps> = ({
           <Button
             compact
             color={isFollowed ? ButtonColor.DEFAULT : ButtonColor.ACCENT}
-            className={styles.user__follow}
             disabled={isAdding || isRemoving}
             onClick={toggleFollow}
           >

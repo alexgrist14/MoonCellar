@@ -26,6 +26,7 @@ import {
   ConflictItemResponseDto,
   ConflictsResponseDto,
   ConflictsSummaryDto,
+  GameConflictsResponseDto,
   ConflictsSummaryRequestDto,
   DecideConflictRequestDto,
   GetConflictsRequestDto,
@@ -69,6 +70,16 @@ export class ConflictsController {
   @ApiOkResponse({ type: ConflictsResponseDto })
   getList(@Query() dto: GetConflictsRequestDto) {
     return this.conflictsService.getList(dto);
+  }
+
+  @Get("by-game/:gameId")
+  @ApiOperation({
+    summary:
+      "List the conflicts still waiting for a decision that involve a game",
+  })
+  @ApiOkResponse({ type: GameConflictsResponseDto })
+  getForGame(@Param("gameId") gameId: string) {
+    return this.conflictsService.getForGame(gameId);
   }
 
   @Get(":source/:externalId")

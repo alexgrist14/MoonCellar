@@ -7,6 +7,8 @@ export const conflictQueryKeys = {
     [...conflictQueryKeys.summaryAll(), source ?? "all"] as const,
   item: (source: IConflictSource, externalId: string) =>
     [...conflictQueryKeys.all, "item", source, externalId] as const,
+  byGame: (gameId: string) =>
+    [...conflictQueryKeys.all, "by-game", gameId] as const,
   listAll: () => [...conflictQueryKeys.all, "list"] as const,
   list: (params: IGetConflictsParams) =>
     [...conflictQueryKeys.listAll(), params] as const,

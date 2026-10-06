@@ -63,7 +63,7 @@ export const ModeratedComment: FC<IModeratedCommentProps> = ({
           {comment.isSpoiler && <Badge tone="muted">Spoiler</Badge>}
         </div>
         {comment.body ? (
-          <RichText content={comment.body} className={styles.card__body} />
+          <RichText content={comment.body} />
         ) : (
           <p className={styles.removed}>
             The comment was deleted and its text is gone.

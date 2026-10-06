@@ -44,7 +44,7 @@ export const GamePlaysInfo: FC<IGamePlaysInfoProps> = ({
           {!!play.comment && (
             <RichText
               content={play.comment}
-              className={styles.plays__comment}
+              tone="primary"
             />
           )}
         </div>

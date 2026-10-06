@@ -177,6 +177,8 @@
   --game-hero-counters-width: 360px;
   --game-rating-popover-width: 320px;
   --popover-width: 320px;
+  --achievements-icon-size: 44px;
+  --achievements-icon-size-sm: 48px;
   --popover-max-height: 320px;
   --popover-sheet-max-height: 85dvh;
   --textarea-handle-size: 20px;
@@ -194,6 +196,7 @@
   --expandable-fade-height: 32px;
   --date-picker-width: 300px;
   --date-picker-field-min-width: 140px;
+  --game-card-min-width: 160px;
   --playthrough-platform-min-width: 200px;
   --playthrough-time-min-width: 120px;
   --date-picker-cell-size: 34px;
@@ -265,6 +268,7 @@
   --search-modal-width: 900px;
   --search-tab-height: 36px;
   --reaction-active-color: var(--color-accent);
+  --tabs-muted-opacity: 0.55;
   --loader-block-min-height: 96px;
   --burger-animation-duration: 600ms;
 }
@@ -334,7 +338,7 @@
     border: 1px solid var(--color-border-primary);
     border-radius: var(--radius-x4);
     overflow: hidden;
-    margin-top: var(--gap-x2);
+    margin-top: var(--padding-x2);
   }
 
   .brief div { background: var(--color-bg-primary); padding: var(--padding-x4); }
@@ -344,7 +348,7 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--color-gray);
-    margin-bottom: var(--gap-x1);
+    margin-bottom: var(--padding-x1);
   }
 
   .brief dd { margin: 0; font-size: 14px; color: var(--color-text-secondary); }
@@ -358,7 +362,7 @@
     align-items: baseline;
     gap: var(--gap-x3);
     flex-wrap: wrap;
-    margin-bottom: var(--gap-x1);
+    margin-bottom: var(--padding-x1);
   }
 
   .variant__letter {
@@ -377,7 +381,7 @@
   .variant__thesis {
     color: var(--color-text-muted);
     max-width: 64ch;
-    margin: 0 0 var(--gap-x5);
+    margin: 0 0 var(--padding-x5);
   }
 
   .stage {
@@ -393,7 +397,7 @@
   .stage__context {
     font-size: 12px;
     color: var(--color-gray);
-    margin: 0 0 var(--gap-x3);
+    margin: 0 0 var(--padding-x3);
     display: flex;
     align-items: center;
     gap: var(--gap-x2);
@@ -409,7 +413,7 @@
   }
 
   .hint {
-    margin: var(--gap-x3) 0 0;
+    margin: var(--padding-x3) 0 0;
     font-size: 12.5px;
     color: var(--color-gray);
     border-left: 2px solid var(--color-border-primary);
@@ -444,7 +448,7 @@
     width: 1px;
     height: 18px;
     background: var(--color-border-primary);
-    margin-inline: var(--gap-x1);
+    margin-inline: var(--padding-x1);
     flex-shrink: 0;
   }
 
@@ -481,7 +485,7 @@
     padding: 1px 5px;
   }
 
-  .ed figure { margin: var(--gap-x3) 0; position: relative; max-width: 320px; }
+  .ed figure { margin: var(--padding-x3) 0; position: relative; max-width: 320px; }
   .ed figure img { width: 100%; max-width: 100%; display: block; border-radius: var(--radius-x3); }
 
   .ed figcaption {
@@ -598,7 +602,7 @@
   .fieldB__body { min-height: 168px; }
 
   .fieldB__foot {
-    margin-top: var(--gap-x2);
+    margin-top: var(--padding-x2);
     padding-top: var(--padding-x2);
     border-top: 1px solid var(--color-border-primary);
   }
@@ -671,7 +675,7 @@
 
   @media (max-width: 520px) { .fieldC__foot { padding-left: var(--padding-x3); } }
 
-  .thread { margin-top: var(--gap-x4); display: flex; flex-direction: column; gap: var(--gap-x3); }
+  .thread { margin-top: var(--padding-x4); display: flex; flex-direction: column; gap: var(--gap-x3); }
   .cmt { display: flex; gap: var(--gap-x3); }
   .cmt__b { flex: 1; min-width: 0; }
   .cmt__meta { display: flex; align-items: baseline; gap: var(--gap-x2); margin-bottom: 3px; }
@@ -715,11 +719,11 @@
   .spec__win { color: var(--color-positive); }
 
   .section { margin-top: var(--padding-x18); }
-  .section h2 { font-size: 23px; font-weight: 700; margin-top: var(--gap-x1); }
+  .section h2 { font-size: 23px; font-weight: 700; margin-top: var(--padding-x1); }
 
   .tablewrap {
     overflow-x: auto;
-    margin-top: var(--gap-x5);
+    margin-top: var(--padding-x5);
     border: 1px solid var(--color-border-primary);
     border-radius: var(--radius-x4);
   }
@@ -754,7 +758,7 @@
   td { color: var(--color-text-secondary); background: var(--color-bg-primary); }
 
   .common ul {
-    margin: var(--gap-x5) 0 0;
+    margin: var(--padding-x5) 0 0;
     padding: 0;
     list-style: none;
     display: flex;
@@ -767,11 +771,11 @@
   }
 
   .common li { background: var(--color-bg-primary); padding: var(--padding-x4); }
-  .common li b { display: block; font-size: 14px; margin-bottom: var(--gap-x1); }
+  .common li b { display: block; font-size: 14px; margin-bottom: var(--padding-x1); }
   .common li span { font-size: 13.5px; color: var(--color-text-muted); }
 
   .note {
-    margin-top: var(--gap-x6);
+    margin-top: var(--padding-x6);
     font-size: 13px;
     color: var(--color-gray);
     border-left: 2px solid var(--color-border-primary);

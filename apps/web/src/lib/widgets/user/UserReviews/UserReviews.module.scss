@@ -118,7 +118,6 @@ $categories: completed, playing, mastered, played, backlog, dropped;
   &__placeholder {
     width: 100%;
     aspect-ratio: var(--cover-ratio);
-    border-radius: var(--radius-x4);
   }
 
   &__main {
@@ -160,10 +159,6 @@ $categories: completed, playing, mastered, played, backlog, dropped;
 
   &__score {
     margin-left: auto;
-  }
-
-  &__body {
-    color: var(--color-text-secondary);
   }
 
   &__actions {

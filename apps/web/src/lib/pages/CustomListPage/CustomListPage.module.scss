@@ -92,12 +92,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--gap-x2);
-
-  &__button {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--gap-x2);
-  }
 }
 
 .toolbar {

@@ -33,6 +33,10 @@
     background-color: currentColor;
   }
 
+  &_struck {
+    text-decoration: line-through;
+  }
+
   &_wrap {
     flex-shrink: 1;
     min-width: 0;

@@ -220,7 +220,10 @@ export class VndbService implements OnModuleInit {
     });
   }
 
-  async parseGame(gameId: string): Promise<IVndbParseResponse> {
+  async parseGame(
+    gameId: string,
+    requestedVnId?: string
+  ): Promise<IVndbParseResponse> {
     if (!mongoose.isValidObjectId(gameId)) {
       throw new BadRequestException(`Invalid game id: ${gameId}`);
     }
@@ -232,7 +235,40 @@ export class VndbService implements OnModuleInit {
 
     if (!game) throw new NotFoundException(`Game not found: ${gameId}`);
 
-    const vnId = game.vndb?.vnId;
+    const newVnId = requestedVnId?.trim().toLowerCase();
+
+    if (newVnId && newVnId !== game.vndb?.vnId) {
+      if (!/^v\d+$/.test(newVnId)) {
+        throw new BadRequestException(
+          `Invalid VNDB id: ${requestedVnId}. A VNDB id looks like v17`
+        );
+      }
+
+      if (this.isRunning) {
+        throw new ConflictException("A VNDB sync is running, try again later");
+      }
+
+      const owner = await this.gamesModel
+        .findOne({ "vndb.vnId": newVnId, _id: { $ne: game._id } })
+        .select("slug")
+        .lean();
+
+      if (owner) {
+        throw new ConflictException(
+          `VNDB ${newVnId} already belongs to /games/${owner.slug}`
+        );
+      }
+
+      await this.gamesModel.updateOne(
+        { _id: game._id },
+        { $set: { "vndb.vnId": newVnId } }
+      );
+      await this.conflicts.removeForGame("vndb", game._id, {
+        externalIds: [newVnId],
+      });
+    }
+
+    const vnId = newVnId || game.vndb?.vnId;
 
     if (!vnId) {
       throw new BadRequestException("The game has no VNDB id to parse");

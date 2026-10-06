@@ -251,6 +251,14 @@ export const PossibleDuplicatesErrorSchema = z.object({
   duplicates: PossibleDuplicateSchema.array(),
 });
 
+export const GameConflictSchema = z.object({
+  source: ConflictSourceSchema,
+  externalId: z.string(),
+  externalName: z.string(),
+});
+
+export const GameConflictsResponseSchema = GameConflictSchema.array();
+
 export const PossibleDuplicatesResponseSchema = z.object({
   duplicates: PossibleDuplicateSchema.array(),
 });
@@ -260,6 +268,7 @@ export type IPossibleDuplicatesError = z.infer<
   typeof PossibleDuplicatesErrorSchema
 >;
 export type IConflictSource = z.infer<typeof ConflictSourceSchema>;
+export type IGameConflict = z.infer<typeof GameConflictSchema>;
 export type IConflictState = z.infer<typeof ConflictStateSchema>;
 export type IConflictDirection = z.infer<typeof ConflictDirectionSchema>;
 export type IConflictEntry = z.infer<typeof ConflictEntrySchema>;

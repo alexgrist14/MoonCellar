@@ -173,7 +173,7 @@
 
   &__hint {
     display: block;
-    margin-top: var(--gap-x1);
+    margin-top: var(--padding-x1);
     color: var(--color-text-muted);
     @include font(12px, 16px, 400);
   }

@@ -8,9 +8,17 @@ import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { TextField } from "@/src/lib/shared/ui/Fields";
 import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
 import { modal } from "@/src/lib/shared/ui/Modal";
-import { gamesApi, hltbApi, igdbApi, vndbApi } from "@/src/lib/shared/api";
+import {
+  gamesApi,
+  hltbApi,
+  igdbApi,
+  raApi,
+  vndbApi,
+} from "@/src/lib/shared/api";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { IGameResponse } from "@mooncellar/schemas";
+import { Badge } from "@/src/lib/shared/ui/Badge";
+import { useGameConflictsQuery } from "@/src/lib/entities/conflict/api";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { revalidateGamePage } from "@/src/lib/entities/game/api/game.actions";
 import {
@@ -30,9 +38,15 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
   const [isFullParsing, setIsFullParsing] = useState(false);
   const [isParsingHltb, setIsParsingHltb] = useState(false);
   const [isParsingVndb, setIsParsingVndb] = useState(false);
+  const [isParsingRa, setIsParsingRa] = useState(false);
   const [hltbId, setHltbId] = useState("");
+  const [vndbId, setVndbId] = useState("");
+  const [raId, setRaId] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRevalidating, setIsRevalidating] = useState(false);
+
+  const { data: conflicts = [], refetch: refetchConflicts } =
+    useGameConflictsQuery(game._id, !!isAdmin);
 
   if (!isAdmin) return null;
 
@@ -70,7 +84,10 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
     setIsParsingVndb(true);
 
     try {
-      const { data } = await vndbApi.parseGame(game._id);
+      const { data } = await vndbApi.parseGame(
+        game._id,
+        vndbId.trim() || undefined
+      );
 
       if (data.status === "failed") {
         toast.error({ title: "VNDB parse failed", description: data.message });
@@ -81,6 +98,7 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
 
       await revalidateGamePage(game.slug, data.slug);
       router.refresh();
+      refetchConflicts();
     } catch {
       toast.error({
         title: "Failed to parse from VNDB",
@@ -109,6 +127,7 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
 
       await revalidateGamePage(game.slug, data.slug);
       router.refresh();
+      refetchConflicts();
     } catch {
       toast.error({
         title: "Failed to parse from HLTB",
@@ -116,6 +135,31 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
       });
     } finally {
       setIsParsingHltb(false);
+    }
+  };
+
+  const handleParseRa = async () => {
+    setIsParsingRa(true);
+
+    try {
+      const { data } = await raApi.parseGame({
+        gameId: game._id,
+        raId: raId.trim() || undefined,
+      });
+
+      toast.success({
+        title: "Parsed from RetroAchievements",
+        description: data.message,
+      });
+      setRaId("");
+
+      await revalidateGamePage(game.slug, data.slug);
+      router.refresh();
+      refetchConflicts();
+    } catch {
+      return;
+    } finally {
+      setIsParsingRa(false);
     }
   };
 
@@ -181,8 +225,36 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
   };
 
   return (
-    <ExpandMenu position="bottom-right" titleOpen="Admin">
+    <ExpandMenu
+      position="bottom-right"
+      titleOpen={
+        conflicts.length ? (
+          <span className={styles.title}>
+            Admin
+            <Badge tone="attention">{conflicts.length}</Badge>
+          </span>
+        ) : (
+          "Admin"
+        )
+      }
+    >
       <div className={styles.controls}>
+        {!!conflicts.length && (
+          <div className={styles.conflicts}>
+            <p className={styles.conflicts__title}>Conflicts</p>
+            {conflicts.map(({ source, externalId, externalName }) => (
+              <Button
+                key={`${source}-${externalId}`}
+                color={ButtonColor.DEFAULT}
+                href={`/admin/conflicts?source=${source}&conflict=${encodeURIComponent(externalId)}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {`${source.toUpperCase()} · ${externalName}`}
+              </Button>
+            ))}
+          </div>
+        )}
         <div className={styles.id}>
           <span className={styles.id__value}>{game._id}</span>
           <Button color={ButtonColor.DEFAULT} compact onClick={handleCopyId}>
@@ -230,36 +302,67 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
             {isFullParsing ? "Parsing…" : "Full reparse from IGDB"}
           </Button>
         )}
-        {!!vnId && (
-          <Button
-            color={ButtonColor.DEFAULT}
-            disabled={isParsingVndb}
-            onClick={handleParseVndb}
-          >
-            {isParsingVndb ? "Parsing…" : "Parse from VNDB"}
-          </Button>
-        )}
+        <TextField
+          label={vnId ? `VNDB id (current: ${vnId})` : "VNDB id"}
+          value={vndbId}
+          placeholder="v17"
+          disabled={isParsingVndb}
+          onChange={setVndbId}
+          isFlush
+          action={
+            <Button
+              color={ButtonColor.DEFAULT}
+              disabled={isParsingVndb || (!vnId && !vndbId.trim())}
+              onClick={handleParseVndb}
+            >
+              {isParsingVndb ? "Parsing…" : "Parse"}
+            </Button>
+          }
+        />
+        <TextField
+          label={
+            game.retroachievements?.length
+              ? `RetroAchievements id (current: ${game.retroachievements
+                  .map(({ gameId }) => gameId)
+                  .join(", ")})`
+              : "RetroAchievements id"
+          }
+          value={raId}
+          disabled={isParsingRa}
+          onChange={setRaId}
+          isFlush
+          action={
+            <Button
+              color={ButtonColor.DEFAULT}
+              disabled={
+                isParsingRa || (!game.retroachievements?.length && !raId.trim())
+              }
+              onClick={handleParseRa}
+            >
+              {isParsingRa ? "Parsing…" : "Parse"}
+            </Button>
+          }
+        />
         <TextField
           label={
             game.hltb?.hltbId
               ? `HLTB id (current: ${game.hltb.hltbId})`
-              : "HLTB id (optional)"
+              : "HLTB id"
           }
           value={hltbId}
           disabled={isParsingHltb}
           onChange={setHltbId}
+          isFlush
+          action={
+            <Button
+              color={ButtonColor.DEFAULT}
+              disabled={isParsingHltb}
+              onClick={handleParseHltb}
+            >
+              {isParsingHltb ? "Parsing…" : "Parse"}
+            </Button>
+          }
         />
-        <Button
-          color={ButtonColor.DEFAULT}
-          disabled={isParsingHltb}
-          onClick={handleParseHltb}
-        >
-          {isParsingHltb
-            ? "Parsing…"
-            : hltbId.trim()
-              ? "Parse HLTB by id"
-              : "Parse from HLTB"}
-        </Button>
         <Button
           color={ButtonColor.RED}
           disabled={isDeleting}

@@ -21,7 +21,7 @@
 }
 
 .optional {
-  margin-left: var(--gap-x1);
+  margin-left: var(--padding-x1);
   font-size: 12px;
   color: var(--color-text-muted);
 }
@@ -30,11 +30,6 @@
   font-size: 12px;
   color: var(--color-text-muted);
   font-variant-numeric: tabular-nums;
-}
-
-.textarea {
-  background: var(--color-bg-primary);
-  border-radius: var(--radius-x2);
 }
 
 .hint {

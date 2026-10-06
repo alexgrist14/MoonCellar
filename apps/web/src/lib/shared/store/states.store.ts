@@ -9,6 +9,7 @@ type IState = {
   isRoyal?: boolean;
   isHistory?: boolean;
   isMobile?: boolean;
+  isSmall?: boolean;
 };
 
 type IAction = {
@@ -19,6 +20,7 @@ type IAction = {
   setRoyal: (royal: boolean) => void;
   setHistory: (isHistory: boolean) => void;
   setMobile: (isMobile: boolean | undefined) => void;
+  setSmall: (isSmall: boolean) => void;
 };
 
 export const useStatesStore = create<IState & IAction>()(
@@ -33,6 +35,7 @@ export const useStatesStore = create<IState & IAction>()(
       setRoyal: (isRoyal) => set({ isRoyal }),
       setHistory: (isHistory) => set({ isHistory }),
       setMobile: (isMobile) => set({ isMobile }),
+      setSmall: (isSmall) => set({ isSmall }),
       clear: () =>
         set({
           isFinished: true,

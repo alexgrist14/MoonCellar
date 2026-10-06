@@ -24,6 +24,8 @@ export const NotificationsBell: FC = () => {
       <Button
         ref={anchorRef}
         className={styles.trigger}
+        compact
+        isOnlyIcon
         color={ButtonColor.TRANSPARENT}
         tooltip="Notifications"
         aria-label={

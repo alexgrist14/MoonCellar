@@ -51,3 +51,10 @@ export const useConflictsQuery = (params: IGetConflictsParams) =>
     placeholderData: keepPreviousData,
     staleTime: LIST_STALE_MS,
   });
+
+export const useGameConflictsQuery = (gameId: string, enabled = true) =>
+  useQuery({
+    queryKey: conflictQueryKeys.byGame(gameId),
+    queryFn: () => adminConflictsApi.getByGame(gameId).then(({ data }) => data),
+    enabled: enabled && !!gameId,
+  });

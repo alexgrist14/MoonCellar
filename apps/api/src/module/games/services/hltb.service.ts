@@ -30,6 +30,7 @@ import {
   HLTB_CRON_MAX_GAMES,
   HLTB_DEFAULT_BATCH_SIZE,
   HLTB_DEFAULT_DELAY_MS,
+  HLTB_MAX_CONSECUTIVE_FAILURES,
   HLTB_QUERY_DELAY_MS,
   HLTB_STALE_DAYS,
   HLTB_SYNC_CRON,
@@ -71,7 +72,7 @@ export type HltbGameSyncResult = {
 };
 
 export type HltbSyncResult = {
-  status: "running" | "finished" | "skipped" | "empty_queue";
+  status: "running" | "finished" | "skipped" | "empty_queue" | "aborted";
   message: string;
   processed: number;
   updated: number;
@@ -81,6 +82,8 @@ export type HltbSyncResult = {
   targetTotal?: number;
   mode?: string;
 };
+
+export class HltbSearchFailedError extends Error {}
 
 @Injectable()
 export class HltbService implements OnModuleInit {
@@ -310,8 +313,10 @@ export class HltbService implements OnModuleInit {
     let lastId: unknown = null;
     let lastUpdatedAt: string | null = null;
     let batchNumber = 0;
+    let consecutiveFailures = 0;
+    let isAborted = false;
 
-    while (true) {
+    while (!isAborted) {
       if (maxToProcess != null && result.processed >= maxToProcess) {
         break;
       }
@@ -354,7 +359,8 @@ export class HltbService implements OnModuleInit {
 
         try {
           const ctx = this.buildMatchContext(game, platformNames);
-          const { hltb, ambiguous } = await this.fetchHltbForGame(ctx);
+          const { hltb, ambiguous, isEmpty } = await this.fetchHltbForGame(ctx);
+          consecutiveFailures = 0;
 
           if (!hltb || !hasHltbTimes(hltb)) {
             result.skipped += 1;
@@ -364,6 +370,13 @@ export class HltbService implements OnModuleInit {
             const update: Record<string, unknown> = {
               $set: { hltbNotFoundAt: now, updatedAt: now },
             };
+
+            if (game.hltb && isEmpty) {
+              this.logger.warn(
+                `${progress} kept HLTB for "${game.name}" — the search returned nothing`
+              );
+              continue;
+            }
 
             if (game.hltb) {
               update.$unset = { hltb: "" };
@@ -406,6 +419,18 @@ export class HltbService implements OnModuleInit {
         } catch (err) {
           result.failed += 1;
           this.logger.warn(err, `${progress} failed "${game.name}"`);
+
+          if (err instanceof HltbSearchFailedError) {
+            consecutiveFailures += 1;
+
+            if (consecutiveFailures >= HLTB_MAX_CONSECUTIVE_FAILURES) {
+              this.logger.error(
+                `HLTB sync aborted: ${consecutiveFailures} searches failed in a row`
+              );
+              isAborted = true;
+              break;
+            }
+          }
         }
 
         if (delayMs > 0) {
@@ -435,14 +460,14 @@ export class HltbService implements OnModuleInit {
       }
     }
 
-    const message = `HLTB sync finished in ${this.formatElapsed(startedAt)}: processed=${result.processed}, updated=${result.updated}, skipped=${result.skipped}, failed=${result.failed}`;
+    const message = `HLTB sync ${isAborted ? "aborted" : "finished"} in ${this.formatElapsed(startedAt)}: processed=${result.processed}, updated=${result.updated}, skipped=${result.skipped}, failed=${result.failed}`;
 
     this.logger.info(message);
 
     this.metrics.recordGames("hltb", "updated", result.updated);
 
     return {
-      status: "finished",
+      status: isAborted ? "aborted" : "finished",
       message,
       ...result,
       queuedTotal,
@@ -469,17 +494,24 @@ export class HltbService implements OnModuleInit {
     }
 
     if (target.hltbId) {
-      return this.applyHltbEntryById(game, target.hltbId);
+      const result = await this.applyHltbEntryById(game, target.hltbId);
+
+      await this.conflicts.removeForGame("hltb", game._id, {
+        externalIds: [String(game._id)],
+      });
+
+      return result;
     }
 
     const platformNames = await this.loadPlatformNames();
     const ctx = this.buildMatchContext(game, platformNames);
-    const { hltb, ambiguous } = await this.fetchHltbForGame(ctx);
+    const { hltb, ambiguous, isEmpty } = await this.fetchHltbForGame(ctx);
     const now = new Date().toISOString();
 
     if (!hltb || !hasHltbTimes(hltb)) {
       await this.recordAmbiguity(game, ambiguous);
 
+      const isKept = !!game.hltb && isEmpty;
       const update: Record<string, unknown> = {
         $set: { hltbNotFoundAt: now, updatedAt: now },
       };
@@ -488,11 +520,15 @@ export class HltbService implements OnModuleInit {
         update.$unset = { hltb: "" };
       }
 
-      await this.gamesModel.updateOne({ _id: game._id }, update);
+      if (!isKept) {
+        await this.gamesModel.updateOne({ _id: game._id }, update);
+      }
 
-      const message = game.hltb
-        ? `Cleared stale HLTB for "${game.name}" — no verified match`
-        : `No verified HLTB match for "${game.name}"`;
+      const message = isKept
+        ? `Kept HLTB for "${game.name}" — the search returned nothing`
+        : game.hltb
+          ? `Cleared stale HLTB for "${game.name}" — no verified match`
+          : `No verified HLTB match for "${game.name}"`;
 
       this.logger.warn(message);
 
@@ -776,7 +812,11 @@ export class HltbService implements OnModuleInit {
       // stop early; the exact-title fallback waits for all queries so a later
       // query cannot reveal a second exact title that should void it.
       if (match?.tier === "confirmed") {
-        return { hltb: mapHltbEntryToField(match.entry), ambiguous: [] };
+        return {
+          hltb: mapHltbEntryToField(match.entry),
+          ambiguous: [],
+          isEmpty: false,
+        };
       }
 
       if (i < queries.length - 1 && HLTB_QUERY_DELAY_MS > 0) {
@@ -785,17 +825,24 @@ export class HltbService implements OnModuleInit {
     }
 
     return bestMatch
-      ? { hltb: mapHltbEntryToField(bestMatch), ambiguous: [] }
+      ? { hltb: mapHltbEntryToField(bestMatch), ambiguous: [], isEmpty: false }
       : {
           hltb: null,
           ambiguous: findAmbiguousHltbEntries([...pool.values()], ctx),
+          isEmpty: pool.size === 0,
         };
   }
 
   private async search(query: string): Promise<HltbSearchEntry[]> {
     const response = await this.hltbClient.search(query);
 
-    if (!response.success || !response.data?.length) {
+    if (!response.success) {
+      throw new HltbSearchFailedError(
+        `HLTB search failed for "${query}": ${(response as { error?: string }).error ?? "unknown error"}`
+      );
+    }
+
+    if (!response.data?.length) {
       return [];
     }
 

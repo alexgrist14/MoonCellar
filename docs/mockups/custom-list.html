@@ -177,6 +177,8 @@
   --game-hero-counters-width: 360px;
   --game-rating-popover-width: 320px;
   --popover-width: 320px;
+  --achievements-icon-size: 44px;
+  --achievements-icon-size-sm: 48px;
   --popover-max-height: 320px;
   --popover-sheet-max-height: 85dvh;
   --textarea-handle-size: 20px;
@@ -194,6 +196,7 @@
   --expandable-fade-height: 32px;
   --date-picker-width: 300px;
   --date-picker-field-min-width: 140px;
+  --game-card-min-width: 160px;
   --playthrough-platform-min-width: 200px;
   --playthrough-time-min-width: 120px;
   --date-picker-cell-size: 34px;
@@ -265,6 +268,7 @@
   --search-modal-width: 900px;
   --search-tab-height: 36px;
   --reaction-active-color: var(--color-accent);
+  --tabs-muted-opacity: 0.55;
   --loader-block-min-height: 96px;
   --burger-animation-duration: 600ms;
 }
@@ -333,7 +337,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
     gap: var(--gap-x4) var(--gap-x6);
-    margin: var(--gap-x4) 0 0;
+    margin: var(--padding-x4) 0 0;
     padding-top: var(--padding-x5);
     border-top: 1px solid var(--color-border-primary);
   }
@@ -344,7 +348,7 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--color-gray);
-    margin-bottom: var(--gap-x1);
+    margin-bottom: var(--padding-x1);
   }
 
   .brief dd { margin: 0; font-size: 14px; color: var(--color-text-secondary); }
@@ -361,7 +365,7 @@
     align-items: baseline;
     gap: var(--gap-x3);
     flex-wrap: wrap;
-    margin-bottom: var(--gap-x2);
+    margin-bottom: var(--padding-x2);
   }
 
   .variant__letter {
@@ -380,7 +384,7 @@
   .variant__thesis {
     color: var(--color-text-muted);
     max-width: 70ch;
-    margin-bottom: var(--gap-x5);
+    margin-bottom: var(--padding-x5);
     display: grid;
     gap: var(--gap-x2);
   }
@@ -569,7 +573,7 @@
     color: var(--color-text-muted);
   }
 
-  .lhead__meta > span + span::before { content: "·"; margin-right: var(--gap-x2); color: var(--color-gray); }
+  .lhead__meta > span + span::before { content: "·"; margin-right: var(--padding-x2); color: var(--color-gray); }
   .lhead__actions { display: flex; gap: var(--gap-x1); flex-wrap: wrap; }
 
   .lhead__note {
@@ -1283,7 +1287,7 @@
     text-transform: uppercase;
     color: var(--color-gray);
     font-weight: 600;
-    margin-bottom: var(--gap-x2);
+    margin-bottom: var(--padding-x2);
   }
 
   .hints ul, .plan ul {

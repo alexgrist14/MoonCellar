@@ -111,9 +111,14 @@ export class VndbController {
       "Re-fetch one VNDB-linked game from VNDB by MoonCellar id and link its characters",
   })
   @ApiQuery({ name: "gameId", required: true })
+  @ApiQuery({
+    name: "vnId",
+    required: false,
+    description: "VNDB id to link before parsing, such as v17",
+  })
   @ApiOkResponse({ type: VndbParseResponseDto })
-  parseGame(@Query("gameId") gameId: string) {
-    return this.vndbService.parseGame(gameId);
+  parseGame(@Query("gameId") gameId: string, @Query("vnId") vnId?: string) {
+    return this.vndbService.parseGame(gameId, vnId);
   }
 
   @UseGuards(RolesGuard)

@@ -236,7 +236,6 @@ export const CommentItem: FC<ICommentItemProps> = ({
               <Spoiler isActive={comment.isSpoiler}>
                 <RichText
                   content={comment.body}
-                  className={styles.entry__body}
                 />
               </Spoiler>
             )}
@@ -328,7 +327,7 @@ export const CommentItem: FC<ICommentItemProps> = ({
                     type="button"
                     color={ButtonColor.GHOST}
                     compact
-                    className={styles.threadAction}
+                    isAccentText
                     onClick={() => setIsRepliesOpen(true)}
                   >
                     <SvgComment size="16" style={{ color: "inherit" }} />

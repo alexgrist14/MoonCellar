@@ -9,7 +9,7 @@ $statuses: wishlist, backlog, playing, played, completed, mastered, dropped;
   aspect-ratio: var(--cover-ratio);
   margin-inline: auto;
   flex: 1;
-  min-width: 140px;
+  min-width: var(--game-card-min-width);
   position: relative;
   max-height: 320px;
   max-width: calc(320px * 0.75);
@@ -92,7 +92,6 @@ $statuses: wishlist, backlog, playing, played, completed, mastered, dropped;
   }
 
   &__placeholder {
-    border-radius: var(--radius-x2);
     aspect-ratio: var(--cover-ratio);
     height: auto !important;
   }
@@ -252,8 +251,13 @@ $statuses: wishlist, backlog, playing, played, completed, mastered, dropped;
 
   div &__more {
     padding: var(--padding-x1);
+    color: inherit;
     background-color: var(--color-bg-primary-tint);
     transition: 0.3s;
+
+    &:hover {
+      background-color: var(--color-bg-hover);
+    }
 
     @include gameGlowOutline;
   }

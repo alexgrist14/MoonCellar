@@ -170,3 +170,24 @@ export const WithMobileMenu: Story = {
     ],
   },
 };
+
+export const Fit: Story = {
+  args: {
+    isFit: true,
+    contents: [
+      { tabName: "Completed" },
+      { tabName: "Playing" },
+      { tabName: "Dropped" },
+    ],
+  },
+};
+
+export const WithMutedTab: Story = {
+  args: {
+    contents: [
+      { tabName: "Games", count: 12 },
+      { tabName: "Lists", count: 0, isMuted: true },
+      { tabName: "Users", count: 3 },
+    ],
+  },
+};

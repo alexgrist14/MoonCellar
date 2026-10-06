@@ -2,7 +2,7 @@
 
 A controlled floating panel anchored to an element. On desktop it is a blurred `Box` positioned
 below (or, without room, above) the anchor and clamped to the viewport; on mobile
-(`useStatesStore().isMobile`) the same props render `PopoverSheet`, a bottom sheet with a
+(`useStatesStore().isSmall`, viewport ≤ 500px — `$screenSm`) the same props render `PopoverSheet`, a bottom sheet with a
 backdrop, a drag handle and, when `title` is set, a heading. Both portal into `#dropdown-connector`.
 
 ## When to use
@@ -36,7 +36,7 @@ backdrop, a drag handle and, when `title` is set, a heading. Both portal into `#
 | `reservedHeight`   | `number`                         | `0`                                           | Height in px the below/above choice assumes, if larger than the panel.   |
 
 `PopoverSheet` takes the same props minus `align`/`width`, plus `sheetRef`; import it from
-`./PopoverSheet` only to force the sheet regardless of `isMobile`, as `Dropdown` does.
+`./PopoverSheet` only to force the sheet regardless of `isSmall`, as `Dropdown` does.
 
 ## Usage
 
@@ -79,9 +79,11 @@ const [isOpen, setIsOpen] = useState(false);
   `bottom`, the browser grows it upward in the same layout pass.
 - Toggle from the anchor's `onClick` and pass the same element as `anchorRef`; the anchor is
   excluded from outside clicks, so toggling does not close and immediately reopen it.
-- The root calls `preventDefault` on every click inside it, because a portal still bubbles React
-  events to the card `Link` it was opened from. A native `<a>` or checkbox inside stops working
-  unless its own wrapper stops propagation, as `GameButtons` does.
+- The root stops propagation of every click inside it, because a portal still bubbles React
+  events to the component it was opened from — a card `Link` would navigate to the game. It must
+  never call `preventDefault` instead: that also cancels the native default of everything inside,
+  so an `<a target="_blank">` in the panel (the RetroAchievements rows) did nothing on click and a
+  checkbox could not be ticked.
 - It needs `#dropdown-connector` (mounted after `ModalsConnector` in `Layout`, so it stays above
   modals); without it the panel falls back to `document.body`.
 - Clicks inside `#modals` do not close a popover opened outside a modal, so a confirm modal

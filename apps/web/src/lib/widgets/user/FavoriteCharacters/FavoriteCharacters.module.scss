@@ -5,13 +5,6 @@
   min-width: 0;
 }
 
-.edit {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--gap-x2);
-  color: var(--color-text-muted);
-}
-
 .grid {
   display: grid;
   grid-template-columns: repeat(

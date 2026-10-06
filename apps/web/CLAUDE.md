@@ -69,6 +69,11 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
 
 - Only use the global CSS variables defined in `:root` (see `src/lib/app/styles/vars/`) for colors, borders, padding, radius, gap, etc. — never hardcode raw values (hex colors, px, etc.) for anything already covered by a `:root` variable.
 - If a new value is needed that isn't covered by an existing `:root` variable, add it as a new CSS variable in `:root` (in the relevant file under `src/lib/app/styles/vars/`) instead of hardcoding it inline.
+- **`--gap-x*` is only for the `gap` property; margins take `--padding-x*`.** The two scales hold
+  the same values today, but they are separate knobs: `gap` spaces siblings from the parent, while a
+  margin is space an element keeps around itself, like padding. A margin written in gap tokens
+  changes the day the gap scale is retuned for flex and grid layouts. Prefer `gap` on the parent
+  over a margin on the child wherever the layout allows it.
 - **A CSS custom property that derives from other custom properties must be declared on the same element whose values it reads.** `var()` inside a custom property is substituted where the property is *declared*, not where it is used, so a value computed in `:root` freezes the root defaults and ignores any modifier class further down. `--page-height-available` is declared on `.container` for this reason — declaring it in `:root` silently ignored `.container_bottomBar`.
 - **A button's inline padding is always twice its block padding** — the shared `Button` uses
   `var(--padding-x2) var(--padding-x4)` and `compact` uses `x05`/`x1`, and any override keeps
@@ -88,6 +93,16 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   field and search, `RichEditor`'s body. Equal padding pushes the caret and placeholder against
   the rounded border, and a larger block padding makes a field read as a card rather than a
   control. A field with a leading icon may raise only the side the icon sits on.
+- **A consumer never repaints a shared `ui` component through `className`; a missing look becomes a
+  prop of the component.** A parent stylesheet may place it — margin, grid placement, width or
+  flex sizing, `align-self` — but colour, radius, padding, font, gap and opacity come from the
+  component (`Button`'s `compact`, `isAccentText`, `--button-active-color`; `Tabs`' `isFit` and
+  per-tab `isMuted`; `RichText`'s `tone`; `Badge`'s `isStruck`; `Avatar`'s `shape`; `Input`'s
+  `icon`). A doubled selector such as `.x.x` or `& &__x` is the tell: it exists only to out-rank
+  the component's own rule, so it breaks silently the next time that rule changes, and the same
+  control ends up looking different on every screen. When a consumer-owned look is really the
+  consumer's own element (`GameCard`'s rail chips), render a native element from its module
+  instead of a restyled `Button`.
 - For text colour use the semantic tokens, never a raw `--color-neutral-*`: `--color-text-primary` (headings and main copy), `--color-text-secondary` (body text, intro paragraphs), `--color-text-muted` (captions, notes, metadata, breadcrumbs). Picking neutrals by hand is how text ends up unreadable on a `Box` over `BGImage` — the muted step is deliberately the lightest one that still reads as secondary.
 
 ## Rich text
@@ -196,7 +211,7 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   other. Do not override either from a consumer.
 - **Derive a radius from the parent only for an element pressed against the parent's rounded
   edge** — closer than the parent's padding, such as a full-bleed card in a `Box`, the segments of
-  `Tabs`, the "Advanced" button inside the search input. Its corner is read together with the
+  `Tabs` (done inside `Tabs` itself, never by its consumer). Its corner is read together with the
   parent's, so it takes the parent's radius minus the gap, rounded to the `--radius-x*` scale
   (`Box` is `--radius-x5`). Decorative radii (covers, artwork) are a style choice and exempt.
 
@@ -543,7 +558,7 @@ break silently when ignored:
   `ConfirmModal` disables its buttons from its own `useState` while it awaits `onConfirm`, which is
   why that callback may return a promise.
 
-- Before building a new modal that shows a title plus a list of "row" blocks (an icon/content on one side, text on the other — e.g. `AchievementsModal`, `GamePlaysInfo`), ask the user whether the shared `RowsModal` component (`src/lib/shared/ui/RowsModal`) should be used instead of a bespoke layout. Do not silently assume either way.
+- Before building a new modal that shows a title plus a list of "row" blocks (an icon/content on one side, text on the other — e.g. `GamePlaysInfo`), ask the user whether the shared `RowsModal` component (`src/lib/shared/ui/RowsModal`) should be used instead of a bespoke layout. Do not silently assume either way.
 
 ## Adult content
 

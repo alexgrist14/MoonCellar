@@ -1,5 +1,6 @@
+import type { CSSProperties } from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { SvgClose, SvgThumb } from "../svg";
+import { SvgClose, SvgComment, SvgThumb } from "../svg";
 import { Button, ButtonColor } from "./Button";
 
 const meta = {
@@ -43,6 +44,31 @@ export const GhostActive: Story = {
     color: ButtonColor.GHOST,
     active: true,
     children: [<SvgThumb key="icon" size="16" />, "12"],
+  },
+};
+
+export const GhostAccentText: Story = {
+  args: {
+    color: ButtonColor.GHOST,
+    compact: true,
+    isAccentText: true,
+    children: [<SvgComment key="icon" size="16" />, "3 replies"],
+  },
+};
+
+export const SegmentedActiveColor: Story = {
+  args: {
+    color: ButtonColor.SEGMENTED,
+    active: true,
+    style: { "--button-active-color": "var(--game-mastered-color)" } as CSSProperties,
+    children: "★ Mastered",
+  },
+};
+
+export const IconAndLabel: Story = {
+  args: {
+    color: ButtonColor.ACCENT,
+    children: [<SvgThumb key="icon" size="16" />, "Like"],
   },
 };
 

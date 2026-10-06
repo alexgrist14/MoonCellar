@@ -3,6 +3,10 @@
 
   color: var(--color-text-secondary);
 
+  &_primary {
+    color: var(--color-text-primary);
+  }
+
   strong,
   b {
     color: var(--color-text-primary);

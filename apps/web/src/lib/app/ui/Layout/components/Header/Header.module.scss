@@ -24,16 +24,6 @@
     gap: var(--gap-x2);
   }
 
-  &__buttons {
-    & button,
-    & a {
-      @include flexCenter;
-      gap: var(--gap-x1);
-      padding: var(--padding-x05) var(--padding-x1);
-      border-radius: var(--radius-button);
-    }
-  }
-
   .nav_desktop {
     display: flex;
     align-items: center;
@@ -55,14 +45,6 @@
 
   .burger {
     position: relative;
-
-    &__toggle {
-      @include flexCenter;
-      aspect-ratio: 1;
-      height: 32px;
-      padding: var(--padding-x05);
-      border-radius: var(--radius-x2);
-    }
 
     &__dropdown {
       position: absolute;
@@ -87,8 +69,6 @@
       & a {
         width: 100%;
         justify-content: flex-start;
-        gap: var(--gap-x2);
-        border-radius: var(--radius-x4);
       }
     }
   }

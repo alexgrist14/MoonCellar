@@ -144,7 +144,7 @@ export const PopoverSheet: FC<IPopoverSheetProps> = ({
           transform: isClosing ? "translateY(100%)" : `translateY(${offset}px)`,
         }}
         onTransitionEnd={() => isClosing && onClose()}
-        onClick={(event) => event.preventDefault()}
+        onClick={(event) => event.stopPropagation()}
       >
         <div
           className={styles.sheet__handle}

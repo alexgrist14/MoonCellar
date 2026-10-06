@@ -30,6 +30,8 @@ export class Conflict {
   externalId: string;
   @Prop()
   externalName: string;
+  @Prop({ type: Object, default: null })
+  externalData: Record<string, unknown> | null;
   @Prop({ type: String })
   reason: IMatchReason;
   @Prop({ type: [Object] })

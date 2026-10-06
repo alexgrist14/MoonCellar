@@ -140,25 +140,70 @@ type HltbEntryEvaluation = {
   yearConflict: boolean;
 };
 
+const ROMAN_NUMERALS: Record<string, string> = {
+  ii: "2",
+  iii: "3",
+  iv: "4",
+  vi: "6",
+  vii: "7",
+  viii: "8",
+  ix: "9",
+  xi: "11",
+  xii: "12",
+  xiii: "13",
+  xiv: "14",
+  xv: "15",
+  xvi: "16",
+  xvii: "17",
+  xviii: "18",
+  xix: "19",
+  xx: "20",
+};
+
+export const normalizeHltbTitle = (value: string): string =>
+  normalizeTitle(value)
+    .split(" ")
+    .map((token) => ROMAN_NUMERALS[token] ?? token)
+    .join(" ");
+
+const entryTitles = (entry: HltbSearchEntry): string[] => [
+  entry.name,
+  ...(entry.alias ?? "")
+    .split(",")
+    .map((alias) => alias.trim())
+    .filter(Boolean),
+];
+
+const evaluateTitle = (title: string, name: string) => {
+  const entryTitle = normalizeHltbTitle(title);
+  const ctxTitle = normalizeHltbTitle(name);
+  const entryCore = normalizeCoreTitle(entryTitle);
+  const ctxCore = normalizeCoreTitle(ctxTitle);
+  const titleExact = entryTitle === ctxTitle;
+  const coreExact = entryCore === ctxCore;
+  const titleScore = Math.max(
+    titleSimilarity(entryTitle, ctxTitle),
+    jaccard(tokenSetFrom(entryCore), tokenSetFrom(ctxCore))
+  );
+
+  return {
+    titleExact,
+    titleScore,
+    strongTitle:
+      titleExact || coreExact || titleScore >= HLTB_STRONG_TITLE_SIMILARITY,
+  };
+};
+
 const evaluateEntry = (
   entry: HltbSearchEntry,
   ctx: HltbMatchContext
 ): HltbEntryEvaluation => {
-  const titleExact = normalizeTitle(entry.name) === normalizeTitle(ctx.name);
-
-  const entryCore = normalizeCoreTitle(entry.name);
-  const ctxCore = normalizeCoreTitle(ctx.name);
-  const coreExact = entryCore === ctxCore;
-
-  // Score against both the full and edition-stripped titles, keeping the best,
-  // so a re-release suffix ("20th Anniversary Edition") doesn't sink an
-  // otherwise exact match.
-  const titleScore = Math.max(
-    titleSimilarity(entry.name, ctx.name),
-    jaccard(tokenSetFrom(entryCore), tokenSetFrom(ctxCore))
+  const titles = entryTitles(entry).map((title) =>
+    evaluateTitle(title, ctx.name)
   );
-  const strongTitle =
-    titleExact || coreExact || titleScore >= HLTB_STRONG_TITLE_SIMILARITY;
+  const titleExact = titles.some((title) => title.titleExact);
+  const strongTitle = titles.some((title) => title.strongTitle);
+  const titleScore = Math.max(...titles.map((title) => title.titleScore));
 
   const entryPlatformKeys = (entry.platforms ?? []).map(canonicalPlatform);
   const platformMatch =
@@ -170,9 +215,6 @@ const evaluateEntry = (
     ctx.years.size > 0 &&
     [...ctx.years].some((year) => Math.abs(year - entry.releaseYear!) <= 1);
 
-  // Both sides know a year, yet none of ours lines up with the entry's. For
-  // same-title games (e.g. two "Mixtape" releases years apart) this is the
-  // signal that the entry belongs to a *different* game, not to ours.
   const yearConflict =
     entry.releaseYear != null && ctx.years.size > 0 && !yearMatch;
 
@@ -258,16 +300,13 @@ export const findAmbiguousHltbEntries = (
   results: HltbSearchEntry[],
   ctx: HltbMatchContext,
   limit = HLTB_CONFLICT_ENTRIES_LIMIT
-): HltbSearchEntry[] => {
-  const isReRelease = normalizeTitle(ctx.name) !== normalizeCoreTitle(ctx.name);
-
-  return results
+): HltbSearchEntry[] =>
+  results
     .map((entry) => evaluateEntry(entry, ctx))
-    .filter((item) => item.strongTitle && !(item.yearConflict && !isReRelease))
+    .filter((item) => item.strongTitle)
     .sort(rankEvaluations)
     .slice(0, limit)
     .map(({ entry }) => entry);
-};
 
 /** Thin wrapper kept for callers/tests that only need the entry. */
 export const pickBestHltbMatch = (

@@ -1,10 +1,5 @@
 .trigger {
-  @include flexCenter;
   position: relative;
-  aspect-ratio: 1;
-  height: 32px;
-  padding: var(--padding-x05);
-  border-radius: var(--radius-x2);
 }
 
 .count {

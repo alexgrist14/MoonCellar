@@ -7,7 +7,6 @@ import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { SvgHeart, SvgHeartFilled } from "@/src/lib/shared/ui/svg";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
-import styles from "./FavoriteCharacterButton.module.scss";
 
 const ICON_STYLE = { color: "var(--favorite-color)" };
 
@@ -40,7 +39,6 @@ export const FavoriteCharacterButton: FC<{
 
   return (
     <Button
-      className={styles.button}
       color={ButtonColor.DEFAULT}
       disabled={!userId || isPending}
       aria-pressed={isFavorite}

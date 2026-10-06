@@ -8,7 +8,6 @@ import { useUserStore } from "@/src/lib/shared/store/user.store";
 import { GameCardInfo } from "@/src/lib/widgets/game/GameCardInfo";
 import { Tooltip } from "@/src/lib/shared/ui/Tooltip";
 import { IGameResponse } from "@mooncellar/schemas";
-import { Button } from "@/src/lib/shared/ui/Button";
 import {
   SvgAchievement,
   SvgBookmark,
@@ -30,7 +29,6 @@ import { useHideAdult } from "@/src/lib/shared/hooks/useHideAdult";
 import { isAdultGame } from "@/src/lib/shared/utils/adult.utils";
 import { GameControls } from "@/src/lib/widgets/game/GameControls";
 import { modal } from "@/src/lib/shared/ui/Modal";
-import { AchievementsModal } from "@/src/lib/shared/ui/AchievementsModal";
 import {
   PLAYTHROUGH_MODAL_ID,
   PlaythroughModal,
@@ -39,6 +37,7 @@ import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { playthroughPriorityOrder } from "@/src/lib/shared/constants/user.const";
 import { getAverageRating } from "@/src/lib/shared/utils/rating.utils";
 import { GameRatingPopover } from "@/src/lib/features/game/ui/GameRatingPopover";
+import { GameAchievementsPopover } from "@/src/lib/features/game/ui/GameAchievementsPopover";
 import { useRoyalGames } from "@/src/lib/entities/royal/model/useRoyalGames";
 import { Checkbox } from "@/src/lib/shared/ui/Checkbox";
 import { EXPAND_KEEP_OPEN_ATTRIBUTE } from "@/src/lib/shared/ui/ExpandMenu";
@@ -81,8 +80,10 @@ export const GameCard = memo(
   }: IGameCardProps) => {
     const cardRef = useRef<HTMLDivElement>(null);
     const ratingRef = useRef<HTMLDivElement>(null);
+    const achievementsRef = useRef<HTMLDivElement>(null);
 
     const [isRatingOpen, setIsRatingOpen] = useState(false);
+    const [isAchievementsOpen, setIsAchievementsOpen] = useState(false);
 
     const hideMedia = useHideAdult() && isAdultGame(game);
 
@@ -307,16 +308,16 @@ export const GameCard = memo(
                 >
                   <div
                     role="button"
+                    ref={achievementsRef}
                     aria-label="RetroAchievements"
+                    aria-expanded={isAchievementsOpen}
                     className={styles.card__achievement}
                     data-prevent-progress
                     onClick={(event) => {
                       event.preventDefault();
                       event.stopPropagation();
 
-                      modal.open(<AchievementsModal game={game} />, {
-                        id: "game-achievements",
-                      });
+                      setIsAchievementsOpen((current) => !current);
                     }}
                   >
                     <SvgAchievement
@@ -351,24 +352,26 @@ export const GameCard = memo(
                 styles.card__rail_topRight
               )}
             >
-              <Button
-                color="transparent"
-                tooltip={isActive ? "Close" : "Game info"}
-                isOnlyIcon
-                className={classNames(
-                  styles.card__more,
-                  isActive && styles[`card__more_${status}`]
-                )}
-                data-prevent-progress
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
+              <Tooltip content={isActive ? "Close" : "Game info"}>
+                <button
+                  type="button"
+                  aria-label={isActive ? "Close" : "Game info"}
+                  aria-expanded={isActive}
+                  className={classNames(
+                    styles.card__more,
+                    isActive && styles[`card__more_${status}`]
+                  )}
+                  data-prevent-progress
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
 
-                  setIsActive(!isActive);
-                }}
-              >
-                {isActive ? <SvgClose size="16" /> : <SvgMore />}
-              </Button>
+                    setIsActive(!isActive);
+                  }}
+                >
+                  {isActive ? <SvgClose size="16" /> : <SvgMore />}
+                </button>
+              </Tooltip>
             </div>
           )}
           {isLoading && <Loader key={game._id + "_loader"} />}
@@ -397,6 +400,14 @@ export const GameCard = memo(
           isOpen={isRatingOpen}
           onClose={() => setIsRatingOpen(false)}
         />
+        {!!game.retroachievements?.length && (
+          <GameAchievementsPopover
+            game={game}
+            anchorRef={achievementsRef}
+            isOpen={isAchievementsOpen}
+            onClose={() => setIsAchievementsOpen(false)}
+          />
+        )}
         {isInfoDisabled && (
           <GameControls game={game} className={styles.card__controls} />
         )}

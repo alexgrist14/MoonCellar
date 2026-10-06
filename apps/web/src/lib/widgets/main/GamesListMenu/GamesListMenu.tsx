@@ -92,7 +92,6 @@ export const GamesListMenu: FC<IGamesListMenuProps> = ({ games }) => {
 
               <p className={styles.menu__label}>Add the selection to</p>
               <Button
-                className={styles.menu__action}
                 disabled={!selected.length}
                 onClick={() => {
                   addRoyalGames(selected);
@@ -106,7 +105,6 @@ export const GamesListMenu: FC<IGamesListMenuProps> = ({ games }) => {
                 Royal games
               </Button>
               <Button
-                className={styles.menu__action}
                 color={ButtonColor.ACCENT}
                 disabled={!selected.length || !isAuth || !profile?._id}
                 tooltip={!isAuth ? "Sign in to use custom lists" : undefined}

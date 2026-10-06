@@ -24,7 +24,7 @@ import {
   useUploadGameImageMutation,
 } from "@/src/lib/entities/game/api/game.mutations";
 import { usePlatformsQuery } from "@/src/lib/entities/platform/api/platform.queries";
-import { hltbApi, igdbApi, vndbApi } from "@/src/lib/shared/api";
+import { hltbApi, igdbApi, raApi, vndbApi } from "@/src/lib/shared/api";
 import { revalidateGamePage } from "@/src/lib/entities/game/api/game.actions";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
@@ -225,7 +225,7 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
     submission: number;
   } | null>(null);
   const [parsingSource, setParsingSource] = useState<
-    "igdb" | "vndb" | "hltb" | null
+    "igdb" | "vndb" | "hltb" | "ra" | null
   >(null);
 
   const {
@@ -277,6 +277,9 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
 
   const { errors, isSubmitting } = formState;
   const hltbId = watch("hltb.hltbId");
+  const vnIdValue = (watch("vndb.vnId") as string | undefined)?.trim();
+  const raEntries = watch("retroachievements") as
+    { gameId?: number | string }[] | undefined;
   const [imagePicks, setImagePicks] = useState<
     Record<IGameImageKind, string[]>
   >({ cover: [], screenshots: [], artworks: [] });
@@ -517,6 +520,15 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
 
   const originalIgdbId = (original.igdb as IGameResponse["igdb"])?.gameId;
   const originalVnId = (original.vndb as IGameResponse["vndb"])?.vnId;
+  const originalRaIds = new Set(
+    (
+      (original.retroachievements as IGameResponse["retroachievements"]) ?? []
+    ).map(({ gameId }) => String(gameId))
+  );
+  const raIds = (raEntries ?? [])
+    .map(({ gameId }) => String(gameId ?? "").trim())
+    .filter(Boolean);
+  const newRaIds = raIds.filter((id) => !originalRaIds.has(id));
   const isDirty = formState.isDirty;
 
   const reloadGame = async () => {
@@ -529,7 +541,7 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
   };
 
   const runParse = async (
-    source: "igdb" | "vndb" | "hltb",
+    source: "igdb" | "vndb" | "hltb" | "ra",
     parse: () => Promise<{ slug?: string; isFailed?: boolean; message: string }>
   ) => {
     if (!gameId || parsingSource) return;
@@ -572,7 +584,10 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
 
   const handleParseVndb = () =>
     runParse("vndb", async () => {
-      const { data } = await vndbApi.parseGame(gameId!);
+      const { data } = await vndbApi.parseGame(
+        gameId!,
+        vnIdValue && vnIdValue !== originalVnId ? vnIdValue : undefined
+      );
 
       return {
         slug: data.slug,
@@ -592,6 +607,27 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
         slug: data.slug,
         isFailed: data.status === "not_found",
         message: data.message,
+      };
+    });
+
+  const handleParseRa = () =>
+    runParse("ra", async () => {
+      if (!newRaIds.length) {
+        const { data } = await raApi.parseGame({ gameId: gameId! });
+
+        return { slug: data.slug, message: data.message };
+      }
+
+      let slug: string | undefined;
+
+      for (const raId of newRaIds) {
+        const { data } = await raApi.parseGame({ gameId: gameId!, raId });
+        slug = data.slug;
+      }
+
+      return {
+        slug,
+        message: `Linked RetroAchievements ${newRaIds.join(", ")}`,
       };
     });
 
@@ -1082,17 +1118,41 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
           {!isCreate && (
             <Button
               color={ButtonColor.DEFAULT}
-              disabled={!!parsingSource || !originalVnId}
+              disabled={!!parsingSource || !vnIdValue}
               tooltip={
-                !originalVnId
-                  ? "Save a VNDB id first"
+                !vnIdValue
+                  ? "Enter a VNDB id first"
                   : isDirty
                     ? "Unsaved changes will be replaced by the parsed data"
                     : undefined
               }
               onClick={handleParseVndb}
             >
-              {parsingSource === "vndb" ? "Parsing…" : "Parse from VNDB"}
+              {parsingSource === "vndb"
+                ? "Parsing…"
+                : vnIdValue && vnIdValue !== originalVnId
+                  ? "Parse VNDB by id"
+                  : "Parse from VNDB"}
+            </Button>
+          )}
+          {!isCreate && (
+            <Button
+              color={ButtonColor.DEFAULT}
+              disabled={!!parsingSource || !raIds.length}
+              tooltip={
+                !raIds.length
+                  ? "Add a RetroAchievements id first"
+                  : isDirty
+                    ? "Unsaved changes will be replaced by the parsed data"
+                    : undefined
+              }
+              onClick={handleParseRa}
+            >
+              {parsingSource === "ra"
+                ? "Parsing…"
+                : newRaIds.length
+                  ? "Link RetroAchievements by id"
+                  : "Refresh RetroAchievements"}
             </Button>
           )}
           {!isCreate && (

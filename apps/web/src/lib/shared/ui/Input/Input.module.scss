@@ -19,7 +19,8 @@
     border-color: var(--color-accent);
   }
 
-  &_withHelp {
+  &_withHelp,
+  &_withIcon {
     display: flex;
     align-items: center;
     gap: var(--gap-x2);
@@ -45,6 +46,13 @@
       color: var(--color-gray);
     }
   }
+}
+
+.icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  pointer-events: none;
 }
 
 .help {
