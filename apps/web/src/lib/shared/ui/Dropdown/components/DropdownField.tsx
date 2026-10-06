@@ -1,4 +1,4 @@
-import { CSSProperties, FC } from "react";
+import { CSSProperties, FC, ReactNode } from "react";
 import cl from "classnames";
 import styles from "../Dropdown.module.scss";
 
@@ -14,6 +14,7 @@ interface IDropdownFieldProps {
   isFieldDisabled: boolean;
   isWithInput?: boolean;
   value?: string;
+  valueIcon?: ReactNode;
   placeholder?: string;
   defaultPlaceholder: string;
   onClick: () => void;
@@ -33,6 +34,7 @@ export const DropdownField: FC<IDropdownFieldProps> = ({
   isFieldDisabled,
   isWithInput,
   value,
+  valueIcon,
   placeholder,
   defaultPlaceholder,
   onClick,
@@ -65,6 +67,9 @@ export const DropdownField: FC<IDropdownFieldProps> = ({
                 : "calc(100% - 20px)",
           }}
         >
+          {!!valueIcon && (
+            <span className={styles.dropdown__icon}>{valueIcon}</span>
+          )}
           {value || placeholder || defaultPlaceholder}
         </p>
       ) : (

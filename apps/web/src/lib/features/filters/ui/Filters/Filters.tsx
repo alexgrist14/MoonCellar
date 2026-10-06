@@ -1,4 +1,5 @@
 import { FC, Fragment, useEffect, useState } from "react";
+import { ACHIEVEMENTS_FILTER_OPTIONS } from "../../model/achievements-filter";
 import styles from "./Filters.module.scss";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
@@ -15,6 +16,7 @@ import {
   SortControl,
 } from "@/src/lib/shared/ui/SortControl";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
+import { SvgRetroAchievements, SvgSteam } from "@/src/lib/shared/ui/svg";
 import { ITabContent } from "@/src/lib/shared/types/tabs.type";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { Loader } from "@/src/lib/shared/ui/Loader";
@@ -456,30 +458,36 @@ export const Filters: FC<{
               disabled={!!isLoading}
             />
           </div>
+          <FilterGroup
+            title="Achievements"
+            className={styles.filters__achievements}
+          >
+            <Dropdown
+              overflowRootId="filters"
+              isDisabled={isLoading}
+              list={ACHIEVEMENTS_FILTER_OPTIONS.map(({ label }) => label)}
+              iconNodes={ACHIEVEMENTS_FILTER_OPTIONS.map(({ value }) =>
+                value === "steam" ? (
+                  <SvgSteam key="steam" size="16" />
+                ) : value === "ra" ? (
+                  <SvgRetroAchievements key="ra" size="16" />
+                ) : null
+              )}
+              hints={ACHIEVEMENTS_FILTER_OPTIONS.map(({ hint }) => hint)}
+              overwriteValue={
+                ACHIEVEMENTS_FILTER_OPTIONS.find(
+                  ({ value }) => value === filters?.achievements
+                )?.label
+              }
+              getIndex={(index) =>
+                setFilters((filters) => ({
+                  ...filters,
+                  achievements: ACHIEVEMENTS_FILTER_OPTIONS[index]?.value,
+                }))
+              }
+            />
+          </FilterGroup>
           <div className={styles.filters__toggles}>
-            <ToggleSwitch
-              label="RetroAchievements"
-              labelPosition="end"
-              checked={!!filters?.isOnlyWithAchievements}
-              onChange={(isOnlyWithAchievements) =>
-                setFilters((filters) => ({
-                  ...filters,
-                  isOnlyWithAchievements: isOnlyWithAchievements || undefined,
-                }))
-              }
-            />
-            <ToggleSwitch
-              label="Steam achievements"
-              labelPosition="end"
-              checked={!!filters?.isOnlyWithSteamAchievements}
-              onChange={(isOnlyWithSteamAchievements) =>
-                setFilters((filters) => ({
-                  ...filters,
-                  isOnlyWithSteamAchievements:
-                    isOnlyWithSteamAchievements || undefined,
-                }))
-              }
-            />
             <ToggleSwitch
               label="Steam games"
               labelPosition="end"

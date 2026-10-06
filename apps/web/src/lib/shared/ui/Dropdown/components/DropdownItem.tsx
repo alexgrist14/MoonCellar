@@ -1,4 +1,4 @@
-import { CSSProperties, memo } from "react";
+import { CSSProperties, memo, ReactNode } from "react";
 import Image from "next/image";
 import styles from "../Dropdown.module.scss";
 import { Checkbox } from "../../Checkbox";
@@ -11,6 +11,10 @@ export interface IDropdownItemProps {
   isMulti?: boolean;
   isWithExclude?: boolean;
   icon?: string;
+  iconNode?: ReactNode;
+  hint?: string;
+  isIconSlot?: boolean;
+  isCheckSlot?: boolean;
   onClick: () => void;
   style?: CSSProperties;
 }
@@ -23,6 +27,10 @@ export const DropdownItem = memo(
     isMulti,
     isWithExclude,
     icon,
+    iconNode,
+    hint,
+    isIconSlot,
+    isCheckSlot,
     onClick,
     style,
   }: IDropdownItemProps) => {
@@ -31,7 +39,7 @@ export const DropdownItem = memo(
         className={styles.dropdown__item}
         onClick={onClick}
         style={{
-          gridTemplateColumns: `${!!icon ? "40px " : ""}1fr auto`,
+          gridTemplateColumns: `${!!icon ? "40px " : isIconSlot ? "auto " : ""}1fr ${hint ? "auto " : ""}auto`,
           ...style,
         }}
       >
@@ -40,9 +48,17 @@ export const DropdownItem = memo(
             <Image alt="" src={icon} width={200} height={90} priority />
           </div>
         )}
+        {!icon && isIconSlot && (
+          <span className={styles.dropdown__icon}>{iconNode}</span>
+        )}
         <span>{item.value}</span>
-        {(isMulti || isChecked) && (
-          <div className={styles.dropdown__check}>
+        {!!hint && <span className={styles.dropdown__hint}>{hint}</span>}
+        {(isMulti || isChecked || isCheckSlot) && (
+          <div
+            className={styles.dropdown__check}
+            style={isMulti || isChecked ? undefined : { visibility: "hidden" }}
+            aria-hidden={isMulti || isChecked ? undefined : true}
+          >
             <Checkbox
               colorTheme={
                 isWithExclude ? (isExcluded ? "off" : "on") : "accent"

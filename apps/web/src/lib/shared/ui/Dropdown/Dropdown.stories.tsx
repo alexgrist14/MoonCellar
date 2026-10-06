@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Dropdown } from "./Dropdown";
+import { SvgRetroAchievements, SvgSteam } from "../svg";
 
 const platforms = [
   "PC (Microsoft Windows)",
@@ -137,4 +138,26 @@ export const ThroughPortal: Story = {
       />
     </div>
   ),
+};
+
+export const WithIconsAndHints: Story = {
+  args: {
+    title: "Achievements",
+    list: ["All games", "Steam", "RetroAchievements", "Both", "Either"],
+    iconNodes: [
+      null,
+      <SvgSteam key="steam" size="16" />,
+      <SvgRetroAchievements key="ra" size="16" />,
+      null,
+      null,
+    ],
+    hints: [
+      "",
+      "Steam achievements",
+      "At least one RA set",
+      "Steam and RA",
+      "Steam or RA",
+    ],
+    initialValue: "Steam",
+  },
 };

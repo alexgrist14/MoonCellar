@@ -1,6 +1,7 @@
 "use client";
 
 import { FC, ReactNode, useMemo } from "react";
+import { ACHIEVEMENTS_FILTER_LABELS } from "../../model/achievements-filter";
 import { IGameFilters, IGetGamesRequest } from "@mooncellar/schemas";
 import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
@@ -120,18 +121,12 @@ export const AppliedGameFilters: FC<{
       });
     }
 
-    if (filters.isOnlyWithAchievements) {
-      push("achievements", "RetroAchievements", {
-        ...filters,
-        isOnlyWithAchievements: undefined,
-      });
-    }
-
-    if (filters.isOnlyWithSteamAchievements) {
-      push("steam-achievements", "Steam achievements", {
-        ...filters,
-        isOnlyWithSteamAchievements: undefined,
-      });
+    if (filters.achievements) {
+      push(
+        "achievements",
+        `Achievements: ${ACHIEVEMENTS_FILTER_LABELS[filters.achievements]}`,
+        { ...filters, achievements: undefined }
+      );
     }
 
     if (filters.isOnlySteam) {

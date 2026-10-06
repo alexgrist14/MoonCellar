@@ -57,8 +57,9 @@ request approved with RA ids is pinned the same way.
   set with its console, icon and count, and the viewer's award (Beaten or Mastered with its date)
   when they have one. The medal is yellow when the viewer mastered a set, green when they beat
   one, and grey otherwise.
-- **Filters.** The "RetroAchievements" toggle (`isOnlyWithAchievements`) keeps games with at
-  least one set, on the Games page, in Gauntlet, on lists and on the Steam tab.
+- **Filters.** The "Achievements" dropdown under "Filters" (`achievements`: `ra`, `both`, `any`)
+  keep games with RA sets, on the Games page, in Gauntlet, on lists and on the
+  Steam tab. The values are in [`steam.md`](./steam.md#filters).
 
 ## Connected accounts
 

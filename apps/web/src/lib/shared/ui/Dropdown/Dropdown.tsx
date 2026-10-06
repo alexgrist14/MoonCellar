@@ -31,6 +31,9 @@ export const Dropdown = memo((props: IDropDownListProps) => {
     isThroughPortal,
     borderTheme,
     icons,
+    iconNodes,
+    hints,
+    list,
   } = props;
 
   const {
@@ -98,6 +101,8 @@ export const Dropdown = memo((props: IDropDownListProps) => {
       isMulti={isMulti}
       isWithExclude={isWithExclude}
       icons={icons}
+      iconNodes={iconNodes}
+      hints={hints}
       onItemClick={clickHandler}
     />
   );
@@ -145,6 +150,9 @@ export const Dropdown = memo((props: IDropDownListProps) => {
           isFieldDisabled={isFieldDisabled}
           isWithInput={isWithInput}
           value={value}
+          valueIcon={
+            !isMulti && value ? iconNodes?.[list.indexOf(value)] : undefined
+          }
           placeholder={placeholder}
           defaultPlaceholder={defaultPlaceholder}
           onClick={fieldClickHandler}

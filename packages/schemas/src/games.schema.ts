@@ -372,6 +372,10 @@ export const GetGamesByIdsSchema = z.object({
     .optional(),
 });
 
+export const ACHIEVEMENTS_FILTERS = ["steam", "ra", "both", "any"] as const;
+
+export const AchievementsFilterSchema = z.enum(ACHIEVEMENTS_FILTERS);
+
 export const GetGamesRequestSchema = z.object({
   take: z.coerce
     .number()
@@ -400,7 +404,7 @@ export const GetGamesRequestSchema = z.object({
           ? false
           : Boolean(val)
     )
-    .describe("Return only games that have retroachievements")
+    .describe("Deprecated, use achievements: games with RetroAchievements")
     .optional(),
   isOnlyWithSteamAchievements: z
     .union([z.string(), z.boolean()])
@@ -411,8 +415,11 @@ export const GetGamesRequestSchema = z.object({
           ? false
           : Boolean(val)
     )
-    .describe("Return only games that have Steam achievements")
+    .describe("Deprecated, use achievements: games with Steam achievements")
     .optional(),
+  achievements: AchievementsFilterSchema.optional().describe(
+    "Games by achievement source: Steam, RetroAchievements, both or either"
+  ),
   isOnlySteam: z
     .union([z.string(), z.boolean()])
     .transform((val) =>
@@ -651,3 +658,5 @@ export type IFindGameImagesResponse = z.infer<
 export type IImportGameImageRequest = z.infer<
   typeof ImportGameImageRequestSchema
 >;
+
+export type IAchievementsFilter = z.infer<typeof AchievementsFilterSchema>;

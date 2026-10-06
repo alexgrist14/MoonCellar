@@ -1,6 +1,11 @@
 import queryString from "query-string";
 import { IGameFiltersQuery } from "@/src/lib/shared/types/filters.type";
-import { ICustomListGamesFilters, IGetGamesRequest } from "@mooncellar/schemas";
+import {
+  AchievementsFilterSchema,
+  IAchievementsFilter,
+  ICustomListGamesFilters,
+  IGetGamesRequest,
+} from "@mooncellar/schemas";
 
 const STRING_LIST_FILTERS = [
   "Genres",
@@ -26,6 +31,21 @@ const STRING_QUERY_TYPES = Object.fromEntries([
   ]),
 ]);
 
+const parseAchievementsFilter = (
+  filters: IGameFiltersQuery
+): IAchievementsFilter | undefined => {
+  const parsed = AchievementsFilterSchema.safeParse(filters?.achievements);
+
+  if (parsed.success) return parsed.data;
+  if (filters?.isOnlyWithAchievements && filters?.isOnlyWithSteamAchievements) {
+    return "both";
+  }
+  if (filters?.isOnlyWithAchievements) return "ra";
+  if (filters?.isOnlyWithSteamAchievements) return "steam";
+
+  return undefined;
+};
+
 export const parseQueryFilters = (pathWithQuery: string): IGetGamesRequest => {
   const { query } = queryString.parseUrl(pathWithQuery, {
     arrayFormat: "bracket",
@@ -44,8 +64,7 @@ export const parseQueryFilters = (pathWithQuery: string): IGetGamesRequest => {
     years: filters?.years
       ? [normalizeYear(filters.years[0]), normalizeYear(filters.years[1])]
       : undefined,
-    isOnlyWithAchievements: filters?.isOnlyWithAchievements,
-    isOnlyWithSteamAchievements: filters?.isOnlyWithSteamAchievements,
+    achievements: parseAchievementsFilter(filters),
     isOnlySteam: filters?.isOnlySteam,
     rating: filters?.rating,
     votes: filters?.votes,
@@ -158,6 +177,7 @@ const FILTER_QUERY_KEYS = new Set([
   "isOnlyWithAchievements",
   "isOnlyWithSteamAchievements",
   "isOnlySteam",
+  "achievements",
   "rating",
   "votes",
   "sortBy",
@@ -188,8 +208,7 @@ export const pushFiltersToQuery = (filters: IGetGamesRequest) => {
 
 export const hasGameFilters = (filters: IGetGamesRequest) =>
   !!filters.search ||
-  !!filters.isOnlyWithAchievements ||
-  !!filters.isOnlyWithSteamAchievements ||
+  !!filters.achievements ||
   !!filters.isOnlySteam ||
   filters.rating !== undefined ||
   filters.votes !== undefined ||
@@ -217,8 +236,7 @@ export const pickListGameFilters = (
     rating,
     votes,
     search: name,
-    isOnlyWithAchievements,
-    isOnlyWithSteamAchievements,
+    achievements,
     isOnlySteam,
   } = parsed;
 
@@ -230,8 +248,7 @@ export const pickListGameFilters = (
     rating,
     votes,
     search: name,
-    isOnlyWithAchievements,
-    isOnlyWithSteamAchievements,
+    achievements,
     isOnlySteam,
   };
 };

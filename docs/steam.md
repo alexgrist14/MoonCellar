@@ -129,13 +129,24 @@ library from that old list and the stored achievement progress, without playtime
 
 ## Filters
 
-`GetGamesRequestSchema` has two Steam toggles, under "Filters" on the Games page, in Gauntlet, on
-lists and on the Steam tab:
+Under "Filters" on the Games page, in Gauntlet, on lists and on the Steam tab:
 
-| Toggle | Param | Keeps |
-|---|---|---|
-| Steam achievements | `isOnlyWithSteamAchievements` | games with `steamAchievements.total > 0` |
-| Steam games | `isOnlySteam` | games with a Steam store page (`externalPages.name: "Steam"`) |
+- **Achievements** is a dropdown, `achievements` in the URL and in `GetGamesRequestSchema`:
+
+  | Option | Value | Keeps |
+  |---|---|---|
+  | All games | — | every game |
+  | Steam | `steam` | games with `steamAchievements.total > 0` |
+  | RetroAchievements | `ra` | games with at least one RA set |
+  | Both | `both` | games with both |
+  | Either | `any` | games with either |
+
+  It replaced the two toggles `isOnlyWithAchievements` and `isOnlyWithSteamAchievements`. Both
+  are still read, so old links and saved filters keep working: the site turns them into
+  `achievements` when it parses a URL, and the API maps them when `achievements` is absent
+  (`gamesFilters`).
+- **Steam games** is a toggle, `isOnlySteam`: games with a Steam store page
+  (`externalPages.name: "Steam"`).
 
 ## Rules
 

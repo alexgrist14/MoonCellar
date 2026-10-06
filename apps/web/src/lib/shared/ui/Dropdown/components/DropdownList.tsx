@@ -1,4 +1,4 @@
-import { FC, RefObject, useState } from "react";
+import { FC, RefObject, useState, ReactNode } from "react";
 import cl from "classnames";
 import styles from "../Dropdown.module.scss";
 import { Scrollbar } from "../../Scrollbar";
@@ -31,6 +31,8 @@ interface IDropdownListProps {
   isMulti?: boolean;
   isWithExclude?: boolean;
   icons?: string[];
+  iconNodes?: ReactNode[];
+  hints?: string[];
   onItemClick: (item: IIndexedItem, options: IDropdownClickOptions) => void;
 }
 
@@ -51,6 +53,8 @@ export const DropdownList: FC<IDropdownListProps> = ({
   isMulti,
   isWithExclude,
   icons,
+  iconNodes,
+  hints,
   onItemClick,
 }) => {
   const [scrollTop, setScrollTop] = useState(0);
@@ -68,6 +72,10 @@ export const DropdownList: FC<IDropdownListProps> = ({
       isMulti,
       isWithExclude,
       icon,
+      iconNode: iconNodes?.[item.index],
+      isIconSlot: !!iconNodes?.some(Boolean),
+      isCheckSlot: !!hints?.some(Boolean),
+      hint: hints?.[item.index],
       onClick: () => onItemClick(item, { isChecked, isExcluded }),
     };
   };

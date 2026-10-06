@@ -177,6 +177,7 @@ export const CustomListGamesFiltersSchema = GetGamesRequestSchema.pick({
   isOnlyWithAchievements: true,
   isOnlyWithSteamAchievements: true,
   isOnlySteam: true,
+  achievements: true,
 });
 
 export const FilterCustomListBySlugRequestSchema =

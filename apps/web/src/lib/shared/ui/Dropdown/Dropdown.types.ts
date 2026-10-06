@@ -1,4 +1,4 @@
-import { CSSProperties, RefObject } from "react";
+import { CSSProperties, RefObject, ReactNode } from "react";
 
 export interface IIndexedItem {
   value: string;
@@ -42,6 +42,8 @@ export interface IDropDownListProps {
   isThroughPortal?: boolean;
   borderTheme?: "default" | "green" | "red";
   icons?: string[];
+  iconNodes?: ReactNode[];
+  hints?: string[];
 }
 
 export interface IDropdownPortalCoords {

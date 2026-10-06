@@ -1,5 +1,8 @@
 import mongoose from "mongoose";
-import { type IGetGamesRequest } from "@mooncellar/schemas";
+import {
+  type IAchievementsFilter,
+  type IGetGamesRequest,
+} from "@mooncellar/schemas";
 
 const avgIgnoringNulls = (input: unknown[]) => ({
   $avg: {
@@ -116,6 +119,19 @@ const buildAgeRatingConditions = (
   ];
 };
 
+const HAS_RA = { "retroachievements.0": { $exists: true } };
+const HAS_STEAM = { "steamAchievements.total": { $gt: 0 } };
+
+const ACHIEVEMENTS_MATCH: Record<
+  IAchievementsFilter,
+  Record<string, unknown>
+> = {
+  ra: HAS_RA,
+  steam: HAS_STEAM,
+  both: { $and: [HAS_RA, HAS_STEAM] },
+  any: { $or: [HAS_RA, HAS_STEAM] },
+};
+
 export const gamesFilters = (
   filters: IGetGamesRequest,
   searchedIds?: mongoose.Types.ObjectId[]
@@ -124,6 +140,7 @@ export const gamesFilters = (
     isOnlyWithAchievements,
     isOnlyWithSteamAchievements,
     isOnlySteam,
+    achievements,
     mode,
     years,
     excluded,
@@ -136,21 +153,18 @@ export const gamesFilters = (
   const modeFor = (field: keyof NonNullable<IGetGamesRequest["mode"]>) =>
     mode?.[field] === "all" ? "all" : "any";
 
+  const achievementsFilter =
+    achievements ??
+    (isOnlyWithAchievements === true && isOnlyWithSteamAchievements === true
+      ? "both"
+      : isOnlyWithAchievements === true
+        ? "ra"
+        : isOnlyWithSteamAchievements === true
+          ? "steam"
+          : undefined);
+
   const conditions = [
-    ...(isOnlyWithAchievements === true
-      ? [
-          {
-            retroachievements: {
-              $exists: true,
-              $type: "array",
-              $ne: [],
-            },
-          },
-        ]
-      : []),
-    ...(isOnlyWithSteamAchievements === true
-      ? [{ "steamAchievements.total": { $gt: 0 } }]
-      : []),
+    ...(achievementsFilter ? [ACHIEVEMENTS_MATCH[achievementsFilter]] : []),
     ...(isOnlySteam === true ? [{ "externalPages.name": "Steam" }] : []),
     ...(!!searchedIds
       ? [
