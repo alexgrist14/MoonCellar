@@ -17,6 +17,7 @@ import {
   SvgFlag,
   SvgMore,
   SvgPlayTriangle,
+  SvgPlus,
   SvgStar,
   SvgTrophy,
 } from "@/src/lib/shared/ui/svg";
@@ -263,30 +264,44 @@ export const GameCard = memo(
                   {!!rating ? <p>{rating}</p> : <SvgStar size="16" />}
                 </div>
               </Tooltip>
-              {!!status && !!StatusIcon && (
-                <Tooltip content={`${commonUtils.upFL(status)} · Playthroughs`}>
-                  <div
-                    role="button"
-                    aria-label={`Status: ${status}. Open playthroughs`}
-                    data-prevent-progress
-                    className={classNames(
-                      styles.card__status,
-                      styles[`card__status_${status}`]
-                    )}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      event.stopPropagation();
+              <Tooltip
+                content={
+                  status
+                    ? `${commonUtils.upFL(status)} · Playthroughs`
+                    : "Add a playthrough"
+                }
+              >
+                <div
+                  role="button"
+                  aria-label={
+                    status
+                      ? `Status: ${status}. Open playthroughs`
+                      : "Add a playthrough"
+                  }
+                  data-prevent-progress
+                  className={classNames(
+                    styles.card__status,
+                    status
+                      ? styles[`card__status_${status}`]
+                      : styles.card__status_empty
+                  )}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
 
-                      modal.open(
-                        <PlaythroughModal game={game} userId={profile._id} />,
-                        { id: PLAYTHROUGH_MODAL_ID, isResizable: true }
-                      );
-                    }}
-                  >
+                    modal.open(
+                      <PlaythroughModal game={game} userId={profile._id} />,
+                      { id: PLAYTHROUGH_MODAL_ID, isResizable: true }
+                    );
+                  }}
+                >
+                  {StatusIcon ? (
                     <StatusIcon size="16" style={{ color: "inherit" }} />
-                  </div>
-                </Tooltip>
-              )}
+                  ) : (
+                    <SvgPlus size="16" style={{ color: "inherit" }} />
+                  )}
+                </div>
+              </Tooltip>
             </div>
           )}
           {(!!game.retroachievements?.length || !!combinedRating) && (

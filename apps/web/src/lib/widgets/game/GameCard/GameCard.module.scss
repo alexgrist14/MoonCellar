@@ -272,6 +272,10 @@ $statuses: wishlist, backlog, playing, played, completed, mastered, dropped;
       background-color: var(--color-bg-tertiary);
     }
 
+    &_empty {
+      color: var(--color-text-secondary);
+    }
+
     @each $status in $statuses {
       &_#{$status} {
         color: var(--game-#{$status}-color);
