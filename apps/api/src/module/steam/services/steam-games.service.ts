@@ -32,7 +32,7 @@ import type {
 import { BusinessMetricsService } from "../../metrics/business-metrics.service";
 import { runInCronLogContext } from "../../../shared/cron-logging";
 import { runCronExclusive, withDbLock } from "../../../shared/cron-mutex";
-import { mergeSteamStore } from "../utils/steam.utils";
+import { extractSteamAppInfo, mergeSteamStore } from "../utils/steam.utils";
 import {
   buildSteamGamePayload,
   decodeHtml,
@@ -69,19 +69,31 @@ type TCatalogueGame = {
   nameNormalized?: string;
   platformIds?: mongoose.Types.ObjectId[];
   externalPages?: IExternalPageField[];
+  websites?: string[];
   steam?: ISteamGameField;
 };
 
-export const getSteamUids = (game: Pick<TCatalogueGame, "externalPages">) =>
-  (game.externalPages ?? [])
-    .filter((page) => page.name === "Steam" && /^\d+$/.test(page.uid ?? ""))
-    .map((page) => page.uid);
+export const getSteamUids = (
+  game: Pick<TCatalogueGame, "externalPages" | "websites">
+) => [
+  ...new Set([
+    ...(game.externalPages ?? [])
+      .filter((page) => page.name === "Steam" && /^\d+$/.test(page.uid ?? ""))
+      .map((page) => page.uid),
+    ...(game.websites ?? []).flatMap((url) => {
+      const info = extractSteamAppInfo(url);
 
-export const getSteamUid = (game: Pick<TCatalogueGame, "externalPages">) =>
-  getSteamUids(game)[0];
+      return info ? [String(info.gameId)] : [];
+    }),
+  ]),
+];
+
+export const getSteamUid = (
+  game: Pick<TCatalogueGame, "externalPages" | "websites">
+) => getSteamUids(game)[0];
 
 export const pickOwnApp = <T extends { appid: number; name: string }>(
-  game: Pick<TCatalogueGame, "name" | "externalPages">,
+  game: Pick<TCatalogueGame, "name" | "externalPages" | "websites">,
   appById: Map<string, T>
 ) => {
   const apps = getSteamUids(game).flatMap((uid) => {
@@ -147,7 +159,10 @@ export const pickSameCompanyCandidate = <
 };
 
 export const isAutoLinkable = (
-  candidates: Pick<TCatalogueGame, "externalPages" | "platformIds">[],
+  candidates: Pick<
+    TCatalogueGame,
+    "externalPages" | "websites" | "platformIds"
+  >[],
   pcPlatformIds: Set<string>
 ) =>
   candidates.length === 1 &&
@@ -324,7 +339,9 @@ export class SteamGamesService implements OnModuleInit {
     const appById = new Map(apps.map((app) => [String(app.appid), app]));
     const games: TCatalogueGame[] = await this.games
       .find()
-      .select("_id name slug nameNormalized platformIds externalPages steam")
+      .select(
+        "_id name slug nameNormalized platformIds externalPages websites steam"
+      )
       .lean();
     const pcPlatformIds = await this.getPcPlatformIds();
     const resolutions = await this.conflicts.getResolutions("steam");

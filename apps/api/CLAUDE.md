@@ -179,6 +179,12 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   patterns are prefixes so a family's studios (Rockstar North, Nintendo EAD, Ubisoft Montreal)
   count. Companies are chosen by popularity — the IGDB votes of their ten most-voted games — not
   by how many games they have, which would rank Konami above FromSoftware.
+- **Game search ranks by match kind, never by the fuzzysort score.** `getSearchRelevanceTier`
+  puts the exact name first, then names starting with the query as a whole word, then names
+  holding it as a whole word later, then substrings, then fuzzy matches, and sorts by votes
+  inside each tier. The score mostly measures title length:
+  "eden" scored `edengrad` 0.907 and `metal eden` 0.884, so score thresholds put a dozen unrated
+  short titles above every popular game with the word in its name.
 - **`POST /lists/by-slug` filters a list's games with the catalogue's `gamesFilters`, restricted
   to the list's ids, and searches names by substring of `nameNormalized`.** The GET stays for the
   server render and the unfiltered page. The response keeps `gamesCount` as the full count and

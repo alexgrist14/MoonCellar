@@ -50,14 +50,21 @@ const SEARCH_CANDIDATES_LIMIT = 1000;
 const SEARCH_SCORE_THRESHOLD = 0.3;
 const SEARCH_INDEX_TTL_MS = 10 * 60 * 1000;
 
-const SEARCH_RELEVANCE_TIER_THRESHOLDS = [0.9, 0.75, 0.6];
-const SEARCH_RELEVANCE_FALLBACK_TIER = SEARCH_RELEVANCE_TIER_THRESHOLDS.length;
+const SEARCH_RELEVANCE_FALLBACK_TIER = 4;
 const SEARCH_RELEVANCE_FIELD = "_searchRelevanceTier";
 
-const getSearchRelevanceTier = (score: number) => {
-  for (let tier = 0; tier < SEARCH_RELEVANCE_TIER_THRESHOLDS.length; tier++) {
-    if (score >= SEARCH_RELEVANCE_TIER_THRESHOLDS[tier]) return tier;
-  }
+export const getSearchRelevanceTier = (
+  query: string,
+  entry: Pick<SearchIndexEntry, "nameNormalized" | "nameArabicNumerals">
+) => {
+  const names = [entry.nameNormalized, entry.nameArabicNumerals].filter(
+    (name): name is string => !!name
+  );
+
+  if (names.includes(query)) return 0;
+  if (names.some((name) => `${name} `.startsWith(`${query} `))) return 1;
+  if (names.some((name) => ` ${name} `.includes(` ${query} `))) return 2;
+  if (names.some((name) => name.includes(query))) return 3;
   return SEARCH_RELEVANCE_FALLBACK_TIER;
 };
 
@@ -409,7 +416,8 @@ export class GamesService implements OnModuleInit {
       if (search) {
         const candidates = await this.getSearchIndex();
 
-        const matches = fuzzysort.go(normalizeGameName(search), candidates, {
+        const query = normalizeGameName(search);
+        const matches = fuzzysort.go(query, candidates, {
           keys: SEARCH_KEYS,
           limit: SEARCH_CANDIDATES_LIMIT,
           threshold: SEARCH_SCORE_THRESHOLD,
@@ -417,7 +425,7 @@ export class GamesService implements OnModuleInit {
 
         searchedIds = matches.map((match) => match.obj._id);
         searchRelevanceTiers = matches.map((match) =>
-          getSearchRelevanceTier(match.score)
+          getSearchRelevanceTier(query, match.obj)
         );
 
         if (!searchedIds.length) {

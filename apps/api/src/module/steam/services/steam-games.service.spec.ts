@@ -72,6 +72,19 @@ describe("getSteamUids", () => {
       })
     ).toEqual(["8640", "8780"]);
   });
+
+  it("reads Steam store links from websites", () => {
+    expect(
+      getSteamUids({
+        externalPages: [{ name: "Steam", uid: "348610" }],
+        websites: [
+          "https://store.steampowered.com/app/315810",
+          "https://store.steampowered.com/app/348610/",
+          "https://www.gog.com/game/eden",
+        ],
+      })
+    ).toEqual(["348610", "315810"]);
+  });
 });
 
 describe("pickOwnApp", () => {
