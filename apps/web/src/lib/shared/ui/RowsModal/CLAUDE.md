@@ -2,7 +2,7 @@
 
 Modal body made of a titled `Box` with a scroll area and a vertical list of "rows" — each row a
 two-sided block (icon or meta on one side, text on the other). Shows `emptyState` when there are
-no rows. `GamePlaysInfo` is built on it.
+no rows. Nothing renders it at the moment: `GamePlaysInfo` moved to the drawer (`drawer.open`), which brings its own title and panel.
 
 ## When to use
 

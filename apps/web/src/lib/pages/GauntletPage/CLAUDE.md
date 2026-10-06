@@ -44,6 +44,11 @@ Then, in `.page`:
 
 ## Rules and gotchas
 
+- **The winner block slides: the winner enters from the right, leaves to the right with a fade,
+  and the intro then enters from the right again** (from below and to below on mobile).
+  `useDelayedSwap` keeps the old content (winner or intro) mounted until its exit animation ends and
+  only then renders the new one; `WheelContainer` keys the block on it so the entry animation
+  replays. Swapping the content at once made the intro vanish in one frame when a winner arrived.
 - **The toolbar stays one row on desktop; never put the mode copy back above the wheel.** The wheel
   takes whatever height the toolbar leaves, and the former two-column panel with cards, lede and
   steps left a ~400px wheel at 1280×800. Explanations belong in `GauntletIntro`, the winner block's

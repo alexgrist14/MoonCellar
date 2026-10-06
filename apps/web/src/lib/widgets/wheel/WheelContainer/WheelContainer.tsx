@@ -8,7 +8,7 @@ import { WheelComponent } from "@/src/lib/features/wheel/ui/WheelComponent";
 import { WheelOptions } from "@/src/lib/features/wheel/ui/WheelOptions";
 import { useWheelStore } from "@/src/lib/shared/store/wheel.store";
 import { Box } from "@/src/lib/shared/ui/Box";
-import { useDelayedUnmount } from "@/src/lib/shared/hooks/useDelayedUnmount";
+import { useDelayedSwap } from "@/src/lib/shared/hooks/useDelayedSwap";
 import { GauntletWinner } from "./GauntletWinner";
 import { GauntletIntro } from "./GauntletIntro";
 
@@ -23,7 +23,7 @@ export const WheelContainer: FC = () => {
     rendered: shownWinner,
     isExiting,
     onExitEnd,
-  } = useDelayedUnmount(winner);
+  } = useDelayedSwap(winner);
 
   return (
     <>
@@ -41,10 +41,11 @@ export const WheelContainer: FC = () => {
         </div>
         <div
           className={classNames(styles.container__right, {
-            [styles.container_panelReveal]: !!shownWinner && !isExiting,
+            [styles.container_panelReveal]: !isExiting,
             [styles.container_conceal]: isExiting,
           })}
           onAnimationEnd={onExitEnd}
+          key={shownWinner ? "winner" : "intro"}
         >
           <Box
             isWithScrollBar={!isMobile}

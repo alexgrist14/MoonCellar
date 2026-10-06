@@ -9,7 +9,7 @@ import styles from "./UserGames.module.scss";
 import { useSearchParams } from "next/navigation";
 import { IPlaythrough, IUserRating } from "@mooncellar/schemas";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
-import { modal } from "@/src/lib/shared/ui/Modal";
+import { DRAWER_TRIGGER_ATTRIBUTE, drawer } from "@/src/lib/shared/ui/Drawer";
 import { GamePlaysInfo } from "@/src/lib/entities/game/ui/GamePlaysInfo";
 import { GamesCards } from "@/src/lib/widgets/game/GamesCards";
 import { takeUserGames } from "@/src/lib/shared/constants/games.const";
@@ -281,12 +281,11 @@ export const UserGames: FC<UserGamesProps> = ({
                 <>
                   <Button
                     className={styles.games__plays}
+                    {...{ [DRAWER_TRIGGER_ATTRIBUTE]: "" }}
                     onClick={() =>
-                      modal.open(
-                        <GamePlaysInfo
-                          gameName={game.name}
-                          playthroughs={gamePlaythroughs}
-                        />
+                      drawer.open(
+                        <GamePlaysInfo playthroughs={gamePlaythroughs} />,
+                        { title: game.name }
                       )
                     }
                   >

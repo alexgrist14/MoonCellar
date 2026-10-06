@@ -1,7 +1,7 @@
 @keyframes revealSlide {
   from {
     opacity: 0;
-    transform: translateX(var(--reveal-offset)) scale(var(--reveal-scale));
+    transform: translateX(var(--gauntlet-panel-offset));
   }
 
   to {
@@ -13,7 +13,7 @@
 @keyframes revealRise {
   from {
     opacity: 0;
-    transform: translateY(var(--reveal-offset)) scale(var(--reveal-scale));
+    transform: translateY(var(--gauntlet-panel-offset));
   }
 
   to {
@@ -22,7 +22,7 @@
   }
 }
 
-@keyframes conceal {
+@keyframes concealSlide {
   from {
     opacity: 1;
     transform: none;
@@ -30,11 +30,27 @@
 
   to {
     opacity: 0;
-    transform: scale(var(--reveal-scale));
+    transform: translateX(var(--gauntlet-panel-offset));
+  }
+}
+
+@keyframes concealSink {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(var(--gauntlet-panel-offset));
   }
 }
 
 .container {
+  --gauntlet-panel-offset: var(--padding-x6);
+  --gauntlet-panel-reveal: calc(var(--duration-slow) * 1.75);
+  --gauntlet-panel-conceal: var(--duration-base);
+
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   grid-template-areas: "wheel right";
@@ -83,7 +99,7 @@
   }
 
   &_panelReveal {
-    animation: revealSlide var(--duration-base) var(--easing-out) both;
+    animation: revealSlide var(--gauntlet-panel-reveal) ease both;
 
     @include mediaMd {
       animation-name: revealRise;
@@ -91,7 +107,11 @@
   }
 
   &_conceal {
-    animation: conceal var(--duration-fast) var(--easing-in) both;
+    animation: concealSlide var(--gauntlet-panel-conceal) ease-in-out both;
+
+    @include mediaMd {
+      animation-name: concealSink;
+    }
   }
 
   &_panelReveal,

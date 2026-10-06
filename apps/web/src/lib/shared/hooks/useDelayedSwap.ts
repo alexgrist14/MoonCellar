@@ -1,27 +1,21 @@
 import { AnimationEvent, useCallback, useEffect, useState } from "react";
 
-export const useDelayedUnmount = <T>(value: T | undefined) => {
+export const useDelayedSwap = <T>(value: T) => {
   const [rendered, setRendered] = useState(value);
   const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
-    if (value !== undefined) {
-      setRendered(value);
-      setIsExiting(false);
-      return;
-    }
-
-    if (rendered !== undefined) setIsExiting(true);
+    setIsExiting(value !== rendered);
   }, [value, rendered]);
 
   const onExitEnd = useCallback(
     (event: AnimationEvent<HTMLElement>) => {
       if (!isExiting || event.target !== event.currentTarget) return;
 
-      setRendered(undefined);
+      setRendered(value);
       setIsExiting(false);
     },
-    [isExiting]
+    [isExiting, value]
   );
 
   return { rendered, isExiting, onExitEnd };
