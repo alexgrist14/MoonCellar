@@ -180,7 +180,9 @@ export const UserNavigation: FC<{
             onClick={closeMenu}
           >
             <span className={styles.label}>Favourites</span>
-            <span className={styles.count}>{favoritesCount + favoriteCharactersCount}</span>
+            <span className={styles.count}>
+              {favoritesCount + favoriteCharactersCount}
+            </span>
           </Button>
         )}
         <Button

@@ -9,7 +9,6 @@ interface IUpdateProfileRequest {
   userId: string;
   description?: string;
   avatar?: File;
-  raUsername?: string;
   background?: File;
   settings?: IUpdateUserSettingsRequest;
 }
@@ -20,7 +19,6 @@ export const useUpdateProfileMutation = () =>
       userId,
       description,
       avatar,
-      raUsername,
       background,
       settings,
     }: IUpdateProfileRequest) => {
@@ -31,9 +29,6 @@ export const useUpdateProfileMutation = () =>
       }
       if (avatar) {
         calls.push(userAPI.addAvatar(userId, avatar));
-      }
-      if (raUsername) {
-        calls.push(userAPI.setRaUserInfo(userId, raUsername));
       }
       if (background) {
         calls.push(userAPI.addBackground(userId, background));

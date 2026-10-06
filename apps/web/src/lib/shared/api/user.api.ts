@@ -9,6 +9,7 @@ import {
   IUpdateFavoriteCharactersResponse,
   IUpdateFavoritesResponse,
   IUpdateUserSettingsRequest,
+  IRaConnectResponse,
 } from "@mooncellar/schemas";
 import {
   CategoriesType,
@@ -152,9 +153,16 @@ const updateSettings = (
   return agent.patch<IUser>(`${USER_URL}/settings/${userId}`, settingsDto);
 };
 
-const setRaUserInfo = (userId: string, raUserName: string) => {
-  return agent.patch<IUser>(`${USER_URL}/ra/${userId}/${raUserName}`);
-};
+const connectRa = (username: string) =>
+  agent.post<IRaConnectResponse>(`${USER_URL}/ra/connect`, { username });
+
+const verifyRa = () =>
+  agent.post<{ username: string }>(`${USER_URL}/ra/verify`);
+
+const syncRa = () =>
+  agent.post<{ awards: number; syncedAt: string }>(`${USER_URL}/ra/sync`);
+
+const disconnectRa = () => agent.delete(`${USER_URL}/ra`);
 
 const getFavorites = (userId: string) => {
   return agent.get<IUpdateFavoritesResponse>(`${USER_URL}/${userId}/favorites`);
@@ -238,7 +246,10 @@ export const userAPI = {
   removeFilter,
   getFilters,
   updateDescription,
-  setRaUserInfo,
+  connectRa,
+  verifyRa,
+  syncRa,
+  disconnectRa,
   addPreset,
   removePreset,
   getPresets,

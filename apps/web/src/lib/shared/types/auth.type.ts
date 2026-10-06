@@ -1,4 +1,9 @@
-import { IRole, ISteamAccount, IUserSettings } from "@mooncellar/schemas";
+import {
+  IRaPending,
+  IRole,
+  ISteamAccount,
+  IUserSettings,
+} from "@mooncellar/schemas";
 import { IRAAward } from "./retroachievements.type";
 import { IFollowers, IFollowings, IUserFilter, IUserPreset } from "./user.type";
 
@@ -22,6 +27,11 @@ export interface IUser {
   createdAt: Date;
   description: string;
   raUsername?: string;
+  raUlid?: string | null;
+  raUserPic?: string | null;
+  raVerifiedAt?: string | null;
+  raSyncedAt?: string | null;
+  raPending?: IRaPending | null;
   raAwards?: IRAAward[];
   roles?: string[];
   avatar: string;

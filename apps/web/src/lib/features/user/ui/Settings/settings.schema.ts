@@ -11,7 +11,6 @@ export const settingsSchema = z.object({
     .string()
     .max(450, "Description must be less than 450 characters")
     .optional(),
-  raUsername: z.string().optional(),
   showAdultContent: z.boolean().optional(),
   bgOpacity: z.number().min(0).max(100),
   mutedNotifications: MutableNotificationTypeSchema.array(),

@@ -1,0 +1,65 @@
+.ra {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x3);
+
+  &__note {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.4;
+
+    a {
+      color: var(--color-accent);
+      text-decoration: underline;
+    }
+
+    b {
+      color: var(--color-text-primary);
+    }
+  }
+
+  &__hint {
+    color: var(--color-text-muted);
+    @include font(12px, 16px, 400);
+  }
+
+  &__account {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x3);
+  }
+
+  &__avatar {
+    flex-shrink: 0;
+    border-radius: var(--radius-x2);
+  }
+
+  &__code {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    padding: var(--padding-x2) var(--padding-x3);
+    border-radius: var(--radius-control);
+    background-color: var(--color-bg-primary);
+
+    code {
+      flex: 1;
+      min-width: 0;
+      color: var(--color-text-primary);
+      font-family: monospace;
+      user-select: all;
+      @include font(15px, 20px, 600);
+      @include textEllipsis;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-x2);
+  }
+
+  &__back {
+    align-self: flex-start;
+  }
+}

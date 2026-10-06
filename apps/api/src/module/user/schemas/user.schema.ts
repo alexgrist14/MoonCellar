@@ -3,6 +3,7 @@ import { MaxLength } from "class-validator";
 import mongoose, { Document } from "mongoose";
 import {
   type IRAAward,
+  type IRaPending,
   type IRole,
   DEFAULT_BG_OPACITY,
   type IUserSettings,
@@ -46,6 +47,16 @@ export class User extends Document {
   description?: string;
   @Prop()
   raUsername?: string;
+  @Prop()
+  raUlid?: string;
+  @Prop()
+  raUserPic?: string;
+  @Prop()
+  raVerifiedAt?: string;
+  @Prop()
+  raSyncedAt?: string;
+  @Prop({ type: Object, default: null })
+  raPending?: IRaPending | null;
   @Prop({ type: [Object] })
   raAwards: IRAAward[];
   @Prop({ type: UserSteamAccountSchema, required: false })

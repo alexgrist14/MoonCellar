@@ -646,10 +646,11 @@ export class RetroachievementsService implements OnModuleInit {
       for (const user of users) {
         try {
           const userAwards = await getUserAwards(authorization, {
-            username: user.raUsername,
+            username: user.raUlid ?? user.raUsername,
           });
 
           user.raAwards = userAwards.visibleUserAwards;
+          user.raSyncedAt = new Date().toISOString();
           await user.save();
           updated++;
         } catch (err) {

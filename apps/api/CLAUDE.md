@@ -505,6 +505,15 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   keeps the pinned conflict of the linked set (`keepExternalIds`): the pin is what stops the nightly
   run from removing the link, and `matchGames` keeps a pinned set on its game even when the set's
   console is not downloaded.
+- **A RetroAchievements account is connected only through the motto check, never by typing a
+  name.** RA has no OAuth for third parties yet, so `POST /user/ra/connect` stores a pending
+  `mooncellar-…` code (30 minutes), the user puts it into their RA motto, and `POST /user/ra/verify`
+  reads the motto with `getUserProfile` before saving `raUsername`, `raUlid`, `raUserPic` and
+  `raVerifiedAt`. The old `PATCH /user/ra/:userId/:raUserName` had no guard and accepted any name,
+  so anyone could show someone else's awards. RA usernames can change since 2025: look users up by
+  `raUlid` (the API accepts it wherever it takes a username), as the nightly awards refresh does.
+  One RA account belongs to one verified MoonCellar user. `POST /user/ra/sync` reloads the awards
+  on demand, at most once a minute per user (`raSyncedAt`); the nightly run sets `raSyncedAt` too.
 - **An RA link written outside the sync must be pinned with `ConflictsService.pin`, or the next
   nightly run removes it.** Approving a request with RA ids does this: `pin` upserts a resolved
   `ra` conflict and adds the game to its `winners`, which `matchGames` then keeps.

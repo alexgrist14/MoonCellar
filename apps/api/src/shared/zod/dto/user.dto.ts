@@ -5,6 +5,8 @@ import {
   GetUserByIdSchema,
   GetUserByStringSchema,
   GetUserLoginsResponseSchema,
+  RaConnectRequestSchema,
+  RaConnectResponseSchema,
   SearchUsersRequestSchema,
   SearchUsersResponseSchema,
   UpdateFavoritesRequestSchema,
@@ -51,4 +53,10 @@ export class GetFavoriteCharactersResponseDto extends createZodDto(
 export class SearchUsersDto extends createZodDto(SearchUsersRequestSchema) {}
 export class SearchUsersResponseDto extends createZodDto(
   SearchUsersResponseSchema
+) {}
+
+export class RaConnectRequestDto extends createZodDto(RaConnectRequestSchema) {}
+
+export class RaConnectResponseDto extends createZodDto(
+  RaConnectResponseSchema
 ) {}

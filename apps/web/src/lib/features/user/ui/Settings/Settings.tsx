@@ -20,6 +20,7 @@ import {
   DELETE_ACCOUNT_MODAL_ID,
   DeleteAccountModal,
 } from "@/src/lib/features/user/ui/DeleteAccountModal";
+import { RaAccount } from "@/src/lib/features/user/ui/RaAccount";
 import { SteamAccount } from "@/src/lib/features/user/ui/SteamAccount";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FC, useEffect, useState } from "react";
@@ -63,7 +64,6 @@ export const Settings: FC<SettingsProps> = ({}) => {
       userName: profile?.userName,
       email: profile?.email,
       description: profile?.description,
-      raUsername: profile?.raUsername,
       showAdultContent: !!profile?.settings?.showAdultContent,
       bgOpacity: Math.round(profileBgOpacity * 100),
       mutedNotifications: profile?.settings?.mutedNotifications ?? [],
@@ -78,7 +78,6 @@ export const Settings: FC<SettingsProps> = ({}) => {
       userName: profile.userName,
       email: profile.email,
       description: profile.description,
-      raUsername: profile.raUsername,
       showAdultContent: !!profile.settings?.showAdultContent,
       bgOpacity: Math.round(
         (profile.settings?.bgOpacity ?? DEFAULT_BG_OPACITY) * 100
@@ -135,10 +134,6 @@ export const Settings: FC<SettingsProps> = ({}) => {
           description: data.description ?? "",
         }),
         ...(tempAvatar && { avatar: tempAvatar }),
-        ...(data.raUsername &&
-          data.raUsername !== profile.raUsername && {
-            raUsername: data.raUsername,
-          }),
         ...(background && { background }),
         ...(!!Object.keys(settings).length && { settings }),
       },
@@ -196,17 +191,6 @@ export const Settings: FC<SettingsProps> = ({}) => {
                   error={errors.email}
                 />
               </div>
-              <div className={styles.field}>
-                <label htmlFor="ra">RA username</label>
-                <Input
-                  type="text"
-                  id="ra"
-                  className={styles.input}
-                  containerClassname={styles.input}
-                  {...register("raUsername")}
-                  error={errors.raUsername}
-                />
-              </div>
             </div>
           </div>
           <div className={styles.field}>
@@ -256,6 +240,11 @@ export const Settings: FC<SettingsProps> = ({}) => {
             <section className={styles.section}>
               <SectionTitle as="h3">Steam</SectionTitle>
               <SteamAccount />
+            </section>
+
+            <section className={styles.section}>
+              <SectionTitle as="h3">RetroAchievements</SectionTitle>
+              <RaAccount />
             </section>
 
             <section className={styles.section}>

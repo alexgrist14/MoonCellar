@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { CharacterSchema } from "./characters.schema";
 import { MutableNotificationTypeSchema } from "./notifications.schema";
-import { RaAwardSchema } from "./ra.schema";
+import { RaAwardSchema, RaPendingSchema } from "./ra.schema";
 import { RoleSchema } from "./role.schema";
 import { ObjectIdSchema } from "./utils";
 
@@ -47,6 +47,11 @@ export const UserSchemaZod = z.object({
   presets: z.array(z.object({ name: z.string(), preset: z.string() })),
   description: z.string().max(450).nullable(),
   raUsername: z.string().nullable(),
+  raUlid: z.string().nullable().optional(),
+  raUserPic: z.string().nullable().optional(),
+  raVerifiedAt: z.string().nullable().optional(),
+  raSyncedAt: z.string().nullable().optional(),
+  raPending: RaPendingSchema.nullable().optional(),
   raAwards: RaAwardSchema.array(),
   steam: SteamAccountSchema.nullable().optional(),
   roles: RoleSchema.array().default(["user"]),
