@@ -1,7 +1,7 @@
 import { FC } from "react";
-import styles from "./GameVndbBlock.module.scss";
 import { InfoBlock } from "@/src/lib/shared/ui/InfoBlock";
-import { StatTile } from "@/src/lib/shared/ui/StatTile";
+import { StatRows } from "@/src/lib/shared/ui/StatRows";
+import { getHltbAmount } from "@/src/lib/shared/utils/hltb.utils";
 import { IGameResponse } from "@mooncellar/schemas";
 
 interface IGameVndbBlockProps {
@@ -13,18 +13,15 @@ export const GameVndbBlock: FC<IGameVndbBlockProps> = ({
   game,
   isBoxed = true,
 }) => {
-  const vndbTime = game.vndb?.lengthMinutes;
+  const length = getHltbAmount((game.vndb?.lengthMinutes ?? 0) / 60);
 
-  if (!vndbTime) return null;
+  if (!length) return null;
 
   return (
     <InfoBlock title="VNDB:" isBoxed={isBoxed}>
-      <div className={styles.tiles}>
-        <StatTile
-          value={`${Math.floor(vndbTime / 60)}h ${vndbTime % 60}m`}
-          align="center"
-        />
-      </div>
+      <StatRows
+        rows={[{ label: "Average length", value: length.amount, unit: "h" }]}
+      />
     </InfoBlock>
   );
 };

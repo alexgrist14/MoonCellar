@@ -1,21 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Cron } from "@nestjs/schedule";
 import mongoose, { Model } from "mongoose";
 import { PinoLogger } from "nestjs-pino";
 import type { ISteamProgress } from "@mooncellar/schemas";
 import { Game, type GameDocument } from "../../games/schemas/game.schema";
 import { User } from "../../user/schemas/user.schema";
-import { sleep } from "../../../shared/utils";
-import { runInCronLogContext } from "../../../shared/cron-logging";
-import { runCronExclusive, withDbLock } from "../../../shared/cron-mutex";
 import { SteamPlaythroughsService } from "./steam-playthroughs.service";
 import {
   STEAM_PROGRESS_APPS_PER_REQUEST,
-  STEAM_PROGRESS_CRON,
-  STEAM_PROGRESS_CRON_OPTIONS,
   STEAM_PROGRESS_MASTERED_LOOKUPS,
-  STEAM_PROGRESS_USER_DELAY_MS,
 } from "../constants/steam-progress";
 import { STEAM_ACHIEVEMENTS_TIMEOUT_MS } from "../constants/steam-achievements";
 
@@ -220,46 +213,5 @@ export class SteamProgressService {
       mastered: achievements.filter(({ unlocked, total }) => unlocked >= total)
         .length,
     };
-  }
-
-  @Cron(STEAM_PROGRESS_CRON, STEAM_PROGRESS_CRON_OPTIONS)
-  async syncCron() {
-    return runCronExclusive(() =>
-      runInCronLogContext(this.logger, "steam-progress-sync", async () => {
-        const lock = await withDbLock(
-          this.users.db,
-          "steam-progress-sync",
-          () => this.syncAll()
-        );
-
-        if (!lock.locked) {
-          this.logger.warn("Steam progress sync is already running");
-        }
-      })
-    );
-  }
-
-  private async syncAll() {
-    const users = await this.users
-      .find({ "steam.steamId": { $exists: true } })
-      .select("_id")
-      .lean();
-    let updated = 0;
-
-    for (const { _id } of users) {
-      try {
-        if (await this.syncUser(_id as mongoose.Types.ObjectId)) updated += 1;
-      } catch (err) {
-        this.logger.warn(
-          `Steam progress failed for user ${String(_id)}: ${(err as Error).message}`
-        );
-      }
-
-      await sleep(STEAM_PROGRESS_USER_DELAY_MS);
-    }
-
-    this.logger.info(
-      `Steam progress sync finished: ${updated}/${users.length} users`
-    );
   }
 }

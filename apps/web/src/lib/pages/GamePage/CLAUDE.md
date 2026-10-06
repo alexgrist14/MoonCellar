@@ -71,3 +71,7 @@ landing page — there are about 10 000 of them.
   absent from the HTML by design.
 - Image URLs in metadata go through `/img/image-proxy`, never under `/api` (blocked by
   `robots.txt`).
+- **`GameAdminControls` is rendered with `key={game._id}`.** Its id fields start from the game's
+  current VNDB, RetroAchievements and HLTB ids; a client navigation to another game keeps the
+  component mounted, and without the key the fields kept the previous game's ids (Terraria's RA and
+  HLTB ids showed on Ever 17).

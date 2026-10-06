@@ -197,17 +197,23 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
 
 ## Steam import
 
-- **A list with a `source` belongs to the linked account, and `CustomListsService` refuses to
-  delete it or change its games (403).** Only `syncSourceList` (import) and `deleteSourceList`
-  (unlink) write it; a manual edit would be overwritten by the next import anyway. The flow and
-  the endpoints are in [`docs/steam-import.md`](../../docs/steam-import.md).
+- **A linked Steam library lives in `steamlibraries` (one document per user), never in a custom
+  list or on the user document.** `GET /user` responses return the whole user in many places, and
+  a library of a few thousand games would travel with each of them. `POST /steam/library` reads
+  it with the user's `steam.achievements`, filters through `CustomListsService.findMatchingGames`
+  and sorts with `sortSteamLibrary`. Lists with `source: "steam"` are legacy: every import deletes
+  the user's one (`deleteSourceList`), and `CustomListsService` still refuses edits to any list
+  with a `source` (403). The flow and the endpoints are in [`docs/steam.md`](../../docs/steam.md).
+- **The nightly Steam run is `SteamAccountService.syncAllCron` (05:15): it re-imports each
+  library, which then reads achievement progress.** `SteamProgressService` has no cron of its own;
+  a second one would read progress against a library the import is about to replace.
 - **The OpenID `return_to` is compared exactly with `<FRONT_URL>/user/<name>/settings` of the
   signed-in user, and the assertion is linked only after Steam answers `is_valid:true` to
   `check_authentication`.** Skipping either lets anyone post a forged or replayed claimed id and
   import someone else's library.
 - **`GetOwnedGames` answers `{ response: {} }` for a profile whose game details are private.**
   It is not an error status; treat a missing `games` array as "private" (422), never as an
-  empty library, or the import replaces a full list with nothing.
+  empty library, or the import replaces a full library with nothing.
 
 - **Steam achievement counts come from `ISteamUserStats/GetSchemaForGame` with `STEAM_API_KEY`,
   never from the store's `appdetails`.** The Web API allows about 100,000 calls a day; the store

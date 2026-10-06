@@ -1,8 +1,9 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { gamesApi, userAPI } from "@/src/lib/shared/api";
+import { gamesApi, steamAPI, userAPI } from "@/src/lib/shared/api";
 import {
   ICharacterResponse,
   IGameResponse,
+  IGetSteamLibraryRequest,
   IRaUserGame,
 } from "@mooncellar/schemas";
 import { ILogs } from "@/src/lib/shared/types/user.type";
@@ -91,4 +92,15 @@ export const useUserRaGamesQuery = (userId: string, enabled = true) =>
     },
     enabled: enabled && !!userId,
     staleTime: 60000,
+  });
+
+export const useSteamLibraryQuery = (
+  request: IGetSteamLibraryRequest,
+  enabled = true
+) =>
+  useQuery({
+    queryKey: userQueryKeys.steamLibrary(request.userName, request),
+    queryFn: () => steamAPI.getLibrary(request).then(({ data }) => data),
+    enabled: enabled && !!request.userName,
+    placeholderData: keepPreviousData,
   });

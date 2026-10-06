@@ -38,10 +38,6 @@
     @include font(12px, 16px, 500);
   }
 
-  &_compact {
-    padding-inline: var(--padding-x1);
-  }
-
   &_labelBelow {
     .tile__label {
       order: 3;

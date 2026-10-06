@@ -19,7 +19,6 @@ interface IStatTileProps extends Omit<
   valueColor?: string;
   align?: "start" | "center";
   isLabelBelow?: boolean;
-  isCompact?: boolean;
   onClick?: (event: MouseEvent<HTMLButtonElement>) => void;
 }
 
@@ -31,7 +30,6 @@ export const StatTile: FC<IStatTileProps> = ({
   valueColor,
   align = "start",
   isLabelBelow,
-  isCompact,
   onClick,
   className,
   style,
@@ -42,7 +40,6 @@ export const StatTile: FC<IStatTileProps> = ({
     styles[`tile_${align}`],
     {
       [styles.tile_labelBelow]: isLabelBelow,
-      [styles.tile_compact]: isCompact,
       [styles.tile_interactive]: !!onClick,
     },
     className

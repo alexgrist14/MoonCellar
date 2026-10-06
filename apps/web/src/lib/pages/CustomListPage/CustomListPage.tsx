@@ -70,10 +70,7 @@ import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import { SvgLink, SvgLock, SvgPen } from "@/src/lib/shared/ui/svg";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
-import {
-  hasGameFilters,
-  parseQueryFilters,
-} from "@/src/lib/shared/utils/filters.utils";
+import { pickListGameFilters } from "@/src/lib/shared/utils/filters.utils";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import styles from "./CustomListPage.module.scss";
 
@@ -129,35 +126,10 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
     [query]
   );
   const [initialSort] = useState(sort);
-  const gameFilters = useMemo((): ICustomListGamesFilters | undefined => {
-    const parsed = parseQueryFilters(`?${query.toString()}`);
-
-    if (!hasGameFilters(parsed)) return undefined;
-
-    const {
-      selected,
-      excluded,
-      mode,
-      years,
-      rating,
-      votes,
-      search,
-      isOnlyWithAchievements,
-      isOnlyWithSteamAchievements,
-    } = parsed;
-
-    return {
-      selected,
-      excluded,
-      mode,
-      years,
-      rating,
-      votes,
-      search,
-      isOnlyWithAchievements,
-      isOnlyWithSteamAchievements,
-    };
-  }, [query]);
+  const gameFilters = useMemo(
+    () => pickListGameFilters(`?${query.toString()}`),
+    [query]
+  );
   const listKey = listQueryKeys.bySlug(
     user.userName,
     initialList.slug,

@@ -236,7 +236,12 @@ export const UserProfile: FC<UserProfileProps> = ({
           {tab === ACTIVITY_TAB && (
             <ActivityTimeline userId={user._id} isOwner={isAuthedUser} />
           )}
-          {tab === STEAM_TAB && <UserSteamGames steam={displayUser.steam} />}
+          {tab === STEAM_TAB && (
+            <UserSteamGames
+              userName={displayUser.userName}
+              steam={displayUser.steam}
+            />
+          )}
           {tab === RETROACHIEVEMENTS_TAB && (
             <UserRaGames
               userId={user._id}

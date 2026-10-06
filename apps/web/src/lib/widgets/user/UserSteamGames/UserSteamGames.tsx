@@ -1,7 +1,27 @@
 import { FC, useMemo, useState } from "react";
 import classNames from "classnames";
-import { ISteamAccount } from "@mooncellar/schemas";
+import { useSearchParams } from "next/navigation";
+import {
+  CustomListsOrderSchema,
+  DEFAULT_STEAM_LIBRARY_ORDER,
+  DEFAULT_STEAM_LIBRARY_SORT,
+  ICustomListsOrder,
+  ISteamAccount,
+  ISteamLibrarySort,
+  SteamLibrarySortSchema,
+} from "@mooncellar/schemas";
 import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
+import { useSteamLibraryQuery } from "@/src/lib/entities/user/api/user.queries";
+import {
+  AppliedGameFilters,
+  Filters,
+} from "@/src/lib/features/filters/ui/Filters";
+import { pickListGameFilters } from "@/src/lib/shared/utils/filters.utils";
+import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
+import {
+  ISortControlOption,
+  SortControl,
+} from "@/src/lib/shared/ui/SortControl";
 import { useGridRows } from "@/src/lib/shared/hooks/useGridRows";
 import { GameCard } from "@/src/lib/widgets/game/GameCard";
 import { Badge } from "@/src/lib/shared/ui/Badge";
@@ -16,6 +36,19 @@ import styles from "./UserSteamGames.module.scss";
 const PREVIEW_LIMIT = 12;
 const PREVIEW_ROWS = 2;
 const PAGE_SIZE = 24;
+const SORT_PARAM = "sort";
+const ORDER_PARAM = "order";
+
+const SORT_OPTIONS: ISortControlOption<ISteamLibrarySort>[] = [
+  { value: "achievements", label: "Achievements" },
+  { value: "playtime", label: "Playtime" },
+  { value: "name", label: "Name" },
+  { value: "release", label: "Release date" },
+  { value: "rating", label: "Rating" },
+];
+
+const formatPlaytime = (minutes: number) =>
+  minutes < 60 ? `${minutes} min` : `${Math.round(minutes / 60)} h`;
 
 const CARD_STYLE = {
   width: "100%",
@@ -26,39 +59,52 @@ const CARD_STYLE = {
 };
 
 interface IUserSteamGamesProps {
+  userName: string;
   steam?: ISteamAccount | null;
   isPreview?: boolean;
   onShowAll?: () => void;
 }
 
 export const UserSteamGames: FC<IUserSteamGamesProps> = ({
+  userName,
   steam,
   isPreview,
   onShowAll,
 }) => {
-  const entries = useMemo(
+  const query = useSearchParams();
+  const sortBy = isPreview
+    ? DEFAULT_STEAM_LIBRARY_SORT
+    : (SteamLibrarySortSchema.safeParse(query?.get(SORT_PARAM)).data ??
+      DEFAULT_STEAM_LIBRARY_SORT);
+  const sortOrder = isPreview
+    ? DEFAULT_STEAM_LIBRARY_ORDER
+    : (CustomListsOrderSchema.safeParse(query?.get(ORDER_PARAM)).data ??
+      DEFAULT_STEAM_LIBRARY_ORDER);
+  const filters = useMemo(
     () =>
-      (steam?.achievements ?? [])
-        .filter(({ gameId }) => !!gameId)
-        .sort((a, b) => {
-          const isMasteredA = a.unlocked >= a.total;
-          const isMasteredB = b.unlocked >= b.total;
-
-          if (isMasteredA !== isMasteredB) return isMasteredA ? -1 : 1;
-          if (isMasteredA) {
-            return (b.masteredAt ?? "").localeCompare(a.masteredAt ?? "");
-          }
-
-          return b.unlocked / b.total - a.unlocked / a.total;
-        }),
-    [steam]
+      isPreview
+        ? undefined
+        : pickListGameFilters(`?${query?.toString() ?? ""}`),
+    [isPreview, query]
   );
+  const { data: library, isLoading: isLibraryLoading } = useSteamLibraryQuery(
+    { userName, sortBy, sortOrder, filters },
+    !!steam
+  );
+  const entries = useMemo(() => library?.games ?? [], [library]);
   const [page, setPage] = useState(1);
+  const resultKey = JSON.stringify([sortBy, sortOrder, filters]);
+  const [pageKey, setPageKey] = useState(resultKey);
+
+  if (pageKey !== resultKey) {
+    setPageKey(resultKey);
+    setPage(1);
+  }
   const shown = isPreview
     ? entries.slice(0, PREVIEW_LIMIT)
     : entries.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  const { data: games = [], isLoading } = useGamesByIdsQuery(
-    shown.map(({ gameId }) => gameId!),
+  const { data: games = [], isLoading: isGamesLoading } = useGamesByIdsQuery(
+    shown.map(({ gameId }) => gameId),
     undefined,
     shown.length > 0
   );
@@ -67,13 +113,40 @@ export const UserSteamGames: FC<IUserSteamGamesProps> = ({
     [games]
   );
   const items = shown.flatMap((entry) => {
-    const game = gameById.get(entry.gameId!);
+    const game = gameById.get(entry.gameId);
 
     return game ? [{ ...entry, game }] : [];
   });
+  const isLoading = isLibraryLoading || isGamesLoading;
   const masteredCount = entries.filter(
-    ({ unlocked, total }) => unlocked >= total
+    ({ unlocked, total }) => !!total && (unlocked ?? 0) >= total
   ).length;
+
+  const changeSort = (
+    nextSortBy: ISteamLibrarySort,
+    nextSortOrder: ICustomListsOrder
+  ) => {
+    const nextQuery = new URLSearchParams(query?.toString());
+    const isDefault =
+      nextSortBy === DEFAULT_STEAM_LIBRARY_SORT &&
+      nextSortOrder === DEFAULT_STEAM_LIBRARY_ORDER;
+
+    nextQuery.delete(SORT_PARAM);
+    nextQuery.delete(ORDER_PARAM);
+
+    if (!isDefault) {
+      nextQuery.set(SORT_PARAM, nextSortBy);
+      nextQuery.set(ORDER_PARAM, nextSortOrder);
+    }
+
+    const search = nextQuery.toString();
+
+    window.history.pushState(
+      null,
+      "",
+      `${window.location.pathname}${search ? `?${search}` : ""}`
+    );
+  };
   const { ref: gridRef, visibleCount } = useGridRows<HTMLUListElement>(
     items.length,
     isPreview ? PREVIEW_ROWS : undefined
@@ -85,7 +158,7 @@ export const UserSteamGames: FC<IUserSteamGamesProps> = ({
     <section className={styles.steam} aria-labelledby="profile-steam-games">
       <SectionTitle
         as="h3"
-        count={entries.length || undefined}
+        count={library?.total || undefined}
         action={
           isPreview && (
             <Button
@@ -100,6 +173,12 @@ export const UserSteamGames: FC<IUserSteamGamesProps> = ({
       >
         <span id="profile-steam-games">Steam</span>
       </SectionTitle>
+
+      {!isPreview && !!steam && (
+        <ExpandMenu position="left" titleOpen="Filters">
+          <Filters isSortHidden />
+        </ExpandMenu>
+      )}
 
       {!isPreview && !!steam && (
         <p className={styles.steam__note}>
@@ -120,6 +199,19 @@ export const UserSteamGames: FC<IUserSteamGamesProps> = ({
         </p>
       )}
 
+      {!isPreview && !!steam && (
+        <div className={styles.steam__toolbar}>
+          <AppliedGameFilters />
+          <SortControl
+            className={styles.steam__sort}
+            options={SORT_OPTIONS}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            onChange={(by, order) => changeSort(by ?? sortBy, order)}
+          />
+        </div>
+      )}
+
       {isLoading && <Loader type="pulse" />}
 
       {!isLoading && !items.length && (
@@ -127,7 +219,9 @@ export const UserSteamGames: FC<IUserSteamGamesProps> = ({
           variant="inline"
           title={
             steam
-              ? "No Steam achievements for games in the catalogue yet."
+              ? filters
+                ? "No Steam games match these filters."
+                : "None of the games on this Steam account are in the catalogue yet."
               : "No Steam account is linked."
           }
         />
@@ -138,30 +232,41 @@ export const UserSteamGames: FC<IUserSteamGamesProps> = ({
           ref={gridRef}
           className={isPreview ? styles.steam__preview : styles.steam__grid}
         >
-          {items.map(({ game, unlocked, total, masteredAt }, index) => {
-            const isMastered = unlocked >= total;
+          {items.map(
+            ({ game, unlocked, total, masteredAt, playtime }, index) => {
+              const hasProgress = !!unlocked && !!total;
+              const isMastered = hasProgress && unlocked >= total;
 
-            return (
-              <li
-                key={game._id}
-                className={classNames(styles.steam__item, {
-                  [styles.steam__item_hidden]: index >= visibleCount,
-                })}
-              >
-                <GameCard game={game} style={CARD_STYLE} />
-                <div className={styles.steam__caption}>
-                  <Badge tone={isMastered ? "attention" : "neutral"}>
-                    {isMastered ? "Mastered" : `${unlocked} / ${total}`}
-                  </Badge>
-                  <span className={styles.steam__date}>
-                    {isMastered && masteredAt
-                      ? commonUtils.formatDate(masteredAt)
-                      : `${Math.round((unlocked / total) * 100)}%`}
-                  </span>
-                </div>
-              </li>
-            );
-          })}
+              return (
+                <li
+                  key={game._id}
+                  className={classNames(styles.steam__item, {
+                    [styles.steam__item_hidden]: index >= visibleCount,
+                  })}
+                >
+                  <GameCard game={game} style={CARD_STYLE} />
+                  <div className={styles.steam__caption}>
+                    {hasProgress ? (
+                      <Badge tone={isMastered ? "attention" : "neutral"}>
+                        {isMastered ? "Mastered" : `${unlocked} / ${total}`}
+                      </Badge>
+                    ) : (
+                      <span />
+                    )}
+                    <span className={styles.steam__date}>
+                      {isMastered && masteredAt
+                        ? commonUtils.formatDate(masteredAt)
+                        : hasProgress
+                          ? `${Math.round((unlocked / total) * 100)}%`
+                          : playtime
+                            ? formatPlaytime(playtime)
+                            : "Not played"}
+                    </span>
+                  </div>
+                </li>
+              );
+            }
+          )}
         </ul>
       )}
       {!isPreview && (

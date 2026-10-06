@@ -22,6 +22,8 @@ export class UserSteamAccount {
   achievements?: ISteamProgress[];
   @Prop({ type: Date, default: null })
   achievementsSyncedAt?: Date | null;
+  @Prop({ type: Number })
+  libraryCount?: number;
 }
 
 export const UserSteamAccountSchema =

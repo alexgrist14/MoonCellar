@@ -13,6 +13,23 @@
     }
   }
 
+  &__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x3);
+  }
+
+  &__sort {
+    width: min(100%, var(--list-sort-width));
+    margin-left: auto;
+
+    @include mediaSm {
+      width: 100%;
+    }
+  }
+
   &__grid,
   &__preview {
     display: grid;

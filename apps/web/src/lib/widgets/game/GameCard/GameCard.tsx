@@ -9,7 +9,6 @@ import { GameCardInfo } from "@/src/lib/widgets/game/GameCardInfo";
 import { Tooltip } from "@/src/lib/shared/ui/Tooltip";
 import { IGameResponse } from "@mooncellar/schemas";
 import {
-  SvgAchievement,
   SvgBookmark,
   SvgCheck,
   SvgClock,
@@ -18,7 +17,9 @@ import {
   SvgMore,
   SvgPlayTriangle,
   SvgPlus,
+  SvgRetroAchievements,
   SvgStar,
+  SvgSteam,
   SvgTrophy,
 } from "@/src/lib/shared/ui/svg";
 import { ISvgBaseProps } from "@/src/lib/shared/ui/svg/Svg/Svg";
@@ -39,6 +40,7 @@ import { playthroughPriorityOrder } from "@/src/lib/shared/constants/user.const"
 import { getAverageRating } from "@/src/lib/shared/utils/rating.utils";
 import { GameRatingPopover } from "@/src/lib/features/game/ui/GameRatingPopover";
 import { GameAchievementsPopover } from "@/src/lib/features/game/ui/GameAchievementsPopover";
+import { GameSteamPopover } from "@/src/lib/features/game/ui/GameSteamPopover";
 import { useRoyalGames } from "@/src/lib/entities/royal/model/useRoyalGames";
 import { Checkbox } from "@/src/lib/shared/ui/Checkbox";
 import { EXPAND_KEEP_OPEN_ATTRIBUTE } from "@/src/lib/shared/ui/ExpandMenu";
@@ -82,9 +84,11 @@ export const GameCard = memo(
     const cardRef = useRef<HTMLDivElement>(null);
     const ratingRef = useRef<HTMLDivElement>(null);
     const achievementsRef = useRef<HTMLDivElement>(null);
+    const steamRef = useRef<HTMLDivElement>(null);
 
     const [isRatingOpen, setIsRatingOpen] = useState(false);
     const [isAchievementsOpen, setIsAchievementsOpen] = useState(false);
+    const [isSteamOpen, setIsSteamOpen] = useState(false);
 
     const hideMedia = useHideAdult() && isAdultGame(game);
 
@@ -151,6 +155,16 @@ export const GameCard = memo(
         ),
       };
     }, [game, profile]);
+
+    const steamProgress = useMemo(
+      () =>
+        profile?.steam?.achievements?.find(
+          (entry) => entry.gameId === game._id && entry.unlocked > 0
+        ),
+      [game._id, profile]
+    );
+    const isSteamMastered =
+      !!steamProgress && steamProgress.unlocked >= steamProgress.total;
 
     // useCloseEvents([cardRef], () => setIsActive(false));
 
@@ -304,13 +318,42 @@ export const GameCard = memo(
               </Tooltip>
             </div>
           )}
-          {(!!game.retroachievements?.length || !!combinedRating) && (
+          {(!!game.retroachievements?.length || !!steamProgress) && (
             <div
               className={classNames(
                 styles.card__rail,
                 styles.card__rail_bottomRight
               )}
             >
+              {!!steamProgress && (
+                <Tooltip
+                  content={
+                    isSteamMastered
+                      ? "Steam: mastered"
+                      : `Steam: ${steamProgress.unlocked} / ${steamProgress.total}`
+                  }
+                >
+                  <div
+                    role="button"
+                    ref={steamRef}
+                    aria-label="Steam achievements"
+                    aria-expanded={isSteamOpen}
+                    className={styles.card__achievement}
+                    data-prevent-progress
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+
+                      setIsSteamOpen((current) => !current);
+                    }}
+                  >
+                    <SvgSteam
+                      size="16"
+                      color={isSteamMastered ? "attention" : "secondary"}
+                    />
+                  </div>
+                </Tooltip>
+              )}
               {!!game.retroachievements?.length && (
                 <Tooltip
                   content={
@@ -335,7 +378,7 @@ export const GameCard = memo(
                       setIsAchievementsOpen((current) => !current);
                     }}
                   >
-                    <SvgAchievement
+                    <SvgRetroAchievements
                       color={
                         isMastered
                           ? "attention"
@@ -347,7 +390,38 @@ export const GameCard = memo(
                   </div>
                 </Tooltip>
               )}
-              {!!combinedRating && (
+            </div>
+          )}
+          {(!isInfoDisabled || !!combinedRating) && (
+            <div
+              className={classNames(
+                styles.card__rail,
+                styles.card__rail_topRight
+              )}
+            >
+              {!isInfoDisabled && (
+                <Tooltip content={isActive ? "Close" : "Game info"}>
+                  <button
+                    type="button"
+                    aria-label={isActive ? "Close" : "Game info"}
+                    aria-expanded={isActive}
+                    className={classNames(
+                      styles.card__more,
+                      isActive && styles[`card__more_${status}`]
+                    )}
+                    data-prevent-progress
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+
+                      setIsActive(!isActive);
+                    }}
+                  >
+                    {isActive ? <SvgClose size="16" /> : <SvgMore />}
+                  </button>
+                </Tooltip>
+              )}
+              {!!combinedRating && !isActive && (
                 <Tooltip content="Average of IGDB, HowLongToBeat and user ratings">
                   <div
                     aria-label={`Average rating: ${combinedRating}`}
@@ -360,35 +434,6 @@ export const GameCard = memo(
               )}
             </div>
           )}
-          {!isInfoDisabled && (
-            <div
-              className={classNames(
-                styles.card__rail,
-                styles.card__rail_topRight
-              )}
-            >
-              <Tooltip content={isActive ? "Close" : "Game info"}>
-                <button
-                  type="button"
-                  aria-label={isActive ? "Close" : "Game info"}
-                  aria-expanded={isActive}
-                  className={classNames(
-                    styles.card__more,
-                    isActive && styles[`card__more_${status}`]
-                  )}
-                  data-prevent-progress
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-
-                    setIsActive(!isActive);
-                  }}
-                >
-                  {isActive ? <SvgClose size="16" /> : <SvgMore />}
-                </button>
-              </Tooltip>
-            </div>
-          )}
           {isLoading && <Loader key={game._id + "_loader"} />}
           {isActive && (
             <GameCardInfo game={game} playthroughs={filteredPlaythroughs} />
@@ -398,8 +443,8 @@ export const GameCard = memo(
               onLoad={() => setIsLoading(false)}
               alt={`${game.name} cover`}
               src={game.cover}
-              width={260}
-              height={325}
+              width={264}
+              height={352}
               priority={priority}
               className={classNames(styles.card__cover, {
                 [styles.card__cover_active]: !isLoading,
@@ -415,6 +460,15 @@ export const GameCard = memo(
           isOpen={isRatingOpen}
           onClose={() => setIsRatingOpen(false)}
         />
+        {!!steamProgress && !!profile?.steam?.steamId && (
+          <GameSteamPopover
+            progress={steamProgress}
+            steamId={profile.steam.steamId}
+            anchorRef={steamRef}
+            isOpen={isSteamOpen}
+            onClose={() => setIsSteamOpen(false)}
+          />
+        )}
         {!!game.retroachievements?.length && (
           <GameAchievementsPopover
             game={game}

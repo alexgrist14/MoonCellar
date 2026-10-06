@@ -201,8 +201,10 @@ export const UserNavigation: FC<{
           >
             <span className={styles.label}>Steam</span>
             <span className={styles.count}>
-              {user.steam.achievements?.filter(({ gameId }) => !!gameId)
-                .length ?? 0}
+              {user.steam.libraryCount ??
+                user.steam.achievements?.filter(({ gameId }) => !!gameId)
+                  .length ??
+                0}
             </span>
           </Button>
         )}

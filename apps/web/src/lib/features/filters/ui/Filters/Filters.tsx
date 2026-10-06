@@ -480,6 +480,17 @@ export const Filters: FC<{
                 }))
               }
             />
+            <ToggleSwitch
+              label="Steam games"
+              labelPosition="end"
+              checked={!!filters?.isOnlySteam}
+              onChange={(isOnlySteam) =>
+                setFilters((filters) => ({
+                  ...filters,
+                  isOnlySteam: isOnlySteam || undefined,
+                }))
+              }
+            />
             {isGauntlet && (
               <ToggleSwitch
                 label="Exclude history"

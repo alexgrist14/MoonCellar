@@ -61,10 +61,15 @@ editing controls.
      tab and "All" on the Profile tab opens the right one. The navigation has a single Favourites
      entry, active on both, counting both lists.
    - `reviews` → `widgets/user/UserReviews`
-   - `steam` → `widgets/user/UserSteamGames`, read from `user.steam.achievements` (no request of
-     its own besides the game cards): mastered games first by date, then the rest by completion,
-     each captioned "Mastered" or "unlocked / total". The navigation shows it only for a linked
-     Steam account; the Profile tab shows the same widget as a two-row preview (`steam` block).
+   - `steam` → `widgets/user/UserSteamGames`: every game of the linked Steam library that is in
+     the catalogue, from `POST /steam/library` (`useSteamLibraryQuery`), each captioned "Mastered"
+     with its date, "unlocked / total", or its playtime when it has no achievements. Default order
+     is Achievements (mastered newest first, then by completion, games without achievements last);
+     `SortControl` also offers Playtime, Name, Release date and Rating, and the left "Filters"
+     menu takes the catalogue filters. Sort (`sort`, `order`) and filters live in the URL, written
+     with `pushState`; a change of either returns to page 1. The navigation shows the tab only for
+     a linked Steam account; the Profile tab shows the same widget as a two-row preview in the
+     default order (`steam` block). The whole flow is in `docs/steam.md`.
    - `activity` → `features/user/ui/ActivityTimeline`, the whole feed with pagination
      (`takeLogs` per page). The Profile tab shows the same component with `isPreview`: the first
      12 entries, no pagination, and "All" leading here.

@@ -47,7 +47,8 @@ private ones only to their owner.
 3. `Box`: `Breadcrumbs` (Home / user / Lists / list), header with `SectionTitle as="h1"`,
    `AppliedGameFilters` chips, description, meta (author, count, updated, privacy) and actions — `ListLikeButton` (public),
    Edit (owner), Copy link (public), Manage / Cancel / Done (owner, not an imported list).
-   An imported list (`source: "steam"`) shows a note that it comes from a Steam library.
+   An imported list (`source: "steam"`, legacy — every Steam import now deletes it) shows a note
+   that it comes from a Steam library.
 4. Toolbar: `ListGameSearch` (owner, not managing, not an imported list) and `ListGamesSort`
    (more than one game).
 5. Body: `EmptyState`, or `SortableGrid` in Manage mode, or `GamesCards` with `getRank` for a
@@ -81,7 +82,7 @@ private ones only to their owner.
   (`grid_fetching`) during a refetch.
 - **An imported list (`list.source`) gets no add, remove, reorder or delete controls** —
   `canEditGames` is `isOwner && !list.source`. The API refuses those writes with 403; the games
-  follow the Steam account (`docs/steam-import.md`).
+  follow the Steam account (`docs/steam.md`).
 - **Manage is unavailable while filters are applied, and the filters menu is hidden while
   managing.** Reordering sends the whole list (`ReorderCustomListRequest` must hold exactly its
   games), and a filtered `list.games` is only part of it — the API would refuse it with 400.

@@ -336,7 +336,7 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
         <TextField
           label="VNDB id"
           value={vndbId}
-          placeholder="v17"
+          placeholder="e.g. v17"
           disabled={isParsingVndb}
           onChange={setVndbId}
           isFlush
@@ -357,7 +357,7 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
               : "RetroAchievements id"
           }
           value={raId}
-          placeholder="32909"
+          placeholder="e.g. 32909"
           disabled={isParsingRa}
           onChange={setRaId}
           isFlush
@@ -376,7 +376,7 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
         <TextField
           label="HLTB id"
           value={hltbId}
-          placeholder="9705"
+          placeholder="e.g. 9705"
           disabled={isParsingHltb}
           onChange={setHltbId}
           isFlush

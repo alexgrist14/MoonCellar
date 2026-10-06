@@ -292,6 +292,7 @@ export const UserInfo: FC<UserInfoProps> = ({
 
       {!hiddenBlocks.has("steam") && (
         <UserSteamGames
+          userName={user.userName}
           steam={user.steam}
           isPreview
           onShowAll={() => goTo(STEAM_TAB)}

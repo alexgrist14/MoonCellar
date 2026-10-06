@@ -123,6 +123,7 @@ export const gamesFilters = (
   const {
     isOnlyWithAchievements,
     isOnlyWithSteamAchievements,
+    isOnlySteam,
     mode,
     years,
     excluded,
@@ -150,6 +151,7 @@ export const gamesFilters = (
     ...(isOnlyWithSteamAchievements === true
       ? [{ "steamAchievements.total": { $gt: 0 } }]
       : []),
+    ...(isOnlySteam === true ? [{ "externalPages.name": "Steam" }] : []),
     ...(!!searchedIds
       ? [
           {

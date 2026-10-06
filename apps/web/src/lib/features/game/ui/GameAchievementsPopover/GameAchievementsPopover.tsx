@@ -8,7 +8,7 @@ import { IGameResponse } from "@mooncellar/schemas";
 import { IRAAward } from "@/src/lib/shared/types/retroachievements.type";
 import { Popover } from "@/src/lib/shared/ui/Popover";
 import { Badge } from "@/src/lib/shared/ui/Badge";
-import { SvgAchievement } from "@/src/lib/shared/ui/svg";
+import { SvgRetroAchievements } from "@/src/lib/shared/ui/svg";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
@@ -127,7 +127,7 @@ export const GameAchievementsPopover: FC<IGameAchievementsPopoverProps> = ({
                       styles.row__icon_empty
                     )}
                   >
-                    <SvgAchievement size="20" color="secondary" />
+                    <SvgRetroAchievements size="20" color="secondary" />
                   </span>
                 )}
                 <span className={styles.row__text}>

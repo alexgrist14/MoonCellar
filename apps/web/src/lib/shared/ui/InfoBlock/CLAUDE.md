@@ -28,18 +28,9 @@ content, wrapped in its own `Box` with `--padding-x3` unless told otherwise.
 import { InfoBlock } from "@/src/lib/shared/ui/InfoBlock";
 
 <InfoBlock title="HowLongToBeat:" isBoxed={isBoxed}>
-  <div className={styles.tiles}>
-    {tiles.map((tile) => (
-      <StatTile
-        key={tile.label}
-        label={tile.label}
-        value={tile.amount}
-        hint={tile.unit}
-        align="center"
-        isLabelBelow
-      />
-    ))}
-  </div>
+  <StatRows
+    rows={tiles.map(({ label, amount }) => ({ label, value: amount, unit: "h" }))}
+  />
 </InfoBlock>;
 ```
 

@@ -134,6 +134,13 @@ export const AppliedGameFilters: FC<{
       });
     }
 
+    if (filters.isOnlySteam) {
+      push("steam", "Steam games", {
+        ...filters,
+        isOnlySteam: undefined,
+      });
+    }
+
     return result;
   }, [filters, systems]);
 

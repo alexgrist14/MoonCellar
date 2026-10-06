@@ -78,24 +78,6 @@ export const CenteredWithHint: Story = {
   },
 };
 
-export const Compact: Story = {
-  args: {
-    label: "Main + extra",
-    value: "7½",
-    hint: "Hours",
-    align: "center",
-    isLabelBelow: true,
-    isCompact: true,
-  },
-  decorators: [
-    (Story) => (
-      <div style={{ width: 128 }}>
-        <Story />
-      </div>
-    ),
-  ],
-};
-
 export const Grid: Story = {
   render: () => (
     <div style={grid}>

@@ -1,0 +1,71 @@
+.steam {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x2);
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x3);
+  }
+
+  &__count {
+    font-variant-numeric: tabular-nums;
+
+    @include font(20px, 26px, 700);
+  }
+
+  &__total {
+    color: var(--color-text-muted);
+
+    @include font(14px, 26px, 500);
+  }
+
+  &__progress {
+    width: 100%;
+    height: var(--range-track-height);
+    border: none;
+    border-radius: var(--radius-x1);
+    overflow: hidden;
+    appearance: none;
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-secondary);
+
+    &::-webkit-progress-bar {
+      background-color: var(--color-bg-primary);
+    }
+
+    &::-webkit-progress-value {
+      background-color: var(--color-text-secondary);
+    }
+
+    &::-moz-progress-bar {
+      background-color: var(--color-text-secondary);
+    }
+
+    &[data-mastered] {
+      &::-webkit-progress-value {
+        background-color: var(--color-attention);
+      }
+
+      &::-moz-progress-bar {
+        background-color: var(--color-attention);
+      }
+    }
+  }
+
+  &__sub {
+    margin: 0;
+    color: var(--color-text-muted);
+
+    @include font(13px, 18px, 400);
+  }
+
+  &__actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gap-x2);
+    margin-top: var(--padding-x1);
+  }
+}

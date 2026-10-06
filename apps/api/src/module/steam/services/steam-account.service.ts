@@ -11,7 +11,6 @@ import { InjectModel } from "@nestjs/mongoose";
 import axios from "axios";
 import mongoose, { type Model } from "mongoose";
 import {
-  STEAM_LIBRARY_LIST_NAME,
   type ISteamAccount,
   type ISteamLoginUrlResponse,
   type ISteamSyncResponse,
@@ -21,6 +20,17 @@ import { FRONT_URL } from "../../../shared/constants";
 import { Game } from "../../games/schemas/game.schema";
 import { User } from "../../user/schemas/user.schema";
 import { SteamProgressService } from "./steam-progress.service";
+import { SteamLibrary } from "../schemas/steam-library.schema";
+import { Cron } from "@nestjs/schedule";
+import { PinoLogger } from "nestjs-pino";
+import { sleep } from "../../../shared/utils";
+import { runInCronLogContext } from "../../../shared/cron-logging";
+import { runCronExclusive, withDbLock } from "../../../shared/cron-mutex";
+import {
+  STEAM_PROGRESS_CRON,
+  STEAM_PROGRESS_CRON_OPTIONS,
+  STEAM_PROGRESS_USER_DELAY_MS,
+} from "../constants/steam-progress";
 import { CustomListsService } from "../../collections/services/custom-lists.service";
 import {
   buildIgdbQueryParams,
@@ -65,8 +75,11 @@ export class SteamAccountService {
   constructor(
     @InjectModel(User.name) private readonly users: Model<User>,
     @InjectModel(Game.name) private readonly games: Model<Game>,
+    @InjectModel(SteamLibrary.name)
+    private readonly libraries: Model<SteamLibrary>,
     private readonly lists: CustomListsService,
-    private readonly progress: SteamProgressService
+    private readonly progress: SteamProgressService,
+    private readonly pino: PinoLogger
   ) {}
 
   private getReturnTo(user: User) {
@@ -80,6 +93,7 @@ export class SteamAccountService {
       steamId: steam.steamId,
       linkedAt: steam.linkedAt.toISOString(),
       syncedAt: steam.syncedAt ? steam.syncedAt.toISOString() : null,
+      libraryCount: steam.libraryCount,
     };
   }
 
@@ -157,14 +171,36 @@ export class SteamAccountService {
         appId: game.appid,
         name: game.name || `App ${game.appid}`,
       }));
-    const list = await this.lists.syncSourceList(
-      userId,
-      "steam",
-      STEAM_LIBRARY_LIST_NAME,
-      gameIds
+    const seen = new Set<string>();
+
+    await this.libraries.updateOne(
+      { userId },
+      {
+        $set: {
+          games: owned.flatMap((game) => {
+            const gameId = byAppId.get(String(game.appid));
+
+            if (!gameId || seen.has(String(gameId))) return [];
+
+            seen.add(String(gameId));
+
+            return [
+              {
+                appId: game.appid,
+                gameId,
+                playtime: game.playtime_forever ?? 0,
+              },
+            ];
+          }),
+          syncedAt: new Date(),
+        },
+      },
+      { upsert: true }
     );
+    await this.lists.deleteSourceList(userId, "steam");
 
     user.steam.syncedAt = new Date();
+    user.steam.libraryCount = seen.size;
     user.markModified("steam");
     await user.save();
 
@@ -181,7 +217,6 @@ export class SteamAccountService {
 
     return {
       steam: this.toAccount(user),
-      list,
       ownedCount: owned.length,
       matchedCount: gameIds.length,
       unmatched,
@@ -191,11 +226,51 @@ export class SteamAccountService {
   async unlink(
     userId: mongoose.Types.ObjectId
   ): Promise<IUnlinkSteamAccountResponse> {
-    const deletedListId = await this.lists.deleteSourceList(userId, "steam");
-
+    await this.lists.deleteSourceList(userId, "steam");
+    await this.libraries.deleteOne({ userId });
     await this.users.updateOne({ _id: userId }, { $unset: { steam: 1 } });
 
-    return { deletedListId };
+    return { isUnlinked: true };
+  }
+
+  @Cron(STEAM_PROGRESS_CRON, STEAM_PROGRESS_CRON_OPTIONS)
+  async syncAllCron() {
+    return runCronExclusive(() =>
+      runInCronLogContext(this.pino, "steam-library-sync", async () => {
+        const lock = await withDbLock(this.users.db, "steam-library-sync", () =>
+          this.syncAll()
+        );
+
+        if (!lock.locked) {
+          this.logger.warn("Steam library sync is already running");
+        }
+      })
+    );
+  }
+
+  private async syncAll() {
+    const users = await this.users
+      .find({ "steam.steamId": { $exists: true } })
+      .select("_id")
+      .lean();
+    let updated = 0;
+
+    for (const { _id } of users) {
+      try {
+        await this.sync(_id as mongoose.Types.ObjectId);
+        updated += 1;
+      } catch (err) {
+        this.logger.warn(
+          `Steam library sync failed for user ${String(_id)}: ${(err as Error).message}`
+        );
+      }
+
+      await sleep(STEAM_PROGRESS_USER_DELAY_MS);
+    }
+
+    this.logger.log(
+      `Steam library sync finished: ${updated}/${users.length} users`
+    );
   }
 
   private async getOwnedGames(steamId: string) {

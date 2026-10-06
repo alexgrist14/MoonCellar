@@ -1,6 +1,6 @@
 import queryString from "query-string";
 import { IGameFiltersQuery } from "@/src/lib/shared/types/filters.type";
-import { IGetGamesRequest } from "@mooncellar/schemas";
+import { ICustomListGamesFilters, IGetGamesRequest } from "@mooncellar/schemas";
 
 const STRING_LIST_FILTERS = [
   "Genres",
@@ -46,6 +46,7 @@ export const parseQueryFilters = (pathWithQuery: string): IGetGamesRequest => {
       : undefined,
     isOnlyWithAchievements: filters?.isOnlyWithAchievements,
     isOnlyWithSteamAchievements: filters?.isOnlyWithSteamAchievements,
+    isOnlySteam: filters?.isOnlySteam,
     rating: filters?.rating,
     votes: filters?.votes,
     sortBy: filters?.sortBy,
@@ -156,6 +157,7 @@ const FILTER_QUERY_KEYS = new Set([
   "years",
   "isOnlyWithAchievements",
   "isOnlyWithSteamAchievements",
+  "isOnlySteam",
   "rating",
   "votes",
   "sortBy",
@@ -188,6 +190,7 @@ export const hasGameFilters = (filters: IGetGamesRequest) =>
   !!filters.search ||
   !!filters.isOnlyWithAchievements ||
   !!filters.isOnlyWithSteamAchievements ||
+  !!filters.isOnlySteam ||
   filters.rating !== undefined ||
   filters.votes !== undefined ||
   !!filters.years?.some((year) => year !== null && year !== undefined) ||
@@ -198,3 +201,37 @@ export const hasGameFilters = (filters: IGetGamesRequest) =>
         Array.isArray(values) ? values.length > 0 : !!values
       )
   );
+
+export const pickListGameFilters = (
+  search: string
+): ICustomListGamesFilters | undefined => {
+  const parsed = parseQueryFilters(search);
+
+  if (!hasGameFilters(parsed)) return undefined;
+
+  const {
+    selected,
+    excluded,
+    mode,
+    years,
+    rating,
+    votes,
+    search: name,
+    isOnlyWithAchievements,
+    isOnlyWithSteamAchievements,
+    isOnlySteam,
+  } = parsed;
+
+  return {
+    selected,
+    excluded,
+    mode,
+    years,
+    rating,
+    votes,
+    search: name,
+    isOnlyWithAchievements,
+    isOnlyWithSteamAchievements,
+    isOnlySteam,
+  };
+};

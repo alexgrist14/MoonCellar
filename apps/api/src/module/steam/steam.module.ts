@@ -5,6 +5,7 @@ import { SteamAchievementsService } from "./services/steam-achievements.service"
 import { SteamProgressService } from "./services/steam-progress.service";
 import { SteamPlaythroughsService } from "./services/steam-playthroughs.service";
 import { SteamGamesService } from "./services/steam-games.service";
+import { SteamLibraryService } from "./services/steam-library.service";
 import { ConflictsModule } from "../conflicts/conflicts.module";
 import { GamesModule } from "../games/games.module";
 import {
@@ -20,6 +21,10 @@ import { SteamController } from "./controllers/steam.controller";
 import { SteamAccountController } from "./controllers/steam-account.controller";
 import { Game, GameDatabaseSchema } from "../games/schemas/game.schema";
 import { User, UserSchema } from "../user/schemas/user.schema";
+import {
+  SteamLibrary,
+  SteamLibrarySchema,
+} from "./schemas/steam-library.schema";
 import { MetricsModule } from "../metrics/metrics.module";
 import { CollectionsModule } from "../collections/collections.module";
 
@@ -32,6 +37,7 @@ import { CollectionsModule } from "../collections/collections.module";
     SteamProgressService,
     SteamPlaythroughsService,
     SteamGamesService,
+    SteamLibraryService,
   ],
   imports: [
     MongooseModule.forFeature([
@@ -39,6 +45,7 @@ import { CollectionsModule } from "../collections/collections.module";
       { name: User.name, schema: UserSchema },
       { name: Platform.name, schema: PlatformDatabaseSchema },
       { name: Playthrough.name, schema: PlaythroughDatabaseSchema },
+      { name: SteamLibrary.name, schema: SteamLibrarySchema },
     ]),
     MetricsModule,
     CollectionsModule,

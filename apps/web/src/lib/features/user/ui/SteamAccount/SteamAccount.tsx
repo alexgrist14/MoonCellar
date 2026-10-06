@@ -1,7 +1,5 @@
 import { FC, useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { ISteamSyncResponse } from "@mooncellar/schemas";
-import { useUserListsQuery } from "@/src/lib/entities/list/api";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { ActionsMenu } from "@/src/lib/shared/ui/ActionsMenu";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
@@ -10,7 +8,6 @@ import { modal } from "@/src/lib/shared/ui/Modal";
 import { SvgSteam } from "@/src/lib/shared/ui/svg";
 import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
-import { getListHref } from "@/src/lib/shared/utils/links.utils";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import {
   useSteamLinkMutation,
@@ -39,8 +36,6 @@ const takeOpenIdParams = () => {
 export const SteamAccount: FC = () => {
   const profile = useAuthStore((s) => s.profile);
   const steam = profile?.steam;
-  const { data: lists } = useUserListsQuery(profile?._id, undefined, !!steam);
-  const steamList = lists?.find((list) => list.source === "steam");
 
   const login = useSteamLoginMutation();
   const link = useSteamLinkMutation();
@@ -106,10 +101,7 @@ export const SteamAccount: FC = () => {
     modal.open(
       <ConfirmModal
         title="Unlink Steam"
-        message={`Unlink your Steam account? ${
-          steamList ? `The “${steamList.name}” list is deleted with it.` : ""
-        }`}
-        warning="Likes on the list and links to it are lost."
+        message="Unlink your Steam account? Your Steam games and achievement progress disappear from your profile."
         onCancel={() => modal.close(UNLINK_STEAM_MODAL_ID)}
         onConfirm={async () => {
           await unlink.mutateAsync();
@@ -124,9 +116,9 @@ export const SteamAccount: FC = () => {
     return (
       <div className={styles.steam}>
         <span className={styles.steam__note}>
-          Sign in through Steam to import your library as a list. The list stays
-          in sync with Steam and is deleted when you unlink the account. Your
-          Steam profile must show game details publicly.
+          Sign in through Steam to show your library and achievement progress on
+          your profile&apos;s Steam page. It stays in sync with Steam every
+          night. Your Steam profile must show game details publicly.
         </span>
         <Button
           type="button"
@@ -157,13 +149,6 @@ export const SteamAccount: FC = () => {
           ? `, imported ${commonUtils.getHumanDate(steam.syncedAt)}`
           : ""}
         .
-        {steamList && (
-          <>
-            {" "}
-            Your library is the{" "}
-            <Link href={getListHref(steamList)}>{steamList.name}</Link> list.
-          </>
-        )}
       </span>
       <span className={styles.steam__note}>
         {progress.length

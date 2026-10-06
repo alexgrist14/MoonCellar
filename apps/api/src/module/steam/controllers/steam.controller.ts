@@ -1,6 +1,9 @@
 import {
   BadRequestException,
+  Body,
   Controller,
+  HttpCode,
+  HttpStatus,
   NotFoundException,
   Param,
   Post,
@@ -10,6 +13,7 @@ import {
 import { AuthGuard } from "@nestjs/passport";
 import {
   ApiCookieAuth,
+  ApiOkResponse,
   ApiOperation,
   ApiQuery,
   ApiResponse,
@@ -21,6 +25,11 @@ import { Roles } from "../../roles/roles.decorator";
 import { SteamService } from "../services/steam.service";
 import { SteamAchievementsService } from "../services/steam-achievements.service";
 import { SteamGamesService } from "../services/steam-games.service";
+import { SteamLibraryService } from "../services/steam-library.service";
+import {
+  GetSteamLibraryRequestDto,
+  GetSteamLibraryResponseDto,
+} from "../../../shared/zod/dto/steam.dto";
 
 @ApiTags("Steam")
 @Controller("steam")
@@ -28,8 +37,20 @@ export class SteamController {
   constructor(
     private readonly service: SteamService,
     private readonly achievements: SteamAchievementsService,
-    private readonly steamGames: SteamGamesService
+    private readonly steamGames: SteamGamesService,
+    private readonly library: SteamLibraryService
   ) {}
+
+  @Post("/library")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      "A user's Steam games found in the catalogue, with achievement progress, filtered and sorted",
+  })
+  @ApiOkResponse({ type: GetSteamLibraryResponseDto })
+  getLibrary(@Body() dto: GetSteamLibraryRequestDto) {
+    return this.library.getLibrary(dto);
+  }
 
   @ApiCookieAuth()
   @UseGuards(RolesGuard)

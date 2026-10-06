@@ -10,5 +10,7 @@ export const userQueryKeys = {
     [...userQueryKeys.all, "favorite-characters", userId] as const,
   raGames: (userId: string) =>
     [...userQueryKeys.all, "ra-games", userId] as const,
+  steamLibrary: (userName: string, request?: unknown) =>
+    [...userQueryKeys.all, "steam-library", userName, request] as const,
   search: (q: string) => [...userQueryKeys.all, "search", q] as const,
 };

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { listQueryKeys } from "@/src/lib/entities/list/api";
+import { userQueryKeys } from "@/src/lib/entities/user/api/user.query-keys";
 import { playthroughQueryKeys } from "@/src/lib/entities/playthrough/api/playthrough.query-keys";
 import { steamAPI, userAPI } from "@/src/lib/shared/api";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
@@ -11,6 +12,9 @@ const useAfterSteamChange = () => {
     const profile = useAuthStore.getState().profile;
 
     await queryClient.invalidateQueries({ queryKey: listQueryKeys.all });
+    await queryClient.invalidateQueries({
+      queryKey: [...userQueryKeys.all, "steam-library"],
+    });
 
     if (!profile) return;
 

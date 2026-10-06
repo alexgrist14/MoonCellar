@@ -1,12 +1,13 @@
 # StatTile
 
 A bordered tile with a small muted label over a large number: profile counters, a game's
-"Beaten by / Playing now" counters, HowLongToBeat hours. Clickable when given `onClick`.
+"Beaten by / Playing now" counters. Clickable when given `onClick`.
 
 ## When to use
 
 - A single figure with a caption, usually several side by side in a grid the consumer lays out.
 - `onClick` when the tile opens what it counts (the profile's Games tab, the followers drawer).
+- Not for a list of labelled figures in a side column — that is `StatRows`.
 - Not for a status word — that is `Badge`; not for a labelled block of arbitrary content — that
   is `InfoBlock`.
 
@@ -21,7 +22,6 @@ A bordered tile with a small muted label over a large number: profile counters, 
 | `valueColor`   | `string`                                         | —         | CSS colour of the value, e.g. `"var(--game-completed-color)"`                                                               |
 | `align`        | `"start" \| "center"`                            | `"start"` | Text alignment                                                                                                              |
 | `isLabelBelow` | `boolean`                                        | `false`   | Moves the label under the value (and the hint)                                                                              |
-| `isCompact`    | `boolean`                                        | —         | Narrow horizontal padding (`--padding-x1`) for tiles in tight grids, e.g. the three HowLongToBeat tiles in the side column. |
 | `onClick`      | `(event: MouseEvent<HTMLButtonElement>) => void` | —         | Renders a `button type="button"` with a hover/focus ring instead of a `div`                                                 |
 | `className`    | `string`                                         | —         | Extra class                                                                                                                 |
 | `...rest`      | `HTMLAttributes<HTMLElement>`                    | —         | `data-*`, `aria-*`, `title`, `style`… reach the root element                                                                |
@@ -44,7 +44,6 @@ import { StatTile } from "@/src/lib/shared/ui/StatTile";
 
 <StatTile label="Beaten by" value={formatCount(stats.completed)} valueColor="var(--game-completed-color)" />
 
-<StatTile label={tile.label} value={tile.amount} hint={tile.unit} align="center" isLabelBelow />
 ```
 
 ## Rules and gotchas

@@ -500,7 +500,7 @@ export class CustomListsService {
     }
   }
 
-  private async getSortKeys(
+  async getSortKeys(
     gameIds: mongoose.Types.ObjectId[],
     sortBy: ICustomListGamesSort
   ): Promise<Map<string, IListGameSortKeys>> {
@@ -583,7 +583,7 @@ export class CustomListsService {
     };
   }
 
-  private async findMatchingGames(
+  async findMatchingGames(
     gameIds: mongoose.Types.ObjectId[],
     filters?: ICustomListGamesFilters
   ) {
@@ -725,63 +725,16 @@ export class CustomListsService {
     }
   }
 
-  async syncSourceList(
+  async getSourceListGameIds(
     userId: mongoose.Types.ObjectId,
-    source: ICustomListSource,
-    name: string,
-    gameIds: mongoose.Types.ObjectId[]
-  ): Promise<ICustomList> {
-    const existing = await this.listModel.findOne({ userId, source });
-    const addedAt = new Map(
-      (existing?.games ?? []).map((game) => [
-        game.gameId.toString(),
-        game.addedAt,
-      ])
-    );
-    const now = new Date();
-    const games = [
-      ...new Map(gameIds.map((id) => [id.toString(), id])).values(),
-    ].map((gameId) => ({
-      gameId,
-      addedAt: addedAt.get(gameId.toString()) ?? now,
-    }));
+    source: ICustomListSource
+  ) {
+    const list = await this.listModel
+      .findOne({ userId, source })
+      .select("games.gameId")
+      .lean();
 
-    try {
-      if (existing) {
-        existing.games = games;
-        existing.gamesCount = games.length;
-        await existing.save();
-
-        return this.toList(await this.findPresented({ _id: existing._id }));
-      }
-
-      let freeName = name;
-
-      for (let index = 2; ; index++) {
-        const clash = await this.listModel.exists({
-          userId,
-          nameNormalized: normalizeListName(freeName),
-        });
-
-        if (!clash) break;
-        freeName = `${name} ${index}`;
-      }
-
-      const list = await this.listModel.create({
-        userId,
-        source,
-        name: freeName,
-        nameNormalized: normalizeListName(freeName),
-        slug: await this.getFreeSlug(userId, freeName),
-        games,
-        gamesCount: games.length,
-      });
-
-      return this.toList(await this.findPresented({ _id: list._id }));
-    } catch (err) {
-      this.logger.error(err, `Failed to sync ${source} list of: ${userId}`);
-      throw err;
-    }
+    return (list?.games ?? []).map(({ gameId }) => gameId);
   }
 
   async deleteSourceList(

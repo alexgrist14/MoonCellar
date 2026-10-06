@@ -413,6 +413,17 @@ export const GetGamesRequestSchema = z.object({
     )
     .describe("Return only games that have Steam achievements")
     .optional(),
+  isOnlySteam: z
+    .union([z.string(), z.boolean()])
+    .transform((val) =>
+      typeof val === "boolean"
+        ? val
+        : ["false", "0", "no"].includes(val.toLowerCase())
+          ? false
+          : Boolean(val)
+    )
+    .describe("Return only games with a Steam store page")
+    .optional(),
   page: z.coerce.number().min(1).describe("Page number").default(1).optional(),
   selected: GameFiltersSchema.describe(
     "Filters to include games by"

@@ -52,7 +52,9 @@ import { SortControl } from "@/src/lib/shared/ui/SortControl";
 - The order button is disabled while `sortBy` is unset — an order with no key means nothing,
   which is the `/games` behaviour this replaces.
 - The dropdown takes the row's remaining width (`flex: 1; min-width: 0`) and keeps its own
-  `min-width: 170px`, so the control needs at least that plus the button.
+  `min-width: 170px`, so the control needs at least that plus the button. Give the control itself
+  a width (`min(100%, var(--list-sort-width))`, full width on mobile) — in a row that sizes it by
+  content it shrinks to the button and a truncated label.
 - The order button's accessible name and tooltip are "Ascending"/"Descending", the current
   order. Earlier copies used a colourless `ToggleSwitch` with chevrons, which had no
   accessible name.

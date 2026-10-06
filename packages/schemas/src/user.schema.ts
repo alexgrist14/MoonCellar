@@ -63,6 +63,10 @@ export const SteamAccountSchema = z.object({
   achievements: SteamProgressSchema.array()
     .optional()
     .describe("Games with at least one unlocked achievement"),
+  libraryCount: z
+    .number()
+    .optional()
+    .describe("Owned games found in the catalogue"),
   achievementsSyncedAt: z
     .string()
     .nullable()

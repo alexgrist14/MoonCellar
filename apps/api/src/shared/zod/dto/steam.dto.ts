@@ -1,5 +1,7 @@
 import { createZodDto } from "nestjs-zod";
 import {
+  GetSteamLibraryRequestSchema,
+  GetSteamLibraryResponseSchema,
   LinkSteamAccountRequestSchema,
   SteamLoginUrlResponseSchema,
   SteamSyncResponseSchema,
@@ -20,4 +22,12 @@ export class SteamSyncResponseDto extends createZodDto(
 
 export class UnlinkSteamAccountResponseDto extends createZodDto(
   UnlinkSteamAccountResponseSchema
+) {}
+
+export class GetSteamLibraryRequestDto extends createZodDto(
+  GetSteamLibraryRequestSchema
+) {}
+
+export class GetSteamLibraryResponseDto extends createZodDto(
+  GetSteamLibraryResponseSchema
 ) {}

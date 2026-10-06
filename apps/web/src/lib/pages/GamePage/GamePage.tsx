@@ -59,7 +59,7 @@ export const GamePage: FC<IGamePageProps> = ({
         <GameReleaseDates game={game} className={styles.page__column} />
         <GameMultiplayer game={game} className={styles.page__column} />
       </div>
-      <GameAdminControls game={game} />
+      <GameAdminControls key={game._id} game={game} />
     </div>
   );
 };
