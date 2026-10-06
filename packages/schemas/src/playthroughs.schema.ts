@@ -33,6 +33,10 @@ export const PlaythroughSchema = z.object({
     .number()
     .describe("RetroAchievements set the playthrough was created from")
     .optional(),
+  steamAppId: z
+    .number()
+    .describe("Steam app the playthrough was created from")
+    .optional(),
   helpfulCount: z
     .number()
     .describe("Players who found the review helpful")
@@ -47,6 +51,7 @@ export const PlaythroughEditSchema = PlaythroughSchema.omit({
   updatedAt: true,
   helpfulCount: true,
   raGameId: true,
+  steamAppId: true,
 });
 
 export const PlaythroughFullResponseSchema = PlaythroughSchema;

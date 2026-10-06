@@ -121,9 +121,16 @@ export const AppliedGameFilters: FC<{
     }
 
     if (filters.isOnlyWithAchievements) {
-      push("achievements", "Only with achievements", {
+      push("achievements", "RetroAchievements", {
         ...filters,
         isOnlyWithAchievements: undefined,
+      });
+    }
+
+    if (filters.isOnlyWithSteamAchievements) {
+      push("steam-achievements", "Steam achievements", {
+        ...filters,
+        isOnlyWithSteamAchievements: undefined,
       });
     }
 

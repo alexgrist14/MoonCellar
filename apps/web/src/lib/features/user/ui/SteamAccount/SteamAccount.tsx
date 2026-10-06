@@ -8,12 +8,14 @@ import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { SvgSteam } from "@/src/lib/shared/ui/svg";
+import { ToggleSwitch } from "@/src/lib/shared/ui/ToggleSwitch";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { getListHref } from "@/src/lib/shared/utils/links.utils";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import {
   useSteamLinkMutation,
   useSteamLoginMutation,
+  useSteamPlaythroughsToggleMutation,
   useSteamSyncMutation,
   useSteamUnlinkMutation,
 } from "../../model/useSteamAccount";
@@ -44,8 +46,17 @@ export const SteamAccount: FC = () => {
   const link = useSteamLinkMutation();
   const sync = useSteamSyncMutation();
   const unlink = useSteamUnlinkMutation();
+  const playthroughsToggle = useSteamPlaythroughsToggleMutation();
   const isBusy =
-    login.isPending || link.isPending || sync.isPending || unlink.isPending;
+    login.isPending ||
+    link.isPending ||
+    sync.isPending ||
+    unlink.isPending ||
+    playthroughsToggle.isPending;
+  const progress = steam?.achievements ?? [];
+  const masteredCount = progress.filter(
+    ({ unlocked, total }) => unlocked >= total
+  ).length;
 
   const [unmatched, setUnmatched] = useState<ISteamSyncResponse["unmatched"]>(
     []
@@ -154,6 +165,28 @@ export const SteamAccount: FC = () => {
           </>
         )}
       </span>
+      <span className={styles.steam__note}>
+        {progress.length
+          ? `Achievements in ${progress.length} ${commonUtils.addLastS("game", progress.length)}, ${masteredCount} mastered${steam.achievementsSyncedAt ? `, read ${commonUtils.getHumanDate(steam.achievementsSyncedAt)}` : ""}.`
+          : "No achievement progress yet; it is read with the library and every night."}
+      </span>
+      <ToggleSwitch
+        label="Mark playthroughs from achievements"
+        hint="Each mastered game gets a Mastered playthrough. Games you already have a playthrough for are left alone, and a deleted one is not added again."
+        checked={!!profile?.settings?.steamSyncPlaythroughs}
+        isDisabled={isBusy}
+        onChange={(isOn) =>
+          playthroughsToggle.mutate(isOn, {
+            onSuccess: (result) =>
+              result &&
+              toast.success({
+                description: result.created
+                  ? `${result.created} ${commonUtils.addLastS("playthrough", result.created)} added from Steam`
+                  : "Playthroughs are up to date",
+              }),
+          })
+        }
+      />
       <div className={styles.steam__actions}>
         <Button
           type="button"

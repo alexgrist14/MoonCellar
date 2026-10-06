@@ -9,6 +9,7 @@ import {
   FAVOURITE_GAMES_TAB,
   ACTIVITY_TAB,
   RETROACHIEVEMENTS_TAB,
+  STEAM_TAB,
   userListCategories,
 } from "@/src/lib/shared/constants/user.const";
 import { useUserRaGamesQuery } from "@/src/lib/entities/user/api/user.queries";
@@ -188,6 +189,21 @@ export const UserNavigation: FC<{
           >
             <span className={styles.label}>RetroAchievements</span>
             <span className={styles.count}>{raGames.length}</span>
+          </Button>
+        )}
+        {!!user.steam?.steamId && (
+          <Button
+            className={styles.btn}
+            active={currentList === STEAM_TAB}
+            color={ButtonColor.TRANSPARENT}
+            href={getProfileHref(user.userName, STEAM_TAB)}
+            onClick={closeMenu}
+          >
+            <span className={styles.label}>Steam</span>
+            <span className={styles.count}>
+              {user.steam.achievements?.filter(({ gameId }) => !!gameId)
+                .length ?? 0}
+            </span>
           </Button>
         )}
         {(isAuthedUser || !!visibleLists.length) && (

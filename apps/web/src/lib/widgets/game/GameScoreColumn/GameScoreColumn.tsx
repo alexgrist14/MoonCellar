@@ -7,6 +7,10 @@ import { IGameResponse } from "@mooncellar/schemas";
 import { getHltbTiles } from "@/src/lib/shared/utils/hltb.utils";
 import { getGameRatingRows } from "@/src/lib/shared/utils/rating.utils";
 import { GameVndbBlock } from "@/src/lib/entities/game/ui/GameVndbBlock";
+import {
+  GameAchievementsBlock,
+  getAchievementCounts,
+} from "@/src/lib/entities/game/ui/GameAchievementsBlock";
 
 interface IGameScoreColumnProps {
   game: IGameResponse;
@@ -17,7 +21,14 @@ export const GameScoreColumn: FC<IGameScoreColumnProps> = ({
   game,
   className,
 }) => {
-  if (!getGameRatingRows(game).length && !getHltbTiles(game).length) {
+  const achievements = getAchievementCounts(game);
+
+  if (
+    !getGameRatingRows(game).length &&
+    !getHltbTiles(game).length &&
+    !achievements.steam &&
+    !achievements.retroachievements
+  ) {
     return null;
   }
 
@@ -32,6 +43,7 @@ export const GameScoreColumn: FC<IGameScoreColumnProps> = ({
       <GameRatingsBlock game={game} isBoxed={false} />
       <GameHltbBlock game={game} isBoxed={false} />
       <GameVndbBlock game={game} isBoxed={false} />
+      <GameAchievementsBlock game={game} isBoxed={false} />
     </Box>
   );
 };

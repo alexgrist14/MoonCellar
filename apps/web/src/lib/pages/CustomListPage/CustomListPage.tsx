@@ -143,6 +143,7 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
       votes,
       search,
       isOnlyWithAchievements,
+      isOnlyWithSteamAchievements,
     } = parsed;
 
     return {
@@ -154,6 +155,7 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
       votes,
       search,
       isOnlyWithAchievements,
+      isOnlyWithSteamAchievements,
     };
   }, [query]);
   const listKey = listQueryKeys.bySlug(
@@ -427,10 +429,7 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
             </div>
             <div className={styles.actions}>
               {!list.isPrivate && (
-                <ListLikeButton
-                  list={list}
-                  viewerId={viewerId}
-                />
+                <ListLikeButton list={list} viewerId={viewerId} />
               )}
               {isOwner && (
                 <Button
@@ -444,10 +443,7 @@ export const CustomListPage: FC<ICustomListPageProps> = ({
                 </Button>
               )}
               {!list.isPrivate && (
-                <Button
-                  color={ButtonColor.DEFAULT}
-                  onClick={handleCopyLink}
-                >
+                <Button color={ButtonColor.DEFAULT} onClick={handleCopyLink}>
                   <SvgLink size="16" style={{ color: "inherit" }} />
                   Copy link
                 </Button>

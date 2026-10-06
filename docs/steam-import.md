@@ -62,3 +62,47 @@ is unlinked.
 | `DELETE` | `/steam/account` | Unlink and delete the Steam list |
 
 All four need the session cookie and the `x-user-id` header (`UserIdGuard`).
+
+## Achievement counts
+
+Separate from the library import: every game with a Steam app id gets
+`steamAchievements: { appId, total, updatedAt }`, read from the Steam Web API
+(`ISteamUserStats/GetSchemaForGame`). The game page shows it in the "Achievements" block of the
+score column, next to the sum of its RetroAchievements sets.
+
+| | |
+|---|---|
+| Schedule | Nightly at 03:30 Moscow time, up to 60,000 games, one request about every second |
+| Order | Games never read, then counts older than 60 days |
+| No achievements | `total: 0` (Steam answers `{"game":{}}`, or 400 for an unknown app) |
+| Failure | Nothing stored; 10 in a row stop the run |
+| Manual | `POST /steam/achievements/sync?limit=`, `POST /steam/achievements/games/:gameId` (admin); the second is the "Parse Steam achievements" button in a game's Admin menu and on its edit page |
+
+## Achievement progress of linked accounts
+
+| | |
+|---|---|
+| Source | `IPlayerService/GetTopAchievementsForGames` (100 apps per request); `GetPlayerAchievements` for the date a game was fully completed |
+| When | After every library import (link, Update library) and nightly at 05:15 Moscow time for every linked account |
+| Stored | `user.steam.achievements`: games with at least one unlocked achievement, with their catalogue game when it matched |
+| Shown | Settings (counts and the playthrough toggle), the profile's Steam tab and block (progress such as "34 / 51", "Mastered") |
+| Playthroughs | Opt-in toggle: a mastered game (every achievement unlocked) gets a Completed + Mastered playthrough on PC |
+
+## Steam games in the catalogue
+
+Every game can carry `steam: { appId, name, updatedAt }`, its Steam app. `SteamGamesService` reads
+the whole Steam games list every Monday at 04:00 Moscow time (`POST /steam/games/sync` by hand) and:
+
+| Case | What happens |
+|---|---|
+| The game already has a Steam page (`externalPages`) | `steam` is filled from it |
+| One game has the app's exact name, has PC among its platforms and no Steam page | Linked automatically, Steam page added |
+| Several games share the name, or the only one is not on PC or has another Steam app | A `steam` conflict in the admin Conflicts tab |
+| No game has the name | Nothing; the app is not imported as a new game |
+
+Matching a conflict links the chosen games and adds their Steam page. Skipping adds the app as a
+new game, built from its store page: name, short description, developers and publishers, release
+date, PC / Mac / Linux, genres and game modes mapped to the catalogue's names, up to 10
+screenshots, the 600×900 library poster as the cover (the header image when there is none) and
+the library hero art as the background. The game is saved like one added by hand (`isCustom`),
+so a later IGDB match only fills its empty fields; a skipped Steam conflict cannot be reopened.

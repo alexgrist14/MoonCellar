@@ -458,13 +458,25 @@ export const Filters: FC<{
           </div>
           <div className={styles.filters__toggles}>
             <ToggleSwitch
-              label="Only with achievements"
+              label="RetroAchievements"
               labelPosition="end"
               checked={!!filters?.isOnlyWithAchievements}
               onChange={(isOnlyWithAchievements) =>
                 setFilters((filters) => ({
                   ...filters,
                   isOnlyWithAchievements: isOnlyWithAchievements || undefined,
+                }))
+              }
+            />
+            <ToggleSwitch
+              label="Steam achievements"
+              labelPosition="end"
+              checked={!!filters?.isOnlyWithSteamAchievements}
+              onChange={(isOnlyWithSteamAchievements) =>
+                setFilters((filters) => ({
+                  ...filters,
+                  isOnlyWithSteamAchievements:
+                    isOnlyWithSteamAchievements || undefined,
                 }))
               }
             />

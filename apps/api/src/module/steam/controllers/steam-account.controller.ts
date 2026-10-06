@@ -26,11 +26,27 @@ import {
   UnlinkSteamAccountResponseDto,
 } from "../../../shared/zod/dto/steam.dto";
 import { SteamAccountService } from "../services/steam-account.service";
+import { SteamPlaythroughsService } from "../services/steam-playthroughs.service";
 
 @ApiTags("Steam account")
 @Controller("steam/account")
 export class SteamAccountController {
-  constructor(private readonly service: SteamAccountService) {}
+  constructor(
+    private readonly service: SteamAccountService,
+    private readonly playthroughs: SteamPlaythroughsService
+  ) {}
+
+  @Post("playthroughs/sync")
+  @ApiOperation({
+    summary:
+      "Create playthroughs from fully completed Steam games, if the user turned it on",
+  })
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), UserIdGuard)
+  @HttpCode(HttpStatus.OK)
+  syncPlaythroughs(@Req() request: IViewerRequest) {
+    return this.playthroughs.sync(request.user._id as mongoose.Types.ObjectId);
+  }
 
   @Get("login-url")
   @ApiOperation({

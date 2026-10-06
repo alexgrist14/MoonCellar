@@ -1,4 +1,5 @@
 import {
+  ISteamAchievementsField,
   ILinkSteamAccountRequest,
   ISteamLoginUrlResponse,
   ISteamSyncResponse,
@@ -16,4 +17,10 @@ export const steamAPI = {
     agent.post<ISteamSyncResponse>(`${STEAM_ACCOUNT_URL}/link`, dto),
   sync: () => agent.post<ISteamSyncResponse>(`${STEAM_ACCOUNT_URL}/sync`),
   unlink: () => agent.delete<IUnlinkSteamAccountResponse>(STEAM_ACCOUNT_URL),
+  syncPlaythroughs: () =>
+    agent.post<{ created: number }>(`${STEAM_ACCOUNT_URL}/playthroughs/sync`),
+  parseAchievements: (gameId: string) =>
+    agent.post<ISteamAchievementsField>(
+      `${API_URL}/steam/achievements/games/${gameId}`
+    ),
 };

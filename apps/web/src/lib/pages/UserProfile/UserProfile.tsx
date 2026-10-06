@@ -7,6 +7,7 @@ import {
   FAVOURITE_GAMES_TAB,
   ACTIVITY_TAB,
   RETROACHIEVEMENTS_TAB,
+  STEAM_TAB,
   profileTabLabels,
   userListCategories,
 } from "@/src/lib/shared/constants/user.const";
@@ -20,6 +21,7 @@ import { Settings } from "@/src/lib/features/user/ui/Settings";
 import { UserGames } from "@/src/lib/widgets/user/UserGames";
 import { UserReviews } from "@/src/lib/widgets/user/UserReviews";
 import { UserRaGames } from "@/src/lib/widgets/user/UserRaGames";
+import { UserSteamGames } from "@/src/lib/widgets/user/UserSteamGames";
 import { ActivityTimeline } from "@/src/lib/features/user/ui/ActivityTimeline";
 import { UserLists } from "@/src/lib/widgets/user/UserLists";
 import { UserInfo } from "@/src/lib/widgets/user/UserInfo";
@@ -234,6 +236,7 @@ export const UserProfile: FC<UserProfileProps> = ({
           {tab === ACTIVITY_TAB && (
             <ActivityTimeline userId={user._id} isOwner={isAuthedUser} />
           )}
+          {tab === STEAM_TAB && <UserSteamGames steam={displayUser.steam} />}
           {tab === RETROACHIEVEMENTS_TAB && (
             <UserRaGames
               userId={user._id}

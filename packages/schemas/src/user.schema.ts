@@ -15,6 +15,7 @@ export const ProfileBlockSchema = z.enum([
   "favoriteGames",
   "favoriteCharacters",
   "retroachievements",
+  "steam",
   "lists",
   "likedLists",
   "activity",
@@ -30,12 +31,27 @@ export const UserSettingsSchema = z.object({
     .boolean()
     .default(false)
     .describe("Create playthroughs from RetroAchievements awards"),
+  steamSyncPlaythroughs: z
+    .boolean()
+    .default(false)
+    .describe("Create playthroughs from fully completed Steam games"),
   hiddenProfileBlocks: ProfileBlockSchema.array()
     .default([])
     .describe("Blocks hidden from the Profile tab"),
 });
 
 export const USER_NAME_MAX_LENGTH = 15;
+
+export const SteamProgressSchema = z.object({
+  appId: z.number().describe("Steam app"),
+  gameId: z.string().nullable().describe("Catalogue game the app matched"),
+  unlocked: z.number().describe("Achievements the user unlocked"),
+  total: z.number().describe("Achievements in the app"),
+  masteredAt: z
+    .string()
+    .nullable()
+    .describe("Last unlock of a game with every achievement, null otherwise"),
+});
 
 export const SteamAccountSchema = z.object({
   steamId: z.string().describe("SteamID64 of the linked account"),
@@ -44,6 +60,14 @@ export const SteamAccountSchema = z.object({
     .string()
     .nullable()
     .describe("Date the library was last imported"),
+  achievements: SteamProgressSchema.array()
+    .optional()
+    .describe("Games with at least one unlocked achievement"),
+  achievementsSyncedAt: z
+    .string()
+    .nullable()
+    .optional()
+    .describe("Date the achievement progress was last read"),
 });
 
 export const UserSchemaZod = z.object({
@@ -80,6 +104,7 @@ export const UserSchemaZod = z.object({
     bgOpacity: DEFAULT_BG_OPACITY,
     mutedNotifications: [],
     raSyncPlaythroughs: false,
+    steamSyncPlaythroughs: false,
     hiddenProfileBlocks: [],
   }),
   updatedAt: z.date(),
@@ -113,6 +138,7 @@ export const UpdateSettingsSchema = z
     bgOpacity: z.number().min(0).max(1),
     mutedNotifications: MutableNotificationTypeSchema.array(),
     raSyncPlaythroughs: z.boolean(),
+    steamSyncPlaythroughs: z.boolean(),
     hiddenProfileBlocks: ProfileBlockSchema.array(),
   })
   .partial();
@@ -215,4 +241,5 @@ export type IGetUserLoginsResponse = z.infer<
   typeof GetUserLoginsResponseSchema
 >;
 
+export type ISteamProgress = z.infer<typeof SteamProgressSchema>;
 export type IProfileBlock = z.infer<typeof ProfileBlockSchema>;

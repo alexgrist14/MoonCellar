@@ -20,6 +20,7 @@ import {
 import { FRONT_URL } from "../../../shared/constants";
 import { Game } from "../../games/schemas/game.schema";
 import { User } from "../../user/schemas/user.schema";
+import { SteamProgressService } from "./steam-progress.service";
 import { CustomListsService } from "../../collections/services/custom-lists.service";
 import {
   buildIgdbQueryParams,
@@ -64,7 +65,8 @@ export class SteamAccountService {
   constructor(
     @InjectModel(User.name) private readonly users: Model<User>,
     @InjectModel(Game.name) private readonly games: Model<Game>,
-    private readonly lists: CustomListsService
+    private readonly lists: CustomListsService,
+    private readonly progress: SteamProgressService
   ) {}
 
   private getReturnTo(user: User) {
@@ -165,6 +167,17 @@ export class SteamAccountService {
     user.steam.syncedAt = new Date();
     user.markModified("steam");
     await user.save();
+
+    await this.progress
+      .syncUser(userId, {
+        appIds: owned.map(({ appid }) => appid),
+        gameIdByAppId: byAppId,
+      })
+      .catch((err: Error) =>
+        this.logger.warn(
+          `Steam achievements were not read for ${String(userId)}: ${err.message}`
+        )
+      );
 
     return {
       steam: this.toAccount(user),

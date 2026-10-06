@@ -1,6 +1,20 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { SteamService } from "./services/steam.service";
+import { SteamAchievementsService } from "./services/steam-achievements.service";
+import { SteamProgressService } from "./services/steam-progress.service";
+import { SteamPlaythroughsService } from "./services/steam-playthroughs.service";
+import { SteamGamesService } from "./services/steam-games.service";
+import { ConflictsModule } from "../conflicts/conflicts.module";
+import { GamesModule } from "../games/games.module";
+import {
+  Platform,
+  PlatformDatabaseSchema,
+} from "../games/schemas/platform.schema";
+import {
+  Playthrough,
+  PlaythroughDatabaseSchema,
+} from "../games/schemas/playthroughs.schema";
 import { SteamAccountService } from "./services/steam-account.service";
 import { SteamController } from "./controllers/steam.controller";
 import { SteamAccountController } from "./controllers/steam-account.controller";
@@ -11,14 +25,25 @@ import { CollectionsModule } from "../collections/collections.module";
 
 @Module({
   controllers: [SteamController, SteamAccountController],
-  providers: [SteamService, SteamAccountService],
+  providers: [
+    SteamService,
+    SteamAccountService,
+    SteamAchievementsService,
+    SteamProgressService,
+    SteamPlaythroughsService,
+    SteamGamesService,
+  ],
   imports: [
     MongooseModule.forFeature([
       { name: Game.name, schema: GameDatabaseSchema },
       { name: User.name, schema: UserSchema },
+      { name: Platform.name, schema: PlatformDatabaseSchema },
+      { name: Playthrough.name, schema: PlaythroughDatabaseSchema },
     ]),
     MetricsModule,
     CollectionsModule,
+    ConflictsModule,
+    GamesModule,
   ],
 })
 export class SteamModule {}

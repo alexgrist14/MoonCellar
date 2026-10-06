@@ -2,7 +2,13 @@ import { z } from "zod";
 import { CompanySchema } from "./games.schema";
 import { ObjectIdSchema } from "./utils";
 
-export const ConflictSourceSchema = z.enum(["vndb", "igdb", "hltb", "ra"]);
+export const ConflictSourceSchema = z.enum([
+  "vndb",
+  "igdb",
+  "hltb",
+  "ra",
+  "steam",
+]);
 
 export const ConflictDirectionSchema = z
   .enum(["games", "entries"])

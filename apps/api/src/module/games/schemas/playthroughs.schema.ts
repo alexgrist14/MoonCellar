@@ -31,6 +31,8 @@ export class Playthrough {
   isSpoiler: boolean;
   @Prop()
   raGameId?: number;
+  @Prop()
+  steamAppId?: number;
   @Prop({ default: 0 })
   helpfulCount: number;
   @Prop()

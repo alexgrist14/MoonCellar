@@ -11,12 +11,14 @@ export const SOURCE_LABELS: Record<IConflictSource, string> = {
   igdb: "IGDB",
   hltb: "HLTB",
   ra: "RetroAchievements",
+  steam: "Steam",
 };
 
 const EXTERNAL_URLS: Partial<Record<IConflictSource, (id: string) => string>> =
   {
     vndb: (id) => `https://vndb.org/${id}`,
     ra: (id) => `https://retroachievements.org/game/${id}`,
+    steam: (id) => `https://store.steampowered.com/app/${id}`,
   };
 
 export const externalUrl = (source: IConflictSource, externalId: string) =>
@@ -48,6 +50,7 @@ const CREATES_GAME: Record<IConflictSource, boolean> = {
   igdb: true,
   hltb: false,
   ra: false,
+  steam: true,
 };
 
 const REOPENABLE: Record<IConflictSource, boolean> = {
@@ -55,6 +58,7 @@ const REOPENABLE: Record<IConflictSource, boolean> = {
   igdb: false,
   hltb: false,
   ra: true,
+  steam: false,
 };
 
 export const isReopenable = (source: IConflictSource, state: string) =>

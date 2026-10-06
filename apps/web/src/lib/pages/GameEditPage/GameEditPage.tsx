@@ -24,7 +24,13 @@ import {
   useUploadGameImageMutation,
 } from "@/src/lib/entities/game/api/game.mutations";
 import { usePlatformsQuery } from "@/src/lib/entities/platform/api/platform.queries";
-import { hltbApi, igdbApi, raApi, vndbApi } from "@/src/lib/shared/api";
+import {
+  hltbApi,
+  igdbApi,
+  raApi,
+  steamAPI,
+  vndbApi,
+} from "@/src/lib/shared/api";
 import { revalidateGamePage } from "@/src/lib/entities/game/api/game.actions";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
@@ -225,7 +231,7 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
     submission: number;
   } | null>(null);
   const [parsingSource, setParsingSource] = useState<
-    "igdb" | "vndb" | "hltb" | "ra" | null
+    "igdb" | "vndb" | "hltb" | "ra" | "steam" | null
   >(null);
 
   const {
@@ -541,7 +547,7 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
   };
 
   const runParse = async (
-    source: "igdb" | "vndb" | "hltb" | "ra",
+    source: "igdb" | "vndb" | "hltb" | "ra" | "steam",
     parse: () => Promise<{ slug?: string; isFailed?: boolean; message: string }>
   ) => {
     if (!gameId || parsingSource) return;
@@ -628,6 +634,21 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
       return {
         slug,
         message: `Linked RetroAchievements ${newRaIds.join(", ")}`,
+      };
+    });
+
+  const originalSteamAppId = (
+    original.externalPages as IGameResponse["externalPages"]
+  )?.find((page) => page.name === "Steam" && /^\d+$/.test(page.uid ?? ""))?.uid;
+
+  const handleParseSteamAchievements = () =>
+    runParse("steam", async () => {
+      const { data } = await steamAPI.parseAchievements(gameId!);
+
+      return {
+        message: data.total
+          ? `${data.total} achievements on Steam`
+          : "The Steam app has no achievements",
       };
     });
 
@@ -1153,6 +1174,24 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
                 : newRaIds.length
                   ? "Link RetroAchievements by id"
                   : "Refresh RetroAchievements"}
+            </Button>
+          )}
+          {!isCreate && (
+            <Button
+              color={ButtonColor.DEFAULT}
+              disabled={!!parsingSource || !originalSteamAppId}
+              tooltip={
+                !originalSteamAppId
+                  ? "Save a Steam external page first"
+                  : steamAppId !== originalSteamAppId
+                    ? "Reads the saved Steam app id; save the new one first"
+                    : undefined
+              }
+              onClick={handleParseSteamAchievements}
+            >
+              {parsingSource === "steam"
+                ? "Parsing…"
+                : "Parse Steam achievements"}
             </Button>
           )}
           {!isCreate && (

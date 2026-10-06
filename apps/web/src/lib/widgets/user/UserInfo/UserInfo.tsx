@@ -3,6 +3,7 @@ import {
   FAVOURITE_CHARACTERS_TAB,
   ACTIVITY_TAB,
   RETROACHIEVEMENTS_TAB,
+  STEAM_TAB,
   FAVOURITE_GAMES_TAB,
 } from "@/src/lib/shared/constants/user.const";
 import Image from "next/image";
@@ -42,6 +43,7 @@ import {
 import { FavoriteGames } from "@/src/lib/widgets/user/FavoriteGames";
 import { FavoriteCharacters } from "@/src/lib/widgets/user/FavoriteCharacters";
 import { UserRaGames } from "@/src/lib/widgets/user/UserRaGames";
+import { UserSteamGames } from "@/src/lib/widgets/user/UserSteamGames";
 import { useViewerFollowings } from "@/src/lib/features/user/model/useViewerFollowings";
 import styles from "./UserInfo.module.scss";
 
@@ -285,6 +287,14 @@ export const UserInfo: FC<UserInfoProps> = ({
           raUsername={user.raUsername}
           isPreview
           onShowAll={() => goTo(RETROACHIEVEMENTS_TAB)}
+        />
+      )}
+
+      {!hiddenBlocks.has("steam") && (
+        <UserSteamGames
+          steam={user.steam}
+          isPreview
+          onShowAll={() => goTo(STEAM_TAB)}
         />
       )}
 

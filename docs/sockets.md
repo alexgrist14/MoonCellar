@@ -516,7 +516,7 @@ that cancels out and deletes it, or a log removed by its owner.
 Admins resolving parser conflicts see each other's decisions live. When one admin matches or skips a
 conflict, every other open Conflicts tab marks it as decided, and an admin who has that conflict
 open gets a toast and loses the Skip and Match buttons. A conflict is identified by its `source`
-(`vndb`, `igdb`, `hltb`, `ra`) and its `externalId` — the entry in that source, or for `hltb` the catalogue game.
+(`vndb`, `igdb`, `hltb`, `ra`, `steam`) and its `externalId` — the entry in that source, or for `hltb` the catalogue game.
 
 | | |
 |---|---|
@@ -552,7 +552,7 @@ goes back to the queue.
 
 | Field | Type | Meaning |
 |---|---|---|
-| `source` | `"vndb"` \| `"igdb"` \| `"hltb"` \| `"ra"` | Parser the conflict came from |
+| `source` | `"vndb"` \| `"igdb"` \| `"hltb"` \| `"ra"` \| `"steam"` | Parser the conflict came from |
 | `externalId` | string | The entry in that source |
 | `state` | `"queued-match"` \| `"queued-new"` \| `"waiting"` | State after the decision; `"waiting"` after a reopen |
 | `decidedBy` | string \| null | User name of the admin who decided or reopened |
@@ -568,7 +568,7 @@ Emitted by `ConflictsService.applyBatch` after a batch is written.
 
 | Field | Type | Meaning |
 |---|---|---|
-| `source` | `"vndb"` \| `"igdb"` \| `"hltb"` \| `"ra"` | Parser the batch belongs to |
+| `source` | `"vndb"` \| `"igdb"` \| `"hltb"` \| `"ra"` \| `"steam"` | Parser the batch belongs to |
 | `externalIds` | string[] | Entries of the batch — written to games, or returned to review because nothing could be written |
 
 Client: invalidates those conflict items, the summaries and the list.

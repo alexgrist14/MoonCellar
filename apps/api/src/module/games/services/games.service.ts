@@ -354,6 +354,7 @@ export class GamesService implements OnModuleInit {
     take = 50,
     isRandom = false,
     isOnlyWithAchievements = false,
+    isOnlyWithSteamAchievements = false,
     page = 1,
     selected,
     excluded,
@@ -369,6 +370,7 @@ export class GamesService implements OnModuleInit {
     try {
       const baseFilters = {
         isOnlyWithAchievements,
+        isOnlyWithSteamAchievements,
         selected,
         excluded,
         mode,

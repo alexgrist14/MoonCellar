@@ -41,6 +41,20 @@ export const RetroachievementsSchema = z.object({
   numAchievements: z.number().optional(),
 });
 
+export const SteamGameSchema = z.object({
+  appId: z.number().describe("Steam app id"),
+  name: z.string().describe("Name of the app on Steam"),
+  updatedAt: z.string().describe("When the link was last confirmed"),
+});
+
+export const SteamAchievementsSchema = z.object({
+  appId: z.number().describe("Steam app the count was read from"),
+  total: z
+    .number()
+    .describe("Achievements in the Steam app, 0 when it has none"),
+  updatedAt: z.string().describe("When the count was read"),
+});
+
 export const VndbSchema = z.object({
   vnId: z.string(),
   lengthMinutes: z.number().nullable().optional(),
@@ -336,6 +350,8 @@ export const GameSchema = z.object({
   igdb: IGDBSchema.optional(),
   vndb: VndbSchema.optional(),
   hltb: HltbSchema.optional(),
+  steamAchievements: SteamAchievementsSchema.optional(),
+  steam: SteamGameSchema.optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -385,6 +401,17 @@ export const GetGamesRequestSchema = z.object({
           : Boolean(val)
     )
     .describe("Return only games that have retroachievements")
+    .optional(),
+  isOnlyWithSteamAchievements: z
+    .union([z.string(), z.boolean()])
+    .transform((val) =>
+      typeof val === "boolean"
+        ? val
+        : ["false", "0", "no"].includes(val.toLowerCase())
+          ? false
+          : Boolean(val)
+    )
+    .describe("Return only games that have Steam achievements")
     .optional(),
   page: z.coerce.number().min(1).describe("Page number").default(1).optional(),
   selected: GameFiltersSchema.describe(
@@ -567,6 +594,8 @@ export type IRetroachievementsField = z.infer<typeof RetroachievementsSchema>;
 export type IGDBField = z.infer<typeof IGDBSchema>;
 export type IVndbField = z.infer<typeof VndbSchema>;
 export type IHltbField = z.infer<typeof HltbSchema>;
+export type ISteamAchievementsField = z.infer<typeof SteamAchievementsSchema>;
+export type ISteamGameField = z.infer<typeof SteamGameSchema>;
 export type ICompanyField = z.infer<typeof CompanySchema>;
 export type IGameFilters = z.infer<typeof GameFiltersSchema>;
 export type IFilterMode = z.infer<typeof FilterModeSchema>;

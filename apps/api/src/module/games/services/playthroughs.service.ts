@@ -141,10 +141,17 @@ export class PlaythroughsService {
         }
       );
 
-      if (play?.raGameId != null) {
+      if (play?.raGameId != null || play?.steamAppId != null) {
         await this.users.updateOne(
           { _id: play.userId },
-          { $addToSet: { raIgnoredSets: play.raGameId } }
+          {
+            $addToSet: {
+              ...(play.raGameId != null && { raIgnoredSets: play.raGameId }),
+              ...(play.steamAppId != null && {
+                steamIgnoredApps: play.steamAppId,
+              }),
+            },
+          }
         );
 
         return play;

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { listQueryKeys } from "@/src/lib/entities/list/api";
+import { playthroughQueryKeys } from "@/src/lib/entities/playthrough/api/playthrough.query-keys";
 import { steamAPI, userAPI } from "@/src/lib/shared/api";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 
@@ -55,6 +56,31 @@ export const useSteamUnlinkMutation = () => {
     mutationFn: () => steamAPI.unlink().then(({ data }) => data),
     onSuccess: () => {
       void refresh();
+    },
+  });
+};
+
+export const useSteamPlaythroughsToggleMutation = () => {
+  const refresh = useAfterSteamChange();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (isOn: boolean) => {
+      const profile = useAuthStore.getState().profile;
+
+      if (!profile) return null;
+
+      await userAPI.updateSettings(profile._id, {
+        steamSyncPlaythroughs: isOn,
+      });
+
+      return isOn ? steamAPI.syncPlaythroughs().then(({ data }) => data) : null;
+    },
+    onSuccess: () => {
+      void refresh();
+      void queryClient.invalidateQueries({
+        queryKey: playthroughQueryKeys.all,
+      });
     },
   });
 };

@@ -13,6 +13,7 @@ import {
   hltbApi,
   igdbApi,
   raApi,
+  steamAPI,
   vndbApi,
 } from "@/src/lib/shared/api";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
@@ -37,11 +38,16 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
   const [isParsing, setIsParsing] = useState(false);
   const [isFullParsing, setIsFullParsing] = useState(false);
   const [isParsingHltb, setIsParsingHltb] = useState(false);
+  const [isParsingSteam, setIsParsingSteam] = useState(false);
   const [isParsingVndb, setIsParsingVndb] = useState(false);
   const [isParsingRa, setIsParsingRa] = useState(false);
-  const [hltbId, setHltbId] = useState("");
-  const [vndbId, setVndbId] = useState("");
-  const [raId, setRaId] = useState("");
+  const [hltbId, setHltbId] = useState(game.hltb?.hltbId ?? "");
+  const [vndbId, setVndbId] = useState(game.vndb?.vnId ?? "");
+  const [raId, setRaId] = useState(
+    game.retroachievements?.length === 1
+      ? String(game.retroachievements[0].gameId)
+      : ""
+  );
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRevalidating, setIsRevalidating] = useState(false);
 
@@ -151,7 +157,6 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
         title: "Parsed from RetroAchievements",
         description: data.message,
       });
-      setRaId("");
 
       await revalidateGamePage(game.slug, data.slug);
       router.refresh();
@@ -186,6 +191,32 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
       toast.success({ title: "Game id copied", description: game._id });
     } catch {
       toast.error({ title: "Failed to copy the game id" });
+    }
+  };
+
+  const steamAppId = game.externalPages?.find(
+    (page) => page.name === "Steam" && /^\d+$/.test(page.uid ?? "")
+  )?.uid;
+
+  const handleParseSteamAchievements = async () => {
+    setIsParsingSteam(true);
+
+    try {
+      const { data } = await steamAPI.parseAchievements(game._id);
+
+      toast.success({
+        title: "Parsed Steam achievements",
+        description: data.total
+          ? `${data.total} achievements on Steam`
+          : "The Steam app has no achievements",
+      });
+
+      await revalidateGamePage(game.slug);
+      router.refresh();
+    } catch {
+      return;
+    } finally {
+      setIsParsingSteam(false);
     }
   };
 
@@ -303,7 +334,7 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
           </Button>
         )}
         <TextField
-          label={vnId ? `VNDB id (current: ${vnId})` : "VNDB id"}
+          label="VNDB id"
           value={vndbId}
           placeholder="v17"
           disabled={isParsingVndb}
@@ -321,13 +352,12 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
         />
         <TextField
           label={
-            game.retroachievements?.length
-              ? `RetroAchievements id (current: ${game.retroachievements
-                  .map(({ gameId }) => gameId)
-                  .join(", ")})`
+            (game.retroachievements?.length ?? 0) > 1
+              ? `RetroAchievements id (${game.retroachievements!.length} sets linked)`
               : "RetroAchievements id"
           }
           value={raId}
+          placeholder="32909"
           disabled={isParsingRa}
           onChange={setRaId}
           isFlush
@@ -344,12 +374,9 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
           }
         />
         <TextField
-          label={
-            game.hltb?.hltbId
-              ? `HLTB id (current: ${game.hltb.hltbId})`
-              : "HLTB id"
-          }
+          label="HLTB id"
           value={hltbId}
+          placeholder="9705"
           disabled={isParsingHltb}
           onChange={setHltbId}
           isFlush
@@ -363,6 +390,20 @@ export const GameAdminControls: FC<IGameAdminControlsProps> = ({ game }) => {
             </Button>
           }
         />
+        {!!steamAppId && (
+          <Button
+            color={ButtonColor.DEFAULT}
+            disabled={isParsingSteam}
+            tooltip={
+              game.steamAchievements
+                ? `Current: ${game.steamAchievements.total} on Steam app ${game.steamAchievements.appId}`
+                : `Steam app ${steamAppId}, not read yet`
+            }
+            onClick={handleParseSteamAchievements}
+          >
+            {isParsingSteam ? "Parsing…" : "Parse Steam achievements"}
+          </Button>
+        )}
         <Button
           color={ButtonColor.RED}
           disabled={isDeleting}

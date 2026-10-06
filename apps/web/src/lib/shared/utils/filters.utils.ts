@@ -45,6 +45,7 @@ export const parseQueryFilters = (pathWithQuery: string): IGetGamesRequest => {
       ? [normalizeYear(filters.years[0]), normalizeYear(filters.years[1])]
       : undefined,
     isOnlyWithAchievements: filters?.isOnlyWithAchievements,
+    isOnlyWithSteamAchievements: filters?.isOnlyWithSteamAchievements,
     rating: filters?.rating,
     votes: filters?.votes,
     sortBy: filters?.sortBy,
@@ -154,6 +155,7 @@ const FILTER_QUERY_KEYS = new Set([
   "search",
   "years",
   "isOnlyWithAchievements",
+  "isOnlyWithSteamAchievements",
   "rating",
   "votes",
   "sortBy",
@@ -185,6 +187,7 @@ export const pushFiltersToQuery = (filters: IGetGamesRequest) => {
 export const hasGameFilters = (filters: IGetGamesRequest) =>
   !!filters.search ||
   !!filters.isOnlyWithAchievements ||
+  !!filters.isOnlyWithSteamAchievements ||
   filters.rating !== undefined ||
   filters.votes !== undefined ||
   !!filters.years?.some((year) => year !== null && year !== undefined) ||

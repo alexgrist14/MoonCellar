@@ -6,6 +6,8 @@ import {
   type IExternalPageField,
   type IGDBField,
   type IHltbField,
+  type ISteamAchievementsField,
+  type ISteamGameField,
   type IMultiplayerModeField,
   type IReleaseDate,
   type IRelatedGamesField,
@@ -104,6 +106,10 @@ export class Game {
   vndb: IVndbField;
   @Prop({ type: Object })
   hltb: IHltbField;
+  @Prop({ type: Object })
+  steamAchievements?: ISteamAchievementsField;
+  @Prop({ type: Object })
+  steam?: ISteamGameField;
   @Prop()
   hltbNotFoundAt: string;
   @Prop()

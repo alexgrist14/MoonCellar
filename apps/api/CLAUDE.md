@@ -209,6 +209,49 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   It is not an error status; treat a missing `games` array as "private" (422), never as an
   empty library, or the import replaces a full list with nothing.
 
+- **Steam achievement counts come from `ISteamUserStats/GetSchemaForGame` with `STEAM_API_KEY`,
+  never from the store's `appdetails`.** The Web API allows about 100,000 calls a day; the store
+  endpoint about 200 per five minutes, which would take days for the ~180,000 games that carry a
+  Steam app id (`externalPages` entry `Steam`, numeric `uid`). `SteamAchievementsService` runs
+  nightly (`STEAM_ACHIEVEMENTS_CRON`, at most `STEAM_ACHIEVEMENTS_DAILY_LIMIT` games under the
+  `steam-achievements-sync` lock): games never read first, then counts older than
+  `STEAM_ACHIEVEMENTS_STALE_DAYS`. `200 {"game":{}}` and `400` mean "no achievements" and store
+  `total: 0`; any other failure stores nothing, and 10 failures in a row stop the run — the HLTB
+  sync once read failures as "not found" and hid 60,000 games. Admins trigger it with
+  `POST /steam/achievements/sync` and one game with `POST /steam/achievements/games/:gameId`.
+
+- **A linked user's Steam progress comes from `IPlayerService/GetTopAchievementsForGames`, 100
+  apps per request.** With a large `max_achievements` it returns, per app, the total and every
+  achievement the user unlocked, so a 700-game library costs 8 requests instead of one
+  `GetPlayerAchievements` per game. It is not in Steam's published docs; if it changes, fall back to
+  `GetPlayerAchievements`. `SteamProgressService.syncUser` runs after every library import (link,
+  Update library) and nightly for every linked account, stores only games with at least one
+  unlocked achievement in `user.steam.achievements` (`appId`, `gameId`, `unlocked`, `total`,
+  `masteredAt`), and takes `masteredAt` from the last unlock time of `GetPlayerAchievements` for
+  newly mastered games only (`STEAM_PROGRESS_MASTERED_LOOKUPS` per run). A failure there never
+  fails the library import. `SteamPlaythroughsService` mirrors the RA one: only for a user with
+  `settings.steamSyncPlaythroughs`, a mastered game gets a `completed` + `isMastered` playthrough
+  marked `steamAppId`, never on a game the user already has a playthrough of, and deleting it adds
+  the app to `steamIgnoredApps`.
+- **The RA sync fills in set data for every linked set that lacks it** (`fillMissingSetData`):
+  from the downloaded lists when the set is there, otherwise one `getGameExtended` per set, at most
+  `RA_MISSING_SET_LOOKUPS` per run. A link the run did not match again — kept on purpose — or a set
+  on a console no platform maps to would otherwise stay without its icon and count forever.
+
+- **A game's Steam link lives in `steam` (`appId`, `name`, `updatedAt`), filled by
+  `SteamGamesService` from `IStoreService/GetAppList` (all ~190,000 Steam games, 50,000 per
+  request).** A game whose `externalPages` already carries a Steam id is linked directly (~143,000).
+  A Steam app nobody links is matched by exact `nameNormalized`: it links on its own only when
+  there is one candidate, the candidate has no Steam id of its own and PC (`win`, `mac`, `linux`)
+  among its platforms; any other name match becomes a `steam` conflict (direction `games`) with
+  the app snapshotted in `externalData`. Skip creates the game, as for VNDB: `createGame` reads the
+  store page (`appdetails`), takes the 600×900 library poster as the cover (the header image when
+  there is none) and `library_hero` as the background, and saves it through
+  `GamesService.addGame` (`isCustom`, images uploaded to the Space), so the conflict cannot be
+  reopened. A resolved conflict pins its
+  winners on every later run, so a link survives an IGDB sync that rewrites `externalPages`. Apps
+  with no name match (~44,000) are not imported as new games on their own.
+
 ## Database
 
 - **Declare reference paths as `@Prop({ type: mongoose.Schema.Types.ObjectId, ref })`; a bare
@@ -452,7 +495,7 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   back to `pending` with candidates rebuilt by the handler's `rematch`, so a game added to the
   catalogue after the Skip shows up. A VNDB or IGDB Skip has already created a game; reopening it
   would leave that game behind and let a Match link the entry a second time. RA implements it;
-  HLTB does not yet.
+  HLTB does not yet, and Steam must not (its Skip creates a game).
 - **A game the matcher missed is matched by adding it to the candidates first, never by passing
   its id to `decision`.** `decide` only accepts winners that are already among `candidates`
   (otherwise `400 The game is not a candidate`), so `POST /conflicts/:source/:externalId/candidates`

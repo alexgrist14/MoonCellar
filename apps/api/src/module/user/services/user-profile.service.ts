@@ -227,6 +227,7 @@ export class UserProfileService {
         bgOpacity: DEFAULT_BG_OPACITY,
         mutedNotifications: [],
         raSyncPlaythroughs: false,
+        steamSyncPlaythroughs: false,
         hiddenProfileBlocks: [],
         ...(user.settings ?? {}),
         ...(settings.showAdultContent !== undefined && {
@@ -240,6 +241,9 @@ export class UserProfileService {
         }),
         ...(settings.raSyncPlaythroughs !== undefined && {
           raSyncPlaythroughs: settings.raSyncPlaythroughs,
+        }),
+        ...(settings.steamSyncPlaythroughs !== undefined && {
+          steamSyncPlaythroughs: settings.steamSyncPlaythroughs,
         }),
         ...(settings.hiddenProfileBlocks !== undefined && {
           hiddenProfileBlocks: [...new Set(settings.hiddenProfileBlocks)],

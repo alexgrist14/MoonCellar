@@ -61,6 +61,10 @@ editing controls.
      tab and "All" on the Profile tab opens the right one. The navigation has a single Favourites
      entry, active on both, counting both lists.
    - `reviews` → `widgets/user/UserReviews`
+   - `steam` → `widgets/user/UserSteamGames`, read from `user.steam.achievements` (no request of
+     its own besides the game cards): mastered games first by date, then the rest by completion,
+     each captioned "Mastered" or "unlocked / total". The navigation shows it only for a linked
+     Steam account; the Profile tab shows the same widget as a two-row preview (`steam` block).
    - `activity` → `features/user/ui/ActivityTimeline`, the whole feed with pagination
      (`takeLogs` per page). The Profile tab shows the same component with `isPreview`: the first
      12 entries, no pagination, and "All" leading here.
@@ -68,7 +72,9 @@ editing controls.
      award for, from `GET /user/ra/:userId/games`, each card captioned with its best RA status
      (Mastered, Completed, Beaten, Beaten (softcore)) and the award date, sorted by that status
      and, within it, newest award first (`getUserGames` on the API). The navigation shows the
-     tab only when the user has an `raUsername`.
+     tab only when the user has an `raUsername`. Both achievement tabs page through 24 games
+     at a time with the fixed `Pagination` (24 fills whole rows at 6, 4, 3 and 2 columns); the
+     Steam tab loads game cards for the current page only.
    - `settings` → `features/user/ui/Settings`, owner only: one column of `CollapsibleSection`s,
      Account always open (`isStatic`) and every other section collapsed until clicked; Steam is
      `isKeptMounted` because `SteamAccount` finishes the Steam sign-in on mount and must run while

@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import classNames from "classnames";
 import { useGridRows } from "@/src/lib/shared/hooks/useGridRows";
 import { IRaGameStatus } from "@mooncellar/schemas";
@@ -8,12 +8,14 @@ import { Badge, BadgeTone } from "@/src/lib/shared/ui/Badge";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import styles from "./UserRaGames.module.scss";
 
 const PREVIEW_LIMIT = 12;
 const PREVIEW_ROWS = 2;
+const PAGE_SIZE = 24;
 
 const STATUS_LABELS: Record<IRaGameStatus, { label: string; tone: BadgeTone }> =
   {
@@ -46,7 +48,10 @@ export const UserRaGames: FC<IUserRaGamesProps> = ({
 }) => {
   const { data = [], isLoading } = useUserRaGamesQuery(userId, !!raUsername);
 
-  const items = isPreview ? data.slice(0, PREVIEW_LIMIT) : data;
+  const [page, setPage] = useState(1);
+  const items = isPreview
+    ? data.slice(0, PREVIEW_LIMIT)
+    : data.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const { ref: gridRef, visibleCount } = useGridRows<HTMLUListElement>(
     items.length,
     isPreview ? PREVIEW_ROWS : undefined
@@ -120,6 +125,15 @@ export const UserRaGames: FC<IUserRaGamesProps> = ({
             </li>
           ))}
         </ul>
+      )}
+      {!isPreview && (
+        <Pagination
+          take={PAGE_SIZE}
+          total={data.length}
+          page={page}
+          onPageChange={setPage}
+          isFixed
+        />
       )}
     </section>
   );

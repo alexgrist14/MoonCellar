@@ -56,6 +56,7 @@ import {
 } from "../utils/retroach.utils";
 
 const RA_MEDIA_URL = "https://media.retroachievements.org";
+const RA_MISSING_SET_LOOKUPS = 300;
 
 type TRaSet = Pick<
   GameList[number],
@@ -429,12 +430,74 @@ export class RetroachievementsService implements OnModuleInit {
       const consoles = await getConsoleIds(authorization);
       const matchedConsoles = await this.matchConsolesToPlatforms(consoles);
       const raGames = await this.fetchAllGames(authorization, matchedConsoles);
+      const result = await this.matchGames(raGames);
 
-      return await this.matchGames(raGames);
+      await this.fillMissingSetData(authorization, raGames);
+
+      return result;
     } catch (err) {
       this.logger.error(err, "Failed to sync RA games");
       throw err;
     }
+  }
+
+  private async fillMissingSetData(
+    authorization: AuthObject,
+    raGames: TRaSet[]
+  ) {
+    const missing = await this.games
+      .aggregate<{ _id: number }>([
+        { $unwind: "$retroachievements" },
+        { $match: { "retroachievements.consoleName": { $exists: false } } },
+        { $group: { _id: "$retroachievements.gameId" } },
+      ])
+      .exec();
+
+    if (!missing.length) return;
+
+    const fetchedById = new Map(raGames.map((raGame) => [raGame.id, raGame]));
+    let lookups = 0;
+    let filled = 0;
+
+    for (const { _id: raId } of missing) {
+      let raGame = fetchedById.get(raId);
+
+      if (!raGame && lookups < RA_MISSING_SET_LOOKUPS) {
+        lookups += 1;
+
+        try {
+          raGame = await getGameExtended(authorization, { gameId: raId });
+        } catch {
+          raGame = undefined;
+        }
+
+        await sleep(RA_GAMES_FETCH_DELAY_MS);
+      }
+
+      if (!raGame?.title) continue;
+
+      const { consoleName, imageIcon, numAchievements } =
+        this.toSetEntry(raGame);
+
+      await this.games.updateMany(
+        { "retroachievements.gameId": raId },
+        {
+          $set: {
+            "retroachievements.$[set].consoleName": consoleName,
+            ...(imageIcon && {
+              "retroachievements.$[set].imageIcon": imageIcon,
+            }),
+            "retroachievements.$[set].numAchievements": numAchievements,
+          },
+        },
+        { arrayFilters: [{ "set.gameId": raId }] }
+      );
+      filled += 1;
+    }
+
+    this.logger.info(
+      `Filled RA set data for ${filled} of ${missing.length} sets missing it (${lookups} looked up one by one)`
+    );
   }
 
   private async matchGames(raGames: TRaSet[]) {

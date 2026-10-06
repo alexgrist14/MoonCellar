@@ -4,6 +4,7 @@ import mongoose, { Document } from "mongoose";
 import {
   type IRAAward,
   type IRaPending,
+  type ISteamProgress,
   type IRole,
   DEFAULT_BG_OPACITY,
   type IUserSettings,
@@ -17,6 +18,10 @@ export class UserSteamAccount {
   linkedAt: Date;
   @Prop({ type: Date, default: null })
   syncedAt: Date | null;
+  @Prop({ type: [Object], default: undefined })
+  achievements?: ISteamProgress[];
+  @Prop({ type: Date, default: null })
+  achievementsSyncedAt?: Date | null;
 }
 
 export const UserSteamAccountSchema =
@@ -61,6 +66,8 @@ export class User extends Document {
   raAwards: IRAAward[];
   @Prop({ type: [Number], default: [] })
   raIgnoredSets: number[];
+  @Prop({ type: [Number], default: [] })
+  steamIgnoredApps: number[];
   @Prop({ type: UserSteamAccountSchema, required: false })
   steam?: UserSteamAccount;
   @Prop({ type: [String], default: ["user"] })
@@ -76,6 +83,7 @@ export class User extends Document {
       bgOpacity: DEFAULT_BG_OPACITY,
       mutedNotifications: [],
       raSyncPlaythroughs: false,
+      steamSyncPlaythroughs: false,
       hiddenProfileBlocks: [],
     },
   })
