@@ -1,6 +1,6 @@
 .container {
   @include flexColumnCenter;
-  gap: var(--gap-x12);
+  gap: var(--gap-x8);
   width: 100%;
 
   .banner {
@@ -87,108 +87,77 @@
     }
   }
 
-  .releases {
-    width: 100%;
-    z-index: 1;
+  .browse {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gap-x10);
 
-    &__groups {
+    &__group {
       display: flex;
       flex-direction: column;
-      gap: var(--gap-x8);
-    }
-
-    &__quarter {
-      font-size: clamp(1.05rem, 2vw, 1.3rem);
-      font-weight: 600;
-      color: var(--color-text-secondary);
-      margin-bottom: 14px;
-    }
-  }
-
-  .gauntlet {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-
-    &__content {
-      @include flexCenter;
-      gap: var(--gap-x5);
-      justify-content: space-evenly;
-      border-radius: var(--radius-x2);
-      padding: var(--padding-x5);
-      overflow: hidden;
-
-      .text {
-        color: var(--color-text-primary);
-        font-size: clamp(1.125rem, 2.1vw, 26px);
-        line-height: 1.5;
-
-        .link {
-          @include link;
-          color: inherit;
-        }
-
-        .img {
-          width: 32px;
-          height: 16px;
-        }
-      }
-
-      .cta {
-        width: 150px;
-        margin-top: var(--padding-x5);
-      }
-    }
-  }
-
-  .browse {
-    width: 100%;
-    z-index: 1;
-
-    &__content {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      width: 100%;
-      gap: var(--gap-x4);
-    }
-
-    &__card {
-      @include flexColumnCenter;
-      border-radius: var(--radius-x2);
-      width: 100%;
-      min-width: 0;
-      height: 150px;
-      padding: var(--padding-x8) var(--padding-x6);
-      background: $darkblueBg;
-      transition: transform 0.3s ease;
-
-      &:hover {
-        cursor: pointer;
-        transform: translateY(-4px);
-      }
+      gap: var(--gap-x2);
     }
 
     &__title {
-      font-size: clamp(1rem, 1.8vw, 1.5rem);
-      text-align: center;
+      padding-inline: var(--padding-x3);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-text-secondary);
+    }
+
+    &__list {
+      display: flex;
+      flex-direction: column;
+
+      li + li {
+        border-top: 1px solid var(--color-border-primary);
+      }
+    }
+
+    &__row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--gap-x4);
+      padding: var(--padding-x2) var(--padding-x3);
+      border-radius: var(--radius-x2);
+      color: var(--color-text-primary);
+      transition: background-color var(--duration-fast) var(--easing-out);
+
+      &:hover {
+        background-color: var(--color-bg-tertiary);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: -2px;
+      }
+    }
+
+    &__name {
+      min-width: 0;
+      font-size: 0.9375rem;
+      font-weight: 500;
     }
 
     &__count {
+      flex-shrink: 0;
+      font-size: 0.8125rem;
+      font-variant-numeric: tabular-nums;
       color: var(--color-text-muted);
+    }
+
+    @include mediaMd {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--gap-x6);
     }
   }
 
   @media (max-width: 1100px) {
-    gap: var(--gap-x10);
-
     .banner {
       padding: var(--padding-x10) var(--padding-x8);
-    }
-
-    .browse {
-      &__content {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
     }
   }
 
@@ -202,36 +171,11 @@
         text-align: center;
       }
     }
-
-    .gauntlet {
-      &__content {
-        flex-direction: column;
-        text-align: center;
-
-        .cta {
-          margin-inline: auto;
-        }
-      }
-    }
   }
 
   @media (max-width: 640px) {
-    gap: var(--gap-x8);
-
     .banner {
       padding: var(--padding-x8) var(--padding-x5);
-    }
-
-    .browse {
-      &__content {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      &__card {
-        height: auto;
-        min-height: 120px;
-        padding: var(--padding-x6) var(--padding-x4);
-      }
     }
   }
 
@@ -269,18 +213,6 @@
             transform: none;
           }
         }
-      }
-    }
-
-    .gauntlet {
-      &__content {
-        padding: var(--padding-x5) var(--padding-x4);
-      }
-    }
-
-    .browse {
-      &__content {
-        grid-template-columns: 1fr;
       }
     }
   }

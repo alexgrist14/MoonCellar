@@ -234,6 +234,15 @@
   --not-found-image-height: 240px;
   --not-found-backdrop-size: 400px;
   --favorite-color: var(--color-pink);
+  --moon-phase-lit-color: var(--color-neutral-95);
+  --moon-phase-dark-color: var(--color-bg-hover);
+  --moon-phase-unknown-color: var(--color-text-muted);
+  --moon-phase-unknown-fill: var(--color-bg-secondary);
+  --release-calendar-card-width: 172px;
+  --release-calendar-card-width-sm: var(--game-card-min-width);
+  --release-calendar-month-height: 16px;
+  --release-calendar-node-size: 28px;
+  --release-calendar-axis-color: var(--color-bg-hover);
   --game-controls-icon-size: 24px;
   --game-controls-icon-size-sm: 20px;
   --game-controls-badge-size: 15px;

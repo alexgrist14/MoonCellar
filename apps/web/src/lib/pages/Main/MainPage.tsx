@@ -2,16 +2,15 @@
 
 import Image from "next/image";
 import { FC } from "react";
+import Link from "next/link";
 import {
   IGameResponse,
   IGenreResponse,
   IUpcomingReleaseGroup,
 } from "@mooncellar/schemas";
 import styles from "./MainPage.module.scss";
-import Link from "next/link";
-import { commonUtils } from "@/src/lib/shared/utils/common.utils";
+import { ReleaseCalendar } from "@/src/lib/widgets/main/ReleaseCalendar";
 import { ReleaseRail } from "@/src/lib/widgets/main/ReleaseRail";
-import { GauntletWheel } from "@/src/lib/widgets/main/GauntletWheel";
 import { useHideAdult } from "@/src/lib/shared/hooks/useHideAdult";
 import { isAdultGame } from "@/src/lib/shared/utils/adult.utils";
 import { toSlug } from "@/src/lib/shared/utils/slug.utils";
@@ -19,7 +18,6 @@ import { IPlatformCount } from "@/src/lib/shared/types/games.type";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { BGImage } from "@/src/lib/shared/ui/BGImage";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
-import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { MAIN_PAGE_DESCRIPTION, MAIN_PAGE_TITLE } from "./MainPage.constants";
 
 interface MainPageProps {
@@ -30,14 +28,22 @@ interface MainPageProps {
     recent: IGameResponse[];
   };
   platforms: IPlatformCount[];
+  now: number;
 }
 
-export const MainPage: FC<MainPageProps> = ({ games, platforms }) => {
+const formatCount = (count: number) => count.toLocaleString("en-US");
+
+export const MainPage: FC<MainPageProps> = ({ games, platforms, now }) => {
   const hideAdult = useHideAdult();
+
+  const upcomingCount = games.upcoming.reduce(
+    (total, group) => total + group.games.length,
+    0
+  );
 
   const browseSections = [
     {
-      title: "Browse By Genre",
+      title: "By genre",
       items: games.genre.slice(0, 10).map((item) => ({
         name: item.genre,
         href: `/games/genre/${toSlug(item.genre)}`,
@@ -45,14 +51,14 @@ export const MainPage: FC<MainPageProps> = ({ games, platforms }) => {
       })),
     },
     {
-      title: "Browse By Platform",
+      title: "By platform",
       items: platforms.map((platform) => ({
         name: platform.name,
         href: `/games/platform/${platform.slug}`,
         count: platform.count,
       })),
     },
-  ];
+  ].filter(({ items }) => items.length);
 
   return (
     <>
@@ -84,84 +90,36 @@ export const MainPage: FC<MainPageProps> = ({ games, platforms }) => {
             </div>
           </div>
         </Box>
-        {!!games.upcoming?.length && (
-          <Box classNameContent={styles.releases}>
-            <SectionTitle isWithMarginBottom>Upcoming Releases</SectionTitle>
-            <div className={styles.releases__groups}>
-              {games.upcoming.map((group) => (
-                <div
-                  className={styles.releases__group}
-                  key={`${group.year}-${group.quarter}`}
-                >
-                  <h3 className={styles.releases__quarter}>{group.label}</h3>
-                  <ReleaseRail games={group.games} withDate />
-                </div>
-              ))}
-            </div>
+        {!!upcomingCount && (
+          <Box title="Release calendar" titleCount={upcomingCount}>
+            <ReleaseCalendar groups={games.upcoming} now={now} />
           </Box>
         )}
-        {!!games.recent?.length && (
-          <Box classNameContent={styles.releases}>
-            <SectionTitle isWithMarginBottom>Recently Released</SectionTitle>
+        {!!games.recent.length && (
+          <Box title="Out now">
             <ReleaseRail games={games.recent} withDate />
           </Box>
         )}
-        <Box classNameContent={styles.gauntlet}>
-          <SectionTitle isWithMarginBottom>Gauntlet</SectionTitle>
-          <div className={styles.gauntlet__content}>
-            <GauntletWheel />
-            <div>
-              <p className={styles.text}>
-                Can&apos;t decide what to play? Let fate choose your next
-                adventure from your library. It also supports games from{" "}
-                <Link
-                  className={styles.link}
-                  href={"https://retroachievements.org/"}
-                  target="_blank"
-                >
-                  RetroAchievements
-                </Link>{" "}
-                <Image
-                  className={styles.img}
-                  src={
-                    "https://static.retroachievements.org/assets/images/ra-icon.webp"
-                  }
-                  width={76}
-                  height={42}
-                  alt="RetroAchievements"
-                />
-              </p>
-              <Button
-                href="/gauntlet"
-                color={ButtonColor.GREEN}
-                className={styles.cta}
-              >
-                Try it now!
-              </Button>
-            </div>
-          </div>
-        </Box>
-        {browseSections.map(
-          ({ title, items }) =>
-            !!items.length && (
-              <Box classNameContent={styles.browse} key={title}>
-                <SectionTitle isWithMarginBottom>{title}</SectionTitle>
-                <div className={styles.browse__content}>
+        {!!browseSections.length && (
+          <Box title="Browse the catalogue" classNameContent={styles.browse}>
+            {browseSections.map(({ title, items }) => (
+              <section className={styles.browse__group} key={title}>
+                <h3 className={styles.browse__title}>{title}</h3>
+                <ul className={styles.browse__list}>
                   {items.map(({ name, href, count }) => (
-                    <Link
-                      href={href}
-                      className={styles.browse__card}
-                      key={href}
-                    >
-                      <h4 className={styles.browse__title}>{name}</h4>
-                      <div className={styles.browse__count}>
-                        {">"} {commonUtils.roundToFirstDigit(count)}
-                      </div>
-                    </Link>
+                    <li key={href}>
+                      <Link href={href} className={styles.browse__row}>
+                        <span className={styles.browse__name}>{name}</span>
+                        <span className={styles.browse__count}>
+                          {formatCount(count)}
+                        </span>
+                      </Link>
+                    </li>
                   ))}
-                </div>
-              </Box>
-            )
+                </ul>
+              </section>
+            ))}
+          </Box>
         )}
       </div>
     </>

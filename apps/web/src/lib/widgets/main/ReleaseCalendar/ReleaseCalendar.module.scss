@@ -1,0 +1,107 @@
+.calendar {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--gap-x8);
+  width: max-content;
+  padding-bottom: var(--padding-x2);
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(
+      var(--release-calendar-month-height) + var(--gap-x2) +
+        var(--release-calendar-node-size) / 2
+    );
+    height: 1px;
+    background: var(--release-calendar-axis-color);
+  }
+
+  @include mediaSm {
+    gap: var(--gap-x6);
+  }
+}
+
+.stop {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x2);
+
+  &__month,
+  &__node,
+  &__date,
+  &__caption {
+    margin-inline-start: var(--padding-x2);
+  }
+
+  &__month {
+    height: var(--release-calendar-month-height);
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: var(--release-calendar-month-height);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--color-text-secondary);
+  }
+
+  &__node {
+    position: relative;
+    align-self: flex-start;
+  }
+
+  &__date {
+    display: flex;
+    align-items: baseline;
+    gap: var(--gap-x2);
+    margin-top: var(--padding-x1);
+    white-space: nowrap;
+  }
+
+  &__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-primary);
+  }
+
+  &__weekday {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+  }
+
+  &__caption {
+    font-size: 0.8125rem;
+    white-space: nowrap;
+    color: var(--color-text-secondary);
+  }
+
+  &__games {
+    display: flex;
+    gap: var(--gap-x3);
+    margin-top: var(--padding-x2);
+  }
+
+  &__game {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--gap-x1);
+    width: var(--release-calendar-card-width);
+  }
+
+  &__release {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+  }
+
+  @include mediaSm {
+    &__game {
+      width: var(--release-calendar-card-width-sm);
+    }
+  }
+}

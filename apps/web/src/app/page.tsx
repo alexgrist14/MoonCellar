@@ -102,10 +102,11 @@ async function getGames(): Promise<{
 }
 
 export default async function Home() {
+  const now = new Date().getTime();
   const [games, platforms] = await Promise.all([
     getGames(),
     getFeaturedPlatforms().catch(() => [] as IPlatformCount[]),
   ]);
 
-  return <MainPage games={games} platforms={platforms} />;
+  return <MainPage games={games} platforms={platforms} now={now} />;
 }

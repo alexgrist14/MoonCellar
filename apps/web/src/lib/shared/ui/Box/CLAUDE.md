@@ -64,6 +64,12 @@ import { Box } from "@/src/lib/shared/ui/Box";
   heading duplicates the header the panel already draws.
 - Change a `Box`'s look only through its own props, never by overriding its internal classes
   from outside or copying its markup into a custom wrapper.
+- **A layout class passed through `classNameContent` must out-rank `.template__content`.** That
+  element already sets `display: flex`, `flex-direction: column`, `gap` and `padding` with one
+  class, the same specificity as yours, so whichever stylesheet loads last wins — and production
+  orders CSS chunks differently from `next dev`: a flex row on the home page rendered as a column
+  this way. Nest the class under the page's container (`.container .browse`), as `MainPage`
+  does, and restate every property Box sets that you rely on (`flex-direction: row`).
 - A percentage `max-height` on `contentStyle` does nothing on its own: `.wrapper` and
   `.template` are `height: fit-content`. Give the grid cell `align-self: stretch; min-height: 0`
   and pass `minHeight: 0; maxHeight: 100%` through `wrapperStyle`/`templateStyle`.

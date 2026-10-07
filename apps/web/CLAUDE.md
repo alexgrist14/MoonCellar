@@ -270,7 +270,7 @@ before:
   revalidate: a mass parse would turn every touched page into a cold render.
 - **Never catch inside an `unstable_cache` callback.** Next stores whatever the callback resolves
   to, so a `.catch(() => [])` inside turns a failed request into a legitimate empty result cached
-  for the whole `revalidate` window — the home page's "Browse By Platform" block disappeared for
+  for the whole `revalidate` window — the home page's platform links disappeared for
   an hour after a single render during an API outage, with `[]` sitting in the data cache. Let the
   callback throw and fall back at the call site, as `sitemap.ts` does: a thrown error is never
   written to the cache, so the next request retries.

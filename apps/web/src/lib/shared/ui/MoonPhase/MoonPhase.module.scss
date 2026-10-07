@@ -1,0 +1,25 @@
+.moon {
+  display: inline-flex;
+  flex-shrink: 0;
+  border-radius: 50%;
+
+  &_highlighted {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  &__dark {
+    fill: var(--moon-phase-dark-color);
+  }
+
+  &__lit {
+    fill: var(--moon-phase-lit-color);
+  }
+
+  &__unknown {
+    fill: var(--moon-phase-unknown-fill);
+    stroke: var(--moon-phase-unknown-color);
+    stroke-width: 1.5;
+    stroke-dasharray: 3 2.5;
+  }
+}

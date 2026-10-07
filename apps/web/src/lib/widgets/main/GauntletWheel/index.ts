@@ -1,1 +1,0 @@
-export { GauntletWheel } from "./GauntletWheel";
