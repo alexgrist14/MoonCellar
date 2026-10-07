@@ -141,6 +141,18 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   session and retries after a refresh, which would loop on a wrong password and then log the
   user out.
 
+## Gauntlet history
+
+- **Never add a single-segment `GET /user/<word>` route.** `UserProfileController` declares
+  `@Get(":userId")` and is registered first, so `GET /user/gauntlet-history` reached `getUser`
+  with `userId = "gauntlet-history"`. That is why the history has its own `gauntlet-history`
+  controller prefix; take the viewer from `request.user`, not from a path id.
+- **A history lives in `gauntlethistories`, one document per user and game (unique
+  `{ userId, gameId }`), ordered by `wonAt`.** A re-won game moves to the top instead of
+  appearing twice, unknown game ids are dropped, and every add trims the list to
+  `GAUNTLET_HISTORY_LIMIT` (oldest first). The limit is what keeps `GET /gauntlet-history/ids`
+  small — the web sends that whole list as `excludeGames` for "Exclude history".
+
 ## Custom lists and favourites
 
 - **Public user search is `GET /users/search`; never point a search box at `GET /user/search`.**
@@ -608,6 +620,11 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   `resolveMatch` is the former VNDB scoring unchanged, and the snapshot spec
   `vndb-match.characterization.spec.ts` pins it. A new source adds a profile. Change VNDB
   behaviour only on purpose: a changed snapshot is a behaviour change.
+- **Every RA link set by hand is pinned with `conflicts.pin("ra", …)`: "Link RetroAchievements by
+  id", an approved content request, and `GamesService.addGame` for a game created with
+  `retroachievements`.** The nightly RA sync matches each set by title and pulls it off every game
+  it did not match, so an unpinned set on a game named or filed differently from the RA title
+  silently disappears the next morning.
 
 ## AI drafts
 
@@ -617,6 +634,18 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   the character list, and the run spawned a draft for a "character" named "Clarification /
   Request". Keep `identified` on the character schema and `game` on the list schema, and turn a
   negative answer into a failed run whose error says what to change in the query.
+- **A link the server cannot fetch is described before the model starts, never left to
+  `fetch_page`.** `describeLink` turns a catalogue link (from our database) and a
+  `retroachievements.org/game/<id>` link (from the RA Web API, `getGameExtended`) into facts
+  appended to the query. RetroAchievements answers 403 to every server-side page fetch, so a draft
+  started from an RA link knew nothing but the id. `/Images/000002.png` is RA's "no box art"
+  placeholder and is dropped. A game draft from an RA link also carries the set in
+  `retroachievements`, built by `toRaSetEntry` like every other RA link.
+- **A search answered by the OpenAI fallback is a success, even though its text quotes the SearXNG
+  failure.** `searchWebWithFallback` prefixes the answer with `OPENAI_SEARCH_PREFIX` and the
+  reason, which contains `SEARCH_ENGINES_UNAVAILABLE`; the abort checks in `research` skip such
+  outputs. Matching the phrase anywhere failed every draft with "rate-limited or ask for a
+  CAPTCHA" while the fallback had already returned results.
 
 ## VNDB
 

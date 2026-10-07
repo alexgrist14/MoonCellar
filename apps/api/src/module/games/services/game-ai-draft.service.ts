@@ -9,6 +9,7 @@ import {
   ServiceUnavailableException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
+import { buildAuthorization, getGameExtended } from "@retroachievements/api";
 import { isValidObjectId, type Model, type Types } from "mongoose";
 import {
   GAME_IMAGE_CANDIDATES_MAX,
@@ -46,8 +47,12 @@ import {
 } from "../../../shared/remote-image";
 import { toReleaseDate } from "../../../shared/release-date";
 import { normalizeGameName, uniqueSlug } from "../../../shared/utils";
-import { FRONT_URL } from "../../../shared/constants";
+import { FRONT_URL, RA_MAIN_USER_NAME } from "../../../shared/constants";
 import { VNDB_WORLDWIDE_REGION } from "../constants/vndb";
+import {
+  RA_MEDIA_URL,
+  toRaSetEntry,
+} from "../../retroach/utils/retroach.utils";
 
 const OPENAI_URL = "https://api.openai.com/v1/responses";
 const STEAMGRIDDB_URL = "https://www.steamgriddb.com/api/v2";
@@ -62,6 +67,11 @@ const IMAGE_SEARCH_SUFFIX: Record<IGameImageKind, string> = {
 };
 const ADMIN_FETCH = { useSessions: true };
 const OPENAI_SEARCH_PREFIX = "OpenAI web search results";
+const RA_HOSTS = new Set([
+  "retroachievements.org",
+  "www.retroachievements.org",
+]);
+const RA_NO_IMAGE = "/Images/000002.png";
 const GENERIC_QUERY_WORDS = new Set([
   "the",
   "and",
@@ -460,9 +470,10 @@ export class GameAiDraftService implements OnModuleInit {
       `Known languages: ${filters.languages.join("; ")}`,
     ].join("\n");
 
+    const { context, retroachievements } = await this.describeLink(query);
     const draft = await this.research<IDraft>({
       instructions: `${INSTRUCTIONS}\n\n${knownLists}`,
-      input: query,
+      input: context ? `${query}\n\n${context}` : query,
       tools: TOOLS,
       schemaName: "game",
       schema,
@@ -471,7 +482,10 @@ export class GameAiDraftService implements OnModuleInit {
 
     await addStep("Building the draft");
 
-    return this.toGame(draft, platforms, filters);
+    return {
+      ...(await this.toGame(draft, platforms, filters)),
+      ...(retroachievements && { retroachievements }),
+    };
   }
 
   private async draftCharacterList(
@@ -479,7 +493,7 @@ export class GameAiDraftService implements OnModuleInit {
     count: number,
     addStep: (step: string) => Promise<unknown>
   ) {
-    const context = await this.describeCatalogueGame(query);
+    const { context } = await this.describeLink(query);
     const { game, characters } = await this.research<{
       game: string | null;
       characters: { name: string; query: string }[];
@@ -541,7 +555,7 @@ export class GameAiDraftService implements OnModuleInit {
     query: string,
     addStep: (step: string) => Promise<unknown>
   ): Promise<ISaveCharacterRequest> {
-    const context = await this.describeCatalogueGame(query);
+    const { context } = await this.describeLink(query);
     const draft = await this.research<ICharacterDraft>({
       instructions: CHARACTER_INSTRUCTIONS,
       input: context ? `${query}\n\n${context}` : query,
@@ -601,6 +615,66 @@ export class GameAiDraftService implements OnModuleInit {
     }
 
     return undefined;
+  }
+
+  private async describeLink(query: string) {
+    const catalogue = await this.describeCatalogueGame(query);
+
+    if (catalogue) return { context: catalogue };
+
+    const raGame = await this.findRaGame(query);
+
+    if (!raGame) return {};
+
+    return {
+      context: this.describeRaGame(raGame),
+      retroachievements: [toRaSetEntry(raGame)],
+    };
+  }
+
+  private async findRaGame(query: string) {
+    let gameId: number | undefined;
+
+    try {
+      const url = new URL(query.trim());
+
+      if (RA_HOSTS.has(url.host)) {
+        gameId = Number(url.pathname.match(/^\/game\/(\d+)\/?$/)?.[1]);
+      }
+    } catch {
+      return null;
+    }
+
+    const webApiKey = process.env.RETROACHIEVEMENTS_API_KEY;
+
+    if (!gameId || !webApiKey) return null;
+
+    const game = await getGameExtended(
+      buildAuthorization({ username: RA_MAIN_USER_NAME, webApiKey }),
+      { gameId }
+    ).catch(() => null);
+
+    return game?.title ? game : null;
+  }
+
+  private describeRaGame(game: Awaited<ReturnType<typeof getGameExtended>>) {
+    const images = [game.imageBoxArt, game.imageTitle, game.imageIngame]
+      .filter((path) => !!path && path !== RA_NO_IMAGE)
+      .map((path) => `${RA_MEDIA_URL}${path}`);
+
+    return [
+      "The link is this game on RetroAchievements. The site blocks fetching its pages, so do not fetch the link; search by the title instead.",
+      `Title: ${game.title}`,
+      "A ~Tag~ in a RetroAchievements title marks the kind of release (Prototype, Hack, Homebrew, Unlicensed, Demo, Subset), not part of the name.",
+      `Platform: ${game.consoleName}`,
+      game.developer && `Developer: ${game.developer}`,
+      game.publisher && `Publisher: ${game.publisher}`,
+      game.genre && `Genre: ${game.genre}`,
+      game.released && `Released: ${game.released}`,
+      images.length && `Images from RetroAchievements: ${images.join(" ")}`,
+    ]
+      .filter(Boolean)
+      .join("\n");
   }
 
   private async describeCatalogueGame(query: string) {
@@ -743,10 +817,15 @@ export class GameAiDraftService implements OnModuleInit {
         })
       );
       const searches = outputs.filter(({ name }) => SEARCH_TOOLS.has(name));
+      const allSearchesFailed = (isFailure: (output: string) => boolean) =>
+        !!searches.length &&
+        searches.every(
+          ({ output }) =>
+            !output.startsWith(OPENAI_SEARCH_PREFIX) && isFailure(output)
+        );
 
       if (
-        searches.length &&
-        searches.every(({ output }) =>
+        allSearchesFailed((output) =>
           output.includes(SEARCH_ENGINES_UNAVAILABLE)
         )
       ) {
@@ -755,10 +834,7 @@ export class GameAiDraftService implements OnModuleInit {
         );
       }
 
-      if (
-        searches.length &&
-        searches.every(({ output }) => CONNECTION_FAILURE.test(output))
-      ) {
+      if (allSearchesFailed((output) => CONNECTION_FAILURE.test(output))) {
         throw new ServiceUnavailableException(
           "Web search is not reachable: check that SearXNG runs at SEARXNG_URL, then retry the draft"
         );

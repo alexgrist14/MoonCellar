@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
-import { IGameResponse } from "@mooncellar/schemas";
+import { GAUNTLET_HISTORY_LIMIT, IGameResponse } from "@mooncellar/schemas";
 
 type IState = {
   games?: IGameResponse[];
@@ -49,8 +49,8 @@ const getActions = (set: any): IAction => ({
     set((state: IState) => ({
       historyGames: [
         game,
-        ...(!!state.historyGames?.length ? state.historyGames : []),
-      ],
+        ...(state.historyGames ?? []).filter(({ _id }) => _id !== game._id),
+      ].slice(0, GAUNTLET_HISTORY_LIMIT),
     })),
   removeHistoryGame: (game) =>
     set((state: IState) => ({

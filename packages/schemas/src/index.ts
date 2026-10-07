@@ -20,6 +20,7 @@ export * from "./platforms.schema";
 export * from "./playthroughs.schema";
 export * from "./ra.schema";
 export * from "./role.schema";
+export * from "./gauntlet-history.schema";
 export * from "./royal-games.schema";
 export * from "./steam.schema";
 export * from "./user-logs.schema";

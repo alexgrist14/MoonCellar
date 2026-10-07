@@ -91,7 +91,7 @@ export const CharacterProfile: FC<ICharacterProfileProps> = ({
         {description || "No description yet."}
       </p>
 
-      <div>
+      <div className={styles.profile__games}>
         <h3>Appears in:</h3>
         {games}
       </div>

@@ -9,5 +9,5 @@ interface CharacterGamesProps {
 export const CharacterGames: FC<CharacterGamesProps> = ({ games }) => {
   const { data } = useGamesByIdsQuery(games ?? []);
 
-  return <GamesCards games={data} />;
+  return <GamesCards games={data} columns={2} />;
 };

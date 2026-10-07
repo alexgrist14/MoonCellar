@@ -19,13 +19,15 @@ handled as follows:
 
 | Case | What happens |
 |---|---|
-| The game already has a Steam page (`externalPages`) | `steam` is filled from it |
+| The game already has a Steam page (`externalPages`) or a Steam store link in `websites` | `steam` is filled from it |
 | One game has the app's exact name, has PC among its platforms and no Steam page | Linked automatically, Steam page added |
 | Several games share the name, or the only one is not on PC or has another Steam app | A `steam` conflict in the admin Conflicts tab |
 | No game has the name | Nothing; the app is not imported as a new game |
 
 A game can carry several Steam pages (an edition, an expansion or a re-release on its own app).
-Every one of them counts as linked; `steam` takes the app whose name equals the game's, or the
+Every one of them counts as linked, and so does every `store.steampowered.com/app/<id>` link in
+`websites` — VNDB can fill `externalPages` with a demo's app while IGDB's link to the real one
+sits only in `websites`; `steam` takes the app whose name equals the game's, or the
 first one still on Steam. Each run deletes the undecided conflicts of apps that turned out to be
 linked already.
 

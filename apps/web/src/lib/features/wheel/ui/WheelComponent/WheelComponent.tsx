@@ -14,6 +14,11 @@ import { useSettingsStore } from "@/src/lib/shared/store/settings.store";
 import { SvgWheelPointer } from "@/src/lib/shared/ui/svg";
 import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
 import { useRoyalGames } from "@/src/lib/entities/royal/model/useRoyalGames";
+import {
+  useGauntletHistory,
+  useGauntletHistoryIds,
+} from "@/src/lib/entities/gauntlet-history/model/useGauntletHistory";
+import { useFiltersStore } from "@/src/lib/shared/store/filters.store";
 
 interface WheelComponentProps {
   primaryColor?: string;
@@ -65,7 +70,10 @@ export const WheelComponent: FC<WheelComponentProps> = ({
     (state) => state.setRoyalRemainingIds
   );
 
-  const { addHistoryGame, games } = useGamesStore();
+  const games = useGamesStore((state) => state.games);
+  const { addGame: addHistoryGame } = useGauntletHistory();
+  const isExcludeHistory = useFiltersStore((state) => state.isExcludeHistory);
+  const historyIds = useGauntletHistoryIds(isExcludeHistory);
   const { royalGames } = useRoyalGames();
   const {
     isFinished,
@@ -97,6 +105,7 @@ export const WheelComponent: FC<WheelComponentProps> = ({
     contrastColor,
     fontFamily,
     primaryColor,
+    excludeGames: historyIds,
   });
 
   useEffect(() => {

@@ -18,6 +18,7 @@ import { CustomList } from "../../collections/schemas/custom-list.schema";
 import { CustomListLike } from "../../collections/schemas/custom-list-like.schema";
 import { Notification } from "../../notifications/schemas/notification.schema";
 import { PushSubscription } from "../../notifications/schemas/push-subscription.schema";
+import { GauntletHistory } from "../schemas/gauntlet-history.schema";
 import { S3_FOLDERS } from "../../../shared/s3";
 import { FileService } from "./file-upload.service";
 import { UserRatingsService } from "./user-ratings.service";
@@ -46,6 +47,8 @@ export class AccountDeletionService {
     private readonly notifications: Model<Notification>,
     @InjectModel(PushSubscription.name)
     private readonly pushSubscriptions: Model<PushSubscription>,
+    @InjectModel(GauntletHistory.name)
+    private readonly gauntletHistory: Model<GauntletHistory>,
     private readonly ratingsService: UserRatingsService,
     private readonly fileService: FileService
   ) {}
@@ -81,6 +84,7 @@ export class AccountDeletionService {
     await this.deleteLists(id);
     await this.deleteNotifications(id);
     await this.pushSubscriptions.deleteMany({ userId: id });
+    await this.gauntletHistory.deleteMany({ userId: id });
     await this.users.updateMany(
       { $or: [{ followings: id }, { followers: id }] },
       { $pull: { followings: id, followers: id } },

@@ -36,6 +36,7 @@ import {
   weightedRatingExpr,
 } from "../../../shared/games";
 import { GameMatcherService } from "../matching/game-matcher.service";
+import { ConflictsService } from "../../conflicts/services/conflicts.service";
 import { FileService } from "../../user/services/file-upload.service";
 import { User } from "../../user/schemas/user.schema";
 import { Rating } from "../../user/schemas/user-ratings.schema";
@@ -121,7 +122,7 @@ const CHARACTERS_LOOKUP_STAGE = {
   },
 };
 
-const STRIP_CHARACTERS_STAGE = { $unset: "characters" };
+export const STRIP_CHARACTERS_STAGE = { $unset: "characters" };
 
 const withOrderedCharacters = <
   T extends {
@@ -140,7 +141,7 @@ const withOrderedCharacters = <
   ),
 });
 
-const TRIM_IGDB_STAGE = {
+export const TRIM_IGDB_STAGE = {
   $addFields: {
     igdb: {
       $cond: [
@@ -181,7 +182,8 @@ export class GamesService implements OnModuleInit {
     private userLogs: Model<UserLogs>,
     private fileService: FileService,
     private indexNow: IndexNowService,
-    private gameMatcher: GameMatcherService
+    private gameMatcher: GameMatcherService,
+    private conflicts: ConflictsService
   ) {}
 
   onModuleInit() {
@@ -527,6 +529,14 @@ export class GamesService implements OnModuleInit {
         createdAt: now,
         updatedAt: now,
       });
+
+      if (data.retroachievements?.length) {
+        await this.conflicts.pin(
+          "ra",
+          data.retroachievements.map(({ gameId }) => String(gameId)),
+          game._id
+        );
+      }
 
       this.indexNow.submitUrl(`${FRONT_URL}/games/${game.slug}`);
 

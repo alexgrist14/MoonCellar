@@ -1,5 +1,8 @@
 import { useCallback, useRef } from "react";
-import { createImage, drawCoverImage } from "@/src/lib/shared/utils/image.utils";
+import {
+  createImage,
+  drawCoverImage,
+} from "@/src/lib/shared/utils/image.utils";
 import { IGameResponse } from "@mooncellar/schemas";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { useGames } from "./useGames";
@@ -17,13 +20,15 @@ export const useWheel = ({
   contrastColor = "white",
   fontFamily = "pentagra",
   primaryColor = "black",
+  excludeGames,
 }: {
   primaryColor?: string;
   contrastColor?: string;
   fontFamily?: string;
+  excludeGames?: string[];
 }) => {
   const { setFinished, setLoading, setStarted, isRoyal } = useStatesStore();
-  const { getIGDBGames } = useGames();
+  const { getIGDBGames } = useGames(excludeGames);
   const hideAdult = useHideAdult();
 
   const lastDrawRef = useRef<{

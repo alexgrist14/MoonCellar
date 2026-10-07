@@ -2,7 +2,7 @@
 
 The game picker: a wheel that spins over either the filtered catalogue (Gauntlet mode) or the
 viewer's crowned shortlist (Royal mode, knock-out). Public; history and royal games persist per
-viewer.
+viewer — on the account for a signed-in user, in the browser for a guest.
 
 ## Routes
 
@@ -21,6 +21,12 @@ viewer.
   `pushState`. `GauntletModePanel` counts matching games with `useGamesQuery({ …, take: 1 })`.
 - Royal games are read and written only through `useRoyalGames` (guest store or the `/royal`
   socket for a signed-in user).
+- History (every Gauntlet winner) goes through `entities/gauntlet-history`: `useGauntletHistory`
+  adds, removes and clears, `useGauntletHistoryPageQuery` reads a page of
+  `GAUNTLET_HISTORY_TAKE` (6) games and `useGauntletHistoryIds` feeds "Exclude history". A
+  signed-in user's history is REST (`/gauntlet-history`, paged on the server); a guest's stays in
+  the persisted `games` store and is paged on the client. `useGauntletHistorySync` (mounted in
+  `Layout`) moves a guest history into the account at sign-in and empties the local one.
 
 ## Composition
 
@@ -35,7 +41,8 @@ Everything sits in `.wrapper` inside one `Suspense`:
 Then, in `.page`:
 
 2. Left `ExpandMenu` "Filters" → `Filters isGauntlet` — hidden in Royal mode.
-3. Right `ExpandMenu` "Lists" → `widgets/main/ConsolesList` (Gauntlet games, Royal list, History tabs).
+3. Right `ExpandMenu` "Lists" → `widgets/main/ConsolesList` (Gauntlet games, Royal list, History tabs;
+   History is `GauntletHistoryList`, with an inline `Pagination` under it).
 4. `BGImage` of the current winner.
 5. `widgets/wheel/WheelContainer` — the wheel, as tall as the space under the toolbar, and beside
    it the winner block, which always reaches the bottom of the page and scrolls inside. Before a
@@ -53,6 +60,12 @@ Then, in `.page`:
   takes whatever height the toolbar leaves, and the former two-column panel with cards, lede and
   steps left a ~400px wheel at 1280×800. Explanations belong in `GauntletIntro`, the winner block's
   empty state. Mockup: `docs/mockups/gauntlet-responsive.html` (option A).
+- **Read and change the history only through `entities/gauntlet-history`.** Reading
+  `useGamesStore().historyGames` shows a signed-in user the guest leftovers, and writing to it
+  never reaches the account. A guest's list is capped at `GAUNTLET_HISTORY_LIMIT` and deduplicated
+  like the server's, so a re-won game moves to the top instead of appearing twice.
+- **"Exclude history" sends every history id as `excludeGames`**, so the ids come from
+  `GET /gauntlet-history/ids`, not from the paged list — a page holds only 6 of them.
 - **Read and change royal games only through `useRoyalGames`.** Reading
   `useGamesStore().royalGames` directly shows a signed-in user the leftover guest list, and
   writing to it changes nothing on the account.

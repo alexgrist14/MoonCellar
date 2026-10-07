@@ -31,6 +31,10 @@
     margin: 0;
   }
 
+  &__games {
+    align-self: stretch;
+  }
+
   &__spoiler {
     align-self: stretch;
     padding-block: var(--padding-x1);

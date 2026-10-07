@@ -419,7 +419,8 @@ the ack. Other users never receive it. The client replaces `royal.store` with th
 | Royal games of a guest | Local `games` store only |
 | Saved presets (save, list, remove) | REST — `PUT`/`GET`/`DELETE /user/presets/:userId`; only *loading* a preset changes the list over the socket |
 | Game details of the listed games | REST — `useGamesByIdsQuery` fetches them by id |
-| History list, Gauntlet list, royal mode switch, wheel spin | Local stores |
+| History list | REST — `/gauntlet-history` for a signed-in user, the local `games` store for a guest |
+| Gauntlet list, royal mode switch, wheel spin | Local stores |
 | Another user's royal games | Not exposed anywhere |
 
 A change pushed from another tab while a royal round is in progress re-shuffles that tab's wheel,

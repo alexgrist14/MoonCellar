@@ -9,7 +9,6 @@ import {
   type AuthObject,
   buildAuthorization,
   type FetchedSystem,
-  type GameList,
   getConsoleIds,
   getGame,
   getGameExtended,
@@ -53,16 +52,13 @@ import {
 import {
   matchPlatformToConsole,
   pickExactTitleMatch,
+  RA_MEDIA_URL,
   rankGamesByTitle,
+  toRaSetEntry,
+  type TRaSet,
 } from "../utils/retroach.utils";
 
-const RA_MEDIA_URL = "https://media.retroachievements.org";
 const RA_MISSING_SET_LOOKUPS = 300;
-
-type TRaSet = Pick<
-  GameList[number],
-  "id" | "title" | "consoleId" | "consoleName" | "numAchievements"
-> & { imageIcon?: string; imageBoxArt?: string };
 
 @Injectable()
 export class RetroachievementsService implements OnModuleInit {
@@ -90,18 +86,6 @@ export class RetroachievementsService implements OnModuleInit {
       username: this.userName,
       webApiKey: this.apiKey,
     });
-  }
-
-  private toSetEntry(raGame: TRaSet): IRetroachievementsField {
-    return {
-      gameId: raGame.id,
-      consoleId: raGame.consoleId,
-      consoleName: raGame.consoleName,
-      ...(raGame.imageIcon && {
-        imageIcon: `${RA_MEDIA_URL}${raGame.imageIcon}`,
-      }),
-      numAchievements: raGame.numAchievements,
-    };
   }
 
   private toSnapshot(raGame: TRaSet): Record<string, unknown> {
@@ -322,7 +306,7 @@ export class RetroachievementsService implements OnModuleInit {
       );
       const { matchedCount } = await this.games.updateMany(
         { _id: { $in: winners } },
-        { $push: { retroachievements: this.toSetEntry(raGame) } }
+        { $push: { retroachievements: toRaSetEntry(raGame) } }
       );
 
       if (matchedCount) applied.set(externalId, winners[0]);
@@ -376,7 +360,7 @@ export class RetroachievementsService implements OnModuleInit {
         throw new NotFoundException(`RetroAchievements game not found: ${id}`);
       }
 
-      entries.push(this.toSetEntry(raGame));
+      entries.push(toRaSetEntry(raGame));
 
       if (raId !== undefined) {
         await this.conflicts.pin("ra", [String(id)], game._id);
@@ -477,8 +461,7 @@ export class RetroachievementsService implements OnModuleInit {
 
       if (!raGame?.title) continue;
 
-      const { consoleName, imageIcon, numAchievements } =
-        this.toSetEntry(raGame);
+      const { consoleName, imageIcon, numAchievements } = toRaSetEntry(raGame);
 
       await this.games.updateMany(
         { "retroachievements.gameId": raId },
@@ -592,7 +575,7 @@ export class RetroachievementsService implements OnModuleInit {
 
       for (const match of matches) {
         const id = match._id.toString();
-        const value = this.toSetEntry(raGame);
+        const value = toRaSetEntry(raGame);
         const list = gameIds[id];
 
         list ? list.push(value) : (gameIds[id] = [value]);

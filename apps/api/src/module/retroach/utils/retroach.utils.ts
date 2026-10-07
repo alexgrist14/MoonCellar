@@ -1,9 +1,28 @@
 import * as fuzzysort from "fuzzysort";
+import type { GameList } from "@retroachievements/api";
+import type { IRetroachievementsField } from "@mooncellar/schemas";
 import { getFormattedTitle } from "../../../shared/utils";
 import {
   RA_CONFLICT_CANDIDATES_LIMIT,
   RA_NAME_MATCH_THRESHOLD,
 } from "../constants/sync";
+
+export const RA_MEDIA_URL = "https://media.retroachievements.org";
+
+export type TRaSet = Pick<
+  GameList[number],
+  "id" | "title" | "consoleId" | "consoleName" | "numAchievements"
+> & { imageIcon?: string; imageBoxArt?: string };
+
+export const toRaSetEntry = (raGame: TRaSet): IRetroachievementsField => ({
+  gameId: raGame.id,
+  consoleId: raGame.consoleId,
+  consoleName: raGame.consoleName,
+  ...(raGame.imageIcon && {
+    imageIcon: `${RA_MEDIA_URL}${raGame.imageIcon}`,
+  }),
+  numAchievements: raGame.numAchievements,
+});
 
 export type MatchableGame = { name: string };
 

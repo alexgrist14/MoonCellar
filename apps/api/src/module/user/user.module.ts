@@ -29,6 +29,12 @@ import { Game, GameDatabaseSchema } from "../games/schemas/game.schema";
 import { JwtModule } from "@nestjs/jwt";
 import { UserRoyalGamesService } from "./services/user-royal-games.service";
 import { RoyalGamesGateway } from "./gateways/royal-games.gateway";
+import {
+  GauntletHistory,
+  GauntletHistoryDatabaseSchema,
+} from "./schemas/gauntlet-history.schema";
+import { UserGauntletHistoryService } from "./services/user-gauntlet-history.service";
+import { UserGauntletHistoryController } from "./controllers/user-gauntlet-history.controller";
 import { NotificationsModule } from "../notifications/notifications.module";
 import { RetroachievementsModule } from "../retroach/retroach.module";
 import { AccountDeletionService } from "./services/account-deletion.service";
@@ -82,6 +88,7 @@ import {
       { name: CustomListLike.name, schema: CustomListLikeDatabaseSchema },
       { name: Notification.name, schema: NotificationDatabaseSchema },
       { name: PushSubscription.name, schema: PushSubscriptionDatabaseSchema },
+      { name: GauntletHistory.name, schema: GauntletHistoryDatabaseSchema },
     ]),
     MetricsModule,
     NotificationsModule,
@@ -98,6 +105,7 @@ import {
     UserRAController,
     UserLogsController,
     UserRatingsController,
+    UserGauntletHistoryController,
     FilesController,
   ],
   providers: [
@@ -111,6 +119,7 @@ import {
     UserRatingsService,
     UserRAService,
     UserRoyalGamesService,
+    UserGauntletHistoryService,
     RoyalGamesGateway,
     AccountDeletionService,
   ],

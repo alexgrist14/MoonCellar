@@ -46,9 +46,8 @@ export const GameAchievementsBlock: FC<IGameAchievementsBlockProps> = ({
 
         return {
           key: `ra-${gameId}`,
-          label: platform
-            ? `RetroAchievements · ${platform}`
-            : "RetroAchievements",
+          label: "RetroAchievements",
+          sublabel: platform,
           value: numAchievements,
           icon: <SvgRetroAchievements size="20" />,
           title: `${numAchievements} achievements in the RetroAchievements set${platform ? ` for ${platform}` : ""}`,

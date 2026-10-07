@@ -20,14 +20,15 @@ Achievements blocks.
 
 `IStatRow`:
 
-| Field   | Type        | Purpose                                                                 |
-| ------- | ----------- | ----------------------------------------------------------------------- |
-| `key`   | `string`    | React key; defaults to the label when it is a string                    |
-| `label` | `ReactNode` | Caption, 14/18px `--color-text-muted`                                   |
-| `value` | `ReactNode` | The figure, 16/20px bold, tabular numbers, never wraps; format it first |
-| `unit`  | `ReactNode` | Small muted suffix after the value ("h")                                |
-| `icon`  | `ReactNode` | Rendered before the label (a trophy)                                    |
-| `title` | `string`    | Native tooltip on the row                                               |
+| Field      | Type        | Purpose                                                                 |
+| ---------- | ----------- | ----------------------------------------------------------------------- |
+| `key`      | `string`    | React key; defaults to the label when it is a string                    |
+| `label`    | `ReactNode` | Caption, 14/18px `--color-text-muted`                                   |
+| `sublabel` | `ReactNode` | Second line under the label, 12/16px muted (a platform name)            |
+| `value`    | `ReactNode` | The figure, 16/20px bold, tabular numbers, never wraps; format it first |
+| `unit`     | `ReactNode` | Small muted suffix after the value ("h")                                |
+| `icon`     | `ReactNode` | Rendered before the label (a trophy)                                    |
+| `title`    | `string`    | Native tooltip on the row                                               |
 
 ## Usage
 

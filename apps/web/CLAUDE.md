@@ -103,6 +103,13 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   control ends up looking different on every screen. When a consumer-owned look is really the
   consumer's own element (`GameCard`'s rail chips), render a native element from its module
   instead of a restyled `Button`.
+- **A component's own default for anything a consumer may place — `width`, margins, flex or grid
+  sizing — goes in `:where(.root)`, not in `.root`.** The consumer's `.parent__child` and the
+  component's `.root` have the same specificity, so the stylesheet loaded last wins, and production
+  splits CSS modules into chunks in a different order than `next dev`: `CharacterPortrait`'s
+  `width: 100%` loaded after `CharacterProfile`'s `--character-profile-portrait-width` and
+  stretched the portrait across the whole drawer in production only. `:where()` has zero
+  specificity, so the consumer's class wins in any order.
 - For text colour use the semantic tokens, never a raw `--color-neutral-*`: `--color-text-primary` (headings and main copy), `--color-text-secondary` (body text, intro paragraphs), `--color-text-muted` (captions, notes, metadata, breadcrumbs). Picking neutrals by hand is how text ends up unreadable on a `Box` over `BGImage` — the muted step is deliberately the lightest one that still reads as secondary.
 
 ## Rich text

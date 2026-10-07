@@ -1,6 +1,9 @@
+:where(.portrait) {
+  width: 100%;
+}
+
 .portrait {
   position: relative;
-  width: 100%;
   max-width: 100%;
   aspect-ratio: 3 / 4;
   border-radius: var(--radius-x3);

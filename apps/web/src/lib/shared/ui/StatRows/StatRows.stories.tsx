@@ -42,6 +42,7 @@ export const WithIcons: Story = {
       },
       {
         label: "RetroAchievements",
+        sublabel: "PlayStation 2",
         value: "117",
         icon: <SvgRetroAchievements size="20" />,
       },

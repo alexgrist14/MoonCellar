@@ -48,7 +48,9 @@ RA data is never stored in collections of its own; it lives on the records that 
 or on its edit page: `POST /ra/games/parse?raId=`. With an empty field, the button re-reads the
 sets already linked. The link is pinned through a resolved conflict (`ConflictsService.pin`), so
 the next sync keeps it. Open conflicts that list the game end; decided ones stay. A content
-request approved with RA ids is pinned the same way.
+request approved with RA ids is pinned the same way, and so is a game created on the admin
+page with RA sets filled in — including an AI draft started from a
+`retroachievements.org/game/<id>` link, which fills the set in from the RA Web API.
 
 ### Where it shows
 

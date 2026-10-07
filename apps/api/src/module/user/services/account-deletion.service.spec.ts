@@ -62,6 +62,7 @@ const createService = async () => {
     }),
     notifications: model(),
     pushSubscriptions: model(),
+    gauntletHistory: model(),
   };
   const ratingsService = {
     recalculateAverageRating: jest.fn().mockResolvedValue(undefined),
@@ -84,6 +85,7 @@ const createService = async () => {
     models.listLikes as never,
     models.notifications as never,
     models.pushSubscriptions as never,
+    models.gauntletHistory as never,
     ratingsService as never,
     fileService as never
   );

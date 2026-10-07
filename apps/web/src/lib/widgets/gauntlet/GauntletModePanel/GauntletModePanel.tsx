@@ -7,11 +7,11 @@ import {
   useGamesQuery,
 } from "@/src/lib/entities/game/api/game.queries";
 import { useRoyalGames } from "@/src/lib/entities/royal/model/useRoyalGames";
+import { useGauntletHistoryIds } from "@/src/lib/entities/gauntlet-history/model/useGauntletHistory";
 import { AppliedGameFilters } from "@/src/lib/features/filters/ui/Filters/AppliedGameFilters";
 import { ModeCards } from "@/src/lib/features/wheel/ui/ModeCards";
 import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
 import { useFiltersStore } from "@/src/lib/shared/store/filters.store";
-import { useGamesStore } from "@/src/lib/shared/store/games.store";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { parseQueryFilters } from "@/src/lib/shared/utils/filters.utils";
 import { useWheelStore } from "@/src/lib/shared/store/wheel.store";
@@ -27,17 +27,14 @@ export const GauntletModePanel: FC = () => {
   const isRoyal = !!useStatesStore((state) => state.isRoyal);
   const { asPath } = useAdvancedRouter();
   const isExcludeHistory = useFiltersStore((state) => state.isExcludeHistory);
-  const historyGames = useGamesStore((state) => state.historyGames);
+  const historyIds = useGauntletHistoryIds(isExcludeHistory);
   const matchParams = useMemo(
     () => ({
       ...parseQueryFilters(asPath),
       take: 1,
-      ...(isExcludeHistory &&
-        !!historyGames?.length && {
-          excludeGames: historyGames.map((game) => game._id),
-        }),
+      ...(!!historyIds?.length && { excludeGames: historyIds }),
     }),
-    [asPath, isExcludeHistory, historyGames]
+    [asPath, historyIds]
   );
   const { data: matches } = useGamesQuery(matchParams, !isRoyal);
   const matchTotal = matches?.total;

@@ -6,12 +6,12 @@ import { GamesList } from "@/src/lib/widgets/game/GamesList";
 import { RoyalGamesPanel } from "@/src/lib/widgets/main/RoyalGamesPanel";
 import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
 import { useRoyalGames } from "@/src/lib/entities/royal/model/useRoyalGames";
+import { GauntletHistoryList } from "./GauntletHistoryList";
 
 export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
   initialTabIndex,
 }) => {
-  const { games, historyGames, setHistoryGames, removeHistoryGame } =
-    useGamesStore();
+  const games = useGamesStore((state) => state.games);
   const { royalGames } = useRoyalGames();
 
   const [tabIndex, setTabIndex] = useState(initialTabIndex || 0);
@@ -51,13 +51,7 @@ export const ConsolesList: FC<{ initialTabIndex?: number }> = ({
       </div>
       {tabIndex === 0 && <GamesList games={games || royalGamesData || []} />}
       {tabIndex === 1 && <RoyalGamesPanel />}
-      {tabIndex === 2 && (
-        <GamesList
-          games={historyGames || []}
-          getGames={(games) => setHistoryGames(games)}
-          removeGame={(game) => removeHistoryGame(game)}
-        />
-      )}
+      {tabIndex === 2 && <GauntletHistoryList />}
     </div>
   );
 };
