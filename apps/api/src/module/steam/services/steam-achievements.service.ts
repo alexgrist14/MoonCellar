@@ -115,6 +115,12 @@ export class SteamAchievementsService {
 
     if (response.status === 400) return 0;
 
+    if (response.status === 403) {
+      const body = await response.json().catch(() => null);
+
+      if (body?.game) return countSchemaAchievements(body);
+    }
+
     if (!response.ok) {
       throw new SteamAchievementsFailedError(
         `Steam answered ${response.status} for app ${appId}`

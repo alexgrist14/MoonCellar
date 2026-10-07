@@ -79,7 +79,7 @@ Steam logo, next to the sum of its RetroAchievements sets.
 |---|---|
 | Schedule | Nightly at 03:30 Moscow time, up to 60,000 games, one request about every second |
 | Order | Games never read, then counts older than 60 days |
-| No achievements | `total: 0` (Steam answers `{"game":{}}`, or 400 for an unknown app) |
+| No achievements | `total: 0` (Steam answers `{"game":{}}` with 200 or 403, or 400 for an unknown app) |
 | Failure | Nothing stored; 10 in a row stop the run |
 | Manual | `POST /steam/achievements/sync?limit=`, `POST /steam/achievements/games/:gameId` (admin); the second is the "Parse Steam achievements" button in a game's Admin menu and on its edit page |
 

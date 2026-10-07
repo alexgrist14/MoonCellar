@@ -1,6 +1,8 @@
 import {
   countSchemaAchievements,
   getSteamAppId,
+  SteamAchievementsFailedError,
+  SteamAchievementsService,
 } from "./steam-achievements.service";
 
 describe("countSchemaAchievements", () => {
@@ -34,5 +36,32 @@ describe("getSteamAppId", () => {
     expect(
       getSteamAppId({ externalPages: [{ name: "Steam", uid: "portal-2" }] })
     ).toBeNull();
+  });
+});
+
+describe("SteamAchievementsService.fetchTotal", () => {
+  process.env.STEAM_API_KEY = "test";
+  const service = new SteamAchievementsService(
+    {} as never,
+    { setContext: jest.fn() } as never,
+    {} as never
+  );
+  const answer = (status: number, body: string) =>
+    jest
+      .spyOn(global, "fetch")
+      .mockResolvedValue(new Response(body, { status }));
+
+  afterEach(() => jest.restoreAllMocks());
+
+  it("reads a 403 with an empty schema as no achievements", async () => {
+    answer(403, '{"game":{}}');
+    await expect(service.fetchTotal(1036080)).resolves.toBe(0);
+  });
+
+  it("fails on a 403 that rejects the key", async () => {
+    answer(403, "<html><h1>Forbidden</h1></html>");
+    await expect(service.fetchTotal(440)).rejects.toThrow(
+      SteamAchievementsFailedError
+    );
   });
 });

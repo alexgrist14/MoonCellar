@@ -239,9 +239,12 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   Steam app id (`externalPages` entry `Steam`, numeric `uid`). `SteamAchievementsService` runs
   nightly (`STEAM_ACHIEVEMENTS_CRON`, at most `STEAM_ACHIEVEMENTS_DAILY_LIMIT` games under the
   `steam-achievements-sync` lock): games never read first, then counts older than
-  `STEAM_ACHIEVEMENTS_STALE_DAYS`. `200 {"game":{}}` and `400` mean "no achievements" and store
-  `total: 0`; any other failure stores nothing, and 10 failures in a row stop the run — the HLTB
-  sync once read failures as "not found" and hid 60,000 games. Admins trigger it with
+  `STEAM_ACHIEVEMENTS_STALE_DAYS`. `200 {"game":{}}`, `403 {"game":{}}` and `400` mean "no
+  achievements" and store `total: 0`; any other failure stores nothing, and 10 failures in a row
+  stop the run — the HLTB sync once read failures as "not found" and hid 60,000 games. Steam
+  answers an app without a stats schema with `403 {"game":{}}` and a bad key with a `403` HTML
+  page, so `fetchTotal` reads the body of a 403 before failing: counting every 403 as a failure
+  aborted each run after 10 schema-less games. Admins trigger it with
   `POST /steam/achievements/sync` and one game with `POST /steam/achievements/games/:gameId`.
 
 - **A linked user's Steam progress comes from `IPlayerService/GetTopAchievementsForGames`, 100
