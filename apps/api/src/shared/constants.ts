@@ -15,17 +15,24 @@ export const INDEXNOW_KEY =
   process.env.INDEXNOW_KEY || "74a6b85cd7164d77a0cccb5baae3d563";
 
 export const mimeToExt = {
-  'image/jpeg': 'jpg',
-  'image/png': 'png',
-  'image/gif': 'gif',
-  'image/webp': 'webp',
-  'image/avif': 'avif',
-  'application/pdf': 'pdf',
-  'application/msword': 'doc',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
-  'text/plain': 'txt',
-  'text/csv': 'csv',
-  'application/json': 'json',
-  'video/mp4': 'mp4',
-  'audio/mpeg': 'mp3',
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/gif": "gif",
+  "image/webp": "webp",
+  "image/avif": "avif",
+  "application/pdf": "pdf",
+  "application/msword": "doc",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+    "docx",
+  "text/plain": "txt",
+  "text/csv": "csv",
+  "application/json": "json",
+  "video/mp4": "mp4",
+  "audio/mpeg": "mp3",
 };
+
+export const SECOND = 1000;
+export const MINUTE = 60 * SECOND;
+export const HOUR = 60 * MINUTE;
+export const DAY = 24 * HOUR;
+export const WEEK = 7 * DAY;

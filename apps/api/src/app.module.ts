@@ -24,6 +24,7 @@ import { pinoConfig } from "./module/logger/logger.module";
 import { MetricsModule } from "./module/metrics/metrics.module";
 import { HttpMetricsInterceptor } from "./module/metrics/http-metrics.interceptor";
 import { HttpModule } from "@nestjs/axios";
+import { CacheModule } from "@nestjs/cache-manager";
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { HttpModule } from "@nestjs/axios";
       monitorCommands: true,
     }),
     HttpModule,
+    CacheModule.register({ isGlobal: true }),
     AuthModule,
     UserModule,
     AdminModule,

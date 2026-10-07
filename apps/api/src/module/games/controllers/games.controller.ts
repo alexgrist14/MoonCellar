@@ -64,6 +64,8 @@ import { RolesGuard } from "../../roles/roles.guard";
 import { Roles } from "../../roles/roles.decorator";
 import { RolesEnum } from "@mooncellar/schemas";
 import { UserIdGuard } from "../../auth/user.guard";
+import { CacheInterceptor, CacheTTL } from "@nestjs/cache-manager";
+import { DAY, HOUR, MINUTE, WEEK } from "../../../shared/constants";
 
 @ApiTags("Games")
 @Controller("games")
@@ -139,6 +141,8 @@ export class GamesController {
   }
 
   @Get("/top-rated-random")
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(15 * MINUTE)
   @ApiOperation({ summary: "Get 3 random top rated games" })
   @ApiCreatedResponse({ type: GetGamesResponseDto })
   async getTopRatedRandomGames() {
@@ -146,6 +150,8 @@ export class GamesController {
   }
 
   @Get("/count-by-genre")
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(WEEK)
   @ApiOperation({ summary: "Get total games count grouped by genre" })
   @ApiCreatedResponse({
     description: "Array of objects with genre and count",
@@ -165,6 +171,8 @@ export class GamesController {
   }
 
   @Get("/upcoming")
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(HOUR)
   @ApiOperation({ summary: "Get upcoming releases grouped by quarter" })
   @ApiCreatedResponse({
     description: "Array of quarter groups with games",
