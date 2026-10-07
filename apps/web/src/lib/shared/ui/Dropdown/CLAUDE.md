@@ -19,7 +19,7 @@ the list opens in a bottom `PopoverSheet` instead.
 | `list`                                             | `string[]`                        | —                                         | Labels to show. Values are reported by label or by index into this array.                                                                                                                                       |
 | `title`                                            | `string`                          | —                                         | Heading (`h4`) above the field; also the mobile sheet title. Without it the sheet has none — never the placeholder, which reads as a value ("All games").                                                       |
 | `placeholder`                                      | `string`                          | `"Select..."` / `"Enter/Select value..."` | Field text when empty.                                                                                                                                                                                          |
-| `initialValue`                                     | `string`                          | —                                         | Starting single value.                                                                                                                                                                                          |
+| `initialValue`                                     | `string`                          | —                                         | Single value. Re-applied whenever it changes, so a parent can drive it (a form `reset`).                                                                                                                        |
 | `overwriteValue`                                   | `string`                          | —                                         | Controlled single value; every change overwrites the internal one.                                                                                                                                              |
 | `initialMultiValue`                                | `number[]`                        | —                                         | Selected indexes (multi). Re-applied whenever the array identity changes.                                                                                                                                       |
 | `initialExcludeValue`                              | `number[]`                        | —                                         | Excluded indexes (with `isWithExclude`).                                                                                                                                                                        |
@@ -87,9 +87,13 @@ import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
   the search query.
 - `initialMultiValue` is re-applied on every new array identity — pass a memoised array or
   each parent render resets the selection.
+- **`initialValue` is re-applied whenever it changes, so pass the current value, never a value
+  that moves on its own.** It used to be read only on mount, and `EnumField` (which forwards its
+  `value` here) kept showing the old choice after a react-hook-form `reset`: an applied AI draft
+  showed an empty Type while the form held one and created the game with it.
 
 ## Storybook
 
 `Shared/Dropdown`: `Default`, `WithTitle`, `Selected`, `WithReset`, `Multi`, `WithExclude`,
-`WithSearch`, `WithSearchAutoFocus`, `WithInput`, `Compact`, `BorderThemes`, `Disabled`, `Loading`, `Empty`,
+`WithSearch`, `WithSearchAutoFocus`, `WithInput`, `ChangedByParent`, `Compact`, `BorderThemes`, `Disabled`, `Loading`, `Empty`,
 `ThroughPortal`, `WithIconsAndHints`.

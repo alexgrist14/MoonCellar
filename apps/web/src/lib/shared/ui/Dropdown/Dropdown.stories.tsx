@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { useState } from "react";
+import { Button } from "../Button";
 import { Dropdown } from "./Dropdown";
 import { SvgRetroAchievements, SvgSteam } from "../svg";
 
@@ -99,6 +101,29 @@ export const WithInput: Story = {
     list: ["Team Cherry", "FromSoftware", "Supergiant Games"],
     isWithInput: true,
   },
+};
+
+const ChangedByParentDemo = () => {
+  const [value, setValue] = useState<string>();
+
+  return (
+    <div style={{ display: "grid", gap: "var(--gap-x3)" }}>
+      <Dropdown
+        list={platforms}
+        title="Platform"
+        isWithReset
+        initialValue={value}
+        getValue={(next) => setValue(next ?? undefined)}
+      />
+      <Button onClick={() => setValue("Nintendo Switch")}>
+        Set Nintendo Switch from outside
+      </Button>
+    </div>
+  );
+};
+
+export const ChangedByParent: Story = {
+  render: () => <ChangedByParentDemo />,
 };
 
 export const Compact: Story = { args: { isCompact: true } };

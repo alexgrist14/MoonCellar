@@ -220,6 +220,10 @@ export const useDropdown = ({
   }, [overwriteValue]);
 
   useEffect(() => {
+    overwriteValue === undefined && setValue(initialValue);
+  }, [initialValue, overwriteValue]);
+
+  useEffect(() => {
     !!initialMultiValue && setMultiValue(initialMultiValue);
   }, [initialMultiValue]);
 
