@@ -21,28 +21,31 @@ export const NotificationsBell: FC = () => {
 
   return (
     <>
-      <Button
-        ref={anchorRef}
-        className={styles.trigger}
-        compact
-        isOnlyIcon
-        color={ButtonColor.TRANSPARENT}
-        tooltip="Notifications"
-        aria-label={
-          unreadCount ? `Notifications, ${unreadCount} unread` : "Notifications"
-        }
-        aria-expanded={isOpen}
-        onClick={() => setIsOpen((value) => !value)}
-      >
-        <SvgBell size="20" />
+      <span className={styles.trigger}>
+        <Button
+          ref={anchorRef}
+          compact
+          isOnlyIcon
+          color={ButtonColor.TRANSPARENT}
+          tooltip="Notifications"
+          aria-label={
+            unreadCount
+              ? `Notifications, ${unreadCount} unread`
+              : "Notifications"
+          }
+          aria-expanded={isOpen}
+          onClick={() => setIsOpen((value) => !value)}
+        >
+          <SvgBell size="20" />
+        </Button>
         {!!unreadCount && (
-          <span className={styles.count}>
+          <span className={styles.count} aria-hidden>
             {unreadCount > MAX_SHOWN_COUNT
               ? `${MAX_SHOWN_COUNT}+`
               : unreadCount}
           </span>
         )}
-      </Button>
+      </span>
       <Popover
         anchorRef={anchorRef}
         isOpen={isOpen}

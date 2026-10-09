@@ -31,6 +31,7 @@ export type INotifyParams = {
   actorId?: IIdLike | null;
   type: INotificationType;
   subjectId: IIdLike;
+  groupId?: IIdLike;
   payload?: INotificationPayload;
 };
 
@@ -43,8 +44,14 @@ export type IRetractParams = {
 
 const toId = (id: IIdLike) => new mongoose.Types.ObjectId(String(id));
 
-const getGroupKey = (type: INotificationType, subjectId: IIdLike) =>
-  `${type}:${String(subjectId)}`;
+const getGroupKey = (
+  type: INotificationType,
+  subjectId: IIdLike,
+  groupId?: IIdLike
+) =>
+  groupId
+    ? `${type}:${String(subjectId)}:${String(groupId)}`
+    : `${type}:${String(subjectId)}`;
 
 const isDuplicateKeyError = (error: unknown) =>
   (error as { code?: number } | null)?.code === 11000;
@@ -215,7 +222,15 @@ export class NotificationsService {
     return { unreadCount: await this.pushUnreadCount(userId) };
   }
 
-  private upsert({ userId, actorId, type, subjectId, payload }: INotifyParams) {
+  private upsert({
+    userId,
+    actorId,
+    type,
+    subjectId,
+    groupId,
+    payload,
+  }: INotifyParams) {
+    const groupKey = getGroupKey(type, subjectId, groupId);
     const recipient = toId(userId);
     const actor = actorId ? toId(actorId) : null;
     const actorIds = { $ifNull: ["$actorIds", []] };
@@ -224,7 +239,7 @@ export class NotificationsService {
       .findOneAndUpdate(
         {
           userId: recipient,
-          groupKey: getGroupKey(type, subjectId),
+          groupKey,
           isRead: false,
         },
         [
@@ -233,7 +248,7 @@ export class NotificationsService {
               userId: recipient,
               type: { $literal: type },
               subjectId: toId(subjectId),
-              groupKey: { $literal: getGroupKey(type, subjectId) },
+              groupKey: { $literal: groupKey },
               payload: { $literal: payload ?? {} },
               isRead: false,
               readAt: null,

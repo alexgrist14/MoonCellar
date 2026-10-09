@@ -18,6 +18,7 @@ import {
   getFollowingActivity,
   isEmptyLog,
   isSameLogValue,
+  LOG_FIELDS,
   mergeLogChanges,
   pickLogChanges,
   toLogUpdate,
@@ -131,6 +132,8 @@ export class UserLogsService {
 
     if (!activity) return;
 
+    const part = LOG_FIELDS.find((field) => change[field] !== undefined);
+
     try {
       const [user, game] = await Promise.all([
         this.userModel.findById(userId).select("followers").lean(),
@@ -145,6 +148,7 @@ export class UserLogsService {
           actorId: userId,
           type: "following-activity",
           subjectId: userId,
+          groupId: `${gameId}:${part}`,
           payload: { ...activity, gameSlug: game.slug, gameName: game.name },
         });
       }

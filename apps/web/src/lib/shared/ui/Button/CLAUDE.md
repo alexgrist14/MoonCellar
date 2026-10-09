@@ -106,6 +106,10 @@ import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
   consumer.
 - Icon and label are spaced by the button's own `gap: var(--gap-x2)`; never restate it.
 - Give an icon-only button an accessible name: `tooltip` as a string or `aria-label`.
+- **`Button` clips its children (`overflow: hidden` from `textEllipsis`, cut to
+  `--radius-button`).** A badge positioned at its edge loses its corners; put the button and the
+  badge in a `position: relative` wrapper and render the badge as the button's sibling, as
+  `NotificationsBell` does with its unread count.
 - **Icon plus text goes in as siblings, never wrapped in a fragment.** A single child whose type
   is not a string counts as an icon, and a `<>…</>` is such a child — it gets `button_icon`'s
   equal padding. `<Svg />{count}` is an array and is measured as text.

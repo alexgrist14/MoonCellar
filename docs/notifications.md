@@ -23,7 +23,7 @@ yet. Each user can turn types off under Settings → Notifications.
 | `list-like` | Owner of the list | `CustomListsService.setLike` | The list | The list |
 | `request-decided` | Author of the request | `ContentRequestsService.decide` | Nothing | `/requests` |
 | `wishlist-release` | Everyone with the game in `wishlist` | `WishlistReleasesService`, daily at 09:00 Moscow | Nothing: one per game | The game page |
-| `following-activity` | Every follower of the user | `UserLogsService.recordUserLog`, when a log entry is created or changed (a playthrough, a rating, a favourite) | The followed user: one unread notification per person, its game is the latest one | That user's profile, where the activity feed is |
+| `following-activity` | Every follower of the user | `UserLogsService.recordUserLog`, when a log entry is created or changed (a playthrough, a rating, a favourite) | The followed user, the game and the part of the log (playthrough, rating, favourite): one unread notification per person, game and part | That user's profile, where the activity feed is |
 | `comment-moderated` | Author of the comment | `CommentsService.changeStatus` (hide or delete by someone else) | The comment | `/games/<slug>#discussion` |
 
 `#discussion` opens the game page's Discussion tab and `#reviews` its Reviews tab, and both
@@ -34,7 +34,10 @@ scroll to the block (`GameCommunity`).
 favourite, a new status ("completed", "added … to their wishlist"), mastering, or any other edit of
 a playthrough. Removals (a cleared rating, an unfavourite, a deleted playthrough) notify nobody.
 The group keeps only the latest event, so its sentence always describes the last thing the person
-did. It is not an alert, so it never pushes, and it is not retracted: removing a log entry leaves
+did to that part of that game. Completing a game and rating it are two notifications, and so are
+two games rated in a row (`groupId` is `<gameId>:<part>`). Grouping by the person alone made every
+action overwrite the one before, so a follower saw only the last rating and never the
+completion. It is not an alert, so it never pushes, and it is not retracted: removing a log entry leaves
 an unread notification about it in place. It fans out with one `notify()` per
 follower, each with its own mute check and upsert; a user with thousands of followers would need a
 bulk write instead.
@@ -65,7 +68,7 @@ One document in `notifications` per group of events:
 | `userId` | Recipient |
 | `type` | One of the types above |
 | `subjectId` | What it is about: the comment, review, list, request, or the recipient for `follow` |
-| `groupKey` | `type:subjectId` |
+| `groupKey` | `type:subjectId`, plus `:groupId` when `notify()` is given one (the game and the log part for `following-activity`) |
 | `actorIds` | Everyone behind it, latest first; empty for moderation and requests |
 | `payload` | What the text and the link need: game slug and name, list slug and name, decision, request kind and name, the moderator's reason, the moderation status |
 | `isRead`, `readAt` | Read state |
