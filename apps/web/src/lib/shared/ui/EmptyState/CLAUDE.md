@@ -15,7 +15,7 @@ the content (`inline`), and a full status page block — 404, error — (`page`)
 - `page` — the body of a status page (`NotFoundPage`, `ErrorPage`): `as="h1"`, a description,
   actions, an optional big `eyebrow` (the "404") and an optional figure in `icon`. The page keeps
   its own `Box` with `minHeight: var(--page-height-available)` around it.
-- Not as a loading state — render `Loader` while the query is loading.
+- Not as a loading state — render a `Skeleton` of the content while the query is loading.
 - `Table` has its own empty state; do not nest this inside a `Table`.
 
 ## API

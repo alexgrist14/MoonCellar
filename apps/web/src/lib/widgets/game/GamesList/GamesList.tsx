@@ -2,7 +2,7 @@ import { FC } from "react";
 import styles from "./GamesList.module.scss";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
-import { GameCard } from "@/src/lib/widgets/game/GameCard";
+import { GameCard, GameCardSkeleton } from "@/src/lib/widgets/game/GameCard";
 import { IGameResponse } from "@mooncellar/schemas";
 
 interface IGamesListProps {
@@ -10,6 +10,8 @@ interface IGamesListProps {
   getGames?: (games: IGameResponse[]) => void;
   removeGame?: (game: IGameResponse) => void;
   saveCallback?: () => void;
+  isLoading?: boolean;
+  skeletonCount?: number;
 }
 
 export const GamesList: FC<IGamesListProps> = ({
@@ -17,7 +19,23 @@ export const GamesList: FC<IGamesListProps> = ({
   getGames,
   removeGame,
   saveCallback,
+  isLoading,
+  skeletonCount = 4,
 }) => {
+  if (isLoading) {
+    return (
+      <div
+        className={styles.consoles__games}
+        role="status"
+        aria-label="Loading"
+      >
+        {Array.from({ length: skeletonCount }, (_, index) => (
+          <GameCardSkeleton key={index} />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className={styles.consoles__royal}>
       {(!games?.length || !!saveCallback || !!getGames) && (

@@ -13,18 +13,19 @@ A bordered tile with a small muted label over a large number: profile counters, 
 
 ## API
 
-| Prop           | Type                                             | Default   | Purpose                                                                                                                     |
-| -------------- | ------------------------------------------------ | --------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `label`        | `ReactNode`                                      | —         | Caption, `--color-text-muted` 12px; omitted, the tile shows only the value (when the block's heading already names it)      |
-| `value`        | `ReactNode`                                      | —         | The figure, 20/26px bold, tabular numbers; format it before passing                                                         |
-| `hint`         | `ReactNode`                                      | —         | Small secondary line under the value (a unit: "hours")                                                                      |
-| `children`     | `ReactNode`                                      | —         | Rendered at the right end of the value row (an avatar stack)                                                                |
-| `valueColor`   | `string`                                         | —         | CSS colour of the value, e.g. `"var(--game-completed-color)"`                                                               |
-| `align`        | `"start" \| "center"`                            | `"start"` | Text alignment                                                                                                              |
-| `isLabelBelow` | `boolean`                                        | `false`   | Moves the label under the value (and the hint)                                                                              |
-| `onClick`      | `(event: MouseEvent<HTMLButtonElement>) => void` | —         | Renders a `button type="button"` with a hover/focus ring instead of a `div`                                                 |
-| `className`    | `string`                                         | —         | Extra class                                                                                                                 |
-| `...rest`      | `HTMLAttributes<HTMLElement>`                    | —         | `data-*`, `aria-*`, `title`, `style`… reach the root element                                                                |
+| Prop           | Type                                             | Default   | Purpose                                                                                                                |
+| -------------- | ------------------------------------------------ | --------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `label`        | `ReactNode`                                      | —         | Caption, `--color-text-muted` 12px; omitted, the tile shows only the value (when the block's heading already names it) |
+| `value`        | `ReactNode`                                      | —         | The figure, 20/26px bold, tabular numbers; format it before passing (optional only with `isLoading`)                   |
+| `hint`         | `ReactNode`                                      | —         | Small secondary line under the value (a unit: "hours")                                                                 |
+| `children`     | `ReactNode`                                      | —         | Rendered at the right end of the value row (an avatar stack)                                                           |
+| `valueColor`   | `string`                                         | —         | CSS colour of the value, e.g. `"var(--game-completed-color)"`                                                          |
+| `align`        | `"start" \| "center"`                            | `"start"` | Text alignment                                                                                                         |
+| `isLabelBelow` | `boolean`                                        | `false`   | Moves the label under the value (and the hint)                                                                         |
+| `isLoading`    | `boolean`                                        | `false`   | Keeps the tile's frame and size and shows `Skeleton` bars for the label and the value; never clickable while loading   |
+| `onClick`      | `(event: MouseEvent<HTMLButtonElement>) => void` | —         | Renders a `button type="button"` with a hover/focus ring instead of a `div`                                            |
+| `className`    | `string`                                         | —         | Extra class                                                                                                            |
+| `...rest`      | `HTMLAttributes<HTMLElement>`                    | —         | `data-*`, `aria-*`, `title`, `style`… reach the root element                                                           |
 
 ## Usage
 
@@ -63,4 +64,4 @@ import { StatTile } from "@/src/lib/shared/ui/StatTile";
 ## Storybook
 
 `Shared/StatTile` — `Default`, `Clickable`, `WithChildren`, `ValueColor`, `CenteredWithHint`,
-`Grid`, `LongLabel`, `WithoutLabel`.
+`Grid`, `LongLabel`, `WithoutLabel`, `Loading`.

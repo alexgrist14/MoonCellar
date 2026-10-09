@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
-import { Loader } from "@/src/lib/shared/ui/Loader";
+import { Skeleton } from "@/src/lib/shared/ui/Skeleton";
 import { Badge } from "@/src/lib/shared/ui/Badge";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { pluralize } from "@/src/lib/shared/utils/plural.utils";
@@ -277,7 +277,16 @@ export const Conflicts: FC = () => {
 
       {!!externalId &&
         (isLoaderShown ? (
-          <Loader minHeight="var(--community-loading-height)" />
+          <div className={styles.split} role="status" aria-label="Loading">
+            <Skeleton
+              height="var(--vndb-review-height)"
+              radius="var(--radius-x4)"
+            />
+            <Skeleton
+              height="var(--vndb-review-height)"
+              radius="var(--radius-x4)"
+            />
+          </div>
         ) : !item ? (
           <EmptyState
             title={`No conflict record for ${externalId}.`}

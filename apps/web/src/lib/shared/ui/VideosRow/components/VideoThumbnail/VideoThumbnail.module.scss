@@ -1,3 +1,9 @@
+.skeleton {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+}
+
 .image {
   opacity: 0;
   transition: 0.4s;

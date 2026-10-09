@@ -11,7 +11,7 @@ import { revalidateGamePage } from "@/src/lib/entities/game/api/game.actions";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Checkbox } from "@/src/lib/shared/ui/Checkbox";
-import { Loader } from "@/src/lib/shared/ui/Loader";
+import { Skeleton } from "@/src/lib/shared/ui/Skeleton";
 import { Table } from "@/src/lib/shared/ui/Table";
 import { Chip } from "@/src/lib/shared/ui/Chip";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
@@ -150,7 +150,14 @@ export const RequestReviewPanel: FC<{ requestId: string }> = ({
   );
 
   if (isLoading || !request) {
-    return <Loader minHeight="var(--requests-panel-min-height)" />;
+    return (
+      <div role="status" aria-label="Loading">
+        <Skeleton
+          height="var(--requests-panel-min-height)"
+          radius="var(--radius-x4)"
+        />
+      </div>
+    );
   }
 
   const fields = Object.keys(request.payload);

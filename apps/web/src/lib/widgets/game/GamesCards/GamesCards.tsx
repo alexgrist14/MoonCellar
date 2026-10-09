@@ -2,12 +2,13 @@ import { CSSProperties, FC, ReactNode } from "react";
 import classNames from "classnames";
 import styles from "./GamesCards.module.scss";
 import { IGameResponse } from "@mooncellar/schemas";
-import { GameCard } from "@/src/lib/widgets/game/GameCard";
+import { GameCard, GameCardSkeleton } from "@/src/lib/widgets/game/GameCard";
 import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
 
 const PRIORITY_COUNT = 6;
 const COLUMN_TIERS = [2, 3, 4, 5, 6];
 const MIN_COLUMNS = 2;
+const SKELETON_COUNT = 12;
 
 export const getSnappedColumns = (limit: number, columns?: number) =>
   COLUMN_TIERS.reduce<Record<string, number>>((vars, tier) => {
@@ -32,6 +33,8 @@ interface IGamesCardsProps {
   isSelectable?: boolean;
   selectedIds?: string[];
   onSelectGame?: (gameId: string) => void;
+  isLoading?: boolean;
+  skeletonCount?: number;
 }
 
 export const GamesCards: FC<IGamesCardsProps> = ({
@@ -46,8 +49,10 @@ export const GamesCards: FC<IGamesCardsProps> = ({
   isSelectable,
   selectedIds,
   onSelectGame,
+  isLoading,
+  skeletonCount,
 }) => {
-  if (!games?.length) return null;
+  if (!isLoading && !games?.length) return null;
 
   const grid = (
     <div
@@ -62,20 +67,32 @@ export const GamesCards: FC<IGamesCardsProps> = ({
             ? ({ "--games-columns": columns } as CSSProperties)
             : undefined
       }
+      role={isLoading ? "status" : undefined}
+      aria-label={isLoading ? "Loading" : undefined}
     >
-      {games.map((game, index) => (
-        <div key={game._id} className={gameClassName}>
-          <GameCard
-            game={game}
-            rank={getRank?.(game)}
-            priority={index < PRIORITY_COUNT}
-            isSelectable={isSelectable}
-            isSelected={selectedIds?.includes(game._id)}
-            onSelect={onSelectGame}
-          />
-          {additionalGameNode?.(game)}
-        </div>
-      ))}
+      {isLoading &&
+        Array.from(
+          { length: skeletonCount ?? limit ?? SKELETON_COUNT },
+          (_, index) => (
+            <div key={index} className={gameClassName}>
+              <GameCardSkeleton />
+            </div>
+          )
+        )}
+      {!isLoading &&
+        games?.map((game, index) => (
+          <div key={game._id} className={gameClassName}>
+            <GameCard
+              game={game}
+              rank={getRank?.(game)}
+              priority={index < PRIORITY_COUNT}
+              isSelectable={isSelectable}
+              isSelected={selectedIds?.includes(game._id)}
+              onSelect={onSelectGame}
+            />
+            {additionalGameNode?.(game)}
+          </div>
+        ))}
     </div>
   );
 

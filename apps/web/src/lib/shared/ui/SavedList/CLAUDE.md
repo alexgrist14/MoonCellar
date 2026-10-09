@@ -11,9 +11,10 @@ button. Used for saved filter presets in `Filters` and saved royal-game sets in
 
 ## API
 
-| Prop    | Type                                                            | Default | Purpose         |
-| ------- | --------------------------------------------------------------- | ------- | --------------- |
-| `items` | `{ name: string; onApply: () => void; onRemove: () => void }[]` | —       | Rows to render. |
+| Prop        | Type                                                            | Default | Purpose                                       |
+| ----------- | --------------------------------------------------------------- | ------- | --------------------------------------------- |
+| `items`     | `{ name: string; onApply: () => void; onRemove: () => void }[]` | `[]`    | Rows to render.                               |
+| `isLoading` | `boolean`                                                       | —       | Three `Skeleton` rows of the real row height. |
 
 ## Usage
 
@@ -33,11 +34,11 @@ import { SavedList } from "@/src/lib/shared/ui/SavedList";
 
 - **`name` is the React key,** so names must be unique within the list.
 - **Empty `items` renders an empty `<ul>`, not a placeholder.** The consumer shows its own empty
-  state.
+  state. While the presets load, pass `isLoading` instead of a spinner of your own.
 - The Remove button is the shared `Button` without a `type`; inside a `<form>` it submits it.
 - Long names are cut with an ellipsis; the row height is tied to `--community-avatar-size`.
 - **The apply target stays a native `<button>`.** It is the whole row, laid out as a `subgrid` across the item's columns, not a button-shaped control; only the delete action is a `Button`.
 
 ## Storybook
 
-`Shared/SavedList`: `Default`, `LongName`, `Empty`.
+`Shared/SavedList`: `Default`, `LongName`, `Empty`, `Loading`.

@@ -7,7 +7,7 @@ drafts. Reached from the Characters tab of the admin panel.
 
 - `/admin/characters/[id]` — `src/app/admin/characters/[id]/page.tsx`. `id === "new"` renders
   the create form (`characterId` undefined); any other value edits that character.
-- The route wraps the page in `Suspense` with `PageLoader`. Dynamic, no metadata.
+- The route wraps the page in `Suspense` with `PageSkeleton`. Dynamic, no metadata.
 - Gated by `src/app/admin/layout.tsx` (404 for a viewer without admin access, see `Admin`), and
   again on the client.
 

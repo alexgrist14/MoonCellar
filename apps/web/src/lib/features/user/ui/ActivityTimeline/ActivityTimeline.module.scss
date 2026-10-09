@@ -74,6 +74,10 @@ $activityGap: 24px;
   align-items: flex-start;
   gap: var(--gap-x2);
   min-width: 0;
+
+  &_skeleton {
+    align-items: stretch;
+  }
 }
 
 .head {

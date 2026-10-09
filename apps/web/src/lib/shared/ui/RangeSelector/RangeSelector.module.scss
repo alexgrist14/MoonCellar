@@ -27,6 +27,10 @@
   }
 }
 
+.skeleton {
+  grid-area: slider;
+}
+
 .slider {
   grid-area: slider;
   display: flex;

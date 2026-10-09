@@ -40,3 +40,5 @@ export const LongName: Story = {
 };
 
 export const Empty: Story = { args: { items: [] } };
+
+export const Loading: Story = { args: { items: [], isLoading: true } };

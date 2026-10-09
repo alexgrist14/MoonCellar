@@ -16,6 +16,8 @@ import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { Skeleton } from "@/src/lib/shared/ui/Skeleton";
+import { GameCardSkeleton } from "@/src/lib/widgets/game/GameCard";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { IRangeValue, RangeSelector } from "@/src/lib/shared/ui/RangeSelector";
@@ -117,7 +119,26 @@ export const UserReviews: FC<IUserReviewsProps> = ({
   const toggleHelpful = (review: IUserReview) =>
     setHelpful({ reviewId: review._id, isHelpful: !review.isHelpful });
 
-  if (isLoaderShown) return <Loader type="moon" />;
+  if (isLoaderShown) {
+    return (
+      <div className={styles.reviews} role="status" aria-label="Loading">
+        <Skeleton shape="text" width="30%" />
+        <div className={styles.feed}>
+          {Array.from({ length: 3 }, (_, index) => (
+            <div key={index} className={styles.item}>
+              <div className={styles.item__card}>
+                <GameCardSkeleton />
+              </div>
+              <div className={styles.item__main}>
+                <Skeleton shape="text" width="40%" />
+                <Skeleton shape="text" count={3} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   if (!summary?.total) {
     return (

@@ -15,8 +15,6 @@ export interface ILoaderProps {
   size?: number | string;
   speedMultiplier?: number;
   className?: string;
-  isBlock?: boolean;
-  minHeight?: string;
 }
 
 export const Loader: FC<ILoaderProps> = ({
@@ -25,32 +23,15 @@ export const Loader: FC<ILoaderProps> = ({
   size,
   speedMultiplier,
   className,
-  isBlock,
-  minHeight,
 }) => {
-  const isBlockMode = isBlock || !!minHeight;
   const spinnerProps = { speedMultiplier, size, color: color || accentColor };
 
-  const loader = (
-    <div className={classNames(styles.loader, !isBlockMode && className)}>
+  return (
+    <div className={classNames(styles.loader, className)}>
       {type === "pulse" && <PulseLoader {...spinnerProps} />}
       {type === "propogate" && <PropagateLoader {...spinnerProps} />}
       {type === "pacman" && <PacmanLoader {...spinnerProps} />}
       {type === "moon" && <MoonLoader {...spinnerProps} />}
-    </div>
-  );
-
-  if (!isBlockMode) return loader;
-
-  return (
-    <div
-      className={classNames(styles.block, className)}
-      style={minHeight ? { minHeight } : undefined}
-      role="status"
-      aria-label="Loading"
-      aria-busy
-    >
-      {loader}
     </div>
   );
 };

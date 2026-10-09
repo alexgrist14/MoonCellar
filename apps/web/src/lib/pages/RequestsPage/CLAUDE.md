@@ -6,7 +6,7 @@ and follows the requests they sent. Moderators review them in the admin panel. G
 
 ## Routes
 
-- `/requests` — `src/app/requests/page.tsx`, wrapped in `Suspense` with `PageLoader` (the page
+- `/requests` — `src/app/requests/page.tsx`, wrapped in `Suspense` with `PageSkeleton` (the page
   reads `useSearchParams`).
 - Static metadata: title `Requests`, `robots: { index: false, follow: true }`.
 - Client-only content: the route fetches nothing.

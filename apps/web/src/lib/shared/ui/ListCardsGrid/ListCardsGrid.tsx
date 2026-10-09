@@ -7,6 +7,7 @@ interface IListCardsGridProps {
   children: ReactNode;
   maxRows?: number;
   isGameSized?: boolean;
+  isLoading?: boolean;
   className?: string;
 }
 
@@ -14,6 +15,7 @@ export const ListCardsGrid: FC<IListCardsGridProps> = ({
   children,
   maxRows,
   isGameSized,
+  isLoading,
   className,
 }) => {
   const items = Children.toArray(children);
@@ -30,6 +32,8 @@ export const ListCardsGrid: FC<IListCardsGridProps> = ({
           [styles.grid_gameSized]: isGameSized,
           [styles.grid_twoRows]: isGameSized && maxRows === 2,
         })}
+        role={isLoading ? "status" : undefined}
+        aria-label={isLoading ? "Loading" : undefined}
       >
         {items.map((item, index) =>
           index < visibleCount ? (

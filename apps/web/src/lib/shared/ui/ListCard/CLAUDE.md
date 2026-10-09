@@ -29,6 +29,11 @@ private lists), the author, the game count, the last update and the like count. 
 `ListMosaic`: `covers: string[]`, `className?: string`, `sizes?: string` (default `"120px"`).
 Always renders four cells; missing covers become empty cells.
 
+`ListCardSkeleton`: `layout?: "tile" | "row"` (default `"tile"`). The loading placeholder of a
+card, built on the card's own `tile`/`row` classes so it takes exactly the card's size in any grid.
+Render as many as the page will hold — `CUSTOM_LISTS_PAGE_SIZE` on `/lists` — inside
+`ListCardsGrid isLoading`.
+
 ## Usage
 
 ```tsx
@@ -53,7 +58,10 @@ import { ListCard } from "@/src/lib/shared/ui/ListCard";
 - The tile's hover ring is drawn on an `::after` overlay because the `fill` images paint above an
   outline on the parent. Keep it there if the hover style changes.
 - The whole card is one `Link`; do not nest another link or a button inside it.
+- **A loading list grid is `ListCardSkeleton`s, never a spinner.** The skeleton shares the card's
+  classes, so a change to the tile's layout reaches the placeholder too; keep the two in one file.
 
 ## Storybook
 
-`Shared/ListCard`: Tile, TilePrivateNoLikes, Row, RowDescriptionMatch, EmptyList, Mosaic.
+`Shared/ListCard`: Tile, TilePrivateNoLikes, Row, RowDescriptionMatch, EmptyList, Mosaic,
+TileSkeleton, RowSkeleton.

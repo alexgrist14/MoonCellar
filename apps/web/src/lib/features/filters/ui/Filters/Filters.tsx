@@ -19,7 +19,6 @@ import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { SvgRetroAchievements, SvgSteam } from "@/src/lib/shared/ui/svg";
 import { ITabContent } from "@/src/lib/shared/types/tabs.type";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
-import { Loader } from "@/src/lib/shared/ui/Loader";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { useUserFiltersQuery } from "@/src/lib/entities/user/api/user.queries";
 import { useRemoveUserFilterMutation } from "@/src/lib/entities/user/api/user.mutations";
@@ -579,7 +578,7 @@ export const Filters: FC<{
               )}
             </div>
           ) : (
-            <Loader type="propogate" />
+            <SavedList isLoading />
           )}
         </div>
       )}

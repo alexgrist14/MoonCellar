@@ -2,7 +2,7 @@ import { FC, RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import classNames from "classnames";
 import { Input } from "../Input";
-import { Loader } from "../Loader";
+import { Skeleton } from "../Skeleton";
 import { Scrollbar } from "../Scrollbar";
 import { Tooltip } from "../Tooltip";
 import { useCloseEvents } from "@/src/lib/shared/hooks/useCloseEvents";
@@ -206,13 +206,25 @@ export const EmojiPicker: FC<IEmojiPickerProps> = ({
         contentStyle={{ maxHeight: "var(--emoji-picker-grid-height)" }}
       >
         {!groups ? (
-          <div className={styles.picker__state}>
-            {isFailed ? (
-              "Emoji could not be loaded. Close the picker and try again."
-            ) : (
-              <Loader type="pulse" />
-            )}
-          </div>
+          isFailed ? (
+            <div className={styles.picker__state}>
+              Emoji could not be loaded. Close the picker and try again.
+            </div>
+          ) : (
+            <div
+              className={styles.picker__grid}
+              role="status"
+              aria-label="Loading"
+            >
+              {Array.from({ length: 48 }, (_, index) => (
+                <Skeleton
+                  key={index}
+                  height="var(--emoji-picker-cell-size)"
+                  radius="var(--radius-x4)"
+                />
+              ))}
+            </div>
+          )
         ) : !visibleEmojis.length ? (
           <div className={styles.picker__state}>
             {isSearching ? "No emoji match this search." : "Nothing here yet."}

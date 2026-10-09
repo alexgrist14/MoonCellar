@@ -6,6 +6,7 @@ import {
   ReactNode,
 } from "react";
 import classNames from "classnames";
+import { Skeleton } from "../Skeleton";
 import styles from "./StatTile.module.scss";
 
 interface IStatTileProps extends Omit<
@@ -13,12 +14,13 @@ interface IStatTileProps extends Omit<
   "onClick" | "children"
 > {
   label?: ReactNode;
-  value: ReactNode;
+  value?: ReactNode;
   hint?: ReactNode;
   children?: ReactNode;
   valueColor?: string;
   align?: "start" | "center";
   isLabelBelow?: boolean;
+  isLoading?: boolean;
   onClick?: (event: MouseEvent<HTMLButtonElement>) => void;
 }
 
@@ -30,6 +32,7 @@ export const StatTile: FC<IStatTileProps> = ({
   valueColor,
   align = "start",
   isLabelBelow,
+  isLoading,
   onClick,
   className,
   style,
@@ -49,7 +52,16 @@ export const StatTile: FC<IStatTileProps> = ({
     ? ({ ...style, "--stat-tile-value-color": valueColor } as CSSProperties)
     : style;
 
-  const content = (
+  const content = isLoading ? (
+    <>
+      <span className={styles.tile__label}>
+        <Skeleton shape="text" width="var(--padding-x12)" />
+      </span>
+      <span className={styles.tile__value}>
+        <Skeleton shape="text" width="var(--padding-x10)" />
+      </span>
+    </>
+  ) : (
     <>
       {!!label && <span className={styles.tile__label}>{label}</span>}
       <span className={styles.tile__value}>
@@ -60,7 +72,7 @@ export const StatTile: FC<IStatTileProps> = ({
     </>
   );
 
-  if (onClick) {
+  if (onClick && !isLoading) {
     return (
       <button
         type="button"

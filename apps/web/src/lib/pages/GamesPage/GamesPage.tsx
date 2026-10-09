@@ -8,7 +8,6 @@ import {
   AppliedGameFilters,
   Filters,
 } from "@/src/lib/features/filters/ui/Filters";
-import { Loader } from "@/src/lib/shared/ui/Loader";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { parseQueryFilters } from "@/src/lib/shared/utils/filters.utils";
 import { Box } from "@/src/lib/shared/ui/Box";
@@ -112,9 +111,7 @@ export const GamesPage: FC<IGamesPageProps> = ({
         />
         <SectionTitle as="h1">Games</SectionTitle>
         <AppliedGameFilters />
-        {isLoading ? (
-          <Loader type="pacman" />
-        ) : !games?.length ? (
+        {!isLoading && !games?.length ? (
           <EmptyState
             as="h2"
             className={styles.page__empty}
@@ -123,6 +120,8 @@ export const GamesPage: FC<IGamesPageProps> = ({
         ) : (
           <GamesCards
             games={games}
+            isLoading={isLoading}
+            skeletonCount={takeGames}
             columns={6}
             isWithoutScroll
             isSelectable={isSelectMode}

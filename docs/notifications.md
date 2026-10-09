@@ -5,7 +5,7 @@ follower, a reply, a comment on their review, a like, a decision on their reques
 acting on their comment, or new activity of someone they follow.
 
 The bell in the header shows the unread count and the latest 20; `/notifications` lists them all.
-Opening the bell always refetches and holds a loader (at least 400 ms) until the fresh list
+Opening the bell always refetches and holds skeleton rows (at least 400 ms) until the fresh list
 arrives (`NotificationsFeed isFreshOnly`), because the cached list from the previous opening would
 otherwise flash before the new one replaces it.
 Delivery is in-app plus web push on the devices a user turned it on for; e-mail is not planned

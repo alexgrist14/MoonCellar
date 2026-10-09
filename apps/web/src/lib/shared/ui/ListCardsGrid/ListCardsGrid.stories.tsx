@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { ListCardsGrid } from "./ListCardsGrid";
+import { ListCardSkeleton } from "../ListCard";
 
 const LIST_NAMES = [
   "Best of the SNES",
@@ -53,4 +54,13 @@ export const TwoRows: Story = {
 
 export const GameSized: Story = {
   args: { isGameSized: true, maxRows: 2 },
+};
+
+export const Loading: Story = {
+  args: {
+    isLoading: true,
+    children: Array.from({ length: 6 }, (_, index) => (
+      <ListCardSkeleton key={index} />
+    )),
+  },
 };

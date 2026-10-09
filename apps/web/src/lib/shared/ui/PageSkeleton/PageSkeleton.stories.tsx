@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { PageLoader } from "./PageLoader";
+import { PageSkeleton } from "./PageSkeleton";
 
 const meta = {
-  title: "Shared/PageLoader",
-  component: PageLoader,
+  title: "Shared/PageSkeleton",
+  component: PageSkeleton,
   parameters: { layout: "fullscreen" },
-} satisfies Meta<typeof PageLoader>;
+} satisfies Meta<typeof PageSkeleton>;
 
 export default meta;
 

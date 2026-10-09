@@ -6,6 +6,7 @@ import { ICustomList } from "@mooncellar/schemas";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { getListHref } from "@/src/lib/shared/utils/links.utils";
 import { Highlight } from "../Highlight";
+import { Skeleton } from "../Skeleton";
 import { SvgHeartFilled, SvgLock } from "../svg";
 import styles from "./ListCard.module.scss";
 
@@ -182,3 +183,18 @@ export const ListCard: FC<IListCardProps> = ({
     </Link>
   );
 };
+
+export const ListCardSkeleton: FC<{ layout?: "tile" | "row" }> = ({
+  layout = "tile",
+}) =>
+  layout === "row" ? (
+    <span className={classNames(styles.row, styles.row_skeleton)}>
+      <Skeleton aspectRatio="var(--cover-ratio)" radius="var(--radius-x2)" />
+      <Skeleton shape="text" count={2} gap="var(--gap-x1)" />
+    </span>
+  ) : (
+    <span className={styles.tile}>
+      <Skeleton aspectRatio="var(--cover-ratio)" radius="var(--radius-x4)" />
+      <Skeleton shape="text" count={2} gap="var(--gap-x1)" />
+    </span>
+  );

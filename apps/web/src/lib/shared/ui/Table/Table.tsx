@@ -3,7 +3,7 @@ import styles from "./Table.module.scss";
 import { ITableHeaders, ITableRows } from "@/src/lib/shared/types/table.type";
 import classNames from "classnames";
 import { CSSProperties, useEffect, useMemo, useRef, useState } from "react";
-import { Loader } from "@/src/lib/shared/ui/Loader";
+import { Skeleton } from "@/src/lib/shared/ui/Skeleton";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
 import { MobileTable } from "@/src/lib/shared/ui/MobileTable";
@@ -274,7 +274,14 @@ export const Table = <T extends object>({
   return (
     <div key={Object.keys(headers).join("_")} className={styles.wrapper}>
       {isLoaderShown ? (
-        <Loader />
+        <div className={styles.table} role="status" aria-label="Loading">
+          <Skeleton
+            count={8}
+            height="var(--padding-x8)"
+            radius="var(--radius-x1)"
+            gap="var(--gap-x1)"
+          />
+        </div>
       ) : !sortedRows?.length ? (
         <div className={styles.table}>
           <p className={styles.table__empty}>List is empty</p>

@@ -19,9 +19,8 @@ import { Box } from "@/src/lib/shared/ui/Box";
 import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { ExpandMenu } from "@/src/lib/shared/ui/ExpandMenu";
-import { ListCard } from "@/src/lib/shared/ui/ListCard";
+import { ListCard, ListCardSkeleton } from "@/src/lib/shared/ui/ListCard";
 import { ListCardsGrid } from "@/src/lib/shared/ui/ListCardsGrid";
-import { Loader } from "@/src/lib/shared/ui/Loader";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import {
@@ -178,7 +177,11 @@ export const ListsPage: FC<IListsPageProps> = ({
           }
         />
         {isLoading ? (
-          <Loader type="pacman" />
+          <ListCardsGrid isLoading>
+            {Array.from({ length: CUSTOM_LISTS_PAGE_SIZE }, (_, index) => (
+              <ListCardSkeleton key={index} />
+            ))}
+          </ListCardsGrid>
         ) : !lists.length ? (
           <EmptyState
             className={styles.page__empty}

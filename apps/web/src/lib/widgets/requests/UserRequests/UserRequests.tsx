@@ -17,7 +17,7 @@ import { RequestForm } from "@/src/lib/features/requests/ui/RequestForm";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
-import { Loader } from "@/src/lib/shared/ui/Loader";
+import { Skeleton } from "@/src/lib/shared/ui/Skeleton";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
@@ -84,7 +84,16 @@ export const UserRequests: FC<IUserRequestsProps> = ({
         <SectionTitle as="h3" count={total || undefined}>
           <span id="my-requests">My requests</span>
         </SectionTitle>
-        {isLoading && <Loader isBlock />}
+        {isLoading && (
+          <ul className={styles.list} role="status" aria-label="Loading">
+            {Array.from({ length: 3 }, (_, index) => (
+              <li key={index} className={styles.item}>
+                <Skeleton shape="text" width="70%" />
+                <Skeleton shape="text" width="40%" />
+              </li>
+            ))}
+          </ul>
+        )}
         {!isLoading && !requests.length && (
           <EmptyState
             variant="compact"

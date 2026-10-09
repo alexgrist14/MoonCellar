@@ -16,6 +16,7 @@ than two, so a tile is the same size in the profile's narrow column and on the w
 | ----------- | ----------- | ------- | --------------------------------------------------------------------------------------------------------------------------- |
 | `children`  | `ReactNode` | —       | The tiles                                                                                                                   |
 | `maxRows`   | `number`    | —       | Shows only that many whole rows at the current column count; the rest stay in the DOM, `hidden` (a profile preview shows 2) |
+| `isLoading` | `boolean`   | —       | Marks the grid as a loading `status`; pass `ListCardSkeleton`s as the children                                              |
 | `className` | `string`    | —       | Extra class on the outer wrapper                                                                                            |
 
 ## Usage
@@ -42,4 +43,4 @@ import { ListCard } from "@/src/lib/shared/ui/ListCard";
 
 ## Storybook
 
-`Shared/ListCardsGrid` — `Default`, `FewItems`.
+`Shared/ListCardsGrid` — `Default`, `FewItems`, `TwoRows`, `GameSized`, `Loading`.

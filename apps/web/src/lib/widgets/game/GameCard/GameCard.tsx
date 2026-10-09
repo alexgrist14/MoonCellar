@@ -3,7 +3,7 @@ import styles from "./GameCard.module.scss";
 import classNames from "classnames";
 import Image from "next/image";
 import { Cover } from "@/src/lib/shared/ui/Cover";
-import { Loader } from "@/src/lib/shared/ui/Loader";
+import { Skeleton } from "@/src/lib/shared/ui/Skeleton";
 import { useUserStore } from "@/src/lib/shared/store/user.store";
 import { GameCardInfo } from "@/src/lib/widgets/game/GameCardInfo";
 import { Tooltip } from "@/src/lib/shared/ui/Tooltip";
@@ -439,7 +439,12 @@ export const GameCard = memo(
               )}
             </div>
           )}
-          {isLoading && <Loader key={game._id + "_loader"} />}
+          {isLoading && (
+            <Skeleton
+              radius="var(--radius-x4)"
+              className={styles.card__skeleton}
+            />
+          )}
           {isActive && (
             <GameCardInfo game={game} playthroughs={filteredPlaythroughs} />
           )}

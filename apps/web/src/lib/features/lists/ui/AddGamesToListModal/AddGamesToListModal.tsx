@@ -10,12 +10,11 @@ import { useUserListsQuery } from "@/src/lib/entities/list/api/list.queries";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
-import { Loader } from "@/src/lib/shared/ui/Loader";
 import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { InlineCreateList } from "../InlineCreateList";
-import { ListCheckRow } from "../ListCheckRow";
+import { ListCheckRow, ListCheckRowSkeleton } from "../ListCheckRow";
 import styles from "./AddGamesToListModal.module.scss";
 
 export const ADD_GAMES_TO_LIST_MODAL_ID = "add-games-to-list";
@@ -81,7 +80,7 @@ export const AddGamesToListModal: FC<IAddGamesToListModalProps> = ({
       contentStyle={{ padding: "var(--padding-x4)", gap: "var(--gap-x3)" }}
     >
       {isLoading ? (
-        <Loader isBlock />
+        <ListCheckRowSkeleton />
       ) : !lists?.length ? (
         <EmptyState
           variant="compact"

@@ -1,4 +1,4 @@
-import { UserProfile } from "@/src/lib/pages/UserProfile";
+import { UserProfile, UserProfileSkeleton } from "@/src/lib/pages/UserProfile";
 import {
   gamesApi,
   listsAPI,
@@ -11,7 +11,6 @@ import { ACCESS_TOKEN } from "@/src/lib/shared/constants";
 import { IAuthToken } from "@/src/lib/shared/types/auth.type";
 import { jwtDecode } from "jwt-decode";
 import { Metadata } from "next";
-import { PageLoader } from "@/src/lib/shared/ui/PageLoader";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { ReactNode, Suspense } from "react";
@@ -143,7 +142,7 @@ export default async function ProfileLayout({
   ]);
 
   return (
-    <Suspense fallback={<PageLoader />}>
+    <Suspense fallback={<UserProfileSkeleton />}>
       <UserProfile
         user={{ ...user, followings: userFollowings, followers: userFollowers }}
         authUserId={authUserInfo?.id}

@@ -10,7 +10,7 @@ import { Box } from "@/src/lib/shared/ui/Box";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Checkbox } from "@/src/lib/shared/ui/Checkbox";
 import { Input } from "@/src/lib/shared/ui/Input";
-import { Loader } from "@/src/lib/shared/ui/Loader";
+import { Skeleton } from "@/src/lib/shared/ui/Skeleton";
 import { Textarea } from "@/src/lib/shared/ui/Textarea";
 import styles from "./ImageGenerator.module.scss";
 
@@ -71,9 +71,13 @@ export const ElementsModal: FC<IElementsModalProps> = ({
         </p>
 
         {isPending && (
-          <div className={styles.elements__loading}>
-            <Loader minHeight="var(--padding-x8)" />
+          <div className={styles.elements__loading} role="status">
             <span>Looking at the image…</span>
+            <Skeleton
+              count={3}
+              height="var(--field-control-height)"
+              radius="var(--radius-control)"
+            />
           </div>
         )}
 

@@ -3,11 +3,10 @@ import classNames from "classnames";
 import { useGridRows } from "@/src/lib/shared/hooks/useGridRows";
 import { IRaGameStatus } from "@mooncellar/schemas";
 import { useUserRaGamesQuery } from "@/src/lib/entities/user/api/user.queries";
-import { GameCard } from "@/src/lib/widgets/game/GameCard";
+import { GameCard, GameCardSkeleton } from "@/src/lib/widgets/game/GameCard";
 import { Badge, BadgeTone } from "@/src/lib/shared/ui/Badge";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
-import { Loader } from "@/src/lib/shared/ui/Loader";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
@@ -93,7 +92,19 @@ export const UserRaGames: FC<IUserRaGamesProps> = ({
         </p>
       )}
 
-      {isLoading && <Loader type="pulse" />}
+      {isLoading && (
+        <ul
+          className={isPreview ? styles.ra__preview : styles.ra__grid}
+          role="status"
+          aria-label="Loading"
+        >
+          {Array.from({ length: 12 }, (_, index) => (
+            <li key={index} className={styles.ra__item}>
+              <GameCardSkeleton style={CARD_STYLE} />
+            </li>
+          ))}
+        </ul>
+      )}
 
       {!isLoading && !items.length && (
         <EmptyState

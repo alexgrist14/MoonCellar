@@ -9,14 +9,18 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   it first.** `src/lib` is Feature-Sliced Design: `app` → `pages` → `widgets` → `features` →
   `entities` → `shared`, and `src/app` holds Next route files that do nothing but load data and
   pick a page. A page directory contains the page and nothing else — `<Name>.tsx`,
-  `<Name>.module.scss`, `index.ts`, and at most its own route constants — and composes
-  everything it shows out of the layers below. A `components/` folder inside a page, or a
-  sibling folder like `pages/UserProfile/UserInfo/`, is the violation this rule exists to
+  `<Name>.module.scss`, `index.ts`, at most its own route constants and its own loading state
+  as `<Name>Skeleton.tsx` — and composes everything it shows out of the layers below. A
+  `components/` folder inside a page, or a sibling folder like `pages/UserProfile/UserInfo/`, is the violation this rule exists to
   prevent: the second screen that needs the component either imports it out of a page, which
   reverses the layer order, or copies it and the two drift apart.
 - **A new `shared/ui` component is not done without `<Name>/CLAUDE.md` and
   `<Name>/<Name>.stories.tsx`, and a new page is not done without `pages/<Page>/CLAUDE.md`.** The
   repository-root `CLAUDE.md` lists what each must contain; Storybook (`bun run storybook`, port 4222) is where the component is checked in every state before it is used on a screen.
+- **A page's skeleton is its own `"use client"` module, never a second export of the page
+  file.** A route's `Suspense` fallback is what shows while the page's client chunk is still
+  loading, so it must not be part of that chunk. It shares the page's `.module.scss`, so its
+  frame cannot drift from the page's (`UserProfileSkeleton`).
 - **`bun run lint` fails on a component inside a page folder and on any import that points up
   a layer** (`scripts/check-fsd.mjs`). It runs after ESLint, needs no dependencies, and there is
   no exception list — a component that has to reach up belongs one layer higher.

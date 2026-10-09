@@ -128,3 +128,5 @@ export const LongLabel: Story = {
 export const WithoutLabel: Story = {
   args: { label: undefined, value: "12h 30m", align: "center" },
 };
+
+export const Loading: Story = { args: { isLoading: true } };

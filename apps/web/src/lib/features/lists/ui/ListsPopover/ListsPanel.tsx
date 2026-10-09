@@ -10,11 +10,10 @@ import {
 import { useUserListsQuery } from "@/src/lib/entities/list/api/list.queries";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { Input } from "@/src/lib/shared/ui/Input";
-import { Loader } from "@/src/lib/shared/ui/Loader";
 import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { InlineCreateList } from "../InlineCreateList";
-import { ListCheckRow } from "../ListCheckRow";
+import { ListCheckRow, ListCheckRowSkeleton } from "../ListCheckRow";
 import styles from "./ListsPopover.module.scss";
 
 const FILTER_THRESHOLD = 9;
@@ -166,7 +165,7 @@ export const ListsPanel: FC<IListsPanelProps> = ({ game, userId, isTouch }) => {
   return (
     <div className={styles.panel} onClick={(event) => event.stopPropagation()}>
       <p className={styles.panel__game}>{game.name}</p>
-      {isLoading && <Loader isBlock />}
+      {isLoading && <ListCheckRowSkeleton />}
       {hasLists && ordered.length >= FILTER_THRESHOLD && (
         <Input
           value={filter}

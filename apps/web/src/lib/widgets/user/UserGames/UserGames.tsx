@@ -1,6 +1,5 @@
 import { SortType } from "@/src/lib/shared/types/sort.type";
 import { CategoriesFilterType } from "@/src/lib/shared/types/user.type";
-import { Loader } from "@/src/lib/shared/ui/Loader";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { FC, useMemo, useState } from "react";
@@ -221,7 +220,13 @@ export const UserGames: FC<UserGamesProps> = ({
     return (
       <>
         {searchField}
-        <Loader type="moon" />
+        <GamesCards
+          isLoading
+          skeletonCount={pageGameIds.length || 10}
+          gameClassName={styles.games__game}
+          isWithoutScroll
+          columns={5}
+        />
       </>
     );
 

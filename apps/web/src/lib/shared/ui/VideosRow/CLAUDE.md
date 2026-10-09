@@ -1,7 +1,7 @@
 # VideosRow
 
 Horizontal rail of YouTube thumbnails inside a `Scrollbar` with arrows. Clicking a thumbnail opens
-the video in a modal with an autoplaying embed. Each thumbnail shows a `Loader` until its image
+the video in a modal with an autoplaying embed. Each thumbnail is a `Skeleton` until its image
 loads, then a play icon.
 
 ## When to use

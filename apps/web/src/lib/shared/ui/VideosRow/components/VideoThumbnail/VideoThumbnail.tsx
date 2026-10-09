@@ -3,7 +3,7 @@ import styles from "./VideoThumbnail.module.scss";
 import Image from "next/image";
 import classNames from "classnames";
 import { SvgVideoPlay } from "../../../svg";
-import { Loader } from "../../../Loader";
+import { Skeleton } from "../../../Skeleton";
 import { getYoutubeThumbnailUrl } from "@/src/lib/shared/utils/youtube.utils";
 
 export const VideoThumbnail: FC<{ video: string }> = ({ video }) => {
@@ -11,7 +11,7 @@ export const VideoThumbnail: FC<{ video: string }> = ({ video }) => {
 
   return (
     <>
-      {isLoading && <Loader />}
+      {isLoading && <Skeleton radius="inherit" className={styles.skeleton} />}
       <Image
         onLoad={() => setIsLoading(false)}
         className={classNames(styles.image, {

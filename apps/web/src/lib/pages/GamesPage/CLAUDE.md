@@ -12,7 +12,7 @@ for adding games to lists and selecting several at once. Public.
   `undefined` and the client fetches instead.
 - Static metadata: title `Games`, canonical `/games`, own keywords. The route renders
   `BreadcrumbList` and, when there are results, `ItemList` JSON-LD.
-- The page sits inside a `Suspense` with `PageLoader` in the route (it reads `useSearchParams`).
+- The page sits inside a `Suspense` with `PageSkeleton` in the route (it reads `useSearchParams`).
 
 ## Data
 
@@ -31,18 +31,19 @@ for adding games to lists and selecting several at once. Public.
 3. Right `ExpandMenu` "Manage" → `widgets/main/GamesListMenu` (Controls with select mode, Royal list).
 4. `Pagination` (fixed, `take={takeGames}`).
 5. `Box`: `Breadcrumbs`, `SectionTitle as="h1"` "Games", `AppliedGameFilters` chips, then
-   `Loader`, an `EmptyState` "Games not found", or `widgets/game/GamesCards` (6 columns, selectable in select
-   mode).
+   an `EmptyState` "Games not found" or `widgets/game/GamesCards` (6 columns, selectable in select
+   mode). While loading, the same `GamesCards` gets `isLoading` and renders `takeGames` (60)
+   `GameCardSkeleton`s in the same grid, so the cards land where the placeholders were.
 
 ## Rules and gotchas
 
 - **Page state goes into the URL with `pushState`, never `router.push`.** `router.push` re-runs
   the server route and `useSearchParams` changes only after that render, so pagination scrolled
-  to the top and swapped the cards later with no loader.
+  to the top and swapped the cards later with no skeleton.
 - **Seed `initialData` only for the key the server rendered.** React Query seeds every new key
   with `initialData` and does not fetch it within `staleTime`; the `hashKey` comparison is what
   keeps page 2 from showing page 1.
-- **Gate the loader on `isLoading`, not `isPending` or `isFetching`.** `isFetching` is also true
+- **Gate the skeleton on `isLoading`, not `isPending` or `isFetching`.** `isFetching` is also true
   during a background refetch, which made every browser Back show a spinner and refetch.
 - **The server must parse filters with the same `parseQueryFilters` as the client.** If the two
   keys differ, the seed is discarded and the first client render refetches.

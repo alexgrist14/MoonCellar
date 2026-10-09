@@ -26,8 +26,9 @@
   }
 
   &_loading {
-    @include flexCenter;
+    gap: var(--gap-x4);
     min-height: 180px;
+    padding: var(--padding-x2) var(--padding-x3);
   }
 
   &__toolbar {

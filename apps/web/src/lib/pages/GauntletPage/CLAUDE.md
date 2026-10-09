@@ -10,7 +10,7 @@ viewer — on the account for a signed-in user, in the browser for a guest.
 - Static metadata: title `Gauntlet`, canonical `/gauntlet`, own keywords. The route renders
   `BreadcrumbList` JSON-LD.
 - No server data fetch. The route renders the JSON-LD and `<GauntletPage />` from the barrel and
-  nothing else; the page owns its layout, its `Suspense` (with `PageLoader`, because the panel
+  nothing else; the page owns its layout, its `Suspense` (with `PageSkeleton`, because the panel
   and the filters read the query string) and its styles.
 
 ## Data

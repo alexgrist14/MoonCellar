@@ -26,7 +26,7 @@ mode with two thumbs for a from/to range. It keeps its own value state seeded fr
 | `variant`       | `"accent" \| "green"`          | `"accent"`           | Fill colour                                                         |
 | `isWithValue`   | `boolean`                      | –                    | Shows the value on the thumb                                        |
 | `formatValue`   | `(value: number) => string`    | –                    | Formats that value (`"40%"`)                                        |
-| `isLoading`     | `boolean`                      | –                    | Replaces the slider with a `moon` loader (kept for a minimum time)  |
+| `isLoading`     | `boolean`                      | –                    | Replaces the slider with a `Skeleton` (kept for a minimum time)     |
 | `disabled`      | `boolean`                      | –                    | Disables the inputs                                                 |
 
 In dual mode both callbacks receive `[low, high]` sorted, whichever thumb moved.

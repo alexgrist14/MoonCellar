@@ -1,9 +1,9 @@
 import { Suspense } from "react";
 import { Admin } from "@/src/lib/pages/Admin";
-import { PageLoader } from "@/src/lib/shared/ui/PageLoader";
+import { PageSkeleton } from "@/src/lib/shared/ui/PageSkeleton";
 
 const AdminTabPage = () => (
-  <Suspense fallback={<PageLoader />}>
+  <Suspense fallback={<PageSkeleton />}>
     <Admin tab="images" />
   </Suspense>
 );

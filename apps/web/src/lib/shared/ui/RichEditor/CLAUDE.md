@@ -65,8 +65,8 @@ const onSubmit = async (data: FormValues) => {
   `Controller`, or the registration drops and a `disabled: !isValid` button locks.
 - The editor content area uses the same `richText` mixin as `RichText`, so it shows what the
   reader will see. Do not restyle paragraphs or image width here alone; change the mixin.
-- `immediatelyRender: false`: the first render (and the server render) is a loader; the
-  toolbar appears after mount.
+- `immediatelyRender: false`: the first render (and the server render) is the empty field with a
+  `Skeleton` toolbar and three text lines; the toolbar appears after mount.
 - Images over 5 MB are rejected with a toast. Blob URLs are revoked on unmount.
 - The emoji picker portals into `#dropdown-connector` (falling back to `body`).
 - All toolbar buttons have `type="button"`, so the editor is safe inside a native `<form>`.

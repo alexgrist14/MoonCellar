@@ -6,7 +6,7 @@ an AI draft). It also triggers IGDB / VNDB / HLTB re-parses and deletes games.
 ## Routes
 
 - `/admin/games/[id]` — `src/app/admin/games/[id]/page.tsx`. `id === "new"` is create mode
-  (`gameId` undefined). Wrapped in `Suspense` with `PageLoader`. Dynamic, no metadata.
+  (`gameId` undefined). Wrapped in `Suspense` with `PageSkeleton`. Dynamic, no metadata.
 - Gated by `src/app/admin/layout.tsx` (see `Admin`) and by the client
   `isAuthChecked && !isAdmin → notFound()`.
 

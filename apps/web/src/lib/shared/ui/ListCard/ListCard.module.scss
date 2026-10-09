@@ -137,6 +137,10 @@
     background: var(--color-bg-hover);
   }
 
+  &_skeleton {
+    pointer-events: none;
+  }
+
   &__mosaic {
     border-radius: var(--radius-x2);
   }

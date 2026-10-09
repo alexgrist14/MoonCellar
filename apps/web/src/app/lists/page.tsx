@@ -4,7 +4,7 @@ import { ListsPage } from "@/src/lib/pages/ListsPage";
 import { parseListsQuery } from "@/src/lib/features/lists/model/lists-query.utils";
 import { listsAPI } from "@/src/lib/shared/api";
 import { JsonLd } from "@/src/lib/shared/ui/JsonLd";
-import { PageLoader } from "@/src/lib/shared/ui/PageLoader";
+import { PageSkeleton } from "@/src/lib/shared/ui/PageSkeleton";
 import { getBreadcrumbJsonLd } from "@/src/lib/shared/utils/json-ld.utils";
 
 export const metadata: Metadata = {
@@ -62,7 +62,7 @@ const ListsPageIndex = async ({
           { name: "Lists", path: "/lists" },
         ])}
       />
-      <Suspense fallback={<PageLoader />}>
+      <Suspense fallback={<PageSkeleton />}>
         <ListsPage initialParams={params} initialData={initialData} />
       </Suspense>
     </>

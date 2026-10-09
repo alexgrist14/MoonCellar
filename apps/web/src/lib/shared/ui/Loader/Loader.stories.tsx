@@ -36,19 +36,3 @@ export const CustomColor: Story = {
 };
 
 export const Small: Story = { args: { size: 8 } };
-
-export const Block: Story = {
-  args: { isBlock: true },
-  decorators: [
-    (Story) => (
-      <div style={{ textAlign: "center" }}>
-        <Story />
-        <p>Content below the block</p>
-      </div>
-    ),
-  ],
-};
-
-export const BlockMinHeight: Story = {
-  args: { type: "pacman", minHeight: "240px" },
-};

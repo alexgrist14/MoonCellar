@@ -11,7 +11,7 @@ import { RequestStatus } from "@/src/lib/entities/request/ui/RequestStatus";
 import { getRequestTitle } from "@/src/lib/entities/request/model/request.utils";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
-import { Loader } from "@/src/lib/shared/ui/Loader";
+import { Skeleton } from "@/src/lib/shared/ui/Skeleton";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { RequestReviewPanel } from "./RequestReviewPanel";
@@ -62,7 +62,16 @@ export const RequestsReview: FC<IRequestsReviewProps> = ({ kind }) => {
               }))}
             />
           </div>
-          {isSwitching && <Loader isBlock />}
+          {isSwitching && (
+            <div role="status" aria-label="Loading">
+              <Skeleton
+                count={4}
+                height="var(--padding-x16)"
+                radius="var(--radius-x4)"
+                gap="var(--gap-x1)"
+              />
+            </div>
+          )}
           {!isSwitching && !requests.length && (
             <EmptyState variant="compact" title={`No ${status} requests.`} />
           )}
@@ -92,7 +101,12 @@ export const RequestsReview: FC<IRequestsReviewProps> = ({ kind }) => {
           </ul>
         </div>
         {isSwitching ? (
-          <Loader minHeight="var(--requests-panel-min-height)" />
+          <div role="status" aria-label="Loading">
+            <Skeleton
+              height="var(--requests-panel-min-height)"
+              radius="var(--radius-x4)"
+            />
+          </div>
         ) : activeId ? (
           <RequestReviewPanel key={activeId} requestId={activeId} />
         ) : (

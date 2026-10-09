@@ -5,11 +5,13 @@ import {
   useNotificationsQuery,
   useRemoveNotificationMutation,
 } from "@/src/lib/entities/notification/api";
-import { NotificationItem } from "@/src/lib/entities/notification/ui/NotificationItem";
+import {
+  NotificationItem,
+  NotificationItemSkeleton,
+} from "@/src/lib/entities/notification/ui/NotificationItem";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
-import { Loader } from "@/src/lib/shared/ui/Loader";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import styles from "./NotificationsFeed.module.scss";
 
@@ -59,7 +61,15 @@ export const NotificationsFeed: FC<INotificationsFeedProps> = ({
     [remove]
   );
 
-  if (isLoaderShown) return <Loader />;
+  if (isLoaderShown) {
+    return (
+      <div className={styles.feed} role="status" aria-label="Loading">
+        {Array.from({ length: 4 }, (_, index) => (
+          <NotificationItemSkeleton key={index} />
+        ))}
+      </div>
+    );
+  }
 
   if (!items.length) {
     return (

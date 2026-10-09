@@ -139,7 +139,7 @@ Clips reliably and handles shapes a radius cannot. Both are heavier to paint tha
 ### J. Drop the parent background
 
 Nothing shows through if nothing is painted. But `background-color` is what fills the tile
-while `SlideshowImage` is still loading (it renders a `Loader` over that fill), so removing it
+while `SlideshowImage` is still loading (it renders a `Skeleton` over that fill), so removing it
 trades a hairline for a hole during load.
 
 ## 5. What this codebase uses

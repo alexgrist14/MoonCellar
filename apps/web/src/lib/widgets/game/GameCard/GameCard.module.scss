@@ -92,6 +92,12 @@ $statuses: wishlist, backlog, playing, played, completed, mastered, dropped;
     }
   }
 
+  &__skeleton {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+  }
+
   &__placeholder {
     aspect-ratio: var(--cover-ratio);
     height: auto !important;

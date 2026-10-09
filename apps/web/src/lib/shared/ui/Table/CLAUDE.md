@@ -1,13 +1,13 @@
 # Table
 
 The shared data table: column-based (or, with `layout="rows"`, row-aligned grid) layout with header sorting, drag-resizable columns,
-client-side pagination, a loader and an empty state. On mobile, with `mobileHeadField`, it
+client-side pagination, skeleton rows while loading and an empty state. On mobile, with `mobileHeadField`, it
 switches to `MobileTable` — one card per row with that field as the card head.
 
 ## When to use
 
 - Every tabular list, admin lists above all. Never a hand-written `<table>`: that silently
-  loses resizing, sorting, the mobile layout and the shared loader/empty state.
+  loses resizing, sorting, the mobile layout and the shared loading/empty states.
 - A list of rich cards (games, users) is a grid of cards, not a table.
 
 ## API
@@ -18,12 +18,12 @@ switches to `MobileTable` — one card per row with that field as the card head.
 | Prop                     | Type                                      | Default     | Purpose                                                                                  |
 | ------------------------ | ----------------------------------------- | ----------- | ---------------------------------------------------------------------------------------- |
 | `headers`                | `ITableHeaders<T>`                        | —           | One cell per column; key order is column order.                                          |
-| `rows`                   | `ITableRows<T>`                           | —           | Data rows. `undefined` and `[]` show "List is empty"; the loader is `isLoading`.         |
+| `rows`                   | `ITableRows<T>`                           | —           | Data rows. `undefined` and `[]` show "List is empty"; skeleton rows are `isLoading`.     |
 | `columnStyles`           | `Partial<Record<keyof T, CSSProperties>>` | —           | Per-column style; `width` becomes the flex basis.                                        |
 | `initialSortingKey`      | `keyof T`                                 | —           | Column sorted on mount.                                                                  |
 | `initialSortingOrder`    | `"asc" \| "desc"`                         | `"desc"`    | Initial order.                                                                           |
 | `sortingCallback`        | `(key, order) => void`                    | —           | Server-side sorting: rows are shown as given and the callback reports header clicks.     |
-| `isLoading`              | `boolean`                                 | —           | Shows the loader (kept for a minimum time).                                              |
+| `isLoading`              | `boolean`                                 | —           | Shows eight skeleton rows (kept for a minimum time).                                     |
 | `limit`                  | `number`                                  | `50`        | Rows per client page.                                                                    |
 | `mobileHeadField`        | `keyof T`                                 | —           | Enables the mobile card layout; this field heads each card.                              |
 | `isWithoutMobileSorting` | `boolean`                                 | —           | Hides the sort control in the mobile layout (always hidden with `sortingCallback`).      |
@@ -74,7 +74,7 @@ import { Table } from "@/src/lib/shared/ui/Table";
 - A header reserves 24px for the sort arrow and 24px for the resize handle (drawn in the
   bottom-right corner); `isNotResizable` drops the second slot, so a narrow fixed column such as
   a cover keeps room for its label.
-  Resizing, hover, loader, empty state, pagination and the mobile layout work as in `columns`.
+  Resizing, hover, skeleton rows, empty state, pagination and the mobile layout work as in `columns`.
 - `getRowClassName`'s class lands on each cell, not on a row element (in `rows` the row wrapper
   is `display: contents` and draws nothing), so target one column with a compound selector:
   `.row_off.new { opacity: 0.45 }`.
@@ -97,7 +97,7 @@ import { Table } from "@/src/lib/shared/ui/Table";
   orders.
 - With `sortingCallback`, the table does not sort locally — the caller must refetch.
 - Pass `isLoading` while the rows are being fetched: `rows={undefined}` alone renders the empty
-  state, not the loader.
+  state, not the skeleton rows.
 - **A sortable table sets `initialSortingKey` (and `initialSortingOrder` when it is not
   `desc`).** Without it the mobile sort control reads "Select..." and the arrow shows nothing.
   Pick the order the rows already arrive in, so the first render does not reshuffle them. When

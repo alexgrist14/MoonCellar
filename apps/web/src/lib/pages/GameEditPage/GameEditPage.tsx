@@ -51,7 +51,7 @@ import {
 } from "@/src/lib/shared/utils/admin-url.utils";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
-import { Loader } from "@/src/lib/shared/ui/Loader";
+import { Skeleton } from "@/src/lib/shared/ui/Skeleton";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
@@ -1069,7 +1069,20 @@ export const GameEditPage: FC<IGameEditPageProps> = ({ gameId }) => {
   if (isPageLoading || !filters) {
     return (
       <Box>
-        <Loader isBlock />
+        <div className={styles.content} role="status" aria-label="Loading">
+          <Skeleton shape="text" width="30%" />
+          <Skeleton
+            width="40%"
+            height="var(--padding-x8)"
+            radius="var(--radius-x2)"
+          />
+          <Skeleton
+            count={6}
+            height="var(--field-control-height)"
+            radius="var(--radius-control)"
+            gap="var(--gap-x4)"
+          />
+        </div>
       </Box>
     );
   }

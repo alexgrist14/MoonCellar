@@ -1,5 +1,4 @@
 import { FC } from "react";
-import { Loader } from "@/src/lib/shared/ui/Loader";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import {
@@ -7,6 +6,7 @@ import {
   useRepliesQuery,
 } from "@/src/lib/entities/comment/api/comment.queries";
 import { CommentItem } from "./CommentItem";
+import { ReplySkeleton } from "./EntrySkeleton";
 
 interface ICommentRepliesProps {
   commentId: string;
@@ -24,7 +24,7 @@ export const CommentReplies: FC<ICommentRepliesProps> = ({
   const replies = flattenPages(data?.pages);
 
   if (isLoaderShown) {
-    return <Loader type="pulse" isBlock />;
+    return <ReplySkeleton />;
   }
 
   return (

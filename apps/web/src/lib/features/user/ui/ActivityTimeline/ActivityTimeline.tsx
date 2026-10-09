@@ -19,7 +19,7 @@ import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Cover } from "@/src/lib/shared/ui/Cover";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
-import { Loader } from "@/src/lib/shared/ui/Loader";
+import { ActivityTimelineSkeleton } from "./ActivityTimelineSkeleton";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import { StatusBadge, StatusDetails } from "@/src/lib/shared/ui/StatusBadge";
@@ -196,7 +196,7 @@ export const ActivityTimeline: FC<IActivityTimelineProps> = ({
         })}
         aria-busy={isLogsLoading || isPlaceholderData}
       >
-        {isLogsLoading && <Loader type="moon" />}
+        {isLogsLoading && <ActivityTimelineSkeleton />}
         {!isLogsLoading && !logs.length && (
           <EmptyState
             variant="inline"

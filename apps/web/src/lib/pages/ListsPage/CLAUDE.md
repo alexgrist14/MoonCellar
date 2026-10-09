@@ -10,7 +10,7 @@ games, size and last update, 24 per page. Public.
   (`features/lists/model/lists-query.utils`), fetches `listsAPI.getLists(params)` and passes
   `initialParams` + `initialData`. A failed fetch passes `undefined`.
 - Static metadata: title `Lists`, canonical `/lists`, own keywords. The route renders
-  `BreadcrumbList` JSON-LD and wraps the page in `Suspense` with `PageLoader`.
+  `BreadcrumbList` JSON-LD and wraps the page in `Suspense` with `PageSkeleton`.
 
 ## Data
 
@@ -28,8 +28,9 @@ games, size and last update, 24 per page. Public.
 2. Left `ExpandMenu` "Filters" → `features/lists/ui/ListsFilters`.
 3. `Pagination` (fixed, `take={CUSTOM_LISTS_PAGE_SIZE}`).
 4. `Box`: `Breadcrumbs`, `SectionTitle as="h1"` "Lists" with the total as its `count`, `AppliedFilters`
-   chips derived here from the parsed query, then `Loader`, `EmptyState`, or `ListCardsGrid` of
-   `ListCard`s.
+   chips derived here from the parsed query, then `EmptyState` or `ListCardsGrid` of
+   `ListCard`s. While loading, `ListCardsGrid isLoading` holds `CUSTOM_LISTS_PAGE_SIZE`
+   `ListCardSkeleton`s.
 
 ## Rules and gotchas
 
@@ -44,4 +45,4 @@ games, size and last update, 24 per page. Public.
 - **The grid's container-query thresholds duplicate tokens.** `ListsPage.module.scss` copies
   `--list-card-min-width` and `--gap-x4` into `$listCardMinWidth`/`$listCardsGap`; change both
   together, and keep every column count a divisor of `CUSTOM_LISTS_PAGE_SIZE` (24).
-- Gate the loader on `isLoading` (wrapped in `useMinimumLoading`), never on `isFetching`.
+- Gate the skeleton on `isLoading` (wrapped in `useMinimumLoading`), never on `isFetching`.

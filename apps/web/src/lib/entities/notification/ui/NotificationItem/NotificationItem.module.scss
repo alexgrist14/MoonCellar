@@ -11,6 +11,15 @@
     background-color: var(--color-bg-hover);
   }
 
+  &_skeleton {
+    pointer-events: none;
+
+    .item__info {
+      flex: 1;
+      gap: var(--gap-x2);
+    }
+  }
+
   &_unread::before {
     content: "";
     position: absolute;

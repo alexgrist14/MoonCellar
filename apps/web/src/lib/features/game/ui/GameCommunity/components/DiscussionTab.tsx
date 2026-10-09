@@ -1,7 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import { ICommentsSort, IGameResponse, IReview } from "@mooncellar/schemas";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
-import { Loader } from "@/src/lib/shared/ui/Loader";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { SvgClose } from "@/src/lib/shared/ui/svg";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
@@ -17,6 +16,7 @@ import { CommentComposer } from "./CommentComposer";
 import { CommentItem } from "./CommentItem";
 import { CommentQuote } from "./CommentQuote";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
+import { EntrySkeleton } from "./EntrySkeleton";
 
 interface IDiscussionTabProps {
   game: IGameResponse;
@@ -120,7 +120,7 @@ export const DiscussionTab: FC<IDiscussionTabProps> = ({
         />
       </div>
       {isLoaderShown ? (
-        <Loader type="pulse" isBlock />
+        <EntrySkeleton />
       ) : !comments.length ? (
         <EmptyState
           variant="compact"

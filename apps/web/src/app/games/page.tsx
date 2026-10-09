@@ -4,7 +4,7 @@ import { takeGames } from "@/src/lib/shared/constants/games.const";
 import { parseQueryFilters } from "@/src/lib/shared/utils/filters.utils";
 import { Metadata } from "next";
 import { Suspense } from "react";
-import { PageLoader } from "@/src/lib/shared/ui/PageLoader";
+import { PageSkeleton } from "@/src/lib/shared/ui/PageSkeleton";
 import { JsonLd } from "@/src/lib/shared/ui/JsonLd";
 import {
   getBreadcrumbJsonLd,
@@ -78,7 +78,7 @@ const GamesPageIndex = async ({
       {!!initialData?.results.length && (
         <JsonLd data={getItemListJsonLd(initialData.results)} />
       )}
-      <Suspense fallback={<PageLoader />}>
+      <Suspense fallback={<PageSkeleton />}>
         <GamesPage initialParams={params} initialData={initialData} />
       </Suspense>
     </>

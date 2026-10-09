@@ -22,7 +22,7 @@ import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Cover } from "@/src/lib/shared/ui/Cover";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { Input } from "@/src/lib/shared/ui/Input";
-import { Loader } from "@/src/lib/shared/ui/Loader";
+import { Skeleton } from "@/src/lib/shared/ui/Skeleton";
 import { Popover } from "@/src/lib/shared/ui/Popover";
 import { SvgCheck, SvgSearch } from "@/src/lib/shared/ui/svg";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
@@ -151,7 +151,19 @@ export const ListGameSearch: FC<IListGameSearchProps> = ({
             {CUSTOM_LIST_GAMES_MAX} games.
           </p>
         )}
-        {isSearching && !games.length && <Loader isBlock />}
+        {isSearching && !games.length && (
+          <div role="status" aria-label="Loading">
+            {Array.from({ length: 3 }, (_, index) => (
+              <div key={index} className={styles.result}>
+                <Skeleton
+                  aspectRatio="var(--cover-ratio)"
+                  radius="var(--radius-x1)"
+                />
+                <Skeleton shape="text" count={2} gap="var(--gap-x1)" />
+              </div>
+            ))}
+          </div>
+        )}
         {!isSearching && !games.length && (
           <EmptyState
             variant="compact"

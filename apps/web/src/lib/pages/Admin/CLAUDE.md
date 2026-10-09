@@ -7,7 +7,7 @@ whose account is an admin ever see it — everyone else gets a 404.
 
 - `/admin/users`, `/admin/games`, `/admin/comments`, `/admin/conflicts`, `/admin/characters`,
   `/admin/images`, `/admin/sites` — one route file each under `src/app/admin/<tab>/page.tsx`,
-  each rendering `<Admin tab="<tab>" />` inside a `Suspense` with `PageLoader` (the page reads
+  each rendering `<Admin tab="<tab>" />` inside a `Suspense` with `PageSkeleton` (the page reads
   `useSearchParams`).
 - `/admin` (`src/app/admin/page.tsx`) only redirects: the legacy `?tab=<tab>` becomes
   `/admin/<tab>`, an unknown or missing tab becomes `/admin/users`, other query params are kept.
@@ -47,7 +47,7 @@ whose account is an admin ever see it — everyone else gets a 404.
 - **Keep both gates: the server layout and the client `isAuthChecked && !isAdmin → notFound()`.**
   The layout lets a 401-with-refresh-cookie through, so only the client check catches a session
   that turns out not to be an admin after the refresh.
-- **Render no admin content until `isAdmin` is true — show `PageLoader` instead.** The badge
+- **Render no admin content until `isAdmin` is true — show `PageSkeleton` instead.** The badge
   queries are disabled until then, and rendering the widgets earlier fires admin requests that
   fail with toasts. Returning nothing left a blank page whenever the auth check stalled.
 - **Add a tab in `admin-url.utils.ts` (`ADMIN_TABS`, `ADMIN_TAB_LABELS`), add its route file, and

@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { Button } from "@/src/lib/shared/ui/Button";
 import { SvgChevron } from "@/src/lib/shared/ui/svg";
 import classNames from "classnames";
-import { Loader } from "@/src/lib/shared/ui/Loader";
+import { Skeleton } from "@/src/lib/shared/ui/Skeleton";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
@@ -95,7 +95,14 @@ export const MobileTable = <T extends object>({
   return (
     <div className={styles.table}>
       {isLoaderShown ? (
-        <Loader />
+        <div role="status" aria-label="Loading">
+          <Skeleton
+            count={4}
+            height="var(--padding-x25)"
+            radius="var(--radius-x2)"
+            gap="var(--gap-x1)"
+          />
+        </div>
       ) : (
         <>
           {!isWithoutMobileSorting && (

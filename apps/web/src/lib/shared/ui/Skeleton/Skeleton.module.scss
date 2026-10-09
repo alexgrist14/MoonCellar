@@ -1,0 +1,43 @@
+:where(.skeleton) {
+  width: 100%;
+}
+
+:where(.group) {
+  width: 100%;
+}
+
+.skeleton {
+  display: block;
+  flex-shrink: 0;
+  background-color: var(--color-bg-tertiary);
+  animation: skeletonPulse 0.9s var(--easing-in) infinite alternate;
+
+  &_block {
+    border-radius: var(--radius-x2);
+  }
+
+  &_text {
+    height: 1em;
+    margin-block: calc((1lh - 1em) / 2);
+    border-radius: var(--radius-x1);
+  }
+
+  &_circle {
+    aspect-ratio: 1;
+    border-radius: 50%;
+  }
+
+  @include reducedMotion {
+    animation: none;
+  }
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x2);
+
+  & > .skeleton_text:last-child {
+    width: 60%;
+  }
+}

@@ -23,11 +23,10 @@ import {
   SortControl,
 } from "@/src/lib/shared/ui/SortControl";
 import { useGridRows } from "@/src/lib/shared/hooks/useGridRows";
-import { GameCard } from "@/src/lib/widgets/game/GameCard";
+import { GameCard, GameCardSkeleton } from "@/src/lib/widgets/game/GameCard";
 import { Badge } from "@/src/lib/shared/ui/Badge";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
-import { Loader } from "@/src/lib/shared/ui/Loader";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
@@ -212,7 +211,19 @@ export const UserSteamGames: FC<IUserSteamGamesProps> = ({
         </div>
       )}
 
-      {isLoading && <Loader type="pulse" />}
+      {isLoading && (
+        <ul
+          className={isPreview ? styles.steam__preview : styles.steam__grid}
+          role="status"
+          aria-label="Loading"
+        >
+          {Array.from({ length: 12 }, (_, index) => (
+            <li key={index} className={styles.steam__item}>
+              <GameCardSkeleton style={CARD_STYLE} />
+            </li>
+          ))}
+        </ul>
+      )}
 
       {!isLoading && !items.length && (
         <EmptyState

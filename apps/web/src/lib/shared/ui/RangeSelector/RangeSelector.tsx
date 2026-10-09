@@ -8,7 +8,7 @@ import {
 } from "react";
 import styles from "./RangeSelector.module.scss";
 import classNames from "classnames";
-import { Loader } from "../Loader";
+import { Skeleton } from "../Skeleton";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 
 export type IRangeValue = [number, number];
@@ -152,7 +152,11 @@ export const RangeSelector: FC<RangeSelectorProps> = ({
     >
       {!!text && <span className={styles.selector__text}>{text}</span>}
       {isLoaderShown ? (
-        <Loader type="moon" />
+        <Skeleton
+          height="var(--range-thumb-height)"
+          radius="var(--radius-x1)"
+          className={styles.skeleton}
+        />
       ) : (
         <div className={styles.slider}>
           <div

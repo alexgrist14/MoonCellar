@@ -26,6 +26,10 @@
     }
   }
 
+  &_skeleton {
+    pointer-events: none;
+  }
+
   &_touch {
     min-height: var(--padding-x11);
   }

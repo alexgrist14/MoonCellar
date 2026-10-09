@@ -5,7 +5,7 @@ import {
   ICommentReportGroup,
   ICommentReportStatus,
 } from "@mooncellar/schemas";
-import { Loader } from "@/src/lib/shared/ui/Loader";
+import { Skeleton } from "@/src/lib/shared/ui/Skeleton";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { pluralize } from "@/src/lib/shared/utils/plural.utils";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
@@ -123,7 +123,14 @@ export const ReportList: FC = () => {
       </div>
 
       {isLoaderShown ? (
-        <Loader minHeight="var(--community-loading-height)" />
+        <div role="status" aria-label="Loading">
+          <Skeleton
+            count={3}
+            height="var(--community-loading-height)"
+            radius="var(--radius-x4)"
+            gap="var(--gap-x3)"
+          />
+        </div>
       ) : !reports.length ? (
         <EmptyState
           title={

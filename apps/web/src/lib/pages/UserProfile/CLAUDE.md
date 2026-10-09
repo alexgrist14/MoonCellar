@@ -89,6 +89,22 @@ editing controls.
    tab. Settings is not a tab in it: the owner reaches it from the gear icon at the right of
    that block, and from the account menu in the header.
 
+## Loading state
+
+- `UserProfileSkeleton` (`UserProfileSkeleton.tsx`) is the `Suspense` fallback of the layout. It
+  draws the page's own frame — `.container`, the content `Box` and the navigation column — and
+  fills it from the components' skeletons: `UserNavigationSkeleton` for the column, and on the
+  Profile tab `UserInfoSkeleton` (banner, avatar, name, `StatTile isLoading` counters, a card row
+  and `ActivityTimelineSkeleton`). Other tabs get a breadcrumb line and a panel; their widgets
+  show their own skeletons once the page mounts.
+- **The fallback is on screen only while the page's client chunk loads, not while the layout
+  fetches.** The layout awaits its data before it returns the `Suspense`, and no `loading.tsx` may
+  sit above it: the layout calls `notFound()`, and a boundary above that answers a missing user
+  with a soft 200.
+- **A change to the hero, the counters or the navigation's rows changes their skeleton too.**
+  Each skeleton is built on its component's classes, so sizes follow automatically, but a new
+  block or row only appears in the placeholder when it is added there.
+
 ## Rules and gotchas
 
 - **The owner hides Profile-tab blocks in Settings → Profile page, stored as

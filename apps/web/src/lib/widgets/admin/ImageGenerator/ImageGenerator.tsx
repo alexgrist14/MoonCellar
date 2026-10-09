@@ -23,6 +23,7 @@ import { Checkbox } from "@/src/lib/shared/ui/Checkbox";
 import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 import { Loader } from "@/src/lib/shared/ui/Loader";
+import { Skeleton } from "@/src/lib/shared/ui/Skeleton";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { Table } from "@/src/lib/shared/ui/Table";
@@ -414,9 +415,7 @@ export const ImageGenerator: FC = () => {
                     aria-label="Generating the image"
                     disabled
                   >
-                    <span className={styles.preview__loader}>
-                      <Loader />
-                    </span>
+                    <Skeleton height="100%" radius="inherit" />
                   </button>
                 ),
               },

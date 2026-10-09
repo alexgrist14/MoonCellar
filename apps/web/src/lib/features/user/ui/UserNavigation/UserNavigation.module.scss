@@ -24,6 +24,17 @@
     justify-content: space-between;
   }
 
+  .row {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    padding: var(--padding-x2) var(--padding-x4);
+    border: 1px solid transparent;
+    font-size: 14px;
+    line-height: 1;
+    justify-content: space-between;
+  }
+
   .profile {
     display: flex;
     align-items: center;

@@ -29,7 +29,7 @@ import {
 import { ISvgBaseProps } from "../svg/Svg";
 import { filesAPI } from "@/src/lib/shared/api/files.api";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
-import { Loader } from "../Loader";
+import { Skeleton } from "../Skeleton";
 import { EmojiPicker } from "../EmojiPicker";
 import { Tooltip } from "../Tooltip";
 import { Separator } from "../Separator";
@@ -264,8 +264,11 @@ export const RichEditor: FC<IRichEditorProps> = ({
     return (
       <div
         className={classNames(styles.editor, styles.editor_loading, className)}
+        role="status"
+        aria-label="Loading"
       >
-        <Loader type="pulse" />
+        <Skeleton width="60%" height="var(--padding-x8)" />
+        <Skeleton shape="text" count={3} />
       </div>
     );
   }

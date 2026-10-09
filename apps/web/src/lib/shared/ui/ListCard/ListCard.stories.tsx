@@ -1,6 +1,6 @@
 import type { ICustomList } from "@mooncellar/schemas";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { ListCard, ListMosaic } from "./ListCard";
+import { ListCard, ListCardSkeleton, ListMosaic } from "./ListCard";
 
 const list: ICustomList = {
   _id: "6650a1f2c3b4d5e6f7a8b9c0",
@@ -90,4 +90,12 @@ export const Mosaic: Story = {
       <ListMosaic covers={list.covers.slice(0, 3)} sizes="160px" />
     </div>
   ),
+};
+
+export const TileSkeleton: Story = {
+  render: () => <ListCardSkeleton />,
+};
+
+export const RowSkeleton: Story = {
+  render: () => <ListCardSkeleton layout="row" />,
 };

@@ -8,9 +8,12 @@ import { openListModal } from "@/src/lib/features/lists/ui/ListModal";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
-import { ListCard, ListMosaic } from "@/src/lib/shared/ui/ListCard";
+import {
+  ListCard,
+  ListCardSkeleton,
+  ListMosaic,
+} from "@/src/lib/shared/ui/ListCard";
 import { ListCardsGrid } from "@/src/lib/shared/ui/ListCardsGrid";
-import { Loader } from "@/src/lib/shared/ui/Loader";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import { SortableGrid } from "@/src/lib/shared/ui/SortableGrid";
 import { SvgPlus } from "@/src/lib/shared/ui/svg";
@@ -111,7 +114,11 @@ export const UserLists: FC<IUserListsProps> = ({
         {isLiked ? "Liked lists" : "Lists"}
       </SectionTitle>
       {isListsLoading ? (
-        <Loader type="moon" />
+        <ListCardsGrid isLoading>
+          {Array.from({ length: 6 }, (_, index) => (
+            <ListCardSkeleton key={index} />
+          ))}
+        </ListCardsGrid>
       ) : !lists.length ? (
         <EmptyState
           title={

@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { Suspense } from "react";
 import { RequestsPage } from "@/src/lib/pages/RequestsPage";
-import { PageLoader } from "@/src/lib/shared/ui/PageLoader";
+import { PageSkeleton } from "@/src/lib/shared/ui/PageSkeleton";
 
 export const metadata: Metadata = {
   title: "Requests",
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 const RequestsRoute = () => (
-  <Suspense fallback={<PageLoader />}>
+  <Suspense fallback={<PageSkeleton />}>
     <RequestsPage />
   </Suspense>
 );

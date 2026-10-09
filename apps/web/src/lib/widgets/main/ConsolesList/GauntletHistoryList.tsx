@@ -2,7 +2,6 @@ import { FC, useRef, useState } from "react";
 import { GAUNTLET_HISTORY_TAKE, IGameResponse } from "@mooncellar/schemas";
 import { useGauntletHistoryPageQuery } from "@/src/lib/entities/gauntlet-history/api/gauntlet-history.queries";
 import { useGauntletHistory } from "@/src/lib/entities/gauntlet-history/model/useGauntletHistory";
-import { Loader } from "@/src/lib/shared/ui/Loader";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { GamesList } from "@/src/lib/widgets/game/GamesList";
 import styles from "./ConsolesList.module.scss";
@@ -34,7 +33,7 @@ export const GauntletHistoryList: FC = () => {
     clear();
   };
 
-  if (isLoading) return <Loader />;
+  if (isLoading) return <GamesList games={[]} isLoading />;
 
   return (
     <div ref={listRef} className={styles.consoles__list}>

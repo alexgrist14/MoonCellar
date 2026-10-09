@@ -5,13 +5,13 @@ import { Box } from "@/src/lib/shared/ui/Box";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { Button } from "@/src/lib/shared/ui/Button";
-import { Loader } from "@/src/lib/shared/ui/Loader";
+import { Skeleton } from "@/src/lib/shared/ui/Skeleton";
 import { ButtonGroup } from "@/src/lib/shared/ui/Button/ButtonGroup";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
 import { GamesCards } from "@/src/lib/widgets/game/GamesCards";
-import { ListCard } from "@/src/lib/shared/ui/ListCard";
+import { ListCard, ListCardSkeleton } from "@/src/lib/shared/ui/ListCard";
 import { SvgGames, SvgListBullet, SvgProfile } from "@/src/lib/shared/ui/svg";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { useExpandStore } from "@/src/lib/shared/store/expand.store";
@@ -180,7 +180,35 @@ export const SearchModal: FC = () => {
     }
 
     if (isSearching) {
-      return <Loader type="pacman" minHeight="100%" />;
+      if (tab === "games") {
+        return <GamesCards isLoading skeletonCount={8} columns={4} />;
+      }
+
+      return (
+        <div className={styles.results} role="status" aria-label="Loading">
+          {tab === "users" ? (
+            <div className={classNames(styles.users, styles.users_skeleton)}>
+              {Array.from({ length: 5 }, (_, index) => (
+                <div key={index} className={styles.user}>
+                  <span className={styles.user__link}>
+                    <Skeleton
+                      shape="circle"
+                      width="var(--community-avatar-size)"
+                    />
+                    <Skeleton shape="text" count={2} gap="var(--gap-x1)" />
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className={styles.lists}>
+              {Array.from({ length: 6 }, (_, index) => (
+                <ListCardSkeleton key={index} layout="row" />
+              ))}
+            </div>
+          )}
+        </div>
+      );
     }
 
     if (!activeResultsCount) return renderEmpty();

@@ -8,7 +8,6 @@ import {
   IReviewsSort,
 } from "@mooncellar/schemas";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
-import { Loader } from "@/src/lib/shared/ui/Loader";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import {
@@ -29,6 +28,7 @@ import { useRequireAuth } from "@/src/lib/features/game/ui/GameCommunity/useRequ
 import { ReviewItem } from "./ReviewItem";
 import { ReviewsSummary } from "./ReviewsSummary";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
+import { EntrySkeleton } from "./EntrySkeleton";
 
 interface IReviewsTabProps {
   game: IGameResponse;
@@ -88,17 +88,14 @@ export const ReviewsTab: FC<IReviewsTabProps> = ({
     });
 
   const writeButton = (
-    <Button
-      color={ButtonColor.ACCENT}
-      onClick={openReviewModal}
-    >
+    <Button color={ButtonColor.ACCENT} onClick={openReviewModal}>
       <SvgPen size="16" style={{ color: "inherit" }} />
       Write a review
     </Button>
   );
 
   if (isLoaderShown && !summary) {
-    return <Loader type="pulse" isBlock />;
+    return <EntrySkeleton />;
   }
 
   if (!summary?.total) {
@@ -159,7 +156,7 @@ export const ReviewsTab: FC<IReviewsTabProps> = ({
         />
       </div>
       {isLoaderShown ? (
-        <Loader type="pulse" isBlock />
+        <EntrySkeleton />
       ) : (
         <div className={styles.feed}>
           {reviews.map((review) => (

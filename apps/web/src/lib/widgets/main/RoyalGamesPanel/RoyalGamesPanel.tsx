@@ -4,7 +4,6 @@ import { FC, useState } from "react";
 import styles from "./RoyalGamesPanel.module.scss";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { GamesList } from "@/src/lib/widgets/game/GamesList";
-import { Loader } from "@/src/lib/shared/ui/Loader";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { SavedList } from "@/src/lib/shared/ui/SavedList";
@@ -59,7 +58,7 @@ export const RoyalGamesPanel: FC = () => {
       />
       {tabIndex === 0 &&
         (!!royalGames?.length && isRoyalGamesLoaderShown ? (
-          <Loader type="propogate" />
+          <GamesList games={[]} isLoading skeletonCount={royalGames.length} />
         ) : (
           <GamesList
             games={royalGamesData || []}
@@ -125,7 +124,7 @@ export const RoyalGamesPanel: FC = () => {
               )}
             </div>
           ) : (
-            <Loader type="propogate" />
+            <SavedList isLoading />
           )}
         </>
       )}
