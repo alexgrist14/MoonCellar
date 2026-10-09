@@ -2,6 +2,7 @@
 
 import { FC, useMemo } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import styles from "./GameHero.module.scss";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
@@ -139,12 +140,21 @@ export const GameHero: FC<IGameHeroProps> = ({ game, stats }) => {
             { name: game.name, href: `/games/${game.slug}` },
           ]}
         />
-        {isRoyal && (
-          <Badge size="md" className={styles.hero__royal}>
-            <SvgCrown size="16" />
-            In royal games
-          </Badge>
-        )}
+        <div className={styles.hero__actions}>
+          {isRoyal && (
+            <Badge size="md">
+              <SvgCrown size="16" />
+              In royal games
+            </Badge>
+          )}
+          <Link
+            href={`/requests?kind=game&targetId=${game._id}&targetName=${encodeURIComponent(game.name)}`}
+            className={styles.hero__suggest}
+            rel="nofollow"
+          >
+            Suggest an edit
+          </Link>
+        </div>
       </div>
 
       <div className={styles.hero__body}>

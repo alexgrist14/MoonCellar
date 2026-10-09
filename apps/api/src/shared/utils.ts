@@ -32,6 +32,16 @@ export const normalizeGameName = (value: string) =>
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
 
+export const normalizeSearchText = (value: string) =>
+  value
+    .normalize("NFKD")
+    .replace(/\p{M}/gu, "")
+    .replace(/&/g, " and ")
+    .replace(/['’]/g, "")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+
 const ROMAN_NUMERAL_PATTERN =
   /^m{0,3}(cm|cd|d?c{0,3})(xc|xl|l?x{0,3})(ix|iv|v?i{0,3})$/;
 

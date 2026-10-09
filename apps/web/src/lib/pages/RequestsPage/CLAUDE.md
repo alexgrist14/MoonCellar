@@ -16,7 +16,7 @@ and follows the requests they sent. Moderators review them in the admin panel. G
 - `useAuthStore().isAuth` — decides between the form and the login prompt.
 - Query params, read once as initial values: `kind` (`character`, anything else → `game`),
   `targetId` + `targetName` (both required) to open the form as a correction of that entity.
-  The game page's details block builds them (`GameDetails`); the page never writes them back.
+  The game page's hero builds them (`GameHero`); the page never writes them back.
 - `widgets/requests/UserRequests` runs its own queries and mutations.
 
 ## Composition

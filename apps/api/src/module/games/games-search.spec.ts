@@ -1,7 +1,9 @@
-import { getSearchRelevanceTier } from "./services/games.service";
+import {
+  getSearchNames,
+  getSearchRelevanceTier,
+} from "./services/games.service";
 
-const tier = (name: string, nameArabicNumerals?: string) =>
-  getSearchRelevanceTier("eden", { nameNormalized: name, nameArabicNumerals });
+const tier = (name: string) => getSearchRelevanceTier("eden", name);
 
 describe("getSearchRelevanceTier", () => {
   it("ranks the exact name first", () => {
@@ -19,16 +21,41 @@ describe("getSearchRelevanceTier", () => {
     expect(tier("edengrad")).toBeGreaterThan(tier("metal eden"));
   });
 
-  it("matches the arabic numerals variant", () => {
-    expect(
-      getSearchRelevanceTier("eden 2", {
-        nameNormalized: "eden ii",
-        nameArabicNumerals: "eden 2",
-      })
-    ).toBe(0);
-  });
-
   it("puts subsequence-only matches last", () => {
     expect(tier("elden ring")).toBe(4);
+  });
+});
+
+describe("getSearchNames", () => {
+  it("indexes the name, its arabic numerals variant and the alternative names", () => {
+    expect(
+      getSearchNames({
+        name: "The Witcher 3: Wild Hunt",
+        alternative_names: [
+          "Witcher III",
+          "Ведьмак 3: Дикая охота",
+          "ウィッチャー３　ワイルドハント",
+          "WITCHER III",
+        ],
+      })
+    ).toEqual([
+      "the witcher 3 wild hunt",
+      "witcher iii",
+      "witcher 3",
+      "ведьмак 3 дикая охота",
+      "ウィッチャー3 ワイルトハント",
+    ]);
+  });
+
+  it("drops names that normalise to nothing", () => {
+    expect(getSearchNames({ name: "***", alternative_names: null })).toEqual(
+      []
+    );
+  });
+
+  it("folds diacritics and ё", () => {
+    expect(
+      getSearchNames({ name: "Pokémon", alternative_names: ["Ёжик"] })
+    ).toEqual(["pokemon", "ежик"]);
   });
 });

@@ -35,7 +35,8 @@ landing page — there are about 10 000 of them.
 ## Composition
 
 1. `BGImage` — background derived from the game (deterministically, not at random).
-2. `widgets/game/GameHero` — cover, name (`h1`), stats, controls.
+2. `widgets/game/GameHero` — cover, name (`h1`), stats, controls, and the "Suggest an edit" link
+   to `/requests` in the banner's top-right corner, so it shows even when `GameDetails` has no rows.
 3. Three columns: `entities/game/ui/GameOverview` (summary, storyline, keywords), `widgets/game/GameScoreColumn`,
    `widgets/game/GameSideColumn`.
 4. `entities/game/ui/GameMedia` and `widgets/game/GameCharacters` (`game.characters`, ordered by role in `getGameBySlug` / `getGameById` with `sortCharactersByRole`: an admin's role, else VNDB's, else Protagonist from the description; `GET /characters?gameId=` uses the same order) — hidden for adult games

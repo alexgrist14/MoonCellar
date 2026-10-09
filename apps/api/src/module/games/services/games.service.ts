@@ -43,7 +43,11 @@ import { Rating } from "../../user/schemas/user-ratings.schema";
 import { UserLogs } from "../../user/schemas/user-logs.schema";
 import { IndexNowService } from "../../indexnow/indexnow.service";
 import { FRONT_URL } from "../../../shared/constants";
-import { normalizeGameName, replaceRomanNumerals } from "../../../shared/utils";
+import {
+  normalizeGameName,
+  normalizeSearchText,
+  replaceRomanNumerals,
+} from "../../../shared/utils";
 import { pickFollowingsStatus } from "../utils/followings-status.utils";
 import { parseS3ImageUrl, S3_FOLDERS, type S3Folder } from "../../../shared/s3";
 
@@ -54,19 +58,26 @@ const SEARCH_INDEX_TTL_MS = 10 * 60 * 1000;
 const SEARCH_RELEVANCE_FALLBACK_TIER = 4;
 const SEARCH_RELEVANCE_FIELD = "_searchRelevanceTier";
 
-export const getSearchRelevanceTier = (
-  query: string,
-  entry: Pick<SearchIndexEntry, "nameNormalized" | "nameArabicNumerals">
-) => {
-  const names = [entry.nameNormalized, entry.nameArabicNumerals].filter(
-    (name): name is string => !!name
-  );
-
-  if (names.includes(query)) return 0;
-  if (names.some((name) => `${name} `.startsWith(`${query} `))) return 1;
-  if (names.some((name) => ` ${name} `.includes(` ${query} `))) return 2;
-  if (names.some((name) => name.includes(query))) return 3;
+export const getSearchRelevanceTier = (query: string, name: string) => {
+  if (name === query) return 0;
+  if (`${name} `.startsWith(`${query} `)) return 1;
+  if (` ${name} `.includes(` ${query} `)) return 2;
+  if (name.includes(query)) return 3;
   return SEARCH_RELEVANCE_FALLBACK_TIER;
+};
+
+export const getSearchNames = ({
+  name,
+  alternative_names,
+}: {
+  name: string;
+  alternative_names?: string[] | null;
+}) => {
+  const names = [name, ...(alternative_names ?? [])]
+    .map(normalizeSearchText)
+    .filter(Boolean);
+
+  return [...new Set(names.flatMap((n) => [n, replaceRomanNumerals(n)]))];
 };
 
 const SORT_FIELD_MAP: Record<string, string> = {
@@ -156,11 +167,7 @@ export const TRIM_IGDB_STAGE = {
 type SearchIndexEntry = {
   _id: mongoose.Types.ObjectId;
   name: string;
-  nameNormalized: string;
-  nameArabicNumerals?: string;
 };
-
-const SEARCH_KEYS = ["nameNormalized", "nameArabicNumerals"];
 
 @Injectable()
 export class GamesService implements OnModuleInit {
@@ -203,22 +210,18 @@ export class GamesService implements OnModuleInit {
       this.searchIndexRefreshPromise = this.Games.find({
         _id: { $exists: true },
       })
-        .select("_id name nameNormalized")
-        .lean<SearchIndexEntry[]>()
+        .select("_id name alternative_names")
+        .lean<
+          {
+            _id: mongoose.Types.ObjectId;
+            name: string;
+            alternative_names?: string[];
+          }[]
+        >()
         .then((docs) => {
-          const entries = docs.map((doc) => {
-            const nameNormalized =
-              doc.nameNormalized || normalizeGameName(doc.name);
-            const nameArabicNumerals = replaceRomanNumerals(nameNormalized);
-
-            return {
-              ...doc,
-              nameNormalized,
-              ...(nameArabicNumerals !== nameNormalized && {
-                nameArabicNumerals,
-              }),
-            };
-          });
+          const entries = docs.flatMap((doc) =>
+            getSearchNames(doc).map((name) => ({ _id: doc._id, name }))
+          );
           this.searchIndexCache = entries;
           this.searchIndexCachedAt = Date.now();
           this.searchIndexRefreshPromise = null;
@@ -231,6 +234,34 @@ export class GamesService implements OnModuleInit {
     }
 
     return this.searchIndexCache ?? this.searchIndexRefreshPromise;
+  }
+
+  private async searchIndex(
+    search: string,
+    filter?: (entry: SearchIndexEntry) => boolean
+  ) {
+    const query = normalizeSearchText(search);
+    const index = await this.getSearchIndex();
+    const matches = fuzzysort.go(query, filter ? index.filter(filter) : index, {
+      key: "name",
+      limit: SEARCH_CANDIDATES_LIMIT,
+      threshold: SEARCH_SCORE_THRESHOLD,
+    });
+    const best = new Map<
+      string,
+      { _id: mongoose.Types.ObjectId; tier: number }
+    >();
+
+    for (const match of matches) {
+      const id = match.obj._id.toString();
+      const tier = getSearchRelevanceTier(query, match.obj.name);
+
+      if ((best.get(id)?.tier ?? Infinity) > tier) {
+        best.set(id, { _id: match.obj._id, tier });
+      }
+    }
+
+    return [...best.values()];
   }
 
   async importImage(
@@ -352,21 +383,15 @@ export class GamesService implements OnModuleInit {
       }
 
       const idSet = new Set(ids);
-      const candidates = (await this.getSearchIndex()).filter((entry) =>
+      const matches = await this.searchIndex(search, (entry) =>
         idSet.has(entry._id.toString())
       );
-
-      const matches = fuzzysort.go(normalizeGameName(search), candidates, {
-        keys: SEARCH_KEYS,
-        limit: SEARCH_CANDIDATES_LIMIT,
-        threshold: SEARCH_SCORE_THRESHOLD,
-      });
 
       if (!matches.length) {
         return [];
       }
 
-      const matchedIds = matches.map((match) => match.obj._id);
+      const matchedIds = matches.map((match) => match._id);
 
       return await this.Games.aggregate([
         { $match: { _id: { $in: matchedIds } } },
@@ -416,19 +441,10 @@ export class GamesService implements OnModuleInit {
       let searchRelevanceTiers: number[] | undefined;
 
       if (search) {
-        const candidates = await this.getSearchIndex();
+        const matches = await this.searchIndex(search);
 
-        const query = normalizeGameName(search);
-        const matches = fuzzysort.go(query, candidates, {
-          keys: SEARCH_KEYS,
-          limit: SEARCH_CANDIDATES_LIMIT,
-          threshold: SEARCH_SCORE_THRESHOLD,
-        });
-
-        searchedIds = matches.map((match) => match.obj._id);
-        searchRelevanceTiers = matches.map((match) =>
-          getSearchRelevanceTier(query, match.obj)
-        );
+        searchedIds = matches.map((match) => match._id);
+        searchRelevanceTiers = matches.map((match) => match.tier);
 
         if (!searchedIds.length) {
           return { results: [], total: 0 };

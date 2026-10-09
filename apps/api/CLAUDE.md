@@ -197,6 +197,14 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   inside each tier. The score mostly measures title length:
   "eden" scored `edengrad` 0.907 and `metal eden` 0.884, so score thresholds put a dozen unrated
   short titles above every popular game with the word in its name.
+- **The search index holds one entry per name variant — the name, each `alternative_names`
+  entry, and the Arabic-numeral form of each — and a game takes the best tier of its entries.**
+  `getSearchNames` builds them and `searchIndex` folds the matches back to one row per game;
+  `getGames` counts `total` from that list, so a game matched twice must not appear twice.
+- **Search text goes through `normalizeSearchText`, never `normalizeGameName`.** The latter keeps
+  only `a-z0-9` because it feeds the stored `nameNormalized` that the source matchers compare;
+  used for search it turned "Ведьмак 3: Дикая охота" into "3" and a Cyrillic query into an empty
+  one. Query and index must use the same normaliser, or nothing matches.
 - **`POST /lists/by-slug` filters a list's games with the catalogue's `gamesFilters`, restricted
   to the list's ids, and searches names by substring of `nameNormalized`.** The GET stays for the
   server render and the unfiltered page. The response keeps `gamesCount` as the full count and

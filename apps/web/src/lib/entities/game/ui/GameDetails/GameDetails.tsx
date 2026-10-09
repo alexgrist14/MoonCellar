@@ -103,15 +103,6 @@ export const GameDetails: FC<IGameDetailsProps> = ({ game }) => {
     <Box
       title="Details"
       isTitleStart
-      titleAction={
-        <Link
-          href={`/requests?kind=game&targetId=${game._id}&targetName=${encodeURIComponent(game.name)}`}
-          className={styles.details__suggest}
-          rel="nofollow"
-        >
-          Suggest an edit
-        </Link>
-      }
       classNameContent={styles.details}
     >
       {rows.map((row) => (

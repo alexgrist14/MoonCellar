@@ -25,10 +25,24 @@
     left: var(--padding-x6);
   }
 
-  &__royal {
+  &__actions {
     position: absolute;
     top: var(--padding-x4);
     right: var(--padding-x6);
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x3);
+  }
+
+  &__suggest {
+    @include font(13px, 17px, 500);
+    color: var(--color-text-muted);
+    filter: var(--shadow-text);
+
+    &:hover {
+      color: var(--color-text-primary);
+      text-decoration: underline;
+    }
   }
 
   &__body {

@@ -80,7 +80,7 @@ A new character always needs a `name`; it has no source ids.
 ## Submitting
 
 - **Where.** `/requests`, linked from the user menu ("Requests") and from the "Suggest an edit"
-  link in a game page's Details block, which opens the form as an update of that game through
+  link in the top-right corner of a game page's hero, which opens the form as an update of that game through
   the `kind`, `targetId` and `targetName` query parameters.
 - **Who.** Any signed-in user (`AuthGuard("jwt")` + `UserIdGuard`). Guests see "Log in to send a
   request." The page is `noindex`.
