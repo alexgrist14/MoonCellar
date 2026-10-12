@@ -27,3 +27,7 @@ export const HLTB_QUERY_DELAY_MS = 400;
 export const HLTB_CONFLICT_ENTRIES_LIMIT = 5;
 
 export const HLTB_MAX_CONSECUTIVE_FAILURES = 10;
+
+export const HLTB_PLATFORM_YEAR_TOLERANCE = 2;
+
+export const HLTB_LOOSE_TITLE_OVERLAP = 0.8;

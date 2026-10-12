@@ -1,10 +1,13 @@
-import { type IHltbField } from "@mooncellar/schemas";
+import { type IHltbField, type IMatchReason } from "@mooncellar/schemas";
 import {
+  HLTB_LOOSE_TITLE_OVERLAP,
   HLTB_NOT_FOUND_RETRY_DAYS,
+  HLTB_PLATFORM_YEAR_TOLERANCE,
   HLTB_STRONG_TITLE_SIMILARITY,
   HLTB_CONFLICT_ENTRIES_LIMIT,
 } from "../constants/hltb";
 import {
+  descriptionOverlap,
   jaccard,
   normalizeCoreTitle,
   normalizeTitle,
@@ -135,9 +138,11 @@ type HltbEntryEvaluation = {
   titleExact: boolean;
   titleScore: number;
   strongTitle: boolean;
+  looseTitle: boolean;
   platformMatch: boolean;
   yearMatch: boolean;
   yearConflict: boolean;
+  yearNear: boolean;
 };
 
 const ROMAN_NUMERALS: Record<string, string> = {
@@ -185,12 +190,20 @@ const evaluateTitle = (title: string, name: string) => {
     titleSimilarity(entryTitle, ctxTitle),
     jaccard(tokenSetFrom(entryCore), tokenSetFrom(ctxCore))
   );
+  const entryTokens = tokenSetFrom(entryTitle);
+  const ctxTokens = tokenSetFrom(ctxTitle);
+  const [entryNumbers, ctxNumbers] = [entryTokens, ctxTokens].map((tokens) =>
+    [...tokens].filter((token) => /^\d+$/.test(token)).sort().join(" ")
+  );
 
   return {
     titleExact,
     titleScore,
     strongTitle:
       titleExact || coreExact || titleScore >= HLTB_STRONG_TITLE_SIMILARITY,
+    looseTitle:
+      descriptionOverlap(entryTokens, ctxTokens) >= HLTB_LOOSE_TITLE_OVERLAP &&
+      (!entryNumbers || !ctxNumbers || entryNumbers === ctxNumbers),
   };
 };
 
@@ -203,6 +216,7 @@ const evaluateEntry = (
   );
   const titleExact = titles.some((title) => title.titleExact);
   const strongTitle = titles.some((title) => title.strongTitle);
+  const looseTitle = titles.some((title) => title.looseTitle);
   const titleScore = Math.max(...titles.map((title) => title.titleScore));
 
   const entryPlatformKeys = (entry.platforms ?? []).map(canonicalPlatform);
@@ -218,14 +232,23 @@ const evaluateEntry = (
   const yearConflict =
     entry.releaseYear != null && ctx.years.size > 0 && !yearMatch;
 
+  const yearNear =
+    entry.releaseYear != null &&
+    [...ctx.years].some(
+      (year) =>
+        Math.abs(year - entry.releaseYear!) <= HLTB_PLATFORM_YEAR_TOLERANCE
+    );
+
   return {
     entry,
     titleExact,
     titleScore,
     strongTitle,
+    looseTitle,
     platformMatch,
     yearMatch,
     yearConflict,
+    yearNear,
   };
 };
 
@@ -238,6 +261,11 @@ const rankEvaluations = (
   (Number(b.titleExact) - Number(a.titleExact)) * 2 +
   (b.titleScore - a.titleScore) +
   ((b.entry.similarity ?? 0) - (a.entry.similarity ?? 0));
+
+const isCorroboratedCandidate = (item: HltbEntryEvaluation): boolean =>
+  (item.strongTitle || item.looseTitle) &&
+  item.platformMatch &&
+  item.yearMatch;
 
 /**
  * Picks the HLTB entry for a game, prioritising precision over coverage.
@@ -254,7 +282,10 @@ const rankEvaluations = (
  * belongs to a *different* game and platform overlap is not enough to accept it
  * (e.g. two same-titled "Mixtape" games released years apart, both on the same
  * platform). Re-releases named with an edition/version marker are exempt — for
- * them a year gap against HLTB's base entry is expected, not a conflict.
+ * them a year gap against HLTB's base entry is expected, not a conflict. So is
+ * an exact title on a shared platform within HLTB_PLATFORM_YEAR_TOLERANCE
+ * years: HLTB dates an entry by its earliest release (early access, the
+ * Japanese or arcade original), which our release dates often lack.
  *
  * Anything else returns null — we would rather store no time than a wrong one.
  */
@@ -267,10 +298,11 @@ export const selectHltbMatch = (
   }
 
   const isReRelease = normalizeTitle(ctx.name) !== normalizeCoreTitle(ctx.name);
-  const blockedByYear = (item: HltbEntryEvaluation): boolean =>
-    item.yearConflict && !isReRelease;
-
   const evaluations = results.map((entry) => evaluateEntry(entry, ctx));
+  const blockedByYear = (item: HltbEntryEvaluation): boolean =>
+    item.yearConflict &&
+    !isReRelease &&
+    !(item.titleExact && item.platformMatch && item.yearNear);
 
   const confirmed = evaluations
     .filter(
@@ -296,17 +328,38 @@ export const selectHltbMatch = (
   return null;
 };
 
-export const findAmbiguousHltbEntries = (
+export type HltbConflict = {
+  reason: IMatchReason;
+  entries: HltbSearchEntry[];
+};
+
+export const findHltbConflict = (
   results: HltbSearchEntry[],
   ctx: HltbMatchContext,
   limit = HLTB_CONFLICT_ENTRIES_LIMIT
-): HltbSearchEntry[] =>
-  results
-    .map((entry) => evaluateEntry(entry, ctx))
-    .filter((item) => item.strongTitle)
-    .sort(rankEvaluations)
-    .slice(0, limit)
-    .map(({ entry }) => entry);
+): HltbConflict | null => {
+  const evaluations = results
+    .filter((entry) => hasHltbTimes(mapHltbEntryToField(entry)))
+    .map((entry) => evaluateEntry(entry, ctx));
+  const picked = evaluations
+    .filter((item) => item.strongTitle || isCorroboratedCandidate(item))
+    .sort(
+      (a, b) =>
+        Number(b.strongTitle) - Number(a.strongTitle) || rankEvaluations(a, b)
+    )
+    .slice(0, limit);
+
+  if (!picked.length) return null;
+
+  return {
+    reason: !picked.some((item) => item.strongTitle)
+      ? "weak-title"
+      : picked.length > 1
+        ? "competing-candidates"
+        : "unverified-title",
+    entries: picked.map(({ entry }) => entry),
+  };
+};
 
 /** Thin wrapper kept for callers/tests that only need the entry. */
 export const pickBestHltbMatch = (
@@ -388,33 +441,24 @@ export const mapHltbEntryToField = (entry: HltbSearchEntry): IHltbField => ({
   updatedAt: new Date().toISOString(),
 });
 
+const HLTB_TIME_FIELDS = [
+  "mainStory",
+  "mainExtra",
+  "completionist",
+  "coop",
+  "multiplayer",
+] as const;
+
 export const hasHltbTimes = (hltb?: IHltbField | null): boolean =>
-  !!hltb &&
-  (hltb.mainStory != null ||
-    hltb.mainExtra != null ||
-    hltb.completionist != null);
+  !!hltb && HLTB_TIME_FIELDS.some((field) => hltb[field] != null);
 
 const missingHltbTimesFilter = {
-  $and: [
-    {
-      $or: [
-        { "hltb.mainStory": { $exists: false } },
-        { "hltb.mainStory": null },
-      ],
-    },
-    {
-      $or: [
-        { "hltb.mainExtra": { $exists: false } },
-        { "hltb.mainExtra": null },
-      ],
-    },
-    {
-      $or: [
-        { "hltb.completionist": { $exists: false } },
-        { "hltb.completionist": null },
-      ],
-    },
-  ],
+  $and: HLTB_TIME_FIELDS.map((field) => ({
+    $or: [
+      { [`hltb.${field}`]: { $exists: false } },
+      { [`hltb.${field}`]: null },
+    ],
+  })),
 };
 
 export const getStaleBeforeIso = (staleDays: number, now = Date.now()) =>

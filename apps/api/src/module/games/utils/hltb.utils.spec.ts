@@ -1,5 +1,5 @@
 import {
-  findAmbiguousHltbEntries,
+  findHltbConflict,
   buildHltbSearchQueries,
   buildIncrementalHltbFilter,
   buildMissingHltbFilter,
@@ -325,6 +325,96 @@ describe("hltb.utils", () => {
       expect(result).toBeNull();
     });
 
+    it("accepts an exact title on a shared platform that HLTB dates a few years earlier", () => {
+      const result = pickBestHltbMatch(
+        [
+          {
+            id: 46226,
+            name: "Tekken 7",
+            platforms: ["PC", "PlayStation 4", "Xbox One"],
+            releaseYear: 2015,
+          },
+        ],
+        ctx({
+          name: "Tekken 7",
+          platformKeys: buildPlatformKeySet(["PC (Microsoft Windows)"]),
+          years: new Set([2017]),
+        })
+      );
+
+      expect(result?.id).toBe(46226);
+    });
+
+    it("sends an exact title three years off to review instead of matching it", () => {
+      const entries = [
+        {
+          id: 120442,
+          name: "Final Fantasy XIV",
+          alias: "Final Fantasy XIV Online, Final Fantasy XIV 1.0",
+          platforms: ["PC", "PlayStation 3"],
+          releaseYear: 2010,
+          mainTime: 14400,
+        },
+      ];
+      const game = ctx({
+        name: "Final Fantasy XIV Online",
+        platformKeys: buildPlatformKeySet(["PC (Microsoft Windows)"]),
+        years: new Set([2013]),
+      });
+
+      expect(pickBestHltbMatch(entries, game)).toBeNull();
+      expect(findHltbConflict(entries, game)?.reason).toBe("unverified-title");
+    });
+
+    it("lists the strong title before loose ones that match the year", () => {
+      const conflict = findHltbConflict(
+        [
+          {
+            id: 7029,
+            name: "Phoenix Wright: Ace Attorney - Trials and Tribulations",
+            platforms: ["Nintendo DS"],
+            releaseYear: 2004,
+            mainTime: 3600,
+          },
+          {
+            id: 7026,
+            name: "Phoenix Wright: Ace Attorney",
+            platforms: ["Nintendo DS"],
+            releaseYear: 2001,
+            mainTime: 3600,
+          },
+        ],
+        ctx({
+          name: "Phoenix Wright: Ace Attorney",
+          platformKeys: buildPlatformKeySet(["Nintendo DS"]),
+          years: new Set([2005]),
+        })
+      );
+
+      expect(conflict?.entries.map(({ id }) => id)).toEqual([7026, 7029]);
+    });
+
+    it("keeps the year veto for a shared title and platform years apart", () => {
+      const result = pickBestHltbMatch(
+        [
+          {
+            id: 123997,
+            name: "RuneScape",
+            alias: "Old School RuneScape",
+            platforms: ["PC"],
+            releaseYear: 2001,
+          },
+        ],
+        ctx({
+          name: "Old School RuneScape",
+          platformKeys: buildPlatformKeySet(["PC (Microsoft Windows)"]),
+          years: new Set([2013]),
+        })
+      );
+
+      expect(result).toBeNull();
+    });
+
     it("accepts a unique exact title when the years line up", () => {
       const result = pickBestHltbMatch(
         [
@@ -459,6 +549,17 @@ describe("hltb.utils", () => {
       ).toBe(true);
     });
 
+    it("counts co-op and multiplayer times for games HLTB lists without a single-player block", () => {
+      expect(
+        hasHltbTimes({
+          hltbId: "80199",
+          coop: 14.2,
+          multiplayer: 2.3,
+          updatedAt: "2026-01-01T00:00:00.000Z",
+        })
+      ).toBe(true);
+    });
+
     it("returns false when all times are missing", () => {
       expect(
         hasHltbTimes({
@@ -503,6 +604,18 @@ describe("hltb.utils", () => {
                         $or: [
                           { "hltb.completionist": { $exists: false } },
                           { "hltb.completionist": null },
+                        ],
+                      },
+                      {
+                        $or: [
+                          { "hltb.coop": { $exists: false } },
+                          { "hltb.coop": null },
+                        ],
+                      },
+                      {
+                        $or: [
+                          { "hltb.multiplayer": { $exists: false } },
+                          { "hltb.multiplayer": null },
                         ],
                       },
                     ],
@@ -559,6 +672,18 @@ describe("hltb.utils", () => {
                       { "hltb.completionist": null },
                     ],
                   },
+                  {
+                    $or: [
+                      { "hltb.coop": { $exists: false } },
+                      { "hltb.coop": null },
+                    ],
+                  },
+                  {
+                    $or: [
+                      { "hltb.multiplayer": { $exists: false } },
+                      { "hltb.multiplayer": null },
+                    ],
+                  },
                 ],
               },
             ],
@@ -570,34 +695,112 @@ describe("hltb.utils", () => {
   });
 });
 
-describe("findAmbiguousHltbEntries", () => {
+describe("findHltbConflict", () => {
   const ctx = {
     name: "The Incredible Hulk",
     platformKeys: new Set<string>(),
     years: new Set([2008]),
   };
+  const timed = { mainTime: 3600 };
+  const ids = (conflict: { entries: { id: number }[] } | null) =>
+    conflict?.entries.map(({ id }) => id);
 
   it("offers every same-title entry the rules could not tell apart", () => {
-    const entries = [
-      { id: 1, name: "The Incredible Hulk", releaseYear: 2008 },
-      { id: 2, name: "The Incredible Hulk", releaseYear: 2008 },
-      { id: 3, name: "Hulk", releaseYear: 2003 },
-    ];
+    const conflict = findHltbConflict(
+      [
+        { id: 1, name: "The Incredible Hulk", releaseYear: 2008, ...timed },
+        { id: 2, name: "The Incredible Hulk", releaseYear: 2008, ...timed },
+        { id: 3, name: "Hulk", releaseYear: 2003, ...timed },
+      ],
+      ctx
+    );
 
-    expect(findAmbiguousHltbEntries(entries, ctx).map(({ id }) => id)).toEqual([
-      1, 2,
-    ]);
+    expect(conflict?.reason).toBe("competing-candidates");
+    expect(ids(conflict)).toEqual([1, 2]);
   });
 
   it("offers an entry with a different release year after the matching ones", () => {
-    const entries = [
-      { id: 4, name: "The Incredible Hulk", releaseYear: 1994 },
-      { id: 1, name: "The Incredible Hulk", releaseYear: 2008 },
-    ];
+    const conflict = findHltbConflict(
+      [
+        { id: 4, name: "The Incredible Hulk", releaseYear: 1994, ...timed },
+        { id: 1, name: "The Incredible Hulk", releaseYear: 2008, ...timed },
+      ],
+      ctx
+    );
 
-    expect(findAmbiguousHltbEntries(entries, ctx).map(({ id }) => id)).toEqual([
-      1, 4,
-    ]);
+    expect(ids(conflict)).toEqual([1, 4]);
+  });
+
+  it("leaves out entries without times, which cannot be applied", () => {
+    const conflict = findHltbConflict(
+      [
+        { id: 1, name: "The Incredible Hulk", releaseYear: 2008 },
+        { id: 2, name: "The Incredible Hulk", releaseYear: 1994, ...timed },
+      ],
+      ctx
+    );
+
+    expect(conflict?.reason).toBe("unverified-title");
+    expect(ids(conflict)).toEqual([2]);
+  });
+
+  it("offers a loosely titled entry that shares the platform and the year", () => {
+    const conflict = findHltbConflict(
+      [
+        {
+          id: 13937,
+          name: "Pokémon X and Y",
+          platforms: ["Nintendo 3DS"],
+          releaseYear: 2013,
+          ...timed,
+        },
+        {
+          id: 130008,
+          name: "Pokemon Eternal X",
+          platforms: ["Nintendo 3DS"],
+          releaseYear: 0,
+          ...timed,
+        },
+      ],
+      {
+        name: "Pokémon X",
+        platformKeys: buildPlatformKeySet(["Nintendo 3DS"]),
+        years: new Set([2013]),
+      }
+    );
+
+    expect(conflict?.reason).toBe("weak-title");
+    expect(ids(conflict)).toEqual([13937]);
+  });
+
+  it("does not offer another numbered entry of a series", () => {
+    const conflict = findHltbConflict(
+      [
+        {
+          id: 162424,
+          name: "Hidden World 9 Top-Down 3D",
+          platforms: ["PC"],
+          releaseYear: 2023,
+          ...timed,
+        },
+      ],
+      {
+        name: "Hidden World 7 Top-Down 3D",
+        platformKeys: buildPlatformKeySet(["PC (Microsoft Windows)"]),
+        years: new Set([2023]),
+      }
+    );
+
+    expect(conflict).toBeNull();
+  });
+
+  it("does not offer a loose title without platform and year corroboration", () => {
+    const conflict = findHltbConflict(
+      [{ id: 22640, name: "Randal's Monday", releaseYear: 2014, ...timed }],
+      { name: "Monday", platformKeys: new Set(), years: new Set() }
+    );
+
+    expect(conflict).toBeNull();
   });
 });
 

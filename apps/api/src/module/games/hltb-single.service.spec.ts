@@ -36,8 +36,19 @@ const buildService = (
   const findOne = jest.fn().mockReturnValue({
     select: () => ({ lean: () => Promise.resolve(game) }),
   });
+  const bulkWrite = jest.fn().mockResolvedValue({});
 
-  const gamesModel = { findOne, updateOne } as never;
+  const gamesModel = {
+    findOne,
+    updateOne,
+    bulkWrite,
+    countDocuments: jest.fn().mockResolvedValue(1),
+    find: () => ({
+      select: () => ({
+        sort: () => ({ limit: () => ({ lean: () => Promise.resolve([game]) }) }),
+      }),
+    }),
+  } as never;
   const platformsModel = {
     find: () => ({
       select: () => ({
@@ -69,16 +80,25 @@ const buildService = (
   );
 
   const getById = jest.fn().mockResolvedValue(byId);
+  const search = jest.fn().mockResolvedValue({
+    success: true,
+    data: searchResults,
+  });
 
   (service as unknown as { hltbClient: unknown }).hltbClient = {
-    search: jest.fn().mockResolvedValue({
-      success: true,
-      data: searchResults,
-    }),
+    search,
     getById,
   };
 
-  return { service, findOne, updateOne, getById, conflicts };
+  return {
+    service,
+    findOne,
+    updateOne,
+    bulkWrite,
+    getById,
+    search,
+    conflicts,
+  };
 };
 
 describe("HltbService.syncGame", () => {
@@ -127,6 +147,63 @@ describe("HltbService.syncGame", () => {
     expect(update.$unset).toEqual({ hltb: "" });
   });
 
+  it("stores co-op and versus times for a game HLTB lists without a single-player block", async () => {
+    const { service, updateOne } = buildService(
+      buildGame({ name: "It Takes Two", release_dates: [{ year: 2021 }] }),
+      [
+        buildEntry({
+          id: 80199,
+          name: "It Takes Two",
+          mainTime: undefined,
+          mainExtraTime: undefined,
+          completionistTime: undefined,
+          coopTime: 51101,
+          multiplayerTime: 8273,
+          releaseYear: 2021,
+        }),
+      ]
+    );
+
+    const result = await service.syncGame({ gameId: GAME_ID });
+
+    expect(result.status).toBe("updated");
+    expect(result.hltb?.coop).toBe(14.2);
+    expect(result.hltb?.multiplayer).toBe(2.3);
+    expect(updateOne.mock.calls[0][1].$unset).toEqual({ hltbNotFoundAt: "" });
+  });
+
+  it("sends a match without times to review with the entries that have them", async () => {
+    const { service, conflicts } = buildService(
+      buildGame({ name: "Titan Quest: Gold Edition", release_dates: [] }),
+      [
+        buildEntry({
+          id: 188894,
+          name: "Titan Quest: Gold Edition",
+          mainTime: undefined,
+          mainExtraTime: undefined,
+          completionistTime: undefined,
+          platforms: ["PC"],
+          releaseYear: 2007,
+        }),
+        buildEntry({
+          id: 10379,
+          name: "Titan Quest",
+          platforms: ["PC"],
+          releaseYear: 2006,
+        }),
+      ]
+    );
+
+    const result = await service.syncGame({ gameId: GAME_ID });
+
+    expect(result.status).toBe("not_found");
+    const [[source, [record]]] = conflicts.record.mock.calls;
+    expect(source).toBe("hltb");
+    expect(record.entries.map(({ id }: { id: string }) => id)).toEqual([
+      "10379",
+    ]);
+  });
+
   it("rejects a malformed game id", async () => {
     const { service } = buildService(buildGame(), [buildEntry()]);
 
@@ -170,6 +247,7 @@ describe("HltbService.syncGame with an explicit HLTB id", () => {
 
     const [, update] = updateOne.mock.calls[0];
     expect(update.$set.hltb.hltbId).toBe("4242");
+    expect(update.$set.hltb.isManual).toBe(true);
     expect(update.$unset).toEqual({ hltbNotFoundAt: "" });
     expect(conflicts.removeForGame).toHaveBeenCalledWith(
       "hltb",
@@ -217,5 +295,45 @@ describe("HltbService.syncGame with an explicit HLTB id", () => {
     ).rejects.toThrow(BadRequestException);
 
     expect(getById).not.toHaveBeenCalled();
+  });
+});
+
+describe("HltbService.syncAllGames", () => {
+  it("refreshes a link an admin chose by its id instead of searching again", async () => {
+    const { service, search, getById, bulkWrite } = buildService(
+      buildGame({
+        hltb: { hltbId: "4242", isManual: true, updatedAt: "2020-01-01" },
+      }),
+      [],
+      { success: true, data: buildEntry({ id: 4242, mainTime: 6 * 3600 }) }
+    );
+
+    const result = await service.syncAllGames({ delayMs: 0 });
+
+    expect(result.updated).toBe(1);
+    expect(search).not.toHaveBeenCalled();
+    expect(getById).toHaveBeenCalledWith(4242);
+
+    const [[[op]]] = bulkWrite.mock.calls;
+    expect(op.updateOne.update.$set.hltb).toMatchObject({
+      hltbId: "4242",
+      mainStory: 6,
+      isManual: true,
+    });
+  });
+
+  it("keeps a manual link when HLTB cannot be reached", async () => {
+    const { service, bulkWrite } = buildService(
+      buildGame({
+        hltb: { hltbId: "4242", isManual: true, updatedAt: "2020-01-01" },
+      }),
+      [],
+      { success: false, data: null }
+    );
+
+    const result = await service.syncAllGames({ delayMs: 0 });
+
+    expect(result.failed).toBe(1);
+    expect(bulkWrite).not.toHaveBeenCalled();
   });
 });

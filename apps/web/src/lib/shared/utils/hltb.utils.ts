@@ -43,6 +43,8 @@ export const getHltbTiles = (game: IGameResponse): IHltbTile[] => {
     { label: "Main story", parts: getHltbAmount(game.hltb.mainStory) },
     { label: "Main + extra", parts: getHltbAmount(game.hltb.mainExtra) },
     { label: "Completionist", parts: getHltbAmount(game.hltb.completionist) },
+    { label: "Co-op", parts: getHltbAmount(game.hltb.coop) },
+    { label: "Vs.", parts: getHltbAmount(game.hltb.multiplayer) },
   ];
 
   return tiles.flatMap(({ label, parts }) =>

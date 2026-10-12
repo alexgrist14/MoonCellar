@@ -41,7 +41,8 @@ import {
   buildIncrementalHltbFilter,
   buildMissingHltbFilter,
   buildPlatformKeySet,
-  findAmbiguousHltbEntries,
+  findHltbConflict,
+  type HltbConflict,
   hasHltbTimes,
   type HltbMatchContext,
   type HltbSearchEntry,
@@ -114,18 +115,17 @@ export class HltbService implements OnModuleInit {
 
   private async recordAmbiguity(
     game: { _id: unknown; name: string },
-    ambiguous: HltbSearchEntry[]
+    conflict: HltbConflict | null
   ) {
-    if (!ambiguous.length) return;
+    if (!conflict) return;
 
     await this.conflicts.record("hltb", [
       {
         externalId: String(game._id),
         externalName: game.name,
-        reason:
-          ambiguous.length > 1 ? "competing-candidates" : "unverified-title",
+        reason: conflict.reason,
         candidates: [],
-        entries: ambiguous.map((entry) => this.toConflictEntry(entry)),
+        entries: conflict.entries.map((entry) => this.toConflictEntry(entry)),
       },
     ]);
   }
@@ -359,12 +359,14 @@ export class HltbService implements OnModuleInit {
 
         try {
           const ctx = this.buildMatchContext(game, platformNames);
-          const { hltb, ambiguous, isEmpty } = await this.fetchHltbForGame(ctx);
+          const { hltb, conflict, isEmpty } = game.hltb?.isManual
+            ? await this.refreshManualLink(game.hltb.hltbId)
+            : await this.fetchHltbForGame(ctx);
           consecutiveFailures = 0;
 
           if (!hltb || !hasHltbTimes(hltb)) {
             result.skipped += 1;
-            await this.recordAmbiguity(game, ambiguous);
+            await this.recordAmbiguity(game, conflict);
 
             const now = new Date().toISOString();
             const update: Record<string, unknown> = {
@@ -505,11 +507,11 @@ export class HltbService implements OnModuleInit {
 
     const platformNames = await this.loadPlatformNames();
     const ctx = this.buildMatchContext(game, platformNames);
-    const { hltb, ambiguous, isEmpty } = await this.fetchHltbForGame(ctx);
+    const { hltb, conflict, isEmpty } = await this.fetchHltbForGame(ctx);
     const now = new Date().toISOString();
 
     if (!hltb || !hasHltbTimes(hltb)) {
-      await this.recordAmbiguity(game, ambiguous);
+      await this.recordAmbiguity(game, conflict);
 
       const isKept = !!game.hltb && isEmpty;
       const update: Record<string, unknown> = {
@@ -589,7 +591,10 @@ export class HltbService implements OnModuleInit {
       throw new NotFoundException(`HLTB entry not found: ${hltbId}`);
     }
 
-    const hltb = mapHltbEntryToField(this.toSearchEntry(response.data));
+    const hltb = {
+      ...mapHltbEntryToField(this.toSearchEntry(response.data)),
+      isManual: true,
+    };
 
     if (!hasHltbTimes(hltb)) {
       throw new BadRequestException(
@@ -790,7 +795,8 @@ export class HltbService implements OnModuleInit {
   private async fetchHltbForGame(ctx: HltbMatchContext) {
     const queries = buildHltbSearchQueries(ctx.name);
     const pool = new Map<number, HltbSearchEntry>();
-    let bestMatch: HltbSearchEntry | null = null;
+    const hasTimes = (entry: HltbSearchEntry) =>
+      hasHltbTimes(mapHltbEntryToField(entry));
 
     for (let i = 0; i < queries.length; i += 1) {
       const query = queries[i];
@@ -806,15 +812,14 @@ export class HltbService implements OnModuleInit {
       }
 
       const match = selectHltbMatch([...pool.values()], ctx);
-      bestMatch = match?.entry ?? bestMatch;
 
       // A corroborated match (title + platform/year) is trustworthy enough to
       // stop early; the exact-title fallback waits for all queries so a later
       // query cannot reveal a second exact title that should void it.
-      if (match?.tier === "confirmed") {
+      if (match?.tier === "confirmed" && hasTimes(match.entry)) {
         return {
           hltb: mapHltbEntryToField(match.entry),
-          ambiguous: [],
+          conflict: null,
           isEmpty: false,
         };
       }
@@ -824,13 +829,36 @@ export class HltbService implements OnModuleInit {
       }
     }
 
-    return bestMatch
-      ? { hltb: mapHltbEntryToField(bestMatch), ambiguous: [], isEmpty: false }
+    const entries = [...pool.values()];
+    const match = selectHltbMatch(entries, ctx);
+
+    return match && hasTimes(match.entry)
+      ? { hltb: mapHltbEntryToField(match.entry), conflict: null, isEmpty: false }
       : {
           hltb: null,
-          ambiguous: findAmbiguousHltbEntries([...pool.values()], ctx),
+          conflict: findHltbConflict(entries, ctx),
           isEmpty: pool.size === 0,
         };
+  }
+
+  private async refreshManualLink(hltbId: string) {
+    const response = await this.hltbClient.getById(Number(hltbId));
+
+    if (!response.success || !response.data) {
+      throw new HltbSearchFailedError(`HLTB lookup failed for #${hltbId}`);
+    }
+
+    const hltb = mapHltbEntryToField(this.toSearchEntry(response.data));
+
+    if (!hasHltbTimes(hltb)) {
+      throw new Error(`HLTB entry #${hltbId} has no completion times`);
+    }
+
+    return {
+      hltb: { ...hltb, isManual: true },
+      conflict: null,
+      isEmpty: false,
+    };
   }
 
   private async search(query: string): Promise<HltbSearchEntry[]> {

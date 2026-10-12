@@ -580,11 +580,38 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   HLTB), hid them from every sync for the 90-day retry window, wiped the times of games that already
   had them and produced no conflicts at all. A search that succeeds with no results does not clear
   stored times either; only a non-empty result with no acceptable entry does.
+- **A game marked `hltbNotFoundAt` is invisible to `POST /hltb/backfill?onlyMissing=true`.** Only
+  the weekly run retries it, after `HLTB_NOT_FOUND_RETRY_DAYS` (90). Marks written by an older
+  matcher therefore stay until then — 316,000 from July 2026, among them Baldur's Gate III. To
+  re-check them sooner, run the backfill without `onlyMissing` or `$unset` the marks first.
+- **HLTB co-op and Vs. times are times: `hasHltbTimes`, the missing-times filter and the web tiles
+  read `coop` and `multiplayer` next to the three single-player fields.** HLTB sets
+  `comp_lvl_sp: 0` for co-op and multiplayer games and hides their single-player block, so
+  `howlongtobeat-ts` returns no `mainTime` for them. Reading only the single-player fields marked
+  It Takes Two, Split Fiction, Dota 2 and Team Fortress 2 "not found" — 44 of the 150 most-rated
+  unmatched games. Do not take `raw.comp_main` instead: HLTB hides it on purpose, and it would show
+  Team Fortress 2 a 290-hour "main story".
 - **HLTB titles compare with Roman numerals as digits and against the entry's alias too**
   (`normalizeHltbTitle`, `evaluateEntry`), so "Baldur's Gate III" meets HLTB's "Baldur's Gate 3".
-  Single-letter numerals (I, V, X) stay words — "Mega Man X" is not "Mega Man 10". Every
-  strong-title candidate the rules could not accept goes to the conflict, a different release year
-  included; the year vetoes only the automatic match.
+  Single-letter numerals (I, V, X) stay words — "Mega Man X" is not "Mega Man 10".
+- **HLTB dates an entry by its earliest release, so an exact title on a shared platform is
+  accepted up to `HLTB_PLATFORM_YEAR_TOLERANCE` (2) years off; a wider gap goes to Conflicts.**
+  Early access, the Japanese and the arcade originals are missing from our release dates; with a
+  ±1 veto Tekken 7, Garry's Mod and Project Zomboid never matched. Do not raise it to 3: our 2013
+  "Final Fantasy XIV Online" then matched HLTB's 2010 "Final Fantasy XIV" (aliased "Online"), and
+  the right 2013 entry is not even in the search results for that title.
+- **Every HLTB entry the rules found but could not accept goes to Conflicts.** `findHltbConflict`
+  offers each strong title (a different release year included — the year vetoes only the
+  automatic match) and each loose title — the shorter title's words at least 80% inside the
+  other's, the same numbers — that also shares our platform and year (`weak-title`: "Pokémon X"
+  against "Pokémon X and Y", "Rainbow Six Siege" against "Tom Clancy's Rainbow Six Siege"). Entries
+  without times are never offered: applying one fails, and the decision would return to the queue
+  forever. Loosen the loose rule only after measuring it — on a random 100 not-found games it adds
+  about 4 conflicts, most of them noise ("Axolotl" against "Magic Axolotl").
+- **An HLTB link chosen by hand carries `hltb.isManual`, and the sync refreshes it by id instead of
+  searching again.** `applyHltbEntryById` sets it for a Conflicts decision and an explicit
+  `hltbId`. Without it the 30-day refresh re-ran the matcher that had rejected the entry and wiped
+  the admin's choice. Searching by `POST /hltb/games/parse` without `hltbId` still re-matches it.
 - **An id set by hand ends the source's open conflicts for that game, never its decided ones.**
   `POST /hltb/games/parse?hltbId`, `POST /vndb/games/parse?vnId` and `POST /ra/games/parse?raId`
   call `ConflictsService.removeForGame`: it deletes the conflict of the linked id itself and every
