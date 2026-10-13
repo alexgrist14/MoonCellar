@@ -87,6 +87,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "shared.akamai.steamstatic.com",
       },
+      {
+        protocol: "https",
+        hostname: "howlongtobeat.com",
+      },
     ],
   },
 };

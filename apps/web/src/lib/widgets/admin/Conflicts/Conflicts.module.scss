@@ -82,6 +82,10 @@
   align-items: start;
   gap: var(--gap-x3);
 
+  &_entries {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  }
+
   @include mediaMax(960px) {
     grid-template-columns: minmax(0, 1fr);
   }

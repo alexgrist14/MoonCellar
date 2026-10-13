@@ -358,4 +358,44 @@ describe("ConflictsService", () => {
       service.addCandidate("vndb", "v1", String(new Types.ObjectId()))
     ).rejects.toBeInstanceOf(BadRequestException);
   });
+
+  it("refreshes an undecided conflict in place and inserts the missing ones", async () => {
+    const bulkWrite = jest.fn().mockResolvedValue({});
+    const insertMany = jest.fn().mockResolvedValue([]);
+    const service = createService({
+      conflictsModel: { ...idleModel, bulkWrite, insertMany },
+    });
+    const entries = [
+      {
+        id: "10379",
+        name: "Titan Quest",
+        score: 1,
+        releaseYear: 2006,
+        platforms: ["PC"],
+        cover: "https://howlongtobeat.com/games/10379_Titan_Quest.jpg",
+        url: "https://howlongtobeat.com/game/10379",
+        details: [],
+      },
+    ];
+
+    await service.refresh("hltb", [
+      {
+        externalId: "g1",
+        externalName: "Titan Quest: Gold Edition",
+        reason: "unverified-title",
+        candidates: [],
+        entries,
+      },
+    ]);
+
+    const [[[op]]] = bulkWrite.mock.calls;
+    expect(op.updateOne.filter).toEqual({
+      source: "hltb",
+      externalId: "g1",
+      status: "pending",
+      decision: null,
+    });
+    expect(op.updateOne.update.$set.entries).toEqual(entries);
+    expect(insertMany).toHaveBeenCalledTimes(1);
+  });
 });

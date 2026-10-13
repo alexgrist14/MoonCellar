@@ -64,31 +64,16 @@ export class HltbController {
   }
 
   @Post("/backfill")
-  @ApiOperation({ summary: "Backfill HLTB completion times for games" })
-  @ApiCookieAuth()
-  @UseGuards(AuthGuard("jwt"))
-  @HttpCode(HttpStatus.OK)
-  @ApiQuery({ name: "limit", required: false })
-  @ApiQuery({ name: "delayMs", required: false })
-  @ApiQuery({
-    name: "onlyMissing",
-    required: false,
-    default: false,
-    type: Boolean,
+  @ApiOperation({
+    summary:
+      "Download the HLTB catalogue and match every game against it in the background",
   })
-  @ApiQuery({ name: "staleDays", required: false })
-  async backfillHltb(
-    @Query("limit") limitQuery?: string,
-    @Query("delayMs") delayMsQuery?: string,
-    @Query("onlyMissing") onlyMissingQuery?: string,
-    @Query("staleDays") staleDaysQuery?: string
-  ) {
-    this.hltb.syncAllGames({
-      limit: parsePositiveInt(limitQuery),
-      delayMs: parsePositiveInt(delayMsQuery),
-      onlyMissing: onlyMissingQuery === "true",
-      staleDays: parsePositiveInt(staleDaysQuery),
-    });
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard("jwt"), RolesGuard)
+  @Roles(RolesEnum.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  async backfillHltb() {
+    this.hltb.syncAllGames().catch(() => undefined);
 
     return { message: "HLTB backfill started" };
   }
@@ -96,19 +81,10 @@ export class HltbController {
   @Delete("/remove-all")
   @ApiOperation({ summary: "Remove stored HLTB times from all games" })
   @ApiCookieAuth()
-  @UseGuards(AuthGuard("jwt"))
+  @UseGuards(AuthGuard("jwt"), RolesGuard)
+  @Roles(RolesEnum.ADMIN)
   @HttpCode(HttpStatus.OK)
   async clearHltb() {
     return this.hltb.clearAllHltb();
   }
 }
-
-const parsePositiveInt = (value?: string) => {
-  if (!value) {
-    return undefined;
-  }
-
-  const parsed = Number(value);
-
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
-};

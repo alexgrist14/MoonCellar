@@ -105,6 +105,9 @@ export const Conflicts: FC = () => {
   const isDecidable = item?.state === "waiting";
   const subject = item?.subject;
   const sourceName = item ? SOURCE_LABELS[item.source] : "";
+  const subjectLabel = isEntries
+    ? "Catalogue game"
+    : `${sourceName} ${item?.externalId ?? ""}`;
   const sourceIndex = source ? CONFLICT_SOURCES.indexOf(source) + 1 : 0;
   const pending = summary?.pending ?? 0;
   const applying = summary?.applying ?? 0;
@@ -213,6 +216,152 @@ export const Conflicts: FC = () => {
     resolve,
   ]);
 
+  const subjectPanel = item && (
+    <section key="subject" className={styles.panel} aria-label={subjectLabel}>
+      <Scrollbar contentStyle={SCROLL_STYLE}>
+        <div className={styles.vn}>
+          <div className={styles.vn__head}>
+            {subject?.url ? (
+              <a
+                className={styles.eyebrow}
+                href={subject.url}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {subjectLabel}
+              </a>
+            ) : (
+              <span className={styles.eyebrow}>{subjectLabel}</span>
+            )}
+            {item.reason && (
+              <span className={styles.reason}>
+                {REASON_LABELS[item.reason]}
+              </span>
+            )}
+            {!isDecidable && (
+              <Badge tone={stateTone(item.state)}>
+                {stateLabel(item.source, item.state)}
+                {item.decidedBy && ` · ${item.decidedBy}`}
+              </Badge>
+            )}
+          </div>
+
+          {subject ? (
+            <>
+              <div className={styles.vn__title}>
+                {subject.cover && !failedCovers.has(subject.cover) && (
+                  <Image
+                    className={classNames(styles.vn__cover, {
+                      [styles.vn__cover_explicit]: subject.isExplicitCover,
+                    })}
+                    src={subject.cover}
+                    width={120}
+                    height={160}
+                    alt={subject.name}
+                    onError={() =>
+                      setFailedCovers((covers) =>
+                        new Set(covers).add(subject.cover!)
+                      )
+                    }
+                  />
+                )}
+                <div>
+                  <h3 className={styles.vn__name}>{subject.name}</h3>
+                  {subject.originalName !== subject.name && (
+                    <p className={styles.muted}>{subject.originalName}</p>
+                  )}
+                </div>
+              </div>
+
+              <dl className={styles.facts}>
+                <Fact label="Released" value={subject.released} />
+                <Fact
+                  label="Developers"
+                  value={subject.developers.join(", ")}
+                />
+                <Fact
+                  label="Platforms"
+                  value={platformNames(subject.platformIds)}
+                />
+                <Fact
+                  label="Also known as"
+                  value={subject.alternativeNames.join(" · ")}
+                />
+                <Fact
+                  label="Length"
+                  value={
+                    subject.lengthMinutes
+                      ? formatLength(subject.lengthMinutes)
+                      : null
+                  }
+                />
+              </dl>
+
+              {subject.description && (
+                <p className={styles.description}>{subject.description}</p>
+              )}
+            </>
+          ) : (
+            <p className={styles.muted}>
+              {isEntries
+                ? "The catalogue no longer has this game."
+                : `${sourceName} no longer has ${item.externalId}.`}{" "}
+              A decision on it returns to the queue.
+            </p>
+          )}
+        </div>
+      </Scrollbar>
+    </section>
+  );
+
+  const optionsPanel = item && (
+    <section
+      key="options"
+      className={styles.panel}
+      aria-label={isEntries ? `${sourceName} entries` : "Catalogue candidates"}
+    >
+      <Scrollbar contentStyle={SCROLL_STYLE}>
+        <p className={styles.eyebrow}>
+          {isEntries
+            ? `${pluralize(options.length, "entry", "entries")} on ${sourceName}`
+            : `${pluralize(options.length, "candidate")} in the catalogue`}
+        </p>
+        <ul className={styles.candidates}>
+          {item.entries.map((entry, index) => (
+            <EntryCard
+              key={entry.id}
+              entry={entry}
+              isSelected={index === selectedIndex}
+              onSelect={() => select(index)}
+            />
+          ))}
+          {item.candidates.map((candidate, index) => (
+            <CandidateCard
+              key={candidate.gameId}
+              candidate={candidate}
+              isSelected={index === selectedIndex}
+              isChosen={chosenIds.includes(candidate.gameId)}
+              platformNames={platformNames}
+              onSelect={() => select(index)}
+              onToggle={
+                isMultiMatch && isDecidable
+                  ? () => toggle(candidate.gameId)
+                  : undefined
+              }
+            />
+          ))}
+        </ul>
+        {!isEntries && isDecidable && (
+          <CandidateSearch
+            key={item.id}
+            item={item}
+            onAdded={() => select(0)}
+          />
+        )}
+      </Scrollbar>
+    </section>
+  );
+
   return (
     <div className={styles.review}>
       <div className={styles.toolbar}>
@@ -294,158 +443,14 @@ export const Conflicts: FC = () => {
           />
         ) : (
           <>
-            <div className={styles.split}>
-              <section
-                className={styles.panel}
-                aria-label={`${sourceName} entry`}
-              >
-                <Scrollbar contentStyle={SCROLL_STYLE}>
-                  <div className={styles.vn}>
-                    <div className={styles.vn__head}>
-                      {subject?.url ? (
-                        <a
-                          className={styles.eyebrow}
-                          href={subject.url}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {sourceName} {item.externalId}
-                        </a>
-                      ) : (
-                        <span className={styles.eyebrow}>
-                          {sourceName} {item.externalId}
-                        </span>
-                      )}
-                      {item.reason && (
-                        <span className={styles.reason}>
-                          {REASON_LABELS[item.reason]}
-                        </span>
-                      )}
-                      {!isDecidable && (
-                        <Badge tone={stateTone(item.state)}>
-                          {stateLabel(item.source, item.state)}
-                          {item.decidedBy && ` · ${item.decidedBy}`}
-                        </Badge>
-                      )}
-                    </div>
-
-                    {subject ? (
-                      <>
-                        <div className={styles.vn__title}>
-                          {subject.cover &&
-                            !failedCovers.has(subject.cover) && (
-                              <Image
-                                className={classNames(styles.vn__cover, {
-                                  [styles.vn__cover_explicit]:
-                                    subject.isExplicitCover,
-                                })}
-                                src={subject.cover}
-                                width={120}
-                                height={160}
-                                alt={subject.name}
-                                onError={() =>
-                                  setFailedCovers((covers) =>
-                                    new Set(covers).add(subject.cover!)
-                                  )
-                                }
-                              />
-                            )}
-                          <div>
-                            <h3 className={styles.vn__name}>{subject.name}</h3>
-                            {subject.originalName !== subject.name && (
-                              <p className={styles.muted}>
-                                {subject.originalName}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-
-                        <dl className={styles.facts}>
-                          <Fact label="Released" value={subject.released} />
-                          <Fact
-                            label="Developers"
-                            value={subject.developers.join(", ")}
-                          />
-                          <Fact
-                            label="Platforms"
-                            value={platformNames(subject.platformIds)}
-                          />
-                          <Fact
-                            label="Also known as"
-                            value={subject.alternativeNames.join(" · ")}
-                          />
-                          <Fact
-                            label="Length"
-                            value={
-                              subject.lengthMinutes
-                                ? formatLength(subject.lengthMinutes)
-                                : null
-                            }
-                          />
-                        </dl>
-
-                        {subject.description && (
-                          <p className={styles.description}>
-                            {subject.description}
-                          </p>
-                        )}
-                      </>
-                    ) : (
-                      <p className={styles.muted}>
-                        {sourceName} no longer has {item.externalId}. A decision
-                        on it returns to the queue.
-                      </p>
-                    )}
-                  </div>
-                </Scrollbar>
-              </section>
-
-              <section
-                className={styles.panel}
-                aria-label={
-                  isEntries ? `${sourceName} entries` : "Catalogue candidates"
-                }
-              >
-                <Scrollbar contentStyle={SCROLL_STYLE}>
-                  <p className={styles.eyebrow}>
-                    {isEntries
-                      ? `${pluralize(options.length, "entry", "entries")} on ${sourceName}`
-                      : `${pluralize(options.length, "candidate")} in the catalogue`}
-                  </p>
-                  <ul className={styles.candidates}>
-                    {item.entries.map((entry, index) => (
-                      <EntryCard
-                        key={entry.id}
-                        entry={entry}
-                        isSelected={index === selectedIndex}
-                        onSelect={() => select(index)}
-                      />
-                    ))}
-                    {item.candidates.map((candidate, index) => (
-                      <CandidateCard
-                        key={candidate.gameId}
-                        candidate={candidate}
-                        isSelected={index === selectedIndex}
-                        isChosen={chosenIds.includes(candidate.gameId)}
-                        platformNames={platformNames}
-                        onSelect={() => select(index)}
-                        onToggle={
-                          isMultiMatch && isDecidable
-                            ? () => toggle(candidate.gameId)
-                            : undefined
-                        }
-                      />
-                    ))}
-                  </ul>
-                  {!isEntries && isDecidable && (
-                    <CandidateSearch
-                      key={item.id}
-                      item={item}
-                      onAdded={() => select(0)}
-                    />
-                  )}
-                </Scrollbar>
-              </section>
+            <div
+              className={classNames(styles.split, {
+                [styles.split_entries]: isEntries,
+              })}
+            >
+              {isEntries
+                ? [optionsPanel, subjectPanel]
+                : [subjectPanel, optionsPanel]}
             </div>
 
             <div className={styles.actions}>

@@ -8,13 +8,20 @@ import { Cron } from "@nestjs/schedule";
 import { InjectModel } from "@nestjs/mongoose";
 import {
   type HowLongToBeatEntry,
+  type HowLongToBeatResultEntry,
   HowLongToBeatService,
+  type InitResponse,
+  SearchModifier,
 } from "howlongtobeat-ts";
-import mongoose, { type FilterQuery, Model } from "mongoose";
+import mongoose, {
+  type AnyBulkWriteOperation,
+  type FilterQuery,
+  Model,
+} from "mongoose";
 import { PinoLogger } from "nestjs-pino";
 import { sleep } from "../../../shared/utils";
 import { runInCronLogContext } from "../../../shared/cron-logging";
-import { runCronExclusive } from "../../../shared/cron-mutex";
+import { runCronExclusive, withDbLock } from "../../../shared/cron-mutex";
 import { BusinessMetricsService } from "../../metrics/business-metrics.service";
 import {
   type IConflictEntry,
@@ -22,40 +29,41 @@ import {
   type IHltbField,
 } from "@mooncellar/schemas";
 import { ConflictsService } from "../../conflicts/services/conflicts.service";
-import type { IConflictDecision } from "../../conflicts/types/conflicts.types";
+import type {
+  IConflictDecision,
+  IConflictRecord,
+} from "../../conflicts/types/conflicts.types";
 import { Game, type GameDocument } from "../schemas/game.schema";
 import { Platform, type PlatformDocument } from "../schemas/platform.schema";
 import {
-  HLTB_CRON_DELAY_MS,
-  HLTB_CRON_MAX_GAMES,
-  HLTB_DEFAULT_BATCH_SIZE,
-  HLTB_DEFAULT_DELAY_MS,
-  HLTB_MAX_CONSECUTIVE_FAILURES,
+  HLTB_CATALOG_MIN_COMPLETENESS,
+  HLTB_CATALOG_PAGE_ATTEMPTS,
+  HLTB_CATALOG_PAGE_DELAY_MS,
+  HLTB_CATALOG_PAGE_SIZE,
+  HLTB_CATALOG_RETRY_DELAY_MS,
+  HLTB_CATALOG_TOKEN_REQUESTS,
   HLTB_QUERY_DELAY_MS,
-  HLTB_STALE_DAYS,
   HLTB_SYNC_CRON,
   HLTB_SYNC_CRON_OPTIONS,
+  HLTB_SYNC_WRITE_BATCH,
+  HLTB_USER_AGENT,
 } from "../constants/hltb";
 import {
+  buildHltbCatalog,
   buildHltbSearchQueries,
-  buildIncrementalHltbFilter,
-  buildMissingHltbFilter,
   buildPlatformKeySet,
+  findCatalogCandidates,
   findHltbConflict,
+  type HltbCatalog,
   type HltbConflict,
   hasHltbTimes,
   type HltbMatchContext,
   type HltbSearchEntry,
+  isSameHltb,
   mapHltbEntryToField,
+  mapRawHltbEntry,
   selectHltbMatch,
 } from "../utils/hltb.utils";
-
-export type HltbSyncOptions = {
-  limit?: number;
-  delayMs?: number;
-  onlyMissing?: boolean;
-  staleDays?: number;
-};
 
 export type HltbGameTarget = {
   gameId?: string;
@@ -72,17 +80,41 @@ export type HltbGameSyncResult = {
   hltb: IHltbField | null;
 };
 
-export type HltbSyncResult = {
-  status: "running" | "finished" | "skipped" | "empty_queue" | "aborted";
-  message: string;
+type HltbSyncTotals = {
+  catalog: number;
   processed: number;
   updated: number;
+  unchanged: number;
+  notFound: number;
   skipped: number;
-  failed: number;
-  queuedTotal?: number;
-  targetTotal?: number;
-  mode?: string;
 };
+
+export type HltbSyncResult = HltbSyncTotals & {
+  status: "finished" | "skipped";
+  message: string;
+};
+
+type CatalogSession = { auth?: InitResponse; requests: number };
+
+type HltbCatalogOutcome = {
+  result: Exclude<keyof HltbSyncTotals, "catalog" | "processed">;
+  update?: mongoose.mongo.UpdateFilter<GameDocument>;
+  conflict?: HltbConflict | null;
+};
+
+const emptySyncTotals = (): HltbSyncTotals => ({
+  catalog: 0,
+  processed: 0,
+  updated: 0,
+  unchanged: 0,
+  notFound: 0,
+  skipped: 0,
+});
+
+const formatTotals = (totals: HltbSyncTotals) =>
+  Object.entries(totals)
+    .map(([key, value]) => `${key}=${value}`)
+    .join(", ");
 
 export class HltbSearchFailedError extends Error {}
 
@@ -119,7 +151,7 @@ export class HltbService implements OnModuleInit {
   ) {
     if (!conflict) return;
 
-    await this.conflicts.record("hltb", [
+    await this.conflicts.refresh("hltb", [
       {
         externalId: String(game._id),
         externalName: game.name,
@@ -141,7 +173,7 @@ export class HltbService implements OnModuleInit {
       score: entry.similarity ?? null,
       releaseYear: entry.releaseYear ?? null,
       platforms: entry.platforms ?? [],
-      cover: null,
+      cover: entry.imageUrl ?? null,
       url: `https://howlongtobeat.com/game/${entry.id}`,
       details: [
         ...hours("Main story", field.mainStory),
@@ -218,11 +250,7 @@ export class HltbService implements OnModuleInit {
       runInCronLogContext(this.logger, "hltb-sync", async () => {
         try {
           return await this.metrics.trackSync("hltb-sync", () =>
-            this.syncAllGames({
-              limit: HLTB_CRON_MAX_GAMES,
-              delayMs: HLTB_CRON_DELAY_MS,
-              staleDays: HLTB_STALE_DAYS,
-            })
+            this.syncAllGames()
           );
         } catch (err) {
           this.logger.error(err, "Failed to run HLTB sync cron");
@@ -232,250 +260,295 @@ export class HltbService implements OnModuleInit {
     );
   }
 
-  async syncAllGames(options?: HltbSyncOptions): Promise<HltbSyncResult> {
+  async syncAllGames(): Promise<HltbSyncResult> {
     if (this.isSyncRunning) {
-      const message = "HLTB sync is already running, skipping new request";
-      this.logger.warn(message);
-
-      return {
-        status: "skipped",
-        message,
-        processed: 0,
-        updated: 0,
-        skipped: 0,
-        failed: 0,
-      };
+      return this.skipSync("HLTB sync is already running");
     }
 
     this.isSyncRunning = true;
-    const startedAt = Date.now();
 
     try {
-      return await this.runSync(options, startedAt);
+      const lock = await withDbLock(this.gamesModel.db, "hltb-sync", () =>
+        this.runSync()
+      );
+
+      return lock.locked
+        ? lock.result
+        : this.skipSync("HLTB sync is running in another process");
     } finally {
       this.isSyncRunning = false;
     }
   }
 
-  private async runSync(
-    options: HltbSyncOptions | undefined,
-    startedAt: number
-  ): Promise<HltbSyncResult> {
-    const maxToProcess = options?.limit;
-    const delayMs = options?.delayMs ?? HLTB_DEFAULT_DELAY_MS;
-    const pageSize = HLTB_DEFAULT_BATCH_SIZE;
-    const filter = this.buildSyncFilter(options);
-    const syncMode = this.describeSyncMode(options);
-    const orderByStaleness =
-      options?.staleDays != null && !options?.onlyMissing;
-    const sortSpec = orderByStaleness
-      ? ({ "hltb.updatedAt": 1, _id: 1 } as const)
-      : ({ _id: 1 } as const);
+  private skipSync(message: string): HltbSyncResult {
+    this.logger.warn(`${message}, skipping new request`);
 
-    const queuedTotal = await this.gamesModel.countDocuments(filter);
-    const targetTotal =
-      maxToProcess != null ? Math.min(maxToProcess, queuedTotal) : queuedTotal;
+    return { status: "skipped", message, ...emptySyncTotals() };
+  }
 
-    this.logger.info(
-      `HLTB sync started (${syncMode}): queued=${queuedTotal}, target=${targetTotal}, delayMs=${delayMs}`
+  private async runSync(): Promise<HltbSyncResult> {
+    const startedAt = Date.now();
+    const catalog = buildHltbCatalog(
+      await this.downloadCatalog().catch((err) => {
+        this.logger.error(err, "HLTB sync aborted: no complete catalogue");
+        throw err;
+      })
     );
-
-    if (queuedTotal === 0) {
-      const message =
-        syncMode === "missing only"
-          ? "No games without HLTB found. Try without onlyMissing=true or use staleDays=30."
-          : "No games matched the sync filter";
-
-      this.logger.info(`HLTB sync finished: ${message}`);
-
-      return {
-        status: "empty_queue",
-        message,
-        processed: 0,
-        updated: 0,
-        skipped: 0,
-        failed: 0,
-        queuedTotal: 0,
-        targetTotal: 0,
-        mode: syncMode,
-      };
-    }
-
     const platformNames = await this.loadPlatformNames();
+    const totals = emptySyncTotals();
+    totals.catalog = catalog.entries.length;
 
-    const result = {
-      processed: 0,
-      updated: 0,
-      skipped: 0,
-      failed: 0,
+    let ops: AnyBulkWriteOperation<GameDocument>[] = [];
+    let records: IConflictRecord[] = [];
+    let settled: string[] = [];
+
+    const flush = async () => {
+      if (ops.length) await this.gamesModel.bulkWrite(ops, { ordered: false });
+      await this.conflicts.refresh("hltb", records);
+      await this.conflicts.dismissUndecided("hltb", settled);
+      ops = [];
+      records = [];
+      settled = [];
     };
 
-    let lastId: unknown = null;
-    let lastUpdatedAt: string | null = null;
-    let batchNumber = 0;
-    let consecutiveFailures = 0;
-    let isAborted = false;
+    const games = this.gamesModel
+      .find({})
+      .select(
+        "_id name hltb hltbNotFoundAt platformIds release_dates first_release"
+      )
+      .lean()
+      .cursor();
 
-    while (!isAborted) {
-      if (maxToProcess != null && result.processed >= maxToProcess) {
-        break;
+    for await (const game of games) {
+      totals.processed += 1;
+      const outcome = this.matchFromCatalog(game, catalog, platformNames);
+      totals[outcome.result] += 1;
+
+      if (outcome.update) {
+        ops.push({
+          updateOne: { filter: { _id: game._id }, update: outcome.update },
+        });
       }
 
-      const remaining =
-        maxToProcess != null ? maxToProcess - result.processed : pageSize;
-      const currentLimit = Math.min(pageSize, remaining);
-
-      const pageFilter = this.buildPageFilter(
-        filter,
-        orderByStaleness,
-        lastId,
-        lastUpdatedAt
-      );
-
-      batchNumber += 1;
-      this.logger.info(
-        `HLTB sync batch #${batchNumber}: loading up to ${currentLimit} games (after ${orderByStaleness ? `updatedAt=${lastUpdatedAt ?? "never"}` : `_id=${lastId ?? "start"}`})`
-      );
-
-      const games = await this.gamesModel
-        .find(pageFilter)
-        .select("_id name hltb platformIds release_dates first_release")
-        .sort(sortSpec)
-        .limit(currentLimit)
-        .lean();
-
-      if (!games.length) {
-        this.logger.info("HLTB sync: no more games in queue");
-        break;
+      if (outcome.conflict) {
+        records.push({
+          externalId: String(game._id),
+          externalName: game.name,
+          reason: outcome.conflict.reason,
+          candidates: [],
+          entries: outcome.conflict.entries.map((entry) =>
+            this.toConflictEntry(entry)
+          ),
+        });
+      } else if (outcome.result !== "skipped") {
+        settled.push(String(game._id));
       }
 
-      const bulkOps = [];
-
-      for (const game of games) {
-        result.processed += 1;
-        const progress = `[${result.processed}/${targetTotal}]`;
-
-        this.logger.info(`${progress} fetching HLTB for "${game.name}"`);
-
-        try {
-          const ctx = this.buildMatchContext(game, platformNames);
-          const { hltb, conflict, isEmpty } = game.hltb?.isManual
-            ? await this.refreshManualLink(game.hltb.hltbId)
-            : await this.fetchHltbForGame(ctx);
-          consecutiveFailures = 0;
-
-          if (!hltb || !hasHltbTimes(hltb)) {
-            result.skipped += 1;
-            await this.recordAmbiguity(game, conflict);
-
-            const now = new Date().toISOString();
-            const update: Record<string, unknown> = {
-              $set: { hltbNotFoundAt: now, updatedAt: now },
-            };
-
-            if (game.hltb && isEmpty) {
-              this.logger.warn(
-                `${progress} kept HLTB for "${game.name}" — the search returned nothing`
-              );
-              continue;
-            }
-
-            if (game.hltb) {
-              update.$unset = { hltb: "" };
-              this.logger.warn(
-                `${progress} cleared stale HLTB for "${game.name}" — no verified match`
-              );
-            } else {
-              this.logger.warn(
-                `${progress} marked "${game.name}" as not found on HLTB`
-              );
-            }
-
-            bulkOps.push({
-              updateOne: {
-                filter: { _id: game._id },
-                update,
-              },
-            });
-
-            continue;
-          }
-
-          bulkOps.push({
-            updateOne: {
-              filter: { _id: game._id },
-              update: {
-                $set: {
-                  hltb,
-                  updatedAt: new Date().toISOString(),
-                },
-                $unset: { hltbNotFoundAt: "" },
-              },
-            },
-          });
-
-          result.updated += 1;
-          this.logger.info(
-            `${progress} updated "${game.name}" — main=${hltb.mainStory ?? "-"}h, main+extra=${hltb.mainExtra ?? "-"}h, completionist=${hltb.completionist ?? "-"}h`
-          );
-        } catch (err) {
-          result.failed += 1;
-          this.logger.warn(err, `${progress} failed "${game.name}"`);
-
-          if (err instanceof HltbSearchFailedError) {
-            consecutiveFailures += 1;
-
-            if (consecutiveFailures >= HLTB_MAX_CONSECUTIVE_FAILURES) {
-              this.logger.error(
-                `HLTB sync aborted: ${consecutiveFailures} searches failed in a row`
-              );
-              isAborted = true;
-              break;
-            }
-          }
-        }
-
-        if (delayMs > 0) {
-          await sleep(delayMs);
-        }
+      if (
+        Math.max(ops.length, records.length, settled.length) >=
+        HLTB_SYNC_WRITE_BATCH
+      ) {
+        await flush();
       }
 
-      if (bulkOps.length) {
-        await this.gamesModel.bulkWrite(bulkOps);
+      if (totals.processed % 10000 === 0) {
+        this.logger.info(`HLTB sync progress: ${formatTotals(totals)}`);
+      }
+    }
+
+    await flush();
+
+    const message = `HLTB sync finished in ${this.formatElapsed(startedAt)}: ${formatTotals(totals)}`;
+    this.logger.info(message);
+    this.metrics.recordGames("hltb", "updated", totals.updated);
+
+    return { status: "finished", message, ...totals };
+  }
+
+  private matchFromCatalog(
+    game: Pick<
+      Game,
+      | "name"
+      | "platformIds"
+      | "release_dates"
+      | "first_release"
+      | "hltbNotFoundAt"
+    > & { hltb?: IHltbField | null },
+    catalog: HltbCatalog,
+    platformNames: Map<string, string>
+  ): HltbCatalogOutcome {
+    if (game.hltb?.hltbId) {
+      const entry = catalog.byId.get(Number(game.hltb.hltbId));
+      const hltb = entry && mapHltbEntryToField(entry);
+
+      return hltb && hasHltbTimes(hltb)
+        ? this.storeCatalogMatch(game, hltb)
+        : { result: "skipped" };
+    }
+
+    const ctx = this.buildMatchContext(game, platformNames);
+    const pool = findCatalogCandidates(catalog, game.name);
+    const match = selectHltbMatch(pool, ctx);
+    const matched = match ? mapHltbEntryToField(match.entry) : null;
+
+    if (matched && hasHltbTimes(matched)) {
+      return this.storeCatalogMatch(game, matched);
+    }
+
+    const conflict = findHltbConflict(pool, ctx);
+
+    return game.hltbNotFoundAt
+      ? { result: "notFound", conflict }
+      : {
+          result: "notFound",
+          conflict,
+          update: { $set: { hltbNotFoundAt: new Date().toISOString() } },
+        };
+  }
+
+  private storeCatalogMatch(
+    game: { hltb?: IHltbField | null; hltbNotFoundAt?: string },
+    hltb: IHltbField
+  ): HltbCatalogOutcome {
+    if (game.hltb && isSameHltb(game.hltb, hltb)) {
+      return game.hltbNotFoundAt
+        ? { result: "unchanged", update: { $unset: { hltbNotFoundAt: "" } } }
+        : { result: "unchanged" };
+    }
+
+    return {
+      result: "updated",
+      update: {
+        $set: { hltb, updatedAt: new Date().toISOString() },
+        $unset: { hltbNotFoundAt: "" },
+      },
+    };
+  }
+
+  private async downloadCatalog(): Promise<HltbSearchEntry[]> {
+    const entries = new Map<number, HltbSearchEntry>();
+    const session: CatalogSession = { requests: 0 };
+    let pageTotal = 1;
+    let count = 0;
+
+    for (let page = 1; page <= pageTotal; page += 1) {
+      const result = await this.fetchCatalogPageWithRetry(page, session);
+      pageTotal = result.pageTotal;
+      count = result.count;
+
+      for (const raw of result.data) {
+        entries.set(raw.game_id, mapRawHltbEntry(raw));
+      }
+
+      if (page % 500 === 0) {
         this.logger.info(
-          `HLTB sync batch #${batchNumber}: saved ${bulkOps.length} games to database`
+          `HLTB catalogue: page ${page}/${pageTotal}, ${entries.size} entries`
         );
       }
 
-      const lastGame = games[games.length - 1];
-      lastId = lastGame._id;
-      lastUpdatedAt = orderByStaleness
-        ? (lastGame.hltb?.updatedAt ?? null)
-        : null;
-
-      this.logger.info(
-        `HLTB sync progress: processed=${result.processed}, updated=${result.updated}, skipped=${result.skipped}, failed=${result.failed}, elapsed=${this.formatElapsed(startedAt)}`
-      );
-
-      if (games.length < currentLimit) {
-        break;
-      }
+      await sleep(HLTB_CATALOG_PAGE_DELAY_MS);
     }
 
-    const message = `HLTB sync ${isAborted ? "aborted" : "finished"} in ${this.formatElapsed(startedAt)}: processed=${result.processed}, updated=${result.updated}, skipped=${result.skipped}, failed=${result.failed}`;
+    if (entries.size < count * HLTB_CATALOG_MIN_COMPLETENESS) {
+      throw new HltbSearchFailedError(
+        `HLTB catalogue is incomplete: ${entries.size} of ${count} entries`
+      );
+    }
 
-    this.logger.info(message);
+    this.logger.info(`HLTB catalogue downloaded: ${entries.size} entries`);
 
-    this.metrics.recordGames("hltb", "updated", result.updated);
+    return [...entries.values()];
+  }
 
-    return {
-      status: isAborted ? "aborted" : "finished",
-      message,
-      ...result,
-      queuedTotal,
-      targetTotal,
-      mode: syncMode,
+  private async fetchCatalogPageWithRetry(
+    page: number,
+    session: CatalogSession
+  ) {
+    for (let attempt = 1; ; attempt += 1) {
+      try {
+        if (!session.auth || session.requests >= HLTB_CATALOG_TOKEN_REQUESTS) {
+          session.auth = await this.fetchSearchAuth();
+          session.requests = 0;
+        }
+
+        session.requests += 1;
+
+        return await this.fetchCatalogPage(page, session.auth);
+      } catch (err) {
+        const reason = (err as Error).message;
+
+        if (attempt >= HLTB_CATALOG_PAGE_ATTEMPTS) {
+          throw new HltbSearchFailedError(
+            `HLTB catalogue page ${page} failed: ${reason}`
+          );
+        }
+
+        session.auth = undefined;
+        this.logger.warn(
+          `HLTB catalogue page ${page} failed (attempt ${attempt}): ${reason}`
+        );
+        await sleep(HLTB_CATALOG_RETRY_DELAY_MS);
+      }
+    }
+  }
+
+  private async fetchCatalogPage(page: number, auth: InitResponse) {
+    const body = JSON.parse(
+      HowLongToBeatService.getSearchRequestData(
+        "",
+        SearchModifier.NONE,
+        page,
+        auth
+      )
+    );
+    body.size = HLTB_CATALOG_PAGE_SIZE;
+    body.searchOptions.games.sortCategory = "name";
+
+    const response = await fetch(HowLongToBeatService.SEARCH_URL, {
+      method: "POST",
+      headers: HowLongToBeatService.getSearchRequestHeaders(auth),
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      throw new Error(`search answered ${response.status}`);
+    }
+
+    const json = (await response.json()) as {
+      count?: number;
+      pageTotal?: number;
+      data?: HowLongToBeatResultEntry[];
     };
+
+    if (!Array.isArray(json.data) || !json.count || !json.pageTotal) {
+      throw new Error("search answered without a catalogue page");
+    }
+
+    return { count: json.count, pageTotal: json.pageTotal, data: json.data };
+  }
+
+  private async fetchSearchAuth(): Promise<InitResponse> {
+    const response = await fetch(
+      `${HowLongToBeatService.INIT_URL}?t=${Date.now()}`,
+      {
+        headers: {
+          "User-Agent": HLTB_USER_AGENT,
+          Referer: HowLongToBeatService.REFERER_HEADER,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`init answered ${response.status}`);
+    }
+
+    const json = (await response.json()) as Partial<InitResponse>;
+
+    if (!json.token) {
+      throw new Error("init answered without a token");
+    }
+
+    return { ...json, userAgent: HLTB_USER_AGENT } as InitResponse;
   }
 
   /** Fetches HLTB times for a single game addressed by its MoonCellar id or
@@ -591,10 +664,7 @@ export class HltbService implements OnModuleInit {
       throw new NotFoundException(`HLTB entry not found: ${hltbId}`);
     }
 
-    const hltb = {
-      ...mapHltbEntryToField(this.toSearchEntry(response.data)),
-      isManual: true,
-    };
+    const hltb = mapHltbEntryToField(this.toSearchEntry(response.data));
 
     if (!hasHltbTimes(hltb)) {
       throw new BadRequestException(
@@ -644,18 +714,6 @@ export class HltbService implements OnModuleInit {
     throw new BadRequestException("Either gameId or slug must be provided");
   }
 
-  private describeSyncMode(options?: HltbSyncOptions): string {
-    if (options?.onlyMissing) {
-      return "missing only";
-    }
-
-    if (options?.staleDays != null) {
-      return `incremental (stale > ${options.staleDays} days)`;
-    }
-
-    return "full collection";
-  }
-
   private formatElapsed(startedAt: number): string {
     const seconds = Math.round((Date.now() - startedAt) / 1000);
 
@@ -667,60 +725,6 @@ export class HltbService implements OnModuleInit {
     const restSeconds = seconds % 60;
 
     return `${minutes}m ${restSeconds}s`;
-  }
-
-  private buildSyncFilter(
-    options?: HltbSyncOptions
-  ): FilterQuery<GameDocument> {
-    if (options?.onlyMissing) {
-      return buildMissingHltbFilter();
-    }
-
-    if (options?.staleDays != null) {
-      return buildIncrementalHltbFilter(options.staleDays);
-    }
-
-    return {};
-  }
-
-  private buildPageFilter(
-    filter: FilterQuery<GameDocument>,
-    orderByStaleness: boolean,
-    lastId: unknown,
-    lastUpdatedAt: string | null
-  ): FilterQuery<GameDocument> {
-    if (lastId == null) {
-      return filter;
-    }
-
-    if (!orderByStaleness) {
-      return {
-        $and: [filter, { _id: { $gt: lastId } }],
-      } as FilterQuery<GameDocument>;
-    }
-
-    const cursor =
-      lastUpdatedAt == null
-        ? {
-            $or: [
-              {
-                "hltb.updatedAt": { $exists: false },
-                _id: { $gt: lastId },
-              },
-              { "hltb.updatedAt": { $exists: true } },
-            ],
-          }
-        : {
-            $or: [
-              { "hltb.updatedAt": { $gt: lastUpdatedAt } },
-              {
-                "hltb.updatedAt": lastUpdatedAt,
-                _id: { $gt: lastId },
-              },
-            ],
-          };
-
-    return { $and: [filter, cursor] } as FilterQuery<GameDocument>;
   }
 
   /** Removes the `hltb` field from every game so the catalogue can be rebuilt
@@ -833,32 +837,16 @@ export class HltbService implements OnModuleInit {
     const match = selectHltbMatch(entries, ctx);
 
     return match && hasTimes(match.entry)
-      ? { hltb: mapHltbEntryToField(match.entry), conflict: null, isEmpty: false }
+      ? {
+          hltb: mapHltbEntryToField(match.entry),
+          conflict: null,
+          isEmpty: false,
+        }
       : {
           hltb: null,
           conflict: findHltbConflict(entries, ctx),
           isEmpty: pool.size === 0,
         };
-  }
-
-  private async refreshManualLink(hltbId: string) {
-    const response = await this.hltbClient.getById(Number(hltbId));
-
-    if (!response.success || !response.data) {
-      throw new HltbSearchFailedError(`HLTB lookup failed for #${hltbId}`);
-    }
-
-    const hltb = mapHltbEntryToField(this.toSearchEntry(response.data));
-
-    if (!hasHltbTimes(hltb)) {
-      throw new Error(`HLTB entry #${hltbId} has no completion times`);
-    }
-
-    return {
-      hltb: { ...hltb, isManual: true },
-      conflict: null,
-      isEmpty: false,
-    };
   }
 
   private async search(query: string): Promise<HltbSearchEntry[]> {

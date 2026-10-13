@@ -1,4 +1,5 @@
 import { FC, useEffect, useRef } from "react";
+import Image from "next/image";
 import classNames from "classnames";
 import { IConflictEntry } from "@mooncellar/schemas";
 import { Fact } from "./CandidateCard";
@@ -31,6 +32,12 @@ export const EntryCard: FC<IEntryCardProps> = ({
       })}
       onClick={onSelect}
     >
+      <div className={styles.candidate__cover}>
+        {entry.cover && (
+          <Image src={entry.cover} width={64} height={88} alt={entry.name} />
+        )}
+      </div>
+
       <div className={styles.candidate__body}>
         <div className={styles.candidate__head}>
           {entry.url ? (
@@ -51,7 +58,7 @@ export const EntryCard: FC<IEntryCardProps> = ({
         <dl className={styles.facts}>
           <Fact
             label="Released"
-            value={entry.releaseYear ? String(entry.releaseYear) : null}
+            value={entry.releaseYear ? String(entry.releaseYear) : "Unknown"}
           />
           <Fact label="Platforms" value={entry.platforms.join(", ")} />
         </dl>

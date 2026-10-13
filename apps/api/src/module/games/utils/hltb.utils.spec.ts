@@ -1,8 +1,10 @@
 import {
+  buildHltbCatalog,
+  findCatalogCandidates,
   findHltbConflict,
+  isSameHltb,
+  mapRawHltbEntry,
   buildHltbSearchQueries,
-  buildIncrementalHltbFilter,
-  buildMissingHltbFilter,
   buildPlatformKeySet,
   canonicalPlatform,
   hasHltbTimes,
@@ -12,7 +14,6 @@ import {
   pickBestHltbMatch,
   selectHltbMatch,
 } from "./hltb.utils";
-import { HLTB_NOT_FOUND_RETRY_DAYS, HLTB_STALE_DAYS } from "../constants/hltb";
 import { normalizeCoreTitle, titleSimilarity } from "./title-match.utils";
 
 const ctx = (overrides: Partial<HltbMatchContext> = {}): HltbMatchContext => ({
@@ -572,127 +573,6 @@ describe("hltb.utils", () => {
       ).toBe(false);
     });
   });
-
-  describe("buildIncrementalHltbFilter", () => {
-    it("includes stale records and untried games missing the marker", () => {
-      const now = Date.parse("2026-06-21T00:00:00.000Z");
-      const filter = buildIncrementalHltbFilter(HLTB_STALE_DAYS, now);
-
-      expect(filter).toEqual({
-        $or: [
-          {
-            $and: [
-              {
-                $or: [
-                  { hltb: { $exists: false } },
-                  { "hltb.updatedAt": { $exists: false } },
-                  {
-                    $and: [
-                      {
-                        $or: [
-                          { "hltb.mainStory": { $exists: false } },
-                          { "hltb.mainStory": null },
-                        ],
-                      },
-                      {
-                        $or: [
-                          { "hltb.mainExtra": { $exists: false } },
-                          { "hltb.mainExtra": null },
-                        ],
-                      },
-                      {
-                        $or: [
-                          { "hltb.completionist": { $exists: false } },
-                          { "hltb.completionist": null },
-                        ],
-                      },
-                      {
-                        $or: [
-                          { "hltb.coop": { $exists: false } },
-                          { "hltb.coop": null },
-                        ],
-                      },
-                      {
-                        $or: [
-                          { "hltb.multiplayer": { $exists: false } },
-                          { "hltb.multiplayer": null },
-                        ],
-                      },
-                    ],
-                  },
-                ],
-              },
-              { hltbNotFoundAt: { $exists: false } },
-            ],
-          },
-          { "hltb.updatedAt": { $lt: "2026-05-22T00:00:00.000Z" } },
-          { hltbNotFoundAt: { $lt: "2026-03-23T00:00:00.000Z" } },
-        ],
-      });
-    });
-
-    it("re-checks not-found games older than the retry window", () => {
-      const now = Date.parse("2026-06-21T00:00:00.000Z");
-      const filter = buildIncrementalHltbFilter(
-        HLTB_STALE_DAYS,
-        now,
-        HLTB_NOT_FOUND_RETRY_DAYS
-      );
-
-      expect(filter.$or).toContainEqual({
-        hltbNotFoundAt: { $lt: "2026-03-23T00:00:00.000Z" },
-      });
-    });
-  });
-
-  describe("buildMissingHltbFilter", () => {
-    it("matches games without hltb data and excludes marked not-found games", () => {
-      expect(buildMissingHltbFilter()).toEqual({
-        $and: [
-          {
-            $or: [
-              { hltb: { $exists: false } },
-              {
-                $and: [
-                  {
-                    $or: [
-                      { "hltb.mainStory": { $exists: false } },
-                      { "hltb.mainStory": null },
-                    ],
-                  },
-                  {
-                    $or: [
-                      { "hltb.mainExtra": { $exists: false } },
-                      { "hltb.mainExtra": null },
-                    ],
-                  },
-                  {
-                    $or: [
-                      { "hltb.completionist": { $exists: false } },
-                      { "hltb.completionist": null },
-                    ],
-                  },
-                  {
-                    $or: [
-                      { "hltb.coop": { $exists: false } },
-                      { "hltb.coop": null },
-                    ],
-                  },
-                  {
-                    $or: [
-                      { "hltb.multiplayer": { $exists: false } },
-                      { "hltb.multiplayer": null },
-                    ],
-                  },
-                ],
-              },
-            ],
-          },
-          { hltbNotFoundAt: { $exists: false } },
-        ],
-      });
-    });
-  });
 });
 
 describe("findHltbConflict", () => {
@@ -849,5 +729,107 @@ describe("HLTB title comparison", () => {
   it("keeps a single-letter X as a word, not a numeral", () => {
     expect(normalizeHltbTitle("Mega Man X")).toBe("mega man x");
     expect(normalizeHltbTitle("Final Fantasy VII")).toBe("final fantasy 7");
+  });
+});
+
+describe("HLTB catalogue", () => {
+  const raw = (overrides: Record<string, unknown> = {}) =>
+    ({
+      game_id: 80199,
+      game_name: "It Takes Two",
+      game_alias: "It Takes 2",
+      game_type: "multi",
+      game_image: "80199_It_Takes_Two.jpg",
+      comp_lvl_sp: 0,
+      comp_lvl_co: 1,
+      comp_lvl_mp: 1,
+      comp_main: 46231,
+      comp_plus: 51172,
+      comp_100: 59318,
+      comp_all: 50940,
+      comp_main_count: 1786,
+      comp_plus_count: 1690,
+      comp_100_count: 781,
+      comp_all_count: 4257,
+      invested_co: 51101,
+      invested_mp: 8273,
+      invested_co_count: 807,
+      invested_mp_count: 4,
+      review_score: 88,
+      profile_platform: "PC, PlayStation 5",
+      profile_popular: 526,
+      release_world: 2021,
+      ...overrides,
+    }) as never;
+
+  it("hides the single-player times HLTB hides, as its own pages do", () => {
+    const entry = mapRawHltbEntry(raw());
+
+    expect(entry.mainTime).toBeUndefined();
+    expect(entry.coopTime).toBe(51101);
+    expect(entry.multiplayerTime).toBe(8273);
+    expect(entry.platforms).toEqual(["PC", "PlayStation 5"]);
+    expect(entry.imageUrl).toBe(
+      "https://howlongtobeat.com/games/80199_It_Takes_Two.jpg"
+    );
+  });
+
+  const entry = (id: number, name: string, popularity = 0, alias = "") => ({
+    id,
+    name,
+    alias,
+    popularity,
+  });
+
+  it("finds entries holding every query word, in the name or the alias", () => {
+    const catalog = buildHltbCatalog([
+      entry(1, "Baldur's Gate 3", 10, "Baldur's Gate III"),
+      entry(2, "Baldur's Gate", 5),
+      entry(3, "Gate of Doom", 1),
+    ]);
+
+    expect(
+      findCatalogCandidates(catalog, "Baldur's Gate III").map(({ id }) => id)
+    ).toEqual([1]);
+  });
+
+  it("keeps HLTB's first page: the most popular 20 entries of a query", () => {
+    const catalog = buildHltbCatalog(
+      Array.from({ length: 30 }, (_, i) =>
+        entry(i + 1, `Hidden Object ${i + 1}`, i)
+      )
+    );
+
+    const ids = findCatalogCandidates(catalog, "Hidden Object").map(
+      ({ id }) => id
+    );
+
+    expect(ids).toHaveLength(20);
+    expect(ids).toContain(30);
+    expect(ids).not.toContain(1);
+  });
+
+  it("scores each entry against the query that found it", () => {
+    const catalog = buildHltbCatalog([
+      entry(1, "Run"),
+      entry(2, "Run Run Run Away From the Haunted Castle"),
+    ]);
+
+    const found = findCatalogCandidates(catalog, "Run");
+
+    expect(found.find(({ id }) => id === 1)?.similarity).toBe(1);
+    expect(found.find(({ id }) => id === 2)?.similarity).toBeLessThan(1);
+  });
+
+  it("treats a refreshed entry with the same times as unchanged", () => {
+    const stored = mapHltbEntryToField({ id: 1, name: "A", mainTime: 3600 });
+    const fresh = {
+      ...stored,
+      updatedAt: "2030-01-01T00:00:00.000Z",
+      similarity: 0.7,
+    };
+
+    expect(isSameHltb(stored, fresh)).toBe(true);
+    expect(isSameHltb(stored, { ...fresh, mainStory: 2 })).toBe(false);
   });
 });

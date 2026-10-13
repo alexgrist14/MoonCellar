@@ -192,7 +192,6 @@ export const HltbSchema = z.object({
   alias: z.string().nullable().optional(),
   type: z.string().nullable().optional(),
   sourceName: z.string().optional(),
-  isManual: z.boolean().optional(),
   updatedAt: z.string(),
 });
 

@@ -572,20 +572,42 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   snapshot instead of asking RA again; each run refreshes the snapshot of every RA set that has a
   conflict. A link added by hand (a content request) has only `gameId` and `consoleId` until the
   next sync fills in the rest, so the web must render an entry without them.
-- **A failed HLTB search is never "not on HLTB".** `howlongtobeat-ts` answers `success: false`
-  when the request fails, and `HltbService.search` throws `HltbSearchFailedError` for it: the game
-  is counted as failed, keeps its data and gets no `hltbNotFoundAt`, and a run stops after
-  `HLTB_MAX_CONSECUTIVE_FAILURES` failures in a row. Treating a failure as an empty result marked
-  about 60,000 games "not found" between 2026-08-30 and 2026-10-04 (two in three of them were on
-  HLTB), hid them from every sync for the 90-day retry window, wiped the times of games that already
-  had them and produced no conflicts at all. A search that succeeds with no results does not clear
-  stored times either; only a non-empty result with no acceptable entry does.
-- **A game marked `hltbNotFoundAt` is invisible to `POST /hltb/backfill?onlyMissing=true`.** Only
-  the weekly run retries it, after `HLTB_NOT_FOUND_RETRY_DAYS` (90). Marks written by an older
-  matcher therefore stay until then — 316,000 from July 2026, among them Baldur's Gate III. To
-  re-check them sooner, run the backfill without `onlyMissing` or `$unset` the marks first.
-- **HLTB co-op and Vs. times are times: `hasHltbTimes`, the missing-times filter and the web tiles
-  read `coop` and `multiplayer` next to the three single-player fields.** HLTB sets
+- **The weekly HLTB sync downloads HLTB's whole catalogue and matches every game in memory; only
+  the single-game `POST /hltb/games/parse` still searches.** HLTB has no API; the site's search
+  (`api/search/site`) with an empty query lists every entry — about 96,000, DLC included — sorted
+  by `name` so pages do not shift during the download. It serves at most 25 per page and answers
+  an empty `{}` to anything larger, so the run is about 3,850 pages, about 1.5 hours. Searching
+  per game took 2–10 requests each and about 12 weeks for the 374,000 games without times.
+  `POST /hltb/backfill` (admin) starts the same run.
+- **Download the catalogue one page at a time.** Six pages in parallel got `429` after about 60
+  pages; one page a second ran without a single one. HLTB sends no `Retry-After` and lifts the
+  limit within a minute, so a failed page waits `HLTB_CATALOG_RETRY_DELAY_MS` (60 s). A search
+  token stops working after about 100 requests (`403`), so the session takes a new one every
+  `HLTB_CATALOG_TOKEN_REQUESTS` (90).
+- **A catalogue that is not complete writes nothing.** A page still failing after
+  `HLTB_CATALOG_PAGE_ATTEMPTS`, or fewer entries than `HLTB_CATALOG_MIN_COMPLETENESS` of HLTB's
+  `count`, aborts the run before the first game. A partial catalogue reads as "not on HLTB": the
+  per-game search once treated failed requests that way, marked about 60,000 games "not found"
+  between 2026-08-30 and 2026-10-04 (two in three were on HLTB), wiped the times of games that had
+  them and produced no conflicts. For the same reason a stored link whose entry is missing from
+  this download is left untouched, and the single-game search throws `HltbSearchFailedError`
+  rather than returning an empty result.
+- **The weekly sync never re-matches a game that already has `hltb.hltbId`; it refreshes the times
+  from the catalogue entry with that id.** Only games without HLTB go through the matcher. A link
+  an admin chose in Conflicts or by `hltbId` must survive every run, and re-matching 57,000 links
+  weekly would let any difference between the catalogue and the search clear them. A wrong old
+  link stays until an admin relinks it with `POST /hltb/games/parse?hltbId`.
+- **The catalogue stands in for HLTB's search, so `findCatalogCandidates` must keep returning what
+  the search returned.** Per query of `buildHltbSearchQueries` it takes the entries holding every
+  query word in their name or alias and keeps the `HLTB_SEARCH_RESULTS_PER_QUERY` (20) most popular
+  — HLTB's first page. The matcher, the year tolerance and the loose-title rule were all measured
+  on those pools; a wider pool turns unique titles into competing ones.
+- **The sync writes a game only when its HLTB data changed** (`isSameHltb` ignores `updatedAt` and
+  `similarity`), and a not-found mark never touches `updatedAt`. Every game is read every week,
+  and `updatedAt` is the sitemap's `lastmod`. `hltbNotFoundAt` is only a record of the last miss;
+  the next run checks the game again.
+- **HLTB co-op and Vs. times are times: `hasHltbTimes` and the web tiles read `coop` and
+  `multiplayer` next to the three single-player fields.** HLTB sets
   `comp_lvl_sp: 0` for co-op and multiplayer games and hides their single-player block, so
   `howlongtobeat-ts` returns no `mainTime` for them. Reading only the single-player fields marked
   It Takes Two, Split Fiction, Dota 2 and Team Fortress 2 "not found" — 44 of the 150 most-rated
@@ -607,11 +629,11 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   against "Pokémon X and Y", "Rainbow Six Siege" against "Tom Clancy's Rainbow Six Siege"). Entries
   without times are never offered: applying one fails, and the decision would return to the queue
   forever. Loosen the loose rule only after measuring it — on a random 100 not-found games it adds
-  about 4 conflicts, most of them noise ("Axolotl" against "Magic Axolotl").
-- **An HLTB link chosen by hand carries `hltb.isManual`, and the sync refreshes it by id instead of
-  searching again.** `applyHltbEntryById` sets it for a Conflicts decision and an explicit
-  `hltbId`. Without it the 30-day refresh re-ran the matcher that had rejected the entry and wiped
-  the admin's choice. Searching by `POST /hltb/games/parse` without `hltbId` still re-matches it.
+  about 4 conflicts, most of them noise ("Axolotl" against "Magic Axolotl"). Each run deletes the
+  undecided conflict of every game it settled (matched, or no candidates left) and rewrites the
+  entries of every other one through `ConflictsService.refresh`, so the queue follows the current
+  rules and catalogue. `record` alone leaves an existing conflict as it was: the 1,769 conflicts
+  recorded before HLTB entries carried `cover` would never have shown a poster.
 - **An id set by hand ends the source's open conflicts for that game, never its decided ones.**
   `POST /hltb/games/parse?hltbId`, `POST /vndb/games/parse?vnId` and `POST /ra/games/parse?raId`
   call `ConflictsService.removeForGame`: it deletes the conflict of the linked id itself and every

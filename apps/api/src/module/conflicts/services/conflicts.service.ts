@@ -144,6 +144,21 @@ export class ConflictsService {
     }
   }
 
+  async refresh(source: IConflictSource, records: IConflictRecord[]) {
+    if (!records.length) return;
+
+    await this.conflictsModel.bulkWrite(
+      records.map(({ externalId, externalName, reason, entries }) => ({
+        updateOne: {
+          filter: { source, externalId, ...UNDECIDED_FILTER },
+          update: { $set: { externalName, reason, entries: entries ?? [] } },
+        },
+      })),
+      { ordered: false }
+    );
+    await this.record(source, records);
+  }
+
   async setExternalData(
     source: IConflictSource,
     items: { externalId: string; externalData: Record<string, unknown> }[]

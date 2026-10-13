@@ -1,8 +1,9 @@
 import { type IHltbField, type IMatchReason } from "@mooncellar/schemas";
+import { getMatchScore, type HowLongToBeatResultEntry } from "howlongtobeat-ts";
 import {
   HLTB_LOOSE_TITLE_OVERLAP,
-  HLTB_NOT_FOUND_RETRY_DAYS,
   HLTB_PLATFORM_YEAR_TOLERANCE,
+  HLTB_SEARCH_RESULTS_PER_QUERY,
   HLTB_STRONG_TITLE_SIMILARITY,
   HLTB_CONFLICT_ENTRIES_LIMIT,
 } from "../constants/hltb";
@@ -37,6 +38,7 @@ export type HltbSearchEntry = {
   similarity?: number;
   platforms?: string[];
   releaseYear?: number | null;
+  popularity?: number;
 };
 
 /**
@@ -193,7 +195,10 @@ const evaluateTitle = (title: string, name: string) => {
   const entryTokens = tokenSetFrom(entryTitle);
   const ctxTokens = tokenSetFrom(ctxTitle);
   const [entryNumbers, ctxNumbers] = [entryTokens, ctxTokens].map((tokens) =>
-    [...tokens].filter((token) => /^\d+$/.test(token)).sort().join(" ")
+    [...tokens]
+      .filter((token) => /^\d+$/.test(token))
+      .sort()
+      .join(" ")
   );
 
   return {
@@ -263,9 +268,7 @@ const rankEvaluations = (
   ((b.entry.similarity ?? 0) - (a.entry.similarity ?? 0));
 
 const isCorroboratedCandidate = (item: HltbEntryEvaluation): boolean =>
-  (item.strongTitle || item.looseTitle) &&
-  item.platformMatch &&
-  item.yearMatch;
+  (item.strongTitle || item.looseTitle) && item.platformMatch && item.yearMatch;
 
 /**
  * Picks the HLTB entry for a game, prioritising precision over coverage.
@@ -452,49 +455,117 @@ const HLTB_TIME_FIELDS = [
 export const hasHltbTimes = (hltb?: IHltbField | null): boolean =>
   !!hltb && HLTB_TIME_FIELDS.some((field) => hltb[field] != null);
 
-const missingHltbTimesFilter = {
-  $and: HLTB_TIME_FIELDS.map((field) => ({
-    $or: [
-      { [`hltb.${field}`]: { $exists: false } },
-      { [`hltb.${field}`]: null },
-    ],
-  })),
-};
+const VOLATILE_HLTB_FIELDS = new Set(["updatedAt", "similarity"]);
 
-export const getStaleBeforeIso = (staleDays: number, now = Date.now()) =>
-  new Date(now - staleDays * 24 * 60 * 60 * 1000).toISOString();
+export const isSameHltb = (a: IHltbField, b: IHltbField): boolean =>
+  [...new Set([...Object.keys(a), ...Object.keys(b)])]
+    .filter((key) => !VOLATILE_HLTB_FIELDS.has(key))
+    .every(
+      (key) =>
+        JSON.stringify(a[key as keyof IHltbField] ?? null) ===
+        JSON.stringify(b[key as keyof IHltbField] ?? null)
+    );
 
-export const buildMissingHltbFilter = () => ({
-  $and: [
-    { $or: [{ hltb: { $exists: false } }, missingHltbTimesFilter] },
-    { hltbNotFoundAt: { $exists: false } },
-  ],
+const HLTB_IMAGE_URL = "https://howlongtobeat.com/games/";
+
+export const mapRawHltbEntry = (
+  raw: HowLongToBeatResultEntry
+): HltbSearchEntry => ({
+  id: raw.game_id,
+  name: raw.game_name,
+  alias: raw.game_alias,
+  type: raw.game_type,
+  mainTime: raw.comp_lvl_sp ? raw.comp_main : undefined,
+  mainExtraTime: raw.comp_lvl_sp ? raw.comp_plus : undefined,
+  completionistTime: raw.comp_lvl_sp ? raw.comp_100 : undefined,
+  allStylesTime: raw.comp_lvl_sp ? raw.comp_all : undefined,
+  coopTime: raw.comp_lvl_co ? raw.invested_co : undefined,
+  multiplayerTime: raw.comp_lvl_mp ? raw.invested_mp : undefined,
+  mainCount: raw.comp_lvl_sp ? raw.comp_main_count : undefined,
+  mainExtraCount: raw.comp_lvl_sp ? raw.comp_plus_count : undefined,
+  completionistCount: raw.comp_lvl_sp ? raw.comp_100_count : undefined,
+  allStylesCount: raw.comp_lvl_sp ? raw.comp_all_count : undefined,
+  coopCount: raw.comp_lvl_co ? raw.invested_co_count : undefined,
+  multiplayerCount: raw.comp_lvl_mp ? raw.invested_mp_count : undefined,
+  imageUrl: raw.game_image ? `${HLTB_IMAGE_URL}${raw.game_image}` : undefined,
+  reviewScore: raw.review_score,
+  platforms: raw.profile_platform ? raw.profile_platform.split(", ") : [],
+  releaseYear: raw.release_world,
+  popularity: raw.profile_popular,
 });
 
-export const buildIncrementalHltbFilter = (
-  staleDays: number,
-  now = Date.now(),
-  notFoundRetryDays = HLTB_NOT_FOUND_RETRY_DAYS
-) => {
-  const staleBefore = getStaleBeforeIso(staleDays, now);
-  const notFoundRetryBefore = getStaleBeforeIso(notFoundRetryDays, now);
+export type HltbCatalog = {
+  entries: HltbSearchEntry[];
+  byId: Map<number, HltbSearchEntry>;
+  index: Map<string, number[]>;
+};
+
+const titleTokens = (value: string): string[] =>
+  normalizeHltbTitle(value).split(" ").filter(Boolean);
+
+export const buildHltbCatalog = (entries: HltbSearchEntry[]): HltbCatalog => {
+  const index = new Map<string, number[]>();
+
+  entries.forEach((entry, position) => {
+    for (const token of new Set(entryTitles(entry).flatMap(titleTokens))) {
+      const positions = index.get(token);
+      if (positions) positions.push(position);
+      else index.set(token, [position]);
+    }
+  });
 
   return {
-    $or: [
-      {
-        $and: [
-          {
-            $or: [
-              { hltb: { $exists: false } },
-              { "hltb.updatedAt": { $exists: false } },
-              missingHltbTimesFilter,
-            ],
-          },
-          { hltbNotFoundAt: { $exists: false } },
-        ],
-      },
-      { "hltb.updatedAt": { $lt: staleBefore } },
-      { hltbNotFoundAt: { $lt: notFoundRetryBefore } },
-    ],
+    entries,
+    byId: new Map(entries.map((entry) => [entry.id, entry])),
+    index,
   };
+};
+
+const hasSorted = (values: number[], value: number): boolean => {
+  let low = 0;
+  let high = values.length - 1;
+
+  while (low <= high) {
+    const middle = (low + high) >> 1;
+    if (values[middle] === value) return true;
+    if (values[middle] < value) low = middle + 1;
+    else high = middle - 1;
+  }
+
+  return false;
+};
+
+export const findCatalogCandidates = (
+  catalog: HltbCatalog,
+  name: string
+): HltbSearchEntry[] => {
+  const pool = new Map<number, HltbSearchEntry>();
+
+  for (const query of buildHltbSearchQueries(name)) {
+    const [smallest, ...rest] = [...new Set(titleTokens(query))]
+      .map((token) => catalog.index.get(token) ?? [])
+      .sort((a, b) => a.length - b.length);
+
+    if (!smallest?.length) continue;
+
+    const found = smallest
+      .filter((position) => rest.every((list) => hasSorted(list, position)))
+      .map((position) => catalog.entries[position])
+      .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))
+      .slice(0, HLTB_SEARCH_RESULTS_PER_QUERY);
+
+    for (const entry of found) {
+      if (!pool.has(entry.id)) {
+        pool.set(entry.id, {
+          ...entry,
+          similarity: Math.max(
+            getMatchScore(entry.name, query),
+            getMatchScore(entry.alias ?? "", query)
+          ),
+        });
+      }
+    }
+  }
+
+  return [...pool.values()];
 };
