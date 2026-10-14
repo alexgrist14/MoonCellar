@@ -1,4 +1,5 @@
 import type { IAddGameRequest } from "@mooncellar/schemas";
+import { decodeHtml } from "../../../shared/utils";
 
 export interface ISteamAppDetails {
   type?: string;
@@ -45,17 +46,6 @@ export const STEAM_PLATFORM_SLUGS = {
 } as const;
 
 const SCREENSHOTS_LIMIT = 10;
-
-export const decodeHtml = (value: string) =>
-  value
-    .replace(/<[^>]+>/g, "")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;|&apos;/g, "'")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .trim();
 
 export const parseSteamDate = (value?: string) => {
   if (!value) return null;

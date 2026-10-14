@@ -130,6 +130,10 @@ GameDatabaseSchema.index(
   { unique: true, partialFilterExpression: { "vndb.vnId": { $exists: true } } }
 );
 GameDatabaseSchema.index({ "hltb.updatedAt": 1, _id: 1 });
+GameDatabaseSchema.index(
+  { "hltb.hltbId": 1 },
+  { partialFilterExpression: { "hltb.hltbId": { $exists: true } } }
+);
 GameDatabaseSchema.index({ "externalPages.name": 1, "externalPages.uid": 1 });
 GameDatabaseSchema.index({ hltbNotFoundAt: 1 });
 GameDatabaseSchema.index({ createdAt: -1 });

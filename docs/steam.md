@@ -43,7 +43,7 @@ description. What happens to each conflict:
 | `coming_soon` — not released yet | **Waits for release**: out of the queue, checked again after 30 days (`externalData.recheckAfter`) |
 | The matcher is confident | Linked, data copied into empty fields, conflict removed |
 | One candidate has the same title (or alternative name) and a shared company | Linked the same way, even when the dates differ or the title is short — a re-release on Steam |
-| Anything else | Stays waiting, marked `externalData.verifiedAt` so it is not read again |
+| Anything else | Stays waiting, marked `externalData.verifiedAt` so it is not read again; its candidates keep the matcher's scores (title, companies, date, platforms) in place of the weekly run's title-only placeholder |
 
 An admin can still match or skip a dismissed or postponed conflict by hand; it then goes through
 the normal flow. Results are written every 50 conflicts

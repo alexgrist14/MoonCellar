@@ -39,7 +39,7 @@ export const MATCH_CANDIDATE_PROJECTION = {
   isCustom: 1,
 };
 
-type TMatchedTitle = { key: string; isExact: boolean };
+type TMatchedTitle = { key: string; isExact: boolean; isGameMain: boolean };
 
 export const isStrongTitle = (normalized: string) =>
   normalized.length >= MIN_STRING_LENGTH || normalized.split(" ").length > 1;
@@ -68,6 +68,7 @@ const matchedTitles = (
   game: TMatchCandidate
 ): TMatchedTitle[] => {
   const gameKeys = titleKeyMap([game.name, ...(game.alternative_names ?? [])]);
+  const gameMainKeys = titleKeyMap([game.name]);
   const subjectKeys = titleKeyMap([subject.name, ...subject.alternativeNames]);
 
   const matched: TMatchedTitle[] = [];
@@ -76,7 +77,11 @@ const matchedTitles = (
     const isGamePrimary = gameKeys.get(key);
     if (isGamePrimary === undefined) continue;
 
-    matched.push({ key, isExact: isSubjectPrimary && isGamePrimary });
+    matched.push({
+      key,
+      isExact: isSubjectPrimary && isGamePrimary,
+      isGameMain: gameMainKeys.has(key),
+    });
   }
 
   return matched;
@@ -138,14 +143,19 @@ const titleMatchScore = (
 ) => {
   let bestScore = 0;
 
-  for (const { key, isExact } of titles) {
+  for (const { key, isExact, isGameMain } of titles) {
     const tier = isDistinctiveTitle(key, sharedTitles)
       ? profile.title.distinctive
       : isStrongTitle(key)
         ? profile.title.strong
         : profile.title.weak;
 
-    const points = isExact ? tier : Math.min(tier, profile.title.strong);
+    const points = Math.min(
+      isExact
+        ? tier
+        : Math.min(tier, profile.title.variant ?? profile.title.strong),
+      isGameMain ? Infinity : (profile.title.alternative ?? Infinity)
+    );
 
     if (points > bestScore) bestScore = points;
   }
@@ -315,7 +325,7 @@ const scoreCandidate = (
     title: titles.length
       ? titleMatchScore(titles, sharedTitles, profile)
       : isSimilarTitle(subject, game, profile.title.fuzzySimilarity)
-        ? profile.title.weak
+        ? (profile.title.fuzzy ?? profile.title.weak)
         : 0,
     companies:
       companyMatchScore(subject, game, profile) +
@@ -345,9 +355,14 @@ const getRejectionReason = (
   candidate: IScoredCandidate,
   profile: IMatchProfile
 ): TMatchReason | null => {
-  if (candidate.breakdown.title < profile.title.strong) return "weak-title";
+  if (
+    candidate.breakdown.title < (profile.title.minimum ?? profile.title.strong)
+  ) {
+    return "weak-title";
+  }
   if (candidate.isContradicted) return "date-contradicts";
   if (candidate.breakdown.genre < 0) return "genre-mismatch";
+  if (profile.requireEvidence === false) return null;
 
   if (
     candidate.breakdown.companies <= 0 &&

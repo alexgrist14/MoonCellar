@@ -87,3 +87,22 @@ export const IGDB_MATCH_PROFILE: IMatchProfile = {
   },
   reviewCustomGames: true,
 };
+
+export const RA_MATCH_PROFILE: IMatchProfile = {
+  ...IGDB_MATCH_PROFILE,
+  threshold: 3,
+  gap: 1,
+  title: {
+    distinctive: 4,
+    strong: 3,
+    weak: 3,
+    variant: 2,
+    alternative: 2,
+    minimum: 2,
+    fuzzy: 1,
+    fuzzySimilarity: VNDB_FUZZY_TITLE_SIMILARITY,
+  },
+  typeScore: () => 0,
+  reviewCustomGames: false,
+  requireEvidence: false,
+};

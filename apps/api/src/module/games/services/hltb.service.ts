@@ -19,15 +19,11 @@ import mongoose, {
   Model,
 } from "mongoose";
 import { PinoLogger } from "nestjs-pino";
-import { sleep } from "../../../shared/utils";
+import { sleep, uniqueSlug } from "../../../shared/utils";
 import { runInCronLogContext } from "../../../shared/cron-logging";
 import { runCronExclusive, withDbLock } from "../../../shared/cron-mutex";
 import { BusinessMetricsService } from "../../metrics/business-metrics.service";
-import {
-  type IConflictEntry,
-  type IConflictSubject,
-  type IHltbField,
-} from "@mooncellar/schemas";
+import { type IConflictSubject, type IHltbField } from "@mooncellar/schemas";
 import { ConflictsService } from "../../conflicts/services/conflicts.service";
 import type {
   IConflictDecision,
@@ -35,6 +31,8 @@ import type {
 } from "../../conflicts/types/conflicts.types";
 import { Game, type GameDocument } from "../schemas/game.schema";
 import { Platform, type PlatformDocument } from "../schemas/platform.schema";
+import type { IScoredCandidate } from "../matching/game-matcher.types";
+import { GamesService } from "./games.service";
 import {
   HLTB_CATALOG_MIN_COMPLETENESS,
   HLTB_CATALOG_PAGE_ATTEMPTS,
@@ -50,10 +48,19 @@ import {
 } from "../constants/hltb";
 import {
   buildHltbCatalog,
+  buildHltbGamePayload,
+  buildHltbMatchContext,
   buildHltbSearchQueries,
-  buildPlatformKeySet,
   findCatalogCandidates,
+  decideHltbMatch,
   findHltbConflict,
+  getEditionParentId,
+  hltbAliases,
+  hltbConflictReason,
+  hltbPageFields,
+  readHltbPage,
+  mapHltbPlatformIds,
+  toHltbCandidate,
   type HltbCatalog,
   type HltbConflict,
   hasHltbTimes,
@@ -96,6 +103,11 @@ export type HltbSyncResult = HltbSyncTotals & {
 
 type CatalogSession = { auth?: InitResponse; requests: number };
 
+type THltbEntryConflict = {
+  entry: HltbSearchEntry;
+  candidates: IScoredCandidate[];
+};
+
 type HltbCatalogOutcome = {
   result: Exclude<keyof HltbSyncTotals, "catalog" | "processed">;
   update?: mongoose.mongo.UpdateFilter<GameDocument>;
@@ -130,7 +142,8 @@ export class HltbService implements OnModuleInit {
     private readonly platformsModel: Model<PlatformDocument>,
     private readonly logger: PinoLogger,
     private readonly metrics: BusinessMetricsService,
-    private readonly conflicts: ConflictsService
+    private readonly conflicts: ConflictsService,
+    private readonly gamesService: GamesService
   ) {
     this.logger.setContext(HltbService.name);
   }
@@ -138,83 +151,140 @@ export class HltbService implements OnModuleInit {
   onModuleInit() {
     this.conflicts.register({
       source: "hltb",
-      direction: "entries",
+      direction: "games",
+      isMultiMatch: true,
       linkField: "hltb.hltbId",
-      describe: (gameId) => this.describeConflict(gameId),
+      describe: (entryId, data) => this.describeConflict(entryId, data),
       apply: (decisions) => this.applyConflictDecisions(decisions),
     });
   }
 
-  private async recordAmbiguity(
-    game: { _id: unknown; name: string },
-    conflict: HltbConflict | null
+  private collectConflict(
+    byEntry: Map<number, THltbEntryConflict>,
+    game: { _id: unknown; slug: string; name: string },
+    conflict: HltbConflict
   ) {
-    if (!conflict) return;
+    conflict.entries.forEach((entry, index) => {
+      const item = byEntry.get(entry.id) ?? { entry, candidates: [] };
 
-    await this.conflicts.refresh("hltb", [
-      {
-        externalId: String(game._id),
-        externalName: game.name,
-        reason: conflict.reason,
-        candidates: [],
-        entries: conflict.entries.map((entry) => this.toConflictEntry(entry)),
-      },
-    ]);
+      item.candidates.push(toHltbCandidate(game, conflict.breakdowns[index]));
+      byEntry.set(entry.id, item);
+    });
   }
 
-  private toConflictEntry(entry: HltbSearchEntry): IConflictEntry {
-    const field = mapHltbEntryToField(entry);
-    const hours = (label: string, value: number | null) =>
-      value ? [`${label} ${value} h`] : [];
+  private toConflictRecords(
+    byEntry: Map<number, THltbEntryConflict>
+  ): IConflictRecord[] {
+    return [...byEntry.values()].map(({ entry, candidates }) => {
+      const sorted = [...candidates].sort((a, b) => b.score - a.score);
 
-    return {
-      id: String(entry.id),
-      name: entry.name,
-      score: entry.similarity ?? null,
-      releaseYear: entry.releaseYear ?? null,
-      platforms: entry.platforms ?? [],
-      cover: entry.imageUrl ?? null,
-      url: `https://howlongtobeat.com/game/${entry.id}`,
-      details: [
-        ...hours("Main story", field.mainStory),
-        ...hours("Main + extra", field.mainExtra),
-        ...hours("Completionist", field.completionist),
-        ...(entry.alias ? [`Also known as ${entry.alias}`] : []),
-      ],
-    };
+      return {
+        externalId: String(entry.id),
+        externalName: entry.name,
+        externalData: { ...entry },
+        reason: hltbConflictReason(sorted),
+        candidates: sorted,
+      };
+    });
+  }
+
+  private fromSnapshot(
+    entryId: string,
+    data: Record<string, unknown> | null
+  ): HltbSearchEntry | null {
+    return data && typeof data.name === "string"
+      ? { ...(data as HltbSearchEntry), id: Number(entryId) }
+      : null;
   }
 
   private async describeConflict(
-    gameId: string
+    entryId: string,
+    data: Record<string, unknown> | null
   ): Promise<IConflictSubject | null> {
-    if (!mongoose.Types.ObjectId.isValid(gameId)) return null;
+    const entry = this.fromSnapshot(entryId, data);
 
-    const game = await this.gamesModel
-      .findById(gameId)
-      .select(
-        "slug name alternative_names summary first_release companies platformIds cover"
-      )
-      .lean();
+    if (!entry) return null;
 
-    if (!game) return null;
+    const [platforms, linked, fetched] = await Promise.all([
+      this.platformsModel.find({}).select("_id name slug").lean(),
+      this.gamesModel.find({ "hltb.hltbId": entryId }).select("name").lean(),
+      this.fetchEntry(entry.id).catch(() => null),
+    ]);
+    const page = fetched?.page;
+    const field = mapHltbEntryToField(fetched?.entry ?? entry);
+    const hours = (label: string, value: number | null) =>
+      value ? [`${label} ${value} h`] : [];
+    const facts = [
+      ...hours("Main story", field.mainStory),
+      ...hours("Main + extra", field.mainExtra),
+      ...hours("Completionist", field.completionist),
+      ...hours("Co-op", field.coop),
+      ...hours("Vs.", field.multiplayer),
+      ...(linked.length
+        ? [`Already linked to ${linked.map(({ name }) => name).join(", ")}`]
+        : []),
+    ].join(" · ");
 
     return {
-      name: game.name,
-      originalName: game.name,
-      alternativeNames: game.alternative_names ?? [],
-      description: game.summary ?? "",
-      released: game.first_release
-        ? new Date(game.first_release * 1000).toISOString().slice(0, 10)
-        : null,
-      developers: (game.companies ?? [])
-        .filter(({ developer }) => developer)
-        .map(({ name }) => name),
-      platformIds: (game.platformIds ?? []).map(String),
-      lengthMinutes: null,
-      cover: game.cover ?? null,
+      name: entry.name,
+      originalName: entry.name,
+      alternativeNames: hltbAliases(entry),
+      description: [page?.summary, facts].filter(Boolean).join("\n\n"),
+      released:
+        page?.released ??
+        (entry.releaseYear ? String(entry.releaseYear) : null),
+      developers: page?.developers ?? [],
+      platformIds: mapHltbPlatformIds(entry.platforms ?? [], platforms),
+      lengthMinutes: field.mainStory ? Math.round(field.mainStory * 60) : null,
+      cover: entry.imageUrl ?? null,
       isExplicitCover: false,
-      url: `/games/${game.slug}`,
+      url: `https://howlongtobeat.com/game/${entry.id}`,
     };
+  }
+
+  private async fetchEntry(id: number) {
+    const response = await this.hltbClient.getById(id);
+
+    return response.success && response.data
+      ? {
+          entry: this.toSearchEntry(response.data),
+          page: readHltbPage(
+            response.data.raw as unknown as Record<string, unknown>
+          ),
+        }
+      : null;
+  }
+
+  async createGame(entry: HltbSearchEntry) {
+    const existing = await this.gamesModel
+      .findOne({ "hltb.hltbId": String(entry.id) })
+      .select("_id")
+      .lean();
+
+    if (existing) return existing;
+
+    const fetched = await this.fetchEntry(entry.id);
+    const fresh = fetched?.entry ?? entry;
+    const platforms = await this.platformsModel
+      .find({})
+      .select("_id name slug")
+      .lean();
+    const slug = await uniqueSlug(
+      (candidate) => this.gamesModel.exists({ slug: candidate }),
+      fresh.name
+    );
+    const game = await this.gamesService.addGame(
+      buildHltbGamePayload(fresh, {
+        slug,
+        platformIds: mapHltbPlatformIds(fresh.platforms ?? [], platforms),
+        page: fetched?.page ?? null,
+      }),
+      true
+    );
+
+    this.logger.info(`Added "${game.name}" from HLTB entry ${entry.id}`);
+
+    return game;
   }
 
   private async applyConflictDecisions(
@@ -222,20 +292,30 @@ export class HltbService implements OnModuleInit {
   ): Promise<Map<string, mongoose.Types.ObjectId | null>> {
     const applied = new Map<string, mongoose.Types.ObjectId | null>();
 
-    for (const { externalId, decision, winnerEntryId } of decisions) {
+    for (const { externalId, externalData, decision, winners } of decisions) {
+      const entry = this.fromSnapshot(externalId, externalData);
+
       try {
-        const game = await this.gamesModel
-          .findById(externalId)
+        if (decision === "skip") {
+          if (!entry) continue;
+
+          const game = await this.createGame(entry);
+          applied.set(externalId, game._id as mongoose.Types.ObjectId);
+          continue;
+        }
+
+        const games = await this.gamesModel
+          .find({ _id: { $in: winners } })
           .select("_id slug name hltb platformIds release_dates first_release")
           .lean();
 
-        if (!game) continue;
+        if (!games.length) continue;
 
-        if (decision === "match" && winnerEntryId) {
-          await this.applyHltbEntryById(game, winnerEntryId);
+        for (const game of games) {
+          await this.applyHltbEntryById(game, externalId);
         }
 
-        applied.set(externalId, game._id);
+        applied.set(externalId, games[0]._id);
       } catch (err) {
         this.logger.warn(err, `Failed to apply HLTB conflict ${externalId}`);
       }
@@ -295,33 +375,29 @@ export class HltbService implements OnModuleInit {
       })
     );
     const platformNames = await this.loadPlatformNames();
+    const linkedHltbIds = await this.loadLinkedHltbIds();
     const totals = emptySyncTotals();
     totals.catalog = catalog.entries.length;
 
     let ops: AnyBulkWriteOperation<GameDocument>[] = [];
-    let records: IConflictRecord[] = [];
-    let settled: string[] = [];
-
-    const flush = async () => {
-      if (ops.length) await this.gamesModel.bulkWrite(ops, { ordered: false });
-      await this.conflicts.refresh("hltb", records);
-      await this.conflicts.dismissUndecided("hltb", settled);
-      ops = [];
-      records = [];
-      settled = [];
-    };
+    const byEntry = new Map<number, THltbEntryConflict>();
 
     const games = this.gamesModel
       .find({})
       .select(
-        "_id name hltb hltbNotFoundAt platformIds release_dates first_release"
+        "_id slug name type relatedGames.version_parent hltb hltbNotFoundAt platformIds release_dates first_release"
       )
       .lean()
       .cursor();
 
     for await (const game of games) {
       totals.processed += 1;
-      const outcome = this.matchFromCatalog(game, catalog, platformNames);
+      const outcome = this.matchFromCatalog(
+        game,
+        catalog,
+        platformNames,
+        linkedHltbIds
+      );
       totals[outcome.result] += 1;
 
       if (outcome.update) {
@@ -331,24 +407,12 @@ export class HltbService implements OnModuleInit {
       }
 
       if (outcome.conflict) {
-        records.push({
-          externalId: String(game._id),
-          externalName: game.name,
-          reason: outcome.conflict.reason,
-          candidates: [],
-          entries: outcome.conflict.entries.map((entry) =>
-            this.toConflictEntry(entry)
-          ),
-        });
-      } else if (outcome.result !== "skipped") {
-        settled.push(String(game._id));
+        this.collectConflict(byEntry, game, outcome.conflict);
       }
 
-      if (
-        Math.max(ops.length, records.length, settled.length) >=
-        HLTB_SYNC_WRITE_BATCH
-      ) {
-        await flush();
+      if (ops.length >= HLTB_SYNC_WRITE_BATCH) {
+        await this.gamesModel.bulkWrite(ops, { ordered: false });
+        ops = [];
       }
 
       if (totals.processed % 10000 === 0) {
@@ -356,7 +420,24 @@ export class HltbService implements OnModuleInit {
       }
     }
 
-    await flush();
+    if (ops.length) await this.gamesModel.bulkWrite(ops, { ordered: false });
+
+    const records = this.toConflictRecords(byEntry);
+    const offered = new Set(records.map(({ externalId }) => externalId));
+
+    for (let i = 0; i < records.length; i += HLTB_SYNC_WRITE_BATCH) {
+      await this.conflicts.refresh(
+        "hltb",
+        records.slice(i, i + HLTB_SYNC_WRITE_BATCH)
+      );
+    }
+
+    await this.conflicts.dismissUndecided(
+      "hltb",
+      (await this.conflicts.findUndecidedIds("hltb")).filter(
+        (externalId) => !offered.has(externalId)
+      )
+    );
 
     const message = `HLTB sync finished in ${this.formatElapsed(startedAt)}: ${formatTotals(totals)}`;
     this.logger.info(message);
@@ -369,13 +450,16 @@ export class HltbService implements OnModuleInit {
     game: Pick<
       Game,
       | "name"
+      | "type"
+      | "relatedGames"
       | "platformIds"
       | "release_dates"
       | "first_release"
       | "hltbNotFoundAt"
     > & { hltb?: IHltbField | null },
     catalog: HltbCatalog,
-    platformNames: Map<string, string>
+    platformNames: Map<string, string>,
+    linkedHltbIds: Map<string, string>
   ): HltbCatalogOutcome {
     if (game.hltb?.hltbId) {
       const entry = catalog.byId.get(Number(game.hltb.hltbId));
@@ -386,16 +470,16 @@ export class HltbService implements OnModuleInit {
         : { result: "skipped" };
     }
 
-    const ctx = this.buildMatchContext(game, platformNames);
-    const pool = findCatalogCandidates(catalog, game.name);
-    const match = selectHltbMatch(pool, ctx);
-    const matched = match ? mapHltbEntryToField(match.entry) : null;
+    const parentHltbId = linkedHltbIds.get(getEditionParentId(game) ?? "");
+    const { entry, conflict } = decideHltbMatch(
+      findCatalogCandidates(catalog, game.name),
+      buildHltbMatchContext(game, platformNames),
+      parentHltbId ? catalog.byId.get(Number(parentHltbId)) : null
+    );
 
-    if (matched && hasHltbTimes(matched)) {
-      return this.storeCatalogMatch(game, matched);
+    if (entry) {
+      return this.storeCatalogMatch(game, mapHltbEntryToField(entry));
     }
-
-    const conflict = findHltbConflict(pool, ctx);
 
     return game.hltbNotFoundAt
       ? { result: "notFound", conflict }
@@ -559,7 +643,9 @@ export class HltbService implements OnModuleInit {
 
     const game = await this.gamesModel
       .findOne(filter)
-      .select("_id slug name hltb platformIds release_dates first_release")
+      .select(
+        "_id slug name type relatedGames.version_parent hltb platformIds release_dates first_release"
+      )
       .lean();
 
     if (!game) {
@@ -569,22 +655,27 @@ export class HltbService implements OnModuleInit {
     }
 
     if (target.hltbId) {
-      const result = await this.applyHltbEntryById(game, target.hltbId);
-
-      await this.conflicts.removeForGame("hltb", game._id, {
-        externalIds: [String(game._id)],
-      });
-
-      return result;
+      return this.linkHltbId(game, target.hltbId);
     }
 
     const platformNames = await this.loadPlatformNames();
-    const ctx = this.buildMatchContext(game, platformNames);
+    const ctx = buildHltbMatchContext(game, platformNames);
     const { hltb, conflict, isEmpty } = await this.fetchHltbForGame(ctx);
     const now = new Date().toISOString();
 
     if (!hltb || !hasHltbTimes(hltb)) {
-      await this.recordAmbiguity(game, conflict);
+      const parentHltbId = await this.findParentHltbId(game);
+
+      if (parentHltbId) {
+        return this.linkHltbId(game, parentHltbId);
+      }
+
+      if (conflict) {
+        const byEntry = new Map<number, THltbEntryConflict>();
+
+        this.collectConflict(byEntry, game, conflict);
+        await this.conflicts.record("hltb", this.toConflictRecords(byEntry));
+      }
 
       const isKept = !!game.hltb && isEmpty;
       const update: Record<string, unknown> = {
@@ -641,6 +732,45 @@ export class HltbService implements OnModuleInit {
     };
   }
 
+  private async linkHltbId(
+    game: Parameters<HltbService["applyHltbEntryById"]>[0] & {
+      _id: mongoose.Types.ObjectId;
+    },
+    hltbId: string
+  ): Promise<HltbGameSyncResult> {
+    const result = await this.applyHltbEntryById(game, hltbId);
+
+    await this.conflicts.removeForGame("hltb", game._id, {
+      externalIds: [hltbId],
+    });
+
+    return result;
+  }
+
+  private async findParentHltbId(
+    game: Pick<Game, "type" | "relatedGames">
+  ): Promise<string | null> {
+    const parentId = getEditionParentId(game);
+
+    if (!parentId) return null;
+
+    const parent = await this.gamesModel
+      .findById(parentId)
+      .select("hltb.hltbId")
+      .lean();
+
+    return parent?.hltb?.hltbId ?? null;
+  }
+
+  private async loadLinkedHltbIds(): Promise<Map<string, string>> {
+    const games = await this.gamesModel
+      .find({ "hltb.hltbId": { $exists: true } })
+      .select("_id hltb.hltbId")
+      .lean();
+
+    return new Map(games.map((game) => [String(game._id), game.hltb.hltbId]));
+  }
+
   /** Stores the HLTB entry an admin picked by hand. The automatic matching
    * rules are deliberately skipped — an explicit id is a human decision — but a
    * miss must not touch the stored record, so a wrong id fails loudly instead
@@ -665,6 +795,9 @@ export class HltbService implements OnModuleInit {
     }
 
     const hltb = mapHltbEntryToField(this.toSearchEntry(response.data));
+    const page = readHltbPage(
+      response.data.raw as unknown as Record<string, unknown>
+    );
 
     if (!hasHltbTimes(hltb)) {
       throw new BadRequestException(
@@ -681,6 +814,19 @@ export class HltbService implements OnModuleInit {
         $unset: { hltbNotFoundAt: "" },
       }
     );
+
+    await this.gamesService
+      .fillEmptyFields(
+        game._id as mongoose.Types.ObjectId,
+        hltbPageFields(page, {
+          platformIds: (game.platformIds ?? []).map(String),
+        })
+      )
+      .catch((err: Error) =>
+        this.logger.warn(
+          `HLTB page data was not copied to ${game.name}: ${err.message}`
+        )
+      );
 
     this.metrics.recordGames("hltb", "updated", 1);
 
@@ -766,34 +912,6 @@ export class HltbService implements OnModuleInit {
     }
 
     return map;
-  }
-
-  private buildMatchContext(
-    game: Pick<
-      Game,
-      "name" | "platformIds" | "release_dates" | "first_release"
-    >,
-    platformNames: Map<string, string>
-  ): HltbMatchContext {
-    const platformLabels = (game.platformIds ?? [])
-      .map((id) => platformNames.get(String(id)))
-      .filter((name): name is string => !!name);
-
-    const years = new Set<number>();
-    for (const release of game.release_dates ?? []) {
-      if (release?.year) {
-        years.add(release.year);
-      }
-    }
-    if (game.first_release) {
-      years.add(new Date(game.first_release * 1000).getUTCFullYear());
-    }
-
-    return {
-      name: game.name,
-      platformKeys: buildPlatformKeySet(platformLabels),
-      years,
-    };
   }
 
   private async fetchHltbForGame(ctx: HltbMatchContext) {

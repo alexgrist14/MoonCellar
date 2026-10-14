@@ -1,5 +1,55 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
+exports[`VNDB match characterization Roman numeral against an Arabic one 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 2,
+        "platforms": 1,
+        "title": 1,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Midnight Clocktower Academy 2",
+      "score": 10,
+    },
+  ],
+  "reason": "weak-title",
+  "verdict": "ambiguous",
+  "winner": null,
+}
+`;
+
+exports[`VNDB match characterization candidate's alternative name is the VN title 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 2,
+        "platforms": 1,
+        "title": 4,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Clocktower Gakuen",
+      "score": 13,
+    },
+  ],
+  "reason": null,
+  "verdict": "matched",
+  "winner": "Clocktower Gakuen",
+}
+`;
+
 exports[`VNDB match characterization descriptions differ and no company evidence 1`] = `
 {
   "candidates": [
@@ -70,6 +120,31 @@ exports[`VNDB match characterization distinctive title without dates or companie
     },
   ],
   "reason": "no-company-evidence",
+  "verdict": "ambiguous",
+  "winner": null,
+}
+`;
+
+exports[`VNDB match characterization edition subtitle against the base game 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 2,
+        "platforms": 1,
+        "title": 1,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Midnight Clocktower Academy",
+      "score": 10,
+    },
+  ],
+  "reason": "weak-title",
   "verdict": "ambiguous",
   "winner": null,
 }
@@ -209,6 +284,31 @@ exports[`VNDB match characterization no candidates 1`] = `
 }
 `;
 
+exports[`VNDB match characterization numeral inside an alternative name 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 2,
+        "platforms": 1,
+        "title": 1,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Clocktower Gakuen 2",
+      "score": 10,
+    },
+  ],
+  "reason": "weak-title",
+  "verdict": "ambiguous",
+  "winner": null,
+}
+`;
+
 exports[`VNDB match characterization platform mismatch 1`] = `
 {
   "candidates": [
@@ -299,6 +399,31 @@ exports[`VNDB match characterization release dates contradict 1`] = `
 }
 `;
 
+exports[`VNDB match characterization sequel numeral is not a spelling variant 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 2,
+        "platforms": 1,
+        "title": 1,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Midnight Clocktower Academy III",
+      "score": 10,
+    },
+  ],
+  "reason": "weak-title",
+  "verdict": "ambiguous",
+  "winner": null,
+}
+`;
+
 exports[`VNDB match characterization short title is weak 1`] = `
 {
   "candidates": [
@@ -315,6 +440,31 @@ exports[`VNDB match characterization short title is weak 1`] = `
       "descriptionSignal": "match",
       "hasCompanyMismatch": false,
       "name": "Aoi",
+      "score": 10,
+    },
+  ],
+  "reason": "weak-title",
+  "verdict": "ambiguous",
+  "winner": null,
+}
+`;
+
+exports[`VNDB match characterization single-letter numeral stays a word 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 2,
+        "platforms": 1,
+        "title": 1,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Midnight Clocktower Academy 10",
       "score": 10,
     },
   ],

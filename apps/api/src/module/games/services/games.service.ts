@@ -43,11 +43,11 @@ import { Rating } from "../../user/schemas/user-ratings.schema";
 import { UserLogs } from "../../user/schemas/user-logs.schema";
 import { IndexNowService } from "../../indexnow/indexnow.service";
 import { FRONT_URL } from "../../../shared/constants";
+import { normalizeSearchText } from "../../../shared/utils";
 import {
-  normalizeGameName,
-  normalizeSearchText,
+  normalizeTitle,
   replaceRomanNumerals,
-} from "../../../shared/utils";
+} from "../utils/title-match.utils";
 import { pickFollowingsStatus } from "../utils/followings-status.utils";
 import { parseS3ImageUrl, S3_FOLDERS, type S3Folder } from "../../../shared/s3";
 
@@ -540,7 +540,7 @@ export class GamesService implements OnModuleInit {
         ...data,
         ...(await this.storeRemoteImages(_id, data)),
         _id,
-        nameNormalized: normalizeGameName(data.name),
+        nameNormalized: normalizeTitle(data.name),
         isCustom: true,
         createdAt: now,
         updatedAt: now,
@@ -664,7 +664,7 @@ export class GamesService implements OnModuleInit {
         { _id },
         {
           ...data,
-          ...(data.name && { nameNormalized: normalizeGameName(data.name) }),
+          ...(data.name && { nameNormalized: normalizeTitle(data.name) }),
           updatedAt: new Date().toISOString(),
         },
         { new: true }

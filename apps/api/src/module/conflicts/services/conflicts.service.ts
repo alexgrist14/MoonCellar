@@ -81,6 +81,7 @@ const toCandidateEntry = (
   descriptionSignal: candidate.descriptionSignal,
   hasCompanyMismatch: candidate.hasCompanyMismatch,
   matchedTitle: candidate.matchedTitle ?? null,
+  ...(candidate.isManual && { isManual: true }),
 });
 
 const readPath = (value: unknown, path: string): unknown =>
@@ -147,16 +148,65 @@ export class ConflictsService {
   async refresh(source: IConflictSource, records: IConflictRecord[]) {
     if (!records.length) return;
 
+    const manual = new Map(
+      (
+        await this.conflictsModel
+          .find({
+            source,
+            externalId: { $in: records.map(({ externalId }) => externalId) },
+            ...UNDECIDED_FILTER,
+            "candidates.isManual": true,
+          })
+          .select("externalId candidates")
+          .lean()
+      ).map(({ externalId, candidates }) => [
+        externalId,
+        candidates.filter(({ isManual }) => isManual),
+      ])
+    );
+
     await this.conflictsModel.bulkWrite(
-      records.map(({ externalId, externalName, reason, entries }) => ({
-        updateOne: {
-          filter: { source, externalId, ...UNDECIDED_FILTER },
-          update: { $set: { externalName, reason, entries: entries ?? [] } },
-        },
-      })),
+      records.map(
+        ({
+          externalId,
+          externalName,
+          externalData,
+          reason,
+          entries,
+          candidates,
+        }) => {
+          const scored = candidates.map(toCandidateEntry);
+          const scoredIds = new Set(scored.map(({ gameId }) => String(gameId)));
+          const kept = (manual.get(externalId) ?? []).filter(
+            ({ gameId }) => !scoredIds.has(String(gameId))
+          );
+
+          return {
+            updateOne: {
+              filter: { source, externalId, ...UNDECIDED_FILTER },
+              update: {
+                $set: {
+                  externalName,
+                  reason,
+                  entries: entries ?? [],
+                  ...(externalData && { externalData }),
+                  ...(scored.length && { candidates: [...kept, ...scored] }),
+                },
+              },
+            },
+          };
+        }
+      ),
       { ordered: false }
     );
     await this.record(source, records);
+  }
+
+  async findUndecidedIds(source: IConflictSource): Promise<string[]> {
+    return this.conflictsModel.distinct("externalId", {
+      source,
+      ...UNDECIDED_FILTER,
+    });
   }
 
   async setExternalData(
@@ -238,7 +288,9 @@ export class ConflictsService {
             : []),
         ],
       })
-      .select("externalId externalData candidates.gameId")
+      .select(
+        "externalId externalData reason candidates.gameId candidates.isManual"
+      )
       .sort({ _id: 1 })
       .limit(limit)
       .lean();

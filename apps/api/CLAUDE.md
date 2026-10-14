@@ -201,7 +201,7 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   entry, and the Arabic-numeral form of each — and a game takes the best tier of its entries.**
   `getSearchNames` builds them and `searchIndex` folds the matches back to one row per game;
   `getGames` counts `total` from that list, so a game matched twice must not appear twice.
-- **Search text goes through `normalizeSearchText`, never `normalizeGameName`.** The latter keeps
+- **Search text goes through `normalizeSearchText`, never `normalizeTitle`.** The latter keeps
   only `a-z0-9` because it feeds the stored `nameNormalized` that the source matchers compare;
   used for search it turned "Ведьмак 3: Дикая охота" into "3" and a Cyrillic query into an empty
   one. Query and index must use the same normaliser, or nothing matches.
@@ -527,20 +527,21 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   `vndbcandidates`, and the migration only inserts records that are missing, so a decision
   made on the old API after the copy is lost. Drop `vndbcandidates` only after checking the
   Conflicts tab on production.
-- **A conflict has a direction, and it decides what the candidates are.** `games` (VNDB, IGDB,
-  RA) lists catalogue games for one source entry, and the decision carries `gameId`. `entries`
-  (HLTB) lists source entries for one catalogue game, so `externalId` is the game's `_id` and the
-  decision carries `entryId`. What Skip means belongs to the source, not the direction: it
-  creates a game for VNDB and IGDB and leaves the entry unlinked for RA and HLTB.
+- **A conflict has a direction, and it decides what the candidates are.** `games` (every source
+  today) lists catalogue games for one source entry, and the decision carries `gameId`. `entries`
+  lists source entries for one catalogue game and carries `entryId`; HLTB used it until 2026-10-14,
+  when it moved to `games` so its conflicts get the game search and a Skip that creates a game.
+  What Skip means belongs to the source: it creates a game for VNDB, IGDB, Steam and HLTB and leaves
+  the entry unlinked for RA.
 - **A handler's `apply` returns `null` for an entry it applied without a game.** Leaving an entry
-  out of the map sends the decision back to review, so an RA or HLTB Skip that returned nothing
+  out of the map sends the decision back to review, so an RA Skip that returned nothing
   would come back to the queue forever.
 - **Only a source whose Skip creates nothing may implement `rematch`, and only `absent`
   conflicts are reopened.** `POST /conflicts/:source/:externalId/reopen` puts a skipped conflict
   back to `pending` with candidates rebuilt by the handler's `rematch`, so a game added to the
   catalogue after the Skip shows up. A VNDB or IGDB Skip has already created a game; reopening it
   would leave that game behind and let a Match link the entry a second time. RA implements it;
-  HLTB does not yet, and Steam must not (its Skip creates a game).
+  Steam and HLTB must not (their Skip creates a game).
 - **A game the matcher missed is matched by adding it to the candidates first, never by passing
   its id to `decision`.** `decide` only accepts winners that are already among `candidates`
   (otherwise `400 The game is not a candidate`), so `POST /conflicts/:source/:externalId/candidates`
@@ -556,7 +557,14 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   links (localised titles such as "Wipeout 2097" on Wipeout XL, consoles whose platform mapping
   changed, sets waiting in a conflict) next to 78 stale ones. A match counts as ambiguous when the two best fuzzysort scores
   differ by less than `RA_AMBIGUITY_GAP` (0.05): about 570 of the 10,021 RA games that matched on
-  2026-09-30.
+  2026-09-30. A set the run does not match keeps its link only while its game takes no other set:
+  `$set` rewrites the whole `retroachievements` list of every matched game.
+- **`RA_USE_MATCH_ENGINE` switches the RA sync from fuzzysort to the shared matcher
+  (`createRaEnginePicker`, `RA_MATCH_PROFILE`), and it is flipped only after a reviewed dry run.**
+  The engine also reads the games' `alternative_names`, so its first run on 2026-10-14 data adds
+  about 450 links (Rockman & Forte → Mega Man & Bass) and moves or drops a few dozen; every one of
+  them must be in the reviewed `bun scripts/matching-dry-run.ts ra` report. Keep the fuzzysort path
+  until one nightly run on the engine has been checked, so a bad run is undone by flipping back.
 - **RA candidates come only from platforms whose `raId` is the set's console, so a platform the
   name matcher misses hides all its games.** `matchConsolesToPlatforms` needs an exact shared name
   segment, and IGDB names regional and revision variants differently ("Family Computer" against RA's
@@ -614,7 +622,7 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   unmatched games. Do not take `raw.comp_main` instead: HLTB hides it on purpose, and it would show
   Team Fortress 2 a 290-hour "main story".
 - **HLTB titles compare with Roman numerals as digits and against the entry's alias too**
-  (`normalizeHltbTitle`, `evaluateEntry`), so "Baldur's Gate III" meets HLTB's "Baldur's Gate 3".
+  (`normalizeTitleWithNumerals`, `evaluateEntry`), so "Baldur's Gate III" meets HLTB's "Baldur's Gate 3".
   Single-letter numerals (I, V, X) stay words — "Mega Man X" is not "Mega Man 10".
 - **HLTB dates an entry by its earliest release, so an exact title on a shared platform is
   accepted up to `HLTB_PLATFORM_YEAR_TOLERANCE` (2) years off; a wider gap goes to Conflicts.**
@@ -629,11 +637,44 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   against "Pokémon X and Y", "Rainbow Six Siege" against "Tom Clancy's Rainbow Six Siege"). Entries
   without times are never offered: applying one fails, and the decision would return to the queue
   forever. Loosen the loose rule only after measuring it — on a random 100 not-found games it adds
-  about 4 conflicts, most of them noise ("Axolotl" against "Magic Axolotl"). Each run deletes the
-  undecided conflict of every game it settled (matched, or no candidates left) and rewrites the
-  entries of every other one through `ConflictsService.refresh`, so the queue follows the current
-  rules and catalogue. `record` alone leaves an existing conflict as it was: the 1,769 conflicts
-  recorded before HLTB entries carried `cover` would never have shown a poster.
+  about 4 conflicts, most of them noise ("Axolotl" against "Magic Axolotl").
+- **An HLTB conflict is one HLTB entry with every unlinked game the rules offered it to**
+  (`externalId` is the HLTB id, `isMultiMatch`, because editions share one entry). The weekly run
+  collects them over the whole catalogue before it writes: it rewrites every undecided one through
+  `ConflictsService.refresh` and deletes the undecided ones no game offered any more, so the queue
+  follows the current rules and catalogue. `refresh` keeps the games an admin added by search
+  (`isManual`) and replaces the rest; `record` alone would leave an existing conflict as it was —
+  the 1,769 conflicts recorded before HLTB entries carried `cover` never showed a poster.
+  Candidates carry a breakdown in the shape the other sources use (title, platforms, release year).
+  Match writes the entry to each chosen game; Skip adds the entry as a game (`createGame`), unless
+  a game already carries that `hltb.hltbId` — then Skip returns that game and creates nothing.
+- **HLTB's search and catalogue carry no description and no companies; only the game page does**
+  (`getById` → `raw.profile_summary`, `profile_dev`, `profile_pub`, `release_world` as a full date,
+  `profile_steam`; `readHltbPage`). It is read only when one entry is described, linked by id,
+  matched or added as a game: linking fills the game's empty description, companies, release date
+  and release dates (`fillEmptyFields`), and a game added from HLTB gets them plus its Steam page.
+  The weekly run never reads pages — one request per game would take days.
+- **HLTB writes an unknown date part as zeros, so `hltbDate` cuts a date at its first zero part
+  before parsing.** `"0000-00-00"` (no date) and `"2015-00-00"` (year only) both pass
+  `parsePartialDate`'s pattern, and the first once dated a new game to the year −1. The page's
+  NA, EU and JP dates become `release_dates` with the IGDB region codes (2, 1, 5), one row per
+  platform of the game, because HLTB does not date platforms; regions that agree collapse into one
+  Worldwide (8) row. `human` keeps HLTB's precision ("2015", "Apr 2006"), while `first_release` of a
+  year-only date is January 1, as VNDB does.
+- **An edition the matcher cannot place takes its original's HLTB link** (`getEditionParentId`:
+  `relatedGames.version_parent`, never for an add-on type). Editions share their original's times,
+  and HLTB lists most of them only under the original's name, so "Payday 3: Day One Edition" sat
+  in Conflicts against "Payday 3" — 2,189 of the 26,271 conflicts of the 2026-10-13 run. The
+  edition's own title match still wins. The weekly sync reads the originals' links once before
+  the run (`loadLinkedHltbIds`), so an edition whose original was linked in the same run follows a
+  week later; `POST /hltb/games/parse` reads it on the spot.
+- **An add-on (`HLTB_ADDON_GAME_TYPES`) never takes, and is never offered, its base game:** an
+  HLTB entry that is not `dlc`, `mod` or `hack` and whose title is the leading words of ours
+  (`isBaseGameEntry`). The loose-title rule offered "Call of Duty: Black Ops 6" to every season of
+  it, 6,780 such conflicts on 2026-10-13. Do not narrow it to "add-ons take only `dlc` entries":
+  HLTB files many add-ons as `game` under their own title (105 linked DLC, 212 mods, Covert Front's
+  episodes). `Update` and `Bundle` stay out — "FTL: Advanced Edition" and "X: Complete Edition"
+  rightly take the base game's times.
 - **An id set by hand ends the source's open conflicts for that game, never its decided ones.**
   `POST /hltb/games/parse?hltbId`, `POST /vndb/games/parse?vnId` and `POST /ra/games/parse?raId`
   call `ConflictsService.removeForGame`: it deletes the conflict of the linked id itself and every
@@ -677,9 +718,20 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   candidate also stores `matchedTitle`, the part of a `|` title it matched, so equal scores on two
   different games read as two different titles rather than a broken scorer.
 - **The matcher lives in `games/matching`, and a profile, not the caller, decides the rules.**
-  `resolveMatch` is the former VNDB scoring unchanged, and the snapshot spec
-  `vndb-match.characterization.spec.ts` pins it. A new source adds a profile. Change VNDB
-  behaviour only on purpose: a changed snapshot is a behaviour change.
+  `resolveMatch` is the former VNDB scoring, and the snapshot specs
+  `vndb-match.characterization.spec.ts` and `igdb-match.characterization.spec.ts` pin it. A new
+  source adds a profile, and a rule one source needs is a profile option whose default leaves the
+  others alone (`title.variant`, `title.alternative`, `title.minimum`, `title.fuzzy`,
+  `requireEvidence`, all set only by `RA_MATCH_PROFILE`). Change VNDB or IGDB behaviour only on
+  purpose: a changed snapshot is a behaviour change.
+- **A change to RA or HLTB matching ships with a `scripts/matching-dry-run.ts` report.** The script
+  runs the same functions as the syncs (`matchRaSets`, `decideHltbMatch`) against the production
+  database, read-only, with RA's lists and HLTB's catalogue cached in `scripts/.dry-run/`, and lists
+  links added, removed and moved and the conflicts that appear or go. A matcher is added to its
+  `RA_PICKERS` / `HLTB_DECIDERS` map and compared with the current one before the sync uses it.
+- **Spelling variants never collapse a Roman numeral.** `titleKeyVariants` folds Japanese long
+  vowels ("ou" → "o", "aa" → "a"), which once turned "III" and "II" into "i": "Magical Drop III"
+  matched "Magical Drop II" and "Ys II" matched Ys III. Numeral tokens skip that step.
 - **Every RA link set by hand is pinned with `conflicts.pin("ra", …)`: "Link RetroAchievements by
   id", an approved content request, and `GamesService.addGame` for a game created with
   `retroachievements`.** The nightly RA sync matches each set by title and pulls it off every game

@@ -28,17 +28,19 @@ RA data is never stored in collections of its own; it lives on the records that 
    segment (`matchConsolesToPlatforms`). Some IGDB names never share a segment with RA's ("Family
    Computer" against "NES/Famicom"); `RA_CONSOLE_BY_PLATFORM_SLUG` maps those by hand.
 2. **Sets.** Downloads every console's game list, then matches each set to games on that console's
-   platforms with the shared matcher (`games/matching`). The search is fuzzy (fuzzysort,
-   threshold `RA_NAME_MATCH_THRESHOLD`).
-3. **Conflicts.** A match is ambiguous when the two best scores differ by less than
-   `RA_AMBIGUITY_GAP` (0.05). Such a set becomes an `ra` conflict in the admin Conflicts tab, with
-   up to 5 candidates. One RA set can cover several games ("Pokémon HeartGold | SoulSilver"), so
+   platforms (`matchRaSets`). By default the search is fuzzy (fuzzysort, threshold
+   `RA_NAME_MATCH_THRESHOLD`); with `RA_USE_MATCH_ENGINE` the shared matcher (`games/matching`,
+   `RA_MATCH_PROFILE`) scores the titles instead, alternative names and Roman numerals included.
+3. **Conflicts.** With fuzzysort a match is ambiguous when the two best scores differ by less than
+   `RA_AMBIGUITY_GAP` (0.05); with the shared matcher, when it returns no single winner. Such a set
+   becomes an `ra` conflict in the admin Conflicts tab, with up to 5 candidates. One RA set can cover several games ("Pokémon HeartGold | SoulSilver"), so
    an RA conflict accepts several winners.
 4. **Links.** Links are recomputed, but decisions are kept:
    - a resolved conflict pins its winners;
    - a pending or skipped conflict links nothing;
    - a set the run gave to another game is pulled from the old one;
-   - a link is never cleared just because nothing matched it this time.
+   - a link is never cleared just because nothing matched it this time, unless its game took
+     another set: each matched game's list is rewritten whole.
 5. **Missing data.** Every linked set without its icon or count is filled in
    (`fillMissingSetData`): from the downloaded lists, or with one `getGameExtended` per set, up to
    `RA_MISSING_SET_LOOKUPS` (300) per run.

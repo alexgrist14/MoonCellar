@@ -36,7 +36,8 @@ import { FileService } from "../../user/services/file-upload.service";
 import { IndexNowService } from "../../indexnow/indexnow.service";
 import { parseS3ImageUrl, S3_FOLDERS, type S3Folder } from "../../../shared/s3";
 import { FRONT_URL } from "../../../shared/constants";
-import { normalizeGameName, uniqueSlug } from "../../../shared/utils";
+import { uniqueSlug } from "../../../shared/utils";
+import { normalizeTitle } from "../utils/title-match.utils";
 import { MAIN_GAME_TYPE } from "../constants/vndb";
 import { IGDBService } from "../../igdb/igdb.service";
 import { HltbService } from "./hltb.service";
@@ -673,7 +674,7 @@ export class ContentRequestsService {
         cover: null,
         platformIds: [],
         name: payload.name,
-        nameNormalized: normalizeGameName(payload.name),
+        nameNormalized: normalizeTitle(payload.name),
         slug: await uniqueSlug(
           (candidate) => this.games.exists({ slug: candidate }),
           payload.name
@@ -822,7 +823,7 @@ export class ContentRequestsService {
       set[key] = value;
     }
 
-    if (payload.name) set.nameNormalized = normalizeGameName(payload.name);
+    if (payload.name) set.nameNormalized = normalizeTitle(payload.name);
 
     if (payload.platformIds) {
       set.platformIds = await this.existingIds(

@@ -30,6 +30,7 @@ import {
   CONFLICT_SOURCES,
   REASON_LABELS,
   SOURCE_LABELS,
+  isServerBlockedImage,
   skipCaption,
   isReopenable,
   stateLabel,
@@ -258,6 +259,7 @@ export const Conflicts: FC = () => {
                     width={120}
                     height={160}
                     alt={subject.name}
+                    unoptimized={isServerBlockedImage(subject.cover)}
                     onError={() =>
                       setFailedCovers((covers) =>
                         new Set(covers).add(subject.cover!)

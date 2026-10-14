@@ -1,6 +1,24 @@
-import { type IHltbField, type IMatchReason } from "@mooncellar/schemas";
+import {
+  type IAddGameRequest,
+  type IHltbField,
+  type IMatchReason,
+  type IRelatedGamesField,
+  type IScoreBreakdown,
+} from "@mooncellar/schemas";
+import type {
+  IScoredCandidate,
+  TMatchCandidate,
+} from "../matching/game-matcher.types";
+import { decodeHtml } from "../../../shared/utils";
+import { parsePartialDate, toReleaseDate } from "../../../shared/release-date";
 import { getMatchScore, type HowLongToBeatResultEntry } from "howlongtobeat-ts";
 import {
+  HLTB_ADDON_ENTRY_TYPES,
+  HLTB_ADDON_GAME_TYPES,
+  HLTB_GAME_TYPES,
+  HLTB_PREFERRED_PLATFORM_SLUGS,
+  HLTB_RELEASE_REGIONS,
+  HLTB_WORLDWIDE_REGION,
   HLTB_LOOSE_TITLE_OVERLAP,
   HLTB_PLATFORM_YEAR_TOLERANCE,
   HLTB_SEARCH_RESULTS_PER_QUERY,
@@ -12,6 +30,7 @@ import {
   jaccard,
   normalizeCoreTitle,
   normalizeTitle,
+  normalizeTitleWithNumerals,
   titleSimilarity,
   tokenSetFrom,
 } from "./title-match.utils";
@@ -51,6 +70,7 @@ export type HltbMatchContext = {
   platformKeys: Set<string>;
   /** Release years known for the game (from release_dates / first_release). */
   years: Set<number>;
+  type?: string | null;
 };
 
 export type HltbMatchTier = "confirmed" | "exact-title";
@@ -147,43 +167,20 @@ type HltbEntryEvaluation = {
   yearNear: boolean;
 };
 
-const ROMAN_NUMERALS: Record<string, string> = {
-  ii: "2",
-  iii: "3",
-  iv: "4",
-  vi: "6",
-  vii: "7",
-  viii: "8",
-  ix: "9",
-  xi: "11",
-  xii: "12",
-  xiii: "13",
-  xiv: "14",
-  xv: "15",
-  xvi: "16",
-  xvii: "17",
-  xviii: "18",
-  xix: "19",
-  xx: "20",
-};
-
-export const normalizeHltbTitle = (value: string): string =>
-  normalizeTitle(value)
-    .split(" ")
-    .map((token) => ROMAN_NUMERALS[token] ?? token)
-    .join(" ");
+export const hltbAliases = (entry: Pick<HltbSearchEntry, "alias">): string[] =>
+  (entry.alias ?? "")
+    .split(",")
+    .map((alias) => alias.trim())
+    .filter(Boolean);
 
 const entryTitles = (entry: HltbSearchEntry): string[] => [
   entry.name,
-  ...(entry.alias ?? "")
-    .split(",")
-    .map((alias) => alias.trim())
-    .filter(Boolean),
+  ...hltbAliases(entry),
 ];
 
 const evaluateTitle = (title: string, name: string) => {
-  const entryTitle = normalizeHltbTitle(title);
-  const ctxTitle = normalizeHltbTitle(name);
+  const entryTitle = normalizeTitleWithNumerals(title);
+  const ctxTitle = normalizeTitleWithNumerals(name);
   const entryCore = normalizeCoreTitle(entryTitle);
   const ctxCore = normalizeCoreTitle(ctxTitle);
   const titleExact = entryTitle === ctxTitle;
@@ -270,6 +267,34 @@ const rankEvaluations = (
 const isCorroboratedCandidate = (item: HltbEntryEvaluation): boolean =>
   (item.strongTitle || item.looseTitle) && item.platformMatch && item.yearMatch;
 
+const isAddon = (type?: string | null): boolean =>
+  !!type && HLTB_ADDON_GAME_TYPES.includes(type);
+
+const isBaseGameEntry = (
+  entry: HltbSearchEntry,
+  ctx: HltbMatchContext
+): boolean => {
+  if (!isAddon(ctx.type) || HLTB_ADDON_ENTRY_TYPES.includes(entry.type ?? "")) {
+    return false;
+  }
+
+  const name = normalizeTitleWithNumerals(ctx.name);
+
+  return entryTitles(entry).some((title) => {
+    const base = normalizeTitleWithNumerals(title);
+
+    return !!base && base !== name && `${name} `.startsWith(`${base} `);
+  });
+};
+
+export const getEditionParentId = (game: {
+  type?: string | null;
+  relatedGames?: IRelatedGamesField | null;
+}): string | null =>
+  game.relatedGames?.version_parent && !isAddon(game.type)
+    ? String(game.relatedGames.version_parent)
+    : null;
+
 /**
  * Picks the HLTB entry for a game, prioritising precision over coverage.
  *
@@ -301,7 +326,9 @@ export const selectHltbMatch = (
   }
 
   const isReRelease = normalizeTitle(ctx.name) !== normalizeCoreTitle(ctx.name);
-  const evaluations = results.map((entry) => evaluateEntry(entry, ctx));
+  const evaluations = results
+    .filter((entry) => !isBaseGameEntry(entry, ctx))
+    .map((entry) => evaluateEntry(entry, ctx));
   const blockedByYear = (item: HltbEntryEvaluation): boolean =>
     item.yearConflict &&
     !isReRelease &&
@@ -334,7 +361,25 @@ export const selectHltbMatch = (
 export type HltbConflict = {
   reason: IMatchReason;
   entries: HltbSearchEntry[];
+  breakdowns: IScoreBreakdown[];
 };
+
+const toBreakdown = (
+  item: HltbEntryEvaluation,
+  ctx: HltbMatchContext
+): IScoreBreakdown => ({
+  title: item.titleExact ? 4 : item.strongTitle ? 2 : item.looseTitle ? 1 : 0,
+  platforms:
+    !ctx.platformKeys.size || !item.entry.platforms?.length
+      ? 0
+      : item.platformMatch
+        ? 1
+        : -1,
+  date: item.yearMatch ? 3 : item.yearNear ? 1 : item.yearConflict ? -4 : 0,
+  companies: 0,
+  genre: 0,
+  type: 0,
+});
 
 export const findHltbConflict = (
   results: HltbSearchEntry[],
@@ -342,7 +387,10 @@ export const findHltbConflict = (
   limit = HLTB_CONFLICT_ENTRIES_LIMIT
 ): HltbConflict | null => {
   const evaluations = results
-    .filter((entry) => hasHltbTimes(mapHltbEntryToField(entry)))
+    .filter(
+      (entry) =>
+        hasHltbTimes(mapHltbEntryToField(entry)) && !isBaseGameEntry(entry, ctx)
+    )
     .map((entry) => evaluateEntry(entry, ctx));
   const picked = evaluations
     .filter((item) => item.strongTitle || isCorroboratedCandidate(item))
@@ -361,7 +409,54 @@ export const findHltbConflict = (
         ? "competing-candidates"
         : "unverified-title",
     entries: picked.map(({ entry }) => entry),
+    breakdowns: picked.map((item) => toBreakdown(item, ctx)),
   };
+};
+
+export const buildHltbMatchContext = (
+  game: {
+    name: string;
+    type?: string | null;
+    platformIds?: { toString(): string }[] | null;
+    release_dates?: { year?: number | null }[] | null;
+    first_release?: number | null;
+  },
+  platformNames: Map<string, string>
+): HltbMatchContext => {
+  const platformLabels = (game.platformIds ?? [])
+    .map((id) => platformNames.get(String(id)))
+    .filter((name): name is string => !!name);
+
+  const years = new Set<number>();
+  for (const release of game.release_dates ?? []) {
+    if (release?.year) {
+      years.add(release.year);
+    }
+  }
+  if (game.first_release) {
+    years.add(new Date(game.first_release * 1000).getUTCFullYear());
+  }
+
+  return {
+    name: game.name,
+    platformKeys: buildPlatformKeySet(platformLabels),
+    years,
+    type: game.type,
+  };
+};
+
+const withTimes = (entry?: HltbSearchEntry | null): HltbSearchEntry | null =>
+  entry && hasHltbTimes(mapHltbEntryToField(entry)) ? entry : null;
+
+export const decideHltbMatch = (
+  pool: HltbSearchEntry[],
+  ctx: HltbMatchContext,
+  parentEntry?: HltbSearchEntry | null
+): { entry: HltbSearchEntry | null; conflict: HltbConflict | null } => {
+  const entry =
+    withTimes(selectHltbMatch(pool, ctx)?.entry) ?? withTimes(parentEntry);
+
+  return { entry, conflict: entry ? null : findHltbConflict(pool, ctx) };
 };
 
 /** Thin wrapper kept for callers/tests that only need the entry. */
@@ -501,7 +596,7 @@ export type HltbCatalog = {
 };
 
 const titleTokens = (value: string): string[] =>
-  normalizeHltbTitle(value).split(" ").filter(Boolean);
+  normalizeTitleWithNumerals(value).split(" ").filter(Boolean);
 
 export const buildHltbCatalog = (entries: HltbSearchEntry[]): HltbCatalog => {
   const index = new Map<string, number[]>();
@@ -569,3 +664,196 @@ export const findCatalogCandidates = (
 
   return [...pool.values()];
 };
+
+export const toHltbCandidate = (
+  game: { _id: unknown; slug: string; name: string },
+  breakdown: IScoreBreakdown
+): IScoredCandidate => ({
+  game: game as unknown as TMatchCandidate,
+  score: breakdown.title + breakdown.platforms + breakdown.date,
+  breakdown,
+  dateSignal:
+    breakdown.date >= 3
+      ? "confirms"
+      : breakdown.date < 0
+        ? "contradicts"
+        : "unknown",
+  descriptionSignal: "unknown",
+  hasCompanyMismatch: false,
+  isDistinctiveTitle: breakdown.title >= 4,
+  isMainTitleMatch: breakdown.title >= 4,
+  isCorroborated: breakdown.date >= 3 || breakdown.platforms > 0,
+  isContradicted: breakdown.date < 0,
+});
+
+export const hltbConflictReason = ([
+  best,
+  ...rest
+]: IScoredCandidate[]): IMatchReason =>
+  rest.length
+    ? "competing-candidates"
+    : best.isContradicted
+      ? "date-contradicts"
+      : best.breakdown.title < 2
+        ? "weak-title"
+        : "unverified-title";
+
+export const mapHltbPlatformIds = (
+  names: string[],
+  platforms: { _id: { toString(): string }; name: string; slug: string }[]
+): string[] => {
+  const ids = new Set<string>();
+
+  for (const name of names) {
+    const key = canonicalPlatform(name);
+    const preferred = HLTB_PREFERRED_PLATFORM_SLUGS[key];
+
+    for (const platform of platforms) {
+      if (
+        canonicalPlatform(platform.name) === key &&
+        (!preferred || preferred.includes(platform.slug))
+      ) {
+        ids.add(platform._id.toString());
+      }
+    }
+  }
+
+  return [...ids];
+};
+
+export type HltbRelease = { date: string; region: number };
+
+export type HltbPage = {
+  summary: string | null;
+  developers: string[];
+  publishers: string[];
+  released: string | null;
+  releases: HltbRelease[];
+  steamAppId: number | null;
+};
+
+const listOf = (value: unknown): string[] =>
+  typeof value === "string"
+    ? value
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean)
+    : [];
+
+const hltbDate = (value: unknown): string | null => {
+  if (typeof value !== "string") return null;
+
+  const parts = value.split("-");
+  const known = parts.findIndex((part) => /^0*$/.test(part));
+  const date = parts.slice(0, known === -1 ? parts.length : known).join("-");
+
+  return parsePartialDate(date) ? date : null;
+};
+
+export const readHltbPage = (raw: Record<string, unknown> = {}): HltbPage => {
+  const summary =
+    typeof raw.profile_summary === "string"
+      ? decodeHtml(raw.profile_summary)
+      : "";
+  const world = hltbDate(raw.release_world);
+  const regional = Object.entries(HLTB_RELEASE_REGIONS).flatMap(
+    ([key, region]) => {
+      const date = hltbDate(raw[key]);
+
+      return date ? [{ date, region }] : [];
+    }
+  );
+  const dates = new Set(regional.map(({ date }) => date));
+  const [onlyDate] = dates;
+  const releases =
+    dates.size === 1 && (!world || world === onlyDate)
+      ? [{ date: onlyDate, region: HLTB_WORLDWIDE_REGION }]
+      : regional.length
+        ? regional
+        : world
+          ? [{ date: world, region: HLTB_WORLDWIDE_REGION }]
+          : [];
+  const released = world ?? [...dates].sort()[0] ?? null;
+  const steamAppId = Number(raw.profile_steam);
+
+  return {
+    summary: summary || null,
+    developers: listOf(raw.profile_dev),
+    publishers: listOf(raw.profile_pub),
+    released,
+    releases,
+    steamAppId: steamAppId > 0 ? steamAppId : null,
+  };
+};
+
+export const hltbPageFields = (
+  page: HltbPage | null,
+  {
+    releaseYear,
+    platformIds = [],
+  }: { releaseYear?: number | null; platformIds?: string[] } = {}
+): Partial<IAddGameRequest> => {
+  const developers = page?.developers ?? [];
+  const publishers = page?.publishers ?? [];
+  const yearOnly = releaseYear ? String(releaseYear) : null;
+  const released = parsePartialDate(page?.released ?? yearOnly);
+  const releases = page?.releases.length
+    ? page.releases
+    : yearOnly
+      ? [{ date: yearOnly, region: HLTB_WORLDWIDE_REGION }]
+      : [];
+
+  return {
+    summary: page?.summary ?? null,
+    companies: [...new Set([...developers, ...publishers])].map((name) => ({
+      name,
+      developer: developers.includes(name),
+      publisher: publishers.includes(name),
+      porting: false,
+      supporting: false,
+    })),
+    first_release: released ? released.getTime() / 1000 : null,
+    release_dates: releases.flatMap(({ date, region }) => {
+      const release = toReleaseDate(date);
+
+      return release
+        ? platformIds.map((platformId) => ({ ...release, platformId, region }))
+        : [];
+    }),
+  };
+};
+
+export const buildHltbGamePayload = (
+  entry: HltbSearchEntry,
+  {
+    slug,
+    platformIds,
+    page,
+  }: { slug: string; platformIds: string[]; page: HltbPage | null }
+): IAddGameRequest =>
+  ({
+    name: entry.name.trim(),
+    slug,
+    type: HLTB_GAME_TYPES[entry.type ?? ""] ?? "Main Game",
+    cover: entry.imageUrl ?? null,
+    alternative_names: hltbAliases(entry),
+    ...hltbPageFields(page, { releaseYear: entry.releaseYear, platformIds }),
+    platformIds,
+    externalPages: [
+      {
+        name: "HowLongToBeat",
+        uid: String(entry.id),
+        url: `https://howlongtobeat.com/game/${entry.id}`,
+      },
+      ...(page?.steamAppId
+        ? [
+            {
+              name: "Steam",
+              uid: String(page.steamAppId),
+              url: `https://store.steampowered.com/app/${page.steamAppId}`,
+            },
+          ]
+        : []),
+    ],
+    hltb: mapHltbEntryToField(entry),
+  }) as IAddGameRequest;

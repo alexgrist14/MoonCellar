@@ -12,7 +12,10 @@ export interface IConflictRecord {
   externalId: string;
   externalName: string;
   reason: IMatchReason | null;
-  candidates: (IScoredCandidate & { matchedTitle?: string | null })[];
+  candidates: (IScoredCandidate & {
+    matchedTitle?: string | null;
+    isManual?: boolean;
+  })[];
   entries?: IConflictEntry[];
   externalData?: Record<string, unknown>;
 }

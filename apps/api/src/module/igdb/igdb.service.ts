@@ -13,7 +13,6 @@ import type { IConflictDecision } from "../conflicts/types/conflicts.types";
 import { GameMatcherService } from "../games/matching/game-matcher.service";
 import { resolveMatch } from "../games/matching/game-matcher.utils";
 import { IGDB_MATCH_PROFILE } from "../games/matching/match-profiles";
-import type { IMatchSubject } from "../games/matching/game-matcher.types";
 import {
   buildIgdbQueryParams,
   getLink,
@@ -25,11 +24,8 @@ import {
   runWithConcurrency,
 } from "./utils/igdb";
 import { type ParserType } from "./interface/common.interface";
-import {
-  getImageLink,
-  isSameObjectIdList,
-  normalizeGameName,
-} from "../../shared/utils";
+import { getImageLink, isSameObjectIdList } from "../../shared/utils";
+import { normalizeTitle } from "../games/utils/title-match.utils";
 import { findSteamAppInfo, mergeSteamStore } from "../steam/utils/steam.utils";
 import { Game, type GameDocument } from "../games/schemas/game.schema";
 import {
@@ -91,6 +87,7 @@ import { S3_FOLDERS, type S3Folder } from "../../shared/s3";
 import {
   IGDB_CONFLICT_CANDIDATES_LIMIT,
   isConfirmedIgdbMatch,
+  toIgdbMatchSubject,
   withoutOtherIgdbGames,
 } from "./utils/igdb-match.utils";
 import { buildEditionLinks } from "./utils/edition-links.utils";
@@ -1078,7 +1075,7 @@ export class IGDBService implements OnModuleInit {
     const update = {
       slug: resolvedSlug,
       name: igdbGame.name,
-      nameNormalized: normalizeGameName(igdbGame.name),
+      nameNormalized: normalizeTitle(igdbGame.name),
       type:
         igdbGame.game_type?.type ||
         (igdbGame.category !== undefined
@@ -1260,46 +1257,6 @@ export class IGDBService implements OnModuleInit {
     return update.slug + " parsed";
   }
 
-  private toMatchSubject(igdbGame: IGDBExpandedGame, platformSlugs: string[]) {
-    const companies = igdbGame.involved_companies || [];
-    const namesOf = (
-      isRole: (company: (typeof companies)[number]) => boolean
-    ) =>
-      companies
-        .filter(isRole)
-        .map(({ company }) => company?.name)
-        .filter((name): name is string => !!name);
-
-    return {
-      id: String(igdbGame.id),
-      name: igdbGame.name,
-      originalName: igdbGame.name,
-      alternativeNames: (igdbGame.alternative_names || []).map(
-        ({ name }) => name
-      ),
-      type:
-        igdbGame.game_type?.type ||
-        (igdbGame.category !== undefined
-          ? categoryTypeNames[igdbGame.category]
-          : undefined) ||
-        "",
-      releaseDates: igdbGame.first_release_date
-        ? [
-            new Date(igdbGame.first_release_date * 1000)
-              .toISOString()
-              .slice(0, 10),
-          ]
-        : [],
-      developers: namesOf(
-        ({ developer, porting, supporting }) =>
-          !!(developer || porting || supporting)
-      ),
-      publishers: namesOf(({ publisher }) => !!publisher),
-      platformSlugs,
-      description: igdbGame.summary ?? "",
-    } satisfies IMatchSubject;
-  }
-
   private async matchNewIgdbGame(igdbGame: IGDBExpandedGame) {
     const [platforms, platformSlugById] = await Promise.all([
       this.Platforms.find({ igdbId: { $in: igdbGame.platforms || [] } })
@@ -1307,9 +1264,9 @@ export class IGDBService implements OnModuleInit {
         .lean(),
       this.gameMatcher.getPlatformSlugById(),
     ]);
-    if (!normalizeGameName(igdbGame.name)) return null;
+    if (!normalizeTitle(igdbGame.name)) return null;
 
-    const subject = this.toMatchSubject(
+    const subject = toIgdbMatchSubject(
       igdbGame,
       platforms.map(({ slug }) => slug)
     );
@@ -1409,7 +1366,7 @@ export class IGDBService implements OnModuleInit {
     })
       .select("_id")
       .lean();
-    const subject = this.toMatchSubject(igdbGame, []);
+    const subject = toIgdbMatchSubject(igdbGame, []);
 
     return {
       name: igdbGame.name,

@@ -211,6 +211,87 @@ const CASES: [string, () => IMatchResult][] = [
         context()
       ),
   ],
+  [
+    "Roman numeral against an Arabic one",
+    () =>
+      resolve(
+        vn({ name: "Midnight Clocktower Academy II", alternativeNames: [] }),
+        [
+          game({
+            name: "Midnight Clocktower Academy 2",
+            nameNormalized: "midnight clocktower academy 2",
+          }),
+        ],
+        context()
+      ),
+  ],
+  [
+    "single-letter numeral stays a word",
+    () =>
+      resolve(
+        vn({ name: "Midnight Clocktower Academy X", alternativeNames: [] }),
+        [
+          game({
+            name: "Midnight Clocktower Academy 10",
+            nameNormalized: "midnight clocktower academy 10",
+          }),
+        ],
+        context()
+      ),
+  ],
+  [
+    "edition subtitle against the base game",
+    () =>
+      resolve(
+        vn({ name: "Midnight Clocktower Academy: Complete Edition" }),
+        [game()],
+        context()
+      ),
+  ],
+  [
+    "candidate's alternative name is the VN title",
+    () =>
+      resolve(
+        vn({ originalName: "", alternativeNames: [] }),
+        [
+          game({
+            name: "Clocktower Gakuen",
+            nameNormalized: "clocktower gakuen",
+            alternative_names: ["Midnight Clocktower Academy"],
+          }),
+        ],
+        context()
+      ),
+  ],
+  [
+    "sequel numeral is not a spelling variant",
+    () =>
+      resolve(
+        vn({ name: "Midnight Clocktower Academy II", alternativeNames: [] }),
+        [
+          game({
+            name: "Midnight Clocktower Academy III",
+            nameNormalized: "midnight clocktower academy iii",
+          }),
+        ],
+        context()
+      ),
+  ],
+  [
+    "numeral inside an alternative name",
+    () =>
+      resolve(
+        vn({ alternativeNames: ["Mayonaka Tokeitou Gakuen II"] }),
+        [
+          game({
+            name: "Clocktower Gakuen 2",
+            nameNormalized: "clocktower gakuen 2",
+            alternative_names: ["Mayonaka Tokeitou Gakuen 2"],
+          }),
+        ],
+        context()
+      ),
+  ],
 ];
 
 describe("VNDB match characterization", () => {

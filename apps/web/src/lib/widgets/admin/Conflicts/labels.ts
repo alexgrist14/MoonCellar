@@ -17,12 +17,18 @@ export const SOURCE_LABELS: Record<IConflictSource, string> = {
 const EXTERNAL_URLS: Partial<Record<IConflictSource, (id: string) => string>> =
   {
     vndb: (id) => `https://vndb.org/${id}`,
+    hltb: (id) => `https://howlongtobeat.com/game/${id}`,
     ra: (id) => `https://retroachievements.org/game/${id}`,
     steam: (id) => `https://store.steampowered.com/app/${id}`,
   };
 
 export const externalUrl = (source: IConflictSource, externalId: string) =>
   EXTERNAL_URLS[source]?.(externalId) ?? null;
+
+const SERVER_BLOCKED_IMAGE_HOSTS = ["howlongtobeat.com"];
+
+export const isServerBlockedImage = (src: string) =>
+  SERVER_BLOCKED_IMAGE_HOSTS.some((host) => new URL(src).hostname === host);
 
 export const CONFLICT_SOURCES = ConflictSourceSchema.options;
 
@@ -48,7 +54,7 @@ export const REASON_LABELS: Record<IMatchReason, string> = {
 const CREATES_GAME: Record<IConflictSource, boolean> = {
   vndb: true,
   igdb: true,
-  hltb: false,
+  hltb: true,
   ra: false,
   steam: true,
 };

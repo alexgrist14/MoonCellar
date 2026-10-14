@@ -43,6 +43,10 @@ export interface IMatchProfile {
     distinctive: number;
     strong: number;
     weak: number;
+    variant?: number;
+    alternative?: number;
+    minimum?: number;
+    fuzzy?: number;
     fuzzySimilarity: number;
   };
   company: { role: number; any: number; mismatch: number };
@@ -57,6 +61,7 @@ export interface IMatchProfile {
   description: { minTokens: number; minShared: number; similarity: number };
   typeScore: (subjectType: string, gameType: string) => number;
   reviewCustomGames: boolean;
+  requireEvidence?: boolean;
 }
 
 export interface IMatchContext {

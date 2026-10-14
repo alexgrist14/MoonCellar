@@ -398,4 +398,63 @@ describe("ConflictsService", () => {
     expect(op.updateOne.update.$set.entries).toEqual(entries);
     expect(insertMany).toHaveBeenCalledTimes(1);
   });
+
+  it("rewrites the scored candidates of a games conflict and keeps the ones an admin added", async () => {
+    const bulkWrite = jest.fn().mockResolvedValue({});
+    const added = {
+      gameId: new Types.ObjectId(),
+      slug: "akira-1988",
+      name: "Akira",
+      score: 0,
+      isManual: true,
+    };
+    const service = createService({
+      conflictsModel: {
+        ...idleModel,
+        find: () => query([{ externalId: "8780", candidates: [added] }]),
+        bulkWrite,
+        insertMany: jest.fn().mockResolvedValue([]),
+      },
+    });
+    const breakdown = {
+      title: 4,
+      companies: 2,
+      date: 3,
+      platforms: 1,
+      genre: 0,
+      type: 0,
+    };
+
+    await service.refresh("steam", [
+      {
+        externalId: "8780",
+        externalName: "Akira",
+        reason: "unverified-title",
+        candidates: [
+          {
+            game: {
+              _id: "507f1f77bcf86cd799439011",
+              slug: "akira",
+              name: "Akira",
+            } as never,
+            score: 10,
+            breakdown,
+            dateSignal: "confirms",
+            descriptionSignal: "unknown",
+            hasCompanyMismatch: false,
+            isDistinctiveTitle: true,
+            isMainTitleMatch: true,
+            isCorroborated: true,
+            isContradicted: false,
+          },
+        ],
+      },
+    ]);
+
+    const [[[op]]] = bulkWrite.mock.calls;
+    expect(op.updateOne.update.$set.candidates).toEqual([
+      added,
+      expect.objectContaining({ slug: "akira", score: 10, breakdown }),
+    ]);
+  });
 });

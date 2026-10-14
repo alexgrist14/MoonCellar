@@ -91,8 +91,13 @@ const canonicalRomaji = (normalized: string): string => {
   }
 
   return value
-    .replace(/ou/g, "o")
-    .replace(/([aeiou])\1+/g, "$1")
+    .split(" ")
+    .map((token) =>
+      isRomanNumeral(token)
+        ? token
+        : token.replace(/ou/g, "o").replace(/([aeiou])\1+/g, "$1")
+    )
+    .join(" ")
     .replace(/\s+/g, " ")
     .trim();
 };
@@ -360,3 +365,47 @@ const EDITION_PATTERNS: RegExp[] = [
   // HLTB sometimes suffixes DLC entries with "DLC".
   /\bdlc\b/g,
 ];
+
+const ROMAN_NUMERAL_PATTERN =
+  /^m{0,3}(cm|cd|d?c{0,3})(xc|xl|l?x{0,3})(ix|iv|v?i{0,3})$/;
+
+const ROMAN_DIGITS: Record<string, number> = {
+  i: 1,
+  v: 5,
+  x: 10,
+  l: 50,
+  c: 100,
+  d: 500,
+  m: 1000,
+};
+
+const romanToNumber = (token: string) =>
+  [...token].reduce((total, char, index) => {
+    const value = ROMAN_DIGITS[char];
+    const next = ROMAN_DIGITS[token[index + 1]] ?? 0;
+
+    return total + (value < next ? -value : value);
+  }, 0);
+
+const isRomanNumeral = (token: string): boolean =>
+  token.length > 1 && ROMAN_NUMERAL_PATTERN.test(token);
+
+export const replaceRomanNumerals = (
+  normalizedName: string,
+  { minLength = 1, max = Infinity } = {}
+) =>
+  normalizedName
+    .split(" ")
+    .map((token) => {
+      if (token.length < minLength || !ROMAN_NUMERAL_PATTERN.test(token)) {
+        return token;
+      }
+
+      const value = romanToNumber(token);
+
+      return value <= max ? String(value) : token;
+    })
+    .join(" ");
+
+export const normalizeTitleWithNumerals = (value: string): string =>
+  replaceRomanNumerals(normalizeTitle(value), { minLength: 2, max: 20 });

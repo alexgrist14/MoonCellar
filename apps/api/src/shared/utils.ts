@@ -22,14 +22,15 @@ export const getRandomArray = (array: unknown[], count: number) => {
   return randomIndices.map((index) => array[index]);
 };
 
-export const normalizeGameName = (value: string) =>
+export const decodeHtml = (value: string) =>
   value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/&/g, " and ")
-    .replace(/['\u2019]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
     .trim();
 
 export const normalizeSearchText = (value: string) =>
@@ -41,37 +42,6 @@ export const normalizeSearchText = (value: string) =>
     .toLowerCase()
     .replace(/[^\p{L}\p{N}]+/gu, " ")
     .trim();
-
-const ROMAN_NUMERAL_PATTERN =
-  /^m{0,3}(cm|cd|d?c{0,3})(xc|xl|l?x{0,3})(ix|iv|v?i{0,3})$/;
-
-const ROMAN_DIGITS: Record<string, number> = {
-  i: 1,
-  v: 5,
-  x: 10,
-  l: 50,
-  c: 100,
-  d: 500,
-  m: 1000,
-};
-
-const romanToNumber = (token: string) =>
-  [...token].reduce((total, char, index) => {
-    const value = ROMAN_DIGITS[char];
-    const next = ROMAN_DIGITS[token[index + 1]] ?? 0;
-
-    return total + (value < next ? -value : value);
-  }, 0);
-
-export const replaceRomanNumerals = (normalizedName: string) =>
-  normalizedName
-    .split(" ")
-    .map((token) =>
-      token && ROMAN_NUMERAL_PATTERN.test(token)
-        ? String(romanToNumber(token))
-        : token
-    )
-    .join(" ");
 
 export const toSlug = (value: string) =>
   value

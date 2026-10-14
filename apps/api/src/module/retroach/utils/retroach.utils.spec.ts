@@ -1,6 +1,7 @@
 import {
   matchGameByTitle,
   matchPlatformToConsole,
+  matchRaSets,
   pickExactTitleMatch,
   rankGamesByTitle,
 } from "./retroach.utils";
@@ -193,5 +194,86 @@ describe("rankGamesByTitle", () => {
         ],
       ])
     );
+  });
+});
+
+describe("matchRaSets", () => {
+  const NES = "nes-platform";
+  const set = (id: number, title: string) => ({
+    id,
+    title,
+    consoleId: 7,
+    consoleName: "NES/Famicom",
+    numAchievements: 20,
+  });
+  const game = (id: string, name: string, extra: object = {}) => ({
+    _id: id,
+    name,
+    platformIds: [NES],
+    ...extra,
+  });
+  const run = (
+    raGames: ReturnType<typeof set>[],
+    games: ReturnType<typeof game>[],
+    resolutions = new Map<string, { status: string; winners: string[] }>()
+  ) =>
+    matchRaSets({
+      raGames,
+      games,
+      platforms: [{ _id: NES, raId: 7 }],
+      resolutions,
+    });
+  const linked = (result: ReturnType<typeof run>) =>
+    Object.fromEntries(
+      Object.entries(result.gameIds).map(([id, sets]) => [
+        id,
+        sets.map(({ gameId }) => gameId),
+      ])
+    );
+
+  it("links a set to the best title on its console", () => {
+    const result = run(
+      [set(1, "Mega Man 2")],
+      [game("a", "Mega Man 2"), game("b", "Bomberman")]
+    );
+
+    expect(linked(result)).toEqual({ a: [1] });
+    expect(result.ambiguous).toEqual([]);
+  });
+
+  it("lets an exact title break a near tie, and sends a tie without one to review", () => {
+    const tied = [game("a", "Contra Force"), game("b", "Contra Forces")];
+
+    expect(linked(run([set(1, "Contra Force")], tied))).toEqual({ a: [1] });
+    expect(
+      run([set(2, "Contra For")], tied).ambiguous.map(({ raGame }) => raGame.id)
+    ).toEqual([2]);
+  });
+
+  it("follows a resolved conflict and skips a pending one", () => {
+    const result = run(
+      [set(1, "Mega Man 2"), set(2, "Bomberman")],
+      [game("a", "Mega Man 2"), game("b", "Bomberman")],
+      new Map([
+        ["1", { status: "resolved", winners: ["b"] }],
+        ["2", { status: "pending", winners: [] }],
+      ])
+    );
+
+    expect(linked(result)).toEqual({ b: [1] });
+  });
+
+  it("keeps a pinned set on its game when RA did not list it this run", () => {
+    const result = run(
+      [set(1, "Mega Man 2")],
+      [
+        game("a", "Mega Man 2", {
+          retroachievements: [{ gameId: 9, consoleId: 7 }],
+        }),
+      ],
+      new Map([["9", { status: "resolved", winners: ["a"] }]])
+    );
+
+    expect(linked(result)).toEqual({ a: [1, 9] });
   });
 });

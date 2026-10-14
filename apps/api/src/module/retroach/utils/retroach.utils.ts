@@ -1,8 +1,13 @@
 import * as fuzzysort from "fuzzysort";
 import type { GameList } from "@retroachievements/api";
-import type { IRetroachievementsField } from "@mooncellar/schemas";
+import type {
+  IMatchReason,
+  IRetroachievementsField,
+} from "@mooncellar/schemas";
+import type { IScoredCandidate } from "../../games/matching/game-matcher.types";
 import { getFormattedTitle } from "../../../shared/utils";
 import {
+  RA_AMBIGUITY_GAP,
   RA_CONFLICT_CANDIDATES_LIMIT,
   RA_NAME_MATCH_THRESHOLD,
 } from "../constants/sync";
@@ -82,6 +87,170 @@ export const matchGameByTitle = <T extends MatchableGame>(
   threshold = RA_NAME_MATCH_THRESHOLD
 ): T | null =>
   rankGamesByTitle(raTitle, candidates, threshold)[0]?.game ?? null;
+
+type TId = { toString(): string };
+
+export type TRaCandidate = MatchableGame & {
+  _id: TId;
+  platformIds?: TId[];
+  retroachievements?: IRetroachievementsField[] | null;
+};
+
+export type TRaRanked<T> = {
+  game: T;
+  score: number;
+  matchedTitle: string;
+  scored?: IScoredCandidate;
+};
+
+export type TRaPick<T> = {
+  matches: T[];
+  ranked: TRaRanked<T>[];
+  reason?: IMatchReason | null;
+};
+
+export type TRaPicker = <T extends TRaCandidate>(
+  raGame: TRaSet,
+  candidates: T[]
+) => TRaPick<T>;
+
+export const pickRaMatchesByTitle: TRaPicker = (
+  { title: raTitle },
+  candidates
+) => {
+  const ranked = rankGamesByTitle(raTitle, candidates);
+  const [best, runnerUp] = ranked;
+
+  if (!best) return { matches: [], ranked };
+
+  if (
+    runnerUp &&
+    runnerUp.game._id.toString() !== best.game._id.toString() &&
+    best.score - runnerUp.score < RA_AMBIGUITY_GAP
+  ) {
+    const exact = pickExactTitleMatch(raTitle, ranked);
+
+    return { matches: exact ? [exact] : [], ranked };
+  }
+
+  return { matches: [best.game], ranked };
+};
+
+export type TRaResolution = { status: string; winners: TId[] };
+
+export const matchRaSets = <T extends TRaCandidate>({
+  raGames,
+  games,
+  platforms,
+  resolutions,
+  pick = pickRaMatchesByTitle,
+}: {
+  raGames: TRaSet[];
+  games: T[];
+  platforms: { _id: TId; raId?: number | null }[];
+  resolutions: Map<string, TRaResolution>;
+  pick?: TRaPicker;
+}) => {
+  const platformsByRaId = new Map<number, string[]>();
+  for (const platform of platforms) {
+    if (platform.raId == null) continue;
+    const list = platformsByRaId.get(platform.raId);
+    const id = platform._id.toString();
+    list ? list.push(id) : platformsByRaId.set(platform.raId, [id]);
+  }
+
+  const gamesByPlatformId = new Map<string, T[]>();
+  for (const game of games) {
+    for (const platformId of game.platformIds ?? []) {
+      const key = platformId.toString();
+      const list = gamesByPlatformId.get(key);
+      list ? list.push(game) : gamesByPlatformId.set(key, [game]);
+    }
+  }
+
+  const gameIds: Record<string, IRetroachievementsField[]> = {};
+  const ambiguous: {
+    raGame: TRaSet;
+    ranked: TRaRanked<T>[];
+    reason?: IMatchReason | null;
+  }[] = [];
+
+  for (const raGame of raGames) {
+    const platformIds = platformsByRaId.get(raGame.consoleId);
+    if (!platformIds?.length) continue;
+
+    const seenIds = new Set<string>();
+    const candidates: T[] = [];
+
+    for (const platformId of platformIds) {
+      for (const game of gamesByPlatformId.get(platformId) ?? []) {
+        const id = game._id.toString();
+        if (!seenIds.has(id)) {
+          seenIds.add(id);
+          candidates.push(game);
+        }
+      }
+    }
+
+    const resolution = resolutions.get(String(raGame.id));
+    let matches: { _id: TId }[] = [];
+
+    if (resolution) {
+      if (resolution.status !== "resolved") continue;
+
+      matches = resolution.winners.map((_id) => ({ _id }));
+    } else {
+      const picked = pick(raGame, candidates);
+
+      if (!picked.matches.length) {
+        if (picked.ranked.length) {
+          ambiguous.push({
+            raGame,
+            ranked: picked.ranked,
+            reason: picked.reason,
+          });
+        }
+        continue;
+      }
+
+      matches = picked.matches;
+    }
+
+    for (const match of matches) {
+      const id = match._id.toString();
+      const value = toRaSetEntry(raGame);
+      const list = gameIds[id];
+
+      list ? list.push(value) : (gameIds[id] = [value]);
+    }
+  }
+
+  const seenRaIds = new Set(raGames.map(({ id }) => id));
+
+  for (const game of games) {
+    const id = game._id.toString();
+    const list = gameIds[id];
+
+    if (!list) continue;
+
+    for (const entry of game.retroachievements ?? []) {
+      const resolution = resolutions.get(String(entry.gameId));
+      const isPinnedHere =
+        resolution?.status === "resolved" &&
+        resolution.winners.some((winner) => winner.toString() === id);
+
+      if (
+        isPinnedHere &&
+        !seenRaIds.has(entry.gameId) &&
+        !list.some(({ gameId }) => gameId === entry.gameId)
+      ) {
+        list.push(entry);
+      }
+    }
+  }
+
+  return { gameIds, ambiguous };
+};
 
 export type NamedConsole = { name: string };
 

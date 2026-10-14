@@ -46,7 +46,8 @@ import {
   isHttpUrl,
 } from "../../../shared/remote-image";
 import { toReleaseDate } from "../../../shared/release-date";
-import { normalizeGameName, uniqueSlug } from "../../../shared/utils";
+import { uniqueSlug } from "../../../shared/utils";
+import { normalizeTitle } from "../utils/title-match.utils";
 import { FRONT_URL, RA_MAIN_USER_NAME } from "../../../shared/constants";
 import { VNDB_WORLDWIDE_REGION } from "../constants/vndb";
 import {
@@ -724,7 +725,7 @@ export class GameAiDraftService implements OnModuleInit {
   private async findGameIds(names: string[]) {
     const ids = await Promise.all(
       names.slice(0, 20).map((name) =>
-        this.Games.findOne({ nameNormalized: normalizeGameName(name) })
+        this.Games.findOne({ nameNormalized: normalizeTitle(name) })
           .sort({ "igdb.total_rating_count": -1 })
           .select("_id")
           .lean()

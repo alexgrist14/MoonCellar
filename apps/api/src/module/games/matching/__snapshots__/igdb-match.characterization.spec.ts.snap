@@ -1,0 +1,416 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`IGDB match characterization Roman numeral against an Arabic one 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 0,
+        "platforms": 1,
+        "title": 1,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Lanterns of the Drowned Isles 3",
+      "score": 8,
+    },
+  ],
+  "isConfirmed": false,
+  "reason": "weak-title",
+  "verdict": "ambiguous",
+  "winner": null,
+}
+`;
+
+exports[`IGDB match characterization candidate linked to another IGDB game is dropped first 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 0,
+        "genre": 0,
+        "platforms": 1,
+        "title": 4,
+        "type": 1,
+      },
+      "dateSignal": "unknown",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Lanterns of the Drowned Isles",
+      "score": 8,
+    },
+  ],
+  "isConfirmed": false,
+  "reason": null,
+  "verdict": "matched",
+  "winner": "Lanterns of the Drowned Isles",
+}
+`;
+
+exports[`IGDB match characterization category without game_type 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 0,
+        "platforms": 1,
+        "title": 4,
+        "type": -1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Lanterns of the Drowned Isles",
+      "score": 9,
+    },
+  ],
+  "isConfirmed": true,
+  "reason": null,
+  "verdict": "matched",
+  "winner": "Lanterns of the Drowned Isles",
+}
+`;
+
+exports[`IGDB match characterization edition subtitle against the base game 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 0,
+        "platforms": 1,
+        "title": 1,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Lanterns of the Drowned Isles",
+      "score": 8,
+    },
+  ],
+  "isConfirmed": false,
+  "reason": "weak-title",
+  "verdict": "ambiguous",
+  "winner": null,
+}
+`;
+
+exports[`IGDB match characterization exact title confirmed by date and developer 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 0,
+        "platforms": 1,
+        "title": 4,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Lanterns of the Drowned Isles",
+      "score": 11,
+    },
+  ],
+  "isConfirmed": true,
+  "reason": null,
+  "verdict": "matched",
+  "winner": "Lanterns of the Drowned Isles",
+}
+`;
+
+exports[`IGDB match characterization exact title without companies is not confirmed 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 0,
+        "date": 3,
+        "genre": 0,
+        "platforms": 1,
+        "title": 4,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Lanterns of the Drowned Isles",
+      "score": 9,
+    },
+  ],
+  "isConfirmed": false,
+  "reason": null,
+  "verdict": "matched",
+  "winner": "Lanterns of the Drowned Isles",
+}
+`;
+
+exports[`IGDB match characterization hand-made game goes to review 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 0,
+        "platforms": 1,
+        "title": 4,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Lanterns of the Drowned Isles",
+      "score": 11,
+    },
+  ],
+  "isConfirmed": false,
+  "reason": "custom-game",
+  "verdict": "ambiguous",
+  "winner": null,
+}
+`;
+
+exports[`IGDB match characterization match only through an alternative name 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 0,
+        "platforms": 1,
+        "title": 4,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Drowned Isles",
+      "score": 11,
+    },
+  ],
+  "isConfirmed": true,
+  "reason": null,
+  "verdict": "matched",
+  "winner": "Drowned Isles",
+}
+`;
+
+exports[`IGDB match characterization no candidates 1`] = `
+{
+  "candidates": [],
+  "isConfirmed": false,
+  "reason": null,
+  "verdict": "absent",
+  "winner": null,
+}
+`;
+
+exports[`IGDB match characterization platform mismatch 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 0,
+        "platforms": -1,
+        "title": 4,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Lanterns of the Drowned Isles",
+      "score": 9,
+    },
+  ],
+  "isConfirmed": true,
+  "reason": null,
+  "verdict": "matched",
+  "winner": "Lanterns of the Drowned Isles",
+}
+`;
+
+exports[`IGDB match characterization port against the main game 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 0,
+        "platforms": 1,
+        "title": 4,
+        "type": -1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Lanterns of the Drowned Isles",
+      "score": 9,
+    },
+  ],
+  "isConfirmed": true,
+  "reason": null,
+  "verdict": "matched",
+  "winner": "Lanterns of the Drowned Isles",
+}
+`;
+
+exports[`IGDB match characterization release dates contradict 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": -4,
+        "genre": 0,
+        "platforms": 1,
+        "title": 4,
+        "type": 1,
+      },
+      "dateSignal": "contradicts",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Lanterns of the Drowned Isles",
+      "score": 4,
+    },
+  ],
+  "isConfirmed": false,
+  "reason": "date-contradicts",
+  "verdict": "ambiguous",
+  "winner": null,
+}
+`;
+
+exports[`IGDB match characterization shared title is not distinctive 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 0,
+        "date": 0,
+        "genre": 0,
+        "platforms": 1,
+        "title": 2,
+        "type": 1,
+      },
+      "dateSignal": "unknown",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Lanterns of the Drowned Isles",
+      "score": 4,
+    },
+  ],
+  "isConfirmed": false,
+  "reason": "unverified-title",
+  "verdict": "ambiguous",
+  "winner": null,
+}
+`;
+
+exports[`IGDB match characterization single-letter numeral stays a word 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 0,
+        "platforms": 1,
+        "title": 0,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Mega Rocket 10",
+      "score": 7,
+    },
+  ],
+  "isConfirmed": false,
+  "reason": "weak-title",
+  "verdict": "ambiguous",
+  "winner": null,
+}
+`;
+
+exports[`IGDB match characterization two identical candidates compete 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 0,
+        "platforms": 1,
+        "title": 2,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Lanterns of the Drowned Isles",
+      "score": 9,
+    },
+    {
+      "breakdown": {
+        "companies": 2,
+        "date": 3,
+        "genre": 0,
+        "platforms": 1,
+        "title": 2,
+        "type": 1,
+      },
+      "dateSignal": "confirms",
+      "descriptionSignal": "match",
+      "hasCompanyMismatch": false,
+      "name": "Lanterns of the Drowned Isles",
+      "score": 9,
+    },
+  ],
+  "isConfirmed": false,
+  "reason": "competing-candidates",
+  "verdict": "ambiguous",
+  "winner": null,
+}
+`;
+
+exports[`IGDB match characterization unrelated candidate below threshold 1`] = `
+{
+  "candidates": [
+    {
+      "breakdown": {
+        "companies": 0,
+        "date": -4,
+        "genre": 0,
+        "platforms": 1,
+        "title": 0,
+        "type": 1,
+      },
+      "dateSignal": "contradicts",
+      "descriptionSignal": "mismatch",
+      "hasCompanyMismatch": false,
+      "name": "Neon Garage Rivals",
+      "score": -2,
+    },
+  ],
+  "isConfirmed": false,
+  "reason": "below-threshold",
+  "verdict": "absent",
+  "winner": null,
+}
+`;

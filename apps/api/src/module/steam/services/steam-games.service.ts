@@ -35,13 +35,12 @@ import { runCronExclusive, withDbLock } from "../../../shared/cron-mutex";
 import { extractSteamAppInfo, mergeSteamStore } from "../utils/steam.utils";
 import {
   buildSteamGamePayload,
-  decodeHtml,
   parseSteamDate,
   STEAM_PLATFORM_SLUGS,
   type ISteamAppDetails,
 } from "../utils/steam-game-payload.utils";
 import { GamesService } from "../../games/services/games.service";
-import { sleep, uniqueSlug } from "../../../shared/utils";
+import { decodeHtml, sleep, uniqueSlug } from "../../../shared/utils";
 import {
   STEAM_GAMES_CRON,
   STEAM_GAMES_CRON_OPTIONS,
@@ -488,6 +487,7 @@ export class SteamGamesService implements OnModuleInit {
       postponed: [],
       dismissed: [],
     };
+    let rescored: IConflictRecord[] = [];
     let processed = 0;
     const flush = async () => {
       if (!isDryRun) {
@@ -498,12 +498,15 @@ export class SteamGamesService implements OnModuleInit {
         for (const status of ["pending", "postponed", "dismissed"] as const) {
           await this.conflicts.setStatus("steam", byStatus[status], status);
         }
+
+        await this.conflicts.refresh("steam", rescored);
       }
 
       linkOps = [];
       linked = [];
       snapshots = [];
       byStatus = { pending: [], postponed: [], dismissed: [] };
+      rescored = [];
       this.logger.info(
         `Steam conflicts verify progress: ${processed}/${pending.length} ${JSON.stringify(summary)}`
       );
@@ -602,10 +605,25 @@ export class SteamGamesService implements OnModuleInit {
           });
           summary.linked += 1;
         } else {
+          const manualIds = new Set(
+            (conflict.candidates ?? [])
+              .filter(({ isManual }) => isManual)
+              .map(({ gameId }) => String(gameId))
+          );
+
           byStatus.pending.push(conflict.externalId);
           snapshots.push({
             externalId: conflict.externalId,
             externalData: { ...snapshot, recheckAfter: null },
+          });
+          rescored.push({
+            externalId: conflict.externalId,
+            externalName: app.name,
+            reason: result.reason ?? conflict.reason ?? null,
+            candidates: result.candidates.map((candidate) => ({
+              ...candidate,
+              isManual: manualIds.has(String(candidate.game._id)),
+            })),
           });
           summary.kept += 1;
         }

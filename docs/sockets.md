@@ -517,7 +517,7 @@ that cancels out and deletes it, or a log removed by its owner.
 Admins resolving parser conflicts see each other's decisions live. When one admin matches or skips a
 conflict, every other open Conflicts tab marks it as decided, and an admin who has that conflict
 open gets a toast and loses the Skip and Match buttons. A conflict is identified by its `source`
-(`vndb`, `igdb`, `hltb`, `ra`, `steam`) and its `externalId` — the entry in that source, or for `hltb` the catalogue game.
+(`vndb`, `igdb`, `hltb`, `ra`, `steam`) and its `externalId` — the entry in that source (for `hltb` the HLTB game id).
 
 | | |
 |---|---|

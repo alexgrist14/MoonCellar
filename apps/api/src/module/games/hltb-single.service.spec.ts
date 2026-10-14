@@ -1,4 +1,5 @@
 import { BadRequestException, NotFoundException } from "@nestjs/common";
+import type { IHltbField } from "@mooncellar/schemas";
 import mongoose from "mongoose";
 import { HltbService } from "./services/hltb.service";
 import { mapHltbEntryToField, mapRawHltbEntry } from "./utils/hltb.utils";
@@ -36,13 +37,17 @@ const buildEntry = (overrides: Record<string, unknown> = {}) => ({
 const buildService = (
   game: unknown,
   searchResults: unknown[],
-  byId: unknown = { success: false, data: null }
+  byId: unknown = { success: false, data: null },
+  parent: unknown = null
 ) => {
   const updateOne = jest.fn().mockResolvedValue({ modifiedCount: 1 });
   const findOne = jest.fn().mockReturnValue({
     select: () => ({ lean: () => Promise.resolve(game) }),
   });
-  const gamesModel = { findOne, updateOne } as never;
+  const findById = jest.fn().mockReturnValue({
+    select: () => ({ lean: () => Promise.resolve(parent) }),
+  });
+  const gamesModel = { findOne, findById, updateOne } as never;
   const platformsModel = {
     find: () => ({
       select: () => ({
@@ -61,16 +66,18 @@ const buildService = (
   const metrics = { recordGames: jest.fn() } as never;
 
   const conflicts = {
-    refresh: jest.fn(),
+    record: jest.fn(),
     register: jest.fn(),
     removeForGame: jest.fn().mockResolvedValue(0),
   };
+  const gamesService = { fillEmptyFields: jest.fn().mockResolvedValue([]) };
   const service = new HltbService(
     gamesModel,
     platformsModel,
     logger,
     metrics,
-    conflicts as never
+    conflicts as never,
+    gamesService as never
   );
 
   const getById = jest.fn().mockResolvedValue(byId);
@@ -84,7 +91,16 @@ const buildService = (
     getById,
   };
 
-  return { service, findOne, updateOne, getById, search, conflicts };
+  return {
+    service,
+    findOne,
+    findById,
+    updateOne,
+    getById,
+    search,
+    conflicts,
+    gamesService,
+  };
 };
 
 describe("HltbService.syncGame", () => {
@@ -115,6 +131,27 @@ describe("HltbService.syncGame", () => {
     await service.syncGame({ slug: "super-castlevania-iv" });
 
     expect(findOne).toHaveBeenCalledWith({ slug: "super-castlevania-iv" });
+  });
+
+  it("gives an edition its original's link when nothing matches it", async () => {
+    const parentId = new mongoose.Types.ObjectId();
+    const { service, findById, updateOne, getById, conflicts } = buildService(
+      buildGame({
+        name: "Super Castlevania IV: Collector's Box",
+        relatedGames: { version_parent: parentId },
+      }),
+      [],
+      { success: true, data: buildEntry() },
+      { _id: parentId, hltb: { hltbId: "6910" } }
+    );
+
+    const result = await service.syncGame({ gameId: GAME_ID });
+
+    expect(findById).toHaveBeenCalledWith(String(parentId));
+    expect(getById).toHaveBeenCalledWith(6910);
+    expect(result.status).toBe("updated");
+    expect(updateOne.mock.calls[0][1].$set.hltb.hltbId).toBe("6910");
+    expect(conflicts.removeForGame).toHaveBeenCalled();
   });
 
   it("drops stale times when no verified match is found", async () => {
@@ -184,14 +221,15 @@ describe("HltbService.syncGame", () => {
     const result = await service.syncGame({ gameId: GAME_ID });
 
     expect(result.status).toBe("not_found");
-    const [[source, [record]]] = conflicts.refresh.mock.calls;
+    const [[source, records]] = conflicts.record.mock.calls;
     expect(source).toBe("hltb");
-    expect(record.entries.map(({ id }: { id: string }) => id)).toEqual([
-      "10379",
-    ]);
-    expect(record.entries[0].cover).toBe(
+    expect(
+      records.map(({ externalId }: { externalId: string }) => externalId)
+    ).toEqual(["10379"]);
+    expect(records[0].externalData.imageUrl).toBe(
       "https://howlongtobeat.com/games/10379_Titan_Quest.jpg"
     );
+    expect(records[0].candidates[0].game.slug).toBe("super-castlevania-iv");
   });
 
   it("rejects a malformed game id", async () => {
@@ -241,7 +279,7 @@ describe("HltbService.syncGame with an explicit HLTB id", () => {
     expect(conflicts.removeForGame).toHaveBeenCalledWith(
       "hltb",
       new mongoose.Types.ObjectId(GAME_ID),
-      { externalIds: [GAME_ID] }
+      { externalIds: ["4242"] }
     );
   });
 
@@ -337,7 +375,10 @@ describe("HltbService.syncAllGames", () => {
       );
     });
 
-  const buildSync = (games: Record<string, unknown>[]) => {
+  const buildSync = (
+    games: Record<string, unknown>[],
+    staleConflictIds: string[] = []
+  ) => {
     const bulkWrite = jest.fn().mockResolvedValue({});
     const locks = {
       updateOne: jest.fn().mockResolvedValue({}),
@@ -346,13 +387,20 @@ describe("HltbService.syncAllGames", () => {
     const gamesModel = {
       db: { collection: () => locks },
       bulkWrite,
-      find: () => ({
+      find: (filter: Record<string, unknown>) => ({
         select: () => ({
-          lean: () => ({
-            cursor: async function* () {
-              yield* games;
-            },
-          }),
+          lean: () =>
+            filter["hltb.hltbId"]
+              ? Promise.resolve(
+                  games.filter(
+                    (game) => (game.hltb as IHltbField | undefined)?.hltbId
+                  )
+                )
+              : {
+                  cursor: async function* () {
+                    yield* games;
+                  },
+                },
         }),
       }),
     } as never;
@@ -368,6 +416,7 @@ describe("HltbService.syncAllGames", () => {
       register: jest.fn(),
       refresh: jest.fn().mockResolvedValue(undefined),
       dismissUndecided: jest.fn().mockResolvedValue(0),
+      findUndecidedIds: jest.fn().mockResolvedValue(staleConflictIds),
     };
     const service = new HltbService(
       gamesModel,
@@ -380,7 +429,8 @@ describe("HltbService.syncAllGames", () => {
         debug: jest.fn(),
       } as never,
       { recordGames: jest.fn() } as never,
-      conflicts as never
+      conflicts as never,
+      { fillEmptyFields: jest.fn() } as never
     );
 
     return { service, bulkWrite, conflicts };
@@ -412,11 +462,10 @@ describe("HltbService.syncAllGames", () => {
       _id: new mongoose.Types.ObjectId(),
       name: "Nothing Like It",
     });
-    const { service, bulkWrite, conflicts } = buildSync([
-      matched,
-      unsure,
-      missing,
-    ]);
+    const { service, bulkWrite, conflicts } = buildSync(
+      [matched, unsure, missing],
+      [String(missing._id), "700001"]
+    );
 
     const result = await service.syncAllGames();
 
@@ -436,9 +485,12 @@ describe("HltbService.syncAllGames", () => {
       expect.any(String)
     );
     const [[, [record]]] = conflicts.refresh.mock.calls;
-    expect(record.externalId).toBe(String(unsure._id));
+    expect(record.externalId).toBe("700001");
+    expect(record.externalName).toBe("Mixtape");
+    expect(
+      record.candidates.map(({ game }: { game: { _id: unknown } }) => game._id)
+    ).toEqual([unsure._id]);
     expect(conflicts.dismissUndecided).toHaveBeenCalledWith("hltb", [
-      String(matched._id),
       String(missing._id),
     ]);
   });
@@ -491,8 +543,176 @@ describe("HltbService.syncAllGames", () => {
       hltbId: "6910",
       mainStory: 6,
     });
-    expect(conflicts.dismissUndecided).toHaveBeenCalledWith("hltb", [
-      String(linked._id),
+    expect(conflicts.dismissUndecided).toHaveBeenCalledWith("hltb", []);
+  });
+
+  it("gives an edition its original's link when nothing in the catalogue matches it", async () => {
+    serveCatalogue([[rawEntry()]]);
+    const original = buildGame({
+      hltb: {
+        ...mapHltbEntryToField(mapRawHltbEntry(rawEntry() as never)),
+        updatedAt: "2020-01-01T00:00:00.000Z",
+      },
+    });
+    const edition = buildGame({
+      _id: new mongoose.Types.ObjectId(),
+      name: "Akumajou Dracula Collector's Box",
+      relatedGames: { version_parent: original._id },
+    });
+    const addon = buildGame({
+      _id: new mongoose.Types.ObjectId(),
+      name: "Akumajou Dracula Soundtrack",
+      type: "DLC",
+      relatedGames: { version_parent: original._id },
+    });
+    const { service, bulkWrite } = buildSync([original, edition, addon]);
+
+    const result = await service.syncAllGames();
+
+    expect(result).toMatchObject({ unchanged: 1, updated: 1, notFound: 1 });
+    const [inherited] = ops(bulkWrite).filter(
+      (op: { updateOne: { filter: { _id: unknown } } }) =>
+        op.updateOne.filter._id === edition._id
+    );
+    expect(inherited.updateOne.update.$set.hltb.hltbId).toBe("6910");
+  });
+});
+
+describe("HltbService conflict handler", () => {
+  const PAGE = {
+    profile_summary: "A whip-wielding vampire hunter returns.",
+    profile_dev: "Konami",
+    profile_pub: "Konami",
+    release_world: "1991-10-31",
+    profile_steam: 0,
+  };
+  const handlerOf = (built: ReturnType<typeof buildService>) => {
+    built.service.onModuleInit();
+    return (built.conflicts.register as jest.Mock).mock.calls[0][0];
+  };
+  const snapshot = { ...buildEntry(), id: 6910 };
+
+  it("registers as a games conflict that may link several games", () => {
+    const handler = handlerOf(buildService(buildGame(), []));
+
+    expect(handler).toMatchObject({
+      source: "hltb",
+      direction: "games",
+      isMultiMatch: true,
+    });
+  });
+
+  it("describes the entry with the description and developers of its page", async () => {
+    const built = buildService(buildGame(), [], {
+      success: true,
+      data: buildEntry({ raw: PAGE }),
+    });
+    built.findOne as jest.Mock;
+    const gamesModel = (
+      built.service as unknown as { gamesModel: Record<string, unknown> }
+    ).gamesModel;
+    gamesModel.find = () => ({ select: () => ({ lean: async () => [] }) });
+    const subject = await handlerOf(built).describe("6910", snapshot);
+
+    expect(subject.description).toContain(
+      "A whip-wielding vampire hunter returns."
+    );
+    expect(subject.developers).toEqual(["Konami"]);
+    expect(subject.released).toBe("1991-10-31");
+    expect(subject.url).toBe("https://howlongtobeat.com/game/6910");
+  });
+
+  it("adds a skipped entry as a new game with its page data, once", async () => {
+    const created = {
+      _id: new mongoose.Types.ObjectId(),
+      name: "Super Castlevania IV",
+    };
+    const fresh = buildService(null, [], {
+      success: true,
+      data: buildEntry({ raw: PAGE }),
+    });
+    const linked = buildService(buildGame(), []);
+    const decision = {
+      externalId: "6910",
+      externalName: "Super Castlevania IV",
+      externalData: snapshot,
+      decision: "skip" as const,
+      winner: null,
+      winners: [],
+      winnerEntryId: null,
+    };
+
+    for (const built of [fresh, linked]) {
+      Object.assign(
+        (built.service as unknown as { gamesModel: Record<string, unknown> })
+          .gamesModel,
+        { exists: async () => null }
+      );
+      Object.assign(built.gamesService, {
+        addGame: jest.fn().mockResolvedValue(created),
+      });
+    }
+
+    expect((await handlerOf(fresh).apply([decision])).get("6910")).toBe(
+      created._id
+    );
+    expect(
+      (fresh.gamesService as unknown as { addGame: jest.Mock }).addGame
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: "Super Castlevania IV",
+        slug: "super-castlevania-iv",
+        summary: "A whip-wielding vampire hunter returns.",
+        companies: [expect.objectContaining({ name: "Konami" })],
+        hltb: expect.objectContaining({ hltbId: "6910" }),
+      }),
+      true
+    );
+
+    await handlerOf(linked).apply([decision]);
+    expect(
+      (linked.gamesService as unknown as { addGame: jest.Mock }).addGame
+    ).not.toHaveBeenCalled();
+  });
+
+  it("fills the empty fields of a matched game from the HLTB page", async () => {
+    const built = buildService(buildGame(), [], {
+      success: true,
+      data: buildEntry({ raw: PAGE }),
+    });
+    const gamesModel = (
+      built.service as unknown as { gamesModel: Record<string, unknown> }
+    ).gamesModel;
+    gamesModel.find = () => ({
+      select: () => ({ lean: async () => [buildGame()] }),
+    });
+
+    const applied = await handlerOf(built).apply([
+      {
+        externalId: "6910",
+        externalName: "Super Castlevania IV",
+        externalData: snapshot,
+        decision: "match",
+        winner: new mongoose.Types.ObjectId(GAME_ID),
+        winners: [new mongoose.Types.ObjectId(GAME_ID)],
+        winnerEntryId: null,
+      },
     ]);
+
+    expect(applied.get("6910")).toEqual(new mongoose.Types.ObjectId(GAME_ID));
+    expect(built.updateOne.mock.calls[0][1].$set.hltb.hltbId).toBe("6910");
+    expect(built.gamesService.fillEmptyFields).toHaveBeenCalledWith(
+      new mongoose.Types.ObjectId(GAME_ID),
+      expect.objectContaining({
+        summary: "A whip-wielding vampire hunter returns.",
+        companies: [
+          expect.objectContaining({
+            name: "Konami",
+            developer: true,
+            publisher: true,
+          }),
+        ],
+      })
+    );
   });
 });

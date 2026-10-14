@@ -3,6 +3,7 @@ import Image from "next/image";
 import classNames from "classnames";
 import { IConflictEntry } from "@mooncellar/schemas";
 import { Fact } from "./CandidateCard";
+import { isServerBlockedImage } from "./labels";
 import { Badge } from "@/src/lib/shared/ui/Badge";
 import styles from "./Conflicts.module.scss";
 
@@ -34,7 +35,13 @@ export const EntryCard: FC<IEntryCardProps> = ({
     >
       <div className={styles.candidate__cover}>
         {entry.cover && (
-          <Image src={entry.cover} width={64} height={88} alt={entry.name} />
+          <Image
+            src={entry.cover}
+            width={64}
+            height={88}
+            alt={entry.name}
+            unoptimized={isServerBlockedImage(entry.cover)}
+          />
         )}
       </div>
 

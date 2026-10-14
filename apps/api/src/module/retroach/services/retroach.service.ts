@@ -32,6 +32,7 @@ import { User } from "../../user/schemas/user.schema";
 import { RA_MAIN_USER_NAME } from "../../../shared/constants";
 import type {
   IConflictSubject,
+  IMatchReason,
   IRetroachievementsField,
 } from "@mooncellar/schemas";
 import { ConflictsService } from "../../conflicts/services/conflicts.service";
@@ -42,18 +43,24 @@ import type {
 } from "../../conflicts/types/conflicts.types";
 import type { TMatchCandidate } from "../../games/matching/game-matcher.types";
 import {
-  RA_AMBIGUITY_GAP,
   RA_AWARDS_FETCH_DELAY_MS,
   RA_CONSOLE_BY_PLATFORM_SLUG,
   RA_GAMES_FETCH_DELAY_MS,
   RA_SYNC_CRON,
   RA_SYNC_CRON_OPTIONS,
+  RA_USE_MATCH_ENGINE,
 } from "../constants/sync";
 import {
+  buildRaPlatformMaps,
+  createRaEnginePicker,
+  RA_ENGINE_GAME_FIELDS,
+} from "../utils/ra-match.utils";
+import {
   matchPlatformToConsole,
-  pickExactTitleMatch,
+  matchRaSets,
   RA_MEDIA_URL,
   rankGamesByTitle,
+  type TRaRanked,
   toRaSetEntry,
   type TRaSet,
 } from "../utils/retroach.utils";
@@ -199,7 +206,8 @@ export class RetroachievementsService implements OnModuleInit {
 
   private toConflictRecord(
     raGame: TRaSet,
-    ranked: { game: GameDocument; score: number; matchedTitle: string }[]
+    ranked: TRaRanked<GameDocument>[],
+    reason: IMatchReason | null = "competing-candidates"
   ): IConflictRecord {
     const hasSeveralTitles = raGame.title.includes("|");
 
@@ -207,27 +215,31 @@ export class RetroachievementsService implements OnModuleInit {
       externalId: String(raGame.id),
       externalName: raGame.title,
       externalData: this.toSnapshot(raGame),
-      reason: "competing-candidates",
-      candidates: ranked.map(({ game, score, matchedTitle }) => ({
-        game: game as unknown as TMatchCandidate,
-        matchedTitle: hasSeveralTitles ? matchedTitle : null,
-        score: Math.round(score * 100) / 100,
-        dateSignal: "unknown",
-        breakdown: {
-          title: Math.round(score * 100) / 100,
-          companies: 0,
-          date: 0,
-          platforms: 0,
-          genre: 0,
-          type: 0,
-        },
-        isDistinctiveTitle: false,
-        isMainTitleMatch: false,
-        isCorroborated: false,
-        isContradicted: false,
-        hasCompanyMismatch: false,
-        descriptionSignal: "unknown",
-      })),
+      reason,
+      candidates: ranked.map(({ game, score, matchedTitle, scored }) =>
+        scored
+          ? { ...scored, matchedTitle: hasSeveralTitles ? matchedTitle : null }
+          : {
+              game: game as unknown as TMatchCandidate,
+              matchedTitle: hasSeveralTitles ? matchedTitle : null,
+              score: Math.round(score * 100) / 100,
+              dateSignal: "unknown",
+              breakdown: {
+                title: Math.round(score * 100) / 100,
+                companies: 0,
+                date: 0,
+                platforms: 0,
+                genre: 0,
+                type: 0,
+              },
+              isDistinctiveTitle: false,
+              isMainTitleMatch: false,
+              isCorroborated: false,
+              isContradicted: false,
+              hasCompanyMismatch: false,
+              descriptionSignal: "unknown" as const,
+            }
+      ),
     };
   }
 
@@ -241,17 +253,27 @@ export class RetroachievementsService implements OnModuleInit {
 
     const platforms = await this.platforms
       .find({ raId: raGame.consoleId })
-      .select("_id")
+      .select("_id slug raId")
       .lean();
-    const candidates = await this.games
+    const candidates = (await this.games
       .find({ platformIds: { $in: platforms.map(({ _id }) => _id) } })
-      .select("name slug")
-      .lean();
+      .select(RA_USE_MATCH_ENGINE ? RA_ENGINE_GAME_FIELDS : "name slug")
+      .lean()) as unknown as GameDocument[];
 
-    return this.toConflictRecord(
+    if (!RA_USE_MATCH_ENGINE) {
+      return this.toConflictRecord(
+        raGame,
+        rankGamesByTitle(raGame.title, candidates)
+      ).candidates;
+    }
+
+    const picked = createRaEnginePicker(buildRaPlatformMaps(platforms))(
       raGame,
-      rankGamesByTitle(raGame.title, candidates as GameDocument[])
-    ).candidates;
+      candidates
+    );
+
+    return this.toConflictRecord(raGame, picked.ranked, picked.reason)
+      .candidates;
   }
 
   private async describeConflict(
@@ -488,9 +510,12 @@ export class RetroachievementsService implements OnModuleInit {
     const platforms = await this.platforms.find();
     const games = await this.games
       .find()
-      .select("name slug platformIds retroachievements");
+      .select(
+        RA_USE_MATCH_ENGINE
+          ? RA_ENGINE_GAME_FIELDS
+          : "name slug platformIds retroachievements"
+      );
     const resolutions = await this.conflicts.getResolutions("ra");
-    const ambiguous: IConflictRecord[] = [];
 
     await this.conflicts.setExternalData(
       "ra",
@@ -502,109 +527,18 @@ export class RetroachievementsService implements OnModuleInit {
         }))
     );
 
-    const platformsByRaId = new Map<number, PlatformDocument[]>();
-    for (const platform of platforms) {
-      if (platform.raId == null) continue;
-      const list = platformsByRaId.get(platform.raId);
-      list
-        ? list.push(platform)
-        : platformsByRaId.set(platform.raId, [platform]);
-    }
-
-    const gamesByPlatformId = new Map<string, GameDocument[]>();
-    for (const game of games) {
-      for (const platformId of game.platformIds ?? []) {
-        const key = platformId.toString();
-        const list = gamesByPlatformId.get(key);
-        list ? list.push(game) : gamesByPlatformId.set(key, [game]);
-      }
-    }
-
-    const gameIds: Record<string, IRetroachievementsField[]> = {};
-
-    for (const raGame of raGames) {
-      const parsedPlatforms = platformsByRaId.get(raGame.consoleId);
-      if (!parsedPlatforms?.length) continue;
-
-      const seenIds = new Set<string>();
-      const candidates: GameDocument[] = [];
-
-      for (const platform of parsedPlatforms) {
-        const platformGames =
-          gamesByPlatformId.get(platform._id.toString()) ?? [];
-
-        for (const game of platformGames) {
-          const id = game._id.toString();
-          if (!seenIds.has(id)) {
-            seenIds.add(id);
-            candidates.push(game);
-          }
-        }
-      }
-
-      const resolution = resolutions.get(String(raGame.id));
-      let matches: { _id: mongoose.Types.ObjectId }[] = [];
-
-      if (resolution) {
-        if (resolution.status !== "resolved") continue;
-
-        matches = resolution.winners.map((_id) => ({ _id }));
-      } else {
-        const ranked = rankGamesByTitle(raGame.title, candidates);
-        const [best, runnerUp] = ranked;
-
-        if (!best) continue;
-
-        if (
-          runnerUp &&
-          runnerUp.game._id.toString() !== best.game._id.toString() &&
-          best.score - runnerUp.score < RA_AMBIGUITY_GAP
-        ) {
-          const exact = pickExactTitleMatch(raGame.title, ranked);
-
-          if (!exact) {
-            ambiguous.push(this.toConflictRecord(raGame, ranked));
-            continue;
-          }
-
-          matches = [exact];
-        } else {
-          matches = [best.game];
-        }
-      }
-
-      for (const match of matches) {
-        const id = match._id.toString();
-        const value = toRaSetEntry(raGame);
-        const list = gameIds[id];
-
-        list ? list.push(value) : (gameIds[id] = [value]);
-      }
-    }
-
-    const seenRaIds = new Set(raGames.map(({ id }) => id));
-
-    for (const game of games) {
-      const id = game._id.toString();
-      const list = gameIds[id];
-
-      if (!list) continue;
-
-      for (const entry of game.retroachievements ?? []) {
-        const resolution = resolutions.get(String(entry.gameId));
-        const isPinnedHere =
-          resolution?.status === "resolved" &&
-          resolution.winners.some((winner) => winner.toString() === id);
-
-        if (
-          isPinnedHere &&
-          !seenRaIds.has(entry.gameId) &&
-          !list.some(({ gameId }) => gameId === entry.gameId)
-        ) {
-          list.push(entry);
-        }
-      }
-    }
+    const { gameIds, ambiguous: unsure } = matchRaSets({
+      raGames,
+      games,
+      platforms,
+      resolutions,
+      pick: RA_USE_MATCH_ENGINE
+        ? createRaEnginePicker(buildRaPlatformMaps(platforms))
+        : undefined,
+    });
+    const ambiguous = unsure.map(({ raGame, ranked, reason }) =>
+      this.toConflictRecord(raGame, ranked, reason)
+    );
 
     for (const record of ambiguous) {
       try {

@@ -2,7 +2,11 @@ import {
   buildHltbCatalog,
   findCatalogCandidates,
   findHltbConflict,
+  getEditionParentId,
+  hltbPageFields,
   isSameHltb,
+  mapHltbPlatformIds,
+  readHltbPage,
   mapRawHltbEntry,
   buildHltbSearchQueries,
   buildPlatformKeySet,
@@ -10,7 +14,6 @@ import {
   hasHltbTimes,
   HltbMatchContext,
   mapHltbEntryToField,
-  normalizeHltbTitle,
   pickBestHltbMatch,
   selectHltbMatch,
 } from "./hltb.utils";
@@ -611,6 +614,27 @@ describe("findHltbConflict", () => {
     expect(ids(conflict)).toEqual([1, 4]);
   });
 
+  it("scores each offered entry by title, platform and year", () => {
+    const conflict = findHltbConflict(
+      [
+        { id: 4, name: "The Incredible Hulk", releaseYear: 1994, ...timed },
+        { id: 1, name: "The Incredible Hulk", releaseYear: 2008, ...timed },
+      ],
+      ctx
+    );
+
+    expect(
+      conflict?.breakdowns.map(({ title, date, platforms }) => [
+        title,
+        date,
+        platforms,
+      ])
+    ).toEqual([
+      [4, 3, 0],
+      [4, -4, 0],
+    ]);
+  });
+
   it("leaves out entries without times, which cannot be applied", () => {
     const conflict = findHltbConflict(
       [
@@ -682,6 +706,97 @@ describe("findHltbConflict", () => {
 
     expect(conflict).toBeNull();
   });
+
+  it("does not offer an add-on its base game, only HLTB's add-on entries", () => {
+    const conflict = findHltbConflict(
+      [
+        {
+          id: 1,
+          name: "Coloring Pixels",
+          type: "game",
+          platforms: ["PC"],
+          releaseYear: 2020,
+          ...timed,
+        },
+        {
+          id: 2,
+          name: "Coloring Pixels - Music",
+          type: "dlc",
+          platforms: ["PC"],
+          releaseYear: 2020,
+          ...timed,
+        },
+      ],
+      {
+        name: "Coloring Pixels: Music Pack",
+        platformKeys: buildPlatformKeySet(["PC (Microsoft Windows)"]),
+        years: new Set([2020]),
+        type: "DLC",
+      }
+    );
+
+    expect(ids(conflict)).toEqual([2]);
+  });
+});
+
+describe("HLTB add-ons", () => {
+  const season = {
+    platformKeys: buildPlatformKeySet(["PC (Microsoft Windows)"]),
+    years: new Set([2024]),
+    type: "Season",
+  };
+
+  it("never matches an add-on to the entry of its base game", () => {
+    const entries = [
+      {
+        id: 141133,
+        name: "Call of Duty: Black Ops 6",
+        type: "game",
+        platforms: ["PC"],
+        releaseYear: 2024,
+        mainTime: 8 * 3600,
+      },
+    ];
+    const addon = { ...season, name: "Call of Duty: Black Ops 6 - Season 6" };
+
+    expect(selectHltbMatch(entries, addon)).toBeNull();
+    expect(findHltbConflict(entries, addon)).toBeNull();
+    expect(
+      selectHltbMatch(entries, { ...addon, type: "Main Game" })
+    ).not.toBeNull();
+  });
+
+  it("still matches an add-on that HLTB lists as a game under its own title", () => {
+    const match = selectHltbMatch(
+      [
+        {
+          id: 2024,
+          name: "Championship Manager: Season 00/01",
+          type: "game",
+          platforms: ["PC"],
+          releaseYear: 2024,
+        },
+      ],
+      { ...season, name: "Championship Manager: Season 00/01" }
+    );
+
+    expect(match?.entry.id).toBe(2024);
+  });
+});
+
+describe("getEditionParentId", () => {
+  const relatedGames = { version_parent: "65f0c0ffee0000000000abcd" };
+
+  it("returns the original of an edition", () => {
+    expect(getEditionParentId({ type: "Main Game", relatedGames })).toBe(
+      "65f0c0ffee0000000000abcd"
+    );
+  });
+
+  it("returns nothing for an add-on or a game that is no edition", () => {
+    expect(getEditionParentId({ type: "DLC", relatedGames })).toBeNull();
+    expect(getEditionParentId({ type: "Main Game" })).toBeNull();
+  });
 });
 
 describe("HLTB title comparison", () => {
@@ -724,11 +839,6 @@ describe("HLTB title comparison", () => {
     );
 
     expect(match?.entry.id).toBe(1);
-  });
-
-  it("keeps a single-letter X as a word, not a numeral", () => {
-    expect(normalizeHltbTitle("Mega Man X")).toBe("mega man x");
-    expect(normalizeHltbTitle("Final Fantasy VII")).toBe("final fantasy 7");
   });
 });
 
@@ -831,5 +941,131 @@ describe("HLTB catalogue", () => {
 
     expect(isSameHltb(stored, fresh)).toBe(true);
     expect(isSameHltb(stored, { ...fresh, mainStory: 2 })).toBe(false);
+  });
+});
+
+describe("HLTB game pages", () => {
+  const page = readHltbPage({
+    profile_summary: "Geralt &amp; Ciri <br>hunt the Wild Hunt.",
+    profile_dev: "CD Projekt RED",
+    profile_pub: "CD Projekt, Warner Bros. Interactive Entertainment",
+    release_world: "2015-05-19",
+    profile_steam: 292030,
+  });
+
+  it("reads the description, companies, release date and Steam id", () => {
+    expect(page).toEqual({
+      summary: "Geralt & Ciri hunt the Wild Hunt.",
+      developers: ["CD Projekt RED"],
+      publishers: ["CD Projekt", "Warner Bros. Interactive Entertainment"],
+      released: "2015-05-19",
+      releases: [{ date: "2015-05-19", region: 8 }],
+      steamAppId: 292030,
+    });
+  });
+
+  it("reads HLTB's zero-filled dates as unknown parts", () => {
+    const released = (dates: Record<string, string>) =>
+      readHltbPage(dates).released;
+
+    expect(released({ release_world: "0000-00-00" })).toBeNull();
+    expect(released({ release_world: "2015-00-00" })).toBe("2015");
+    expect(released({ release_world: "2015-06-00" })).toBe("2015-06");
+    expect(
+      released({
+        release_world: "0000-00-00",
+        release_na: "2006-04-25",
+        release_eu: "2006-09-29",
+        release_jp: "0000-00-00",
+      })
+    ).toBe("2006-04-25");
+  });
+
+  it("turns them into game fields, with the release year when the page has no date", () => {
+    expect(hltbPageFields(page)).toMatchObject({
+      summary: "Geralt & Ciri hunt the Wild Hunt.",
+      companies: [
+        { name: "CD Projekt RED", developer: true, publisher: false },
+        { name: "CD Projekt", developer: false, publisher: true },
+        {
+          name: "Warner Bros. Interactive Entertainment",
+          developer: false,
+          publisher: true,
+        },
+      ],
+      first_release: Date.UTC(2015, 4, 19) / 1000,
+    });
+    expect(
+      hltbPageFields(readHltbPage(), { releaseYear: 1998 }).first_release
+    ).toBe(Date.UTC(1998, 0, 1) / 1000);
+  });
+
+  it("keeps one worldwide date when the regions agree, and each region when they differ", () => {
+    expect(
+      readHltbPage({
+        release_world: "2023-11-22",
+        release_na: "2023-11-22",
+        release_eu: "2023-11-22",
+        release_jp: "0000-00-00",
+      }).releases
+    ).toEqual([{ date: "2023-11-22", region: 8 }]);
+    expect(
+      readHltbPage({
+        release_world: "2005-05-26",
+        release_na: "2006-04-25",
+        release_eu: "2006-09-29",
+        release_jp: "2005-05-26",
+      }).releases
+    ).toEqual([
+      { date: "2006-04-25", region: 2 },
+      { date: "2006-09-29", region: 1 },
+      { date: "2005-05-26", region: 5 },
+    ]);
+  });
+
+  it("dates every platform of the game, with the precision HLTB knows", () => {
+    const fields = hltbPageFields(
+      readHltbPage({ release_na: "2006-04-00", release_jp: "2005-05-26" }),
+      { platformIds: ["ps2", "ps3"] }
+    );
+
+    expect(fields.first_release).toBe(Date.UTC(2005, 4, 26) / 1000);
+    expect(
+      fields.release_dates?.map(({ human, platformId, region }) => [
+        human,
+        platformId,
+        region,
+      ])
+    ).toEqual([
+      ["Apr 2006", "ps2", 2],
+      ["Apr 2006", "ps3", 2],
+      ["May 26, 2005", "ps2", 5],
+      ["May 26, 2005", "ps3", 5],
+    ]);
+    expect(
+      hltbPageFields(null, { releaseYear: 1998, platformIds: ["ps"] })
+        .release_dates?.[0]
+    ).toMatchObject({ human: "1998", year: 1998, platformId: "ps", region: 8 });
+  });
+
+  it("maps HLTB platforms onto one catalogue platform each", () => {
+    const platforms = [
+      { _id: "win", name: "PC (Microsoft Windows)", slug: "win" },
+      { _id: "dos", name: "DOS", slug: "dos" },
+      {
+        _id: "snes",
+        name: "Super Nintendo Entertainment System",
+        slug: "snes",
+      },
+      { _id: "sfam", name: "Super Famicom", slug: "sfam" },
+      { _id: "ps4", name: "PlayStation 4", slug: "ps4--1" },
+    ];
+
+    expect(
+      mapHltbPlatformIds(
+        ["PC", "Super Nintendo", "PlayStation 4", "3DO"],
+        platforms
+      )
+    ).toEqual(["win", "snes", "ps4"]);
   });
 });
