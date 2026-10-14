@@ -648,6 +648,16 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   Candidates carry a breakdown in the shape the other sources use (title, platforms, release year).
   Match writes the entry to each chosen game; Skip adds the entry as a game (`createGame`), unless
   a game already carries that `hltb.hltbId` — then Skip returns that game and creates nothing.
+- **An HLTB entry that a game already holds is offered to another game only on an exact title that a
+  platform or the release year confirms and nothing contradicts** (`isOfferedLinkedEntry`, applied in
+  `toConflictRecords` after the run, so links made in the same run count). The entry has found its game;
+  another game with the same name and no supporting fact is almost always a different game. On
+  2026-10-14, 11,894 of the 15,571 waiting conflicts offered a held entry: 7,787 only by a loose title
+  ("Neon" against "Neon Beats"), 3,523 with a contradicting year, and most of the rest with an exact
+  title and nothing else (the unreleased 1983 Atari "The Incredible Hulk" against the 2008 game's
+  entry, platforms −1, no date). 29 are kept, a second catalogue entry of the same release among them
+  ("Shiver: Vanishing Hitchhiker" next to its linked Collector's Edition), which is what multi-match is
+  for.
 - **HLTB's search and catalogue carry no description and no companies; only the game page does**
   (`getById` → `raw.profile_summary`, `profile_dev`, `profile_pub`, `release_world` as a full date,
   `profile_steam`; `readHltbPage`). It is read only when one entry is described, linked by id,
@@ -675,6 +685,29 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   HLTB files many add-ons as `game` under their own title (105 linked DLC, 212 mods, Covert Front's
   episodes). `Update` and `Bundle` stay out — "FTL: Advanced Edition" and "X: Complete Edition"
   rightly take the base game's times.
+- **A match is taken back only through `ConflictsService.undo` and the handler's `undo`, which only HLTB
+  implements.** `POST /conflicts/:source/:externalId/undo` accepts a `resolved` conflict, asks the handler to
+  unlink its games and puts the conflict back to `pending` with no decision. The HLTB handler records what a
+  match wrote in `externalData.applied` (per game: the `hltb` it replaced and the fields the HLTB page filled,
+  with their values); undo restores that `hltb` or removes the link, and clears a filled field only while it
+  still holds the value HLTB wrote, so an admin's later edit survives. A game linked to another HLTB id since
+  is left alone. A conflict resolved before `applied` existed is undone by unlinking its winners only. Skip has
+  no undo: it created a game that may already be in use.
+- **OpenAI judges HLTB conflicts only through `POST /hltb/conflicts/ai` (`HltbAiService`), and it decides
+  nothing until `apply=true`.** A run judges up to `limit` undecided conflicts that have no verdict yet,
+  with the entry's page (developer, description) and every unlinked candidate, and stores the answer in
+  `externalData.aiVerdict` (game ids, `high`/`medium`/`low`, a reason). The item and the list rows carry it
+  as `aiVerdict`, and `GET /conflicts/list?aiOnly=true` lists only judged conflicts, which is how a dry run
+  is reviewed. With `apply=true` every verdict, stored earlier or new, that names games at a confidence in
+  `HLTB_AI_APPLY_CONFIDENCES` goes through `ConflictsService.decide` as the admin who started the run, with
+  `decidedBy.isAi` (shown as "AI (name)"). `POST /hltb/conflicts/ai/undo` undoes every resolved match carrying
+  that flag; an undone match marks its verdict `undoneAt`, and such a verdict is never applied again. Undo
+  only reads `resolved` conflicts, so run it after the queued decisions are written (the admin screen disables
+  the button while any are), or the ones still queued stay linked.
+  The model never skips: a Skip creates a game and HLTB has no `rematch`, so a wrong one could not be
+  reopened. Set the confidences from a labelled dry run, never by guess. The weekly run replaces
+  `externalData`, so verdicts last until the next sync and a later run judges the queue again. A whole
+  batch failing stops the run, so a spent quota does not leave the queue half judged without a trace.
 - **An id set by hand ends the source's open conflicts for that game, never its decided ones.**
   `POST /hltb/games/parse?hltbId`, `POST /vndb/games/parse?vnId` and `POST /ra/games/parse?raId`
   call `ConflictsService.removeForGame`: it deletes the conflict of the linked id itself and every

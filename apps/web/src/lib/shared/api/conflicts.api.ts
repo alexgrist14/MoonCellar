@@ -55,6 +55,12 @@ const reopen = (source: IConflictSource, externalId: string) => {
   );
 };
 
+const undo = (source: IConflictSource, externalId: string) => {
+  return agent.post<IConflictsSummary>(
+    `${CONFLICTS_URL}/${source}/${encodeURIComponent(externalId)}/undo`
+  );
+};
+
 const getByGame = (gameId: string) =>
   agent.get<IGameConflict[]>(`${CONFLICTS_URL}/by-game/${gameId}`);
 
@@ -66,4 +72,5 @@ export const adminConflictsApi = {
   decide,
   addCandidate,
   reopen,
+  undo,
 };

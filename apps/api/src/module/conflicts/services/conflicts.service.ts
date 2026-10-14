@@ -9,6 +9,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
 import {
   ConflictSourceSchema,
+  type IConflictAiVerdict,
   type IConflictItem,
   type IConflictSource,
   type IConflictState,
@@ -448,10 +449,12 @@ export class ConflictsService {
     search,
     source,
     state,
+    aiOnly,
   }: IGetConflictsParams): Promise<IConflictsResponse> {
     const filter = {
       ...(source ? { source } : {}),
       ...(state ? STATE_FILTERS[state] : {}),
+      ...(aiOnly ? { "externalData.aiVerdict": { $exists: true } } : {}),
       ...(search
         ? {
             $or: [
@@ -513,6 +516,9 @@ export class ConflictsService {
             ? [{ _id: String(game._id), name: game.name, slug: game.slug }]
             : [];
         }),
+        aiVerdict:
+          (row.externalData?.aiVerdict as IConflictAiVerdict | undefined) ??
+          null,
       })),
     };
   }
@@ -609,7 +615,12 @@ export class ConflictsService {
       state: conflictState(conflict),
       remaining,
       nextExternalId: next?.externalId ?? null,
-      decidedBy: conflict.decidedBy?.userName ?? null,
+      decidedBy: conflict.decidedBy
+        ? conflict.decidedBy.isAi
+          ? `AI (${conflict.decidedBy.userName})`
+          : conflict.decidedBy.userName
+        : null,
+      isUndoable: !!handler.undo && conflict.status === "resolved",
       subject,
       candidates: conflict.candidates.map((entry) => {
         const game = gameById.get(String(entry.gameId));
@@ -642,6 +653,9 @@ export class ConflictsService {
         };
       }),
       entries: conflict.entries ?? [],
+      aiVerdict:
+        (conflict.externalData?.aiVerdict as IConflictAiVerdict | undefined) ??
+        null,
     };
   }
 
@@ -653,7 +667,8 @@ export class ConflictsService {
       gameIds?: string[];
       entryId?: string | null;
     },
-    user: Pick<User, "_id" | "userName">
+    user: Pick<User, "_id" | "userName">,
+    { isAi = false }: { isAi?: boolean } = {}
   ): Promise<IConflictsSummary> {
     const { direction, isMultiMatch } = this.getHandler(source);
     const gameIds =
@@ -695,6 +710,7 @@ export class ConflictsService {
             decidedBy: {
               userId: new Types.ObjectId(String(user._id)),
               userName: user.userName,
+              ...(isAi && { isAi }),
             },
           },
         },
@@ -829,6 +845,64 @@ export class ConflictsService {
     });
 
     return this.getSummary(source);
+  }
+
+  async undo(
+    source: IConflictSource,
+    externalId: string,
+    user: Pick<User, "_id" | "userName">
+  ): Promise<IConflictsSummary> {
+    const handler = this.getHandler(source);
+
+    if (!handler.undo) {
+      throw new BadRequestException(`${source} decisions cannot be undone`);
+    }
+
+    const conflict = await this.conflictsModel
+      .findOne({ source, externalId, status: "resolved" })
+      .lean();
+
+    if (!conflict) {
+      throw new ConflictException(
+        `${externalId} is not a matched ${source} conflict`
+      );
+    }
+
+    await handler.undo({
+      externalId,
+      externalData: conflict.externalData ?? null,
+      winners: winnerIds(conflict),
+    });
+    await this.conflictsModel.updateOne(
+      { _id: conflict._id, status: "resolved" },
+      {
+        $set: {
+          status: "pending",
+          winner: null,
+          winners: [],
+          winnerEntryId: null,
+          decision: null,
+          decidedBy: null,
+        },
+      }
+    );
+
+    this.events.conflictDecided({
+      source,
+      externalId,
+      state: "waiting",
+      decidedBy: user.userName,
+    });
+
+    return this.getSummary(source);
+  }
+
+  async findAiResolvedIds(source: IConflictSource): Promise<string[]> {
+    return this.conflictsModel.distinct("externalId", {
+      source,
+      status: "resolved",
+      "decidedBy.isAi": true,
+    });
   }
 
   private getHandler(source: IConflictSource) {

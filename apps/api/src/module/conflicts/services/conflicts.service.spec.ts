@@ -58,6 +58,65 @@ const idleModel = {
 };
 
 describe("ConflictsService", () => {
+  it("undoes only a matched conflict through its source and requeues it", async () => {
+    const gameId = new Types.ObjectId();
+    const conflict = {
+      _id: "c1",
+      externalId: "6910",
+      status: "resolved",
+      externalData: { applied: [] },
+      winners: [gameId],
+    };
+    const updateOne = jest.fn().mockResolvedValue({ modifiedCount: 1 });
+    const undo = jest.fn().mockResolvedValue(undefined);
+    const events = createEvents();
+    const service = createService({
+      events,
+      conflictsModel: {
+        ...idleModel,
+        findOne: jest
+          .fn()
+          .mockReturnValueOnce(query(conflict))
+          .mockReturnValue(query(null)),
+        updateOne,
+      },
+      handler: { ...createHandler(), undo },
+    });
+
+    await service.undo("vndb", "6910", ADMIN);
+
+    expect(undo).toHaveBeenCalledWith({
+      externalId: "6910",
+      externalData: { applied: [] },
+      winners: [gameId],
+    });
+    expect(updateOne).toHaveBeenCalledWith(
+      { _id: "c1", status: "resolved" },
+      {
+        $set: expect.objectContaining({
+          status: "pending",
+          decision: null,
+          winners: [],
+          decidedBy: null,
+        }),
+      }
+    );
+    expect(events.conflictDecided).toHaveBeenCalledWith(
+      expect.objectContaining({ externalId: "6910", state: "waiting" })
+    );
+    await expect(service.undo("vndb", "6910", ADMIN)).rejects.toBeInstanceOf(
+      ConflictException
+    );
+  });
+
+  it("refuses to undo for a source without an undo", async () => {
+    const service = createService({ conflictsModel: idleModel });
+
+    await expect(service.undo("vndb", "v1", ADMIN)).rejects.toBeInstanceOf(
+      BadRequestException
+    );
+  });
+
   it("refuses to reopen a source without a rematch", async () => {
     const service = createService({ conflictsModel: idleModel });
 

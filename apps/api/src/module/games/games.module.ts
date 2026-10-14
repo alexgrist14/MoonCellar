@@ -26,6 +26,7 @@ import {
   GameAiDraftDatabaseSchema,
 } from "./schemas/game-ai-draft.schema";
 import { HltbService } from "./services/hltb.service";
+import { HltbAiService } from "./services/hltb-ai.service";
 import { HltbController } from "./controllers/hltb.controller";
 import { MetricsModule } from "../metrics/metrics.module";
 import { User, UserSchema } from "../user/schemas/user.schema";
@@ -69,6 +70,7 @@ import { NotificationsModule } from "../notifications/notifications.module";
     GamesService,
     GameAiDraftService,
     HltbService,
+    HltbAiService,
     PlaythroughsService,
     UserLogsService,
     FileService,

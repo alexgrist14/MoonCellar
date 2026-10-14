@@ -59,7 +59,9 @@ export const useAddConflictCandidateMutation = () => {
   });
 };
 
-export const useReopenConflictMutation = () => {
+const useRequeueConflictMutation = (
+  request: typeof adminConflictsApi.reopen
+) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -67,7 +69,7 @@ export const useReopenConflictMutation = () => {
       source,
       externalId,
     }: Omit<IDecideConflictVariables, "choice">) =>
-      adminConflictsApi.reopen(source, externalId).then(({ data }) => data),
+      request(source, externalId).then(({ data }) => data),
     onSuccess: (summary, { source, externalId }) => {
       queryClient.setQueryData(conflictQueryKeys.summary(source), summary);
       queryClient.invalidateQueries({
@@ -80,3 +82,9 @@ export const useReopenConflictMutation = () => {
     },
   });
 };
+
+export const useReopenConflictMutation = () =>
+  useRequeueConflictMutation(adminConflictsApi.reopen);
+
+export const useUndoConflictMutation = () =>
+  useRequeueConflictMutation(adminConflictsApi.undo);

@@ -49,7 +49,11 @@ export class Conflict {
   @Prop({ type: String, default: null })
   decision: "match" | "skip" | null;
   @Prop({ type: Object, default: null })
-  decidedBy: { userId: Types.ObjectId; userName: string } | null;
+  decidedBy: {
+    userId: Types.ObjectId;
+    userName: string;
+    isAi?: boolean;
+  } | null;
 }
 
 export type ConflictDocument = Conflict & { _id: Types.ObjectId };

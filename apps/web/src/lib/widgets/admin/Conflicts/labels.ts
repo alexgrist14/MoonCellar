@@ -1,6 +1,8 @@
+import type { BadgeTone } from "@/src/lib/shared/ui/Badge";
 import {
   ConflictSourceSchema,
   ConflictStateSchema,
+  IConflictAiVerdict,
   IConflictSource,
   IConflictState,
   IMatchReason,
@@ -121,3 +123,12 @@ export const stateTone = (state: IConflictState) =>
     : state === "matched" || state === "new-game"
       ? "positive"
       : "muted";
+
+export const AI_CONFIDENCE_TONES: Record<
+  IConflictAiVerdict["confidence"],
+  BadgeTone
+> = {
+  high: "positive",
+  medium: "attention",
+  low: "muted",
+};

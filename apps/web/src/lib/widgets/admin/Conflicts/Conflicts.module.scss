@@ -38,6 +38,33 @@
   max-width: var(--vndb-search-width);
 }
 
+.ai {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--gap-x3) var(--gap-x5);
+
+  &__field {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x2);
+    color: var(--color-text-secondary);
+
+    @include font(14px, 20px, 400);
+  }
+
+  &__limit {
+    flex: 0 0 var(--conflicts-ai-limit-width);
+  }
+}
+
+.verdict {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--gap-x1);
+}
+
 .stateFilter {
   flex: 0 1 var(--conflicts-state-filter-width);
 }
@@ -47,6 +74,33 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--gap-x05);
+}
+
+.rowVerdict {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-x2);
+  white-space: nowrap;
+}
+
+.verdictDetails {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--gap-x3);
+
+  &__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--gap-x2);
+  }
+
+  &__picks {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x1);
+  }
 }
 
 .rowName {

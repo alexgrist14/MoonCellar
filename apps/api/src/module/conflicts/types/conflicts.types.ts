@@ -46,4 +46,7 @@ export interface IConflictSourceHandler {
     externalId: string,
     externalData: Record<string, unknown> | null
   ): Promise<IConflictRecord["candidates"] | null>;
+  undo?(
+    decision: Pick<IConflictDecision, "externalId" | "externalData" | "winners">
+  ): Promise<void>;
 }

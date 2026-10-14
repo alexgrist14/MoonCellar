@@ -123,6 +123,21 @@ export const ConflictEntrySchema = z.object({
   details: z.string().array().describe("Short facts shown on the card"),
 });
 
+export const ConflictAiVerdictSchema = z.object({
+  gameIds: z
+    .string()
+    .array()
+    .describe("Candidates the model took for the entry"),
+  confidence: z.enum(["high", "medium", "low"]),
+  reason: z.string(),
+  model: z.string(),
+  judgedAt: z.string(),
+  undoneAt: z
+    .string()
+    .optional()
+    .describe("Set when an admin undid the match this verdict made"),
+});
+
 export const ConflictItemSchema = z.object({
   id: z.string().describe("Conflict record id"),
   source: ConflictSourceSchema,
@@ -141,11 +156,17 @@ export const ConflictItemSchema = z.object({
     .nullable()
     .describe("Next conflict of this source waiting for a decision"),
   decidedBy: z.string().nullable().describe("Admin who recorded the decision"),
+  isUndoable: z
+    .boolean()
+    .describe("A match whose source can unlink it and requeue the conflict"),
   subject: ConflictSubjectSchema.nullable().describe(
     "Null if the source no longer has the entry"
   ),
   candidates: ConflictCandidateSchema.array(),
   entries: ConflictEntrySchema.array(),
+  aiVerdict: ConflictAiVerdictSchema.nullable().describe(
+    "What OpenAI answered for this conflict, until the next sync replaces it"
+  ),
 });
 
 export const ConflictsSummaryRequestSchema = z.object({
@@ -184,6 +205,10 @@ export const GetConflictsRequestSchema = z.object({
   state: ConflictStateSchema.optional().describe(
     "Only conflicts in this state"
   ),
+  aiOnly: z
+    .stringbool()
+    .optional()
+    .describe("Only conflicts OpenAI has judged"),
 });
 
 export const ConflictCandidateGameSchema = z.object({
@@ -206,6 +231,7 @@ export const ConflictRowSchema = z.object({
     .object({ _id: z.string(), name: z.string(), slug: z.string() })
     .array()
     .describe("Games the entry ended up in"),
+  aiVerdict: ConflictAiVerdictSchema.nullable(),
 });
 
 export const ConflictsResponseSchema = z.object({
@@ -292,6 +318,7 @@ export type IConflictSubject = z.infer<typeof ConflictSubjectSchema>;
 export type IConflictGame = z.infer<typeof ConflictGameSchema>;
 export type IConflictCandidate = z.infer<typeof ConflictCandidateSchema>;
 export type IConflictItem = z.infer<typeof ConflictItemSchema>;
+export type IConflictAiVerdict = z.infer<typeof ConflictAiVerdictSchema>;
 export type IAddConflictCandidateRequest = z.infer<
   typeof AddConflictCandidateRequestSchema
 >;

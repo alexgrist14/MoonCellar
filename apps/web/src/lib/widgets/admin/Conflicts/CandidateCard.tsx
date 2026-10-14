@@ -69,6 +69,7 @@ interface ICandidateCardProps {
   candidate: IConflictCandidate;
   isSelected: boolean;
   isChosen?: boolean;
+  isAiPick?: boolean;
   platformNames: (ids: string[]) => string;
   onSelect: () => void;
   onToggle?: () => void;
@@ -78,6 +79,7 @@ export const CandidateCard: FC<ICandidateCardProps> = ({
   candidate,
   isSelected,
   isChosen,
+  isAiPick,
   platformNames,
   onSelect,
   onToggle,
@@ -123,6 +125,7 @@ export const CandidateCard: FC<ICandidateCardProps> = ({
               {game.type}
             </Badge>
           )}
+          {isAiPick && <Badge tone="accent">AI pick</Badge>}
           {candidate.isManual && <Badge tone="muted">Found by search</Badge>}
           {game?.isCustom && <Badge tone="attention">Added by hand</Badge>}
           {game?.linkedExternalId && (

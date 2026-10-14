@@ -47,6 +47,12 @@ import {
 } from "../../../shared/remote-image";
 import { toReleaseDate } from "../../../shared/release-date";
 import { uniqueSlug } from "../../../shared/utils";
+import {
+  callOpenAi,
+  type IOpenAiOutput,
+  openAiModel,
+  outputText,
+} from "../../../shared/openai";
 import { normalizeTitle } from "../utils/title-match.utils";
 import { FRONT_URL, RA_MAIN_USER_NAME } from "../../../shared/constants";
 import { VNDB_WORLDWIDE_REGION } from "../constants/vndb";
@@ -55,7 +61,6 @@ import {
   toRaSetEntry,
 } from "../../retroach/utils/retroach.utils";
 
-const OPENAI_URL = "https://api.openai.com/v1/responses";
 const STEAMGRIDDB_URL = "https://www.steamgriddb.com/api/v2";
 const STEAMGRIDDB_IMAGES_LIMIT = 5;
 const MAX_TURNS = 12;
@@ -137,11 +142,6 @@ type IFilters = Record<
   | "companies",
   string[]
 >;
-
-type IOpenAiOutput =
-  | { type: "function_call"; call_id: string; name: string; arguments: string }
-  | { type: "message"; content: { type: string; text?: string }[] }
-  | { type: string };
 
 type IDraft = {
   name: string;
@@ -758,7 +758,7 @@ export class GameAiDraftService implements OnModuleInit {
     }
 
     let body: Record<string, unknown> = {
-      model: process.env.OPENAI_MODEL || "gpt-5-mini",
+      model: openAiModel(),
       instructions,
       input,
       tools,
@@ -777,7 +777,7 @@ export class GameAiDraftService implements OnModuleInit {
             ? "Reading the results"
             : "Asking OpenAI"
       );
-      const response = await this.callOpenAi(apiKey, {
+      const response = await callOpenAi(apiKey, {
         ...body,
         tool_choice: isLastTurn ? "none" : "auto",
       });
@@ -851,25 +851,6 @@ export class GameAiDraftService implements OnModuleInit {
     throw new BadGatewayException("OpenAI did not finish the research");
   }
 
-  private async callOpenAi(apiKey: string, body: Record<string, unknown>) {
-    const res = await fetch(OPENAI_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      this.logger.error(`OpenAI request failed: ${res.status} ${text}`);
-      throw new BadGatewayException(`OpenAI request failed: ${res.status}`);
-    }
-
-    return (await res.json()) as { id: string; output: IOpenAiOutput[] };
-  }
-
   private async searchWebWithFallback(query = "") {
     let reason = "no results";
 
@@ -887,19 +868,14 @@ export class GameAiDraftService implements OnModuleInit {
 
     if (!apiKey) throw new Error(`SearXNG: ${reason}`);
 
-    const response = await this.callOpenAi(apiKey, {
-      model: process.env.OPENAI_MODEL || "gpt-5-mini",
+    const response = await callOpenAi(apiKey, {
+      model: openAiModel(),
       instructions: OPENAI_SEARCH_INSTRUCTIONS,
       input: query,
       tools: [{ type: "web_search" }],
       tool_choice: "required",
     });
-    const text = response.output
-      .flatMap((item) => ("content" in item ? item.content : []))
-      .filter((content) => content.type === "output_text")
-      .map((content) => content.text)
-      .join("\n")
-      .trim();
+    const text = outputText(response.output).trim();
 
     return `${OPENAI_SEARCH_PREFIX} (SearXNG: ${reason})\n${text || "Nothing found."}`;
   }

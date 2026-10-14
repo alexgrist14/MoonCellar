@@ -157,4 +157,23 @@ export class ConflictsController {
       request.user
     );
   }
+
+  @Post(":source/:externalId/undo")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      "Take back a match: unlink the games it wrote and put the conflict back in the queue",
+  })
+  @ApiOkResponse({ type: ConflictsSummaryDto })
+  undo(
+    @Param("source") source: string,
+    @Param("externalId") externalId: string,
+    @Req() request: IAuthorizedRequest
+  ) {
+    return this.conflictsService.undo(
+      parseSource(source),
+      externalId,
+      request.user
+    );
+  }
 }

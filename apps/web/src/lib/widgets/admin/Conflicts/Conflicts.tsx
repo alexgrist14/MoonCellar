@@ -20,13 +20,16 @@ import {
   useConflictsSummaryQuery,
   useDecideConflictMutation,
   useReopenConflictMutation,
+  useUndoConflictMutation,
 } from "@/src/lib/entities/conflict/api";
 import { setAdminQuery } from "@/src/lib/shared/utils/admin-url.utils";
 import { CandidateCard, Fact } from "./CandidateCard";
 import { CandidateSearch } from "./CandidateSearch";
 import { ConflictList } from "./ConflictList";
 import { EntryCard } from "./EntryCard";
+import { HltbAiControls } from "./HltbAiControls";
 import {
+  AI_CONFIDENCE_TONES,
   CONFLICT_SOURCES,
   REASON_LABELS,
   SOURCE_LABELS,
@@ -75,15 +78,16 @@ export const Conflicts: FC = () => {
   const { mutate: decide } = useDecideConflictMutation();
   const { mutate: reopen, isPending: isReopening } =
     useReopenConflictMutation();
+  const { mutate: undo, isPending: isUndoing } = useUndoConflictMutation();
   const { data: platforms } = usePlatformsQuery();
   const isLoaderShown = useMinimumLoading(isLoading);
 
   useConflictsSocket(externalId);
 
   const item = data?.item ?? null;
-  const selectedIndex =
-    item && selection.externalId === item.externalId ? selection.index : 0;
   const isEntries = item?.direction === "entries";
+  const verdict = item?.aiVerdict ?? null;
+  const aiPicks = verdict && !verdict.undoneAt ? verdict.gameIds : [];
   const options = !item
     ? []
     : isEntries
@@ -93,6 +97,13 @@ export const Conflicts: FC = () => {
           name,
           isUsable: !!game,
         }));
+  const selectedIndex =
+    item && selection.externalId === item.externalId
+      ? selection.index
+      : Math.max(
+          options.findIndex(({ id }) => aiPicks.includes(id)),
+          0
+        );
   const selected = options[selectedIndex];
   const optionsCount = options.length;
   const isMultiMatch = !!item?.isMultiMatch;
@@ -299,6 +310,30 @@ export const Conflicts: FC = () => {
                 />
               </dl>
 
+              {verdict && (
+                <div className={styles.verdict}>
+                  <Badge
+                    tone={
+                      verdict.undoneAt
+                        ? "muted"
+                        : AI_CONFIDENCE_TONES[verdict.confidence]
+                    }
+                  >
+                    AI · {verdict.confidence}
+                    {verdict.undoneAt && " · undone"}
+                  </Badge>
+                  <p className={styles.description}>
+                    {verdict.gameIds.length
+                      ? `Picks ${options
+                          .filter(({ id }) => verdict.gameIds.includes(id))
+                          .map(({ name }) => name)
+                          .join(" and ")}. `
+                      : "No candidate is this entry. "}
+                    {verdict.reason}
+                  </p>
+                </div>
+              )}
+
               {subject.description && (
                 <p className={styles.description}>{subject.description}</p>
               )}
@@ -343,6 +378,7 @@ export const Conflicts: FC = () => {
               candidate={candidate}
               isSelected={index === selectedIndex}
               isChosen={chosenIds.includes(candidate.gameId)}
+              isAiPick={aiPicks.includes(candidate.gameId)}
               platformNames={platformNames}
               onSelect={() => select(index)}
               onToggle={
@@ -422,6 +458,7 @@ export const Conflicts: FC = () => {
               })),
             ]}
           />
+          {source === "hltb" && <HltbAiControls isApplying={applying > 0} />}
           <ConflictList source={source} />
         </>
       )}
@@ -512,6 +549,20 @@ export const Conflicts: FC = () => {
                   </>
                 ) : (
                   <>
+                    {item.isUndoable && (
+                      <Button
+                        className={styles.actionButton}
+                        disabled={isUndoing}
+                        onClick={() =>
+                          undo({
+                            source: item.source,
+                            externalId: item.externalId,
+                          })
+                        }
+                      >
+                        {isUndoing ? "Undoing…" : "Undo match"}
+                      </Button>
+                    )}
                     {isReopenable(item.source, item.state) && (
                       <Button
                         className={styles.actionButton}

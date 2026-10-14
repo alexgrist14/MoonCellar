@@ -47,7 +47,12 @@ const buildService = (
   const findById = jest.fn().mockReturnValue({
     select: () => ({ lean: () => Promise.resolve(parent) }),
   });
-  const gamesModel = { findOne, findById, updateOne } as never;
+  const gamesModel = {
+    findOne,
+    findById,
+    updateOne,
+    distinct: jest.fn().mockResolvedValue([]),
+  } as never;
   const platformsModel = {
     find: () => ({
       select: () => ({
@@ -69,6 +74,7 @@ const buildService = (
     record: jest.fn(),
     register: jest.fn(),
     removeForGame: jest.fn().mockResolvedValue(0),
+    setExternalData: jest.fn().mockResolvedValue(undefined),
   };
   const gamesService = { fillEmptyFields: jest.fn().mockResolvedValue([]) };
   const service = new HltbService(
@@ -387,6 +393,12 @@ describe("HltbService.syncAllGames", () => {
     const gamesModel = {
       db: { collection: () => locks },
       bulkWrite,
+      distinct: async () =>
+        games.flatMap((game) => {
+          const hltbId = (game.hltb as IHltbField | undefined)?.hltbId;
+
+          return hltbId ? [hltbId] : [];
+        }),
       find: (filter: Record<string, unknown>) => ({
         select: () => ({
           lean: () =>
@@ -493,6 +505,31 @@ describe("HltbService.syncAllGames", () => {
     expect(conflicts.dismissUndecided).toHaveBeenCalledWith("hltb", [
       String(missing._id),
     ]);
+  });
+
+  it("offers an entry another game already holds only on an exact title that nothing contradicts", async () => {
+    const clash = buildGame({
+      _id: new mongoose.Types.ObjectId(),
+      release_dates: [{ year: 2010 }],
+    });
+    const holder = buildGame({
+      hltb: mapHltbEntryToField(mapRawHltbEntry(rawEntry() as never)),
+    });
+
+    serveCatalogue([[rawEntry()]]);
+    const free = buildSync([clash]);
+    await free.service.syncAllGames();
+
+    serveCatalogue([[rawEntry()]]);
+    const held = buildSync([holder, clash]);
+    await held.service.syncAllGames();
+
+    expect(
+      free.conflicts.refresh.mock.calls[0][1].map(
+        ({ externalId }: { externalId: string }) => externalId
+      )
+    ).toEqual(["6910"]);
+    expect(held.conflicts.refresh).not.toHaveBeenCalled();
   });
 
   it("does not rewrite a game whose times did not change", async () => {
@@ -714,5 +751,80 @@ describe("HltbService conflict handler", () => {
         ],
       })
     );
+  });
+
+  it("undoes a match: unlinks the game and clears only the fields it filled that nobody changed since", async () => {
+    const summary = "A whip-wielding vampire hunter returns.";
+    const companies = [{ name: "Konami", developer: true, publisher: true }];
+    const built = buildService(buildGame(), [], {
+      success: true,
+      data: buildEntry({ raw: PAGE }),
+    });
+    const gamesModel = (
+      built.service as unknown as { gamesModel: Record<string, unknown> }
+    ).gamesModel;
+    gamesModel.find = () => ({
+      select: () => ({ lean: async () => [buildGame()] }),
+    });
+    const leanOnce = (value: unknown) =>
+      built.findById.mockReturnValueOnce({
+        select: () => ({ lean: () => Promise.resolve(value) }),
+      });
+    const handler = handlerOf(built);
+
+    leanOnce({ summary, companies, release_dates: [{ year: 1991 }] });
+    await handler.apply([
+      {
+        externalId: "6910",
+        externalName: "Super Castlevania IV",
+        externalData: snapshot,
+        decision: "match",
+        winner: new mongoose.Types.ObjectId(GAME_ID),
+        winners: [new mongoose.Types.ObjectId(GAME_ID)],
+        winnerEntryId: null,
+      },
+    ]);
+
+    const [[, [stored]]] = built.conflicts.setExternalData.mock.calls;
+    const changes = stored.externalData.applied;
+    expect(changes).toEqual([
+      { gameId: GAME_ID, hltb: null, filled: { summary, companies } },
+    ]);
+
+    built.updateOne.mockClear();
+    leanOnce({
+      _id: GAME_ID,
+      hltb: { hltbId: "6910" },
+      summary,
+      companies: [{ name: "Konami (edited)" }],
+    });
+    leanOnce({ _id: GAME_ID, hltb: { hltbId: "999" }, summary });
+    const verdict = { gameIds: [GAME_ID], confidence: "high", reason: "r" };
+
+    await handler.undo({
+      externalId: "6910",
+      externalData: { ...snapshot, applied: changes, aiVerdict: verdict },
+      winners: [],
+    });
+    await handler.undo({
+      externalId: "6910",
+      externalData: { ...snapshot, applied: changes },
+      winners: [],
+    });
+
+    expect(built.updateOne).toHaveBeenCalledTimes(1);
+    expect(built.updateOne.mock.calls[0][1].$unset).toEqual({
+      hltb: "",
+      summary: "",
+    });
+    expect(built.conflicts.setExternalData.mock.calls[1][1]).toEqual([
+      {
+        externalId: "6910",
+        externalData: {
+          applied: null,
+          aiVerdict: { ...verdict, undoneAt: expect.any(String) },
+        },
+      },
+    ]);
   });
 });

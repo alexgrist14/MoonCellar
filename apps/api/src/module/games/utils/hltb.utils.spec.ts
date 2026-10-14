@@ -4,6 +4,7 @@ import {
   findHltbConflict,
   getEditionParentId,
   hltbPageFields,
+  isOfferedLinkedEntry,
   isSameHltb,
   mapHltbPlatformIds,
   readHltbPage,
@@ -781,6 +782,23 @@ describe("HLTB add-ons", () => {
     );
 
     expect(match?.entry.id).toBe(2024);
+  });
+});
+
+describe("isOfferedLinkedEntry", () => {
+  const offer = (title: number, platforms: number, date: number) =>
+    isOfferedLinkedEntry({
+      breakdown: { title, platforms, date, companies: 0, genre: 0, type: 0 },
+    });
+
+  it("keeps only an exact title that a platform or the year confirms and nothing contradicts", () => {
+    expect(offer(4, 1, 0)).toBe(true);
+    expect(offer(4, 0, 1)).toBe(true);
+    expect(offer(4, 1, 3)).toBe(true);
+    expect(offer(4, 0, 0)).toBe(false);
+    expect(offer(4, -1, 0)).toBe(false);
+    expect(offer(4, 1, -4)).toBe(false);
+    expect(offer(2, 1, 3)).toBe(false);
   });
 });
 

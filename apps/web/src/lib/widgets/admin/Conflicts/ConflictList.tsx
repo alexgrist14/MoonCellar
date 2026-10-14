@@ -10,10 +10,14 @@ import { Input } from "@/src/lib/shared/ui/Input";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
 import { Table } from "@/src/lib/shared/ui/Table";
 import { Badge } from "@/src/lib/shared/ui/Badge";
+import { Button } from "@/src/lib/shared/ui/Button";
+import { Checkbox } from "@/src/lib/shared/ui/Checkbox";
+import { DRAWER_TRIGGER_ATTRIBUTE, drawer } from "@/src/lib/shared/ui/Drawer";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { useConflictsQuery } from "@/src/lib/entities/conflict/api";
 import { setAdminQuery } from "@/src/lib/shared/utils/admin-url.utils";
 import {
+  AI_CONFIDENCE_TONES,
   REASON_LABELS,
   SOURCE_LABELS,
   stateLabel,
@@ -22,6 +26,7 @@ import {
   stateTone,
   externalUrl,
 } from "./labels";
+import { AiVerdictDetails } from "./AiVerdictDetails";
 import styles from "./Conflicts.module.scss";
 
 const SEARCH_DELAY_MS = 300;
@@ -36,6 +41,8 @@ export const ConflictList: FC<IConflictListProps> = ({ source }) => {
   const [search, setSearch] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [state, setState] = useState<IConflictState | undefined>("waiting");
+  const [isAiOnly, setIsAiOnly] = useState(false);
+  const isAiShown = source === "hltb";
 
   const { data, isLoading, isFetching } = useConflictsQuery({
     page,
@@ -43,6 +50,7 @@ export const ConflictList: FC<IConflictListProps> = ({ source }) => {
     search: search || undefined,
     source,
     state,
+    aiOnly: (isAiShown && isAiOnly) || undefined,
   });
 
   const debouncedSearch = useDebouncedCallback((value: string) => {
@@ -80,6 +88,18 @@ export const ConflictList: FC<IConflictListProps> = ({ source }) => {
             }}
           />
         </div>
+        {isAiShown && (
+          <label className={styles.ai__field}>
+            <Checkbox
+              checked={isAiOnly}
+              onChange={() => {
+                setIsAiOnly(!isAiOnly);
+                setPage(1);
+              }}
+            />
+            Only judged by AI
+          </label>
+        )}
       </div>
 
       <Table
@@ -92,7 +112,9 @@ export const ConflictList: FC<IConflictListProps> = ({ source }) => {
           state: { content: "State" },
           reason: { content: "Why it waits" },
           result: { content: "Result" },
+          ai: { content: "AI verdict", isHidden: !isAiShown },
         }}
+        rowClickExcludeKeys={["ai"]}
         onRowClick={(index) =>
           setAdminQuery({
             source: rows[index].source,
@@ -148,6 +170,36 @@ export const ConflictList: FC<IConflictListProps> = ({ source }) => {
                   </Link>
                 ))
               : "—",
+          },
+          ai: {
+            content: row.aiVerdict ? (
+              <div className={styles.rowVerdict}>
+                <Badge
+                  tone={
+                    row.aiVerdict.undoneAt
+                      ? "muted"
+                      : AI_CONFIDENCE_TONES[row.aiVerdict.confidence]
+                  }
+                >
+                  {row.aiVerdict.confidence}
+                  {!row.aiVerdict.gameIds.length && " · no match"}
+                  {row.aiVerdict.undoneAt && " · undone"}
+                </Badge>
+                <Button
+                  compact
+                  {...{ [DRAWER_TRIGGER_ATTRIBUTE]: "" }}
+                  onClick={() =>
+                    drawer.open(<AiVerdictDetails row={row} />, {
+                      title: "AI verdict",
+                    })
+                  }
+                >
+                  Details
+                </Button>
+              </div>
+            ) : (
+              "—"
+            ),
           },
         }))}
       />

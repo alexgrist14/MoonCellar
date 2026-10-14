@@ -67,3 +67,7 @@ export const HLTB_RELEASE_REGIONS: Record<string, number> = {
   release_eu: 1,
   release_jp: 5,
 };
+
+export const HLTB_AI_CONCURRENCY = 5;
+
+export const HLTB_AI_APPLY_CONFIDENCES = ["high"];

@@ -686,6 +686,16 @@ export const toHltbCandidate = (
   isContradicted: breakdown.date < 0,
 });
 
+export const isOfferedLinkedEntry = ({
+  breakdown,
+}: {
+  breakdown: IScoreBreakdown;
+}) =>
+  breakdown.title >= 4 &&
+  breakdown.platforms >= 0 &&
+  breakdown.date >= 0 &&
+  breakdown.platforms + breakdown.date > 0;
+
 export const hltbConflictReason = ([
   best,
   ...rest

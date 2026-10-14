@@ -23,7 +23,13 @@ import { sleep, uniqueSlug } from "../../../shared/utils";
 import { runInCronLogContext } from "../../../shared/cron-logging";
 import { runCronExclusive, withDbLock } from "../../../shared/cron-mutex";
 import { BusinessMetricsService } from "../../metrics/business-metrics.service";
-import { type IConflictSubject, type IHltbField } from "@mooncellar/schemas";
+import {
+  type IConflictAiVerdict,
+  type IConflictSubject,
+  type IHltbField,
+} from "@mooncellar/schemas";
+import { isDeepStrictEqual } from "node:util";
+import { pickEmptyFields } from "../utils/fill-fields.utils";
 import { ConflictsService } from "../../conflicts/services/conflicts.service";
 import type {
   IConflictDecision,
@@ -66,6 +72,7 @@ import {
   hasHltbTimes,
   type HltbMatchContext,
   type HltbSearchEntry,
+  isOfferedLinkedEntry,
   isSameHltb,
   mapHltbEntryToField,
   mapRawHltbEntry,
@@ -102,6 +109,19 @@ export type HltbSyncResult = HltbSyncTotals & {
 };
 
 type CatalogSession = { auth?: InitResponse; requests: number };
+
+type THltbAppliedGame = {
+  gameId: string;
+  hltb: IHltbField | null;
+  filled: Record<string, unknown>;
+};
+
+const HLTB_PAGE_FIELDS = [
+  "summary",
+  "companies",
+  "first_release",
+  "release_dates",
+];
 
 type THltbEntryConflict = {
   entry: HltbSearchEntry;
@@ -156,6 +176,7 @@ export class HltbService implements OnModuleInit {
       linkField: "hltb.hltbId",
       describe: (entryId, data) => this.describeConflict(entryId, data),
       apply: (decisions) => this.applyConflictDecisions(decisions),
+      undo: (decision) => this.undoConflictDecision(decision),
     });
   }
 
@@ -172,19 +193,32 @@ export class HltbService implements OnModuleInit {
     });
   }
 
-  private toConflictRecords(
+  private async toConflictRecords(
     byEntry: Map<number, THltbEntryConflict>
-  ): IConflictRecord[] {
-    return [...byEntry.values()].map(({ entry, candidates }) => {
-      const sorted = [...candidates].sort((a, b) => b.score - a.score);
+  ): Promise<IConflictRecord[]> {
+    const linked = new Set<string>(
+      await this.gamesModel.distinct("hltb.hltbId", {
+        "hltb.hltbId": { $in: [...byEntry.keys()].map(String) },
+      })
+    );
 
-      return {
-        externalId: String(entry.id),
-        externalName: entry.name,
-        externalData: { ...entry },
-        reason: hltbConflictReason(sorted),
-        candidates: sorted,
-      };
+    return [...byEntry.values()].flatMap(({ entry, candidates }) => {
+      const offered = linked.has(String(entry.id))
+        ? candidates.filter(isOfferedLinkedEntry)
+        : candidates;
+      const sorted = [...offered].sort((a, b) => b.score - a.score);
+
+      return sorted.length
+        ? [
+            {
+              externalId: String(entry.id),
+              externalName: entry.name,
+              externalData: { ...entry },
+              reason: hltbConflictReason(sorted),
+              candidates: sorted,
+            },
+          ]
+        : [];
     });
   }
 
@@ -306,15 +340,36 @@ export class HltbService implements OnModuleInit {
 
         const games = await this.gamesModel
           .find({ _id: { $in: winners } })
-          .select("_id slug name hltb platformIds release_dates first_release")
+          .select(
+            `_id slug name hltb platformIds ${HLTB_PAGE_FIELDS.join(" ")}`
+          )
           .lean();
 
         if (!games.length) continue;
 
+        const changes: THltbAppliedGame[] = [];
+
         for (const game of games) {
           await this.applyHltbEntryById(game, externalId);
+
+          const after = await this.gamesModel
+            .findById(game._id)
+            .select(HLTB_PAGE_FIELDS.join(" "))
+            .lean();
+
+          changes.push({
+            gameId: String(game._id),
+            hltb: game.hltb ?? null,
+            filled: pickEmptyFields(
+              game as unknown as Record<string, unknown>,
+              (after ?? {}) as Record<string, unknown>
+            ),
+          });
         }
 
+        await this.conflicts.setExternalData("hltb", [
+          { externalId, externalData: { applied: changes } },
+        ]);
         applied.set(externalId, games[0]._id);
       } catch (err) {
         this.logger.warn(err, `Failed to apply HLTB conflict ${externalId}`);
@@ -324,19 +379,65 @@ export class HltbService implements OnModuleInit {
     return applied;
   }
 
+  private async undoConflictDecision({
+    externalId,
+    externalData,
+    winners,
+  }: Pick<IConflictDecision, "externalId" | "externalData" | "winners">) {
+    const changes =
+      (externalData?.applied as THltbAppliedGame[] | undefined) ??
+      winners.map((id) => ({ gameId: String(id), hltb: null, filled: {} }));
+    const now = new Date().toISOString();
+
+    for (const { gameId, hltb, filled } of changes) {
+      const game = await this.gamesModel
+        .findById(gameId)
+        .select(["hltb", ...Object.keys(filled)].join(" "))
+        .lean();
+
+      if (game?.hltb?.hltbId !== externalId) continue;
+
+      const reverted = Object.keys(filled).filter((key) =>
+        isDeepStrictEqual(
+          (game as unknown as Record<string, unknown>)[key],
+          filled[key]
+        )
+      );
+      const unset = [...(hltb ? [] : ["hltb"]), ...reverted];
+
+      await this.gamesModel.updateOne(
+        { _id: game._id },
+        {
+          $set: { ...(hltb && { hltb }), updatedAt: now },
+          ...(unset.length && {
+            $unset: Object.fromEntries(unset.map((key) => [key, ""])),
+          }),
+        }
+      );
+      this.logger.info(
+        `Unlinked ${gameId} from HLTB ${externalId}${reverted.length ? `, cleared ${reverted.join(", ")}` : ""}`
+      );
+    }
+
+    const verdict = externalData?.aiVerdict as IConflictAiVerdict | undefined;
+
+    await this.conflicts.setExternalData("hltb", [
+      {
+        externalId,
+        externalData: {
+          applied: null,
+          ...(verdict && { aiVerdict: { ...verdict, undoneAt: now } }),
+        },
+      },
+    ]);
+  }
+
   @Cron(HLTB_SYNC_CRON, HLTB_SYNC_CRON_OPTIONS)
   async syncHltbCron() {
     return runCronExclusive(() =>
-      runInCronLogContext(this.logger, "hltb-sync", async () => {
-        try {
-          return await this.metrics.trackSync("hltb-sync", () =>
-            this.syncAllGames()
-          );
-        } catch (err) {
-          this.logger.error(err, "Failed to run HLTB sync cron");
-          throw err;
-        }
-      })
+      runInCronLogContext(this.logger, "hltb-sync", () =>
+        this.metrics.trackSync("hltb-sync", () => this.syncAllGames())
+      )
     );
   }
 
@@ -355,6 +456,9 @@ export class HltbService implements OnModuleInit {
       return lock.locked
         ? lock.result
         : this.skipSync("HLTB sync is running in another process");
+    } catch (err) {
+      this.logger.error(err, "HLTB sync failed");
+      throw err;
     } finally {
       this.isSyncRunning = false;
     }
@@ -422,7 +526,7 @@ export class HltbService implements OnModuleInit {
 
     if (ops.length) await this.gamesModel.bulkWrite(ops, { ordered: false });
 
-    const records = this.toConflictRecords(byEntry);
+    const records = await this.toConflictRecords(byEntry);
     const offered = new Set(records.map(({ externalId }) => externalId));
 
     for (let i = 0; i < records.length; i += HLTB_SYNC_WRITE_BATCH) {
@@ -674,7 +778,10 @@ export class HltbService implements OnModuleInit {
         const byEntry = new Map<number, THltbEntryConflict>();
 
         this.collectConflict(byEntry, game, conflict);
-        await this.conflicts.record("hltb", this.toConflictRecords(byEntry));
+        await this.conflicts.record(
+          "hltb",
+          await this.toConflictRecords(byEntry)
+        );
       }
 
       const isKept = !!game.hltb && isEmpty;
