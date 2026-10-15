@@ -11,6 +11,7 @@ export interface ITableCell {
   title?: string | ReactNode;
   isHidden?: boolean;
   isNotResizable?: boolean;
+  isNotSortable?: boolean;
 }
 
 type GenericCell<T> = Record<keyof T, ITableCell>;

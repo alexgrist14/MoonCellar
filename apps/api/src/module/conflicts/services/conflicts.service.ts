@@ -47,6 +47,47 @@ const STATE_FILTERS: Record<IConflictState, object> = {
   dismissed: { status: "dismissed" },
 };
 
+const AI_VERDICT = "$externalData.aiVerdict";
+
+const AI_VERDICT_RANK_FIELDS = {
+  hasAiVerdict: { $cond: [{ $ifNull: [AI_VERDICT, false] }, 1, 0] },
+  aiRank: {
+    $cond: [
+      { $ifNull: [`${AI_VERDICT}.undoneAt`, false] },
+      0,
+      {
+        $add: [
+          {
+            $multiply: [
+              {
+                $add: [
+                  {
+                    $indexOfArray: [
+                      ["low", "medium", "high"],
+                      `${AI_VERDICT}.confidence`,
+                    ],
+                  },
+                  1,
+                ],
+              },
+              2,
+            ],
+          },
+          {
+            $cond: [
+              {
+                $gt: [{ $size: { $ifNull: [`${AI_VERDICT}.gameIds`, []] } }, 0],
+              },
+              1,
+              0,
+            ],
+          },
+        ],
+      },
+    ],
+  },
+};
+
 const escapeRegExp = (value: string) =>
   value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -452,6 +493,8 @@ export class ConflictsService {
     source,
     state,
     aiOnly,
+    sortBy = "queue",
+    sortOrder = "desc",
   }: IGetConflictsParams): Promise<IConflictsResponse> {
     const filter = {
       ...(source ? { source } : {}),
@@ -481,7 +524,19 @@ export class ConflictsService {
             },
           },
         },
-        { $sort: { isWaiting: -1, _id: 1 } },
+        ...(sortBy === "ai"
+          ? [
+              { $addFields: AI_VERDICT_RANK_FIELDS },
+              {
+                $sort: {
+                  hasAiVerdict: -1,
+                  aiRank: sortOrder === "asc" ? 1 : -1,
+                  isWaiting: -1,
+                  _id: 1,
+                },
+              } as const,
+            ]
+          : [{ $sort: { isWaiting: -1, _id: 1 } } as const]),
         { $skip: (page - 1) * take },
         { $limit: take },
       ]),

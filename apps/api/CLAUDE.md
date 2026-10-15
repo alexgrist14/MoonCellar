@@ -732,7 +732,9 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   nothing until `apply=true`.** A run judges up to `limit` undecided conflicts of the source that have no
   verdict yet and stores the answer in `externalData.aiVerdict` (game ids, `high`/`medium`/`low`, a reason).
   The item and the list rows carry it as `aiVerdict`, and `GET /conflicts/list?aiOnly=true` lists only judged
-  conflicts, which is how a dry run is reviewed. With `apply=true` every verdict, stored earlier or new, that
+  conflicts, which is how a dry run is reviewed. `sortBy=ai` orders the list by `AI_VERDICT_RANK_FIELDS`:
+  high match, high no-match, medium match, medium no-match, low match, low no-match, then undone verdicts;
+  conflicts without a verdict stay last in either `sortOrder`, as Steam games without achievements do. With `apply=true` every verdict, stored earlier or new, that
   names games at a confidence in `CONFLICTS_AI_APPLY_CONFIDENCES` goes through `ConflictsService.decide` as
   the admin who started the run, with `decidedBy.isAi` (shown as "AI (name)"); `limit=0&apply=true` applies
   the stored verdicts and judges nothing, which is the admin screen's "Apply verdicts" after a dry run.

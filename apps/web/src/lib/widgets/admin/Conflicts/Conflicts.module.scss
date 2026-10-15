@@ -94,6 +94,10 @@
   flex: 0 1 var(--conflicts-state-filter-width);
 }
 
+.sortFilter {
+  flex: 0 1 var(--conflicts-state-filter-width);
+}
+
 .rowVn {
   display: flex;
   flex-direction: column;

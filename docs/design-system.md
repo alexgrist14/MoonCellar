@@ -37,7 +37,8 @@ generated block inside a mockup is pointless; the next run overwrites it.
 
 ## Starting a mockup
 
-Copy the template and rename it:
+The project skill `mockup` (`.agents/skills/mockup/SKILL.md`) runs the whole workflow below, plus
+publishing the page as an Artifact. By hand, copy the template and rename it:
 
 ```bash
 cp docs/mockups/_template.html docs/mockups/<name>.html

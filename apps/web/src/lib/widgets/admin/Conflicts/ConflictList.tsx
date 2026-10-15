@@ -3,8 +3,10 @@ import Link from "next/link";
 import { useDebouncedCallback } from "use-debounce";
 import {
   CONFLICTS_PAGE_SIZE,
+  ICustomListsOrder,
   IConflictSource,
   IConflictState,
+  IConflictsSort,
 } from "@mooncellar/schemas";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { Dropdown } from "@/src/lib/shared/ui/Dropdown";
@@ -14,6 +16,10 @@ import { Button } from "@/src/lib/shared/ui/Button";
 import { Checkbox } from "@/src/lib/shared/ui/Checkbox";
 import { DRAWER_TRIGGER_ATTRIBUTE, drawer } from "@/src/lib/shared/ui/Drawer";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
+import {
+  ISortControlOption,
+  SortControl,
+} from "@/src/lib/shared/ui/SortControl";
 import { useConflictsQuery } from "@/src/lib/entities/conflict/api";
 import { setAdminQuery } from "@/src/lib/shared/utils/admin-url.utils";
 import {
@@ -36,12 +42,18 @@ interface IConflictListProps {
   source?: IConflictSource;
 }
 
+const SORT_OPTIONS: ISortControlOption<IConflictsSort>[] = [
+  { value: "ai", label: "AI verdict" },
+];
+
 export const ConflictList: FC<IConflictListProps> = ({ source }) => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [state, setState] = useState<IConflictState | undefined>("waiting");
   const [isAiOnly, setIsAiOnly] = useState(false);
+  const [sortBy, setSortBy] = useState<IConflictsSort>();
+  const [sortOrder, setSortOrder] = useState<ICustomListsOrder>("desc");
   const { data, isLoading, isFetching } = useConflictsQuery({
     page,
     take: CONFLICTS_PAGE_SIZE,
@@ -49,6 +61,8 @@ export const ConflictList: FC<IConflictListProps> = ({ source }) => {
     source,
     state,
     aiOnly: isAiOnly || undefined,
+    sortBy: sortBy ?? "queue",
+    sortOrder,
   });
 
   const debouncedSearch = useDebouncedCallback((value: string) => {
@@ -96,18 +110,44 @@ export const ConflictList: FC<IConflictListProps> = ({ source }) => {
           />
           Only judged by AI
         </label>
+        <SortControl
+          className={styles.sortFilter}
+          options={SORT_OPTIONS}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          placeholder="Queue order"
+          isWithReset
+          onChange={(by, order) => {
+            setSortBy(by);
+            setSortOrder(order);
+            setPage(1);
+          }}
+        />
       </div>
 
       <Table
+        key={`${sortBy ?? "queue"}-${sortOrder}`}
         mobileHeadField="entry"
-        isWithoutSorting
+        initialSortingKey={sortBy === "ai" ? "ai" : undefined}
+        initialSortingOrder={sortOrder}
+        sortingCallback={(key, order) => {
+          if (key !== "ai") return;
+          setSortBy("ai");
+          setSortOrder(order);
+          setPage(1);
+        }}
+        onSortingReset={() => {
+          setSortBy(undefined);
+          setSortOrder("desc");
+          setPage(1);
+        }}
         isLoading={isLoading}
         limit={CONFLICTS_PAGE_SIZE}
         headers={{
-          entry: { content: "Entry" },
-          state: { content: "State" },
-          reason: { content: "Why it waits" },
-          result: { content: "Result" },
+          entry: { content: "Entry", isNotSortable: true },
+          state: { content: "State", isNotSortable: true },
+          reason: { content: "Why it waits", isNotSortable: true },
+          result: { content: "Result", isNotSortable: true },
           ai: { content: "AI verdict" },
         }}
         rowClickExcludeKeys={["ai"]}

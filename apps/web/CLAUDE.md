@@ -423,7 +423,8 @@ component needs to build the value itself (a `basePath` string, not a `getHref` 
 ## Mockups
 
 Design proposals are built as standalone HTML in `docs/mockups/`, not as throwaway files
-outside the repository. The full reference — palette roles, scales, what a mockup must respect
+outside the repository, through the project skill `mockup` (`.agents/skills/mockup`), which
+walks the template, the token sync, the checks and the Artifact publish in order. The full reference — palette roles, scales, what a mockup must respect
 to be buildable — is [`docs/design-system.md`](../../docs/design-system.md). The rules that
 break silently when ignored:
 

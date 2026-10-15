@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CustomListsOrderSchema } from "./custom-lists.schema";
 import { CompanySchema } from "./games.schema";
 import { ObjectIdSchema } from "./utils";
 
@@ -233,6 +234,10 @@ export const ConflictsSummarySchema = z.object({
     .describe("Conflicts waiting for a decision per source"),
 });
 
+export const CONFLICTS_SORTS = ["queue", "ai"] as const;
+
+export const ConflictsSortSchema = z.enum(CONFLICTS_SORTS);
+
 export const GetConflictsRequestSchema = z.object({
   page: z.coerce.number().int().min(1).default(1).describe("Page"),
   take: z.coerce
@@ -256,6 +261,12 @@ export const GetConflictsRequestSchema = z.object({
     .stringbool()
     .optional()
     .describe("Only conflicts OpenAI has judged"),
+  sortBy: ConflictsSortSchema.default("queue").describe(
+    "queue: waiting first, then oldest first; ai: by AI verdict, conflicts without one last in either order"
+  ),
+  sortOrder: CustomListsOrderSchema.default("desc").describe(
+    "With sortBy=ai, desc puts confident matches first"
+  ),
 });
 
 export const ConflictCandidateGameSchema = z.object({
@@ -376,6 +387,7 @@ export type IConflictsSummaryRequest = z.infer<
   typeof ConflictsSummaryRequestSchema
 >;
 export type IConflictsSummary = z.infer<typeof ConflictsSummarySchema>;
+export type IConflictsSort = z.infer<typeof ConflictsSortSchema>;
 export type IConflictItemResponse = z.infer<typeof ConflictItemResponseSchema>;
 export type IDecideConflictRequest = z.infer<
   typeof DecideConflictRequestSchema

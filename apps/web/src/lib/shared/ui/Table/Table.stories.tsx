@@ -152,6 +152,23 @@ export const ServerSorting: Story = {
   ),
 };
 
+export const SingleSortableColumn: Story = {
+  render: () => (
+    <Table
+      headers={{
+        name: { ...headers.name, isNotSortable: true },
+        platform: { ...headers.platform, isNotSortable: true },
+        status: { ...headers.status, isNotSortable: true },
+        rating: headers.rating,
+        hours: { ...headers.hours, isNotSortable: true },
+      }}
+      rows={buildRows()}
+      columnStyles={columnStyles}
+      onSortingReset={() => {}}
+    />
+  ),
+};
+
 export const Loading: Story = {
   render: () => <Table headers={headers} rows={buildRows()} isLoading />,
 };

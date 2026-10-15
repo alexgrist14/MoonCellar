@@ -22,6 +22,7 @@ interface ITableProps<T> {
   isWithoutMobileSorting?: boolean;
   limit?: number;
   sortingCallback?: (key: keyof T, order: "asc" | "desc") => void;
+  onSortingReset?: () => void;
   onRowClick?: (rowIndex: number) => void;
   rowClickExcludeKeys?: (keyof T)[];
   isWithoutSorting?: boolean;
@@ -44,6 +45,7 @@ export const Table = <T extends object>({
   isWithoutMobileSorting,
   limit,
   sortingCallback,
+  onSortingReset,
   onRowClick,
   rowClickExcludeKeys,
   isWithoutSorting,
@@ -176,7 +178,7 @@ export const Table = <T extends object>({
       !!onRowClick &&
       rowIndex !== undefined &&
       !rowClickExcludeKeys?.includes(key);
-    const isSortable = isHeader && !isWithoutSorting;
+    const isSortable = isHeader && !isWithoutSorting && !cell.isNotSortable;
 
     return (
       <div
@@ -207,6 +209,10 @@ export const Table = <T extends object>({
               setSortingKey(key);
               setSortingOrder("desc");
               sortingCallback?.(key, "desc");
+            } else if (sortingOrder === "asc" && onSortingReset) {
+              setSortingKey(undefined);
+              setSortingOrder("desc");
+              onSortingReset();
             } else {
               setSortingOrder(sortingOrder === "asc" ? "desc" : "asc");
               sortingCallback?.(

@@ -23,6 +23,7 @@ switches to `MobileTable` — one card per row with that field as the card head.
 | `initialSortingKey`      | `keyof T`                                 | —           | Column sorted on mount.                                                                  |
 | `initialSortingOrder`    | `"asc" \| "desc"`                         | `"desc"`    | Initial order.                                                                           |
 | `sortingCallback`        | `(key, order) => void`                    | —           | Server-side sorting: rows are shown as given and the callback reports header clicks.     |
+| `onSortingReset`         | `() => void`                              | —           | A third click on the sorted column (desc → asc → off) clears the sorting and calls it.   |
 | `isLoading`              | `boolean`                                 | —           | Shows eight skeleton rows (kept for a minimum time).                                     |
 | `limit`                  | `number`                                  | `50`        | Rows per client page.                                                                    |
 | `mobileHeadField`        | `keyof T`                                 | —           | Enables the mobile card layout; this field heads each card.                              |
@@ -36,7 +37,8 @@ switches to `MobileTable` — one card per row with that field as the card head.
 
 `ITableCell`: `content` (string or node), `sortingValue` (used instead of `content` when
 sorting), `onClick`, `className`, `style`, `id`, `isHidden` (a hidden header hides the column),
-`isNotResizable` (header only), `title` (filled automatically for the mobile layout), `link`.
+`isNotResizable` (header only), `isNotSortable` (header only: no arrow, clicks do not sort that
+column), `title` (filled automatically for the mobile layout), `link`.
 
 ## Usage
 
@@ -101,8 +103,15 @@ import { Table } from "@/src/lib/shared/ui/Table";
 - **A sortable table sets `initialSortingKey` (and `initialSortingOrder` when it is not
   `desc`).** Without it the mobile sort control reads "Select..." and the arrow shows nothing.
   Pick the order the rows already arrive in, so the first render does not reshuffle them. When
-  the row order is meaningful on its own (Conflicts: waiting first; Images: children under their
-  parent), pass `isWithoutSorting` instead.
+  the row order is meaningful on its own (Images: children under their parent), pass
+  `isWithoutSorting` instead. A list that has such an order and a few columns the server can sort
+  by (Conflicts: queue order, and the AI verdict) marks every other header `isNotSortable`, sorts
+  through `sortingCallback`, and passes `onSortingReset` so a third click returns to that order;
+  it leaves `initialSortingKey` unset while the list is in its own order.
+- **The sort state lives in the table, so a consumer that also sorts from outside (a `SortControl`)
+  remounts it with a `key` built from the sort.** `initialSortingKey`/`initialSortingOrder` are read
+  on mount only; without the remount the header arrow keeps showing the previous sort. The remount
+  also resets resized column widths.
 - Over `limit` rows the table pages them itself with the shared `Pagination` (inline, without
   the summary lines); at `limit` or fewer it renders no pager. For a server-paginated list pass
   one page of rows, no more than `limit`, and render `Pagination` beside it, as `ConflictList`
@@ -115,5 +124,5 @@ import { Table } from "@/src/lib/shared/ui/Table";
 
 ## Storybook
 
-`Shared/Table`: `Default`, `Paginated`, `ClickableRows`, `RowClick`, `ServerSorting`, `Loading`, `Empty`, `WithoutRows`,
+`Shared/Table`: `Default`, `Paginated`, `ClickableRows`, `RowClick`, `ServerSorting`, `SingleSortableColumn`, `Loading`, `Empty`, `WithoutRows`,
 `ZeroAndMissingValues`, `Mobile`, `WithoutSorting`, `DimmedRows`, `RowLayout`.
