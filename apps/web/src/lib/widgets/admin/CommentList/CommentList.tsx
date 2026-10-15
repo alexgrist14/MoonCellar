@@ -36,7 +36,7 @@ const SUCCESS_MESSAGES: Record<IAdminCommentAction, string> = {
 };
 
 export const CommentList: FC = () => {
-  const [status, setStatus] = useState<ICommentStatus>();
+  const [status, setStatus] = useState<ICommentStatus | undefined>("visible");
   const [page, setPage] = useState(1);
 
   const { data, isLoading, isFetching } = useAdminCommentsQuery(status, page);

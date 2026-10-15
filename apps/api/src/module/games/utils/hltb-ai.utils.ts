@@ -1,5 +1,4 @@
-import type { IConflictAiVerdict } from "@mooncellar/schemas";
-import { HLTB_AI_APPLY_CONFIDENCES } from "../constants/hltb";
+import { clip, companiesWith } from "../../conflicts/utils/conflicts-ai.utils";
 import {
   type HltbPage,
   type HltbSearchEntry,
@@ -30,26 +29,6 @@ A candidate is not the entry when:
 Release years can differ by a year or two, because HLTB dates a game by its earliest release anywhere (early access, Japan, arcade). Platform lists are often incomplete on both sides. Missing data is not evidence against a match; a contradiction is.
 
 Answer with the ids of the candidates that are the entry, or an empty list when none is. Set confidence to "high" only when the title, the developer or the description, and the dates agree and nothing contradicts them; "medium" when the match is likely but a key fact is missing; "low" when you are guessing. Write the reason as one sentence that names the deciding facts and the chosen game by its title, never by its id.`;
-
-export const hltbAiSchema = (gameIds: string[]) => ({
-  type: "object",
-  additionalProperties: false,
-  required: ["gameIds", "confidence", "reason"],
-  properties: {
-    gameIds: { type: "array", items: { type: "string", enum: gameIds } },
-    confidence: { type: "string", enum: ["high", "medium", "low"] },
-    reason: { type: "string" },
-  },
-});
-
-const clip = (text: string | null | undefined, max: number) =>
-  text && text.length > max ? `${text.slice(0, max)}…` : text || null;
-
-const companiesWith = (
-  companies: THltbAiGame["companies"],
-  role: "developer" | "publisher"
-) =>
-  (companies ?? []).filter((company) => company[role]).map(({ name }) => name);
 
 export const buildHltbAiInput = ({
   entry,
@@ -101,28 +80,3 @@ export const buildHltbAiInput = ({
     })),
   });
 };
-
-export const toHltbAiVerdict = (
-  text: string,
-  gameIds: string[],
-  model: string
-): IConflictAiVerdict => {
-  const answer = JSON.parse(text) as Pick<
-    IConflictAiVerdict,
-    "gameIds" | "confidence" | "reason"
-  >;
-  const allowed = new Set(gameIds);
-
-  return {
-    gameIds: [...new Set(answer.gameIds)].filter((id) => allowed.has(id)),
-    confidence: answer.confidence,
-    reason: answer.reason,
-    model,
-    judgedAt: new Date().toISOString(),
-  };
-};
-
-export const isHltbAiMatch = (verdict: IConflictAiVerdict | null | undefined) =>
-  !!verdict?.gameIds.length &&
-  !verdict.undoneAt &&
-  HLTB_AI_APPLY_CONFIDENCES.includes(verdict.confidence);

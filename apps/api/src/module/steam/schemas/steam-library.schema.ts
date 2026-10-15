@@ -5,6 +5,7 @@ export interface ISteamLibraryEntry {
   appId: number;
   gameId: mongoose.Types.ObjectId;
   playtime: number;
+  lastPlayed?: number;
 }
 
 @Schema({ collection: "steamlibraries", versionKey: false })

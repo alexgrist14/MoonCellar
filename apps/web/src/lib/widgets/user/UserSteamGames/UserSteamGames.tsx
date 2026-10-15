@@ -34,13 +34,14 @@ import styles from "./UserSteamGames.module.scss";
 
 const PREVIEW_LIMIT = 12;
 const PREVIEW_ROWS = 2;
-const PAGE_SIZE = 24;
+const PAGE_SIZE = 48;
 const SORT_PARAM = "sort";
 const ORDER_PARAM = "order";
 
 const SORT_OPTIONS: ISortControlOption<ISteamLibrarySort>[] = [
   { value: "achievements", label: "Achievements" },
   { value: "playtime", label: "Playtime" },
+  { value: "lastPlayed", label: "Last played" },
   { value: "name", label: "Name" },
   { value: "release", label: "Release date" },
   { value: "rating", label: "Rating" },
@@ -256,24 +257,40 @@ export const UserSteamGames: FC<IUserSteamGamesProps> = ({
                   })}
                 >
                   <GameCard game={game} style={CARD_STYLE} />
-                  <div className={styles.steam__caption}>
-                    {hasProgress ? (
-                      <Badge tone={isMastered ? "attention" : "neutral"}>
-                        {isMastered ? "Mastered" : `${unlocked} / ${total}`}
-                      </Badge>
-                    ) : (
-                      <span />
-                    )}
-                    <span className={styles.steam__date}>
-                      {isMastered && masteredAt
+                  <Badge
+                    className={styles.steam__badge}
+                    tone={
+                      isMastered
+                        ? "attention"
+                        : hasProgress
+                          ? "neutral"
+                          : "muted"
+                    }
+                  >
+                    {isMastered
+                      ? "Mastered"
+                      : hasProgress
+                        ? `${unlocked} / ${total}`
+                        : game.steamAchievements?.total
+                          ? `0 / ${game.steamAchievements.total}`
+                          : "No achievements"}
+                  </Badge>
+                  <span className={styles.steam__date}>
+                    {[
+                      isMastered && masteredAt
                         ? commonUtils.formatDate(masteredAt)
                         : hasProgress
                           ? `${Math.round((unlocked / total) * 100)}%`
-                          : playtime
-                            ? formatPlaytime(playtime)
-                            : "Not played"}
-                    </span>
-                  </div>
+                          : null,
+                      playtime
+                        ? formatPlaytime(playtime)
+                        : hasProgress
+                          ? null
+                          : "Not played",
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </span>
                 </li>
               );
             }

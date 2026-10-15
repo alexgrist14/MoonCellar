@@ -109,6 +109,80 @@ describe("ConflictsService", () => {
     );
   });
 
+  it("undoes a skipped conflict through the source's undoSkip", async () => {
+    const created = new Types.ObjectId();
+    const conflict = {
+      _id: "c2",
+      externalId: "8937",
+      status: "absent",
+      externalData: { created: String(created) },
+      winner: created,
+    };
+    const updateOne = jest.fn().mockResolvedValue({ modifiedCount: 1 });
+    const undo = jest.fn();
+    const undoSkip = jest.fn().mockResolvedValue(undefined);
+    const service = createService({
+      conflictsModel: {
+        ...idleModel,
+        findOne: jest.fn().mockReturnValue(query(conflict)),
+        updateOne,
+      },
+      handler: { ...createHandler(), undo, undoSkip },
+    });
+
+    await service.undo("vndb", "8937", ADMIN);
+
+    expect(undo).not.toHaveBeenCalled();
+    expect(undoSkip).toHaveBeenCalledWith({
+      externalId: "8937",
+      externalData: { created: String(created) },
+      winners: [created],
+    });
+    expect(updateOne).toHaveBeenCalledWith(
+      { _id: "c2", status: "absent" },
+      { $set: expect.objectContaining({ status: "pending" }) }
+    );
+  });
+
+  it("refuses to undo a skip when the source can only undo matches", async () => {
+    const service = createService({
+      conflictsModel: {
+        ...idleModel,
+        findOne: () =>
+          query({ _id: "c3", externalId: "1", status: "absent", winners: [] }),
+      },
+      handler: { ...createHandler(), undo: jest.fn() },
+    });
+
+    await expect(service.undo("vndb", "1", ADMIN)).rejects.toThrow(
+      "vndb skips cannot be undone"
+    );
+  });
+
+  it("leaves decisions to the process that holds the apply lock", async () => {
+    const handler = createHandler();
+    const service = createService({
+      conflictsModel: {
+        ...idleModel,
+        find: () => query([{ _id: "c4", externalId: "1", decision: "skip" }]),
+        db: {
+          collection: () => ({
+            updateOne: jest.fn().mockRejectedValue({ code: 11000 }),
+          }),
+        },
+      },
+      handler,
+    });
+
+    await (
+      service as unknown as {
+        applyDecisions: (source: string) => Promise<void>;
+      }
+    ).applyDecisions("vndb");
+
+    expect(handler.apply).not.toHaveBeenCalled();
+  });
+
   it("refuses to undo for a source without an undo", async () => {
     const service = createService({ conflictsModel: idleModel });
 

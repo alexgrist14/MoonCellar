@@ -589,8 +589,10 @@ break silently when ignored:
 
 ## Data fetching failures
 
-- **Every failed request already shows a toast**, from the response interceptor in
-  `shared/api/agent.api.ts`, so never call `toast.error` for an `agent` request yourself — not in a
+- **Every failed request already shows a toast with the API's `message`**, from the response
+  interceptor in `shared/api/agent.api.ts` — the API guarantees one in English for every error (the
+  Errors section of `apps/api/CLAUDE.md`), so a toast that reads "Request failed with status …" is an
+  API bug to fix there, not here. Never call `toast.error` for an `agent` request yourself — not in a
   mutation's `onError`, not in a `catch` around `mutateAsync`. The API's message then appears
   twice, once under the interceptor's "Error" title and once without it ("Steam import is not
   configured" stacked twice). Handle the failure without a toast — re-enable a button, keep a modal

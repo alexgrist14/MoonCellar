@@ -34,6 +34,33 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   `TypeError` thrown by `Reflect.getMetadata`; started from `apps/api` it runs. This applies to
   scratch scripts kept outside the app too.
 
+## Errors
+
+- **Every error response is `{ statusCode, message, ... }`, and `message` is a non-empty English sentence
+  the web shows as is.** `agent.api.ts` toasts `message` for every failed request, so a missing or vague one
+  reaches the user as "Request failed with status 500" with no way to act on it. This applies to every
+  endpoint, new or changed.
+- **Throw a Nest `HttpException` with a specific message for anything the caller can act on; never a plain
+  `Error` in a request path.** Say what failed and, where it helps, what to do: "The game is not a
+  candidate", "Steam hides this library. Set Game details to Public…". Pick the status by who is at fault —
+  4xx for the request, 502 for an upstream service (`BadGatewayException`, as `HltbSearchFailedError` and
+  `remote-image.ts` do), 503 for a missing key or a disabled feature. Never construct an exception without
+  a message, and an exception with an object body carries `message` next to its data
+  (`PossibleDuplicatesErrorSchema`).
+- **`ErrorResponseFilter` (`shared/error-response.filter.ts`, `APP_FILTER`) is the net under that rule, not a
+  replacement for it.** It normalises a list of messages into one sentence, spells out a Zod validation
+  failure field by field ("Validation failed: name: …"), maps a malformed id (`CastError`) to 400, a duplicate
+  key to 409, a failed axios call to 502 naming the host, and a body-parser error to its own status. Anything
+  else becomes 500 with a generic message: the real text stays in the log, because an unknown error's message
+  can carry internals (a connection string, a query) that must not reach a browser. A 500 the user meets is
+  therefore a bug to fix at the throw site.
+- **A guard throws its own message; it never returns `false`.** `false` makes Nest answer
+  "Forbidden resource", which tells an admin nothing; `RolesGuard` names the role the action needs.
+- **A handler that answers through `@Res()` still throws for errors**, never `res.status(4xx).send()`
+  without a body: the filter only shapes what is thrown.
+- **WebSocket gateways are outside the filter** (global filters never reach them, see Sockets) and answer
+  through the ack or `connect_error`.
+
 ## Auth
 
 - **Every path that ends a session clears the cookies in its own response, before anything
@@ -311,7 +338,8 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   not only with an in-memory flag.** `isRunning` and `runCronExclusive` exist per process. On
   2026-09-28 two processes ran the VNDB sync at once, and the unique `vndb.vnId` index rejected
   the loser's games after its images were uploaded, which left about 1,250 orphan folders in the
-  Space. The VNDB sync and the IGDB games and characters syncs take the lock today.
+  Space. The VNDB sync, the IGDB games and characters syncs and the conflict decision worker take the lock
+  today.
 
 - **A game's characters are read from `character.gameIds`, never from `game.characters`.**
   `CHARACTERS_LOOKUP_STAGE` joins on `gameIds` because `linkGameCharacters` (IGDB) and
@@ -691,23 +719,67 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   match wrote in `externalData.applied` (per game: the `hltb` it replaced and the fields the HLTB page filled,
   with their values); undo restores that `hltb` or removes the link, and clears a filled field only while it
   still holds the value HLTB wrote, so an admin's later edit survives. A game linked to another HLTB id since
-  is left alone. A conflict resolved before `applied` existed is undone by unlinking its winners only. Skip has
-  no undo: it created a game that may already be in use.
-- **OpenAI judges HLTB conflicts only through `POST /hltb/conflicts/ai` (`HltbAiService`), and it decides
-  nothing until `apply=true`.** A run judges up to `limit` undecided conflicts that have no verdict yet,
-  with the entry's page (developer, description) and every unlinked candidate, and stores the answer in
-  `externalData.aiVerdict` (game ids, `high`/`medium`/`low`, a reason). The item and the list rows carry it
-  as `aiVerdict`, and `GET /conflicts/list?aiOnly=true` lists only judged conflicts, which is how a dry run
-  is reviewed. With `apply=true` every verdict, stored earlier or new, that names games at a confidence in
-  `HLTB_AI_APPLY_CONFIDENCES` goes through `ConflictsService.decide` as the admin who started the run, with
-  `decidedBy.isAi` (shown as "AI (name)"). `POST /hltb/conflicts/ai/undo` undoes every resolved match carrying
-  that flag; an undone match marks its verdict `undoneAt`, and such a verdict is never applied again. Undo
-  only reads `resolved` conflicts, so run it after the queued decisions are written (the admin screen disables
-  the button while any are), or the ones still queued stay linked.
-  The model never skips: a Skip creates a game and HLTB has no `rematch`, so a wrong one could not be
-  reopened. Set the confidences from a labelled dry run, never by guess. The weekly run replaces
-  `externalData`, so verdicts last until the next sync and a later run judges the queue again. A whole
-  batch failing stops the run, so a spent quota does not leave the queue half judged without a trace.
+  is left alone. A conflict resolved before `applied` existed is undone by unlinking its winners only.
+- **A Skip is taken back through the same endpoint and the handler's `undoSkip`, which only HLTB implements,
+  and only by deleting a game nobody uses.** `ConflictsService.undo` routes an `absent` conflict to
+  `undoSkip`. The HLTB Skip records the game it created in `externalData.created` (`null` when a game already
+  carried that `hltbId` and nothing was created); undo deletes that game through `GamesService.deleteGame`
+  only while `findGamesWithUserData` finds no playthrough, rating, log, comment, list entry, favourite or
+  royal-games entry for it, and answers 409 naming the game otherwise. A Skip made before `created` existed
+  is refused: the game it added cannot be told apart from one that was already there. The admin card asks for
+  confirmation before this undo, because it deletes a game.
+- **OpenAI judges conflicts only through `POST /conflicts/:source/ai` (`ConflictsAiService`), and it decides
+  nothing until `apply=true`.** A run judges up to `limit` undecided conflicts of the source that have no
+  verdict yet and stores the answer in `externalData.aiVerdict` (game ids, `high`/`medium`/`low`, a reason).
+  The item and the list rows carry it as `aiVerdict`, and `GET /conflicts/list?aiOnly=true` lists only judged
+  conflicts, which is how a dry run is reviewed. With `apply=true` every verdict, stored earlier or new, that
+  names games at a confidence in `CONFLICTS_AI_APPLY_CONFIDENCES` goes through `ConflictsService.decide` as
+  the admin who started the run, with `decidedBy.isAi` (shown as "AI (name)"); `limit=0&apply=true` applies
+  the stored verdicts and judges nothing, which is the admin screen's "Apply verdicts" after a dry run.
+  `POST /conflicts/ai` (the All tab) runs the same review for every source in turn, `limit` per source, and
+  `POST /conflicts/ai/undo` undoes every source that can. One AI job runs at a time, whatever its source
+  (in-process flag plus the `conflicts-ai` `withDbLock`), so two runs never spend the OpenAI quota at once.
+  A job counts its work before it starts (stored verdicts to apply plus conflicts to judge, or matches to
+  undo, over every source it covers) and keeps its progress in memory; `GET /conflicts/ai/status` returns
+  it, and the admin screen polls it every second while `isRunning` to draw the bar under the AI buttons.
+  The status lives in the process that runs the job: a job refused because another process holds the lock
+  ends at once with that reason in `error`.
+- **A source judges with the generic prompt unless it registers its own judge.** The generic judge reads
+  the review item (`getItem`: the handler's `describe` and every candidate as stored) and adds a per-source
+  note on what one entry of that source is (`SOURCE_NOTES` in `conflicts-ai.utils.ts`); a new source needs
+  its note there. HLTB registers `HltbAiService.judge` with `ConflictsAiService.register`, which reads the
+  entry's HLTB page and hours and skips candidates already holding an HLTB id. The Steam judge calls `describe`, which reads the
+  store page, so a long Steam run can meet the store's 200-per-5-minutes limit; the entry is then judged
+  without its details.
+- **The conflict decision worker runs under `withDbLock("conflicts-apply-<source>")`, never on its in-memory
+  `applying` flag alone.** `getSummary` restarts the worker in whichever process serves it while decisions
+  are queued, so a local API and the production one on the same database both wrote the same Skips on
+  2026-10-15: Twilight Observer and Black Hole were created twice, and Asteroid Quest! got its game while its
+  conflict went back to Waiting. A process that finds the lock held leaves the queue to the holder, which reads
+  every queued decision, whoever made it.
+- **Only a source whose handler has `undo` (HLTB today) can take its AI matches back.**
+  `POST /conflicts/:source/ai/undo` (or `/conflicts/ai/undo`) undoes the resolved matches carrying
+  `decidedBy.isAi` — every one, or only the `items` (`{ source, externalId }`) in the body, which the admin
+  screen picks from `GET /conflicts/ai/matches` (newest first: all, the latest 10, or one by one) — and answers
+  400 for any other source; an undone match marks its verdict `undoneAt`, and such a verdict is never applied again.
+  Undo only reads `resolved` conflicts, so run it after the queued decisions are written (the admin screen
+  disables the button while any are), or the ones still queued stay linked. On the other sources an applied
+  AI match is permanent, which is why "Apply verdicts" warns there. Apply never skips. Set the confidences
+  from a labelled dry run, never by guess. A sync that replaces `externalData` drops the verdicts, and a later run judges those
+  conflicts again. A whole batch failing stops the run, so a spent quota does not leave the queue half judged
+  without a trace.
+- **The AI adds a game only through `POST /conflicts/:source/ai/create` (and `POST /conflicts/ai/create`),
+  and only where the source registered `canCreate`.** It turns every undecided conflict whose verdict names
+  no game at a confidence in `CONFLICTS_AI_APPLY_CONFIDENCES`, never undone, and that `canCreate` accepts
+  into a Skip as the admin with `decidedBy.isAi`; the handler then creates the game as for a manual Skip.
+  HLTB allows it for entries of type `game` only — DLC, mods and hacks stay for a person. "No candidate is the
+  entry" is not "the entry belongs in the catalogue", so this is a separate button with a confirmation, never
+  part of Apply. Each such game is taken back from its conflict card (Undo new game, the `undoSkip` above);
+  undoing marks the verdict `undoneAt`, so the next run does not add it again. "Undo AI matches" does not
+  touch them.
+- **The AI routes (`ai`, `:source/ai` and their `/create` and `/undo`) stay declared above the `:source/:externalId`
+  routes in `ConflictsController`.** Express matches in declaration order, so below them `ai/undo` reaches the
+  per-conflict undo with `externalId = "ai"`.
 - **An id set by hand ends the source's open conflicts for that game, never its decided ones.**
   `POST /hltb/games/parse?hltbId`, `POST /vndb/games/parse?vnId` and `POST /ra/games/parse?raId`
   call `ConflictsService.removeForGame`: it deletes the conflict of the linked id itself and every

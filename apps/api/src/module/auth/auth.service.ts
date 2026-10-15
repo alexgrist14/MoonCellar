@@ -121,7 +121,7 @@ export class AuthService {
     const user = await this.userModel.findById(userId);
 
     if (!user?.refreshToken) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException("The session has ended. Sign in again.");
     }
 
     try {

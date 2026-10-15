@@ -272,8 +272,8 @@ pins the internal API address, so it stays a secret on both counts.
 | `METRICS_TOKEN` | **yes** | Bearer token guarding `/metrics`. Prometheus must be configured with the same value |
 | `INDEXNOW_KEY` | **yes** | IndexNow key used to submit new game pages to search engines |
 | `SEARXNG_URL` | no | SearXNG the admin "Fill with AI" draft searches through — `http://searxng:8080`, the `searxng` service of `infra/docker-compose.prod.yml`. The default, `http://localhost:8891`, is empty inside the container: every search step then fails |
-| `OPENAI_API_KEY` | **yes** | OpenAI key for the admin "Fill with AI" game draft and the HLTB conflict review. Without it `POST /games/ai-drafts` and `POST /hltb/conflicts/ai` answer 503 |
-| `OPENAI_MODEL` | no | Model the draft and the HLTB conflict review run on, `gpt-5-mini` by default |
+| `OPENAI_API_KEY` | **yes** | OpenAI key for the admin "Fill with AI" game draft and the AI conflict review. Without it `POST /games/ai-drafts` and `POST /conflicts/:source/ai` answer 503 |
+| `OPENAI_MODEL` | no | Model the draft and the AI conflict review run on, `gpt-5-mini` by default |
 | `SITE_SESSIONS_KEY` | **yes** | Any long random string; the cookies of the admin Sites tab are encrypted with its SHA-256. Must be the same wherever the same database is used, or stored cookies cannot be read. Without it saving a site answers 503 |
 | `RECRAFT_API_TOKEN` | **yes** | Recraft API token for the admin Images tab (recraft.ai → Profile → API). Without it generating with a Recraft model answers 503; OpenAI models keep working through `OPENAI_API_KEY` |
 | `STEAMGRIDDB_API_KEY` | **yes** | SteamGridDB API key (steamgriddb.com → Preferences → API) the draft takes covers and hero banners from. Without it that step fails and the draft falls back to images found elsewhere |

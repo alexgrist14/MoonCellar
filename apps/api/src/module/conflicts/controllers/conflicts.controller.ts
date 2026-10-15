@@ -12,7 +12,12 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
-import { ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from "@nestjs/swagger";
 import {
   ConflictSourceSchema,
   type IConflictSource,
@@ -24,6 +29,9 @@ import type { IAuthorizedRequest } from "../../comments/types/community.type";
 import {
   AddConflictCandidateRequestDto,
   ConflictItemResponseDto,
+  ConflictsAiStatusDto,
+  ConflictAiMatchesResponseDto,
+  UndoAiMatchesRequestDto,
   ConflictsResponseDto,
   ConflictsSummaryDto,
   GameConflictsResponseDto,
@@ -31,6 +39,7 @@ import {
   DecideConflictRequestDto,
   GetConflictsRequestDto,
 } from "../../../shared/zod/dto/conflicts.dto";
+import { ConflictsAiService } from "../services/conflicts-ai.service";
 import { ConflictsService } from "../services/conflicts.service";
 
 const parseSource = (value: string): IConflictSource => {
@@ -50,7 +59,10 @@ const parseSource = (value: string): IConflictSource => {
 @UseGuards(AuthGuard("jwt"), RolesGuard)
 @Roles(RolesEnum.ADMIN)
 export class ConflictsController {
-  constructor(private readonly conflictsService: ConflictsService) {}
+  constructor(
+    private readonly conflictsService: ConflictsService,
+    private readonly conflictsAi: ConflictsAiService
+  ) {}
 
   @Get()
   @ApiOperation({
@@ -80,6 +92,95 @@ export class ConflictsController {
   @ApiOkResponse({ type: GameConflictsResponseDto })
   getForGame(@Param("gameId") gameId: string) {
     return this.conflictsService.getForGame(gameId);
+  }
+
+  @Get("ai/status")
+  @ApiOperation({
+    summary: "Progress of the running AI job, or the result of the last one",
+  })
+  @ApiOkResponse({ type: ConflictsAiStatusDto })
+  getAiStatus() {
+    return this.conflictsAi.getStatus();
+  }
+
+  @Get("ai/matches")
+  @ApiOperation({
+    summary:
+      "Matches the AI made that can be undone, newest first, for a source or every source that can undo",
+  })
+  @ApiOkResponse({ type: ConflictAiMatchesResponseDto })
+  getAiMatches(@Query("source") source?: string) {
+    return this.conflictsAi.getMatches(
+      source ? parseSource(source) : undefined
+    );
+  }
+
+  @Post(["ai", ":source/ai"])
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      "Ask OpenAI in the background to judge undecided conflicts of a source, or of each source without one; with apply, confident verdicts are decided",
+  })
+  @ApiQuery({
+    name: "limit",
+    required: false,
+    description:
+      "How many conflicts without a verdict to judge per source (default 200); 0 with apply only applies stored verdicts",
+  })
+  @ApiQuery({
+    name: "apply",
+    required: false,
+    description:
+      "true decides every confident match, including verdicts stored by earlier runs",
+  })
+  reviewWithAi(
+    @Req() request: IAuthorizedRequest,
+    @Param("source") source?: string,
+    @Query("limit") limit?: string,
+    @Query("apply") apply?: string
+  ) {
+    return this.conflictsAi.start(
+      source === undefined ? undefined : parseSource(source),
+      {
+        limit: limit === undefined ? 200 : Math.max(0, Number(limit) || 0),
+        apply: apply === "true",
+      },
+      request.user
+    );
+  }
+
+  @Post(["ai/create", ":source/ai/create"])
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      "Add a new game in the background for every waiting conflict whose AI verdict says, with high confidence, that no candidate is the entry; only sources that allow it",
+  })
+  createWithAi(
+    @Req() request: IAuthorizedRequest,
+    @Param("source") source?: string
+  ) {
+    return this.conflictsAi.startCreate(
+      source === undefined ? undefined : parseSource(source),
+      request.user
+    );
+  }
+
+  @Post(["ai/undo", ":source/ai/undo"])
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      "Undo in the background every match the AI made for a source, or for every source that can undo, and put those conflicts back in the queue",
+  })
+  undoAiDecisions(
+    @Req() request: IAuthorizedRequest,
+    @Body() dto: UndoAiMatchesRequestDto,
+    @Param("source") source?: string
+  ) {
+    return this.conflictsAi.startUndo(
+      source === undefined ? undefined : parseSource(source),
+      request.user,
+      dto?.items
+    );
   }
 
   @Get(":source/:externalId")

@@ -189,6 +189,7 @@ export class SteamAccountService {
                 appId: game.appid,
                 gameId,
                 playtime: game.playtime_forever ?? 0,
+                lastPlayed: game.rtime_last_played ?? 0,
               },
             ];
           }),

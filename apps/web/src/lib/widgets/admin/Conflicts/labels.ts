@@ -69,6 +69,26 @@ const REOPENABLE: Record<IConflictSource, boolean> = {
   steam: false,
 };
 
+const UNDOABLE: Record<IConflictSource, boolean> = {
+  vndb: false,
+  igdb: false,
+  hltb: true,
+  ra: false,
+  steam: false,
+};
+
+export const isUndoable = (source: IConflictSource) => UNDOABLE[source];
+
+const AI_CREATES: Record<IConflictSource, boolean> = {
+  vndb: false,
+  igdb: false,
+  hltb: true,
+  ra: false,
+  steam: false,
+};
+
+export const canAiCreate = (source: IConflictSource) => AI_CREATES[source];
+
 export const isReopenable = (source: IConflictSource, state: string) =>
   REOPENABLE[source] && state === "new-game";
 
@@ -123,6 +143,11 @@ export const stateTone = (state: IConflictState) =>
     : state === "matched" || state === "new-game"
       ? "positive"
       : "muted";
+
+export const aiVerdictTone = (verdict: IConflictAiVerdict): BadgeTone =>
+  verdict.undoneAt || !verdict.gameIds.length
+    ? "muted"
+    : AI_CONFIDENCE_TONES[verdict.confidence];
 
 export const AI_CONFIDENCE_TONES: Record<
   IConflictAiVerdict["confidence"],

@@ -96,9 +96,10 @@
   }
 
   &__item {
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-x2);
+    display: grid;
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+    row-gap: var(--gap-x2);
     min-width: 0;
 
     &_hidden {
@@ -106,12 +107,8 @@
     }
   }
 
-  &__caption {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--gap-x2);
-    min-width: 0;
+  &__badge {
+    justify-self: start;
   }
 
   &__date {

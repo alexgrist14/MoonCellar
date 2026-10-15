@@ -45,7 +45,13 @@ agent.interceptors.response.use(
         });
     }
 
-    const errorMessage = err?.response?.data?.message ?? "Something went wrong";
+    const message = err.response?.data?.message;
+    const errorMessage =
+      typeof message === "string" && message
+        ? message
+        : err.response
+          ? `Request failed with status ${err.response.status}`
+          : "The server could not be reached. Check your connection.";
 
     logger.error("API request error", err, {
       url: err.config?.url,

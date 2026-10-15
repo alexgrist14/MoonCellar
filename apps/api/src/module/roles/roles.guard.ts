@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   Injectable,
   type CanActivate,
   type ExecutionContext,
@@ -21,6 +22,12 @@ export class RolesGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-    return requiredRoles.some((role) => user.roles?.includes(role));
+    if (!requiredRoles.some((role) => user?.roles?.includes(role))) {
+      throw new ForbiddenException(
+        `This action needs the ${requiredRoles.join(" or ")} role`
+      );
+    }
+
+    return true;
   }
 }

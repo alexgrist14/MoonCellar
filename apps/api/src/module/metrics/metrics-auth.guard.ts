@@ -13,7 +13,7 @@ export class MetricsAuthGuard implements CanActivate {
     const header: string | undefined = req.headers?.authorization;
 
     if (!token || header !== `Bearer ${token}`) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException("A valid metrics token is required");
     }
 
     return true;

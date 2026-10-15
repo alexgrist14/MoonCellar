@@ -42,9 +42,9 @@ export const sortSteamLibrary = (
     });
   }
 
-  if (sortBy === "playtime") {
+  if (sortBy === "playtime" || sortBy === "lastPlayed") {
     return [...rows].sort(
-      (a, b) => (a.playtime - b.playtime) * direction || a.position - b.position
+      (a, b) => (a[sortBy] - b[sortBy]) * direction || a.position - b.position
     );
   }
 

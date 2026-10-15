@@ -2,6 +2,9 @@ import { createZodDto } from "nestjs-zod";
 import {
   AddConflictCandidateRequestSchema,
   ConflictItemResponseSchema,
+  ConflictsAiStatusSchema,
+  ConflictAiMatchesResponseSchema,
+  UndoAiMatchesRequestSchema,
   ConflictsResponseSchema,
   ConflictsSummaryRequestSchema,
   ConflictsSummarySchema,
@@ -38,4 +41,16 @@ export class ConflictsResponseDto extends createZodDto(
 
 export class GameConflictsResponseDto extends createZodDto(
   GameConflictsResponseSchema
+) {}
+
+export class ConflictsAiStatusDto extends createZodDto(
+  ConflictsAiStatusSchema
+) {}
+
+export class ConflictAiMatchesResponseDto extends createZodDto(
+  ConflictAiMatchesResponseSchema
+) {}
+
+export class UndoAiMatchesRequestDto extends createZodDto(
+  UndoAiMatchesRequestSchema
 ) {}

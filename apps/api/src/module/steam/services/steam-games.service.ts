@@ -1,4 +1,8 @@
-import { Injectable, type OnModuleInit } from "@nestjs/common";
+import {
+  BadGatewayException,
+  Injectable,
+  type OnModuleInit,
+} from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Cron } from "@nestjs/schedule";
 import mongoose, { Model } from "mongoose";
@@ -707,7 +711,7 @@ export class SteamGamesService implements OnModuleInit {
     );
 
     if (!response.ok) {
-      throw new Error(`Steam store answered ${response.status}`);
+      throw new BadGatewayException(`Steam store answered ${response.status}`);
     }
 
     const body = (await response.json()) as Record<

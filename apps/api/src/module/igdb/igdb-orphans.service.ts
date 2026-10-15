@@ -28,6 +28,7 @@ import {
   igdbAuth,
   wait,
 } from "./utils/igdb";
+import { findGamesWithUserData } from "../games/utils/game-user-data.utils";
 import {
   IGDB_ORPHANS_BATCH_SIZE,
   IGDB_ORPHANS_CRON,
@@ -50,16 +51,6 @@ type TCandidate = {
   vndb?: { vnId?: string };
   isCustom?: boolean;
 };
-
-const USER_DATA_SOURCES = [
-  { collection: "playthroughs", field: "gameId" },
-  { collection: "ratings", field: "gameId" },
-  { collection: "userlogs", field: "gameId" },
-  { collection: "gamecomments", field: "gameId" },
-  { collection: "customlists", field: "games.gameId" },
-  { collection: "users", field: "favorites" },
-  { collection: "users", field: "royalGames" },
-];
 
 @Injectable()
 export class IgdbOrphansService {
@@ -350,24 +341,8 @@ export class IgdbOrphansService {
     }
   }
 
-  private async findGamesWithUserData(ids: Types.ObjectId[]) {
-    const found = new Set<string>();
-
-    for (let i = 0; i < ids.length; i += IGDB_ORPHANS_BATCH_SIZE) {
-      const chunk = ids.slice(i, i + IGDB_ORPHANS_BATCH_SIZE);
-      const values = [...chunk, ...chunk.map(String)];
-      const results = await Promise.all(
-        USER_DATA_SOURCES.map(({ collection, field }) =>
-          this.connection
-            .collection(collection)
-            .distinct(field, { [field]: { $in: values } })
-        )
-      );
-
-      results.flat().forEach((id) => found.add(String(id)));
-    }
-
-    return found;
+  private findGamesWithUserData(ids: Types.ObjectId[]) {
+    return findGamesWithUserData(this.connection, ids, IGDB_ORPHANS_BATCH_SIZE);
   }
 
   private record(

@@ -11,6 +11,7 @@ const row = (
   gameId,
   appId: position,
   playtime: 100 - position,
+  lastPlayed: position,
   unlocked: null,
   total: null,
   masteredAt: null,
@@ -53,6 +54,11 @@ describe("sortSteamLibrary", () => {
   it("sorts by playtime", () => {
     expect(ids(sortSteamLibrary(rows, "playtime", "desc"))[0]).toBe("none-1");
     expect(ids(sortSteamLibrary(rows, "playtime", "asc"))[0]).toBe("little");
+  });
+
+  it("sorts by last played", () => {
+    expect(ids(sortSteamLibrary(rows, "lastPlayed", "desc"))[0]).toBe("little");
+    expect(ids(sortSteamLibrary(rows, "lastPlayed", "asc"))[0]).toBe("none-1");
   });
 
   it("sorts by name through the list sort keys", () => {

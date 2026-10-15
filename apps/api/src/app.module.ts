@@ -15,7 +15,8 @@ import { GamesModule } from "./module/games/games.module";
 import { CommentsModule } from "./module/comments/comments.module";
 import { CollectionsModule } from "./module/collections/collections.module";
 import { NotificationsModule } from "./module/notifications/notifications.module";
-import { APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
+import { ErrorResponseFilter } from "./shared/error-response.filter";
 import { ZodValidationPipe } from "nestjs-zod";
 import { AdminModule } from "./module/admin/admin.module";
 import { FaroModule } from "./module/faro/faro.module";
@@ -57,6 +58,10 @@ import { CacheModule } from "@nestjs/cache-manager";
     }),
   ],
   providers: [
+    {
+      provide: APP_FILTER,
+      useClass: ErrorResponseFilter,
+    },
     {
       provide: APP_PIPE,
       useClass: ZodValidationPipe,

@@ -6,7 +6,7 @@ import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { drawer } from "@/src/lib/shared/ui/Drawer";
 import { setAdminQuery } from "@/src/lib/shared/utils/admin-url.utils";
 import { Fact } from "./CandidateCard";
-import { AI_CONFIDENCE_TONES } from "./labels";
+import { aiVerdictTone } from "./labels";
 import styles from "./Conflicts.module.scss";
 
 const formatTime = (iso: string) => iso.slice(0, 16).replace("T", " ");
@@ -27,11 +27,7 @@ export const AiVerdictDetails: FC<IAiVerdictDetailsProps> = ({ row }) => {
   return (
     <div className={styles.verdictDetails}>
       <div className={styles.verdictDetails__head}>
-        <Badge
-          tone={
-            verdict.undoneAt ? "muted" : AI_CONFIDENCE_TONES[verdict.confidence]
-          }
-        >
+        <Badge tone={aiVerdictTone(verdict)}>
           {verdict.confidence}
           {verdict.undoneAt && " · undone"}
         </Badge>

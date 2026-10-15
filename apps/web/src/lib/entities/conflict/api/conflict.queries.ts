@@ -11,6 +11,8 @@ const SUMMARY_REFRESH_MS = 5000;
 
 const LIST_STALE_MS = 5 * 60 * 1000;
 
+const AI_STATUS_REFRESH_MS = 1000;
+
 export const conflictItemQueryOptions = (
   source: IConflictSource,
   externalId: string
@@ -42,6 +44,21 @@ export const useConflictsSummaryQuery = (
     refetchInterval: ({ state }) =>
       state.data?.applying ? SUMMARY_REFRESH_MS : false,
     enabled: isEnabled,
+  });
+
+export const useConflictsAiStatusQuery = () =>
+  useQuery({
+    queryKey: conflictQueryKeys.aiStatus(),
+    queryFn: () => adminConflictsApi.getAiStatus().then(({ data }) => data),
+    refetchInterval: ({ state }) =>
+      state.data?.isRunning ? AI_STATUS_REFRESH_MS : false,
+  });
+
+export const useConflictAiMatchesQuery = (source?: IConflictSource) =>
+  useQuery({
+    queryKey: conflictQueryKeys.aiMatches(source),
+    queryFn: () =>
+      adminConflictsApi.getAiMatches(source).then(({ data }) => data),
   });
 
 export const useConflictsQuery = (params: IGetConflictsParams) =>

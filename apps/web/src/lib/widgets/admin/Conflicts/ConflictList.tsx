@@ -17,7 +17,7 @@ import { Pagination } from "@/src/lib/shared/ui/Pagination";
 import { useConflictsQuery } from "@/src/lib/entities/conflict/api";
 import { setAdminQuery } from "@/src/lib/shared/utils/admin-url.utils";
 import {
-  AI_CONFIDENCE_TONES,
+  aiVerdictTone,
   REASON_LABELS,
   SOURCE_LABELS,
   stateLabel,
@@ -42,15 +42,13 @@ export const ConflictList: FC<IConflictListProps> = ({ source }) => {
   const [inputValue, setInputValue] = useState("");
   const [state, setState] = useState<IConflictState | undefined>("waiting");
   const [isAiOnly, setIsAiOnly] = useState(false);
-  const isAiShown = source === "hltb";
-
   const { data, isLoading, isFetching } = useConflictsQuery({
     page,
     take: CONFLICTS_PAGE_SIZE,
     search: search || undefined,
     source,
     state,
-    aiOnly: (isAiShown && isAiOnly) || undefined,
+    aiOnly: isAiOnly || undefined,
   });
 
   const debouncedSearch = useDebouncedCallback((value: string) => {
@@ -88,18 +86,16 @@ export const ConflictList: FC<IConflictListProps> = ({ source }) => {
             }}
           />
         </div>
-        {isAiShown && (
-          <label className={styles.ai__field}>
-            <Checkbox
-              checked={isAiOnly}
-              onChange={() => {
-                setIsAiOnly(!isAiOnly);
-                setPage(1);
-              }}
-            />
-            Only judged by AI
-          </label>
-        )}
+        <label className={styles.ai__field}>
+          <Checkbox
+            checked={isAiOnly}
+            onChange={() => {
+              setIsAiOnly(!isAiOnly);
+              setPage(1);
+            }}
+          />
+          Only judged by AI
+        </label>
       </div>
 
       <Table
@@ -112,7 +108,7 @@ export const ConflictList: FC<IConflictListProps> = ({ source }) => {
           state: { content: "State" },
           reason: { content: "Why it waits" },
           result: { content: "Result" },
-          ai: { content: "AI verdict", isHidden: !isAiShown },
+          ai: { content: "AI verdict" },
         }}
         rowClickExcludeKeys={["ai"]}
         onRowClick={(index) =>
@@ -174,13 +170,7 @@ export const ConflictList: FC<IConflictListProps> = ({ source }) => {
           ai: {
             content: row.aiVerdict ? (
               <div className={styles.rowVerdict}>
-                <Badge
-                  tone={
-                    row.aiVerdict.undoneAt
-                      ? "muted"
-                      : AI_CONFIDENCE_TONES[row.aiVerdict.confidence]
-                  }
-                >
+                <Badge tone={aiVerdictTone(row.aiVerdict)}>
                   {row.aiVerdict.confidence}
                   {!row.aiVerdict.gameIds.length && " · no match"}
                   {row.aiVerdict.undoneAt && " · undone"}

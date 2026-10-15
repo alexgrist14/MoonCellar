@@ -70,13 +70,14 @@ export class SteamLibraryService {
     const gameIds = owned.map(({ gameId }) => gameId);
     const matching = await this.lists.findMatchingGames(gameIds, filters);
     const rows = owned
-      .map(({ appId, gameId, playtime }, index) => {
+      .map(({ appId, gameId, playtime, lastPlayed }, index) => {
         const entry = progress.get(appId);
 
         return {
           gameId: String(gameId),
           appId,
           playtime,
+          lastPlayed: lastPlayed ?? 0,
           unlocked: entry?.unlocked ?? null,
           total: entry?.total ?? null,
           masteredAt: entry?.masteredAt ?? null,

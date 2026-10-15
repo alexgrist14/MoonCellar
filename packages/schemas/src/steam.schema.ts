@@ -8,6 +8,7 @@ import { SteamAccountSchema } from "./user.schema";
 export const STEAM_LIBRARY_SORTS = [
   "achievements",
   "playtime",
+  "lastPlayed",
   "name",
   "release",
   "rating",
@@ -48,6 +49,9 @@ export const SteamLibraryGameSchema = z.object({
   gameId: z.string().describe("Catalogue game"),
   appId: z.number().describe("Steam app"),
   playtime: z.number().describe("Minutes played on Steam"),
+  lastPlayed: z
+    .number()
+    .describe("Unix seconds of the last launch on Steam, 0 when never"),
   unlocked: z
     .number()
     .nullable()

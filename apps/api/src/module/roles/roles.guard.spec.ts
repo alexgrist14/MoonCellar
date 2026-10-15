@@ -23,7 +23,9 @@ describe("RolesGuard", () => {
   it("rejects an authenticated user without the required admin role", () => {
     const guard = new RolesGuard(reflectorWith([RolesEnum.ADMIN]));
 
-    expect(guard.canActivate(ctx([RolesEnum.USER]))).toBe(false);
+    expect(() => guard.canActivate(ctx([RolesEnum.USER]))).toThrow(
+      `This action needs the ${RolesEnum.ADMIN} role`
+    );
   });
 
   it("allows an authenticated user with the required admin role", () => {

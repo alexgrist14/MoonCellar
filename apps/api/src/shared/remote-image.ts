@@ -1,6 +1,7 @@
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import axios from "axios";
+import { BadGatewayException, BadRequestException } from "@nestjs/common";
 
 export const REMOTE_IMAGE_MAX_BYTES = 15 * 1024 * 1024;
 
@@ -76,19 +77,31 @@ const withSession = async (
 });
 
 const assertPublicUrl = async (raw: string) => {
+  if (!URL.canParse(raw)) {
+    throw new BadRequestException(`Not a valid link: ${raw.slice(0, 200)}`);
+  }
+
   const url = new URL(raw);
 
   if (url.protocol !== "https:" && url.protocol !== "http:") {
-    throw new Error(`Unsupported protocol: ${url.protocol}`);
+    throw new BadRequestException(
+      `Only http and https links are allowed, not ${url.protocol}`
+    );
   }
 
   const host = url.hostname.replace(/^\[|\]$/g, "");
   const addresses = isIP(host)
     ? [host]
-    : (await lookup(host, { all: true })).map(({ address }) => address);
+    : await lookup(host, { all: true })
+        .then((found) => found.map(({ address }) => address))
+        .catch(() => {
+          throw new BadRequestException(`${url.hostname} does not exist`);
+        });
 
   if (!addresses.length || addresses.some(isPrivateAddress)) {
-    throw new Error(`Refusing a private address: ${url.hostname}`);
+    throw new BadRequestException(
+      `Links to private addresses are not allowed: ${url.hostname}`
+    );
   }
 
   return url;
@@ -117,7 +130,11 @@ export const downloadRemoteImage = async (
     if (response.status >= 300) {
       const location = response.headers.location;
 
-      if (!location) throw new Error(`Redirect without a location: ${url}`);
+      if (!location) {
+        throw new BadGatewayException(
+          `${url.host} redirected without saying where`
+        );
+      }
 
       url = await assertPublicUrl(new URL(location, url).toString());
       continue;
@@ -129,13 +146,15 @@ export const downloadRemoteImage = async (
       .toLowerCase();
 
     if (!IMAGE_MIME_TYPES.includes(mimetype)) {
-      throw new Error(`Not an image: ${mimetype || "unknown type"}`);
+      throw new BadRequestException(
+        `The link is not an image (${mimetype || "unknown type"})`
+      );
     }
 
     return { buffer: Buffer.from(response.data), mimetype };
   }
 
-  throw new Error(`Too many redirects: ${raw}`);
+  throw new BadGatewayException(`Too many redirects: ${raw}`);
 };
 
 const REMOTE_PAGE_MAX_BYTES = 5 * 1024 * 1024;
@@ -164,12 +183,16 @@ export const downloadRemotePage = async (
     if (response.status >= 300) {
       const location = response.headers.location;
 
-      if (!location) throw new Error(`Redirect without a location: ${url}`);
+      if (!location) {
+        throw new BadGatewayException(
+          `${url.host} redirected without saying where`
+        );
+      }
 
       const next = new URL(location, url);
 
       if (BLOCK_REDIRECT_HOST.test(next.hostname) && next.host !== url.host) {
-        throw new Error(
+        throw new BadGatewayException(
           `${url.host} redirected to ${next.host}: the site blocks requests from this server's region`
         );
       }
@@ -181,7 +204,7 @@ export const downloadRemotePage = async (
     return response.data;
   }
 
-  throw new Error(`Too many redirects: ${raw}`);
+  throw new BadGatewayException(`Too many redirects: ${raw}`);
 };
 
 const PAGE_IMAGE_CANDIDATES_LIMIT = 80;

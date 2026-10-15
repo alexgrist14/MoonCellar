@@ -121,7 +121,9 @@ share one store page. So steps 1 and 2 can find several games for one app, and
 - then a "Main Game".
 
 The matched games are stored in the `steamlibraries` collection, one document per user:
-`{ userId, games: [{ appId, gameId, playtime }], syncedAt }`. They are kept out of the user
+`{ userId, games: [{ appId, gameId, playtime, lastPlayed }], syncedAt }`, with `lastPlayed` in
+Unix seconds from `rtime_last_played` (0 when never launched; missing in libraries imported before
+the field existed until their next import). They are kept out of the user
 document, so the library does not travel with every user response. The import's response
 reports `matchedCount` of `ownedCount`. It also lists the rest in `unmatched`; the settings
 section opens them from a button as a searchable menu of links to their store pages.
@@ -146,10 +148,14 @@ library from that old list and the stored achievement progress, without playtime
 ### Where it shows
 
 - **Profile → Steam tab** (`UserSteamGames`, `POST /steam/library`).
-  - **Games:** every library game in the catalogue, 24 per page. Each has its progress ("34 / 51",
-    "Mastered" with the date), or its playtime when it has no achievements.
+  - **Games:** every library game in the catalogue, 48 per page. Each has a badge — "Mastered"
+    with the date, "34 / 51" with the percentage, or a muted "0 / 51" or "No achievements" — and
+    always its playtime ("Not played" when it has neither). The cards, badges and text lines sit
+    on a subgrid, so every card of a row stays aligned.
   - **Sort:** Achievements (default: mastered first, newest first, then by progress, games
-    without achievements last in either direction), Playtime, Name, Release date or Rating.
+    without achievements last in either direction), Playtime, Last played, Name, Release date or
+    Rating. Steam has no public field for the date a game was added to a library, so there is no
+    sort by it.
   - **Filters:** the catalogue filters from the left "Filters" menu. Sort and filters live in
     the URL (`sort`, `order` and the `/games` filter params).
 - **Profile → main tab.** A two-row Steam block, in the default order.

@@ -25,6 +25,9 @@ export class JwtRefreshGuard extends AuthGuard("jwt-refresh") {
       http.getRequest<Request>().headers?.origin
     );
 
-    throw error ?? new UnauthorizedException();
+    throw (
+      error ??
+      new UnauthorizedException("The session has expired. Sign in again.")
+    );
   }
 }

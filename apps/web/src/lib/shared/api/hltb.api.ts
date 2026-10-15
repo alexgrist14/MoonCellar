@@ -23,16 +23,6 @@ const parseGame = (target: {
   });
 };
 
-const reviewConflicts = (params: { limit: number; apply: boolean }) =>
-  agent.post<{ message: string }>(`${HLTB_URL}/conflicts/ai`, undefined, {
-    params,
-  });
-
-const undoAiDecisions = () =>
-  agent.post<{ message: string }>(`${HLTB_URL}/conflicts/ai/undo`);
-
 export const hltbApi = {
   parseGame,
-  reviewConflicts,
-  undoAiDecisions,
 };

@@ -1,6 +1,7 @@
 "use client";
 
 import { FC, RefObject } from "react";
+import { ProgressBar } from "@/src/lib/shared/ui/ProgressBar";
 import styles from "./GameSteamPopover.module.scss";
 import { ISteamProgress } from "@mooncellar/schemas";
 import { Popover } from "@/src/lib/shared/ui/Popover";
@@ -51,12 +52,11 @@ export const GameSteamPopover: FC<IGameSteamPopoverProps> = ({
                 {isMastered ? "Mastered" : "In progress"}
               </Badge>
             </div>
-            <progress
-              className={styles.steam__progress}
+            <ProgressBar
               value={unlocked}
               max={total}
+              tone={isMastered ? "attention" : "neutral"}
               aria-label={`${unlocked} of ${total} achievements unlocked`}
-              data-mastered={isMastered || undefined}
             />
             <p className={styles.steam__sub}>
               {isMastered

@@ -6,6 +6,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { Skeleton } from "@/src/lib/shared/ui/Skeleton";
 import { Badge } from "@/src/lib/shared/ui/Badge";
+import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
+import { modal } from "@/src/lib/shared/ui/Modal";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { pluralize } from "@/src/lib/shared/utils/plural.utils";
 import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
@@ -27,9 +29,9 @@ import { CandidateCard, Fact } from "./CandidateCard";
 import { CandidateSearch } from "./CandidateSearch";
 import { ConflictList } from "./ConflictList";
 import { EntryCard } from "./EntryCard";
-import { HltbAiControls } from "./HltbAiControls";
+import { AiControls } from "./AiControls";
 import {
-  AI_CONFIDENCE_TONES,
+  aiVerdictTone,
   CONFLICT_SOURCES,
   REASON_LABELS,
   SOURCE_LABELS,
@@ -41,6 +43,8 @@ import {
   parseConflictSource,
 } from "./labels";
 import styles from "./Conflicts.module.scss";
+
+const UNDO_SKIP_MODAL_ID = "undo-conflict-skip";
 
 const SCROLL_STYLE = { maxHeight: "var(--vndb-review-height)" };
 
@@ -78,7 +82,11 @@ export const Conflicts: FC = () => {
   const { mutate: decide } = useDecideConflictMutation();
   const { mutate: reopen, isPending: isReopening } =
     useReopenConflictMutation();
-  const { mutate: undo, isPending: isUndoing } = useUndoConflictMutation();
+  const {
+    mutate: undo,
+    mutateAsync: undoAsync,
+    isPending: isUndoing,
+  } = useUndoConflictMutation();
   const { data: platforms } = usePlatformsQuery();
   const isLoaderShown = useMinimumLoading(isLoading);
 
@@ -312,14 +320,9 @@ export const Conflicts: FC = () => {
 
               {verdict && (
                 <div className={styles.verdict}>
-                  <Badge
-                    tone={
-                      verdict.undoneAt
-                        ? "muted"
-                        : AI_CONFIDENCE_TONES[verdict.confidence]
-                    }
-                  >
+                  <Badge tone={aiVerdictTone(verdict)}>
                     AI · {verdict.confidence}
+                    {!verdict.gameIds.length && " · no match"}
                     {verdict.undoneAt && " · undone"}
                   </Badge>
                   <p className={styles.description}>
@@ -458,7 +461,7 @@ export const Conflicts: FC = () => {
               })),
             ]}
           />
-          {source === "hltb" && <HltbAiControls isApplying={applying > 0} />}
+          <AiControls source={source} isApplying={applying > 0} />
           <ConflictList source={source} />
         </>
       )}
@@ -553,14 +556,36 @@ export const Conflicts: FC = () => {
                       <Button
                         className={styles.actionButton}
                         disabled={isUndoing}
-                        onClick={() =>
-                          undo({
+                        onClick={() => {
+                          const target = {
                             source: item.source,
                             externalId: item.externalId,
-                          })
-                        }
+                          };
+
+                          if (item.state !== "new-game") return undo(target);
+
+                          modal.open(
+                            <ConfirmModal
+                              title="Undo the new game"
+                              message={`Delete the game this Skip added and put ${item.externalId} back in the queue?`}
+                              warning="Refused when the game already has playthroughs, ratings, comments or list entries."
+                              confirmText="Delete and requeue"
+                              onConfirm={() =>
+                                undoAsync(target).then(() =>
+                                  modal.close(UNDO_SKIP_MODAL_ID)
+                                )
+                              }
+                              onCancel={() => modal.close(UNDO_SKIP_MODAL_ID)}
+                            />,
+                            { id: UNDO_SKIP_MODAL_ID }
+                          );
+                        }}
                       >
-                        {isUndoing ? "Undoing…" : "Undo match"}
+                        {isUndoing
+                          ? "Undoing…"
+                          : item.state === "new-game"
+                            ? "Undo new game"
+                            : "Undo match"}
                       </Button>
                     )}
                     {isReopenable(item.source, item.state) && (

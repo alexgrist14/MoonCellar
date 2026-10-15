@@ -1,10 +1,13 @@
 import {
+  BadGatewayException,
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
   type OnModuleInit,
 } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
+import { findGamesWithUserData } from "../utils/game-user-data.utils";
 import { InjectModel } from "@nestjs/mongoose";
 import {
   type HowLongToBeatEntry,
@@ -148,7 +151,7 @@ const formatTotals = (totals: HltbSyncTotals) =>
     .map(([key, value]) => `${key}=${value}`)
     .join(", ");
 
-export class HltbSearchFailedError extends Error {}
+export class HltbSearchFailedError extends BadGatewayException {}
 
 @Injectable()
 export class HltbService implements OnModuleInit {
@@ -177,6 +180,7 @@ export class HltbService implements OnModuleInit {
       describe: (entryId, data) => this.describeConflict(entryId, data),
       apply: (decisions) => this.applyConflictDecisions(decisions),
       undo: (decision) => this.undoConflictDecision(decision),
+      undoSkip: (decision) => this.undoSkippedConflict(decision),
     });
   }
 
@@ -289,13 +293,17 @@ export class HltbService implements OnModuleInit {
       : null;
   }
 
-  async createGame(entry: HltbSearchEntry) {
+  async createGame(
+    entry: HltbSearchEntry
+  ): Promise<{ _id: mongoose.Types.ObjectId; isCreated: boolean }> {
     const existing = await this.gamesModel
       .findOne({ "hltb.hltbId": String(entry.id) })
       .select("_id")
       .lean();
 
-    if (existing) return existing;
+    if (existing) {
+      return { _id: existing._id as mongoose.Types.ObjectId, isCreated: false };
+    }
 
     const fetched = await this.fetchEntry(entry.id);
     const fresh = fetched?.entry ?? entry;
@@ -318,7 +326,7 @@ export class HltbService implements OnModuleInit {
 
     this.logger.info(`Added "${game.name}" from HLTB entry ${entry.id}`);
 
-    return game;
+    return { _id: game._id as mongoose.Types.ObjectId, isCreated: true };
   }
 
   private async applyConflictDecisions(
@@ -333,8 +341,15 @@ export class HltbService implements OnModuleInit {
         if (decision === "skip") {
           if (!entry) continue;
 
-          const game = await this.createGame(entry);
-          applied.set(externalId, game._id as mongoose.Types.ObjectId);
+          const { _id, isCreated } = await this.createGame(entry);
+
+          await this.conflicts.setExternalData("hltb", [
+            {
+              externalId,
+              externalData: { created: isCreated ? String(_id) : null },
+            },
+          ]);
+          applied.set(externalId, _id);
           continue;
         }
 
@@ -427,6 +442,60 @@ export class HltbService implements OnModuleInit {
         externalData: {
           applied: null,
           ...(verdict && { aiVerdict: { ...verdict, undoneAt: now } }),
+        },
+      },
+    ]);
+  }
+
+  private async undoSkippedConflict({
+    externalId,
+    externalData,
+  }: Pick<IConflictDecision, "externalId" | "externalData">) {
+    const created = externalData?.created;
+
+    if (created === undefined) {
+      throw new ConflictException(
+        "This Skip was made before created games were recorded, so the game it added is unknown. Delete that game by hand if it is wrong."
+      );
+    }
+
+    if (typeof created === "string") {
+      const gameId = new mongoose.Types.ObjectId(created);
+      const game = await this.gamesModel
+        .findById(gameId)
+        .select("_id name")
+        .lean();
+
+      if (game) {
+        const used = await findGamesWithUserData(
+          this.gamesModel.db,
+          [gameId],
+          1
+        );
+
+        if (used.size) {
+          throw new ConflictException(
+            `"${game.name}" already has playthroughs, ratings, comments or list entries, so the Skip cannot be undone`
+          );
+        }
+
+        await this.gamesService.deleteGame(gameId);
+        this.logger.info(
+          `Deleted "${game.name}" created by the Skip of HLTB ${externalId}`
+        );
+      }
+    }
+
+    const verdict = externalData?.aiVerdict as IConflictAiVerdict | undefined;
+
+    await this.conflicts.setExternalData("hltb", [
+      {
+        externalId,
+        externalData: {
+          created: null,
+          ...(verdict && {
+            aiVerdict: { ...verdict, undoneAt: new Date().toISOString() },
+          }),
         },
       },
     ]);

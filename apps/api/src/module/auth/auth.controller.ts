@@ -119,7 +119,8 @@ export class AuthController {
         throw err;
       }
       return res.status(HttpStatus.OK).json({ userId });
-    } else throw new UnauthorizedException();
+    } else
+      throw new UnauthorizedException("No session to refresh. Sign in again.");
   }
 
   @Post(":id/logout")

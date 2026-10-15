@@ -158,7 +158,9 @@ export const ConflictItemSchema = z.object({
   decidedBy: z.string().nullable().describe("Admin who recorded the decision"),
   isUndoable: z
     .boolean()
-    .describe("A match whose source can unlink it and requeue the conflict"),
+    .describe(
+      "A match the source can unlink, or a Skip whose created game it can remove, and requeue the conflict"
+    ),
   subject: ConflictSubjectSchema.nullable().describe(
     "Null if the source no longer has the entry"
   ),
@@ -167,6 +169,51 @@ export const ConflictItemSchema = z.object({
   aiVerdict: ConflictAiVerdictSchema.nullable().describe(
     "What OpenAI answered for this conflict, until the next sync replaces it"
   ),
+});
+
+export const ConflictsAiStatusSchema = z.object({
+  isRunning: z.boolean(),
+  action: z
+    .enum(["review", "apply", "create", "undo"])
+    .nullable()
+    .describe(
+      "Last job: a dry run, applying stored verdicts, adding games for no-match verdicts, or undoing AI matches"
+    ),
+  source: ConflictSourceSchema.nullable().describe("null: every source"),
+  total: z
+    .number()
+    .describe("Conflicts the job goes through, 0 until it has counted them"),
+  done: z.number().describe("Conflicts it has gone through"),
+  judged: z.number(),
+  matches: z.number().describe("Verdicts confident enough to apply"),
+  decided: z.number().describe("Matches it queued"),
+  undone: z.number(),
+  failed: z.number(),
+  startedAt: z.string().nullable(),
+  finishedAt: z.string().nullable(),
+  error: z.string().nullable().describe("Why the job stopped early"),
+});
+
+export const ConflictAiMatchSchema = z.object({
+  source: ConflictSourceSchema,
+  externalId: z.string(),
+  externalName: z.string(),
+  games: z
+    .object({ _id: z.string(), name: z.string(), slug: z.string() })
+    .array()
+    .describe("Games the match linked"),
+  confidence: z.enum(["high", "medium", "low"]).nullable(),
+  decidedAt: z.string().describe("When the match was written to the games"),
+});
+
+export const ConflictAiMatchesResponseSchema = ConflictAiMatchSchema.array();
+
+export const UndoAiMatchesRequestSchema = z.object({
+  items: z
+    .object({ source: ConflictSourceSchema, externalId: z.string() })
+    .array()
+    .optional()
+    .describe("Matches to undo; every AI match of the source when omitted"),
 });
 
 export const ConflictsSummaryRequestSchema = z.object({
@@ -319,6 +366,9 @@ export type IConflictGame = z.infer<typeof ConflictGameSchema>;
 export type IConflictCandidate = z.infer<typeof ConflictCandidateSchema>;
 export type IConflictItem = z.infer<typeof ConflictItemSchema>;
 export type IConflictAiVerdict = z.infer<typeof ConflictAiVerdictSchema>;
+export type IConflictsAiStatus = z.infer<typeof ConflictsAiStatusSchema>;
+export type IConflictAiMatch = z.infer<typeof ConflictAiMatchSchema>;
+export type IUndoAiMatchesRequest = z.infer<typeof UndoAiMatchesRequestSchema>;
 export type IAddConflictCandidateRequest = z.infer<
   typeof AddConflictCandidateRequestSchema
 >;

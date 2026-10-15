@@ -63,9 +63,11 @@ editing controls.
    - `reviews` → `widgets/user/UserReviews`
    - `steam` → `widgets/user/UserSteamGames`: every game of the linked Steam library that is in
      the catalogue, from `POST /steam/library` (`useSteamLibraryQuery`), each captioned "Mastered"
-     with its date, "unlocked / total", or its playtime when it has no achievements. Default order
+     with its date, "unlocked / total" with the percentage, or a muted "0 / total" or "No
+     achievements", and always its playtime. Each `li` is a three-row subgrid (card, badge, text)
+     so the cards of a row line up whatever their captions hold. Default order
      is Achievements (mastered newest first, then by completion, games without achievements last);
-     `SortControl` also offers Playtime, Name, Release date and Rating, and the left "Filters"
+     `SortControl` also offers Playtime, Last played, Name, Release date and Rating, and the left "Filters"
      menu takes the catalogue filters. Sort (`sort`, `order`) and filters live in the URL, written
      with `pushState`; a change of either returns to page 1. The navigation shows the tab only for
      a linked Steam account; the Profile tab shows the same widget as a two-row preview in the
@@ -77,9 +79,9 @@ editing controls.
      award for, from `GET /user/ra/:userId/games`, each card captioned with its best RA status
      (Mastered, Completed, Beaten, Beaten (softcore)) and the award date, sorted by that status
      and, within it, newest award first (`getUserGames` on the API). The navigation shows the
-     tab only when the user has an `raUsername`. Both achievement tabs page through 24 games
-     at a time with the fixed `Pagination` (24 fills whole rows at 6, 4, 3 and 2 columns); the
-     Steam tab loads game cards for the current page only.
+     tab only when the user has an `raUsername`. Both achievement tabs page with the fixed
+     `Pagination`, 48 games at a time on Steam and 24 on RetroAchievements (both fill whole rows
+     at 6, 4, 3 and 2 columns); the Steam tab loads game cards for the current page only.
    - `settings` → `features/user/ui/Settings`, owner only: one column of `CollapsibleSection`s,
      Account always open (`isStatic`) and every other section collapsed until clicked; Steam is
      `isKeptMounted` because `SteamAccount` finishes the Steam sign-in on mount and must run while

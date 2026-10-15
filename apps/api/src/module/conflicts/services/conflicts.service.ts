@@ -9,6 +9,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
 import {
   ConflictSourceSchema,
+  type IConflictAiMatch,
   type IConflictAiVerdict,
   type IConflictItem,
   type IConflictSource,
@@ -18,6 +19,7 @@ import {
   type IGameConflict,
   type IGetConflictsParams,
 } from "@mooncellar/schemas";
+import { withDbLock } from "../../../shared/cron-mutex";
 import { Game, type GameDocument } from "../../games/schemas/game.schema";
 import type { User } from "../../user/schemas/user.schema";
 import {
@@ -620,7 +622,9 @@ export class ConflictsService {
           ? `AI (${conflict.decidedBy.userName})`
           : conflict.decidedBy.userName
         : null,
-      isUndoable: !!handler.undo && conflict.status === "resolved",
+      isUndoable:
+        (conflict.status === "resolved" && !!handler.undo) ||
+        (conflict.status === "absent" && !!handler.undoSkip),
       subject,
       candidates: conflict.candidates.map((entry) => {
         const game = gameById.get(String(entry.gameId));
@@ -854,27 +858,36 @@ export class ConflictsService {
   ): Promise<IConflictsSummary> {
     const handler = this.getHandler(source);
 
-    if (!handler.undo) {
+    if (!handler.undo && !handler.undoSkip) {
       throw new BadRequestException(`${source} decisions cannot be undone`);
     }
 
     const conflict = await this.conflictsModel
-      .findOne({ source, externalId, status: "resolved" })
+      .findOne({ source, externalId, status: { $in: ["resolved", "absent"] } })
       .lean();
 
     if (!conflict) {
       throw new ConflictException(
-        `${externalId} is not a matched ${source} conflict`
+        `${externalId} is not a matched or skipped ${source} conflict`
       );
     }
 
-    await handler.undo({
+    const isSkip = conflict.status === "absent";
+    const undo = isSkip ? handler.undoSkip : handler.undo;
+
+    if (!undo) {
+      throw new BadRequestException(
+        `${source} ${isSkip ? "skips" : "matches"} cannot be undone`
+      );
+    }
+
+    await undo.call(handler, {
       externalId,
       externalData: conflict.externalData ?? null,
       winners: winnerIds(conflict),
     });
     await this.conflictsModel.updateOne(
-      { _id: conflict._id, status: "resolved" },
+      { _id: conflict._id, status: conflict.status },
       {
         $set: {
           status: "pending",
@@ -895,6 +908,46 @@ export class ConflictsService {
     });
 
     return this.getSummary(source);
+  }
+
+  canUndo(source: IConflictSource) {
+    return !!this.getHandler(source).undo;
+  }
+
+  async getAiMatches(sources: IConflictSource[]): Promise<IConflictAiMatch[]> {
+    const conflicts = await this.conflictsModel
+      .find({
+        source: { $in: sources },
+        status: "resolved",
+        "decidedBy.isAi": true,
+      })
+      .select(
+        "source externalId externalName winner winners externalData.aiVerdict.confidence updatedAt"
+      )
+      .sort({ updatedAt: -1 })
+      .lean<(Conflict & { _id: Types.ObjectId; updatedAt?: Date })[]>();
+    const games = await this.gamesModel
+      .find({ _id: { $in: conflicts.flatMap(winnerIds) } })
+      .select("name slug")
+      .lean();
+    const gameById = new Map(games.map((game) => [String(game._id), game]));
+
+    return conflicts.map((conflict) => ({
+      source: conflict.source,
+      externalId: conflict.externalId,
+      externalName: conflict.externalName ?? conflict.externalId,
+      games: winnerIds(conflict).flatMap((id) => {
+        const game = gameById.get(String(id));
+
+        return game
+          ? [{ _id: String(game._id), name: game.name, slug: game.slug }]
+          : [];
+      }),
+      confidence:
+        (conflict.externalData?.aiVerdict as IConflictAiVerdict | undefined)
+          ?.confidence ?? null,
+      decidedAt: conflict.updatedAt?.toISOString() ?? "",
+    }));
   }
 
   async findAiResolvedIds(source: IConflictSource): Promise<string[]> {
@@ -954,17 +1007,29 @@ export class ConflictsService {
     this.applying.add(source);
 
     try {
-      while (this.hasNewDecisions.delete(source)) {
-        for (;;) {
-          const decided = await this.conflictsModel
-            .find({ source, status: "pending", decision: { $ne: null } })
-            .limit(APPLY_BATCH_SIZE)
-            .lean();
+      const lock = await withDbLock(
+        this.conflictsModel.db,
+        `conflicts-apply-${source}`,
+        async () => {
+          while (this.hasNewDecisions.delete(source)) {
+            for (;;) {
+              const decided = await this.conflictsModel
+                .find({ source, status: "pending", decision: { $ne: null } })
+                .limit(APPLY_BATCH_SIZE)
+                .lean();
 
-          if (!decided.length) break;
+              if (!decided.length) break;
 
-          await this.applyBatch(handler, decided);
+              await this.applyBatch(handler, decided);
+            }
+          }
         }
+      );
+
+      if (!lock.locked) {
+        this.logger.log(
+          `${source} conflict decisions are being applied by another process`
+        );
       }
     } finally {
       this.applying.delete(source);
