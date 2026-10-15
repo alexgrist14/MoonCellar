@@ -69,14 +69,16 @@ const aiUrl = (source?: IConflictSource) =>
 
 const reviewWithAi = (
   source: IConflictSource | undefined,
-  params: { limit: number; apply: boolean }
+  params: { limit: number; apply: boolean; confidences?: string }
 ) =>
   agent.post<{ message: string }>(aiUrl(source), undefined, {
     params,
   });
 
-const createWithAi = (source?: IConflictSource) =>
-  agent.post<{ message: string }>(`${aiUrl(source)}/create`);
+const createWithAi = (source?: IConflictSource, confidences?: string) =>
+  agent.post<{ message: string }>(`${aiUrl(source)}/create`, undefined, {
+    params: { confidences },
+  });
 
 const undoAiDecisions = (
   source?: IConflictSource,

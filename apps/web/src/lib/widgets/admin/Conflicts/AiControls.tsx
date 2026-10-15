@@ -1,6 +1,10 @@
 import { ComponentProps, FC, useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { IConflictsAiStatus, IConflictSource } from "@mooncellar/schemas";
+import {
+  IConflictAiVerdict,
+  IConflictsAiStatus,
+  IConflictSource,
+} from "@mooncellar/schemas";
 import {
   conflictQueryKeys,
   useConflictsAiStatusQuery,
@@ -11,6 +15,7 @@ import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
 import { Input } from "@/src/lib/shared/ui/Input";
 import { modal } from "@/src/lib/shared/ui/Modal";
 import { ProgressBar } from "@/src/lib/shared/ui/ProgressBar";
+import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { DRAWER_TRIGGER_ATTRIBUTE, drawer } from "@/src/lib/shared/ui/Drawer";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import {
@@ -24,6 +29,22 @@ import styles from "./Conflicts.module.scss";
 
 const APPLY_MODAL_ID = "apply-ai-verdicts";
 const CREATE_MODAL_ID = "create-ai-games";
+
+const CONFIDENCE_OPTIONS: {
+  label: string;
+  phrase: string;
+  value: IConflictAiVerdict["confidence"][];
+}[] = [
+  { label: "High", phrase: "high", value: ["high"] },
+  {
+    label: "High + medium",
+    phrase: "high or medium",
+    value: ["high", "medium"],
+  },
+];
+
+const MEDIUM_WARNING =
+  "Medium verdicts are likely but miss a key fact: check a few of them first.";
 const DEFAULT_LIMIT = "10";
 
 const ACTION_LABELS: Record<
@@ -41,9 +62,9 @@ const NOTHING_TO_DO: Record<
   string
 > = {
   review: "no waiting conflict is left without a verdict",
-  apply: "nothing to apply: no waiting conflict has a high-confidence match",
+  apply: "nothing to apply: no waiting conflict has a match at that confidence",
   create:
-    "nothing to add: no waiting game entry has a high-confidence no-match verdict",
+    "nothing to add: no waiting game entry has a no-match verdict at that confidence",
   undo: "no AI match to undo",
 };
 
@@ -91,6 +112,11 @@ interface IAiControlsProps {
 export const AiControls: FC<IAiControlsProps> = ({ source, isApplying }) => {
   const [limit, setLimit] = useState(DEFAULT_LIMIT);
   const [isPending, setIsPending] = useState(false);
+  const [confidenceIndex, setConfidenceIndex] = useState(0);
+  const confidence = CONFIDENCE_OPTIONS[confidenceIndex];
+  const mediumWarning = confidence.value.includes("medium")
+    ? ` ${MEDIUM_WARNING}`
+    : "";
   const queryClient = useQueryClient();
   const { data: status, refetch } = useConflictsAiStatusQuery();
   const isRunning = !!status?.isRunning;
@@ -184,6 +210,16 @@ export const AiControls: FC<IAiControlsProps> = ({ source, isApplying }) => {
         >
           Ask AI
         </Button>
+        <Tabs
+          theme="segmented"
+          ariaLabel="Confidence to apply"
+          contents={CONFIDENCE_OPTIONS.map((option, index) => ({
+            tabName: option.label,
+            onTabClick: () => setConfidenceIndex(index),
+          }))}
+          defaultTabIndex={confidenceIndex}
+          isUseDefaultIndex
+        />
         <Button
           disabled={isBusy}
           onClick={() =>
@@ -191,18 +227,21 @@ export const AiControls: FC<IAiControlsProps> = ({ source, isApplying }) => {
               APPLY_MODAL_ID,
               {
                 title: "Apply AI verdicts",
-                message: `Match every waiting ${scope}conflict whose stored AI verdict is confident?`,
-                warning: !source
-                  ? `Only ${undoableLabel} matches can be undone; the others are permanent. Check the verdicts with "Only judged by AI" first.`
-                  : undoable.length
-                    ? "Undo AI matches takes them back."
-                    : `${SOURCE_LABELS[source]} matches cannot be undone. Check the verdicts with "Only judged by AI" first.`,
+                message: `Match every waiting ${scope}conflict whose stored AI verdict names a game with ${confidence.phrase} confidence?`,
+                warning:
+                  (!source
+                    ? `Only ${undoableLabel} matches can be undone; the others are permanent. Check the verdicts with "Only judged by AI" first.`
+                    : undoable.length
+                      ? "Undo AI matches takes them back."
+                      : `${SOURCE_LABELS[source]} matches cannot be undone. Check the verdicts with "Only judged by AI" first.`) +
+                  mediumWarning,
                 confirmText: "Apply",
               },
               () =>
                 adminConflictsApi.reviewWithAi(source, {
                   limit: 0,
                   apply: true,
+                  confidences: confidence.value.join(","),
                 })
             )
           }
@@ -217,12 +256,15 @@ export const AiControls: FC<IAiControlsProps> = ({ source, isApplying }) => {
                 CREATE_MODAL_ID,
                 {
                   title: "Add games from AI verdicts",
-                  message: `Add a new game for every waiting ${creatable.map((name) => SOURCE_LABELS[name]).join(", ")} conflict whose AI verdict says, with high confidence, that no candidate is the entry? Add-ons, mods and hacks are left alone.`,
-                  warning:
-                    'Check the "no match" verdicts first. A game added this way is removed by opening its conflict and pressing Undo new game, as long as nobody has used it yet.',
+                  message: `Add a new game for every waiting ${creatable.map((name) => SOURCE_LABELS[name]).join(", ")} conflict whose AI verdict says, with ${confidence.phrase} confidence, that no candidate is the entry? Add-ons, mods and hacks are left alone.`,
+                  warning: `Check the "no match" verdicts first. A game added this way is removed by opening its conflict and pressing Undo new game, as long as nobody has used it yet.${mediumWarning}`,
                   confirmText: "Add games",
                 },
-                () => adminConflictsApi.createWithAi(source)
+                () =>
+                  adminConflictsApi.createWithAi(
+                    source,
+                    confidence.value.join(",")
+                  )
               )
             }
           >

@@ -19,6 +19,7 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 import {
+  ConflictAiVerdictSchema,
   ConflictSourceSchema,
   type IConflictSource,
   RolesEnum,
@@ -41,6 +42,24 @@ import {
 } from "../../../shared/zod/dto/conflicts.dto";
 import { ConflictsAiService } from "../services/conflicts-ai.service";
 import { ConflictsService } from "../services/conflicts.service";
+
+const parseConfidences = (value?: string) => {
+  if (value === undefined) return undefined;
+
+  const confidences = value.split(",").map((part) => part.trim());
+  const allowed = ConflictAiVerdictSchema.shape.confidence.options;
+  const unknown = confidences.filter(
+    (part) => !(allowed as readonly string[]).includes(part)
+  );
+
+  if (!confidences.length || unknown.length) {
+    throw new BadRequestException(
+      `Unknown confidence: ${unknown.join(", ") || "none given"}. Allowed: ${allowed.join(", ")}`
+    );
+  }
+
+  return confidences as (typeof allowed)[number][];
+};
 
 const parseSource = (value: string): IConflictSource => {
   const parsed = ConflictSourceSchema.safeParse(value);
@@ -133,17 +152,25 @@ export class ConflictsController {
     description:
       "true decides every confident match, including verdicts stored by earlier runs",
   })
+  @ApiQuery({
+    name: "confidences",
+    required: false,
+    description:
+      "Comma-separated verdict confidences to apply (high, medium, low); high when omitted",
+  })
   reviewWithAi(
     @Req() request: IAuthorizedRequest,
     @Param("source") source?: string,
     @Query("limit") limit?: string,
-    @Query("apply") apply?: string
+    @Query("apply") apply?: string,
+    @Query("confidences") confidences?: string
   ) {
     return this.conflictsAi.start(
       source === undefined ? undefined : parseSource(source),
       {
         limit: limit === undefined ? 200 : Math.max(0, Number(limit) || 0),
         apply: apply === "true",
+        confidences: parseConfidences(confidences),
       },
       request.user
     );
@@ -155,13 +182,21 @@ export class ConflictsController {
     summary:
       "Add a new game in the background for every waiting conflict whose AI verdict says, with high confidence, that no candidate is the entry; only sources that allow it",
   })
+  @ApiQuery({
+    name: "confidences",
+    required: false,
+    description:
+      "Comma-separated no-match verdict confidences to add games for (high, medium, low); high when omitted",
+  })
   createWithAi(
     @Req() request: IAuthorizedRequest,
-    @Param("source") source?: string
+    @Param("source") source?: string,
+    @Query("confidences") confidences?: string
   ) {
     return this.conflictsAi.startCreate(
       source === undefined ? undefined : parseSource(source),
-      request.user
+      request.user,
+      parseConfidences(confidences)
     );
   }
 

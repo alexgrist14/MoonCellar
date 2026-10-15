@@ -418,6 +418,52 @@ describe("Conflicts AI review", () => {
     expect(service.getStatus()).toMatchObject({ total: 1, undone: 1 });
   });
 
+  it("applies medium verdicts only when they are asked for", async () => {
+    const stored = [
+      conflict("high", verdict()),
+      conflict("medium", verdict({ confidence: "medium" })),
+      conflict("low", verdict({ confidence: "low" })),
+    ];
+    const highOnly = buildService(stored);
+    const withMedium = buildService(stored);
+
+    await highOnly.service.review("hltb", { limit: 0, apply: true }, ADMIN);
+    await withMedium.service.review(
+      "hltb",
+      { limit: 0, apply: true, confidences: ["high", "medium"] },
+      ADMIN
+    );
+
+    expect(highOnly.conflicts.decide.mock.calls.map(([, id]) => id)).toEqual([
+      "high",
+    ]);
+    expect(withMedium.conflicts.decide.mock.calls.map(([, id]) => id)).toEqual([
+      "high",
+      "medium",
+    ]);
+  });
+
+  it("adds games for medium no-match verdicts only when they are asked for", async () => {
+    const { service, conflicts } = buildService([
+      conflict("high", verdict({ gameIds: [] })),
+      conflict("medium", verdict({ gameIds: [], confidence: "medium" })),
+    ]);
+    const jobs: (() => Promise<unknown>)[] = [];
+
+    service.register("hltb", { canCreate: () => true });
+    jest
+      .spyOn(service as never, "runInBackground")
+      .mockImplementation(((_kind: unknown, run: () => Promise<unknown>) =>
+        jobs.push(run)) as never);
+    service.startCreate("hltb", ADMIN, ["high", "medium"]);
+    await jobs[0]();
+
+    expect(conflicts.decide.mock.calls.map(([, id]) => id)).toEqual([
+      "high",
+      "medium",
+    ]);
+  });
+
   it("stops when a whole batch fails", async () => {
     jest.mocked(callOpenAi).mockRejectedValue(new Error("429"));
     const { service, conflicts } = buildService([conflict("1"), conflict("2")]);

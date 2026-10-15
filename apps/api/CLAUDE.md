@@ -734,9 +734,11 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   The item and the list rows carry it as `aiVerdict`, and `GET /conflicts/list?aiOnly=true` lists only judged
   conflicts, which is how a dry run is reviewed. `sortBy=ai` orders the list by `AI_VERDICT_RANK_FIELDS`:
   high match, high no-match, medium match, medium no-match, low match, low no-match, then undone verdicts;
-  conflicts without a verdict stay last in either `sortOrder`, as Steam games without achievements do. With `apply=true` every verdict, stored earlier or new, that
-  names games at a confidence in `CONFLICTS_AI_APPLY_CONFIDENCES` goes through `ConflictsService.decide` as
-  the admin who started the run, with `decidedBy.isAi` (shown as "AI (name)"); `limit=0&apply=true` applies
+  conflicts without a verdict stay last in either `sortOrder`, as Steam games without achievements do.
+  With `apply=true` every verdict, stored earlier or new, that names games at a confidence in `confidences`
+  (a comma-separated query parameter; `CONFLICTS_AI_APPLY_CONFIDENCES`, `high` alone, when omitted — the
+  admin screen's switch sends `high` or `high,medium`) goes through `ConflictsService.decide` as the admin
+  who started the run, with `decidedBy.isAi` (shown as "AI (name)"); `limit=0&apply=true` applies
   the stored verdicts and judges nothing, which is the admin screen's "Apply verdicts" after a dry run.
   `POST /conflicts/ai` (the All tab) runs the same review for every source in turn, `limit` per source, and
   `POST /conflicts/ai/undo` undoes every source that can. One AI job runs at a time, whatever its source
@@ -772,7 +774,8 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   without a trace.
 - **The AI adds a game only through `POST /conflicts/:source/ai/create` (and `POST /conflicts/ai/create`),
   and only where the source registered `canCreate`.** It turns every undecided conflict whose verdict names
-  no game at a confidence in `CONFLICTS_AI_APPLY_CONFIDENCES`, never undone, and that `canCreate` accepts
+  no game at a confidence in `confidences` (the same parameter and default as Apply), never undone, and that
+  `canCreate` accepts
   into a Skip as the admin with `decidedBy.isAi`; the handler then creates the game as for a manual Skip.
   HLTB allows it for entries of type `game` only — DLC, mods and hacks stay for a person. "No candidate is the
   entry" is not "the entry belongs in the catalogue", so this is a separate button with a confirmation, never

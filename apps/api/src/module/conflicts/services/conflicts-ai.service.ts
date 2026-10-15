@@ -23,17 +23,23 @@ import {
 import type { User } from "../../user/schemas/user.schema";
 import {
   buildConflictAiInput,
+  CONFLICTS_AI_APPLY_CONFIDENCES,
   CONFLICTS_AI_CONCURRENCY,
   conflictAiInstructions,
   conflictAiSchema,
   isConflictAiMatch,
   isConflictAiNoMatch,
+  type TAiConfidence,
   noMatchVerdict,
   toConflictAiVerdict,
 } from "../utils/conflicts-ai.utils";
 import { ConflictsService } from "./conflicts.service";
 
-type TReviewOptions = { limit: number; apply: boolean };
+type TReviewOptions = {
+  limit: number;
+  apply: boolean;
+  confidences?: TAiConfidence[];
+};
 type TReviewer = Pick<User, "_id" | "userName">;
 
 export type TUndecidedConflict = Awaited<
@@ -49,6 +55,7 @@ type TPlan = {
   source: IConflictSource;
   stored: TUndecidedConflict[];
   queue: TUndecidedConflict[];
+  confidences: TAiConfidence[];
 };
 
 const IDLE_STATUS: IConflictsAiStatus = {
@@ -137,7 +144,7 @@ export class ConflictsAiService {
     return {
       message: options.limit
         ? `AI review of ${options.limit} ${scope} started${options.apply ? ", applying confident matches" : ", dry run"}`
-        : `Applying the confident AI verdicts of ${source ?? "every source"}`,
+        : `Applying the ${(options.confidences ?? CONFLICTS_AI_APPLY_CONFIDENCES).join(" and ")}-confidence AI matches of ${source ?? "every source"}`,
     };
   }
 
@@ -204,7 +211,11 @@ export class ConflictsAiService {
     };
   }
 
-  startCreate(source: IConflictSource | undefined, user: TReviewer) {
+  startCreate(
+    source: IConflictSource | undefined,
+    user: TReviewer,
+    confidences = CONFLICTS_AI_APPLY_CONFIDENCES
+  ) {
     if (source && !this.creatable.has(source)) {
       throw new BadRequestException(
         `The AI does not add ${source} entries as new games`
@@ -233,7 +244,8 @@ export class ConflictsAiService {
             source: next,
             conflicts: undecided.filter(
               (conflict) =>
-                isConflictAiNoMatch(verdictOf(conflict)) && canCreate(conflict)
+                isConflictAiNoMatch(verdictOf(conflict), confidences) &&
+                canCreate(conflict)
             ),
           });
         }
@@ -247,7 +259,7 @@ export class ConflictsAiService {
     );
 
     return {
-      message: `Adding games for the confident no-match verdicts of ${source ?? sources.join(", ")}`,
+      message: `Adding games for the ${confidences.join(" and ")}-confidence no-match verdicts of ${source ?? sources.join(", ")}`,
     };
   }
 
@@ -364,14 +376,21 @@ export class ConflictsAiService {
 
   private async plan(
     source: IConflictSource,
-    { limit, apply }: TReviewOptions
+    {
+      limit,
+      apply,
+      confidences = CONFLICTS_AI_APPLY_CONFIDENCES,
+    }: TReviewOptions
   ): Promise<TPlan> {
     const undecided = await this.conflicts.findUndecided(source, { limit: 0 });
 
     return {
       source,
+      confidences,
       stored: apply
-        ? undecided.filter((conflict) => isConflictAiMatch(verdictOf(conflict)))
+        ? undecided.filter((conflict) =>
+            isConflictAiMatch(verdictOf(conflict), confidences)
+          )
         : [],
       queue: undecided
         .filter((conflict) => !verdictOf(conflict))
@@ -380,7 +399,7 @@ export class ConflictsAiService {
   }
 
   private async execute(
-    { source, stored, queue }: TPlan,
+    { source, stored, queue, confidences }: TPlan,
     apply: boolean,
     user: TReviewer
   ) {
@@ -392,7 +411,7 @@ export class ConflictsAiService {
     );
     const judge = this.judges.get(source) ?? this.judgeItem(source);
     const decide = async (externalId: string, verdict?: IConflictAiVerdict) => {
-      if (!apply || !isConflictAiMatch(verdict)) return;
+      if (!apply || !isConflictAiMatch(verdict, confidences)) return;
 
       await this.conflicts
         .decide(source, externalId, { gameIds: verdict!.gameIds }, user, {
@@ -456,7 +475,7 @@ export class ConflictsAiService {
         if (!verdict) continue;
 
         status.judged += 1;
-        if (isConflictAiMatch(verdict)) status.matches += 1;
+        if (isConflictAiMatch(verdict, confidences)) status.matches += 1;
         await decide(batch[index].externalId, verdict);
       }
 

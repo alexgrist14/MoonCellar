@@ -6,7 +6,9 @@ import type {
 
 export const CONFLICTS_AI_CONCURRENCY = 5;
 
-export const CONFLICTS_AI_APPLY_CONFIDENCES = ["high"];
+export type TAiConfidence = IConflictAiVerdict["confidence"];
+
+export const CONFLICTS_AI_APPLY_CONFIDENCES: TAiConfidence[] = ["high"];
 
 const SOURCE_NOTES: Record<IConflictSource, string> = {
   vndb: "The entry is a VNDB visual novel. VNDB keeps one entry per visual novel for all its releases, platforms and translations, so a port, a translation or a re-release is the entry, while a fan disc, an append, a sequel or a remake with an entry of its own is not.",
@@ -140,16 +142,18 @@ export const noMatchVerdict = (
 });
 
 export const isConflictAiNoMatch = (
-  verdict: IConflictAiVerdict | null | undefined
+  verdict: IConflictAiVerdict | null | undefined,
+  confidences = CONFLICTS_AI_APPLY_CONFIDENCES
 ) =>
   !!verdict &&
   !verdict.gameIds.length &&
   !verdict.undoneAt &&
-  CONFLICTS_AI_APPLY_CONFIDENCES.includes(verdict.confidence);
+  confidences.includes(verdict.confidence);
 
 export const isConflictAiMatch = (
-  verdict: IConflictAiVerdict | null | undefined
+  verdict: IConflictAiVerdict | null | undefined,
+  confidences = CONFLICTS_AI_APPLY_CONFIDENCES
 ) =>
   !!verdict?.gameIds.length &&
   !verdict.undoneAt &&
-  CONFLICTS_AI_APPLY_CONFIDENCES.includes(verdict.confidence);
+  confidences.includes(verdict.confidence);
