@@ -17,6 +17,7 @@ jobs:
     outputs:
       web: ${{ steps.filter.outputs.web == 'true' || github.event_name == 'workflow_dispatch' }}
       api: ${{ steps.filter.outputs.api == 'true' || github.event_name == 'workflow_dispatch' }}
+      game: ${{ steps.filter.outputs.game == 'true' || github.event_name == 'workflow_dispatch' }}
       infra: ${{ steps.filter.outputs.infra == 'true' || github.event_name == 'workflow_dispatch' }}
       docs: ${{ steps.filter.outputs.docs == 'true' || github.event_name == 'workflow_dispatch' }}
       storybook: ${{ steps.filter.outputs.storybook == 'true' || github.event_name == 'workflow_dispatch' }}
@@ -39,6 +40,12 @@ jobs:
               - '.github/workflows/ci.yml'
             api:
               - 'apps/api/**'
+              - 'packages/**'
+              - 'package.json'
+              - 'bun.lock'
+              - '.github/workflows/ci.yml'
+            game:
+              - 'apps/game/**'
               - 'packages/**'
               - 'package.json'
               - 'bun.lock'
@@ -87,6 +94,7 @@ jobs:
       (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
       github.ref == 'refs/heads/main' &&
       (needs.changes.outputs.web == 'true' || needs.changes.outputs.api == 'true' ||
+       needs.changes.outputs.game == 'true' ||
        needs.changes.outputs.infra == 'true' || needs.changes.outputs.docs == 'true' ||
        needs.changes.outputs.storybook == 'true')
     runs-on: ubuntu-latest
@@ -94,10 +102,11 @@ jobs:
     env:
       DEPLOY_WEB: ${{ needs.changes.outputs.web }}
       DEPLOY_API: ${{ needs.changes.outputs.api }}
+      DEPLOY_GAME: ${{ needs.changes.outputs.game }}
       DEPLOY_INFRA: ${{ needs.changes.outputs.infra }}
       DEPLOY_DOCS: ${{ needs.changes.outputs.docs }}
       DEPLOY_STORYBOOK: ${{ needs.changes.outputs.storybook }}
-      BUILDS_IMAGES: ${{ needs.changes.outputs.web == 'true' || needs.changes.outputs.api == 'true' || needs.changes.outputs.docs == 'true' || needs.changes.outputs.storybook == 'true' }}
+      BUILDS_IMAGES: ${{ needs.changes.outputs.web == 'true' || needs.changes.outputs.api == 'true' || needs.changes.outputs.game == 'true' || needs.changes.outputs.docs == 'true' || needs.changes.outputs.storybook == 'true' }}
 
     steps:
       - name: Checkout code
@@ -135,6 +144,15 @@ jobs:
               -t mooncellar-backend:latest \
               .
             IMAGES="$IMAGES mooncellar-backend:latest"
+          fi
+
+          if [ "$DEPLOY_GAME" = "true" ]; then
+            echo "${{ secrets.HOST_ENV_GAME }}" > apps/game/.env;
+            docker build \
+              -f apps/game/Dockerfile \
+              -t mooncellar-game:latest \
+              .
+            IMAGES="$IMAGES mooncellar-game:latest"
           fi
 
           if [ "$DEPLOY_DOCS" = "true" ]; then
@@ -194,7 +212,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: DEPLOY_WEB,DEPLOY_API,DEPLOY_INFRA,DEPLOY_DOCS,DEPLOY_STORYBOOK
+          envs: DEPLOY_WEB,DEPLOY_API,DEPLOY_GAME,DEPLOY_INFRA,DEPLOY_DOCS,DEPLOY_STORYBOOK
           script: |
             set -e
 
@@ -247,6 +265,10 @@ jobs:
 
             if [ "$DEPLOY_API" = "true" ]; then
               run_app mooncellar-backend 3228
+            fi
+
+            if [ "$DEPLOY_GAME" = "true" ]; then
+              run_app mooncellar-game 3229
             fi
 
             if [ "$DEPLOY_DOCS" = "true" ]; then

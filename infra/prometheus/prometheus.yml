@@ -9,3 +9,11 @@ scrape_configs:
       credentials: change-me-local-token
     static_configs:
       - targets: ["host.containers.internal:3228"]
+
+  - job_name: mooncellar-game
+    metrics_path: /metrics
+    authorization:
+      type: Bearer
+      credentials: change-me-local-token
+    static_configs:
+      - targets: ["host.containers.internal:3229"]

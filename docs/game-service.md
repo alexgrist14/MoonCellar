@@ -38,3 +38,10 @@ MongoDB, as the API's build does.
 | `LOKI_HOST`               | —       | Sends logs to Loki under the label `app=mooncellar-game`; without it logs are pretty-printed |
 | `PROMETHEUS_ENABLED`      | `true`  | Default process metrics, prefixed `mooncellar_game_`                                         |
 | `METRICS_TOKEN`           | —       | Bearer token of `/metrics`                                                                   |
+
+## Deployment
+
+The `game` path filter of `.github/workflows/ci.yml` builds `apps/game/Dockerfile` with the
+`HOST_ENV_GAME` secret as its `.env` and runs it as `mooncellar-game` in the `mooncellar` network;
+nginx serves it as `game.mooncellar.space`, Prometheus scrapes it as the job `mooncellar-game`.
+Variables and the first-deploy checklist are in [deploy-env.md](deploy-env.md#host_env_game-contents).

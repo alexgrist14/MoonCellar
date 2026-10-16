@@ -31,6 +31,7 @@ below (`SSH_HOST_WEB` / `SSH_HOST_API`).
 |---|---|---|
 | `HOST_ENV_WEB` | `HOST_ENV` (frontend repo) | Whole `.env` file for `apps/web`, written by the workflow before `docker build` |
 | `HOST_ENV_API` | `HOST_ENV` (backend repo) | Whole `.env` file for `apps/api` |
+| `HOST_ENV_GAME` | new | Whole `.env` file for `apps/game` — see below |
 | `HOST_ENV_INFRA` | new | Whole `.env` file for `infra/docker-compose.prod.yml` — see below |
 
 There is no path secret any more. The deploy owns the containers outright — `docker run
@@ -283,6 +284,30 @@ pins the internal API address, so it stays a secret on both counts.
 | `VAPID_PRIVATE_KEY` | **yes** | Web push private key of the same pair |
 | `VAPID_SUBJECT` | no | Contact the push services see, `mailto:admin@mooncellar.space` by default |
 | `DISABLE_CRONS` | no | `true` stops every `@Cron` job. Local development only, because the local `.env` points at the production database and Space. Never set it in `HOST_ENV_API` |
+
+## `HOST_ENV_GAME` — contents
+
+The game service (`apps/game`, [game-service.md](game-service.md)) runs as the
+`mooncellar-game` container on port 3229 behind `game.mooncellar.space`. Its image is built and
+deployed whenever `apps/game/**`, `packages/**`, `package.json` or `bun.lock` change.
+
+| Variable | Secret | Description |
+|---|---|---|
+| `MONGO_CONNECTION_STRING` | **yes** | The compose MongoDB with credentials — `mongodb://<MONGO_ROOT_USERNAME>:<MONGO_ROOT_PASSWORD>@mongodb:27017/?authSource=admin`. The service picks its own `game` database; the path part of the URI is ignored |
+| `PORT` | no | `3229`; the deploy publishes the same port to `127.0.0.1` for nginx |
+| `LOKI_HOST` | no | `http://loki:3100`. Logs carry the label `app=mooncellar-game` |
+| `PROMETHEUS_ENABLED` | no | `true` / `false` — default process metrics on `/metrics` |
+| `METRICS_TOKEN` | **yes** | Bearer token guarding `/metrics`. Must equal `METRICS_TOKEN` of `HOST_ENV_INFRA`: Prometheus scrapes the job `mooncellar-game` with the same credentials file as the API |
+
+Before the first deploy of the service:
+
+1. Add an `A` record for `game.mooncellar.space` pointing at the host. The infra deploy reissues
+   the shared certificate with every `server_name` of `infra/nginx/mooncellar.conf` and stops if
+   a name does not resolve.
+2. Create the secret: `gh secret set HOST_ENV_GAME < prod-game.env`.
+3. Merge: the push to `main` builds and starts `mooncellar-game`, and the infra deploy adds the
+   site and the Prometheus job. `curl https://game.mooncellar.space/health` answers
+   `{"status":"ok","database":"up",…}`.
 
 ---
 
