@@ -14,6 +14,7 @@ export * from "./content-requests.schema";
 export * from "./custom-lists.schema";
 export * from "./files.schema";
 export * from "./game-followings-status.schema";
+export * from "./game.schema";
 export * from "./games.schema";
 export * from "./game-stats.schema";
 export * from "./platforms.schema";

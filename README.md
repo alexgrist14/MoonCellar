@@ -26,13 +26,14 @@
 
 ## Workspaces
 
-One repository, one lockfile, three workspaces. Everything is installed and run from the root
+One repository, one lockfile, four workspaces. Everything is installed and run from the root
 with `bun --filter`.
 
 | Workspace | Package name | What it is |
 |---|---|---|
 | `apps/web` | `web` | Next.js 16 App Router frontend — the site itself |
 | `apps/api` | `api` | NestJS 11 service — catalogue, users, scheduled ingestion |
+| `apps/game` | `game` | NestJS 11 service — online features of the game ports (leaderboards); see [docs/game-service.md](docs/game-service.md) |
 | `packages/schemas` | `@mooncellar/schemas` | Zod schemas shared by both: one definition, no copies |
 | `infra/` | — | docker-compose stack: MongoDB, Loki, Grafana, Alloy, Prometheus, SearXNG; host nginx config |
 
@@ -40,7 +41,8 @@ with `bun --filter`.
 MoonCellar/
 ├── apps/
 │   ├── web/          # Next.js — see the frontend section below
-│   └── api/          # NestJS — see the backend section below
+│   ├── api/          # NestJS — see the backend section below
+│   └── game/         # NestJS — online service of the game ports
 ├── packages/
 │   └── schemas/      # @mooncellar/schemas — request/response contracts
 ├── infra/            # docker-compose.yml + grafana, monitoring, nginx, prometheus, searxng configs
@@ -138,7 +140,8 @@ bun --filter api start:dev                 # bun --watch; needs MongoDB from the
 bun --filter web dev                       # needs the API up: pages fetch it while rendering
 ```
 
-The root aliases run exactly these two: `bun run dev:api`, `bun run dev:web`.
+The root aliases run exactly these two: `bun run dev:api`, `bun run dev:web`. The game service
+runs on its own with `bun run dev:game` (port 3229, Swagger at `:3229/api`).
 
 Two things that are easy to get wrong here:
 
