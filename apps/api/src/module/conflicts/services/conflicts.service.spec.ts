@@ -632,14 +632,18 @@ describe("ConflictsService", () => {
     });
   });
 
-  it("records what a match changed and the game a Skip created", async () => {
+  it("records what a match changed and the game a Skip created, even on a retried batch", async () => {
     const gameId = new Types.ObjectId();
     const created = new Types.ObjectId();
+    const retried = new Types.ObjectId();
+    const existing = new Types.ObjectId();
+    const decidedAt = new Date("2026-10-16T16:47:30.000Z");
     const handler = createHandler(
       new Map([
         ["v1", gameId],
         ["v2", created],
-        ["v3", gameId],
+        ["v3", retried],
+        ["v4", existing],
       ])
     );
     const service = createService({
@@ -651,10 +655,16 @@ describe("ConflictsService", () => {
           .mockReturnValueOnce(
             query([{ _id: gameId, name: "Old", updatedAt: 1 }])
           )
-          .mockReturnValueOnce(query([{ _id: gameId, vndb: { vnId: "v3" } }]))
           .mockReturnValueOnce(
             query([
               { _id: gameId, name: "New", vndb: { vnId: "v1" }, updatedAt: 2 },
+            ])
+          )
+          .mockReturnValueOnce(
+            query([
+              { _id: created, createdAt: "2026-10-16T16:58:00.000Z" },
+              { _id: retried, createdAt: "2026-10-16T16:50:00.000Z" },
+              { _id: existing, createdAt: "2024-01-01T00:00:00.000Z" },
             ])
           ),
       },
@@ -663,8 +673,9 @@ describe("ConflictsService", () => {
 
     await service["applyBatch"](handler, [
       { externalId: "v1", decision: "match", winners: [gameId] },
-      { externalId: "v2", decision: "skip", winner: null },
-      { externalId: "v3", decision: "skip", winner: null },
+      { externalId: "v2", decision: "skip", updatedAt: decidedAt },
+      { externalId: "v3", decision: "skip", updatedAt: decidedAt },
+      { externalId: "v4", decision: "skip", updatedAt: decidedAt },
     ] as never);
 
     expect(setExternalData).toHaveBeenCalledWith("vndb", [
@@ -681,7 +692,8 @@ describe("ConflictsService", () => {
         },
       },
       { externalId: "v2", externalData: { created: String(created) } },
-      { externalId: "v3", externalData: { created: null } },
+      { externalId: "v3", externalData: { created: String(retried) } },
+      { externalId: "v4", externalData: { created: null } },
     ]);
   });
 

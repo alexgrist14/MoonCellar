@@ -979,8 +979,7 @@ export class ConflictsService {
     else await this.undoChanges(handler, decision);
 
     const verdict = conflict.externalData?.aiVerdict as
-      | IConflictAiVerdict
-      | undefined;
+      IConflictAiVerdict | undefined;
 
     await this.setExternalData(source, [
       {
@@ -1036,9 +1035,7 @@ export class ConflictsService {
     const now = new Date().toISOString();
 
     for (const { gameId, before, after } of changes) {
-      const game = await this.gamesModel
-        .findById(gameId)
-        .lean<TGameRecord>();
+      const game = await this.gamesModel.findById(gameId).lean<TGameRecord>();
 
       if (!game || String(readPath(game, linkField)) !== externalId) continue;
 
@@ -1235,15 +1232,7 @@ export class ConflictsService {
       : decided
           .filter(({ decision }) => decision === "match")
           .flatMap(winnerIds);
-    const [before, linked] = await Promise.all([
-      this.readGames(tracked),
-      this.findLinkedIds(
-        handler,
-        decided
-          .filter(({ decision }) => decision === "skip")
-          .map(({ externalId }) => externalId)
-      ),
-    ]);
+    const before = await this.readGames(tracked);
     const gameIdByExternalId = await handler.apply(
       decided.map((conflict) => ({
         externalId: conflict.externalId,
@@ -1255,7 +1244,16 @@ export class ConflictsService {
         winnerEntryId: conflict.winnerEntryId ?? null,
       }))
     );
-    const after = await this.readGames(tracked);
+    const [after, skipped] = await Promise.all([
+      this.readGames(tracked),
+      this.readGames(
+        decided.flatMap(({ externalId, decision }) => {
+          const gameId = gameIdByExternalId.get(externalId);
+
+          return decision === "skip" && gameId ? [gameId] : [];
+        })
+      ),
+    ]);
 
     await this.setExternalData(
       handler.source,
@@ -1269,13 +1267,19 @@ export class ConflictsService {
 
         if (decision === "skip") {
           const gameId = gameIdByExternalId.get(externalId);
+          const createdAt = gameId && skipped.get(String(gameId))?.createdAt;
+          const { updatedAt: decidedAt } = conflict as { updatedAt?: Date };
 
           return [
             {
               externalId,
               externalData: {
                 created:
-                  gameId && !linked.has(externalId) ? String(gameId) : null,
+                  createdAt &&
+                  decidedAt &&
+                  new Date(String(createdAt)) >= decidedAt
+                    ? String(gameId)
+                    : null,
               },
             },
           ];
@@ -1352,26 +1356,5 @@ export class ConflictsService {
       .lean<TGameRecord[]>();
 
     return new Map(games.map((game) => [String(game._id), game]));
-  }
-
-  private async findLinkedIds(
-    { linkField }: IConflictSourceHandler,
-    externalIds: string[]
-  ) {
-    if (!externalIds.length) return new Set<string>();
-
-    const games = await this.gamesModel
-      .find({
-        [linkField]: {
-          $in: [
-            ...externalIds,
-            ...externalIds.map(Number).filter(Number.isInteger),
-          ],
-        },
-      })
-      .select(linkField)
-      .lean();
-
-    return new Set(games.map((game) => String(readPath(game, linkField))));
   }
 }

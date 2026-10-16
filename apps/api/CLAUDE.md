@@ -728,8 +728,10 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   array, so undo pulls the set from the winners. Playthroughs the RA awards sync made through a wrong link
   stay.
 - **A Skip is taken back through the same endpoint by deleting the game it created, and only while nobody
-  uses it.** `applyBatch` records that game in `externalData.created` (`null` when a game already held the
-  entry's `linkField` and nothing was created). Undo deletes it through `GamesService.deleteGame` only while
+  uses it.** `applyBatch` records that game in `externalData.created`, or `null` when the game the handler
+  returned is older than the decision (it already held the entry, nothing was created). It compares the
+  game's `createdAt` with the conflict's `updatedAt`, never "was the entry linked before `apply`": a batch
+  cut short by a restart is applied again, and its games then already exist. Undo deletes it through `GamesService.deleteGame` only while
   `findGamesWithUserData` finds no playthrough, rating, log, comment, list entry, favourite or royal-games
   entry for it, and answers 409 naming the game otherwise. `GamesModule` imports `ConflictsModule`, so
   `ConflictsService` cannot inject `GamesService`; `GamesService.onModuleInit` hands it `deleteGame` through

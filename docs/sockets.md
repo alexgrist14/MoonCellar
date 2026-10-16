@@ -582,20 +582,23 @@ Client: invalidates those conflict items, the summaries and the list.
 - **No new port or service.** Socket.IO is attached to the API's HTTP server on 3228, and Bun
   serves it through `node:http`: WebSocket, long-polling and the polling → WebSocket upgrade all
   work on Bun 1.4.2.
-- **The reverse proxy in front of `api.mooncellar.space` must pass WebSocket upgrades** for
-  `/socket.io/`. That proxy is configured on the host, not in this repository. Without it both
-  namespaces still work over long-polling, at the cost of one HTTP request held open per
-  connection (answered at the latest with each 25-second ping) plus a separate POST for every
-  message. For nginx:
+- **`/socket.io/` has its own `location` in `infra/nginx/mooncellar.conf`, which passes WebSocket
+  upgrades and reads for 60 seconds.** The API's general `location /` clears `Connection` (for
+  upstream keepalive) and cuts responses after 15 s. Under it the upgrade never happened, and every
+  long-polling GET — which the server holds until the next 25-second ping — ended as nginx's 504
+  without CORS headers, so the browser reported a CORS error, and the next POST of the dropped
+  session got `400`. The block:
 
   ```nginx
   location /socket.io/ {
-    proxy_pass http://127.0.0.1:3228;
+    include proxy_params;
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection "upgrade";
-    proxy_set_header Host $host;
+    proxy_set_header Connection $connection_upgrade;
+    proxy_connect_timeout 10s;
+    proxy_send_timeout 60s;
     proxy_read_timeout 60s;
+    proxy_pass http://api;
   }
   ```
 

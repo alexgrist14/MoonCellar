@@ -186,6 +186,11 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
   on the next deploy, and so are the `ssl_*` lines `certbot --nginx` would write — certificates
   are issued with `certbot certonly` from the `server_name` list. Details in
   `docs/deploy-env.md`.
+- **`/socket.io/` keeps its own `location` in that file, with the `Upgrade` headers and a read
+  timeout above 45 s; never let it fall under the API's general `location /`.** That one clears
+  `Connection` and reads for 15 s, so WebSockets never connect and every long-polling GET ends as a
+  504 that the browser shows as a CORS error on `socket.io/?EIO=4&transport=polling`, followed by
+  `400` on the next POST. Details in `docs/sockets.md`.
 
 - **`infra/searxng/` is mounted read-write into the SearXNG container, and the container can
   chown it to its own user.** A file in the repository that the host user cannot write breaks the
