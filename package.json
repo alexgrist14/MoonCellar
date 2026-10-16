@@ -24,6 +24,7 @@
     "dev": "bun run dev:api & bun run dev:web & wait",
     "dev:api": "bun --filter api start:dev",
     "dev:web": "bun --filter web dev",
+    "dev:game": "bun --filter game start:dev",
     "build": "bun --filter '*' build",
     "lint": "bun --filter '*' lint",
     "mongo": "ssh -f -N -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -L 27017:localhost:27017 root@31.57.201.233",

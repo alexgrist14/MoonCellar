@@ -154,7 +154,7 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
 
 ## Monorepo
 
-- Three workspaces: `apps/web` (Next.js), `apps/api` (NestJS) and
+- Four workspaces: `apps/web` (Next.js), `apps/api` (NestJS), `apps/game` (NestJS) and
   `packages/schemas` (`@mooncellar/schemas`). Install and run everything from the root
   with `bun --filter <workspace> <script>` — never `cd` into an app to install, the
   lockfile is shared.
@@ -171,7 +171,7 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
 - **`apps/web/next.config.mjs` points `turbopack.root` and `outputFileTracingRoot` at
   the monorepo root.** Pinning them to the app directory puts `packages/` outside the
   project root and imports from the shared package stop resolving.
-- Every Dockerfile (`apps/web`, `apps/api`, and `static.Dockerfile` for the documentation and
+- Every Dockerfile (`apps/web`, `apps/api`, `apps/game`, and `static.Dockerfile` for the documentation and
   Storybook images) builds with the repository root as context and copies every workspace
   manifest before `bun install --frozen-lockfile`; a partial copy fails the frozen
   lockfile check.

@@ -5,6 +5,7 @@ ENV HUSKY=0
 COPY package.json bun.lock ./
 COPY apps/web/package.json apps/web/
 COPY apps/api/package.json apps/api/
+COPY apps/game/package.json apps/game/
 COPY packages/schemas/package.json packages/schemas/
 RUN bun install --frozen-lockfile
 
