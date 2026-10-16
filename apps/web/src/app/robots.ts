@@ -1,7 +1,9 @@
 import { MetadataRoute } from "next";
 import { FRONT_URL } from "@/src/lib/shared/constants";
 
-const disallow = ["/admin", "/api"];
+// Filter combinations on /games and request forms link to each other
+// endlessly and let crawlers reach the whole catalog.
+const disallow = ["/admin", "/api", "/games?", "/requests"];
 
 // Crawlers that hammered /games and /_next/image hard enough to fill the
 // server disk with ISR and image caches.
