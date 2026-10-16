@@ -11,6 +11,9 @@ const nextConfig = {
     root: monorepoRoot,
   },
   outputFileTracingRoot: monorepoRoot,
+  // Keep on-demand ISR pages in memory only, see cache-handler.cjs.
+  cacheHandler: join(projectRoot, "cache-handler.cjs"),
+  cacheMaxMemorySize: 256 * 1024 * 1024,
   sassOptions: {
     loadPaths: [join(projectRoot, "src/lib/app/styles")],
     additionalData: '@use "@/src/lib/app/styles/index.scss" as *;',
@@ -33,6 +36,8 @@ const nextConfig = {
     ];
   },
   images: {
+    // Defaults to half of the free disk space at startup.
+    maximumDiskCacheSize: 2 * 1024 * 1024 * 1024,
     remotePatterns: [
       {
         protocol: "https",
