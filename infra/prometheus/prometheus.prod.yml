@@ -9,3 +9,11 @@ scrape_configs:
       credentials_file: /etc/prometheus/metrics_token
     static_configs:
       - targets: ["mooncellar-backend:3228"]
+
+  - job_name: mooncellar-game
+    metrics_path: /metrics
+    authorization:
+      type: Bearer
+      credentials_file: /etc/prometheus/metrics_token
+    static_configs:
+      - targets: ["mooncellar-game:3229"]
