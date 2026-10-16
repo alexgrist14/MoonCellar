@@ -18,12 +18,7 @@ import { ProgressBar } from "@/src/lib/shared/ui/ProgressBar";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { DRAWER_TRIGGER_ATTRIBUTE, drawer } from "@/src/lib/shared/ui/Drawer";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
-import {
-  canAiCreate,
-  CONFLICT_SOURCES,
-  isUndoable,
-  SOURCE_LABELS,
-} from "./labels";
+import { canAiCreate, CONFLICT_SOURCES, SOURCE_LABELS } from "./labels";
 import { AiUndoPanel } from "./AiUndoPanel";
 import styles from "./Conflicts.module.scss";
 
@@ -124,8 +119,6 @@ export const AiControls: FC<IAiControlsProps> = ({ source, isApplying }) => {
   const seenFinishedAt = useRef(finishedAt);
   const isBusy = isPending || isRunning;
   const count = Number(limit);
-  const undoable = (source ? [source] : CONFLICT_SOURCES).filter(isUndoable);
-  const undoableLabel = undoable.map((name) => SOURCE_LABELS[name]).join(", ");
   const creatable = (source ? [source] : CONFLICT_SOURCES).filter(canAiCreate);
   const scope = source ? `${SOURCE_LABELS[source]} ` : "";
 
@@ -228,13 +221,7 @@ export const AiControls: FC<IAiControlsProps> = ({ source, isApplying }) => {
               {
                 title: "Apply AI verdicts",
                 message: `Match every waiting ${scope}conflict whose stored AI verdict names a game with ${confidence.phrase} confidence?`,
-                warning:
-                  (!source
-                    ? `Only ${undoableLabel} matches can be undone; the others are permanent. Check the verdicts with "Only judged by AI" first.`
-                    : undoable.length
-                      ? "Undo AI matches takes them back."
-                      : `${SOURCE_LABELS[source]} matches cannot be undone. Check the verdicts with "Only judged by AI" first.`) +
-                  mediumWarning,
+                warning: `Undo AI matches takes them back.${mediumWarning}`,
                 confirmText: "Apply",
               },
               () =>
@@ -271,23 +258,20 @@ export const AiControls: FC<IAiControlsProps> = ({ source, isApplying }) => {
             Add games for no match
           </Button>
         )}
-        {!!undoable.length && (
-          <Button
-            disabled={isBusy || isApplying}
-            {...{ [DRAWER_TRIGGER_ATTRIBUTE]: "" }}
-            onClick={() =>
-              drawer.open(
-                <AiUndoPanel
-                  source={source}
-                  onStarted={() => void refetch()}
-                />,
-                { title: `Undo AI matches · ${undoableLabel}` }
-              )
-            }
-          >
-            Undo AI matches
-          </Button>
-        )}
+        <Button
+          disabled={isBusy || isApplying}
+          {...{ [DRAWER_TRIGGER_ATTRIBUTE]: "" }}
+          onClick={() =>
+            drawer.open(
+              <AiUndoPanel source={source} onStarted={() => void refetch()} />,
+              {
+                title: `Undo AI matches · ${source ? SOURCE_LABELS[source] : "All sources"}`,
+              }
+            )
+          }
+        >
+          Undo AI matches
+        </Button>
       </div>
       {!!status?.startedAt && (
         <div className={styles.aiProgress}>

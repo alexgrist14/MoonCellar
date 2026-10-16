@@ -569,7 +569,8 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   back to `pending` with candidates rebuilt by the handler's `rematch`, so a game added to the
   catalogue after the Skip shows up. A VNDB or IGDB Skip has already created a game; reopening it
   would leave that game behind and let a Match link the entry a second time. RA implements it;
-  Steam and HLTB must not (their Skip creates a game).
+  Steam and HLTB must not (their Skip creates a game). `ConflictsService.skipCreatesGame` is
+  `!rematch`, so a source that gains a `rematch` also loses Undo new game and the AI's Add games.
 - **A game the matcher missed is matched by adding it to the candidates first, never by passing
   its id to `decision`.** `decide` only accepts winners that are already among `candidates`
   (otherwise `400 The game is not a candidate`), so `POST /conflicts/:source/:externalId/candidates`
@@ -713,21 +714,28 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   HLTB files many add-ons as `game` under their own title (105 linked DLC, 212 mods, Covert Front's
   episodes). `Update` and `Bundle` stay out — "FTL: Advanced Edition" and "X: Complete Edition"
   rightly take the base game's times.
-- **A match is taken back only through `ConflictsService.undo` and the handler's `undo`, which only HLTB
-  implements.** `POST /conflicts/:source/:externalId/undo` accepts a `resolved` conflict, asks the handler to
-  unlink its games and puts the conflict back to `pending` with no decision. The HLTB handler records what a
-  match wrote in `externalData.applied` (per game: the `hltb` it replaced and the fields the HLTB page filled,
-  with their values); undo restores that `hltb` or removes the link, and clears a filled field only while it
-  still holds the value HLTB wrote, so an admin's later edit survives. A game linked to another HLTB id since
-  is left alone. A conflict resolved before `applied` existed is undone by unlinking its winners only.
-- **A Skip is taken back through the same endpoint and the handler's `undoSkip`, which only HLTB implements,
-  and only by deleting a game nobody uses.** `ConflictsService.undo` routes an `absent` conflict to
-  `undoSkip`. The HLTB Skip records the game it created in `externalData.created` (`null` when a game already
-  carried that `hltbId` and nothing was created); undo deletes that game through `GamesService.deleteGame`
-  only while `findGamesWithUserData` finds no playthrough, rating, log, comment, list entry, favourite or
-  royal-games entry for it, and answers 409 naming the game otherwise. A Skip made before `created` existed
-  is refused: the game it added cannot be told apart from one that was already there. The admin card asks for
-  confirmation before this undo, because it deletes a game.
+- **A match is taken back only through `ConflictsService.undo`, from what the match changed.**
+  `POST /conflicts/:source/:externalId/undo` accepts a `resolved` conflict, reverts its games and puts the
+  conflict back to `pending` with no decision. For a source without its own `undo`, `applyBatch` reads every
+  winner before and after the handler's `apply` and stores the top-level fields that changed in
+  `externalData.changes` (`{ gameId, before, after }` per game). Undo restores the link field (the first segment
+  of `linkField`) whatever it holds now, and every other changed field only while it still equals `after`, so
+  an admin's later edit survives — and so does a field a sync rewrote since. A game whose `linkField` now names
+  another entry is left alone, and a match made before `changes` existed only loses its link. Images the match
+  uploaded stay in the Space until the orphan sweep. Two sources keep their own `undo`: HLTB, whose matches
+  record `externalData.applied` (per game: the `hltb` it replaced and the fields the HLTB page filled) and
+  were undone from it before `changes` existed; and RA, whose link is an entry of the `retroachievements`
+  array, so undo pulls the set from the winners. Playthroughs the RA awards sync made through a wrong link
+  stay.
+- **A Skip is taken back through the same endpoint by deleting the game it created, and only while nobody
+  uses it.** `applyBatch` records that game in `externalData.created` (`null` when a game already held the
+  entry's `linkField` and nothing was created). Undo deletes it through `GamesService.deleteGame` only while
+  `findGamesWithUserData` finds no playthrough, rating, log, comment, list entry, favourite or royal-games
+  entry for it, and answers 409 naming the game otherwise. `GamesModule` imports `ConflictsModule`, so
+  `ConflictsService` cannot inject `GamesService`; `GamesService.onModuleInit` hands it `deleteGame` through
+  `useDeleteGame`. A Skip made before `created` existed is refused: the game it added cannot be told apart
+  from one that was already there. A source whose Skip creates nothing (RA) answers 400 — reopen it instead.
+  The admin card asks for confirmation before this undo, because it deletes a game.
 - **OpenAI judges conflicts only through `POST /conflicts/:source/ai` (`ConflictsAiService`), and it decides
   nothing until `apply=true`.** A run judges up to `limit` undecided conflicts of the source that have no
   verdict yet and stores the answer in `externalData.aiVerdict` (game ids, `high`/`medium`/`low`, a reason).
@@ -761,27 +769,25 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   2026-10-15: Twilight Observer and Black Hole were created twice, and Asteroid Quest! got its game while its
   conflict went back to Waiting. A process that finds the lock held leaves the queue to the holder, which reads
   every queued decision, whoever made it.
-- **Only a source whose handler has `undo` (HLTB today) can take its AI matches back.**
-  `POST /conflicts/:source/ai/undo` (or `/conflicts/ai/undo`) undoes the resolved matches carrying
-  `decidedBy.isAi` — every one, or only the `items` (`{ source, externalId }`) in the body, which the admin
-  screen picks from `GET /conflicts/ai/matches` (newest first: all, the latest 10, or one by one) — and answers
-  400 for any other source; an undone match marks its verdict `undoneAt`, and such a verdict is never applied again.
-  Undo only reads `resolved` conflicts, so run it after the queued decisions are written (the admin screen
-  disables the button while any are), or the ones still queued stay linked. On the other sources an applied
-  AI match is permanent, which is why "Apply verdicts" warns there. Apply never skips. Set the confidences
-  from a labelled dry run, never by guess. A sync that replaces `externalData` drops the verdicts, and a later run judges those
-  conflicts again. A whole batch failing stops the run, so a spent quota does not leave the queue half judged
-  without a trace.
+- **Every source can take its AI matches back.**
+  `POST /conflicts/:source/ai/undo` (or `/conflicts/ai/undo` for every source) undoes the resolved matches
+  carrying `decidedBy.isAi` — every one, or only the `items` (`{ source, externalId }`) in the body, which the
+  admin screen picks from `GET /conflicts/ai/matches` (newest first: all, the latest 10, or one by one).
+  `ConflictsService.undo` marks the verdict of every undone match or Skip `undoneAt`, and such a verdict is
+  never applied again. Undo only reads `resolved` conflicts, so run it after the queued decisions are written
+  (the admin screen disables the button while any are), or the ones still queued stay linked. Apply never
+  skips. Set the confidences from a labelled dry run, never by guess. A sync that replaces `externalData`
+  drops the verdicts, and a later run judges those conflicts again. A whole batch failing stops the run, so a
+  spent quota does not leave the queue half judged without a trace.
 - **The AI adds a game only through `POST /conflicts/:source/ai/create` (and `POST /conflicts/ai/create`),
-  and only where the source registered `canCreate`.** It turns every undecided conflict whose verdict names
-  no game at a confidence in `confidences` (the same parameter and default as Apply), never undone, and that
-  `canCreate` accepts
-  into a Skip as the admin with `decidedBy.isAi`; the handler then creates the game as for a manual Skip.
-  HLTB allows it for entries of type `game` only — DLC, mods and hacks stay for a person. "No candidate is the
-  entry" is not "the entry belongs in the catalogue", so this is a separate button with a confirmation, never
-  part of Apply. Each such game is taken back from its conflict card (Undo new game, the `undoSkip` above);
-  undoing marks the verdict `undoneAt`, so the next run does not add it again. "Undo AI matches" does not
-  touch them.
+  and only for a source whose Skip creates a game (`skipCreatesGame`: VNDB, IGDB, Steam and HLTB, not RA).**
+  It turns every undecided conflict whose verdict names no game at a confidence in `confidences` (the same
+  parameter and default as Apply), never undone, into a Skip as the admin with `decidedBy.isAi`; the handler
+  then creates the game as for a manual Skip. A `canCreate` registered with `ConflictsAiService.register`
+  narrows it: HLTB allows entries of type `game` only — DLC, mods and hacks stay for a person; the other
+  sources register none and add every such entry. "No candidate is the entry" is not "the entry belongs in the
+  catalogue", so this is a separate button with a confirmation, never part of Apply. Each such game is taken
+  back from its conflict card (Undo new game, the Skip undo above); "Undo AI matches" does not touch them.
 - **The AI routes (`ai`, `:source/ai` and their `/create` and `/undo`) stay declared above the `:source/:externalId`
   routes in `ConflictsController`.** Express matches in declaration order, so below them `ai/undo` reaches the
   per-conflict undo with `externalId = "ai"`.

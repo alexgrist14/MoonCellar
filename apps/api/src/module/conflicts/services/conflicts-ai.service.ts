@@ -83,7 +83,7 @@ const verdictOf = (conflict: TUndecidedConflict) =>
 export class ConflictsAiService {
   private readonly logger = new Logger(ConflictsAiService.name);
   private readonly judges = new Map<IConflictSource, TConflictJudge>();
-  private readonly creatable = new Map<
+  private readonly createFilters = new Map<
     IConflictSource,
     (conflict: TUndecidedConflict) => boolean
   >();
@@ -107,7 +107,7 @@ export class ConflictsAiService {
     }
   ) {
     if (judge) this.judges.set(source, judge);
-    if (canCreate) this.creatable.set(source, canCreate);
+    if (canCreate) this.createFilters.set(source, canCreate);
   }
 
   getStatus(): IConflictsAiStatus {
@@ -149,19 +149,9 @@ export class ConflictsAiService {
   }
 
   getMatches(source: IConflictSource | undefined) {
-    return this.conflicts.getAiMatches(this.undoableSources(source));
-  }
-
-  private undoableSources(source: IConflictSource | undefined) {
-    if (source && !this.conflicts.canUndo(source)) {
-      throw new BadRequestException(`${source} decisions cannot be undone`);
-    }
-
-    return source
-      ? [source]
-      : ConflictSourceSchema.options.filter((next) =>
-          this.conflicts.canUndo(next)
-        );
+    return this.conflicts.getAiMatches(
+      source ? [source] : ConflictSourceSchema.options
+    );
   }
 
   startUndo(
@@ -169,7 +159,7 @@ export class ConflictsAiService {
     user: TReviewer,
     items?: { source: IConflictSource; externalId: string }[]
   ) {
-    const sources = this.undoableSources(source);
+    const sources = source ? [source] : ConflictSourceSchema.options;
 
     this.runInBackground(
       { action: "undo", source: source ?? null },
@@ -207,7 +197,7 @@ export class ConflictsAiService {
     return {
       message: items
         ? `Undoing ${items.length} AI ${items.length === 1 ? "match" : "matches"}`
-        : `Undoing every ${sources.join(", ")} match the AI made`,
+        : `Undoing every ${source ? `${source} ` : ""}match the AI made`,
     };
   }
 
@@ -216,7 +206,7 @@ export class ConflictsAiService {
     user: TReviewer,
     confidences = CONFLICTS_AI_APPLY_CONFIDENCES
   ) {
-    if (source && !this.creatable.has(source)) {
+    if (source && !this.conflicts.skipCreatesGame(source)) {
       throw new BadRequestException(
         `The AI does not add ${source} entries as new games`
       );
@@ -224,7 +214,9 @@ export class ConflictsAiService {
 
     const sources = source
       ? [source]
-      : ConflictSourceSchema.options.filter((next) => this.creatable.has(next));
+      : ConflictSourceSchema.options.filter((next) =>
+          this.conflicts.skipCreatesGame(next)
+        );
 
     this.runInBackground(
       { action: "create", source: source ?? null },
@@ -235,7 +227,7 @@ export class ConflictsAiService {
         }[] = [];
 
         for (const next of sources) {
-          const canCreate = this.creatable.get(next)!;
+          const canCreate = this.createFilters.get(next) ?? (() => true);
           const undecided = await this.conflicts.findUndecided(next, {
             limit: 0,
           });

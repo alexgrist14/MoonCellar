@@ -69,25 +69,7 @@ const REOPENABLE: Record<IConflictSource, boolean> = {
   steam: false,
 };
 
-const UNDOABLE: Record<IConflictSource, boolean> = {
-  vndb: false,
-  igdb: false,
-  hltb: true,
-  ra: false,
-  steam: false,
-};
-
-export const isUndoable = (source: IConflictSource) => UNDOABLE[source];
-
-const AI_CREATES: Record<IConflictSource, boolean> = {
-  vndb: false,
-  igdb: false,
-  hltb: true,
-  ra: false,
-  steam: false,
-};
-
-export const canAiCreate = (source: IConflictSource) => AI_CREATES[source];
+export const canAiCreate = (source: IConflictSource) => CREATES_GAME[source];
 
 export const isReopenable = (source: IConflictSource, state: string) =>
   REOPENABLE[source] && state === "new-game";

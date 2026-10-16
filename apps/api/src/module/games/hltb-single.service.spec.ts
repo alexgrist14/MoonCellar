@@ -799,11 +799,10 @@ describe("HltbService conflict handler", () => {
       companies: [{ name: "Konami (edited)" }],
     });
     leanOnce({ _id: GAME_ID, hltb: { hltbId: "999" }, summary });
-    const verdict = { gameIds: [GAME_ID], confidence: "high", reason: "r" };
 
     await handler.undo({
       externalId: "6910",
-      externalData: { ...snapshot, applied: changes, aiVerdict: verdict },
+      externalData: { ...snapshot, applied: changes },
       winners: [],
     });
     await handler.undo({
@@ -820,10 +819,7 @@ describe("HltbService conflict handler", () => {
     expect(built.conflicts.setExternalData.mock.calls[1][1]).toEqual([
       {
         externalId: "6910",
-        externalData: {
-          applied: null,
-          aiVerdict: { ...verdict, undoneAt: expect.any(String) },
-        },
+        externalData: { applied: null },
       },
     ]);
   });

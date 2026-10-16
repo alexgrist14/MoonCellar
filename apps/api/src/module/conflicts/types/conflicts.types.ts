@@ -49,7 +49,10 @@ export interface IConflictSourceHandler {
   undo?(
     decision: Pick<IConflictDecision, "externalId" | "externalData" | "winners">
   ): Promise<void>;
-  undoSkip?(
-    decision: Pick<IConflictDecision, "externalId" | "externalData" | "winners">
-  ): Promise<void>;
+}
+
+export interface IConflictGameChanges {
+  gameId: string;
+  before: Record<string, unknown>;
+  after: Record<string, unknown>;
 }

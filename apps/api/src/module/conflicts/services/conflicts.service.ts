@@ -6,6 +6,7 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
+import { isDeepStrictEqual } from "node:util";
 import { Model, Types } from "mongoose";
 import {
   ConflictSourceSchema,
@@ -21,6 +22,7 @@ import {
 } from "@mooncellar/schemas";
 import { withDbLock } from "../../../shared/cron-mutex";
 import { Game, type GameDocument } from "../../games/schemas/game.schema";
+import { findGamesWithUserData } from "../../games/utils/game-user-data.utils";
 import type { User } from "../../user/schemas/user.schema";
 import {
   Conflict,
@@ -29,6 +31,8 @@ import {
 } from "../schemas/conflict.schema";
 import { ConflictsGateway } from "../gateways/conflicts.gateway";
 import type {
+  IConflictDecision,
+  IConflictGameChanges,
   IConflictRecord,
   IConflictSourceHandler,
 } from "../types/conflicts.types";
@@ -48,6 +52,8 @@ const STATE_FILTERS: Record<IConflictState, object> = {
 };
 
 const AI_VERDICT = "$externalData.aiVerdict";
+
+const UNTRACKED_GAME_FIELDS = new Set(["_id", "__v", "createdAt", "updatedAt"]);
 
 const AI_VERDICT_RANK_FIELDS = {
   hasAiVerdict: { $cond: [{ $ifNull: [AI_VERDICT, false] }, 1, 0] },
@@ -136,6 +142,33 @@ const readPath = (value: unknown, path: string): unknown =>
       value
     );
 
+const pickKeys = (value: Record<string, unknown>, keys: string[]) =>
+  Object.fromEntries(
+    keys.filter((key) => key in value).map((key) => [key, value[key]])
+  );
+
+const diffGame = (
+  gameId: string,
+  before: Record<string, unknown> = {},
+  after: Record<string, unknown> = {}
+): IConflictGameChanges => {
+  const keys = [
+    ...new Set([...Object.keys(before), ...Object.keys(after)]),
+  ].filter(
+    (key) =>
+      !UNTRACKED_GAME_FIELDS.has(key) &&
+      !isDeepStrictEqual(before[key], after[key])
+  );
+
+  return {
+    gameId,
+    before: pickKeys(before, keys),
+    after: pickKeys(after, keys),
+  };
+};
+
+type TGameRecord = Record<string, unknown>;
+
 @Injectable()
 export class ConflictsService {
   private readonly logger = new Logger(ConflictsService.name);
@@ -145,6 +178,7 @@ export class ConflictsService {
   >();
   private readonly applying = new Set<IConflictSource>();
   private readonly hasNewDecisions = new Set<IConflictSource>();
+  private deleteGame?: (gameId: Types.ObjectId) => Promise<unknown>;
 
   constructor(
     @InjectModel(Conflict.name)
@@ -155,6 +189,10 @@ export class ConflictsService {
 
   register(handler: IConflictSourceHandler) {
     this.handlers.set(handler.source, handler);
+  }
+
+  useDeleteGame(deleteGame: (gameId: Types.ObjectId) => Promise<unknown>) {
+    this.deleteGame = deleteGame;
   }
 
   async record(source: IConflictSource, records: IConflictRecord[]) {
@@ -678,8 +716,8 @@ export class ConflictsService {
           : conflict.decidedBy.userName
         : null,
       isUndoable:
-        (conflict.status === "resolved" && !!handler.undo) ||
-        (conflict.status === "absent" && !!handler.undoSkip),
+        conflict.status === "resolved" ||
+        (conflict.status === "absent" && this.skipCreatesGame(source)),
       subject,
       candidates: conflict.candidates.map((entry) => {
         const game = gameById.get(String(entry.gameId));
@@ -912,11 +950,6 @@ export class ConflictsService {
     user: Pick<User, "_id" | "userName">
   ): Promise<IConflictsSummary> {
     const handler = this.getHandler(source);
-
-    if (!handler.undo && !handler.undoSkip) {
-      throw new BadRequestException(`${source} decisions cannot be undone`);
-    }
-
     const conflict = await this.conflictsModel
       .findOne({ source, externalId, status: { $in: ["resolved", "absent"] } })
       .lean();
@@ -928,19 +961,38 @@ export class ConflictsService {
     }
 
     const isSkip = conflict.status === "absent";
-    const undo = isSkip ? handler.undoSkip : handler.undo;
 
-    if (!undo) {
+    if (isSkip && !this.skipCreatesGame(source)) {
       throw new BadRequestException(
-        `${source} ${isSkip ? "skips" : "matches"} cannot be undone`
+        `A ${source} Skip adds no game, so it is reopened rather than undone`
       );
     }
 
-    await undo.call(handler, {
+    const decision = {
       externalId,
       externalData: conflict.externalData ?? null,
       winners: winnerIds(conflict),
-    });
+    };
+
+    if (isSkip) await this.undoCreatedGame(source, decision);
+    else if (handler.undo) await handler.undo(decision);
+    else await this.undoChanges(handler, decision);
+
+    const verdict = conflict.externalData?.aiVerdict as
+      | IConflictAiVerdict
+      | undefined;
+
+    await this.setExternalData(source, [
+      {
+        externalId,
+        externalData: {
+          ...(isSkip ? { created: null } : { changes: null }),
+          ...(verdict && {
+            aiVerdict: { ...verdict, undoneAt: new Date().toISOString() },
+          }),
+        },
+      },
+    ]);
     await this.conflictsModel.updateOne(
       { _id: conflict._id, status: conflict.status },
       {
@@ -965,8 +1017,91 @@ export class ConflictsService {
     return this.getSummary(source);
   }
 
-  canUndo(source: IConflictSource) {
-    return !!this.getHandler(source).undo;
+  skipCreatesGame(source: IConflictSource) {
+    return !this.getHandler(source).rematch;
+  }
+
+  private async undoChanges(
+    { source, linkField }: IConflictSourceHandler,
+    {
+      externalId,
+      externalData,
+      winners,
+    }: Pick<IConflictDecision, "externalId" | "externalData" | "winners">
+  ) {
+    const linkKey = linkField.split(".")[0];
+    const changes =
+      (externalData?.changes as IConflictGameChanges[] | undefined) ??
+      winners.map((id) => ({ gameId: String(id), before: {}, after: {} }));
+    const now = new Date().toISOString();
+
+    for (const { gameId, before, after } of changes) {
+      const game = await this.gamesModel
+        .findById(gameId)
+        .lean<TGameRecord>();
+
+      if (!game || String(readPath(game, linkField)) !== externalId) continue;
+
+      const keys = [
+        linkKey,
+        ...Object.keys({ ...before, ...after }).filter(
+          (key) => key !== linkKey && isDeepStrictEqual(game[key], after[key])
+        ),
+      ];
+      const unset = keys.filter((key) => !(key in before));
+
+      await this.gamesModel.updateOne(
+        { _id: gameId },
+        {
+          $set: { ...pickKeys(before, keys), updatedAt: now },
+          ...(unset.length && {
+            $unset: Object.fromEntries(unset.map((key) => [key, ""])),
+          }),
+        }
+      );
+      this.logger.log(
+        `Undid the ${source} ${externalId} match on ${gameId}: ${keys.join(", ")}`
+      );
+    }
+  }
+
+  private async undoCreatedGame(
+    source: IConflictSource,
+    {
+      externalId,
+      externalData,
+    }: Pick<IConflictDecision, "externalId" | "externalData">
+  ) {
+    const created = externalData?.created;
+
+    if (created === undefined) {
+      throw new ConflictException(
+        "This Skip was made before created games were recorded, so the game it added is unknown. Delete that game by hand if it is wrong."
+      );
+    }
+
+    if (typeof created !== "string") return;
+
+    const gameId = new Types.ObjectId(created);
+    const game = await this.gamesModel
+      .findById(gameId)
+      .select("_id name")
+      .lean();
+
+    if (!game) return;
+
+    const used = await findGamesWithUserData(this.gamesModel.db, [gameId], 1);
+
+    if (used.size) {
+      throw new ConflictException(
+        `"${game.name}" already has playthroughs, ratings, comments or list entries, so the Skip cannot be undone`
+      );
+    }
+
+    await this.deleteGame!(gameId);
+    this.logger.log(
+      `Deleted "${game.name}" created by the Skip of ${source} ${externalId}`
+    );
   }
 
   async getAiMatches(sources: IConflictSource[]): Promise<IConflictAiMatch[]> {
@@ -1095,6 +1230,20 @@ export class ConflictsService {
     handler: IConflictSourceHandler,
     decided: ConflictDocument[]
   ) {
+    const tracked = handler.undo
+      ? []
+      : decided
+          .filter(({ decision }) => decision === "match")
+          .flatMap(winnerIds);
+    const [before, linked] = await Promise.all([
+      this.readGames(tracked),
+      this.findLinkedIds(
+        handler,
+        decided
+          .filter(({ decision }) => decision === "skip")
+          .map(({ externalId }) => externalId)
+      ),
+    ]);
     const gameIdByExternalId = await handler.apply(
       decided.map((conflict) => ({
         externalId: conflict.externalId,
@@ -1105,6 +1254,50 @@ export class ConflictsService {
         winners: winnerIds(conflict),
         winnerEntryId: conflict.winnerEntryId ?? null,
       }))
+    );
+    const after = await this.readGames(tracked);
+
+    await this.setExternalData(
+      handler.source,
+      decided.flatMap<{
+        externalId: string;
+        externalData: Record<string, unknown>;
+      }>((conflict) => {
+        const { externalId, decision } = conflict;
+
+        if (!gameIdByExternalId.has(externalId)) return [];
+
+        if (decision === "skip") {
+          const gameId = gameIdByExternalId.get(externalId);
+
+          return [
+            {
+              externalId,
+              externalData: {
+                created:
+                  gameId && !linked.has(externalId) ? String(gameId) : null,
+              },
+            },
+          ];
+        }
+
+        return handler.undo
+          ? []
+          : [
+              {
+                externalId,
+                externalData: {
+                  changes: winnerIds(conflict).map((id) =>
+                    diffGame(
+                      String(id),
+                      before.get(String(id)),
+                      after.get(String(id))
+                    )
+                  ),
+                },
+              },
+            ];
+      })
     );
 
     await this.conflictsModel.bulkWrite(
@@ -1149,5 +1342,36 @@ export class ConflictsService {
     this.logger.log(
       `Applied ${decided.length - returned.length}/${decided.length} ${handler.source} conflict decisions`
     );
+  }
+
+  private async readGames(ids: Types.ObjectId[]) {
+    if (!ids.length) return new Map<string, TGameRecord>();
+
+    const games = await this.gamesModel
+      .find({ _id: { $in: ids } })
+      .lean<TGameRecord[]>();
+
+    return new Map(games.map((game) => [String(game._id), game]));
+  }
+
+  private async findLinkedIds(
+    { linkField }: IConflictSourceHandler,
+    externalIds: string[]
+  ) {
+    if (!externalIds.length) return new Set<string>();
+
+    const games = await this.gamesModel
+      .find({
+        [linkField]: {
+          $in: [
+            ...externalIds,
+            ...externalIds.map(Number).filter(Number.isInteger),
+          ],
+        },
+      })
+      .select(linkField)
+      .lean();
+
+    return new Set(games.map((game) => String(readPath(game, linkField))));
   }
 }

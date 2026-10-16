@@ -194,6 +194,7 @@ export class GamesService implements OnModuleInit {
   ) {}
 
   onModuleInit() {
+    this.conflicts.useDeleteGame((gameId) => this.deleteGame(gameId));
     this.getSearchIndex().catch((err) =>
       this.logger.error(err, "Failed to warm up search index")
     );

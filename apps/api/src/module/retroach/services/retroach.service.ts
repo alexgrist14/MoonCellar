@@ -201,6 +201,13 @@ export class RetroachievementsService implements OnModuleInit {
       describe: (raId, data) => this.describeConflict(raId, data),
       apply: (decisions) => this.applyConflictDecisions(decisions),
       rematch: (raId, data) => this.rematchConflict(raId, data),
+      undo: ({ externalId, winners }) =>
+        this.games
+          .updateMany(
+            { _id: { $in: winners } },
+            { $pull: { retroachievements: { gameId: Number(externalId) } } }
+          )
+          .then(() => undefined),
     });
   }
 

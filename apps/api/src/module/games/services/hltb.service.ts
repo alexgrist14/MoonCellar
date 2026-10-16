@@ -1,13 +1,11 @@
 import {
   BadGatewayException,
   BadRequestException,
-  ConflictException,
   Injectable,
   NotFoundException,
   type OnModuleInit,
 } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
-import { findGamesWithUserData } from "../utils/game-user-data.utils";
 import { InjectModel } from "@nestjs/mongoose";
 import {
   type HowLongToBeatEntry,
@@ -27,7 +25,6 @@ import { runInCronLogContext } from "../../../shared/cron-logging";
 import { runCronExclusive, withDbLock } from "../../../shared/cron-mutex";
 import { BusinessMetricsService } from "../../metrics/business-metrics.service";
 import {
-  type IConflictAiVerdict,
   type IConflictSubject,
   type IHltbField,
 } from "@mooncellar/schemas";
@@ -180,7 +177,6 @@ export class HltbService implements OnModuleInit {
       describe: (entryId, data) => this.describeConflict(entryId, data),
       apply: (decisions) => this.applyConflictDecisions(decisions),
       undo: (decision) => this.undoConflictDecision(decision),
-      undoSkip: (decision) => this.undoSkippedConflict(decision),
     });
   }
 
@@ -293,17 +289,13 @@ export class HltbService implements OnModuleInit {
       : null;
   }
 
-  async createGame(
-    entry: HltbSearchEntry
-  ): Promise<{ _id: mongoose.Types.ObjectId; isCreated: boolean }> {
+  async createGame(entry: HltbSearchEntry): Promise<mongoose.Types.ObjectId> {
     const existing = await this.gamesModel
       .findOne({ "hltb.hltbId": String(entry.id) })
       .select("_id")
       .lean();
 
-    if (existing) {
-      return { _id: existing._id as mongoose.Types.ObjectId, isCreated: false };
-    }
+    if (existing) return existing._id as mongoose.Types.ObjectId;
 
     const fetched = await this.fetchEntry(entry.id);
     const fresh = fetched?.entry ?? entry;
@@ -326,7 +318,7 @@ export class HltbService implements OnModuleInit {
 
     this.logger.info(`Added "${game.name}" from HLTB entry ${entry.id}`);
 
-    return { _id: game._id as mongoose.Types.ObjectId, isCreated: true };
+    return game._id as mongoose.Types.ObjectId;
   }
 
   private async applyConflictDecisions(
@@ -341,15 +333,7 @@ export class HltbService implements OnModuleInit {
         if (decision === "skip") {
           if (!entry) continue;
 
-          const { _id, isCreated } = await this.createGame(entry);
-
-          await this.conflicts.setExternalData("hltb", [
-            {
-              externalId,
-              externalData: { created: isCreated ? String(_id) : null },
-            },
-          ]);
-          applied.set(externalId, _id);
+          applied.set(externalId, await this.createGame(entry));
           continue;
         }
 
@@ -434,70 +418,8 @@ export class HltbService implements OnModuleInit {
       );
     }
 
-    const verdict = externalData?.aiVerdict as IConflictAiVerdict | undefined;
-
     await this.conflicts.setExternalData("hltb", [
-      {
-        externalId,
-        externalData: {
-          applied: null,
-          ...(verdict && { aiVerdict: { ...verdict, undoneAt: now } }),
-        },
-      },
-    ]);
-  }
-
-  private async undoSkippedConflict({
-    externalId,
-    externalData,
-  }: Pick<IConflictDecision, "externalId" | "externalData">) {
-    const created = externalData?.created;
-
-    if (created === undefined) {
-      throw new ConflictException(
-        "This Skip was made before created games were recorded, so the game it added is unknown. Delete that game by hand if it is wrong."
-      );
-    }
-
-    if (typeof created === "string") {
-      const gameId = new mongoose.Types.ObjectId(created);
-      const game = await this.gamesModel
-        .findById(gameId)
-        .select("_id name")
-        .lean();
-
-      if (game) {
-        const used = await findGamesWithUserData(
-          this.gamesModel.db,
-          [gameId],
-          1
-        );
-
-        if (used.size) {
-          throw new ConflictException(
-            `"${game.name}" already has playthroughs, ratings, comments or list entries, so the Skip cannot be undone`
-          );
-        }
-
-        await this.gamesService.deleteGame(gameId);
-        this.logger.info(
-          `Deleted "${game.name}" created by the Skip of HLTB ${externalId}`
-        );
-      }
-    }
-
-    const verdict = externalData?.aiVerdict as IConflictAiVerdict | undefined;
-
-    await this.conflicts.setExternalData("hltb", [
-      {
-        externalId,
-        externalData: {
-          created: null,
-          ...(verdict && {
-            aiVerdict: { ...verdict, undoneAt: new Date().toISOString() },
-          }),
-        },
-      },
+      { externalId, externalData: { applied: null } },
     ]);
   }
 

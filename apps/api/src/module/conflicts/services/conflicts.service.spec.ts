@@ -55,6 +55,56 @@ const idleModel = {
   find: () => query([]),
   aggregate: jest.fn().mockResolvedValue([]),
   distinct: jest.fn().mockResolvedValue([]),
+  bulkWrite: jest.fn(),
+};
+
+const CREATED = new Types.ObjectId();
+
+const buildSkipUndo = ({
+  externalData,
+  usedIds = [] as string[],
+}: {
+  externalData: Record<string, unknown>;
+  usedIds?: string[];
+}) => {
+  const distinct = jest.fn((_field: string, filter: Record<string, unknown>) =>
+    Promise.resolve(
+      JSON.stringify(filter).includes(String(CREATED)) ? usedIds : []
+    )
+  );
+  const updateOne = jest.fn().mockResolvedValue({ modifiedCount: 1 });
+  const deleteGame = jest.fn().mockResolvedValue(undefined);
+  const service = createService({
+    conflictsModel: {
+      ...idleModel,
+      findOne: jest
+        .fn()
+        .mockReturnValueOnce(
+          query({
+            _id: "c2",
+            externalId: "8937",
+            status: "absent",
+            externalData,
+            winner: CREATED,
+          })
+        )
+        .mockReturnValue(query(null)),
+      updateOne,
+    },
+    gamesModel: {
+      findById: () => query({ _id: CREATED, name: "Spider Solitaire" }),
+      db: { collection: () => ({ distinct }) },
+    },
+  });
+
+  service.useDeleteGame(deleteGame);
+
+  return {
+    service,
+    updateOne,
+    deleteGame,
+    setExternalData: jest.spyOn(service, "setExternalData"),
+  };
 };
 
 describe("ConflictsService", () => {
@@ -82,8 +132,12 @@ describe("ConflictsService", () => {
       },
       handler: { ...createHandler(), undo },
     });
+    const gamesUpdate = jest.fn();
 
+    service["gamesModel"].updateOne = gamesUpdate;
     await service.undo("vndb", "6910", ADMIN);
+
+    expect(gamesUpdate).not.toHaveBeenCalled();
 
     expect(undo).toHaveBeenCalledWith({
       externalId: "6910",
@@ -109,53 +163,176 @@ describe("ConflictsService", () => {
     );
   });
 
-  it("undoes a skipped conflict through the source's undoSkip", async () => {
-    const created = new Types.ObjectId();
-    const conflict = {
-      _id: "c2",
-      externalId: "8937",
-      status: "absent",
-      externalData: { created: String(created) },
-      winner: created,
-    };
-    const updateOne = jest.fn().mockResolvedValue({ modifiedCount: 1 });
-    const undo = jest.fn();
-    const undoSkip = jest.fn().mockResolvedValue(undefined);
-    const service = createService({
-      conflictsModel: {
-        ...idleModel,
-        findOne: jest.fn().mockReturnValue(query(conflict)),
-        updateOne,
+  it("deletes the game a Skip created, requeues it and stops the AI from adding it again", async () => {
+    const { service, updateOne, deleteGame, setExternalData } = buildSkipUndo({
+      externalData: {
+        created: String(CREATED),
+        aiVerdict: { gameIds: [], confidence: "high" },
       },
-      handler: { ...createHandler(), undo, undoSkip },
     });
 
     await service.undo("vndb", "8937", ADMIN);
 
-    expect(undo).not.toHaveBeenCalled();
-    expect(undoSkip).toHaveBeenCalledWith({
-      externalId: "8937",
-      externalData: { created: String(created) },
-      winners: [created],
-    });
+    expect(deleteGame).toHaveBeenCalledWith(CREATED);
+    expect(setExternalData).toHaveBeenCalledWith("vndb", [
+      {
+        externalId: "8937",
+        externalData: {
+          created: null,
+          aiVerdict: expect.objectContaining({ undoneAt: expect.any(String) }),
+        },
+      },
+    ]);
     expect(updateOne).toHaveBeenCalledWith(
       { _id: "c2", status: "absent" },
       { $set: expect.objectContaining({ status: "pending" }) }
     );
   });
 
-  it("refuses to undo a skip when the source can only undo matches", async () => {
+  it("keeps a created game that someone already uses", async () => {
+    const { service, deleteGame } = buildSkipUndo({
+      externalData: { created: String(CREATED) },
+      usedIds: [String(CREATED)],
+    });
+
+    await expect(service.undo("vndb", "8937", ADMIN)).rejects.toThrow(
+      "Spider Solitaire"
+    );
+    expect(deleteGame).not.toHaveBeenCalled();
+  });
+
+  it("only requeues a Skip that reused a game already holding the entry", async () => {
+    const { service, updateOne, deleteGame } = buildSkipUndo({
+      externalData: { created: null },
+    });
+
+    await service.undo("vndb", "8937", ADMIN);
+
+    expect(deleteGame).not.toHaveBeenCalled();
+    expect(updateOne).toHaveBeenCalled();
+  });
+
+  it("refuses a Skip made before created games were recorded", async () => {
+    const { service } = buildSkipUndo({ externalData: {} });
+
+    await expect(service.undo("vndb", "8937", ADMIN)).rejects.toThrow(
+      "before created games"
+    );
+  });
+
+  it("refuses to undo a Skip of a source whose Skip adds no game", async () => {
     const service = createService({
       conflictsModel: {
         ...idleModel,
         findOne: () =>
           query({ _id: "c3", externalId: "1", status: "absent", winners: [] }),
       },
-      handler: { ...createHandler(), undo: jest.fn() },
+      handler: { ...createHandler(), rematch: jest.fn() },
     });
 
     await expect(service.undo("vndb", "1", ADMIN)).rejects.toThrow(
-      "vndb skips cannot be undone"
+      "reopened rather than undone"
+    );
+  });
+
+  it("undoes a match from what it changed, keeping fields edited since and games linked elsewhere", async () => {
+    const gameId = new Types.ObjectId();
+    const otherId = new Types.ObjectId();
+    const gamesUpdate = jest.fn();
+    const service = createService({
+      conflictsModel: {
+        ...idleModel,
+        findOne: jest
+          .fn()
+          .mockReturnValueOnce(
+            query({
+              _id: "c5",
+              externalId: "v1",
+              status: "resolved",
+              winners: [gameId, otherId],
+              externalData: {
+                changes: [
+                  {
+                    gameId: String(gameId),
+                    before: { name: "Old", summary: "Old summary" },
+                    after: {
+                      name: "New",
+                      summary: "New summary",
+                      vndb: { vnId: "v1", syncedAt: "a" },
+                      cover: "c.jpg",
+                    },
+                  },
+                  {
+                    gameId: String(otherId),
+                    before: {},
+                    after: { vndb: { vnId: "v1" } },
+                  },
+                ],
+              },
+            })
+          )
+          .mockReturnValue(query(null)),
+        updateOne: jest.fn(),
+      },
+      gamesModel: {
+        findById: jest
+          .fn()
+          .mockReturnValueOnce(
+            query({
+              _id: gameId,
+              name: "New",
+              summary: "Edited by an admin",
+              vndb: { vnId: "v1", syncedAt: "b" },
+              cover: "c.jpg",
+            })
+          )
+          .mockReturnValueOnce(query({ _id: otherId, vndb: { vnId: "v2" } })),
+        updateOne: gamesUpdate,
+      },
+    });
+
+    await service.undo("vndb", "v1", ADMIN);
+
+    expect(gamesUpdate).toHaveBeenCalledTimes(1);
+    expect(gamesUpdate).toHaveBeenCalledWith(
+      { _id: String(gameId) },
+      {
+        $set: { name: "Old", updatedAt: expect.any(String) },
+        $unset: { vndb: "", cover: "" },
+      }
+    );
+  });
+
+  it("only unlinks the winners of a match made before changes were recorded", async () => {
+    const gameId = new Types.ObjectId();
+    const gamesUpdate = jest.fn();
+    const service = createService({
+      conflictsModel: {
+        ...idleModel,
+        findOne: jest
+          .fn()
+          .mockReturnValueOnce(
+            query({
+              _id: "c6",
+              externalId: "v1",
+              status: "resolved",
+              winners: [gameId],
+            })
+          )
+          .mockReturnValue(query(null)),
+        updateOne: jest.fn(),
+      },
+      gamesModel: {
+        findById: () => query({ _id: gameId, name: "X", vndb: { vnId: "v1" } }),
+        updateOne: gamesUpdate,
+      },
+    });
+
+    await service.undo("vndb", "v1", ADMIN);
+
+    expect(gamesUpdate).toHaveBeenCalledWith(
+      { _id: String(gameId) },
+      { $set: { updatedAt: expect.any(String) }, $unset: { vndb: "" } }
     );
   });
 
@@ -181,14 +358,6 @@ describe("ConflictsService", () => {
     ).applyDecisions("vndb");
 
     expect(handler.apply).not.toHaveBeenCalled();
-  });
-
-  it("refuses to undo for a source without an undo", async () => {
-    const service = createService({ conflictsModel: idleModel });
-
-    await expect(service.undo("vndb", "v1", ADMIN)).rejects.toBeInstanceOf(
-      BadRequestException
-    );
   });
 
   it("refuses to reopen a source without a rematch", async () => {
@@ -377,6 +546,7 @@ describe("ConflictsService", () => {
       events,
       handler,
       conflictsModel: { bulkWrite },
+      gamesModel: { find: () => query([]) },
     });
     const _id = new Types.ObjectId();
 
@@ -413,7 +583,11 @@ describe("ConflictsService", () => {
     const bulkWrite = jest.fn();
     const gameId = new Types.ObjectId();
     const handler = createHandler(new Map([["v1", gameId]]));
-    const service = createService({ handler, conflictsModel: { bulkWrite } });
+    const service = createService({
+      handler,
+      conflictsModel: { bulkWrite },
+      gamesModel: { find: () => query([]) },
+    });
     const _id = new Types.ObjectId();
 
     await service["applyBatch"](handler, [
@@ -426,7 +600,7 @@ describe("ConflictsService", () => {
       } as never,
     ]);
 
-    expect(bulkWrite.mock.calls[0][0][0].updateOne.update).toEqual({
+    expect(bulkWrite.mock.lastCall[0][0].updateOne.update).toEqual({
       $set: { status: "resolved", winner: gameId, decision: null },
     });
   });
@@ -437,7 +611,11 @@ describe("ConflictsService", () => {
       ...createHandler(new Map([["42", null]])),
       direction: "entries" as const,
     };
-    const service = createService({ handler, conflictsModel: { bulkWrite } });
+    const service = createService({
+      handler,
+      conflictsModel: { bulkWrite },
+      gamesModel: { find: () => query([]) },
+    });
 
     await service["applyBatch"](handler, [
       {
@@ -449,9 +627,62 @@ describe("ConflictsService", () => {
       } as never,
     ]);
 
-    expect(bulkWrite.mock.calls[0][0][0].updateOne.update).toEqual({
+    expect(bulkWrite.mock.lastCall[0][0].updateOne.update).toEqual({
       $set: { status: "absent", winner: null, decision: null },
     });
+  });
+
+  it("records what a match changed and the game a Skip created", async () => {
+    const gameId = new Types.ObjectId();
+    const created = new Types.ObjectId();
+    const handler = createHandler(
+      new Map([
+        ["v1", gameId],
+        ["v2", created],
+        ["v3", gameId],
+      ])
+    );
+    const service = createService({
+      handler,
+      conflictsModel: { bulkWrite: jest.fn() },
+      gamesModel: {
+        find: jest
+          .fn()
+          .mockReturnValueOnce(
+            query([{ _id: gameId, name: "Old", updatedAt: 1 }])
+          )
+          .mockReturnValueOnce(query([{ _id: gameId, vndb: { vnId: "v3" } }]))
+          .mockReturnValueOnce(
+            query([
+              { _id: gameId, name: "New", vndb: { vnId: "v1" }, updatedAt: 2 },
+            ])
+          ),
+      },
+    });
+    const setExternalData = jest.spyOn(service, "setExternalData");
+
+    await service["applyBatch"](handler, [
+      { externalId: "v1", decision: "match", winners: [gameId] },
+      { externalId: "v2", decision: "skip", winner: null },
+      { externalId: "v3", decision: "skip", winner: null },
+    ] as never);
+
+    expect(setExternalData).toHaveBeenCalledWith("vndb", [
+      {
+        externalId: "v1",
+        externalData: {
+          changes: [
+            {
+              gameId: String(gameId),
+              before: { name: "Old" },
+              after: { name: "New", vndb: { vnId: "v1" } },
+            },
+          ],
+        },
+      },
+      { externalId: "v2", externalData: { created: String(created) } },
+      { externalId: "v3", externalData: { created: null } },
+    ]);
   });
 
   it("prepends a game found by hand as a manual candidate", async () => {

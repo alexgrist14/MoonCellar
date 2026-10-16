@@ -121,7 +121,7 @@ const buildService = (undecided: unknown[]) => {
     getItem: jest.fn((_source: string, externalId: string) =>
       Promise.resolve(item(externalId))
     ),
-    canUndo: jest.fn((source: string) => source === "hltb"),
+    skipCreatesGame: jest.fn((source: string) => source !== "ra"),
     findAiResolvedIds: jest.fn(),
     undo: jest.fn(),
   };
@@ -282,14 +282,6 @@ describe("Conflicts AI review", () => {
     expect(await service.undoAll("hltb", ADMIN)).toBe(2);
   });
 
-  it("refuses to undo a source whose matches cannot be undone", () => {
-    const { service } = buildService([]);
-
-    expect(() => service.startUndo("steam", ADMIN)).toThrow(
-      "steam decisions cannot be undone"
-    );
-  });
-
   it("counts every source before it starts, then reviews them in turn", async () => {
     jest
       .mocked(callOpenAi)
@@ -338,7 +330,7 @@ describe("Conflicts AI review", () => {
     });
   });
 
-  it("undoes only the sources that can undo when none is given", () => {
+  it("undoes the AI matches of every source when none is given", () => {
     const { service } = buildService([]);
 
     jest
@@ -346,7 +338,7 @@ describe("Conflicts AI review", () => {
       .mockImplementation(() => undefined as never);
 
     expect(service.startUndo(undefined, ADMIN).message).toBe(
-      "Undoing every hltb match the AI made"
+      "Undoing every match the AI made"
     );
   });
 
@@ -384,11 +376,33 @@ describe("Conflicts AI review", () => {
     expect(service.getStatus()).toMatchObject({ total: 1, decided: 1 });
   });
 
-  it("refuses to add games for a source that does not allow it", () => {
+  it("refuses to add games for a source whose Skip adds none", () => {
     const { service } = buildService([]);
 
-    expect(() => service.startCreate("steam", ADMIN)).toThrow(
-      "The AI does not add steam entries as new games"
+    expect(() => service.startCreate("ra", ADMIN)).toThrow(
+      "The AI does not add ra entries as new games"
+    );
+  });
+
+  it("adds games for every no-match verdict of a source without a filter", async () => {
+    const { service, conflicts } = buildService([
+      conflict("v1", verdict({ gameIds: [] })),
+    ]);
+    const jobs: (() => Promise<unknown>)[] = [];
+
+    jest
+      .spyOn(service as never, "runInBackground")
+      .mockImplementation(((_kind: unknown, run: () => Promise<unknown>) =>
+        jobs.push(run)) as never);
+    service.startCreate("vndb", ADMIN);
+    await jobs[0]();
+
+    expect(conflicts.decide).toHaveBeenCalledWith(
+      "vndb",
+      "v1",
+      { gameId: null },
+      ADMIN,
+      { isAi: true }
     );
   });
 
@@ -414,8 +428,11 @@ describe("Conflicts AI review", () => {
 
     expect(
       conflicts.undo.mock.calls.map(([source, id]) => [source, id])
-    ).toEqual([["hltb", "3"]]);
-    expect(service.getStatus()).toMatchObject({ total: 1, undone: 1 });
+    ).toEqual([
+      ["hltb", "3"],
+      ["steam", "1"],
+    ]);
+    expect(service.getStatus()).toMatchObject({ total: 2, undone: 2 });
   });
 
   it("applies medium verdicts only when they are asked for", async () => {
