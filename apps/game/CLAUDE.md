@@ -46,6 +46,10 @@ does and how to run it is in [`docs/game-service.md`](../../docs/game-service.md
 
 ## Leaderboards
 
+- **A time is recorded only with a run that holds up** (`ghost.ts`, `docs/game-service.md`,
+  "Run checks"). The checks use only the ghost file itself — never level geometry or other game
+  data, which belong to the game's publisher and must not enter this repository. Change
+  `GHOST_LIMITS` only together with `ghost.spec.ts`, and against real runs from the port.
 - **A submitted time replaces the entry only when it is faster**, together with its ghost; a
   slower one answers `improved: false` and refreshes only the display name.
 - **The ghost is stored with `select: false`** and read only by
