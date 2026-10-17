@@ -25,6 +25,25 @@ returned; without it, or after the device was signed out on the site, the endpoi
 Request and response shapes are the `Game*` schemas of `@mooncellar/schemas`
 (`packages/schemas/src/game.schema.ts`).
 
+## Match signalling
+
+`wss://game.mooncellar.space/signal` is a WebSocket where two game ports find each other before
+they connect directly (plan G4 of the port). Messages are JSON text frames, shaped by
+`GameSignalClientMessageSchema` and `GameSignalServerMessageSchema`:
+
+| Client sends                        | Server answers                                                                                             |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `{ type: "host", port }`            | `{ type: "hosted", code }` — a four-character room code to give the other player                           |
+| `{ type: "join", code, port }`      | `{ type: "joined", code, peer }` to the guest and `{ type: "peer", peer }` to the host                     |
+| `{ type: "signal", data }`          | `{ type: "signal", data }` delivered to the other player (up to 4 KiB, e.g. connection candidates)         |
+| `{ type: "leave" }`, or disconnects | `{ type: "left" }` to the host when the guest leaves; `{ type: "closed" }` to the guest when the host does |
+
+`peer` is `{ name, address, port }`: the address the server saw the player connect from
+(`X-Forwarded-For` behind nginx) and the port that player announced. A game token
+(`Authorization: Bearer` or `?token=`) makes `name` the MoonCellar user name, otherwise it is
+`Player`. A room holds two players; mistakes answer `{ type: "error", message }`. The server pings
+every 30 seconds and drops a socket that misses a pong; nginx keeps an idle socket for 120 seconds.
+
 ## Running it locally
 
 ```bash

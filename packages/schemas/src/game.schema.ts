@@ -67,3 +67,49 @@ export const GameGhostSchema = z.object({
   ghost: z.string(),
 });
 export type IGameGhost = z.infer<typeof GameGhostSchema>;
+
+export const GAME_SIGNAL_MAX_BYTES = 4096;
+
+export const GameSignalClientMessageSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("host"),
+    port: z.number().int().min(0).max(65535).default(0),
+  }),
+  z.object({
+    type: z.literal("join"),
+    code: z.string().trim().min(1).max(8),
+    port: z.number().int().min(0).max(65535).default(0),
+  }),
+  z.object({
+    type: z.literal("signal"),
+    data: z.string().max(GAME_SIGNAL_MAX_BYTES),
+  }),
+  z.object({ type: z.literal("leave") }),
+]);
+export type IGameSignalClientMessage = z.infer<
+  typeof GameSignalClientMessageSchema
+>;
+
+export const GameSignalPeerSchema = z.object({
+  name: z.string(),
+  address: z.string(),
+  port: z.number().int(),
+});
+export type IGameSignalPeer = z.infer<typeof GameSignalPeerSchema>;
+
+export const GameSignalServerMessageSchema = z.discriminatedUnion("type", [
+  z.object({ type: z.literal("hosted"), code: z.string() }),
+  z.object({
+    type: z.literal("joined"),
+    code: z.string(),
+    peer: GameSignalPeerSchema,
+  }),
+  z.object({ type: z.literal("peer"), peer: GameSignalPeerSchema }),
+  z.object({ type: z.literal("signal"), data: z.string() }),
+  z.object({ type: z.literal("left") }),
+  z.object({ type: z.literal("closed") }),
+  z.object({ type: z.literal("error"), message: z.string() }),
+]);
+export type IGameSignalServerMessage = z.infer<
+  typeof GameSignalServerMessageSchema
+>;

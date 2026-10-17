@@ -33,6 +33,17 @@ does and how to run it is in [`docs/game-service.md`](../../docs/game-service.md
 - **An endpoint that acts for a player uses `GameTokenGuard`**, which puts the account on
   `request.account`; the player's name is taken from it, never from the request body.
 
+## Signalling
+
+- **`/signal` is a plain `ws` server on the HTTP server's `upgrade` event, not a Nest gateway or
+  socket.io**: the game ports speak raw WebSocket frames through libcurl. `SignalGateway` attaches
+  it at bootstrap and destroys any other upgrade request. Rooms live in memory
+  (`SignalService`), so the service must stay a single instance while it holds them.
+- **Every client message goes through `GameSignalClientMessageSchema.safeParse`**; a bad one
+  answers `{ type: "error" }` and never closes the socket.
+- **nginx needs its own `location = /signal` with the upgrade headers** for `game.mooncellar.space`;
+  the plain `location /` sends `Connection: ""` and the handshake fails.
+
 ## Leaderboards
 
 - **A submitted time replaces the entry only when it is faster**, together with its ghost; a
