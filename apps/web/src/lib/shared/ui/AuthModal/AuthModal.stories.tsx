@@ -15,6 +15,10 @@ type Story = StoryObj<typeof meta>;
 
 export const Inline: Story = {};
 
+export const SignIn: Story = {
+  args: { isSignIn: true },
+};
+
 export const InModal: Story = {
   render: () => <Button onClick={() => openAuthModal()}>Sign in</Button>,
 };

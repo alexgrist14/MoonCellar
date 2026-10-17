@@ -14,11 +14,15 @@ hook, which stores the profile and closes the modal on success.
 
 ## API
 
-`AuthModal` takes no props.
+| Prop       | Type      | Default | Purpose                                                           |
+| ---------- | --------- | ------- | ----------------------------------------------------------------- |
+| `isSignIn` | `boolean` | `false` | Open in login mode instead of sign-up; the user can still switch. |
+
+`openAuthModal(props?)` passes the same props.
 
 | Export             | Type                                 | Purpose                                                                                                                       |
 | ------------------ | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
-| `AuthModal`        | `FC`                                 | The form itself. Opens in sign-up mode.                                                                                       |
+| `AuthModal`        | `FC<{ isSignIn?: boolean }>`         | The form itself. Opens in sign-up mode unless `isSignIn`.                                                                     |
 | `createAuthSchema` | `(isRegister: boolean) => ZodObject` | Login schema, or the stricter sign-up schema (username 3–15 `[a-zA-Z0-9_]`, password 6–100). Not re-exported from the barrel. |
 | `AuthSchema`       | type                                 | Inferred form values (`userName?`, `email`, `password`).                                                                      |
 
@@ -57,5 +61,5 @@ import { modal } from "@/src/lib/shared/ui/Modal";
 
 ## Storybook
 
-`Shared/AuthModal`: `Inline`, `InModal`. Neither story submits — submitting would hit the
+`Shared/AuthModal`: `Inline`, `SignIn`, `InModal`. Neither story submits — submitting would hit the
 auth API.

@@ -2,8 +2,10 @@
 
 Where a player confirms the code a game port shows while signing in with a MoonCellar account
 (device sign-in, `docs/game-sign-in.md`). The game opens this page, or the player scans its QR
-code on a phone; the code is prefilled from `?code=`. Guests see a "Log in" prompt with a Sign in
-button that opens the auth modal, and the form appears once they are signed in, keeping the code.
+code on a phone; the code is prefilled from `?code=`. A guest who arrives with a code gets the
+auth modal opened for them — in sign-up mode with `?signup=1` (the game's "Create an account"),
+in login mode otherwise — and the form appears once they are signed in, keeping the code. Without
+a code a guest sees the "Log in" prompt and opens the modal with its button.
 
 ## Routes
 
@@ -15,7 +17,10 @@ button that opens the auth modal, and the form appears once they are signed in, 
 ## Data
 
 - `useAuthStore().isAuth` — decides between the form and the login prompt.
-- Query param `code`, read once as the initial value of the code field.
+- Query param `code`, read once as the initial value of the code field; `signup=1` picks the
+  modal's sign-up mode for a guest.
+- `useAuthStore().isAuthChecked` — the modal opens only after the session check, so a signed-in
+  player never sees it flash.
 - `features/user/ui/GameDeviceLink` runs `GET /auth/game/device/:userCode` (which device is
   waiting) and `POST /auth/game/device/approve` through `entities/game-session`.
 

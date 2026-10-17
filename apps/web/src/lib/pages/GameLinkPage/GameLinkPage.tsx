@@ -1,6 +1,6 @@
 "use client";
 
-import { FC } from "react";
+import { FC, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { GameDeviceLink } from "@/src/lib/features/user/ui/GameDeviceLink";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
@@ -14,7 +14,17 @@ import styles from "./GameLinkPage.module.scss";
 
 export const GameLinkPage: FC = () => {
   const isAuth = useAuthStore((s) => s.isAuth);
-  const code = useSearchParams().get("code") ?? undefined;
+  const isAuthChecked = useAuthStore((s) => s.isAuthChecked);
+  const searchParams = useSearchParams();
+  const code = searchParams.get("code") ?? undefined;
+  const isSignUp = searchParams.get("signup") === "1";
+  const isModalOpened = useRef(false);
+
+  useEffect(() => {
+    if (!isAuthChecked || isAuth || !code || isModalOpened.current) return;
+    isModalOpened.current = true;
+    openAuthModal({ isSignIn: !isSignUp });
+  }, [isAuthChecked, isAuth, code, isSignUp]);
 
   return (
     <Box classNameContent={styles.page}>
@@ -39,8 +49,11 @@ export const GameLinkPage: FC = () => {
           isWithoutImage
           title="Log in to link a game."
           action={
-            <Button color={ButtonColor.ACCENT} onClick={() => openAuthModal()}>
-              Sign in
+            <Button
+              color={ButtonColor.ACCENT}
+              onClick={() => openAuthModal({ isSignIn: !isSignUp })}
+            >
+              {isSignUp ? "Create an account" : "Sign in"}
             </Button>
           }
         />
