@@ -5,12 +5,14 @@ const FIXED_ONE = 65536;
 
 export const GHOST_LIMITS = {
   maxFrameGapMs: 2000,
-  lateFinishMs: 250,
-  earlyFinishMs: 1500,
+  lateFinishMs: 750,
+  idleMeters: 0.05,
   maxSpeedMetersPerSecond: 35,
   minSegmentMs: 100,
   segmentSlackMeters: 1,
   respawnRadiusMeters: 12,
+  cruiseMetersPerSecond: 11,
+  maxFastShare: 0.25,
 };
 
 export type IGhostFrame = { dt: number; x: number; y: number; z: number };
@@ -49,30 +51,56 @@ export const parseGhost = (data: Buffer): IGhostRun | string => {
 const distance = (a: IGhostFrame, b: IGhostFrame) =>
   Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
 
+export const movingDuration = (run: IGhostRun) => {
+  let idleMs = 0;
+  for (let index = 1; index < run.frames.length; index++) {
+    if (
+      distance(run.frames[index - 1], run.frames[index]) >=
+      GHOST_LIMITS.idleMeters
+    ) {
+      break;
+    }
+    idleMs += run.frames[index].dt;
+  }
+  return run.durationMs - idleMs;
+};
+
 export const checkRun = (run: IGhostRun, timeMs: number): string | null => {
   const limits = GHOST_LIMITS;
-  if (run.durationMs > timeMs + limits.lateFinishMs) {
+  if (movingDuration(run) > timeMs + limits.lateFinishMs) {
     return "The run is longer than the submitted time";
   }
-  if (run.durationMs < timeMs - limits.earlyFinishMs) {
-    return "The run is shorter than the submitted time";
-  }
+  let movingMs = 0;
+  let fastMs = 0;
   for (let index = 1; index < run.frames.length; index++) {
     const frame = run.frames[index];
     if (frame.dt > limits.maxFrameGapMs) return "The run has a gap";
     const previous = run.frames[index - 1];
+    const covered = distance(previous, frame);
     const reach =
       (limits.maxSpeedMetersPerSecond *
         Math.max(frame.dt, limits.minSegmentMs)) /
         1000 +
       limits.segmentSlackMeters;
-    if (distance(previous, frame) <= reach) continue;
-    const respawned = run.frames
-      .slice(0, index)
-      .some(
-        (earlier) => distance(earlier, frame) <= limits.respawnRadiusMeters
-      );
-    if (!respawned) return "The run moves faster than the runner can";
+    if (covered > reach) {
+      const respawned = run.frames
+        .slice(0, index)
+        .some(
+          (earlier) => distance(earlier, frame) <= limits.respawnRadiusMeters
+        );
+      if (!respawned) return "The run moves faster than the runner can";
+      continue;
+    }
+    if (frame.dt < limits.minSegmentMs || covered < limits.idleMeters) {
+      continue;
+    }
+    movingMs += frame.dt;
+    if ((covered * 1000) / frame.dt > limits.cruiseMetersPerSecond) {
+      fastMs += frame.dt;
+    }
+  }
+  if (movingMs > 0 && fastMs / movingMs > limits.maxFastShare) {
+    return "The run is faster than the runner can keep up";
   }
   return null;
 };

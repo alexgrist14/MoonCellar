@@ -53,27 +53,42 @@ describe("parseGhost", () => {
 
 describe("checkRun", () => {
   it("accepts a run that matches its time", () => {
-    expect(checkRun(parse(runAt(6, 10)), 10_300)).toBeNull();
+    expect(checkRun(parse(runAt(9.5, 10)), 10_300)).toBeNull();
   });
 
-  it("rejects a time far from the run", () => {
-    expect(checkRun(parse(runAt(6, 10)), 5_000)).toBe(
+  it("does not count standing at the start, before the race clock runs", () => {
+    const standing = Array.from({ length: 10 }, (_, index) => ({
+      dt: index === 0 ? 0 : 500,
+      x: 0,
+    }));
+    const run = runAt(9.5, 10).map((point, index) => ({
+      ...point,
+      dt: index === 0 ? 500 : point.dt,
+    }));
+    expect(checkRun(parse([...standing, ...run]), 10_000)).toBeNull();
+  });
+
+  it("rejects a time shorter than the run", () => {
+    expect(checkRun(parse(runAt(9.5, 10)), 8_000)).toBe(
       "The run is longer than the submitted time"
     );
-    expect(checkRun(parse(runAt(6, 10)), 20_000)).toBe(
-      "The run is shorter than the submitted time"
+  });
+
+  it("rejects a run kept above the runner's pace", () => {
+    expect(checkRun(parse(runAt(11.5, 10)), 10_000)).toBe(
+      "The run is faster than the runner can keep up"
     );
   });
 
   it("rejects a jump ahead but allows a respawn at an earlier spot", () => {
-    const teleport = runAt(6, 4);
-    teleport[5] = { dt: 500, x: 200 };
+    const teleport = runAt(9.5, 4);
+    teleport[5] = { dt: 500, x: 300 };
     expect(checkRun(parse(teleport), 4_000)).toBe(
       "The run moves faster than the runner can"
     );
 
-    const respawn = runAt(6, 4);
-    respawn[6] = { dt: 500, x: 3 };
+    const respawn = runAt(9.5, 4);
+    respawn[6] = { dt: 500, x: 5 };
     expect(checkRun(parse(respawn), 4_000)).toBeNull();
   });
 });

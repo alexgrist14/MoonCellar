@@ -32,14 +32,20 @@ the game's ghost file (version 3: big-endian frame count, then per frame the mil
 the previous one and the 16.16 fixed-point position) and rejects the time when:
 
 - the file is not a complete version 3 run;
-- the run lasts longer than the time plus 250 ms, or shorter than the time minus 1.5 s (the game
-  writes a frame at most every 500 ms, so the last moments before the finish are missing);
+- the run, from the first step, lasts longer than the time plus 750 ms. The game starts recording
+  during the camera fly-over before the countdown, while the race clock still stands, so the
+  standing frames at the start are not counted; the last frame comes up to 500 ms before the
+  finish;
 - two frames are more than 2 s apart;
 - the runner covers more than 35 m/s between two frames, unless the new spot is within 12 m of an
-  earlier one — a respawn at a checkpoint.
+  earlier one — a respawn at a checkpoint;
+- more than a quarter of the moving time goes faster than 11 m/s. The runner tops out at about
+  10 m/s: in a real run of the training level 83 % of the moving time is 9–11 m/s and 5 % is
+  faster, while the same run sped up by 11 % is above 11 m/s for 80 % of the time.
 
-The limits are `GHOST_LIMITS`; they know nothing about the level itself, so a run built by hand
-along a plausible path still passes. `bun --filter game test` runs the checks.
+The limits are `GHOST_LIMITS`, calibrated on real runs from the port; they know nothing about the
+level itself, so a run built by hand along a plausible path, or one sped up by a few percent,
+still passes. `bun --filter game test` runs the checks.
 
 ## Match signalling
 
