@@ -1,34 +1,64 @@
 import {
   Injectable,
+  Logger,
   NotFoundException,
+  type OnModuleInit,
   UnprocessableEntityException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import type {
   IGameAccount,
-  IGameGhost,
   IGameLeaderboard,
   IGameLeaderboardEntry,
+  IGameReplay,
   IGameSubmitResult,
 } from "@mooncellar/schemas";
-import type { Model } from "mongoose";
-import {
-  type IRunEnds,
-  checkEnds,
-  checkRun,
-  endsOf,
-  parseGhost,
-} from "./ghost";
+import type { Model, SortOrder } from "mongoose";
+import type { IGameDefinition } from "../../games/game-definition";
 import { LeaderboardEntry } from "./schemas/leaderboard-entry.schema";
 
 type ILeanEntry = LeaderboardEntry & { _id: { toString(): string } };
 
+const ACCEPTED_REPLAYS = 20;
+
 @Injectable()
-export class LeaderboardsService {
+export class LeaderboardsService implements OnModuleInit {
+  private readonly logger = new Logger(LeaderboardsService.name);
+
   constructor(
     @InjectModel(LeaderboardEntry.name)
     private readonly entries: Model<LeaderboardEntry>
   ) {}
+
+  async onModuleInit() {
+    const result = await this.entries.collection.updateMany(
+      { level: { $exists: true } },
+      [
+        {
+          $set: {
+            game: "rooftops",
+            board: {
+              $concat: ["level-", { $toString: { $add: ["$level", 1] } }],
+            },
+            score: "$timeMs",
+            replay: "$ghost",
+            hasReplay: { $ifNull: ["$hasGhost", false] },
+          },
+        },
+        { $unset: ["level", "timeMs", "ghost", "hasGhost"] },
+      ]
+    );
+    if (result.modifiedCount) {
+      this.logger.log(
+        `Moved ${result.modifiedCount} leaderboard entries to game boards`
+      );
+    }
+    await this.entries.syncIndexes();
+  }
+
+  private sortOf(game: IGameDefinition): Record<string, SortOrder> {
+    return { score: game.scoreOrder === "asc" ? 1 : -1, updatedAt: 1 };
+  }
 
   private toEntry(row: ILeanEntry, rank: number): IGameLeaderboardEntry {
     return {
@@ -36,146 +66,148 @@ export class LeaderboardsService {
       rank,
       userId: row.userId,
       displayName: row.displayName,
-      timeMs: row.timeMs,
-      hasGhost: !!row.hasGhost,
+      score: row.score,
+      hasReplay: !!row.hasReplay,
       recordedAt: row.updatedAt.toISOString(),
     };
   }
 
-  private async rankOf(row: ILeanEntry) {
+  private async rankOf(game: IGameDefinition, row: ILeanEntry) {
+    const better = game.scoreOrder === "asc" ? "$lt" : "$gt";
     const ahead = await this.entries.countDocuments({
-      level: row.level,
+      game: row.game,
+      board: row.board,
       $or: [
-        { timeMs: { $lt: row.timeMs } },
-        { timeMs: row.timeMs, updatedAt: { $lt: row.updatedAt } },
+        { score: { [better]: row.score } },
+        { score: row.score, updatedAt: { $lt: row.updatedAt } },
       ],
     });
     return ahead + 1;
   }
 
   async getLeaderboard(
-    level: number,
+    game: IGameDefinition,
+    board: string,
     limit: number,
     offset: number
   ): Promise<IGameLeaderboard> {
+    const filter = { game: game.slug, board };
     const [total, rows] = await Promise.all([
-      this.entries.countDocuments({ level }),
+      this.entries.countDocuments(filter),
       this.entries
-        .find({ level })
-        .sort({ timeMs: 1, updatedAt: 1 })
+        .find(filter)
+        .sort(this.sortOf(game))
         .skip(offset)
         .limit(limit)
         .lean<ILeanEntry[]>(),
     ]);
-
     return {
-      level,
+      game: game.slug,
+      board,
       total,
       entries: rows.map((row, index) => this.toEntry(row, offset + index + 1)),
     };
   }
 
-  async acceptedEnds(level: number): Promise<IRunEnds[]> {
+  private async acceptedReplays(game: IGameDefinition, board: string) {
     const rows = await this.entries
-      .find({ level, hasGhost: true })
-      .sort({ timeMs: 1, updatedAt: 1 })
-      .limit(20)
-      .select("+ghost");
-    return rows.flatMap((row) => {
-      const run = row.ghost ? parseGhost(Buffer.from(row.ghost)) : "";
-      return typeof run === "string" ? [] : [endsOf(run)];
-    });
+      .find({ game: game.slug, board, hasReplay: true })
+      .sort(this.sortOf(game))
+      .limit(ACCEPTED_REPLAYS)
+      .select("+replay");
+    return rows.flatMap((row) => (row.replay ? [Buffer.from(row.replay)] : []));
   }
 
-  async checkSubmittedRun(
-    level: number,
-    ghost: Buffer,
-    timeMs: number
+  async checkReplay(
+    game: IGameDefinition,
+    board: string,
+    score: number,
+    replay: Buffer | null
   ): Promise<string | null> {
-    const run = parseGhost(ghost);
-    if (typeof run === "string") return run;
-    return (
-      checkRun(run, timeMs) ?? checkEnds(run, await this.acceptedEnds(level))
+    if (!replay) {
+      return game.replay.required
+        ? `${game.name} records a score only with its replay`
+        : null;
+    }
+    if (replay.length > game.replay.maxBytes) return "The replay is too large";
+    if (!game.replay.check) return null;
+    return game.replay.check(
+      replay,
+      score,
+      await this.acceptedReplays(game, board)
     );
   }
 
   async submit(
-    level: number,
+    game: IGameDefinition,
+    board: string,
     account: IGameAccount,
-    timeMs: number,
-    ghost: string
+    score: number,
+    replayBase64?: string
   ): Promise<IGameSubmitResult> {
-    const ghostData = Buffer.from(ghost, "base64");
-    const rejection = await this.checkSubmittedRun(level, ghostData, timeMs);
+    const replay = replayBase64 ? Buffer.from(replayBase64, "base64") : null;
+    const rejection = await this.checkReplay(game, board, score, replay);
     if (rejection) {
       throw new UnprocessableEntityException(
-        `${rejection}. The time was not recorded`
+        `${rejection}. The score was not recorded`
       );
     }
+    const key = { game: game.slug, board, userId: account.id };
+    const worse = game.scoreOrder === "asc" ? "$gt" : "$lt";
+    const update = {
+      score,
+      displayName: account.userName,
+      replay,
+      hasReplay: !!replay,
+    };
     const improved = await this.entries.findOneAndUpdate(
-      {
-        level,
-        userId: account.id,
-        timeMs: { $gt: timeMs },
-      },
-      {
-        $set: {
-          timeMs,
-          displayName: account.userName,
-          ghost: ghostData,
-          hasGhost: true,
-        },
-      },
+      { ...key, score: { [worse]: score } },
+      { $set: update },
       { new: true }
     );
-
     if (!improved) {
       try {
-        await this.entries.create({
-          level,
-          userId: account.id,
-          displayName: account.userName,
-          timeMs,
-          ghost: ghostData,
-          hasGhost: true,
-        });
+        await this.entries.create({ ...key, ...update });
       } catch (error) {
         if ((error as { code?: number })?.code !== 11000) throw error;
         const current = await this.entries
           .findOneAndUpdate(
-            { level, userId: account.id },
+            key,
             { $set: { displayName: account.userName } },
             { new: true }
           )
           .lean<ILeanEntry>();
         return {
           improved: false,
-          entry: this.toEntry(current!, await this.rankOf(current!)),
+          entry: this.toEntry(current!, await this.rankOf(game, current!)),
         };
       }
     }
-
-    const saved = await this.entries
-      .findOne({ level, userId: account.id })
-      .lean<ILeanEntry>();
+    const saved = await this.entries.findOne(key).lean<ILeanEntry>();
     return {
       improved: true,
-      entry: this.toEntry(saved!, await this.rankOf(saved!)),
+      entry: this.toEntry(saved!, await this.rankOf(game, saved!)),
     };
   }
 
-  async getGhost(entryId: string): Promise<IGameGhost> {
-    const row = await this.entries.findById(entryId).select("+ghost");
-    if (!row?.ghost?.length) {
-      throw new NotFoundException("This entry has no recorded run");
+  async getReplay(
+    game: IGameDefinition,
+    entryId: string
+  ): Promise<IGameReplay> {
+    const row = await this.entries
+      .findOne({ _id: entryId, game: game.slug })
+      .select("+replay");
+    if (!row?.replay?.length) {
+      throw new NotFoundException("This entry has no replay");
     }
     return {
       entryId: row._id.toString(),
-      level: row.level,
+      game: row.game,
+      board: row.board,
       userId: row.userId,
       displayName: row.displayName,
-      timeMs: row.timeMs,
-      ghost: Buffer.from(row.ghost).toString("base64"),
+      score: row.score,
+      replay: Buffer.from(row.replay).toString("base64"),
     };
   }
 }

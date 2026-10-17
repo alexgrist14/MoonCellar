@@ -5,23 +5,28 @@ export type LeaderboardEntryDocument = HydratedDocument<LeaderboardEntry>;
 
 @Schema({ collection: "leaderboard_entries", timestamps: true })
 export class LeaderboardEntry {
-  @Prop({ type: Number, required: true })
-  level: number;
+  @Prop({ type: String, required: true })
+  game: string;
+  @Prop({ type: String, required: true })
+  board: string;
   @Prop({ type: String, required: true })
   userId: string;
   @Prop({ type: String, required: true })
   displayName: string;
   @Prop({ type: Number, required: true })
-  timeMs: number;
+  score: number;
   @Prop({ type: Buffer, default: null, select: false })
-  ghost: Buffer | null;
+  replay: Buffer | null;
   @Prop({ type: Boolean, default: false })
-  hasGhost: boolean;
+  hasReplay: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export const LeaderboardEntrySchema =
   SchemaFactory.createForClass(LeaderboardEntry);
-LeaderboardEntrySchema.index({ level: 1, userId: 1 }, { unique: true });
-LeaderboardEntrySchema.index({ level: 1, timeMs: 1, updatedAt: 1 });
+LeaderboardEntrySchema.index(
+  { game: 1, board: 1, userId: 1 },
+  { unique: true }
+);
+LeaderboardEntrySchema.index({ game: 1, board: 1, score: 1, updatedAt: 1 });

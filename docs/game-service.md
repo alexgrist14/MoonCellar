@@ -4,36 +4,44 @@
 `apps/api` and built the same way. It answers on `game.mooncellar.space` (port 3229 in the
 container and in development) and keeps its data in the `game` database of the stack's MongoDB.
 
+It is not tied to one game. Sign-in, friends and match signalling are shared by every port;
+leaderboards and challenges live under `/games/:game/…`, where `:game` is a slug registered in
+`src/games/games.ts` (see "Adding a game"). The first registered game is `rooftops`, the
+port of a rooftop-running game from the decompilation project.
+
 ## Endpoints
 
-| Method | Path                                   | What it returns                                                                                                                                                                                                                                     |
-| ------ | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `GET`  | `/health`                              | `{ status, database, uptimeSeconds }` — `database` is `up` while MongoDB is connected                                                                                                                                                               |
-| `GET`  | `/leaderboards/:level`                 | Best times of a level, fastest first: `{ level, total, entries }`, paged by `limit` (1–100, default 20) and `offset`                                                                                                                                |
-| `PUT`  | `/leaderboards/:level`                 | Game token. Submits `{ timeMs, ghost }` (the recorded run, base64, up to 256 KiB); the run is checked against the time (see below) and replaces the player's entry only when faster: `{ improved, entry }`; a run that does not hold up answers 422 |
-| `GET`  | `/leaderboards/entries/:entryId/ghost` | The recorded run of an entry: `{ entryId, level, userId, displayName, timeMs, ghost }`; 404 when it has none                                                                                                                                        |
-| `POST` | `/account/device`                      | Starts signing in: `{ deviceCode, userCode, verificationUrl, … }` ([game-sign-in.md](game-sign-in.md))                                                                                                                                              |
-| `POST` | `/account/device/token`                | Polls the sign-in: `{ status: "pending" }`, then `{ status: "approved", token, account }`                                                                                                                                                           |
-| `GET`  | `/account/me`                          | Game token. The account the game is signed in with: `{ id, userName, avatar }`                                                                                                                                                                      |
-| `POST` | `/account/sign-out`                    | Game token. Revokes the token; the device disappears from the site's Settings → Game devices                                                                                                                                                        |
-| `GET`  | `/account/friends`                     | Game token. Who the player can challenge: MoonCellar followings and followers, `[{ id, userName, avatar }]` by name                                                                                                                                 |
-| `POST` | `/challenges`                          | Game token. Challenges a friend with a run: `{ toUserId, level, timeMs, comment, ghost }`, checked like a leaderboard time; 403 for someone who is not a friend, 429 after five unopened challenges to the same friend                              |
-| `GET`  | `/challenges/incoming`                 | Game token. Challenges sent to the player since the last call, oldest first, without ghosts; each is handed out once                                                                                                                                |
-| `GET`  | `/challenges/:challengeId`             | Game token. The challenge with its ghost, for its recipient or sender; challenges expire after 30 days                                                                                                                                              |
-| `GET`  | `/api`                                 | Swagger UI and the OpenAPI document of the service                                                                                                                                                                                                  |
-| `GET`  | `/metrics`                             | Prometheus metrics, behind `Authorization: Bearer <METRICS_TOKEN>`                                                                                                                                                                                  |
-
-"Game token" means `Authorization: Bearer <token>` with the token `/account/device/token`
-returned; without it, or after the device was signed out on the site, the endpoint answers 401.
+| Method | Path                                                | What it returns                                                                                                                                                                                                                                                                      |
+| ------ | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `GET`  | `/health`                                           | `{ status, database, uptimeSeconds }` — `database` is `up` while MongoDB is connected                                                                                                                                                                                                |
+| `POST` | `/account/device`                                   | Starts signing in: `{ deviceCode, userCode, verificationUrl, … }` ([game-sign-in.md](game-sign-in.md))                                                                                                                                                                               |
+| `POST` | `/account/device/token`                             | Polls the sign-in: `{ status: "pending" }`, then `{ status: "approved", token, account }`                                                                                                                                                                                            |
+| `GET`  | `/account/me`                                       | Game token. The account the game is signed in with: `{ id, userName, avatar }`                                                                                                                                                                                                       |
+| `GET`  | `/account/friends`                                  | Game token. MoonCellar followings and followers, `[{ id, userName, avatar }]` by name                                                                                                                                                                                                |
+| `POST` | `/account/sign-out`                                 | Game token. Revokes the token; the device disappears from the site's Settings → Game devices                                                                                                                                                                                         |
+| `GET`  | `/games`                                            | The registered games: `[{ slug, name, scoreOrder, scoreUnit, replayRequired }]`                                                                                                                                                                                                      |
+| `GET`  | `/games/:game/leaderboards/:board`                  | A leaderboard, best score first (`scoreOrder` of the game): `{ game, board, total, entries }`, paged by `limit` (1–100, default 20) and `offset`; 404 for an unknown game or a board the game does not have                                                                          |
+| `PUT`  | `/games/:game/leaderboards/:board`                  | Game token. Submits `{ score, replay? }` (replay — the game's own recording, base64, up to 256 KiB); the game's replay check runs (see "Replay checks"), and the player's entry is replaced only by a better score: `{ improved, entry }`; a score that does not hold up answers 422 |
+| `GET`  | `/games/:game/leaderboards/entries/:entryId/replay` | The replay of an entry: `{ entryId, game, board, userId, displayName, score, replay }`; 404 when it has none                                                                                                                                                                         |
+| `POST` | `/games/:game/challenges`                           | Game token. Challenges a friend: `{ toUserId, board, score, comment, replay? }`, checked like a leaderboard score; 403 for someone who is not a friend, 429 after five unopened challenges to the same friend                                                                        |
+| `GET`  | `/games/:game/challenges/incoming`                  | Game token. Challenges of this game sent to the player since the last call, oldest first, without replays; each is handed out once                                                                                                                                                   |
+| `GET`  | `/games/:game/challenges/:challengeId`              | Game token. The challenge with its replay (or `null`), for its recipient or sender; challenges expire after 30 days                                                                                                                                                                  |
+| `GET`  | `/api`                                              | Swagger UI and the OpenAPI document of the service                                                                                                                                                                                                                                   |
+| `GET`  | `/metrics`                                          | Prometheus metrics, behind `Authorization: Bearer <METRICS_TOKEN>`                                                                                                                                                                                                                   |
 
 Request and response shapes are the `Game*` schemas of `@mooncellar/schemas`
 (`packages/schemas/src/game.schema.ts`).
 
-## Run checks
+## Replay checks
 
-A submitted time is only as good as the run recorded with it. `module/leaderboards/ghost.ts` reads
-the game's ghost file (version 3: big-endian frame count, then per frame the milliseconds since
-the previous one and the 16.16 fixed-point position) and rejects the time when:
+A score is only as good as the replay recorded with it, so every game may bring a check
+(`IGameDefinition.replay.check`): it gets the submitted replay, the score and the replays of the
+board's twenty best entries, and returns a reason to reject or `null`. Challenges go through the
+same check. The service itself never reads a replay; a game without a check stores it as is.
+
+`rooftops` (`src/games/rooftops/ghost.ts`) reads its ghost file (version 3: big-endian frame
+count, then per frame the milliseconds since the previous one and the 16.16 fixed-point
+position) and rejects the time when:
 
 - the file is not a complete version 3 run;
 - the run, from the first step, lasts longer than the time plus 750 ms. The game starts recording
@@ -46,16 +54,26 @@ the previous one and the 16.16 fixed-point position) and rejects the time when:
 - the runner moves for less than half of the time;
 - more than a quarter of the moving time goes faster than 11 m/s. The runner tops out at about
   10 m/s: in a real run of the training level 83 % of the moving time is 9–11 m/s and 5 % is
-  faster, while the same run sped up by 11 % is above 11 m/s for 80 % of the time.
+  faster, while the same run sped up by 11 % is above 11 m/s for 80 % of the time;
+- the board already has accepted runs and this one does not start within 15 m of the start, or
+  finish within 30 m of the finish, of one of them. Every honest run of a level shares the spawn
+  point and the finish, so a run cut short or recorded elsewhere stops there; the first run of a
+  board is trusted.
 
-Once a level has accepted runs, a new one must also start within 15 m of the start of one of the
-twenty best and finish within 30 m of one of their finishes: every honest run of a level shares the
-spawn point and the finish, so a run cut short or recorded elsewhere stops there. The first run of
-a level has nothing to compare with and is trusted. Challenges go through the same checks.
-
-The limits are `GHOST_LIMITS`, calibrated on real runs from the port; they know nothing about the
-level itself, so a run built by hand along a plausible path, or one sped up by a few percent,
+The limits are `GHOST_LIMITS`, calibrated on real runs from the port; they use only the replays,
+never level data, so a run built by hand along a plausible path, or one sped up by a few percent,
 still passes. `bun --filter game test` runs the checks.
+
+## Adding a game
+
+1. Pick a slug (`[a-z][a-z0-9-]`, up to 32 characters) and add `src/games/<slug>/<slug>.game.ts`
+   with an `IGameDefinition`: `name`, `scoreOrder` (`asc` when lower is better, as with times),
+   `scoreUnit` (`ms` or `points`), `board` — a regular expression of the board ids the game
+   uses — and `replay` (`required`, `maxBytes`, an optional `check`).
+2. Register it in `GAMES` in `src/games/games.ts`. Nothing else changes: the routes, the
+   collections and the challenges take the slug from the URL.
+3. A replay check reads only the replays and the score. Game data (levels, assets) belongs to
+   the game's publisher and never enters this repository.
 
 ## Match signalling
 

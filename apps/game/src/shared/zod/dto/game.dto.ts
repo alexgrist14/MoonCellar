@@ -1,41 +1,27 @@
 import { createZodDto } from "nestjs-zod";
 import {
   GameAccountSchema,
+  GameBoardParamsSchema,
   GameChallengeCreateSchema,
   GameChallengeParamsSchema,
   GameChallengeSchema,
-  GameChallengeWithGhostSchema,
+  GameChallengeWithReplaySchema,
+  GameDefinitionSchema,
   GameDeviceCodeRequestSchema,
   GameDeviceCodeSchema,
   GameDeviceTokenRequestSchema,
   GameDeviceTokenSchema,
   GameEntryParamsSchema,
-  GameGhostSchema,
   GameHealthSchema,
   GameLeaderboardQuerySchema,
   GameLeaderboardSchema,
-  GameLevelParamsSchema,
+  GameParamsSchema,
+  GameReplaySchema,
   GameSubmitResultSchema,
-  GameSubmitTimeSchema,
+  GameSubmitScoreSchema,
 } from "@mooncellar/schemas";
 
 export class GameHealthDto extends createZodDto(GameHealthSchema) {}
-
-export class GameLevelParamsDto extends createZodDto(GameLevelParamsSchema) {}
-
-export class GameLeaderboardQueryDto extends createZodDto(
-  GameLeaderboardQuerySchema
-) {}
-
-export class GameLeaderboardDto extends createZodDto(GameLeaderboardSchema) {}
-
-export class GameSubmitTimeDto extends createZodDto(GameSubmitTimeSchema) {}
-
-export class GameSubmitResultDto extends createZodDto(GameSubmitResultSchema) {}
-
-export class GameEntryParamsDto extends createZodDto(GameEntryParamsSchema) {}
-
-export class GameGhostDto extends createZodDto(GameGhostSchema) {}
 
 export class GameAccountDto extends createZodDto(GameAccountSchema) {}
 
@@ -51,6 +37,26 @@ export class GameDeviceTokenRequestDto extends createZodDto(
 
 export class GameDeviceTokenDto extends createZodDto(GameDeviceTokenSchema) {}
 
+export class GameDefinitionDto extends createZodDto(GameDefinitionSchema) {}
+
+export class GameParamsDto extends createZodDto(GameParamsSchema) {}
+
+export class GameBoardParamsDto extends createZodDto(GameBoardParamsSchema) {}
+
+export class GameLeaderboardQueryDto extends createZodDto(
+  GameLeaderboardQuerySchema
+) {}
+
+export class GameLeaderboardDto extends createZodDto(GameLeaderboardSchema) {}
+
+export class GameSubmitScoreDto extends createZodDto(GameSubmitScoreSchema) {}
+
+export class GameSubmitResultDto extends createZodDto(GameSubmitResultSchema) {}
+
+export class GameEntryParamsDto extends createZodDto(GameEntryParamsSchema) {}
+
+export class GameReplayDto extends createZodDto(GameReplaySchema) {}
+
 export class GameChallengeCreateDto extends createZodDto(
   GameChallengeCreateSchema
 ) {}
@@ -61,6 +67,6 @@ export class GameChallengeParamsDto extends createZodDto(
 
 export class GameChallengeDto extends createZodDto(GameChallengeSchema) {}
 
-export class GameChallengeWithGhostDto extends createZodDto(
-  GameChallengeWithGhostSchema
+export class GameChallengeWithReplayDto extends createZodDto(
+  GameChallengeWithReplaySchema
 ) {}
