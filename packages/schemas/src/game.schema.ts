@@ -177,3 +177,100 @@ export const GameChallengeWithReplaySchema = GameChallengeSchema.extend({
 export type IGameChallengeWithReplay = z.infer<
   typeof GameChallengeWithReplaySchema
 >;
+
+// Player levels: a level is the game's own map format, opaque to the service except for the
+// game's check; it holds only the player's layout and numbers of pieces from the game's data.
+
+export const GAME_LEVEL_MAX_BYTES = 256 * 1024;
+export const GAME_LEVEL_NAME_MAX = 64;
+export const GAME_LEVEL_DESCRIPTION_MAX = 500;
+export const GAME_LEVEL_REPORT_MAX = 300;
+
+const levelData = z
+  .base64()
+  .min(1)
+  .max(Math.ceil(GAME_LEVEL_MAX_BYTES / 3) * 4);
+
+export const GameLevelParamsSchema = z.object({
+  game: gameSlug,
+  levelId: objectId,
+});
+export type IGameLevelParams = z.infer<typeof GameLevelParamsSchema>;
+
+export const GameLevelListQuerySchema = z.object({
+  sort: z.enum(["new", "best"]).default("new"),
+  q: z.string().trim().max(GAME_LEVEL_NAME_MAX).default(""),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+  offset: z.coerce.number().int().min(0).default(0),
+});
+export type IGameLevelListQuery = z.infer<typeof GameLevelListQuerySchema>;
+
+export const GameLevelSchema = z.object({
+  id: z.string(),
+  game: z.string(),
+  name: z.string(),
+  description: z.string(),
+  base: z.string(),
+  authorId: z.string(),
+  authorName: z.string(),
+  version: z.number().int().positive(),
+  board: z.string(),
+  size: z.number().int().nonnegative(),
+  rating: z.number().min(0).max(5),
+  ratings: z.number().int().nonnegative(),
+  downloads: z.number().int().nonnegative(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+export type IGameLevel = z.infer<typeof GameLevelSchema>;
+
+export const GameLevelListSchema = z.object({
+  game: z.string(),
+  total: z.number().int().nonnegative(),
+  levels: z.array(GameLevelSchema),
+});
+export type IGameLevelList = z.infer<typeof GameLevelListSchema>;
+
+export const GameLevelUploadSchema = z.object({
+  name: z.string().trim().min(1).max(GAME_LEVEL_NAME_MAX),
+  description: z.string().trim().max(GAME_LEVEL_DESCRIPTION_MAX).default(""),
+  base: z.string().regex(/^[a-z0-9_]{1,40}$/),
+  data: levelData,
+});
+export type IGameLevelUpload = z.infer<typeof GameLevelUploadSchema>;
+
+export const GameLevelFileSchema = z.object({
+  id: z.string(),
+  version: z.number().int().positive(),
+  data: z.string(),
+});
+export type IGameLevelFile = z.infer<typeof GameLevelFileSchema>;
+
+export const GameLevelRatingSchema = z.object({
+  stars: z.number().int().min(1).max(5),
+});
+export type IGameLevelRating = z.infer<typeof GameLevelRatingSchema>;
+
+export const GameLevelReportSchema = z.object({
+  reason: z.string().trim().min(1).max(GAME_LEVEL_REPORT_MAX),
+});
+export type IGameLevelReport = z.infer<typeof GameLevelReportSchema>;
+
+export const GameLevelReportResultSchema = z.object({
+  reported: z.literal(true),
+  hidden: z.boolean(),
+});
+export type IGameLevelReportResult = z.infer<typeof GameLevelReportResultSchema>;
+
+export const GameLevelModerationSchema = z.object({
+  hidden: z.boolean(),
+});
+export type IGameLevelModeration = z.infer<typeof GameLevelModerationSchema>;
+
+export const GameLevelReportedSchema = GameLevelSchema.extend({
+  hidden: z.boolean(),
+  reports: z.array(
+    z.object({ userId: z.string(), reason: z.string(), at: z.string() })
+  ),
+});
+export type IGameLevelReported = z.infer<typeof GameLevelReportedSchema>;

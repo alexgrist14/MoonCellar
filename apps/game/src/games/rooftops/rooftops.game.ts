@@ -1,12 +1,14 @@
 import type { IGameDefinition } from "../game-definition";
 import { checkEnds, checkRun, endsOf, parseGhost } from "./ghost";
+import { checkLevel } from "./level";
 
 export const rooftops: IGameDefinition = {
   slug: "rooftops",
   name: "Rooftops",
   scoreOrder: "asc",
   scoreUnit: "ms",
-  board: /^level-([1-9]|[1-9][0-9])$/,
+  // The game's levels, and player levels `u<levelId>v<version>` (levelBoard)
+  board: /^(level-([1-9]|[1-9][0-9])|u[0-9a-f]{24}v[1-9][0-9]{0,3})$/,
   replay: {
     required: true,
     maxBytes: 256 * 1024,
@@ -19,5 +21,9 @@ export const rooftops: IGameDefinition = {
       });
       return checkRun(run, score) ?? checkEnds(run, ends);
     },
+  },
+  levels: {
+    maxBytes: 128 * 1024,
+    check: checkLevel,
   },
 };

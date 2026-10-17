@@ -26,6 +26,16 @@ port of a rooftop-running game from the decompilation project.
 | `POST` | `/games/:game/challenges`                           | Game token. Challenges a friend: `{ toUserId, board, score, comment, replay? }`, checked like a leaderboard score; 403 for someone who is not a friend, 429 after five unopened challenges to the same friend                                                                        |
 | `GET`  | `/games/:game/challenges/incoming`                  | Game token. Challenges of this game sent to the player since the last call, oldest first, without replays; each is handed out once                                                                                                                                                   |
 | `GET`  | `/games/:game/challenges/:challengeId`              | Game token. The challenge with its replay (or `null`), for its recipient or sender; challenges expire after 30 days                                                                                                                                                                  |
+| `GET`  | `/games/:game/levels`                               | Player levels, `{ game, total, levels }`: `sort` `new` (default) or `best` (rating, then number of ratings), `q` — part of the name or author, `limit` (1–50, default 20), `offset`; hidden levels are left out |
+| `GET`  | `/games/:game/levels/:levelId`                      | A player level: `{ id, name, description, base, authorId, authorName, version, board, size, rating, ratings, downloads, createdAt, updatedAt }`; 404 when hidden                                                                                                                      |
+| `GET`  | `/games/:game/levels/:levelId/file`                 | The level's map `{ id, version, data }` (base64); counts a download                                                                                                                                                                                                                  |
+| `POST` | `/games/:game/levels`                               | Game token. Uploads `{ name, description, base, data }`; the game's level check runs (see "Player levels"); 409 at 50 levels of one author                                                                                                                                          |
+| `PUT`  | `/games/:game/levels/:levelId`                      | Game token, the author only. A new version of the level: `version` grows, and with it the level's leaderboard `board`                                                                                                                                                                |
+| `DELETE` | `/games/:game/levels/:levelId`                    | Game token, the author only. Deletes the level                                                                                                                                                                                                                                       |
+| `PUT`  | `/games/:game/levels/:levelId/rating`               | Game token. `{ stars }` 1–5, replacing the player's earlier rating; not for one's own level                                                                                                                                                                                          |
+| `POST` | `/games/:game/levels/:levelId/report`               | Game token. `{ reason }`; three players reporting a level hide it: `{ reported, hidden }`                                                                                                                                                                                            |
+| `GET`  | `/games/:game/levels/reported`                      | `MODERATION_TOKEN`. Reported and hidden levels with their reports                                                                                                                                                                                                                    |
+| `PUT`  | `/games/:game/levels/:levelId/moderation`           | `MODERATION_TOKEN`. `{ hidden }`; showing a level again clears its reports                                                                                                                                                                                                           |
 | `GET`  | `/api`                                              | Swagger UI and the OpenAPI document of the service                                                                                                                                                                                                                                   |
 | `GET`  | `/metrics`                                          | Prometheus metrics, behind `Authorization: Bearer <METRICS_TOKEN>`                                                                                                                                                                                                                   |
 
@@ -63,6 +73,25 @@ position) and rejects the time when:
 The limits are `GHOST_LIMITS`, calibrated on real runs from the port; they use only the replays,
 never level data, so a run built by hand along a plausible path, or one sped up by a few percent,
 still passes. `bun --filter game test` runs the checks.
+
+## Player levels
+
+A game that takes levels made by its players has `levels` in its definition: `maxBytes` and an
+optional `check` that gets the map file and returns a reason it would not load, or `null`. The
+service stores the file as it is (`select: false`, read only by `…/file`) and never reads it
+otherwise. A level's leaderboard is the board `u<levelId>v<version>` (`levelBoard`), so the
+game's `board` pattern must accept it; a new version starts an empty board.
+
+`rooftops` (`src/games/rooftops/level.ts`) takes levels of the port's map format up to 128 KiB and
+walks the structure the way the game's loader reads it, checking every index the loader follows,
+so a level that passes cannot crash the game. It knows only the layout of the format and the
+lengths of the game's lookup tables. A player level holds the player's layout and numbers of
+pieces from the game's own data; levels copied from the game's chapters are not uploaded — the
+port allows it only for levels made from scratch.
+
+Reports hide a level after three different players; a moderator sees them at
+`/games/:game/levels/reported` and hides or shows a level with `…/moderation`, both behind
+`MODERATION_TOKEN`. Ratings are 1–5 stars, one per player; `rating` is their average.
 
 ## Adding a game
 
@@ -117,6 +146,7 @@ MongoDB, as the API's build does.
 | `LOKI_HOST`               | —       | Sends logs to Loki under the label `app=mooncellar-game`; without it logs are pretty-printed |
 | `PROMETHEUS_ENABLED`      | `true`  | Default process metrics, prefixed `mooncellar_game_`                                         |
 | `METRICS_TOKEN`           | —       | Bearer token of `/metrics`                                                                   |
+| `MODERATION_TOKEN`        | —       | Bearer token of the player-level moderation endpoints; without it nobody moderates           |
 
 ## Deployment
 
