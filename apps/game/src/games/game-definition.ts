@@ -4,6 +4,8 @@ export type IReplayCheck = (
   accepted: Buffer[]
 ) => string | null;
 
+export type ILevelCheck = (level: Buffer) => string | null;
+
 export type IGameDefinition = {
   slug: string;
   name: string;
@@ -15,4 +17,13 @@ export type IGameDefinition = {
     maxBytes: number;
     check?: IReplayCheck;
   };
+  // Player levels: present when the game takes levels made by its players. A level's leaderboard
+  // is the board `u<levelId>v<version>`, so the game's `board` pattern must accept it.
+  levels?: {
+    maxBytes: number;
+    check?: ILevelCheck;
+  };
 };
+
+export const levelBoard = (levelId: string, version: number) =>
+  `u${levelId}v${version}`;

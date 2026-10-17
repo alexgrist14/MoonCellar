@@ -299,6 +299,7 @@ deployed whenever `apps/game/**`, `packages/**`, `package.json` or `bun.lock` ch
 | `LOKI_HOST` | no | `http://loki:3100`. Logs carry the label `app=mooncellar-game` |
 | `PROMETHEUS_ENABLED` | no | `true` / `false` — default process metrics on `/metrics` |
 | `METRICS_TOKEN` | **yes** | Bearer token guarding `/metrics`. Must equal `METRICS_TOKEN` of `HOST_ENV_INFRA`: Prometheus scrapes the job `mooncellar-game` with the same credentials file as the API |
+| `MODERATION_TOKEN` | **yes** | Bearer token of the player-level moderation endpoints (`/games/:game/levels/reported`, `…/moderation`, [game-service.md](game-service.md#player-levels)). Without it nobody can hide or show a level; reports still hide one after three |
 
 Before the first deploy of the service:
 

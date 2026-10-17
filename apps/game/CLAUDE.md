@@ -66,6 +66,18 @@ does and how to run it is in [`docs/game-service.md`](../../docs/game-service.md
 - **nginx needs its own `location = /signal` with the upgrade headers** for `game.mooncellar.space`;
   the plain `location /` sends `Connection: ""` and the handshake fails.
 
+## Player levels
+
+- **A level file is opaque to the service: only the game's `levels.check` reads it**, and the
+  service stores it with `select: false`, read only by `GET …/levels/:levelId/file`. A check reads
+  the format alone — never level data of the game's publisher, which must not enter this
+  repository.
+- **A level's leaderboard is the board `levelBoard(id, version)` = `u<levelId>v<version>`**, so a
+  game taking levels must accept that pattern in `board` (`rooftops` does); a new version starts a
+  new board. Keep it within `GAME_BOARD_PATTERN` (32 characters).
+- **Moderation takes `MODERATION_TOKEN`, not a MoonCellar role** (`ModerationGuard`, like
+  `/metrics`); three reports from different players hide a level until a moderator shows it again.
+
 ## Leaderboards
 
 - **A score is recorded only with a replay that holds up**, when the game defines a check

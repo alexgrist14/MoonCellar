@@ -9,6 +9,7 @@ import { ChallengesModule } from "./module/challenges/challenges.module";
 import { GamesModule } from "./games/games.module";
 import { HealthModule } from "./module/health/health.module";
 import { LeaderboardsModule } from "./module/leaderboards/leaderboards.module";
+import { LevelsModule } from "./module/levels/levels.module";
 import { pinoConfig } from "./module/logger/logger.module";
 import { MetricsModule } from "./module/metrics/metrics.module";
 import { SignalModule } from "./module/signal/signal.module";
@@ -27,6 +28,7 @@ import { ErrorResponseFilter } from "./shared/error-response.filter";
     AccountModule,
     LeaderboardsModule,
     ChallengesModule,
+    LevelsModule,
     SignalModule,
   ],
   providers: [

@@ -15,6 +15,17 @@ import {
   GameHealthSchema,
   GameLeaderboardQuerySchema,
   GameLeaderboardSchema,
+  GameLevelFileSchema,
+  GameLevelListQuerySchema,
+  GameLevelListSchema,
+  GameLevelModerationSchema,
+  GameLevelParamsSchema,
+  GameLevelRatingSchema,
+  GameLevelReportResultSchema,
+  GameLevelReportSchema,
+  GameLevelReportedSchema,
+  GameLevelSchema,
+  GameLevelUploadSchema,
   GameParamsSchema,
   GameReplaySchema,
   GameSubmitResultSchema,
@@ -70,3 +81,31 @@ export class GameChallengeDto extends createZodDto(GameChallengeSchema) {}
 export class GameChallengeWithReplayDto extends createZodDto(
   GameChallengeWithReplaySchema
 ) {}
+
+export class GameLevelParamsDto extends createZodDto(GameLevelParamsSchema) {}
+
+export class GameLevelListQueryDto extends createZodDto(
+  GameLevelListQuerySchema
+) {}
+
+export class GameLevelDto extends createZodDto(GameLevelSchema) {}
+
+export class GameLevelListDto extends createZodDto(GameLevelListSchema) {}
+
+export class GameLevelUploadDto extends createZodDto(GameLevelUploadSchema) {}
+
+export class GameLevelFileDto extends createZodDto(GameLevelFileSchema) {}
+
+export class GameLevelRatingDto extends createZodDto(GameLevelRatingSchema) {}
+
+export class GameLevelReportDto extends createZodDto(GameLevelReportSchema) {}
+
+export class GameLevelReportResultDto extends createZodDto(
+  GameLevelReportResultSchema
+) {}
+
+export class GameLevelModerationDto extends createZodDto(
+  GameLevelModerationSchema
+) {}
+
+export class GameLevelReportedDto extends createZodDto(GameLevelReportedSchema) {}
