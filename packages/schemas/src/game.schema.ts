@@ -8,10 +8,35 @@ export const GameHealthSchema = z.object({
 });
 export type IGameHealth = z.infer<typeof GameHealthSchema>;
 
-export const GameLevelParamsSchema = z.object({
-  level: z.coerce.number().int().min(0).max(99),
+export const GAME_SLUG_PATTERN = /^[a-z][a-z0-9-]{1,31}$/;
+export const GAME_BOARD_PATTERN = /^[a-z0-9][a-z0-9-]{0,31}$/;
+export const GAME_REPLAY_MAX_BYTES = 256 * 1024;
+
+const gameSlug = z.string().regex(GAME_SLUG_PATTERN);
+const boardId = z.string().regex(GAME_BOARD_PATTERN);
+const objectId = z.string().regex(/^[0-9a-f]{24}$/);
+const replay = z
+  .base64()
+  .min(1)
+  .max(Math.ceil(GAME_REPLAY_MAX_BYTES / 3) * 4);
+
+export const GameDefinitionSchema = z.object({
+  slug: z.string(),
+  name: z.string(),
+  scoreOrder: z.enum(["asc", "desc"]),
+  scoreUnit: z.enum(["ms", "points"]),
+  replayRequired: z.boolean(),
 });
-export type IGameLevelParams = z.infer<typeof GameLevelParamsSchema>;
+export type IGameDefinitionInfo = z.infer<typeof GameDefinitionSchema>;
+
+export const GameParamsSchema = z.object({ game: gameSlug });
+export type IGameParams = z.infer<typeof GameParamsSchema>;
+
+export const GameBoardParamsSchema = z.object({
+  game: gameSlug,
+  board: boardId,
+});
+export type IGameBoardParams = z.infer<typeof GameBoardParamsSchema>;
 
 export const GameLeaderboardQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
@@ -24,29 +49,25 @@ export const GameLeaderboardEntrySchema = z.object({
   rank: z.number().int().positive(),
   userId: z.string(),
   displayName: z.string(),
-  timeMs: z.number().int().positive(),
-  hasGhost: z.boolean(),
+  score: z.number().int(),
+  hasReplay: z.boolean(),
   recordedAt: z.string(),
 });
 export type IGameLeaderboardEntry = z.infer<typeof GameLeaderboardEntrySchema>;
 
 export const GameLeaderboardSchema = z.object({
-  level: z.number().int().min(0),
+  game: z.string(),
+  board: z.string(),
   total: z.number().int().nonnegative(),
   entries: z.array(GameLeaderboardEntrySchema),
 });
 export type IGameLeaderboard = z.infer<typeof GameLeaderboardSchema>;
 
-export const GAME_GHOST_MAX_BYTES = 256 * 1024;
-
-export const GameSubmitTimeSchema = z.object({
-  timeMs: z.number().int().positive().max(3_600_000),
-  ghost: z
-    .base64()
-    .min(1)
-    .max(Math.ceil(GAME_GHOST_MAX_BYTES / 3) * 4),
+export const GameSubmitScoreSchema = z.object({
+  score: z.number().int().min(-1_000_000_000).max(1_000_000_000),
+  replay: replay.optional(),
 });
-export type IGameSubmitTime = z.infer<typeof GameSubmitTimeSchema>;
+export type IGameSubmitScore = z.infer<typeof GameSubmitScoreSchema>;
 
 export const GameSubmitResultSchema = z.object({
   improved: z.boolean(),
@@ -55,19 +76,21 @@ export const GameSubmitResultSchema = z.object({
 export type IGameSubmitResult = z.infer<typeof GameSubmitResultSchema>;
 
 export const GameEntryParamsSchema = z.object({
-  entryId: z.string().regex(/^[0-9a-f]{24}$/),
+  game: gameSlug,
+  entryId: objectId,
 });
 export type IGameEntryParams = z.infer<typeof GameEntryParamsSchema>;
 
-export const GameGhostSchema = z.object({
+export const GameReplaySchema = z.object({
   entryId: z.string(),
-  level: z.number().int().min(0),
+  game: z.string(),
+  board: z.string(),
   userId: z.string(),
   displayName: z.string(),
-  timeMs: z.number().int().positive(),
-  ghost: z.string(),
+  score: z.number().int(),
+  replay: z.string(),
 });
-export type IGameGhost = z.infer<typeof GameGhostSchema>;
+export type IGameReplay = z.infer<typeof GameReplaySchema>;
 
 export const GAME_SIGNAL_MAX_BYTES = 4096;
 
@@ -121,37 +144,36 @@ export type IGameFriend = z.infer<typeof GameFriendSchema>;
 export const GAME_CHALLENGE_COMMENT_MAX = 255;
 
 export const GameChallengeCreateSchema = z.object({
-  toUserId: z.string().regex(/^[0-9a-f]{24}$/),
-  level: z.number().int().min(0).max(99),
-  timeMs: z.number().int().positive().max(3_600_000),
+  toUserId: objectId,
+  board: boardId,
+  score: z.number().int().min(-1_000_000_000).max(1_000_000_000),
   comment: z.string().trim().max(GAME_CHALLENGE_COMMENT_MAX).default(""),
-  ghost: z
-    .base64()
-    .min(1)
-    .max(Math.ceil(GAME_GHOST_MAX_BYTES / 3) * 4),
+  replay: replay.optional(),
 });
 export type IGameChallengeCreate = z.infer<typeof GameChallengeCreateSchema>;
 
 export const GameChallengeParamsSchema = z.object({
-  challengeId: z.string().regex(/^[0-9a-f]{24}$/),
+  game: gameSlug,
+  challengeId: objectId,
 });
 export type IGameChallengeParams = z.infer<typeof GameChallengeParamsSchema>;
 
 export const GameChallengeSchema = z.object({
   id: z.string(),
+  game: z.string(),
+  board: z.string(),
   fromUserId: z.string(),
   fromName: z.string(),
   toUserId: z.string(),
-  level: z.number().int().min(0),
-  timeMs: z.number().int().positive(),
+  score: z.number().int(),
   comment: z.string(),
   createdAt: z.string(),
 });
 export type IGameChallenge = z.infer<typeof GameChallengeSchema>;
 
-export const GameChallengeWithGhostSchema = GameChallengeSchema.extend({
-  ghost: z.string(),
+export const GameChallengeWithReplaySchema = GameChallengeSchema.extend({
+  replay: z.string().nullable(),
 });
-export type IGameChallengeWithGhost = z.infer<
-  typeof GameChallengeWithGhostSchema
+export type IGameChallengeWithReplay = z.infer<
+  typeof GameChallengeWithReplaySchema
 >;

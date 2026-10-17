@@ -16,62 +16,66 @@ import {
   ApiOperation,
   ApiTags,
 } from "@nestjs/swagger";
+import { findGame } from "../../games/games";
 import {
+  GameBoardParamsDto,
   GameEntryParamsDto,
-  GameGhostDto,
   GameLeaderboardDto,
   GameLeaderboardQueryDto,
-  GameLevelParamsDto,
+  GameReplayDto,
   GameSubmitResultDto,
-  GameSubmitTimeDto,
+  GameSubmitScoreDto,
 } from "../../shared/zod/dto/game.dto";
 import { GameTokenGuard, type IGameRequest } from "../account/game-token.guard";
 import { LeaderboardsService } from "./leaderboards.service";
 
 @ApiTags("Leaderboards")
-@Controller("leaderboards")
+@Controller("games/:game/leaderboards")
 export class LeaderboardsController {
   constructor(private readonly leaderboards: LeaderboardsService) {}
 
-  @Get("entries/:entryId/ghost")
-  @ApiOperation({ summary: "The recorded run of a leaderboard entry" })
-  @ApiOkResponse({ type: GameGhostDto })
-  getGhost(@Param() params: GameEntryParamsDto) {
-    return this.leaderboards.getGhost(params.entryId);
+  @Get("entries/:entryId/replay")
+  @ApiOperation({ summary: "The replay recorded with a leaderboard entry" })
+  @ApiOkResponse({ type: GameReplayDto })
+  getReplay(@Param() params: GameEntryParamsDto) {
+    return this.leaderboards.getReplay(findGame(params.game), params.entryId);
   }
 
-  @Get(":level")
-  @ApiOperation({ summary: "Best times of a level, fastest first" })
+  @Get(":board")
+  @ApiOperation({ summary: "A leaderboard, best score first" })
   @ApiOkResponse({ type: GameLeaderboardDto })
   getLeaderboard(
-    @Param() params: GameLevelParamsDto,
+    @Param() params: GameBoardParamsDto,
     @Query() query: GameLeaderboardQueryDto
   ) {
     return this.leaderboards.getLeaderboard(
-      params.level,
+      findGame(params.game, params.board),
+      params.board,
       query.limit,
       query.offset
     );
   }
 
-  @Put(":level")
+  @Put(":board")
   @ApiOperation({
-    summary: "Submit a time; it replaces the player's entry only if faster",
+    summary:
+      "Submit a score with its replay; it replaces the player's entry only if better",
   })
   @ApiOkResponse({ type: GameSubmitResultDto })
   @ApiBearerAuth()
   @UseGuards(GameTokenGuard)
   @HttpCode(HttpStatus.OK)
   submit(
-    @Param() params: GameLevelParamsDto,
-    @Body() dto: GameSubmitTimeDto,
+    @Param() params: GameBoardParamsDto,
+    @Body() dto: GameSubmitScoreDto,
     @Req() request: IGameRequest
   ) {
     return this.leaderboards.submit(
-      params.level,
+      findGame(params.game, params.board),
+      params.board,
       request.account,
-      dto.timeMs,
-      dto.ghost
+      dto.score,
+      dto.replay
     );
   }
 }

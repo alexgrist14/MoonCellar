@@ -14,11 +14,13 @@ import {
   ApiOperation,
   ApiTags,
 } from "@nestjs/swagger";
+import { findGame } from "../../games/games";
 import {
   GameChallengeCreateDto,
   GameChallengeDto,
   GameChallengeParamsDto,
-  GameChallengeWithGhostDto,
+  GameChallengeWithReplayDto,
+  GameParamsDto,
 } from "../../shared/zod/dto/game.dto";
 import { GameTokenGuard, type IGameRequest } from "../account/game-token.guard";
 import { ChallengesService } from "./challenges.service";
@@ -26,17 +28,25 @@ import { ChallengesService } from "./challenges.service";
 @ApiTags("Challenges")
 @ApiBearerAuth()
 @UseGuards(GameTokenGuard)
-@Controller("challenges")
+@Controller("games/:game/challenges")
 export class ChallengesController {
   constructor(private readonly challenges: ChallengesService) {}
 
   @Post()
   @ApiOperation({
-    summary: "Challenge a friend with a run: its time, ghost and a comment",
+    summary: "Challenge a friend with a score, its replay and a comment",
   })
   @ApiCreatedResponse({ type: GameChallengeDto })
-  create(@Body() dto: GameChallengeCreateDto, @Req() request: IGameRequest) {
-    return this.challenges.create(request.account, dto);
+  create(
+    @Param() params: GameParamsDto,
+    @Body() dto: GameChallengeCreateDto,
+    @Req() request: IGameRequest
+  ) {
+    return this.challenges.create(
+      findGame(params.game, dto.board),
+      request.account,
+      dto
+    );
   }
 
   @Get("incoming")
@@ -44,14 +54,18 @@ export class ChallengesController {
     summary: "Challenges sent to this player since the last call, oldest first",
   })
   @ApiOkResponse({ type: [GameChallengeDto] })
-  incoming(@Req() request: IGameRequest) {
-    return this.challenges.takeIncoming(request.account);
+  incoming(@Param() params: GameParamsDto, @Req() request: IGameRequest) {
+    return this.challenges.takeIncoming(findGame(params.game), request.account);
   }
 
   @Get(":challengeId")
-  @ApiOperation({ summary: "A challenge with its ghost, to race it" })
-  @ApiOkResponse({ type: GameChallengeWithGhostDto })
+  @ApiOperation({ summary: "A challenge with its replay, to play it" })
+  @ApiOkResponse({ type: GameChallengeWithReplayDto })
   get(@Param() params: GameChallengeParamsDto, @Req() request: IGameRequest) {
-    return this.challenges.get(request.account, params.challengeId);
+    return this.challenges.get(
+      findGame(params.game),
+      request.account,
+      params.challengeId
+    );
   }
 }

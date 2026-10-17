@@ -3,7 +3,9 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  Logger,
   NotFoundException,
+  type OnModuleInit,
   UnprocessableEntityException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
@@ -11,9 +13,10 @@ import type {
   IGameAccount,
   IGameChallenge,
   IGameChallengeCreate,
-  IGameChallengeWithGhost,
+  IGameChallengeWithReplay,
 } from "@mooncellar/schemas";
 import type { Model } from "mongoose";
+import type { IGameDefinition } from "../../games/game-definition";
 import { AccountService } from "../account/account.service";
 import { LeaderboardsService } from "../leaderboards/leaderboards.service";
 import { Challenge } from "./schemas/challenge.schema";
@@ -25,17 +28,20 @@ type ILeanChallenge = Challenge & { _id: { toString(): string } };
 
 const toChallenge = (row: ILeanChallenge): IGameChallenge => ({
   id: row._id.toString(),
+  game: row.game,
+  board: row.board,
   fromUserId: row.fromUserId,
   fromName: row.fromName,
   toUserId: row.toUserId,
-  level: row.level,
-  timeMs: row.timeMs,
+  score: row.score,
   comment: row.comment,
   createdAt: row.createdAt.toISOString(),
 });
 
 @Injectable()
-export class ChallengesService {
+export class ChallengesService implements OnModuleInit {
+  private readonly logger = new Logger(ChallengesService.name);
+
   constructor(
     @InjectModel(Challenge.name)
     private readonly challenges: Model<Challenge>,
@@ -43,7 +49,33 @@ export class ChallengesService {
     private readonly leaderboards: LeaderboardsService
   ) {}
 
+  async onModuleInit() {
+    const result = await this.challenges.collection.updateMany(
+      { level: { $exists: true } },
+      [
+        {
+          $set: {
+            game: "rooftops",
+            board: {
+              $concat: ["level-", { $toString: { $add: ["$level", 1] } }],
+            },
+            score: "$timeMs",
+            replay: "$ghost",
+          },
+        },
+        { $unset: ["level", "timeMs", "ghost"] },
+      ]
+    );
+    if (result.modifiedCount) {
+      this.logger.log(
+        `Moved ${result.modifiedCount} challenges to game boards`
+      );
+    }
+    await this.challenges.syncIndexes();
+  }
+
   async create(
+    game: IGameDefinition,
     from: IGameAccount,
     dto: IGameChallengeCreate
   ): Promise<IGameChallenge> {
@@ -53,11 +85,12 @@ export class ChallengesService {
         "You can challenge only people you follow or who follow you"
       );
     }
-    const ghost = Buffer.from(dto.ghost, "base64");
-    const rejection = await this.leaderboards.checkSubmittedRun(
-      dto.level,
-      ghost,
-      dto.timeMs
+    const replay = dto.replay ? Buffer.from(dto.replay, "base64") : null;
+    const rejection = await this.leaderboards.checkReplay(
+      game,
+      dto.board,
+      dto.score,
+      replay
     );
     if (rejection) {
       throw new UnprocessableEntityException(
@@ -65,6 +98,7 @@ export class ChallengesService {
       );
     }
     const waiting = await this.challenges.countDocuments({
+      game: game.slug,
       fromUserId: from.id,
       toUserId: dto.toUserId,
       deliveredAt: null,
@@ -76,21 +110,25 @@ export class ChallengesService {
       );
     }
     const created = await this.challenges.create({
+      game: game.slug,
+      board: dto.board,
       fromUserId: from.id,
       fromName: from.userName,
       toUserId: dto.toUserId,
-      level: dto.level,
-      timeMs: dto.timeMs,
+      score: dto.score,
       comment: dto.comment,
-      ghost,
+      replay,
       expiresAt: new Date(Date.now() + LIFETIME_MS),
     });
     return toChallenge(created.toObject() as ILeanChallenge);
   }
 
-  async takeIncoming(account: IGameAccount): Promise<IGameChallenge[]> {
+  async takeIncoming(
+    game: IGameDefinition,
+    account: IGameAccount
+  ): Promise<IGameChallenge[]> {
     const rows = await this.challenges
-      .find({ toUserId: account.id, deliveredAt: null })
+      .find({ game: game.slug, toUserId: account.id, deliveredAt: null })
       .sort({ createdAt: 1 })
       .limit(20)
       .lean<ILeanChallenge[]>();
@@ -104,10 +142,13 @@ export class ChallengesService {
   }
 
   async get(
+    game: IGameDefinition,
     account: IGameAccount,
     challengeId: string
-  ): Promise<IGameChallengeWithGhost> {
-    const row = await this.challenges.findById(challengeId).select("+ghost");
+  ): Promise<IGameChallengeWithReplay> {
+    const row = await this.challenges
+      .findOne({ _id: challengeId, game: game.slug })
+      .select("+replay");
     if (
       !row ||
       (row.toUserId !== account.id && row.fromUserId !== account.id)
@@ -118,7 +159,7 @@ export class ChallengesService {
     }
     return {
       ...toChallenge(row.toObject() as ILeanChallenge),
-      ghost: Buffer.from(row.ghost).toString("base64"),
+      replay: row.replay ? Buffer.from(row.replay).toString("base64") : null,
     };
   }
 }

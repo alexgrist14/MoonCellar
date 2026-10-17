@@ -23,6 +23,17 @@ does and how to run it is in [`docs/game-service.md`](../../docs/game-service.md
 - **Errors are `{ statusCode, message }` with an English sentence**, as in `apps/api`
   ("Errors"); `ErrorResponseFilter` is the API's filter without the axios branch.
 
+## Games
+
+- **Nothing outside `src/games/` knows a particular game.** Leaderboards and challenges take the
+  slug and board from the URL and the definition from `findGame`, which also rejects a board the
+  game does not have; a game's replay format and its checks live in its own folder
+  (`src/games/rooftops/`). A new game is a new definition registered in `GAMES`
+  (`docs/game-service.md`, "Adding a game").
+- **Data written before games existed is moved at startup**: `onModuleInit` of the leaderboards
+  and challenges services turns documents that still have `level` into `rooftops` boards
+  (`level-<n+1>`), then `syncIndexes` drops the old indexes. The update is idempotent.
+
 ## Accounts
 
 - **The service never verifies a game token itself: `AccountService` asks the API**
@@ -41,8 +52,8 @@ does and how to run it is in [`docs/game-service.md`](../../docs/game-service.md
 - **`GET /challenges/incoming` marks what it returns as delivered**, so the game queues each
   challenge once; the game keeps its own queue of pending challenges, as it did with push
   notifications on the iPad.
-- **A challenge's run passes the leaderboard checks** (`LeaderboardsService.checkSubmittedRun`),
-  including the start and finish of the level's accepted runs.
+- **A challenge's replay passes the leaderboard check** (`LeaderboardsService.checkReplay`),
+  against the replays of the same board.
 
 ## Signalling
 
@@ -57,14 +68,16 @@ does and how to run it is in [`docs/game-service.md`](../../docs/game-service.md
 
 ## Leaderboards
 
-- **A time is recorded only with a run that holds up** (`ghost.ts`, `docs/game-service.md`,
-  "Run checks"). The checks use only the ghost file itself — never level geometry or other game
-  data, which belong to the game's publisher and must not enter this repository. Change
-  `GHOST_LIMITS` only together with `ghost.spec.ts`, and against real runs from the port.
-- **A submitted time replaces the entry only when it is faster**, together with its ghost; a
-  slower one answers `improved: false` and refreshes only the display name.
-- **The ghost is stored with `select: false`** and read only by
-  `GET /leaderboards/entries/:entryId/ghost`, so a leaderboard page never carries the runs.
-  `main.ts` raises the JSON body limit to 512 KiB for it; the schema caps the run at 256 KiB.
-- **One entry per user and level** (unique index `{ level, userId }`). Ranking sorts by `timeMs`,
-  then by `updatedAt`, so an earlier equal time ranks first.
+- **A score is recorded only with a replay that holds up**, when the game defines a check
+  (`docs/game-service.md`, "Replay checks"). `rooftops`' checks use only its ghost files — never
+  level geometry or other game data, which belong to the game's publisher and must not enter
+  this repository. Change `GHOST_LIMITS` only together with `ghost.spec.ts`, and against real
+  runs from the port.
+- **A submitted score replaces the entry only when it is better** (the game's `scoreOrder`),
+  together with its replay; a worse one answers `improved: false` and refreshes only the display
+  name.
+- **The replay is stored with `select: false`** and read only by
+  `GET /games/:game/leaderboards/entries/:entryId/replay`, so a leaderboard page never carries
+  them. `main.ts` raises the JSON body limit to 512 KiB; the schema caps a replay at 256 KiB.
+- **One entry per user and board** (unique index `{ game, board, userId }`). Ranking sorts by
+  `score` in the game's order, then by `updatedAt`, so an earlier equal score ranks first.
