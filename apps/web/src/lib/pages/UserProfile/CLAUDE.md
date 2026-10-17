@@ -85,7 +85,7 @@ editing controls.
    - `settings` → `features/user/ui/Settings`, owner only: one column of `CollapsibleSection`s,
      Account always open (`isStatic`) and every other section collapsed until clicked; Steam is
      `isKeptMounted` because `SteamAccount` finishes the Steam sign-in on mount and must run while
-     its section is closed. Its "Danger zone" opens `features/user/ui/DeleteAccountModal`, which asks for the password, calls `DELETE /user/account/:userId`, clears the auth store and the React Query cache and goes home; its "App" section installs the PWA through `useInstallApp` (the browser's install prompt where there is one, menu instructions otherwise) and links the APK releases
+     its section is closed. "Game devices" (`features/user/ui/GameDevices`) lists the game ports signed in through `/link` (`GET /auth/game/sessions`) and signs one out with `DELETE /auth/game/sessions/:id`. Its "Danger zone" opens `features/user/ui/DeleteAccountModal`, which asks for the password, calls `DELETE /user/account/:userId`, clears the auth store and the React Query cache and goes home; its "App" section installs the PWA through `useInstallApp` (the browser's install prompt where there is one, menu instructions otherwise) and links the APK releases
 4. Desktop column: `features/user/ui/UserNavigation` (tabs and counts; sorting lives in `UserGames` and `UserReviews`, above their content).
    Its first block — avatar and name, linking to Profile and active there — is shown on every
    tab. Settings is not a tab in it: the owner reaches it from the gear icon at the right of

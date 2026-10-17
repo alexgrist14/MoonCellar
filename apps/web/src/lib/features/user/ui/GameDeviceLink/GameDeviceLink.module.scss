@@ -1,0 +1,37 @@
+.link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x3);
+  max-width: 420px;
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x1);
+  }
+
+  &__code {
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  &__confirm {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x3);
+  }
+
+  &__note {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  &__done {
+    color: var(--color-text-primary);
+  }
+
+  &__button {
+    align-self: flex-start;
+  }
+}
