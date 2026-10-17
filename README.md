@@ -29,13 +29,13 @@
 One repository, one lockfile, four workspaces. Everything is installed and run from the root
 with `bun --filter`.
 
-| Workspace | Package name | What it is |
-|---|---|---|
-| `apps/web` | `web` | Next.js 16 App Router frontend — the site itself |
-| `apps/api` | `api` | NestJS 11 service — catalogue, users, scheduled ingestion |
-| `apps/game` | `game` | NestJS 11 service — online features of the game ports (leaderboards); see [docs/game-service.md](docs/game-service.md) |
-| `packages/schemas` | `@mooncellar/schemas` | Zod schemas shared by both: one definition, no copies |
-| `infra/` | — | docker-compose stack: MongoDB, Loki, Grafana, Alloy, Prometheus, SearXNG; host nginx config |
+| Workspace          | Package name          | What it is                                                                                                                                                                       |
+| ------------------ | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/web`         | `web`                 | Next.js 16 App Router frontend — the site itself                                                                                                                                 |
+| `apps/api`         | `api`                 | NestJS 11 service — catalogue, users, scheduled ingestion                                                                                                                        |
+| `apps/game`        | `game`                | NestJS 11 service — online features of the game ports (leaderboards, sign-in); see [docs/game-service.md](docs/game-service.md) and [docs/game-sign-in.md](docs/game-sign-in.md) |
+| `packages/schemas` | `@mooncellar/schemas` | Zod schemas shared by both: one definition, no copies                                                                                                                            |
+| `infra/`           | —                     | docker-compose stack: MongoDB, Loki, Grafana, Alloy, Prometheus, SearXNG; host nginx config                                                                                      |
 
 ```
 MoonCellar/
@@ -54,10 +54,10 @@ MoonCellar/
 
 ## Documentation and Storybook
 
-| Site | Hosted | Local | What it holds |
-|---|---|---|---|
-| Documentation | [docs.mooncellar.space](https://docs.mooncellar.space) | `bun run docs` → port 4333 | The guides in `docs/`: architecture, deployment, branding, design system, SEO, sockets, conflicts |
-| Storybook | [storybook.mooncellar.space](https://storybook.mooncellar.space) | `bun run storybook` → port 4222 | Every shared UI component of `apps/web` in each of its states |
+| Site          | Hosted                                                           | Local                           | What it holds                                                                                     |
+| ------------- | ---------------------------------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Documentation | [docs.mooncellar.space](https://docs.mooncellar.space)           | `bun run docs` → port 4333      | The guides in `docs/`: architecture, deployment, branding, design system, SEO, sockets, conflicts |
+| Storybook     | [storybook.mooncellar.space](https://storybook.mooncellar.space) | `bun run storybook` → port 4222 | Every shared UI component of `apps/web` in each of its states                                     |
 
 Rules for working in the code live next to it, in the `CLAUDE.md` files: the repository root,
 each app, every shared UI component and every page.
@@ -153,35 +153,35 @@ Two things that are easy to get wrong here:
 
 ### Services and ports
 
-| Service | URL | Comes from |
-|---|---|---|
-| Frontend (dev) | http://localhost:3000 | `bun --filter web dev` |
-| Frontend (built) | http://localhost:3111 | `bun --filter web start` |
-| API + Swagger | http://localhost:3228/api | `bun --filter api start:dev` |
-| MongoDB | mongodb://localhost:27017 | compose |
-| Grafana | http://localhost:3001 (`admin` / `admin`) | compose |
-| Loki | http://localhost:3100 | compose |
-| Alloy (Faro receiver) | http://localhost:12347 | compose |
-| SearXNG | http://localhost:8891 | compose |
-| Prometheus | http://localhost:9090 | compose, `monitoring` profile |
+| Service               | URL                                       | Comes from                    |
+| --------------------- | ----------------------------------------- | ----------------------------- |
+| Frontend (dev)        | http://localhost:3000                     | `bun --filter web dev`        |
+| Frontend (built)      | http://localhost:3111                     | `bun --filter web start`      |
+| API + Swagger         | http://localhost:3228/api                 | `bun --filter api start:dev`  |
+| MongoDB               | mongodb://localhost:27017                 | compose                       |
+| Grafana               | http://localhost:3001 (`admin` / `admin`) | compose                       |
+| Loki                  | http://localhost:3100                     | compose                       |
+| Alloy (Faro receiver) | http://localhost:12347                    | compose                       |
+| SearXNG               | http://localhost:8891                     | compose                       |
+| Prometheus            | http://localhost:9090                     | compose, `monitoring` profile |
 
 ### Root commands
 
-| Command | Effect |
-|---|---|
-| `bun install` | Installs all workspaces into one hoisted `node_modules` |
-| `bun install --filter './apps/api...'` | Installs one app and its workspace dependencies only |
-| `bun run dev` | Runs the API and web watchers in one terminal |
-| `bun run dev:api` | `api start:dev` only — Bun watch mode on :3228 |
-| `bun run dev:web` | `web dev` only — Next.js on :3000 |
-| `bun run build` | `build` in every workspace — the Next.js build, and a type check plus preview boot for the API |
-| `bun run lint` | `lint` in every workspace |
-| `bun run mongo` | Opens a background SSH tunnel to the production MongoDB on `localhost:27017` — see *Reaching a production service* |
-| `bun run mongo:stop` | Closes it |
-| `bun run format:check` | Prettier over the whole repo |
-| `bun --filter web <script>` | Runs a script in one workspace |
-| `bun add <pkg> --filter web` | Adds a dependency to one workspace, never to the root |
-| `bun add -d <pkg>` | Adds shared tooling to the root workspace |
+| Command                                | Effect                                                                                                             |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `bun install`                          | Installs all workspaces into one hoisted `node_modules`                                                            |
+| `bun install --filter './apps/api...'` | Installs one app and its workspace dependencies only                                                               |
+| `bun run dev`                          | Runs the API and web watchers in one terminal                                                                      |
+| `bun run dev:api`                      | `api start:dev` only — Bun watch mode on :3228                                                                     |
+| `bun run dev:web`                      | `web dev` only — Next.js on :3000                                                                                  |
+| `bun run build`                        | `build` in every workspace — the Next.js build, and a type check plus preview boot for the API                     |
+| `bun run lint`                         | `lint` in every workspace                                                                                          |
+| `bun run mongo`                        | Opens a background SSH tunnel to the production MongoDB on `localhost:27017` — see _Reaching a production service_ |
+| `bun run mongo:stop`                   | Closes it                                                                                                          |
+| `bun run format:check`                 | Prettier over the whole repo                                                                                       |
+| `bun --filter web <script>`            | Runs a script in one workspace                                                                                     |
+| `bun add <pkg> --filter web`           | Adds a dependency to one workspace, never to the root                                                              |
+| `bun add -d <pkg>`                     | Adds shared tooling to the root workspace                                                                          |
 
 Dependency versions shared by both apps (zod, typescript, eslint, prettier, `@types/node`) are
 pinned once in the root `catalog` — bump them there, not in the app manifests. Two copies of
@@ -260,35 +260,35 @@ must keep page content in the server-rendered HTML — see [`docs/seo.md`](docs/
 <details>
 <summary>Tech stack</summary>
 
-| Area | Tools |
-|---|---|
-| Framework | Next.js 16 (App Router, Turbopack), React 19 |
-| Language | TypeScript 5.9 |
-| State | Zustand 5 |
-| Forms & validation | React Hook Form, zod 4 (`@mooncellar/schemas`) |
-| Styling | Sass, CSS custom properties, CSS Modules |
-| Data fetching | TanStack Query, axios with interceptors (token refresh, error reporting) |
-| Performance | `react-virtualized`, `use-debounce`, `react-resize-detector`, `react-scan` |
-| Observability | `@grafana/faro-web-sdk` → Grafana Alloy → Loki |
-| Geo | `maxmind` (GeoIP country lookup) |
+| Area               | Tools                                                                      |
+| ------------------ | -------------------------------------------------------------------------- |
+| Framework          | Next.js 16 (App Router, Turbopack), React 19                               |
+| Language           | TypeScript 5.9                                                             |
+| State              | Zustand 5                                                                  |
+| Forms & validation | React Hook Form, zod 4 (`@mooncellar/schemas`)                             |
+| Styling            | Sass, CSS custom properties, CSS Modules                                   |
+| Data fetching      | TanStack Query, axios with interceptors (token refresh, error reporting)   |
+| Performance        | `react-virtualized`, `use-debounce`, `react-resize-detector`, `react-scan` |
+| Observability      | `@grafana/faro-web-sdk` → Grafana Alloy → Loki                             |
+| Geo                | `maxmind` (GeoIP country lookup)                                           |
 
 </details>
 
 <details>
 <summary>Environment — <code>apps/web/.env</code></summary>
 
-| Variable | Purpose |
-|---|---|
-| `NEXT_PUBLIC_API_URL` | Public URL of the API (`http://localhost:3228` in dev) |
-| `INTERNAL_API_URL` | API URL used from server components and route handlers |
-| `NEXT_PUBLIC_FRONT_URL` | Public URL of this app — canonical links, SEO |
-| `NEXT_PUBLIC_S3_HOST` | S3 / CDN host for user uploads |
-| `NEXT_PUBLIC_LOKI_HOST` | Loki endpoint for the `/api/logs` handler |
-| `NEXT_PUBLIC_CORS_SERVER` | Origin sent as CORS credentials target |
-| `NEXT_PUBLIC_APP_VERSION` | Version tag attached to Faro telemetry |
-| `NEXT_PUBLIC_FARO_APP_NAME` | App name in Grafana Faro |
-| `GEOIP_DB_PATH` | Path to the GeoLite2 country database |
-| `GEO_BLOCK_COUNTRIES` | Comma-separated country codes to block |
+| Variable                    | Purpose                                                |
+| --------------------------- | ------------------------------------------------------ |
+| `NEXT_PUBLIC_API_URL`       | Public URL of the API (`http://localhost:3228` in dev) |
+| `INTERNAL_API_URL`          | API URL used from server components and route handlers |
+| `NEXT_PUBLIC_FRONT_URL`     | Public URL of this app — canonical links, SEO          |
+| `NEXT_PUBLIC_S3_HOST`       | S3 / CDN host for user uploads                         |
+| `NEXT_PUBLIC_LOKI_HOST`     | Loki endpoint for the `/api/logs` handler              |
+| `NEXT_PUBLIC_CORS_SERVER`   | Origin sent as CORS credentials target                 |
+| `NEXT_PUBLIC_APP_VERSION`   | Version tag attached to Faro telemetry                 |
+| `NEXT_PUBLIC_FARO_APP_NAME` | App name in Grafana Faro                               |
+| `GEOIP_DB_PATH`             | Path to the GeoLite2 country database                  |
+| `GEO_BLOCK_COUNTRIES`       | Comma-separated country codes to block                 |
 
 </details>
 
@@ -340,20 +340,20 @@ frontend parses with, and annotated with cookie auth (`accessMoonToken`).
 
 ### Modules
 
-| Module | Responsibility |
-|---|---|
-| `auth` | Sign-up, login, refresh, logout. JWT access + refresh tokens as httpOnly cookies; passport local and JWT strategies |
-| `roles` | Role-based access control |
-| `user` | Profile, ratings, activity logs, saved filter presets, followings, avatar uploads to S3 |
-| `games` | Games catalogue, platforms, playthroughs, HowLongToBeat completion times |
-| `igdb` | IGDB catalogue ingestion — the source of truth for game metadata |
-| `retroach` | RetroAchievements integration: consoles, achievements, per-user progress |
-| `steam` | Steam integration |
-| `admin` | Moderation endpoints for the catalogue |
-| `metrics` | Prometheus HTTP, business and MongoDB metrics |
-| `logger` | Structured logging via pino, shipped to Loki |
-| `faro` | Collector endpoint for frontend telemetry (Grafana Faro) |
-| `indexnow` | IndexNow pings so new game pages get indexed by search engines |
+| Module     | Responsibility                                                                                                      |
+| ---------- | ------------------------------------------------------------------------------------------------------------------- |
+| `auth`     | Sign-up, login, refresh, logout. JWT access + refresh tokens as httpOnly cookies; passport local and JWT strategies |
+| `roles`    | Role-based access control                                                                                           |
+| `user`     | Profile, ratings, activity logs, saved filter presets, followings, avatar uploads to S3                             |
+| `games`    | Games catalogue, platforms, playthroughs, HowLongToBeat completion times                                            |
+| `igdb`     | IGDB catalogue ingestion — the source of truth for game metadata                                                    |
+| `retroach` | RetroAchievements integration: consoles, achievements, per-user progress                                            |
+| `steam`    | Steam integration                                                                                                   |
+| `admin`    | Moderation endpoints for the catalogue                                                                              |
+| `metrics`  | Prometheus HTTP, business and MongoDB metrics                                                                       |
+| `logger`   | Structured logging via pino, shipped to Loki                                                                        |
+| `faro`     | Collector endpoint for frontend telemetry (Grafana Faro)                                                            |
+| `indexnow` | IndexNow pings so new game pages get indexed by search engines                                                      |
 
 ### Data model
 
@@ -372,11 +372,11 @@ per source), **single-flight** (a guard skips the tick if the previous run is st
 **rate-limit aware** (bounded concurrency and inter-batch delays, tuned per upstream) and
 **instrumented** (duration and record counts reported under a per-job correlation context).
 
-| Job | Source | What it pulls |
-|---|---|---|
-| `igdb-games-sync` | IGDB (Twitch OAuth) | Game metadata, releases, platforms, genres |
-| RetroAchievements sync | RetroAchievements API | Consoles, achievements, user progress |
-| HowLongToBeat sync | HowLongToBeat | Completion time estimates |
+| Job                    | Source                | What it pulls                              |
+| ---------------------- | --------------------- | ------------------------------------------ |
+| `igdb-games-sync`      | IGDB (Twitch OAuth)   | Game metadata, releases, platforms, genres |
+| RetroAchievements sync | RetroAchievements API | Consoles, achievements, user progress      |
+| HowLongToBeat sync     | HowLongToBeat         | Completion time estimates                  |
 
 </details>
 
@@ -402,21 +402,21 @@ config in `infra/prometheus/`, and the Alloy receiver config in `infra/monitorin
 <details>
 <summary>Environment — <code>apps/api/.env</code></summary>
 
-| Variable | Purpose |
-|---|---|
-| `MONGO_CONNECTION_STRING` | MongoDB connection string (database `games`) |
-| `JWT_SECRET` / `JWT_EXPIRE` | Signing key and lifetime for access and refresh tokens |
-| `FRONT_URL` | Public frontend URL — CORS, links in generated content |
-| `LOCAL_CONNECTION` | Extra comma-separated origins allowed by CORS in dev |
-| `TWITCH_CLIENT_ID` / `TWITCH_CLIENT_SECRET` | IGDB API credentials (IGDB authenticates via Twitch) |
-| `RETROACHIEVEMENTS_API_KEY` | RetroAchievements API key |
-| `S3_ID`, `S3_KEY`, `S3_ENDPOINT`, `S3_BUCKET`, `S3_CDN_URL` | DigitalOcean Spaces: one bucket, one folder per content type |
-| `LOKI_HOST` | Loki endpoint for log shipping |
-| `FARO_COLLECTOR_URL` | Grafana Alloy / Faro collector endpoint |
-| `PROMETHEUS_ENABLED` | Toggle the metrics endpoint |
-| `METRICS_TOKEN` | Bearer token guarding `/metrics` |
-| `INDEXNOW_KEY` | IndexNow key for search engine submission |
-| `SEARXNG_URL`, `API_BASE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Used by the `game-adder` MCP server |
+| Variable                                                       | Purpose                                                      |
+| -------------------------------------------------------------- | ------------------------------------------------------------ |
+| `MONGO_CONNECTION_STRING`                                      | MongoDB connection string (database `games`)                 |
+| `JWT_SECRET` / `JWT_EXPIRE`                                    | Signing key and lifetime for access and refresh tokens       |
+| `FRONT_URL`                                                    | Public frontend URL — CORS, links in generated content       |
+| `LOCAL_CONNECTION`                                             | Extra comma-separated origins allowed by CORS in dev         |
+| `TWITCH_CLIENT_ID` / `TWITCH_CLIENT_SECRET`                    | IGDB API credentials (IGDB authenticates via Twitch)         |
+| `RETROACHIEVEMENTS_API_KEY`                                    | RetroAchievements API key                                    |
+| `S3_ID`, `S3_KEY`, `S3_ENDPOINT`, `S3_BUCKET`, `S3_CDN_URL`    | DigitalOcean Spaces: one bucket, one folder per content type |
+| `LOKI_HOST`                                                    | Loki endpoint for log shipping                               |
+| `FARO_COLLECTOR_URL`                                           | Grafana Alloy / Faro collector endpoint                      |
+| `PROMETHEUS_ENABLED`                                           | Toggle the metrics endpoint                                  |
+| `METRICS_TOKEN`                                                | Bearer token guarding `/metrics`                             |
+| `INDEXNOW_KEY`                                                 | IndexNow key for search engine submission                    |
+| `SEARXNG_URL`, `API_BASE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Used by the `game-adder` MCP server                          |
 
 </details>
 
@@ -575,11 +575,11 @@ docker build -f static.Dockerfile --build-arg BUILD="bun --filter web build-stor
 
 One workflow, `.github/workflows/ci.yml`, with three jobs:
 
-| Job | What it does |
-|---|---|
+| Job       | What it does                                                                                                                    |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | `changes` | Decides which targets a push touched — `apps/web/**`, `apps/api/**`, `packages/**`, `docs/**`, `infra/**` or the root manifests |
-| `lint` | Installs once and lints every workspace, on every push and pull request |
-| `deploy` | On `main` only, and only for the apps — or the infrastructure — `changes` marked |
+| `lint`    | Installs once and lints every workspace, on every push and pull request                                                         |
+| `deploy`  | On `main` only, and only for the apps — or the infrastructure — `changes` marked                                                |
 
 The deploy job builds just the changed images, packs them into a single archive (both share the
 `oven/bun` base layer, so one archive is smaller than two), copies it over in one transfer and
