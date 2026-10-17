@@ -42,8 +42,8 @@ export const GameSubmitTimeSchema = z.object({
   timeMs: z.number().int().positive().max(3_600_000),
   ghost: z
     .base64()
-    .max(Math.ceil(GAME_GHOST_MAX_BYTES / 3) * 4)
-    .optional(),
+    .min(1)
+    .max(Math.ceil(GAME_GHOST_MAX_BYTES / 3) * 4),
 });
 export type IGameSubmitTime = z.infer<typeof GameSubmitTimeSchema>;
 

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import type {
   IGameAccount,
@@ -8,6 +12,7 @@ import type {
   IGameSubmitResult,
 } from "@mooncellar/schemas";
 import type { Model } from "mongoose";
+import { checkRun, parseGhost } from "./ghost";
 import { LeaderboardEntry } from "./schemas/leaderboard-entry.schema";
 
 type ILeanEntry = LeaderboardEntry & { _id: { toString(): string } };
@@ -68,9 +73,16 @@ export class LeaderboardsService {
     level: number,
     account: IGameAccount,
     timeMs: number,
-    ghost?: string
+    ghost: string
   ): Promise<IGameSubmitResult> {
-    const ghostData = ghost ? Buffer.from(ghost, "base64") : null;
+    const ghostData = Buffer.from(ghost, "base64");
+    const run = parseGhost(ghostData);
+    const rejection = typeof run === "string" ? run : checkRun(run, timeMs);
+    if (rejection) {
+      throw new UnprocessableEntityException(
+        `${rejection}. The time was not recorded`
+      );
+    }
     const improved = await this.entries.findOneAndUpdate(
       {
         level,
@@ -82,7 +94,7 @@ export class LeaderboardsService {
           timeMs,
           displayName: account.userName,
           ghost: ghostData,
-          hasGhost: !!ghostData?.length,
+          hasGhost: true,
         },
       },
       { new: true }
@@ -96,7 +108,7 @@ export class LeaderboardsService {
           displayName: account.userName,
           timeMs,
           ghost: ghostData,
-          hasGhost: !!ghostData?.length,
+          hasGhost: true,
         });
       } catch (error) {
         if ((error as { code?: number })?.code !== 11000) throw error;
