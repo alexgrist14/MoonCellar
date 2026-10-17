@@ -23,12 +23,16 @@ const getErrorMessage = (error: unknown, fallback: string) => {
   return typeof message === "string" ? message : fallback;
 };
 
-export const openAuthModal = () =>
-  modal.open(<AuthModal />, { id: AUTH_MODAL_ID });
+interface IAuthModalProps {
+  isSignIn?: boolean;
+}
 
-export const AuthModal: FC = () => {
+export const openAuthModal = (props: IAuthModalProps = {}) =>
+  modal.open(<AuthModal {...props} />, { id: AUTH_MODAL_ID });
+
+export const AuthModal: FC<IAuthModalProps> = ({ isSignIn = false }) => {
   const { login, signup } = useAuth();
-  const [isRegister, setIsRegister] = useState<boolean>(true);
+  const [isRegister, setIsRegister] = useState<boolean>(!isSignIn);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const isLoaderShown = useMinimumLoading(isLoading);
