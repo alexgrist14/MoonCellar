@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { GameAccountSchema } from "./game-auth.schema";
 
 export const GameHealthSchema = z.object({
   status: z.literal("ok"),
@@ -112,4 +113,45 @@ export const GameSignalServerMessageSchema = z.discriminatedUnion("type", [
 ]);
 export type IGameSignalServerMessage = z.infer<
   typeof GameSignalServerMessageSchema
+>;
+
+export const GameFriendSchema = GameAccountSchema;
+export type IGameFriend = z.infer<typeof GameFriendSchema>;
+
+export const GAME_CHALLENGE_COMMENT_MAX = 255;
+
+export const GameChallengeCreateSchema = z.object({
+  toUserId: z.string().regex(/^[0-9a-f]{24}$/),
+  level: z.number().int().min(0).max(99),
+  timeMs: z.number().int().positive().max(3_600_000),
+  comment: z.string().trim().max(GAME_CHALLENGE_COMMENT_MAX).default(""),
+  ghost: z
+    .base64()
+    .min(1)
+    .max(Math.ceil(GAME_GHOST_MAX_BYTES / 3) * 4),
+});
+export type IGameChallengeCreate = z.infer<typeof GameChallengeCreateSchema>;
+
+export const GameChallengeParamsSchema = z.object({
+  challengeId: z.string().regex(/^[0-9a-f]{24}$/),
+});
+export type IGameChallengeParams = z.infer<typeof GameChallengeParamsSchema>;
+
+export const GameChallengeSchema = z.object({
+  id: z.string(),
+  fromUserId: z.string(),
+  fromName: z.string(),
+  toUserId: z.string(),
+  level: z.number().int().min(0),
+  timeMs: z.number().int().positive(),
+  comment: z.string(),
+  createdAt: z.string(),
+});
+export type IGameChallenge = z.infer<typeof GameChallengeSchema>;
+
+export const GameChallengeWithGhostSchema = GameChallengeSchema.extend({
+  ghost: z.string(),
+});
+export type IGameChallengeWithGhost = z.infer<
+  typeof GameChallengeWithGhostSchema
 >;

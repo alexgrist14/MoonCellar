@@ -1,6 +1,10 @@
 import { createZodDto } from "nestjs-zod";
 import {
   GameAccountSchema,
+  GameChallengeCreateSchema,
+  GameChallengeParamsSchema,
+  GameChallengeSchema,
+  GameChallengeWithGhostSchema,
   GameDeviceCodeRequestSchema,
   GameDeviceCodeSchema,
   GameDeviceTokenRequestSchema,
@@ -46,3 +50,17 @@ export class GameDeviceTokenRequestDto extends createZodDto(
 ) {}
 
 export class GameDeviceTokenDto extends createZodDto(GameDeviceTokenSchema) {}
+
+export class GameChallengeCreateDto extends createZodDto(
+  GameChallengeCreateSchema
+) {}
+
+export class GameChallengeParamsDto extends createZodDto(
+  GameChallengeParamsSchema
+) {}
+
+export class GameChallengeDto extends createZodDto(GameChallengeSchema) {}
+
+export class GameChallengeWithGhostDto extends createZodDto(
+  GameChallengeWithGhostSchema
+) {}

@@ -17,5 +17,6 @@ import {
   ],
   controllers: [LeaderboardsController],
   providers: [LeaderboardsService],
+  exports: [LeaderboardsService],
 })
 export class LeaderboardsModule {}

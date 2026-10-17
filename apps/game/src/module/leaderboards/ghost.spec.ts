@@ -1,5 +1,11 @@
 import { describe, expect, it } from "bun:test";
-import { GHOST_VERSION, checkRun, parseGhost } from "./ghost";
+import {
+  GHOST_VERSION,
+  checkEnds,
+  checkRun,
+  endsOf,
+  parseGhost,
+} from "./ghost";
 
 type IPoint = { dt: number; x: number; y?: number; z?: number };
 
@@ -74,6 +80,16 @@ describe("checkRun", () => {
     );
   });
 
+  it("rejects a run that mostly stands still", () => {
+    const standing = Array.from({ length: 9 }, (_, index) => ({
+      dt: index === 0 ? 0 : 500,
+      x: index === 8 ? 5 : 0,
+    }));
+    expect(checkRun(parse(standing), 4_000)).toBe(
+      "The runner stands still for most of the run"
+    );
+  });
+
   it("rejects a run kept above the runner's pace", () => {
     expect(checkRun(parse(runAt(11.5, 10)), 10_000)).toBe(
       "The run is faster than the runner can keep up"
@@ -90,5 +106,34 @@ describe("checkRun", () => {
     const respawn = runAt(9.5, 4);
     respawn[6] = { dt: 500, x: 5 };
     expect(checkRun(parse(respawn), 4_000)).toBeNull();
+  });
+});
+
+describe("checkEnds", () => {
+  const reference = [endsOf(parse(runAt(9.5, 10)))];
+
+  it("trusts the first run of a level", () => {
+    expect(checkEnds(parse(runAt(9.5, 3)), [])).toBeNull();
+  });
+
+  it("accepts a run between the same start and finish", () => {
+    const slower = runAt(9.5, 12).map((point) => ({
+      ...point,
+      x: Math.min(point.x, 95),
+    }));
+    expect(checkEnds(parse(slower), reference)).toBeNull();
+  });
+
+  it("rejects a run that stops short or starts elsewhere", () => {
+    expect(checkEnds(parse(runAt(9.5, 3)), reference)).toBe(
+      "The run does not reach the finish of this level"
+    );
+    const elsewhere = runAt(9.5, 10).map((point) => ({
+      ...point,
+      x: point.x + 50,
+    }));
+    expect(checkEnds(parse(elsewhere), reference)).toBe(
+      "The run does not start where this level starts"
+    );
   });
 });

@@ -59,6 +59,17 @@ export class AccountController {
     return request.account;
   }
 
+  @Get("friends")
+  @ApiOperation({
+    summary: "Who this player can challenge: followings and followers",
+  })
+  @ApiOkResponse({ type: [GameAccountDto] })
+  @ApiBearerAuth()
+  @UseGuards(GameTokenGuard)
+  friends(@Req() request: IGameRequest) {
+    return this.accounts.friendsOf(request.account.id);
+  }
+
   @Post("sign-out")
   @ApiOperation({ summary: "Sign this game out and revoke its token" })
   @ApiNoContentResponse()
