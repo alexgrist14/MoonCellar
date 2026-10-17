@@ -33,6 +33,17 @@ does and how to run it is in [`docs/game-service.md`](../../docs/game-service.md
 - **An endpoint that acts for a player uses `GameTokenGuard`**, which puts the account on
   `request.account`; the player's name is taken from it, never from the request body.
 
+## Challenges
+
+- **A friend is a MoonCellar following or follower** — `AccountService.friendsOf` reads the API's
+  public `/user/followings/:id` and `/user/followers/:id` and keeps the answer for a minute. Only a
+  friend can be challenged.
+- **`GET /challenges/incoming` marks what it returns as delivered**, so the game queues each
+  challenge once; the game keeps its own queue of pending challenges, as it did with push
+  notifications on the iPad.
+- **A challenge's run passes the leaderboard checks** (`LeaderboardsService.checkSubmittedRun`),
+  including the start and finish of the level's accepted runs.
+
 ## Signalling
 
 - **`/signal` is a plain `ws` server on the HTTP server's `upgrade` event, not a Nest gateway or

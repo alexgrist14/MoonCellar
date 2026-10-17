@@ -5,6 +5,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { LoggerModule } from "nestjs-pino";
 import { ZodValidationPipe } from "nestjs-zod";
 import { AccountModule } from "./module/account/account.module";
+import { ChallengesModule } from "./module/challenges/challenges.module";
 import { HealthModule } from "./module/health/health.module";
 import { LeaderboardsModule } from "./module/leaderboards/leaderboards.module";
 import { pinoConfig } from "./module/logger/logger.module";
@@ -23,6 +24,7 @@ import { ErrorResponseFilter } from "./shared/error-response.filter";
     HealthModule,
     AccountModule,
     LeaderboardsModule,
+    ChallengesModule,
     SignalModule,
   ],
   providers: [

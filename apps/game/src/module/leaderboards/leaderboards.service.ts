@@ -12,7 +12,13 @@ import type {
   IGameSubmitResult,
 } from "@mooncellar/schemas";
 import type { Model } from "mongoose";
-import { checkRun, parseGhost } from "./ghost";
+import {
+  type IRunEnds,
+  checkEnds,
+  checkRun,
+  endsOf,
+  parseGhost,
+} from "./ghost";
 import { LeaderboardEntry } from "./schemas/leaderboard-entry.schema";
 
 type ILeanEntry = LeaderboardEntry & { _id: { toString(): string } };
@@ -69,6 +75,30 @@ export class LeaderboardsService {
     };
   }
 
+  async acceptedEnds(level: number): Promise<IRunEnds[]> {
+    const rows = await this.entries
+      .find({ level, hasGhost: true })
+      .sort({ timeMs: 1, updatedAt: 1 })
+      .limit(20)
+      .select("+ghost");
+    return rows.flatMap((row) => {
+      const run = row.ghost ? parseGhost(Buffer.from(row.ghost)) : "";
+      return typeof run === "string" ? [] : [endsOf(run)];
+    });
+  }
+
+  async checkSubmittedRun(
+    level: number,
+    ghost: Buffer,
+    timeMs: number
+  ): Promise<string | null> {
+    const run = parseGhost(ghost);
+    if (typeof run === "string") return run;
+    return (
+      checkRun(run, timeMs) ?? checkEnds(run, await this.acceptedEnds(level))
+    );
+  }
+
   async submit(
     level: number,
     account: IGameAccount,
@@ -76,8 +106,7 @@ export class LeaderboardsService {
     ghost: string
   ): Promise<IGameSubmitResult> {
     const ghostData = Buffer.from(ghost, "base64");
-    const run = parseGhost(ghostData);
-    const rejection = typeof run === "string" ? run : checkRun(run, timeMs);
+    const rejection = await this.checkSubmittedRun(level, ghostData, timeMs);
     if (rejection) {
       throw new UnprocessableEntityException(
         `${rejection}. The time was not recorded`

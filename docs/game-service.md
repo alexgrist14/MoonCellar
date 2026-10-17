@@ -16,6 +16,10 @@ container and in development) and keeps its data in the `game` database of the s
 | `POST` | `/account/device/token`                | Polls the sign-in: `{ status: "pending" }`, then `{ status: "approved", token, account }`                                                                                                                                                           |
 | `GET`  | `/account/me`                          | Game token. The account the game is signed in with: `{ id, userName, avatar }`                                                                                                                                                                      |
 | `POST` | `/account/sign-out`                    | Game token. Revokes the token; the device disappears from the site's Settings → Game devices                                                                                                                                                        |
+| `GET`  | `/account/friends`                     | Game token. Who the player can challenge: MoonCellar followings and followers, `[{ id, userName, avatar }]` by name                                                                                                                                 |
+| `POST` | `/challenges`                          | Game token. Challenges a friend with a run: `{ toUserId, level, timeMs, comment, ghost }`, checked like a leaderboard time; 403 for someone who is not a friend, 429 after five unopened challenges to the same friend                              |
+| `GET`  | `/challenges/incoming`                 | Game token. Challenges sent to the player since the last call, oldest first, without ghosts; each is handed out once                                                                                                                                |
+| `GET`  | `/challenges/:challengeId`             | Game token. The challenge with its ghost, for its recipient or sender; challenges expire after 30 days                                                                                                                                              |
 | `GET`  | `/api`                                 | Swagger UI and the OpenAPI document of the service                                                                                                                                                                                                  |
 | `GET`  | `/metrics`                             | Prometheus metrics, behind `Authorization: Bearer <METRICS_TOKEN>`                                                                                                                                                                                  |
 
@@ -39,9 +43,15 @@ the previous one and the 16.16 fixed-point position) and rejects the time when:
 - two frames are more than 2 s apart;
 - the runner covers more than 35 m/s between two frames, unless the new spot is within 12 m of an
   earlier one — a respawn at a checkpoint;
+- the runner moves for less than half of the time;
 - more than a quarter of the moving time goes faster than 11 m/s. The runner tops out at about
   10 m/s: in a real run of the training level 83 % of the moving time is 9–11 m/s and 5 % is
   faster, while the same run sped up by 11 % is above 11 m/s for 80 % of the time.
+
+Once a level has accepted runs, a new one must also start within 15 m of the start of one of the
+twenty best and finish within 30 m of one of their finishes: every honest run of a level shares the
+spawn point and the finish, so a run cut short or recorded elsewhere stops there. The first run of
+a level has nothing to compare with and is trusted. Challenges go through the same checks.
 
 The limits are `GHOST_LIMITS`, calibrated on real runs from the port; they know nothing about the
 level itself, so a run built by hand along a plausible path, or one sped up by a few percent,

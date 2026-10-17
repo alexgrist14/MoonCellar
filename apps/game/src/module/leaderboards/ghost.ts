@@ -13,6 +13,9 @@ export const GHOST_LIMITS = {
   respawnRadiusMeters: 12,
   cruiseMetersPerSecond: 11,
   maxFastShare: 0.25,
+  minMovingShare: 0.5,
+  startRadiusMeters: 15,
+  finishRadiusMeters: 30,
 };
 
 export type IGhostFrame = { dt: number; x: number; y: number; z: number };
@@ -70,6 +73,7 @@ export const checkRun = (run: IGhostRun, timeMs: number): string | null => {
   if (movingDuration(run) > timeMs + limits.lateFinishMs) {
     return "The run is longer than the submitted time";
   }
+  let activeMs = 0;
   let movingMs = 0;
   let fastMs = 0;
   for (let index = 1; index < run.frames.length; index++) {
@@ -91,6 +95,7 @@ export const checkRun = (run: IGhostRun, timeMs: number): string | null => {
       if (!respawned) return "The run moves faster than the runner can";
       continue;
     }
+    if (covered >= limits.idleMeters) activeMs += frame.dt;
     if (frame.dt < limits.minSegmentMs || covered < limits.idleMeters) {
       continue;
     }
@@ -99,8 +104,41 @@ export const checkRun = (run: IGhostRun, timeMs: number): string | null => {
       fastMs += frame.dt;
     }
   }
+  if (activeMs < timeMs * limits.minMovingShare) {
+    return "The runner stands still for most of the run";
+  }
   if (movingMs > 0 && fastMs / movingMs > limits.maxFastShare) {
     return "The run is faster than the runner can keep up";
+  }
+  return null;
+};
+
+export type IRunEnds = { start: IGhostFrame; finish: IGhostFrame };
+
+export const endsOf = (run: IGhostRun): IRunEnds => ({
+  start: run.frames[0],
+  finish: run.frames[run.frames.length - 1],
+});
+
+export const checkEnds = (
+  run: IGhostRun,
+  accepted: IRunEnds[]
+): string | null => {
+  if (!accepted.length) return null;
+  const { start, finish } = endsOf(run);
+  if (
+    !accepted.some(
+      (ends) => distance(ends.start, start) <= GHOST_LIMITS.startRadiusMeters
+    )
+  ) {
+    return "The run does not start where this level starts";
+  }
+  if (
+    !accepted.some(
+      (ends) => distance(ends.finish, finish) <= GHOST_LIMITS.finishRadiusMeters
+    )
+  ) {
+    return "The run does not reach the finish of this level";
   }
   return null;
 };
