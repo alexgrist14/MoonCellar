@@ -319,13 +319,19 @@ export class SteamAccountService {
           $elemMatch: { name: "Steam", uid: { $in: uids } },
         },
       })
-      .select("_id name versionTitle type externalPages")
+      .select("_id name versionTitle type externalPages steam")
       .lean();
 
     const wanted = new Set(uids);
     const steamNames = new Map(
       owned.map((game) => [String(game.appid), game.name])
     );
+
+    for (const { steam } of linked) {
+      if (steam?.name && wanted.has(String(steam.appId))) {
+        steamNames.set(String(steam.appId), steam.name);
+      }
+    }
     const candidatesByUid = new Map<string, typeof linked>();
 
     for (const game of linked) {

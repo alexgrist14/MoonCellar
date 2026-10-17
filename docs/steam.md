@@ -116,7 +116,9 @@ catalogue game, in this order:
 IGDB gives an edition the Steam id of its base game: "Hell is Us" and "Hell is Us: Deluxe Edition"
 share one store page. So steps 1 and 2 can find several games for one app, and
 `pickSteamCandidate` then prefers:
-- the game whose name equals the Steam name;
+- the game whose name equals the Steam name — the store name in a candidate's `steam.name` when
+  one carries it, else the library's. The library can keep an app's old name: app 35720 is
+  "Trine 2" there and "Trine 2: Complete Story" in the store;
 - then a game without `versionTitle`;
 - then a "Main Game".
 
@@ -161,7 +163,8 @@ library from that old list and the stored achievement progress, without playtime
 - **Profile → main tab.** A two-row Steam block, in the default order.
 - **Game cards.** Every game with Steam achievements shows a Steam logo in the bottom-right
   corner, as every game with an RA set shows the medal: yellow when the viewer mastered it, grey
-  otherwise. It opens `GameSteamPopover`: the viewer's unlocked count and a progress bar when they
+  otherwise. The viewer's progress is found by the game, then by its Steam app, so a base game and
+  its edition on one app both show it. It opens `GameSteamPopover`: the viewer's unlocked count and a progress bar when they
   have progress, or the game's achievement count when they have none (with a hint to link Steam
   when no account is linked), and buttons to the achievements page (the viewer's own, or Steam's
   global one) and the store page.

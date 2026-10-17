@@ -274,6 +274,10 @@ an instance of Module)`. Use a default import; tsc reports the call as `TS2349`.
   signed-in user, and the assertion is linked only after Steam answers `is_valid:true` to
   `check_authentication`.** Skipping either lets anyone post a forged or replayed claimed id and
   import someone else's library.
+- **`GetOwnedGames` can name an app by its old title, so the library match compares candidates
+  with the store name (`steam.name`) first.** App 35720 is "Trine 2" in the library and "Trine 2:
+  Complete Story" in the store; matched by the library name, everyone who owns the Complete Story
+  got the base game.
 - **`GetOwnedGames` answers `{ response: {} }` for a profile whose game details are private.**
   It is not an error status; treat a missing `games` array as "private" (422), never as an
   empty library, or the import replaces a full library with nothing.

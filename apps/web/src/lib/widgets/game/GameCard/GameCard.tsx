@@ -156,13 +156,16 @@ export const GameCard = memo(
       };
     }, [game, profile]);
 
-    const steamProgress = useMemo(
-      () =>
-        profile?.steam?.achievements?.find(
-          (entry) => entry.gameId === game._id && entry.unlocked > 0
-        ),
-      [game._id, profile]
-    );
+    const steamProgress = useMemo(() => {
+      const entries = profile?.steam?.achievements?.filter(
+        ({ unlocked }) => unlocked > 0
+      );
+
+      return (
+        entries?.find(({ gameId }) => gameId === game._id) ??
+        entries?.find(({ appId }) => appId === game.steamAchievements?.appId)
+      );
+    }, [game._id, game.steamAchievements?.appId, profile]);
     const steamTotal =
       steamProgress?.total ?? game.steamAchievements?.total ?? 0;
     const steamAppId = steamProgress?.appId ?? game.steamAchievements?.appId;
