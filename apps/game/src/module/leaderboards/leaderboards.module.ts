@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
+import { AccountModule } from "../account/account.module";
 import { LeaderboardsController } from "./leaderboards.controller";
 import { LeaderboardsService } from "./leaderboards.service";
 import {
@@ -9,6 +10,7 @@ import {
 
 @Module({
   imports: [
+    AccountModule,
     MongooseModule.forFeature([
       { name: LeaderboardEntry.name, schema: LeaderboardEntrySchema },
     ]),

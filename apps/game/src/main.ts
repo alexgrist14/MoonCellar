@@ -11,6 +11,7 @@ async function bootstrap() {
     bufferLogs: true,
   });
   app.set("trust proxy", true);
+  app.useBodyParser("json", { limit: "512kb" });
   app.enableCors({ origin: getCorsOrigins() });
   app.useLogger(app.get(Logger));
 
