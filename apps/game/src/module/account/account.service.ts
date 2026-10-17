@@ -1,6 +1,7 @@
 import {
   HttpException,
   Injectable,
+  Logger,
   ServiceUnavailableException,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
@@ -16,6 +17,7 @@ const REQUEST_TIMEOUT_MS = 10_000;
 
 @Injectable()
 export class AccountService {
+  private readonly logger = new Logger(AccountService.name);
   private readonly cache = new Map<
     string,
     { expiresAt: number; result: IGameTokenIntrospection }
@@ -34,15 +36,17 @@ export class AccountService {
   }
 
   private async call<T>(path: string, body: unknown): Promise<T> {
+    const url = `${this.apiUrl()}/auth/game${path}`;
     let response: Response;
     try {
-      response = await fetch(`${this.apiUrl()}/auth/game${path}`, {
+      response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
         signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       });
-    } catch {
+    } catch (error) {
+      this.logger.warn(`Account service ${url}: ${error}`);
       throw new ServiceUnavailableException(
         "The account service is not reachable right now"
       );
