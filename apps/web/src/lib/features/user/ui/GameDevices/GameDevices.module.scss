@@ -1,0 +1,36 @@
+.devices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x3);
+
+  &__note {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.4;
+
+    a {
+      color: var(--color-accent);
+      text-decoration: underline;
+    }
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x2);
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-x3);
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x05);
+    min-width: 0;
+  }
+}

@@ -22,6 +22,7 @@ import {
 } from "@/src/lib/features/user/ui/DeleteAccountModal";
 import { RaAccount } from "@/src/lib/features/user/ui/RaAccount";
 import { SteamAccount } from "@/src/lib/features/user/ui/SteamAccount";
+import { GameDevices } from "@/src/lib/features/user/ui/GameDevices";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FC, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -270,6 +271,12 @@ export const Settings: FC<SettingsProps> = ({}) => {
         <CollapsibleSection title="RetroAchievements">
           <div className={styles.section}>
             <RaAccount />
+          </div>
+        </CollapsibleSection>
+
+        <CollapsibleSection title="Game devices">
+          <div className={styles.section}>
+            <GameDevices />
           </div>
         </CollapsibleSection>
 

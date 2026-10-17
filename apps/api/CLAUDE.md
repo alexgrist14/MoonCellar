@@ -13,13 +13,13 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   `verbatimModuleSyntax`); do not relax it.** It is the only thing that catches two boot
   failures before they ship:
   - A type imported without `import type` and named in decorator metadata — a decorated
-    constructor, method *or property*, such as `@Prop() settings: IUserSettings` — stays in
+    constructor, method _or property_, such as `@Prop() settings: IUserSettings` — stays in
     Bun's output, and the boot dies with `SyntaxError: Export named 'IUserSettings' not found
-    in module …`. tsc reports it as `TS1484`. `isolatedModules` alone (`TS1272`) misses the
+in module …`. tsc reports it as `TS1484`. `isolatedModules` alone (`TS1272`) misses the
     property case.
   - `import * as x` of a CommonJS package whose export is a function yields a namespace Bun
     will not call: `cookieParser is not a function. (In 'cookieParser()', 'cookieParser' is
-    an instance of Module)`. Use a default import; tsc reports the call as `TS2349`.
+an instance of Module)`. Use a default import; tsc reports the call as `TS2349`.
 - **A named value import from a CommonJS package must be an own property of its exports, and
   tsc cannot check that.** mongoose's `Connection` lives on the prototype, so
   `import { Connection } from "mongoose"` in a decorated constructor dies with
@@ -69,6 +69,16 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   `refreshToken`, otherwise leaves a valid `accessMoonToken` behind for up to seven days, and the
   web profile keeps treating that browser as its owner. `JwtRefreshGuard` and the refresh handler
   clear them on `UnauthorizedException` only — a database error must not log everyone out.
+
+## Game sign-in
+
+- **Game tokens are signed with `JWT_SECRET + ":game"`, never with the plain `JWT_SECRET`.**
+  `JwtStrategy` accepts any token signed with the plain key as the `accessMoonToken` cookie, so a
+  game token signed with it would open the site as that user. The flow, the endpoints and the
+  introspection contract are in [`docs/game-sign-in.md`](../../docs/game-sign-in.md).
+- **A game token is only valid while its `game_sessions` row is not revoked** — check it through
+  `GameAuthService.introspect`, never by verifying the signature alone, or signing a device out
+  on the site would not stop it.
 
 ## Sockets
 
@@ -132,12 +142,12 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
 - **A log stores state, never text: `playthrough` (`action`, `before`, `after`), `rating`
   (`value`, `previous`) and `favorite`, and the web builds every sentence from them.** The
   former HTML text was parsed back with regexes on read, so rewording a header silently broke
-  old rows, and a status stored as "Mastered" *or* the category lost that a game was completed.
+  old rows, and a status stored as "Mastered" _or_ the category lost that a game was completed.
   Rows written before the change are converted by `scripts/migrate-user-logs.ts` (dry run unless
   `--apply`).
 - **Every write goes through `recordUserLog`, which merges into the user's latest log when it is
   for the same game and the same playthrough, using `mergeLogChanges`.** A merge keeps the
-  *first* `before` and the *last* `after`, and drops a part that nets to nothing (added then
+  _first_ `before` and the _last_ `after`, and drops a part that nets to nothing (added then
   removed, rating set then removed, an update reverted). Replacing the whole part instead is what
   made a repeated save with nothing changed overwrite the recorded update with an empty one.
 - **The playthrough state never includes the comment, only `hasReview`.** The comment is a review
@@ -241,7 +251,7 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   what happened to a game, not how it was filed. Favourites do log, through the `favorite`
   segment.
 - **A single favourite is added or removed through `POST`/`DELETE
-  /user/:userId/favorites/:gameId` (and `favorite-characters/:characterId`), never through the
+/user/:userId/favorites/:gameId` (and `favorite-characters/:characterId`), never through the
   `PATCH` that replaces the whole list.** The client builds lists from the persisted auth-store
   profile, which can be older than the database (another tab or device), and a replace built from
   it silently deletes favourites added elsewhere. The `PATCH` is for the reorder editors only.
@@ -364,7 +374,7 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
 - **A spec that imports anything reaching `shared/utils/rich-text.utils` must mock that
   module.** Jest runs the source as CommonJS and cannot load `htmlparser2`, the ESM-only
   dependency of `sanitize-html`, so the suite dies at import with `Must use import to load ES
-  Module` before a single test runs. `comments.controller.spec.ts` mocks it with `jest.mock`.
+Module` before a single test runs. `comments.controller.spec.ts` mocks it with `jest.mock`.
 
 ## Storage
 
@@ -407,7 +417,7 @@ Rules that apply to the NestJS service. Repository-wide rules live in the root
   to `S3_CDN_URL/<folder>/…` across `games`, `characters`, `users`, `playthroughs` and `userlogs`.
   It is a dry run unless called with `--apply`; apply it only after the objects are copied into the
   Space, or every rewritten link 404s.
-- **Duplicate game images are found by md5 *and* by perceptual hash, because neither alone finds
+- **Duplicate game images are found by md5 _and_ by perceptual hash, because neither alone finds
   them all.** `ImageDedupeService` (`POST /games/images/dedupe/:slug`, and the background run on
   `POST /games/images/dedupe`) needs both: IGDB serves the same picture under several `image_id`s,
   which is byte-identical and md5 catches it, while the copy of a picture that VNDB also has was

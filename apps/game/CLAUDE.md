@@ -23,7 +23,22 @@ does and how to run it is in [`docs/game-service.md`](../../docs/game-service.md
 - **Errors are `{ statusCode, message }` with an English sentence**, as in `apps/api`
   ("Errors"); `ErrorResponseFilter` is the API's filter without the axios branch.
 
+## Accounts
+
+- **The service never verifies a game token itself: `AccountService` asks the API**
+  (`POST /auth/game/token/introspect`, [`docs/game-sign-in.md`](../../docs/game-sign-in.md)) and
+  keeps the answer for 30 seconds. It holds no JWT key, and a device signed out on the site loses
+  access within that window.
+- **`/account/*` proxies the API's device sign-in**, so a game talks to one host only.
+- **An endpoint that acts for a player uses `GameTokenGuard`**, which puts the account on
+  `request.account`; the player's name is taken from it, never from the request body.
+
 ## Leaderboards
 
+- **A submitted time replaces the entry only when it is faster**, together with its ghost; a
+  slower one answers `improved: false` and refreshes only the display name.
+- **The ghost is stored with `select: false`** and read only by
+  `GET /leaderboards/entries/:entryId/ghost`, so a leaderboard page never carries the runs.
+  `main.ts` raises the JSON body limit to 512 KiB for it; the schema caps the run at 256 KiB.
 - **One entry per user and level** (unique index `{ level, userId }`). Ranking sorts by `timeMs`,
   then by `updatedAt`, so an earlier equal time ranks first.

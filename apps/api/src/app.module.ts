@@ -4,6 +4,7 @@ import { ScheduleModule } from "@nestjs/schedule";
 import { MongooseModule } from "@nestjs/mongoose";
 import { ConfigModule } from "@nestjs/config";
 import { AuthModule } from "./module/auth/auth.module";
+import { GameAuthModule } from "./module/game-auth/game-auth.module";
 import { UserModule } from "./module/user/user.module";
 import { IgdbModule } from "./module/igdb/igdb.module";
 import { ImagesModule } from "./module/images/images.module";
@@ -40,6 +41,7 @@ import { CacheModule } from "@nestjs/cache-manager";
     HttpModule,
     CacheModule.register({ isGlobal: true }),
     AuthModule,
+    GameAuthModule,
     UserModule,
     AdminModule,
     FaroModule,

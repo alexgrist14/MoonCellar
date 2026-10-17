@@ -13,6 +13,10 @@ export class LeaderboardEntry {
   displayName: string;
   @Prop({ type: Number, required: true })
   timeMs: number;
+  @Prop({ type: Buffer, default: null, select: false })
+  ghost: Buffer | null;
+  @Prop({ type: Boolean, default: false })
+  hasGhost: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

@@ -295,6 +295,7 @@ deployed whenever `apps/game/**`, `packages/**`, `package.json` or `bun.lock` ch
 |---|---|---|
 | `MONGO_CONNECTION_STRING` | **yes** | The compose MongoDB with credentials — `mongodb://<MONGO_ROOT_USERNAME>:<MONGO_ROOT_PASSWORD>@mongodb:27017/?authSource=admin`. The service picks its own `game` database; the path part of the URI is ignored |
 | `PORT` | no | `3229`; the deploy publishes the same port to `127.0.0.1` for nginx |
+| `API_URL` | no | `http://mooncellar-backend:3228` — the API container in the `mooncellar` network. Game sign-in and token checks go through it ([game-sign-in.md](game-sign-in.md)); without it `/account/*` and submitting a time answer 503, reading leaderboards still works |
 | `LOKI_HOST` | no | `http://loki:3100`. Logs carry the label `app=mooncellar-game` |
 | `PROMETHEUS_ENABLED` | no | `true` / `false` — default process metrics on `/metrics` |
 | `METRICS_TOKEN` | **yes** | Bearer token guarding `/metrics`. Must equal `METRICS_TOKEN` of `HOST_ENV_INFRA`: Prometheus scrapes the job `mooncellar-game` with the same credentials file as the API |
@@ -304,7 +305,8 @@ Before the first deploy of the service:
 1. Add an `A` record for `game.mooncellar.space` pointing at the host. The infra deploy reissues
    the shared certificate with every `server_name` of `infra/nginx/mooncellar.conf` and stops if
    a name does not resolve.
-2. Create the secret: `gh secret set HOST_ENV_GAME < prod-game.env`.
+2. Create the secret: `gh secret set HOST_ENV_GAME < prod-game.env`. A secret created before
+   game sign-in existed needs `API_URL` added.
 3. Merge: the push to `main` builds and starts `mooncellar-game`, and the infra deploy adds the
    site and the Prometheus job. `curl https://game.mooncellar.space/health` answers
    `{"status":"ok","database":"up",…}`.

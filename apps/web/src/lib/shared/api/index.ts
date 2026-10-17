@@ -19,3 +19,4 @@ export * from "./site-sessions.api";
 export * from "./steam.api";
 export * from "./ra.api";
 export * from "./gauntlet-history.api";
+export * from "./game-auth.api";
