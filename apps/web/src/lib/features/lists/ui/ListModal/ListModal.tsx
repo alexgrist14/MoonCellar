@@ -265,7 +265,7 @@ export const ListModal: FC<IListModalProps> = ({ list, userName, gameId }) => {
           render={({ field }) => (
             <ToggleSwitch
               label="Ranked list"
-              hint="Show each game's position, like in a top 10."
+              hint="Number the games by their position in the list."
               checked={field.value}
               isDisabled={isBusy}
               onChange={field.onChange}

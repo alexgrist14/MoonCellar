@@ -255,7 +255,7 @@ const ToggleWithHintDemo = () => {
       />
       <ToggleField
         label="Ranked list"
-        hint="Show each game's position, like in a top 10."
+        hint="Number the games by their position in the list."
         labelPosition="end"
         value={isRanked}
         onChange={setIsRanked}

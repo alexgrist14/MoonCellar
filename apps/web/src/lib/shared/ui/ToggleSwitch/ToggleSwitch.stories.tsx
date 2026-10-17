@@ -38,7 +38,7 @@ export const WithLabel: Story = { args: { label: "Show adult content" } };
 export const WithHint: Story = {
   args: {
     label: "Ranked list",
-    hint: "Show each game's position, like in a top 10.",
+    hint: "Number the games by their position in the list.",
   },
 };
 
