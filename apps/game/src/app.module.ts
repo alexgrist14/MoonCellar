@@ -9,6 +9,7 @@ import { HealthModule } from "./module/health/health.module";
 import { LeaderboardsModule } from "./module/leaderboards/leaderboards.module";
 import { pinoConfig } from "./module/logger/logger.module";
 import { MetricsModule } from "./module/metrics/metrics.module";
+import { SignalModule } from "./module/signal/signal.module";
 import { ErrorResponseFilter } from "./shared/error-response.filter";
 
 @Module({
@@ -22,6 +23,7 @@ import { ErrorResponseFilter } from "./shared/error-response.filter";
     HealthModule,
     AccountModule,
     LeaderboardsModule,
+    SignalModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: ErrorResponseFilter },
