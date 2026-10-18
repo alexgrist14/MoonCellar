@@ -161,7 +161,9 @@ traffic through the `coturn` service of `infra/docker-compose.prod.yml`. With `T
 `username` is `<expiry unix time>:<room code>`, `credential` is base64 HMAC-SHA1 of it with
 `TURN_SECRET`, valid for `ttl` seconds (12 hours). Without them the field is absent and players
 connect only directly. coturn listens on UDP 3478 and relays through UDP 49160–49200 on the host
-network, refuses peers in private and loopback ranges, and caps a session at 256 KB/s.
+network, refuses peers in private and loopback ranges, and caps a session at 256 KB/s. It runs a
+single relay thread: with one per core, the kernel spread clients over per-thread `SO_REUSEPORT`
+sockets on the production host and about half of them answered only now and then.
 
 ## Running it locally
 
