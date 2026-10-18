@@ -140,8 +140,8 @@ they connect directly (plan G4 of the port). Messages are JSON text frames, shap
 
 | Client sends                        | Server answers                                                                                             |
 | ----------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `{ type: "host", port }`            | `{ type: "hosted", code }` — a four-character room code to give the other player                           |
-| `{ type: "join", code, port }`      | `{ type: "joined", code, peer }` to the guest and `{ type: "peer", peer }` to the host                     |
+| `{ type: "host", port }`            | `{ type: "hosted", code, turn? }` — a four-character room code to give the other player                    |
+| `{ type: "join", code, port }`      | `{ type: "joined", code, peer, turn? }` to the guest and `{ type: "peer", peer, turn? }` to the host       |
 | `{ type: "signal", data }`          | `{ type: "signal", data }` delivered to the other player (up to 4 KiB, e.g. connection candidates)         |
 | `{ type: "leave" }`, or disconnects | `{ type: "left" }` to the host when the guest leaves; `{ type: "closed" }` to the guest when the host does |
 
@@ -150,6 +150,17 @@ they connect directly (plan G4 of the port). Messages are JSON text frames, shap
 (`Authorization: Bearer` or `?token=`) makes `name` the MoonCellar user name, otherwise it is
 `Player`. A room holds two players; mistakes answer `{ type: "error", message }`. The server pings
 every 30 seconds and drops a socket that misses a pong; nginx keeps an idle socket for 120 seconds.
+
+### TURN relay
+
+When the two players' networks block a direct path (NAT traversal fails), the game relays its
+traffic through the `coturn` service of `infra/docker-compose.prod.yml`. With `TURN_SECRET` and
+`TURN_URLS` set, `hosted`, `joined` and `peer` carry
+`turn: { urls, username, credential, ttl }` — coturn REST credentials (`use-auth-secret`):
+`username` is `<expiry unix time>:<room code>`, `credential` is base64 HMAC-SHA1 of it with
+`TURN_SECRET`, valid for `ttl` seconds (12 hours). Without them the field is absent and players
+connect only directly. coturn listens on UDP 3478 and relays through UDP 49160–49200 on the host
+network, refuses peers in private and loopback ranges, and caps a session at 256 KB/s.
 
 ## Running it locally
 
@@ -173,6 +184,8 @@ MongoDB, as the API's build does.
 | `LOCAL_CONNECTION`        | —       | Extra CORS origins, comma-separated, next to `https://mooncellar.space`                      |
 | `LOKI_HOST`               | —       | Sends logs to Loki under the label `app=mooncellar-game`; without it logs are pretty-printed |
 | `PROMETHEUS_ENABLED`      | `true`  | Default process metrics, prefixed `mooncellar_game_`                                         |
+| `TURN_SECRET`             | —       | coturn `static-auth-secret`; with `TURN_URLS` it turns on relay credentials in signalling     |
+| `TURN_URLS`               | —       | TURN servers, comma-separated `host:port` (`game.mooncellar.space:3478`)                     |
 | `METRICS_TOKEN`           | —       | Bearer token of `/metrics`                                                                   |
 | `MODERATION_TOKEN`        | —       | Bearer token of the player-level moderation endpoints; without it nobody moderates           |
 

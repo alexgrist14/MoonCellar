@@ -121,14 +121,31 @@ export const GameSignalPeerSchema = z.object({
 });
 export type IGameSignalPeer = z.infer<typeof GameSignalPeerSchema>;
 
+export const GameSignalTurnSchema = z.object({
+  urls: z.array(z.string()),
+  username: z.string(),
+  credential: z.string(),
+  ttl: z.number().int(),
+});
+export type IGameSignalTurn = z.infer<typeof GameSignalTurnSchema>;
+
 export const GameSignalServerMessageSchema = z.discriminatedUnion("type", [
-  z.object({ type: z.literal("hosted"), code: z.string() }),
+  z.object({
+    type: z.literal("hosted"),
+    code: z.string(),
+    turn: GameSignalTurnSchema.optional(),
+  }),
   z.object({
     type: z.literal("joined"),
     code: z.string(),
     peer: GameSignalPeerSchema,
+    turn: GameSignalTurnSchema.optional(),
   }),
-  z.object({ type: z.literal("peer"), peer: GameSignalPeerSchema }),
+  z.object({
+    type: z.literal("peer"),
+    peer: GameSignalPeerSchema,
+    turn: GameSignalTurnSchema.optional(),
+  }),
   z.object({ type: z.literal("signal"), data: z.string() }),
   z.object({ type: z.literal("left") }),
   z.object({ type: z.literal("closed") }),

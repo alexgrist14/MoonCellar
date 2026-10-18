@@ -105,6 +105,9 @@ refuses to start rather than fall back to `admin`.
 | `PROMETHEUS_DATA_DIR` | no | Host directory bind-mounted as `/prometheus` — `/home/admin/prometheus` on the old host. Seven days of metrics history; losing it is survivable, keeping it is one line |
 | `METRICS_TOKEN` | **yes** | Bearer token Prometheus sends when scraping the API's `/metrics`. Must be byte-identical to the API's own `METRICS_TOKEN`, or every scrape is a 401 |
 | `SEARXNG_SECRET` | **yes** | SearXNG's `server.secret_key` (`openssl rand -hex 32`). `infra/searxng/settings.yml` is committed without it, so the key never lands in git |
+| `TURN_SECRET` | **yes** | Optional, unlike the keys above. coturn's `static-auth-secret` (`openssl rand -hex 32`), byte-identical to `TURN_SECRET` of `HOST_ENV_GAME`. Without it the `coturn` container only logs that the relay is off. With it the host firewall must let in UDP 3478 and UDP 49160–49200: coturn runs on the host network, so `ufw` filters it (`ufw allow 3478/udp`, `ufw allow 49160:49200/udp`) |
+| `TURN_REALM` | no | Optional realm coturn announces, `game.mooncellar.space` by default |
+| `TURN_EXTERNAL_IP` | no | Optional public address of the host when it sits behind 1:1 NAT (a cloud VM whose interface has a private address); leave it empty when the public address is on the interface |
 
 `METRICS_TOKEN` is also written to `infra/prometheus/metrics_token`, because a Prometheus
 config file cannot read an environment variable — `prometheus.prod.yml` points
@@ -300,6 +303,8 @@ deployed whenever `apps/game/**`, `packages/**`, `package.json` or `bun.lock` ch
 | `PROMETHEUS_ENABLED` | no | `true` / `false` — default process metrics on `/metrics` |
 | `METRICS_TOKEN` | **yes** | Bearer token guarding `/metrics`. Must equal `METRICS_TOKEN` of `HOST_ENV_INFRA`: Prometheus scrapes the job `mooncellar-game` with the same credentials file as the API |
 | `MODERATION_TOKEN` | **yes** | Bearer token of the player-level moderation endpoints (`/games/:game/levels/reported`, `…/moderation`, [game-service.md](game-service.md#player-levels)). Without it nobody can hide or show a level; reports still hide one after three |
+| `TURN_SECRET` | **yes** | Must equal `TURN_SECRET` of `HOST_ENV_INFRA`. With `TURN_URLS` the signalling hands players time-limited TURN credentials ([game-service.md](game-service.md#turn-relay)); without either, players connect only directly |
+| `TURN_URLS` | no | `game.mooncellar.space:3478` — the coturn host and port, comma-separated if several |
 
 Before the first deploy of the service:
 
@@ -543,6 +548,8 @@ What it does need, and what the pipeline will not do for you:
    app cannot resolve a country and treats every visitor as geo-blocked.
 4. **A firewall that understands Docker.** `ufw` filters the `INPUT` chain, while Docker's
    published ports traverse `FORWARD` through `DOCKER-USER`. Everything is published on loopback
-   only, so nothing is exposed until the proxy is — keep it that way when adding a port.
+   only, so nothing is exposed until the proxy is — keep it that way when adding a port. The one
+   exception is `coturn` on the host network: `ufw` filters it like any host service, so its UDP
+   3478 and 49160–49200 need `ufw allow` rules.
 5. **DNS last.** Deploy, check the new host through a hosts entry, and only then move the A
    records. The old host keeps serving until they propagate.
