@@ -100,6 +100,9 @@ does and how to run it is in [`docs/game-service.md`](../../docs/game-service.md
   registers the raw body parser up to `GAME_STORAGE_MAX_FILE_BYTES` next to the 512 KiB JSON one.
   A body sent with another type reaches the controller as a non-`Buffer` and answers 415; an empty
   octet-stream body arrives as `{}`, so the controller turns it into an empty `Buffer` itself.
+- **`client_max_body_size` of `game.mooncellar.space` in `infra/nginx/mooncellar.conf` must be at
+  least `GAME_STORAGE_MAX_FILE_BYTES`**; nginx defaults to 1 MiB and answers 413 with its own
+  HTML page to any larger file before the service sees it. Raise them together.
 - **A bucket exists only when the game's definition names it** (`storage` in `IGameDefinition`);
   limits are checked by `quotaProblem` against the sum of the player's files in that bucket,
   counting a replaced file once. Change limits only together with `docs/game-service.md`.
