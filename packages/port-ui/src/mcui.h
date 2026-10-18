@@ -126,7 +126,7 @@ void DeviceCode(const char* code, const char* url = nullptr);
 
 struct Notification {
     std::string title, text;
-    const Icon* icon = nullptr;  // drawn on an accent tile; none — the MoonCellar mark there
+    const Icon* icon = nullptr;  // drawn on an accent tile; none — the MoonCellar mark on a neutral one
     float seconds = 5.0f;
 };
 // Queues a notification. Safe from any thread.

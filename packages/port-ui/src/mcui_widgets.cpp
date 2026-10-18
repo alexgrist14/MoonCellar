@@ -169,9 +169,12 @@ void DrawNotifications(double now) {
                           kRadiusX2 * s);
         dl->AddRectFilled(p, q, Packed(kColorBgPrimary, alpha), kRadiusX2 * s);
         dl->AddRect(p, q, Packed(kColorBgTertiary, alpha), kRadiusX2 * s);
+        // The tile: accent under an achievement's icon, tertiary under the mark (its violet would vanish)
         ImVec2 t0(p.x + pad, p.y + pad);
-        dl->AddRectFilled(t0, ImVec2(t0.x + tile, t0.y + tile), Packed(kColorAccent, alpha), kRadiusX3 * s);
-        if (n.icon && n.icon->Valid()) {
+        const bool hasIcon = n.icon && n.icon->Valid();
+        dl->AddRectFilled(t0, ImVec2(t0.x + tile, t0.y + tile), Packed(hasIcon ? kColorAccent : kColorBgTertiary, alpha),
+                          kRadiusX3 * s);
+        if (hasIcon) {
             float icon = tile * 0.6f;
             DrawIcon(dl, *n.icon, ImVec2(t0.x + (tile - icon) / 2, t0.y + (tile - icon) / 2), icon,
                      Packed(kColorTextPrimary, alpha));
