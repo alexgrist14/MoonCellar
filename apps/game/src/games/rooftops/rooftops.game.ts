@@ -37,5 +37,15 @@ export const rooftops: IGameDefinition = {
       maxFiles: 256,
       maxBytes: 64 * 1024 * 1024,
     },
+    levels: {
+      maxFileBytes: 512 * 1024,
+      maxFiles: 400,
+      maxBytes: 32 * 1024 * 1024,
+    },
+    prefs: {
+      maxFileBytes: 4 * 1024 * 1024,
+      maxFiles: 8,
+      maxBytes: 8 * 1024 * 1024,
+    },
   },
 };
