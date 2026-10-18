@@ -109,7 +109,8 @@ void ApplyStyle(float scale) {
     s.SeparatorTextPadding = ImVec2(kPaddingX4, kPaddingX1);
     s.ButtonTextAlign = ImVec2(0.5f, 0.5f);
     s.ScaleAllSizes(scale);
-    s.FontSizeBase = kTextBody;
+    // The text size stays the font's own (LoadFonts loads at kTextBody), so a window that loads its
+    // own font keeps its size
     s.FontScaleDpi = scale;
 
     ImVec4* c = s.Colors;
