@@ -20,6 +20,11 @@ set up by hand on the host, not by `infra/`.
   protects `main`; `post-receive` writes a status page to `/srv/git/status/medecomp.md`.
   Emergency switch: `sudo touch /srv/git/hooks-off` disables the hooks, removing the file
   enables them again.
+- **Status page**: https://status.mooncellar.space — the host nginx serves `/srv/git/status`
+  (`medecomp.html`, `medecomp.md`) behind basic auth; the password file is
+  `/etc/nginx/medecomp-status.htpasswd` (user `medecomp`, a line `medecomp:<hash>` with the hash
+  from `openssl passwd -apr1`, group `www-data`, mode 640). Files starting with a dot (the hook's
+  lock and half-written files) are not served.
 
 ## Backups
 
