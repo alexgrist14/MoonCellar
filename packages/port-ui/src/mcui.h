@@ -31,9 +31,13 @@ constexpr float kTextDisplay = 28.0f;
 // this package: the port keeps it next to its build. `fallback` — files merged into every face for
 // glyphs it lacks (arrows, Chinese, Japanese, Korean); when the face itself is missing, the first
 // fallback stands in for it.
+struct FontFile {
+    std::string path;
+    int index = 0;  // the face inside a collection (.ttc)
+};
 struct FontFiles {
     std::string regular, medium, bold;
-    std::vector<std::string> fallback;
+    std::vector<FontFile> fallback;
 };
 
 struct Fonts {
@@ -55,7 +59,8 @@ float Scale();
 
 void Title(const char* text);    // bold, title size
 void Caption(const char* text);  // muted, caption size, wrapped
-// A heading of a group: an accent bar and the label (the site's SectionTitle, "bar")
+// A heading of a group: an accent bar and the label (the site's SectionTitle, "bar"); below other
+// content it keeps a gap above itself
 void SectionTitle(const char* text);
 
 // ---- Controls ----
@@ -113,9 +118,9 @@ void AchievementCard(const AchievementView& view, float width = 0.0f);
 
 // ---- Account ----
 
-// Signing in with a device code: the code to type on the site and the address to open. The port
-// draws its QR code next to it.
-void DeviceCode(const char* code, const char* url);
+// Signing in with a device code: the code to type on the site and, when given, the address to
+// open. The port draws its QR code next to it.
+void DeviceCode(const char* code, const char* url = nullptr);
 
 // ---- Notifications ----
 

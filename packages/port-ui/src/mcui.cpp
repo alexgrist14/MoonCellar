@@ -22,17 +22,18 @@ bool fileExists(const std::string& path) {
 }
 
 // The face, then every fallback merged into it for the glyphs it lacks
-ImFont* addFace(const std::string& file, const std::vector<std::string>& fallback) {
+ImFont* addFace(const std::string& file, const std::vector<FontFile>& fallback) {
     ImGuiIO& io = ImGui::GetIO();
     ImFontConfig cfg;
     cfg.Flags |= ImFontFlags_NoLoadError;
     ImFont* font = fileExists(file) ? io.Fonts->AddFontFromFileTTF(file.c_str(), kTextBody, &cfg) : nullptr;
-    for (const std::string& extra : fallback) {
-        if (!fileExists(extra)) continue;
+    for (const FontFile& extra : fallback) {
+        if (!fileExists(extra.path)) continue;
         ImFontConfig merge;
         merge.Flags |= ImFontFlags_NoLoadError;
         merge.MergeMode = font != nullptr;
-        ImFont* added = io.Fonts->AddFontFromFileTTF(extra.c_str(), kTextBody, &merge);
+        merge.FontNo = extra.index;
+        ImFont* added = io.Fonts->AddFontFromFileTTF(extra.path.c_str(), kTextBody, &merge);
         if (!font) font = added;
     }
     return font;
@@ -188,6 +189,7 @@ void Caption(const char* text) {
 }
 
 void SectionTitle(const char* text) {
+    if (ImGui::GetCursorPosY() > ImGui::GetCursorStartPos().y + 1.0f) ImGui::Dummy(ImVec2(0, kGapX2 * s_scale));
     ImGui::PushFont(s_fonts.medium, kTextBody + 1.0f);
     float h = ImGui::GetTextLineHeight();
     ImVec2 p = ImGui::GetCursorScreenPos();

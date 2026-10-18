@@ -93,6 +93,7 @@ void DeviceCode(const char* code, const char* url) {
     dl->AddRect(p, ImVec2(p.x + box.x, p.y + box.y), Packed(kColorAccent), kRadiusControl * s, 0, 2.0f * s);
     dl->AddText(fonts.bold, kTextDisplay * s, ImVec2(p.x + padX, p.y + padY), Packed(kColorTextPrimary), code);
     ImGui::Dummy(box);
+    if (!url || !*url) return;
     ImGui::PushFont(fonts.regular, kTextCaption);
     ImGui::PushStyleColor(ImGuiCol_Text, Color(kColorTextMuted));
     ImGui::TextUnformatted(url);
