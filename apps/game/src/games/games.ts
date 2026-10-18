@@ -20,4 +20,6 @@ export const describeGame = (game: IGameDefinition): IGameDefinitionInfo => ({
   scoreOrder: game.scoreOrder,
   scoreUnit: game.scoreUnit,
   replayRequired: game.replay.required,
+  siteGame: game.siteGame ?? null,
+  achievements: game.achievements?.list.length ?? 0,
 });

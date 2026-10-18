@@ -1,12 +1,18 @@
 import { FC } from "react";
 import { InfoBlock } from "@/src/lib/shared/ui/InfoBlock";
 import { StatRows, type IStatRow } from "@/src/lib/shared/ui/StatRows";
-import { SvgRetroAchievements, SvgSteam } from "@/src/lib/shared/ui/svg";
+import {
+  SvgLogo,
+  SvgRetroAchievements,
+  SvgSteam,
+} from "@/src/lib/shared/ui/svg";
 import { IGameResponse } from "@mooncellar/schemas";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 
 interface IGameAchievementsBlockProps {
   game: IGameResponse;
+  // Achievements of the MoonCellar Team port (the game service), listed further down the page
+  portTotal?: number;
   isBoxed?: boolean;
 }
 
@@ -20,12 +26,23 @@ export const getAchievementCounts = (game: IGameResponse) => ({
 
 export const GameAchievementsBlock: FC<IGameAchievementsBlockProps> = ({
   game,
+  portTotal,
   isBoxed = true,
 }) => {
   const { steam } = getAchievementCounts(game);
   const systems = useCommonStore((state) => state.systems);
 
   const rows: IStatRow[] = [
+    ...(portTotal
+      ? [
+          {
+            label: "MoonCellar Team port",
+            value: portTotal,
+            icon: <SvgLogo size="16" />,
+            title: `${portTotal} achievements in the PC port by MoonCellar Team`,
+          },
+        ]
+      : []),
     ...(steam
       ? [
           {

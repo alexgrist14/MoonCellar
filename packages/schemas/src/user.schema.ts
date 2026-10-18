@@ -16,6 +16,7 @@ export const ProfileBlockSchema = z.enum([
   "favoriteCharacters",
   "retroachievements",
   "steam",
+  "ports",
   "lists",
   "likedLists",
   "activity",

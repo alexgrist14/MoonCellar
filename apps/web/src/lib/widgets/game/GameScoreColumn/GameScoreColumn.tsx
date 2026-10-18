@@ -14,11 +14,13 @@ import {
 
 interface IGameScoreColumnProps {
   game: IGameResponse;
+  portAchievementsTotal?: number;
   className?: string;
 }
 
 export const GameScoreColumn: FC<IGameScoreColumnProps> = ({
   game,
+  portAchievementsTotal,
   className,
 }) => {
   const achievements = getAchievementCounts(game);
@@ -27,7 +29,8 @@ export const GameScoreColumn: FC<IGameScoreColumnProps> = ({
     !getGameRatingRows(game).length &&
     !getHltbTiles(game).length &&
     !achievements.steam &&
-    !achievements.retroachievements
+    !achievements.retroachievements &&
+    !portAchievementsTotal
   ) {
     return null;
   }
@@ -43,7 +46,11 @@ export const GameScoreColumn: FC<IGameScoreColumnProps> = ({
       <GameRatingsBlock game={game} isBoxed={false} />
       <GameHltbBlock game={game} isBoxed={false} />
       <GameVndbBlock game={game} isBoxed={false} />
-      <GameAchievementsBlock game={game} isBoxed={false} />
+      <GameAchievementsBlock
+        game={game}
+        portTotal={portAchievementsTotal}
+        isBoxed={false}
+      />
     </Box>
   );
 };

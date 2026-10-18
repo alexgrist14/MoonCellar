@@ -78,6 +78,14 @@ export const useGameFollowingsStatusQuery = (
     staleTime: 60000,
   });
 
+export const useGameBySlugQuery = (slug?: string | null) =>
+  useQuery({
+    queryKey: gameQueryKeys.detail(slug ?? ""),
+    queryFn: () => gamesApi.getBySlug({ slug: slug! }).then(({ data }) => data),
+    enabled: !!slug,
+    staleTime: 60000,
+  });
+
 export const useGameStatsQuery = (gameId: string, initialData?: IGameStats) =>
   useQuery({
     queryKey: gameQueryKeys.stats(gameId),

@@ -44,6 +44,7 @@ import { FavoriteGames } from "@/src/lib/widgets/user/FavoriteGames";
 import { FavoriteCharacters } from "@/src/lib/widgets/user/FavoriteCharacters";
 import { UserRaGames } from "@/src/lib/widgets/user/UserRaGames";
 import { UserSteamGames } from "@/src/lib/widgets/user/UserSteamGames";
+import { UserPortAchievements } from "@/src/lib/widgets/user/UserPortAchievements";
 import { useViewerFollowings } from "@/src/lib/features/user/model/useViewerFollowings";
 import styles from "./UserInfo.module.scss";
 
@@ -298,6 +299,8 @@ export const UserInfo: FC<UserInfoProps> = ({
           onShowAll={() => goTo(STEAM_TAB)}
         />
       )}
+
+      {!hiddenBlocks.has("ports") && <UserPortAchievements userId={id} />}
 
       {isListsVisible && (
         <section className={styles.lists} aria-labelledby="profile-lists">

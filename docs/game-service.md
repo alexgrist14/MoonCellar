@@ -19,7 +19,7 @@ port of a rooftop-running game from the decompilation project.
 | `GET`  | `/account/me`                                       | Game token. The account the game is signed in with: `{ id, userName, avatar }`                                                                                                                                                                                                       |
 | `GET`  | `/account/friends`                                  | Game token. MoonCellar followings and followers, `[{ id, userName, avatar }]` by name                                                                                                                                                                                                |
 | `POST` | `/account/sign-out`                                 | Game token. Revokes the token; the device disappears from the site's Settings → Game devices                                                                                                                                                                                         |
-| `GET`  | `/games`                                            | The registered games: `[{ slug, name, scoreOrder, scoreUnit, replayRequired }]`                                                                                                                                                                                                      |
+| `GET`  | `/games`                                            | The registered games: `[{ slug, name, scoreOrder, scoreUnit, replayRequired, siteGame, achievements }]` — `siteGame`: the slug of the game's page on the site (or `null`), `achievements`: how many it has                                                                                                                                                                                                      |
 | `GET`  | `/games/:game/leaderboards/:board`                  | A leaderboard, best score first (`scoreOrder` of the game): `{ game, board, total, entries }`, paged by `limit` (1–100, default 20) and `offset`; 404 for an unknown game or a board the game does not have                                                                          |
 | `PUT`  | `/games/:game/leaderboards/:board`                  | Game token. Submits `{ score, replay? }` (replay — the game's own recording, base64, up to 256 KiB); the game's replay check runs (see "Replay checks"), and the player's entry is replaced only by a better score: `{ improved, entry }`; a score that does not hold up answers 422 |
 | `GET`  | `/games/:game/leaderboards/entries/:entryId/replay` | The replay of an entry: `{ entryId, game, board, userId, displayName, score, replay }`; 404 when it has none                                                                                                                                                                         |
@@ -149,11 +149,19 @@ project's `docs/achievements.md`): `format`, `game`, and per achievement a `key`
   unlock is written once — on insert, or where `unlockedAt` is still `null` — so the first time
   stays; `current` changes only through `$max`. Two first reports at once meet the unique index,
   and the second one updates instead.
+- **On the site.** A game's `siteGame` (in `GET /games`) is the slug of its page on
+  mooncellar.space: that page lists the port's achievements and the viewer's own states, and a
+  profile shows the player's progress in each port (`apps/web`: `entities/port-achievement`,
+  `widgets/game/GamePortAchievements`, `widgets/user/UserPortAchievements`). The site reaches the
+  service at `NEXT_PUBLIC_GAME_URL` from the browser — without cookies, which its CORS does not
+  allow — and at `INTERNAL_GAME_URL` from the server. Icons are drawn as CSS masks so they take the
+  page's colours, which needs the CORS header on `/icons/` too (it has it, like every route).
 
 ## Adding a game
 
 1. Pick a slug (`[a-z][a-z0-9-]`, up to 32 characters) and add `src/games/<slug>/<slug>.game.ts`
-   with an `IGameDefinition`: `name`, `scoreOrder` (`asc` when lower is better, as with times),
+   with an `IGameDefinition`: `name`, `siteGame` (the slug of the game's page on the site, where its
+   achievements are shown), `scoreOrder` (`asc` when lower is better, as with times),
    `scoreUnit` (`ms` or `points`), `board` — a regular expression of the board ids the game
    uses — and `replay` (`required`, `maxBytes`, an optional `check`).
 2. Register it in `GAMES` in `src/games/games.ts`. Nothing else changes: the routes, the

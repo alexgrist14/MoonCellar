@@ -52,7 +52,13 @@ editing controls.
 1. `BGImage` with the user's background (the store's copy for the owner).
 2. Mobile only: `UserNavigationMenu` (`features/user/ui/UserNavigation`) — the shared icon-only burger `ExpandMenu`, bottom-right, holding `UserNavigation`. A custom list page uses the same component; never inline a copy.
 3. `Box`: `Breadcrumbs` on every tab except Profile, then the tab:
-   - `profile` → `widgets/user/UserInfo`
+   - `profile` → `widgets/user/UserInfo`. Its `ports` block, `widgets/user/UserPortAchievements`,
+     has no tab of its own: the MoonCellar Team ports the user has achievements in, from the game
+     service (`GET /achievements/players/:userId`, then each port's
+     `/games/:game/achievements/players/:userId`), each as the site's game card (the port's
+     `siteGame`), "unlocked of total · %", a progress bar, the last unlock date and every
+     achievement's icon, muted until unlocked, with its texts in a `Tooltip`. Hidden while the
+     user has none
    - `all` and each status → `widgets/user/UserGames`
    - `lists` / `liked` → `widgets/user/UserLists` (`kind="liked"`)
    - `favourites/games` → `widgets/user/FavoriteGames`; `favourites/characters` →
