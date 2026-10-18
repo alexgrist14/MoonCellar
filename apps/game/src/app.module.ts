@@ -13,6 +13,7 @@ import { LevelsModule } from "./module/levels/levels.module";
 import { pinoConfig } from "./module/logger/logger.module";
 import { MetricsModule } from "./module/metrics/metrics.module";
 import { SignalModule } from "./module/signal/signal.module";
+import { StorageModule } from "./module/storage/storage.module";
 import { ErrorResponseFilter } from "./shared/error-response.filter";
 
 @Module({
@@ -29,6 +30,7 @@ import { ErrorResponseFilter } from "./shared/error-response.filter";
     LeaderboardsModule,
     ChallengesModule,
     LevelsModule,
+    StorageModule,
     SignalModule,
   ],
   providers: [

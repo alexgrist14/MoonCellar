@@ -6,6 +6,12 @@ export type IReplayCheck = (
 
 export type ILevelCheck = (level: Buffer) => string | null;
 
+export type IGameStorageBucket = {
+  maxFileBytes: number;
+  maxFiles: number;
+  maxBytes: number;
+};
+
 export type IGameDefinition = {
   slug: string;
   name: string;
@@ -23,6 +29,7 @@ export type IGameDefinition = {
     maxBytes: number;
     check?: ILevelCheck;
   };
+  storage?: Record<string, IGameStorageBucket>;
 };
 
 export const levelBoard = (levelId: string, version: number) =>

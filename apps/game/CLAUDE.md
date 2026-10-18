@@ -93,3 +93,17 @@ does and how to run it is in [`docs/game-service.md`](../../docs/game-service.md
   them. `main.ts` raises the JSON body limit to 512 KiB; the schema caps a replay at 256 KiB.
 - **One entry per user and board** (unique index `{ game, board, userId }`). Ranking sorts by
   `score` in the game's order, then by `updatedAt`, so an earlier equal score ranks first.
+
+## Storage
+
+- **Storage files travel as raw `application/octet-stream`, never base64 in JSON**: `main.ts`
+  registers the raw body parser up to `GAME_STORAGE_MAX_FILE_BYTES` next to the 512 KiB JSON one.
+  A body sent with another type reaches the controller as a non-`Buffer` and answers 415; an empty
+  octet-stream body arrives as `{}`, so the controller turns it into an empty `Buffer` itself.
+- **A bucket exists only when the game's definition names it** (`storage` in `IGameDefinition`);
+  limits are checked by `quotaProblem` against the sum of the player's files in that bucket,
+  counting a replaced file once. Change limits only together with `docs/game-service.md`.
+- **`revision` of `storage_buckets` grows with every write and delete**, and a write or delete
+  with `revision` answers 409 when the bucket moved on; the ports rely on it to tell a change
+  made on another computer from their own.
+
