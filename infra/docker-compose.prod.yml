@@ -155,7 +155,7 @@ services:
         umask 077
         printf 'static-auth-secret=%s\n' "$$TURN_SECRET" > /tmp/turnserver.conf
         exec turnserver -c /tmp/turnserver.conf \
-          --log-file=stdout --simple-log \
+          --log-file=stdout --simple-log --relay-threads=1 \
           --listening-port=3478 --min-port=49160 --max-port=49200 \
           --fingerprint --use-auth-secret --realm="$$TURN_REALM" \
           --no-tls --no-tcp-relay --no-multicast-peers \
