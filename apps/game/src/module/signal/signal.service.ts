@@ -6,6 +6,7 @@ import {
   type IGameSignalServerMessage,
 } from "@mooncellar/schemas";
 import type { WebSocket } from "ws";
+import { turnCredentials, turnUrls } from "./signal-turn";
 
 const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const CODE_LENGTH = 4;
@@ -27,6 +28,8 @@ type ISignalRoom = {
 @Injectable()
 export class SignalService {
   private readonly rooms = new Map<string, ISignalRoom>();
+  private readonly turnSecret = process.env.TURN_SECRET ?? "";
+  private readonly turnUrls = turnUrls(process.env.TURN_URLS);
 
   get roomCount() {
     return this.rooms.size;
@@ -40,6 +43,11 @@ export class SignalService {
 
   private peerOf(client: ISignalClient): IGameSignalPeer {
     return { name: client.name, address: client.address, port: client.port };
+  }
+
+  private turn(room: ISignalRoom) {
+    if (!this.turnSecret || this.turnUrls.length === 0) return undefined;
+    return turnCredentials(this.turnSecret, this.turnUrls, room.code, Date.now());
   }
 
   private newCode() {
@@ -81,7 +89,11 @@ export class SignalService {
       };
       this.rooms.set(room.code, room);
       client.room = room;
-      return this.send(client, { type: "hosted", code: room.code });
+      return this.send(client, {
+        type: "hosted",
+        code: room.code,
+        turn: this.turn(room),
+      });
     }
 
     if (message.type === "join") {
@@ -102,12 +114,18 @@ export class SignalService {
       client.port = message.port;
       room.guest = client;
       client.room = room;
+      const turn = this.turn(room);
       this.send(client, {
         type: "joined",
         code: room.code,
         peer: this.peerOf(room.host),
+        turn,
       });
-      return this.send(room.host, { type: "peer", peer: this.peerOf(client) });
+      return this.send(room.host, {
+        type: "peer",
+        peer: this.peerOf(client),
+        turn,
+      });
     }
 
     if (message.type === "signal") {

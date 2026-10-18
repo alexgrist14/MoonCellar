@@ -65,6 +65,9 @@ does and how to run it is in [`docs/game-service.md`](../../docs/game-service.md
   answers `{ type: "error" }` and never closes the socket.
 - **nginx needs its own `location = /signal` with the upgrade headers** for `game.mooncellar.space`;
   the plain `location /` sends `Connection: ""` and the handshake fails.
+- **TURN credentials ride on `hosted`, `joined` and `peer`** (`signal-turn.ts`): coturn REST
+  credentials bound to the room code, only when both `TURN_SECRET` and `TURN_URLS` are set. The
+  secret never leaves the server; it must match coturn's in `infra/.env`.
 
 ## Player levels
 

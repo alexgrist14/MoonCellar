@@ -135,6 +135,41 @@ services:
     # Caps GitLab so a memory spike cannot push MongoDB and the apps out.
     mem_limit: 4g
 
+  coturn:
+    image: coturn/coturn:4.18.0
+    container_name: coturn
+    restart: always
+    # Relay ports are a UDP range: host networking, so the host firewall (ufw) filters them.
+    network_mode: host
+    environment:
+      TURN_SECRET: ${TURN_SECRET:-}
+      TURN_REALM: ${TURN_REALM:-game.mooncellar.space}
+      TURN_EXTERNAL_IP: ${TURN_EXTERNAL_IP:-}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        if [ -z "$$TURN_SECRET" ]; then
+          echo "TURN_SECRET is not set in infra/.env: the relay stays off"
+          exec sleep infinity
+        fi
+        umask 077
+        printf 'static-auth-secret=%s\n' "$$TURN_SECRET" > /tmp/turnserver.conf
+        exec turnserver -c /tmp/turnserver.conf \
+          --log-file=stdout --simple-log \
+          --listening-port=3478 --min-port=49160 --max-port=49200 \
+          --fingerprint --use-auth-secret --realm="$$TURN_REALM" \
+          --no-tls --no-tcp-relay --no-multicast-peers \
+          --user-quota=8 --total-quota=400 --max-bps=262144 \
+          --denied-peer-ip=0.0.0.0-0.255.255.255 \
+          --denied-peer-ip=10.0.0.0-10.255.255.255 \
+          --denied-peer-ip=100.64.0.0-100.127.255.255 \
+          --denied-peer-ip=127.0.0.0-127.255.255.255 \
+          --denied-peer-ip=169.254.0.0-169.254.255.255 \
+          --denied-peer-ip=172.16.0.0-172.31.255.255 \
+          --denied-peer-ip=192.168.0.0-192.168.255.255 \
+          $${TURN_EXTERNAL_IP:+--external-ip=$$TURN_EXTERNAL_IP}
+    mem_limit: 128m
+
 volumes:
   loki_data:
   gitlab_config:
