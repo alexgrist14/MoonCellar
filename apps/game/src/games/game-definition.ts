@@ -1,3 +1,5 @@
+import type { IGameAchievements } from "./achievements";
+
 export type IReplayCheck = (
   replay: Buffer,
   score: number,
@@ -30,6 +32,8 @@ export type IGameDefinition = {
     check?: ILevelCheck;
   };
   storage?: Record<string, IGameStorageBucket>;
+  // Achievements: the game's catalog (loadAchievements), when the game has them
+  achievements?: IGameAchievements;
 };
 
 export const levelBoard = (levelId: string, version: number) =>

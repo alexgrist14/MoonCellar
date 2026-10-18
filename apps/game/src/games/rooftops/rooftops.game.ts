@@ -1,3 +1,4 @@
+import { loadAchievements } from "../achievements";
 import type { IGameDefinition } from "../game-definition";
 import { checkEnds, checkRun, endsOf, parseGhost } from "./ghost";
 import { checkLevel } from "./level";
@@ -48,4 +49,6 @@ export const rooftops: IGameDefinition = {
       maxBytes: 8 * 1024 * 1024,
     },
   },
+  // The port's catalog (its config/achievements/rooftops.json), our own texts and icons
+  achievements: loadAchievements(__dirname, "rooftops"),
 };

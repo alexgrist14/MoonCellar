@@ -5,6 +5,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { LoggerModule } from "nestjs-pino";
 import { ZodValidationPipe } from "nestjs-zod";
 import { AccountModule } from "./module/account/account.module";
+import { AchievementsModule } from "./module/achievements/achievements.module";
 import { ChallengesModule } from "./module/challenges/challenges.module";
 import { GamesModule } from "./games/games.module";
 import { HealthModule } from "./module/health/health.module";
@@ -31,6 +32,7 @@ import { ErrorResponseFilter } from "./shared/error-response.filter";
     ChallengesModule,
     LevelsModule,
     StorageModule,
+    AchievementsModule,
     SignalModule,
   ],
   providers: [

@@ -341,3 +341,124 @@ export const GameStorageWriteResultSchema = z.object({
   file: GameStorageFileSchema.nullable(),
 });
 export type IGameStorageWriteResult = z.infer<typeof GameStorageWriteResultSchema>;
+
+// Achievements of the ports: a catalog per game in one format for every game (the port
+// project's docs/achievements.md), and the player's state of each achievement.
+export const GAME_ACHIEVEMENT_KEY_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+export const GAME_ACHIEVEMENT_ICON_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*\.svg$/;
+export const GAME_LANGUAGE_PATTERN = /^[a-z]{2}(_[A-Z]{2})?$/;
+
+const achievementKey = z.string().regex(GAME_ACHIEVEMENT_KEY_PATTERN);
+const achievementTexts = z
+  .record(z.string().regex(GAME_LANGUAGE_PATTERN), z.string().min(1))
+  .refine((texts) => !!texts.en, "English (en) is required");
+const achievementGoal = z.object({
+  target: z.number().int().min(2),
+  unit: z.enum(["count", "m", "s"]),
+});
+
+// The catalog file as the port writes it (format 1); `trigger` belongs to the port
+export const GameAchievementCatalogFileSchema = z.object({
+  format: z.literal(1),
+  game: gameSlug,
+  achievements: z
+    .array(
+      z.object({
+        key: achievementKey,
+        icon: z.string().regex(GAME_ACHIEVEMENT_ICON_PATTERN),
+        title: achievementTexts,
+        description: achievementTexts,
+        progress: achievementGoal.optional(),
+        hidden: z.boolean().optional(),
+        trigger: z.record(z.string(), z.unknown()),
+      })
+    )
+    .min(1),
+});
+export type IGameAchievementCatalogFile = z.infer<
+  typeof GameAchievementCatalogFileSchema
+>;
+
+// Texts are null for a hidden achievement the player has not unlocked
+export const GameAchievementSchema = z.object({
+  key: z.string(),
+  title: z.record(z.string(), z.string()).nullable(),
+  description: z.record(z.string(), z.string()).nullable(),
+  icon: z.string(),
+  hidden: z.boolean(),
+  progress: achievementGoal.nullable(),
+});
+export type IGameAchievement = z.infer<typeof GameAchievementSchema>;
+
+export const GameAchievementListSchema = z.object({
+  game: z.string(),
+  total: z.number().int().nonnegative(),
+  achievements: z.array(GameAchievementSchema),
+});
+export type IGameAchievementList = z.infer<typeof GameAchievementListSchema>;
+
+export const GamePlayerAchievementSchema = GameAchievementSchema.extend({
+  unlocked: z.boolean(),
+  unlockedAt: z.string().nullable(),
+  current: z.number().int().nonnegative().nullable(),
+});
+export type IGamePlayerAchievement = z.infer<typeof GamePlayerAchievementSchema>;
+
+export const GamePlayerAchievementsSchema = z.object({
+  game: z.string(),
+  userId: z.string(),
+  total: z.number().int().nonnegative(),
+  unlocked: z.number().int().nonnegative(),
+  achievements: z.array(GamePlayerAchievementSchema),
+});
+export type IGamePlayerAchievements = z.infer<typeof GamePlayerAchievementsSchema>;
+
+export const GameAchievementParamsSchema = z.object({
+  game: gameSlug,
+  key: achievementKey,
+});
+export type IGameAchievementParams = z.infer<typeof GameAchievementParamsSchema>;
+
+export const GameAchievementIconParamsSchema = z.object({
+  game: gameSlug,
+  icon: z.string().regex(GAME_ACHIEVEMENT_ICON_PATTERN),
+});
+export type IGameAchievementIconParams = z.infer<
+  typeof GameAchievementIconParamsSchema
+>;
+
+export const GameAchievementPlayerParamsSchema = z.object({
+  game: gameSlug,
+  userId: objectId,
+});
+export type IGameAchievementPlayerParams = z.infer<
+  typeof GameAchievementPlayerParamsSchema
+>;
+
+export const GamePlayerParamsSchema = z.object({ userId: objectId });
+export type IGamePlayerParams = z.infer<typeof GamePlayerParamsSchema>;
+
+// What the game reports: the unlock (once; repeating it changes nothing) and/or how far the
+// player is. `unlockedAt` — when it happened in the game, for unlocks sent later from a queue
+export const GameAchievementReportSchema = z
+  .object({
+    unlocked: z.literal(true).optional(),
+    unlockedAt: z.iso.datetime({ offset: true }).optional(),
+    current: z.number().int().nonnegative().max(2_000_000_000).optional(),
+  })
+  .refine(
+    (body) => body.unlocked !== undefined || body.current !== undefined,
+    "Send unlocked, current or both"
+  );
+export type IGameAchievementReport = z.infer<typeof GameAchievementReportSchema>;
+
+export const GamePlayerGameAchievementsSchema = z.object({
+  game: z.string(),
+  name: z.string(),
+  total: z.number().int().nonnegative(),
+  unlocked: z.number().int().nonnegative(),
+  lastUnlockedAt: z.string().nullable(),
+});
+export type IGamePlayerGameAchievements = z.infer<
+  typeof GamePlayerGameAchievementsSchema
+>;

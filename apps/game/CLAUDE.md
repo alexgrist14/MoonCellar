@@ -34,6 +34,16 @@ does and how to run it is in [`docs/game-service.md`](../../docs/game-service.md
   and challenges services turns documents that still have `level` into `rooftops` boards
   (`level-<n+1>`), then `syncIndexes` drops the old indexes. The update is idempotent.
 
+## Achievements
+
+- **A game's achievements are the port's catalog, copied as is** to
+  `src/games/<slug>/achievements.json` with its icons (`docs/game-service.md`, "Achievements");
+  texts are changed in the port's catalog and copied again, never edited here. `loadAchievements`
+  checks the catalog at startup.
+- **An unlock is written once and `current` only grows**: `$setOnInsert` and an update where
+  `unlockedAt` is `null` keep the first time, `$max` keeps the progress, so a game may repeat a
+  report safely.
+
 ## Accounts
 
 - **The service never verifies a game token itself: `AccountService` asks the API**
