@@ -109,10 +109,13 @@ with `revision`. Paths are up to four segments of `[A-Za-z0-9._-]`, never `.` or
 Files travel as raw bytes, not base64 in JSON: `main.ts` takes `application/octet-stream`
 bodies up to `GAME_STORAGE_MAX_FILE_BYTES` (8 MiB) and keeps JSON at 512 KiB.
 
-`rooftops` has two buckets: `save` — the game's progress, the files of the port's `Documents`
-folder (1 MiB each, 64 files, 4 MiB), and `skins` — the player's custom heroine models,
-`<skin>/<file>` (8 MiB each, 256 files, 64 MiB). The port syncs them on sign-in in its
-launcher and after a session, so a player can go on from another computer.
+`rooftops` has four buckets: `save` — the game's progress, the files of the port's `Documents`
+folder (1 MiB each, 64 files, 4 MiB); `skins` — the player's custom heroine models,
+`<skin>/<file>` (8 MiB each, 256 files, 64 MiB); `levels` — the levels the player made,
+`<level>/<file>` (512 KiB each, 400 files, 32 MiB); and `prefs` — the settings that travel between
+computers (language, sound, controls, the chosen skin) and the player's colour grading image
+(4 MiB each, 8 files, 8 MiB). The port syncs them on sign-in in its launcher and after a session,
+so a player can go on from another computer.
 
 ## Adding a game
 
