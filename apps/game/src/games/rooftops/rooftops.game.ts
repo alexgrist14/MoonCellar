@@ -6,6 +6,8 @@ import { checkLevel } from "./level";
 export const rooftops: IGameDefinition = {
   slug: "rooftops",
   name: "Rooftops",
+  // The iOS version's page in the site's catalogue
+  siteGame: "mirrors-edge",
   scoreOrder: "asc",
   scoreUnit: "ms",
   // The game's levels, and player levels `u<levelId>v<version>` (levelBoard)

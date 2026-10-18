@@ -1,0 +1,51 @@
+.port {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x3);
+
+  &__note {
+    margin: 0;
+    color: var(--color-text-muted);
+
+    @include font(13px, 18px, 400);
+  }
+
+  &__summary {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x1);
+  }
+
+  &__count {
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+
+    @include font(14px, 20px, 500);
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gap-x2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    @include mediaLg {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include mediaSm {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  &__item {
+    display: flex;
+    min-width: 0;
+
+    & > * {
+      flex: 1;
+    }
+  }
+}

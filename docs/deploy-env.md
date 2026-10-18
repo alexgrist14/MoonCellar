@@ -240,6 +240,8 @@ Two keys were set in production but referenced nowhere in the code — `NEXT_PUB
 |---|---|---|
 | `NEXT_PUBLIC_API_URL` | no | Public API URL used from the browser — `https://api.mooncellar.space` in production, `http://localhost:3228` in dev |
 | `INTERNAL_API_URL` | no | API URL used from server components and route handlers — `http://mooncellar-backend:3228`, the container name on the `mooncellar` network. Separate from the public one, and it must be set: the fallback points at the host gateway, where nothing listens |
+| `NEXT_PUBLIC_GAME_URL` | no | Public URL of the game service (`apps/game`), for the achievements of the MoonCellar Team ports on game pages and profiles; defaults to `https://game.mooncellar.space` |
+| `INTERNAL_GAME_URL` | no | The game service from server components — `http://mooncellar-game:3229` on the `mooncellar` network; unset, the server goes through the public URL |
 | `NEXT_PUBLIC_FRONT_URL` | no | Public URL of the site. Canonical links, sitemap and Open Graph URLs are built from it — a wrong value here is an SEO incident, not a cosmetic bug |
 | `NEXT_PUBLIC_CORS_SERVER` | no | Origin sent as the CORS credentials target; must match the API's `FRONT_URL` |
 | `NEXT_PUBLIC_APP_VERSION` | no | Version tag attached to every Faro event, so telemetry can be filtered by release |
@@ -379,6 +381,9 @@ NEXT_PUBLIC_API_URL=http://localhost:3228
 INTERNAL_API_URL=http://localhost:3228
 # Public URL of this app — canonical links, sitemap, Open Graph
 NEXT_PUBLIC_FRONT_URL=http://localhost:3000
+# Game service (apps/game) from the browser and from the server: ports' achievements
+NEXT_PUBLIC_GAME_URL=http://localhost:3229
+INTERNAL_GAME_URL=http://localhost:3229
 # Origin sent as the CORS credentials target
 NEXT_PUBLIC_CORS_SERVER=http://localhost:3000
 # Release tag attached to Faro telemetry

@@ -17,6 +17,8 @@ export type IGameStorageBucket = {
 export type IGameDefinition = {
   slug: string;
   name: string;
+  // The slug of the game's page on mooncellar.space (the API's catalogue), if the site has it
+  siteGame?: string;
   scoreOrder: "asc" | "desc";
   scoreUnit: "ms" | "points";
   board: RegExp;

@@ -23,12 +23,15 @@ import { GameMultiplayer } from "@/src/lib/entities/game/ui/GameMultiplayer";
 import { GameCharacters } from "@/src/lib/widgets/game/GameCharacters";
 import { GameRelated } from "@/src/lib/widgets/game/GameRelated";
 import { GameCommunity } from "@/src/lib/features/game/ui/GameCommunity";
+import { GamePortAchievements } from "@/src/lib/widgets/game/GamePortAchievements";
+import { IPortGameAchievements } from "@/src/lib/entities/port-achievement/model";
 
 interface IGamePageProps {
   game: IGameResponse;
   stats?: IGameStats;
   reviews?: IReviewsResponse;
   related?: IRelatedGamesResponse;
+  portAchievements?: IPortGameAchievements;
 }
 
 export const GamePage: FC<IGamePageProps> = ({
@@ -36,6 +39,7 @@ export const GamePage: FC<IGamePageProps> = ({
   stats,
   reviews,
   related,
+  portAchievements,
 }) => {
   const hideMedia = useHideAdult() && isAdultGame(game);
 
@@ -45,12 +49,19 @@ export const GamePage: FC<IGamePageProps> = ({
       <GameHero game={game} stats={stats} />
       <div className={styles.page__columns}>
         <GameOverview game={game} className={styles.page__columnWide} />
-        <GameScoreColumn game={game} className={styles.page__column} />
+        <GameScoreColumn
+          game={game}
+          portAchievementsTotal={portAchievements?.total}
+          className={styles.page__column}
+        />
         <GameSideColumn game={game} className={styles.page__column} />
       </div>
       {!hideMedia && <GameMedia game={game} />}
       {!hideMedia && (
         <GameCharacters characters={game.characters} gameId={game._id} />
+      )}
+      {!!portAchievements && (
+        <GamePortAchievements achievements={portAchievements} />
       )}
       <GameDetails game={game} />
       <GameRelated related={related} />

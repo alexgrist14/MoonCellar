@@ -6,6 +6,16 @@ export const API_URL =
 export const FRONT_URL =
   process.env.NEXT_PUBLIC_FRONT_URL || "https://mooncellar.space";
 
+// The game service of the MoonCellar Team ports (apps/game): their achievements. Links and icons
+// in the page always take the public address; server components may reach the container directly
+export const GAME_PUBLIC_URL =
+  process.env.NEXT_PUBLIC_GAME_URL || "https://game.mooncellar.space";
+
+export const GAME_URL =
+  typeof window === "undefined"
+    ? process.env.INTERNAL_GAME_URL || GAME_PUBLIC_URL
+    : GAME_PUBLIC_URL;
+
 export const ACCESS_TOKEN = "accessMoonToken";
 export const REFRESH_TOKEN = "refreshMoonToken";
 

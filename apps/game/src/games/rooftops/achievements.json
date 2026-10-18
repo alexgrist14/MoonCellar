@@ -135,7 +135,8 @@
     "unit": "m"
    },
    "trigger": {
-    "index": 7
+    "index": 7,
+    "metric": "runDist"
    }
   },
   {
@@ -154,7 +155,8 @@
     "unit": "m"
    },
    "trigger": {
-    "index": 8
+    "index": 8,
+    "metric": "wallRunDist"
    }
   },
   {
@@ -173,7 +175,8 @@
     "unit": "m"
    },
    "trigger": {
-    "index": 9
+    "index": 9,
+    "metric": "climbDist"
    }
   },
   {
@@ -192,7 +195,8 @@
     "unit": "m"
    },
    "trigger": {
-    "index": 10
+    "index": 10,
+    "metric": "ziplineDist"
    }
   },
   {
@@ -211,7 +215,8 @@
     "unit": "m"
    },
    "trigger": {
-    "index": 11
+    "index": 11,
+    "metric": "slideDist"
    }
   },
   {
@@ -230,7 +235,8 @@
     "unit": "m"
    },
    "trigger": {
-    "index": 12
+    "index": 12,
+    "metric": "balanceDist"
    }
   },
   {
@@ -249,7 +255,8 @@
     "unit": "m"
    },
    "trigger": {
-    "index": 13
+    "index": 13,
+    "metric": "fallDist"
    }
   },
   {
@@ -279,7 +286,8 @@
     "ru": "Обезвредьте противника."
    },
    "trigger": {
-    "index": 15
+    "index": 15,
+    "metric": "kills"
    }
   },
   {
@@ -298,7 +306,8 @@
     "unit": "count"
    },
    "trigger": {
-    "index": 16
+    "index": 16,
+    "metric": "kills"
    }
   },
   {
@@ -328,7 +337,8 @@
     "ru": "Отберите оружие у противника."
    },
    "trigger": {
-    "index": 18
+    "index": 18,
+    "metric": "disarms"
    }
   },
   {
@@ -347,7 +357,8 @@
     "unit": "count"
    },
    "trigger": {
-    "index": 19
+    "index": 19,
+    "metric": "disarms"
    }
   },
   {
@@ -362,7 +373,8 @@
     "ru": "Обезвредьте соперника-бегуна."
    },
    "trigger": {
-    "index": 20
+    "index": 20,
+    "metric": "rivalKills"
    }
   },
   {
@@ -381,7 +393,8 @@
     "unit": "count"
    },
    "trigger": {
-    "index": 21
+    "index": 21,
+    "metric": "rivalKills"
    }
   },
   {
@@ -396,7 +409,8 @@
     "ru": "Сбросьте противника с уступа."
    },
    "trigger": {
-    "index": 22
+    "index": 22,
+    "metric": "enemyFalls"
    }
   },
   {
@@ -415,7 +429,8 @@
     "unit": "count"
    },
    "trigger": {
-    "index": 23
+    "index": 23,
+    "metric": "enemyFalls"
    }
   },
   {

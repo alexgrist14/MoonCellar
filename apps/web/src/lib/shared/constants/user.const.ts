@@ -40,6 +40,7 @@ export const PROFILE_BLOCK_LABELS: Record<IProfileBlock, string> = {
   favoriteCharacters: "Favourite characters",
   retroachievements: "RetroAchievements",
   steam: "Steam",
+  ports: "MoonCellar Team ports",
   lists: "Lists",
   likedLists: "Liked lists",
   activity: "Activity",

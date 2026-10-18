@@ -1,0 +1,35 @@
+.icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  border-radius: var(--radius-x3);
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-muted);
+
+  &::before {
+    content: "";
+    width: 55%;
+    height: 55%;
+    background-color: currentColor;
+    mask: var(--port-achievement-icon) center / contain no-repeat;
+  }
+
+  &_sm {
+    border-radius: var(--radius-x2);
+  }
+
+  &_unlocked {
+    background-color: var(--color-bg-accent);
+    color: var(--color-text-primary);
+  }
+}
+
+:where(.icon_md) {
+  width: var(--achievements-icon-size);
+}
+
+:where(.icon_sm) {
+  width: var(--port-achievement-icon-size-sm);
+}
