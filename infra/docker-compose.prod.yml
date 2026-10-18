@@ -99,42 +99,6 @@ services:
     networks:
       - mooncellar
 
-  gitlab:
-    image: gitlab/gitlab-ce:19.4.2-ce.0
-    container_name: gitlab
-    hostname: gitlab.mooncellar.space
-    restart: always
-    shm_size: 256m
-    ports:
-      # Web behind the host nginx (TLS there); Git over SSH on 2222, the host sshd keeps 22.
-      - "127.0.0.1:8929:80"
-      - "2222:22"
-    environment:
-      GITLAB_OMNIBUS_CONFIG: |
-        external_url 'https://gitlab.mooncellar.space'
-        nginx['listen_port'] = 80
-        nginx['listen_https'] = false
-        nginx['real_ip_trusted_addresses'] = ['127.0.0.1', '172.16.0.0/12']
-        nginx['real_ip_header'] = 'X-Forwarded-For'
-        nginx['real_ip_recursive'] = 'on'
-        letsencrypt['enable'] = false
-        gitlab_rails['gitlab_shell_ssh_port'] = 2222
-        gitlab_rails['usage_ping_enabled'] = false
-        puma['worker_processes'] = 0
-        sidekiq['concurrency'] = 10
-        prometheus_monitoring['enable'] = false
-        registry['enable'] = false
-        gitlab_pages['enable'] = false
-        gitlab_kas['enable'] = false
-        gitlab_rails['env'] = { 'MALLOC_CONF' => 'dirty_decay_ms:1000,muzzy_decay_ms:1000' }
-        gitaly['env'] = { 'MALLOC_CONF' => 'dirty_decay_ms:1000,muzzy_decay_ms:1000', 'GITALY_COMMAND_SPAWN_MAX_PARALLEL' => '2' }
-    volumes:
-      - gitlab_config:/etc/gitlab
-      - gitlab_logs:/var/log/gitlab
-      - gitlab_data:/var/opt/gitlab
-    # Caps GitLab so a memory spike cannot push MongoDB and the apps out.
-    mem_limit: 4g
-
   coturn:
     image: coturn/coturn:4.18.0
     container_name: coturn
@@ -172,9 +136,6 @@ services:
 
 volumes:
   loki_data:
-  gitlab_config:
-  gitlab_logs:
-  gitlab_data:
 
 networks:
   mooncellar:
