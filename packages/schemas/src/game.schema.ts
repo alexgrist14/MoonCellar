@@ -274,3 +274,53 @@ export const GameLevelReportedSchema = GameLevelSchema.extend({
   ),
 });
 export type IGameLevelReported = z.infer<typeof GameLevelReportedSchema>;
+
+export const GAME_STORAGE_MAX_FILE_BYTES = 8 * 1024 * 1024;
+export const GAME_STORAGE_BUCKET_PATTERN = /^[a-z][a-z0-9-]{0,31}$/;
+export const GAME_STORAGE_PATH_PATTERN =
+  /^(?!.*(^|\/)\.{1,2}(\/|$))[A-Za-z0-9._-]{1,100}(\/[A-Za-z0-9._-]{1,100}){0,3}$/;
+
+const storagePath = z.string().regex(GAME_STORAGE_PATH_PATTERN);
+
+export const GameStorageParamsSchema = z.object({
+  game: gameSlug,
+  bucket: z.string().regex(GAME_STORAGE_BUCKET_PATTERN),
+});
+export type IGameStorageParams = z.infer<typeof GameStorageParamsSchema>;
+
+export const GameStorageFileQuerySchema = z.object({
+  path: storagePath,
+});
+export type IGameStorageFileQuery = z.infer<typeof GameStorageFileQuerySchema>;
+
+export const GameStorageWriteQuerySchema = GameStorageFileQuerySchema.extend({
+  revision: z.coerce.number().int().nonnegative().optional(),
+});
+export type IGameStorageWriteQuery = z.infer<typeof GameStorageWriteQuerySchema>;
+
+export const GameStorageFileSchema = z.object({
+  path: z.string(),
+  size: z.number().int().nonnegative(),
+  sha256: z.string(),
+  updatedAt: z.string(),
+});
+export type IGameStorageFile = z.infer<typeof GameStorageFileSchema>;
+
+export const GameStorageListSchema = z.object({
+  game: z.string(),
+  bucket: z.string(),
+  revision: z.number().int().nonnegative(),
+  usedBytes: z.number().int().nonnegative(),
+  maxBytes: z.number().int().positive(),
+  maxFileBytes: z.number().int().positive(),
+  maxFiles: z.number().int().positive(),
+  files: z.array(GameStorageFileSchema),
+});
+export type IGameStorageList = z.infer<typeof GameStorageListSchema>;
+
+export const GameStorageWriteResultSchema = z.object({
+  revision: z.number().int().nonnegative(),
+  usedBytes: z.number().int().nonnegative(),
+  file: GameStorageFileSchema.nullable(),
+});
+export type IGameStorageWriteResult = z.infer<typeof GameStorageWriteResultSchema>;

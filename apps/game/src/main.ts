@@ -1,4 +1,5 @@
 import { NestFactory } from "@nestjs/core";
+import { GAME_STORAGE_MAX_FILE_BYTES } from "@mooncellar/schemas";
 import { type NestExpressApplication } from "@nestjs/platform-express";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { cleanupOpenApiDoc } from "nestjs-zod";
@@ -12,6 +13,10 @@ async function bootstrap() {
   });
   app.set("trust proxy", true);
   app.useBodyParser("json", { limit: "512kb" });
+  app.useBodyParser("raw", {
+    type: "application/octet-stream",
+    limit: GAME_STORAGE_MAX_FILE_BYTES,
+  });
   app.enableCors({ origin: getCorsOrigins() });
   app.useLogger(app.get(Logger));
 

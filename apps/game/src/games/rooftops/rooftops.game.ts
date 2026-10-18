@@ -26,4 +26,16 @@ export const rooftops: IGameDefinition = {
     maxBytes: 128 * 1024,
     check: checkLevel,
   },
+  storage: {
+    save: {
+      maxFileBytes: 1024 * 1024,
+      maxFiles: 64,
+      maxBytes: 4 * 1024 * 1024,
+    },
+    skins: {
+      maxFileBytes: 8 * 1024 * 1024,
+      maxFiles: 256,
+      maxBytes: 64 * 1024 * 1024,
+    },
+  },
 };

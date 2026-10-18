@@ -36,6 +36,10 @@ port of a rooftop-running game from the decompilation project.
 | `POST` | `/games/:game/levels/:levelId/report`               | Game token. `{ reason }`; three players reporting a level hide it: `{ reported, hidden }`                                                                                                                                                                                            |
 | `GET`  | `/games/:game/levels/reported`                      | `MODERATION_TOKEN`. Reported and hidden levels with their reports                                                                                                                                                                                                                    |
 | `PUT`  | `/games/:game/levels/:levelId/moderation`           | `MODERATION_TOKEN`. `{ hidden }`; showing a level again clears its reports                                                                                                                                                                                                           |
+| `GET`  | `/games/:game/storage/:bucket`                      | Game token. The player's files in a storage bucket of the game, without data: `{ game, bucket, revision, usedBytes, maxBytes, maxFileBytes, maxFiles, files: [{ path, size, sha256, updatedAt }] }`; 404 for a bucket the game does not have (see "Cloud storage") |
+| `GET`  | `/games/:game/storage/:bucket/file?path=`           | Game token. The file as raw bytes (`application/octet-stream`), with `X-Content-SHA256` and `Last-Modified` |
+| `PUT`  | `/games/:game/storage/:bucket/file?path=&revision=` | Game token. Writes the file from a raw `application/octet-stream` body (up to 8 MiB): `{ revision, usedBytes, file }`; with `revision`, 409 unless the bucket is still at it; 422 past the bucket's limits |
+| `DELETE` | `/games/:game/storage/:bucket/file?path=&revision=` | Game token. Deletes the file: `{ revision, usedBytes, file: null }` |
 | `GET`  | `/api`                                              | Swagger UI and the OpenAPI document of the service                                                                                                                                                                                                                                   |
 | `GET`  | `/metrics`                                          | Prometheus metrics, behind `Authorization: Bearer <METRICS_TOKEN>`                                                                                                                                                                                                                   |
 
@@ -93,6 +97,23 @@ Reports hide a level after three different players; a moderator sees them at
 `/games/:game/levels/reported` and hides or shows a level with `…/moderation`, both behind
 `MODERATION_TOKEN`. Ratings are 1–5 stars, one per player; `rating` is their average.
 
+## Cloud storage
+
+A game that keeps files in the player's account has `storage` in its definition: buckets by name,
+each with `maxFileBytes`, `maxFiles` and `maxBytes`. The service stores a file as it is
+(`storage_files`, one document per file, `data` with `select: false`) under the player's id, and
+never reads it. A bucket's `revision` (`storage_buckets`) grows with every write and delete, so
+a game can tell whether anything changed since it last looked, and can make a write conditional
+with `revision`. Paths are up to four segments of `[A-Za-z0-9._-]`, never `.` or `..`.
+
+Files travel as raw bytes, not base64 in JSON: `main.ts` takes `application/octet-stream`
+bodies up to `GAME_STORAGE_MAX_FILE_BYTES` (8 MiB) and keeps JSON at 512 KiB.
+
+`rooftops` has two buckets: `save` — the game's progress, the files of the port's `Documents`
+folder (1 MiB each, 64 files, 4 MiB), and `skins` — the player's custom heroine models,
+`<skin>/<file>` (8 MiB each, 256 files, 64 MiB). The port syncs them on sign-in in its
+launcher and after a session, so a player can go on from another computer.
+
 ## Adding a game
 
 1. Pick a slug (`[a-z][a-z0-9-]`, up to 32 characters) and add `src/games/<slug>/<slug>.game.ts`
@@ -101,7 +122,9 @@ Reports hide a level after three different players; a moderator sees them at
    uses — and `replay` (`required`, `maxBytes`, an optional `check`).
 2. Register it in `GAMES` in `src/games/games.ts`. Nothing else changes: the routes, the
    collections and the challenges take the slug from the URL.
-3. A replay check reads only the replays and the score. Game data (levels, assets) belongs to
+3. Files the game keeps in the player's account go in `storage` (see "Cloud storage"); a
+   bucket name is `[a-z][a-z0-9-]`, up to 32 characters.
+4. A replay check reads only the replays and the score. Game data (levels, assets) belongs to
    the game's publisher and never enters this repository.
 
 ## Match signalling

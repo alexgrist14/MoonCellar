@@ -30,6 +30,12 @@ import {
   GameReplaySchema,
   GameSubmitResultSchema,
   GameSubmitScoreSchema,
+  GameStorageFileQuerySchema,
+  GameStorageFileSchema,
+  GameStorageListSchema,
+  GameStorageParamsSchema,
+  GameStorageWriteQuerySchema,
+  GameStorageWriteResultSchema,
 } from "@mooncellar/schemas";
 
 export class GameHealthDto extends createZodDto(GameHealthSchema) {}
@@ -109,3 +115,21 @@ export class GameLevelModerationDto extends createZodDto(
 ) {}
 
 export class GameLevelReportedDto extends createZodDto(GameLevelReportedSchema) {}
+
+export class GameStorageParamsDto extends createZodDto(GameStorageParamsSchema) {}
+
+export class GameStorageFileQueryDto extends createZodDto(
+  GameStorageFileQuerySchema
+) {}
+
+export class GameStorageWriteQueryDto extends createZodDto(
+  GameStorageWriteQuerySchema
+) {}
+
+export class GameStorageFileDto extends createZodDto(GameStorageFileSchema) {}
+
+export class GameStorageListDto extends createZodDto(GameStorageListSchema) {}
+
+export class GameStorageWriteResultDto extends createZodDto(
+  GameStorageWriteResultSchema
+) {}
