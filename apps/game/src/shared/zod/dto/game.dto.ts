@@ -1,6 +1,15 @@
 import { createZodDto } from "nestjs-zod";
 import {
   GameAccountSchema,
+  GameAchievementIconParamsSchema,
+  GameAchievementListSchema,
+  GameAchievementParamsSchema,
+  GameAchievementPlayerParamsSchema,
+  GameAchievementReportSchema,
+  GamePlayerAchievementSchema,
+  GamePlayerAchievementsSchema,
+  GamePlayerGameAchievementsSchema,
+  GamePlayerParamsSchema,
   GameBoardParamsSchema,
   GameChallengeCreateSchema,
   GameChallengeParamsSchema,
@@ -132,4 +141,38 @@ export class GameStorageListDto extends createZodDto(GameStorageListSchema) {}
 
 export class GameStorageWriteResultDto extends createZodDto(
   GameStorageWriteResultSchema
+) {}
+
+export class GameAchievementListDto extends createZodDto(
+  GameAchievementListSchema
+) {}
+
+export class GameAchievementParamsDto extends createZodDto(
+  GameAchievementParamsSchema
+) {}
+
+export class GameAchievementIconParamsDto extends createZodDto(
+  GameAchievementIconParamsSchema
+) {}
+
+export class GameAchievementPlayerParamsDto extends createZodDto(
+  GameAchievementPlayerParamsSchema
+) {}
+
+export class GamePlayerParamsDto extends createZodDto(GamePlayerParamsSchema) {}
+
+export class GameAchievementReportDto extends createZodDto(
+  GameAchievementReportSchema
+) {}
+
+export class GamePlayerAchievementDto extends createZodDto(
+  GamePlayerAchievementSchema
+) {}
+
+export class GamePlayerAchievementsDto extends createZodDto(
+  GamePlayerAchievementsSchema
+) {}
+
+export class GamePlayerGameAchievementsDto extends createZodDto(
+  GamePlayerGameAchievementsSchema
 ) {}

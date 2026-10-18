@@ -5,7 +5,7 @@
 container and in development) and keeps its data in the `game` database of the stack's MongoDB.
 
 It is not tied to one game. Sign-in, friends and match signalling are shared by every port;
-leaderboards and challenges live under `/games/:game/…`, where `:game` is a slug registered in
+leaderboards, challenges and achievements live under `/games/:game/…`, where `:game` is a slug registered in
 `src/games/games.ts` (see "Adding a game"). The first registered game is `rooftops`, the
 port of a rooftop-running game from the decompilation project.
 
@@ -40,6 +40,12 @@ port of a rooftop-running game from the decompilation project.
 | `GET`  | `/games/:game/storage/:bucket/file?path=`           | Game token. The file as raw bytes (`application/octet-stream`), with `X-Content-SHA256` and `Last-Modified` |
 | `PUT`  | `/games/:game/storage/:bucket/file?path=&revision=` | Game token. Writes the file from a raw `application/octet-stream` body (up to 8 MiB): `{ revision, usedBytes, file }`; with `revision`, 409 unless the bucket is still at it; 422 past the bucket's limits |
 | `DELETE` | `/games/:game/storage/:bucket/file?path=&revision=` | Game token. Deletes the file: `{ revision, usedBytes, file: null }` |
+| `GET`  | `/games/:game/achievements`                         | The game's achievements in its order: `{ game, total, achievements: [{ key, title, description, icon, hidden, progress }] }` — `title` and `description` by language (`en` always), `null` for a hidden achievement; `icon` — the path of its SVG on this service; `progress` — `{ target, unit }` of a counter, or `null`; 404 for a game without achievements (see "Achievements") |
+| `GET`  | `/games/:game/achievements/icons/:icon`             | An achievement icon as `image/svg+xml`: a 24×24 outline in `currentColor`, coloured by the page |
+| `GET`  | `/games/:game/achievements/me`                      | Game token. The player's achievements of the game: `{ game, userId, total, unlocked, achievements }`, each with `unlocked`, `unlockedAt` and `current` |
+| `GET`  | `/games/:game/achievements/players/:userId`         | The same for any player, for the profile |
+| `PUT`  | `/games/:game/achievements/:key`                    | Game token. Reports `{ unlocked?: true, unlockedAt?, current? }`: the unlock is kept once, with its first time (`unlockedAt` — the game's time of an unlock it queued offline, taken when it is no older than 400 days and not ahead of the server); `current` only grows; repeating a report changes nothing. Answers the achievement as in `…/me`; 404 for a key the game does not have |
+| `GET`  | `/achievements/players/:userId`                     | The games with achievements a player has started: `[{ game, name, total, unlocked, lastUnlockedAt }]` |
 | `GET`  | `/api`                                              | Swagger UI and the OpenAPI document of the service                                                                                                                                                                                                                                   |
 | `GET`  | `/metrics`                                          | Prometheus metrics, behind `Authorization: Bearer <METRICS_TOKEN>`                                                                                                                                                                                                                   |
 
@@ -119,6 +125,31 @@ computers (language, sound, controls, the chosen skin) and the player's colour g
 (4 MiB each, 8 files, 8 MiB). The port syncs them on sign-in in its launcher and after a session,
 so a player can go on from another computer.
 
+## Achievements
+
+Unlike Steam and RetroAchievements, which MoonCellar knows only by counts, the ports report
+every achievement. A game's set is a catalog in the format shared by every port (the port
+project's `docs/achievements.md`): `format`, `game`, and per achievement a `key`, `title` and
+`description` by language, an `icon`, optional `progress` (`{ target, unit }` of a counter) and
+`hidden`, and the port's own `trigger`, which the service neither reads nor returns.
+
+- **The catalog comes from the port.** Its source is the port's `config/achievements/<game>.json`
+  with the icons next to it; the service keeps a copy beside the game's definition
+  (`src/games/<slug>/achievements.json`, icons in `src/games/<slug>/achievements/`), loaded by
+  `loadAchievements` at startup. A catalog that does not hold up — a repeated key, a missing
+  English text, languages that differ between achievements, an icon that is not a 24×24
+  `currentColor` outline of paths, an icon no achievement uses — stops the service from starting,
+  so `check:boot` catches it.
+- **Keys are for ever.** Unlocks are stored by key: a key is never renamed or given to another
+  achievement; a new achievement gets a new key.
+- **Texts and icons are the team's own.** `en` is required, as the site is English only; the
+  port shows the player's language. Never the game's own texts or art: they belong to its
+  publisher (rule 5 of "Adding a game").
+- **A player's state** is one document of `achievement_states` per player and achievement. The
+  unlock is written once — on insert, or where `unlockedAt` is still `null` — so the first time
+  stays; `current` changes only through `$max`. Two first reports at once meet the unique index,
+  and the second one updates instead.
+
 ## Adding a game
 
 1. Pick a slug (`[a-z][a-z0-9-]`, up to 32 characters) and add `src/games/<slug>/<slug>.game.ts`
@@ -129,7 +160,10 @@ so a player can go on from another computer.
    collections and the challenges take the slug from the URL.
 3. Files the game keeps in the player's account go in `storage` (see "Cloud storage"); a
    bucket name is `[a-z][a-z0-9-]`, up to 32 characters.
-4. A replay check reads only the replays and the score. Game data (levels, assets) belongs to
+4. Achievements: copy the port's catalog to `src/games/<slug>/achievements.json` and its icons to
+   `src/games/<slug>/achievements/`, and set `achievements: loadAchievements(__dirname, "<slug>")`
+   (see "Achievements").
+5. A replay check reads only the replays and the score. Game data (levels, assets) belongs to
    the game's publisher and never enters this repository.
 
 ## Match signalling
