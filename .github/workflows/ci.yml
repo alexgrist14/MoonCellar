@@ -125,6 +125,8 @@ jobs:
 
       - name: Build images
         if: env.BUILDS_IMAGES == 'true'
+        env:
+          TURN_SECRET: ${{ secrets.TURN_SECRET }}
         run: |
           IMAGES=""
 
@@ -148,6 +150,9 @@ jobs:
 
           if [ "$DEPLOY_GAME" = "true" ]; then
             echo "${{ secrets.HOST_ENV_GAME }}" > apps/game/.env;
+            if [ -n "$TURN_SECRET" ]; then
+              printf 'TURN_SECRET=%s\nTURN_URLS=game.mooncellar.space:3478\n' "$TURN_SECRET" >> apps/game/.env
+            fi
             docker build \
               -f apps/game/Dockerfile \
               -t mooncellar-game:latest \
@@ -191,8 +196,13 @@ jobs:
 
       - name: Prepare infra files
         if: needs.changes.outputs.infra == 'true'
+        env:
+          TURN_SECRET: ${{ secrets.TURN_SECRET }}
         run: |
           echo "${{ secrets.HOST_ENV_INFRA }}" > infra/.env
+          if [ -n "$TURN_SECRET" ]; then
+            printf 'TURN_SECRET=%s\n' "$TURN_SECRET" >> infra/.env
+          fi
           grep -E '^METRICS_TOKEN=' infra/.env | cut -d= -f2- > infra/prometheus/metrics_token
           test -s infra/prometheus/metrics_token
 
@@ -221,6 +231,13 @@ jobs:
 
             if [ "$DEPLOY_INFRA" = "true" ]; then
               docker compose -f /opt/mooncellar/infra/docker-compose.prod.yml up -d
+
+              UFW=ufw
+              [ "$(id -u)" = 0 ] || UFW="sudo -n ufw"
+              if command -v ufw >/dev/null 2>&1 && $UFW status 2>/dev/null | grep -q "Status: active"; then
+                $UFW allow 3478/udp >/dev/null && $UFW allow 49160:49200/udp >/dev/null \
+                  || echo "ufw: could not open the coturn ports, allow UDP 3478 and 49160:49200 by hand"
+              fi
 
               NGINX_NEW=/opt/mooncellar/infra/nginx/mooncellar.conf
               NGINX_LIVE=/etc/nginx/conf.d/mooncellar.conf

@@ -21,6 +21,7 @@ Repository settings → Secrets and variables → Actions → *Repository secret
 | `SSH_HOST` | both workflows | Production host the image is copied to and deployed on |
 | `SSH_USER` | both workflows | SSH user on the production host. It must reach the root Docker daemon — `root` itself, or a user in the `docker` group |
 | `SSH_PRIVATE_KEY` | both workflows | Private key for that user, no passphrase |
+| `TURN_SECRET` | ci.yml deploy | Optional. coturn's REST `static-auth-secret` (random, `openssl rand -hex 32`). The deploy appends it to `infra/.env` and to `apps/game/.env` together with `TURN_URLS=game.mooncellar.space:3478`, so it stays one value; without it the relay is off ([game-service.md](game-service.md#turn-relay)). Create it with `gh secret set TURN_SECRET --body "$(openssl rand -hex 32)"`, then deploy infra and game (`gh workflow run ci.yml --ref main`) |
 
 If the API and the site ever move to different hosts, these split the same way as everything
 below (`SSH_HOST_WEB` / `SSH_HOST_API`).
@@ -105,7 +106,7 @@ refuses to start rather than fall back to `admin`.
 | `PROMETHEUS_DATA_DIR` | no | Host directory bind-mounted as `/prometheus` — `/home/admin/prometheus` on the old host. Seven days of metrics history; losing it is survivable, keeping it is one line |
 | `METRICS_TOKEN` | **yes** | Bearer token Prometheus sends when scraping the API's `/metrics`. Must be byte-identical to the API's own `METRICS_TOKEN`, or every scrape is a 401 |
 | `SEARXNG_SECRET` | **yes** | SearXNG's `server.secret_key` (`openssl rand -hex 32`). `infra/searxng/settings.yml` is committed without it, so the key never lands in git |
-| `TURN_SECRET` | **yes** | Optional, unlike the keys above. coturn's `static-auth-secret` (`openssl rand -hex 32`), byte-identical to `TURN_SECRET` of `HOST_ENV_GAME`. Without it the `coturn` container only logs that the relay is off. With it the host firewall must let in UDP 3478 and UDP 49160–49200: coturn runs on the host network, so `ufw` filters it (`ufw allow 3478/udp`, `ufw allow 49160:49200/udp`) |
+| `TURN_SECRET` | **yes** | Not here: the deploy appends it from the `TURN_SECRET` repository secret. Without it the `coturn` container only logs that the relay is off. coturn runs on the host network, so `ufw` filters it: the infra deploy opens UDP 3478 and 49160–49200 when ufw is active and `SSH_USER` may run it (root, or passwordless sudo); otherwise `ufw allow 3478/udp` and `ufw allow 49160:49200/udp` by hand, and the provider's firewall in any case |
 | `TURN_REALM` | no | Optional realm coturn announces, `game.mooncellar.space` by default |
 | `TURN_EXTERNAL_IP` | no | Optional public address of the host when it sits behind 1:1 NAT (a cloud VM whose interface has a private address); leave it empty when the public address is on the interface |
 
@@ -303,8 +304,7 @@ deployed whenever `apps/game/**`, `packages/**`, `package.json` or `bun.lock` ch
 | `PROMETHEUS_ENABLED` | no | `true` / `false` — default process metrics on `/metrics` |
 | `METRICS_TOKEN` | **yes** | Bearer token guarding `/metrics`. Must equal `METRICS_TOKEN` of `HOST_ENV_INFRA`: Prometheus scrapes the job `mooncellar-game` with the same credentials file as the API |
 | `MODERATION_TOKEN` | **yes** | Bearer token of the player-level moderation endpoints (`/games/:game/levels/reported`, `…/moderation`, [game-service.md](game-service.md#player-levels)). Without it nobody can hide or show a level; reports still hide one after three |
-| `TURN_SECRET` | **yes** | Must equal `TURN_SECRET` of `HOST_ENV_INFRA`. With `TURN_URLS` the signalling hands players time-limited TURN credentials ([game-service.md](game-service.md#turn-relay)); without either, players connect only directly |
-| `TURN_URLS` | no | `game.mooncellar.space:3478` — the coturn host and port, comma-separated if several |
+| `TURN_SECRET`, `TURN_URLS` | **yes** | Not here: the deploy appends both from the `TURN_SECRET` repository secret (`TURN_URLS=game.mooncellar.space:3478`). With them the signalling hands players time-limited TURN credentials ([game-service.md](game-service.md#turn-relay)); without them players connect only directly |
 
 Before the first deploy of the service:
 
