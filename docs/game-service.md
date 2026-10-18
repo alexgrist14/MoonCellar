@@ -155,7 +155,8 @@ every 30 seconds and drops a socket that misses a pong; nginx keeps an idle sock
 
 When the two players' networks block a direct path (NAT traversal fails), the game relays its
 traffic through the `coturn` service of `infra/docker-compose.prod.yml`. With `TURN_SECRET` and
-`TURN_URLS` set, `hosted`, `joined` and `peer` carry
+`TURN_URLS` set (in production the deploy writes both from the `TURN_SECRET` repository secret),
+`hosted`, `joined` and `peer` carry
 `turn: { urls, username, credential, ttl }` — coturn REST credentials (`use-auth-secret`):
 `username` is `<expiry unix time>:<room code>`, `credential` is base64 HMAC-SHA1 of it with
 `TURN_SECRET`, valid for `ttl` seconds (12 hours). Without them the field is absent and players
