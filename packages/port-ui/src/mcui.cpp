@@ -271,10 +271,13 @@ bool Toggle(const char* label, bool* value) {
 
 bool Segmented(const char* id, const char* const* items, int count, int* current) {
     ImGui::PushID(id);
-    const float pad = kPaddingX0_5 * s_scale;
+    // Padding and gap of one step: the selected segment never touches the track or its neighbours, and
+    // the track's radius (x4) is the segment's (x3) plus the padding, so the corners stay concentric
+    const float pad = kPaddingX1 * s_scale;
+    const float gap = kPaddingX1 * s_scale;
     const float h = ImGui::GetFrameHeight();
     const ImGuiStyle& style = ImGui::GetStyle();
-    float width = pad * 2;
+    float width = pad * 2 + gap * (count > 1 ? count - 1 : 0);
     for (int i = 0; i < count; i++) width += ImGui::CalcTextSize(items[i]).x + style.FramePadding.x * 2;
     ImVec2 p = ImGui::GetCursorScreenPos();
     ImDrawList* dl = ImGui::GetWindowDrawList();
@@ -300,7 +303,7 @@ bool Segmented(const char* id, const char* const* items, int count, int* current
         ImVec2 ts = ImGui::CalcTextSize(items[i]);
         dl->AddText(ImVec2(x + (w - ts.x) * 0.5f, p.y + pad + (h - ts.y) * 0.5f),
                     Packed(chosen ? kColorAccent : kColorTextPrimary), items[i]);
-        x += w;
+        x += w + gap;
     }
     ImGui::PopFont();
     ImGui::SetCursorScreenPos(p);
