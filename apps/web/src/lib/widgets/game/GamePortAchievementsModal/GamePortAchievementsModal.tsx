@@ -37,7 +37,7 @@ export const GamePortAchievementsModal: FC<IGamePortAchievementsModalProps> = ({
 
   return (
     <Box
-      title="MoonCellar Team port"
+      title={achievements.port.name}
       titleCount={achievements.total}
       isTitleStart
       onClose={() => modal.close(GAME_PORT_ACHIEVEMENTS_MODAL_ID)}
@@ -47,8 +47,9 @@ export const GamePortAchievementsModal: FC<IGamePortAchievementsModalProps> = ({
     >
       <div className={styles.port}>
         <p className={styles.port__note}>
-          Achievements of the PC port by MoonCellar Team. They unlock in the
-          game and reach this page through the player&apos;s MoonCellar account.
+          Achievements of {achievements.port.name}, the PC port by MoonCellar
+          Team. They unlock in the game and reach this page through the
+          player&apos;s MoonCellar account.
         </p>
         {!!player && (
           <div className={styles.port__summary}>

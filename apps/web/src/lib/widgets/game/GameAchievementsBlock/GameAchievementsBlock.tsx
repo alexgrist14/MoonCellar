@@ -49,7 +49,7 @@ export const GameAchievementsBlock: FC<IGameAchievementsBlockProps> = ({
     ...(portAchievements && portTotal
       ? [
           {
-            label: "MoonCellar Team port",
+            label: portAchievements.port.name,
             value: portTotal,
             icon: (
               <Image
@@ -59,7 +59,7 @@ export const GameAchievementsBlock: FC<IGameAchievementsBlockProps> = ({
                 height={16}
               />
             ),
-            title: `${portTotal} achievements in the PC port by MoonCellar Team`,
+            title: `${portTotal} achievements in ${portAchievements.port.name}, the PC port by MoonCellar Team`,
             onClick: () =>
               modal.open(
                 <GamePortAchievementsModal achievements={portAchievements} />,
