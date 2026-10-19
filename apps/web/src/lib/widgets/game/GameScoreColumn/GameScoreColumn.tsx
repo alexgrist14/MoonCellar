@@ -7,20 +7,21 @@ import { IGameResponse } from "@mooncellar/schemas";
 import { getHltbTiles } from "@/src/lib/shared/utils/hltb.utils";
 import { getGameRatingRows } from "@/src/lib/shared/utils/rating.utils";
 import { GameVndbBlock } from "@/src/lib/entities/game/ui/GameVndbBlock";
+import { IPortGameAchievements } from "@/src/lib/entities/port-achievement/model";
 import {
   GameAchievementsBlock,
   getAchievementCounts,
-} from "@/src/lib/entities/game/ui/GameAchievementsBlock";
+} from "@/src/lib/widgets/game/GameAchievementsBlock";
 
 interface IGameScoreColumnProps {
   game: IGameResponse;
-  portAchievementsTotal?: number;
+  portAchievements?: IPortGameAchievements;
   className?: string;
 }
 
 export const GameScoreColumn: FC<IGameScoreColumnProps> = ({
   game,
-  portAchievementsTotal,
+  portAchievements,
   className,
 }) => {
   const achievements = getAchievementCounts(game);
@@ -30,7 +31,7 @@ export const GameScoreColumn: FC<IGameScoreColumnProps> = ({
     !getHltbTiles(game).length &&
     !achievements.steam &&
     !achievements.retroachievements &&
-    !portAchievementsTotal
+    !portAchievements?.total
   ) {
     return null;
   }
@@ -48,7 +49,7 @@ export const GameScoreColumn: FC<IGameScoreColumnProps> = ({
       <GameVndbBlock game={game} isBoxed={false} />
       <GameAchievementsBlock
         game={game}
-        portTotal={portAchievementsTotal}
+        portAchievements={portAchievements}
         isBoxed={false}
       />
     </Box>

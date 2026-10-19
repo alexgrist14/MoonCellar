@@ -53,7 +53,7 @@ const getReviews = cache(async (gameId: string) =>
     .catch(() => undefined)
 );
 
-// The MoonCellar Team port of this game, if there is one: its achievements are on the page
+// The MoonCellar Team port of this game, if there is one: the Achievements block opens its achievements
 const getPortAchievements = cache(async (slug: string) =>
   getPortGameAchievements(slug).catch(() => undefined)
 );

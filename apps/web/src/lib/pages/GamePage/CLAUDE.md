@@ -25,7 +25,12 @@ landing page — there are about 10 000 of them.
 - Server, all in the route: `gamesApi.getBySlug` (via `fetchOrNull`, 404 → `null`), then in
   parallel `gamesApi.getStats`, `commentsAPI.getReviews`, `gamesApi.getRelated` — each falls back
   to `undefined` on error so a failing side block never breaks the page.
-- The page receives `game`, `stats`, `reviews`, `related` as props and renders them directly.
+- The game service (`apps/game`), also in parallel: `getPortGameAchievements` — the MoonCellar Team
+  port whose `siteGame` (in its `GET /games`) is this page, with every achievement, or `undefined`.
+  It reaches the service with its own axios client (`portAchievementsApi`): no cookies, no toasts.
+  The viewer's own states load in the browser once the port's modal opens.
+- The page receives `game`, `stats`, `reviews`, `related`, `portAchievements` as props and renders
+  them directly.
   Widgets below may run their own client queries (reviews paging, discussion), but the
   first render needs none.
 - No URL state in the route. The `#reviews` and `#discussion` hashes (notification links) open
@@ -38,21 +43,19 @@ landing page — there are about 10 000 of them.
 2. `widgets/game/GameHero` — cover, name (`h1`), stats, controls, and the "Suggest an edit" link
    to `/requests` in the banner's top-right corner, so it shows even when `GameDetails` has no rows.
 3. Three columns: `entities/game/ui/GameOverview` (summary, storyline, keywords), `widgets/game/GameScoreColumn`,
-   `widgets/game/GameSideColumn`.
+   `widgets/game/GameSideColumn`. The score column's last block is `widgets/game/GameAchievementsBlock`,
+   one clickable `StatRows` row per source: Steam and each RetroAchievements set open
+   `GameSteamPopover` / `GameAchievementsPopover` anchored to the row, as the game card's rail chips
+   do, and the MoonCellar Team port row (brand `logo-icon.png`) opens
+   `widgets/game/GamePortAchievementsModal`.
 4. `entities/game/ui/GameMedia` and `widgets/game/GameCharacters` (`game.characters`, ordered by role in `getGameBySlug` / `getGameById` with `sortCharactersByRole`: an admin's role, else VNDB's, else Protagonist from the description; `GET /characters?gameId=` uses the same order) — hidden for adult games
    when `useHideAdult()` is true.
-5. `widgets/game/GamePortAchievements` — only for a game with a MoonCellar Team port (the game
-   service's `GET /games` names this page as the port's `siteGame`): every achievement of the port
-   (`PortAchievementCard`), loaded with the server render (`getPortGameAchievements`, ISR like the
-   rest), and in the browser the viewer's own states over it ("You have N of M", unlock dates,
-   counters). `GameScoreColumn` counts them in its Achievements block. The game service is reached
-   with its own axios client (`portAchievementsApi`): no cookies, no toasts.
-6. `entities/game/ui/GameDetails` — the remaining catalogue facts.
-7. `widgets/game/GameRelated`.
-8. `features/game/ui/GameCommunity` — reviews (seeded with `initialReviews`) and the
+5. `entities/game/ui/GameDetails` — the remaining catalogue facts.
+6. `widgets/game/GameRelated`.
+7. `features/game/ui/GameCommunity` — reviews (seeded with `initialReviews`) and the
    Discussion tab.
-9. Two columns: `GameReleaseDates`, `GameMultiplayer`.
-10. `features/game/ui/GameAdminControls` — admin-only `ExpandMenu` with parse/delete/revalidate.
+8. Two columns: `GameReleaseDates`, `GameMultiplayer`.
+9. `features/game/ui/GameAdminControls` — admin-only `ExpandMenu` with parse/delete/revalidate.
 
 ## Rules and gotchas
 

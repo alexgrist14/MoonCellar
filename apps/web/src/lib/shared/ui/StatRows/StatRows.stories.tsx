@@ -50,6 +50,26 @@ export const WithIcons: Story = {
   },
 };
 
+export const Clickable: Story = {
+  args: {
+    rows: [
+      {
+        label: "Steam",
+        value: "137",
+        icon: <SvgSteam size="16" />,
+        onClick: () => undefined,
+      },
+      {
+        label: "RetroAchievements",
+        sublabel: "PlayStation 2",
+        value: "117",
+        icon: <SvgRetroAchievements size="20" />,
+        onClick: () => undefined,
+      },
+    ],
+  },
+};
+
 export const LongValues: Story = {
   args: {
     rows: [

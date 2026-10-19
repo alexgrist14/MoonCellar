@@ -150,9 +150,10 @@ project's `docs/achievements.md`): `format`, `game`, and per achievement a `key`
   stays; `current` changes only through `$max`. Two first reports at once meet the unique index,
   and the second one updates instead.
 - **On the site.** A game's `siteGame` (in `GET /games`) is the slug of its page on
-  mooncellar.space: that page lists the port's achievements and the viewer's own states, and a
-  profile shows the player's progress in each port (`apps/web`: `entities/port-achievement`,
-  `widgets/game/GamePortAchievements`, `widgets/user/UserPortAchievements`). The site reaches the
+  mooncellar.space: that page counts the port's achievements in its Achievements block, which
+  opens a modal with all of them and the viewer's own states, and a profile shows the player's
+  progress in each port (`apps/web`: `entities/port-achievement`,
+  `widgets/game/GamePortAchievementsModal`, `widgets/user/UserPortAchievements`). The site reaches the
   service at `NEXT_PUBLIC_GAME_URL` from the browser — without cookies, which its CORS does not
   allow — and at `INTERNAL_GAME_URL` from the server. Icons are drawn as CSS masks so they take the
   page's colours, which needs the CORS header on `/icons/` too (it has it, like every route).
@@ -215,6 +216,12 @@ cp apps/game/.env.example apps/game/.env
 bun run dev:game
 curl localhost:3229/health
 ```
+
+`bun run dev` starts it together with the API and the site. The site reaches it only when
+`apps/web/.env` sets `NEXT_PUBLIC_GAME_URL` and `INTERNAL_GAME_URL` to `http://localhost:3229`.
+Without them it falls back to `https://game.mooncellar.space`, whose CORS admits only
+`https://mooncellar.space`: the server render still lists the achievements, but from
+`localhost:3000` their icons stay empty squares and the profile shows no ports.
 
 `bun --filter game build` type-checks the service and boots it in preview mode without touching
 MongoDB, as the API's build does.

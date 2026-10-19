@@ -1,8 +1,9 @@
 "use client";
 
 import { FC } from "react";
-import styles from "./GamePortAchievements.module.scss";
+import styles from "./GamePortAchievementsModal.module.scss";
 import { Box } from "@/src/lib/shared/ui/Box";
+import { modal } from "@/src/lib/shared/ui/Modal";
 import { ProgressBar } from "@/src/lib/shared/ui/ProgressBar";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useIsAuthHydrated } from "@/src/lib/shared/hooks/useIsAuthHydrated";
@@ -13,14 +14,14 @@ import {
 } from "@/src/lib/entities/port-achievement/model";
 import { PortAchievementCard } from "@/src/lib/entities/port-achievement/ui/PortAchievementCard";
 
-const PORT_ACHIEVEMENTS_ANCHOR = "port-achievements";
+export const GAME_PORT_ACHIEVEMENTS_MODAL_ID = "game-port-achievements";
 
-interface IGamePortAchievementsProps {
+interface IGamePortAchievementsModalProps {
   achievements: IPortGameAchievements;
 }
 
 // The catalogue comes with the server render; the viewer's own states load in the browser
-export const GamePortAchievements: FC<IGamePortAchievementsProps> = ({
+export const GamePortAchievementsModal: FC<IGamePortAchievementsModalProps> = ({
   achievements,
 }) => {
   const isHydrated = useIsAuthHydrated();
@@ -36,10 +37,12 @@ export const GamePortAchievements: FC<IGamePortAchievementsProps> = ({
 
   return (
     <Box
-      id={PORT_ACHIEVEMENTS_ANCHOR}
       title="MoonCellar Team port"
       titleCount={achievements.total}
       isTitleStart
+      onClose={() => modal.close(GAME_PORT_ACHIEVEMENTS_MODAL_ID)}
+      isWithScrollBar
+      wrapperStyle={{ width: "var(--game-port-achievements-modal-width)" }}
       contentStyle={{ padding: "var(--padding-x4)" }}
     >
       <div className={styles.port}>

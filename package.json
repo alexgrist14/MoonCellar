@@ -21,7 +21,7 @@
     }
   },
   "scripts": {
-    "dev": "bun run dev:api & bun run dev:web & wait",
+    "dev": "bun run dev:api & bun run dev:web & bun run dev:game & wait",
     "dev:api": "bun --filter api start:dev",
     "dev:web": "bun --filter web dev",
     "dev:game": "bun --filter game start:dev",

@@ -72,7 +72,10 @@ flowchart LR
     N -->|"REST, httpOnly cookies"| A["apps/api<br/>NestJS :3228"]
     S["packages/schemas<br/>zod"] -.->|"types + parsing"| N
     S -.->|"DTOs via createZodDto"| A
+    N -->|"REST, no cookies"| GS["apps/game<br/>NestJS :3229"]
+    GS -->|"sign-in, token checks"| A
     A --> M[("MongoDB")]
+    GS --> M
     A --> S3[("S3 · user uploads")]
     IG["IGDB"] -.->|"cron sync"| A
     RA["RetroAchievements"] -.->|"cron sync"| A
@@ -112,6 +115,7 @@ bun install
 # 3. Environment: each app reads its own .env
 cp apps/web/.env.example apps/web/.env
 cp apps/api/.env.example apps/api/.env
+cp apps/game/.env.example apps/game/.env
 #    then fill in the values — see the per-app tables below
 
 # 4. Infrastructure: MongoDB, Loki, Grafana, Alloy, SearXNG
@@ -123,9 +127,16 @@ docker compose -f infra/docker-compose.yml --profile monitoring up -d
 bun run dev
 ```
 
-`bun run dev` starts both watchers in parallel in a single terminal — it is `dev:api` and
-`dev:web` backgrounded together. Nothing has to be built first: the API runs its TypeScript
-source on Bun, and both apps read `@mooncellar/schemas` straight from its `src`.
+`bun run dev` starts all three watchers in parallel in a single terminal — it is `dev:api`,
+`dev:web` and `dev:game` backgrounded together. Nothing has to be built first: the API and the
+game service run their TypeScript source on Bun, and every app reads `@mooncellar/schemas` straight
+from its `src`.
+
+The site reaches the local game service only when `apps/web/.env` sets `NEXT_PUBLIC_GAME_URL` and
+`INTERNAL_GAME_URL` to `http://localhost:3229`, as `.env.example` does. Without them it falls back
+to `https://game.mooncellar.space`, whose CORS admits only `https://mooncellar.space`: the port
+achievements still render from the server, but their icons stay empty and the profile shows no
+ports.
 
 ### Running the modules separately
 
@@ -138,32 +149,37 @@ bun --filter api start:dev                 # bun --watch; needs MongoDB from the
 
 # terminal 2 — frontend on :3000
 bun --filter web dev                       # needs the API up: pages fetch it while rendering
+
+# terminal 3 — game service on :3229, Swagger at :3229/api
+bun --filter game start:dev                # bun --watch; same MongoDB, its own `game` database
 ```
 
-The root aliases run exactly these two: `bun run dev:api`, `bun run dev:web`. The game service
-runs on its own with `bun run dev:game` (port 3229, Swagger at `:3229/api`).
+The root aliases run exactly these three: `bun run dev:api`, `bun run dev:web`,
+`bun run dev:game`.
 
 Two things that are easy to get wrong here:
 
-- **The API's script is `start:dev`, not `dev`.** `apps/api` has no `dev` script at all, which is
-  why the root alias spells the name out.
-- **Never start them with `bun --filter '*' dev`.** The glob skips `apps/api` in silence, because
-  it has no script by that name. `build` and `lint` may keep `--filter '*'`: those scripts
-  terminate, and there the dependency ordering is exactly what is wanted.
+- **The API's and the game service's script is `start:dev`, not `dev`.** Neither `apps/api` nor
+  `apps/game` has a `dev` script at all, which is why the root aliases spell the name out.
+- **Never start them with `bun --filter '*' dev`.** The glob skips `apps/api` and `apps/game` in
+  silence, because they have no script by that name. `build` and `lint` may keep
+  `--filter '*'`: those scripts terminate, and there the dependency ordering is exactly what is
+  wanted.
 
 ### Services and ports
 
-| Service               | URL                                       | Comes from                    |
-| --------------------- | ----------------------------------------- | ----------------------------- |
-| Frontend (dev)        | http://localhost:3000                     | `bun --filter web dev`        |
-| Frontend (built)      | http://localhost:3111                     | `bun --filter web start`      |
-| API + Swagger         | http://localhost:3228/api                 | `bun --filter api start:dev`  |
-| MongoDB               | mongodb://localhost:27017                 | compose                       |
-| Grafana               | http://localhost:3001 (`admin` / `admin`) | compose                       |
-| Loki                  | http://localhost:3100                     | compose                       |
-| Alloy (Faro receiver) | http://localhost:12347                    | compose                       |
-| SearXNG               | http://localhost:8891                     | compose                       |
-| Prometheus            | http://localhost:9090                     | compose, `monitoring` profile |
+| Service                | URL                                       | Comes from                    |
+| ---------------------- | ----------------------------------------- | ----------------------------- |
+| Frontend (dev)         | http://localhost:3000                     | `bun --filter web dev`        |
+| Frontend (built)       | http://localhost:3111                     | `bun --filter web start`      |
+| API + Swagger          | http://localhost:3228/api                 | `bun --filter api start:dev`  |
+| Game service + Swagger | http://localhost:3229/api                 | `bun --filter game start:dev` |
+| MongoDB                | mongodb://localhost:27017                 | compose                       |
+| Grafana                | http://localhost:3001 (`admin` / `admin`) | compose                       |
+| Loki                   | http://localhost:3100                     | compose                       |
+| Alloy (Faro receiver)  | http://localhost:12347                    | compose                       |
+| SearXNG                | http://localhost:8891                     | compose                       |
+| Prometheus             | http://localhost:9090                     | compose, `monitoring` profile |
 
 ### Root commands
 
@@ -171,9 +187,10 @@ Two things that are easy to get wrong here:
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `bun install`                          | Installs all workspaces into one hoisted `node_modules`                                                            |
 | `bun install --filter './apps/api...'` | Installs one app and its workspace dependencies only                                                               |
-| `bun run dev`                          | Runs the API and web watchers in one terminal                                                                      |
+| `bun run dev`                          | Runs the API, web and game service watchers in one terminal                                                        |
 | `bun run dev:api`                      | `api start:dev` only — Bun watch mode on :3228                                                                     |
 | `bun run dev:web`                      | `web dev` only — Next.js on :3000                                                                                  |
+| `bun run dev:game`                     | `game start:dev` only — Bun watch mode on :3229                                                                    |
 | `bun run build`                        | `build` in every workspace — the Next.js build, and a type check plus preview boot for the API                     |
 | `bun run lint`                         | `lint` in every workspace                                                                                          |
 | `bun run mongo`                        | Opens a background SSH tunnel to the production MongoDB on `localhost:27017` — see _Reaching a production service_ |
@@ -277,18 +294,20 @@ must keep page content in the server-rendered HTML — see [`docs/seo.md`](docs/
 <details>
 <summary>Environment — <code>apps/web/.env</code></summary>
 
-| Variable                    | Purpose                                                |
-| --------------------------- | ------------------------------------------------------ |
-| `NEXT_PUBLIC_API_URL`       | Public URL of the API (`http://localhost:3228` in dev) |
-| `INTERNAL_API_URL`          | API URL used from server components and route handlers |
-| `NEXT_PUBLIC_FRONT_URL`     | Public URL of this app — canonical links, SEO          |
-| `NEXT_PUBLIC_S3_HOST`       | S3 / CDN host for user uploads                         |
-| `NEXT_PUBLIC_LOKI_HOST`     | Loki endpoint for the `/api/logs` handler              |
-| `NEXT_PUBLIC_CORS_SERVER`   | Origin sent as CORS credentials target                 |
-| `NEXT_PUBLIC_APP_VERSION`   | Version tag attached to Faro telemetry                 |
-| `NEXT_PUBLIC_FARO_APP_NAME` | App name in Grafana Faro                               |
-| `GEOIP_DB_PATH`             | Path to the GeoLite2 country database                  |
-| `GEO_BLOCK_COUNTRIES`       | Comma-separated country codes to block                 |
+| Variable                    | Purpose                                                                                    |
+| --------------------------- | ------------------------------------------------------------------------------------------ |
+| `NEXT_PUBLIC_API_URL`       | Public URL of the API (`http://localhost:3228` in dev)                                     |
+| `INTERNAL_API_URL`          | API URL used from server components and route handlers                                     |
+| `NEXT_PUBLIC_GAME_URL`      | Public URL of the game service (`http://localhost:3229` in dev; unset, the production one) |
+| `INTERNAL_GAME_URL`         | Game service URL used from server components                                               |
+| `NEXT_PUBLIC_FRONT_URL`     | Public URL of this app — canonical links, SEO                                              |
+| `NEXT_PUBLIC_S3_HOST`       | S3 / CDN host for user uploads                                                             |
+| `NEXT_PUBLIC_LOKI_HOST`     | Loki endpoint for the `/api/logs` handler                                                  |
+| `NEXT_PUBLIC_CORS_SERVER`   | Origin sent as CORS credentials target                                                     |
+| `NEXT_PUBLIC_APP_VERSION`   | Version tag attached to Faro telemetry                                                     |
+| `NEXT_PUBLIC_FARO_APP_NAME` | App name in Grafana Faro                                                                   |
+| `GEOIP_DB_PATH`             | Path to the GeoLite2 country database                                                      |
+| `GEO_BLOCK_COUNTRIES`       | Comma-separated country codes to block                                                     |
 
 </details>
 

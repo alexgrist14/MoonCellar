@@ -159,9 +159,10 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
   with `bun --filter <workspace> <script>` — never `cd` into an app to install, the
   lockfile is shared.
 - **The root `dev` script must launch each app with its own `bun --filter` call, never
-  `bun --filter '*' dev`.** `apps/api` has no `dev` script and the glob skips it in silence,
-  so `dev:api` calls its `start:dev` by name. `build` and `lint` may keep `--filter '*'`,
-  because those scripts terminate and the dependency ordering is what we want there.
+  `bun --filter '*' dev`.** `apps/api` and `apps/game` have no `dev` script and the glob skips
+  them in silence, so `dev:api` and `dev:game` call their `start:dev` by name. `build` and
+  `lint` may keep `--filter '*'`, because those scripts terminate and the dependency ordering is
+  what we want there.
 - **`apps/api` has no compiled output: Bun executes `src/main.ts` in development and in the
   container, and its `build` script type-checks and boot-checks instead of compiling.**
   Never run the API with Node (`node dist/main`, `nest start`): `@mooncellar/schemas`

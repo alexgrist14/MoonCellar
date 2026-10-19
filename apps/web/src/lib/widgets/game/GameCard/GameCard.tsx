@@ -41,6 +41,7 @@ import { getAverageRating } from "@/src/lib/shared/utils/rating.utils";
 import { GameRatingPopover } from "@/src/lib/features/game/ui/GameRatingPopover";
 import { GameAchievementsPopover } from "@/src/lib/features/game/ui/GameAchievementsPopover";
 import { GameSteamPopover } from "@/src/lib/features/game/ui/GameSteamPopover";
+import { useGameSteamProgress } from "@/src/lib/features/game/model/useGameSteamProgress";
 import { useRoyalGames } from "@/src/lib/entities/royal/model/useRoyalGames";
 import { Checkbox } from "@/src/lib/shared/ui/Checkbox";
 import { EXPAND_KEEP_OPEN_ATTRIBUTE } from "@/src/lib/shared/ui/ExpandMenu";
@@ -156,21 +157,13 @@ export const GameCard = memo(
       };
     }, [game, profile]);
 
-    const steamProgress = useMemo(() => {
-      const entries = profile?.steam?.achievements?.filter(
-        ({ unlocked }) => unlocked > 0
-      );
-
-      return (
-        entries?.find(({ gameId }) => gameId === game._id) ??
-        entries?.find(({ appId }) => appId === game.steamAchievements?.appId)
-      );
-    }, [game._id, game.steamAchievements?.appId, profile]);
-    const steamTotal =
-      steamProgress?.total ?? game.steamAchievements?.total ?? 0;
-    const steamAppId = steamProgress?.appId ?? game.steamAchievements?.appId;
-    const isSteamMastered =
-      !!steamProgress && steamProgress.unlocked >= steamProgress.total;
+    const {
+      progress: steamProgress,
+      total: steamTotal,
+      appId: steamAppId,
+      isMastered: isSteamMastered,
+      steamId,
+    } = useGameSteamProgress(game);
 
     // useCloseEvents([cardRef], () => setIsActive(false));
 
@@ -478,7 +471,7 @@ export const GameCard = memo(
             appId={steamAppId}
             total={steamTotal}
             progress={steamProgress}
-            steamId={profile?.steam?.steamId}
+            steamId={steamId}
             anchorRef={steamRef}
             isOpen={isSteamOpen}
             onClose={() => setIsSteamOpen(false)}

@@ -3,7 +3,6 @@ export * from "./SvgClose";
 export * from "./SvgPlus";
 export * from "./SvgSearch";
 export * from "./SvgCamera";
-export * from "./SvgLogo";
 export * from "./SvgProfile";
 export * from "./SvgResize";
 export * from "./SvgBurger";

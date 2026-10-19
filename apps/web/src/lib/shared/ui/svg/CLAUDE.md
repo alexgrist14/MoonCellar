@@ -71,7 +71,7 @@ export const SvgTicket: FC<ISvgBaseProps> = (props) => (
   set. Font Awesome-style paths with overlapping subpaths need both flags, or holes appear.
 - Colour comes from the `color` token or from the parent through `currentColor` (`color` in a
   module, e.g. `& svg { color: … }`); never hard-code a hex in `Path`'s `color`.
-- Gradient or multi-colour icons (`SvgLogo`) define `<defs>` ids; two on one page share those ids,
+- Gradient or multi-colour icons (`SvgMoon`, `SvgStar`) define `<defs>` ids; two on one page share those ids,
   so keep them unique per icon.
 - Export every new icon from `index.ts`; an icon missing there is absent from the `Icons` story.
 - `SvgBurger`'s open animation lives in `SvgBurger.module.scss` with its own keyframes; pass
