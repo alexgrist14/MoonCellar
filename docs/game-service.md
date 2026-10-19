@@ -150,7 +150,8 @@ project's `docs/achievements.md`): `format`, `game`, and per achievement a `key`
   stays; `current` changes only through `$max`. Two first reports at once meet the unique index,
   and the second one updates instead.
 - **On the site.** A game's `siteGame` (in `GET /games`) is the slug of its page on
-  mooncellar.space: that page counts the port's achievements in its Achievements block, which
+  mooncellar.space: that page counts the port's achievements in its Achievements block, in a row
+  named after the port (its `name`), which
   opens a modal with all of them and the viewer's own states, and a profile shows the player's
   progress in each port (`apps/web`: `entities/port-achievement`,
   `widgets/game/GamePortAchievementsModal`, `widgets/user/UserPortAchievements`). The site reaches the
@@ -161,7 +162,8 @@ project's `docs/achievements.md`): `format`, `game`, and per achievement a `key`
 ## Adding a game
 
 1. Pick a slug (`[a-z][a-z0-9-]`, up to 32 characters) and add `src/games/<slug>/<slug>.game.ts`
-   with an `IGameDefinition`: `name`, `siteGame` (the slug of the game's page on the site, where its
+   with an `IGameDefinition`: `name` (the port's own name, which the site shows — `Glassline` for
+   `rooftops`), `siteGame` (the slug of the game's page on the site, where its
    achievements are shown), `scoreOrder` (`asc` when lower is better, as with times),
    `scoreUnit` (`ms` or `points`), `board` — a regular expression of the board ids the game
    uses — and `replay` (`required`, `maxBytes`, an optional `check`).

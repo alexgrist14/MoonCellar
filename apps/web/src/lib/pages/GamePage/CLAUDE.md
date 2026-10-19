@@ -46,8 +46,8 @@ landing page — there are about 10 000 of them.
    `widgets/game/GameSideColumn`. The score column's last block is `widgets/game/GameAchievementsBlock`,
    one clickable `StatRows` row per source: Steam and each RetroAchievements set open
    `GameSteamPopover` / `GameAchievementsPopover` anchored to the row, as the game card's rail chips
-   do, and the MoonCellar Team port row (brand `logo-icon.png`) opens
-   `widgets/game/GamePortAchievementsModal`.
+   do, and the MoonCellar Team port row (brand `logo-icon.png`, labelled with the port's `name` from
+   `GET /games`, e.g. Glassline) opens `widgets/game/GamePortAchievementsModal`, titled the same.
 4. `entities/game/ui/GameMedia` and `widgets/game/GameCharacters` (`game.characters`, ordered by role in `getGameBySlug` / `getGameById` with `sortCharactersByRole`: an admin's role, else VNDB's, else Protagonist from the description; `GET /characters?gameId=` uses the same order) — hidden for adult games
    when `useHideAdult()` is true.
 5. `entities/game/ui/GameDetails` — the remaining catalogue facts.

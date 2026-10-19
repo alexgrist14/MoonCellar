@@ -5,7 +5,7 @@ import { checkLevel } from "./level";
 
 export const rooftops: IGameDefinition = {
   slug: "rooftops",
-  name: "Rooftops",
+  name: "Glassline",
   // The iOS version's page in the site's catalogue
   siteGame: "mirrors-edge",
   scoreOrder: "asc",
