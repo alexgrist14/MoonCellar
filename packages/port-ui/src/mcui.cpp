@@ -269,8 +269,20 @@ bool Toggle(const char* label, bool* value) {
     return pressed;
 }
 
-bool Segmented(const char* id, const char* const* items, int count, int* current) {
+bool Segmented(const char* id, const char* const* items, int count, int* current, bool gamepadShoulders) {
     ImGui::PushID(id);
+    bool changed = false;
+    bool focusChosen = false;
+    if (gamepadShoulders && count > 1 && !ImGui::IsAnyItemActive() &&
+        !ImGui::IsPopupOpen("", ImGuiPopupFlags_AnyPopupId)) {
+        int step = ImGui::IsKeyPressed(ImGuiKey_GamepadL1, false)   ? -1
+                   : ImGui::IsKeyPressed(ImGuiKey_GamepadR1, false) ? 1
+                                                                     : 0;
+        if (step != 0) {
+            *current = (*current + step + count) % count;
+            changed = focusChosen = true;
+        }
+    }
     // Padding and gap of one step: the selected segment never touches the track or its neighbours, and
     // the track's radius (x4) is the segment's (x3) plus the padding, so the corners stay concentric
     const float pad = kPaddingX1 * s_scale;
@@ -282,7 +294,6 @@ bool Segmented(const char* id, const char* const* items, int count, int* current
     ImVec2 p = ImGui::GetCursorScreenPos();
     ImDrawList* dl = ImGui::GetWindowDrawList();
     dl->AddRectFilled(p, ImVec2(p.x + width, p.y + h + pad * 2), Packed(kColorBgTertiary), kRadiusX4 * s_scale);
-    bool changed = false;
     float x = p.x + pad;
     ImGui::PushFont(s_fonts.medium, 0.0f);
     for (int i = 0; i < count; i++) {
@@ -290,10 +301,11 @@ bool Segmented(const char* id, const char* const* items, int count, int* current
         ImGui::SetCursorScreenPos(ImVec2(x, p.y + pad));
         ImGui::PushID(i);
         bool chosen = *current == i;
-        if (ImGui::InvisibleButton("##item", ImVec2(w, h)) && !chosen) {
+        if (ImGui::InvisibleButton("##item", ImVec2(w, h), ImGuiButtonFlags_EnableNav) && !chosen) {
             *current = i;
             changed = true;
         }
+        if (focusChosen && chosen) ImGui::SetKeyboardFocusHere(-1);
         bool hovered = ImGui::IsItemHovered();
         ImGui::PopID();
         if (chosen || hovered) {
@@ -328,7 +340,7 @@ bool BeginPanel(const char* id, ImVec2 size) {
     ImGui::PushStyleColor(ImGuiCol_ChildBg, Color(kColorBgSecondary, 0.9f));
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, kRadiusX5 * s_scale);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(kPaddingX5 * s_scale, kPaddingX4 * s_scale));
-    ImGuiChildFlags flags = ImGuiChildFlags_AlwaysUseWindowPadding;
+    ImGuiChildFlags flags = ImGuiChildFlags_AlwaysUseWindowPadding | ImGuiChildFlags_NavFlattened;
     if (size.y == 0) flags |= ImGuiChildFlags_AutoResizeY;
     bool open = ImGui::BeginChild(id, size, flags);
     ImGui::PopStyleVar(2);
