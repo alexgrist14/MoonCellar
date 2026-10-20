@@ -16,7 +16,7 @@ import type { Model } from "mongoose";
 import type { IGameDefinition } from "../../games/game-definition";
 import { StorageBucket } from "./schemas/storage-bucket.schema";
 import { StorageFile } from "./schemas/storage-file.schema";
-import { quotaProblem } from "./storage-quota";
+import { folderOf, quotaProblem } from "./storage-quota";
 
 type IFileRow = Pick<StorageFile, "path" | "size" | "sha256" | "updatedAt">;
 
@@ -59,6 +59,22 @@ export class StorageService {
       { $group: { _id: null, files: { $sum: 1 }, bytes: { $sum: "$size" } } },
     ]);
     return { files: row?.files ?? 0, bytes: row?.bytes ?? 0 };
+  }
+
+  private async folders(
+    game: IGameDefinition,
+    bucket: string,
+    account: IGameAccount
+  ) {
+    const paths: string[] = await this.files
+      .distinct("path", this.key(game, bucket, account))
+      .exec();
+    const folders = new Set<string>();
+    for (const path of paths) {
+      const folder = folderOf(path);
+      if (folder !== null) folders.add(folder);
+    }
+    return [...folders];
   }
 
   private async expectRevision(
@@ -142,15 +158,19 @@ export class StorageService {
     const limits = this.limitsOf(game, bucket);
     await this.expectRevision(game, bucket, account, revision);
     const key = { ...this.key(game, bucket, account), path };
-    const [existing, usage] = await Promise.all([
+    const [existing, usage, folders] = await Promise.all([
       this.files.findOne(key).select("size").lean(),
       this.usage(game, bucket, account),
+      limits.maxFolders === undefined
+        ? Promise.resolve(undefined)
+        : this.folders(game, bucket, account),
     ]);
     const problem = quotaProblem(
       limits,
-      usage,
+      { ...usage, folders },
       existing?.size ?? null,
-      data.length
+      data.length,
+      path
     );
     if (problem) throw new UnprocessableEntityException(problem);
     const sha256 = createHash("sha256").update(data).digest("hex");

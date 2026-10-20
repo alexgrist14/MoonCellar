@@ -12,6 +12,7 @@ export type IGameStorageBucket = {
   maxFileBytes: number;
   maxFiles: number;
   maxBytes: number;
+  maxFolders?: number;
 };
 
 export type IGameDefinition = {
