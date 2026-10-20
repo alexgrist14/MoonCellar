@@ -1,3 +1,4 @@
+import type { IGameLevelMode } from "@mooncellar/schemas";
 import type { IGameAchievements } from "./achievements";
 
 export type IReplayCheck = (
@@ -6,7 +7,10 @@ export type IReplayCheck = (
   accepted: Buffer[]
 ) => string | null;
 
-export type ILevelCheck = (level: Buffer) => string | null;
+export type ILevelCheck = (
+  level: Buffer,
+  mode: IGameLevelMode
+) => string | null;
 
 export type IGameStorageBucket = {
   maxFileBytes: number;

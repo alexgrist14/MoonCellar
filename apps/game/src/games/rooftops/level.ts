@@ -4,6 +4,8 @@
 // game; it is the server copy of the port's own check (port/src/platform/levels.cpp). It knows only
 // the layout of the format and the lengths of the game's lookup tables, never level data.
 
+import type { IGameLevelMode } from "@mooncellar/schemas";
+
 // Lengths of the loader's lookup tables: palette and sounds, model sets, materials, object types,
 // hint texts, cutscenes.
 const TABLES = {
@@ -86,8 +88,14 @@ const readRef = (r: Reader, layers: ISection[][][], checkpoint: boolean) => {
   }
 };
 
-// The reason the level would not load, or null when it would.
-export const checkLevel = (data: Buffer): string | null => {
+const BAG = 3;
+
+// The reason the level would not load, or null when it would. A race needs a finish, a bags level
+// a bag to collect.
+export const checkLevel = (
+  data: Buffer,
+  mode: IGameLevelMode = "race"
+): string | null => {
   const r = new Reader(data);
   r.index(r.i32(), TABLES.resource, "palette");
   r.i8();
@@ -151,8 +159,10 @@ export const checkLevel = (data: Buffer): string | null => {
   r.skip(r.count(r.i16(), "fall areas") * 24);
   r.skip(r.count(r.i16(), "pain areas") * 24);
   // Objects: path walkers need a path (-1 stands still, except 5 and 7)
+  let bags = 0;
   for (let n = r.u16(); n > 0 && !r.error; n--) {
     const type = r.i32();
+    if (type === BAG) bags++;
     r.skip(12);
     const path = r.i32();
     const pathOk = path >= 0 && path < paths.length && paths[path] >= 1;
@@ -171,7 +181,8 @@ export const checkLevel = (data: Buffer): string | null => {
     const facing = r.i8();
     if (facing !== -1 && facing !== 1) r.fail(`start facing ${facing}`);
   }
-  r.skip(r.count(r.u8(), "finishes", 1) * 16);
+  r.skip(r.count(r.u8(), "finishes", mode === "race" ? 1 : 0) * 16);
+  if (mode === "bags" && bags === 0 && !r.error) r.fail("bags: 0");
   for (let n = r.u8(); n > 0 && !r.error; n--) {
     r.skip(16);
     readRef(r, layers, true);
