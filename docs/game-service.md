@@ -106,7 +106,10 @@ Reports hide a level after three different players; a moderator sees them at
 ## Cloud storage
 
 A game that keeps files in the player's account has `storage` in its definition: buckets by name,
-each with `maxFileBytes`, `maxFiles` and `maxBytes`. The service stores a file as it is
+each with `maxFileBytes`, `maxFiles` and `maxBytes`, and optionally `maxFolders`: how many
+top-level folders (the first segment of the paths that have one) the bucket may hold, so a write
+that would start one more is refused with 422 while writes into the folders it already has go on.
+The service stores a file as it is
 (`storage_files`, one document per file, `data` with `select: false`) under the player's id, and
 never reads it. A bucket's `revision` (`storage_buckets`) grows with every write and delete, so
 a game can tell whether anything changed since it last looked, and can make a write conditional
@@ -119,7 +122,7 @@ bodies of the same size through to `game.mooncellar.space` (`client_max_body_siz
 
 `rooftops` has four buckets: `save` — the game's progress, the files of the port's `Documents`
 folder (1 MiB each, 64 files, 4 MiB); `skins` — the player's custom heroine models,
-`<skin>/<file>` (8 MiB each, 256 files, 64 MiB); `levels` — the levels the player made,
+`<skin>/<file>` (8 MiB each, 256 files, 64 MiB, at most 10 skins); `levels` — the levels the player made,
 `<level>/<file>` (512 KiB each, 400 files, 32 MiB); and `prefs` — the settings that travel between
 computers (language, sound, controls, the chosen skin) and the player's colour grading image
 (4 MiB each, 8 files, 8 MiB). The port syncs them on sign-in in its launcher and after a session,
