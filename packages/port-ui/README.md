@@ -44,7 +44,10 @@ The mockup of these components is `docs/mockups/port-ui.html`.
    `mcui::ApplyStyle(scale)`.
 3. Draw with ImGui as usual: the style already makes ImGui's own widgets MoonCellar; the components
    (`mcui::Button`, `mcui::Toggle`, `mcui::Segmented`, `mcui::BeginPanel`, `mcui::AchievementCard`,
-   `mcui::DeviceCode`) cover what plain widgets do not.
+   `mcui::DeviceCode`) cover what plain widgets do not. They work with keyboard and gamepad
+   navigation as well as the mouse: the arrows or the D-pad reach every segment and cross into a
+   panel, and `mcui::Segmented(..., true)` also switches segments with the gamepad's shoulder
+   buttons (LB and RB), keeping the focus on the chosen one.
 4. Over the game: `mcui::Notify` from any thread, and every frame while
    `mcui::NotificationsActive()` — an ImGui frame with `mcui::DrawNotifications(now)`.
 
