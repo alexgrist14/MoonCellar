@@ -23,9 +23,21 @@ class Writer {
   }
 }
 
-type IOverrides = { shapeType?: number; starts?: number; trailing?: number };
+type IOverrides = {
+  shapeType?: number;
+  starts?: number;
+  trailing?: number;
+  finishes?: number;
+  bags?: number;
+};
 
-const level = ({ shapeType = 0, starts = 1, trailing = 0 }: IOverrides = {}) => {
+const level = ({
+  shapeType = 0,
+  starts = 1,
+  trailing = 0,
+  finishes = 1,
+  bags = 0,
+}: IOverrides = {}) => {
   const w = new Writer();
   w.i32(0).i8(0).i32(0).fix(-50).fix(200).fix(64);
   w.i16(4); // strips per layer
@@ -35,10 +47,18 @@ const level = ({ shapeType = 0, starts = 1, trailing = 0 }: IOverrides = {}) => 
   w.fix(-40).fix(0).fix(150).fix(1).i8(shapeType).i32(0); // the floor
   w.i8(0); // graphics layers
   w.i16(0).i16(0).i16(0); // paths, fall areas, pain areas
-  w.i16(0); // objects
+  w.i16(bags); // objects
+  for (let i = 0; i < bags; i++)
+    w.i32(3)
+      .fix(10 * i)
+      .fix(1)
+      .fix(0)
+      .i32(-1)
+      .i8(0);
   w.i8(starts);
   for (let i = 0; i < starts; i++) w.fix(0).fix(1).fix(0).i8(1);
-  w.i8(1).fix(100).fix(1).fix(10).fix(6); // finish
+  w.i8(finishes);
+  for (let i = 0; i < finishes; i++) w.fix(100).fix(1).fix(10).fix(6);
   w.i8(0); // checkpoints
   w.i16(0).i16(0).i16(0); // sounds
   w.i8(0); // zip lines
@@ -63,6 +83,18 @@ describe("checkLevel", () => {
 
   test("rejects bytes after the end", () => {
     expect(checkLevel(level({ trailing: 3 }))).toContain("3 bytes after");
+  });
+
+  test("rejects a race without a finish", () => {
+    expect(checkLevel(level({ finishes: 0 }), "race")).toContain("finishes: 0");
+  });
+
+  test("takes a bags level without a finish", () => {
+    expect(checkLevel(level({ finishes: 0, bags: 2 }), "bags")).toBeNull();
+  });
+
+  test("rejects a bags level without bags", () => {
+    expect(checkLevel(level({ finishes: 0 }), "bags")).toContain("bags: 0");
   });
 
   test("rejects a cut file", () => {
