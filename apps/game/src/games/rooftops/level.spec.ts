@@ -25,6 +25,7 @@ class Writer {
 
 type IOverrides = {
   shapeType?: number;
+  material?: number;
   starts?: number;
   trailing?: number;
   finishes?: number;
@@ -33,6 +34,7 @@ type IOverrides = {
 
 const level = ({
   shapeType = 0,
+  material = 0,
   starts = 1,
   trailing = 0,
   finishes = 1,
@@ -44,7 +46,7 @@ const level = ({
   for (let layer = 0; layer < 4; layer++) {
     for (let i = 0; i < 4; i++) w.i16(layer === 0 ? 0 : 1).i16(1);
   }
-  w.fix(-40).fix(0).fix(150).fix(1).i8(shapeType).i32(0); // the floor
+  w.fix(-40).fix(0).fix(150).fix(1).i8(shapeType).i32(material); // the floor
   w.i8(0); // graphics layers
   w.i16(0).i16(0).i16(0); // paths, fall areas, pain areas
   w.i16(bags); // objects
@@ -75,6 +77,18 @@ describe("checkLevel", () => {
 
   test("rejects an unknown shape type", () => {
     expect(checkLevel(level({ shapeType: 7 }))).toContain("shape type 7");
+  });
+
+  test("takes a shape covered with a palette piece", () => {
+    expect(checkLevel(level({ material: 3 | (852002 << 8) }))).toBeNull();
+  });
+
+  test("rejects an unknown material", () => {
+    expect(checkLevel(level({ material: 9 }))).toContain("material 9");
+  });
+
+  test("rejects a negative material", () => {
+    expect(checkLevel(level({ material: -1 }))).toContain("material -1");
   });
 
   test("rejects a level without a start", () => {

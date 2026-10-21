@@ -117,7 +117,9 @@ export const checkLevel = (
     r.skip(16);
     const type = r.i8();
     if (type < 0 || type > 2) r.fail(`shape type ${type}`);
-    r.index(r.i32(), TABLES.material, "material");
+    const material = r.i32();
+    if (material < 0) r.fail(`material ${material}`);
+    r.index(material & 0xff, TABLES.material, "material");
   }
   // Graphics: every section has a piece, and no more highlights than slots for them
   const layers: ISection[][][] = [];
