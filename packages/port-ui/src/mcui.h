@@ -78,7 +78,7 @@ bool Button(const char* label, ButtonKind kind = ButtonKind::Default, ImVec2 siz
 bool Toggle(const char* label, bool* value);
 
 // The site's segmented Tabs; true when the choice changed
-bool Segmented(const char* id, const char* const* items, int count, int* current);
+bool Segmented(const char* id, const char* const* items, int count, int* current, bool gamepadShoulders = false);
 
 // A thin bar (the site's ProgressBar); `fraction` 0..1
 void ProgressBar(float fraction, ImVec2 size = ImVec2(-1.0f, 0.0f), unsigned color = tokens::kColorAccent);

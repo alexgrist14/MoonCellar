@@ -217,8 +217,14 @@ export const GameLevelParamsSchema = z.object({
 });
 export type IGameLevelParams = z.infer<typeof GameLevelParamsSchema>;
 
+export const GAME_LEVEL_MODES = ["race", "bags"] as const;
+export const GAME_LEVEL_TIME_LIMITS = [120000, 180000, 300000] as const;
+export const gameLevelMode = z.enum(GAME_LEVEL_MODES);
+export type IGameLevelMode = z.infer<typeof gameLevelMode>;
+
 export const GameLevelListQuerySchema = z.object({
   sort: z.enum(["new", "best"]).default("new"),
+  mode: gameLevelMode.optional(),
   q: z.string().trim().max(GAME_LEVEL_NAME_MAX).default(""),
   limit: z.coerce.number().int().min(1).max(50).default(20),
   offset: z.coerce.number().int().min(0).default(0),
@@ -231,11 +237,14 @@ export const GameLevelSchema = z.object({
   name: z.string(),
   description: z.string(),
   base: z.string(),
+  mode: gameLevelMode,
+  timeLimit: z.number().int().nonnegative(),
   authorId: z.string(),
   authorName: z.string(),
   version: z.number().int().positive(),
   board: z.string(),
   size: z.number().int().nonnegative(),
+  hash: z.string(),
   rating: z.number().min(0).max(5),
   ratings: z.number().int().nonnegative(),
   downloads: z.number().int().nonnegative(),
@@ -251,12 +260,39 @@ export const GameLevelListSchema = z.object({
 });
 export type IGameLevelList = z.infer<typeof GameLevelListSchema>;
 
-export const GameLevelUploadSchema = z.object({
-  name: z.string().trim().min(1).max(GAME_LEVEL_NAME_MAX),
-  description: z.string().trim().max(GAME_LEVEL_DESCRIPTION_MAX).default(""),
-  base: z.string().regex(/^[a-z0-9_]{1,40}$/),
-  data: levelData,
+export const GameLevelOwnSchema = GameLevelSchema.extend({
+  hidden: z.boolean(),
 });
+export type IGameLevelOwn = z.infer<typeof GameLevelOwnSchema>;
+
+export const GameLevelOwnListSchema = z.object({
+  game: z.string(),
+  authorId: z.string(),
+  levels: z.array(GameLevelOwnSchema),
+});
+export type IGameLevelOwnList = z.infer<typeof GameLevelOwnListSchema>;
+
+export const GameLevelUploadSchema = z
+  .object({
+    name: z.string().trim().min(1).max(GAME_LEVEL_NAME_MAX),
+    description: z.string().trim().max(GAME_LEVEL_DESCRIPTION_MAX).default(""),
+    base: z.string().regex(/^[a-z0-9_]{1,40}$/),
+    mode: gameLevelMode.default("race"),
+    timeLimit: z.number().int().nonnegative().default(0),
+    data: levelData,
+  })
+  .refine(
+    (level) =>
+      level.mode === "race"
+        ? level.timeLimit === 0
+        : (GAME_LEVEL_TIME_LIMITS as readonly number[]).includes(
+            level.timeLimit
+          ),
+    {
+      message: `A bags level takes a time limit of ${GAME_LEVEL_TIME_LIMITS.join(", ")} ms, a race level none`,
+      path: ["timeLimit"],
+    }
+  );
 export type IGameLevelUpload = z.infer<typeof GameLevelUploadSchema>;
 
 export const GameLevelFileSchema = z.object({
@@ -280,7 +316,9 @@ export const GameLevelReportResultSchema = z.object({
   reported: z.literal(true),
   hidden: z.boolean(),
 });
-export type IGameLevelReportResult = z.infer<typeof GameLevelReportResultSchema>;
+export type IGameLevelReportResult = z.infer<
+  typeof GameLevelReportResultSchema
+>;
 
 export const GameLevelModerationSchema = z.object({
   hidden: z.boolean(),
@@ -316,7 +354,9 @@ export type IGameStorageFileQuery = z.infer<typeof GameStorageFileQuerySchema>;
 export const GameStorageWriteQuerySchema = GameStorageFileQuerySchema.extend({
   revision: z.coerce.number().int().nonnegative().optional(),
 });
-export type IGameStorageWriteQuery = z.infer<typeof GameStorageWriteQuerySchema>;
+export type IGameStorageWriteQuery = z.infer<
+  typeof GameStorageWriteQuerySchema
+>;
 
 export const GameStorageFileSchema = z.object({
   path: z.string(),
@@ -343,7 +383,9 @@ export const GameStorageWriteResultSchema = z.object({
   usedBytes: z.number().int().nonnegative(),
   file: GameStorageFileSchema.nullable(),
 });
-export type IGameStorageWriteResult = z.infer<typeof GameStorageWriteResultSchema>;
+export type IGameStorageWriteResult = z.infer<
+  typeof GameStorageWriteResultSchema
+>;
 
 // Achievements of the ports: a catalog per game in one format for every game (the port
 // project's docs/achievements.md), and the player's state of each achievement.
@@ -405,7 +447,9 @@ export const GamePlayerAchievementSchema = GameAchievementSchema.extend({
   unlockedAt: z.string().nullable(),
   current: z.number().int().nonnegative().nullable(),
 });
-export type IGamePlayerAchievement = z.infer<typeof GamePlayerAchievementSchema>;
+export type IGamePlayerAchievement = z.infer<
+  typeof GamePlayerAchievementSchema
+>;
 
 export const GamePlayerAchievementsSchema = z.object({
   game: z.string(),
@@ -414,13 +458,17 @@ export const GamePlayerAchievementsSchema = z.object({
   unlocked: z.number().int().nonnegative(),
   achievements: z.array(GamePlayerAchievementSchema),
 });
-export type IGamePlayerAchievements = z.infer<typeof GamePlayerAchievementsSchema>;
+export type IGamePlayerAchievements = z.infer<
+  typeof GamePlayerAchievementsSchema
+>;
 
 export const GameAchievementParamsSchema = z.object({
   game: gameSlug,
   key: achievementKey,
 });
-export type IGameAchievementParams = z.infer<typeof GameAchievementParamsSchema>;
+export type IGameAchievementParams = z.infer<
+  typeof GameAchievementParamsSchema
+>;
 
 export const GameAchievementIconParamsSchema = z.object({
   game: gameSlug,
@@ -453,7 +501,9 @@ export const GameAchievementReportSchema = z
     (body) => body.unlocked !== undefined || body.current !== undefined,
     "Send unlocked, current or both"
   );
-export type IGameAchievementReport = z.infer<typeof GameAchievementReportSchema>;
+export type IGameAchievementReport = z.infer<
+  typeof GameAchievementReportSchema
+>;
 
 export const GamePlayerGameAchievementsSchema = z.object({
   game: z.string(),

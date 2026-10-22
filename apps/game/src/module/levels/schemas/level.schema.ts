@@ -35,10 +35,16 @@ export class Level {
   description: string;
   @Prop({ type: String, required: true })
   base: string;
+  @Prop({ type: String, default: "race" })
+  mode: string;
+  @Prop({ type: Number, default: 0 })
+  timeLimit: number;
   @Prop({ type: Buffer, required: true, select: false })
   data: Buffer;
   @Prop({ type: Number, required: true })
   size: number;
+  @Prop({ type: String, default: "" })
+  hash: string;
   @Prop({ type: Number, default: 1 })
   version: number;
   @Prop({ type: [LevelRating], default: [], select: false })

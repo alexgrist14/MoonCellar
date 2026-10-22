@@ -26,10 +26,10 @@ port of a rooftop-running game from the decompilation project.
 | `POST` | `/games/:game/challenges`                           | Game token. Challenges a friend: `{ toUserId, board, score, comment, replay? }`, checked like a leaderboard score; 403 for someone who is not a friend, 429 after five unopened challenges to the same friend                                                                        |
 | `GET`  | `/games/:game/challenges/incoming`                  | Game token. Challenges of this game sent to the player since the last call, oldest first, without replays; each is handed out once                                                                                                                                                   |
 | `GET`  | `/games/:game/challenges/:challengeId`              | Game token. The challenge with its replay (or `null`), for its recipient or sender; challenges expire after 30 days                                                                                                                                                                  |
-| `GET`  | `/games/:game/levels`                               | Player levels, `{ game, total, levels }`: `sort` `new` (default) or `best` (rating, then number of ratings), `q` — part of the name or author, `limit` (1–50, default 20), `offset`; hidden levels are left out |
-| `GET`  | `/games/:game/levels/:levelId`                      | A player level: `{ id, name, description, base, authorId, authorName, version, board, size, rating, ratings, downloads, createdAt, updatedAt }`; 404 when hidden                                                                                                                      |
+| `GET`  | `/games/:game/levels`                               | Player levels, `{ game, total, levels }`: `sort` `new` (default) or `best` (rating, then number of ratings), `q` — part of the name or author, `mode` — `race` or `bags` only, `limit` (1–50, default 20), `offset`; hidden levels are left out |
+| `GET`  | `/games/:game/levels/:levelId`                      | A player level: `{ id, name, description, base, mode, timeLimit, authorId, authorName, version, board, size, rating, ratings, downloads, createdAt, updatedAt }`; 404 when hidden                                                                                                                      |
 | `GET`  | `/games/:game/levels/:levelId/file`                 | The level's map `{ id, version, data }` (base64); counts a download                                                                                                                                                                                                                  |
-| `POST` | `/games/:game/levels`                               | Game token. Uploads `{ name, description, base, data }`; the game's level check runs (see "Player levels"); 409 at 50 levels of one author                                                                                                                                          |
+| `POST` | `/games/:game/levels`                               | Game token. Uploads `{ name, description, base, mode, timeLimit, data }`; the game's level check runs (see "Player levels"); 409 at 50 levels of one author                                                                                                                                          |
 | `PUT`  | `/games/:game/levels/:levelId`                      | Game token, the author only. A new version of the level: `version` grows, and with it the level's leaderboard `board`                                                                                                                                                                |
 | `DELETE` | `/games/:game/levels/:levelId`                    | Game token, the author only. Deletes the level                                                                                                                                                                                                                                       |
 | `PUT`  | `/games/:game/levels/:levelId/rating`               | Game token. `{ stars }` 1–5, replacing the player's earlier rating; not for one's own level                                                                                                                                                                                          |
@@ -87,14 +87,18 @@ still passes. `bun --filter game test` runs the checks.
 ## Player levels
 
 A game that takes levels made by its players has `levels` in its definition: `maxBytes` and an
-optional `check` that gets the map file and returns a reason it would not load, or `null`. The
+optional `check` that gets the map file and the level's mode and returns a reason it would not
+load, or `null`. A level's `mode` is `race` (start, checkpoints and a finish; the default, and the
+mode of levels uploaded before modes existed) or `bags` (bags to collect against a time limit,
+`timeLimit` of 120 000, 180 000 or 300 000 ms; a race has 0). The
 service stores the file as it is (`select: false`, read only by `…/file`) and never reads it
 otherwise. A level's leaderboard is the board `u<levelId>v<version>` (`levelBoard`), so the
 game's `board` pattern must accept it; a new version starts an empty board.
 
 `rooftops` (`src/games/rooftops/level.ts`) takes levels of the port's map format up to 128 KiB and
 walks the structure the way the game's loader reads it, checking every index the loader follows,
-so a level that passes cannot crash the game. It knows only the layout of the format and the
+so a level that passes cannot crash the game; a race needs a finish, a bags level a bag (object
+type 3). It knows only the layout of the format and the
 lengths of the game's lookup tables. A player level holds the player's layout and numbers of
 pieces from the game's own data; levels copied from the game's chapters are not uploaded — the
 port allows it only for levels made from scratch.
@@ -106,7 +110,10 @@ Reports hide a level after three different players; a moderator sees them at
 ## Cloud storage
 
 A game that keeps files in the player's account has `storage` in its definition: buckets by name,
-each with `maxFileBytes`, `maxFiles` and `maxBytes`. The service stores a file as it is
+each with `maxFileBytes`, `maxFiles` and `maxBytes`, and optionally `maxFolders`: how many
+top-level folders (the first segment of the paths that have one) the bucket may hold, so a write
+that would start one more is refused with 422 while writes into the folders it already has go on.
+The service stores a file as it is
 (`storage_files`, one document per file, `data` with `select: false`) under the player's id, and
 never reads it. A bucket's `revision` (`storage_buckets`) grows with every write and delete, so
 a game can tell whether anything changed since it last looked, and can make a write conditional
@@ -119,7 +126,7 @@ bodies of the same size through to `game.mooncellar.space` (`client_max_body_siz
 
 `rooftops` has four buckets: `save` — the game's progress, the files of the port's `Documents`
 folder (1 MiB each, 64 files, 4 MiB); `skins` — the player's custom heroine models,
-`<skin>/<file>` (8 MiB each, 256 files, 64 MiB); `levels` — the levels the player made,
+`<skin>/<file>` (8 MiB each, 256 files, 64 MiB, at most 10 skins); `levels` — the levels the player made,
 `<level>/<file>` (512 KiB each, 400 files, 32 MiB); and `prefs` — the settings that travel between
 computers (language, sound, controls, the chosen skin) and the player's colour grading image
 (4 MiB each, 8 files, 8 MiB). The port syncs them on sign-in in its launcher and after a session,
@@ -150,7 +157,8 @@ project's `docs/achievements.md`): `format`, `game`, and per achievement a `key`
   stays; `current` changes only through `$max`. Two first reports at once meet the unique index,
   and the second one updates instead.
 - **On the site.** A game's `siteGame` (in `GET /games`) is the slug of its page on
-  mooncellar.space: that page counts the port's achievements in its Achievements block, which
+  mooncellar.space: that page counts the port's achievements in its Achievements block, in a row
+  named after the port (its `name`), which
   opens a modal with all of them and the viewer's own states, and a profile shows the player's
   progress in each port (`apps/web`: `entities/port-achievement`,
   `widgets/game/GamePortAchievementsModal`, `widgets/user/UserPortAchievements`). The site reaches the
@@ -161,7 +169,8 @@ project's `docs/achievements.md`): `format`, `game`, and per achievement a `key`
 ## Adding a game
 
 1. Pick a slug (`[a-z][a-z0-9-]`, up to 32 characters) and add `src/games/<slug>/<slug>.game.ts`
-   with an `IGameDefinition`: `name`, `siteGame` (the slug of the game's page on the site, where its
+   with an `IGameDefinition`: `name` (the port's own name, which the site shows — `Glassline` for
+   `rooftops`), `siteGame` (the slug of the game's page on the site, where its
    achievements are shown), `scoreOrder` (`asc` when lower is better, as with times),
    `scoreUnit` (`ms` or `points`), `board` — a regular expression of the board ids the game
    uses — and `replay` (`required`, `maxBytes`, an optional `check`).
