@@ -26,6 +26,7 @@ import {
   GameLevelListDto,
   GameLevelListQueryDto,
   GameLevelModerationDto,
+  GameLevelOwnListDto,
   GameLevelParamsDto,
   GameLevelRatingDto,
   GameLevelReportDto,
@@ -57,6 +58,17 @@ export class LevelsController {
   @UseGuards(ModerationGuard)
   reported(@Param() params: GameParamsDto) {
     return this.levels.reported(findGame(params.game));
+  }
+
+  @Get("mine")
+  @ApiOperation({
+    summary: "The player's own levels, hidden ones too, with each map's hash",
+  })
+  @ApiOkResponse({ type: GameLevelOwnListDto })
+  @ApiBearerAuth()
+  @UseGuards(GameTokenGuard)
+  mine(@Param() params: GameParamsDto, @Req() request: IGameRequest) {
+    return this.levels.mine(findGame(params.game), request.account);
   }
 
   @Get(":levelId")

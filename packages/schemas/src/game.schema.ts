@@ -244,6 +244,7 @@ export const GameLevelSchema = z.object({
   version: z.number().int().positive(),
   board: z.string(),
   size: z.number().int().nonnegative(),
+  hash: z.string(),
   rating: z.number().min(0).max(5),
   ratings: z.number().int().nonnegative(),
   downloads: z.number().int().nonnegative(),
@@ -258,6 +259,18 @@ export const GameLevelListSchema = z.object({
   levels: z.array(GameLevelSchema),
 });
 export type IGameLevelList = z.infer<typeof GameLevelListSchema>;
+
+export const GameLevelOwnSchema = GameLevelSchema.extend({
+  hidden: z.boolean(),
+});
+export type IGameLevelOwn = z.infer<typeof GameLevelOwnSchema>;
+
+export const GameLevelOwnListSchema = z.object({
+  game: z.string(),
+  authorId: z.string(),
+  levels: z.array(GameLevelOwnSchema),
+});
+export type IGameLevelOwnList = z.infer<typeof GameLevelOwnListSchema>;
 
 export const GameLevelUploadSchema = z
   .object({
