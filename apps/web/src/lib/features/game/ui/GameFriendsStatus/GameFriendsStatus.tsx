@@ -86,5 +86,5 @@ export const GameFriendsStatus: FC<IGameFriendsStatusProps> = ({
 
   if (!isBoxed) return content;
 
-  return <Box contentStyle={{ padding: "var(--padding-x3)" }}>{content}</Box>;
+  return <Box contentStyle={{ padding: "var(--padding-x4)" }}>{content}</Box>;
 };

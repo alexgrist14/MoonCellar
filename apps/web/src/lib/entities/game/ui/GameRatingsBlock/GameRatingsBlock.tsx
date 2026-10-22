@@ -30,8 +30,18 @@ export const GameRatingsBlock: FC<IGameRatingsBlockProps> = ({
             )}
           >
             <div className={styles.ratings__head}>
-              <p>{row.label}</p>
-              <p className={styles.ratings__value}>{row.value}</p>
+              <p className={styles.ratings__label}>{row.label}</p>
+              <p className={styles.ratings__value}>
+                {row.value}
+                {!!row.count && (
+                  <span
+                    className={styles.ratings__count}
+                    title={`${row.count.toLocaleString("en-US")} ratings`}
+                  >
+                    ({row.count.toLocaleString("en-US")})
+                  </span>
+                )}
+              </p>
             </div>
             <div className={styles.ratings__track}>
               <span
@@ -39,9 +49,6 @@ export const GameRatingsBlock: FC<IGameRatingsBlockProps> = ({
                 style={{ width: `${row.rating * 10}%` }}
               />
             </div>
-            {!!row.count && (
-              <p className={styles.ratings__count}>{row.count} ratings</p>
-            )}
           </div>
         ))}
       </div>

@@ -355,6 +355,11 @@ an instance of Module)`. Use a default import; tsc reports the call as `TS2349`.
   Space. The VNDB sync, the IGDB games and characters syncs and the conflict decision worker take the lock
   today.
 
+- **`TRIM_IGDB_STAGE` (`games.service.ts`) cuts `igdb` down to the fields it names in every game
+  response — by slug, by id, lists, Gauntlet history.** A field stored on `igdb` and declared in
+  `@mooncellar/schemas` still arrives as `undefined` until it is added there: the game page never
+  showed IGDB's vote count although `total_rating_count` was in the database and the web already
+  read it.
 - **A game's characters are read from `character.gameIds`, never from `game.characters`.**
   `CHARACTERS_LOOKUP_STAGE` joins on `gameIds` because `linkGameCharacters` (IGDB) and
   `linkVndbCharacters` rewrite `game.characters` with only their own characters every run, so a

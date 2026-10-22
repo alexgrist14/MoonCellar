@@ -39,8 +39,6 @@ export const GameScoreColumn: FC<IGameScoreColumnProps> = ({
   return (
     <Box
       className={className}
-      wrapperStyle={{ height: "auto" }}
-      templateStyle={{ height: "100%" }}
       classNameContent={styles.score}
       contentStyle={{ padding: "var(--padding-x4)" }}
     >

@@ -47,8 +47,12 @@ landing page — there are about 10 000 of them.
    `getGameStatusTone` (`entities/game/model`) is a `Badge`, Released stays plain text. Genres and
    platforms are `Chip` rows labelled in a `dl`, so a genre such as "Platform" is never read as a
    platform (mockup: `docs/mockups/game-hero-facts.html`, variant B).
-3. Three columns: `entities/game/ui/GameOverview` (summary, storyline, keywords), `widgets/game/GameScoreColumn`,
-   `widgets/game/GameSideColumn`. The score column's last block is `widgets/game/GameAchievementsBlock`,
+3. A text column and a sidebar (mockup: `docs/mockups/game-overview-row.html`, variant C). Left:
+   `entities/game/ui/GameOverview` (summary, storyline, keywords), then `widgets/game/GameLinksPanel`
+   (external pages and links). Right, as wide as the hero's counters plus the hero's padding so
+   the two line up: `widgets/game/GameScoreColumn`, then `GameFriendsStatus` in its own panel.
+   Ratings show each source's vote count in parentheses after the score (`9.4 (938)`). The score
+   column's last block is `widgets/game/GameAchievementsBlock`,
    one clickable `StatRows` row per source: Steam links to the game's global achievements page
    (`steamcommunity.com/stats/<appId>/achievements`, never the viewer's own, which would differ
    between the server and the client render), each RetroAchievements set links to
@@ -64,6 +68,12 @@ landing page — there are about 10 000 of them.
 9. `features/game/ui/GameAdminControls` — admin-only `ExpandMenu` with parse/delete/revalidate.
 
 ## Rules and gotchas
+
+- **The overview row's panels keep their own height; never stretch them to the tallest again.**
+  Equal-height columns with `justify-content: space-between` opened holes in the middle of
+  the shorter panels whenever one block was long. Each column is a stack aligned to the top. At
+  `media960` and below the stacks become `display: contents` so the panels flow as one column,
+  and `GameLinksPanel` takes `order: 1` to stay after the scores.
 
 - **Do not read `searchParams` in the route.** It turns the page dynamic and drops ISR for all
   game pages.
