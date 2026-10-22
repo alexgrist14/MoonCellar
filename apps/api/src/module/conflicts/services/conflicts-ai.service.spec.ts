@@ -121,7 +121,6 @@ const buildService = (undecided: unknown[]) => {
     getItem: jest.fn((_source: string, externalId: string) =>
       Promise.resolve(item(externalId))
     ),
-    skipCreatesGame: jest.fn((source: string) => source !== "ra"),
     findAiResolvedIds: jest.fn(),
     undo: jest.fn(),
   };
@@ -375,14 +374,6 @@ describe("Conflicts AI review", () => {
       ])
     ).toEqual([["game", { gameId: null }, { isAi: true }]]);
     expect(service.getStatus()).toMatchObject({ total: 1, decided: 1 });
-  });
-
-  it("refuses to add games for a source whose Skip adds none", () => {
-    const { service } = buildService([]);
-
-    expect(() => service.startCreate("ra", ADMIN)).toThrow(
-      "The AI does not add ra entries as new games"
-    );
   });
 
   it("adds games for every no-match verdict of a source without a filter", async () => {

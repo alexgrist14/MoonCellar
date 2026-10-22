@@ -67,7 +67,7 @@ header image when the app has none).
   - the library hero art as the background.
 
   The game is saved like one added by hand (`isCustom`), so a later IGDB match only fills its
-  empty fields. A skipped Steam conflict cannot be reopened.
+  empty fields. Undo new game on the conflict card deletes it again while nobody uses it.
 
 ## Catalogue: achievement counts
 

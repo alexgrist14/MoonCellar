@@ -261,7 +261,7 @@ export class ConflictsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary:
-      "Add a catalogue game found by hand to the candidates of a waiting conflict",
+      "Add a catalogue game, found by hand or named by id or slug, to the candidates of a waiting conflict",
   })
   addCandidate(
     @Param("source") source: string,
@@ -271,26 +271,7 @@ export class ConflictsController {
     return this.conflictsService.addCandidate(
       parseSource(source),
       externalId,
-      dto.gameId
-    );
-  }
-
-  @Post(":source/:externalId/reopen")
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary:
-      "Put a skipped conflict back in the queue with freshly matched candidates",
-  })
-  @ApiOkResponse({ type: ConflictsSummaryDto })
-  reopen(
-    @Param("source") source: string,
-    @Param("externalId") externalId: string,
-    @Req() request: IAuthorizedRequest
-  ) {
-    return this.conflictsService.reopen(
-      parseSource(source),
-      externalId,
-      request.user
+      dto.game
     );
   }
 

@@ -44,9 +44,9 @@ export const useAddConflictCandidateMutation = () => {
     mutationFn: ({
       source,
       externalId,
-      gameId,
-    }: Omit<IDecideConflictVariables, "choice"> & { gameId: string }) =>
-      adminConflictsApi.addCandidate(source, externalId, { gameId }),
+      game,
+    }: Omit<IDecideConflictVariables, "choice"> & { game: string }) =>
+      adminConflictsApi.addCandidate(source, externalId, { game }),
     onSettled: (_data, _error, { source, externalId }) =>
       Promise.all([
         queryClient.invalidateQueries({
@@ -59,9 +59,7 @@ export const useAddConflictCandidateMutation = () => {
   });
 };
 
-const useRequeueConflictMutation = (
-  request: typeof adminConflictsApi.reopen
-) => {
+export const useUndoConflictMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -69,7 +67,7 @@ const useRequeueConflictMutation = (
       source,
       externalId,
     }: Omit<IDecideConflictVariables, "choice">) =>
-      request(source, externalId).then(({ data }) => data),
+      adminConflictsApi.undo(source, externalId).then(({ data }) => data),
     onSuccess: (summary, { source, externalId }) => {
       queryClient.setQueryData(conflictQueryKeys.summary(source), summary);
       queryClient.invalidateQueries({
@@ -83,8 +81,3 @@ const useRequeueConflictMutation = (
   });
 };
 
-export const useReopenConflictMutation = () =>
-  useRequeueConflictMutation(adminConflictsApi.reopen);
-
-export const useUndoConflictMutation = () =>
-  useRequeueConflictMutation(adminConflictsApi.undo);

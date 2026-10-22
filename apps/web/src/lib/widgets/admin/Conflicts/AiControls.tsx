@@ -18,7 +18,7 @@ import { ProgressBar } from "@/src/lib/shared/ui/ProgressBar";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { DRAWER_TRIGGER_ATTRIBUTE, drawer } from "@/src/lib/shared/ui/Drawer";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
-import { canAiCreate, CONFLICT_SOURCES, SOURCE_LABELS } from "./labels";
+import { CONFLICT_SOURCES, SOURCE_LABELS } from "./labels";
 import { AiUndoPanel } from "./AiUndoPanel";
 import styles from "./Conflicts.module.scss";
 
@@ -119,7 +119,7 @@ export const AiControls: FC<IAiControlsProps> = ({ source, isApplying }) => {
   const seenFinishedAt = useRef(finishedAt);
   const isBusy = isPending || isRunning;
   const count = Number(limit);
-  const creatable = (source ? [source] : CONFLICT_SOURCES).filter(canAiCreate);
+  const creatable = source ? [source] : CONFLICT_SOURCES;
   const scope = source ? `${SOURCE_LABELS[source]} ` : "";
 
   const run = (request: () => Promise<{ data: { message: string } }>) => {
@@ -235,29 +235,27 @@ export const AiControls: FC<IAiControlsProps> = ({ source, isApplying }) => {
         >
           Apply verdicts
         </Button>
-        {!!creatable.length && (
-          <Button
-            disabled={isBusy}
-            onClick={() =>
-              confirm(
-                CREATE_MODAL_ID,
-                {
-                  title: "Add games from AI verdicts",
-                  message: `Add a new game for every waiting ${creatable.map((name) => SOURCE_LABELS[name]).join(", ")} conflict whose AI verdict says, with ${confidence.phrase} confidence, that no candidate is the entry? Add-ons, mods and hacks are left alone.`,
-                  warning: `Check the "no match" verdicts first. A game added this way is removed by opening its conflict and pressing Undo new game, as long as nobody has used it yet.${mediumWarning}`,
-                  confirmText: "Add games",
-                },
-                () =>
-                  adminConflictsApi.createWithAi(
-                    source,
-                    confidence.value.join(",")
-                  )
-              )
-            }
-          >
-            Add games for no match
-          </Button>
-        )}
+        <Button
+          disabled={isBusy}
+          onClick={() =>
+            confirm(
+              CREATE_MODAL_ID,
+              {
+                title: "Add games from AI verdicts",
+                message: `Add a new game for every waiting ${creatable.map((name) => SOURCE_LABELS[name]).join(", ")} conflict whose AI verdict says, with ${confidence.phrase} confidence, that no candidate is the entry? Add-ons, mods and hacks are left alone.`,
+                warning: `Check the "no match" verdicts first. A game added this way is removed by opening its conflict and pressing Undo new game, as long as nobody has used it yet.${mediumWarning}`,
+                confirmText: "Add games",
+              },
+              () =>
+                adminConflictsApi.createWithAi(
+                  source,
+                  confidence.value.join(",")
+                )
+            )
+          }
+        >
+          Add games for no match
+        </Button>
         <Button
           disabled={isBusy || isApplying}
           {...{ [DRAWER_TRIGGER_ATTRIBUTE]: "" }}

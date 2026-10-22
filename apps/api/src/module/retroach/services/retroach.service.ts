@@ -30,12 +30,16 @@ import {
 } from "../../games/schemas/platform.schema";
 import { User } from "../../user/schemas/user.schema";
 import { RA_MAIN_USER_NAME } from "../../../shared/constants";
-import type {
-  IConflictSubject,
-  IMatchReason,
-  IRetroachievementsField,
+import {
+  AddGameRequestSchema,
+  type IConflictSubject,
+  type IMatchReason,
+  type IRetroachievementsField,
 } from "@mooncellar/schemas";
 import { ConflictsService } from "../../conflicts/services/conflicts.service";
+import { ConflictsAiService } from "../../conflicts/services/conflicts-ai.service";
+import { GamesService } from "../../games/services/games.service";
+import { GameAiDraftService } from "../../games/services/game-ai-draft.service";
 import { RaPlaythroughsService } from "./ra-playthroughs.service";
 import type {
   IConflictDecision,
@@ -56,10 +60,10 @@ import {
   RA_ENGINE_GAME_FIELDS,
 } from "../utils/ra-match.utils";
 import {
+  isRaVariantTitle,
   matchPlatformToConsole,
   matchRaSets,
   RA_MEDIA_URL,
-  rankGamesByTitle,
   type TRaRanked,
   toRaSetEntry,
   type TRaSet,
@@ -83,7 +87,10 @@ export class RetroachievementsService implements OnModuleInit {
     private readonly logger: PinoLogger,
     private readonly metrics: BusinessMetricsService,
     private readonly conflicts: ConflictsService,
-    private readonly raPlaythroughs: RaPlaythroughsService
+    private readonly conflictsAi: ConflictsAiService,
+    private readonly raPlaythroughs: RaPlaythroughsService,
+    private readonly gamesService: GamesService,
+    private readonly aiDrafts: GameAiDraftService
   ) {
     this.logger.setContext(RetroachievementsService.name);
   }
@@ -200,7 +207,6 @@ export class RetroachievementsService implements OnModuleInit {
       linkField: "retroachievements.gameId",
       describe: (raId, data) => this.describeConflict(raId, data),
       apply: (decisions) => this.applyConflictDecisions(decisions),
-      rematch: (raId, data) => this.rematchConflict(raId, data),
       undo: ({ externalId, winners }) =>
         this.games
           .updateMany(
@@ -208,6 +214,9 @@ export class RetroachievementsService implements OnModuleInit {
             { $pull: { retroachievements: { gameId: Number(externalId) } } }
           )
           .then(() => undefined),
+    });
+    this.conflictsAi.register("ra", {
+      canCreate: ({ externalName }) => !isRaVariantTitle(externalName),
     });
   }
 
@@ -250,39 +259,6 @@ export class RetroachievementsService implements OnModuleInit {
     };
   }
 
-  private async rematchConflict(
-    raId: string,
-    data: Record<string, unknown> | null
-  ) {
-    const raGame = this.fromSnapshot(raId, data);
-
-    if (!raGame) return null;
-
-    const platforms = await this.platforms
-      .find({ raId: raGame.consoleId })
-      .select("_id slug raId")
-      .lean();
-    const candidates = (await this.games
-      .find({ platformIds: { $in: platforms.map(({ _id }) => _id) } })
-      .select(RA_USE_MATCH_ENGINE ? RA_ENGINE_GAME_FIELDS : "name slug")
-      .lean()) as unknown as GameDocument[];
-
-    if (!RA_USE_MATCH_ENGINE) {
-      return this.toConflictRecord(
-        raGame,
-        rankGamesByTitle(raGame.title, candidates)
-      ).candidates;
-    }
-
-    const picked = createRaEnginePicker(buildRaPlatformMaps(platforms))(
-      raGame,
-      candidates
-    );
-
-    return this.toConflictRecord(raGame, picked.ranked, picked.reason)
-      .candidates;
-  }
-
   private async describeConflict(
     raId: string,
     data: Record<string, unknown> | null
@@ -312,6 +288,35 @@ export class RetroachievementsService implements OnModuleInit {
     };
   }
 
+  private async createGame(raGame: TRaSet) {
+    const existing = await this.games
+      .findOne({ "retroachievements.gameId": raGame.id })
+      .select("_id")
+      .lean();
+
+    if (existing) return existing;
+
+    const { retroachievements, ...draft } = await this.aiDrafts.createDraft(
+      `https://retroachievements.org/game/${raGame.id}`
+    );
+    const game = await this.gamesService.addGame(
+      AddGameRequestSchema.parse(draft),
+      true
+    );
+
+    await this.games.updateOne(
+      { _id: game._id },
+      {
+        $push: {
+          retroachievements: retroachievements?.[0] ?? toRaSetEntry(raGame),
+        },
+      }
+    );
+    this.logger.info(`Added "${game.name}" from RA set ${raGame.id}`);
+
+    return game;
+  }
+
   private async applyConflictDecisions(
     decisions: IConflictDecision[]
   ): Promise<Map<string, mongoose.Types.ObjectId | null>> {
@@ -323,7 +328,19 @@ export class RetroachievementsService implements OnModuleInit {
       if (!raGame) continue;
 
       if (decision === "skip") {
-        applied.set(externalId, null);
+        if (isRaVariantTitle(raGame.title)) {
+          applied.set(externalId, null);
+          continue;
+        }
+
+        try {
+          applied.set(externalId, (await this.createGame(raGame))._id);
+        } catch (err) {
+          this.logger.warn(
+            err,
+            `Failed to add RA set ${externalId} as a game, the decision returns to review`
+          );
+        }
         continue;
       }
 

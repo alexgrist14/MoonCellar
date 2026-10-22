@@ -51,6 +51,7 @@ export const ConflictStateSchema = z.enum([
   "queued-new",
   "matched",
   "new-game",
+  "skipped",
   "postponed",
   "dismissed",
 ]);
@@ -162,6 +163,10 @@ export const ConflictItemSchema = z.object({
     .describe(
       "A match the source can unlink, or a Skip whose created game it can remove, and requeue the conflict"
     ),
+  createdGame: z
+    .object({ name: z.string() })
+    .nullable()
+    .describe("Game the Skip created, which Undo deletes"),
   subject: ConflictSubjectSchema.nullable().describe(
     "Null if the source no longer has the entry"
   ),
@@ -323,9 +328,14 @@ export const DecideConflictRequestSchema = z.object({
 });
 
 export const AddConflictCandidateRequestSchema = z.object({
-  gameId: ObjectIdSchema.describe(
-    "Catalogue game to add to the candidates of a waiting games-direction conflict"
-  ),
+  game: z
+    .string()
+    .trim()
+    .min(1)
+    .max(200)
+    .describe(
+      "Id or slug of the catalogue game to add to the candidates of a waiting games-direction conflict"
+    ),
 });
 
 export const POSSIBLE_DUPLICATES_MESSAGE =

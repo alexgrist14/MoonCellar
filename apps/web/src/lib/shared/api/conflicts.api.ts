@@ -52,12 +52,6 @@ const addCandidate = (
   );
 };
 
-const reopen = (source: IConflictSource, externalId: string) => {
-  return agent.post<IConflictsSummary>(
-    `${CONFLICTS_URL}/${source}/${encodeURIComponent(externalId)}/reopen`
-  );
-};
-
 const undo = (source: IConflictSource, externalId: string) => {
   return agent.post<IConflictsSummary>(
     `${CONFLICTS_URL}/${source}/${encodeURIComponent(externalId)}/undo`
@@ -103,7 +97,6 @@ export const adminConflictsApi = {
   getItem,
   decide,
   addCandidate,
-  reopen,
   undo,
   reviewWithAi,
   createWithAi,

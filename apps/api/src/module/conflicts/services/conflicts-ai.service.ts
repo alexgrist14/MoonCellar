@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  Logger,
-} from "@nestjs/common";
+import { ConflictException, Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import {
   ConflictSourceSchema,
@@ -203,17 +198,7 @@ export class ConflictsAiService {
     user: TReviewer,
     confidences = CONFLICTS_AI_APPLY_CONFIDENCES
   ) {
-    if (source && !this.conflicts.skipCreatesGame(source)) {
-      throw new BadRequestException(
-        `The AI does not add ${source} entries as new games`
-      );
-    }
-
-    const sources = source
-      ? [source]
-      : ConflictSourceSchema.options.filter((next) =>
-          this.conflicts.skipCreatesGame(next)
-        );
+    const sources = source ? [source] : ConflictSourceSchema.options;
 
     this.runInBackground(
       { action: "create", source: source ?? null },

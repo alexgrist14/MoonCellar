@@ -138,6 +138,13 @@ export const pickRaMatchesByTitle: TRaPicker = (
 
 export type TRaResolution = { status: string; winners: TId[] };
 
+const isPinning = (resolution?: TRaResolution) =>
+  resolution?.status === "resolved" || resolution?.status === "absent";
+
+const RA_VARIANT_TAG = /~(hack|homebrew|prototype|demo|test kit)~|\[subset/i;
+
+export const isRaVariantTitle = (title: string) => RA_VARIANT_TAG.test(title);
+
 export const matchRaSets = <T extends TRaCandidate>({
   raGames,
   games,
@@ -196,7 +203,7 @@ export const matchRaSets = <T extends TRaCandidate>({
     let matches: { _id: TId }[] = [];
 
     if (resolution) {
-      if (resolution.status !== "resolved") continue;
+      if (!isPinning(resolution)) continue;
 
       matches = resolution.winners.map((_id) => ({ _id }));
     } else {
@@ -236,8 +243,8 @@ export const matchRaSets = <T extends TRaCandidate>({
     for (const entry of game.retroachievements ?? []) {
       const resolution = resolutions.get(String(entry.gameId));
       const isPinnedHere =
-        resolution?.status === "resolved" &&
-        resolution.winners.some((winner) => winner.toString() === id);
+        isPinning(resolution) &&
+        resolution!.winners.some((winner) => winner.toString() === id);
 
       if (
         isPinnedHere &&

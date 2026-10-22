@@ -103,6 +103,6 @@ import { NotificationsModule } from "../notifications/notifications.module";
     HttpModule,
     JwtModule.register({}),
   ],
-  exports: [GamesService],
+  exports: [GamesService, GameAiDraftService],
 })
 export class GamesModule {}

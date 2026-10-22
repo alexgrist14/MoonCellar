@@ -21,7 +21,6 @@ import {
   useConflictsSocket,
   useConflictsSummaryQuery,
   useDecideConflictMutation,
-  useReopenConflictMutation,
   useUndoConflictMutation,
 } from "@/src/lib/entities/conflict/api";
 import { setAdminQuery } from "@/src/lib/shared/utils/admin-url.utils";
@@ -36,8 +35,6 @@ import {
   REASON_LABELS,
   SOURCE_LABELS,
   isServerBlockedImage,
-  skipCaption,
-  isReopenable,
   stateLabel,
   stateTone,
   parseConflictSource,
@@ -80,8 +77,6 @@ export const Conflicts: FC = () => {
     externalId
   );
   const { mutate: decide } = useDecideConflictMutation();
-  const { mutate: reopen, isPending: isReopening } =
-    useReopenConflictMutation();
   const {
     mutate: undo,
     mutateAsync: undoAsync,
@@ -260,7 +255,7 @@ export const Conflicts: FC = () => {
             )}
             {!isDecidable && (
               <Badge tone={stateTone(item.state)}>
-                {stateLabel(item.source, item.state)}
+                {stateLabel(item.state)}
                 {item.decidedBy && ` · ${item.decidedBy}`}
               </Badge>
             )}
@@ -505,9 +500,7 @@ export const Conflicts: FC = () => {
                   <kbd className={styles.key}>←</kbd>
                   Skip
                 </Button>
-                <span className={styles.caption}>
-                  {skipCaption(item.source)}
-                </span>
+                <span className={styles.caption}>Adds it as a new game</span>
               </div>
 
               {isDecidable ? (
@@ -562,12 +555,12 @@ export const Conflicts: FC = () => {
                             externalId: item.externalId,
                           };
 
-                          if (item.state !== "new-game") return undo(target);
+                          if (!item.createdGame) return undo(target);
 
                           modal.open(
                             <ConfirmModal
                               title="Undo the new game"
-                              message={`Delete the game this Skip added and put ${item.externalId} back in the queue?`}
+                              message={`Delete "${item.createdGame.name}", the game this Skip added, and put ${item.externalId} back in the queue?`}
                               warning="Refused when the game already has playthroughs, ratings, comments or list entries."
                               confirmText="Delete and requeue"
                               onConfirm={() =>
@@ -583,23 +576,11 @@ export const Conflicts: FC = () => {
                       >
                         {isUndoing
                           ? "Undoing…"
-                          : item.state === "new-game"
-                            ? "Undo new game"
-                            : "Undo match"}
-                      </Button>
-                    )}
-                    {isReopenable(item.source, item.state) && (
-                      <Button
-                        className={styles.actionButton}
-                        disabled={isReopening}
-                        onClick={() =>
-                          reopen({
-                            source: item.source,
-                            externalId: item.externalId,
-                          })
-                        }
-                      >
-                        {isReopening ? "Reopening…" : "Reopen"}
+                          : item.state === "matched"
+                            ? "Undo match"
+                            : item.createdGame
+                              ? "Undo new game"
+                              : "Undo skip"}
                       </Button>
                     )}
                     {!!item.nextExternalId && (

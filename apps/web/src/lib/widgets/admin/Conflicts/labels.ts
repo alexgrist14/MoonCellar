@@ -53,71 +53,20 @@ export const REASON_LABELS: Record<IMatchReason, string> = {
   "custom-game": "Matches a game added by hand",
 };
 
-const CREATES_GAME: Record<IConflictSource, boolean> = {
-  vndb: true,
-  igdb: true,
-  hltb: true,
-  ra: false,
-  steam: true,
+const STATE_LABELS: Record<IConflictState, string> = {
+  waiting: "Waiting",
+  "queued-match": "Match queued",
+  "queued-new": "New game queued",
+  matched: "Matched",
+  "new-game": "New game",
+  skipped: "No game added",
+  postponed: "Waits for release",
+  dismissed: "Dismissed",
 };
 
-const REOPENABLE: Record<IConflictSource, boolean> = {
-  vndb: false,
-  igdb: false,
-  hltb: false,
-  ra: true,
-  steam: false,
-};
-
-export const canAiCreate = (source: IConflictSource) => CREATES_GAME[source];
-
-export const isReopenable = (source: IConflictSource, state: string) =>
-  REOPENABLE[source] && state === "new-game";
-
-export const skipCaption = (source: IConflictSource) =>
-  CREATES_GAME[source] ? "Adds it as a new game" : "Leaves it without a match";
-
-const STATE_LABEL_SETS: Record<
-  "create" | "link",
-  Record<IConflictState, string>
-> = {
-  create: {
-    waiting: "Waiting",
-    "queued-match": "Match queued",
-    "queued-new": "New game queued",
-    matched: "Matched",
-    "new-game": "New game",
-    postponed: "Waits for release",
-    dismissed: "Dismissed",
-  },
-  link: {
-    waiting: "Waiting",
-    "queued-match": "Match queued",
-    "queued-new": "No match queued",
-    matched: "Matched",
-    "new-game": "No match",
-    postponed: "Waits for release",
-    dismissed: "Dismissed",
-  },
-};
-
-export const stateLabel = (source: IConflictSource, state: IConflictState) =>
-  STATE_LABEL_SETS[CREATES_GAME[source] ? "create" : "link"][state];
+export const stateLabel = (state: IConflictState) => STATE_LABELS[state];
 
 export const CONFLICT_STATES = ConflictStateSchema.options;
-
-export const stateFilterLabel = (
-  source: IConflictSource | undefined,
-  state: IConflictState
-) => {
-  if (source) return stateLabel(source, state);
-
-  const { create, link } = STATE_LABEL_SETS;
-
-  return create[state] === link[state]
-    ? create[state]
-    : `${create[state]} / ${link[state]}`;
-};
 
 export const stateTone = (state: IConflictState) =>
   state === "waiting"

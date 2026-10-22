@@ -19,6 +19,7 @@ import {
 } from "../user/schemas/user-ratings.schema";
 import { MetricsModule } from "../metrics/metrics.module";
 import { ConflictsModule } from "../conflicts/conflicts.module";
+import { GamesModule } from "../games/games.module";
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ConflictsModule } from "../conflicts/conflicts.module";
     ]),
     MetricsModule,
     ConflictsModule,
+    GamesModule,
   ],
 
   controllers: [RetroachievementsController],
