@@ -43,6 +43,8 @@ export class Level {
   data: Buffer;
   @Prop({ type: Number, required: true })
   size: number;
+  @Prop({ type: String, default: "" })
+  hash: string;
   @Prop({ type: Number, default: 1 })
   version: number;
   @Prop({ type: [LevelRating], default: [], select: false })

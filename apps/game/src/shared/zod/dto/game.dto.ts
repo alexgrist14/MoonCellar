@@ -28,6 +28,7 @@ import {
   GameLevelListQuerySchema,
   GameLevelListSchema,
   GameLevelModerationSchema,
+  GameLevelOwnListSchema,
   GameLevelParamsSchema,
   GameLevelRatingSchema,
   GameLevelReportResultSchema,
@@ -106,6 +107,8 @@ export class GameLevelListQueryDto extends createZodDto(
 export class GameLevelDto extends createZodDto(GameLevelSchema) {}
 
 export class GameLevelListDto extends createZodDto(GameLevelListSchema) {}
+
+export class GameLevelOwnListDto extends createZodDto(GameLevelOwnListSchema) {}
 
 export class GameLevelUploadDto extends createZodDto(GameLevelUploadSchema) {}
 

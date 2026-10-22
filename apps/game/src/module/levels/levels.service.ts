@@ -6,6 +6,7 @@ import {
   UnprocessableEntityException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
+import { createHash } from "node:crypto";
 import type {
   IGameAccount,
   IGameLevel,
@@ -13,6 +14,7 @@ import type {
   IGameLevelList,
   IGameLevelListQuery,
   IGameLevelMode,
+  IGameLevelOwnList,
   IGameLevelReportResult,
   IGameLevelReported,
   IGameLevelUpload,
@@ -28,6 +30,9 @@ const REPORTS_TO_HIDE = 3;
 
 const escapeRegex = (text: string) =>
   text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+export const levelHash = (data: Buffer) =>
+  createHash("sha256").update(data).digest("hex");
 
 @Injectable()
 export class LevelsService {
@@ -55,6 +60,7 @@ export class LevelsService {
       version: row.version,
       board: levelBoard(id, row.version),
       size: row.size,
+      hash: row.hash ?? "",
       rating: row.rating,
       ratings: row.ratingCount,
       downloads: row.downloads,
@@ -88,6 +94,59 @@ export class LevelsService {
       );
     }
     return data;
+  }
+
+  private async nameFree(
+    game: IGameDefinition,
+    account: IGameAccount,
+    name: string,
+    except?: unknown
+  ) {
+    const filter: Record<string, unknown> = {
+      game: game.slug,
+      authorId: account.id,
+      name: new RegExp(`^${escapeRegex(name.trim())}$`, "i"),
+    };
+    if (except) filter._id = { $ne: except };
+    if (await this.levels.exists(filter)) {
+      throw new ConflictException(
+        `You already have a level named "${name.trim()}". Upload a new version of it instead`
+      );
+    }
+  }
+
+  private async withHashes(rows: ILeanLevel[]) {
+    for (const row of rows) {
+      if (row.hash) continue;
+      const stored = await this.levels
+        .findById(row._id)
+        .select("+data")
+        .lean<{ data?: Buffer }>();
+      if (!stored?.data) continue;
+      row.hash = levelHash(Buffer.from(stored.data));
+      await this.levels.updateOne({ _id: row._id }, { $set: { hash: row.hash } });
+    }
+    return rows;
+  }
+
+  async mine(
+    game: IGameDefinition,
+    account: IGameAccount
+  ): Promise<IGameLevelOwnList> {
+    this.limitsOf(game);
+    const rows = await this.levels
+      .find({ game: game.slug, authorId: account.id })
+      .sort({ createdAt: -1 })
+      .lean<ILeanLevel[]>();
+    await this.withHashes(rows);
+    return {
+      game: game.slug,
+      authorId: account.id,
+      levels: rows.map((row) => ({
+        ...this.toLevel(row),
+        hidden: row.hidden,
+      })),
+    };
   }
 
   async list(
@@ -124,7 +183,8 @@ export class LevelsService {
 
   async get(game: IGameDefinition, levelId: string): Promise<IGameLevel> {
     const row = await this.visible(game, levelId);
-    return this.toLevel(row.toObject() as ILeanLevel);
+    const [level] = await this.withHashes([row.toObject() as ILeanLevel]);
+    return this.toLevel(level);
   }
 
   async file(game: IGameDefinition, levelId: string): Promise<IGameLevelFile> {
@@ -143,6 +203,7 @@ export class LevelsService {
     dto: IGameLevelUpload
   ): Promise<IGameLevel> {
     const data = this.checked(game, dto.data, dto.mode);
+    await this.nameFree(game, account, dto.name);
     const count = await this.levels.countDocuments({
       game: game.slug,
       authorId: account.id,
@@ -163,6 +224,7 @@ export class LevelsService {
       timeLimit: dto.timeLimit,
       data,
       size: data.length,
+      hash: levelHash(data),
     });
     return this.toLevel(row.toObject() as ILeanLevel);
   }
@@ -190,6 +252,7 @@ export class LevelsService {
   ): Promise<IGameLevel> {
     const row = await this.own(game, account, levelId);
     const data = this.checked(game, dto.data, dto.mode);
+    await this.nameFree(game, account, dto.name, row._id);
     row.set({
       name: dto.name,
       description: dto.description,
@@ -198,6 +261,7 @@ export class LevelsService {
       timeLimit: dto.timeLimit,
       data,
       size: data.length,
+      hash: levelHash(data),
       version: row.version + 1,
       authorName: account.userName,
     });
