@@ -106,7 +106,7 @@ bun --version                              # expect 1.3.12 or newer
 
 ```bash
 # 1. Clone
-git clone git@github.com:alexgrist14/MoonCellar.git
+git clone git@github.com:MoonCellar-Team/MoonCellar.git
 cd MoonCellar
 
 # 2. Install every workspace at once — a single root node_modules and bun.lock
