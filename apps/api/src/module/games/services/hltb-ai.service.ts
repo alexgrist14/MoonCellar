@@ -3,7 +3,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import type { IConflictAiVerdict } from "@mooncellar/schemas";
 import { HowLongToBeatService } from "howlongtobeat-ts";
 import { Model } from "mongoose";
-import { callOpenAi, openAiModel, outputText } from "../../../shared/openai";
+import { aiModel, generateJson } from "../../../shared/claude";
 import {
   ConflictsAiService,
   type TUndecidedConflict,
@@ -39,7 +39,7 @@ export class HltbAiService implements OnModuleInit {
     conflict: TUndecidedConflict,
     platformNames: Map<string, string>
   ): Promise<IConflictAiVerdict> {
-    const model = openAiModel();
+    const model = aiModel();
     const entry = {
       ...(conflict.externalData as HltbSearchEntry),
       id: Number(conflict.externalId),
@@ -74,20 +74,14 @@ export class HltbAiService implements OnModuleInit {
     }
 
     const gameIds = games.map(({ _id }) => String(_id));
-    const response = await callOpenAi(process.env.OPENAI_API_KEY!, {
-      model,
+    const answer = await generateJson({
+      task: "hltb conflict review",
       instructions: HLTB_AI_INSTRUCTIONS,
       input: buildHltbAiInput({ entry, page, games, platformNames }),
-      text: {
-        format: {
-          type: "json_schema",
-          name: "hltb_match",
-          strict: true,
-          schema: conflictAiSchema(gameIds),
-        },
-      },
+      name: "hltb_match",
+      schema: conflictAiSchema(gameIds),
     });
 
-    return toConflictAiVerdict(outputText(response.output), gameIds, model);
+    return toConflictAiVerdict(answer.text, gameIds, answer.model);
   }
 }

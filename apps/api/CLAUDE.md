@@ -752,7 +752,7 @@ Module` before a single test runs. `comments.controller.spec.ts` mocks it with `
   `useDeleteGame`. A Skip made before `created` existed is refused: the game it added cannot be told apart
   from one that was already there. A source whose Skip creates nothing (RA) answers 400 — reopen it instead.
   The admin card asks for confirmation before this undo, because it deletes a game.
-- **OpenAI judges conflicts only through `POST /conflicts/:source/ai` (`ConflictsAiService`), and it decides
+- **The AI judges conflicts only through `POST /conflicts/:source/ai` (`ConflictsAiService`), and it decides
   nothing until `apply=true`.** A run judges up to `limit` undecided conflicts of the source that have no
   verdict yet and stores the answer in `externalData.aiVerdict` (game ids, `high`/`medium`/`low`, a reason).
   The item and the list rows carry it as `aiVerdict`, and `GET /conflicts/list?aiOnly=true` lists only judged
@@ -766,7 +766,7 @@ Module` before a single test runs. `comments.controller.spec.ts` mocks it with `
   the stored verdicts and judges nothing, which is the admin screen's "Apply verdicts" after a dry run.
   `POST /conflicts/ai` (the All tab) runs the same review for every source in turn, `limit` per source, and
   `POST /conflicts/ai/undo` undoes every source that can. One AI job runs at a time, whatever its source
-  (in-process flag plus the `conflicts-ai` `withDbLock`), so two runs never spend the OpenAI quota at once.
+  (in-process flag plus the `conflicts-ai` `withDbLock`), so two runs never spend the AI quota at once.
   A job counts its work before it starts (stored verdicts to apply plus conflicts to judge, or matches to
   undo, over every source it covers) and keeps its progress in memory; `GET /conflicts/ai/status` returns
   it, and the admin screen polls it every second while `isRunning` to draw the bar under the AI buttons.
@@ -870,6 +870,22 @@ Module` before a single test runs. `comments.controller.spec.ts` mocks it with `
   it did not match, so an unpinned set on a game named or filed differently from the RA title
   silently disappears the next morning.
 
+## AI providers
+
+- **Every text AI call asks Claude first and OpenAI only after it, through `claudeFirst`
+  (`shared/claude.ts`); never call `callOpenAi` alone for a new one.** Use `generateJson` for a single
+  structured answer and `claudeFirst` with both branches for anything else, as the draft research loop
+  and its web search do. Only image generation stays on OpenAI and Recraft, which Claude cannot do.
+- **Only a `ClaudeError` falls back to OpenAI.** `callClaude` throws it for a failed request, a
+  `refusal` and a `max_tokens` stop; any other error — a draft's own SearXNG abort, a bad query — is
+  rethrown as is, because OpenAI would fail the same way and spend its quota on it. A draft that fails
+  on Claude mid-research starts over on OpenAI, so the run's steps show "Asking OpenAI" after the
+  Claude ones.
+- **A Claude JSON schema may hold at most 16 union-typed parameters (`["string", "null"]`, `anyOf`) and
+  24 optional ones across the output schema and every strict tool of a request.** Above that the API
+  answers 400 "Schema is too complex for compilation", which reads as a Claude failure and silently
+  sends every call to OpenAI. The game draft uses 7 today.
+
 ## AI drafts
 
 - **An AI draft runs unattended, so its prompt must forbid questions and its schema must let the
@@ -885,8 +901,8 @@ Module` before a single test runs. `comments.controller.spec.ts` mocks it with `
   started from an RA link knew nothing but the id. `/Images/000002.png` is RA's "no box art"
   placeholder and is dropped. A game draft from an RA link also carries the set in
   `retroachievements`, built by `toRaSetEntry` like every other RA link.
-- **A search answered by the OpenAI fallback is a success, even though its text quotes the SearXNG
-  failure.** `searchWebWithFallback` prefixes the answer with `OPENAI_SEARCH_PREFIX` and the
+- **A search answered by the AI fallback is a success, even though its text quotes the SearXNG
+  failure.** `searchWebWithFallback` prefixes the answer with `AI_SEARCH_PREFIX` and the
   reason, which contains `SEARCH_ENGINES_UNAVAILABLE`; the abort checks in `research` skip such
   outputs. Matching the phrase anywhere failed every draft with "rate-limited or ask for a
   CAPTCHA" while the fallback had already returned results.

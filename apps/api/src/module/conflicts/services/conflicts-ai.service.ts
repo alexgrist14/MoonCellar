@@ -3,7 +3,6 @@ import {
   ConflictException,
   Injectable,
   Logger,
-  ServiceUnavailableException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import {
@@ -14,7 +13,7 @@ import {
 } from "@mooncellar/schemas";
 import { Model } from "mongoose";
 import { withDbLock } from "../../../shared/cron-mutex";
-import { callOpenAi, openAiModel, outputText } from "../../../shared/openai";
+import { aiModel, assertAiKey, generateJson } from "../../../shared/claude";
 import { Game, type GameDocument } from "../../games/schemas/game.schema";
 import {
   Platform,
@@ -119,9 +118,7 @@ export class ConflictsAiService {
     options: TReviewOptions,
     user: TReviewer
   ) {
-    if (!process.env.OPENAI_API_KEY) {
-      throw new ServiceUnavailableException("OPENAI_API_KEY is not set");
-    }
+    assertAiKey();
 
     const sources = source ? [source] : ConflictSourceSchema.options;
     const scope = source ? `${source} conflicts` : "conflicts of each source";
@@ -481,7 +478,7 @@ export class ConflictsAiService {
 
   private judgeItem(source: IConflictSource): TConflictJudge {
     return async (conflict, platformNames) => {
-      const model = openAiModel();
+      const model = aiModel();
       const item = await this.conflicts.getItem(source, conflict.externalId);
 
       if (!item?.subject) {
@@ -496,21 +493,15 @@ export class ConflictsAiService {
         return noMatchVerdict("No candidate game exists any more.", model);
       }
 
-      const response = await callOpenAi(process.env.OPENAI_API_KEY!, {
-        model,
+      const answer = await generateJson({
+        task: `${source} conflict review`,
         instructions: conflictAiInstructions(source, item.isMultiMatch),
         input: buildConflictAiInput(item, platformNames),
-        text: {
-          format: {
-            type: "json_schema",
-            name: "conflict_match",
-            strict: true,
-            schema: conflictAiSchema(gameIds),
-          },
-        },
+        name: "conflict_match",
+        schema: conflictAiSchema(gameIds),
       });
 
-      return toConflictAiVerdict(outputText(response.output), gameIds, model);
+      return toConflictAiVerdict(answer.text, gameIds, answer.model);
     };
   }
 }

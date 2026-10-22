@@ -168,7 +168,7 @@ export const ConflictItemSchema = z.object({
   candidates: ConflictCandidateSchema.array(),
   entries: ConflictEntrySchema.array(),
   aiVerdict: ConflictAiVerdictSchema.nullable().describe(
-    "What OpenAI answered for this conflict, until the next sync replaces it"
+    "What the AI answered for this conflict, until the next sync replaces it"
   ),
 });
 
@@ -260,7 +260,7 @@ export const GetConflictsRequestSchema = z.object({
   aiOnly: z
     .stringbool()
     .optional()
-    .describe("Only conflicts OpenAI has judged"),
+    .describe("Only conflicts the AI has judged"),
   sortBy: ConflictsSortSchema.default("queue").describe(
     "queue: waiting first, then oldest first; ai: by AI verdict, conflicts without one last in either order"
   ),

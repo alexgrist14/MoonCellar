@@ -143,6 +143,7 @@ const buildService = (undecided: unknown[]) => {
 describe("Conflicts AI review", () => {
   beforeEach(() => {
     process.env.OPENAI_API_KEY = "test";
+    delete process.env.ANTHROPIC_API_KEY;
     jest.mocked(callOpenAi).mockReset();
   });
 

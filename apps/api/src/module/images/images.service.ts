@@ -20,6 +20,7 @@ import {
   type ISuggestImageElementsRequest,
   type ISuggestImageElementsResponse,
 } from "@mooncellar/schemas";
+import { assertAiKey, generateJson } from "../../shared/claude";
 import { S3_FOLDERS } from "../../shared/s3";
 import { FileService } from "../user/services/file-upload.service";
 import {
@@ -67,11 +68,6 @@ type IProviderResponse = {
   data?: { b64_json?: string }[];
   error?: { message?: string } | string;
   message?: string;
-};
-
-type IResponsesOutput = {
-  output?: { content?: { type: string; text?: string }[] }[];
-  error?: { message?: string };
 };
 
 const hexToRgb = (hex: string) =>
@@ -175,55 +171,16 @@ export class ImagesService {
     prompt,
     dataUrl,
   }: ISuggestImageElementsRequest): Promise<ISuggestImageElementsResponse> {
-    const token = this.getToken("openai");
+    assertAiKey();
 
-    const response = await fetch(`${OPENAI_URL}/responses`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: process.env.OPENAI_MODEL || "gpt-5-mini",
-        instructions: ELEMENTS_INSTRUCTIONS,
-        input: [
-          {
-            role: "user",
-            content: [
-              { type: "input_text", text: prompt },
-              { type: "input_image", image_url: dataUrl },
-            ],
-          },
-        ],
-        text: {
-          format: {
-            type: "json_schema",
-            name: "elements",
-            strict: true,
-            schema: ELEMENTS_SCHEMA,
-          },
-        },
-      }),
-      signal: AbortSignal.timeout(GENERATION_TIMEOUT_MS),
-    }).catch((error: Error) => {
-      this.logger.error(error, "OpenAI elements request failed");
-      throw new BadGatewayException("OpenAI is not reachable");
+    const { text } = await generateJson({
+      task: "Image elements",
+      instructions: ELEMENTS_INSTRUCTIONS,
+      input: prompt,
+      image: dataUrl,
+      name: "elements",
+      schema: ELEMENTS_SCHEMA,
     });
-
-    const payload = (await response
-      .json()
-      .catch(() => ({}))) as IResponsesOutput;
-    const text = payload.output
-      ?.flatMap((item) => item.content ?? [])
-      .find((content) => content.type === "output_text")?.text;
-
-    if (!response.ok || !text) {
-      const message = payload.error?.message ?? `HTTP ${response.status}`;
-
-      this.logger.warn(`OpenAI could not split the image: ${message}`);
-      throw new BadGatewayException(`OpenAI: ${message}`);
-    }
-
     const { elements } = JSON.parse(text) as ISuggestImageElementsResponse;
 
     return { elements: elements.slice(0, IMAGE_ELEMENTS_MAX) };

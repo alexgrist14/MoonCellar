@@ -47,12 +47,19 @@ import {
 } from "../../../shared/remote-image";
 import { toReleaseDate } from "../../../shared/release-date";
 import { uniqueSlug } from "../../../shared/utils";
+import type Anthropic from "@anthropic-ai/sdk";
 import {
   callOpenAi,
   type IOpenAiOutput,
   openAiModel,
   outputText,
 } from "../../../shared/openai";
+import {
+  assertAiKey,
+  callClaude,
+  claudeFirst,
+  messageText,
+} from "../../../shared/claude";
 import { normalizeTitle } from "../utils/title-match.utils";
 import { FRONT_URL, RA_MAIN_USER_NAME } from "../../../shared/constants";
 import { VNDB_WORLDWIDE_REGION } from "../constants/vndb";
@@ -72,7 +79,7 @@ const IMAGE_SEARCH_SUFFIX: Record<IGameImageKind, string> = {
   artworks: "key art artwork wallpaper",
 };
 const ADMIN_FETCH = { useSessions: true };
-const OPENAI_SEARCH_PREFIX = "OpenAI web search results";
+const AI_SEARCH_PREFIX = "AI web search results";
 const RA_HOSTS = new Set([
   "retroachievements.org",
   "www.retroachievements.org",
@@ -122,7 +129,7 @@ const isRelevant = (
     return tokens.some((token) => text.includes(token));
   });
 };
-const OPENAI_SEARCH_INSTRUCTIONS = `Search the web for the query and report what the pages say, as a list: for each relevant page its title, URL and the facts it gives about the query. Keep names in their original language as written (for example Japanese) and add a romanised form. Report only what the pages say; when nothing relevant is found, say so.`;
+const AI_SEARCH_INSTRUCTIONS = `Search the web for the query and report what the pages say, as a list: for each relevant page its title, URL and the facts it gives about the query. Keep names in their original language as written (for example Japanese) and add a romanised form. Report only what the pages say; when nothing relevant is found, say so.`;
 const ADULT_KEYWORD = "pay gorn";
 const SEARCH_TOOLS = new Set(["search_web", "search_images", "search_youtube"]);
 const CONNECTION_FAILURE =
@@ -320,6 +327,128 @@ type ICharacterDraft = {
   games: string[];
 };
 
+type IResearch = {
+  instructions: string;
+  input: string;
+  tools: typeof TOOLS;
+  schemaName: string;
+  schema: Record<string, unknown>;
+};
+
+type IToolOutput = { id: string; name: string; output: string };
+
+type IResearchTurn = (
+  outputs: IToolOutput[],
+  isLastTurn: boolean
+) => Promise<{
+  calls: { id: string; name: string; arguments: string }[];
+  text: string;
+}>;
+
+const claudeTurns = ({
+  instructions,
+  input,
+  tools,
+  schema,
+}: IResearch): IResearchTurn => {
+  const messages: Anthropic.MessageParam[] = [{ role: "user", content: input }];
+
+  return async (outputs, isLastTurn) => {
+    if (outputs.length) {
+      messages.push({
+        role: "user",
+        content: outputs.map(({ id, output }) => ({
+          type: "tool_result",
+          tool_use_id: id,
+          content: output,
+        })),
+      });
+    }
+
+    const message = await callClaude({
+      system: instructions,
+      messages,
+      tools: tools.map(({ name, description, parameters }) => ({
+        name,
+        description,
+        input_schema: parameters as Anthropic.Tool.InputSchema,
+        strict: true,
+      })),
+      tool_choice: { type: isLastTurn ? "none" : "auto" },
+      output_config: { format: { type: "json_schema", schema } },
+    });
+
+    messages.push({ role: "assistant", content: message.content });
+
+    return {
+      calls: message.content.flatMap((block) =>
+        block.type === "tool_use"
+          ? [
+              {
+                id: block.id,
+                name: block.name,
+                arguments: JSON.stringify(block.input),
+              },
+            ]
+          : []
+      ),
+      text: messageText(message),
+    };
+  };
+};
+
+const openAiTurns = ({
+  instructions,
+  input,
+  tools,
+  schemaName,
+  schema,
+}: IResearch): IResearchTurn => {
+  let body: Record<string, unknown> = {
+    model: openAiModel(),
+    instructions,
+    input,
+    tools,
+    text: {
+      format: { type: "json_schema", name: schemaName, strict: true, schema },
+    },
+  };
+
+  return async (outputs, isLastTurn) => {
+    if (outputs.length) {
+      body = {
+        ...body,
+        input: outputs.map(({ id, output }) => ({
+          type: "function_call_output",
+          call_id: id,
+          output,
+        })),
+      };
+    }
+
+    const response = await callOpenAi(process.env.OPENAI_API_KEY!, {
+      ...body,
+      tool_choice: isLastTurn ? "none" : "auto",
+    });
+
+    body = { ...body, previous_response_id: response.id };
+
+    return {
+      calls: response.output
+        .filter(
+          (item): item is Extract<IOpenAiOutput, { type: "function_call" }> =>
+            item.type === "function_call"
+        )
+        .map((call) => ({
+          id: call.call_id,
+          name: call.name,
+          arguments: call.arguments,
+        })),
+      text: outputText(response.output),
+    };
+  };
+};
+
 const kindFilter = (kind: IAiDraftKind) =>
   kind === "character" ? { kind } : { kind: { $ne: "character" } };
 
@@ -383,7 +512,7 @@ export class GameAiDraftService implements OnModuleInit {
   }
 
   async startRun(query: string, kind: IAiDraftKind = "game", count = 1) {
-    this.assertApiKey();
+    assertAiKey();
 
     const run = await this.Drafts.create({ query, kind, count });
     await this.pruneRuns(kind);
@@ -393,7 +522,7 @@ export class GameAiDraftService implements OnModuleInit {
   }
 
   async retryRun(id: string) {
-    this.assertApiKey();
+    assertAiKey();
 
     const run = isValidObjectId(id)
       ? await this.Drafts.findOneAndUpdate(
@@ -410,12 +539,6 @@ export class GameAiDraftService implements OnModuleInit {
     void this.execute(run._id, run.query, run.kind ?? "game", run.count ?? 1);
 
     return run;
-  }
-
-  private assertApiKey() {
-    if (!process.env.OPENAI_API_KEY) {
-      throw new ServiceUnavailableException("OPENAI_API_KEY is not set");
-    }
   }
 
   private execute(
@@ -736,36 +859,27 @@ export class GameAiDraftService implements OnModuleInit {
     return [...new Set(ids.filter((id): id is string => !!id))];
   }
 
-  private async research<T>({
-    instructions,
-    input,
-    tools,
-    schemaName,
-    schema,
+  private research<T>({
     addStep,
-  }: {
-    instructions: string;
-    input: string;
-    tools: typeof TOOLS;
-    schemaName: string;
-    schema: Record<string, unknown>;
+    ...research
+  }: IResearch & {
     addStep: (step: string) => Promise<unknown>;
   }): Promise<T> {
-    const apiKey = process.env.OPENAI_API_KEY;
+    assertAiKey();
 
-    if (!apiKey) {
-      throw new ServiceUnavailableException("OPENAI_API_KEY is not set");
-    }
+    return claudeFirst(
+      "AI draft",
+      () => this.runResearch<T>(claudeTurns(research), "Claude", addStep),
+      () => this.runResearch<T>(openAiTurns(research), "OpenAI", addStep)
+    );
+  }
 
-    let body: Record<string, unknown> = {
-      model: openAiModel(),
-      instructions,
-      input,
-      tools,
-      text: {
-        format: { type: "json_schema", name: schemaName, strict: true, schema },
-      },
-    };
+  private async runResearch<T>(
+    nextTurn: IResearchTurn,
+    provider: string,
+    addStep: (step: string) => Promise<unknown>
+  ): Promise<T> {
+    let outputs: IToolOutput[] = [];
 
     for (let turn = 0; turn <= MAX_TURNS; turn++) {
       const isLastTurn = turn === MAX_TURNS;
@@ -775,28 +889,18 @@ export class GameAiDraftService implements OnModuleInit {
           ? "Out of research rounds, asking for the draft"
           : turn
             ? "Reading the results"
-            : "Asking OpenAI"
+            : `Asking ${provider}`
       );
-      const response = await callOpenAi(apiKey, {
-        ...body,
-        tool_choice: isLastTurn ? "none" : "auto",
-      });
-      const calls = response.output.filter(
-        (item): item is Extract<IOpenAiOutput, { type: "function_call" }> =>
-          item.type === "function_call"
-      );
+      const { calls, text } = await nextTurn(outputs, isLastTurn);
 
       if (!calls.length) {
-        const text = response.output
-          .flatMap((item) => ("content" in item ? item.content : []))
-          .find((content) => content.type === "output_text")?.text;
-
-        if (!text) throw new BadGatewayException("OpenAI returned no draft");
+        if (!text)
+          throw new BadGatewayException(`${provider} returned no draft`);
 
         return JSON.parse(text) as T;
       }
 
-      const outputs = await Promise.all(
+      outputs = await Promise.all(
         calls.map(async (call) => {
           const step = `${call.name} ${this.describeArgs(call.arguments)}`;
 
@@ -805,16 +909,11 @@ export class GameAiDraftService implements OnModuleInit {
 
           if (output.startsWith(TOOL_FAILED)) {
             await addStep(`${step}: ${output}`);
-          } else if (output.startsWith(OPENAI_SEARCH_PREFIX)) {
-            await addStep(`${step}: answered by OpenAI web search`);
+          } else if (output.startsWith(AI_SEARCH_PREFIX)) {
+            await addStep(`${step}: answered by AI web search`);
           }
 
-          return {
-            type: "function_call_output",
-            call_id: call.call_id,
-            name: call.name,
-            output,
-          };
+          return { id: call.id, name: call.name, output };
         })
       );
       const searches = outputs.filter(({ name }) => SEARCH_TOOLS.has(name));
@@ -822,7 +921,7 @@ export class GameAiDraftService implements OnModuleInit {
         !!searches.length &&
         searches.every(
           ({ output }) =>
-            !output.startsWith(OPENAI_SEARCH_PREFIX) && isFailure(output)
+            !output.startsWith(AI_SEARCH_PREFIX) && isFailure(output)
         );
 
       if (
@@ -840,15 +939,9 @@ export class GameAiDraftService implements OnModuleInit {
           "Web search is not reachable: check that SearXNG runs at SEARXNG_URL, then retry the draft"
         );
       }
-
-      body = {
-        ...body,
-        previous_response_id: response.id,
-        input: outputs.map(({ name: _name, ...output }) => output),
-      };
     }
 
-    throw new BadGatewayException("OpenAI did not finish the research");
+    throw new BadGatewayException(`${provider} did not finish the research`);
   }
 
   private async searchWebWithFallback(query = "") {
@@ -864,20 +957,35 @@ export class GameAiDraftService implements OnModuleInit {
       reason = (err as Error).message;
     }
 
-    const apiKey = process.env.OPENAI_API_KEY;
+    if (!process.env.ANTHROPIC_API_KEY && !process.env.OPENAI_API_KEY) {
+      throw new Error(`SearXNG: ${reason}`);
+    }
 
-    if (!apiKey) throw new Error(`SearXNG: ${reason}`);
+    const text = await claudeFirst(
+      "AI web search",
+      async () =>
+        messageText(
+          await callClaude({
+            system: AI_SEARCH_INSTRUCTIONS,
+            messages: [{ role: "user", content: query }],
+            tools: [{ type: "web_search_20260209", name: "web_search" }],
+          })
+        ),
+      async () =>
+        outputText(
+          (
+            await callOpenAi(process.env.OPENAI_API_KEY!, {
+              model: openAiModel(),
+              instructions: AI_SEARCH_INSTRUCTIONS,
+              input: query,
+              tools: [{ type: "web_search" }],
+              tool_choice: "required",
+            })
+          ).output
+        )
+    );
 
-    const response = await callOpenAi(apiKey, {
-      model: openAiModel(),
-      instructions: OPENAI_SEARCH_INSTRUCTIONS,
-      input: query,
-      tools: [{ type: "web_search" }],
-      tool_choice: "required",
-    });
-    const text = outputText(response.output).trim();
-
-    return `${OPENAI_SEARCH_PREFIX} (SearXNG: ${reason})\n${text || "Nothing found."}`;
+    return `${AI_SEARCH_PREFIX} (SearXNG: ${reason})\n${text.trim() || "Nothing found."}`;
   }
 
   private describeArgs(rawArgs: string) {
