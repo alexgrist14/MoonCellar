@@ -56,7 +56,8 @@ page with RA sets filled in — including an AI draft started from a
 
 ### Where it shows
 
-- **Game page.** The "Achievements" block shows the RA medal and the sum of the game's sets.
+- **Game page.** The "Achievements" block shows one row per RA set, with its console and count;
+  each row opens the set on `retroachievements.org/game/<id>` in a new tab.
 - **Game cards.** An RA medal in the bottom-right corner opens `GameAchievementsPopover`: each
   set with its console, icon and count, and the viewer's award (Beaten or Mastered with its date)
   when they have one. The medal is yellow when the viewer mastered a set, green when they beat

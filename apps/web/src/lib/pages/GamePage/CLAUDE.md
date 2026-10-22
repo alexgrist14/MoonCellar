@@ -42,11 +42,17 @@ landing page — there are about 10 000 of them.
 1. `BGImage` — background derived from the game (deterministically, not at random).
 2. `widgets/game/GameHero` — cover, name (`h1`), stats, controls, and the "Suggest an edit" link
    to `/requests` in the banner's top-right corner, so it shows even when `GameDetails` has no rows.
+   Under the name, `entities/game/ui/GameFacts` (shared with the Gauntlet winner): single facts
+   (year, type, perspectives, status) are one line of catalogue links; a status with a tone from
+   `getGameStatusTone` (`entities/game/model`) is a `Badge`, Released stays plain text. Genres and
+   platforms are `Chip` rows labelled in a `dl`, so a genre such as "Platform" is never read as a
+   platform (mockup: `docs/mockups/game-hero-facts.html`, variant B).
 3. Three columns: `entities/game/ui/GameOverview` (summary, storyline, keywords), `widgets/game/GameScoreColumn`,
    `widgets/game/GameSideColumn`. The score column's last block is `widgets/game/GameAchievementsBlock`,
-   one clickable `StatRows` row per source: Steam and each RetroAchievements set open
-   `GameSteamPopover` / `GameAchievementsPopover` anchored to the row, as the game card's rail chips
-   do, and the MoonCellar Team port row (brand `logo-icon.png`, labelled with the port's `name` from
+   one clickable `StatRows` row per source: Steam links to the game's global achievements page
+   (`steamcommunity.com/stats/<appId>/achievements`, never the viewer's own, which would differ
+   between the server and the client render), each RetroAchievements set links to
+   `retroachievements.org/game/<gameId>`, both in a new tab, and the MoonCellar Team port row (brand `logo-icon.png`, labelled with the port's `name` from
    `GET /games`, e.g. Glassline) opens `widgets/game/GamePortAchievementsModal`, titled the same.
 4. `entities/game/ui/GameMedia` and `widgets/game/GameCharacters` (`game.characters`, ordered by role in `getGameBySlug` / `getGameById` with `sortCharactersByRole`: an admin's role, else VNDB's, else Protagonist from the description; `GET /characters?gameId=` uses the same order) — hidden for adult games
    when `useHideAdult()` is true.

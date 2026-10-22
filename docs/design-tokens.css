@@ -174,10 +174,14 @@
   --game-hero-cover-width: 200px;
   --game-hero-cover-offset: 104px;
   --game-hero-counters-width: 360px;
+  --game-facts-label-width: 84px;
   --game-rating-popover-width: 320px;
   --popover-width: 320px;
   --achievements-icon-size: 44px;
   --achievements-icon-size-sm: 48px;
+  --port-achievement-icon-size-sm: 32px;
+  --port-game-card-width: 140px;
+  --port-game-card-width-sm: 96px;
   --popover-max-height: 320px;
   --popover-sheet-max-height: 85dvh;
   --textarea-handle-size: 20px;
@@ -264,6 +268,7 @@
   --character-editor-portrait-width: 150px;
   --image-picker-thumb-width: 160px;
   --game-images-modal-width: min(92vw, 960px);
+  --game-port-achievements-modal-width: min(92vw, 960px);
   --requests-queue-width: 440px;
   --list-sort-width: 280px;
   --field-control-height: 40px;

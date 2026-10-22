@@ -184,10 +184,8 @@
     @include font(26px, 30px, 700);
   }
 
-  &__chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--gap-x1);
+  &__info {
+    align-self: stretch;
   }
 
   &__open {

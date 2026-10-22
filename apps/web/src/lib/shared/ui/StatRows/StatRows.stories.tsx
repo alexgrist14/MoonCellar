@@ -70,6 +70,38 @@ export const Clickable: Story = {
   },
 };
 
+export const Linked: Story = {
+  args: {
+    rows: [
+      {
+        label: "Steam",
+        value: "137",
+        icon: <SvgSteam size="16" />,
+        href: "https://steamcommunity.com/stats/367520/achievements",
+        isExternal: true,
+      },
+      {
+        key: "ra-gamecube",
+        label: "RetroAchievements",
+        sublabel: "GameCube",
+        value: "190",
+        icon: <SvgRetroAchievements size="20" />,
+        href: "https://retroachievements.org/game/2840",
+        isExternal: true,
+      },
+      {
+        key: "ra-ps2",
+        label: "RetroAchievements",
+        sublabel: "PlayStation 2",
+        value: "107",
+        icon: <SvgRetroAchievements size="20" />,
+        href: "https://retroachievements.org/game/20580",
+        isExternal: true,
+      },
+    ],
+  },
+};
+
 export const LongValues: Story = {
   args: {
     rows: [
