@@ -1,5 +1,5 @@
 export const ANDROID_APK_URL =
-  "https://github.com/alexgrist14/MoonCellar/releases/latest";
+  "https://github.com/MoonCellar-Team/MoonCellar/releases/latest";
 
 type IInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
