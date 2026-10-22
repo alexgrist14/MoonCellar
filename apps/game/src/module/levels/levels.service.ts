@@ -125,7 +125,8 @@ export class LevelsService {
       row.hash = levelHash(Buffer.from(stored.data));
       await this.levels.updateOne(
         { _id: row._id },
-        { $set: { hash: row.hash } }
+        { $set: { hash: row.hash } },
+        { timestamps: false }
       );
     }
     return rows;
@@ -191,7 +192,11 @@ export class LevelsService {
 
   async file(game: IGameDefinition, levelId: string): Promise<IGameLevelFile> {
     const row = await this.visible(game, levelId, "+data");
-    await this.levels.updateOne({ _id: row._id }, { $inc: { downloads: 1 } });
+    await this.levels.updateOne(
+      { _id: row._id },
+      { $inc: { downloads: 1 } },
+      { timestamps: false }
+    );
     return {
       id: row._id.toString(),
       version: row.version,
