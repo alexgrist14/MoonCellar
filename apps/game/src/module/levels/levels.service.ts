@@ -34,6 +34,8 @@ const escapeRegex = (text: string) =>
 export const levelHash = (data: Buffer) =>
   createHash("sha256").update(data).digest("hex");
 
+const EMPTY_HASH = levelHash(Buffer.alloc(0));
+
 @Injectable()
 export class LevelsService {
   constructor(@InjectModel(Level.name) private readonly levels: Model<Level>) {}
@@ -117,14 +119,14 @@ export class LevelsService {
 
   private async withHashes(rows: ILeanLevel[]) {
     for (const row of rows) {
-      if (row.hash) continue;
-      const stored = await this.levels
-        .findById(row._id)
-        .select("+data")
-        .lean<{ data?: Buffer }>();
-      if (!stored?.data) continue;
+      if (row.hash && row.hash !== EMPTY_HASH) continue;
+      const stored = await this.levels.findById(row._id).select("+data");
+      if (!stored?.data?.length) continue;
       row.hash = levelHash(Buffer.from(stored.data));
-      await this.levels.updateOne({ _id: row._id }, { $set: { hash: row.hash } });
+      await this.levels.updateOne(
+        { _id: row._id },
+        { $set: { hash: row.hash } }
+      );
     }
     return rows;
   }
