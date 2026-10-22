@@ -340,7 +340,11 @@ an instance of Module)`. Use a default import; tsc reports the call as `TS2349`.
   "Not rated" for authors who had rated the game. `Rating.userId`/`gameId` are declared the bare
   way, which is why `UserRatingsService` wraps every id in `new mongoose.Types.ObjectId(...)`.
   Before querying a model with string ids, check `schema.path(name).instance`, or convert
-  explicitly (`asObjectId`/`asObjectIds` in `module/comments/utils`).
+  explicitly (`asObjectId`/`asObjectIds` in `module/comments/utils`). Writes break the same way:
+  `Game.platformIds` was declared bare until 2026-10-22, and the 1,182 games `addGame` created
+  (Steam and HLTB Skips, games added by hand) stored the platform ids as strings, which the
+  catalogue's platform filter (`ObjectId`s in `shared/games.ts`) never matched. An array of
+  references is `@Prop({ type: [mongoose.Schema.Types.ObjectId], ref })`.
 - **The `.env` connection string points at the production database, and Mongoose `autoIndex`
   is on.** A new `Schema.index(...)` is built on production the first time any local process
   loads that schema. One-off scripts that import schemas connect with `autoIndex: false`.
@@ -722,8 +726,12 @@ Module` before a single test runs. `comments.controller.spec.ts` mocks it with `
   and release dates (`fillEmptyFields`), and a game added from HLTB gets them plus its Steam page.
   The weekly run never reads pages — one request per game would take days.
 - **HLTB writes an unknown date part as zeros, so `hltbDate` cuts a date at its first zero part
-  before parsing.** `"0000-00-00"` (no date) and `"2015-00-00"` (year only) both pass
-  `parsePartialDate`'s pattern, and the first once dated a new game to the year −1. The page's
+  before parsing, and `parsePartialDate` refuses a zero year, month or day.** `"0000-00-00"` (no
+  date) and `"2015-00-00"` (year only) both match its pattern; the first once dated a new game to
+  the year −1, and `Date.UTC(0, -1, 0)` made it 1899-11-30 for the games HLTB Skips added until
+  2026-10-22. That date came through `releaseYear`: `howlongtobeat-ts` copies `release_world` into it
+  as is, a year number in the search but the page's date string from `getById`, so
+  `toSearchEntry` keeps only the year. A zero date adds no date at all. The page's
   NA, EU and JP dates become `release_dates` with the IGDB region codes (2, 1, 5), one row per
   platform of the game, because HLTB does not date platforms; regions that agree collapse into one
   Worldwide (8) row. `human` keeps HLTB's precision ("2015", "Apr 2006"), while `first_release` of a
@@ -817,7 +825,11 @@ Module` before a single test runs. `comments.controller.spec.ts` mocks it with `
   then creates the game as for a manual Skip. A `canCreate` registered with `ConflictsAiService.register`
   narrows it: HLTB allows entries of type `game` only — DLC, mods and hacks stay for a person; RA skips
   every `isRaVariantTitle` set; the other sources register none and add every such entry. "No candidate is the entry" is not "the entry belongs in the
-  catalogue", so this is a separate button with a confirmation, never part of Apply. Each such game is taken
+  catalogue", so this is a separate button with a confirmation, never part of Apply, and each entry first goes
+  through `GameMatcherService.findLikelyDuplicates` with the conflict's subject: a likely duplicate is left
+  waiting for a person and logged with the games it resembles. The handlers save with `force`, so this is the
+  only duplicate check an AI Skip gets; without it HLTB added games the catalogue already had, with the same
+  cover and platform (2026-10-22). Each such game is taken
   back from its conflict card (Undo new game, the Skip undo above); "Undo AI matches" does not touch them.
 - **The AI routes (`ai`, `:source/ai` and their `/create` and `/undo`) stay declared above the `:source/:externalId`
   routes in `ConflictsController`.** Express matches in declaration order, so below them `ai/undo` reaches the
@@ -896,6 +908,12 @@ Module` before a single test runs. `comments.controller.spec.ts` mocks it with `
   rethrown as is, because OpenAI would fail the same way and spend its quota on it. A draft that fails
   on Claude mid-research starts over on OpenAI, so the run's steps show "Asking OpenAI" after the
   Claude ones.
+- **An `ANTHROPIC_API_KEY` created at the organization level needs `ANTHROPIC_WORKSPACE_ID`, which
+  `callClaude` sends as the `anthropic-workspace-id` header.** Without it the API answers 400 "This
+  API key is not scoped to a workspace…", which is a `ClaudeError`, so every call silently went to
+  OpenAI and the verdicts and drafts carried a `gpt-…` model while the key looked set (2026-10-22).
+  When AI answers come from OpenAI, look for "falling back to OpenAI" in the API log before
+  suspecting the key itself.
 - **A Claude JSON schema may hold at most 16 union-typed parameters (`["string", "null"]`, `anyOf`) and
   24 optional ones across the output schema and every strict tool of a request.** Above that the API
   answers 400 "Schema is too complex for compilation", which reads as a Claude failure and silently

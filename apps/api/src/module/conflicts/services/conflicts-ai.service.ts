@@ -9,6 +9,8 @@ import {
 import { Model } from "mongoose";
 import { withDbLock } from "../../../shared/cron-mutex";
 import { aiModel, assertAiKey, generateJson } from "../../../shared/claude";
+import { parsePartialDate } from "../../../shared/release-date";
+import { GameMatcherService } from "../../games/matching/game-matcher.service";
 import { Game, type GameDocument } from "../../games/schemas/game.schema";
 import {
   Platform,
@@ -87,7 +89,8 @@ export class ConflictsAiService {
     @InjectModel(Game.name) private readonly gamesModel: Model<GameDocument>,
     @InjectModel(Platform.name)
     private readonly platformsModel: Model<PlatformDocument>,
-    private readonly conflicts: ConflictsService
+    private readonly conflicts: ConflictsService,
+    private readonly matcher: GameMatcherService
   ) {}
 
   register(
@@ -247,9 +250,24 @@ export class ConflictsAiService {
     const status = this.status;
 
     for (const { externalId } of conflicts) {
-      await this.conflicts
-        .decide(source, externalId, { gameId: null }, user, { isAi: true })
-        .then(() => (status.decided += 1))
+      await this.findDuplicates(source, externalId)
+        .then(async (duplicates) => {
+          if (duplicates.length) {
+            this.logger.warn(
+              `${source} AI left ${externalId} for review, the catalogue may already have it: ${duplicates.map(({ name }) => name).join(", ")}`
+            );
+            return;
+          }
+
+          await this.conflicts.decide(
+            source,
+            externalId,
+            { gameId: null },
+            user,
+            { isAi: true }
+          );
+          status.decided += 1;
+        })
         .catch((err) =>
           this.logger.warn(
             `${source} AI could not skip ${externalId}: ${errorMessage(err)}`
@@ -261,6 +279,30 @@ export class ConflictsAiService {
     this.logger.log(
       `${source} AI queued ${status.decided} of ${conflicts.length} entries as new games`
     );
+  }
+
+  private async findDuplicates(source: IConflictSource, externalId: string) {
+    const subject = (await this.conflicts.getItem(source, externalId))
+      ?.subject;
+
+    if (!subject) return [];
+
+    const released = parsePartialDate(subject.released);
+
+    return this.matcher.findLikelyDuplicates({
+      name: subject.name,
+      alternative_names: subject.alternativeNames,
+      first_release: released ? released.getTime() / 1000 : null,
+      companies: subject.developers.map((name) => ({
+        name,
+        developer: true,
+        publisher: false,
+        porting: false,
+        supporting: false,
+      })),
+      platformIds: subject.platformIds,
+      summary: subject.description,
+    });
   }
 
   private runInBackground(

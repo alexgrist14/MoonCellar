@@ -1103,7 +1103,7 @@ export class HltbService implements OnModuleInit {
       reviewScore: entry.reviewScore,
       similarity: entry.similarity,
       platforms: entry.platforms,
-      releaseYear: entry.releaseYear,
+      releaseYear: Number(String(entry.releaseYear).slice(0, 4)) || null,
     };
   }
 }

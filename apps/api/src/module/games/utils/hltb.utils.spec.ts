@@ -1018,6 +1018,17 @@ describe("HLTB game pages", () => {
     ).toBe(Date.UTC(1998, 0, 1) / 1000);
   });
 
+  it("adds no date at all when HLTB has only zeros, never 1899", () => {
+    const zeros = readHltbPage({ release_world: "0000-00-00" });
+    const fields = hltbPageFields(zeros, {
+      releaseYear: "0000-00-00" as unknown as number,
+      platformIds: ["ps"],
+    });
+
+    expect(fields.first_release).toBeNull();
+    expect(fields.release_dates).toEqual([]);
+  });
+
   it("keeps one worldwide date when the regions agree, and each region when they differ", () => {
     expect(
       readHltbPage({

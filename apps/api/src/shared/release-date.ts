@@ -18,6 +18,8 @@ export const parsePartialDate = (date?: string | null) => {
 
   const [year, month = 1, day = 1] = date.split("-").map(Number);
 
+  if (!year || month < 1 || month > 12 || day < 1 || day > 31) return null;
+
   return new Date(Date.UTC(year, month - 1, day));
 };
 

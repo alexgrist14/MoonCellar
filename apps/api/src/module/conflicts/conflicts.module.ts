@@ -6,6 +6,7 @@ import {
   Platform,
   PlatformDatabaseSchema,
 } from "../games/schemas/platform.schema";
+import { MatchingModule } from "../games/matching/matching.module";
 import { User, UserSchema } from "../user/schemas/user.schema";
 import { ConflictsController } from "./controllers/conflicts.controller";
 import { ConflictsGateway } from "./gateways/conflicts.gateway";
@@ -22,6 +23,7 @@ import { ConflictsService } from "./services/conflicts.service";
       { name: User.name, schema: UserSchema },
     ]),
     JwtModule.register({}),
+    MatchingModule,
   ],
   controllers: [ConflictsController],
   providers: [ConflictsService, ConflictsAiService, ConflictsGateway],
