@@ -1,20 +1,29 @@
 .page {
+  display: grid;
+  place-items: center;
+  min-height: var(--page-height-available);
+}
+
+.card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: var(--gap-x3);
-  min-height: max(var(--page-height-available), var(--status-login-min-height));
+  gap: var(--gap-x2);
+  margin-bottom: var(--padding-x2);
+  text-align: center;
+
+  &__logo {
+    width: auto;
+    height: var(--padding-x7);
+  }
 
   &__title {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
-    text-align: center;
   }
 
   &__hint {
-    font-size: 14px;
+    font-size: 13px;
     color: var(--color-text-muted);
-    text-align: center;
   }
 }

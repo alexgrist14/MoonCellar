@@ -1,9 +1,11 @@
 "use client";
 
 import { FC, useEffect } from "react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { AuthModal } from "@/src/lib/shared/ui/AuthModal";
+import { Box } from "@/src/lib/shared/ui/Box";
 import { isSafeStatusPath } from "@/src/lib/shared/utils/status-path.utils";
 import styles from "./StatusLoginPage.module.scss";
 
@@ -23,11 +25,23 @@ export const StatusLoginPage: FC = () => {
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.page__title}>Sign in to Status</h1>
-      <p className={styles.page__hint}>
-        Project status for the MoonCellar team.
-      </p>
-      <AuthModal isPage isSignIn />
+      <Box wrapperStyle={{ width: "var(--status-card-width)" }}>
+        <div className={styles.card}>
+          <Image
+            src="/images/logo-text.png"
+            alt="MoonCellar"
+            width={747}
+            height={165}
+            priority
+            className={styles.card__logo}
+          />
+          <h1 className={styles.card__title}>Sign in to Status</h1>
+          <p className={styles.card__hint}>
+            Project status for the MoonCellar team.
+          </p>
+        </div>
+        <AuthModal isPage isSignIn />
+      </Box>
     </div>
   );
 };
