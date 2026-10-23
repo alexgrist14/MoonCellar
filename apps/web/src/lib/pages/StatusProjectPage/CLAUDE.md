@@ -11,18 +11,23 @@ block — `PlanBlock` or `DecompBlock` (`widgets/status`).
 
 ## Data
 
-- `useProjectsQuery` — the project, its blocks and `uploads` (time, size, progress per block).
-- `useProjectBlockQuery(slug, block, hasUpload)` — the block's JSON as the project uploaded it
-  (`GET /projects/:slug/data/:block`), enabled only when that block was uploaded; both queries
-  refetch every minute.
+- `useProjectsQuery` — the project, its blocks and `uploads` (time, size, progress per block; the
+  Plan's entry moves with every change of the plan).
+- Decompilation: `useProjectBlockQuery(slug, "decomp", hasUpload)` — the block as uploaded
+  (`GET /projects/:slug/data/decomp`), enabled only when it was uploaded.
+- Plan: `useProjectPlanQuery(slug)` — the plan stored in the hub (`GET /projects/:slug/plan`); every
+  edit's answer is the new plan, written straight into this query's cache. Both refetch on a timer
+  (a minute, the plan every 30 seconds).
 
 ## Composition
 
 1. `Box`: `SectionTitle as="h1"`, "Updated … ago" (turns `--color-attention` after
    `STALE_UPLOAD_MS`, a day) and the uploaded commit, then `Tabs` with `tabLink` per block when the
    project has more than one.
-2. No upload of the block → inline `EmptyState` naming the upload endpoint.
-3. Loading → `Skeleton`; loaded → `PlanBlock` or `DecompBlock`.
+2. Decompilation never uploaded → inline `EmptyState` naming the upload endpoint. An empty plan is
+   `PlanBlock`'s own empty state with "Add a section".
+3. Loading → `Skeleton`; loaded → `PlanBlock` (editable, `slug` passed for its mutations) or
+   `DecompBlock`.
 
 Its loading state is `StatusProjectSkeleton.tsx`.
 

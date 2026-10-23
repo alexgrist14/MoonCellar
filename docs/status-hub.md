@@ -35,10 +35,32 @@ knows how to draw; a new project is data, a new block type is code.
 | Block | Schema (`@mooncellar/schemas`) | Shows |
 | --- | --- | --- |
 | `decomp` — Decompilation | `DecompBlockSchema` | Totals, categories, areas, a map with one cell per function, files, feed |
-| `plan` — Plan | `PlanBlockSchema` | Totals, tasks by section with state, owner and what a task waits for |
+| `plan` — Plan | `PlanBlockSchema` | Totals, tasks by section with state, owner and what a task waits for; editable |
 
 The menu shows each project's progress from its first block: functions done for `decomp`, tasks done
 for `plan`. An upload older than a day turns the "Updated" line yellow.
+
+## The plan lives in the hub
+
+A Decompilation block is uploaded by its project. A Plan is not: it is stored in the hub
+(`projectplans`, one document per project) and changed there, by people on the site and by tools
+through the API. Nobody keeps it in a file any more; a project with a markdown plan imports it once.
+
+- **On the site** a task's "⋯" menu and its panel (click the row) take it (for yourself or "Assign
+  to…" someone), release it, mark it done or reopen it, edit it and delete it; every section adds tasks,
+  renames itself and, when empty, deletes itself; "Section" adds one. Admins on the site may override
+  anyone (take a task someone else holds, finish it for them).
+- **State** is derived, never stored: done; taken (has an owner); waiting (a task it depends on is not
+  done); free. A task id is its section's letter and the next number (`H6`); a new section takes the
+  first free letter unless one is given.
+- **Every change is logged** (`projectplanevents`: who, what, when) and shown as the task's history.
+- **Tools act with a project token and say for whom**: `"as": "<name>"` in the body of take, release,
+  done and reopen. With a token, taking a task someone else holds, releasing it or finishing it answers
+  409 unless `"force": true`; deleting is for admins on the site only.
+- **Import**: a plan arrives once, into an empty hub plan — `PUT /projects/:slug/plan`, or the older
+  `PUT /projects/:slug/data/plan` — with done tasks' `doneAt` when known. After that both answer 409.
+  `bun scripts/import-plan.ts [--file plan.md]` parses a markdown plan in the format of
+  [`plan.md`](./plan.md) and imports it with `STATUS_HUB_TOKEN`.
 
 ## Uploading
 
@@ -74,11 +96,9 @@ gzip -c plan.json | curl -X PUT https://api.mooncellar.space/projects/<project>/
 - A wrong token, a project that does not exist and a missing header all answer 401 with the same
   message, so the endpoint does not tell which projects exist.
 
-The MoonCellar project's own plan is [`docs/plan.md`](./plan.md): the CI job `plan` parses it with
-`scripts/upload-plan.ts` (`bun scripts/upload-plan.ts --check` only parses) and uploads it on every
-push to `main` that changes it, with the repository secret `STATUS_HUB_TOKEN` — the token of the
-`mooncellar` project. Without the secret the job checks the plan and warns. Other projects send
-their blocks from their own tooling, usually right after a merge into their `main`.
+Projects send their Decompilation blocks from their own tooling, usually right after a merge into
+their `main`. The MoonCellar project's plan started as [`docs/plan.md`](./plan.md) and lives in the hub
+once imported.
 
 ## API
 
@@ -94,6 +114,14 @@ their blocks from their own tooling, usually right after a merge into their `mai
 | `POST /projects/:slug/connect` | admin | A one-time code for a connect command |
 | `POST /projects/:slug/tokens/exchange` | anyone with a code | Exchange the code for a token |
 | `GET /projects/:slug/data/:block` | admin | The block as uploaded |
+| `GET /projects/:slug/plan` | admin or token | The plan with every task's state |
+| `PUT /projects/:slug/plan` | admin or token | Import a whole plan into an empty one |
+| `POST /projects/:slug/plan/sections` | admin or token | Add a section |
+| `PATCH`, `DELETE /projects/:slug/plan/sections/:id` | admin or token; delete — admin | Rename; delete an empty section |
+| `POST /projects/:slug/plan/tasks` | admin or token | Add a task |
+| `PATCH`, `DELETE /projects/:slug/plan/tasks/:id` | admin or token; delete — admin | Edit; delete |
+| `POST /projects/:slug/plan/tasks/:id/<take, release, done, reopen>` | admin or token | Change the state (`as`, `note`, `force`) |
+| `GET /projects/:slug/plan/events?task=<id>` | admin or token | Recent changes, of the plan or of one task |
 | `PUT /projects/:slug/data/:block` | project token | Upload a block |
 
 ## Trying it locally

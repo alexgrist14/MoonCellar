@@ -1,5 +1,12 @@
 import { createZodDto } from "nestjs-zod";
 import {
+  CreatePlanSectionRequestSchema,
+  CreatePlanTaskRequestSchema,
+  PlanBlockSchema,
+  PlanEventSchema,
+  PlanTaskActionRequestSchema,
+  UpdatePlanSectionRequestSchema,
+  UpdatePlanTaskRequestSchema,
   CreateProjectRequestSchema,
   CreateProjectTokenRequestSchema,
   ProjectConnectCodeSchema,
@@ -44,4 +51,28 @@ export class ProjectTokenExchangeRequestDto extends createZodDto(
 
 export class ProjectTokenExchangeDto extends createZodDto(
   ProjectTokenExchangeSchema
+) {}
+
+export class PlanBlockDto extends createZodDto(PlanBlockSchema) {}
+
+export class PlanEventDto extends createZodDto(PlanEventSchema) {}
+
+export class CreatePlanSectionRequestDto extends createZodDto(
+  CreatePlanSectionRequestSchema
+) {}
+
+export class UpdatePlanSectionRequestDto extends createZodDto(
+  UpdatePlanSectionRequestSchema
+) {}
+
+export class CreatePlanTaskRequestDto extends createZodDto(
+  CreatePlanTaskRequestSchema
+) {}
+
+export class UpdatePlanTaskRequestDto extends createZodDto(
+  UpdatePlanTaskRequestSchema
+) {}
+
+export class PlanTaskActionRequestDto extends createZodDto(
+  PlanTaskActionRequestSchema
 ) {}

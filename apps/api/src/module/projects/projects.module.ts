@@ -11,6 +11,15 @@ import {
   ProjectsController,
 } from "./projects.controller";
 import { ProjectsService } from "./projects.service";
+import { ProjectPlansService } from "./project-plans.service";
+import { ProjectPlansController } from "./project-plans.controller";
+import { ProjectActorGuard } from "./project-actor.guard";
+import {
+  ProjectPlan,
+  ProjectPlanEvent,
+  ProjectPlanEventSchema,
+  ProjectPlanSchema,
+} from "./schemas/project-plan.schema";
 
 @Module({
   imports: [
@@ -18,9 +27,15 @@ import { ProjectsService } from "./projects.service";
       { name: Project.name, schema: ProjectSchema },
       { name: ProjectData.name, schema: ProjectDataSchema },
       { name: ProjectConnectCode.name, schema: ProjectConnectCodeSchema },
+      { name: ProjectPlan.name, schema: ProjectPlanSchema },
+      { name: ProjectPlanEvent.name, schema: ProjectPlanEventSchema },
     ]),
   ],
-  controllers: [ProjectsController, ProjectUploadsController],
-  providers: [ProjectsService],
+  controllers: [
+    ProjectPlansController,
+    ProjectsController,
+    ProjectUploadsController,
+  ],
+  providers: [ProjectsService, ProjectPlansService, ProjectActorGuard],
 })
 export class ProjectsModule {}

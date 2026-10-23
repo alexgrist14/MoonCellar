@@ -121,15 +121,26 @@ export type IProjectTokenExchange = z.infer<typeof ProjectTokenExchangeSchema>;
 export const PlanTaskStateSchema = z.enum(["done", "taken", "free", "waiting"]);
 export type IPlanTaskState = z.infer<typeof PlanTaskStateSchema>;
 
+const PlanTaskIdSchema = z.string().trim().min(1).max(16);
+const PlanTextSchema = z.string().max(20_000);
+const PlanShortTextSchema = z.string().max(4_000);
+const PlanSizeSchema = z.string().trim().max(8);
+const PlanPersonSchema = z.string().trim().min(1).max(64);
+
 export const PlanTaskSchema = z.object({
-  id: z.string().trim().min(1).max(16),
-  title: z.string().max(20_000),
+  id: PlanTaskIdSchema,
+  title: PlanTextSchema,
   state: PlanTaskStateSchema,
   owner: z.string().max(64).optional(),
   waitsFor: z.array(z.string().max(16)).max(50).optional(),
-  where: z.string().max(4_000).optional(),
-  doneWhen: z.string().max(4_000).optional(),
+  depends: z.array(z.string().max(16)).max(50).optional(),
+  where: PlanShortTextSchema.optional(),
+  doneWhen: PlanShortTextSchema.optional(),
   size: z.string().max(8).optional(),
+  note: z.string().max(300).optional(),
+  takenAt: z.string().nullable().optional(),
+  doneAt: z.string().nullable().optional(),
+  doneBy: z.string().max(64).nullable().optional(),
 });
 export type IPlanTask = z.infer<typeof PlanTaskSchema>;
 
@@ -142,6 +153,7 @@ export type IPlanSection = z.infer<typeof PlanSectionSchema>;
 
 export const PlanBlockSchema = z.object({
   commit: z.string().max(64).optional(),
+  version: z.number().int().nonnegative().optional(),
   sections: z.array(PlanSectionSchema).max(100),
 });
 export type IPlanBlock = z.infer<typeof PlanBlockSchema>;
@@ -240,4 +252,82 @@ export const getProjectBlockProgress = (
     done: tasks.filter((task) => task.state === "done").length,
     total: tasks.length,
   };
+};
+
+export const PlanSectionIdSchema = z
+  .string()
+  .trim()
+  .regex(
+    /^[A-Z]{1,3}$/,
+    "A section id is one to three capital letters, like H"
+  );
+
+export const CreatePlanSectionRequestSchema = z.object({
+  id: PlanSectionIdSchema.optional(),
+  title: z.string().trim().min(1).max(200),
+});
+export type ICreatePlanSectionRequest = z.infer<
+  typeof CreatePlanSectionRequestSchema
+>;
+
+export const UpdatePlanSectionRequestSchema = z.object({
+  title: z.string().trim().min(1).max(200),
+});
+export type IUpdatePlanSectionRequest = z.infer<
+  typeof UpdatePlanSectionRequestSchema
+>;
+
+export const CreatePlanTaskRequestSchema = z.object({
+  section: PlanSectionIdSchema,
+  title: PlanTextSchema.trim().min(1),
+  where: PlanShortTextSchema.trim().optional(),
+  depends: z.array(PlanTaskIdSchema).max(50).optional(),
+  doneWhen: PlanShortTextSchema.trim().optional(),
+  size: PlanSizeSchema.optional(),
+});
+export type ICreatePlanTaskRequest = z.infer<
+  typeof CreatePlanTaskRequestSchema
+>;
+
+export const UpdatePlanTaskRequestSchema =
+  CreatePlanTaskRequestSchema.partial();
+export type IUpdatePlanTaskRequest = z.infer<
+  typeof UpdatePlanTaskRequestSchema
+>;
+
+export const PlanTaskActionSchema = z.enum([
+  "take",
+  "release",
+  "done",
+  "reopen",
+]);
+export type IPlanTaskAction = z.infer<typeof PlanTaskActionSchema>;
+
+export const PlanTaskActionRequestSchema = z.object({
+  as: PlanPersonSchema.optional(),
+  note: z.string().trim().max(300).optional(),
+  force: z.boolean().optional(),
+});
+export type IPlanTaskActionRequest = z.infer<
+  typeof PlanTaskActionRequestSchema
+>;
+
+export const PlanEventSchema = z.object({
+  at: z.string(),
+  by: z.string(),
+  action: z.string(),
+  taskId: z.string().optional(),
+  sectionId: z.string().optional(),
+  text: z.string().optional(),
+});
+export type IPlanEvent = z.infer<typeof PlanEventSchema>;
+
+export const getPlanTaskState = (
+  task: { done: boolean; owner?: string | null; depends?: string[] },
+  done: ReadonlySet<string>
+): { state: IPlanTaskState; waitsFor: string[] } => {
+  const waitsFor = (task.depends ?? []).filter((id) => !done.has(id));
+  if (task.done) return { state: "done", waitsFor: [] };
+  if (task.owner) return { state: "taken", waitsFor };
+  return { state: waitsFor.length ? "waiting" : "free", waitsFor };
 };

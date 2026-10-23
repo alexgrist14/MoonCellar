@@ -1,8 +1,10 @@
 # Plan
 
-What the MoonCellar team is working on, task by task. The status hub (`status.mooncellar.space`,
-admins only) shows this file as the MoonCellar project's Plan: CI uploads it on every push to
-`main` that changes it (`scripts/upload-plan.ts`, [status hub](./status-hub.md)).
+What the MoonCellar team is working on, task by task. The plan lives in the status hub
+(`status.mooncellar.space`, admins only), where anyone on the team takes, finishes and adds tasks;
+this file is its starting point and is imported once into the hub's empty plan with
+`bun scripts/import-plan.ts` (see [status hub](./status-hub.md)). After that, change the plan in the
+hub, not here.
 
 ## How to use it
 
@@ -21,4 +23,4 @@ admins only) shows this file as the MoonCellar project's Plan: CI uploads it on 
 | H2 ✓ | A decompilation project uploads its Decompilation and Plan blocks after every merge into its `main` | sergeyhist | H1 | Its page in the hub follows its `main` | S |
 | H3 | This plan in the hub: `docs/plan.md` parsed, checked against `PlanBlockSchema` and uploaded by CI with the project's token | sergeyhist | H1 | Changing this file updates the MoonCellar page in the hub | S |
 | H4 ✓ | One upload token per machine or CI, revocable one by one, and connecting from the terminal: the hub's `/connect` page hands a one-time code to the waiting command, which exchanges it for its own token | sergeyhist | H1 | `bun scripts/hub-connect.ts <project>` saves a working token after one click in the browser | M |
-| H5 | The plan lives in the hub: sections and tasks in the database, edited on the site (take, release, done, new task or section) and through the API by agents with a project token; projects import their plans and stop keeping them in files | sergeyhist | H4 | Someone without an agent takes a task, finishes it and adds a new one on the site, and the project's tools see it | L |
+| H5 ✓ | The plan lives in the hub: sections and tasks in the database, edited on the site (take, release, done, new task or section) and through the API by agents with a project token; projects import their plans and stop keeping them in files | sergeyhist | H4 | Someone without an agent takes a task, finishes it and adds a new one on the site, and the project's tools see it | L |

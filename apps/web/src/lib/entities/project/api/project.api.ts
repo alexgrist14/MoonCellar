@@ -1,5 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  ICreatePlanSectionRequest,
+  ICreatePlanTaskRequest,
+  IPlanBlock,
+  IPlanTaskAction,
+  IPlanTaskActionRequest,
+  IUpdatePlanSectionRequest,
+  IUpdatePlanTaskRequest,
   ICreateProjectRequest,
   IProjectBlock,
   IUpdateProjectRequest,
@@ -8,6 +15,9 @@ import { projectsApi } from "@/src/lib/shared/api";
 
 export const projectQueryKeys = {
   all: ["projects"] as const,
+  plan: (slug: string) => ["projects", slug, "plan"] as const,
+  planEvents: (slug: string, task?: string) =>
+    ["projects", slug, "plan", "events", task ?? ""] as const,
   block: (slug: string, block: IProjectBlock) =>
     ["projects", slug, "data", block] as const,
 };
@@ -98,3 +108,87 @@ export const useConnectProjectMutation = () =>
     mutationFn: ({ slug, name }: { slug: string; name: string }) =>
       projectsApi.connect(slug, name).then(({ data }) => data),
   });
+
+const PLAN_REFRESH_MS = 30_000;
+
+export const useProjectPlanQuery = (slug: string, isEnabled: boolean) =>
+  useQuery({
+    queryKey: projectQueryKeys.plan(slug),
+    queryFn: () => projectsApi.getPlan(slug).then(({ data }) => data),
+    enabled: isEnabled,
+    refetchInterval: PLAN_REFRESH_MS,
+  });
+
+export const usePlanEventsQuery = (slug: string, task?: string) =>
+  useQuery({
+    queryKey: projectQueryKeys.planEvents(slug, task),
+    queryFn: () =>
+      projectsApi.getPlanEvents(slug, task).then(({ data }) => data),
+  });
+
+const usePlanMutation = <T>(
+  slug: string,
+  request: (variables: T) => Promise<{ data: IPlanBlock }>
+) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (variables: T) => request(variables).then(({ data }) => data),
+    onSuccess: (plan) => {
+      queryClient.setQueryData(projectQueryKeys.plan(slug), plan);
+      queryClient.invalidateQueries({
+        queryKey: projectQueryKeys.planEvents(slug),
+      });
+      queryClient.invalidateQueries({
+        queryKey: projectQueryKeys.all,
+        exact: true,
+      });
+    },
+  });
+};
+
+export const usePlanTaskActionMutation = (slug: string) =>
+  usePlanMutation(
+    slug,
+    ({
+      id,
+      action,
+      dto,
+    }: {
+      id: string;
+      action: IPlanTaskAction;
+      dto?: IPlanTaskActionRequest;
+    }) => projectsApi.actOnPlanTask(slug, id, action, dto)
+  );
+
+export const useCreatePlanTaskMutation = (slug: string) =>
+  usePlanMutation(slug, (dto: ICreatePlanTaskRequest) =>
+    projectsApi.createPlanTask(slug, dto)
+  );
+
+export const useUpdatePlanTaskMutation = (slug: string) =>
+  usePlanMutation(
+    slug,
+    ({ id, dto }: { id: string; dto: IUpdatePlanTaskRequest }) =>
+      projectsApi.updatePlanTask(slug, id, dto)
+  );
+
+export const useDeletePlanTaskMutation = (slug: string) =>
+  usePlanMutation(slug, (id: string) => projectsApi.deletePlanTask(slug, id));
+
+export const useCreatePlanSectionMutation = (slug: string) =>
+  usePlanMutation(slug, (dto: ICreatePlanSectionRequest) =>
+    projectsApi.createPlanSection(slug, dto)
+  );
+
+export const useUpdatePlanSectionMutation = (slug: string) =>
+  usePlanMutation(
+    slug,
+    ({ id, dto }: { id: string; dto: IUpdatePlanSectionRequest }) =>
+      projectsApi.updatePlanSection(slug, id, dto)
+  );
+
+export const useDeletePlanSectionMutation = (slug: string) =>
+  usePlanMutation(slug, (id: string) =>
+    projectsApi.deletePlanSection(slug, id)
+  );

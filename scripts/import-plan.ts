@@ -7,7 +7,7 @@ import {
   PlanBlockSchema,
 } from "@mooncellar/schemas";
 
-const PLAN_PATH = join(import.meta.dir, "..", "docs", "plan.md");
+const DEFAULT_PLAN = join(import.meta.dir, "..", "docs", "plan.md");
 const SECTION = /^##\s+([A-Z])\.\s+(.+?)\s*$/;
 const ROW = /^\|\s*([A-Z]\d+)(\s*✓)?\s*\|(.*)\|\s*$/;
 const TASK_ID = /\b[A-Z]\d+\b/g;
@@ -78,7 +78,7 @@ const upload = async (plan: IPlanBlock) => {
   const token = process.env.STATUS_HUB_TOKEN;
   if (!token) {
     console.log(
-      "::warning::STATUS_HUB_TOKEN is not set, the plan was checked but not uploaded"
+      "STATUS_HUB_TOKEN is not set: the plan was checked, nothing was imported"
     );
     return;
   }
@@ -99,14 +99,13 @@ const upload = async (plan: IPlanBlock) => {
       `The hub refused the plan (${response.status}): ${answer.message ?? response.statusText}`
     );
   }
-  console.log(`Plan uploaded: ${answer.done} of ${answer.total} tasks done`);
+  console.log(`Plan imported: ${answer.done} of ${answer.total} tasks done`);
 };
 
 if (import.meta.main) {
-  const plan = parsePlan(
-    readFileSync(PLAN_PATH, "utf8"),
-    process.env.GITHUB_SHA
-  );
+  const fileIndex = process.argv.indexOf("--file");
+  const file = fileIndex > 0 ? process.argv[fileIndex + 1] : DEFAULT_PLAN;
+  const plan = parsePlan(readFileSync(file, "utf8"), process.env.GITHUB_SHA);
   const tasks = plan.sections.flatMap((section) => section.tasks);
   console.log(`${tasks.length} tasks in ${plan.sections.length} sections`);
   if (!process.argv.includes("--check")) await upload(plan);

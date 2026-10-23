@@ -132,6 +132,15 @@ an instance of Module)`. Use a default import; tsc reports the call as `TS2349`.
   (`@Header("Content-Type", "application/json")`). The menu's progress comes from `uploads` on the
   project, written with each upload by `getProjectBlockProgress`, so listing projects never reads a
   block.
+- **A plan is one `projectplans` document per project, and every task change is one
+  `findOneAndUpdate` that matches the task by `$elemMatch` on its id *and* the owner and done flag read
+  just before.** Two people taking the same task at once: the second update matches nothing and answers
+  409 "changed meanwhile". Never write `tasks.$` with a query that matches the array a second way (a
+  top-level `"tasks.done"` next to the `$elemMatch`): the positional operator then points at whichever
+  element matched last. A task's state is derived on read (`getPlanTaskState`), never stored.
+- **`PUT /projects/:slug/data/plan` imports into an empty plan and answers 409 afterwards.** It is how a
+  project that used to upload its plan migrates by itself; once the plan lives in the hub, a stale
+  uploader must not overwrite what people changed on the site.
 - **Uploads are gzip in practice:** the global JSON limit is 2 MB of decoded body and the API's nginx
   block keeps the default 1 MB, which a medium decompilation catalogue passes only compressed.
 - **Project addresses in `RESERVED_PROJECT_SLUGS` are routes of the hub** (`login`, `manage`, …); a

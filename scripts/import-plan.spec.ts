@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { parsePlan } from "./upload-plan";
+import { parsePlan } from "./import-plan";
 
 const plan = `# Plan
 
