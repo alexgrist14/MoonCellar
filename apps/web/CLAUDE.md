@@ -554,6 +554,8 @@ shows and how projects upload to it is in [`docs/status-hub.md`](../../docs/stat
   `GET /admin/access` and the request's cookies: 200 renders `StatusShell`, 403
   `StatusNoAccessPage`, 401 `StatusGate` (a refresh token present: refresh and `router.refresh()`;
   otherwise `/login?next=<page>`). The sign-in route sits outside `(gated)`, or it would gate itself.
+  `next` carries the query too (`StatusGate` reads `location.search`): the connect link
+  (`/connect?project=…&port=…&state=…`) must survive signing in, or the waiting command never hears back.
 - **The hub draws only from `@mooncellar/schemas` block data, never from a project's own format.**
   A project converts its data into `PlanBlockSchema` / `DecompBlockSchema` before uploading; a
   block the hub cannot draw is a new block type in the schema, the API and `widgets/status`.

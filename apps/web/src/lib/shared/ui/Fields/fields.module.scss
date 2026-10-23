@@ -154,6 +154,15 @@
   background: var(--color-bg-secondary);
 }
 
+.sectionAside {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--gap-x2);
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
 .sectionChevron {
   flex-shrink: 0;
   transform: rotate(-90deg);

@@ -16,7 +16,10 @@ export const StatusGate: FC<IStatusGateProps> = ({ state }) => {
   const pathname = usePathname();
 
   useEffect(() => {
-    const signIn = () => router.replace(getStatusSignInPath(pathname));
+    const signIn = () =>
+      router.replace(
+        getStatusSignInPath(window.location.pathname + window.location.search)
+      );
 
     if (state === "signedOut") {
       signIn();

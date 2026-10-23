@@ -5,6 +5,7 @@ import {
 } from "@nestjs/common";
 import { ZodValidationException } from "nestjs-zod";
 import {
+  FIRST_TOKEN_NAME,
   ProjectsService,
   hashProjectToken,
   isProjectToken,
@@ -36,13 +37,21 @@ const chain = <T>(value: T) => {
   return query;
 };
 
+const storedToken = {
+  id: "a1b2c3",
+  name: "deck@HistMate",
+  hash: hashProjectToken(TOKEN),
+  createdAt: CREATED,
+  lastUsedAt: null,
+};
+
 const createService = (stored: Record<string, unknown> | null) => {
   const project = stored && {
     slug: "mooncellar",
     name: "MoonCellar",
     blocks: ["plan"],
     uploads: [],
-    tokenHash: hashProjectToken(TOKEN),
+    tokens: [storedToken],
     createdAt: CREATED,
     ...stored,
   };
@@ -55,7 +64,13 @@ const createService = (stored: Record<string, unknown> | null) => {
       createdAt: CREATED,
     })),
     updateOne: jest.fn().mockResolvedValue({ matchedCount: 1 }),
-    findOneAndUpdate: jest.fn(() => chain(project)),
+    findOneAndUpdate: jest.fn(
+      (
+        _filter: unknown,
+        _update: { $push?: { tokens?: Record<string, unknown> } },
+        _options?: unknown
+      ) => chain(project)
+    ),
     deleteOne: jest.fn(),
   };
   const data = {
@@ -63,8 +78,17 @@ const createService = (stored: Record<string, unknown> | null) => {
     findOneAndUpdate: jest.fn(async () => ({ updatedAt: CREATED })),
     deleteMany: jest.fn(),
   };
-  const service = new ProjectsService(projects as never, data as never);
-  return { service, projects, data };
+  const codes = {
+    create: jest.fn(),
+    findOneAndDelete: jest.fn(() => chain(null)),
+    deleteMany: jest.fn(),
+  };
+  const service = new ProjectsService(
+    projects as never,
+    data as never,
+    codes as never
+  );
+  return { service, projects, data, codes };
 };
 
 describe("project tokens", () => {
@@ -82,22 +106,16 @@ describe("project tokens", () => {
 });
 
 describe("ProjectsService.create", () => {
-  it("stores only the hash and returns the token once", async () => {
-    const { service, projects } = createService(null);
-    const result = await service.create({
-      name: "Glassline",
-      slug: "glassline",
-      blocks: ["plan"],
-    });
-    expect(result.token).toMatch(/^mcp_/);
-    const stored = projects.create.mock.calls[0][0];
-    expect(stored.tokenHash).toBe(hashProjectToken(result.token));
-    expect(stored).not.toHaveProperty("token");
-    expect(result.project).toEqual({
+  it("creates a project without tokens", async () => {
+    const { service } = createService(null);
+    await expect(
+      service.create({ name: "Glassline", slug: "glassline", blocks: ["plan"] })
+    ).resolves.toEqual({
       slug: "glassline",
       name: "Glassline",
       blocks: ["plan"],
       uploads: [],
+      tokens: [],
       createdAt: CREATED.toISOString(),
     });
   });
@@ -110,8 +128,103 @@ describe("ProjectsService.create", () => {
   });
 });
 
+describe("ProjectsService tokens", () => {
+  it("adds a named token, stores only its hash and never lists it", async () => {
+    const { service, projects } = createService({});
+    const issued = await service.addToken("mooncellar", "CI");
+    expect(issued.token).toMatch(/^mcp_/);
+    const pushed = projects.findOneAndUpdate.mock.calls[0][1].$push.tokens;
+    expect(pushed).toMatchObject({
+      name: "CI",
+      hash: hashProjectToken(issued.token),
+    });
+    expect(pushed).not.toHaveProperty("token");
+    expect(issued.tokenId).toBe(pushed.id);
+    expect(issued.project.tokens[0]).toEqual({
+      id: "a1b2c3",
+      name: "deck@HistMate",
+      createdAt: CREATED.toISOString(),
+      lastUsedAt: null,
+    });
+  });
+
+  it("says which token it could not revoke", async () => {
+    const { service, projects } = createService({});
+    projects.findOneAndUpdate.mockReturnValue(chain(null) as never);
+    await expect(service.revokeToken("mooncellar", "nope")).rejects.toThrow(
+      new NotFoundException(
+        'The project at "mooncellar" has no token with the id "nope"'
+      )
+    );
+  });
+
+  it("moves a single token of an older project into the list", async () => {
+    const { service, projects } = createService({});
+    projects.find.mockReturnValue(
+      chain([
+        { slug: "medecomp", tokenHash: "abc", createdAt: CREATED },
+      ]) as never
+    );
+    await service.moveSingleTokens();
+    expect(projects.updateOne).toHaveBeenCalledWith(
+      { slug: "medecomp", tokenHash: "abc" },
+      {
+        $push: {
+          tokens: expect.objectContaining({
+            name: FIRST_TOKEN_NAME,
+            hash: "abc",
+          }),
+        },
+        $unset: { tokenHash: "" },
+      }
+    );
+  });
+});
+
+describe("ProjectsService connect", () => {
+  it("stores only the hash of a connect code that expires", async () => {
+    const { service, codes } = createService({});
+    const before = Date.now();
+    const { code, expiresAt } = await service.createConnectCode(
+      "mooncellar",
+      "deck@HistMate"
+    );
+    const stored = codes.create.mock.calls[0][0];
+    expect(stored).toMatchObject({
+      codeHash: hashProjectToken(code),
+      slug: "mooncellar",
+      name: "deck@HistMate",
+    });
+    expect(new Date(expiresAt).getTime()).toBeGreaterThan(before);
+  });
+
+  it("exchanges a code once for a token named after the device", async () => {
+    const { service, codes, projects } = createService({});
+    codes.findOneAndDelete.mockReturnValue(
+      chain({ slug: "mooncellar", name: "deck@HistMate" }) as never
+    );
+    const result = await service.exchangeCode("mooncellar", "the-code");
+    expect(codes.findOneAndDelete).toHaveBeenCalledWith({
+      codeHash: hashProjectToken("the-code"),
+      slug: "mooncellar",
+      expiresAt: { $gt: expect.any(Date) },
+    });
+    expect(result).toMatchObject({ slug: "mooncellar", name: "deck@HistMate" });
+    expect(projects.findOneAndUpdate.mock.calls[0][1].$push.tokens.name).toBe(
+      "deck@HistMate"
+    );
+  });
+
+  it("refuses an unknown or used code", async () => {
+    const { service } = createService({});
+    await expect(service.exchangeCode("mooncellar", "used")).rejects.toThrow(
+      BadRequestException
+    );
+  });
+});
+
 describe("ProjectsService.putData", () => {
-  it("stores a valid block and records its progress", async () => {
+  it("stores a valid block, records its progress and the token's use", async () => {
     const { service, data, projects } = createService({});
     const upload = await service.putData(
       "mooncellar",
@@ -132,7 +245,7 @@ describe("ProjectsService.putData", () => {
       { upsert: true, new: true }
     );
     expect(projects.updateOne).toHaveBeenLastCalledWith(
-      { slug: "mooncellar" },
+      { slug: "mooncellar", "tokens.id": "a1b2c3" },
       {
         $push: {
           uploads: expect.objectContaining({
@@ -141,6 +254,7 @@ describe("ProjectsService.putData", () => {
             total: 2,
           }),
         },
+        $set: { "tokens.$.lastUsedAt": expect.any(Date) },
       }
     );
   });
@@ -156,6 +270,13 @@ describe("ProjectsService.putData", () => {
     const missing = createService(null);
     await expect(
       missing.service.putData("nothing", "plan", `Bearer ${TOKEN}`, plan)
+    ).rejects.toThrow(UnauthorizedException);
+  });
+
+  it("refuses a revoked token", async () => {
+    const { service } = createService({ tokens: [] });
+    await expect(
+      service.putData("mooncellar", "plan", `Bearer ${TOKEN}`, plan)
     ).rejects.toThrow(UnauthorizedException);
   });
 

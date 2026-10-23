@@ -1,12 +1,11 @@
 "use client";
 
 import { FC, useState } from "react";
-import { IProject, IProjectToken } from "@mooncellar/schemas";
+import { IProject } from "@mooncellar/schemas";
 import {
   useCreateProjectMutation,
   useDeleteProjectMutation,
   useProjectsQuery,
-  useRotateProjectTokenMutation,
   useUpdateProjectMutation,
 } from "@/src/lib/entities/project/api";
 import {
@@ -22,40 +21,23 @@ import { Table } from "@/src/lib/shared/ui/Table";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { ProjectForm } from "./ProjectForm";
-import { ProjectTokenNotice } from "./ProjectTokenNotice";
+import { ProjectTokens } from "./ProjectTokens";
 import styles from "./ProjectsManager.module.scss";
 
 const EDIT_MODAL_ID = "status-project-edit";
+const TOKENS_MODAL_ID = "status-project-tokens";
 const CONFIRM_MODAL_ID = "status-project-confirm";
+
+const tokensLabel = (count: number) =>
+  count === 0 ? "No tokens" : count === 1 ? "1 token" : `${count} tokens`;
 
 export const ProjectsManager: FC = () => {
   const { data: projects = [], isLoading } = useProjectsQuery();
   const [isCreating, setIsCreating] = useState(false);
-  const [token, setToken] = useState<IProjectToken | null>(null);
   const { mutate: create, isPending: isCreatePending } =
     useCreateProjectMutation();
   const { mutateAsync: update } = useUpdateProjectMutation();
   const { mutateAsync: remove } = useDeleteProjectMutation();
-  const { mutateAsync: rotate } = useRotateProjectTokenMutation();
-
-  const confirm = (props: {
-    title: string;
-    message: string;
-    warning: string;
-    confirmText: string;
-    onConfirm: () => Promise<unknown>;
-  }) =>
-    modal.open(
-      <ConfirmModal
-        {...props}
-        onCancel={() => modal.close(CONFIRM_MODAL_ID)}
-        onConfirm={async () => {
-          await props.onConfirm();
-          modal.close(CONFIRM_MODAL_ID);
-        }}
-      />,
-      { id: CONFIRM_MODAL_ID }
-    );
 
   const openEdit = (project: IProject) =>
     modal.open(
@@ -81,34 +63,34 @@ export const ProjectsManager: FC = () => {
       { id: EDIT_MODAL_ID }
     );
 
-  const askRotate = (project: IProject) =>
-    confirm({
-      title: "New upload token",
-      message: `Issue a new upload token for ${project.name}?`,
-      warning:
-        "The current token stops working at once; update it wherever the project uploads from.",
-      confirmText: "Issue token",
-      onConfirm: () => rotate(project.slug).then(setToken),
-    });
+  const openTokens = (slug: string) =>
+    modal.open(
+      <ProjectTokens
+        slug={slug}
+        onClose={() => modal.close(TOKENS_MODAL_ID)}
+      />,
+      { id: TOKENS_MODAL_ID }
+    );
 
   const askRemove = (project: IProject) =>
-    confirm({
-      title: "Delete project",
-      message: `Delete ${project.name} and everything it uploaded?`,
-      warning:
-        "Its token stops working. A new project with the same address starts empty.",
-      confirmText: "Delete",
-      onConfirm: () =>
-        remove(project.slug).then(() =>
-          toast.success({ description: `${project.name} deleted` })
-        ),
-    });
+    modal.open(
+      <ConfirmModal
+        title="Delete project"
+        message={`Delete ${project.name} and everything it uploaded?`}
+        warning="Its tokens stop working. A new project with the same address starts empty."
+        confirmText="Delete"
+        onCancel={() => modal.close(CONFIRM_MODAL_ID)}
+        onConfirm={async () => {
+          await remove(project.slug);
+          modal.close(CONFIRM_MODAL_ID);
+          toast.success({ description: `${project.name} deleted` });
+        }}
+      />,
+      { id: CONFIRM_MODAL_ID }
+    );
 
   return (
     <>
-      {token && (
-        <ProjectTokenNotice token={token} onClose={() => setToken(null)} />
-      )}
       {isCreating && (
         <Box
           title="New project"
@@ -122,7 +104,9 @@ export const ProjectsManager: FC = () => {
               create(values, {
                 onSuccess: (created) => {
                   setIsCreating(false);
-                  setToken(created);
+                  toast.success({
+                    description: `${created.name} created. Connect it from where it uploads, or add a token.`,
+                  });
                 },
               })
             }
@@ -146,8 +130,8 @@ export const ProjectsManager: FC = () => {
         }
       >
         <p className={styles.hint}>
-          A project uploads its blocks with its own token; the hub shows them
-          here. Click a row to rename it or change its blocks.
+          Each machine or CI uploads with its own token. Click a row to rename a
+          project or change its blocks.
         </p>
         <Table
           mobileHeadField="project"
@@ -166,7 +150,7 @@ export const ProjectsManager: FC = () => {
             project: { content: "Project" },
             blocks: { content: "Blocks" },
             upload: { content: "Last upload" },
-            actions: { content: "Token", isNotSortable: true },
+            actions: { content: "Tokens", isNotSortable: true },
           }}
           rows={projects.map((project) => {
             const upload = getLastUpload(project);
@@ -194,8 +178,8 @@ export const ProjectsManager: FC = () => {
               actions: {
                 content: (
                   <span className={styles.actions}>
-                    <Button compact onClick={() => askRotate(project)}>
-                      New token
+                    <Button compact onClick={() => openTokens(project.slug)}>
+                      {tokensLabel(project.tokens.length)}
                     </Button>
                     <Button
                       compact

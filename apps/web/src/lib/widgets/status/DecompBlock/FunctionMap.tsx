@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useEffect, useRef } from "react";
+import { FC, useEffect, useMemo, useRef } from "react";
 import { useResizeDetector } from "react-resize-detector";
 import { DECOMP_MAP_CELLS } from "@mooncellar/schemas";
 import styles from "./DecompBlock.module.scss";
@@ -24,7 +24,28 @@ const getMapGeometry = (width: number, cells: number, maxCell: number) => {
   return { cell, gap, columns, height: Math.max(rows * (cell + gap) - gap, 0) };
 };
 
-export const FunctionMap: FC<{ map: string }> = ({ map }) => {
+export type IFunctionMapOrder = "status" | "address";
+
+const STATUS_ORDER = [
+  DECOMP_MAP_CELLS.done,
+  DECOMP_MAP_CELLS.pending,
+  DECOMP_MAP_CELLS.claimed,
+  DECOMP_MAP_CELLS.todo,
+];
+
+const byStatus = (map: string) =>
+  STATUS_ORDER.map((cell) => cell.repeat(map.split(cell).length - 1)).join("");
+
+interface IFunctionMapProps {
+  map: string;
+  order: IFunctionMapOrder;
+}
+
+export const FunctionMap: FC<IFunctionMapProps> = ({ map: source, order }) => {
+  const map = useMemo(
+    () => (order === "status" ? byStatus(source) : source),
+    [source, order]
+  );
   const { width = 0, ref } = useResizeDetector({ handleHeight: false });
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -75,7 +96,7 @@ export const FunctionMap: FC<{ map: string }> = ({ map }) => {
         ref={canvasRef}
         className={styles.map__canvas}
         role="img"
-        aria-label={`${map.length} functions in address order: ${count(DECOMP_MAP_CELLS.done)} done in main, ${count(DECOMP_MAP_CELLS.pending)} done in a branch, ${count(DECOMP_MAP_CELLS.claimed)} claimed`}
+        aria-label={`${map.length} functions ${order === "status" ? "grouped by status" : "in address order"}: ${count(DECOMP_MAP_CELLS.done)} done in main, ${count(DECOMP_MAP_CELLS.pending)} done in a branch, ${count(DECOMP_MAP_CELLS.claimed)} claimed`}
       />
     </div>
   );
