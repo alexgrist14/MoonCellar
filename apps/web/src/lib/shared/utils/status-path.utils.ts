@@ -1,3 +1,5 @@
+import { IProjectBlock, PROJECT_BLOCKS } from "@mooncellar/schemas";
+
 export const STATUS_SIGN_IN_PATH = "/login";
 
 export const isSafeStatusPath = (
@@ -17,6 +19,10 @@ export interface IConnectRequest {
   name: string;
   port: number;
   state: string;
+  /** What to call the project if it does not exist yet (the command's suggestion). */
+  title?: string;
+  /** Its blocks if it does not exist yet, from `blocks=decomp,plan`. */
+  blocks?: IProjectBlock[];
 }
 
 const STATE = /^[A-Za-z0-9_-]{16,128}$/;
@@ -30,7 +36,20 @@ export const readConnectRequest = (
   const port = Number(params.get("port"));
   if (!project || !name || !STATE.test(state)) return null;
   if (!Number.isInteger(port) || port < 1024 || port > 65535) return null;
-  return { project, name, port, state };
+  const title = params.get("title")?.trim().slice(0, 100) || undefined;
+  const blocks = (params.get("blocks") ?? "")
+    .split(",")
+    .filter((block): block is IProjectBlock =>
+      PROJECT_BLOCKS.includes(block as IProjectBlock)
+    );
+  return {
+    project,
+    name,
+    port,
+    state,
+    ...(title && { title }),
+    ...(blocks.length && { blocks: [...new Set(blocks)] }),
+  };
 };
 
 export const getConnectCallbackUrl = (request: IConnectRequest, code: string) =>

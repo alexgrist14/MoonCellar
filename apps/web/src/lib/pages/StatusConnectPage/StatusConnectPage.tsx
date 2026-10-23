@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { ProjectTokenNameSchema } from "@mooncellar/schemas";
 import {
   useConnectProjectMutation,
+  useCreateProjectMutation,
   useProjectsQuery,
 } from "@/src/lib/entities/project/api";
 import { Box } from "@/src/lib/shared/ui/Box";
@@ -17,12 +18,14 @@ import {
   getConnectCallbackUrl,
   readConnectRequest,
 } from "@/src/lib/shared/utils/status-path.utils";
+import { ProjectForm } from "@/src/lib/widgets/status/ProjectsManager";
 import styles from "./StatusConnectPage.module.scss";
 
 export const StatusConnectPage: FC = () => {
   const request = readConnectRequest(useSearchParams());
   const { data: projects, isLoading } = useProjectsQuery();
   const { mutate: connect, isPending } = useConnectProjectMutation();
+  const { mutate: create, isPending: isCreating } = useCreateProjectMutation();
   const [isCancelled, setIsCancelled] = useState(false);
   const project = projects?.find((item) => item.slug === request?.project);
 
@@ -47,24 +50,6 @@ export const StatusConnectPage: FC = () => {
     );
   }
 
-  if (!project) {
-    return (
-      <Box>
-        <EmptyState
-          variant="page"
-          as="h1"
-          title="No project at this address"
-          description={`There is no project called "${request.project}". Create it in Manage projects, then run the connect command again.`}
-          action={
-            <Button color={ButtonColor.ACCENT} href="/manage">
-              Manage projects
-            </Button>
-          }
-        />
-      </Box>
-    );
-  }
-
   if (isCancelled) {
     return (
       <Box>
@@ -78,14 +63,50 @@ export const StatusConnectPage: FC = () => {
     );
   }
 
-  const allow = () =>
+  const allow = (slug: string) =>
     connect(
-      { slug: project.slug, name: request.name },
+      { slug, name: request.name },
       {
         onSuccess: ({ code }) =>
           window.location.assign(getConnectCallbackUrl(request, code)),
       }
     );
+
+  if (!project) {
+    return (
+      <Box>
+        <div className={styles.page}>
+          <SvgLink size="40" />
+          <SectionTitle as="h1">
+            Create {request.title ?? request.project}
+          </SectionTitle>
+          <p className={styles.page__text}>
+            There is no project at{" "}
+            <code className={styles.page__code}>{request.project}</code> yet.{" "}
+            <strong>{request.name}</strong> asks to create it and to get its own
+            upload token. Allow it only if you have just run the connect command
+            there: the token goes to the program waiting on this computer at{" "}
+            <code className={styles.page__code}>127.0.0.1:{request.port}</code>.
+          </p>
+          <div className={styles.page__form}>
+            <ProjectForm
+              defaults={{
+                name: request.title ?? request.project,
+                slug: request.project,
+                blocks: request.blocks,
+              }}
+              isPending={isCreating || isPending}
+              submitText="Create and allow"
+              onCancel={() => setIsCancelled(true)}
+              onSubmit={(values) =>
+                create(values, { onSuccess: (created) => allow(created.slug) })
+              }
+            />
+          </div>
+        </div>
+      </Box>
+    );
+  }
 
   return (
     <Box>
@@ -112,7 +133,7 @@ export const StatusConnectPage: FC = () => {
             color={ButtonColor.ACCENT}
             isLoading={isPending}
             disabled={isPending}
-            onClick={allow}
+            onClick={() => allow(project.slug)}
           >
             Allow
           </Button>

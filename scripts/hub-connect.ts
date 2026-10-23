@@ -10,7 +10,9 @@ const USAGE = `Connect this machine or a CI to a project of the status hub.
 
 Opens the hub in the browser; after "Allow" the token is saved to the file
 (default ~/.config/mooncellar/<project>-hub-token) or stored as a GitHub Actions
-secret through gh. --no-open only prints the link.`;
+secret through gh. A project that does not exist yet is created on the same page:
+--title <name> and --blocks plan,decomp suggest its name and blocks.
+--no-open only prints the link.`;
 
 const TIMEOUT_MS = 10 * 60 * 1000;
 
@@ -119,11 +121,15 @@ const main = async () => {
     },
   });
 
+  const title = option(args, "--title");
+  const blocks = option(args, "--blocks");
   const link = `${hub}/connect?${new URLSearchParams({
     project,
     name,
     port: String(server.port),
     state,
+    ...(title && { title }),
+    ...(blocks && { blocks }),
   })}`;
   console.log(`Allow "${name}" in the browser:\n  ${link}`);
   if (!args.includes("--no-open")) openInBrowser(link);

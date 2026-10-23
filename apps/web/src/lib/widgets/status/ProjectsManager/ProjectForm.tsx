@@ -19,6 +19,8 @@ export interface IProjectFormValues {
 
 interface IProjectFormProps {
   project?: IProject;
+  /** Starting values of a new project; a given slug is fixed (a connect command waits for it). */
+  defaults?: Partial<IProjectFormValues>;
   isPending: boolean;
   submitText: string;
   onSubmit: (values: IProjectFormValues) => void;
@@ -27,16 +29,20 @@ interface IProjectFormProps {
 
 export const ProjectForm: FC<IProjectFormProps> = ({
   project,
+  defaults,
   isPending,
   submitText,
   onSubmit,
   onCancel,
 }) => {
-  const [name, setName] = useState(project?.name ?? "");
-  const [slug, setSlug] = useState(project?.slug ?? "");
-  const [isSlugEdited, setIsSlugEdited] = useState(!!project);
+  const isSlugLocked = !!project || !!defaults?.slug;
+  const [name, setName] = useState(project?.name ?? defaults?.name ?? "");
+  const [slug, setSlug] = useState(
+    project?.slug ?? defaults?.slug ?? toSlug(defaults?.name ?? "")
+  );
+  const [isSlugEdited, setIsSlugEdited] = useState(isSlugLocked);
   const [blocks, setBlocks] = useState<IProjectBlock[]>(
-    project?.blocks ?? ["plan"]
+    project?.blocks ?? defaults?.blocks ?? ["plan"]
   );
   const parsed = CreateProjectRequestSchema.safeParse({ name, slug, blocks });
   const slugError =
@@ -61,7 +67,7 @@ export const ProjectForm: FC<IProjectFormProps> = ({
         <TextField
           label="Address"
           value={slug}
-          disabled={!!project}
+          disabled={isSlugLocked}
           error={slugError}
           onChange={(value) => {
             setIsSlugEdited(true);

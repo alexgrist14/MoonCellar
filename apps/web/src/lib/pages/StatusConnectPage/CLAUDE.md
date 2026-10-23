@@ -7,7 +7,8 @@ one-time code, which the command exchanges for its own token.
 
 ## Routes
 
-- `/connect?project=<slug>&name=<device>&port=<1024–65535>&state=<random>` on the status host —
+- `/connect?project=<slug>&name=<device>&port=<1024–65535>&state=<random>[&title=<name>][&blocks=decomp,plan]`
+  on the status host —
   `src/app/status/(gated)/connect/page.tsx`, inside the gated layout, so a signed-out admin signs in
   first and comes back with the query intact (`StatusGate` keeps `location.search` in `next`).
   `connect` is in `RESERVED_PROJECT_SLUGS`.
@@ -18,11 +19,17 @@ one-time code, which the command exchanges for its own token.
   shows "This connect link is incomplete" and issues nothing.
 - `useProjectsQuery` for the project's name; `useConnectProjectMutation` →
   `POST /projects/:slug/connect` with the device name → `{ code, expiresAt }`.
+- A project that does not exist yet: `ProjectForm` (from `widgets/status/ProjectsManager`) with the
+  address fixed to the query's `project` and `title` / `blocks` as its starting name and blocks;
+  "Create and allow" runs `useCreateProjectMutation`, then the connect mutation.
 
 ## Composition
 
 - `Box` → link icon, `SectionTitle as="h1"` "Connect <name>", what is being allowed and where the
   token goes, Cancel and Allow. Cancel issues nothing and says so.
+- No such project → "Create <title>": the same text plus `ProjectForm` (name, blocks; the address
+  cannot change, the command waits for it) with Cancel and "Create and allow". This is how a new
+  project joins the hub in one step (a new game's `/init-game` does it).
 
 ## Rules and gotchas
 

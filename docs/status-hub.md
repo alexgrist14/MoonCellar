@@ -28,6 +28,12 @@ host reaches them is in the Status hub section of `apps/web/CLAUDE.md`.
 
 ## Projects and blocks
 
+A new project joins in one step from where it will upload: its connect command
+(`bun scripts/hub-connect.ts <slug> --title "<name>" --blocks plan,decomp`, or the project's own)
+opens `/connect`; for an address that has no project yet the page offers to create it with that name
+and those blocks, and "Create and allow" creates it and hands the command its token. Manage
+projects → New project does the same by hand.
+
 A project has a name, an address (`slug`: lowercase letters, digits and dashes; `login`, `manage`,
 `status`, `api`, `images`, `img` and `connect` are taken by the hub) and one or more blocks. A block is a type the hub
 knows how to draw; a new project is data, a new block type is code.
