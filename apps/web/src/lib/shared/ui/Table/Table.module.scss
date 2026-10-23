@@ -83,6 +83,10 @@
       width: 100%;
     }
 
+    & > p:empty {
+      min-height: 1lh;
+    }
+
     & > p,
     & > a,
     & > a > p {

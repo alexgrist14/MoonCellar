@@ -81,6 +81,10 @@ import { Table } from "@/src/lib/shared/ui/Table";
   is `display: contents` and draws nothing), so target one column with a compound selector:
   `.row_off.new { opacity: 0.45 }`.
 - `isWithoutSorting` also ignores `initialSortingKey` and hides the mobile sort dropdowns.
+- An empty string `content` keeps one line of height (`p:empty { min-height: 1lh }`), so an
+  unlabelled actions header and a blank cell stay level with their neighbours. Without it the
+  empty `<p>` collapsed, the actions header of Upload tokens rose half its height above the
+  others, and in `columns` every cell below a blank one moved up.
 
 - Size columns through `columnStyles` with a `width` and a `minWidth`, so one long column
   cannot squeeze the other headers.
@@ -125,4 +129,4 @@ import { Table } from "@/src/lib/shared/ui/Table";
 ## Storybook
 
 `Shared/Table`: `Default`, `Paginated`, `ClickableRows`, `RowClick`, `ServerSorting`, `SingleSortableColumn`, `Loading`, `Empty`, `WithoutRows`,
-`ZeroAndMissingValues`, `Mobile`, `WithoutSorting`, `DimmedRows`, `RowLayout`.
+`ZeroAndMissingValues`, `Mobile`, `WithoutSorting`, `DimmedRows`, `ActionsColumn`, `RowLayout`.
