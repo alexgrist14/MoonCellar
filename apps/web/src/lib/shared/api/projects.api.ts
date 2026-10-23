@@ -1,5 +1,6 @@
 import {
   ICreatePlanSectionRequest,
+  IDecompFunctions,
   ICreatePlanTaskRequest,
   IPlanBlock,
   IPlanEvent,
@@ -24,6 +25,10 @@ export const projectsApi = {
   getBySlug: (slug: string) => agent.get<IProject>(`${PROJECTS_URL}/${slug}`),
   getBlock: <T>(slug: string, block: IProjectBlock) =>
     agent.get<T>(`${PROJECTS_URL}/${slug}/data/${block}`),
+  getDecompFunctions: (slug: string) =>
+    agent.get<IDecompFunctions>(
+      `${PROJECTS_URL}/${slug}/data/decomp/functions`
+    ),
   create: (dto: ICreateProjectRequest) =>
     agent.post<IProject>(PROJECTS_URL, dto),
   update: (slug: string, dto: IUpdateProjectRequest) =>

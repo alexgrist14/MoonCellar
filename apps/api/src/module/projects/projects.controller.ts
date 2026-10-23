@@ -119,6 +119,17 @@ export class ProjectsController {
     return this.projectsService.createConnectCode(slug, dto.name);
   }
 
+  @Get(":slug/data/decomp/functions")
+  @ApiOperation({
+    summary:
+      "What every cell of the Decompilation map is: address, size, file, name",
+  })
+  @Header("Content-Type", "application/json; charset=utf-8")
+  @Header("Cache-Control", "private, max-age=300")
+  getFunctions(@Param("slug") slug: string) {
+    return this.projectsService.getFunctions(slug);
+  }
+
   @Get(":slug/data/:block")
   @ApiOperation({ summary: "The block as the project last uploaded it" })
   @Header("Content-Type", "application/json; charset=utf-8")
@@ -148,6 +159,21 @@ export class ProjectUploadsController {
     @Body() dto: ProjectTokenExchangeRequestDto
   ) {
     return this.projectsService.exchangeCode(slug, dto.code);
+  }
+
+  @Put(":slug/data/decomp/functions")
+  @ApiOperation({
+    summary:
+      "Upload what the Decompilation map's cells are (DecompFunctionsSchema) with a project token",
+  })
+  @ApiBearerAuth()
+  @ApiBody({ description: "DecompFunctionsSchema from @mooncellar/schemas" })
+  putFunctions(
+    @Param("slug") slug: string,
+    @Headers("authorization") authorization: string | undefined,
+    @Body() body: unknown
+  ) {
+    return this.projectsService.putFunctions(slug, authorization, body);
   }
 
   @Put(":slug/data/:block")

@@ -1,6 +1,7 @@
 "use client";
 
 import { FC } from "react";
+import { useRouter } from "next/navigation";
 import classNames from "classnames";
 import {
   IDecompBlock,
@@ -17,16 +18,18 @@ import {
   getProjectUpload,
   isStaleUpload,
 } from "@/src/lib/entities/project/model";
+import { ActionsMenu } from "@/src/lib/shared/ui/ActionsMenu";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { SectionTitle } from "@/src/lib/shared/ui/SectionTitle";
 import { Skeleton } from "@/src/lib/shared/ui/Skeleton";
-import { SvgClock, SvgListBullet } from "@/src/lib/shared/ui/svg";
+import { SvgClock, SvgListBullet, SvgMore } from "@/src/lib/shared/ui/svg";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { DecompBlock } from "@/src/lib/widgets/status/DecompBlock";
 import { PlanBlock } from "@/src/lib/widgets/status/PlanBlock";
+import { useProjectActions } from "@/src/lib/widgets/status/ProjectsManager";
 import { StatusProjectSkeleton } from "./StatusProjectSkeleton";
 import styles from "./StatusProjectPage.module.scss";
 
@@ -42,6 +45,8 @@ export const StatusProjectPage: FC<IStatusProjectPageProps> = ({
   slug,
   block,
 }) => {
+  const router = useRouter();
+  const { openEdit, openTokens, askRemove } = useProjectActions();
   const { data: projects, isLoading } = useProjectsQuery();
   const project = projects?.find((item) => item.slug === slug);
   const active =
@@ -88,21 +93,51 @@ export const StatusProjectPage: FC<IStatusProjectPageProps> = ({
         <div className={styles.head}>
           <div className={styles.head__row}>
             <SectionTitle as="h1">{project.name}</SectionTitle>
-            <span
-              className={classNames(styles.updated, {
-                [styles.updated_stale]: isStale,
-              })}
-            >
-              <SvgClock size="16" />
-              {upload
-                ? `Updated ${commonUtils.getHumanDate(upload.updatedAt)}`
-                : isPlan
-                  ? "No changes yet"
-                  : "Never uploaded"}
-              {commit && (
-                <code className={styles.commit}>{commit.slice(0, 7)}</code>
-              )}
-            </span>
+            <div className={styles.head__aside}>
+              <span
+                className={classNames(styles.updated, {
+                  [styles.updated_stale]: isStale,
+                })}
+              >
+                <SvgClock size="16" />
+                {upload
+                  ? `Updated ${commonUtils.getHumanDate(upload.updatedAt)}`
+                  : isPlan
+                    ? "No changes yet"
+                    : "Never uploaded"}
+                {commit && (
+                  <code className={styles.commit}>{commit.slice(0, 7)}</code>
+                )}
+              </span>
+              <ActionsMenu
+                title={project.name}
+                items={[
+                  { label: "Edit project", onClick: () => openEdit(project) },
+                  {
+                    label: "Upload tokens",
+                    onClick: () => openTokens(project.slug),
+                  },
+                  {
+                    label: "Delete project",
+                    isDanger: true,
+                    onClick: () =>
+                      askRemove(project, () => router.replace("/")),
+                  },
+                ]}
+                renderTrigger={({ ref, toggle }) => (
+                  <Button
+                    ref={ref}
+                    color={ButtonColor.TRANSPARENT}
+                    compact
+                    isOnlyIcon
+                    aria-label={`Actions for ${project.name}`}
+                    onClick={toggle}
+                  >
+                    <SvgMore size="16" />
+                  </Button>
+                )}
+              />
+            </div>
           </div>
           {project.blocks.length > 1 && (
             <Tabs
@@ -134,7 +169,9 @@ export const StatusProjectPage: FC<IStatusProjectPageProps> = ({
         </Box>
       )}
       {isPlan && plan && <PlanBlock slug={project.slug} plan={plan} />}
-      {!isPlan && upload && decomp && <DecompBlock decomp={decomp} />}
+      {!isPlan && upload && decomp && (
+        <DecompBlock slug={project.slug} decomp={decomp} />
+      )}
     </>
   );
 };

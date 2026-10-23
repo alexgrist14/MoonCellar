@@ -22,12 +22,14 @@ block — `PlanBlock` or `DecompBlock` (`widgets/status`).
 ## Composition
 
 1. `Box`: `SectionTitle as="h1"`, "Updated … ago" (turns `--color-attention` after
-   `STALE_UPLOAD_MS`, a day) and the uploaded commit, then `Tabs` with `tabLink` per block when the
-   project has more than one.
+   `STALE_UPLOAD_MS`, a day), the uploaded commit and a "⋯" `ActionsMenu` — Edit project, Upload
+   tokens, Delete project (`useProjectActions` from `widgets/status/ProjectsManager`; after a delete
+   the page goes to `/`), then `Tabs` with `tabLink` per block when the project has more than one.
 2. Decompilation never uploaded → inline `EmptyState` naming the upload endpoint. An empty plan is
    `PlanBlock`'s own empty state with "Add a section".
 3. Loading → `Skeleton`; loaded → `PlanBlock` (editable, `slug` passed for its mutations) or
-   `DecompBlock`.
+   `DecompBlock` (`slug` for its map: `FunctionMap` loads what the cells are with
+   `useDecompFunctionsQuery` on the first hover or tap and shows it in a tooltip at the pointer).
 
 Its loading state is `StatusProjectSkeleton.tsx`.
 

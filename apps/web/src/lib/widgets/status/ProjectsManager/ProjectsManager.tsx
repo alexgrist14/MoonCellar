@@ -1,12 +1,9 @@
 "use client";
 
 import { FC, useState } from "react";
-import { IProject } from "@mooncellar/schemas";
 import {
   useCreateProjectMutation,
-  useDeleteProjectMutation,
   useProjectsQuery,
-  useUpdateProjectMutation,
 } from "@/src/lib/entities/project/api";
 import {
   PROJECT_BLOCK_TITLES,
@@ -14,19 +11,13 @@ import {
 } from "@/src/lib/entities/project/model";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
-import { ConfirmModal } from "@/src/lib/shared/ui/ConfirmModal";
-import { modal } from "@/src/lib/shared/ui/Modal";
 import { SvgPlus } from "@/src/lib/shared/ui/svg";
 import { Table } from "@/src/lib/shared/ui/Table";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { ProjectForm } from "./ProjectForm";
-import { ProjectTokens } from "./ProjectTokens";
+import { useProjectActions } from "./useProjectActions";
 import styles from "./ProjectsManager.module.scss";
-
-const EDIT_MODAL_ID = "status-project-edit";
-const TOKENS_MODAL_ID = "status-project-tokens";
-const CONFIRM_MODAL_ID = "status-project-confirm";
 
 const tokensLabel = (count: number) =>
   count === 0 ? "No tokens" : count === 1 ? "1 token" : `${count} tokens`;
@@ -36,58 +27,7 @@ export const ProjectsManager: FC = () => {
   const [isCreating, setIsCreating] = useState(false);
   const { mutate: create, isPending: isCreatePending } =
     useCreateProjectMutation();
-  const { mutateAsync: update } = useUpdateProjectMutation();
-  const { mutateAsync: remove } = useDeleteProjectMutation();
-
-  const openEdit = (project: IProject) =>
-    modal.open(
-      <Box
-        title={`Edit ${project.name}`}
-        isTitleStart
-        onClose={() => modal.close(EDIT_MODAL_ID)}
-        wrapperStyle={{ width: "var(--status-edit-modal-width)" }}
-      >
-        <ProjectForm
-          project={project}
-          isPending={false}
-          submitText="Save"
-          onCancel={() => modal.close(EDIT_MODAL_ID)}
-          onSubmit={({ name, blocks }) =>
-            update({ slug: project.slug, dto: { name, blocks } }).then(() => {
-              modal.close(EDIT_MODAL_ID);
-              toast.success({ description: `${name} saved` });
-            })
-          }
-        />
-      </Box>,
-      { id: EDIT_MODAL_ID }
-    );
-
-  const openTokens = (slug: string) =>
-    modal.open(
-      <ProjectTokens
-        slug={slug}
-        onClose={() => modal.close(TOKENS_MODAL_ID)}
-      />,
-      { id: TOKENS_MODAL_ID }
-    );
-
-  const askRemove = (project: IProject) =>
-    modal.open(
-      <ConfirmModal
-        title="Delete project"
-        message={`Delete ${project.name} and everything it uploaded?`}
-        warning="Its tokens stop working. A new project with the same address starts empty."
-        confirmText="Delete"
-        onCancel={() => modal.close(CONFIRM_MODAL_ID)}
-        onConfirm={async () => {
-          await remove(project.slug);
-          modal.close(CONFIRM_MODAL_ID);
-          toast.success({ description: `${project.name} deleted` });
-        }}
-      />,
-      { id: CONFIRM_MODAL_ID }
-    );
+  const { openEdit, openTokens, askRemove } = useProjectActions();
 
   return (
     <>

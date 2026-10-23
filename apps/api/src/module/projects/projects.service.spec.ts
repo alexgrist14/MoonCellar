@@ -76,6 +76,7 @@ const createService = (stored: Record<string, unknown> | null) => {
   const data = {
     findOne: jest.fn(() => chain(null)),
     findOneAndUpdate: jest.fn(async () => ({ updatedAt: CREATED })),
+    updateOne: jest.fn(),
     deleteMany: jest.fn(),
   };
   const codes = {
@@ -83,12 +84,16 @@ const createService = (stored: Record<string, unknown> | null) => {
     findOneAndDelete: jest.fn(() => chain(null)),
     deleteMany: jest.fn(),
   };
+  const plans = { deleteMany: jest.fn() };
+  const planEvents = { deleteMany: jest.fn() };
   const service = new ProjectsService(
     projects as never,
     data as never,
-    codes as never
+    codes as never,
+    plans as never,
+    planEvents as never
   );
-  return { service, projects, data, codes };
+  return { service, projects, data, codes, plans, planEvents };
 };
 
 describe("project tokens", () => {
@@ -338,7 +343,76 @@ describe("ProjectsService.update", () => {
     );
     expect(data.deleteMany).toHaveBeenCalledWith({
       slug: "mooncellar",
-      block: { $in: ["decomp"] },
+      block: { $in: ["decomp", "decomp/functions"] },
     });
+  });
+});
+
+describe("ProjectsService.remove", () => {
+  it("deletes the project with its uploads, codes, plan and plan history", async () => {
+    const { service, projects, data, codes, plans, planEvents } = createService(
+      {}
+    );
+    await service.remove("mooncellar");
+    expect(projects.deleteOne).toHaveBeenCalledWith({ slug: "mooncellar" });
+    for (const model of [data, codes, plans, planEvents]) {
+      expect(model.deleteMany).toHaveBeenCalledWith({ slug: "mooncellar" });
+    }
+  });
+});
+
+describe("ProjectsService functions", () => {
+  const functions = {
+    units: ["src/game/a.cpp", "src/game/b.cpp"],
+    functions: [
+      [0x1000, 64, 0, "A::run()"],
+      [0x1040, 32, 1, "B::stop()"],
+    ],
+  };
+
+  it("stores what the map's cells are beside the Decompilation block", async () => {
+    const { service, data, projects } = createService({ blocks: ["decomp"] });
+    const answer = await service.putFunctions(
+      "mooncellar",
+      `Bearer ${TOKEN}`,
+      functions
+    );
+    expect(answer).toEqual({
+      functions: 2,
+      size: Buffer.byteLength(JSON.stringify(functions)),
+    });
+    expect(data.updateOne).toHaveBeenCalledWith(
+      { slug: "mooncellar", block: "decomp/functions" },
+      { $set: { body: JSON.stringify(functions) } },
+      { upsert: true }
+    );
+    expect(projects.updateOne).toHaveBeenCalledWith(
+      { slug: "mooncellar", "tokens.id": "a1b2c3" },
+      { $set: { "tokens.$.lastUsedAt": expect.any(Date) } }
+    );
+  });
+
+  it("refuses a function that points past the files", async () => {
+    const { service } = createService({ blocks: ["decomp"] });
+    await expect(
+      service.putFunctions("mooncellar", `Bearer ${TOKEN}`, {
+        units: ["src/game/a.cpp"],
+        functions: [[0x1000, 64, 1, "A::run()"]],
+      })
+    ).rejects.toBeInstanceOf(ZodValidationException);
+  });
+
+  it("needs the Decompilation block", async () => {
+    const { service } = createService({});
+    await expect(
+      service.putFunctions("mooncellar", `Bearer ${TOKEN}`, functions)
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it("says when nothing was uploaded yet", async () => {
+    const { service } = createService({ blocks: ["decomp"] });
+    await expect(service.getFunctions("mooncellar")).rejects.toBeInstanceOf(
+      NotFoundException
+    );
   });
 });

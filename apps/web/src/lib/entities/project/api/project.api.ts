@@ -20,6 +20,8 @@ export const projectQueryKeys = {
     ["projects", slug, "plan", "events", task ?? ""] as const,
   block: (slug: string, block: IProjectBlock) =>
     ["projects", slug, "data", block] as const,
+  decompFunctions: (slug: string) =>
+    ["projects", slug, "data", "decomp", "functions"] as const,
 };
 
 const BLOCK_REFRESH_MS = 60_000;
@@ -42,6 +44,20 @@ export const useProjectBlockQuery = <T>(
       projectsApi.getBlock<T>(slug, block).then(({ data }) => data),
     enabled: isEnabled,
     refetchInterval: BLOCK_REFRESH_MS,
+  });
+
+/**
+ * What every cell of the Decompilation map is (address, size, file, name). Large and rarely
+ * changing, so it is loaded only when asked for (the map's first hover) and kept for the visit.
+ */
+export const useDecompFunctionsQuery = (slug: string, isEnabled: boolean) =>
+  useQuery({
+    queryKey: projectQueryKeys.decompFunctions(slug),
+    queryFn: () =>
+      projectsApi.getDecompFunctions(slug).then(({ data }) => data),
+    enabled: isEnabled,
+    staleTime: Infinity,
+    retry: false,
   });
 
 export const useCreateProjectMutation = () => {

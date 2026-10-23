@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { type HydratedDocument } from "mongoose";
-import type { IProjectBlock } from "@mooncellar/schemas";
 
 export type ProjectDataDocument = HydratedDocument<ProjectData>;
 
@@ -8,8 +7,9 @@ export type ProjectDataDocument = HydratedDocument<ProjectData>;
 export class ProjectData {
   @Prop({ type: String, required: true })
   slug: string;
+  /** A block (`decomp`) or something uploaded beside one (`decomp/functions`). */
   @Prop({ type: String, required: true })
-  block: IProjectBlock;
+  block: string;
   @Prop({ type: String, required: true })
   body: string;
   updatedAt: Date;
