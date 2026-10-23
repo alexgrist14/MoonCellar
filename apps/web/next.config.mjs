@@ -21,7 +21,7 @@ const nextConfig = {
   async rewrites() {
     const isStatusHost = [{ type: "host", value: "status\\..+" }];
     const segment =
-      "(?!(?:_next|images|img|api|status|worker\\.js|sw\\.js|offline\\.html|manifest\\.webmanifest|robots\\.txt|sitemap\\.xml)(?:/|$))[^/]+";
+      "(?!(?:_next|images|img|api|status|worker\\.js|sw\\.js|offline\\.html|manifest\\.webmanifest|robots\\.txt|sitemap\\.xml|hub-connector\\.zip)(?:/|$))[^/]+";
     return {
       beforeFiles: [
         { source: "/", has: isStatusHost, destination: "/status" },

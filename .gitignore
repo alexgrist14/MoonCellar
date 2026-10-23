@@ -13,6 +13,7 @@ coverage/
 
 # next.js
 .next/
+apps/web/public/hub-connector.zip
 .vscode/
 out/
 

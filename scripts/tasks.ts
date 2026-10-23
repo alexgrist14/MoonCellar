@@ -1,24 +1,27 @@
 import { execFileSync } from "node:child_process";
 import type { IPlanBlock, IPlanEvent, IPlanTask } from "@mooncellar/schemas";
-import { HubError, hubRequest, hubSettings } from "./hub-client";
+import { HubError, hubRequest, hubSettings, scriptCommand } from "./hub-client";
 
-const USAGE = `Tasks of a project's plan in the status hub (the plan lives there, not in the repository).
+const usage = () => {
+  const self = scriptCommand("tasks");
+  return `Tasks of a project's plan in the status hub (the plan lives there, not in the repository).
 
-  bun scripts/tasks.ts list [--free] [--json]      tasks and their state
-  bun scripts/tasks.ts show <id>                   one task with its history
-  bun scripts/tasks.ts take <id> [--note <text>]   lead a task
-  bun scripts/tasks.ts release <id>                let it go
-  bun scripts/tasks.ts done <id>                   mark it done
-  bun scripts/tasks.ts reopen <id>                 take the mark back
-  bun scripts/tasks.ts add <section> "<task>" [--where …] [--depends H1,H2] [--done-when …] [--size S|M|L]
-  bun scripts/tasks.ts edit <id> [--title …] [--where …] [--depends …] [--done-when …] [--size …]
-  bun scripts/tasks.ts section "<title>" [--id X]  a new section (first free letter unless given)
-  bun scripts/tasks.ts url                         the project's page in the hub
+  ${self} list [--free] [--json]      tasks and their state
+  ${self} show <id>                   one task with its history
+  ${self} take <id> [--note <text>]   lead a task
+  ${self} release <id>                let it go
+  ${self} done <id>                   mark it done
+  ${self} reopen <id>                 take the mark back
+  ${self} add <section> "<task>" [--where …] [--depends H1,H2] [--done-when …] [--size S|M|L]
+  ${self} edit <id> [--title …] [--where …] [--depends …] [--done-when …] [--size …]
+  ${self} section "<title>" [--id X]  a new section (first free letter unless given)
+  ${self} url                         the project's page in the hub
 
 Actions are made for --as <name>, STATUS_HUB_AS or git user.name in lower case. Taking,
 releasing or finishing a task someone else leads needs --force: share work through the hub.
-The token is the one bun scripts/hub-connect.ts <project> saved (or STATUS_HUB_TOKEN);
-STATUS_HUB_PROJECT picks another project (default mooncellar).`;
+The project is the one in the repository's .claude/status-hub.json (or STATUS_HUB_PROJECT);
+the token is the one ${scriptCommand("hub-connect")} saved (or STATUS_HUB_TOKEN).`;
+};
 
 const ACTIONS = ["take", "release", "done", "reopen"] as const;
 type IAction = (typeof ACTIONS)[number];
@@ -91,7 +94,7 @@ const findTask = (plan: IPlanBlock, id: string) => {
     if (task) return { task, section };
   }
   throw new HubError(
-    `No task ${id.toUpperCase()} in the plan (bun scripts/tasks.ts list)`
+    `No task ${id.toUpperCase()} in the plan (${scriptCommand("tasks")} list)`
   );
 };
 
@@ -220,11 +223,11 @@ const run = async (args: string[]): Promise<number> => {
     console.log(`Added section ${added?.id ?? "?"}: ${id}`);
     return 0;
   }
-  console.log(USAGE);
+  console.log(usage());
   return 2;
 };
 
-if (import.meta.main) {
+export const cli = async () => {
   try {
     process.exit(await run(process.argv.slice(2)));
   } catch (error) {
@@ -232,4 +235,6 @@ if (import.meta.main) {
     console.error(error.message);
     process.exit(1);
   }
-}
+};
+
+if (import.meta.main) await cli();

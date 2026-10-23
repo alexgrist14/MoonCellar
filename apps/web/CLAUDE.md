@@ -546,6 +546,10 @@ shows and how projects upload to it is in [`docs/status-hub.md`](../../docs/stat
   two-segment rule took `/status/login` as `first = "status"`, so `/login` became
   `/status/status/login`, rendered the gated layout with `slug = "status"`, and the sign-in page
   showed the gate's loader in an endless redirect to itself.
+- **`/hub-connector.zip` is a file in `public/`, so the rewrites exclude it by name** (`hub-connector\\.zip`
+  in the segment list); without that the status host maps it to `/status/hub-connector.zip` and the
+  "Download" on Manage projects is a 404. The file is not in git: `build` makes it first
+  (`build:connector`, `scripts/build-hub-connector.ts`); in `dev` run `bun run build:connector` once.
 - **`Layout` renders `StatusLayout` when `useSelectedLayoutSegment()` is `STATUS_SEGMENT`.** It
   keeps the page scroll, the connectors and `useMediaStore`, and none of the site's chrome or
   background work — the header, filters, platforms, the `/royal` and `/notifications` sockets, the
@@ -845,7 +849,6 @@ d)`), never `new Date("2026-09-20")` — the latter is parsed as UTC midnight an
 - New `Svg*` components must be built with the shared `Svg` and `Path` components from `src/lib/shared/ui/svg/Svg/Svg.tsx` — do not write raw `<svg>`/`<path>` tags.
 
 <!-- BEGIN:nextjs-agent-rules -->
-
 # This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.

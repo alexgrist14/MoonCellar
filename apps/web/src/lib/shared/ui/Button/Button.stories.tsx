@@ -91,6 +91,15 @@ export const AsExternalLink: Story = {
   },
 };
 
+export const AsDownloadLink: Story = {
+  args: {
+    href: "/hub-connector.zip",
+    download: true,
+    color: ButtonColor.ACCENT,
+    children: "Download hub-connector.zip",
+  },
+};
+
 export const AsLinkActive: Story = {
   args: { href: "/games", active: true, compact: true, children: "Games" },
 };

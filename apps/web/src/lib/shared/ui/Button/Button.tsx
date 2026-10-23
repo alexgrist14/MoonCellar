@@ -55,6 +55,7 @@ export interface IButtonProps extends Pick<
   target?: HTMLAttributeAnchorTarget;
   rel?: string;
   prefetch?: ComponentProps<typeof Link>["prefetch"];
+  download?: boolean | string;
 }
 
 export const Button = memo(
@@ -74,6 +75,7 @@ export const Button = memo(
     target,
     rel,
     prefetch,
+    download,
     ref,
     disabled,
     type,
@@ -126,6 +128,7 @@ export const Button = memo(
           target={target}
           rel={rel}
           prefetch={prefetch}
+          download={download}
           aria-disabled={isDisabled || undefined}
           tabIndex={isDisabled ? -1 : undefined}
           onClick={onClick as unknown as MouseEventHandler<HTMLAnchorElement>}

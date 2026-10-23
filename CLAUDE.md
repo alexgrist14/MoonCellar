@@ -132,6 +132,11 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
   `bun scripts/tasks.ts` (or `/task`), never from memory or a file.** People take and finish tasks
   on the site, so a copy is stale the moment someone clicks. A machine connects once with `/hub`
   (`bun scripts/hub-connect.ts mooncellar`); details are in `docs/status-hub.md`.
+- **The hub scripts run in other repositories too: `scripts/hub-client.ts`, `hub-connect.ts` and
+  `tasks.ts` are bundled into the hub connector (`scripts/hub-connector/`, `docs/status-hub.md`) that
+  runs on Node 18+.** Keep them on `node:` modules and `fetch` — no `Bun.*` and no runtime import of a
+  workspace package (types only) — or `/hub-init` breaks for everyone who downloads it. The project
+  comes from `.claude/status-hub.json`, never from a default.
 - The agent commands live in `.claude/commands/` (`/hub`, `/task`). A command that changes how work
   is done (branches, PRs, checks) is updated together with `CONTRIBUTING.md` and this file.
 
