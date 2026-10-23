@@ -68,15 +68,4 @@
   display: flex;
   flex-direction: column;
   gap: var(--gap-x4);
-
-  &__add {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: end;
-    gap: var(--gap-x2);
-
-    @include mediaSm {
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
 }

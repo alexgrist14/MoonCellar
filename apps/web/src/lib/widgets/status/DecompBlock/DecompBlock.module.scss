@@ -83,11 +83,53 @@
 }
 
 .map {
+  position: relative;
   width: 100%;
 
   &__canvas {
     display: block;
     width: 100%;
+    touch-action: manipulation;
+  }
+
+  &__tip {
+    position: absolute;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x1);
+    width: max-content;
+    max-width: min(320px, 100%);
+    padding: var(--padding-x2) var(--padding-x3);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x2);
+    background-color: var(--color-bg-primary);
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--color-text-secondary);
+    pointer-events: none;
+  }
+
+  &__tipName {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    overflow-wrap: anywhere;
+  }
+
+  &__tipMeta {
+    font-family: monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__tipFile {
+    font-family: monospace;
+    color: var(--color-text-muted);
+    overflow-wrap: anywhere;
+  }
+
+  &__tipMuted {
+    color: var(--color-text-muted);
   }
 }
 

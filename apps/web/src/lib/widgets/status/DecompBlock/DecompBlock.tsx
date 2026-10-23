@@ -11,7 +11,7 @@ import { StatTile } from "@/src/lib/shared/ui/StatTile";
 import { Table } from "@/src/lib/shared/ui/Table";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
-import { FunctionMap, IFunctionMapOrder } from "./FunctionMap";
+import { FunctionMap, IFunctionMapOrder, MAP_CELL_STATES } from "./FunctionMap";
 import styles from "./DecompBlock.module.scss";
 
 type IFilesFilter = "work" | "free" | "done";
@@ -35,13 +35,6 @@ const formatBytes = (bytes: number) =>
   bytes >= 1024 * 1024
     ? `${(bytes / 1024 / 1024).toFixed(1)} MB`
     : `${Math.round(bytes / 1024)} KB`;
-
-const LEGEND = [
-  { label: "Done in main", token: "--color-positive" },
-  { label: "Done in a branch", token: "--status-pending-color" },
-  { label: "Claimed", token: "--color-accent" },
-  { label: "Not started", token: "--color-bg-tertiary" },
-];
 
 const UnitState: FC<{ unit: IDecompUnit }> = ({ unit }) => {
   if (unit.claimedBy) {
@@ -70,7 +63,12 @@ const UnitState: FC<{ unit: IDecompUnit }> = ({ unit }) => {
   );
 };
 
-export const DecompBlock: FC<{ decomp: IDecompBlock }> = ({ decomp }) => {
+interface IDecompBlockProps {
+  slug: string;
+  decomp: IDecompBlock;
+}
+
+export const DecompBlock: FC<IDecompBlockProps> = ({ slug, decomp }) => {
   const [filter, setFilter] = useState<IFilesFilter>("work");
   const [mapOrder, setMapOrder] = useState<IFunctionMapOrder>("status");
   const { totals } = decomp;
@@ -158,7 +156,7 @@ export const DecompBlock: FC<{ decomp: IDecompBlock }> = ({ decomp }) => {
         titleAction={
           <div className={styles.mapActions}>
             <ul className={styles.legend}>
-              {LEGEND.map(({ label, token }) => (
+              {MAP_CELL_STATES.map(({ label, token }) => (
                 <li key={label}>
                   <i style={{ backgroundColor: `var(${token})` }} />
                   {label}
@@ -182,7 +180,12 @@ export const DecompBlock: FC<{ decomp: IDecompBlock }> = ({ decomp }) => {
           </div>
         }
       >
-        <FunctionMap map={decomp.map} order={mapOrder} />
+        <FunctionMap
+          slug={slug}
+          map={decomp.map}
+          units={decomp.units}
+          order={mapOrder}
+        />
       </Box>
 
       <div className={styles.split}>

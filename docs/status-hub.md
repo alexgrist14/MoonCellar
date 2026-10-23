@@ -18,7 +18,7 @@ progress of a decompilation, or both. Each project uploads its own data; the hub
 | --- | --- |
 | `/login` | Sign in |
 | `/` | Opens the first project, or "No projects yet" |
-| `/<project>` and `/<project>/<block>` | The project with a tab per block |
+| `/<project>` and `/<project>/<block>` | The project with a tab per block; "⋯" — edit, tokens, delete |
 | `/manage` | Add a project, change its blocks, manage its tokens, delete |
 | `/connect` | Allow a connect command to get a token |
 
@@ -34,8 +34,14 @@ knows how to draw; a new project is data, a new block type is code.
 
 | Block | Schema (`@mooncellar/schemas`) | Shows |
 | --- | --- | --- |
-| `decomp` — Decompilation | `DecompBlockSchema` | Totals, categories, areas, a map with one cell per function, files, feed |
+| `decomp` — Decompilation | `DecompBlockSchema` | Totals, categories, areas, a map with one cell per function (hover or tap: name, address, size, state, file), files, feed |
 | `plan` — Plan | `PlanBlockSchema` | Totals, tasks by section with state, owner and what a task waits for; editable |
+
+The map's tooltip needs to know what each cell is, which would make the block ten times larger and
+slower to refresh every minute. So a project uploads it beside the block, once per merge, as
+`DecompFunctionsSchema` (`PUT /projects/:slug/data/decomp/functions`: every function in the map's
+order — address, size, file as an index into `units`, name); the page reads it once, on the map's first
+hover. Without it the tooltip shows only the state. It goes away with the block.
 
 The menu shows each project's progress from its first block: functions done for `decomp`, tasks done
 for `plan`. An upload older than a day turns the "Updated" line yellow.
@@ -60,7 +66,8 @@ through the API. Nobody keeps it in a file any more; a project with a markdown p
 - **Import**: a plan arrives once, into an empty hub plan — `PUT /projects/:slug/plan`, or the older
   `PUT /projects/:slug/data/plan` — with done tasks' `doneAt` when known. After that both answer 409.
   `bun scripts/import-plan.ts [--file plan.md]` parses a markdown plan in the format of
-  [`plan.md`](./plan.md) and imports it with `STATUS_HUB_TOKEN`.
+  [`plan.md`](./plan.md) and imports it with the token `bun scripts/hub-connect.ts mooncellar` saved
+  (or `STATUS_HUB_TOKEN`; `STATUS_HUB_PROJECT` for another project).
 
 ## Uploading
 
@@ -108,12 +115,14 @@ once imported.
 | `POST /projects` | admin | Create (no tokens yet) |
 | `GET /projects/:slug` | admin | One project |
 | `PATCH /projects/:slug` | admin | Rename, change blocks (a dropped block loses its upload) |
-| `DELETE /projects/:slug` | admin | Delete with everything uploaded |
+| `DELETE /projects/:slug` | admin | Delete with everything uploaded, the plan and its history |
 | `POST /projects/:slug/tokens` | admin | Add a named token; the answer carries it once |
 | `DELETE /projects/:slug/tokens/:id` | admin | Revoke one token |
 | `POST /projects/:slug/connect` | admin | A one-time code for a connect command |
 | `POST /projects/:slug/tokens/exchange` | anyone with a code | Exchange the code for a token |
 | `GET /projects/:slug/data/:block` | admin | The block as uploaded |
+| `PUT /projects/:slug/data/decomp/functions` | token | What the map's cells are (`DecompFunctionsSchema`) |
+| `GET /projects/:slug/data/decomp/functions` | admin | The same, for the map's tooltip |
 | `GET /projects/:slug/plan` | admin or token | The plan with every task's state |
 | `PUT /projects/:slug/plan` | admin or token | Import a whole plan into an empty one |
 | `POST /projects/:slug/plan/sections` | admin or token | Add a section |

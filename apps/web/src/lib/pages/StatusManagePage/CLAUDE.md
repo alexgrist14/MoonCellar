@@ -16,7 +16,8 @@ projects. The page is a heading plus `widgets/status/ProjectsManager`.
 
 1. `Box` → `SectionTitle as="h1"` "Manage projects".
 2. `ProjectsManager`: the "New project" form and the projects `Table` (row → edit modal; the token
-   count opens `ProjectTokens`; "Delete" behind `ConfirmModal`).
+   count opens `ProjectTokens`; "Delete" behind `ConfirmModal`). The three modals come from
+   `useProjectActions`, which the project page's "⋯" menu uses too.
 3. `ProjectTokens` (a modal): every token of the project with its name, when it was added and when it
    last uploaded, "Revoke" (asks "Sure?" in place), and "Add token" by name, which shows the new token
    once.
@@ -30,4 +31,6 @@ projects. The page is a heading plus `widgets/status/ProjectsManager`.
   modal loses it, and the fix is another token.
 - **`ProjectTokens` reads its project from `useProjectsQuery` by slug, never from props:** `modal.open`
   keeps the JSX it was given, so a project passed in would not show a token just added or revoked.
-- Turning a block off in the edit modal deletes that block's upload on the API.
+- Turning a block off in the edit modal deletes that block's upload on the API (with what was uploaded
+  beside it, like the map's functions); a plan stays until the project is deleted.
+- Deleting a project deletes its uploads, codes, plan and plan history.

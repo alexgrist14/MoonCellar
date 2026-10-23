@@ -232,6 +232,33 @@ export const DecompBlockSchema = z.object({
 });
 export type IDecompBlock = z.infer<typeof DecompBlockSchema>;
 
+/** One function of the map: address, size in bytes, index into `units`, name. */
+export const DecompFunctionSchema = z.tuple([
+  CountSchema,
+  CountSchema,
+  CountSchema,
+  z.string().max(300),
+]);
+export type IDecompFunction = z.infer<typeof DecompFunctionSchema>;
+
+/**
+ * What the Decompilation map's cells are: every function in the map's order (by address), its
+ * file as an index into `units`. Uploaded beside the block (`PUT /projects/:slug/data/decomp/functions`)
+ * and read once per page for the map's tooltip, so the block itself stays small.
+ */
+export const DecompFunctionsSchema = z
+  .object({
+    commit: z.string().max(64).optional(),
+    units: z.array(z.string().max(300)).max(20_000),
+    functions: z.array(DecompFunctionSchema).max(500_000),
+  })
+  .refine(
+    ({ units, functions }) =>
+      functions.every(([, , unit]) => unit < units.length),
+    "Every function points at one of units"
+  );
+export type IDecompFunctions = z.infer<typeof DecompFunctionsSchema>;
+
 export const PROJECT_BLOCK_SCHEMAS = {
   plan: PlanBlockSchema,
   decomp: DecompBlockSchema,

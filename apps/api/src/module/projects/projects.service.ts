@@ -12,6 +12,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import type { Model } from "mongoose";
 import { ZodValidationException } from "nestjs-zod";
 import {
+  DecompFunctionsSchema,
   PROJECT_BLOCK_SCHEMAS,
   ProjectBlockSchema,
   getProjectBlockProgress,
@@ -27,10 +28,19 @@ import {
 import { Project, type ProjectToken } from "./schemas/project.schema";
 import { ProjectData } from "./schemas/project-data.schema";
 import { ProjectConnectCode } from "./schemas/project-connect-code.schema";
+import { ProjectPlan, ProjectPlanEvent } from "./schemas/project-plan.schema";
 
 export const PROJECT_TOKEN_PREFIX = "mcp_";
 export const CONNECT_CODE_TTL_MS = 10 * 60 * 1000;
 export const FIRST_TOKEN_NAME = "First token";
+/** Stored beside the Decompilation block: what every cell of its map is. */
+export const DECOMP_FUNCTIONS = "decomp/functions";
+
+/** What is stored beside a block and goes away with it. */
+const BLOCK_EXTRAS: Record<IProjectBlock, string[]> = {
+  decomp: [DECOMP_FUNCTIONS],
+  plan: [],
+};
 
 export const PROJECT_BLOCK_TITLES: Record<IProjectBlock, string> = {
   plan: "Plan",
@@ -117,7 +127,10 @@ export class ProjectsService implements OnModuleInit {
     @InjectModel(ProjectData.name)
     private readonly data: Model<ProjectData>,
     @InjectModel(ProjectConnectCode.name)
-    private readonly codes: Model<ProjectConnectCode>
+    private readonly codes: Model<ProjectConnectCode>,
+    @InjectModel(ProjectPlan.name) private readonly plans: Model<ProjectPlan>,
+    @InjectModel(ProjectPlanEvent.name)
+    private readonly planEvents: Model<ProjectPlanEvent>
   ) {}
 
   async onModuleInit() {
@@ -190,7 +203,11 @@ export class ProjectsService implements OnModuleInit {
       )
       .lean();
     if (dropped.length) {
-      await this.data.deleteMany({ slug, block: { $in: dropped } });
+      const stored = dropped.flatMap((block) => [
+        block,
+        ...BLOCK_EXTRAS[block],
+      ]);
+      await this.data.deleteMany({ slug, block: { $in: stored } });
     }
     return toProject(updated ?? project);
   }
@@ -200,6 +217,8 @@ export class ProjectsService implements OnModuleInit {
     await this.projects.deleteOne({ slug });
     await this.data.deleteMany({ slug });
     await this.codes.deleteMany({ slug });
+    await this.plans.deleteMany({ slug });
+    await this.planEvents.deleteMany({ slug });
   }
 
   async addToken(slug: string, name: string): Promise<IProjectToken> {
@@ -314,6 +333,42 @@ export class ProjectsService implements OnModuleInit {
       }
     );
     return { ...upload, updatedAt: new Date(upload.updatedAt).toISOString() };
+  }
+
+  async getFunctions(slug: string): Promise<string> {
+    const project = await this.findProject(slug);
+    this.assertHasBlock(project, "decomp");
+    const stored = await this.data
+      .findOne({ slug, block: DECOMP_FUNCTIONS })
+      .lean();
+    if (!stored) {
+      throw new NotFoundException(
+        `${project.name} has not uploaded what its map's functions are yet`
+      );
+    }
+    return stored.body;
+  }
+
+  async putFunctions(
+    slug: string,
+    authorization: string | undefined,
+    body: unknown
+  ): Promise<{ functions: number; size: number }> {
+    const { project, token } = await this.authorizeToken(slug, authorization);
+    this.assertHasBlock(project, "decomp");
+    const parsed = DecompFunctionsSchema.safeParse(body);
+    if (!parsed.success) throw new ZodValidationException(parsed.error);
+    const json = JSON.stringify(parsed.data);
+    await this.data.updateOne(
+      { slug, block: DECOMP_FUNCTIONS },
+      { $set: { body: json } },
+      { upsert: true }
+    );
+    await this.touchToken(slug, token.id);
+    return {
+      functions: parsed.data.functions.length,
+      size: Buffer.byteLength(json),
+    };
   }
 
   async authorizeToken(slug: string, authorization: string | undefined) {

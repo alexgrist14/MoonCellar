@@ -10,6 +10,12 @@
     justify-content: space-between;
     gap: var(--gap-x3);
   }
+
+  &__aside {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x2);
+  }
 }
 
 .updated {

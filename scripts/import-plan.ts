@@ -1,4 +1,5 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { homedir } from "node:os";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
 import {
@@ -74,17 +75,24 @@ export const parsePlan = (markdown: string, commit?: string): IPlanBlock => {
   });
 };
 
+/** STATUS_HUB_TOKEN, else the file `bun scripts/hub-connect.ts <project>` saved. */
+const readToken = (project: string) => {
+  if (process.env.STATUS_HUB_TOKEN) return process.env.STATUS_HUB_TOKEN;
+  const file = join(homedir(), ".config", "mooncellar", `${project}-hub-token`);
+  return existsSync(file) ? readFileSync(file, "utf8").trim() : undefined;
+};
+
 const upload = async (plan: IPlanBlock) => {
-  const token = process.env.STATUS_HUB_TOKEN;
+  const url = process.env.STATUS_HUB_URL ?? "https://api.mooncellar.space";
+  const project = process.env.STATUS_HUB_PROJECT ?? "mooncellar";
+  const token = readToken(project);
   if (!token) {
     console.log(
-      "STATUS_HUB_TOKEN is not set: the plan was checked, nothing was imported"
+      `No token: run bun scripts/hub-connect.ts ${project} or set STATUS_HUB_TOKEN. The plan was checked, nothing was imported`
     );
     return;
   }
-  const url = process.env.STATUS_HUB_URL ?? "https://api.mooncellar.space";
-  const project = process.env.STATUS_HUB_PROJECT ?? "mooncellar";
-  const response = await fetch(`${url}/projects/${project}/data/plan`, {
+  const response = await fetch(`${url}/projects/${project}/plan`, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -99,7 +107,12 @@ const upload = async (plan: IPlanBlock) => {
       `The hub refused the plan (${response.status}): ${answer.message ?? response.statusText}`
     );
   }
-  console.log(`Plan imported: ${answer.done} of ${answer.total} tasks done`);
+  const tasks: IPlanTask[] = (answer as IPlanBlock).sections.flatMap(
+    (section) => section.tasks
+  );
+  console.log(
+    `Plan imported: ${tasks.filter((task) => task.state === "done").length} of ${tasks.length} tasks done`
+  );
 };
 
 if (import.meta.main) {

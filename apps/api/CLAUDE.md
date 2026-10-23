@@ -138,6 +138,9 @@ an instance of Module)`. Use a default import; tsc reports the call as `TS2349`.
   409 "changed meanwhile". Never write `tasks.$` with a query that matches the array a second way (a
   top-level `"tasks.done"` next to the `$elemMatch`): the positional operator then points at whichever
   element matched last. A task's state is derived on read (`getPlanTaskState`), never stored.
+- **What a project uploads beside a block (`decomp/functions` in `projectdata`) is listed in
+  `BLOCK_EXTRAS` and goes away with the block; deleting a project also deletes its plan and plan
+  events.** A new kind of upload beside a block goes into that list, or a dropped block leaves it behind.
 - **`PUT /projects/:slug/data/plan` imports into an empty plan and answers 409 afterwards.** It is how a
   project that used to upload its plan migrates by itself; once the plan lives in the hub, a stale
   uploader must not overwrite what people changed on the site.

@@ -100,22 +100,23 @@ export const ProjectTokens: FC<IProjectTokensProps> = ({ slug, onClose }) => {
             },
           }))}
         />
-        <div className={styles.tokens__add}>
-          <TextField
-            label="New token for"
-            placeholder="CI, or user@machine"
-            value={name}
-            onChange={setName}
-          />
-          <Button
-            color={ButtonColor.ACCENT}
-            disabled={!name.trim() || isAdding}
-            isLoading={isAdding}
-            onClick={addToken}
-          >
-            Add token
-          </Button>
-        </div>
+        <TextField
+          label="New token for"
+          placeholder="CI, or user@machine"
+          value={name}
+          onChange={setName}
+          isFlush
+          action={
+            <Button
+              color={ButtonColor.ACCENT}
+              disabled={!name.trim() || isAdding}
+              isLoading={isAdding}
+              onClick={addToken}
+            >
+              Add token
+            </Button>
+          }
+        />
       </div>
     </Box>
   );
