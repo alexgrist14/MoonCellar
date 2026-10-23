@@ -80,3 +80,37 @@
     }
   }
 }
+
+// isPage: the bare form, framed by the page (the status hub's sign-in card)
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x4);
+  width: 100%;
+
+  .content__inputs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x3);
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap-x1);
+    }
+  }
+
+  label {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+  }
+
+  .error {
+    font-size: 13px;
+    color: var(--color-red);
+  }
+
+  .btn {
+    width: 100%;
+  }
+}

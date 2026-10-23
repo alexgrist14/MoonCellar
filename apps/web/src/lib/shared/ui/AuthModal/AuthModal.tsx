@@ -102,81 +102,87 @@ export const AuthModal: FC<IAuthModalProps> = ({
     });
   };
 
+  const form = (
+    <form
+      onSubmit={onSubmit}
+      className={isPage ? styles.page : styles.content}
+      autoComplete="on"
+    >
+      <div className={styles.content__inputs}>
+        {isRegister && (
+          <div>
+            <label>User Name</label>
+            <Input
+              type="text"
+              {...register("userName")}
+              error={errors.userName}
+            />
+          </div>
+        )}
+        <div>
+          <label>Email</label>
+          <Input
+            type="email"
+            id="email"
+            autoComplete="username"
+            {...register("email")}
+            error={errors.email}
+          />
+        </div>
+        <div>
+          <label>Password</label>
+          <Input
+            type="password"
+            id="password"
+            autoComplete="current-password"
+            {...register("password")}
+            error={errors.password}
+          />
+        </div>
+      </div>
+      {error && <p className={styles.error}>{error}</p>}
+      <div className={styles.content__buttons}>
+        <Button
+          color={ButtonColor.ACCENT}
+          className={styles.btn}
+          type="submit"
+          isLoading={isLoaderShown}
+        >
+          {isRegister ? "Sign up" : "Sign in"}
+        </Button>
+        {!isPage && (
+          <p className={styles.switch}>
+            {isRegister ? "Already have an account?" : "Don't have an account?"}
+            <Button
+              type="button"
+              color={ButtonColor.TRANSPARENT}
+              className={styles.link}
+              compact
+              onClick={() => switchMode(!isRegister)}
+            >
+              {isRegister ? "Sign in" : "Sign up"}
+            </Button>
+          </p>
+        )}
+      </div>
+    </form>
+  );
+
+  if (isPage) return form;
+
   return (
     <div className={styles.container}>
-      <form onSubmit={onSubmit} className={styles.content} autoComplete="on">
-        <div className={styles.content__inputs}>
-          {isRegister && (
-            <div>
-              <label>User Name</label>
-              <Input
-                type="text"
-                {...register("userName")}
-                error={errors.userName}
-              />
-            </div>
-          )}
-          <div>
-            <label>Email</label>
-            <Input
-              type="email"
-              id="email"
-              autoComplete="username"
-              {...register("email")}
-              error={errors.email}
-            />
-          </div>
-          <div>
-            <label>Password</label>
-            <Input
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              {...register("password")}
-              error={errors.password}
-            />
-          </div>
-        </div>
-        {error && <p className={styles.error}>{error}</p>}
-        <div className={styles.content__buttons}>
-          <Button
-            color={ButtonColor.ACCENT}
-            className={styles.btn}
-            type="submit"
-            isLoading={isLoaderShown}
-          >
-            {isRegister ? "Sign up" : "Sign in"}
-          </Button>
-          {!isPage && (
-            <p className={styles.switch}>
-              {isRegister
-                ? "Already have an account?"
-                : "Don't have an account?"}
-              <Button
-                type="button"
-                color={ButtonColor.TRANSPARENT}
-                className={styles.link}
-                compact
-                onClick={() => switchMode(!isRegister)}
-              >
-                {isRegister ? "Sign in" : "Sign up"}
-              </Button>
-            </p>
-          )}
-        </div>
-      </form>
-      {!isPage && (
-        <Button
-          type="button"
-          color={ButtonColor.TRANSPARENT}
-          className={styles.close}
-          tooltip="Close"
-          tooltipAlign="right"
-          onClick={() => modal.close(AUTH_MODAL_ID)}
-        >
-          <SvgClose size="20" />
-        </Button>
-      )}
+      {form}
+      <Button
+        type="button"
+        color={ButtonColor.TRANSPARENT}
+        className={styles.close}
+        tooltip="Close"
+        tooltipAlign="right"
+        onClick={() => modal.close(AUTH_MODAL_ID)}
+      >
+        <SvgClose size="20" />
+      </Button>
       <Background />
     </div>
   );

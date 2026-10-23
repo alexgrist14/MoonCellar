@@ -3,6 +3,7 @@
 import { FC } from "react";
 import { FRONT_URL } from "@/src/lib/shared/constants";
 import { useAuth } from "@/src/lib/shared/hooks/auth";
+import { STATUS_SIGN_IN_PATH } from "@/src/lib/shared/utils/status-path.utils";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
@@ -19,10 +20,9 @@ export const StatusNoAccessPage: FC<IStatusNoAccessPageProps> = ({
   const { logout } = useAuth();
 
   return (
-    <Box>
-      <div className={styles.page}>
+    <div className={styles.page}>
+      <Box wrapperStyle={{ width: "var(--status-card-width)" }}>
         <EmptyState
-          variant="page"
           as="h1"
           icon={<SvgLock size="40" />}
           title="No access"
@@ -36,7 +36,7 @@ export const StatusNoAccessPage: FC<IStatusNoAccessPageProps> = ({
             <>
               <Button
                 color={ButtonColor.DEFAULT}
-                onClick={() => logout(viewer.id)}
+                onClick={() => logout(viewer.id, { href: STATUS_SIGN_IN_PATH })}
               >
                 Sign out
               </Button>
@@ -46,7 +46,7 @@ export const StatusNoAccessPage: FC<IStatusNoAccessPageProps> = ({
             </>
           }
         />
-      </div>
-    </Box>
+      </Box>
+    </div>
   );
 };

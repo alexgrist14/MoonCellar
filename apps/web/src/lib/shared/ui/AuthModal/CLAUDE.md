@@ -9,16 +9,17 @@ hook, which stores the profile and closes the modal on success.
 - Open it with `openAuthModal()` whenever a guest triggers something that needs an
   account (the header avatar, `useRequireAuth` in the game community).
 - Do not embed it inline in a page: its close button calls `modal.close()`, which only makes
-  sense inside `ModalsConnector`. The one exception is `isPage`, which drops that button — the
-  status hub's sign-in page (`pages/StatusLoginPage`) renders it so.
+  sense inside `ModalsConnector`. The one exception is `isPage`: the bare sign-in form, without the
+  modal's frame, background, close button and sign-up switch — the page frames it, as the status hub's
+  sign-in card does (`pages/StatusLoginPage`: a `Box` with the logo and heading above it).
 - Do not build a second login form; extend this one.
 
 ## API
 
-| Prop       | Type      | Default | Purpose                                                                  |
-| ---------- | --------- | ------- | ------------------------------------------------------------------------ |
-| `isSignIn` | `boolean` | `false` | Open in login mode instead of sign-up; the user can still switch.        |
-| `isPage`   | `boolean` | `false` | Sign in only, as the body of a page: no close button, no sign-up switch. |
+| Prop       | Type      | Default | Purpose                                                                                                                                                                        |
+| ---------- | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `isSignIn` | `boolean` | `false` | Open in login mode instead of sign-up; the user can still switch.                                                                                                              |
+| `isPage`   | `boolean` | `false` | Sign in only, as a bare form for a page to frame: stacked labelled fields, the error line and a full-width submit; no modal frame, background, close button or sign-up switch. |
 
 `openAuthModal(props?)` passes the same props.
 

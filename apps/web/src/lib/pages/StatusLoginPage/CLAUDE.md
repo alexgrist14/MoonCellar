@@ -1,7 +1,7 @@
 # StatusLoginPage
 
-The sign-in page of the project status hub (`status.mooncellar.space`): the shared `AuthModal` in its
-`isPage` mode — sign in only, no close button, no sign-up — under a short heading.
+The sign-in page of the project status hub (`status.mooncellar.space`): a centred card with the
+wordmark, a heading and the shared `AuthModal` in its `isPage` mode — sign in only, no sign-up.
 
 ## Routes
 
@@ -19,8 +19,10 @@ The sign-in page of the project status hub (`status.mooncellar.space`): the shar
 
 ## Composition
 
-1. Heading "Sign in to Status" and one line of copy.
-2. `AuthModal isPage isSignIn`.
+A card centred on the page, as in `docs/mockups/status-hub.html`: `Box` at `--status-card-width`
+(380px) with the wordmark (`/images/logo-text.png`), "Sign in to Status", one line of copy and
+`AuthModal isPage isSignIn` — the shared form without the modal's frame. The page is exactly
+`--page-height-available` tall, so the card never pushes a scrollbar.
 
 ## Rules and gotchas
 

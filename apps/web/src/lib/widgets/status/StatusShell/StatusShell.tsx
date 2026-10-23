@@ -8,6 +8,7 @@ import { useProjectsQuery } from "@/src/lib/entities/project/api";
 import { useAuth } from "@/src/lib/shared/hooks/auth";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
+import { STATUS_SIGN_IN_PATH } from "@/src/lib/shared/utils/status-path.utils";
 import { ProjectsMenu } from "@/src/lib/widgets/status/ProjectsMenu";
 import styles from "./StatusShell.module.scss";
 
@@ -50,7 +51,7 @@ export const StatusShell: FC<IStatusShellProps> = ({ viewer, children }) => {
             <Button
               color={ButtonColor.TRANSPARENT}
               compact
-              onClick={() => logout(viewer.id)}
+              onClick={() => logout(viewer.id, { href: STATUS_SIGN_IN_PATH })}
             >
               Sign out
             </Button>
