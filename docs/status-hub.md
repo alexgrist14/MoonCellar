@@ -57,8 +57,11 @@ gzip -c plan.json | curl -X PUT https://api.mooncellar.space/projects/<project>/
 - A wrong token, a project that does not exist and a missing header all answer 401 with the same
   message, so the endpoint does not tell which projects exist.
 
-The MoonCellar project's plan is sent by this repository's CI; other projects send theirs from
-their own tooling, usually right after a merge into their `main`.
+The MoonCellar project's own plan is [`docs/plan.md`](./plan.md): the CI job `plan` parses it with
+`scripts/upload-plan.ts` (`bun scripts/upload-plan.ts --check` only parses) and uploads it on every
+push to `main` that changes it, with the repository secret `STATUS_HUB_TOKEN` — the token of the
+`mooncellar` project. Without the secret the job checks the plan and warns. Other projects send
+their blocks from their own tooling, usually right after a merge into their `main`.
 
 ## API
 
