@@ -13,6 +13,7 @@ export const RESERVED_PROJECT_SLUGS = [
   "api",
   "images",
   "img",
+  "connect",
 ];
 
 export const ProjectSlugSchema = z
@@ -36,11 +37,20 @@ export const ProjectUploadSchema = z.object({
 });
 export type IProjectUpload = z.infer<typeof ProjectUploadSchema>;
 
+export const ProjectTokenInfoSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  createdAt: z.string(),
+  lastUsedAt: z.string().nullable(),
+});
+export type IProjectTokenInfo = z.infer<typeof ProjectTokenInfoSchema>;
+
 export const ProjectSchema = z.object({
   slug: ProjectSlugSchema,
   name: z.string(),
   blocks: z.array(ProjectBlockSchema),
   uploads: z.array(ProjectUploadSchema),
+  tokens: z.array(ProjectTokenInfoSchema),
   createdAt: z.string(),
 });
 export type IProject = z.infer<typeof ProjectSchema>;
@@ -65,11 +75,48 @@ export const UpdateProjectRequestSchema = z.object({
 });
 export type IUpdateProjectRequest = z.input<typeof UpdateProjectRequestSchema>;
 
+export const ProjectTokenNameSchema = z.string().trim().min(1).max(80);
+
+export const CreateProjectTokenRequestSchema = z.object({
+  name: ProjectTokenNameSchema,
+});
+export type ICreateProjectTokenRequest = z.infer<
+  typeof CreateProjectTokenRequestSchema
+>;
+
 export const ProjectTokenSchema = z.object({
   project: ProjectSchema,
+  tokenId: z.string(),
   token: z.string(),
 });
 export type IProjectToken = z.infer<typeof ProjectTokenSchema>;
+
+export const ProjectConnectRequestSchema = z.object({
+  name: ProjectTokenNameSchema,
+});
+export type IProjectConnectRequest = z.infer<
+  typeof ProjectConnectRequestSchema
+>;
+
+export const ProjectConnectCodeSchema = z.object({
+  code: z.string(),
+  expiresAt: z.string(),
+});
+export type IProjectConnectCode = z.infer<typeof ProjectConnectCodeSchema>;
+
+export const ProjectTokenExchangeRequestSchema = z.object({
+  code: z.string().min(1).max(200),
+});
+export type IProjectTokenExchangeRequest = z.infer<
+  typeof ProjectTokenExchangeRequestSchema
+>;
+
+export const ProjectTokenExchangeSchema = z.object({
+  slug: z.string(),
+  name: z.string(),
+  token: z.string(),
+});
+export type IProjectTokenExchange = z.infer<typeof ProjectTokenExchangeSchema>;
 
 export const PlanTaskStateSchema = z.enum(["done", "taken", "free", "waiting"]);
 export type IPlanTaskState = z.infer<typeof PlanTaskStateSchema>;

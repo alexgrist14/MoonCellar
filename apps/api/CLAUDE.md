@@ -112,9 +112,16 @@ an instance of Module)`. Use a default import; tsc reports the call as `TS2349`.
 
 ## Projects (status hub)
 
-- **A project's upload token is stored only as its sha256 (`tokenHash`, `select: false`), and the
-  check is `timingSafeEqual` on the hashes.** The create and rotate answers are the only place the
-  token exists; there is no endpoint that reads it back, so a lost token means a new one.
+- **A project has one upload token per machine or CI (`tokens`: id, name, sha256, `lastUsedAt`), and
+  only the hash is stored.** The add and exchange answers are the only place a token exists; nothing
+  reads it back. The check hashes the token and compares with `timingSafeEqual`. Projects created
+  before the list kept one `tokenHash`; `ProjectsService.onModuleInit` moves it into `tokens` as "First
+  token" with the same hash, so their uploaders keep working — keep that migration until no project
+  carries `tokenHash`.
+- **A connect code is single-use and short-lived: `projectconnectcodes` stores its sha256 with a TTL
+  index on `expiresAt` (ten minutes), and the exchange is one `findOneAndDelete`.** The code travels
+  through the browser (a redirect to `127.0.0.1`), the token never does; a second exchange of the same
+  code answers 400.
 - **`PUT /projects/:slug/data/:block` answers the same 401 for a missing header, a wrong token and a
   project that does not exist,** so the public endpoint does not tell which addresses are taken. It
   sits in its own controller (`ProjectUploadsController`) because the admin controller's class-level

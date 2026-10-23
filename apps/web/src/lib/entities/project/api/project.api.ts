@@ -69,8 +69,32 @@ export const useDeleteProjectMutation = () => {
   });
 };
 
-export const useRotateProjectTokenMutation = () =>
+export const useAddProjectTokenMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ slug, name }: { slug: string; name: string }) =>
+      projectsApi.addToken(slug, name).then(({ data }) => data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: projectQueryKeys.all });
+    },
+  });
+};
+
+export const useRevokeProjectTokenMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ slug, id }: { slug: string; id: string }) =>
+      projectsApi.revokeToken(slug, id).then(({ data }) => data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: projectQueryKeys.all });
+    },
+  });
+};
+
+export const useConnectProjectMutation = () =>
   useMutation({
-    mutationFn: (slug: string) =>
-      projectsApi.rotateToken(slug).then(({ data }) => data),
+    mutationFn: ({ slug, name }: { slug: string; name: string }) =>
+      projectsApi.connect(slug, name).then(({ data }) => data),
   });

@@ -28,8 +28,13 @@ import { RolesGuard } from "../roles/roles.guard";
 import { Roles } from "../roles/roles.decorator";
 import {
   CreateProjectRequestDto,
+  CreateProjectTokenRequestDto,
+  ProjectConnectCodeDto,
+  ProjectConnectRequestDto,
   ProjectDto,
   ProjectTokenDto,
+  ProjectTokenExchangeDto,
+  ProjectTokenExchangeRequestDto,
   ProjectUploadDto,
   UpdateProjectRequestDto,
 } from "../../shared/zod/dto/projects.dto";
@@ -44,24 +49,24 @@ export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
   @Get()
-  @ApiOperation({ summary: "Every project with its blocks and last uploads" })
+  @ApiOperation({
+    summary: "Every project with its blocks, uploads and tokens",
+  })
   @ApiOkResponse({ type: [ProjectDto] })
   list() {
     return this.projectsService.list();
   }
 
   @Post()
-  @ApiOperation({
-    summary: "Add a project; the answer carries its upload token once",
-  })
-  @ApiOkResponse({ type: ProjectTokenDto })
+  @ApiOperation({ summary: "Add a project" })
+  @ApiOkResponse({ type: ProjectDto })
   @HttpCode(HttpStatus.OK)
   create(@Body() dto: CreateProjectRequestDto) {
     return this.projectsService.create(dto);
   }
 
   @Get(":slug")
-  @ApiOperation({ summary: "One project with its blocks and last uploads" })
+  @ApiOperation({ summary: "One project with its blocks, uploads and tokens" })
   @ApiOkResponse({ type: ProjectDto })
   get(@Param("slug") slug: string) {
     return this.projectsService.get(slug);
@@ -82,14 +87,32 @@ export class ProjectsController {
     return this.projectsService.remove(slug);
   }
 
-  @Post(":slug/token")
-  @ApiOperation({
-    summary: "Issue a new upload token; the old one stops working",
-  })
+  @Post(":slug/tokens")
+  @ApiOperation({ summary: "Add an upload token; the answer carries it once" })
   @ApiOkResponse({ type: ProjectTokenDto })
   @HttpCode(HttpStatus.OK)
-  rotateToken(@Param("slug") slug: string) {
-    return this.projectsService.rotateToken(slug);
+  addToken(
+    @Param("slug") slug: string,
+    @Body() dto: CreateProjectTokenRequestDto
+  ) {
+    return this.projectsService.addToken(slug, dto.name);
+  }
+
+  @Delete(":slug/tokens/:id")
+  @ApiOperation({ summary: "Revoke one upload token" })
+  @ApiOkResponse({ type: ProjectDto })
+  revokeToken(@Param("slug") slug: string, @Param("id") id: string) {
+    return this.projectsService.revokeToken(slug, id);
+  }
+
+  @Post(":slug/connect")
+  @ApiOperation({
+    summary: "A one-time code that a connect command exchanges for its token",
+  })
+  @ApiOkResponse({ type: ProjectConnectCodeDto })
+  @HttpCode(HttpStatus.OK)
+  connect(@Param("slug") slug: string, @Body() dto: ProjectConnectRequestDto) {
+    return this.projectsService.createConnectCode(slug, dto.name);
   }
 
   @Get(":slug/data/:block")
@@ -106,10 +129,23 @@ export class ProjectsController {
 export class ProjectUploadsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
+  @Post(":slug/tokens/exchange")
+  @ApiOperation({
+    summary: "Exchange a connection code from the hub for an upload token",
+  })
+  @ApiOkResponse({ type: ProjectTokenExchangeDto })
+  @HttpCode(HttpStatus.OK)
+  exchange(
+    @Param("slug") slug: string,
+    @Body() dto: ProjectTokenExchangeRequestDto
+  ) {
+    return this.projectsService.exchangeCode(slug, dto.code);
+  }
+
   @Put(":slug/data/:block")
   @ApiOperation({
     summary:
-      "Upload a block with the project's token (Authorization: Bearer <token>)",
+      "Upload a block with one of the project's tokens (Authorization: Bearer <token>)",
   })
   @ApiBearerAuth()
   @ApiBody({

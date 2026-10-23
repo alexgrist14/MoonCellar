@@ -20,6 +20,22 @@ export class ProjectUpload {
 
 export const ProjectUploadSchema = SchemaFactory.createForClass(ProjectUpload);
 
+@Schema({ _id: false })
+export class ProjectToken {
+  @Prop({ type: String, required: true })
+  id: string;
+  @Prop({ type: String, required: true })
+  name: string;
+  @Prop({ type: String, required: true })
+  hash: string;
+  @Prop({ type: Date, required: true })
+  createdAt: Date;
+  @Prop({ type: Date, default: null })
+  lastUsedAt: Date | null;
+}
+
+export const ProjectTokenSchema = SchemaFactory.createForClass(ProjectToken);
+
 @Schema({ collection: "projects", timestamps: true })
 export class Project {
   @Prop({ type: String, required: true, unique: true })
@@ -28,8 +44,10 @@ export class Project {
   name: string;
   @Prop({ type: [String], required: true })
   blocks: IProjectBlock[];
-  @Prop({ type: String, required: true, select: false })
-  tokenHash: string;
+  @Prop({ type: [ProjectTokenSchema], default: [] })
+  tokens: ProjectToken[];
+  @Prop({ type: String, select: false })
+  tokenHash?: string;
   @Prop({ type: [ProjectUploadSchema], default: [] })
   uploads: ProjectUpload[];
   createdAt: Date;

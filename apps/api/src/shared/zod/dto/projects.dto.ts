@@ -1,7 +1,12 @@
 import { createZodDto } from "nestjs-zod";
 import {
   CreateProjectRequestSchema,
+  CreateProjectTokenRequestSchema,
+  ProjectConnectCodeSchema,
+  ProjectConnectRequestSchema,
   ProjectSchema,
+  ProjectTokenExchangeRequestSchema,
+  ProjectTokenExchangeSchema,
   ProjectTokenSchema,
   ProjectUploadSchema,
   UpdateProjectRequestSchema,
@@ -19,4 +24,24 @@ export class CreateProjectRequestDto extends createZodDto(
 
 export class UpdateProjectRequestDto extends createZodDto(
   UpdateProjectRequestSchema
+) {}
+
+export class CreateProjectTokenRequestDto extends createZodDto(
+  CreateProjectTokenRequestSchema
+) {}
+
+export class ProjectConnectRequestDto extends createZodDto(
+  ProjectConnectRequestSchema
+) {}
+
+export class ProjectConnectCodeDto extends createZodDto(
+  ProjectConnectCodeSchema
+) {}
+
+export class ProjectTokenExchangeRequestDto extends createZodDto(
+  ProjectTokenExchangeRequestSchema
+) {}
+
+export class ProjectTokenExchangeDto extends createZodDto(
+  ProjectTokenExchangeSchema
 ) {}

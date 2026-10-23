@@ -4,7 +4,9 @@ import { FC, useState } from "react";
 import { IPlanBlock, IPlanTask, IPlanTaskState } from "@mooncellar/schemas";
 import { formatPercent } from "@/src/lib/entities/project/model";
 import { Box } from "@/src/lib/shared/ui/Box";
+import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { DRAWER_TRIGGER_ATTRIBUTE, drawer } from "@/src/lib/shared/ui/Drawer";
+import { CollapsibleSection } from "@/src/lib/shared/ui/Fields";
 import { ProgressBar } from "@/src/lib/shared/ui/ProgressBar";
 import { StatTile } from "@/src/lib/shared/ui/StatTile";
 import { Table } from "@/src/lib/shared/ui/Table";
@@ -33,6 +35,16 @@ const trigger = { [DRAWER_TRIGGER_ATTRIBUTE]: "" };
 
 export const PlanBlock: FC<{ plan: IPlanBlock }> = ({ plan }) => {
   const [filter, setFilter] = useState<IPlanTaskState | null>(null);
+  const [collapsed, setCollapsed] = useState<Set<string>>(
+    () =>
+      new Set(
+        plan.sections
+          .filter((section) =>
+            section.tasks.every((task) => task.state === "done")
+          )
+          .map((section) => section.id)
+      )
+  );
   const tasks = plan.sections.flatMap((section) => section.tasks);
   const count = (state: IPlanTaskState) =>
     tasks.filter((task) => task.state === state).length;
@@ -46,6 +58,23 @@ export const PlanBlock: FC<{ plan: IPlanBlock }> = ({ plan }) => {
       tasks: section.tasks.filter((task) => !filter || task.state === filter),
     }))
     .filter((section) => section.tasks.length);
+
+  const isAllCollapsed = sections.every((section) => collapsed.has(section.id));
+
+  const toggleSection = (id: string, isOpen: boolean) =>
+    setCollapsed((current) => {
+      const next = new Set(current);
+      if (isOpen) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
+  const toggleAll = () =>
+    setCollapsed(
+      isAllCollapsed
+        ? new Set()
+        : new Set(plan.sections.map((section) => section.id))
+    );
 
   const openTask = (task: IPlanTask) =>
     drawer.open(<PlanTaskDetails task={task} />, { title: task.id });
@@ -91,32 +120,36 @@ export const PlanBlock: FC<{ plan: IPlanBlock }> = ({ plan }) => {
         title="Tasks"
         isTitleStart
         titleAction={
-          <Tabs
-            theme="segmented"
-            ariaLabel="Show tasks"
-            isWrap
-            contents={FILTERS.map(({ label, state }) => ({
-              tabName: label,
-              count: state ? count(state) : tasks.length,
-              onTabClick: () => setFilter(state),
-            }))}
-          />
+          <div className={styles.actions}>
+            <Tabs
+              theme="segmented"
+              ariaLabel="Show tasks"
+              isWrap
+              contents={FILTERS.map(({ label, state }) => ({
+                tabName: label,
+                count: state ? count(state) : tasks.length,
+                onTabClick: () => setFilter(state),
+              }))}
+            />
+            <Button color={ButtonColor.TRANSPARENT} compact onClick={toggleAll}>
+              {isAllCollapsed ? "Expand all" : "Collapse all"}
+            </Button>
+          </div>
         }
       >
         <div className={styles.sections}>
           {sections.map((section) => (
-            <section key={section.id} className={styles.section}>
-              <h3 className={styles.section__title}>
-                {section.title}
-                <span>
-                  {section.tasks.filter((task) => task.state === "done").length}{" "}
-                  of {section.tasks.length} done
-                </span>
-              </h3>
+            <CollapsibleSection
+              key={section.id}
+              title={section.title.replaceAll("`", "")}
+              aside={`${section.tasks.filter((task) => task.state === "done").length} of ${section.tasks.length} done`}
+              isOpen={!collapsed.has(section.id)}
+              onToggle={(isOpen) => toggleSection(section.id, isOpen)}
+            >
               <Table
                 layout="rows"
                 mobileHeadField="task"
-              isWithoutMobileSorting
+                isWithoutMobileSorting
                 initialSortingKey="state"
                 initialSortingOrder="asc"
                 columnStyles={{
@@ -162,7 +195,7 @@ export const PlanBlock: FC<{ plan: IPlanBlock }> = ({ plan }) => {
                   },
                 }))}
               />
-            </section>
+            </CollapsibleSection>
           ))}
         </div>
       </Box>

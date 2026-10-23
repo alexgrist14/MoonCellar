@@ -3,7 +3,9 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  Logger,
   NotFoundException,
+  type OnModuleInit,
   UnauthorizedException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
@@ -16,14 +18,19 @@ import {
   type ICreateProjectRequest,
   type IProject,
   type IProjectBlock,
+  type IProjectConnectCode,
   type IProjectToken,
+  type IProjectTokenExchange,
   type IProjectUpload,
   type IUpdateProjectRequest,
 } from "@mooncellar/schemas";
-import { Project } from "./schemas/project.schema";
+import { Project, type ProjectToken } from "./schemas/project.schema";
 import { ProjectData } from "./schemas/project-data.schema";
+import { ProjectConnectCode } from "./schemas/project-connect-code.schema";
 
 export const PROJECT_TOKEN_PREFIX = "mcp_";
+export const CONNECT_CODE_TTL_MS = 10 * 60 * 1000;
+export const FIRST_TOKEN_NAME = "First token";
 
 export const PROJECT_BLOCK_TITLES: Record<IProjectBlock, string> = {
   plan: "Plan",
@@ -45,12 +52,19 @@ export const isProjectToken = (token: string, tokenHash: string) => {
   return actual.length === expected.length && timingSafeEqual(actual, expected);
 };
 
+export const findProjectToken = (token: string, tokens: ProjectToken[]) =>
+  tokens.find((entry) => isProjectToken(token, entry.hash));
+
 type IStoredProject = Pick<
   Project,
   "slug" | "name" | "blocks" | "createdAt"
 > & {
   uploads?: Project["uploads"];
+  tokens?: Project["tokens"];
 };
+
+const toIso = (date: Date | string | null | undefined) =>
+  date ? new Date(date).toISOString() : null;
 
 export const toProject = (project: IStoredProject): IProject => ({
   slug: project.slug,
@@ -62,6 +76,12 @@ export const toProject = (project: IStoredProject): IProject => ({
     size: upload.size,
     done: upload.done,
     total: upload.total,
+  })),
+  tokens: (project.tokens ?? []).map((token) => ({
+    id: token.id,
+    name: token.name,
+    createdAt: new Date(token.createdAt).toISOString(),
+    lastUsedAt: toIso(token.lastUsedAt),
   })),
   createdAt: new Date(project.createdAt).toISOString(),
 });
@@ -76,13 +96,59 @@ const parseBlock = (block: string): IProjectBlock => {
   return parsed.data;
 };
 
+const newToken = (name: string) => {
+  const token = createProjectToken();
+  const entry: ProjectToken = {
+    id: randomBytes(6).toString("hex"),
+    name,
+    hash: hashProjectToken(token),
+    createdAt: new Date(),
+    lastUsedAt: null,
+  };
+  return { token, entry };
+};
+
 @Injectable()
-export class ProjectsService {
+export class ProjectsService implements OnModuleInit {
+  private readonly logger = new Logger(ProjectsService.name);
+
   constructor(
     @InjectModel(Project.name) private readonly projects: Model<Project>,
     @InjectModel(ProjectData.name)
-    private readonly data: Model<ProjectData>
+    private readonly data: Model<ProjectData>,
+    @InjectModel(ProjectConnectCode.name)
+    private readonly codes: Model<ProjectConnectCode>
   ) {}
+
+  async onModuleInit() {
+    await this.moveSingleTokens().catch((error) =>
+      this.logger.error(error, "Could not move project tokens into the list")
+    );
+  }
+
+  async moveSingleTokens() {
+    const legacy = await this.projects
+      .find({ tokenHash: { $exists: true } })
+      .select("+tokenHash")
+      .lean();
+    for (const project of legacy) {
+      await this.projects.updateOne(
+        { slug: project.slug, tokenHash: project.tokenHash },
+        {
+          $push: {
+            tokens: {
+              id: randomBytes(6).toString("hex"),
+              name: FIRST_TOKEN_NAME,
+              hash: project.tokenHash,
+              createdAt: project.createdAt,
+              lastUsedAt: null,
+            },
+          },
+          $unset: { tokenHash: "" },
+        }
+      );
+    }
+  }
 
   async list(): Promise<IProject[]> {
     const projects = await this.projects.find().sort({ name: 1 }).lean();
@@ -93,21 +159,20 @@ export class ProjectsService {
     return toProject(await this.findProject(slug));
   }
 
-  async create(dto: ICreateProjectRequest): Promise<IProjectToken> {
+  async create(dto: ICreateProjectRequest): Promise<IProject> {
     if (await this.projects.exists({ slug: dto.slug })) {
       throw new ConflictException(
         `The address "${dto.slug}" already belongs to another project`
       );
     }
-    const token = createProjectToken();
     const project = await this.projects.create({
       slug: dto.slug,
       name: dto.name,
       blocks: dto.blocks,
-      tokenHash: hashProjectToken(token),
+      tokens: [],
       uploads: [],
     });
-    return { project: toProject(project), token };
+    return toProject(project);
   }
 
   async update(slug: string, dto: IUpdateProjectRequest): Promise<IProject> {
@@ -134,16 +199,70 @@ export class ProjectsService {
     await this.findProject(slug);
     await this.projects.deleteOne({ slug });
     await this.data.deleteMany({ slug });
+    await this.codes.deleteMany({ slug });
   }
 
-  async rotateToken(slug: string): Promise<IProjectToken> {
-    const project = await this.findProject(slug);
-    const token = createProjectToken();
-    await this.projects.updateOne(
-      { slug },
-      { $set: { tokenHash: hashProjectToken(token) } }
-    );
-    return { project: toProject(project), token };
+  async addToken(slug: string, name: string): Promise<IProjectToken> {
+    const { token, entry } = newToken(name);
+    const updated = await this.projects
+      .findOneAndUpdate({ slug }, { $push: { tokens: entry } }, { new: true })
+      .lean();
+    if (!updated) {
+      throw new NotFoundException(`There is no project at "${slug}"`);
+    }
+    return { project: toProject(updated), tokenId: entry.id, token };
+  }
+
+  async revokeToken(slug: string, id: string): Promise<IProject> {
+    const updated = await this.projects
+      .findOneAndUpdate(
+        { slug, "tokens.id": id },
+        { $pull: { tokens: { id } } },
+        { new: true }
+      )
+      .lean();
+    if (!updated) {
+      throw new NotFoundException(
+        `The project at "${slug}" has no token with the id "${id}"`
+      );
+    }
+    return toProject(updated);
+  }
+
+  async createConnectCode(
+    slug: string,
+    name: string
+  ): Promise<IProjectConnectCode> {
+    await this.findProject(slug);
+    const code = randomBytes(24).toString("base64url");
+    const expiresAt = new Date(Date.now() + CONNECT_CODE_TTL_MS);
+    await this.codes.create({
+      codeHash: hashProjectToken(code),
+      slug,
+      name,
+      expiresAt,
+    });
+    return { code, expiresAt: expiresAt.toISOString() };
+  }
+
+  async exchangeCode(
+    slug: string,
+    code: string
+  ): Promise<IProjectTokenExchange> {
+    const pending = await this.codes
+      .findOneAndDelete({
+        codeHash: hashProjectToken(code),
+        slug,
+        expiresAt: { $gt: new Date() },
+      })
+      .lean();
+    if (!pending) {
+      throw new BadRequestException(
+        "The connection code is unknown, used or expired. Run the connect command again"
+      );
+    }
+    const { token } = await this.addToken(slug, pending.name);
+    return { slug, name: pending.name, token };
   }
 
   async getData(slug: string, rawBlock: string): Promise<string> {
@@ -172,13 +291,13 @@ export class ProjectsService {
         "Send the project's upload token as Authorization: Bearer <token>"
       );
     }
-    const project = await this.projects
-      .findOne({ slug })
-      .select("+tokenHash")
-      .lean();
-    if (!project || !isProjectToken(token, project.tokenHash)) {
+    const project = await this.projects.findOne({ slug }).lean();
+    const used = project
+      ? findProjectToken(token, project.tokens ?? [])
+      : undefined;
+    if (!project || !used) {
       throw new UnauthorizedException(
-        "The upload token does not match this project. Issue a new one in Manage projects and use it"
+        "The upload token does not match this project. Connect again or add a token in Manage projects"
       );
     }
     this.assertHasBlock(project, block);
@@ -198,7 +317,13 @@ export class ProjectsService {
       ...getProjectBlockProgress(block, parsed.data),
     };
     await this.projects.updateOne({ slug }, { $pull: { uploads: { block } } });
-    await this.projects.updateOne({ slug }, { $push: { uploads: upload } });
+    await this.projects.updateOne(
+      { slug, "tokens.id": used.id },
+      {
+        $push: { uploads: upload },
+        $set: { "tokens.$.lastUsedAt": new Date() },
+      }
+    );
     return { ...upload, updatedAt: new Date(upload.updatedAt).toISOString() };
   }
 
