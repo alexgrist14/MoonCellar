@@ -4,16 +4,22 @@ import {
   type IPlanTask,
   PlanBlockSchema,
 } from "@mooncellar/schemas";
-import { hubRequest, hubSettings, readToken } from "./hub-client";
+import {
+  HubError,
+  hubRequest,
+  hubSettings,
+  readToken,
+  scriptCommand,
+} from "./hub-client";
 
 const USAGE = `Import a markdown plan once into a project's empty plan in the status hub.
 
   bun scripts/import-plan.ts --file <plan.md> [--check]
 
 A section is "## X. Title", a task a table row "| id | task | who | depends | done when | size |"
-with ✓ after a done task's id. --check only parses. The token is the one
-bun scripts/hub-connect.ts <project> saved (or STATUS_HUB_TOKEN); STATUS_HUB_PROJECT picks the
-project (default mooncellar).`;
+with ✓ after a done task's id. --check only parses. The project is the one in the repository's
+.claude/status-hub.json (or STATUS_HUB_PROJECT); the token is the one bun scripts/hub-connect.ts
+saved (or STATUS_HUB_TOKEN).`;
 const SECTION = /^##\s+([A-Z])\.\s+(.+?)\s*$/;
 const ROW = /^\|\s*([A-Z]\d+)(\s*✓)?\s*\|(.*)\|\s*$/;
 const TASK_ID = /\b[A-Z]\d+\b/g;
@@ -84,7 +90,7 @@ const upload = async (plan: IPlanBlock) => {
   const { project } = hubSettings();
   if (!readToken(project)) {
     console.log(
-      `No token: run bun scripts/hub-connect.ts ${project} or set STATUS_HUB_TOKEN. The plan was checked, nothing was imported`
+      `No token: run ${scriptCommand("hub-connect")} ${project} or set STATUS_HUB_TOKEN. The plan was checked, nothing was imported`
     );
     return;
   }
@@ -109,5 +115,13 @@ if (import.meta.main) {
   const plan = parsePlan(readFileSync(file, "utf8"), process.env.GITHUB_SHA);
   const tasks = plan.sections.flatMap((section) => section.tasks);
   console.log(`${tasks.length} tasks in ${plan.sections.length} sections`);
-  if (!process.argv.includes("--check")) await upload(plan);
+  if (!process.argv.includes("--check")) {
+    try {
+      await upload(plan);
+    } catch (error) {
+      if (!(error instanceof HubError)) throw error;
+      console.error(error.message);
+      process.exit(1);
+    }
+  }
 }

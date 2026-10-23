@@ -1,7 +1,8 @@
 # StatusManagePage
 
-Where admins add projects to the status hub, change their blocks, issue upload tokens and delete
-projects. The page is a heading plus `widgets/status/ProjectsManager`.
+Where admins add projects to the status hub, change their blocks, issue upload tokens, delete
+projects and download the hub connector. The page is a heading plus `widgets/status/ProjectsManager`
+(`ProjectsManager` and `HubConnector`).
 
 ## Routes
 
@@ -18,7 +19,9 @@ projects. The page is a heading plus `widgets/status/ProjectsManager`.
 2. `ProjectsManager`: the "New project" form and the projects `Table` (row → edit modal; the token
    count opens `ProjectTokens`; "Delete" behind `ConfirmModal`). The three modals come from
    `useProjectActions`, which the project page's "⋯" menu uses too.
-3. `ProjectTokens` (a modal): every token of the project with its name, when it was added and when it
+3. `HubConnector`: what the hub connector does and "Download", a `Button` in link mode with
+   `download` for `/hub-connector.zip` (`docs/status-hub.md`, "The hub connector").
+4. `ProjectTokens` (a modal): every token of the project with its name, when it was added and when it
    last uploaded, "Revoke" (asks "Sure?" in place), and "Add token" by name, which shows the new token
    once.
 

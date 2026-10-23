@@ -23,21 +23,22 @@ loading state and an optional `Tooltip`. The folder also exports `ButtonGroup`
 `Button` accepts `children`, `disabled`, `type`, `className`, `onClick`, `form`, `style`, `ref`,
 `aria-label`, `aria-pressed`, `aria-expanded` from the native button, plus:
 
-| Prop           | Type                              | Default               | Purpose                                                                                                 |
-| -------------- | --------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------- |
-| `color`        | `ButtonColor` or its string value | `ButtonColor.DEFAULT` | Theme: `default`, `accent`, `red`, `green`, `greenBorder`, `transparent`, `fancy`, `segmented`, `ghost` |
-| `active`       | `boolean`                         | –                     | Pressed/selected look (adds `button_active` and the color's active class)                               |
-| `tooltip`      | `string \| ReactNode`             | –                     | Wraps the button in `Tooltip`; a string also becomes the `aria-label`                                   |
-| `tooltipAlign` | `"left" \| "right" \| "center"`   | `"center"`            | Tooltip alignment, mapped to `start`/`end`/`center`                                                     |
-| `compact`      | `boolean`                         | –                     | Smaller padding (`x05`/`x1`)                                                                            |
-| `hidden`       | `boolean`                         | –                     | Hides the button through a class, keeping it mounted                                                    |
-| `isOnlyIcon`   | `boolean`                         | –                     | Forces a square (`aspect-ratio: 1`) button                                                              |
-| `isAccentText` | `boolean`                         | –                     | Accent text that stays accent on hover, for a ghost/transparent action that is not a toggle             |
-| `isLoading`    | `boolean`                         | –                     | Disables the button, sets `aria-busy`, shows a pulse `Loader` over the hidden label (width kept)        |
-| `href`         | `LinkProps["href"]`               | –                     | Link mode: renders a `next/link` `Link` with the same classes instead of a `<button>`                   |
-| `target`       | `HTMLAttributeAnchorTarget`       | –                     | Link mode only                                                                                          |
-| `rel`          | `string`                          | –                     | Link mode only                                                                                          |
-| `prefetch`     | `LinkProps["prefetch"]`           | –                     | Link mode only, passed to `Link`                                                                        |
+| Prop           | Type                              | Default               | Purpose                                                                                                      |
+| -------------- | --------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `color`        | `ButtonColor` or its string value | `ButtonColor.DEFAULT` | Theme: `default`, `accent`, `red`, `green`, `greenBorder`, `transparent`, `fancy`, `segmented`, `ghost`      |
+| `active`       | `boolean`                         | –                     | Pressed/selected look (adds `button_active` and the color's active class)                                    |
+| `tooltip`      | `string \| ReactNode`             | –                     | Wraps the button in `Tooltip`; a string also becomes the `aria-label`                                        |
+| `tooltipAlign` | `"left" \| "right" \| "center"`   | `"center"`            | Tooltip alignment, mapped to `start`/`end`/`center`                                                          |
+| `compact`      | `boolean`                         | –                     | Smaller padding (`x05`/`x1`)                                                                                 |
+| `hidden`       | `boolean`                         | –                     | Hides the button through a class, keeping it mounted                                                         |
+| `isOnlyIcon`   | `boolean`                         | –                     | Forces a square (`aspect-ratio: 1`) button                                                                   |
+| `isAccentText` | `boolean`                         | –                     | Accent text that stays accent on hover, for a ghost/transparent action that is not a toggle                  |
+| `isLoading`    | `boolean`                         | –                     | Disables the button, sets `aria-busy`, shows a pulse `Loader` over the hidden label (width kept)             |
+| `href`         | `LinkProps["href"]`               | –                     | Link mode: renders a `next/link` `Link` with the same classes instead of a `<button>`                        |
+| `target`       | `HTMLAttributeAnchorTarget`       | –                     | Link mode only                                                                                               |
+| `rel`          | `string`                          | –                     | Link mode only                                                                                               |
+| `prefetch`     | `LinkProps["prefetch"]`           | –                     | Link mode only, passed to `Link`                                                                             |
+| `download`     | `boolean \| string`               | –                     | Link mode only: the link downloads its file (a string names it); `Link` then leaves the click to the browser |
 
 The active colour of `default`, `segmented` and `ghost` reads `--button-active-color`, falling
 back to the theme's own (`--color-accent`, `--color-text-primary`, `--color-accent`). Set it on

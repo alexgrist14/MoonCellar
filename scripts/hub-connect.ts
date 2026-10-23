@@ -1,18 +1,31 @@
+import { spawn, spawnSync } from "node:child_process";
+import { randomBytes } from "node:crypto";
 import { chmodSync, mkdirSync, writeFileSync } from "node:fs";
+import { createServer, ServerResponse } from "node:http";
+import { AddressInfo } from "node:net";
 import { homedir, hostname, userInfo } from "node:os";
 import { dirname, join } from "node:path";
-import { randomBytes } from "node:crypto";
+import {
+  repositoryProject,
+  saveRepositoryProject,
+  scriptCommand,
+} from "./hub-client";
 
-const USAGE = `Connect this machine or a CI to a project of the status hub.
+const usage = () => {
+  const self = scriptCommand("hub-connect");
+  return `Connect this machine or a CI to a project of the status hub.
 
-  bun scripts/hub-connect.ts <project> [--name <name>] [--file <path>]
-  bun scripts/hub-connect.ts <project> --secret <NAME> [--repo <owner/repo>]
+  ${self} [<project>] [--name <name>] [--file <path>] [--save]
+  ${self} [<project>] --secret <NAME> [--repo <owner/repo>]
 
 Opens the hub in the browser; after "Allow" the token is saved to the file
 (default ~/.config/mooncellar/<project>-hub-token) or stored as a GitHub Actions
-secret through gh. A project that does not exist yet is created on the same page:
---title <name> and --blocks plan,decomp suggest its name and blocks.
+secret through gh. Without <project>, the one in the repository's
+.claude/status-hub.json. A project that does not exist yet is created on the same
+page: --title <name> and --blocks plan,decomp suggest its name and blocks.
+--save records the project in .claude/status-hub.json of this repository.
 --no-open only prints the link.`;
+};
 
 const TIMEOUT_MS = 10 * 60 * 1000;
 
@@ -22,32 +35,29 @@ const option = (args: string[], name: string) => {
 };
 
 const openInBrowser = (url: string) => {
-  const command =
+  const [command, ...rest] =
     process.platform === "darwin"
       ? ["open", url]
       : process.platform === "win32"
         ? ["cmd", "/c", "start", "", url]
         : ["xdg-open", url];
-  try {
-    Bun.spawn(command, { stdout: "ignore", stderr: "ignore" });
-  } catch {
-    console.log("Could not open a browser; open the link above by hand.");
-  }
+  const child = spawn(command, rest, { stdio: "ignore", detached: true });
+  child.on("error", () =>
+    console.log("Could not open a browser; open the link above by hand.")
+  );
+  child.unref();
 };
 
-const store = async (token: string, args: string[], project: string) => {
+const store = (token: string, args: string[], project: string) => {
   const secret = option(args, "--secret");
   if (secret) {
     const repo = option(args, "--repo");
-    const gh = Bun.spawn(
-      ["gh", "secret", "set", secret, ...(repo ? ["--repo", repo] : [])],
-      {
-        stdin: new TextEncoder().encode(token),
-        stdout: "inherit",
-        stderr: "inherit",
-      }
+    const gh = spawnSync(
+      "gh",
+      ["secret", "set", secret, ...(repo ? ["--repo", repo] : [])],
+      { input: token, stdio: ["pipe", "inherit", "inherit"] }
     );
-    if ((await gh.exited) !== 0)
+    if (gh.status !== 0)
       throw new Error(`gh could not set the secret ${secret}`);
     return `GitHub secret ${secret}${repo ? ` of ${repo}` : ""}`;
   }
@@ -60,17 +70,19 @@ const store = async (token: string, args: string[], project: string) => {
   return file;
 };
 
-const page = (title: string, text: string) =>
-  new Response(
-    `<!doctype html><meta charset="utf-8"><title>${title}</title><body style="font:16px system-ui;background:#191d24;color:#e6e6ea;display:grid;place-items:center;height:100vh;margin:0"><div style="max-width:32rem;text-align:center"><h1>${title}</h1><p>${text}</p></div>`,
-    { headers: { "Content-Type": "text/html; charset=utf-8" } }
+const page = (response: ServerResponse, title: string, text: string) => {
+  response.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+  response.end(
+    `<!doctype html><meta charset="utf-8"><title>${title}</title><body style="font:16px system-ui;background:#191d24;color:#e6e6ea;display:grid;place-items:center;height:100vh;margin:0"><div style="max-width:32rem;text-align:center"><h1>${title}</h1><p>${text}</p></div>`
   );
+};
 
-const main = async () => {
+export const cli = async () => {
   const args = process.argv.slice(2);
-  const project = args[0];
-  if (!project || project.startsWith("-")) {
-    console.log(USAGE);
+  const project =
+    args[0] && !args[0].startsWith("-") ? args[0] : repositoryProject();
+  if (!project) {
+    console.log(usage());
     process.exit(2);
   }
   const hub = option(args, "--hub") ?? "https://status.mooncellar.space";
@@ -83,50 +95,63 @@ const main = async () => {
   let finish: (result: string | Error) => void = () => {};
   const done = new Promise<string | Error>((resolve) => (finish = resolve));
 
-  const server = Bun.serve({
-    hostname: "127.0.0.1",
-    port: 0,
-    async fetch(request) {
-      const url = new URL(request.url);
-      if (url.pathname !== "/callback")
-        return new Response("Not found", { status: 404 });
-      const code = url.searchParams.get("code");
-      if (url.searchParams.get("state") !== state || !code) {
-        return page(
-          "Wrong link",
-          "This answer does not belong to the waiting command."
+  const server = createServer(async (request, response) => {
+    const url = new URL(request.url ?? "/", "http://127.0.0.1");
+    if (url.pathname !== "/callback") {
+      response.writeHead(404).end("Not found");
+      return;
+    }
+    const code = url.searchParams.get("code");
+    if (url.searchParams.get("state") !== state || !code) {
+      page(
+        response,
+        "Wrong link",
+        "This answer does not belong to the waiting command."
+      );
+      return;
+    }
+    try {
+      const exchange = await fetch(
+        `${api}/projects/${project}/tokens/exchange`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code }),
+        }
+      );
+      const answer = await exchange.json().catch(() => ({}));
+      if (!exchange.ok)
+        throw new Error(
+          answer.message ?? `The hub answered ${exchange.status}`
         );
-      }
-      try {
-        const response = await fetch(
-          `${api}/projects/${project}/tokens/exchange`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ code }),
-          }
-        );
-        const answer = await response.json().catch(() => ({}));
-        if (!response.ok)
-          throw new Error(
-            answer.message ?? `The hub answered ${response.status}`
-          );
-        const where = await store(answer.token, args, project);
-        finish(`Connected as "${answer.name}". The token is in ${where}.`);
-        return page("Connected", "The token is saved. You can close this tab.");
-      } catch (error) {
-        finish(error as Error);
-        return page("Not connected", (error as Error).message);
-      }
-    },
+      const where = store(answer.token, args, project);
+      const saved = args.includes("--save")
+        ? `\n${saveRepositoryProject(project)}.`
+        : "";
+      finish(
+        `Connected as "${answer.name}". The token is in ${where}.${saved}`
+      );
+      page(
+        response,
+        "Connected",
+        "The token is saved. You can close this tab."
+      );
+    } catch (error) {
+      finish(error as Error);
+      page(response, "Not connected", (error as Error).message);
+    }
   });
+  await new Promise<void>((resolve) =>
+    server.listen(0, "127.0.0.1", () => resolve())
+  );
+  const { port } = server.address() as AddressInfo;
 
   const title = option(args, "--title");
   const blocks = option(args, "--blocks");
   const link = `${hub}/connect?${new URLSearchParams({
     project,
     name,
-    port: String(server.port),
+    port: String(port),
     state,
     ...(title && { title }),
     ...(blocks && { blocks }),
@@ -140,7 +165,10 @@ const main = async () => {
   );
   const result = await done;
   clearTimeout(timer);
-  setTimeout(() => server.stop(true), 200);
+  setTimeout(() => {
+    server.closeAllConnections();
+    server.close();
+  }, 200);
   if (result instanceof Error) {
     console.error(result.message);
     process.exit(1);
@@ -148,4 +176,4 @@ const main = async () => {
   console.log(result);
 };
 
-if (import.meta.main) await main();
+if (import.meta.main) await cli();

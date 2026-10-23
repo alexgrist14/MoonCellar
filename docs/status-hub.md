@@ -21,6 +21,7 @@ progress of a decompilation, or both. Each project uploads its own data; the hub
 | `/<project>` and `/<project>/<block>` | The project with a tab per block; "⋯" — edit, tokens, delete |
 | `/manage` | Add a project, change its blocks, manage its tokens, delete |
 | `/connect` | Allow a connect command to get a token |
+| `/hub-connector.zip` | The hub connector: a static file, built with the web app |
 
 They live in `apps/web` (`src/app/status`, the pages `Status*` and `widgets/status`) and are answered
 only for a host starting with `status.`; on `mooncellar.space` the same routes are a 404. How the
@@ -32,7 +33,8 @@ A new project joins in one step from where it will upload: its connect command
 (`bun scripts/hub-connect.ts <slug> --title "<name>" --blocks plan,decomp`, or the project's own)
 opens `/connect`; for an address that has no project yet the page offers to create it with that name
 and those blocks, and "Create and allow" creates it and hands the command its token. Manage
-projects → New project does the same by hand.
+projects → New project does the same by hand. A repository that has none of this gets it from the
+[hub connector](#the-hub-connector).
 
 A project has a name, an address (`slug`: lowercase letters, digits and dashes; `login`, `manage`,
 `status`, `api`, `images`, `img` and `connect` are taken by the hub) and one or more blocks. A block is a type the hub
@@ -73,8 +75,8 @@ through the API. Nobody keeps it in a file any more; a project with a markdown p
   `PUT /projects/:slug/data/plan` — with done tasks' `doneAt` when known. After that both answer 409.
   `bun scripts/import-plan.ts --file <plan.md>` parses a markdown plan (sections `## X. Title`, rows
   `| id | task | who | depends | done when | size |`, `✓` after a done id) and imports it with the
-  token `bun scripts/hub-connect.ts <project>` saved (or `STATUS_HUB_TOKEN`; `STATUS_HUB_PROJECT`
-  picks the project, `mooncellar` by default).
+  token `bun scripts/hub-connect.ts <project>` saved (or `STATUS_HUB_TOKEN`) into the project of the
+  repository's `.claude/status-hub.json` (or `STATUS_HUB_PROJECT`).
 
 ## The plan from a terminal and from agents
 
@@ -83,11 +85,42 @@ through the API. Nobody keeps it in a file any more; a project with a markdown p
 `section "<title>"`, `edit`, `url`. It acts for git `user.name` in lower case (`--as` or
 `STATUS_HUB_AS` for someone else) and needs `--force` to override someone else's task. It and
 `import-plan.ts` share `scripts/hub-client.ts` (`STATUS_HUB_URL`, `STATUS_HUB_WEB`,
-`STATUS_HUB_PROJECT`, `STATUS_HUB_TOKEN`).
+`STATUS_HUB_PROJECT`, `STATUS_HUB_TOKEN`). The project is the one the repository names in
+`.claude/status-hub.json` (`{ "project": "mooncellar" }` here), found from the working directory up;
+`STATUS_HUB_PROJECT` overrides it. Without either the scripts stop instead of guessing, so a
+repository never changes another project's plan by accident.
 
 Agents in this repository have two commands in `.claude/commands/`: `/hub` connects the machine (runs
 `hub-connect.ts mooncellar`, the user presses "Allow") and gives the link; `/task [id]` lists the free
 tasks or takes one, does it in a branch, opens a PR and, once it is merged, marks the task done.
+
+## The hub connector
+
+Any repository can work with the hub the way this one does, without copying anything from
+MoonCellar: **Manage projects → Hub connector → Download** gives `hub-connector.zip`, which is
+unpacked at the root of that repository:
+
+| In the archive | What it is |
+| --- | --- |
+| `.claude/commands/hub-init.md` | `/hub-init`: sets the repository up once |
+| `.claude/hub/tasks.mjs`, `hub-connect.mjs` | `scripts/tasks.ts` and `scripts/hub-connect.ts`, bundled for Node 18+ (Bun runs them too) |
+| `.claude/hub/templates/` | `hub.md`, `task.md` and `plan-section.md`, with `{{…}}` for what differs between repositories |
+| `.claude/hub/README.md`, `version` | What the connector is; a hash of its files |
+
+`/hub-init` asks for the project (a new one, or one already here) and runs
+`hub-connect.mjs <slug> --save --title … --blocks …`: an admin presses "Create and allow" (or
+"Allow"), the machine gets its token and `--save` writes `.claude/status-hub.json`. Then it writes
+`.claude/commands/hub.md` and `task.md` from the templates, filling the `{{…}}` from that repository
+(its default branch, checks, commit convention, how a change gets merged), and adds the "Plan" section
+to its `CLAUDE.md`. Committed, they give every teammate `/hub` (a token for their machine) and
+`/task`. It is not called `/init`: that is Claude Code's own command, and a project command of the
+same name would replace it.
+
+The archive is built from `scripts/hub-connector/` by `scripts/build-hub-connector.ts`, which the web
+app's `build` runs first (`bun --filter web build:connector` alone), into
+`apps/web/public/hub-connector.zip` (not in git). Updating a repository is unpacking a fresh archive
+over it: it replaces `.claude/hub/` and `/hub-init`, never the `/hub`, `/task` and
+`.claude/status-hub.json` that `/hub-init` wrote.
 
 ## Uploading
 

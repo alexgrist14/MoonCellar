@@ -35,6 +35,11 @@ jobs:
             web:
               - 'apps/web/**'
               - 'packages/**'
+              - 'scripts/hub-client.ts'
+              - 'scripts/hub-connect.ts'
+              - 'scripts/tasks.ts'
+              - 'scripts/hub-connector/**'
+              - 'scripts/build-hub-connector.ts'
               - 'package.json'
               - 'bun.lock'
               - '.github/workflows/ci.yml'
