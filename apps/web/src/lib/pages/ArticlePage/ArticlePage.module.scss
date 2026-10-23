@@ -1,0 +1,123 @@
+.page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--news-sidebar-width);
+  grid-template-areas:
+    "head side"
+    "body side";
+  gap: var(--gap-x4);
+  align-items: start;
+  width: 100%;
+  max-width: var(--news-page-width);
+  margin-inline: auto;
+
+  &__head {
+    grid-area: head;
+  }
+
+  &__body {
+    grid-area: body;
+  }
+
+  &__side {
+    grid-area: side;
+    position: sticky;
+    top: 0;
+    min-width: 0;
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  @include media960 {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "head"
+      "side"
+      "body";
+    gap: var(--gap-x2);
+
+    &__side {
+      position: static;
+    }
+
+    &_news {
+      grid-template-areas:
+        "head"
+        "body"
+        "side";
+    }
+  }
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--gap-x1) var(--gap-x2);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+
+  @include font(13px, 18px, 400);
+
+  &__edit {
+    margin-left: auto;
+  }
+}
+
+.title {
+  @include font(38px, 42px, 700);
+  letter-spacing: -0.4px;
+  text-wrap: balance;
+
+  @include mediaMd {
+    @include font(26px, 31px, 700);
+    letter-spacing: -0.2px;
+  }
+}
+
+.summary {
+  @include font(18px, 28px, 400);
+  color: var(--color-text-secondary);
+
+  @include mediaMd {
+    @include font(16px, 25px, 400);
+  }
+}
+
+.byline {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-x2);
+  color: var(--color-text-secondary);
+
+  @include font(14px, 20px, 400);
+
+  &__avatar {
+    width: var(--padding-x8);
+    height: var(--padding-x8);
+    flex-shrink: 0;
+  }
+
+  & a {
+    font-weight: 600;
+    color: var(--color-text-primary);
+
+    &:hover {
+      color: var(--color-accent);
+    }
+  }
+}
+
+.hero {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-x4);
+  overflow: hidden;
+  background: var(--color-bg-tertiary);
+
+  &__image {
+    object-fit: cover;
+    border-radius: inherit;
+  }
+}

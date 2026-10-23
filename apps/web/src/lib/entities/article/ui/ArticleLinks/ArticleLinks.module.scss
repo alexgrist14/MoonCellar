@@ -1,0 +1,27 @@
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x3);
+}
+
+.link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x05);
+
+  &__title {
+    @include font(14px, 19px, 500);
+    @include lineClamp(2);
+    color: var(--color-text-primary);
+    transition: color var(--duration-fast) var(--easing-out);
+  }
+
+  &:hover &__title {
+    color: var(--color-accent);
+  }
+
+  &__meta {
+    @include font(12px, 16px, 400);
+    color: var(--color-text-muted);
+  }
+}

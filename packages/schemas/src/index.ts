@@ -1,3 +1,4 @@
+export * from "./articles.schema";
 export * from "./characters.schema";
 export * from "./comment-reports.schema";
 export * from "./generated-images.schema";

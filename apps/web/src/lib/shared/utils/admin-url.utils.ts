@@ -6,6 +6,7 @@ export const ADMIN_TABS = [
   "characters",
   "images",
   "sites",
+  "news",
 ] as const;
 
 export type TAdminTab = (typeof ADMIN_TABS)[number];
@@ -18,6 +19,7 @@ export const ADMIN_TAB_LABELS: Record<TAdminTab, string> = {
   characters: "Characters",
   images: "Images",
   sites: "Sites",
+  news: "News",
 };
 
 export const ADMIN_HREF = "/admin";

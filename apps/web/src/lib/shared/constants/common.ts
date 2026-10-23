@@ -26,6 +26,7 @@ export const links = [
   { name: "Home", link: "/" },
   { name: "Games", link: "/games" },
   { name: "Gauntlet", link: "/gauntlet" },
+  { name: "News", link: "/news" },
 ];
 
 export const dateRegions = [

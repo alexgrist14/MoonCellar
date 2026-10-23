@@ -1,5 +1,5 @@
 import { FRONT_URL } from "@/src/lib/shared/constants";
-import { IGameResponse, IReview } from "@mooncellar/schemas";
+import { IArticle, IGameResponse, IReview } from "@mooncellar/schemas";
 
 const MIN_RATINGS_FOR_AGGREGATE = 10;
 
@@ -110,3 +110,25 @@ export const getVideoGameJsonLd = (
     }),
   };
 };
+
+export const getArticleJsonLd = (article: IArticle, image?: string | null) => ({
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: article.title,
+  description: article.summary,
+  url: absolute(`/news/${article.slug}`),
+  ...(article.publishedAt && { datePublished: article.publishedAt }),
+  dateModified: article.updatedAt,
+  ...(image && { image: coverUrl(image) }),
+  ...(article.author && {
+    author: { "@type": "Person", name: article.author.userName },
+  }),
+  publisher: { "@type": "Organization", name: "MoonCellar" },
+  ...(article.game && {
+    about: {
+      "@type": "VideoGame",
+      name: article.game.name,
+      url: absolute(`/games/${article.game.slug}`),
+    },
+  }),
+});

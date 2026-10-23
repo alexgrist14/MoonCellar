@@ -44,6 +44,7 @@ export * from "./SvgStrike";
 export * from "./SvgCode";
 export * from "./SvgHeading";
 export * from "./SvgListBullet";
+export * from "./SvgNews";
 export * from "./SvgListNumbered";
 export * from "./SvgQuote";
 export * from "./SvgLink";

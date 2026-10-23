@@ -8,6 +8,7 @@ import { GameAuthModule } from "./module/game-auth/game-auth.module";
 import { UserModule } from "./module/user/user.module";
 import { IgdbModule } from "./module/igdb/igdb.module";
 import { ImagesModule } from "./module/images/images.module";
+import { ArticlesModule } from "./module/articles/articles.module";
 import { SitesModule } from "./module/sites/sites.module";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { RetroachievementsModule } from "./module/retroach/retroach.module";
@@ -51,6 +52,7 @@ import { CacheModule } from "@nestjs/cache-manager";
     NotificationsModule,
     IgdbModule,
     ImagesModule,
+    ArticlesModule,
     SitesModule,
     RetroachievementsModule,
     SteamModule,

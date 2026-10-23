@@ -1,0 +1,2051 @@
+<!-- artifact: https://claude.ai/artifact/43ceLezDct9wSZPDygZBUq -->
+<meta charset="utf-8">
+<title>MoonCellar News</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* mooncellar-tokens:start */
+/* Generated from apps/web/src/lib/app/styles/vars by
+   `bun --filter web sync:tokens`. Do not edit by hand. */
+:root {
+  /* vars/_colors.scss */
+  --color-neutral-5: #080a0b;
+  --color-neutral-10: #0d1011;
+  --color-neutral-15: #121516;
+  --color-neutral-20: #161b1d;
+  --color-neutral-25: #1a2022;
+  --color-neutral-30: #1f2628;
+  --color-neutral-35: #262d2f;
+  --color-neutral-40: #2f3537;
+  --color-neutral-45: #383e40;
+  --color-neutral-50: #3f4750;
+  --color-neutral-55: #50575d;
+  --color-neutral-60: #5e6a6e;
+  --color-neutral-70: #747d82;
+  --color-neutral-80: #9192a1;
+  --color-neutral-85: #b0b2bc;
+  --color-neutral-90: #d9d9d9;
+  --color-neutral-95: #eaeaea;
+  --color-neutral-100: #ffffff;
+  --color-blue: #3d6bff;
+  --color-blue-light: #00d4ff;
+  --color-cyan: #48cae4;
+  --color-gray: #afb3b9;
+  --color-white: #e8edf5;
+  --color-yellow: #ffc451;
+  --color-yellow-light: #f9f871;
+  --color-orange: #ff8862;
+  --color-pink: #ff4b8f;
+  --color-violet: #9b5de5;
+  --color-green: #2dc653;
+  --color-red: #e5383b;
+  --color-positive: #00c292;
+  --color-negative: #d02729;
+  --color-primary: var(--color-neutral-30);
+  --color-secondary: var(--color-neutral-90);
+  --color-contrast: var(--color-neutral-100);
+  --color-contrast-reverse: var(--color-neutral-5);
+  --color-attention: #ffc451;
+  --color-text-primary: var(--color-neutral-100);
+  --color-text-secondary: var(--color-neutral-90);
+  --color-text-muted: var(--color-neutral-85);
+  --color-accent: #6951ee;
+  --color-bg-primary: #191d24;
+  --color-bg-secondary: #212731;
+  --color-bg-tertiary: #2c3340;
+  --color-bg-accent: #6951ee;
+  --color-bg-hover: #374151;
+  --color-bg-positive: #00c292;
+  --color-bg-primary-tint: #191d24ee;
+  --color-bg-secondary-tint: #212731ee;
+  --color-bg-tertiary-tint: #2c3340ee;
+  --color-bg-accent-tint: #6951eeee;
+  --color-bg-positive-tint: #00c292ee;
+  --color-border-primary: var(--color-neutral-35);
+  --color-scrollbar-track: var(--color-neutral-15);
+  --color-scrollbar-thumb: var(--color-neutral-80);
+  --color-border-secondary: var(--color-neutral-85);
+
+  /* vars/_common.scss */
+  --padding-x05: calc(var(--padding-x1) * 0.5);
+  --padding-x1: 4px;
+  --padding-x2: calc(var(--padding-x1) * 2);
+  --padding-x3: calc(var(--padding-x1) * 3);
+  --padding-x4: calc(var(--padding-x1) * 4);
+  --padding-x5: calc(var(--padding-x1) * 5);
+  --padding-x6: calc(var(--padding-x1) * 6);
+  --padding-x7: calc(var(--padding-x1) * 7);
+  --padding-x8: calc(var(--padding-x1) * 8);
+  --padding-x9: calc(var(--padding-x1) * 9);
+  --padding-x10: calc(var(--padding-x1) * 10);
+  --padding-x11: calc(var(--padding-x1) * 11);
+  --padding-x12: calc(var(--padding-x1) * 12);
+  --padding-x13: calc(var(--padding-x1) * 13);
+  --padding-x14: calc(var(--padding-x1) * 14);
+  --padding-x15: calc(var(--padding-x1) * 15);
+  --padding-x16: calc(var(--padding-x1) * 16);
+  --padding-x17: calc(var(--padding-x1) * 17);
+  --padding-x18: calc(var(--padding-x1) * 18);
+  --padding-x19: calc(var(--padding-x1) * 19);
+  --padding-x20: calc(var(--padding-x1) * 20);
+  --padding-x25: calc(var(--padding-x1) * 25);
+  --radius-x1: 4px;
+  --radius-x2: calc(var(--radius-x1) * 2);
+  --radius-x3: calc(var(--radius-x1) * 3);
+  --radius-x4: calc(var(--radius-x1) * 4);
+  --radius-x5: calc(var(--radius-x1) * 5);
+  --radius-x6: calc(var(--radius-x1) * 6);
+  --radius-x7: calc(var(--radius-x1) * 7);
+  --radius-x8: calc(var(--radius-x1) * 8);
+  --radius-x9: calc(var(--radius-x1) * 9);
+  --radius-x10: calc(var(--radius-x1) * 10);
+  --radius-control: var(--radius-x4);
+  --radius-button: var(--radius-x3);
+  --gap-x05: calc(var(--gap-x1) * 0.5);
+  --gap-x1: 4px;
+  --gap-x2: calc(var(--gap-x1) * 2);
+  --gap-x3: calc(var(--gap-x1) * 3);
+  --gap-x4: calc(var(--gap-x1) * 4);
+  --gap-x5: calc(var(--gap-x1) * 5);
+  --gap-x6: calc(var(--gap-x1) * 6);
+  --gap-x7: calc(var(--gap-x1) * 7);
+  --gap-x8: calc(var(--gap-x1) * 8);
+  --gap-x9: calc(var(--gap-x1) * 9);
+  --gap-x10: calc(var(--gap-x1) * 10);
+  --gap-x11: calc(var(--gap-x1) * 11);
+  --gap-x12: calc(var(--gap-x1) * 12);
+  --blur-x1: 6px;
+  --rich-text-gap: 8px;
+  --duration-instant: 1ms;
+  --duration-fast: 160ms;
+  --duration-base: 280ms;
+  --duration-slow: 400ms;
+  --delay-stagger: 90ms;
+  --easing-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --easing-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --reveal-offset: 12px;
+  --reveal-scale: 0.96;
+  --header-height: 45px;
+  --container-padding-top: calc(var(--header-height) + var(--padding-x3));
+  --container-padding-bottom: var(--padding-x3);
+  --page-height-available: calc(
+    100dvh - var(--container-padding-top) - var(--container-padding-bottom)
+  );
+
+  /* vars/_components.scss */
+  --game-completed-color: var(--color-green);
+  --game-dropped-color: var(--color-red);
+  --game-playing-color: var(--color-blue);
+  --game-wishlist-color: var(--color-violet);
+  --game-backlog-color: var(--color-white);
+  --game-played-color: var(--color-cyan);
+  --game-mastered-color: var(--color-yellow);
+  --cover-ratio: 528/704;
+  --shadow-basic: 0px 4px 4px var(--color-neutral-5);
+  --shadow-text: drop-shadow(0 1px 2px var(--color-neutral-5))
+    drop-shadow(0 0 6px var(--color-neutral-5));
+  --glow-accent: 0 0 0.4rem var(--color-accent);
+  --glow-accent-sm: 0 0 0.15rem var(--color-accent);
+  --avatar-size-sm: var(--padding-x6);
+  --navigation-progress-height: 1px;
+  --navigation-progress-z-index: 1002;
+  --bprogress-color: var(--color-accent) !important;
+  --bprogress-height: var(--navigation-progress-height) !important;
+  --bprogress-box-shadow: var(--glow-accent) !important;
+  --bprogress-z-index: var(--navigation-progress-z-index) !important;
+  --modal-text-width: min(720px, calc(100vw - var(--padding-x10)));
+  --rich-editor-image-width: 400px;
+  --rich-editor-separator-height: 18px;
+  --playthrough-modal-width: min(80vw, 400px);
+  --header-logo-height: 85%;
+  --header-logo-height-sm: 72%;
+  --tab-count-color: color-mix(in srgb, currentColor 60%, transparent);
+  --playthrough-modal-height: min(70dvh, 500px);
+  --playthrough-modal-width-lg: min(88vw, 760px);
+  --playthrough-modal-height-lg: min(86dvh, 780px);
+  --games-card-min-width: 180px;
+  --list-card-min-width: 180px;
+  --range-track-height: 6px;
+  --progress-bar-height: 6px;
+  --progress-bar-sweep-duration: 1200ms;
+  --range-thumb-size: 20px;
+  --range-thumb-width: 44px;
+  --range-thumb-height: 24px;
+  --scrollbar-horizontal-size: 6px;
+  --scrollbar-arrow-width: 32px;
+  --scrollbar-fade-width: 48px;
+  --game-keywords-collapsed-height: 66px;
+  --game-hero-artwork-height: 300px;
+  --game-hero-artwork-height-sm: 180px;
+  --game-hero-cover-width: 200px;
+  --game-hero-cover-offset: 104px;
+  --game-hero-counters-width: 360px;
+  --game-rating-popover-width: 320px;
+  --popover-width: 320px;
+  --achievements-icon-size: 44px;
+  --achievements-icon-size-sm: 48px;
+  --port-achievement-icon-size-sm: 32px;
+  --port-game-card-width: 140px;
+  --port-game-card-width-sm: 96px;
+  --popover-max-height: 320px;
+  --popover-sheet-max-height: 85dvh;
+  --textarea-handle-size: 20px;
+  --image-generator-preview-width: 160px;
+  --ai-drafts-count-width: 88px;
+  --image-finder-portrait-width: 216px;
+  --image-finder-landscape-width: 320px;
+  --site-sessions-modal-width: min(560px, calc(100vw - var(--padding-x8)));
+  --image-generator-elements-width: min(640px, calc(100vw - var(--padding-x8)));
+  --popover-sheet-grabber-width: 40px;
+  --popover-sheet-grabber-height: 5px;
+  --drawer-width: max(20vw, 460px);
+  --drawer-z-index: 5;
+  --expandable-scroll-height: 132px;
+  --expandable-fade-height: 32px;
+  --date-picker-width: 300px;
+  --date-picker-field-min-width: 140px;
+  --game-card-min-width: 160px;
+  --playthrough-platform-min-width: 200px;
+  --playthrough-time-min-width: 120px;
+  --date-picker-cell-size: 34px;
+  --emoji-picker-width: 328px;
+  --emoji-picker-cell-size: 34px;
+  --emoji-picker-group-size: 28px;
+  --emoji-picker-grid-height: 238px;
+  --game-hero-scrim: linear-gradient(
+    180deg,
+    #191d248c 0%,
+    #191d2400 30%,
+    #212731d1 72%,
+    var(--color-bg-secondary) 100%
+  );
+  --spoiler-blur: 7px;
+  --community-avatar-size: 36px;
+  --community-reply-avatar-size: 28px;
+  --community-review-clamp-height: 132px;
+  --community-distribution-height: 8px;
+  --community-distribution-min-width: 240px;
+  --community-dot-size: 7px;
+  --community-loading-height: 96px;
+  --user-review-card-width: 170px;
+  --user-review-card-width-sm: 140px;
+  --user-review-rating-filter-width: 260px;
+  --vndb-review-height: max(360px, calc(100vh - 420px));
+  --vndb-cover-width: 120px;
+  --vndb-search-width: 320px;
+  --conflicts-state-filter-width: 240px;
+  --conflicts-ai-limit-width: 96px;
+  --vndb-candidate-cover-width: 64px;
+  --empty-state-image-size: 180px;
+  --empty-state-image-size-sm: 96px;
+  --empty-state-inline-text-min-width: 200px;
+  --empty-state-page-content-width: 420px;
+  --badge-negative-color: var(--color-orange);
+  --badge-tint-strength: 16%;
+  --stat-tile-bg: var(--color-bg-primary);
+  --not-found-image-height: 240px;
+  --not-found-backdrop-size: 400px;
+  --favorite-color: var(--color-pink);
+  --moon-phase-lit-color: var(--color-neutral-95);
+  --moon-phase-dark-color: var(--color-bg-hover);
+  --moon-phase-unknown-color: var(--color-text-muted);
+  --moon-phase-unknown-fill: var(--color-bg-secondary);
+  --release-calendar-card-width: 172px;
+  --release-calendar-card-width-sm: var(--game-card-min-width);
+  --release-calendar-month-height: 16px;
+  --release-calendar-node-size: 28px;
+  --release-calendar-axis-color: var(--color-bg-hover);
+  --game-controls-icon-size: 24px;
+  --game-controls-icon-size-sm: 20px;
+  --game-controls-badge-size: 15px;
+  --list-card-row-mosaic-size: 44px;
+  --list-card-count-height: 20px;
+  --list-search-width: 320px;
+  --list-row-cover-width: 40px;
+  --profile-hero-height: 168px;
+  --profile-avatar-size: 112px;
+  --profile-avatar-size-sm: 72px;
+  --activity-cover-width: 80px;
+  --people-avatar-size: 22px;
+  --character-card-width: 128px;
+  --character-card-width-sm: 104px;
+  --character-profile-portrait-width: 200px;
+  --character-editor-portrait-width: 150px;
+  --image-picker-thumb-width: 160px;
+  --game-images-modal-width: min(92vw, 960px);
+  --game-port-achievements-modal-width: min(92vw, 960px);
+  --requests-queue-width: 440px;
+  --list-sort-width: 280px;
+  --field-control-height: 40px;
+  --gauntlet-mode-cards-width: 300px;
+  --gauntlet-winner-cover-width: 200px;
+  --gauntlet-winner-cover-width-mobile: 220px;
+  --gauntlet-wheel-max-width: 50vw;
+  --gauntlet-fact-label-width: 110px;
+  --object-field-min-width: 160px;
+  --requests-panel-min-height: 240px;
+  --page-skeleton-crumbs-width: 160px;
+  --page-skeleton-title-width: 240px;
+  --search-modal-width: 900px;
+  --search-tab-height: 36px;
+  --reaction-active-color: var(--color-accent);
+  --tabs-muted-opacity: 0.55;
+  --burger-animation-duration: 600ms;
+}
+/* mooncellar-tokens:end */
+
+  /* Layout: one document, three full-page proposals (A sidecar, B game frame, C timeline and dock), each drawn inside a site frame that reacts to its own width through container queries. */
+  :root {
+    color-scheme: dark;
+    --mock-ui: "Hanken Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mock-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --mock-ground: var(--color-neutral-10);
+    --mock-box-bg: color-mix(in srgb, var(--color-bg-secondary) 90%, transparent);
+    --mock-accent-text: color-mix(in srgb, var(--color-accent) 55%, var(--color-neutral-100));
+    --mock-column: 680px;
+    --mock-a-width: 1080px;
+    --mock-c-width: 760px;
+    --mock-article-size: 17px;
+    --mock-article-line: 28px;
+    --mock-article-gap: var(--padding-x4);
+    --mock-headline-size: 38px;
+    --mock-headline-line: 42px;
+    --mock-headline-size-sm: 26px;
+    --mock-headline-line-sm: 31px;
+    --mock-sidecar-width: 300px;
+    --mock-side-cover: 92px;
+    --mock-side-cover-sm: 64px;
+    --mock-b-lead-cover: 88px;
+    --mock-b-lead-cover-sm: 64px;
+    --mock-feed-thumb: 176px;
+    --mock-feed-thumb-sm: 96px;
+    --mock-b-actions-width: 260px;
+    --mock-b-cover-sm: 120px;
+    --mock-b-card-cover: 56px;
+    --mock-b-card-overlap: var(--padding-x10);
+    --mock-c-date: 56px;
+    --mock-c-date-sm: 36px;
+    --mock-line-cover: 44px;
+    --mock-line-cover-sm: 32px;
+    --mock-dock-cover: 36px;
+    --mock-embed-cover: 56px;
+    --mock-phone-width: 390px;
+    --mock-frame-height: 820px;
+    --mock-phone-height: 760px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--mock-ground);
+    color: var(--color-text-primary);
+    font-family: var(--mock-ui);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4 { margin: 0; text-wrap: balance; }
+  p, figure, blockquote { margin: 0; }
+  ul, ol { margin: 0; padding: 0; list-style: none; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; }
+  img { display: block; max-width: 100%; }
+  :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+  .shell {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding-left: max(var(--padding-x6), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--padding-x6), env(safe-area-inset-right, 0px));
+    padding-block: var(--padding-x14) var(--padding-x20);
+  }
+
+  @media (max-width: 520px) {
+    .shell {
+      padding-left: max(var(--padding-x4), env(safe-area-inset-left, 0px));
+      padding-right: max(var(--padding-x4), env(safe-area-inset-right, 0px));
+      padding-block: var(--padding-x9) var(--padding-x14);
+    }
+  }
+
+  /* ---------- document chrome ---------- */
+
+  .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-gray); }
+  .masthead { display: flex; flex-direction: column; gap: var(--gap-x4); }
+  .masthead h1 { font-size: 34px; line-height: 1.15; font-weight: 700; letter-spacing: -0.5px; }
+  .lede { color: var(--color-text-secondary); max-width: 70ch; }
+  code.t { font-family: var(--mock-mono); font-size: 12px; color: var(--color-yellow); }
+
+  .brief { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--gap-x4) var(--gap-x6); margin: var(--padding-x3) 0 0; padding-top: var(--padding-x5); border-top: 1px solid var(--color-border-primary); }
+  .brief dt { font-size: 12px; font-weight: 600; }
+  .brief dd { margin: 0; font-size: 14px; color: var(--color-text-muted); }
+
+  .jump { display: flex; flex-wrap: wrap; gap: var(--gap-x2); }
+  .jump a { display: inline-flex; align-items: center; gap: var(--gap-x2); padding: var(--padding-x1) var(--padding-x3); border-radius: var(--radius-x2); background: var(--color-bg-secondary); border: 1px solid var(--color-border-primary); font-size: 13px; color: var(--color-text-secondary); transition: border-color var(--duration-fast) var(--easing-out); }
+  .jump a:hover { border-color: var(--color-accent); color: var(--color-text-primary); }
+  .jump b { font-family: var(--mock-mono); font-weight: 500; color: var(--color-accent); }
+
+  .variant, .section { margin-top: var(--padding-x20); display: flex; flex-direction: column; gap: var(--gap-x5); scroll-margin-top: var(--padding-x6); }
+  .variant__head { display: flex; align-items: baseline; gap: var(--gap-x3); flex-wrap: wrap; }
+  .variant__letter { font-family: var(--mock-mono); font-size: 13px; font-weight: 500; color: var(--color-accent); border: 1px solid var(--color-accent); border-radius: var(--radius-x1); padding: 1px 7px; flex-shrink: 0; }
+  .variant__head h2, .section > h2 { font-size: 26px; font-weight: 700; letter-spacing: -0.3px; }
+  .variant__thesis, .section > p { color: var(--color-text-muted); max-width: 74ch; }
+
+  .stage { background: var(--color-bg-secondary); border: 1px solid var(--color-border-primary); border-radius: var(--radius-x4); padding: var(--padding-x5); display: flex; flex-direction: column; gap: var(--gap-x4); min-width: 0; }
+  @media (max-width: 520px) { .stage { padding: var(--padding-x2); } }
+  .stage__context { font-size: 12px; color: var(--color-gray); display: flex; align-items: center; gap: var(--gap-x2); flex-wrap: wrap; }
+  .stage__context::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--color-accent); flex-shrink: 0; }
+  .stage__context em { font-style: normal; color: var(--color-yellow); }
+
+  .phones { display: flex; flex-wrap: wrap; gap: var(--gap-x6); justify-content: center; }
+  .phone { width: min(100%, var(--mock-phone-width)); display: flex; flex-direction: column; gap: var(--gap-x2); }
+  .phone > .stage__context { justify-content: center; }
+  .phone .site { border-radius: var(--radius-x6); outline: 6px solid var(--color-neutral-20); max-height: var(--mock-phone-height); }
+
+  .pros { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--gap-x3) var(--gap-x6); font-size: 14px; color: var(--color-text-muted); }
+  .pros h3 { font-size: 12px; font-weight: 600; color: var(--color-text-primary); margin-bottom: var(--padding-x1); }
+  .pros ul { padding-left: 18px; list-style: disc; display: grid; gap: var(--gap-x1); }
+
+  .newmark { font-family: var(--mock-mono); font-size: 10px; font-weight: 500; letter-spacing: 0.04em; color: var(--color-yellow); border: 1px dashed color-mix(in srgb, var(--color-yellow) 60%, transparent); border-radius: var(--radius-x1); padding: 0 var(--padding-x1); white-space: nowrap; }
+
+  /* ---------- the site frame ---------- */
+
+  .site {
+    --mock-art: var(--color-accent);
+    container: site / inline-size;
+    position: relative;
+    border-radius: var(--radius-x4);
+    overflow: hidden;
+    min-width: 0;
+    background:
+      radial-gradient(90% 55% at 25% 0%, color-mix(in srgb, var(--mock-art) 34%, transparent), transparent 62%),
+      radial-gradient(70% 60% at 100% 100%, color-mix(in srgb, var(--color-violet) 20%, transparent), transparent 60%),
+      linear-gradient(170deg, var(--color-neutral-25), var(--color-neutral-5));
+  }
+
+  .site--scroll { max-height: var(--mock-frame-height); overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--color-scrollbar-thumb) var(--color-scrollbar-track); }
+
+  .art-silk { --mock-art: var(--color-negative); }
+  .art-hk { --mock-art: var(--color-blue); }
+  .art-clair { --mock-art: var(--color-yellow); }
+  .art-signalis { --mock-art: var(--color-pink); }
+  .art-outer { --mock-art: var(--color-orange); }
+  .art-hades { --mock-art: var(--color-violet); }
+  .art-site { --mock-art: var(--color-accent); }
+  .art-ra { --mock-art: var(--color-yellow-light); }
+  .art-lists { --mock-art: var(--color-cyan); }
+
+  .topbar { position: sticky; top: 0; z-index: 4; display: flex; align-items: center; gap: var(--gap-x5); height: var(--header-height); padding-inline: var(--padding-x4); background: var(--color-bg-primary); border-bottom: 1px solid var(--color-border-primary); }
+  .topbar__logo { height: 100%; display: flex; align-items: center; flex-shrink: 0; }
+  .topbar__logo img { height: var(--header-logo-height); width: auto; }
+  .topnav { display: flex; gap: var(--gap-x4); font-size: 14px; flex: 1; min-width: 0; height: 100%; }
+  .topnav a { display: inline-flex; align-items: center; gap: 6px; color: var(--color-text-secondary); white-space: nowrap; }
+  .topnav svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .topnav a[aria-current="page"] { color: var(--color-text-primary); box-shadow: inset 0 -2px 0 var(--color-accent); }
+  .topbar__end { margin-left: auto; display: flex; align-items: center; gap: var(--gap-x3); color: var(--color-text-secondary); }
+  .topbar__end svg { width: 20px; height: 20px; }
+  .topbar__burger, .topbar__search { display: none; }
+
+  @container site (max-width: 860px) {
+    .topnav a:not([aria-current]) span { display: none; }
+  }
+  @container site (max-width: 560px) {
+    .topnav { display: none; }
+    .topbar__burger, .topbar__search { display: inline-flex; }
+  }
+
+  .page { display: flex; flex-direction: column; gap: var(--gap-x4); padding: var(--padding-x4) var(--padding-x4) var(--padding-x10); min-width: 0; }
+  @container site (max-width: 560px) { .page { gap: var(--gap-x2); padding: var(--padding-x2) var(--padding-x2) var(--padding-x8); } }
+
+  .box { background: var(--mock-box-bg); border: 1px solid var(--color-border-primary); border-radius: var(--radius-x5); padding: var(--padding-x5); display: flex; flex-direction: column; gap: var(--gap-x4); min-width: 0; }
+  @container site (max-width: 560px) { .box { padding: var(--padding-x3); gap: var(--gap-x3); } }
+  .box__title { font-size: 15px; font-weight: 600; padding-bottom: var(--padding-x2); border-bottom: 1px solid var(--color-bg-primary); display: flex; align-items: baseline; justify-content: space-between; gap: var(--gap-x2); }
+
+  /* ---------- shared UI drawn from the kit ---------- */
+
+  .crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap-x1); font-size: 13px; color: var(--color-text-muted); min-width: 0; }
+  .crumbs a { display: inline-flex; align-items: center; gap: 2px; }
+  .crumbs a:hover { color: var(--color-text-primary); }
+  .crumbs svg { width: 12px; height: 12px; transform: rotate(90deg); }
+  .crumbs__sep { color: var(--color-text-muted); }
+  .crumbs [aria-current] { color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 36ch; }
+
+  .stitle { display: flex; align-items: center; gap: var(--gap-x2); font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 400; line-height: 1.2; }
+  .stitle::before { content: ""; width: 4px; height: 24px; border-radius: var(--radius-x2); background: var(--color-accent); flex-shrink: 0; }
+  .headrow { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-x3); flex-wrap: wrap; }
+
+  .badge { align-self: flex-start; display: inline-flex; align-items: center; gap: var(--gap-x1); flex-shrink: 0; padding-inline: var(--padding-x2); border-radius: var(--radius-x2); background: var(--color-bg-tertiary); color: var(--color-text-secondary); font-size: 12px; line-height: 18px; font-weight: 600; white-space: nowrap; }
+  .badge--muted { color: var(--color-text-muted); }
+  .badge--accent { color: var(--mock-accent-text); background: color-mix(in srgb, var(--color-accent) var(--badge-tint-strength), transparent); }
+  .badge--attention { color: var(--color-attention); background: color-mix(in srgb, var(--color-attention) var(--badge-tint-strength), transparent); }
+  .badge--dot::before { content: ""; width: var(--padding-x1); height: var(--padding-x1); border-radius: 50%; background: currentColor; }
+
+  .chip { display: inline-flex; align-items: center; gap: var(--gap-x1); padding: var(--padding-x1) var(--padding-x3); border-radius: var(--radius-x2); background: var(--color-bg-tertiary); font-size: 13px; line-height: 17px; color: var(--color-text-secondary); }
+  .chips { display: flex; flex-wrap: wrap; gap: var(--gap-x2); }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--gap-x2); border: 0; border-radius: var(--radius-button); padding: var(--padding-x2) var(--padding-x4); font-size: 14px; font-weight: 500; line-height: 20px; cursor: pointer; white-space: nowrap; color: var(--color-text-primary); background: var(--color-bg-tertiary); }
+  .btn:hover { filter: brightness(0.85); }
+  .btn--accent { background: var(--color-accent); }
+  .btn--ghost { background: transparent; color: var(--color-text-muted); padding: var(--padding-x05) var(--padding-x1); }
+  .btn--ghost:hover { color: var(--color-text-primary); filter: none; }
+  .btn--block { width: 100%; }
+  .btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+  .seg { align-self: flex-start; display: inline-flex; gap: var(--gap-x05); border-radius: var(--radius-x4); background: var(--color-bg-tertiary); max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+  .seg__btn { flex: 0 0 auto; display: inline-flex; align-items: center; gap: var(--gap-x1); border: 0; background: transparent; border-radius: var(--radius-x3); padding: var(--padding-x1) var(--padding-x2); font-size: 13px; line-height: 20px; color: var(--color-text-muted); cursor: pointer; }
+  .seg__btn:hover { color: var(--color-text-primary); }
+  .seg__btn[aria-pressed="true"] { background: var(--color-bg-primary); color: var(--color-text-primary); }
+  .seg__count { color: var(--tab-count-color); font-variant-numeric: tabular-nums; }
+
+  .cover {
+    display: block;
+    width: var(--mock-cover-w, 100%);
+    max-width: 100%;
+    aspect-ratio: var(--cover-ratio);
+    border-radius: var(--mock-cover-r, var(--radius-x3));
+    background:
+      linear-gradient(155deg,
+        color-mix(in srgb, var(--mock-art) 80%, var(--color-neutral-5)) 0%,
+        color-mix(in srgb, var(--mock-art) 30%, var(--color-neutral-10)) 70%,
+        var(--color-neutral-10) 100%);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-neutral-100) 8%, transparent);
+    flex-shrink: 0;
+  }
+
+  .cover--missing { display: grid; place-items: center; background: var(--color-bg-tertiary); }
+  .cover--missing img { width: 46%; opacity: 0.8; }
+
+  .artwork {
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: 16 / 9;
+    background:
+      radial-gradient(70% 90% at 22% 18%, color-mix(in srgb, var(--mock-art) 72%, transparent), transparent 62%),
+      radial-gradient(60% 70% at 88% 92%, color-mix(in srgb, var(--mock-art) 34%, var(--color-neutral-5)), transparent 70%),
+      linear-gradient(200deg, var(--color-neutral-30), var(--color-neutral-10));
+  }
+
+  .thumb-mark { display: grid; place-items: center; background: var(--color-bg-tertiary); }
+  .thumb-mark img { width: 30%; max-width: 64px; }
+
+  .av { width: var(--mock-av-size, 30px); height: var(--mock-av-size, 30px); border-radius: 50%; flex-shrink: 0; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: var(--color-neutral-100); background: color-mix(in srgb, var(--mock-av, var(--color-accent)) 70%, var(--color-neutral-15)); }
+  .av--sm { --mock-av-size: var(--avatar-size-sm); font-size: 10px; }
+  .av-admin { --mock-av: var(--color-cyan); }
+  .av-me { --mock-av: var(--color-yellow); }
+
+  .score { font-size: 15px; font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .score small { font-size: 12px; font-weight: 500; color: var(--color-text-muted); }
+
+  .gctl { display: flex; gap: var(--gap-x1); width: 100%; background: var(--color-bg-primary); border-radius: var(--radius-x3); padding: var(--padding-x1); outline: 1px solid var(--color-border-primary); }
+  .gctl--fit { width: auto; flex-shrink: 0; }
+  .gctl__btn { flex: 1 1 0; min-width: 34px; height: 34px; display: grid; place-items: center; border: 0; background: transparent; border-radius: var(--radius-x2); cursor: pointer; transition: background-color var(--duration-fast) var(--easing-out); }
+  .gctl__btn:hover { background: var(--color-bg-hover); }
+  .gctl__glyph { --mock-tone: var(--color-border-primary); width: var(--game-controls-icon-size); aspect-ratio: 1; padding: var(--padding-x05); border-radius: 50%; outline: 2px solid var(--color-border-primary); background: var(--color-bg-primary); color: var(--color-text-primary); display: grid; place-items: center; }
+  .gctl__glyph svg { width: 100%; height: 100%; }
+  .gctl__glyph--playing { --mock-tone: var(--game-playing-color); }
+  .gctl__glyph--favorite { --mock-tone: var(--favorite-color); }
+  .gctl__glyph--on { outline-color: color-mix(in srgb, var(--mock-tone) 60%, transparent); color: var(--mock-tone); }
+
+  .meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap-x1) var(--gap-x2); font-size: 13px; color: var(--color-text-muted); font-variant-numeric: tabular-nums; }
+  .meta__sep::before { content: "·"; color: var(--color-gray); }
+  .byline { display: flex; align-items: center; gap: var(--gap-x2); font-size: 14px; color: var(--color-text-secondary); }
+  .byline b { font-weight: 600; color: var(--color-text-primary); }
+
+  .headline { font-size: var(--mock-headline-size); line-height: var(--mock-headline-line); font-weight: 700; letter-spacing: -0.4px; }
+  .summary { font-size: 18px; line-height: 28px; color: var(--color-text-secondary); }
+  @container site (max-width: 760px) {
+    .headline { font-size: var(--mock-headline-size-sm); line-height: var(--mock-headline-line-sm); letter-spacing: -0.2px; }
+    .summary { font-size: 16px; line-height: 25px; }
+  }
+
+  .prose { font-size: var(--mock-article-size); line-height: var(--mock-article-line); color: var(--color-text-secondary); display: flow-root; }
+  .prose > * + * { margin-top: var(--mock-article-gap); }
+  .prose h3 { font-size: calc(var(--mock-article-size) + 3px); line-height: calc(var(--mock-article-line) + 4px); font-weight: 700; color: var(--color-text-primary); margin-top: calc(var(--mock-article-gap) * 2); }
+  .prose blockquote { padding-left: var(--padding-x3); border-left: 2px solid var(--color-accent); color: var(--color-text-muted); }
+  .prose blockquote footer { font-size: 14px; margin-top: var(--padding-x1); color: var(--color-gray); }
+  .prose a { color: var(--mock-accent-text); text-decoration: underline; text-underline-offset: 2px; }
+  .prose ul { list-style: disc; padding-left: var(--padding-x5); }
+  .prose li + li { margin-top: var(--padding-x1); }
+  .prose b { color: var(--color-text-primary); font-weight: 600; }
+  .prose figure .artwork { border-radius: var(--radius-x4); }
+  .prose figcaption { font-size: 13px; line-height: 18px; color: var(--color-gray); margin-top: var(--padding-x2); }
+  @container site (max-width: 560px) { .prose { font-size: 16px; line-height: 26px; } }
+
+  .hero-img { border-radius: var(--radius-x4); overflow: hidden; }
+  .hero-img figcaption { font-size: 12px; color: var(--color-gray); padding-top: var(--padding-x2); }
+
+  .dist { display: flex; gap: 2px; height: var(--community-distribution-height); border-radius: var(--radius-x1); overflow: hidden; }
+  .dist i { display: block; flex: var(--n) 1 0; background: var(--c); }
+  .legend { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-x1) var(--gap-x3); font-size: 12px; color: var(--color-text-muted); font-variant-numeric: tabular-nums; }
+  .legend li { display: flex; align-items: center; gap: var(--gap-x1); white-space: nowrap; }
+  .legend li::before { content: ""; width: var(--community-dot-size); height: var(--community-dot-size); border-radius: 50%; background: var(--c); flex-shrink: 0; }
+
+  .pager { display: flex; justify-content: center; gap: 2px; align-self: center; padding: 3px; background: var(--color-bg-primary); border: 1px solid var(--color-border-primary); border-radius: var(--radius-x3); }
+  .pager span { min-width: 32px; height: 28px; display: grid; place-items: center; border-radius: var(--radius-x2); color: var(--color-text-muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .pager span.on { background: var(--color-bg-tertiary); color: var(--color-text-primary); }
+  .pager svg { width: 14px; height: 14px; }
+
+  .clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* ---------- A · sidecar ---------- */
+
+  .a-feed { width: 100%; max-width: var(--mock-a-width); margin-inline: auto; display: grid; grid-template-columns: minmax(0, 1fr) var(--mock-sidecar-width); gap: var(--gap-x4); align-items: start; }
+  .a-feed > .a-feed__head { grid-column: 1 / -1; }
+  .a-feed__side { position: sticky; top: calc(var(--header-height) + var(--padding-x4)); }
+  @container site (max-width: 900px) {
+    .a-feed { grid-template-columns: minmax(0, 1fr); }
+    .a-feed__side { display: none; }
+  }
+
+  .arch { display: flex; flex-direction: column; gap: var(--gap-x05); font-size: 14px; }
+  .arch__row { display: flex; align-items: center; gap: var(--gap-x2); padding: var(--padding-x1) var(--padding-x2); border-radius: var(--radius-x2); color: var(--color-text-secondary); transition: background-color var(--duration-fast) var(--easing-out); }
+  .arch__row:hover { background: var(--color-bg-tertiary); color: var(--color-text-primary); }
+  .arch__row[aria-current="true"] { background: var(--color-bg-tertiary); color: var(--color-text-primary); font-weight: 600; }
+  .arch__row span { margin-left: auto; font-size: 12px; font-weight: 400; color: var(--tab-count-color); font-variant-numeric: tabular-nums; }
+  .arch__row svg { width: 10px; height: 10px; flex-shrink: 0; color: var(--color-gray); transform: rotate(-90deg); transition: transform var(--duration-fast) var(--easing-out); }
+  .arch__row[aria-expanded="true"] svg { transform: none; }
+  .arch__row--all svg { visibility: hidden; }
+  .arch__year { font-weight: 600; }
+  .arch__months { display: flex; flex-direction: column; gap: var(--gap-x05); margin-left: var(--padding-x4); padding-left: var(--padding-x2); border-left: 1px solid var(--color-border-primary); }
+  .side-group { display: flex; flex-direction: column; gap: var(--gap-x2); padding-top: var(--padding-x3); border-top: 1px solid var(--color-bg-primary); }
+  .side-group__label { font-size: 13px; font-weight: 500; color: var(--color-text-muted); }
+
+  .applied { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap-x2); }
+  .pill { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; line-height: 22px; padding: 0 var(--padding-x2) 0 var(--padding-x3); border-radius: var(--radius-x4); background: var(--color-bg-tertiary); color: var(--color-text-secondary); }
+  .pill svg { width: 8px; height: 10px; color: var(--color-gray); }
+  .pill:hover svg { color: var(--color-negative); }
+  .clear { font-size: 13px; color: var(--mock-accent-text); }
+  .input .chev { width: 12px; height: 12px; flex-shrink: 0; color: var(--color-gray); }
+  .feed-filters { display: flex; flex-direction: column; gap: var(--gap-x2); }
+
+  .frows { display: flex; flex-direction: column; }
+  .frows > li { padding-block: var(--padding-x4); border-bottom: 1px solid var(--color-border-primary); }
+  .frows > li:first-child { padding-top: 0; }
+  .frows > li:last-child { border-bottom: 0; padding-bottom: 0; }
+  .frow { display: grid; grid-template-columns: var(--mock-feed-thumb) minmax(0, 1fr); gap: var(--gap-x4); align-items: start; }
+  .frow__thumb { aspect-ratio: 16 / 9; border-radius: var(--radius-x3); overflow: hidden; outline: 2px solid transparent; outline-offset: -2px; transition: outline-color var(--duration-fast) var(--easing-out); }
+  .frow__thumb > * { height: 100%; }
+  .frow:hover .frow__thumb { outline-color: var(--color-accent); }
+  .frow__body { display: flex; flex-direction: column; gap: var(--gap-x1); min-width: 0; }
+  .frow__title { font-size: 18px; line-height: 24px; font-weight: 600; color: var(--color-text-primary); }
+  .frow:hover .frow__title { color: var(--mock-accent-text); }
+  .frow__excerpt { font-size: 14px; line-height: 20px; color: var(--color-text-muted); }
+  .frow .meta { font-size: 12px; margin-top: var(--padding-x1); }
+  .gref { align-self: flex-start; display: inline-flex; align-items: center; gap: var(--gap-x2); font-size: 12px; font-weight: 600; color: var(--color-text-secondary); }
+  .gref .cover { --mock-cover-w: 14px; --mock-cover-r: 2px; }
+  @container site (max-width: 560px) {
+    .frows > li { padding-block: var(--padding-x3); }
+    .frow { grid-template-columns: var(--mock-feed-thumb-sm) minmax(0, 1fr); gap: var(--gap-x3); }
+    .frow__title { font-size: 15px; line-height: 20px; }
+    .frow__excerpt { display: none; }
+  }
+
+  .latest { display: flex; flex-direction: column; gap: var(--gap-x3); }
+  .latest a { display: flex; flex-direction: column; gap: 2px; }
+  .latest b { font-size: 14px; line-height: 19px; font-weight: 600; }
+  .latest small { font-size: 12px; color: var(--color-text-muted); }
+  .latest a:hover b { color: var(--mock-accent-text); }
+
+  .a-read { width: 100%; max-width: var(--mock-a-width); margin-inline: auto; display: grid; grid-template-columns: minmax(0, 1fr) var(--mock-sidecar-width); grid-template-areas: "head side" "body side"; gap: var(--gap-x4); align-items: start; }
+  .a-read__head { grid-area: head; }
+  .a-read__body { grid-area: body; }
+  .a-read__side { grid-area: side; position: sticky; top: calc(var(--header-height) + var(--padding-x4)); display: flex; flex-direction: column; gap: var(--gap-x4); }
+  @container site (max-width: 900px) {
+    .a-read { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "side" "body"; }
+    .a-read--news { grid-template-areas: "head" "body" "side"; }
+    .a-read__side { position: static; }
+  }
+
+  .gpanel__label { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-gray); }
+  .gpanel__game { display: grid; grid-template-columns: var(--mock-side-cover) minmax(0, 1fr); gap: var(--gap-x3); align-items: start; }
+  .gpanel__name { font-size: 17px; line-height: 22px; font-weight: 700; }
+  .gpanel__name:hover { color: var(--mock-accent-text); }
+  .gpanel__info { display: flex; flex-direction: column; gap: var(--gap-x2); min-width: 0; }
+  .gpanel__sub { font-size: 13px; color: var(--color-text-muted); }
+  .gpanel__stats { display: flex; flex-direction: column; gap: var(--gap-x2); padding-top: var(--padding-x3); border-top: 1px solid var(--color-bg-primary); }
+  .gpanel__scoreline { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gap-x2); font-size: 12px; color: var(--color-text-muted); }
+  .gpanel__actions { display: flex; flex-direction: column; gap: var(--gap-x2); }
+  @container site (max-width: 900px) {
+    .gpanel__game { grid-template-columns: var(--mock-side-cover-sm) minmax(0, 1fr); }
+    .gpanel__stats { display: none; }
+    .gpanel__actions { flex-direction: row; }
+    .gpanel__actions .btn { width: auto; }
+  }
+  @container site (max-width: 560px) {
+    .gpanel .chips { display: none; }
+    .gpanel__actions { flex-direction: column; }
+    .gpanel__actions .btn { width: 100%; }
+  }
+
+  /* ---------- B · game frame ---------- */
+
+  .b-mag { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: var(--gap-x4); }
+  .b-mag__side { display: grid; gap: var(--gap-x4); align-content: start; }
+  .b-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap-x4); }
+  @container site (max-width: 980px) {
+    .b-mag { grid-template-columns: minmax(0, 1fr); }
+    .b-mag__side, .b-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @container site (max-width: 560px) {
+    .b-mag, .b-grid { gap: var(--gap-x2); }
+    .b-mag__side, .b-grid { grid-template-columns: minmax(0, 1fr); gap: var(--gap-x2); }
+  }
+
+  .b-card { background: var(--mock-box-bg); border: 1px solid var(--color-border-primary); border-radius: var(--radius-x5); overflow: hidden; display: flex; flex-direction: column; min-width: 0; transition: border-color var(--duration-fast) var(--easing-out); }
+  .b-card:hover { border-color: var(--color-accent); }
+  .b-card__body { position: relative; display: flex; flex-direction: column; gap: var(--gap-x2); padding: var(--padding-x4); min-width: 0; }
+  .b-card__game { display: flex; align-items: flex-end; gap: var(--gap-x3); margin-top: calc(-1 * var(--mock-b-card-overlap)); }
+  .b-card__game .cover { --mock-cover-w: var(--mock-b-card-cover); box-shadow: var(--shadow-basic), inset 0 0 0 1px color-mix(in srgb, var(--color-neutral-100) 10%, transparent); }
+  .b-card__game b { display: block; font-size: 13px; line-height: 17px; font-weight: 600; }
+  .b-card__game small { font-size: 12px; color: var(--color-text-muted); }
+  .b-card__title { font-size: 18px; line-height: 24px; font-weight: 700; }
+  .b-card:hover .b-card__title { color: var(--mock-accent-text); }
+  .b-card__excerpt { font-size: 14px; line-height: 20px; color: var(--color-text-muted); }
+  .b-card__meta { font-size: 12px; color: var(--color-gray); font-variant-numeric: tabular-nums; margin-top: auto; padding-top: var(--padding-x1); }
+  .b-card--lead > .artwork { aspect-ratio: 2 / 1; }
+  .b-card--lead .b-card__body { padding: var(--padding-x5) var(--padding-x6) var(--padding-x6); gap: var(--gap-x3); }
+  .b-card--lead .b-card__game { --mock-b-card-cover: var(--mock-b-lead-cover); --mock-b-card-overlap: var(--padding-x16); }
+  .b-card--lead .b-card__game b { font-size: 15px; }
+  .b-card--lead .b-card__title { font-size: 30px; line-height: 36px; letter-spacing: -0.3px; }
+  .b-card--lead .b-card__excerpt { font-size: 16px; line-height: 24px; color: var(--color-text-secondary); }
+  .b-card--compact .b-card__excerpt { display: none; }
+  @container site (max-width: 560px) {
+    .b-card--lead > .artwork { aspect-ratio: 2 / 1; }
+  .b-card--lead .b-card__body { padding: var(--padding-x3) var(--padding-x4) var(--padding-x4); }
+    .b-card--lead .b-card__game { --mock-b-card-cover: var(--mock-b-lead-cover-sm); --mock-b-card-overlap: var(--padding-x10); }
+    .b-card--lead .b-card__title { font-size: 21px; line-height: 26px; }
+    .b-card--lead .b-card__excerpt { font-size: 14px; line-height: 20px; }
+  }
+
+  .b-hero { padding: 0; gap: 0; overflow: hidden; }
+  .b-hero__banner { position: relative; height: var(--game-hero-artwork-height); }
+  .b-hero__banner .artwork { height: 100%; aspect-ratio: auto; }
+  .b-hero__scrim { position: absolute; inset: 0; background: var(--game-hero-scrim); }
+  .b-hero__crumbs { position: absolute; top: var(--padding-x4); left: var(--padding-x6); right: var(--padding-x6); filter: var(--shadow-text); }
+  .b-hero__crumbs .crumbs { color: var(--color-text-secondary); }
+  .b-hero__body { position: relative; display: flex; align-items: flex-end; gap: var(--gap-x6); padding: 0 var(--padding-x6) var(--padding-x6); margin-top: calc(-1 * var(--game-hero-cover-offset)); }
+  .b-hero__cover { width: var(--game-hero-cover-width); flex-shrink: 0; }
+  .b-hero__cover .cover { box-shadow: var(--shadow-basic), inset 0 0 0 1px color-mix(in srgb, var(--color-neutral-100) 10%, transparent); }
+  .b-hero__main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--gap-x3); }
+  .b-hero__kicker { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--gap-x2); font-size: 14px; color: var(--color-text-muted); }
+  .b-hero__kicker a { font-size: 15px; font-weight: 600; color: var(--mock-accent-text); }
+  .b-hero__kicker a:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .b-hero__side { width: var(--mock-b-actions-width); flex-shrink: 0; display: flex; flex-direction: column; gap: var(--gap-x2); }
+  .b-hero--news .b-hero__body { margin-top: calc(-1 * var(--padding-x20)); }
+  @container site (max-width: 900px) {
+    .b-hero__body { flex-wrap: wrap; }
+    .b-hero__side { width: 100%; flex-direction: row; }
+    .b-hero__side .btn { flex-shrink: 0; }
+  }
+  @container site (max-width: 760px) {
+    .b-hero__banner { height: var(--game-hero-artwork-height-sm); }
+    .b-hero__crumbs { left: var(--padding-x3); right: var(--padding-x3); top: var(--padding-x3); }
+    .b-hero__body { flex-direction: column; align-items: center; text-align: center; gap: var(--gap-x4); padding: 0 var(--padding-x3) var(--padding-x4); margin-top: calc(-1 * var(--padding-x16)); }
+    .b-hero__cover { width: var(--mock-b-cover-sm); }
+    .b-hero__main { align-items: center; }
+    .b-hero__kicker, .b-hero__main .meta { justify-content: center; }
+    .b-hero--news .b-hero__body { margin-top: calc(-1 * var(--padding-x10)); align-items: stretch; text-align: left; }
+    .b-hero--news .b-hero__main { align-items: flex-start; }
+    .b-hero--news .meta { justify-content: flex-start; }
+    .b-hero__side { flex-direction: column; }
+  }
+
+  .b-body { align-items: center; padding: var(--padding-x10) var(--padding-x6) var(--padding-x12); }
+  .readcol { align-items: center; }
+  .readcol > * { width: 100%; max-width: var(--mock-column); }
+  .b-body__end { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-x3); flex-wrap: wrap; padding-top: var(--padding-x4); border-top: 1px solid var(--color-border-primary); }
+  @container site (max-width: 560px) { .b-body { padding: var(--padding-x4) var(--padding-x3) var(--padding-x6); } }
+
+  /* ---------- C · timeline and dock ---------- */
+
+  .c-feed { gap: var(--gap-x8); }
+  .c-month { display: flex; flex-direction: column; gap: var(--gap-x4); }
+  .c-month__label { font-size: 0.75rem; font-weight: 700; line-height: var(--release-calendar-month-height); letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-secondary); padding-left: calc(var(--mock-c-date) + var(--padding-x4)); }
+  .c-line { position: relative; display: flex; flex-direction: column; gap: var(--gap-x2); }
+  .c-line::before { content: ""; position: absolute; top: var(--padding-x3); bottom: var(--padding-x3); left: calc(var(--mock-c-date) + var(--padding-x4) + var(--mock-line-cover) / 2); width: 1px; background: var(--release-calendar-axis-color); }
+  .c-stop { display: grid; grid-template-columns: var(--mock-c-date) var(--mock-line-cover) minmax(0, 1fr); gap: var(--gap-x4); align-items: start; }
+  .c-stop__date { text-align: right; padding-top: var(--padding-x2); }
+  .c-stop__date b { display: block; font-size: 1.75rem; line-height: 1; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .c-stop__date span { font-size: 0.8125rem; font-weight: 500; color: var(--color-text-muted); }
+  .c-stop__node { position: relative; z-index: 1; display: flex; justify-content: center; padding-top: var(--padding-x2); }
+  .c-stop__node .cover { --mock-cover-w: var(--mock-line-cover); --mock-cover-r: var(--radius-x2); box-shadow: 0 0 0 4px var(--color-bg-secondary), inset 0 0 0 1px color-mix(in srgb, var(--color-neutral-100) 10%, transparent); }
+  .c-stop__mark { width: var(--release-calendar-node-size); height: var(--release-calendar-node-size); border-radius: 50%; background: var(--color-bg-tertiary); box-shadow: 0 0 0 4px var(--color-bg-secondary); display: grid; place-items: center; margin-top: var(--padding-x1); }
+  .c-stop__mark img { width: 70%; }
+  .c-stop__card { display: flex; flex-direction: column; gap: var(--gap-x1); padding: var(--padding-x2) var(--padding-x3); border-radius: var(--radius-x4); min-width: 0; transition: background-color var(--duration-fast) var(--easing-out); }
+  .c-stop__card:hover { background: var(--color-bg-tertiary); }
+  .c-stop__kicker { font-size: 12px; font-weight: 600; color: var(--mock-accent-text); }
+  .c-stop__kicker--news { color: var(--color-text-muted); }
+  .c-stop__title { font-size: 18px; line-height: 24px; font-weight: 600; }
+  .c-stop__excerpt { font-size: 14px; line-height: 20px; color: var(--color-text-muted); }
+  .c-stop__meta { font-size: 12px; color: var(--color-gray); }
+  @container site (max-width: 560px) {
+    .c-month__label { padding-left: calc(var(--mock-c-date-sm) + var(--padding-x2)); }
+    .c-line::before { left: calc(var(--mock-c-date-sm) + var(--padding-x2) + var(--mock-line-cover-sm) / 2); }
+    .c-stop { grid-template-columns: var(--mock-c-date-sm) var(--mock-line-cover-sm) minmax(0, 1fr); gap: var(--gap-x2); }
+    .c-stop__date b { font-size: 1.25rem; }
+    .c-stop__date span { font-size: 11px; }
+    .c-stop__node .cover { --mock-cover-w: var(--mock-line-cover-sm); }
+    .c-stop__mark { width: 24px; height: 24px; }
+    .c-stop__card { padding: var(--padding-x1) var(--padding-x2); }
+    .c-stop__title { font-size: 15px; line-height: 20px; }
+    .c-stop__excerpt { display: none; }
+  }
+
+  .c-read { align-items: center; }
+  .c-read > * { width: 100%; max-width: var(--mock-c-width); }
+
+  .c-dock { position: sticky; top: calc(var(--header-height) + var(--padding-x2)); z-index: 3; display: flex; align-items: center; gap: var(--gap-x3); padding: var(--padding-x2) var(--padding-x2) var(--padding-x2) var(--padding-x3); background: var(--color-bg-primary-tint); border: 1px solid var(--color-border-primary); border-radius: var(--radius-x5); backdrop-filter: blur(var(--blur-x1)); }
+  .c-dock .cover { --mock-cover-w: var(--mock-dock-cover); --mock-cover-r: var(--radius-x1); }
+  .c-dock__text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .c-dock__name { font-size: 15px; font-weight: 600; line-height: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .c-dock__name:hover { color: var(--mock-accent-text); }
+  .c-dock__sub { font-size: 12px; color: var(--color-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .c-dock__label { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-gray); padding-right: var(--padding-x3); border-right: 1px solid var(--color-border-primary); white-space: nowrap; }
+  .c-dock .gctl { width: auto; flex-shrink: 0; }
+  @container site (max-width: 900px) { .c-dock__label, .c-dock .score { display: none; } }
+  @container site (max-width: 560px) {
+    .c-dock { order: 9; top: auto; bottom: 0; margin-inline: calc(-1 * var(--padding-x2)); margin-bottom: calc(-1 * var(--padding-x8)); border-radius: var(--radius-x5) var(--radius-x5) 0 0; border-bottom: 0; padding: var(--padding-x2) var(--padding-x3); }
+    .c-dock .btn { display: none; }
+    .c-dock .gctl__btn { min-width: 32px; }
+  }
+
+  .c-embed { display: flex; align-items: center; gap: var(--gap-x3); padding: var(--padding-x3); border-radius: var(--radius-x4); background: var(--color-bg-tertiary); font-size: 14px; line-height: 20px; }
+  .c-embed .cover { --mock-cover-w: var(--mock-embed-cover); --mock-cover-r: var(--radius-x2); }
+  .c-embed__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .c-embed__text a { font-size: 16px; font-weight: 600; color: var(--color-text-primary); text-decoration: none; }
+  .c-embed__text a:hover { color: var(--mock-accent-text); }
+  .c-embed__text span { color: var(--color-text-muted); font-size: 13px; }
+  .c-embed .gctl { width: auto; flex-shrink: 0; }
+  @container site (max-width: 560px) { .c-embed { flex-wrap: wrap; } .c-embed .gctl { width: 100%; } }
+
+  /* ---------- writing a post ---------- */
+
+  .editor-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 340px); gap: var(--gap-x4); align-items: start; }
+  @container site (max-width: 900px) { .editor-wrap { grid-template-columns: minmax(0, 1fr); } }
+  .form { display: flex; flex-direction: column; gap: var(--gap-x5); }
+  .field { display: flex; flex-direction: column; gap: var(--gap-x2); min-width: 0; }
+  .field__label { font-size: 14px; font-weight: 500; display: flex; justify-content: space-between; gap: var(--gap-x2); }
+  .field__label small { font-size: 12px; font-weight: 400; color: var(--color-gray); font-variant-numeric: tabular-nums; }
+  .field__hint { font-size: 12px; color: var(--color-gray); }
+  .input { display: flex; align-items: center; gap: var(--gap-x2); min-height: var(--field-control-height); padding: var(--padding-x2) var(--padding-x4); background: var(--color-bg-primary); border: 1px solid transparent; border-radius: var(--radius-control); font-size: 14px; line-height: 20px; min-width: 0; }
+  .input--area { align-items: flex-start; min-height: 76px; color: var(--color-text-secondary); }
+  .input--focus { border-color: var(--color-accent); }
+  .input--placeholder { color: var(--color-gray); }
+  .input .cover { --mock-cover-w: 26px; --mock-cover-r: var(--radius-x1); }
+  .input__grow { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .input__x { width: 20px; height: 20px; display: grid; place-items: center; border-radius: var(--radius-x1); color: var(--color-text-muted); }
+  .input__x:hover { color: var(--color-negative); }
+  .input__x svg { width: 9px; height: 11px; }
+  .input svg.lead { width: 16px; height: 16px; color: var(--color-gray); flex-shrink: 0; }
+  .rich { border-radius: var(--radius-control); background: var(--color-bg-primary); border: 1px solid transparent; overflow: hidden; }
+  .rich__bar { display: flex; align-items: center; gap: var(--gap-x1); flex-wrap: wrap; padding: var(--padding-x1) var(--padding-x2); border-bottom: 1px solid var(--color-border-primary); }
+  .rich__sep { width: 1px; height: 18px; background: var(--color-border-primary); margin-inline: var(--padding-x1); }
+  .tbtn { width: 30px; height: 30px; display: grid; place-items: center; border-radius: var(--radius-x2); color: var(--color-text-muted); }
+  .tbtn:hover { background: var(--color-bg-hover); color: var(--color-text-primary); }
+  .tbtn svg { width: 15px; height: 15px; }
+  .tbtn--new { width: auto; padding-inline: var(--padding-x2); gap: var(--gap-x1); display: inline-flex; align-items: center; font-size: 12px; color: var(--color-text-secondary); outline: 1px dashed color-mix(in srgb, var(--color-yellow) 60%, transparent); outline-offset: -1px; }
+  .rich__body { padding: var(--padding-x3) var(--padding-x4); font-size: 14px; line-height: 20px; color: var(--color-text-secondary); display: flex; flex-direction: column; gap: var(--rich-text-gap); min-height: 160px; }
+  .rich__body h3 { font-size: 17px; line-height: 24px; color: var(--color-text-primary); }
+  .caret { display: inline-block; width: 1px; height: 1.1em; background: var(--color-text-primary); vertical-align: text-bottom; animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .form__foot { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-x3); flex-wrap: wrap; padding-top: var(--padding-x4); border-top: 1px solid var(--color-border-primary); }
+  .form__foot .meta { font-size: 12px; }
+  .form__buttons { display: flex; gap: var(--gap-x2); flex-wrap: wrap; }
+  .preview-note { font-size: 12px; color: var(--color-gray); }
+
+  /* ---------- states ---------- */
+
+  .states { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: var(--gap-x4); }
+  .empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--gap-x2); padding: var(--padding-x8) var(--padding-x4); font-size: 14px; color: var(--color-text-muted); }
+  .empty svg { width: 56px; height: 56px; color: var(--color-bg-hover); margin-bottom: var(--padding-x2); }
+  .empty b { font-size: 17px; color: var(--color-text-primary); font-weight: 600; }
+  .empty .btn { margin-top: var(--padding-x2); }
+  .empty--compact { padding: var(--padding-x5) var(--padding-x3); }
+  .skel { border-radius: var(--radius-x2); background: linear-gradient(90deg, var(--color-bg-tertiary) 0%, var(--color-bg-hover) 50%, var(--color-bg-tertiary) 100%); background-size: 200% 100%; animation: shimmer var(--progress-bar-sweep-duration) linear infinite; }
+  @keyframes shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+  .skel-row { display: grid; grid-template-columns: var(--mock-feed-thumb-sm) minmax(0, 1fr); gap: var(--gap-x3); }
+  .skel-row .skel:first-child { aspect-ratio: 16 / 9; border-radius: var(--radius-x3); }
+  .skel-lines { display: flex; flex-direction: column; gap: var(--gap-x2); padding-top: var(--padding-x1); }
+  .skel-lines .skel { height: 12px; }
+
+  /* ---------- comparison ---------- */
+
+  .scroll-x { overflow-x: auto; }
+  .compare { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 720px; }
+  .compare th, .compare td { text-align: left; vertical-align: top; padding: var(--padding-x3); border-bottom: 1px solid var(--color-border-primary); }
+  .compare thead th { font-size: 13px; font-weight: 600; }
+  .compare thead th span { font-family: var(--mock-mono); color: var(--color-accent); margin-right: var(--padding-x1); }
+  .compare tbody th { font-weight: 500; color: var(--color-text-muted); width: 20%; }
+  .compare td { color: var(--color-text-secondary); }
+  .good { color: var(--color-positive); }
+  .warn { color: var(--color-yellow); }
+
+  .reco { border-left: 2px solid var(--color-accent); padding: var(--padding-x2) var(--padding-x4); display: grid; gap: var(--gap-x2); max-width: 78ch; }
+  .reco h3 { font-size: 17px; }
+  .reco p { color: var(--color-text-secondary); font-size: 14px; }
+
+  .note { margin-top: var(--padding-x14); font-size: 13px; color: var(--color-gray); border-left: 2px solid var(--color-border-primary); padding-left: var(--padding-x3); max-width: 80ch; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: var(--duration-instant) !important; animation-duration: var(--duration-instant) !important; animation-iteration-count: 1 !important; }
+  }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-games" viewBox="0 0 20 20"><path fill="currentColor" d="M15.9 5.5C15.3 4.5 14.2 4 13 4H7c-1.2 0-2.3.5-2.9 1.5c-2.3 3.5-2.8 8.8-1.2 9.9s5.2-3.7 7.1-3.7s5.4 4.8 7.1 3.7c1.6-1.1 1.1-6.4-1.2-9.9M8 9H7v1H6V9H5V8h1V7h1v1h1zm5.4.5c0 .5-.4.9-.9.9s-.9-.4-.9-.9s.4-.9.9-.9s.9.4.9.9m1.9-2c0 .5-.4.9-.9.9s-.9-.4-.9-.9s.4-.9.9-.9s.9.4.9.9"/></symbol>
+  <symbol id="i-list" viewBox="0 0 18 18"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M6 4.5h10M6 9h10M6 13.5h10M2.6 4.5h.01M2.6 9h.01M2.6 13.5h.01"/></symbol>
+  <symbol id="i-gauntlet" viewBox="0 0 256 256"><path fill="currentColor" d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m39.11 25.19C170.24 83.71 155 99.440 135 113.61c-2.25-24.48-8.44-49.8-38.37-67.82a87.9 87.9 0 0 1 70.5 3.4ZM40.18 133.54c28.34-20 49.57-14.68 71.87-4.39c-20.05 14.19-38.86 32.21-39.530 67.11a87.92 87.92 0 0 1-32.34-62.72m136.5 67.73c-31.45-14.55-37.47-35.58-39.71-60c12.72 5.86 26.31 10.75 41.3 10.75c11.33 0 23.46-2.8 36.63-10.080a88.2 88.2 0 0 1-38.22 59.33"/></symbol>
+  <symbol id="i-random" viewBox="0 0 640 512"><path fill="currentColor" d="M274.9 34.3c-28.1-28.1-73.7-28.1-101.8 0L34.3 173.1c-28.1 28.1-28.1 73.7 0 101.8l138.8 138.8c28.1 28.1 73.7 28.1 101.8 0l138.8-138.8c28.1-28.1 28.1-73.7 0-101.8zM200 224a24 24 0 1 1 48 0a24 24 0 1 1-48 0M96 200a24 24 0 1 1 0 48a24 24 0 1 1 0-48m128 176a24 24 0 1 1 0-48a24 24 0 1 1 0 48m128-176a24 24 0 1 1 0 48a24 24 0 1 1 0-48m-128-80a24 24 0 1 1 0-48a24 24 0 1 1 0 48m96 328c0 35.3 28.7 64 64 64h192c35.3 0 64-28.7 64-64V256c0-35.3-28.7-64-64-64H461.7c11.6 36 3.1 77-25.4 105.5L320 413.8z"/></symbol>
+  <symbol id="i-news" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M5 4.5h10.5v13.5a2 2 0 0 0 2 2H6a2 2 0 0 1-2-2v-12.5a1 1 0 0 1 1-1Zm10.5 5h3.5v8.5a2 2 0 0 1-4 0M7.5 8.5h4.5M7.5 12h4.5M7.5 15.5h3"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0m18 11l-6-6"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M6.5 5.5h11a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3h-11a3 3 0 0 1-3-3v-9a3 3 0 0 1 3-3ZM3.5 10h17M8 3.5v4M16 3.5v4"/></symbol>
+  <symbol id="i-burger" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 512 512"><path fill="currentColor" d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path fill="currentColor" d="M15.835 11.63L9.205 5.2C8.79 4.799 8 5.042 8 5.57v12.86c0 .528.79.771 1.205.37l6.63-6.43a.5.5 0 0 0 0-.74"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3.25a.75.75 0 0 1 .75.75v7.25H20a.75.75 0 0 1 0 1.5h-7.25V20a.75.75 0 0 1-1.5 0v-7.25H4a.75.75 0 0 1 0-1.5h7.25V4a.75.75 0 0 1 .75-.75"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M4 16q-.425 0-.712-.288T3 15t.288-.712T4 14h6q.425 0 .713.288T11 15t-.288.713T10 16zm0-4q-.425 0-.712-.288T3 11t.288-.712T4 10h10q.425 0 .713.288T15 11t-.288.713T14 12zm0-4q-.425 0-.712-.288T3 7t.288-.712T4 6h10q.425 0 .713.288T15 7t-.288.713T14 8zm12.775 12.475q-.125.075-.25.075t-.25-.05t-.2-.162t-.075-.263v-6.15q0-.15.075-.262t.2-.163t.25-.05t.25.075l4.6 3.05q.125.075.175.188t.05.237t-.05.238t-.175.187z"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M12 20.5s-7.5-4.6-7.5-10.1A4.4 4.4 0 0 1 12 7.6a4.4 4.4 0 0 1 7.5 2.8c0 5.5-7.5 10.1-7.5 10.1Z"/></symbol>
+  <symbol id="i-more" viewBox="0 0 16 16"><path fill="currentColor" d="M3 9.5a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3"/></symbol>
+  <symbol id="i-close" viewBox="0 0 384 512"><path fill="currentColor" d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></symbol>
+  <symbol id="i-bold" viewBox="0 0 18 18"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" d="M4 2h5.2a3.3 3.3 0 0 1 0 6.6H4V2Zm0 6.6h5.8a3.4 3.4 0 0 1 0 6.8H4V8.6Z"/></symbol>
+  <symbol id="i-italic" viewBox="0 0 18 18"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M7 2h6M4 15h6M10.5 2 7.5 15"/></symbol>
+  <symbol id="i-strike" viewBox="0 0 18 18"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M3 9h12M12.5 5.2C11.9 3.8 10.3 3 8.6 3 6.4 3 5 4.1 5 5.7c0 1.2.8 2 2.3 2.6M5.5 12c.5 1.5 2 2.4 3.8 2.4 2.2 0 3.7-1 3.7-2.7 0-.8-.3-1.4-.9-1.9"/></symbol>
+  <symbol id="i-heading" viewBox="0 0 18 18"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M2 3v12M8 3v12M2 9h6M11.5 4.5h4l-2.4 3.2A2.6 2.6 0 1 1 11 11.8"/></symbol>
+  <symbol id="i-list-num" viewBox="0 0 18 18"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M7 4.5h9M7 9h9M7 13.5h9M2 3.2h1v3M2 12h2v1.2l-2 .8V15h2"/></symbol>
+  <symbol id="i-quote" viewBox="0 0 18 18"><path fill="currentColor" d="M7 4.5C5 5.4 4 6.9 4 9v4.5h4.5V9H6.2c0-1.4.3-2.4 1.6-3.1L7 4.5Zm7.5 0c-2 .9-3 2.4-3 4.5v4.5H16V9h-2.3c0-1.4.3-2.4 1.6-3.1l-.8-1.4Z"/></symbol>
+  <symbol id="i-link" viewBox="0 0 18 18"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M7.4 10.6a3.2 3.2 0 0 0 4.6 0l2.4-2.4a3.2 3.2 0 0 0-4.6-4.6l-1 1M10.6 7.4a3.2 3.2 0 0 0-4.6 0l-2.4 2.4a3.2 3.2 0 0 0 4.6 4.6l1-1"/></symbol>
+  <symbol id="i-image" viewBox="0 0 18 18"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M2.5 3.5h13v11h-13v-11ZM2.5 11.5l3.6-3.2 3.1 2.7 2.4-2 3.9 3.4M7.5 6.6a1.1 1.1 0 1 1-2.2 0 1.1 1.1 0 0 1 2.2 0Z"/></symbol>
+  <symbol id="i-empty" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" d="M5 4.5h10.5v13.5a2 2 0 0 0 2 2H6a2 2 0 0 1-2-2v-12.5a1 1 0 0 1 1-1Zm10.5 5h3.5v8.5a2 2 0 0 1-4 0M7.5 8.5h4.5M7.5 12h4.5M7.5 15.5h3"/></symbol>
+</svg>
+
+<template id="tpl-topbar">
+  <a class="topbar__logo" href="#" aria-label="MoonCellar home"><img src="logo-text.png" alt=""></a>
+  <nav class="topnav" aria-label="Main">
+    <a href="#"><svg aria-hidden="true"><use href="#i-games"/></svg><span>Games</span></a>
+    <a href="#"><svg aria-hidden="true"><use href="#i-list"/></svg><span>Lists</span></a>
+    <a href="#"><svg aria-hidden="true"><use href="#i-gauntlet"/></svg><span>Gauntlet</span></a>
+    <a href="#"><svg aria-hidden="true"><use href="#i-random"/></svg><span>Random</span></a>
+    <a href="#" aria-current="page"><svg aria-hidden="true"><use href="#i-news"/></svg><span>News</span></a>
+    <a href="#"><svg aria-hidden="true"><use href="#i-search"/></svg><span>Search</span></a>
+  </nav>
+  <div class="topbar__end">
+    <span class="topbar__search" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></span>
+    <span class="av av--sm av-me" aria-label="Your profile">MV</span>
+    <span class="topbar__burger" aria-label="Menu"><svg aria-hidden="true"><use href="#i-burger"/></svg></span>
+  </div>
+</template>
+
+<template id="tpl-silk-head">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="#">Home</a><span class="crumbs__sep">›</span><a href="#"><svg aria-hidden="true"><use href="#i-chevron"/></svg>News</a><span class="crumbs__sep">›</span><span aria-current="page">Silksong a year later</span></nav>
+</template>
+
+<template id="tpl-silk-text-1">
+  <p>Hollow Knight: Silksong came out on 4 September 2025, and within a week it was the game added to the most backlogs on MoonCellar that month. A year on, the numbers have settled enough to say something about how people actually played it.</p>
+  <h3>Where players stopped</h3>
+  <p>Of the <b>1,912</b> players tracking the game here, <b>648</b> marked it completed and <b>97</b> went on to master it. Another 211 are still playing, many of them on a second run. The drop-off sits in the middle: 164 players marked it dropped, and two thirds of them logged under 15 hours.</p>
+  <blockquote>
+    <p>I bounced off it twice before the movement clicked. Third attempt, I finished it in a week.</p>
+    <footer>From a review on the game's page, rated 9 / 10</footer>
+  </blockquote>
+</template>
+
+<template id="tpl-silk-text-2">
+  <h3>How long a run takes</h3>
+  <p>The median completed playthrough logged on MoonCellar is <b>38 hours</b>. Players who mastered it report closer to 70. If you log your time in the playthrough window, your run is counted the next time we write one of these.</p>
+  <figure>
+    <div class="artwork art-silk"></div>
+    <figcaption>Screenshot from the game's press kit.</figcaption>
+  </figure>
+  <p>Still on the fence? Add it to your backlog from the panel next to this article and it will show up in the Gauntlet the next time you spin.</p>
+</template>
+
+<template id="tpl-news-text">
+  <p>MoonCellar now installs on Android as an app. It opens full screen, without the browser's address bar, and keeps you signed in between launches.</p>
+  <p>Everything else is the site you already use: the same library, lists, reviews and Gauntlet, updated the moment we ship a change. There is nothing to sync and nothing to update by hand.</p>
+  <h3>Install it</h3>
+  <ul>
+    <li>Open <a href="#">mooncellar.space/android</a> on your phone and download the latest version.</li>
+    <li>Open the file. Android asks once to allow installs from your browser.</li>
+    <li>Sign in with the account you already have.</li>
+  </ul>
+  <h3>What it does not do yet</h3>
+  <p>Notifications still arrive by e-mail and on the bell in the header. Push notifications on Android are next.</p>
+</template>
+
+<div class="shell">
+  <header class="masthead">
+    <p class="eyebrow">MoonCellar · news and articles</p>
+    <h1>News and articles</h1>
+    <p class="lede">
+      A new section where admins publish two kinds of posts: <b>site news</b> (plain text, like a
+      changelog entry with a picture) and <b>game articles</b>, which are written about one game
+      from the catalogue and show that game next to the text, with its cover, score and the same
+      tracking controls as a game card. What is being decided is where that game sits while
+      someone reads, and how the feed looks. All three options use the same data and the same
+      editor; they differ only in layout.
+    </p>
+    <dl class="brief">
+      <div>
+        <dt>Decision</dt>
+        <dd>Variant A. Beside the feed: an archive by year and month and a game filter, not a "Games in the news" panel, since every game article already names its game. B and C stay below for reference.</dd>
+      </div>
+      <div>
+        <dt>Routes</dt>
+        <dd><code class="t">/news</code> for the feed, <code class="t">/news/[slug]</code> for a post. Both rendered on the server: posts are meant to be shared and found in search. The header gets a News link. The archive and the game filter live in the query string: <code class="t">/news?year=2026&amp;month=9</code>, <code class="t">/news?game=signalis</code>.</dd>
+      </div>
+      <div>
+        <dt>Two kinds of post</dt>
+        <dd>Site news: title, summary, optional image, text. Game article: the same plus one linked game. Without its own image it takes the game's artwork.</dd>
+      </div>
+      <div>
+        <dt>Who writes</dt>
+        <dd>Admins only, from <code class="t">/admin/news</code>. The text is the shared <code class="t">RichEditor</code> and goes through the API's <code class="t">sanitizeRichText</code>, like reviews.</dd>
+      </div>
+      <div>
+        <dt>Link previews</dt>
+        <dd>The post's image as <code class="t">og:image</code>; a game article without one uses the game's cover, as game pages do; otherwise <code class="t">og-default.png</code>.</dd>
+      </div>
+    </dl>
+    <nav class="jump" aria-label="Sections">
+      <a href="#variant-a"><b>A</b> Sidecar</a>
+      <a href="#variant-b"><b>B</b> Game frame</a>
+      <a href="#variant-c"><b>C</b> Timeline and dock</a>
+      <a href="#writing">Writing a post</a>
+      <a href="#states">States</a>
+      <a href="#compare">Comparison</a>
+    </nav>
+  </header>
+
+  <!-- =================================================================== A -->
+
+  <section class="variant" id="variant-a" aria-labelledby="variant-a-title">
+    <div class="variant__head">
+      <span class="variant__letter">A</span>
+      <h2 id="variant-a-title">Sidecar</h2>
+      <span class="badge badge--accent">Chosen</span>
+    </div>
+    <p class="variant__thesis">
+      The text gets the wide column and the game gets a fixed column on the right that stays put
+      while you scroll: cover, score, how MoonCellar players are getting on with it, and the four
+      tracking controls. Site news uses the same frame and puts the latest posts in that column.
+      The feed keeps the article's two columns: the list, and beside it an archive by year and
+      month with post counts, plus a search for articles about one game, the way blogs do it.
+      Below 900px the archive becomes one dropdown above the list. Trades text width for keeping
+      the game in view the whole time.
+    </p>
+
+    <div class="stage">
+      <p class="stage__context">/news · feed · 1280px</p>
+      <div class="site">
+        <header class="topbar" data-fill="tpl-topbar"></header>
+        <div class="page a-feed">
+          <div class="box a-feed__head">
+            <nav class="crumbs" aria-label="Breadcrumb"><a href="#"><svg aria-hidden="true"><use href="#i-chevron"/></svg>Home</a><span class="crumbs__sep">›</span><span aria-current="page">News</span></nav>
+            <div class="headrow">
+              <h1 class="stitle">News</h1>
+              <a class="btn btn--accent" href="#writing"><svg aria-hidden="true"><use href="#i-plus"/></svg>Write a post</a>
+            </div>
+            <div class="seg" role="group" aria-label="Show posts">
+              <button class="seg__btn" type="button" aria-pressed="true">All <span class="seg__count">24</span></button>
+              <button class="seg__btn" type="button" aria-pressed="false">Site news <span class="seg__count">9</span></button>
+              <button class="seg__btn" type="button" aria-pressed="false">Game articles <span class="seg__count">15</span></button>
+            </div>
+          </div>
+
+          <div class="box">
+            <ul class="frows">
+              <li><a class="frow" href="#">
+                <div class="frow__thumb"><div class="artwork art-silk"></div></div>
+                <div class="frow__body">
+                  <span class="gref"><span class="cover art-silk"></span>Hollow Knight: Silksong</span>
+                  <h3 class="frow__title clamp-2">Silksong a year later: how far MoonCellar players got</h3>
+                  <p class="frow__excerpt clamp-2">648 of the 1,912 players tracking it here have finished it. Where the rest stopped, and how long a run really takes.</p>
+                  <p class="meta"><span>22 Oct 2026</span><span class="meta__sep"></span><span>6 min read</span></p>
+                </div>
+              </a></li>
+              <li><a class="frow" href="#">
+                <div class="frow__thumb"><div class="artwork art-site"></div></div>
+                <div class="frow__body">
+                  <span class="badge badge--muted">Site news</span>
+                  <h3 class="frow__title clamp-2">MoonCellar now has an Android app</h3>
+                  <p class="frow__excerpt clamp-2">Full screen, no address bar, signed in with your account. Same library, same lists, same Gauntlet.</p>
+                  <p class="meta"><span>17 Oct 2026</span><span class="meta__sep"></span><span>2 min read</span></p>
+                </div>
+              </a></li>
+              <li><a class="frow" href="#">
+                <div class="frow__thumb"><div class="artwork art-clair"></div></div>
+                <div class="frow__body">
+                  <span class="gref"><span class="cover art-clair"></span>Clair Obscur: Expedition 33</span>
+                  <h3 class="frow__title clamp-2">Clair Obscur: Expedition 33 is a rhythm game in disguise</h3>
+                  <p class="frow__excerpt clamp-2">Every fight is a timing test, and the turn-based menus are the sheet music. Why it clicks for some players and not others.</p>
+                  <p class="meta"><span>9 Oct 2026</span><span class="meta__sep"></span><span>5 min read</span></p>
+                </div>
+              </a></li>
+              <li><a class="frow" href="#">
+                <div class="frow__thumb"><div class="thumb-mark"><img src="logo-icon.png" alt=""></div></div>
+                <div class="frow__body">
+                  <span class="badge badge--muted">Site news</span>
+                  <h3 class="frow__title clamp-2">RetroAchievements progress now shows on game cards</h3>
+                  <p class="frow__excerpt clamp-2">If your RetroAchievements account is linked, beaten and mastered sets now show as a badge on every game card.</p>
+                  <p class="meta"><span>2 Oct 2026</span><span class="meta__sep"></span><span>1 min read</span></p>
+                </div>
+              </a></li>
+              <li><a class="frow" href="#">
+                <div class="frow__thumb"><div class="artwork art-signalis"></div></div>
+                <div class="frow__body">
+                  <span class="gref"><span class="cover art-signalis"></span>Signalis</span>
+                  <h3 class="frow__title clamp-2">Four years on, Signalis is still the best survival horror game sitting in your backlog, and here is why you should move it to the top this autumn</h3>
+                  <p class="frow__excerpt clamp-2">1,104 players have it on their backlog and 214 have finished it. A case for moving it up, without spoilers.</p>
+                  <p class="meta"><span>24 Sep 2026</span><span class="meta__sep"></span><span>7 min read</span></p>
+                </div>
+              </a></li>
+            </ul>
+            <div class="pager" aria-label="Pages"><span class="on">1</span><span>2</span><span>3</span><span><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></div>
+          </div>
+
+          <aside class="box a-feed__side">
+            <h2 class="box__title">Archive</h2>
+            <ul class="arch">
+              <li><a class="arch__row arch__row--all" href="#" aria-current="true"><svg aria-hidden="true"><use href="#i-chevron"/></svg>All posts<span>24</span></a></li>
+              <li>
+                <a class="arch__row arch__year" href="#" aria-expanded="true"><svg aria-hidden="true"><use href="#i-chevron"/></svg>2026<span>18</span></a>
+                <ul class="arch__months">
+                  <li><a class="arch__row" href="#">October<span>4</span></a></li>
+                  <li><a class="arch__row" href="#">September<span>3</span></a></li>
+                  <li><a class="arch__row" href="#">August<span>2</span></a></li>
+                  <li><a class="arch__row" href="#">July<span>3</span></a></li>
+                  <li><a class="arch__row" href="#">June<span>2</span></a></li>
+                  <li><a class="arch__row" href="#">May<span>1</span></a></li>
+                  <li><a class="arch__row" href="#">April<span>1</span></a></li>
+                  <li><a class="arch__row" href="#">March<span>1</span></a></li>
+                  <li><a class="arch__row" href="#">January<span>1</span></a></li>
+                </ul>
+              </li>
+              <li><a class="arch__row arch__year" href="#" aria-expanded="false"><svg aria-hidden="true"><use href="#i-chevron"/></svg>2025<span>6</span></a></li>
+            </ul>
+            <div class="side-group">
+              <span class="side-group__label">About a game</span>
+              <span class="input input--placeholder"><svg class="lead" aria-hidden="true"><use href="#i-search"/></svg><span class="input__grow">Find a game…</span></span>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <p class="stage__context">/news?year=2026&amp;month=9 · archive filter applied · 1280px</p>
+      <div class="site">
+        <header class="topbar" data-fill="tpl-topbar"></header>
+        <div class="page a-feed">
+          <div class="box a-feed__head">
+            <nav class="crumbs" aria-label="Breadcrumb"><a href="#"><svg aria-hidden="true"><use href="#i-chevron"/></svg>Home</a><span class="crumbs__sep">›</span><span aria-current="page">News</span></nav>
+            <div class="headrow">
+              <h1 class="stitle">News</h1>
+              <a class="btn btn--accent" href="#writing"><svg aria-hidden="true"><use href="#i-plus"/></svg>Write a post</a>
+            </div>
+            <div class="feed-filters">
+              <div class="seg" role="group" aria-label="Show posts">
+                <button class="seg__btn" type="button" aria-pressed="true">All <span class="seg__count">3</span></button>
+                <button class="seg__btn" type="button" aria-pressed="false">Site news <span class="seg__count">1</span></button>
+                <button class="seg__btn" type="button" aria-pressed="false">Game articles <span class="seg__count">2</span></button>
+              </div>
+              <div class="applied">
+                <span class="pill">September 2026 <svg aria-hidden="true"><use href="#i-close"/></svg></span>
+                <span class="clear">Clear all</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="box">
+            <ul class="frows">
+              <li><a class="frow" href="#">
+                <div class="frow__thumb"><div class="artwork art-signalis"></div></div>
+                <div class="frow__body">
+                  <span class="gref"><span class="cover art-signalis"></span>Signalis</span>
+                  <h3 class="frow__title clamp-2">Four years on, Signalis is still the best survival horror game sitting in your backlog</h3>
+                  <p class="frow__excerpt clamp-2">1,104 players have it on their backlog and 214 have finished it. A case for moving it up, without spoilers.</p>
+                  <p class="meta"><span>24 Sep 2026</span><span class="meta__sep"></span><span>7 min read</span></p>
+                </div>
+              </a></li>
+              <li><a class="frow" href="#">
+                <div class="frow__thumb"><div class="artwork art-outer"></div></div>
+                <div class="frow__body">
+                  <span class="gref"><span class="cover art-outer"></span>Outer Wilds</span>
+                  <h3 class="frow__title clamp-2">Outer Wilds: play it before anyone tells you anything</h3>
+                  <p class="frow__excerpt clamp-2">The one game where reading a review can ruin it. So this one has no spoilers, only reasons.</p>
+                  <p class="meta"><span>11 Sep 2026</span><span class="meta__sep"></span><span>4 min read</span></p>
+                </div>
+              </a></li>
+              <li><a class="frow" href="#">
+                <div class="frow__thumb"><div class="artwork art-lists"></div></div>
+                <div class="frow__body">
+                  <span class="badge badge--muted">Site news</span>
+                  <h3 class="frow__title clamp-2">Lists get their own catalogue</h3>
+                  <p class="frow__excerpt clamp-2">Every public list now has a place to be found: search by name, author or the games inside it.</p>
+                  <p class="meta"><span>3 Sep 2026</span><span class="meta__sep"></span><span>2 min read</span></p>
+                </div>
+              </a></li>
+            </ul>
+          </div>
+
+          <aside class="box a-feed__side">
+            <h2 class="box__title">Archive</h2>
+            <ul class="arch">
+              <li><a class="arch__row arch__row--all" href="#"><svg aria-hidden="true"><use href="#i-chevron"/></svg>All posts<span>24</span></a></li>
+              <li>
+                <a class="arch__row arch__year" href="#" aria-expanded="true"><svg aria-hidden="true"><use href="#i-chevron"/></svg>2026<span>18</span></a>
+                <ul class="arch__months">
+                  <li><a class="arch__row" href="#">October<span>4</span></a></li>
+                  <li><a class="arch__row" href="#" aria-current="true">September<span>3</span></a></li>
+                  <li><a class="arch__row" href="#">August<span>2</span></a></li>
+                  <li><a class="arch__row" href="#">July<span>3</span></a></li>
+                  <li><a class="arch__row" href="#">June<span>2</span></a></li>
+                  <li><a class="arch__row" href="#">May<span>1</span></a></li>
+                  <li><a class="arch__row" href="#">April<span>1</span></a></li>
+                  <li><a class="arch__row" href="#">March<span>1</span></a></li>
+                  <li><a class="arch__row" href="#">January<span>1</span></a></li>
+                </ul>
+              </li>
+              <li><a class="arch__row arch__year" href="#" aria-expanded="false"><svg aria-hidden="true"><use href="#i-chevron"/></svg>2025<span>6</span></a></li>
+            </ul>
+            <div class="side-group">
+              <span class="side-group__label">About a game</span>
+              <span class="input input--placeholder"><svg class="lead" aria-hidden="true"><use href="#i-search"/></svg><span class="input__grow">Find a game…</span></span>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <p class="stage__context">/news/silksong-a-year-later · game article · 1280px · <em>scroll inside the frame: the game panel stays</em></p>
+      <div class="site site--scroll art-silk">
+        <header class="topbar" data-fill="tpl-topbar"></header>
+        <div class="page a-read">
+          <div class="box a-read__head">
+            <div data-fill="tpl-silk-head" data-inline></div>
+            <p class="meta"><span class="badge badge--accent">Game article</span><span>22 Oct 2026</span><span class="meta__sep"></span><span>6 min read</span></p>
+            <h1 class="headline">Silksong a year later: how far MoonCellar players got</h1>
+            <p class="summary">A year after release, 648 of the 1,912 players tracking Hollow Knight: Silksong here have finished it. Here is where the rest stopped, and what the 97 who mastered it say about the last stretch.</p>
+            <p class="byline"><span class="av av-admin">NS</span><span>by <b>nightshift</b></span></p>
+          </div>
+          <article class="box a-read__body readcol">
+            <figure class="hero-img"><div class="artwork art-silk"></div></figure>
+            <div class="prose" data-fill="tpl-silk-text-1 tpl-silk-text-2"></div>
+          </article>
+          <aside class="a-read__side">
+            <div class="box gpanel">
+              <p class="gpanel__label">The game in this article</p>
+              <div class="gpanel__game">
+                <span class="cover art-silk"></span>
+                <div class="gpanel__info">
+                  <a class="gpanel__name" href="#">Hollow Knight: Silksong</a>
+                  <span class="gpanel__sub">2025 · Team Cherry</span>
+                  <div class="chips"><span class="chip">Platform</span><span class="chip">Adventure</span><span class="chip">Indie</span></div>
+                </div>
+              </div>
+              <div class="gpanel__stats">
+                <div class="gpanel__scoreline"><span class="score">8.9 <small>/ 10</small></span><span>412 ratings</span></div>
+                <div class="dist" aria-label="How 1,912 players track it">
+                  <i style="--n: 648; --c: var(--game-completed-color)"></i>
+                  <i style="--n: 97; --c: var(--game-mastered-color)"></i>
+                  <i style="--n: 211; --c: var(--game-playing-color)"></i>
+                  <i style="--n: 402; --c: var(--game-backlog-color)"></i>
+                  <i style="--n: 390; --c: var(--game-wishlist-color)"></i>
+                  <i style="--n: 164; --c: var(--game-dropped-color)"></i>
+                </div>
+                <ul class="legend">
+                  <li style="--c: var(--game-completed-color)">648 completed</li>
+                  <li style="--c: var(--game-mastered-color)">97 mastered</li>
+                  <li style="--c: var(--game-playing-color)">211 playing</li>
+                  <li style="--c: var(--game-backlog-color)">402 backlog</li>
+                  <li style="--c: var(--game-wishlist-color)">390 wishlist</li>
+                  <li style="--c: var(--game-dropped-color)">164 dropped</li>
+                </ul>
+              </div>
+              <div class="gpanel__actions">
+                <div class="gctl">
+                  <button class="gctl__btn" type="button" aria-label="Playthroughs · Playing"><span class="gctl__glyph gctl__glyph--playing gctl__glyph--on"><svg aria-hidden="true"><use href="#i-play"/></svg></span></button>
+                  <button class="gctl__btn" type="button" aria-label="Add to favourites"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+                  <button class="gctl__btn" type="button" aria-label="Add to a list"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-list"/></svg></span></button>
+                  <button class="gctl__btn" type="button" aria-label="External links"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-more"/></svg></span></button>
+                </div>
+                <a class="btn btn--block" href="#">Open game page</a>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <p class="stage__context">/news/mooncellar-on-android · site news · 1280px</p>
+      <div class="site site--scroll">
+        <header class="topbar" data-fill="tpl-topbar"></header>
+        <div class="page a-read a-read--news">
+          <div class="box a-read__head">
+            <nav class="crumbs" aria-label="Breadcrumb"><a href="#">Home</a><span class="crumbs__sep">›</span><a href="#"><svg aria-hidden="true"><use href="#i-chevron"/></svg>News</a><span class="crumbs__sep">›</span><span aria-current="page">MoonCellar now has an Android app</span></nav>
+            <p class="meta"><span class="badge badge--muted">Site news</span><span>17 Oct 2026</span><span class="meta__sep"></span><span>2 min read</span></p>
+            <h1 class="headline">MoonCellar now has an Android app</h1>
+            <p class="summary">Full screen, no address bar, and signed in with the account you already have.</p>
+          </div>
+          <article class="box a-read__body readcol">
+            <figure class="hero-img"><div class="artwork art-site"></div></figure>
+            <div class="prose" data-fill="tpl-news-text"></div>
+          </article>
+          <aside class="a-read__side">
+            <div class="box">
+              <h2 class="box__title">Latest posts</h2>
+              <div class="latest">
+                <a href="#"><b>Silksong a year later: how far MoonCellar players got</b><small>22 Oct · Hollow Knight: Silksong</small></a>
+                <a href="#"><b>Clair Obscur: Expedition 33 is a rhythm game in disguise</b><small>9 Oct · Clair Obscur: Expedition 33</small></a>
+                <a href="#"><b>RetroAchievements progress now shows on game cards</b><small>2 Oct · Site news</small></a>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <p class="stage__context">Phone · 390px · the archive becomes a dropdown; the game panel slots in between the title and the text</p>
+      <div class="phones">
+        <div class="phone">
+          <p class="stage__context">Feed</p>
+          <div class="site site--scroll">
+            <header class="topbar" data-fill="tpl-topbar"></header>
+            <div class="page a-feed">
+              <div class="box a-feed__head">
+                <nav class="crumbs" aria-label="Breadcrumb"><a href="#"><svg aria-hidden="true"><use href="#i-chevron"/></svg>Home</a><span class="crumbs__sep">›</span><span aria-current="page">News</span></nav>
+                <h1 class="stitle">News</h1>
+                <div class="seg" role="group" aria-label="Show posts">
+                  <button class="seg__btn" type="button" aria-pressed="true">All <span class="seg__count">24</span></button>
+                  <button class="seg__btn" type="button" aria-pressed="false">Site news <span class="seg__count">9</span></button>
+                  <button class="seg__btn" type="button" aria-pressed="false">Game articles <span class="seg__count">15</span></button>
+                </div>
+                <span class="input"><svg class="lead" aria-hidden="true"><use href="#i-calendar"/></svg><span class="input__grow">All time</span><svg class="chev" aria-hidden="true"><use href="#i-chevron"/></svg></span>
+              </div>
+              <div class="box">
+                <ul class="frows">
+                  <li><a class="frow" href="#"><div class="frow__thumb"><div class="artwork art-silk"></div></div><div class="frow__body"><span class="gref"><span class="cover art-silk"></span>Hollow Knight: Silksong</span><h3 class="frow__title clamp-2">Silksong a year later: how far MoonCellar players got</h3><p class="meta"><span>22 Oct</span><span class="meta__sep"></span><span>6 min</span></p></div></a></li>
+                  <li><a class="frow" href="#"><div class="frow__thumb"><div class="artwork art-site"></div></div><div class="frow__body"><span class="badge badge--muted">Site news</span><h3 class="frow__title clamp-2">MoonCellar now has an Android app</h3><p class="meta"><span>17 Oct</span><span class="meta__sep"></span><span>2 min</span></p></div></a></li>
+                  <li><a class="frow" href="#"><div class="frow__thumb"><div class="artwork art-clair"></div></div><div class="frow__body"><span class="gref"><span class="cover art-clair"></span>Clair Obscur: Expedition 33</span><h3 class="frow__title clamp-2">Clair Obscur: Expedition 33 is a rhythm game in disguise</h3><p class="meta"><span>9 Oct</span><span class="meta__sep"></span><span>5 min</span></p></div></a></li>
+                  <li><a class="frow" href="#"><div class="frow__thumb"><div class="thumb-mark"><img src="logo-icon.png" alt=""></div></div><div class="frow__body"><span class="badge badge--muted">Site news</span><h3 class="frow__title clamp-2">RetroAchievements progress now shows on game cards</h3><p class="meta"><span>2 Oct</span><span class="meta__sep"></span><span>1 min</span></p></div></a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="phone">
+          <p class="stage__context">Game article</p>
+          <div class="site site--scroll art-silk">
+            <header class="topbar" data-fill="tpl-topbar"></header>
+            <div class="page a-read">
+              <div class="box a-read__head">
+                <div data-fill="tpl-silk-head" data-inline></div>
+                <p class="meta"><span class="badge badge--accent">Game article</span><span>22 Oct 2026</span><span class="meta__sep"></span><span>6 min</span></p>
+                <h1 class="headline">Silksong a year later: how far MoonCellar players got</h1>
+                <p class="byline"><span class="av av-admin">NS</span><span>by <b>nightshift</b></span></p>
+              </div>
+              <aside class="a-read__side">
+                <div class="box gpanel">
+                  <div class="gpanel__game">
+                    <span class="cover art-silk"></span>
+                    <div class="gpanel__info">
+                      <a class="gpanel__name" href="#">Hollow Knight: Silksong</a>
+                      <span class="gpanel__sub">2025 · Team Cherry · <span class="score">8.9 <small>/ 10</small></span></span>
+                    </div>
+                  </div>
+                  <div class="gpanel__actions">
+                    <div class="gctl">
+                      <button class="gctl__btn" type="button" aria-label="Playthroughs · Playing"><span class="gctl__glyph gctl__glyph--playing gctl__glyph--on"><svg aria-hidden="true"><use href="#i-play"/></svg></span></button>
+                      <button class="gctl__btn" type="button" aria-label="Add to favourites"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+                      <button class="gctl__btn" type="button" aria-label="Add to a list"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-list"/></svg></span></button>
+                      <button class="gctl__btn" type="button" aria-label="External links"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-more"/></svg></span></button>
+                    </div>
+                    <a class="btn btn--block" href="#">Open game page</a>
+                  </div>
+                </div>
+              </aside>
+              <article class="box a-read__body readcol">
+                <div class="prose" data-fill="tpl-silk-text-1"></div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pros">
+      <div><h3>Gains</h3><ul><li>The game never leaves the screen on desktop, which is exactly the brief.</li><li>Room for tracker data no other site has: how many players finished it, dropped it, are playing it.</li><li>One page skeleton for both kinds of post; only the right column changes.</li></ul></div>
+      <div><h3>Costs</h3><ul><li>Text and panel share the row: between 900 and 1080px the text gets narrower than in B and C.</li><li>On a phone the panel is seen once, under the title, and scrolls away.</li><li>Looks like a classic blog; the least MoonCellar-specific of the three.</li></ul></div>
+    </div>
+  </section>
+
+  <!-- =================================================================== B -->
+
+  <section class="variant" id="variant-b" aria-labelledby="variant-b-title">
+    <div class="variant__head">
+      <span class="variant__letter">B</span>
+      <h2 id="variant-b-title">Game frame</h2>
+    </div>
+    <p class="variant__thesis">
+      A game article opens the way a game page does: the game's artwork across the top, the cover
+      overlapping it, and the background of the whole page taken from the game. The title of the
+      article sits where the game's name would, with the game's name above it as a link and the
+      tracking controls beside it. The text below runs in one centred column. The feed is a
+      magazine: a lead story, then cards that carry the same cover-over-artwork mark. Trades
+      keeping the game in view for a page that clearly belongs to that game.
+    </p>
+
+    <div class="stage">
+      <p class="stage__context">/news · feed · 1280px</p>
+      <div class="site">
+        <header class="topbar" data-fill="tpl-topbar"></header>
+        <div class="page">
+          <div class="box">
+            <nav class="crumbs" aria-label="Breadcrumb"><a href="#"><svg aria-hidden="true"><use href="#i-chevron"/></svg>Home</a><span class="crumbs__sep">›</span><span aria-current="page">News</span></nav>
+            <div class="headrow">
+              <h1 class="stitle">News</h1>
+              <div class="seg" role="group" aria-label="Show posts">
+                <button class="seg__btn" type="button" aria-pressed="true">All <span class="seg__count">24</span></button>
+                <button class="seg__btn" type="button" aria-pressed="false">Site news <span class="seg__count">9</span></button>
+                <button class="seg__btn" type="button" aria-pressed="false">Game articles <span class="seg__count">15</span></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="b-mag">
+            <a class="b-card b-card--lead" href="#">
+              <div class="artwork art-silk"></div>
+              <div class="b-card__body">
+                <div class="b-card__game"><span class="cover art-silk"></span><span><b>Hollow Knight: Silksong</b><small>2025 · Team Cherry</small></span></div>
+                <h2 class="b-card__title">Silksong a year later: how far MoonCellar players got</h2>
+                <p class="b-card__excerpt clamp-3">648 of the 1,912 players tracking it here have finished it. Where the rest stopped, how long a run really takes, and what the 97 who mastered it say about the last stretch.</p>
+                <p class="b-card__meta">22 Oct 2026 · 6 min read · by nightshift</p>
+              </div>
+            </a>
+            <div class="b-mag__side">
+              <a class="b-card b-card--compact" href="#">
+                <div class="artwork art-site"></div>
+                <div class="b-card__body">
+                  <span class="badge badge--muted">Site news</span>
+                  <h3 class="b-card__title">MoonCellar now has an Android app</h3>
+                  <p class="b-card__meta">17 Oct 2026 · 2 min read</p>
+                </div>
+              </a>
+              <a class="b-card b-card--compact" href="#">
+                <div class="artwork art-clair"></div>
+                <div class="b-card__body">
+                  <div class="b-card__game"><span class="cover art-clair"></span><span><b>Clair Obscur: Expedition 33</b><small>2025</small></span></div>
+                  <h3 class="b-card__title">Clair Obscur: Expedition 33 is a rhythm game in disguise</h3>
+                  <p class="b-card__meta">9 Oct 2026 · 5 min read</p>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <div class="b-grid">
+            <a class="b-card" href="#">
+              <div class="artwork thumb-mark"><img src="logo-icon.png" alt=""></div>
+              <div class="b-card__body">
+                <span class="badge badge--muted">Site news</span>
+                <h3 class="b-card__title clamp-2">RetroAchievements progress now shows on game cards</h3>
+                <p class="b-card__excerpt clamp-2">If your account is linked, beaten and mastered sets now show as a badge on every game card.</p>
+                <p class="b-card__meta">2 Oct 2026 · 1 min read</p>
+              </div>
+            </a>
+            <a class="b-card" href="#">
+              <div class="artwork art-signalis"></div>
+              <div class="b-card__body">
+                <div class="b-card__game"><span class="cover art-signalis"></span><span><b>Signalis</b><small>2022</small></span></div>
+                <h3 class="b-card__title clamp-2">Four years on, Signalis is still the best survival horror game sitting in your backlog</h3>
+                <p class="b-card__excerpt clamp-2">1,104 players have it on their backlog and 214 have finished it. A case for moving it up.</p>
+                <p class="b-card__meta">24 Sep 2026 · 7 min read</p>
+              </div>
+            </a>
+            <a class="b-card" href="#">
+              <div class="artwork art-outer"></div>
+              <div class="b-card__body">
+                <div class="b-card__game"><span class="cover art-outer"></span><span><b>Outer Wilds</b><small>2019</small></span></div>
+                <h3 class="b-card__title clamp-2">Outer Wilds: play it before anyone tells you anything</h3>
+                <p class="b-card__excerpt clamp-2">The one game where reading a review can ruin it. So this one has no spoilers, only reasons.</p>
+                <p class="b-card__meta">11 Sep 2026 · 4 min read</p>
+              </div>
+            </a>
+          </div>
+          <div class="pager" aria-label="Pages"><span class="on">1</span><span>2</span><span>3</span><span><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <p class="stage__context">/news/silksong-a-year-later · game article · 1280px · <em>the page background is the game's artwork</em></p>
+      <div class="site site--scroll art-silk">
+        <header class="topbar" data-fill="tpl-topbar"></header>
+        <div class="page">
+          <div class="box b-hero">
+            <div class="b-hero__banner">
+              <div class="artwork art-silk"></div>
+              <div class="b-hero__scrim"></div>
+              <div class="b-hero__crumbs" data-fill="tpl-silk-head"></div>
+            </div>
+            <div class="b-hero__body">
+              <div class="b-hero__cover"><span class="cover art-silk"></span></div>
+              <div class="b-hero__main">
+                <p class="b-hero__kicker"><a href="#">Hollow Knight: Silksong</a><span>2025 · Team Cherry</span><span class="score">8.9 <small>/ 10</small></span></p>
+                <h1 class="headline">Silksong a year later: how far MoonCellar players got</h1>
+                <p class="meta"><span class="badge badge--accent">Game article</span><span class="byline"><span class="av av--sm av-admin">NS</span>nightshift</span><span class="meta__sep"></span><span>22 Oct 2026</span><span class="meta__sep"></span><span>6 min read</span></p>
+              </div>
+              <div class="b-hero__side">
+                <div class="gctl">
+                  <button class="gctl__btn" type="button" aria-label="Playthroughs · Playing"><span class="gctl__glyph gctl__glyph--playing gctl__glyph--on"><svg aria-hidden="true"><use href="#i-play"/></svg></span></button>
+                  <button class="gctl__btn" type="button" aria-label="Add to favourites"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+                  <button class="gctl__btn" type="button" aria-label="Add to a list"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-list"/></svg></span></button>
+                  <button class="gctl__btn" type="button" aria-label="External links"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-more"/></svg></span></button>
+                </div>
+                <a class="btn" href="#">Open game page</a>
+              </div>
+            </div>
+          </div>
+          <article class="box b-body readcol">
+            <p class="summary">A year after release, 648 of the 1,912 players tracking Hollow Knight: Silksong here have finished it. Here is where the rest stopped, and what the 97 who mastered it say about the last stretch.</p>
+            <div class="prose" data-fill="tpl-silk-text-1 tpl-silk-text-2"></div>
+            <div class="b-body__end">
+              <span class="byline"><span class="av av-admin">NS</span><span>Written by <b>nightshift</b></span></span>
+              <a class="btn btn--ghost" href="#">More about Hollow Knight: Silksong <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <p class="stage__context">/news/mooncellar-on-android · site news · 1280px · <em>no game: the banner is the post's own image</em></p>
+      <div class="site site--scroll">
+        <header class="topbar" data-fill="tpl-topbar"></header>
+        <div class="page">
+          <div class="box b-hero b-hero--news">
+            <div class="b-hero__banner">
+              <div class="artwork art-site"></div>
+              <div class="b-hero__scrim"></div>
+              <div class="b-hero__crumbs"><nav class="crumbs" aria-label="Breadcrumb"><a href="#">Home</a><span class="crumbs__sep">›</span><a href="#"><svg aria-hidden="true"><use href="#i-chevron"/></svg>News</a><span class="crumbs__sep">›</span><span aria-current="page">MoonCellar now has an Android app</span></nav></div>
+            </div>
+            <div class="b-hero__body">
+              <div class="b-hero__main">
+                <h1 class="headline">MoonCellar now has an Android app</h1>
+                <p class="meta"><span class="badge badge--muted">Site news</span><span>17 Oct 2026</span><span class="meta__sep"></span><span>2 min read</span></p>
+              </div>
+            </div>
+          </div>
+          <article class="box b-body readcol">
+            <p class="summary">Full screen, no address bar, and signed in with the account you already have.</p>
+            <div class="prose" data-fill="tpl-news-text"></div>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <p class="stage__context">Phone · 390px · the hero centres, as the game page does at this width</p>
+      <div class="phones">
+        <div class="phone">
+          <p class="stage__context">Feed</p>
+          <div class="site site--scroll">
+            <header class="topbar" data-fill="tpl-topbar"></header>
+            <div class="page">
+              <div class="box">
+                <h1 class="stitle">News</h1>
+                <div class="seg" role="group" aria-label="Show posts">
+                  <button class="seg__btn" type="button" aria-pressed="true">All <span class="seg__count">24</span></button>
+                  <button class="seg__btn" type="button" aria-pressed="false">Site news <span class="seg__count">9</span></button>
+                  <button class="seg__btn" type="button" aria-pressed="false">Game articles <span class="seg__count">15</span></button>
+                </div>
+              </div>
+              <div class="b-mag">
+                <a class="b-card b-card--lead" href="#">
+                  <div class="artwork art-silk"></div>
+                  <div class="b-card__body">
+                    <div class="b-card__game"><span class="cover art-silk"></span><span><b>Hollow Knight: Silksong</b><small>2025 · Team Cherry</small></span></div>
+                    <h2 class="b-card__title">Silksong a year later: how far MoonCellar players got</h2>
+                    <p class="b-card__excerpt clamp-3">648 of the 1,912 players tracking it here have finished it. Where the rest stopped, and how long a run really takes.</p>
+                    <p class="b-card__meta">22 Oct 2026 · 6 min read</p>
+                  </div>
+                </a>
+                <div class="b-mag__side">
+                  <a class="b-card b-card--compact" href="#">
+                    <div class="artwork art-site"></div>
+                    <div class="b-card__body">
+                      <span class="badge badge--muted">Site news</span>
+                      <h3 class="b-card__title">MoonCellar now has an Android app</h3>
+                      <p class="b-card__meta">17 Oct 2026 · 2 min read</p>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="phone">
+          <p class="stage__context">Game article</p>
+          <div class="site site--scroll art-silk">
+            <header class="topbar" data-fill="tpl-topbar"></header>
+            <div class="page">
+              <div class="box b-hero">
+                <div class="b-hero__banner">
+                  <div class="artwork art-silk"></div>
+                  <div class="b-hero__scrim"></div>
+                  <div class="b-hero__crumbs" data-fill="tpl-silk-head"></div>
+                </div>
+                <div class="b-hero__body">
+                  <div class="b-hero__cover"><span class="cover art-silk"></span></div>
+                  <div class="b-hero__main">
+                    <p class="b-hero__kicker"><a href="#">Hollow Knight: Silksong</a><span>2025</span><span class="score">8.9 <small>/ 10</small></span></p>
+                    <h1 class="headline">Silksong a year later: how far MoonCellar players got</h1>
+                    <p class="meta"><span>22 Oct 2026</span><span class="meta__sep"></span><span>6 min read</span></p>
+                  </div>
+                  <div class="b-hero__side">
+                    <div class="gctl">
+                      <button class="gctl__btn" type="button" aria-label="Playthroughs · Playing"><span class="gctl__glyph gctl__glyph--playing gctl__glyph--on"><svg aria-hidden="true"><use href="#i-play"/></svg></span></button>
+                      <button class="gctl__btn" type="button" aria-label="Add to favourites"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+                      <button class="gctl__btn" type="button" aria-label="Add to a list"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-list"/></svg></span></button>
+                      <button class="gctl__btn" type="button" aria-label="External links"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-more"/></svg></span></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <article class="box b-body readcol">
+                <div class="prose" data-fill="tpl-silk-text-1"></div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pros">
+      <div><h3>Gains</h3><ul><li>Reads as part of MoonCellar: the same hero, cover offset and background as a game page.</li><li>The text keeps a full centred column, the most comfortable to read of the three.</li><li>The feed has a clear lead story, so a big article gets the attention it deserves.</li></ul></div>
+      <div><h3>Costs</h3><ul><li>Once the hero scrolls away, the game is gone until the end of the article.</li><li>Every game article needs good artwork; a game without any falls back to a plain banner.</li><li>The magazine grid needs a lead story; a week of short site news makes it look thin.</li></ul></div>
+    </div>
+  </section>
+
+  <!-- =================================================================== C -->
+
+  <section class="variant" id="variant-c" aria-labelledby="variant-c-title">
+    <div class="variant__head">
+      <span class="variant__letter">C</span>
+      <h2 id="variant-c-title">Timeline and dock</h2>
+    </div>
+    <p class="variant__thesis">
+      The feed is a timeline by month, drawn with the release calendar's day numbers and axis, and
+      every game article is marked on it by the game's cover. Inside an article, the game sits in
+      a slim bar docked above the text, and it follows the reader down the page: under the header
+      on desktop, at the bottom of the screen on a phone, where the thumb is. The editor also gets
+      a "Game" block, so an article can show other games it mentions as cards inside the text.
+      Trades build effort for the only layout that handles several games per post.
+    </p>
+
+    <div class="stage">
+      <p class="stage__context">/news · feed · 1280px</p>
+      <div class="site">
+        <header class="topbar" data-fill="tpl-topbar"></header>
+        <div class="page">
+          <div class="box">
+            <nav class="crumbs" aria-label="Breadcrumb"><a href="#"><svg aria-hidden="true"><use href="#i-chevron"/></svg>Home</a><span class="crumbs__sep">›</span><span aria-current="page">News</span></nav>
+            <div class="headrow">
+              <h1 class="stitle">News</h1>
+              <div class="seg" role="group" aria-label="Show posts">
+                <button class="seg__btn" type="button" aria-pressed="true">All <span class="seg__count">24</span></button>
+                <button class="seg__btn" type="button" aria-pressed="false">Site news <span class="seg__count">9</span></button>
+                <button class="seg__btn" type="button" aria-pressed="false">Game articles <span class="seg__count">15</span></button>
+              </div>
+            </div>
+          </div>
+          <div class="box c-feed">
+            <section class="c-month" aria-labelledby="c-oct">
+              <h2 class="c-month__label" id="c-oct">October 2026</h2>
+              <ol class="c-line">
+                <li class="c-stop">
+                  <div class="c-stop__date"><b>22</b><span>Thu</span></div>
+                  <div class="c-stop__node"><span class="cover art-silk"></span></div>
+                  <a class="c-stop__card" href="#"><span class="c-stop__kicker">Hollow Knight: Silksong</span><h3 class="c-stop__title">Silksong a year later: how far MoonCellar players got</h3><p class="c-stop__excerpt clamp-2">648 of the 1,912 players tracking it here have finished it. Where the rest stopped, and how long a run really takes.</p><span class="c-stop__meta">6 min read · by nightshift</span></a>
+                </li>
+                <li class="c-stop">
+                  <div class="c-stop__date"><b>17</b><span>Sat</span></div>
+                  <div class="c-stop__node"><span class="c-stop__mark"><img src="logo-icon.png" alt=""></span></div>
+                  <a class="c-stop__card" href="#"><span class="c-stop__kicker c-stop__kicker--news">Site news</span><h3 class="c-stop__title">MoonCellar now has an Android app</h3><p class="c-stop__excerpt clamp-2">Full screen, no address bar, signed in with your account. Same library, same lists, same Gauntlet.</p><span class="c-stop__meta">2 min read</span></a>
+                </li>
+                <li class="c-stop">
+                  <div class="c-stop__date"><b>9</b><span>Fri</span></div>
+                  <div class="c-stop__node"><span class="cover art-clair"></span></div>
+                  <a class="c-stop__card" href="#"><span class="c-stop__kicker">Clair Obscur: Expedition 33</span><h3 class="c-stop__title">Clair Obscur: Expedition 33 is a rhythm game in disguise</h3><p class="c-stop__excerpt clamp-2">Every fight is a timing test, and the turn-based menus are the sheet music. Why it clicks for some players and not others.</p><span class="c-stop__meta">5 min read</span></a>
+                </li>
+                <li class="c-stop">
+                  <div class="c-stop__date"><b>2</b><span>Fri</span></div>
+                  <div class="c-stop__node"><span class="c-stop__mark"><img src="logo-icon.png" alt=""></span></div>
+                  <a class="c-stop__card" href="#"><span class="c-stop__kicker c-stop__kicker--news">Site news</span><h3 class="c-stop__title">RetroAchievements progress now shows on game cards</h3><p class="c-stop__excerpt clamp-2">If your RetroAchievements account is linked, beaten and mastered sets now show as a badge on every game card.</p><span class="c-stop__meta">1 min read</span></a>
+                </li>
+              </ol>
+            </section>
+            <section class="c-month" aria-labelledby="c-sep">
+              <h2 class="c-month__label" id="c-sep">September 2026</h2>
+              <ol class="c-line">
+                <li class="c-stop">
+                  <div class="c-stop__date"><b>24</b><span>Thu</span></div>
+                  <div class="c-stop__node"><span class="cover art-signalis"></span></div>
+                  <a class="c-stop__card" href="#"><span class="c-stop__kicker">Signalis</span><h3 class="c-stop__title">Four years on, Signalis is still the best survival horror game sitting in your backlog</h3><p class="c-stop__excerpt clamp-2">1,104 players have it on their backlog and 214 have finished it. A case for moving it up, without spoilers.</p><span class="c-stop__meta">7 min read</span></a>
+                </li>
+                <li class="c-stop">
+                  <div class="c-stop__date"><b>11</b><span>Fri</span></div>
+                  <div class="c-stop__node"><span class="cover art-outer"></span></div>
+                  <a class="c-stop__card" href="#"><span class="c-stop__kicker">Outer Wilds</span><h3 class="c-stop__title">Outer Wilds: play it before anyone tells you anything</h3><p class="c-stop__excerpt clamp-2">The one game where reading a review can ruin it. So this one has no spoilers, only reasons.</p><span class="c-stop__meta">4 min read</span></a>
+                </li>
+              </ol>
+            </section>
+            <div class="pager" aria-label="Pages"><span class="on">1</span><span>2</span><span>3</span><span><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <p class="stage__context">/news/silksong-a-year-later · game article · 1280px · <em>scroll inside the frame: the dock stays under the header</em></p>
+      <div class="site site--scroll art-silk">
+        <header class="topbar" data-fill="tpl-topbar"></header>
+        <div class="page c-read">
+          <div class="c-dock">
+            <span class="c-dock__label">About</span>
+            <span class="cover art-silk"></span>
+            <div class="c-dock__text"><a class="c-dock__name" href="#">Hollow Knight: Silksong</a><span class="c-dock__sub">2025 · Team Cherry · 648 players finished it</span></div>
+            <span class="score">8.9 <small>/ 10</small></span>
+            <div class="gctl">
+              <button class="gctl__btn" type="button" aria-label="Playthroughs · Playing"><span class="gctl__glyph gctl__glyph--playing gctl__glyph--on"><svg aria-hidden="true"><use href="#i-play"/></svg></span></button>
+              <button class="gctl__btn" type="button" aria-label="Add to favourites"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+              <button class="gctl__btn" type="button" aria-label="Add to a list"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-list"/></svg></span></button>
+              <button class="gctl__btn" type="button" aria-label="External links"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-more"/></svg></span></button>
+            </div>
+            <a class="btn" href="#">Game page</a>
+          </div>
+          <article class="box">
+            <div data-fill="tpl-silk-head" data-inline></div>
+            <p class="meta"><span class="badge badge--accent">Game article</span><span>22 Oct 2026</span><span class="meta__sep"></span><span>6 min read</span></p>
+            <h1 class="headline">Silksong a year later: how far MoonCellar players got</h1>
+            <p class="summary">A year after release, 648 of the 1,912 players tracking Hollow Knight: Silksong here have finished it. Here is where the rest stopped, and what the 97 who mastered it say about the last stretch.</p>
+            <p class="byline"><span class="av av-admin">NS</span><span>by <b>nightshift</b></span></p>
+            <figure class="hero-img"><div class="artwork art-silk"></div></figure>
+            <div class="prose">
+              <div data-fill="tpl-silk-text-1" data-inline></div>
+              <p>If Silksong is your first Team Cherry game, the original is still the better place to start, and it is half the length:</p>
+              <div class="c-embed">
+                <span class="cover art-hk"></span>
+                <div class="c-embed__text"><a href="#">Hollow Knight</a><span>2017 · Team Cherry · 9.1 / 10 · 4,380 players</span></div>
+                <div class="gctl">
+                  <button class="gctl__btn" type="button" aria-label="Playthroughs"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-play"/></svg></span></button>
+                  <button class="gctl__btn" type="button" aria-label="Add to favourites"><span class="gctl__glyph gctl__glyph--favorite gctl__glyph--on"><svg aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+                  <button class="gctl__btn" type="button" aria-label="Add to a list"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-list"/></svg></span></button>
+                  <button class="gctl__btn" type="button" aria-label="External links"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-more"/></svg></span></button>
+                </div>
+              </div>
+              <div data-fill="tpl-silk-text-2" data-inline></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <p class="stage__context">/news/mooncellar-on-android · site news · 1280px · <em>no game, no dock</em></p>
+      <div class="site site--scroll">
+        <header class="topbar" data-fill="tpl-topbar"></header>
+        <div class="page c-read">
+          <article class="box">
+            <nav class="crumbs" aria-label="Breadcrumb"><a href="#">Home</a><span class="crumbs__sep">›</span><a href="#"><svg aria-hidden="true"><use href="#i-chevron"/></svg>News</a><span class="crumbs__sep">›</span><span aria-current="page">MoonCellar now has an Android app</span></nav>
+            <p class="meta"><span class="badge badge--muted">Site news</span><span>17 Oct 2026</span><span class="meta__sep"></span><span>2 min read</span></p>
+            <h1 class="headline">MoonCellar now has an Android app</h1>
+            <p class="summary">Full screen, no address bar, and signed in with the account you already have.</p>
+            <figure class="hero-img"><div class="artwork art-site"></div></figure>
+            <div class="prose" data-fill="tpl-news-text"></div>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <p class="stage__context">Phone · 390px · the dock moves to the bottom of the screen</p>
+      <div class="phones">
+        <div class="phone">
+          <p class="stage__context">Feed</p>
+          <div class="site site--scroll">
+            <header class="topbar" data-fill="tpl-topbar"></header>
+            <div class="page">
+              <div class="box">
+                <h1 class="stitle">News</h1>
+                <div class="seg" role="group" aria-label="Show posts">
+                  <button class="seg__btn" type="button" aria-pressed="true">All <span class="seg__count">24</span></button>
+                  <button class="seg__btn" type="button" aria-pressed="false">Site news <span class="seg__count">9</span></button>
+                  <button class="seg__btn" type="button" aria-pressed="false">Game articles <span class="seg__count">15</span></button>
+                </div>
+              </div>
+              <div class="box c-feed">
+                <section class="c-month" aria-labelledby="c-oct-m">
+                  <h2 class="c-month__label" id="c-oct-m">October 2026</h2>
+                  <ol class="c-line">
+                    <li class="c-stop"><div class="c-stop__date"><b>22</b><span>Thu</span></div><div class="c-stop__node"><span class="cover art-silk"></span></div><a class="c-stop__card" href="#"><span class="c-stop__kicker">Hollow Knight: Silksong</span><h3 class="c-stop__title">Silksong a year later: how far MoonCellar players got</h3><span class="c-stop__meta">6 min read</span></a></li>
+                    <li class="c-stop"><div class="c-stop__date"><b>17</b><span>Sat</span></div><div class="c-stop__node"><span class="c-stop__mark"><img src="logo-icon.png" alt=""></span></div><a class="c-stop__card" href="#"><span class="c-stop__kicker c-stop__kicker--news">Site news</span><h3 class="c-stop__title">MoonCellar now has an Android app</h3><span class="c-stop__meta">2 min read</span></a></li>
+                    <li class="c-stop"><div class="c-stop__date"><b>9</b><span>Fri</span></div><div class="c-stop__node"><span class="cover art-clair"></span></div><a class="c-stop__card" href="#"><span class="c-stop__kicker">Clair Obscur: Expedition 33</span><h3 class="c-stop__title">Clair Obscur: Expedition 33 is a rhythm game in disguise</h3><span class="c-stop__meta">5 min read</span></a></li>
+                    <li class="c-stop"><div class="c-stop__date"><b>2</b><span>Fri</span></div><div class="c-stop__node"><span class="c-stop__mark"><img src="logo-icon.png" alt=""></span></div><a class="c-stop__card" href="#"><span class="c-stop__kicker c-stop__kicker--news">Site news</span><h3 class="c-stop__title">RetroAchievements progress now shows on game cards</h3><span class="c-stop__meta">1 min read</span></a></li>
+                  </ol>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="phone">
+          <p class="stage__context">Game article · <em>scroll it</em></p>
+          <div class="site site--scroll art-silk">
+            <header class="topbar" data-fill="tpl-topbar"></header>
+            <div class="page c-read">
+              <article class="box">
+                <div data-fill="tpl-silk-head" data-inline></div>
+                <p class="meta"><span class="badge badge--accent">Game article</span><span>22 Oct 2026</span><span class="meta__sep"></span><span>6 min</span></p>
+                <h1 class="headline">Silksong a year later: how far MoonCellar players got</h1>
+                <p class="byline"><span class="av av-admin">NS</span><span>by <b>nightshift</b></span></p>
+                <div class="prose">
+                  <div data-fill="tpl-silk-text-1" data-inline></div>
+                  <div class="c-embed">
+                    <span class="cover art-hk"></span>
+                    <div class="c-embed__text"><a href="#">Hollow Knight</a><span>2017 · Team Cherry · 9.1 / 10</span></div>
+                    <div class="gctl">
+                      <button class="gctl__btn" type="button" aria-label="Playthroughs"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-play"/></svg></span></button>
+                      <button class="gctl__btn" type="button" aria-label="Add to favourites"><span class="gctl__glyph gctl__glyph--favorite gctl__glyph--on"><svg aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+                      <button class="gctl__btn" type="button" aria-label="Add to a list"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-list"/></svg></span></button>
+                      <button class="gctl__btn" type="button" aria-label="External links"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-more"/></svg></span></button>
+                    </div>
+                  </div>
+                  <div data-fill="tpl-silk-text-2" data-inline></div>
+                </div>
+              </article>
+              <div class="c-dock">
+                <span class="cover art-silk"></span>
+                <div class="c-dock__text"><a class="c-dock__name" href="#">Hollow Knight: Silksong</a><span class="c-dock__sub">2025 · Playing</span></div>
+                <div class="gctl">
+                  <button class="gctl__btn" type="button" aria-label="Playthroughs · Playing"><span class="gctl__glyph gctl__glyph--playing gctl__glyph--on"><svg aria-hidden="true"><use href="#i-play"/></svg></span></button>
+                  <button class="gctl__btn" type="button" aria-label="Add to favourites"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+                  <button class="gctl__btn" type="button" aria-label="Add to a list"><span class="gctl__glyph"><svg aria-hidden="true"><use href="#i-list"/></svg></span></button>
+                </div>
+                <a class="btn" href="#">Game page</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pros">
+      <div><h3>Gains</h3><ul><li>The game is one tap away on every screen size, including phones.</li><li>A post can feature several games: one pinned, the rest as cards in the text. Roundups ("five games for a long weekend") become possible.</li><li>The timeline shows how active the section is at a glance and reuses the release calendar's look.</li></ul></div>
+      <div><h3>Costs</h3><ul><li>The most work: a new <code class="t">RichEditor</code> node, its sanitizer rule on the API, and a game lookup when the post renders.</li><li>The dock is thin, so there is no room for the "how players track it" numbers from A.</li><li>A timeline wastes width on a month with one post.</li></ul></div>
+    </div>
+  </section>
+
+  <!-- =================================================================== editor -->
+
+  <section class="section" id="writing" aria-labelledby="writing-title">
+    <h2 id="writing-title">Writing a post</h2>
+    <p>The same for all three variants. The kind of post is a switch at the top; "Game article" adds the game picker. The dashed "Game" tool in the editor exists only in variant C.</p>
+    <div class="stage">
+      <p class="stage__context">/admin/news/new · admins only · 1280px</p>
+      <div class="site">
+        <header class="topbar" data-fill="tpl-topbar"></header>
+        <div class="page">
+          <div class="editor-wrap">
+            <div class="box">
+              <nav class="crumbs" aria-label="Breadcrumb"><a href="#">Admin</a><span class="crumbs__sep">›</span><a href="#"><svg aria-hidden="true"><use href="#i-chevron"/></svg>News</a><span class="crumbs__sep">›</span><span aria-current="page">New post</span></nav>
+              <h1 class="stitle">New post</h1>
+              <div class="form">
+                <div class="seg" role="group" aria-label="Kind of post">
+                  <button class="seg__btn" type="button" aria-pressed="false">Site news</button>
+                  <button class="seg__btn" type="button" aria-pressed="true">Game article</button>
+                </div>
+                <div class="field">
+                  <span class="field__label">Game</span>
+                  <div class="input">
+                    <span class="cover art-silk"></span>
+                    <span class="input__grow">Hollow Knight: Silksong · 2025</span>
+                    <span class="input__x" aria-label="Remove game"><svg aria-hidden="true"><use href="#i-close"/></svg></span>
+                  </div>
+                  <span class="field__hint">Shown next to the text. Its artwork is used when the post has no image of its own.</span>
+                </div>
+                <div class="field">
+                  <span class="field__label">Title <small>53 / 100</small></span>
+                  <div class="input">Silksong a year later: how far MoonCellar players got</div>
+                </div>
+                <div class="field">
+                  <span class="field__label">Summary <small>196 / 220</small></span>
+                  <div class="input input--area">A year after release, 648 of the 1,912 players tracking Hollow Knight: Silksong here have finished it. Here is where the rest stopped, and what the 97 who mastered it say about the last stretch.</div>
+                  <span class="field__hint">Shown in the feed and in link previews.</span>
+                </div>
+                <div class="field">
+                  <span class="field__label">Image</span>
+                  <div class="input input--placeholder"><svg class="lead" aria-hidden="true"><use href="#i-image"/></svg><span class="input__grow">Using the game's artwork</span><span class="btn btn--ghost">Choose image</span></div>
+                </div>
+                <div class="field">
+                  <span class="field__label">Text</span>
+                  <div class="rich">
+                    <div class="rich__bar" role="toolbar" aria-label="Formatting">
+                      <span class="tbtn" title="Heading"><svg aria-hidden="true"><use href="#i-heading"/></svg></span>
+                      <span class="tbtn" title="Bold"><svg aria-hidden="true"><use href="#i-bold"/></svg></span>
+                      <span class="tbtn" title="Italic"><svg aria-hidden="true"><use href="#i-italic"/></svg></span>
+                      <span class="tbtn" title="Strikethrough"><svg aria-hidden="true"><use href="#i-strike"/></svg></span>
+                      <span class="rich__sep"></span>
+                      <span class="tbtn" title="Bulleted list"><svg aria-hidden="true"><use href="#i-list"/></svg></span>
+                      <span class="tbtn" title="Numbered list"><svg aria-hidden="true"><use href="#i-list-num"/></svg></span>
+                      <span class="tbtn" title="Quote"><svg aria-hidden="true"><use href="#i-quote"/></svg></span>
+                      <span class="rich__sep"></span>
+                      <span class="tbtn" title="Link"><svg aria-hidden="true"><use href="#i-link"/></svg></span>
+                      <span class="tbtn" title="Image"><svg aria-hidden="true"><use href="#i-image"/></svg></span>
+                      <span class="tbtn tbtn--new" title="Insert a game card (variant C)"><svg aria-hidden="true"><use href="#i-games"/></svg>Game</span>
+                    </div>
+                    <div class="rich__body">
+                      <p>Hollow Knight: Silksong came out on 4 September 2025, and within a week it was the game added to the most backlogs on MoonCellar that month.</p>
+                      <h3>Where players stopped</h3>
+                      <p>Of the 1,912 players tracking the game here, 648 marked it completed<span class="caret"></span></p>
+                    </div>
+                  </div>
+                </div>
+                <div class="form__foot">
+                  <p class="meta"><span class="badge badge--attention badge--dot">Draft</span><span>Saved 2 minutes ago</span></p>
+                  <div class="form__buttons">
+                    <span class="btn">Preview</span>
+                    <span class="btn btn--accent">Publish</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <aside class="box">
+              <h2 class="box__title">In the feed</h2>
+              <a class="frow" href="#" style="grid-template-columns: var(--mock-feed-thumb-sm) minmax(0, 1fr); gap: var(--gap-x3)">
+                <div class="frow__thumb"><div class="artwork art-silk"></div></div>
+                <div class="frow__body">
+                  <span class="gref"><span class="cover art-silk"></span>Hollow Knight: Silksong</span>
+                  <h3 class="frow__title clamp-2" style="font-size: 15px; line-height: 20px">Silksong a year later: how far MoonCellar players got</h3>
+                </div>
+              </a>
+              <p class="preview-note">Updates as you type, in the shape of the variant that ships. Publishing makes the post visible to everyone and adds it to the top of the feed.</p>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================== states -->
+
+  <section class="section" id="states" aria-labelledby="states-title">
+    <h2 id="states-title">States</h2>
+    <p>Drawn once, in variant A's shapes; B and C use the same copy and the same shared components.</p>
+    <div class="states">
+      <div class="stage">
+        <p class="stage__context">Feed with nothing published · <code class="t">EmptyState</code></p>
+        <div class="site"><div class="page"><div class="box">
+          <div class="empty">
+            <svg aria-hidden="true"><use href="#i-empty"/></svg>
+            <b>No posts yet</b>
+            <span>Site news and articles about games will show up here.</span>
+            <span class="btn btn--accent"><svg aria-hidden="true"><use href="#i-plus"/></svg>Write a post</span>
+          </div>
+        </div></div></div>
+        <p class="stage__context">The button is shown to admins only; everyone else gets the text.</p>
+      </div>
+      <div class="stage">
+        <p class="stage__context">Loading · <code class="t">Skeleton</code> in the shape of the rows</p>
+        <div class="site"><div class="page"><div class="box">
+          <div class="skel-row"><div class="skel"></div><div class="skel-lines"><div class="skel" style="width: 40%"></div><div class="skel" style="width: 92%"></div><div class="skel" style="width: 60%"></div></div></div>
+          <div class="skel-row"><div class="skel"></div><div class="skel-lines"><div class="skel" style="width: 30%"></div><div class="skel" style="width: 84%"></div><div class="skel" style="width: 52%"></div></div></div>
+          <div class="skel-row"><div class="skel"></div><div class="skel-lines"><div class="skel" style="width: 44%"></div><div class="skel" style="width: 76%"></div><div class="skel" style="width: 58%"></div></div></div>
+        </div></div></div>
+      </div>
+      <div class="stage">
+        <p class="stage__context">A filter with no posts · <code class="t">EmptyState variant="compact"</code></p>
+        <div class="site"><div class="page"><div class="box">
+          <div class="seg" role="group" aria-label="Show posts">
+            <button class="seg__btn" type="button" aria-pressed="false">All <span class="seg__count">3</span></button>
+            <button class="seg__btn" type="button" aria-pressed="false">Site news <span class="seg__count">3</span></button>
+            <button class="seg__btn" type="button" aria-pressed="true">Game articles</button>
+          </div>
+          <div class="empty empty--compact">
+            <b>No game articles yet</b>
+            <span>Articles about a single game will appear here.</span>
+            <span class="btn btn--ghost">Show all posts</span>
+          </div>
+        </div></div></div>
+      </div>
+      <div class="stage">
+        <p class="stage__context">Adult game, viewer hides adult content · <code class="t">Cover</code> placeholder</p>
+        <div class="site"><div class="page"><div class="box gpanel">
+          <p class="gpanel__label">The game in this article</p>
+          <div class="gpanel__game">
+            <span class="cover cover--missing"><img src="logo-icon.png" alt=""></span>
+            <div class="gpanel__info">
+              <a class="gpanel__name" href="#">Katawa Shoujo</a>
+              <span class="gpanel__sub">2012 · Four Leaf Studios</span>
+            </div>
+          </div>
+          <p class="field__hint">The cover, the artwork banner and the post's image are hidden by the same rule as on game cards (<code class="t">useHideAdult</code>); the text stays.</p>
+        </div></div></div>
+      </div>
+      <div class="stage">
+        <p class="stage__context">The linked game was removed from the catalogue</p>
+        <div class="site"><div class="page"><div class="box">
+          <p class="meta"><span class="badge badge--attention badge--dot">Game missing</span><span>visible to admins only</span></p>
+          <p style="font-size: 14px; color: var(--color-text-secondary)">The post renders as site news, without the game. An admin sees this badge on the post and in <code class="t">/admin/news</code>, with "Choose another game".</p>
+        </div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================== comparison -->
+
+  <section class="section" id="compare" aria-labelledby="compare-title">
+    <h2 id="compare-title">Comparison</h2>
+    <div class="stage scroll-x">
+      <table class="compare">
+        <thead>
+          <tr><th></th><th><span>A</span>Sidecar</th><th><span>B</span>Game frame</th><th><span>C</span>Timeline and dock</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>Where the game sits</th><td>A column beside the text</td><td>In the article's header, on the game's artwork</td><td>A bar above the text, plus cards inside it</td></tr>
+          <tr><th>Visible while reading</th><td><span class="good">Always on desktop</span>; once on a phone</td><td><span class="warn">Only at the top</span></td><td><span class="good">Always, desktop and phone</span></td></tr>
+          <tr><th>Text width</th><td><span class="warn">Narrower</span>, shares the row</td><td><span class="good">Full centred column</span></td><td><span class="good">Full column</span></td></tr>
+          <tr><th>Games per post</th><td>One</td><td>One</td><td><span class="good">One pinned, any number inline</span></td></tr>
+          <tr><th>Feed</th><td>List with an archive by year and month</td><td>Magazine with a lead story</td><td>Timeline by month</td></tr>
+          <tr><th>Reuses</th><td><code class="t">Box</code>, <code class="t">Breadcrumbs</code>, <code class="t">Badge</code>, <code class="t">Chip</code>, <code class="t">Tabs</code>, <code class="t">ScoreValue</code>, <code class="t">GameControls</code>, <code class="t">Pagination</code></td><td>The same, plus the <code class="t">GameHero</code> layout and <code class="t">BGImage</code> with the game's artwork</td><td>The same, plus the release calendar's day and axis styles</td></tr>
+          <tr><th>New to build</th><td>A game side panel widget</td><td>An article hero widget (a variant of <code class="t">GameHero</code>)</td><td>The dock widget, a <code class="t">RichEditor</code> game node, its rule in <code class="t">sanitizeRichText</code></td></tr>
+          <tr><th>Build cost</th><td><span class="good">Lowest</span></td><td>Medium</td><td><span class="warn">Highest</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="reco">
+      <h3>Any of them needs</h3>
+      <p>A <code class="t">size="article"</code> prop on <code class="t">RichText</code> that calls the existing <code class="t">richText(17px, 28px)</code> mixin with a wider block gap and full-width images: reviews are set at 14px, which is too small for a 6-minute read. A new <code class="t">SvgNews</code> icon for the header link. An <code class="t">articles</code> module on the API with <code class="t">type: "news" | "game"</code> and an optional <code class="t">gameId</code>.</p>
+    </div>
+  </section>
+
+  <p class="note">
+    Colours, spacing and radii are the project's own tokens: the <code class="t">:root</code>
+    block above is generated from <code class="t">apps/web/src/lib/app/styles/vars</code> by
+    <code class="t">bun --filter web sync:tokens</code>. The typeface is substituted —
+    Hanken Grotesk stands in for ApercuPro, whose licensed file cannot be served from a
+    third-party host. Covers and artwork are colour placeholders; the players, counts and the
+    admin account <b>nightshift</b> are invented.
+  </p>
+</div>
+
+<script>
+  document.querySelectorAll("[data-fill]").forEach((el) => {
+    const parts = el.dataset.fill.split(" ").map((id) => document.getElementById(id).content.cloneNode(true));
+    if (el.hasAttribute("data-inline")) el.replaceWith(...parts);
+    else el.append(...parts);
+  });
+</script>

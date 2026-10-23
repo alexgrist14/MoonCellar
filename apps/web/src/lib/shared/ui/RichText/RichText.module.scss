@@ -7,6 +7,33 @@
     color: var(--color-text-primary);
   }
 
+  &_article {
+    @include richText(17px, 28px);
+
+    p,
+    ul,
+    ol,
+    blockquote,
+    pre {
+      margin-bottom: var(--article-text-gap);
+    }
+
+    h3 {
+      margin: calc(var(--article-text-gap) * 2) 0 var(--article-text-gap);
+      color: var(--color-text-primary);
+    }
+
+    img {
+      max-width: 100%;
+      margin-block: var(--article-text-gap);
+      border-radius: var(--radius-x4);
+    }
+
+    @include mediaSm {
+      @include font(16px, 26px, 400);
+    }
+  }
+
   strong,
   b {
     color: var(--color-text-primary);

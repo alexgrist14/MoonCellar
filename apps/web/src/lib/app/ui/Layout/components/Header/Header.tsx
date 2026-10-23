@@ -13,6 +13,7 @@ import {
   SvgRandom,
   SvgBurger,
   SvgListBullet,
+  SvgNews,
 } from "@/src/lib/shared/ui/svg";
 import Link from "next/link";
 import Image from "next/image";
@@ -87,6 +88,15 @@ export const Header: FC = () => {
           ],
           onClick: randomClickHandler,
           color: ButtonColor.TRANSPARENT,
+        },
+        {
+          title: [
+            <SvgNews key="icon" className={styles.svg} />,
+            <span key="label">News</span>,
+          ],
+          link: "/news",
+          color: ButtonColor.TRANSPARENT,
+          onClick: closeMenu,
         },
       ] as IButtonGroupItem[],
     [randomClickHandler, closeMenu]

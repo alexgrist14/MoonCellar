@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 import { unstable_cache } from "next/cache";
-import { gamesApi, userAPI } from "@/src/lib/shared/api";
+import { articlesAPI, gamesApi, userAPI } from "@/src/lib/shared/api";
 import { platformsAPI } from "@/src/lib/shared/api/platforms.api";
 import { toSlug } from "@/src/lib/shared/utils/slug.utils";
 import {
@@ -31,6 +31,16 @@ const getAllUserLogins = unstable_cache(
   { revalidate: 3600 }
 );
 
+const getArticleSlugs = unstable_cache(
+  async () => {
+    const { data } = await articlesAPI.getSlugs();
+
+    return data;
+  },
+  ["sitemap-article-slugs"],
+  { revalidate: 3600 }
+);
+
 const MIN_GAMES_FOR_HUB = 100;
 
 const getGenreCounts = unstable_cache(
@@ -58,6 +68,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const userLogins = await getAllUserLogins().catch(() => []);
   const genres = await getGenreCounts().catch(() => []);
   const platforms = await getPlatforms().catch(() => []);
+  const articleSlugs = await getArticleSlugs().catch(() => []);
 
   return [
     ...links.map(({ link }) => ({
@@ -85,6 +96,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
     ...userLogins.map(({ userName, updatedAt }) => ({
       url: `${FRONT_URL}/user/${userName}`,
+      lastModified: new Date(updatedAt),
+    })),
+    ...articleSlugs.map(({ slug, updatedAt }) => ({
+      url: `${FRONT_URL}/news/${slug}`,
       lastModified: new Date(updatedAt),
     })),
   ];

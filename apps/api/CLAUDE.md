@@ -173,7 +173,8 @@ an instance of Module)`. Use a default import; tsc reports the call as `TS2349`.
   delete it replaced passed the string alone and left ObjectId rows behind.
 - **The user's comments are soft-deleted (`status: "deleted"`, empty body), never removed,** so
   reply threads keep their structure; content requests, conflicts and comment reports keep the
-  dangling `userId`, which resolves to no author.
+  dangling `userId`, which resolves to no author. So do news posts (`articles.authorId`): they
+  are site content, not the admin's personal data, and an unknown author renders as none.
 - **A wrong password answers 403, not 401.** The web `agent` treats every 401 as an expired
   session and retries after a refresh, which would loop on a wrong password and then log the
   user out.
@@ -257,6 +258,21 @@ an instance of Module)`. Use a default import; tsc reports the call as `TS2349`.
   it silently deletes favourites added elsewhere. The `PATCH` is for the reorder editors only.
   Deleting a character must also pull it from `favoriteCharacters`, or every later replace fails
   with "One of the characters does not exist".
+
+## News posts
+
+- **A post's slug follows its title only until its first publication; after that it never
+  changes.** `ArticlesService.update` keeps the stored slug once `publishedAt` is set, so a link
+  shared or indexed after publishing keeps working through any later retitle. There is no
+  `previousSlugs` redirect as lists have, which is why the slug must not move.
+- **`publishedAt` is the date of the first publication and survives Unpublish.** The archive and
+  the feed group and sort by it, in UTC (`$year`/`$month`, `getPublishedRange`); the web formats
+  dates in UTC too, or a post published near midnight lands in a different month than the
+  archive counts it in.
+- **Post images must be Space URLs** (`image` starting with `S3_CDN_URL`): the editor uploads
+  through `POST /file/comment-image`, and the web renders the image with `next/image`, which
+  only knows the configured hosts. Both `image` and `content` are in `REFERENCE_SOURCES`, or the
+  orphan sweep would delete every post image a week after upload.
 
 ## Steam import
 
@@ -446,8 +462,8 @@ Module` before a single test runs. `comments.controller.spec.ts` mocks it with `
 - **Every field that stores a Space URL must be listed in `REFERENCE_SOURCES`
   (`file-orphans.service.ts`), or the sweep deletes its files.** Today that is `games.cover`,
   `screenshots`, `artworks`, `backgroundImage`, `bannerImage`, `characters.mugShot`,
-  `users.avatar`/`background`, `generatedimages.url` and the rich-text `gamecomments.body` and
-  `playthroughs.comment`.
+  `users.avatar`/`background`, `generatedimages.url`, `articles.image` and the rich-text
+  `gamecomments.body`, `playthroughs.comment` and `articles.content`.
   The first version read only the three game image arrays and would have removed every game
   background and banner. A new image field goes into that list in the same change.
 - **`LastModified` in the Space is the rclone copy time, not the original upload, so a fresh

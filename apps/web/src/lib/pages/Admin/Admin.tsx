@@ -15,6 +15,7 @@ import { RequestsReview } from "@/src/lib/widgets/admin/RequestsReview";
 import { CharactersAdmin } from "@/src/lib/widgets/admin/CharactersAdmin";
 import { ImageGenerator } from "@/src/lib/widgets/admin/ImageGenerator";
 import { SiteSessions } from "@/src/lib/widgets/admin/SiteSessions";
+import { NewsAdmin } from "@/src/lib/widgets/admin/NewsAdmin";
 import { useRequestsQuery } from "@/src/lib/entities/request/api";
 import { useCommentReportsQuery } from "@/src/lib/entities/comment/api/comment-reports.queries";
 import { useConflictsSummaryQuery } from "@/src/lib/entities/conflict/api";
@@ -107,6 +108,7 @@ export const Admin = ({ tab }: IAdminProps) => {
     },
     { tabName: "Images", onTabClick: () => selectTab(5) },
     { tabName: "Sites", onTabClick: () => selectTab(6) },
+    { tabName: "News", onTabClick: () => selectTab(7) },
   ];
 
   return (
@@ -149,6 +151,7 @@ export const Admin = ({ tab }: IAdminProps) => {
         })}
       {tabIndex === 5 && <ImageGenerator />}
       {tabIndex === 6 && <SiteSessions />}
+      {tabIndex === 7 && <NewsAdmin />}
     </Box>
   );
 };

@@ -35,6 +35,7 @@ const REFERENCE_SOURCES = [
   { collection: "gamecomments", fields: ["body"] },
   { collection: "playthroughs", fields: ["comment"] },
   { collection: "generatedimages", fields: ["url"] },
+  { collection: "articles", fields: ["image", "content"] },
 ];
 
 const URL_PATTERN = /https?:\/\/[^\s"'<>)\\]+/g;

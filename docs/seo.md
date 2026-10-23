@@ -28,6 +28,8 @@ Each route adds its own metadata on top:
 | `/user/[name]/favourites/[kind]` | `<Tab label>: <name>`                       | `/user/<name>/favourites/<kind>` | `games` or `characters`; the former `/favorites` and `/characters` tabs `permanentRedirect` here                                                                |
 | `/user/[name]/lists/[slug]`      | `<List> — a list by <author>`               | `/user/<name>/lists/<slug>`      | description from the list's own text or its game count; `robots: { index: false, follow: false }` for a private list                                            |
 | `/lists`                         | `Lists`                                     | `/lists`                         | own `keywords`                                                                                                                                                  |
+| `/news`                          | `News`                                      | `/news`                          | own `keywords`; the archive and game filters (`?year`, `?month`, `?game`, `?type`) keep the same canonical                                                     |
+| `/news/[slug]`                   | post title                                  | `/news/<slug>`                   | description from the post summary, `og:type` `article` with `publishedTime`/`modifiedTime`, `og:image` from the post image, else the game cover, else `og-default.png` |
 | `/requests`                      | `Requests`                                  | —                                | `robots: { index: false, follow: true }`                                                                                                                        |
 | `not-found`                      | `Page not found`                            | —                                | `robots: { index: false, follow: false }`                                                                                                                       |
 
@@ -97,7 +99,8 @@ the builders live in `src/lib/shared/utils/json-ld.utils.ts`.
 | `VideoGame`                | game page                                          | name, url, description, cover, genres, `datePublished` from `first_release`    |
 | `AggregateRating`          | inside `VideoGame`                                 | only when the game has at least 10 MoonCellar ratings; scale 1–10              |
 | `Review`                   | inside `VideoGame`                                 | the loaded reviews that have a rating, an author and text and are not spoilers |
-| `BreadcrumbList`           | game page, catalogue, both hubs, Gauntlet, `Lists` | the same trail as the visible breadcrumbs                                      |
+| `BreadcrumbList`           | game page, catalogue, both hubs, Gauntlet, `Lists`, `News`, a post | the same trail as the visible breadcrumbs                      |
+| `Article`                  | a post (`/news/[slug]`)                            | headline, summary, dates, author, image, and the game as `about` for a game article |
 | `ItemList`                 | catalogue, both hubs                               | the games rendered on the page, with position, url and name                    |
 
 ## Hub pages
@@ -131,6 +134,8 @@ not its release on that platform.
 | `/`                                  | `force-dynamic`; featured platforms come from `unstable_cache` with a 3600 s revalidate                                                                               |
 | `/games`                             | dynamic, it reads `searchParams`                                                                                                                                      |
 | `/lists`                             | dynamic, it reads `searchParams` and passes page 1 to the client as `initialData`                                                                                     |
+| `/news`                              | dynamic, it reads `searchParams` and passes the page and the archive to the client as `initialData`                                                                   |
+| `/news/[slug]`                       | ISR like a game page (`revalidate = 3600`, empty `generateStaticParams`); the admin editor purges it with `revalidateArticlePage` after a save or a delete            |
 | `/user/[name]`, `/user/[name]/[tab]` | dynamic: the profile layout reads `cookies()` to decide who is viewing                                                                                                |
 | `/user/[name]/lists/[slug]`          | dynamic: it reads `cookies()` (forwarded to `by-slug` for private lists) and `searchParams` (`page`, sort)                                                            |
 | `/requests`, `/gauntlet`             | static: no server fetch, no `revalidate`; the client page reads the query string inside its `Suspense`                                                                |
@@ -152,14 +157,15 @@ A cached game page is purged on demand by `revalidateGamePage`
 
 `src/app/sitemap.ts` emits, in order:
 
-1. The three static links from the `links` constant — `/`, `/games`, `/gauntlet`.
+1. The static links from the `links` constant — `/`, `/games`, `/gauntlet`, `/news`.
 2. Every game: `/games/<slug>` with `lastModified` from the record and, when the game has a
    cover, an `<image:loc>` pointing at `/img/image-proxy`.
 3. Genre hubs with at least 100 games (`MIN_GAMES_FOR_HUB`), slugged with `toSlug`.
 4. Every platform hub.
 5. Every user profile, with `lastModified`.
+6. Every published post: `/news/<slug>` with `lastModified`, from `GET /articles/slugs`.
 
-Each of the four upstream calls has its own `unstable_cache` entry and falls back to an empty
+Each of the five upstream calls has its own `unstable_cache` entry and falls back to an empty
 list on error, so one failing endpoint does not empty the whole sitemap.
 
 ## Images

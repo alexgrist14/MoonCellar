@@ -6,7 +6,7 @@ whose account is an admin ever see it — everyone else gets a 404.
 ## Routes
 
 - `/admin/users`, `/admin/games`, `/admin/comments`, `/admin/conflicts`, `/admin/characters`,
-  `/admin/images`, `/admin/sites` — one route file each under `src/app/admin/<tab>/page.tsx`,
+  `/admin/images`, `/admin/sites`, `/admin/news` — one route file each under `src/app/admin/<tab>/page.tsx`,
   each rendering `<Admin tab="<tab>" />` inside a `Suspense` with `PageSkeleton` (the page reads
   `useSearchParams`).
 - `/admin` (`src/app/admin/page.tsx`) only redirects: the legacy `?tab=<tab>` becomes
@@ -32,7 +32,7 @@ whose account is an admin ever see it — everyone else gets a 404.
 ## Composition
 
 1. `Box` → `Breadcrumbs` (Home / Admin / tab label).
-2. `Tabs` — the seven main tabs with badge counts; `mobileMenuTitle="Admin"`.
+2. `Tabs` — the eight main tabs with badge counts; `mobileMenuTitle="Admin"`.
 3. The active tab:
    - Users → `widgets/admin/UserList`.
    - Games → segmented `Tabs` List / Requests: `GameList` or `RequestsReview kind="game"`.
@@ -41,6 +41,8 @@ whose account is an admin ever see it — everyone else gets a 404.
    - Characters → List / Requests: `CharactersAdmin` or `RequestsReview kind="character"`.
    - Images → `ImageGenerator`.
    - Sites → `SiteSessions`.
+   - News → `NewsAdmin`: every post, drafts included, newest edit first; a row opens
+     `/admin/news/<id>` (`pages/ArticleEditPage`), "Write a post" opens `/admin/news/new`.
 
 ## Rules and gotchas
 

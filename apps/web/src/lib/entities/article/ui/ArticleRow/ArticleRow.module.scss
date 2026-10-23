@@ -1,0 +1,104 @@
+.row {
+  display: grid;
+  grid-template-columns: var(--article-row-thumb-width) minmax(0, 1fr);
+  gap: var(--gap-x4);
+  align-items: start;
+  color: var(--color-text-primary);
+
+  &__thumb {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-x3);
+    overflow: hidden;
+    outline: 2px solid transparent;
+    outline-offset: -2px;
+    transition: outline-color var(--duration-fast) var(--easing-out);
+
+    @include reducedMotion {
+      transition-duration: var(--duration-instant);
+    }
+  }
+
+  &:hover &__thumb,
+  &:focus-visible &__thumb {
+    outline-color: var(--color-accent);
+  }
+
+  &__image {
+    object-fit: cover;
+    border-radius: inherit;
+  }
+
+  &__placeholder {
+    aspect-ratio: auto;
+    border-radius: inherit;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--gap-x1);
+    min-width: 0;
+  }
+
+  &__game {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-x2);
+
+    @include font(12px, 18px, 500);
+    color: var(--color-text-secondary);
+  }
+
+  &__gameCover {
+    position: relative;
+    width: var(--article-row-game-cover-width);
+    aspect-ratio: var(--cover-ratio);
+    flex-shrink: 0;
+    border-radius: var(--radius-x1);
+    overflow: hidden;
+    background: var(--color-bg-tertiary);
+
+    & img {
+      object-fit: cover;
+    }
+  }
+
+  &__title {
+    @include font(18px, 24px, 500);
+    @include lineClamp(2);
+    text-wrap: balance;
+    transition: color var(--duration-fast) var(--easing-out);
+  }
+
+  &:hover &__title {
+    color: var(--color-accent);
+  }
+
+  &__summary {
+    @include font(14px, 20px, 400);
+    @include lineClamp(2);
+    color: var(--color-text-muted);
+  }
+
+  &__meta {
+    @include font(12px, 16px, 400);
+    margin-top: var(--padding-x1);
+    color: var(--color-gray);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @include mediaSm {
+    grid-template-columns: var(--article-row-thumb-width-sm) minmax(0, 1fr);
+    gap: var(--gap-x3);
+
+    &__title {
+      @include font(15px, 20px, 500);
+    }
+
+    &__summary {
+      display: none;
+    }
+  }
+}

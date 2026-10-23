@@ -171,6 +171,18 @@
   --search-modal-width: 900px;
   --search-tab-height: 36px;
 
+  --news-page-width: 1080px;
+  --news-sidebar-width: 300px;
+  --article-row-thumb-width: 176px;
+  --article-row-thumb-width-sm: 96px;
+  --article-row-game-cover-width: 14px;
+  --article-game-cover-width: 92px;
+  --article-game-cover-width-sm: 64px;
+  --article-text-gap: 16px;
+  --article-box-padding: var(--padding-x6);
+  --game-stats-bar-height: 8px;
+  --game-stats-dot-size: 7px;
+
   --reaction-active-color: var(--color-accent);
   --tabs-muted-opacity: 0.55;
   --burger-animation-duration: 600ms;
@@ -179,5 +191,6 @@
 @media (max-width: 768px) {
   :root {
     --popover-max-height: 60dvh;
+    --article-box-padding: var(--padding-x3);
   }
 }

@@ -1,0 +1,10 @@
+.news {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x4);
+
+  &__toolbar {
+    display: flex;
+    justify-content: flex-end;
+  }
+}

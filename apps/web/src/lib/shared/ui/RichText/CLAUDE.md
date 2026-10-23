@@ -12,11 +12,12 @@ it with the shared `richText` mixin. Renders nothing when `content` is empty.
 
 ## API
 
-| Prop        | Type     | Default | Purpose                                      |
-| ----------- | -------- | ------- | -------------------------------------------- |
-| `content`   | `string` | –       | HTML string; empty or missing renders `null` |
-| `className` | `string` | –       | Extra class on the wrapper, for layout only  |
-| `tone`      | `"primary" \| "secondary"` | `"secondary"` | Text colour: `--color-text-secondary` for body copy, `--color-text-primary` where the text is the main content (a playthrough comment) |
+| Prop        | Type                       | Default       | Purpose                                                                                                                                                                      |
+| ----------- | -------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `content`   | `string`                   | –             | HTML string; empty or missing renders `null`                                                                                                                                 |
+| `className` | `string`                   | –             | Extra class on the wrapper, for layout only                                                                                                                                  |
+| `tone`      | `"primary" \| "secondary"` | `"secondary"` | Text colour: `--color-text-secondary` for body copy, `--color-text-primary` where the text is the main content (a playthrough comment)                                       |
+| `size`      | `"default" \| "article"`   | `"default"`   | `article`: 17/28px text, `--article-text-gap` between blocks and images as wide as the column — for a news post, where 14px reviews styling is too small to read for minutes |
 
 ## Usage
 
@@ -35,6 +36,9 @@ import { RichText } from "@/src/lib/shared/ui/RichText";
   images or spacing from a consumer; block spacing is `--rich-text-gap`, and images are capped
   at `min(100%, var(--rich-editor-image-width))`.
 - The text colour is `tone`; never set `color` through `className`.
+- **`size="article"` is the one place images are not capped at `--rich-editor-image-width`.** A
+  post's screenshots are part of the story and run the width of the reading column; every other
+  rich text (reviews, comments) keeps the cap, which is why it is a size and not a `className`.
 - A `font-size` on `className` reaches paragraphs only because the mixin sets
   `p { font-size: inherit }`; `root.scss` has a bare `p { font-size: 14px }` that would win
   otherwise. Keep that line if the mixin is edited.
@@ -43,4 +47,4 @@ import { RichText } from "@/src/lib/shared/ui/RichText";
 
 ## Storybook
 
-`Shared/RichText`: Paragraphs, Formatting, WithImage, Empty, PrimaryTone.
+`Shared/RichText`: Paragraphs, Formatting, WithImage, Empty, PrimaryTone, Article.

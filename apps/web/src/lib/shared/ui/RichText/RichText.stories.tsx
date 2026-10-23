@@ -50,3 +50,11 @@ export const PrimaryTone: Story = {
       "<p>Beat it on hard, every optional boss down. Took the true ending route.</p>",
   },
 };
+
+export const Article: Story = {
+  args: {
+    size: "article",
+    content:
+      '<p>Hollow Knight: Silksong came out on 4 September 2025, and within a week it was the game added to the most backlogs on MoonCellar that month.</p><h3>Where players stopped</h3><p>Of the <strong>1,912</strong> players tracking the game here, <strong>648</strong> marked it completed and <strong>97</strong> went on to master it.</p><blockquote>I bounced off it twice before the movement clicked.</blockquote><p><img src="/images/moon.jpg" alt="Screenshot" /></p><p>Still on the fence? Add it to your backlog from the panel next to the article.</p>',
+  },
+};
