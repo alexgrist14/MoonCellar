@@ -67,6 +67,10 @@
     --progress-bar-color: var(--color-accent);
   }
 
+  &_positive {
+    --progress-bar-color: var(--color-positive);
+  }
+
   &_attention {
     --progress-bar-color: var(--color-attention);
   }

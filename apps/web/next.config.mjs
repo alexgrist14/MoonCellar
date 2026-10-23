@@ -18,6 +18,26 @@ const nextConfig = {
     loadPaths: [join(projectRoot, "src/lib/app/styles")],
     additionalData: '@use "@/src/lib/app/styles/index.scss" as *;',
   },
+  async rewrites() {
+    const isStatusHost = [{ type: "host", value: "status\\..+" }];
+    const segment =
+      "(?!(?:_next|images|img|api|status|worker\\.js|sw\\.js|offline\\.html|manifest\\.webmanifest|robots\\.txt|sitemap\\.xml)(?:/|$))[^/]+";
+    return {
+      beforeFiles: [
+        { source: "/", has: isStatusHost, destination: "/status" },
+        {
+          source: `/:first(${segment})`,
+          has: isStatusHost,
+          destination: "/status/:first",
+        },
+        {
+          source: `/:first(${segment})/:second`,
+          has: isStatusHost,
+          destination: "/status/:first/:second",
+        },
+      ],
+    };
+  },
   async headers() {
     return [
       {

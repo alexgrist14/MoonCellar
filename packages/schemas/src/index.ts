@@ -20,6 +20,7 @@ export * from "./games.schema";
 export * from "./game-stats.schema";
 export * from "./platforms.schema";
 export * from "./playthroughs.schema";
+export * from "./projects.schema";
 export * from "./ra.schema";
 export * from "./role.schema";
 export * from "./gauntlet-history.schema";

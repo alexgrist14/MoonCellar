@@ -9,6 +9,7 @@ import { UserModule } from "./module/user/user.module";
 import { IgdbModule } from "./module/igdb/igdb.module";
 import { ImagesModule } from "./module/images/images.module";
 import { SitesModule } from "./module/sites/sites.module";
+import { ProjectsModule } from "./module/projects/projects.module";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { RetroachievementsModule } from "./module/retroach/retroach.module";
 import { SteamModule } from "./module/steam/steam.module";
@@ -54,6 +55,7 @@ import { CacheModule } from "@nestjs/cache-manager";
     SitesModule,
     RetroachievementsModule,
     SteamModule,
+    ProjectsModule,
     ServeStaticModule.forRoot({
       rootPath: `/var/www/uploads/photos`,
       serveRoot: "/photos",

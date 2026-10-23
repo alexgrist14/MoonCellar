@@ -9,14 +9,16 @@ hook, which stores the profile and closes the modal on success.
 - Open it with `openAuthModal()` whenever a guest triggers something that needs an
   account (the header avatar, `useRequireAuth` in the game community).
 - Do not embed it inline in a page: its close button calls `modal.close()`, which only makes
-  sense inside `ModalsConnector`.
+  sense inside `ModalsConnector`. The one exception is `isPage`, which drops that button — the
+  status hub's sign-in page (`pages/StatusLoginPage`) renders it so.
 - Do not build a second login form; extend this one.
 
 ## API
 
-| Prop       | Type      | Default | Purpose                                                           |
-| ---------- | --------- | ------- | ----------------------------------------------------------------- |
-| `isSignIn` | `boolean` | `false` | Open in login mode instead of sign-up; the user can still switch. |
+| Prop       | Type      | Default | Purpose                                                                  |
+| ---------- | --------- | ------- | ------------------------------------------------------------------------ |
+| `isSignIn` | `boolean` | `false` | Open in login mode instead of sign-up; the user can still switch.        |
+| `isPage`   | `boolean` | `false` | Sign in only, as the body of a page: no close button, no sign-up switch. |
 
 `openAuthModal(props?)` passes the same props.
 
@@ -61,5 +63,5 @@ import { modal } from "@/src/lib/shared/ui/Modal";
 
 ## Storybook
 
-`Shared/AuthModal`: `Inline`, `SignIn`, `InModal`. Neither story submits — submitting would hit the
+`Shared/AuthModal`: `Inline`, `SignIn`, `Page`, `InModal`. Neither story submits — submitting would hit the
 auth API.

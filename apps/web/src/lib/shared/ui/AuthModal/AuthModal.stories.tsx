@@ -22,3 +22,7 @@ export const SignIn: Story = {
 export const InModal: Story = {
   render: () => <Button onClick={() => openAuthModal()}>Sign in</Button>,
 };
+
+export const Page: Story = {
+  args: { isPage: true },
+};

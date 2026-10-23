@@ -25,14 +25,18 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 
 interface IAuthModalProps {
   isSignIn?: boolean;
+  isPage?: boolean;
 }
 
 export const openAuthModal = (props: IAuthModalProps = {}) =>
   modal.open(<AuthModal {...props} />, { id: AUTH_MODAL_ID });
 
-export const AuthModal: FC<IAuthModalProps> = ({ isSignIn = false }) => {
+export const AuthModal: FC<IAuthModalProps> = ({
+  isSignIn = false,
+  isPage = false,
+}) => {
   const { login, signup } = useAuth();
-  const [isRegister, setIsRegister] = useState<boolean>(!isSignIn);
+  const [isRegister, setIsRegister] = useState<boolean>(!isSignIn && !isPage);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const isLoaderShown = useMinimumLoading(isLoading);
@@ -143,30 +147,36 @@ export const AuthModal: FC<IAuthModalProps> = ({ isSignIn = false }) => {
           >
             {isRegister ? "Sign up" : "Sign in"}
           </Button>
-          <p className={styles.switch}>
-            {isRegister ? "Already have an account?" : "Don't have an account?"}
-            <Button
-              type="button"
-              color={ButtonColor.TRANSPARENT}
-              className={styles.link}
-              compact
-              onClick={() => switchMode(!isRegister)}
-            >
-              {isRegister ? "Sign in" : "Sign up"}
-            </Button>
-          </p>
+          {!isPage && (
+            <p className={styles.switch}>
+              {isRegister
+                ? "Already have an account?"
+                : "Don't have an account?"}
+              <Button
+                type="button"
+                color={ButtonColor.TRANSPARENT}
+                className={styles.link}
+                compact
+                onClick={() => switchMode(!isRegister)}
+              >
+                {isRegister ? "Sign in" : "Sign up"}
+              </Button>
+            </p>
+          )}
         </div>
       </form>
-      <Button
-        type="button"
-        color={ButtonColor.TRANSPARENT}
-        className={styles.close}
-        tooltip="Close"
-        tooltipAlign="right"
-        onClick={() => modal.close(AUTH_MODAL_ID)}
-      >
-        <SvgClose size="20" />
-      </Button>
+      {!isPage && (
+        <Button
+          type="button"
+          color={ButtonColor.TRANSPARENT}
+          className={styles.close}
+          tooltip="Close"
+          tooltipAlign="right"
+          onClick={() => modal.close(AUTH_MODAL_ID)}
+        >
+          <SvgClose size="20" />
+        </Button>
+      )}
       <Background />
     </div>
   );

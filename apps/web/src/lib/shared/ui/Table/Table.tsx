@@ -170,7 +170,7 @@ export const Table = <T extends object>({
     const cell = row[key];
 
     if (!cell || cell.isHidden)
-      return isRowLayout ? <div key={j} role="cell" /> : null;
+      return isRowLayout ? <div key={String(key)} role="cell" /> : null;
 
     const isHeader = j === 0;
     const rowIndex = isHeader ? undefined : rowIndexes.get(row);
@@ -182,7 +182,7 @@ export const Table = <T extends object>({
 
     return (
       <div
-        key={j + (cell.id || "")}
+        key={isRowLayout ? String(key) : j + (cell.id || "")}
         id={isRowLayout && isHeader ? getColumnId(i) : cell.id}
         role={isRowLayout ? (isHeader ? "columnheader" : "cell") : undefined}
         className={classNames(
