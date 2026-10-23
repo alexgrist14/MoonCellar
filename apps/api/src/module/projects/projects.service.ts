@@ -285,21 +285,10 @@ export class ProjectsService implements OnModuleInit {
     body: unknown
   ): Promise<IProjectUpload> {
     const block = parseBlock(rawBlock);
-    const token = readBearerToken(authorization);
-    if (!token) {
-      throw new UnauthorizedException(
-        "Send the project's upload token as Authorization: Bearer <token>"
-      );
-    }
-    const project = await this.projects.findOne({ slug }).lean();
-    const used = project
-      ? findProjectToken(token, project.tokens ?? [])
-      : undefined;
-    if (!project || !used) {
-      throw new UnauthorizedException(
-        "The upload token does not match this project. Connect again or add a token in Manage projects"
-      );
-    }
+    const { project, token: used } = await this.authorizeToken(
+      slug,
+      authorization
+    );
     this.assertHasBlock(project, block);
     const parsed = PROJECT_BLOCK_SCHEMAS[block].safeParse(body);
     if (!parsed.success) throw new ZodValidationException(parsed.error);
@@ -327,7 +316,43 @@ export class ProjectsService implements OnModuleInit {
     return { ...upload, updatedAt: new Date(upload.updatedAt).toISOString() };
   }
 
-  private async findProject(slug: string) {
+  async authorizeToken(slug: string, authorization: string | undefined) {
+    const token = readBearerToken(authorization);
+    if (!token) {
+      throw new UnauthorizedException(
+        "Send the project's token as Authorization: Bearer <token>"
+      );
+    }
+    const project = await this.projects.findOne({ slug }).lean();
+    const used = project
+      ? findProjectToken(token, project.tokens ?? [])
+      : undefined;
+    if (!project || !used) {
+      throw new UnauthorizedException(
+        "The token does not match this project. Connect again or add a token in Manage projects"
+      );
+    }
+    return { project, token: used };
+  }
+
+  async touchToken(slug: string, tokenId: string) {
+    await this.projects.updateOne(
+      { slug, "tokens.id": tokenId },
+      { $set: { "tokens.$.lastUsedAt": new Date() } }
+    );
+  }
+
+  async recordProgress(
+    slug: string,
+    block: IProjectBlock,
+    progress: { done: number; total: number; size: number }
+  ) {
+    const upload = { block, updatedAt: new Date(), ...progress };
+    await this.projects.updateOne({ slug }, { $pull: { uploads: { block } } });
+    await this.projects.updateOne({ slug }, { $push: { uploads: upload } });
+  }
+
+  async findProject(slug: string) {
     const project = await this.projects.findOne({ slug }).lean();
     if (!project) {
       throw new NotFoundException(`There is no project at "${slug}"`);
@@ -335,7 +360,7 @@ export class ProjectsService implements OnModuleInit {
     return project;
   }
 
-  private assertHasBlock(project: IStoredProject, block: IProjectBlock) {
+  assertHasBlock(project: IStoredProject, block: IProjectBlock) {
     if (!project.blocks.includes(block)) {
       throw new BadRequestException(
         `${project.name} has no ${PROJECT_BLOCK_TITLES[block]} block. Add it in Manage projects first`

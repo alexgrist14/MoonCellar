@@ -39,6 +39,7 @@ import {
   UpdateProjectRequestDto,
 } from "../../shared/zod/dto/projects.dto";
 import { ProjectsService } from "./projects.service";
+import { ProjectPlansService } from "./project-plans.service";
 
 @ApiTags("Projects")
 @Controller("projects")
@@ -46,7 +47,10 @@ import { ProjectsService } from "./projects.service";
 @UseGuards(AuthGuard("jwt"), RolesGuard)
 @Roles(RolesEnum.ADMIN)
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) {}
+  constructor(
+    private readonly projectsService: ProjectsService,
+    private readonly plans: ProjectPlansService
+  ) {}
 
   @Get()
   @ApiOperation({
@@ -119,7 +123,8 @@ export class ProjectsController {
   @ApiOperation({ summary: "The block as the project last uploaded it" })
   @Header("Content-Type", "application/json; charset=utf-8")
   @Header("Cache-Control", "no-store")
-  getData(@Param("slug") slug: string, @Param("block") block: string) {
+  async getData(@Param("slug") slug: string, @Param("block") block: string) {
+    if (block === "plan") return JSON.stringify(await this.plans.getPlan(slug));
     return this.projectsService.getData(slug, block);
   }
 }
@@ -127,7 +132,10 @@ export class ProjectsController {
 @ApiTags("Projects")
 @Controller("projects")
 export class ProjectUploadsController {
-  constructor(private readonly projectsService: ProjectsService) {}
+  constructor(
+    private readonly projectsService: ProjectsService,
+    private readonly plans: ProjectPlansService
+  ) {}
 
   @Post(":slug/tokens/exchange")
   @ApiOperation({
@@ -159,6 +167,31 @@ export class ProjectUploadsController {
     @Headers("authorization") authorization: string | undefined,
     @Body() body: unknown
   ) {
+    if (block === "plan") return this.importPlan(slug, authorization, body);
     return this.projectsService.putData(slug, block, authorization, body);
+  }
+
+  private async importPlan(
+    slug: string,
+    authorization: string | undefined,
+    body: unknown
+  ) {
+    const { token } = await this.projectsService.authorizeToken(
+      slug,
+      authorization
+    );
+    const plan = await this.plans.importPlan(slug, body, {
+      kind: "token",
+      name: token.name,
+      tokenId: token.id,
+    });
+    const tasks = plan.sections.flatMap((section) => section.tasks);
+    return {
+      block: "plan",
+      updatedAt: new Date().toISOString(),
+      size: 0,
+      done: tasks.filter((task) => task.state === "done").length,
+      total: tasks.length,
+    };
   }
 }

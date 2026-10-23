@@ -4,12 +4,12 @@ import { FC } from "react";
 import classNames from "classnames";
 import {
   IDecompBlock,
-  IPlanBlock,
   IProjectBlock,
   PROJECT_BLOCKS,
 } from "@mooncellar/schemas";
 import {
   useProjectBlockQuery,
+  useProjectPlanQuery,
   useProjectsQuery,
 } from "@/src/lib/entities/project/api";
 import {
@@ -51,9 +51,14 @@ export const StatusProjectPage: FC<IStatusProjectPageProps> = ({
       : project.blocks[0]);
   const upload =
     project && active ? getProjectUpload(project, active) : undefined;
-  const { data, isLoading: isBlockLoading } = useProjectBlockQuery<
-    IPlanBlock | IDecompBlock
-  >(slug, active ?? "plan", !!upload);
+  const isPlan = active === "plan";
+  const { data: decomp, isLoading: isDecompLoading } =
+    useProjectBlockQuery<IDecompBlock>(slug, "decomp", !isPlan && !!upload);
+  const { data: plan, isLoading: isPlanLoading } = useProjectPlanQuery(
+    slug,
+    isPlan
+  );
+  const commit = isPlan ? undefined : decomp?.commit;
 
   if (isLoading) return <StatusProjectSkeleton />;
 
@@ -91,9 +96,11 @@ export const StatusProjectPage: FC<IStatusProjectPageProps> = ({
               <SvgClock size="16" />
               {upload
                 ? `Updated ${commonUtils.getHumanDate(upload.updatedAt)}`
-                : "Never uploaded"}
-              {data?.commit && (
-                <code className={styles.commit}>{data.commit.slice(0, 7)}</code>
+                : isPlan
+                  ? "No changes yet"
+                  : "Never uploaded"}
+              {commit && (
+                <code className={styles.commit}>{commit.slice(0, 7)}</code>
               )}
             </span>
           </div>
@@ -110,7 +117,7 @@ export const StatusProjectPage: FC<IStatusProjectPageProps> = ({
           )}
         </div>
       </Box>
-      {!upload && (
+      {!isPlan && !upload && (
         <Box>
           <EmptyState
             variant="inline"
@@ -120,17 +127,14 @@ export const StatusProjectPage: FC<IStatusProjectPageProps> = ({
           />
         </Box>
       )}
-      {upload && (isBlockLoading || !data) && (
+      {((isPlan && (isPlanLoading || !plan)) ||
+        (!isPlan && upload && (isDecompLoading || !decomp))) && (
         <Box>
           <Skeleton height="320px" />
         </Box>
       )}
-      {upload && data && active === "plan" && (
-        <PlanBlock plan={data as IPlanBlock} />
-      )}
-      {upload && data && active === "decomp" && (
-        <DecompBlock decomp={data as IDecompBlock} />
-      )}
+      {isPlan && plan && <PlanBlock slug={project.slug} plan={plan} />}
+      {!isPlan && upload && decomp && <DecompBlock decomp={decomp} />}
     </>
   );
 };

@@ -1,4 +1,12 @@
 import {
+  ICreatePlanSectionRequest,
+  ICreatePlanTaskRequest,
+  IPlanBlock,
+  IPlanEvent,
+  IPlanTaskAction,
+  IPlanTaskActionRequest,
+  IUpdatePlanSectionRequest,
+  IUpdatePlanTaskRequest,
   ICreateProjectRequest,
   IProject,
   IProjectBlock,
@@ -25,6 +33,38 @@ export const projectsApi = {
     agent.post<IProjectToken>(`${PROJECTS_URL}/${slug}/tokens`, { name }),
   revokeToken: (slug: string, id: string) =>
     agent.delete<IProject>(`${PROJECTS_URL}/${slug}/tokens/${id}`),
+  getPlan: (slug: string) =>
+    agent.get<IPlanBlock>(`${PROJECTS_URL}/${slug}/plan`),
+  getPlanEvents: (slug: string, task?: string) =>
+    agent.get<IPlanEvent[]>(`${PROJECTS_URL}/${slug}/plan/events`, {
+      params: task ? { task } : undefined,
+    }),
+  createPlanSection: (slug: string, dto: ICreatePlanSectionRequest) =>
+    agent.post<IPlanBlock>(`${PROJECTS_URL}/${slug}/plan/sections`, dto),
+  updatePlanSection: (
+    slug: string,
+    id: string,
+    dto: IUpdatePlanSectionRequest
+  ) =>
+    agent.patch<IPlanBlock>(`${PROJECTS_URL}/${slug}/plan/sections/${id}`, dto),
+  deletePlanSection: (slug: string, id: string) =>
+    agent.delete<IPlanBlock>(`${PROJECTS_URL}/${slug}/plan/sections/${id}`),
+  createPlanTask: (slug: string, dto: ICreatePlanTaskRequest) =>
+    agent.post<IPlanBlock>(`${PROJECTS_URL}/${slug}/plan/tasks`, dto),
+  updatePlanTask: (slug: string, id: string, dto: IUpdatePlanTaskRequest) =>
+    agent.patch<IPlanBlock>(`${PROJECTS_URL}/${slug}/plan/tasks/${id}`, dto),
+  deletePlanTask: (slug: string, id: string) =>
+    agent.delete<IPlanBlock>(`${PROJECTS_URL}/${slug}/plan/tasks/${id}`),
+  actOnPlanTask: (
+    slug: string,
+    id: string,
+    action: IPlanTaskAction,
+    dto: IPlanTaskActionRequest = {}
+  ) =>
+    agent.post<IPlanBlock>(
+      `${PROJECTS_URL}/${slug}/plan/tasks/${id}/${action}`,
+      dto
+    ),
   connect: (slug: string, name: string) =>
     agent.post<IProjectConnectCode>(`${PROJECTS_URL}/${slug}/connect`, {
       name,

@@ -556,9 +556,13 @@ shows and how projects upload to it is in [`docs/status-hub.md`](../../docs/stat
   otherwise `/login?next=<page>`). The sign-in route sits outside `(gated)`, or it would gate itself.
   `next` carries the query too (`StatusGate` reads `location.search`): the connect link
   (`/connect?project=…&port=…&state=…`) must survive signing in, or the waiting command never hears back.
-- **The hub draws only from `@mooncellar/schemas` block data, never from a project's own format.**
-  A project converts its data into `PlanBlockSchema` / `DecompBlockSchema` before uploading; a
-  block the hub cannot draw is a new block type in the schema, the API and `widgets/status`.
+- **The hub draws only from `@mooncellar/schemas` shapes, never from a project's own format.** A
+  Decompilation block is uploaded by the project as `DecompBlockSchema`; the Plan lives in the hub and
+  is read and changed through `/projects/:slug/plan` (`PlanBlockSchema` out, the plan requests in).
+  A new block type is a schema, the API and `widgets/status`.
+- **Panels and modals of the plan read the plan from `useProjectPlanQuery` by id, never from props.**
+  `drawer.open` and `modal.open` keep the JSX they were given, so a `PlanTaskPanel` handed a task
+  would keep showing its old state after Take or Mark done.
 
 ## Drawer
 

@@ -21,7 +21,6 @@ jobs:
       infra: ${{ steps.filter.outputs.infra == 'true' || github.event_name == 'workflow_dispatch' }}
       docs: ${{ steps.filter.outputs.docs == 'true' || github.event_name == 'workflow_dispatch' }}
       storybook: ${{ steps.filter.outputs.storybook == 'true' || github.event_name == 'workflow_dispatch' }}
-      plan: ${{ steps.filter.outputs.plan == 'true' || github.event_name == 'workflow_dispatch' }}
 
     steps:
       - name: Checkout code
@@ -67,10 +66,6 @@ jobs:
               - 'bun.lock'
               - 'static.Dockerfile'
               - '.github/workflows/ci.yml'
-            plan:
-              - 'docs/plan.md'
-              - 'scripts/upload-plan.ts'
-              - 'packages/schemas/**'
 
   lint:
     runs-on: ubuntu-latest
@@ -92,31 +87,6 @@ jobs:
 
       - name: Run lint
         run: bun run lint
-
-  plan:
-    needs: [changes, lint]
-    if: >-
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
-      github.ref == 'refs/heads/main' && needs.changes.outputs.plan == 'true'
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Use Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: "1.3.12"
-
-      - name: Install dependencies
-        env:
-          HUSKY: 0
-        run: bun install --frozen-lockfile
-
-      - name: Upload the plan to the status hub
-        env:
-          STATUS_HUB_TOKEN: ${{ secrets.STATUS_HUB_TOKEN }}
-        run: bun scripts/upload-plan.ts
 
   deploy:
     needs: [changes, lint]
