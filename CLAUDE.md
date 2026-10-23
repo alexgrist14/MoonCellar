@@ -126,6 +126,15 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
 - The conversation with whoever asked for the work happens in whatever language they use;
   that never reaches a file.
 
+## Plan and agent commands
+
+- **The team's plan lives in the status hub, not in the repository: read and change it with
+  `bun scripts/tasks.ts` (or `/task`), never from memory or a file.** People take and finish tasks
+  on the site, so a copy is stale the moment someone clicks. A machine connects once with `/hub`
+  (`bun scripts/hub-connect.ts mooncellar`); details are in `docs/status-hub.md`.
+- The agent commands live in `.claude/commands/` (`/hub`, `/task`). A command that changes how work
+  is done (branches, PRs, checks) is updated together with `CONTRIBUTING.md` and this file.
+
 ## Skills
 
 - **Skills resolve from the monorepo root, so every skill is available both from the root and

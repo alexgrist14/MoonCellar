@@ -1,14 +1,19 @@
-import { existsSync, readFileSync } from "node:fs";
-import { homedir } from "node:os";
-import { join } from "node:path";
-import { gzipSync } from "node:zlib";
+import { readFileSync } from "node:fs";
 import {
   type IPlanBlock,
   type IPlanTask,
   PlanBlockSchema,
 } from "@mooncellar/schemas";
+import { hubRequest, hubSettings, readToken } from "./hub-client";
 
-const DEFAULT_PLAN = join(import.meta.dir, "..", "docs", "plan.md");
+const USAGE = `Import a markdown plan once into a project's empty plan in the status hub.
+
+  bun scripts/import-plan.ts --file <plan.md> [--check]
+
+A section is "## X. Title", a task a table row "| id | task | who | depends | done when | size |"
+with ✓ after a done task's id. --check only parses. The token is the one
+bun scripts/hub-connect.ts <project> saved (or STATUS_HUB_TOKEN); STATUS_HUB_PROJECT picks the
+project (default mooncellar).`;
 const SECTION = /^##\s+([A-Z])\.\s+(.+?)\s*$/;
 const ROW = /^\|\s*([A-Z]\d+)(\s*✓)?\s*\|(.*)\|\s*$/;
 const TASK_ID = /\b[A-Z]\d+\b/g;
@@ -48,9 +53,8 @@ export const parsePlan = (markdown: string, commit?: string): IPlanBlock => {
   const done = new Set(rows.filter((row) => row.done).map((row) => row.id));
   for (const { section, id, done: isDone, cells } of rows) {
     const [title, who, depends, doneWhen, size] = cells.map(cell);
-    const waitsFor = (depends?.match(TASK_ID) ?? []).filter(
-      (dep) => !done.has(dep)
-    );
+    const dependsOn = depends?.match(TASK_ID) ?? [];
+    const waitsFor = dependsOn.filter((dep) => !done.has(dep));
     const task: IPlanTask = {
       id,
       title: title ?? id,
@@ -62,6 +66,7 @@ export const parsePlan = (markdown: string, commit?: string): IPlanBlock => {
             ? "waiting"
             : "free",
       ...(who && !isDone && { owner: who }),
+      ...(dependsOn.length && { depends: dependsOn }),
       ...(!isDone && waitsFor.length && { waitsFor }),
       ...(doneWhen && { doneWhen }),
       ...(size && { size }),
@@ -75,39 +80,18 @@ export const parsePlan = (markdown: string, commit?: string): IPlanBlock => {
   });
 };
 
-/** STATUS_HUB_TOKEN, else the file `bun scripts/hub-connect.ts <project>` saved. */
-const readToken = (project: string) => {
-  if (process.env.STATUS_HUB_TOKEN) return process.env.STATUS_HUB_TOKEN;
-  const file = join(homedir(), ".config", "mooncellar", `${project}-hub-token`);
-  return existsSync(file) ? readFileSync(file, "utf8").trim() : undefined;
-};
-
 const upload = async (plan: IPlanBlock) => {
-  const url = process.env.STATUS_HUB_URL ?? "https://api.mooncellar.space";
-  const project = process.env.STATUS_HUB_PROJECT ?? "mooncellar";
-  const token = readToken(project);
-  if (!token) {
+  const { project } = hubSettings();
+  if (!readToken(project)) {
     console.log(
       `No token: run bun scripts/hub-connect.ts ${project} or set STATUS_HUB_TOKEN. The plan was checked, nothing was imported`
     );
     return;
   }
-  const response = await fetch(`${url}/projects/${project}/plan`, {
-    method: "PUT",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      "Content-Encoding": "gzip",
-    },
-    body: gzipSync(JSON.stringify(plan)),
+  const answer = await hubRequest<IPlanBlock>("PUT", "/plan", plan, {
+    gzip: true,
   });
-  const answer = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(
-      `The hub refused the plan (${response.status}): ${answer.message ?? response.statusText}`
-    );
-  }
-  const tasks: IPlanTask[] = (answer as IPlanBlock).sections.flatMap(
+  const tasks: IPlanTask[] = answer.sections.flatMap(
     (section) => section.tasks
   );
   console.log(
@@ -117,7 +101,11 @@ const upload = async (plan: IPlanBlock) => {
 
 if (import.meta.main) {
   const fileIndex = process.argv.indexOf("--file");
-  const file = fileIndex > 0 ? process.argv[fileIndex + 1] : DEFAULT_PLAN;
+  const file = fileIndex > 0 ? process.argv[fileIndex + 1] : undefined;
+  if (!file) {
+    console.log(USAGE);
+    process.exit(2);
+  }
   const plan = parsePlan(readFileSync(file, "utf8"), process.env.GITHUB_SHA);
   const tasks = plan.sections.flatMap((section) => section.tasks);
   console.log(`${tasks.length} tasks in ${plan.sections.length} sections`);
