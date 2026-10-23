@@ -101,16 +101,6 @@
     @include lineClamp(1);
   }
 
-  &__chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--gap-x2);
-
-    @include mediaMd {
-      justify-content: center;
-    }
-  }
-
   &__counters {
     align-self: flex-end;
 

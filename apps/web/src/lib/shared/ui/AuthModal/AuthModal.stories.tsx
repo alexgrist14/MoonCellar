@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { Box } from "../Box";
 import { Button } from "../Button";
 import { AuthModal, openAuthModal } from "./AuthModal";
 import { asModal } from "@/.storybook/decorators";
@@ -21,4 +22,15 @@ export const SignIn: Story = {
 
 export const InModal: Story = {
   render: () => <Button onClick={() => openAuthModal()}>Sign in</Button>,
+};
+
+export const Page: Story = {
+  args: { isPage: true },
+  decorators: [
+    (Story) => (
+      <Box wrapperStyle={{ width: "380px" }}>
+        <Story />
+      </Box>
+    ),
+  ],
 };

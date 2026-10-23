@@ -27,7 +27,6 @@ import {
   REASON_LABELS,
   SOURCE_LABELS,
   stateLabel,
-  stateFilterLabel,
   CONFLICT_STATES,
   stateTone,
   externalUrl,
@@ -89,11 +88,9 @@ export const ConflictList: FC<IConflictListProps> = ({ source }) => {
           <Dropdown
             list={[
               ALL_STATES,
-              ...CONFLICT_STATES.map((name) => stateFilterLabel(source, name)),
+              ...CONFLICT_STATES.map(stateLabel),
             ]}
-            overwriteValue={
-              state ? stateFilterLabel(source, state) : ALL_STATES
-            }
+            overwriteValue={state ? stateLabel(state) : ALL_STATES}
             getIndex={(index) => {
               setState(index > 0 ? CONFLICT_STATES[index - 1] : undefined);
               setPage(1);
@@ -185,7 +182,7 @@ export const ConflictList: FC<IConflictListProps> = ({ source }) => {
           state: {
             content: (
               <Badge tone={stateTone(row.state)}>
-                {stateLabel(row.source, row.state)}
+                {stateLabel(row.state)}
               </Badge>
             ),
           },

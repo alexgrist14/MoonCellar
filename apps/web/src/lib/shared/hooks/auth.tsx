@@ -14,17 +14,22 @@ export const useAuth = () => {
   const { setPlaythroughs } = useUserStore();
   const { push } = useRouter();
 
-  const logout = (id: string) => {
+  /**
+   * Signs out and goes to `/`, or loads `href` as a whole page: a server layout that read the
+   * session cookies (the status hub's gate) re-reads them only on a full load.
+   */
+  const logout = (id: string, { href }: { href?: string } = {}) => {
     unsubscribePush()
       .then(() => authAPI.logout(id))
       .then(() => {})
       .catch(() => {})
       .finally(() => {
-        push("/");
         deleteCookie(ACCESS_TOKEN);
         deleteCookie(REFRESH_TOKEN);
         clear();
         setPlaythroughs(undefined);
+        if (href) window.location.assign(href);
+        else push("/");
       });
   };
   const authUpdate = (userId: string) => {

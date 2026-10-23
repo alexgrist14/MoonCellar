@@ -33,7 +33,9 @@ export const AllTones: Story = {
     <div
       style={{ display: "flex", flexDirection: "column", gap: "var(--gap-x3)" }}
     >
-      {(["neutral", "accent", "attention", "negative"] as const).map((tone) => (
+      {(
+        ["neutral", "accent", "positive", "attention", "negative"] as const
+      ).map((tone) => (
         <ProgressBar key={tone} {...args} tone={tone} aria-label={tone} />
       ))}
     </div>

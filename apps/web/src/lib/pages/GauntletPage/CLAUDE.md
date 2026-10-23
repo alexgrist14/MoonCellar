@@ -47,7 +47,9 @@ Then, in `.page`:
 5. `widgets/wheel/WheelContainer` — the wheel, as tall as the space under the toolbar, and beside
    it the winner block, which always reaches the bottom of the page and scrolls inside. Before a
    spin the block shows `GauntletIntro`: the mode's title, lede and three steps, which used to
-   take half the height above the wheel.
+   take half the height above the wheel. After a spin it shows the winner (`GauntletWinner`), whose
+   facts under the name are the game page's `entities/game/ui/GameFacts`; its "More about the game"
+   no longer repeats genres and platforms.
 
 ## Rules and gotchas
 

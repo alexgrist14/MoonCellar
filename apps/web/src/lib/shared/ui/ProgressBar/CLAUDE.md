@@ -12,13 +12,13 @@ job's progress. A styled native `<progress>`, so screen readers announce the val
 
 ## API
 
-| Prop        | Type                                                 | Default     | Purpose                                                                |
-| ----------- | ---------------------------------------------------- | ----------- | ---------------------------------------------------------------------- |
-| `value`     | `number`                                             | —           | Progress so far; omitted, the bar is indeterminate and sweeps          |
-| `max`       | `number`                                             | `1`         | The value of a full bar; pass at least 1 (a `max` of 0 is invalid)     |
-| `tone`      | `"neutral" \| "accent" \| "attention" \| "negative"` | `"neutral"` | Colour of the filled part (`--color-text-secondary` for `neutral`)     |
-| `className` | `string`                                             | —           | Extra class, for placement only                                        |
-| `...rest`   | `ProgressHTMLAttributes<HTMLProgressElement>`        | —           | `aria-label` (always pass one), `title`, `data-*` reach the `progress` |
+| Prop        | Type                                                               | Default     | Purpose                                                                                                                                |
+| ----------- | ------------------------------------------------------------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `value`     | `number`                                                           | —           | Progress so far; omitted, the bar is indeterminate and sweeps                                                                          |
+| `max`       | `number`                                                           | `1`         | The value of a full bar; pass at least 1 (a `max` of 0 is invalid)                                                                     |
+| `tone`      | `"neutral" \| "accent" \| "positive" \| "attention" \| "negative"` | `"neutral"` | Colour of the filled part (`--color-text-secondary` for `neutral`, `--color-positive` for work that is finished, as on the status hub) |
+| `className` | `string`                                                           | —           | Extra class, for placement only                                                                                                        |
+| `...rest`   | `ProgressHTMLAttributes<HTMLProgressElement>`                      | —           | `aria-label` (always pass one), `title`, `data-*` reach the `progress`                                                                 |
 
 ## Usage
 

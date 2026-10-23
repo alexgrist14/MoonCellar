@@ -1,0 +1,33 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gap-x4);
+  max-width: 560px;
+  margin-inline: auto;
+  padding-block: var(--padding-x8);
+  text-align: center;
+
+  &__text {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+  }
+
+  &__code {
+    padding-inline: var(--padding-x05);
+    border-radius: var(--radius-x1);
+    background-color: var(--color-bg-tertiary);
+    font-family: monospace;
+  }
+
+  &__actions {
+    display: flex;
+    gap: var(--gap-x2);
+  }
+
+  &__form {
+    width: 100%;
+    text-align: left;
+  }
+}

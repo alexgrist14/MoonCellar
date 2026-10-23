@@ -121,10 +121,10 @@ const buildService = (undecided: unknown[]) => {
     getItem: jest.fn((_source: string, externalId: string) =>
       Promise.resolve(item(externalId))
     ),
-    skipCreatesGame: jest.fn((source: string) => source !== "ra"),
     findAiResolvedIds: jest.fn(),
     undo: jest.fn(),
   };
+  const matcher = { findLikelyDuplicates: jest.fn().mockResolvedValue([]) };
   const service = new ConflictsAiService(
     { db: {} } as never,
     {
@@ -134,10 +134,11 @@ const buildService = (undecided: unknown[]) => {
         }),
       }),
     } as never,
-    conflicts as never
+    conflicts as never,
+    matcher as never
   );
 
-  return { service, conflicts };
+  return { service, conflicts, matcher };
 };
 
 describe("Conflicts AI review", () => {
@@ -377,14 +378,6 @@ describe("Conflicts AI review", () => {
     expect(service.getStatus()).toMatchObject({ total: 1, decided: 1 });
   });
 
-  it("refuses to add games for a source whose Skip adds none", () => {
-    const { service } = buildService([]);
-
-    expect(() => service.startCreate("ra", ADMIN)).toThrow(
-      "The AI does not add ra entries as new games"
-    );
-  });
-
   it("adds games for every no-match verdict of a source without a filter", async () => {
     const { service, conflicts } = buildService([
       conflict("v1", verdict({ gameIds: [] })),
@@ -405,6 +398,36 @@ describe("Conflicts AI review", () => {
       ADMIN,
       { isAi: true }
     );
+  });
+
+  it("leaves an entry the catalogue may already have for a person", async () => {
+    const { service, conflicts, matcher } = buildService([
+      conflict("v1", verdict({ gameIds: [] })),
+      conflict("v2", verdict({ gameIds: [] })),
+    ]);
+    const jobs: (() => Promise<unknown>)[] = [];
+
+    matcher.findLikelyDuplicates
+      .mockResolvedValueOnce([
+        { _id: GAME_A, name: "Envoy", slug: "envoy", score: 0.9 },
+      ])
+      .mockResolvedValueOnce([]);
+    jest
+      .spyOn(service as never, "runInBackground")
+      .mockImplementation(((_kind: unknown, run: () => Promise<unknown>) =>
+        jobs.push(run)) as never);
+    service.startCreate("vndb", ADMIN);
+    await jobs[0]();
+
+    expect(matcher.findLikelyDuplicates).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: "Envoy",
+        first_release: Date.UTC(2020, 8, 13) / 1000,
+        platformIds: [PLATFORM_ID],
+      })
+    );
+    expect(conflicts.decide.mock.calls.map(([, id]) => id)).toEqual(["v2"]);
+    expect(service.getStatus()).toMatchObject({ total: 2, decided: 1 });
   });
 
   it("undoes only the picked matches", async () => {

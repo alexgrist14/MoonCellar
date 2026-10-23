@@ -31,7 +31,11 @@ export async function callClaude(
     "model" | "max_tokens"
   >
 ): Promise<Anthropic.Message> {
-  client ??= new Anthropic();
+  client ??= new Anthropic({
+    defaultHeaders: process.env.ANTHROPIC_WORKSPACE_ID
+      ? { "anthropic-workspace-id": process.env.ANTHROPIC_WORKSPACE_ID }
+      : undefined,
+  });
   let body = { model: claudeModel(), max_tokens: 32000, ...params };
   let message: Anthropic.Message;
 

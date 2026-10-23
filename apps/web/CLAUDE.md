@@ -78,7 +78,7 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   margin is space an element keeps around itself, like padding. A margin written in gap tokens
   changes the day the gap scale is retuned for flex and grid layouts. Prefer `gap` on the parent
   over a margin on the child wherever the layout allows it.
-- **A CSS custom property that derives from other custom properties must be declared on the same element whose values it reads.** `var()` inside a custom property is substituted where the property is *declared*, not where it is used, so a value computed in `:root` freezes the root defaults and ignores any modifier class further down. `--page-height-available` is declared on `.container` for this reason — declaring it in `:root` silently ignored `.container_bottomBar`.
+- **A CSS custom property that derives from other custom properties must be declared on the same element whose values it reads.** `var()` inside a custom property is substituted where the property is _declared_, not where it is used, so a value computed in `:root` freezes the root defaults and ignores any modifier class further down. `--page-height-available` is declared on `.container` for this reason — declaring it in `:root` silently ignored `.container_bottomBar`.
 - **A button's inline padding is always twice its block padding** — the shared `Button` uses
   `var(--padding-x2) var(--padding-x4)` and `compact` uses `x05`/`x1`, and any override keeps
   the 1:2 ratio on the same scale. The only exception is a button that holds a single icon and
@@ -189,7 +189,7 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   an indefinite parent and is dropped — so `height: 100%` on the item produces the opposite of
   what it reads like. `Box` ships `height: fit-content` on both `.wrapper` and `.template`, which
   cancels stretch the same way, so a column of Boxes passes `wrapperStyle={{ height: "auto" }}`
-  (the flex line stretches it) *and* `templateStyle={{ height: "100%" }}` (the wrapper now has a
+  (the flex line stretches it) _and_ `templateStyle={{ height: "100%" }}` (the wrapper now has a
   definite height to resolve against). `.template__resizer` and `.template__content` carry
   `flex-grow: 1` for the last leg; without them only the panel's background grows and
   `justify-content: space-between` inside the content does nothing.
@@ -239,7 +239,7 @@ Rules that apply to the Next.js app. Repository-wide rules live in the root
   with `fill`, or a grid of positioned cells, paints above its container's outline, so the ring is
   hidden and shows only through the gaps — the list tile's mosaic showed four accent dots on hover
   instead of a frame. Draw it on `&::after` (`position: absolute; inset: 0; z-index: 1;
-  border-radius: inherit; pointer-events: none`) with the same inset outline, as `ListCard`
+border-radius: inherit; pointer-events: none`) with the same inset outline, as `ListCard`
   and `TopFive` do.
 
 ## Server rendering and SEO
@@ -269,7 +269,7 @@ before:
   (`revalidate = 3600`), and a refresh only drops the client Router Cache — the server answers
   from the same cached entry, so a game edited from the browser keeps showing the old data until
   the hour is up. Any admin mutation made in the browser must call the `revalidateGamePage`
-  server action (`entities/game/api/game.actions.ts`) *before* `router.refresh()`, or the refresh
+  server action (`entities/game/api/game.actions.ts`) _before_ `router.refresh()`, or the refresh
   refills the cache with the stale render. Background jobs on the server deliberately do not
   revalidate: a mass parse would turn every touched page into a cold render.
 - **Never catch inside an `unstable_cache` callback.** Next stores whatever the callback resolves
@@ -295,7 +295,7 @@ before:
   (`pages/ErrorPage`); a missing record is `notFound()` in the page component.
 - **Purge a poisoned ISR entry with `POST /api/revalidate`** — header `x-revalidate-secret`
   matching `REVALIDATE_SECRET`, body `{"slugs": [...]}` (max 200). `revalidatePath` inside a Route
-  Handler only *marks* the path; the re-render happens on the next visit, so request each page
+  Handler only _marks_ the path; the re-render happens on the next visit, so request each page
   once afterwards and check its `<title>`.
 - **A page-level `openGraph` or `twitter` object replaces the parent's wholesale — it does not
   merge.** A route that declares `openGraph` must restate `siteName`, `type`, `locale` and
@@ -356,7 +356,7 @@ component needs to build the value itself (a `basePath` string, not a `getHref` 
   position; an inherited `text-align: center` (the search modal's empty state has one) pushes the
   body right while the dots keep their explicit `left`, and the dots fly past the mouth.
 - **An exit animation whose end unmounts the node must never be switched off with `animation:
-  none`.** `useDelayedUnmount` drops the node on `animationend`; with no animation the event never
+none`.** `useDelayedUnmount` drops the node on `animationend`; with no animation the event never
   fires and the block stays on screen forever. Inside the `reducedMotion` mixin set
   `animation-duration: var(--duration-instant)` (1ms) instead of removing the animation.
 - Put the animation on the grid cell that already holds the block, never on a new wrapper around
@@ -367,7 +367,7 @@ component needs to build the value itself (a `basePath` string, not a `getHref` 
 ## Forms
 
 - **A field driven only by `setValue` never recomputes `formState.isValid`.** react-hook-form
-  runs its validity pass when a field *registers*; `setValue` without `shouldValidate` does not,
+  runs its validity pass when a field _registers_; `setValue` without `shouldValidate` does not,
   so a form whose fields are all `setValue`/`watch`-driven keeps the initial `isValid: false`
   after `reset()`, and a `disabled: !isValid` button stays locked on a valid form. The symptom
   was the playthrough modal's Save staying disabled for Wishlist until something was typed into
@@ -398,7 +398,7 @@ component needs to build the value itself (a `basePath` string, not a `getHref` 
   string, or build `key=a&key=b` by hand as `gamesApi.getByIds` does.
 - **Never gate a loader on React Query's `isPending`.** A disabled query
   (`enabled: false`, e.g. `useGamesByIdsQuery`'s `ids.length > 0`) never leaves `status:
-  "pending"`, so `if (isPending) return <Loader />` renders forever and the empty-state branch
+"pending"`, so `if (isPending) return <Loader />` renders forever and the empty-state branch
   below it is unreachable — that is how the profile's "List is empty" placeholder disappeared
   behind an endless spinner. Use `isLoading` (`isPending && isFetching`): it is `false` while a
   query is disabled and `true` on the first render of an enabled one, so nothing flashes before
@@ -408,7 +408,7 @@ component needs to build the value itself (a `basePath` string, not a `getHref` 
   list for the spinner — the `/games` catalogue showed a loader and refetched on every browser
   Back instead of rendering from the cache. Keep `isFetching` for secondary indicators.
 - **A query whose key follows the URL gets `initialData` only for the key the server rendered.**
-  React Query seeds *every* new key with `initialData`, and within `staleTime` it never fetches
+  React Query seeds _every_ new key with `initialData`, and within `staleTime` it never fetches
   it — changing a custom list's sort showed the server's order under the new key until a reload.
   `CustomListPage` keeps the first sort in state and passes `initialList` only while the key
   still matches it.
@@ -532,6 +532,45 @@ break silently when ignored:
   rating is `getCombinedRating` in `@mooncellar/schemas`, wrapped as `getAverageRating` in
   `src/lib/shared/utils/rating.utils.ts`.
 
+## Status hub
+
+The admin-only project status site at `status.mooncellar.space` is part of this app; what it
+shows and how projects upload to it is in [`docs/status-hub.md`](../../docs/status-hub.md).
+
+- **The hub is reached by host, through the `beforeFiles` rewrites in `next.config.mjs`, never by
+  a path on `mooncellar.space`.** A host starting with `status.` maps `/`, `/<a>` and `/<a>/<b>` to
+  `src/app/status/...`; `src/app/status/layout.tsx` answers 404 on any other host. Links inside the
+  hub are host paths (`/rooftops/plan`, `/manage`) — never `/status/...`, which the rewrites skip.
+- **Every exclusion in those rewrites ends at the segment, `(?:/|$)`, never at `$`.** Next applies
+  the `beforeFiles` rules one after another to the already rewritten path: with `status$` the
+  two-segment rule took `/status/login` as `first = "status"`, so `/login` became
+  `/status/status/login`, rendered the gated layout with `slug = "status"`, and the sign-in page
+  showed the gate's loader in an endless redirect to itself.
+- **`/hub-connector.zip` is a file in `public/`, so the rewrites exclude it by name** (`hub-connector\\.zip`
+  in the segment list); without that the status host maps it to `/status/hub-connector.zip` and the
+  "Download" on Manage projects is a 404. The file is not in git: `build` makes it first
+  (`build:connector`, `scripts/build-hub-connector.ts`); in `dev` run `bun run build:connector` once.
+- **`Layout` renders `StatusLayout` when `useSelectedLayoutSegment()` is `STATUS_SEGMENT`.** It
+  keeps the page scroll, the connectors and `useMediaStore`, and none of the site's chrome or
+  background work — the header, filters, platforms, the `/royal` and `/notifications` sockets, the
+  last-online pings. Hooks of the site go in `SiteLayout`, or every hub page starts them too.
+- **Access is decided on the server by `src/app/status/(gated)/layout.tsx`** with
+  `GET /admin/access` and the request's cookies: 200 renders `StatusShell`, 403
+  `StatusNoAccessPage`, 401 `StatusGate` (a refresh token present: refresh and `router.refresh()`;
+  otherwise `/login?next=<page>`). The sign-in route sits outside `(gated)`, or it would gate itself.
+  `next` carries the query too (`StatusGate` reads `location.search`): the connect link
+  (`/connect?project=…&port=…&state=…`) must survive signing in, or the waiting command never hears back.
+- **Signing out on the hub is a full page load: `logout(id, { href: STATUS_SIGN_IN_PATH })`.** The gate
+  is a server layout shared by every hub route, and a soft `router.push` keeps it rendered: Sign out
+  cleared the cookies but left "No access" (or the shell) on screen, so it looked like it did nothing.
+- **The hub draws only from `@mooncellar/schemas` shapes, never from a project's own format.** A
+  Decompilation block is uploaded by the project as `DecompBlockSchema`; the Plan lives in the hub and
+  is read and changed through `/projects/:slug/plan` (`PlanBlockSchema` out, the plan requests in).
+  A new block type is a schema, the API and `widgets/status`.
+- **Panels and modals of the plan read the plan from `useProjectPlanQuery` by id, never from props.**
+  `drawer.open` and `modal.open` keep the JSX they were given, so a `PlanTaskPanel` handed a task
+  would keep showing its old state after Take or Mark done.
+
 ## Drawer
 
 - **Open long content beside the page with `drawer.open(node, { title })` from
@@ -551,7 +590,7 @@ break silently when ignored:
 ## Modals
 
 - **Modals must not push history entries.** `ModalsConnector` closes every open modal on
-  `popstate`, so Back and Forward dismiss the modal *and* still navigate. Pushing an entry per
+  `popstate`, so Back and Forward dismiss the modal _and_ still navigate. Pushing an entry per
   modal (so Back only closes it) was tried and rejected: it swallows the Back press, and keeping
   the pushed depth in sync with programmatic closes needs bookkeeping that breaks as soon as
   anything else touches history.
@@ -625,7 +664,7 @@ break silently when ignored:
   and displays `dd.mm.yyyy` through `commonUtils.formatDate`.
 - Its popover renders into `#dropdown-connector` through a portal, so a field inside a modal or
   a clipped panel cannot cut it off. Parse the incoming ISO string by hand (`new Date(y, m - 1,
-  d)`), never `new Date("2026-09-20")` — the latter is parsed as UTC midnight and shows the
+d)`), never `new Date("2026-09-20")` — the latter is parsed as UTC midnight and shows the
   previous day in any negative-offset timezone.
 
 ## Filters
@@ -768,7 +807,7 @@ break silently when ignored:
   `body` carry `overflow: hidden`. Anything that reads, moves or freezes page scroll targets that
   container, never `window`/`document.body`: `scrollPageToTop` and `useDisableScroll` both look it
   up by id, and a `window.scrollY` read is always 0.
-- **Never size that container in `vh`.** `100vh` is the *large* viewport on mobile — the height
+- **Never size that container in `vh`.** `100vh` is the _large_ viewport on mobile — the height
   with the URL bar retracted — while `html`/`body` at `height: 100%` are the visible one, so a
   `max-height: 100vh` scroller stood taller than `body` by the URL-bar height. The document then
   grew a second, parasitic scroll of those few dozen pixels: a full-height native scrollbar that
@@ -808,7 +847,6 @@ break silently when ignored:
 - Do not use the `Icon` component from `@iconify/react` (or any other icon library component).
 - Use SVG components from `src/lib/shared/ui/svg` instead. If the needed icon doesn't exist there yet, add a new `Svg*` component to that folder (following the existing components' pattern) and export it from `src/lib/shared/ui/svg/index.ts`.
 - New `Svg*` components must be built with the shared `Svg` and `Path` components from `src/lib/shared/ui/svg/Svg/Svg.tsx` — do not write raw `<svg>`/`<path>` tags.
-
 
 <!-- BEGIN:nextjs-agent-rules -->
 # This is NOT the Next.js you know

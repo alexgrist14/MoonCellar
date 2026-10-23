@@ -110,6 +110,45 @@ an instance of Module)`. Use a default import; tsc reports the call as `TS2349`.
   not aggregation-pipeline updates, so a string id would be stored as a string next to ObjectIds
   and the `$in` checks that deduplicate the list would never match it.
 
+## Projects (status hub)
+
+- **A project has one upload token per machine or CI (`tokens`: id, name, sha256, `lastUsedAt`), and
+  only the hash is stored.** The add and exchange answers are the only place a token exists; nothing
+  reads it back. The check hashes the token and compares with `timingSafeEqual`. Projects created
+  before the list kept one `tokenHash`; `ProjectsService.onModuleInit` moves it into `tokens` as "First
+  token" with the same hash, so their uploaders keep working — keep that migration until no project
+  carries `tokenHash`.
+- **A connect code is single-use and short-lived: `projectconnectcodes` stores its sha256 with a TTL
+  index on `expiresAt` (ten minutes), and the exchange is one `findOneAndDelete`.** The code travels
+  through the browser (a redirect to `127.0.0.1`), the token never does; a second exchange of the same
+  code answers 400.
+- **`PUT /projects/:slug/data/:block` answers the same 401 for a missing header, a wrong token and a
+  project that does not exist,** so the public endpoint does not tell which addresses are taken. It
+  sits in its own controller (`ProjectUploadsController`) because the admin controller's class-level
+  JWT and role guards would otherwise run before the token check.
+- **A block is validated with its schema (`PROJECT_BLOCK_SCHEMAS`) and stored as a JSON string in
+  `projectdata.body`, never as a document.** Decompilation units are keyed by file paths full of dots,
+  which Mongo field names handle badly, and the admin read returns the string untouched
+  (`@Header("Content-Type", "application/json")`). The menu's progress comes from `uploads` on the
+  project, written with each upload by `getProjectBlockProgress`, so listing projects never reads a
+  block.
+- **A plan is one `projectplans` document per project, and every task change is one
+  `findOneAndUpdate` that matches the task by `$elemMatch` on its id *and* the owner and done flag read
+  just before.** Two people taking the same task at once: the second update matches nothing and answers
+  409 "changed meanwhile". Never write `tasks.$` with a query that matches the array a second way (a
+  top-level `"tasks.done"` next to the `$elemMatch`): the positional operator then points at whichever
+  element matched last. A task's state is derived on read (`getPlanTaskState`), never stored.
+- **What a project uploads beside a block (`decomp/functions` in `projectdata`) is listed in
+  `BLOCK_EXTRAS` and goes away with the block; deleting a project also deletes its plan and plan
+  events.** A new kind of upload beside a block goes into that list, or a dropped block leaves it behind.
+- **`PUT /projects/:slug/data/plan` imports into an empty plan and answers 409 afterwards.** It is how a
+  project that used to upload its plan migrates by itself; once the plan lives in the hub, a stale
+  uploader must not overwrite what people changed on the site.
+- **Uploads are gzip in practice:** the global JSON limit is 2 MB of decoded body and the API's nginx
+  block keeps the default 1 MB, which a medium decompilation catalogue passes only compressed.
+- **Project addresses in `RESERVED_PROJECT_SLUGS` are routes of the hub** (`login`, `manage`, …); a
+  project there would never be reachable. Extend the list together with a new top-level hub route.
+
 ## Notifications
 
 - **A module whose provider injects `NotificationsService` must import `NotificationsModule`, and
@@ -343,8 +382,7 @@ an instance of Module)`. Use a default import; tsc reports the call as `TS2349`.
   the app snapshotted in `externalData`. Skip creates the game, as for VNDB: `createGame` reads the
   store page (`appdetails`), takes the 600×900 library poster as the cover (the header image when
   there is none) and `library_hero` as the background, and saves it through
-  `GamesService.addGame` (`isCustom`, images uploaded to the Space), so the conflict cannot be
-  reopened. A resolved conflict pins its
+  `GamesService.addGame` (`isCustom`, images uploaded to the Space). A resolved conflict pins its
   winners on every later run, so a link survives an IGDB sync that rewrites `externalPages`. Apps
   with no name match (~44,000) are not imported as new games on their own.
 
@@ -357,7 +395,11 @@ an instance of Module)`. Use a default import; tsc reports the call as `TS2349`.
   "Not rated" for authors who had rated the game. `Rating.userId`/`gameId` are declared the bare
   way, which is why `UserRatingsService` wraps every id in `new mongoose.Types.ObjectId(...)`.
   Before querying a model with string ids, check `schema.path(name).instance`, or convert
-  explicitly (`asObjectId`/`asObjectIds` in `module/comments/utils`).
+  explicitly (`asObjectId`/`asObjectIds` in `module/comments/utils`). Writes break the same way:
+  `Game.platformIds` was declared bare until 2026-10-22, and the 1,182 games `addGame` created
+  (Steam and HLTB Skips, games added by hand) stored the platform ids as strings, which the
+  catalogue's platform filter (`ObjectId`s in `shared/games.ts`) never matched. An array of
+  references is `@Prop({ type: [mongoose.Schema.Types.ObjectId], ref })`.
 - **The `.env` connection string points at the production database, and Mongoose `autoIndex`
   is on.** A new `Schema.index(...)` is built on production the first time any local process
   loads that schema. One-off scripts that import schemas connect with `autoIndex: false`.
@@ -371,6 +413,11 @@ an instance of Module)`. Use a default import; tsc reports the call as `TS2349`.
   Space. The VNDB sync, the IGDB games and characters syncs and the conflict decision worker take the lock
   today.
 
+- **`TRIM_IGDB_STAGE` (`games.service.ts`) cuts `igdb` down to the fields it names in every game
+  response — by slug, by id, lists, Gauntlet history.** A field stored on `igdb` and declared in
+  `@mooncellar/schemas` still arrives as `undefined` until it is added there: the game page never
+  showed IGDB's vote count although `total_rating_count` was in the database and the web already
+  read it.
 - **A game's characters are read from `character.gameIds`, never from `game.characters`.**
   `CHARACTERS_LOOKUP_STAGE` joins on `gameIds` because `linkGameCharacters` (IGDB) and
   `linkVndbCharacters` rewrite `game.characters` with only their own characters every run, so a
@@ -589,26 +636,36 @@ Module` before a single test runs. `comments.controller.spec.ts` mocks it with `
   today) lists catalogue games for one source entry, and the decision carries `gameId`. `entries`
   lists source entries for one catalogue game and carries `entryId`; HLTB used it until 2026-10-14,
   when it moved to `games` so its conflicts get the game search and a Skip that creates a game.
-  What Skip means belongs to the source: it creates a game for VNDB, IGDB, Steam and HLTB and leaves
-  the entry unlinked for RA.
+  What Skip means belongs to the source: it creates a game for every source today, and an RA Skip
+  leaves a hack, homebrew, prototype, demo, test kit or subset unlinked instead (`isRaVariantTitle`).
 - **A handler's `apply` returns `null` for an entry it applied without a game.** Leaving an entry
-  out of the map sends the decision back to review, so an RA Skip that returned nothing
+  out of the map sends the decision back to review, so an RA Skip of a hack that returned nothing
   would come back to the queue forever.
-- **Only a source whose Skip creates nothing may implement `rematch`, and only `absent`
-  conflicts are reopened.** `POST /conflicts/:source/:externalId/reopen` puts a skipped conflict
-  back to `pending` with candidates rebuilt by the handler's `rematch`, so a game added to the
-  catalogue after the Skip shows up. A VNDB or IGDB Skip has already created a game; reopening it
-  would leave that game behind and let a Match link the entry a second time. RA implements it;
-  Steam and HLTB must not (their Skip creates a game). `ConflictsService.skipCreatesGame` is
-  `!rematch`, so a source that gains a `rematch` also loses Undo new game and the AI's Add games.
+- **A skipped conflict goes back to the queue only through Undo, never through a rebuild of its
+  candidates.** A Skip has created a game (or, for an RA hack, nothing), and a requeue that keeps
+  that game leaves it behind and lets a Match link the entry a second time. The former
+  `POST /conflicts/:source/:externalId/reopen` and the handlers' `rematch` were removed on
+  2026-10-22, when RA, the last source that used them, started creating games on Skip.
+- **An RA Skip builds the game with `GameAiDraftService.createDraft` from the set's
+  `retroachievements.org/game/<id>` link and saves it with `addGame` without `retroachievements`,
+  then pushes the set itself.** `addGame` pins every RA set it is given, and that pin would turn
+  the conflict being applied into a resolved Match: the card would read Matched and Undo would only
+  unlink, leaving the AI's game behind. The draft is saved unreviewed and with `force` (its
+  candidates are the duplicates the check would refuse); a draft that fails or does not parse as
+  `AddGameRequestSchema` sends the decision back to review. One draft is a few minutes of research,
+  so the RA decision worker is that slow per Skip.
 - **A game the matcher missed is matched by adding it to the candidates first, never by passing
   its id to `decision`.** `decide` only accepts winners that are already among `candidates`
   (otherwise `400 The game is not a candidate`), so `POST /conflicts/:source/:externalId/candidates`
-  prepends the game an admin found by search, unscored (`score: 0`, an all-zero breakdown,
+  prepends the game an admin found by search or named by id, slug or game link (the web takes the
+  slug out of `/games/<slug>`; the body's `game` is an id or a slug), unscored (`score: 0`, an all-zero breakdown,
   `isManual: true`), to a waiting `games`-direction conflict; the admin then matches or skips as
-  usual. The list filters by `state`, each mapped onto `status`/`decision` in `STATE_FILTERS`.
+  usual. The list filters by `state`, each mapped onto `status`/`decision` in `STATE_FILTERS`; a
+  Skip is `new-game` or, when `externalData.created` is `null`, `skipped` ("No game added"). A
+  missing `created` (a Skip older than the field) stays `new-game`, because that Skip did add a game.
 - **`matchGames` recomputes every RA link each run, so it must read the RA conflicts first.**
-  A resolved conflict pins its winners, and a pending or skipped one links nothing. Without this
+  A resolved conflict pins its winners, and so does a skipped one (`absent`) — its winner is the game
+  the Skip created, or none for a hack the Skip left unlinked; a pending one links nothing. Without this
   the next nightly run replaces an admin's decision with the fuzzy match again. The run also
   pulls an RA set from every game it did not match when the run gave that set to another game, so
   one set never stays on two games after a conflict or a better title match moved it. It never
@@ -635,7 +692,7 @@ Module` before a single test runs. `comments.controller.spec.ts` mocks it with `
   memory, writes `raId` into `platforms` and the set's `consoleName`, `imageIcon` (absolute URL)
   and `numAchievements` into each game's `retroachievements` entry. A set that matched nothing is
   not kept. An ambiguous set has no game to live on, so its RA record is snapshotted into the
-  conflict's `externalData`, and the RA handler's `describe`, `rematch` and `apply` read that
+  conflict's `externalData`, and the RA handler's `describe` and `apply` read that
   snapshot instead of asking RA again; each run refreshes the snapshot of every RA set that has a
   conflict. A link added by hand (a content request) has only `gameId` and `consoleId` until the
   next sync fills in the rest, so the web must render an entry without them.
@@ -724,8 +781,12 @@ Module` before a single test runs. `comments.controller.spec.ts` mocks it with `
   and release dates (`fillEmptyFields`), and a game added from HLTB gets them plus its Steam page.
   The weekly run never reads pages — one request per game would take days.
 - **HLTB writes an unknown date part as zeros, so `hltbDate` cuts a date at its first zero part
-  before parsing.** `"0000-00-00"` (no date) and `"2015-00-00"` (year only) both pass
-  `parsePartialDate`'s pattern, and the first once dated a new game to the year −1. The page's
+  before parsing, and `parsePartialDate` refuses a zero year, month or day.** `"0000-00-00"` (no
+  date) and `"2015-00-00"` (year only) both match its pattern; the first once dated a new game to
+  the year −1, and `Date.UTC(0, -1, 0)` made it 1899-11-30 for the games HLTB Skips added until
+  2026-10-22. That date came through `releaseYear`: `howlongtobeat-ts` copies `release_world` into it
+  as is, a year number in the search but the page's date string from `getById`, so
+  `toSearchEntry` keeps only the year. A zero date adds no date at all. The page's
   NA, EU and JP dates become `release_dates` with the IGDB region codes (2, 1, 5), one row per
   platform of the game, because HLTB does not date platforms; regions that agree collapse into one
   Worldwide (8) row. `human` keeps HLTB's precision ("2015", "Apr 2006"), while `first_release` of a
@@ -766,8 +827,10 @@ Module` before a single test runs. `comments.controller.spec.ts` mocks it with `
   entry for it, and answers 409 naming the game otherwise. `GamesModule` imports `ConflictsModule`, so
   `ConflictsService` cannot inject `GamesService`; `GamesService.onModuleInit` hands it `deleteGame` through
   `useDeleteGame`. A Skip made before `created` existed is refused: the game it added cannot be told apart
-  from one that was already there. A source whose Skip creates nothing (RA) answers 400 — reopen it instead.
-  The admin card asks for confirmation before this undo, because it deletes a game.
+  from one that was already there. A Skip that created nothing (`created: null`: an RA hack, a game that
+  already held the entry, every RA Skip before 2026-10-22) is only requeued. The item's `createdGame` names
+  the game an undo deletes; the admin card asks for confirmation, naming that game, only when there is one,
+  and calls the button Undo skip otherwise.
 - **The AI judges conflicts only through `POST /conflicts/:source/ai` (`ConflictsAiService`), and it decides
   nothing until `apply=true`.** A run judges up to `limit` undecided conflicts of the source that have no
   verdict yet and stores the answer in `externalData.aiVerdict` (game ids, `high`/`medium`/`low`, a reason).
@@ -811,14 +874,17 @@ Module` before a single test runs. `comments.controller.spec.ts` mocks it with `
   skips. Set the confidences from a labelled dry run, never by guess. A sync that replaces `externalData`
   drops the verdicts, and a later run judges those conflicts again. A whole batch failing stops the run, so a
   spent quota does not leave the queue half judged without a trace.
-- **The AI adds a game only through `POST /conflicts/:source/ai/create` (and `POST /conflicts/ai/create`),
-  and only for a source whose Skip creates a game (`skipCreatesGame`: VNDB, IGDB, Steam and HLTB, not RA).**
+- **The AI adds a game only through `POST /conflicts/:source/ai/create` (and `POST /conflicts/ai/create`).**
   It turns every undecided conflict whose verdict names no game at a confidence in `confidences` (the same
   parameter and default as Apply), never undone, into a Skip as the admin with `decidedBy.isAi`; the handler
   then creates the game as for a manual Skip. A `canCreate` registered with `ConflictsAiService.register`
-  narrows it: HLTB allows entries of type `game` only — DLC, mods and hacks stay for a person; the other
-  sources register none and add every such entry. "No candidate is the entry" is not "the entry belongs in the
-  catalogue", so this is a separate button with a confirmation, never part of Apply. Each such game is taken
+  narrows it: HLTB allows entries of type `game` only — DLC, mods and hacks stay for a person; RA skips
+  every `isRaVariantTitle` set; the other sources register none and add every such entry. "No candidate is the entry" is not "the entry belongs in the
+  catalogue", so this is a separate button with a confirmation, never part of Apply, and each entry first goes
+  through `GameMatcherService.findLikelyDuplicates` with the conflict's subject: a likely duplicate is left
+  waiting for a person and logged with the games it resembles. The handlers save with `force`, so this is the
+  only duplicate check an AI Skip gets; without it HLTB added games the catalogue already had, with the same
+  cover and platform (2026-10-22). Each such game is taken
   back from its conflict card (Undo new game, the Skip undo above); "Undo AI matches" does not touch them.
 - **The AI routes (`ai`, `:source/ai` and their `/create` and `/undo`) stay declared above the `:source/:externalId`
   routes in `ConflictsController`.** Express matches in declaration order, so below them `ai/undo` reaches the
@@ -897,6 +963,12 @@ Module` before a single test runs. `comments.controller.spec.ts` mocks it with `
   rethrown as is, because OpenAI would fail the same way and spend its quota on it. A draft that fails
   on Claude mid-research starts over on OpenAI, so the run's steps show "Asking OpenAI" after the
   Claude ones.
+- **An `ANTHROPIC_API_KEY` created at the organization level needs `ANTHROPIC_WORKSPACE_ID`, which
+  `callClaude` sends as the `anthropic-workspace-id` header.** Without it the API answers 400 "This
+  API key is not scoped to a workspace…", which is a `ClaudeError`, so every call silently went to
+  OpenAI and the verdicts and drafts carried a `gpt-…` model while the key looked set (2026-10-22).
+  When AI answers come from OpenAI, look for "falling back to OpenAI" in the API log before
+  suspecting the key itself.
 - **A Claude JSON schema may hold at most 16 union-typed parameters (`["string", "null"]`, `anyOf`) and
   24 optional ones across the output schema and every strict tool of a request.** Above that the API
   answers 400 "Schema is too complex for compilation", which reads as a Claude failure and silently

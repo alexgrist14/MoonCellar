@@ -280,6 +280,7 @@ pins the internal API address, so it stays a secret on both counts.
 | `INDEXNOW_KEY` | **yes** | IndexNow key used to submit new game pages to search engines |
 | `SEARXNG_URL` | no | SearXNG the admin "Fill with AI" draft searches through — `http://searxng:8080`, the `searxng` service of `infra/docker-compose.prod.yml`. The default, `http://localhost:8891`, is empty inside the container: every search step then fails |
 | `ANTHROPIC_API_KEY` | **yes** | Claude key for the admin "Fill with AI" draft, its web-search fallback, the AI conflict review and the image elements split. Every one of them asks Claude first and goes to OpenAI only when this is unset or the Claude request fails. Without both keys `POST /games/ai-drafts` and `POST /conflicts/:source/ai` answer 503 |
+| `ANTHROPIC_WORKSPACE_ID` | with an organization key | Workspace the requests run in, sent as the `anthropic-workspace-id` header. A key not scoped to a workspace is refused without it (400 "This API key is not scoped to a workspace…"), and every call then silently goes to OpenAI. Leave it empty for a key created inside a workspace |
 | `ANTHROPIC_MODEL` | no | Claude model for the same calls, `claude-opus-5-5` by default |
 | `OPENAI_API_KEY` | **yes** | OpenAI key: the fallback for every call above, and the only provider of OpenAI image generation in the Images tab |
 | `OPENAI_MODEL` | no | Model the OpenAI fallback runs on, `gpt-5-mini` by default |
@@ -476,6 +477,7 @@ INDEXNOW_KEY=
 # AI game draft — in production SEARXNG_URL=http://searxng:8080
 SEARXNG_URL=http://localhost:8891
 ANTHROPIC_API_KEY=
+ANTHROPIC_WORKSPACE_ID=
 ANTHROPIC_MODEL=claude-opus-5-5
 OPENAI_API_KEY=
 OPENAI_MODEL=gpt-5-mini

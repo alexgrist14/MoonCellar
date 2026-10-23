@@ -220,21 +220,6 @@ describe("ConflictsService", () => {
     );
   });
 
-  it("refuses to undo a Skip of a source whose Skip adds no game", async () => {
-    const service = createService({
-      conflictsModel: {
-        ...idleModel,
-        findOne: () =>
-          query({ _id: "c3", externalId: "1", status: "absent", winners: [] }),
-      },
-      handler: { ...createHandler(), rematch: jest.fn() },
-    });
-
-    await expect(service.undo("vndb", "1", ADMIN)).rejects.toThrow(
-      "reopened rather than undone"
-    );
-  });
-
   it("undoes a match from what it changed, keeping fields edited since and games linked elsewhere", async () => {
     const gameId = new Types.ObjectId();
     const otherId = new Types.ObjectId();
@@ -358,64 +343,6 @@ describe("ConflictsService", () => {
     ).applyDecisions("vndb");
 
     expect(handler.apply).not.toHaveBeenCalled();
-  });
-
-  it("refuses to reopen a source without a rematch", async () => {
-    const service = createService({ conflictsModel: idleModel });
-
-    await expect(service.reopen("vndb", "v1", ADMIN)).rejects.toBeInstanceOf(
-      BadRequestException
-    );
-  });
-
-  it("reopens only a skipped conflict, with fresh candidates", async () => {
-    const gameId = new Types.ObjectId();
-    const findOneAndUpdate = jest.fn().mockResolvedValue({ _id: "c1" });
-    const events = createEvents();
-    const service = createService({
-      events,
-      conflictsModel: { ...idleModel, findOneAndUpdate },
-      handler: {
-        ...createHandler(),
-        rematch: jest.fn().mockResolvedValue([
-          {
-            game: { _id: String(gameId), slug: "dyna", name: "Dyna" },
-            score: 1,
-            breakdown: {},
-          },
-        ]),
-      },
-    });
-
-    await service.reopen("vndb", "v1", ADMIN);
-
-    const [filter, update] = findOneAndUpdate.mock.calls[0];
-
-    expect(filter).toEqual({
-      source: "vndb",
-      externalId: "v1",
-      status: "absent",
-      decision: null,
-    });
-    expect(update.$set.status).toBe("pending");
-    expect(update.$set.candidates[0].gameId).toEqual(gameId);
-    expect(events.conflictDecided).toHaveBeenCalledWith(
-      expect.objectContaining({ state: "waiting" })
-    );
-  });
-
-  it("answers 409 when the conflict was not skipped", async () => {
-    const service = createService({
-      conflictsModel: {
-        ...idleModel,
-        findOneAndUpdate: jest.fn().mockResolvedValue(null),
-      },
-      handler: { ...createHandler(), rematch: jest.fn().mockResolvedValue([]) },
-    });
-
-    await expect(service.reopen("vndb", "v1", ADMIN)).rejects.toBeInstanceOf(
-      ConflictException
-    );
   });
 
   it("records a decision only on an undecided conflict among its candidates", async () => {
@@ -697,13 +624,48 @@ describe("ConflictsService", () => {
     ]);
   });
 
+  it("tells a Skip that added a game from one that added none", async () => {
+    const item = (externalData: Record<string, unknown>) =>
+      createService({
+        conflictsModel: {
+          ...idleModel,
+          findOne: jest
+            .fn()
+            .mockReturnValueOnce(
+              query({
+                _id: new Types.ObjectId(),
+                externalId: "8937",
+                status: "absent",
+                decision: null,
+                candidates: [],
+                externalData,
+              })
+            )
+            .mockReturnValue(query(null)),
+        },
+        gamesModel: {
+          find: () => query([]),
+          findById: () => query({ name: "Spider Solitaire" }),
+        },
+      }).getItem("vndb", "8937");
+
+    await expect(item({ created: String(CREATED) })).resolves.toMatchObject({
+      state: "new-game",
+      createdGame: { name: "Spider Solitaire" },
+    });
+    await expect(item({ created: null })).resolves.toMatchObject({
+      state: "skipped",
+      createdGame: null,
+    });
+  });
+
   it("prepends a game found by hand as a manual candidate", async () => {
     const gameId = new Types.ObjectId();
     const findOneAndUpdate = jest.fn().mockResolvedValue({ _id: "c1" });
     const service = createService({
       conflictsModel: { ...idleModel, findOneAndUpdate },
       gamesModel: {
-        findById: () => query({ _id: gameId, name: "Dyna", slug: "dyna" }),
+        findOne: () => query({ _id: gameId, name: "Dyna", slug: "dyna" }),
       },
     });
 
@@ -722,6 +684,28 @@ describe("ConflictsService", () => {
       score: 0,
       isManual: true,
     });
+  });
+
+  it("finds a manual candidate by id or by slug", async () => {
+    const gameId = new Types.ObjectId();
+    const findOne = jest
+      .fn()
+      .mockReturnValue(query({ _id: gameId, name: "Dyna", slug: "dyna" }));
+    const service = createService({
+      conflictsModel: {
+        ...idleModel,
+        findOneAndUpdate: jest.fn().mockResolvedValue({ _id: "c1" }),
+      },
+      gamesModel: { findOne },
+    });
+
+    await service.addCandidate("vndb", "v1", String(gameId));
+    await service.addCandidate("vndb", "v1", "dyna");
+
+    expect(findOne.mock.calls).toEqual([
+      [{ _id: String(gameId) }],
+      [{ slug: "dyna" }],
+    ]);
   });
 
   it("refuses a manual candidate on an entries-direction source", async () => {

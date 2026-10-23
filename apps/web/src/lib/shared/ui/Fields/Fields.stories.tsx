@@ -343,6 +343,13 @@ export const Collapsible: Story = {
       <CollapsibleSection title="Media">
         <TextField label="Trailer" value="" onChange={() => {}} />
       </CollapsibleSection>
+      <CollapsibleSection title="Status hub" aside="3 of 4 done" isDefaultOpen>
+        <TextField
+          label="Next task"
+          value="Weekly digest"
+          onChange={() => {}}
+        />
+      </CollapsibleSection>
     </Column>
   ),
 };

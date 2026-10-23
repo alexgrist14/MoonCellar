@@ -5,6 +5,6 @@ export * from "./GameControls";
 export * from "./GameHero";
 export * from "./GameRelated";
 export * from "./GameScoreColumn";
-export * from "./GameSideColumn";
+export * from "./GameLinksPanel";
 export * from "./GamesCards";
 export * from "./GamesList";

@@ -1,24 +1,23 @@
 "use client";
 
-import { FC, useMemo } from "react";
+import { FC } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./GameHero.module.scss";
 import { Box } from "@/src/lib/shared/ui/Box";
 import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
 import { Badge } from "@/src/lib/shared/ui/Badge";
-import { Chip } from "@/src/lib/shared/ui/Chip";
 import { GameCard } from "@/src/lib/widgets/game/GameCard";
 import { GameRating } from "@/src/lib/features/game/ui/GameRating";
 import { SvgCrown } from "@/src/lib/shared/ui/svg/SvgCrown";
 import { IGameResponse, IGameStats } from "@mooncellar/schemas";
 import { GameStatsCounters } from "@/src/lib/entities/game/ui/GameStatsCounters";
-import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { useRoyalGames } from "@/src/lib/entities/royal/model/useRoyalGames";
 import { useHideAdult } from "@/src/lib/shared/hooks/useHideAdult";
 import { isAdultGame } from "@/src/lib/shared/utils/adult.utils";
 import { toSlug } from "@/src/lib/shared/utils/slug.utils";
 import { getGameBanner } from "@/src/lib/shared/utils/game-images.utils";
+import { GameFacts } from "@/src/lib/entities/game/ui/GameFacts";
 
 interface IGameHeroProps {
   game: IGameResponse;
@@ -26,83 +25,12 @@ interface IGameHeroProps {
 }
 
 export const GameHero: FC<IGameHeroProps> = ({ game, stats }) => {
-  const systems = useCommonStore((s) => s.systems);
   const { royalGames } = useRoyalGames();
   const hideMedia = useHideAdult() && isAdultGame(game);
 
   const artwork = hideMedia ? undefined : getGameBanner(game);
 
-  const releaseYear = game.first_release
-    ? new Date(game.first_release * 1000).getFullYear()
-    : undefined;
-
   const isRoyal = !!royalGames?.includes(game._id);
-
-  const chips = useMemo(() => {
-    const items: { key: string; label: string; href: string }[] = [];
-
-    if (releaseYear) {
-      items.push({
-        key: `year-${releaseYear}`,
-        label: String(releaseYear),
-        href: `/games?years[]=${releaseYear}&years[]=${releaseYear}`,
-      });
-    }
-
-    if (game.type) {
-      items.push({
-        key: `type-${game.type}`,
-        label: game.type,
-        href: `/games?selectedGameTypes[]=${game.type}`,
-      });
-    }
-
-    if (game.status) {
-      items.push({
-        key: `status-${game.status}`,
-        label: game.status,
-        href: `/games?selectedStatus[]=${game.status}`,
-      });
-    }
-
-    game.player_perspectives?.forEach((perspective) =>
-      items.push({
-        key: `perspective-${perspective}`,
-        label: perspective,
-        href: `/games?selectedPlayerPerspectives[]=${perspective}`,
-      })
-    );
-
-    return items;
-  }, [game, releaseYear]);
-
-  const genreChips = useMemo(
-    () =>
-      (game.genres ?? []).map((genre) => ({
-        key: `genre-${genre}`,
-        label: genre,
-        href: `/games/genre/${toSlug(genre)}`,
-      })),
-    [game.genres]
-  );
-
-  const platformChips = useMemo(
-    () =>
-      (game.platformIds ?? []).flatMap((id) => {
-        const platform = systems?.find((sys) => sys._id === id);
-
-        return platform
-          ? [
-              {
-                key: `platform-${id}`,
-                label: platform.name,
-                href: `/games/platform/${platform.slug}`,
-              },
-            ]
-          : [];
-      }),
-    [game.platformIds, systems]
-  );
 
   return (
     <Box
@@ -172,18 +100,7 @@ export const GameHero: FC<IGameHeroProps> = ({ game, stats }) => {
             )}
           </div>
 
-          {[chips, genreChips, platformChips].map(
-            (row, index) =>
-              !!row.length && (
-                <div key={index} className={styles.hero__chips}>
-                  {row.map((chip) => (
-                    <Chip key={chip.key} href={chip.href}>
-                      {chip.label}
-                    </Chip>
-                  ))}
-                </div>
-              )
-          )}
+          <GameFacts game={game} isCenteredOnMobile />
 
           <GameRating game={game} />
         </div>

@@ -63,7 +63,7 @@ const parentSearch = useGameSearch();
 - **A game search is `useGameSearch()` from `entities/game/model`** — debounce, the 2-character
   minimum, the `useGamesQuery` call and the option mapping (name, release year, cover). Do not
   rebuild that next to a picker; map its `options` if a screen needs extra meta, as Conflicts
-  does for "already a candidate".
+  does for "already a candidate" and for the "Add by id or slug" row it appends.
 - **Options stay native `<button>`s.** Each option is a full-width result row with a cover and two lines of text, laid out by the picker; `Button`'s centring and ellipsis do not fit a row.
 
 ## Storybook

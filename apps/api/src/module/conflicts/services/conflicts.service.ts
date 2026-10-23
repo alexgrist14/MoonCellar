@@ -19,6 +19,7 @@ import {
   type IConflictsSummary,
   type IGameConflict,
   type IGetConflictsParams,
+  ObjectIdSchema,
 } from "@mooncellar/schemas";
 import { withDbLock } from "../../../shared/cron-mutex";
 import { Game, type GameDocument } from "../../games/schemas/game.schema";
@@ -46,7 +47,11 @@ const STATE_FILTERS: Record<IConflictState, object> = {
   "queued-match": { status: "pending", decision: "match" },
   "queued-new": { status: "pending", decision: "skip" },
   matched: { status: "resolved" },
-  "new-game": { status: "absent" },
+  "new-game": {
+    status: "absent",
+    "externalData.created": { $not: { $type: "null" } },
+  },
+  skipped: { status: "absent", "externalData.created": { $type: "null" } },
   postponed: { status: "postponed" },
   dismissed: { status: "dismissed" },
 };
@@ -100,11 +105,15 @@ const escapeRegExp = (value: string) =>
 const conflictState = ({
   status,
   decision,
-}: Pick<Conflict, "status" | "decision">): IConflictState =>
+  externalData,
+}: Pick<Conflict, "status" | "decision"> &
+  Partial<Pick<Conflict, "externalData">>): IConflictState =>
   status === "resolved"
     ? "matched"
     : status === "absent"
-      ? "new-game"
+      ? externalData?.created === null
+        ? "skipped"
+        : "new-game"
       : status === "postponed" || status === "dismissed"
         ? status
         : decision === "match"
@@ -677,7 +686,9 @@ export class ConflictsService {
     if (!conflict) return null;
 
     const undecided = { source, ...UNDECIDED_FILTER };
-    const [remaining, next, games, subject] = await Promise.all([
+    const created =
+      conflict.status === "absent" ? conflict.externalData?.created : null;
+    const [remaining, next, games, subject, createdGame] = await Promise.all([
       this.conflictsModel.countDocuments({
         ...undecided,
         _id: { $gte: conflict._id },
@@ -696,6 +707,9 @@ export class ConflictsService {
         )
         .lean(),
       handler.describe(externalId, conflict.externalData ?? null),
+      typeof created === "string"
+        ? this.gamesModel.findById(created).select("name").lean()
+        : null,
     ]);
 
     const gameById = new Map(games.map((game) => [String(game._id), game]));
@@ -716,8 +730,8 @@ export class ConflictsService {
           : conflict.decidedBy.userName
         : null,
       isUndoable:
-        conflict.status === "resolved" ||
-        (conflict.status === "absent" && this.skipCreatesGame(source)),
+        conflict.status === "resolved" || conflict.status === "absent",
+      createdGame: createdGame && { name: createdGame.name },
       subject,
       candidates: conflict.candidates.map((entry) => {
         const game = gameById.get(String(entry.gameId));
@@ -832,7 +846,7 @@ export class ConflictsService {
   async addCandidate(
     source: IConflictSource,
     externalId: string,
-    gameId: string
+    idOrSlug: string
   ): Promise<void> {
     if (this.getHandler(source).direction !== "games") {
       throw new BadRequestException(
@@ -841,11 +855,17 @@ export class ConflictsService {
     }
 
     const game = await this.gamesModel
-      .findById(gameId)
+      .findOne(
+        ObjectIdSchema.safeParse(idOrSlug).success
+          ? { _id: idOrSlug }
+          : { slug: idOrSlug }
+      )
       .select("name slug")
       .lean();
 
-    if (!game) throw new NotFoundException(`Game ${gameId} does not exist`);
+    if (!game) {
+      throw new NotFoundException(`No game has the id or slug ${idOrSlug}`);
+    }
 
     const candidate: IConflictCandidateEntry = {
       gameId: game._id,
@@ -889,61 +909,6 @@ export class ConflictsService {
     }
   }
 
-  async reopen(
-    source: IConflictSource,
-    externalId: string,
-    user: Pick<User, "_id" | "userName">
-  ): Promise<IConflictsSummary> {
-    const handler = this.getHandler(source);
-
-    if (!handler.rematch) {
-      throw new BadRequestException(`${source} conflicts cannot be reopened`);
-    }
-
-    const existing = await this.conflictsModel
-      .findOne({ source, externalId })
-      .select("externalData")
-      .lean();
-    const candidates = await handler.rematch(
-      externalId,
-      existing?.externalData ?? null
-    );
-
-    if (!candidates) {
-      throw new NotFoundException(`${source} ${externalId} no longer exists`);
-    }
-
-    const conflict = await this.conflictsModel.findOneAndUpdate(
-      { source, externalId, status: "absent", decision: null },
-      {
-        $set: {
-          status: "pending",
-          candidates: candidates.map(toCandidateEntry),
-          winner: null,
-          winners: [],
-          winnerEntryId: null,
-          decision: null,
-          decidedBy: null,
-        },
-      }
-    );
-
-    if (!conflict) {
-      throw new ConflictException(
-        `${externalId} is not a skipped ${source} conflict`
-      );
-    }
-
-    this.events.conflictDecided({
-      source,
-      externalId,
-      state: "waiting",
-      decidedBy: user.userName,
-    });
-
-    return this.getSummary(source);
-  }
-
   async undo(
     source: IConflictSource,
     externalId: string,
@@ -961,12 +926,6 @@ export class ConflictsService {
     }
 
     const isSkip = conflict.status === "absent";
-
-    if (isSkip && !this.skipCreatesGame(source)) {
-      throw new BadRequestException(
-        `A ${source} Skip adds no game, so it is reopened rather than undone`
-      );
-    }
 
     const decision = {
       externalId,
@@ -1014,10 +973,6 @@ export class ConflictsService {
     });
 
     return this.getSummary(source);
-  }
-
-  skipCreatesGame(source: IConflictSource) {
-    return !this.getHandler(source).rematch;
   }
 
   private async undoChanges(

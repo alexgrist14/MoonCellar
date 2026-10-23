@@ -1,4 +1,5 @@
 import {
+  isRaVariantTitle,
   matchGameByTitle,
   matchPlatformToConsole,
   matchRaSets,
@@ -261,6 +262,32 @@ describe("matchRaSets", () => {
     );
 
     expect(linked(result)).toEqual({ b: [1] });
+  });
+
+  it("pins a skipped set to the game its Skip created, and nothing else", () => {
+    const result = run(
+      [set(1, "Mega Man 2"), set(2, "~Hack~ Mega Man 2")],
+      [game("a", "Mega Man 2"), game("c", "Mega Man II")],
+      new Map([
+        ["1", { status: "absent", winners: ["c"] }],
+        ["2", { status: "absent", winners: [] }],
+      ])
+    );
+
+    expect(linked(result)).toEqual({ c: [1] });
+  });
+
+  it("tells hacks, homebrew, prototypes, demos, test kits and subsets apart", () => {
+    expect(
+      [
+        "~Hack~ Super Mario Bros. Deluxe",
+        "~Homebrew~ Tobu Tobu Girl",
+        "Final Fantasy VII [Subset - Bonus]",
+        "~Test Kit~ NES",
+        "Contra",
+        "~Unlicensed~ Micro Mages",
+      ].map(isRaVariantTitle)
+    ).toEqual([true, true, true, true, false, false]);
   });
 
   it("keeps a pinned set on its game when RA did not list it this run", () => {

@@ -8,7 +8,7 @@ MoonCellar keeps five real-time channels open over Socket.IO, all served by the 
 | `/royal` | Every signed-in user, on every page | **State.** Royal games — the user's list of games for the royal wheel — are read and changed over this socket and pushed to the user's other tabs and devices. |
 | `/notifications` | Every signed-in user, on every page | **Notifications only.** Pushes a new or regrouped notification and the unread count to the user's tabs. The list and every change go through REST. |
 | `/activity` | Anyone with a profile's activity feed open | **Notifications only.** Tells open feeds that the user's activity log changed, so they refetch it. |
-| `/conflicts` | Admins with the Conflicts tab open | **Notifications only.** Tells other admins that a conflict was matched, skipped, reopened or undone, and when queued decisions were written to games. |
+| `/conflicts` | Admins with the Conflicts tab open | **Notifications only.** Tells other admins that a conflict was matched, skipped or undone, and when queued decisions were written to games. |
 
 This document describes how they work, every event on the wire, what depends on the sockets and
 what deliberately does not.
@@ -548,18 +548,17 @@ open gets a toast and loses the Skip and Match buttons. A conflict is identified
 #### `conflict:decided`
 
 Emitted by `ConflictsService.decide` after the decision is written, and by
-`ConflictsService.reopen` (`POST /conflicts/:source/:externalId/reopen`) when a skipped conflict
-goes back to the queue, and by `ConflictsService.undo` (`POST /conflicts/:source/:externalId/undo`)
-when a match is taken back.
+`ConflictsService.undo` (`POST /conflicts/:source/:externalId/undo`) when a match or a Skip is taken
+back.
 
 | Field | Type | Meaning |
 |---|---|---|
 | `source` | `"vndb"` \| `"igdb"` \| `"hltb"` \| `"ra"` \| `"steam"` | Parser the conflict came from |
 | `externalId` | string | The entry in that source |
-| `state` | `"queued-match"` \| `"queued-new"` \| `"waiting"` | State after the decision; `"waiting"` after a reopen or an undo |
-| `decidedBy` | string \| null | User name of the admin who decided, reopened or undid |
+| `state` | `"queued-match"` \| `"queued-new"` \| `"waiting"` | State after the decision; `"waiting"` after an undo |
+| `decidedBy` | string \| null | User name of the admin who decided or undid |
 
-Client: refetches the summaries and the list. For a reopened or undone conflict (`state: "waiting"`)
+Client: refetches the summaries and the list. For an undone conflict (`state: "waiting"`)
 it refetches the item, because its candidates or its decision changed; otherwise it patches `state` and
 `decidedBy` of the cached item and shows a toast when the conflict was waiting and is the one
 open on screen.

@@ -25,14 +25,18 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 
 interface IAuthModalProps {
   isSignIn?: boolean;
+  isPage?: boolean;
 }
 
 export const openAuthModal = (props: IAuthModalProps = {}) =>
   modal.open(<AuthModal {...props} />, { id: AUTH_MODAL_ID });
 
-export const AuthModal: FC<IAuthModalProps> = ({ isSignIn = false }) => {
+export const AuthModal: FC<IAuthModalProps> = ({
+  isSignIn = false,
+  isPage = false,
+}) => {
   const { login, signup } = useAuth();
-  const [isRegister, setIsRegister] = useState<boolean>(!isSignIn);
+  const [isRegister, setIsRegister] = useState<boolean>(!isSignIn && !isPage);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const isLoaderShown = useMinimumLoading(isLoading);
@@ -98,51 +102,55 @@ export const AuthModal: FC<IAuthModalProps> = ({ isSignIn = false }) => {
     });
   };
 
-  return (
-    <div className={styles.container}>
-      <form onSubmit={onSubmit} className={styles.content} autoComplete="on">
-        <div className={styles.content__inputs}>
-          {isRegister && (
-            <div>
-              <label>User Name</label>
-              <Input
-                type="text"
-                {...register("userName")}
-                error={errors.userName}
-              />
-            </div>
-          )}
+  const form = (
+    <form
+      onSubmit={onSubmit}
+      className={isPage ? styles.page : styles.content}
+      autoComplete="on"
+    >
+      <div className={styles.content__inputs}>
+        {isRegister && (
           <div>
-            <label>Email</label>
+            <label>User Name</label>
             <Input
-              type="email"
-              id="email"
-              autoComplete="username"
-              {...register("email")}
-              error={errors.email}
+              type="text"
+              {...register("userName")}
+              error={errors.userName}
             />
           </div>
-          <div>
-            <label>Password</label>
-            <Input
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              {...register("password")}
-              error={errors.password}
-            />
-          </div>
+        )}
+        <div>
+          <label>Email</label>
+          <Input
+            type="email"
+            id="email"
+            autoComplete="username"
+            {...register("email")}
+            error={errors.email}
+          />
         </div>
-        {error && <p className={styles.error}>{error}</p>}
-        <div className={styles.content__buttons}>
-          <Button
-            color={ButtonColor.ACCENT}
-            className={styles.btn}
-            type="submit"
-            isLoading={isLoaderShown}
-          >
-            {isRegister ? "Sign up" : "Sign in"}
-          </Button>
+        <div>
+          <label>Password</label>
+          <Input
+            type="password"
+            id="password"
+            autoComplete="current-password"
+            {...register("password")}
+            error={errors.password}
+          />
+        </div>
+      </div>
+      {error && <p className={styles.error}>{error}</p>}
+      <div className={styles.content__buttons}>
+        <Button
+          color={ButtonColor.ACCENT}
+          className={styles.btn}
+          type="submit"
+          isLoading={isLoaderShown}
+        >
+          {isRegister ? "Sign up" : "Sign in"}
+        </Button>
+        {!isPage && (
           <p className={styles.switch}>
             {isRegister ? "Already have an account?" : "Don't have an account?"}
             <Button
@@ -155,8 +163,16 @@ export const AuthModal: FC<IAuthModalProps> = ({ isSignIn = false }) => {
               {isRegister ? "Sign in" : "Sign up"}
             </Button>
           </p>
-        </div>
-      </form>
+        )}
+      </div>
+    </form>
+  );
+
+  if (isPage) return form;
+
+  return (
+    <div className={styles.container}>
+      {form}
       <Button
         type="button"
         color={ButtonColor.TRANSPARENT}

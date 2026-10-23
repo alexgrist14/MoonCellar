@@ -15,7 +15,8 @@ import { GameAdminControls } from "@/src/lib/features/game/ui/GameAdminControls"
 import { GameHero } from "@/src/lib/widgets/game/GameHero";
 import { GameOverview } from "@/src/lib/entities/game/ui/GameOverview";
 import { GameScoreColumn } from "@/src/lib/widgets/game/GameScoreColumn";
-import { GameSideColumn } from "@/src/lib/widgets/game/GameSideColumn";
+import { GameLinksPanel } from "@/src/lib/widgets/game/GameLinksPanel";
+import { GameFriendsStatus } from "@/src/lib/features/game/ui/GameFriendsStatus";
 import { GameMedia } from "@/src/lib/entities/game/ui/GameMedia";
 import { GameDetails } from "@/src/lib/entities/game/ui/GameDetails";
 import { GameReleaseDates } from "@/src/lib/entities/game/ui/GameReleaseDates";
@@ -46,14 +47,15 @@ export const GamePage: FC<IGamePageProps> = ({
     <div className={styles.page}>
       <BGImage game={game} />
       <GameHero game={game} stats={stats} />
-      <div className={styles.page__columns}>
-        <GameOverview game={game} className={styles.page__columnWide} />
-        <GameScoreColumn
-          game={game}
-          portAchievements={portAchievements}
-          className={styles.page__column}
-        />
-        <GameSideColumn game={game} className={styles.page__column} />
+      <div className={styles.page__overview}>
+        <div className={styles.page__stack}>
+          <GameOverview game={game} />
+          <GameLinksPanel game={game} className={styles.page__links} />
+        </div>
+        <div className={styles.page__stack}>
+          <GameScoreColumn game={game} portAchievements={portAchievements} />
+          <GameFriendsStatus gameId={game._id} />
+        </div>
       </div>
       {!hideMedia && <GameMedia game={game} />}
       {!hideMedia && (

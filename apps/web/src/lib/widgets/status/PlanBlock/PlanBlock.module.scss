@@ -1,0 +1,143 @@
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x4);
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--gap-x3);
+}
+
+.sections {
+  display: flex;
+  flex-direction: column;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--gap-x2);
+}
+
+.id {
+  font-family: monospace;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.task {
+  @include lineClamp(2);
+}
+
+.code {
+  padding-inline: var(--padding-x05);
+  border-radius: var(--radius-x1);
+  background-color: var(--color-bg-tertiary);
+  font-family: monospace;
+  font-size: 0.92em;
+  overflow-wrap: anywhere;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x4);
+  color: var(--color-text-secondary);
+
+  &__state {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-x3);
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-x2);
+  }
+
+  &__size {
+    font-size: 13px;
+    color: var(--color-text-muted);
+  }
+
+  &__text {
+    font-size: 15px;
+    line-height: 1.6;
+    white-space: pre-line;
+  }
+
+  &__fact {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x1);
+
+    h4 {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-gray);
+    }
+
+    p {
+      font-size: 14px;
+    }
+  }
+}
+
+.sectionFooter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-x2);
+  margin-top: var(--padding-x3);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x3);
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--gap-x2);
+  }
+}
+
+.assign {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x2);
+  padding: var(--padding-x2);
+}
+
+.hint {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.history {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--gap-x3);
+    font-size: 13px;
+  }
+
+  time {
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+  }
+}

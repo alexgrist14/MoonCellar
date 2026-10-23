@@ -1,7 +1,7 @@
 # Android app
 
 MoonCellar ships as an installable PWA and as an Android APK published in the GitHub releases of
-`alexgrist14/MoonCellar`. The APK is a Trusted Web Activity (TWA): a thin Android shell, generated
+`MoonCellar-Team/MoonCellar`. The APK is a Trusted Web Activity (TWA): a thin Android shell, generated
 by [Bubblewrap](https://github.com/GoogleChromeLabs/bubblewrap), that opens `mooncellar.space` full
 screen in Chrome. Content ships with the website; a new APK is needed only when the shell changes
 (name, icons, colours, shortcuts, `targetSdk`).
@@ -88,7 +88,7 @@ The workflow fails when the tag and `appVersion` differ. It regenerates the proj
 `bubblewrap update --skipVersionUpgrade`, builds with `bubblewrap build --skipPwaValidation`
 (passwords come from the environment, so nothing prompts), and creates the release with
 `mooncellar.apk`. The file name never changes, so
-`https://github.com/alexgrist14/MoonCellar/releases/latest/download/mooncellar.apk` always points
+`https://github.com/MoonCellar-Team/MoonCellar/releases/latest/download/mooncellar.apk` always points
 at the newest build. `workflow_dispatch` builds the APK as a run artifact without a release.
 
 `ci.yml` listens to branch pushes only, so a release tag does not redeploy the site.

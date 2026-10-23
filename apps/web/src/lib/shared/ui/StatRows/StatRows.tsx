@@ -1,5 +1,6 @@
 import { FC, KeyboardEvent, MouseEvent, ReactNode } from "react";
 import classNames from "classnames";
+import Link from "next/link";
 import styles from "./StatRows.module.scss";
 
 export interface IStatRow {
@@ -10,6 +11,8 @@ export interface IStatRow {
   unit?: ReactNode;
   icon?: ReactNode;
   title?: string;
+  href?: string;
+  isExternal?: boolean;
   onClick?: (event: MouseEvent<HTMLDivElement>) => void;
 }
 
@@ -25,6 +28,29 @@ const clickOnEnterOrSpace = (event: KeyboardEvent<HTMLDivElement>) => {
   event.currentTarget.click();
 };
 
+const renderLabel = (label: ReactNode, href?: string, isExternal?: boolean) => {
+  if (!href) return label;
+
+  if (isExternal) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        className={styles.rows__link}
+      >
+        {label}
+      </a>
+    );
+  }
+
+  return (
+    <Link href={href} className={styles.rows__link}>
+      {label}
+    </Link>
+  );
+};
+
 export const StatRows: FC<IStatRowsProps> = ({ rows, className }) => {
   if (!rows.length) return null;
 
@@ -32,25 +58,37 @@ export const StatRows: FC<IStatRowsProps> = ({ rows, className }) => {
     <dl className={classNames(styles.rows, className)}>
       {rows.map(
         (
-          { key, label, sublabel, value, unit, icon, title, onClick },
+          {
+            key,
+            label,
+            sublabel,
+            value,
+            unit,
+            icon,
+            title,
+            href,
+            isExternal,
+            onClick,
+          },
           index
         ) => (
           <div
             key={key ?? (typeof label === "string" ? label : index)}
             className={classNames(styles.rows__row, {
-              [styles.rows__row_interactive]: !!onClick,
+              [styles.rows__row_interactive]: !!onClick || !!href,
             })}
             title={title}
-            {...(onClick && {
-              role: "button",
-              tabIndex: 0,
-              onClick,
-              onKeyDown: clickOnEnterOrSpace,
-            })}
+            {...(onClick &&
+              !href && {
+                role: "button",
+                tabIndex: 0,
+                onClick,
+                onKeyDown: clickOnEnterOrSpace,
+              })}
           >
             {!!icon && <span className={styles.rows__icon}>{icon}</span>}
             <dt className={styles.rows__label}>
-              {label}
+              {renderLabel(label, href, isExternal)}
               {!!sublabel && (
                 <span className={styles.rows__sublabel}>{sublabel}</span>
               )}

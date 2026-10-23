@@ -1,4 +1,4 @@
-import { FC, MouseEvent, useRef, useState } from "react";
+import { FC } from "react";
 import Image from "next/image";
 import { InfoBlock } from "@/src/lib/shared/ui/InfoBlock";
 import { StatRows, type IStatRow } from "@/src/lib/shared/ui/StatRows";
@@ -7,9 +7,6 @@ import { modal } from "@/src/lib/shared/ui/Modal";
 import { IGameResponse } from "@mooncellar/schemas";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
 import { IPortGameAchievements } from "@/src/lib/entities/port-achievement/model";
-import { GameSteamPopover } from "@/src/lib/features/game/ui/GameSteamPopover";
-import { GameAchievementsPopover } from "@/src/lib/features/game/ui/GameAchievementsPopover";
-import { useGameSteamProgress } from "@/src/lib/features/game/model/useGameSteamProgress";
 import {
   GAME_PORT_ACHIEVEMENTS_MODAL_ID,
   GamePortAchievementsModal,
@@ -36,12 +33,7 @@ export const GameAchievementsBlock: FC<IGameAchievementsBlockProps> = ({
 }) => {
   const { steam } = getAchievementCounts(game);
   const systems = useCommonStore((state) => state.systems);
-  const steamProgress = useGameSteamProgress(game);
-
-  const steamRef = useRef<HTMLDivElement>(null);
-  const raRef = useRef<HTMLDivElement>(null);
-  const [isSteamOpen, setIsSteamOpen] = useState(false);
-  const [isRaOpen, setIsRaOpen] = useState(false);
+  const steamAppId = game.steamAchievements?.appId;
 
   const portTotal = portAchievements?.total;
 
@@ -75,11 +67,9 @@ export const GameAchievementsBlock: FC<IGameAchievementsBlockProps> = ({
             value: steam,
             icon: <SvgSteam size="16" />,
             title: `${steam} achievements on Steam`,
-            ...(!!steamProgress.appId && {
-              onClick: (event: MouseEvent<HTMLDivElement>) => {
-                steamRef.current = event.currentTarget;
-                setIsSteamOpen((current) => !current);
-              },
+            ...(!!steamAppId && {
+              href: `https://steamcommunity.com/stats/${steamAppId}/achievements`,
+              isExternal: true,
             }),
           },
         ]
@@ -99,10 +89,8 @@ export const GameAchievementsBlock: FC<IGameAchievementsBlockProps> = ({
           value: numAchievements,
           icon: <SvgRetroAchievements size="20" />,
           title: `${numAchievements} achievements in the RetroAchievements set${platform ? ` for ${platform}` : ""}`,
-          onClick: (event: MouseEvent<HTMLDivElement>) => {
-            raRef.current = event.currentTarget;
-            setIsRaOpen((current) => !current);
-          },
+          href: `https://retroachievements.org/game/${gameId}`,
+          isExternal: true,
         };
       }),
   ];
@@ -112,25 +100,6 @@ export const GameAchievementsBlock: FC<IGameAchievementsBlockProps> = ({
   return (
     <InfoBlock title="Achievements:" isBoxed={isBoxed}>
       <StatRows rows={rows} />
-      {!!steamProgress.appId && (
-        <GameSteamPopover
-          appId={steamProgress.appId}
-          total={steamProgress.total}
-          progress={steamProgress.progress}
-          steamId={steamProgress.steamId}
-          anchorRef={steamRef}
-          isOpen={isSteamOpen}
-          onClose={() => setIsSteamOpen(false)}
-        />
-      )}
-      {!!game.retroachievements?.length && (
-        <GameAchievementsPopover
-          game={game}
-          anchorRef={raRef}
-          isOpen={isRaOpen}
-          onClose={() => setIsRaOpen(false)}
-        />
-      )}
     </InfoBlock>
   );
 };

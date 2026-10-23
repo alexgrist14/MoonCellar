@@ -16,8 +16,6 @@ export const GameOverview: FC<IGameOverviewProps> = ({ game, className }) => {
   return (
     <Box
       className={className}
-      wrapperStyle={{ height: "auto" }}
-      templateStyle={{ height: "100%" }}
       classNameContent={styles.overview}
       contentStyle={{ padding: "var(--padding-x4)" }}
     >

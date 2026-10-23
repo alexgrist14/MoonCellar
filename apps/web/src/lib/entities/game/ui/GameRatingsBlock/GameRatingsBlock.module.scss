@@ -30,11 +30,11 @@
     align-items: baseline;
     justify-content: space-between;
     gap: var(--gap-x2);
+  }
 
-    & p {
-      @include font(13px, 17px, 400);
-      color: var(--color-gray);
-    }
+  &__label {
+    @include font(13px, 17px, 400);
+    color: var(--color-gray);
   }
 
   &__value {
@@ -57,7 +57,8 @@
   }
 
   &__count {
-    @include font(12px, 14px, 400);
-    color: var(--color-neutral-70);
+    margin-left: var(--padding-x1);
+    color: var(--color-text-muted);
+    @include font(13px, 17px, 400);
   }
 }

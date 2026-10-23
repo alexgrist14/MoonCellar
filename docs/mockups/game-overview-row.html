@@ -1,0 +1,787 @@
+<!-- artifact: https://claude.ai/artifact/LXvWa2265mXvD9AAmhaCaD -->
+<title>Game Overview Row</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* mooncellar-tokens:start */
+/* Generated from apps/web/src/lib/app/styles/vars by
+   `bun --filter web sync:tokens`. Do not edit by hand. */
+:root {
+  /* vars/_colors.scss */
+  --color-neutral-5: #080a0b;
+  --color-neutral-10: #0d1011;
+  --color-neutral-15: #121516;
+  --color-neutral-20: #161b1d;
+  --color-neutral-25: #1a2022;
+  --color-neutral-30: #1f2628;
+  --color-neutral-35: #262d2f;
+  --color-neutral-40: #2f3537;
+  --color-neutral-45: #383e40;
+  --color-neutral-50: #3f4750;
+  --color-neutral-55: #50575d;
+  --color-neutral-60: #5e6a6e;
+  --color-neutral-70: #747d82;
+  --color-neutral-80: #9192a1;
+  --color-neutral-85: #b0b2bc;
+  --color-neutral-90: #d9d9d9;
+  --color-neutral-95: #eaeaea;
+  --color-neutral-100: #ffffff;
+  --color-blue: #3d6bff;
+  --color-blue-light: #00d4ff;
+  --color-cyan: #48cae4;
+  --color-gray: #afb3b9;
+  --color-white: #e8edf5;
+  --color-yellow: #ffc451;
+  --color-yellow-light: #f9f871;
+  --color-orange: #ff8862;
+  --color-pink: #ff4b8f;
+  --color-violet: #9b5de5;
+  --color-green: #2dc653;
+  --color-red: #e5383b;
+  --color-positive: #00c292;
+  --color-negative: #d02729;
+  --color-primary: var(--color-neutral-30);
+  --color-secondary: var(--color-neutral-90);
+  --color-contrast: var(--color-neutral-100);
+  --color-contrast-reverse: var(--color-neutral-5);
+  --color-attention: #ffc451;
+  --color-text-primary: var(--color-neutral-100);
+  --color-text-secondary: var(--color-neutral-90);
+  --color-text-muted: var(--color-neutral-85);
+  --color-accent: #6951ee;
+  --color-bg-primary: #191d24;
+  --color-bg-secondary: #212731;
+  --color-bg-tertiary: #2c3340;
+  --color-bg-accent: #6951ee;
+  --color-bg-hover: #374151;
+  --color-bg-positive: #00c292;
+  --color-bg-primary-tint: #191d24ee;
+  --color-bg-secondary-tint: #212731ee;
+  --color-bg-tertiary-tint: #2c3340ee;
+  --color-bg-accent-tint: #6951eeee;
+  --color-bg-positive-tint: #00c292ee;
+  --color-border-primary: var(--color-neutral-35);
+  --color-scrollbar-track: var(--color-neutral-15);
+  --color-scrollbar-thumb: var(--color-neutral-80);
+  --color-border-secondary: var(--color-neutral-85);
+
+  /* vars/_common.scss */
+  --padding-x05: calc(var(--padding-x1) * 0.5);
+  --padding-x1: 4px;
+  --padding-x2: calc(var(--padding-x1) * 2);
+  --padding-x3: calc(var(--padding-x1) * 3);
+  --padding-x4: calc(var(--padding-x1) * 4);
+  --padding-x5: calc(var(--padding-x1) * 5);
+  --padding-x6: calc(var(--padding-x1) * 6);
+  --padding-x7: calc(var(--padding-x1) * 7);
+  --padding-x8: calc(var(--padding-x1) * 8);
+  --padding-x9: calc(var(--padding-x1) * 9);
+  --padding-x10: calc(var(--padding-x1) * 10);
+  --padding-x11: calc(var(--padding-x1) * 11);
+  --padding-x12: calc(var(--padding-x1) * 12);
+  --padding-x13: calc(var(--padding-x1) * 13);
+  --padding-x14: calc(var(--padding-x1) * 14);
+  --padding-x15: calc(var(--padding-x1) * 15);
+  --padding-x16: calc(var(--padding-x1) * 16);
+  --padding-x17: calc(var(--padding-x1) * 17);
+  --padding-x18: calc(var(--padding-x1) * 18);
+  --padding-x19: calc(var(--padding-x1) * 19);
+  --padding-x20: calc(var(--padding-x1) * 20);
+  --padding-x25: calc(var(--padding-x1) * 25);
+  --radius-x1: 4px;
+  --radius-x2: calc(var(--radius-x1) * 2);
+  --radius-x3: calc(var(--radius-x1) * 3);
+  --radius-x4: calc(var(--radius-x1) * 4);
+  --radius-x5: calc(var(--radius-x1) * 5);
+  --radius-x6: calc(var(--radius-x1) * 6);
+  --radius-x7: calc(var(--radius-x1) * 7);
+  --radius-x8: calc(var(--radius-x1) * 8);
+  --radius-x9: calc(var(--radius-x1) * 9);
+  --radius-x10: calc(var(--radius-x1) * 10);
+  --radius-control: var(--radius-x4);
+  --radius-button: var(--radius-x3);
+  --gap-x05: calc(var(--gap-x1) * 0.5);
+  --gap-x1: 4px;
+  --gap-x2: calc(var(--gap-x1) * 2);
+  --gap-x3: calc(var(--gap-x1) * 3);
+  --gap-x4: calc(var(--gap-x1) * 4);
+  --gap-x5: calc(var(--gap-x1) * 5);
+  --gap-x6: calc(var(--gap-x1) * 6);
+  --gap-x7: calc(var(--gap-x1) * 7);
+  --gap-x8: calc(var(--gap-x1) * 8);
+  --gap-x9: calc(var(--gap-x1) * 9);
+  --gap-x10: calc(var(--gap-x1) * 10);
+  --gap-x11: calc(var(--gap-x1) * 11);
+  --gap-x12: calc(var(--gap-x1) * 12);
+  --blur-x1: 6px;
+  --rich-text-gap: 8px;
+  --duration-instant: 1ms;
+  --duration-fast: 160ms;
+  --duration-base: 280ms;
+  --duration-slow: 400ms;
+  --delay-stagger: 90ms;
+  --easing-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --easing-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --reveal-offset: 12px;
+  --reveal-scale: 0.96;
+  --header-height: 45px;
+  --container-padding-top: calc(var(--header-height) + var(--padding-x3));
+  --container-padding-bottom: var(--padding-x3);
+  --page-height-available: calc(
+    100dvh - var(--container-padding-top) - var(--container-padding-bottom)
+  );
+
+  /* vars/_components.scss */
+  --game-completed-color: var(--color-green);
+  --game-dropped-color: var(--color-red);
+  --game-playing-color: var(--color-blue);
+  --game-wishlist-color: var(--color-violet);
+  --game-backlog-color: var(--color-white);
+  --game-played-color: var(--color-cyan);
+  --game-mastered-color: var(--color-yellow);
+  --cover-ratio: 528/704;
+  --shadow-basic: 0px 4px 4px var(--color-neutral-5);
+  --shadow-text: drop-shadow(0 1px 2px var(--color-neutral-5))
+    drop-shadow(0 0 6px var(--color-neutral-5));
+  --glow-accent: 0 0 0.4rem var(--color-accent);
+  --glow-accent-sm: 0 0 0.15rem var(--color-accent);
+  --avatar-size-sm: var(--padding-x6);
+  --navigation-progress-height: 1px;
+  --navigation-progress-z-index: 1002;
+  --bprogress-color: var(--color-accent) !important;
+  --bprogress-height: var(--navigation-progress-height) !important;
+  --bprogress-box-shadow: var(--glow-accent) !important;
+  --bprogress-z-index: var(--navigation-progress-z-index) !important;
+  --modal-text-width: min(720px, calc(100vw - var(--padding-x10)));
+  --rich-editor-image-width: 400px;
+  --rich-editor-separator-height: 18px;
+  --playthrough-modal-width: min(80vw, 400px);
+  --header-logo-height: 85%;
+  --header-logo-height-sm: 72%;
+  --tab-count-color: color-mix(in srgb, currentColor 60%, transparent);
+  --playthrough-modal-height: min(70dvh, 500px);
+  --playthrough-modal-width-lg: min(88vw, 760px);
+  --playthrough-modal-height-lg: min(86dvh, 780px);
+  --games-card-min-width: 180px;
+  --list-card-min-width: 180px;
+  --range-track-height: 6px;
+  --progress-bar-height: 6px;
+  --progress-bar-sweep-duration: 1200ms;
+  --range-thumb-size: 20px;
+  --range-thumb-width: 44px;
+  --range-thumb-height: 24px;
+  --scrollbar-horizontal-size: 6px;
+  --scrollbar-arrow-width: 32px;
+  --scrollbar-fade-width: 48px;
+  --game-keywords-collapsed-height: 66px;
+  --game-hero-artwork-height: 300px;
+  --game-hero-artwork-height-sm: 180px;
+  --game-hero-cover-width: 200px;
+  --game-hero-cover-offset: 104px;
+  --game-hero-counters-width: 360px;
+  --game-facts-label-width: 84px;
+  --game-rating-popover-width: 320px;
+  --popover-width: 320px;
+  --achievements-icon-size: 44px;
+  --achievements-icon-size-sm: 48px;
+  --port-achievement-icon-size-sm: 32px;
+  --port-game-card-width: 140px;
+  --port-game-card-width-sm: 96px;
+  --popover-max-height: 320px;
+  --popover-sheet-max-height: 85dvh;
+  --textarea-handle-size: 20px;
+  --image-generator-preview-width: 160px;
+  --ai-drafts-count-width: 88px;
+  --image-finder-portrait-width: 216px;
+  --image-finder-landscape-width: 320px;
+  --site-sessions-modal-width: min(560px, calc(100vw - var(--padding-x8)));
+  --image-generator-elements-width: min(640px, calc(100vw - var(--padding-x8)));
+  --popover-sheet-grabber-width: 40px;
+  --popover-sheet-grabber-height: 5px;
+  --drawer-width: max(20vw, 460px);
+  --drawer-z-index: 5;
+  --expandable-scroll-height: 132px;
+  --expandable-fade-height: 32px;
+  --date-picker-width: 300px;
+  --date-picker-field-min-width: 140px;
+  --game-card-min-width: 160px;
+  --playthrough-platform-min-width: 200px;
+  --playthrough-time-min-width: 120px;
+  --date-picker-cell-size: 34px;
+  --emoji-picker-width: 328px;
+  --emoji-picker-cell-size: 34px;
+  --emoji-picker-group-size: 28px;
+  --emoji-picker-grid-height: 238px;
+  --game-hero-scrim: linear-gradient(
+    180deg,
+    #191d248c 0%,
+    #191d2400 30%,
+    #212731d1 72%,
+    var(--color-bg-secondary) 100%
+  );
+  --spoiler-blur: 7px;
+  --community-avatar-size: 36px;
+  --community-reply-avatar-size: 28px;
+  --community-review-clamp-height: 132px;
+  --community-distribution-height: 8px;
+  --community-distribution-min-width: 240px;
+  --community-dot-size: 7px;
+  --community-loading-height: 96px;
+  --user-review-card-width: 170px;
+  --user-review-card-width-sm: 140px;
+  --user-review-rating-filter-width: 260px;
+  --vndb-review-height: max(360px, calc(100vh - 420px));
+  --vndb-cover-width: 120px;
+  --vndb-search-width: 320px;
+  --conflicts-state-filter-width: 240px;
+  --conflicts-ai-limit-width: 96px;
+  --vndb-candidate-cover-width: 64px;
+  --empty-state-image-size: 180px;
+  --empty-state-image-size-sm: 96px;
+  --empty-state-inline-text-min-width: 200px;
+  --empty-state-page-content-width: 420px;
+  --badge-negative-color: var(--color-orange);
+  --badge-tint-strength: 16%;
+  --stat-tile-bg: var(--color-bg-primary);
+  --not-found-image-height: 240px;
+  --not-found-backdrop-size: 400px;
+  --favorite-color: var(--color-pink);
+  --moon-phase-lit-color: var(--color-neutral-95);
+  --moon-phase-dark-color: var(--color-bg-hover);
+  --moon-phase-unknown-color: var(--color-text-muted);
+  --moon-phase-unknown-fill: var(--color-bg-secondary);
+  --release-calendar-card-width: 172px;
+  --release-calendar-card-width-sm: var(--game-card-min-width);
+  --release-calendar-month-height: 16px;
+  --release-calendar-node-size: 28px;
+  --release-calendar-axis-color: var(--color-bg-hover);
+  --game-controls-icon-size: 24px;
+  --game-controls-icon-size-sm: 20px;
+  --game-controls-badge-size: 15px;
+  --list-card-row-mosaic-size: 44px;
+  --list-card-count-height: 20px;
+  --list-search-width: 320px;
+  --list-row-cover-width: 40px;
+  --profile-hero-height: 168px;
+  --profile-avatar-size: 112px;
+  --profile-avatar-size-sm: 72px;
+  --activity-cover-width: 80px;
+  --people-avatar-size: 22px;
+  --character-card-width: 128px;
+  --character-card-width-sm: 104px;
+  --character-profile-portrait-width: 200px;
+  --character-editor-portrait-width: 150px;
+  --image-picker-thumb-width: 160px;
+  --game-images-modal-width: min(92vw, 960px);
+  --game-port-achievements-modal-width: min(92vw, 960px);
+  --requests-queue-width: 440px;
+  --list-sort-width: 280px;
+  --field-control-height: 40px;
+  --gauntlet-mode-cards-width: 300px;
+  --gauntlet-winner-cover-width: 200px;
+  --gauntlet-winner-cover-width-mobile: 220px;
+  --gauntlet-wheel-max-width: 50vw;
+  --gauntlet-fact-label-width: 110px;
+  --object-field-min-width: 160px;
+  --requests-panel-min-height: 240px;
+  --page-skeleton-crumbs-width: 160px;
+  --page-skeleton-title-width: 240px;
+  --search-modal-width: 900px;
+  --search-tab-height: 36px;
+  --reaction-active-color: var(--color-accent);
+  --tabs-muted-opacity: 0.55;
+  --burger-animation-duration: 600ms;
+  --status-menu-width: 248px;
+  --status-menu-active-bg: color-mix(
+    in srgb,
+    var(--color-accent) 16%,
+    transparent
+  );
+  --status-pending-color: color-mix(
+    in srgb,
+    var(--color-positive) 38%,
+    var(--color-bg-primary)
+  );
+  --status-map-cell: 9px;
+  --status-card-width: min(380px, 100%);
+  --status-edit-modal-width: min(560px, calc(100vw - var(--padding-x8)));
+}
+/* mooncellar-tokens:end */
+
+  :root {
+    color-scheme: dark;
+    --mock-ui: "Hanken Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mock-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --mock-ground: var(--color-neutral-10);
+    --mock-row-width: 1240px;
+    --mock-phone: 358px;
+    --mock-stat-panel-min: 260px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--mock-ground);
+    color: var(--color-text-primary);
+    font-family: var(--mock-ui);
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .shell {
+    max-width: calc(var(--mock-row-width) + 2 * var(--padding-x6));
+    margin: 0 auto;
+    padding-inline: var(--padding-x6);
+    padding-block: var(--padding-x14) var(--padding-x20);
+  }
+
+  @media (max-width: 520px) {
+    .shell { padding-inline: var(--padding-x4); padding-block: var(--padding-x9) var(--padding-x14); }
+  }
+
+  h1, h2, h4, p { margin: 0; }
+  h1, h2 { text-wrap: balance; }
+
+  .eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--color-gray);
+  }
+
+  .masthead { display: flex; flex-direction: column; gap: var(--gap-x4); max-width: 1040px; }
+  .masthead h1 { font-size: 34px; line-height: 1.15; font-weight: 700; letter-spacing: -0.5px; }
+  .lede { color: var(--color-text-secondary); max-width: 72ch; }
+
+  .variant { margin-top: var(--padding-x16); display: flex; flex-direction: column; gap: var(--gap-x5); }
+  .variant__head { display: flex; flex-direction: column; gap: var(--gap-x2); max-width: 76ch; }
+  .variant__head h2 { font-size: 24px; line-height: 1.2; }
+  .variant__head p { color: var(--color-text-secondary); }
+  .variant__head ul { margin: 0; padding-left: var(--padding-x5); color: var(--color-text-muted); font-size: 14px; }
+  .variant__tag {
+    align-self: flex-start;
+    font-size: 12px; font-weight: 600; line-height: 18px;
+    padding-inline: var(--padding-x2);
+    border-radius: var(--radius-x2);
+    color: var(--color-text-primary);
+    background: color-mix(in srgb, var(--color-accent) var(--badge-tint-strength), transparent);
+  }
+
+  .frames { display: flex; flex-direction: column; gap: var(--gap-x8); }
+  .frame { display: flex; flex-direction: column; gap: var(--gap-x2); min-width: 0; }
+  .frame__cap { font-family: var(--mock-mono); font-size: 11px; color: var(--color-gray); }
+  .frame__canvas { overflow-x: auto; max-width: 100%; }
+  .frame__stage { width: var(--mock-row-width); }
+  .frame_phone .frame__stage { width: var(--mock-phone); max-width: 100%; }
+
+  .panel {
+    display: flex; flex-direction: column; gap: var(--gap-x5);
+    min-width: 0;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x5);
+    padding: var(--padding-x4);
+  }
+  .panel_spread { justify-content: space-between; }
+  .panel_spread .blk_keywords { margin-top: auto; }
+
+  .blk { display: flex; flex-direction: column; gap: var(--gap-x2); min-width: 0; }
+  .blk h4 { font-size: 16px; line-height: 20px; font-weight: 500; color: var(--color-text-primary); }
+  .blk__text { font-size: 14px; line-height: 22px; color: var(--color-text-secondary); }
+  .blk__scroll {
+    max-height: var(--expandable-scroll-height);
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--expandable-fade-height)), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - var(--expandable-fade-height)), transparent);
+  }
+  .blk__scroll_short { -webkit-mask-image: none; mask-image: none; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: var(--gap-x2); }
+  .chips_clamp { max-height: var(--game-keywords-collapsed-height); overflow: hidden; }
+  .chip {
+    display: inline-flex; align-items: center; gap: var(--gap-x2);
+    padding: var(--padding-x1) var(--padding-x3);
+    border-radius: var(--radius-x2);
+    border: 1px solid var(--color-border-primary);
+    background: var(--color-bg-primary);
+    color: var(--color-text-muted);
+    font-size: 13px; line-height: 17px;
+  }
+  .chip__dot { width: 5px; height: 5px; border-radius: 50%; background: var(--color-accent); flex: none; }
+  .chip__dot_muted { opacity: 0.5; background: var(--color-text-muted); }
+  .more {
+    display: inline-flex; align-items: center; gap: var(--gap-x1);
+    align-self: flex-start;
+    font-size: 14px; line-height: 18px; font-weight: 500; color: var(--color-text-primary);
+  }
+
+  .ratings { display: flex; flex-direction: column; gap: var(--gap-x3); }
+  .rate { display: flex; flex-direction: column; gap: var(--gap-x1); }
+  .rate__head { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; line-height: 17px; color: var(--color-gray); }
+  .rate__head b { font-size: 15px; line-height: 19px; color: var(--rate); }
+  .rate__head b small { margin-left: var(--padding-x1); font-size: 13px; line-height: 17px; font-weight: 400; color: var(--color-text-muted); }
+  .rate__track { height: 6px; border-radius: var(--radius-x1); background: var(--color-bg-primary); overflow: hidden; }
+  .rate__bar { display: block; height: 100%; border-radius: var(--radius-x1); background: var(--rate); }
+  .rate__count { font-size: 12px; line-height: 14px; color: var(--color-text-muted); }
+
+  .rows { margin: 0; border: 1px solid var(--color-border-primary); border-radius: var(--radius-x4); background: var(--stat-tile-bg); overflow: hidden; }
+  .rows__row { display: flex; align-items: center; gap: var(--gap-x3); min-height: var(--field-control-height); padding: var(--padding-x2) var(--padding-x3); }
+  .rows__row + .rows__row { border-top: 1px solid var(--color-border-primary); }
+  .rows__icon { display: flex; justify-content: center; width: var(--padding-x5); flex: none; color: var(--color-text-primary); }
+  .rows dt { flex: 1; min-width: 0; font-size: 14px; line-height: 18px; color: var(--color-text-muted); }
+  .rows dt small { display: block; font-size: 12px; line-height: 16px; }
+  .rows dd { margin: 0; font-size: 16px; line-height: 20px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .rows dd span { margin-left: var(--padding-x05); font-size: 13px; font-weight: 500; color: var(--color-text-muted); }
+
+  .stores { display: flex; flex-wrap: wrap; gap: var(--gap-x2); }
+  .store {
+    display: grid; place-items: center;
+    width: 40px; aspect-ratio: 1;
+    border-radius: var(--radius-x10);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+  }
+
+  .friends { display: flex; flex-direction: column; gap: var(--gap-x2); }
+  .friend { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-x2); }
+  .friend__user { display: flex; align-items: center; gap: var(--gap-x2); min-width: 0; font-size: 13px; line-height: 17px; }
+  .friend__avatar {
+    width: var(--avatar-size-sm); height: var(--avatar-size-sm); flex: none;
+    border-radius: 50%; display: grid; place-items: center;
+    background: var(--color-bg-tertiary); color: var(--color-text-muted);
+    font-size: 11px; font-weight: 600;
+  }
+  .friend__status { display: inline-flex; align-items: center; gap: var(--gap-x2); font-size: 12px; color: var(--color-text-muted); }
+  .status {
+    padding-inline: var(--padding-x2); border-radius: var(--radius-x2);
+    font-size: 12px; line-height: 18px; font-weight: 600; white-space: nowrap;
+    background: color-mix(in srgb, var(--status) 16%, transparent);
+    color: color-mix(in srgb, var(--status) 62%, var(--color-neutral-100));
+  }
+
+  .ico { width: 16px; height: 16px; fill: currentColor; }
+  .ico_stroke { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  .l-row { display: flex; align-items: stretch; gap: var(--gap-x6); }
+  .l-row > .panel { flex: 1 1 0; }
+  .l-row > .panel_wide { flex-grow: 2; }
+
+  .l-side { display: grid; grid-template-columns: minmax(0, 1fr) var(--game-hero-counters-width); gap: var(--gap-x6); align-items: start; }
+  .l-stack { display: flex; flex-direction: column; gap: var(--gap-x6); min-width: 0; }
+
+  .l-strip { display: flex; flex-direction: column; gap: var(--gap-x6); }
+  .l-strip__stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--mock-stat-panel-min), 1fr)); gap: var(--gap-x6); }
+  .l-strip__text { display: flex; align-items: flex-start; gap: var(--gap-x6); }
+  .l-strip__text > .panel { flex: 1 1 0; }
+  .l-strip__text > .panel_wide { flex-grow: 2; }
+  .panel_full .blk__text { max-width: 90ch; }
+
+  .l-cols { columns: 3; column-gap: var(--gap-x6); }
+  .l-cols > .panel { break-inside: avoid; margin-bottom: var(--padding-x6); }
+
+  .frame_phone .l-side,
+  .frame_phone .l-strip__stats { grid-template-columns: minmax(0, 1fr); }
+  .frame_phone .l-strip__text { flex-direction: column; align-items: stretch; }
+
+  .panel_list {
+    margin-top: var(--padding-x16);
+    gap: var(--gap-x3);
+    max-width: 1040px;
+  }
+  .panel_list h2 { font-size: 20px; line-height: 1.25; }
+  .panel_list p, .panel_list li { color: var(--color-text-secondary); font-size: 14px; }
+  .panel_list ul { margin: 0; padding-left: var(--padding-x5); display: flex; flex-direction: column; gap: var(--gap-x1); }
+
+  .note {
+    margin-top: var(--padding-x6);
+    max-width: 1040px;
+    font-size: 13px;
+    color: var(--color-gray);
+    border-left: 2px solid var(--color-border-primary);
+    padding-left: var(--padding-x3);
+  }
+
+  code.t { font-family: var(--mock-mono); font-size: 12px; color: var(--color-yellow); }
+</style>
+
+<div class="shell">
+  <header class="masthead">
+    <p class="eyebrow">MoonCellar · game page overview row</p>
+    <h1>Game page overview row</h1>
+    <p class="lede">
+      Under the hero, Summary, the score column and the links column sit in one row, and all three
+      panels stretch to the tallest. Inside the shorter ones the blocks are pushed apart
+      (<code class="t">justify-content: space-between</code>, Keywords pinned to the bottom), so a
+      game with lots of scores opens holes in the middle of the other two. Four ways out, each drawn
+      at desktop width for a short game (the one from the report) and a long one.
+    </p>
+  </header>
+
+  <section class="variant">
+    <div class="variant__head">
+      <h2>Current</h2>
+      <p>Equal-height panels with their blocks spread to the top and bottom edges.</p>
+    </div>
+    <div class="frames" data-variant="current"></div>
+  </section>
+
+  <section class="variant">
+    <div class="variant__head">
+      <h2>A · Pack to the top</h2>
+      <p>Same three panels and the same height, but blocks stack from the top. Spare height collects at the bottom of the shorter panels.</p>
+      <ul>
+        <li>Three lines of CSS; nothing moves.</li>
+        <li>No holes between blocks, but a long column still leaves an empty foot under the others.</li>
+      </ul>
+    </div>
+    <div class="frames" data-variant="a"></div>
+  </section>
+
+  <section class="variant">
+    <div class="variant__head">
+      <h2>B · Scores in a row, text below</h2>
+      <p>
+        Ratings, HowLongToBeat and Achievements become one row of equal panels: they hold the same
+        kind of content (one to four short rows), so stretching them leaves at most a row or two
+        of space at the foot of the smallest. Text and links follow in a second row where each
+        panel keeps its own height.
+      </p>
+      <ul>
+        <li>Like sits next to like, so equal heights look right instead of leaving holes.</li>
+        <li>With fewer than three score panels, the links panel moves up into the row to fill it, and Summary takes the full width below. With none, the row is skipped.</li>
+        <li>Numbers come first, right under the hero's counters; the summary moves one row down.</li>
+        <li>The blocks already render boxed (<code class="t">isBoxed</code> defaults to true); the row is a grid that takes two to four panels.</li>
+      </ul>
+    </div>
+    <div class="frames" data-variant="b" data-phone="true"></div>
+    <div class="variant__head">
+      <h2>B · When scores are missing</h2>
+      <p>
+        Many games have no HowLongToBeat entry or no achievements. The row never keeps an empty
+        slot: the links panel takes it, and Summary drops below at full width with its text kept
+        to a readable measure.
+      </p>
+    </div>
+    <div class="frames" data-variant="b" data-games="totk,sma,pacman"></div>
+  </section>
+
+  <section class="variant">
+    <div class="variant__head">
+      <span class="variant__tag">Shipped</span>
+      <h2>C · Text with a sidebar</h2>
+      <p>
+        A wide text column (summary, then stores and links) and a sidebar as wide as the hero's
+        counters above it (scores, then followings). Each column stacks its own panels.
+      </p>
+      <ul>
+        <li>Lines up with the hero: the sidebar continues the counters column.</li>
+        <li>A short summary next to a long sidebar still ends early; the gap moves outside the panels instead of inside them.</li>
+      </ul>
+    </div>
+    <div class="frames" data-variant="c"></div>
+  </section>
+
+  <section class="variant">
+    <div class="variant__head">
+      <h2>D · Balanced columns</h2>
+      <p>
+        Every block becomes its own small panel, and CSS columns flow them into three columns of
+        nearly equal height.
+      </p>
+      <ul>
+        <li>The browser balances the heights for any game, with no rules per block.</li>
+        <li>Where a block lands depends on the game, so Ratings is not always in the same place, and Summary is only a third wide.</li>
+      </ul>
+    </div>
+    <div class="frames" data-variant="d"></div>
+  </section>
+
+  <section class="panel panel_list">
+    <h2>Building it</h2>
+    <ul>
+      <li>
+        <b>A:</b> drop <code class="t">justify-content: space-between</code> from
+        <code class="t">GameScoreColumn</code> and <code class="t">GameSideColumn</code>, and
+        <code class="t">margin-top: auto</code> from <code class="t">GameOverview</code>'s keywords.
+      </li>
+      <li>
+        <b>B:</b> <code class="t">GamePage</code> renders <code class="t">GameRatingsBlock</code>,
+        <code class="t">GameHltbBlock</code>, <code class="t">GameVndbBlock</code> and
+        <code class="t">GameAchievementsBlock</code> boxed in a grid
+        (<code class="t">repeat(auto-fit, minmax(260px, 1fr))</code>), then
+        <code class="t">GameOverview</code> and <code class="t">GameSideColumn</code> with
+        <code class="t">align-items: flex-start</code>. <code class="t">GameScoreColumn</code> goes away.
+        The page counts the score panels on the server (it already does, to hide
+        <code class="t">GameScoreColumn</code>): with one or two, <code class="t">GameSideColumn</code>
+        renders inside the score row and <code class="t">GameOverview</code> spans the width below;
+        with none, the row is skipped. Followings load in the browser and never change the layout.
+      </li>
+      <li>
+        <b>C (shipped):</b> a two-column grid, the sidebar at <code class="t">--game-hero-counters-width</code>
+        plus the hero's padding so it lines up with the counters; stores and links move under the
+        overview as <code class="t">GameLinksPanel</code>, followings get their own panel in the sidebar.
+        At 960px and below it is one column: overview, scores, followings, links.
+      </li>
+      <li><b>D:</b> <code class="t">columns: 3</code> with <code class="t">break-inside: avoid</code> on each panel.</li>
+      <li>
+        Below 768px every variant is one column, so the problem and the fix are desktop-only; B's
+        phone order is drawn above. Everything stays in the server HTML.
+      </li>
+      <li>New token if B ships: <code class="t">--mock-stat-panel-min</code> (260px) becomes <code class="t">--game-stat-panel-min-width</code>.</li>
+    </ul>
+  </section>
+
+  <p class="note">
+    Colours, spacing and radii are the project's own tokens: the <code class="t">:root</code>
+    block above is generated from <code class="t">apps/web/src/lib/app/styles/vars</code> by
+    <code class="t">bun --filter web sync:tokens</code>. The typeface is substituted —
+    Hanken Grotesk stands in for ApercuPro, whose licensed file cannot be served from a
+    third-party host.
+  </p>
+</div>
+
+<script>
+  const ICONS = {
+    ra: `<svg class="ico" viewBox="0 0 24 24" style="width:20px;height:20px"><path d="M7.6 14.9 6 22.5l3.2-1.4 2 1.9.8-4.2.8 4.2 2-1.9 3.2 1.4-1.6-7.6a8.4 8.4 0 0 1-8.8 0Z"/><circle cx="12" cy="9" r="8"/><text x="12" y="12.2" text-anchor="middle" font-size="9" font-weight="800" fill="var(--color-bg-primary)">RA</text></svg>`,
+    steam: `<svg class="ico" viewBox="0 0 24 24"><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"/></svg>`,
+    store: `<svg class="ico ico_stroke" viewBox="0 0 24 24"><path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"/><path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244"/><path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05"/></svg>`,
+    twitch: `<svg class="ico" viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg>`,
+    open: `<svg class="ico" viewBox="0 0 24 24"><path d="M5 3h6a1 1 0 1 1 0 2H5v14h14v-6a1 1 0 1 1 2 0v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M14 3h7v7a1 1 0 1 1-2 0V6.41l-8.29 8.3a1 1 0 0 1-1.42-1.42L17.59 5H14a1 1 0 1 1 0-2z"/></svg>`,
+  };
+
+  const GAMES = {
+    thps4: {
+      caption: "Tony Hawk's Pro Skater 4 · short summary, many scores",
+      summary: "Drop into the ultimate challenge. In the next chapter in the Tony Hawk series, pros challenge you to make your mark in huge free-roaming levels, taking on 190 progressively harder goals with no time limits to hold you back. Decide when you're ready to take on your Pro Challenge and move into the pro ranks, where it's a whole new game. Build your skills, perform all-new tricks, play up to eight players online, and show that you've got what it takes to go Pro.",
+      keywords: ["bloody", "gravity", "minigames", "crossover", "online", "custom soundtrack", "sequel", "high score", "instant replay", "skateboarding", "split-screen multiplayer", "challenges", "licensed music", "career mode"],
+      ratings: [["Users", 9, "users", 2], ["IGDB", 7.8, "igdb"], ["HowLongToBeat", 8.1, "hltb"]],
+      hltb: [["Main story", "10"], ["Main + extra", "15"], ["Completionist", "25"]],
+      achievements: [["ra", "RetroAchievements", "GameCube", 190], ["ra", "RetroAchievements", "PlayStation 2", 107]],
+      stores: ["store", "twitch"],
+      friends: [["alexgrist", "mastered", "Mastered", "9 / 10"]],
+      links: [["en.wikipedia.org", false]],
+    },
+    totk: {
+      caption: "The Legend of Zelda: Tears of the Kingdom · no achievements",
+      summary: "An epic adventure across the land and skies of Hyrule awaits in The Legend of Zelda: Tears of the Kingdom for Nintendo Switch. The adventure is yours to create in a world fueled by your imagination. In this sequel to The Legend of Zelda: Breath of the Wild, you'll decide your own path through the sprawling landscapes of Hyrule and the mysterious islands floating in the vast skies above. Can you harness the power of Link's new abilities to fight back against the malevolent forces that threaten the kingdom?",
+      storyline: "While exploring the caves underneath Hyrule Castle to investigate the origins of the gloom, a dangerous substance which appeared all over the kingdom, Link and Zelda find old archeological remains of the Zonai, an ancient race said to have descended from the sky, and a maleficent mummy held by a bodiless arm, who suddenly reanimates, defeats Link, breaks the Master Sword and raises large structures, once found underground, to the skies above Hyrule, with Zelda vanishing with a spark from a strange amulet found on the site.",
+      keywords: ["hunting", "sword", "crafting", "skydiving", "cooking", "sequel", "silent protagonist", "zelda", "link", "horse riding", "throwing weapons", "bow and arrow", "weapon modification", "male protagonist", "horse taming", "bees", "the game awards - best action-adventure game - winner", "the game awards - game of the year - nominee"],
+      ratings: [["IGDB", 9.4, "igdb", 938], ["HowLongToBeat", 9.2, "hltb"]],
+      hltb: [["Main story", "59½"], ["Main + extra", "117½"], ["Completionist", "247½"]],
+      achievements: [],
+      stores: ["twitch", "store"],
+      friends: [],
+      links: [["zelda.com", true], ["en.wikipedia.org", false], ["reddit.com", false], ["zeldawiki.wiki", false]],
+    },
+    sma: {
+      caption: "Super Metroid Arcade · achievements only",
+      summary: "A ROM hack of Super Metroid that turns the game into a replayable \"arcade\" game with kills based points as you go through random rooms and try to rack up a highscore. Multiple difficulties are offered, and it can be played with a time limit, endlessly, or to a set number of rooms cleared.",
+      keywords: ["metroid", "rom hack", "super metroid rom hack"],
+      ratings: [],
+      hltb: [],
+      achievements: [["ra", "RetroAchievements", "SNES/Super Famicom", 67]],
+      stores: [],
+      friends: [],
+      links: [["arcade.supermetroid.run", true]],
+    },
+    pacman: {
+      caption: "Retro Arcade: Pac-Man · no scores at all",
+      summary: "Features Pac-Man, Super Pac-Man, Pac & Pal, Pac-Man Plus, Galaga, Galaxian, Dig Dug, Mappy, Bosconian, Xevious, Pole Position, and New Rally-X.",
+      keywords: [],
+      ratings: [],
+      hltb: [],
+      achievements: [],
+      stores: [],
+      friends: [],
+      links: [["plugplaytvgames.fandom.com", false]],
+    },
+    p5r: {
+      caption: "Persona 5 Royal · long summary and storyline, short scores",
+      summary: "Persona 5 Royal is an expanded version of Persona 5. Don the mask of Joker and join the Phantom Thieves of Hearts. Break free from the chains of modern society and stage grand heists to infiltrate the minds of the corrupt and make them change their ways. A new Phantom Thief, a third semester at Shujin Academy, new areas in every Palace, new Confidants and hours of new story make this the most complete version of the game.",
+      storyline: "Ren Amamiya is put on probation after a powerful man falsely accuses him of assault. Sent to Tokyo to live above a café, he awakens to the power of his Persona and, with classmates who share his anger, forms the Phantom Thieves to steal the distorted desires of corrupt adults from the Metaverse, a world shaped by humanity's subconscious. Each heist forces a confession in the real world, and the group's growing fame draws the attention of a detective who is hunting them.",
+      keywords: ["anime", "high school", "turn-based combat", "time management", "social simulation", "dungeon crawler", "calendar", "jazz soundtrack", "tokyo", "heist", "talking cat", "demons", "fusion", "romance", "part-time jobs", "multiple endings", "new game plus", "persona", "stylized", "japanese voice acting"],
+      ratings: [["Users", 9.4, "users", 14], ["IGDB", 9.4, "igdb", 690]],
+      hltb: [["Main story", "103"], ["Main + extra", "128½"], ["Completionist", "191"]],
+      achievements: [["steam", "Steam", null, 51]],
+      stores: ["steam", "store", "twitch"],
+      friends: [
+        ["alexgrist", "completed", "Completed", "10 / 10"],
+        ["mika_s", "playing", "Playing", ""],
+        ["dvorak", "backlog", "Backlog", ""],
+        ["lune", "dropped", "Dropped", "6 / 10"],
+      ],
+      links: [["persona.atlus.com", true], ["en.wikipedia.org", false], ["megamitensei.fandom.com", false]],
+    },
+  };
+
+  const RATE_COLORS = { users: "var(--color-accent)", igdb: "var(--color-blue)", hltb: "var(--color-positive)" };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+  const blk = (title, body, cls = "") => `<section class="blk ${cls}"><h4>${title}</h4>${body}</section>`;
+
+  const BLOCKS = {
+    summary: (g) => blk("Summary:", `<div class="blk__scroll"><p class="blk__text">${esc(g.summary)}</p></div>`),
+    storyline: (g) => g.storyline && blk("Storyline:", `<div class="blk__scroll"><p class="blk__text">${esc(g.storyline)}</p></div>`),
+    keywords: (g) => !!g.keywords.length && blk("Keywords:",
+      `<div class="chips chips_clamp">${g.keywords.map((k) => `<span class="chip">${esc(k)}</span>`).join("")}</div>` +
+      `<span class="more">Show more ${ICONS.open}</span>`, "blk_keywords"),
+    ratings: (g) => !!g.ratings.length && blk("Ratings:", `<div class="ratings">${g.ratings.map(([label, value, key, count]) =>
+      `<div class="rate" style="--rate:${RATE_COLORS[key]}"><div class="rate__head"><span>${label}</span><b>${value}${count ? `<small>(${count})</small>` : ""}</b></div>` +
+      `<div class="rate__track"><span class="rate__bar" style="width:${value * 10}%"></span></div></div>`).join("")}</div>`),
+    hltb: (g) => !!g.hltb.length && blk("HowLongToBeat:", `<dl class="rows">${g.hltb.map(([l, v]) =>
+      `<div class="rows__row"><dt>${l}</dt><dd>${v}<span>h</span></dd></div>`).join("")}</dl>`),
+    achievements: (g) => !!g.achievements.length && blk("Achievements:", `<dl class="rows">${g.achievements.map(([icon, l, sub, v]) =>
+      `<div class="rows__row"><span class="rows__icon">${ICONS[icon]}</span><dt>${l}${sub ? `<small>${sub}</small>` : ""}</dt><dd>${v}</dd></div>`).join("")}</dl>`),
+    stores: (g) => !!g.stores.length && blk("External pages:", `<div class="stores">${g.stores.map((s) => `<span class="store">${ICONS[s]}</span>`).join("")}</div>`),
+    friends: (g) => !!g.friends.length && `<section class="blk"><h4>Among Followings</h4><div class="friends">${g.friends.map(([name, key, label, score]) =>
+      `<div class="friend"><span class="friend__user"><span class="friend__avatar">${name[0].toUpperCase()}</span>${esc(name)}</span>` +
+      `<span class="friend__status"><span class="status" style="--status:var(--game-${key}-color)">${label}</span>${score}</span></div>`).join("")}</div></section>`,
+    links: (g) => !!g.links.length && blk("Links:", `<div class="chips">${g.links.map(([host, official]) =>
+      `<span class="chip"><span class="chip__dot${official ? "" : " chip__dot_muted"}"></span>${host}</span>`).join("")}</div>`),
+  };
+
+  const panel = (g, names, cls = "") => {
+    const inner = names.map((n) => BLOCKS[n](g)).filter(Boolean).join("");
+    return inner ? `<div class="panel ${cls}">${inner}</div>` : "";
+  };
+
+  const TEXT = ["summary", "storyline", "keywords"];
+  const SCORES = ["ratings", "hltb", "achievements"];
+  const SIDE = ["stores", "friends", "links"];
+
+  const LAYOUTS = {
+    current: (g) => `<div class="l-row">${panel(g, TEXT, "panel_wide panel_spread")}${panel(g, SCORES, "panel_spread")}${panel(g, SIDE, "panel_spread")}</div>`,
+    a: (g) => `<div class="l-row">${panel(g, TEXT, "panel_wide")}${panel(g, SCORES)}${panel(g, SIDE)}</div>`,
+    b: (g) => {
+      const scores = SCORES.map((n) => panel(g, [n])).filter(Boolean);
+      const side = panel(g, SIDE);
+      if (!scores.length) return `<div class="l-strip__text">${panel(g, TEXT, "panel_wide")}${side}</div>`;
+      if (scores.length < 3) {
+        return `<div class="l-strip"><div class="l-strip__stats">${scores.join("")}${side}</div>${panel(g, TEXT, "panel_full")}</div>`;
+      }
+      return `<div class="l-strip"><div class="l-strip__stats">${scores.join("")}</div>` +
+        `<div class="l-strip__text">${panel(g, TEXT, "panel_wide")}${side}</div></div>`;
+    },
+    c: (g) => `<div class="l-side"><div class="l-stack">${panel(g, TEXT)}${panel(g, ["stores", "links"])}</div>` +
+      `<div class="l-stack">${panel(g, SCORES)}${panel(g, ["friends"])}</div></div>`,
+    d: (g) => `<div class="l-cols">${[...TEXT, ...SCORES, ...SIDE].map((n) => panel(g, [n])).join("")}</div>`,
+  };
+
+  document.querySelectorAll("[data-variant]").forEach((host) => {
+    const layout = LAYOUTS[host.dataset.variant];
+    const ids = (host.dataset.games || "thps4,p5r").split(",");
+    const frames = ids.map((id) => GAMES[id]).map((g) =>
+      `<div class="frame"><span class="frame__cap">Desktop · 1240 · ${esc(g.caption)}</span>` +
+      `<div class="frame__canvas"><div class="frame__stage">${layout(g)}</div></div></div>`);
+    if (host.dataset.phone) {
+      frames.push(`<div class="frame frame_phone"><span class="frame__cap">Phone · 390 · ${esc(GAMES.thps4.caption)}</span>` +
+        `<div class="frame__stage">${layout(GAMES.thps4)}</div></div>`);
+    }
+    host.innerHTML = frames.join("");
+  });
+
+  document.querySelectorAll(".blk__scroll").forEach((el) => {
+    if (el.scrollHeight <= el.clientHeight + 1) el.classList.add("blk__scroll_short");
+  });
+
+  document.querySelectorAll(".chips_clamp").forEach((el) => {
+    if (el.scrollHeight <= el.clientHeight + 1) el.nextElementSibling?.remove();
+  });
+</script>

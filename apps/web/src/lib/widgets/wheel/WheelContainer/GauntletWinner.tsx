@@ -4,8 +4,8 @@ import { IGameResponse } from "@mooncellar/schemas";
 import { GameCard } from "@/src/lib/widgets/game/GameCard";
 import { GameMedia } from "@/src/lib/entities/game/ui/GameMedia";
 import { GameStatsBoxes } from "@/src/lib/entities/game/ui/GameStatsBoxes";
+import { GameFacts } from "@/src/lib/entities/game/ui/GameFacts";
 import { useCommonStore } from "@/src/lib/shared/store/common.store";
-import { Chip } from "@/src/lib/shared/ui/Chip";
 import { ExpandableBlock } from "@/src/lib/shared/ui/ExpandableBlock";
 import { SvgOpenWindow, SvgRandom } from "@/src/lib/shared/ui/svg";
 import { SvgCrown } from "@/src/lib/shared/ui/svg/SvgCrown";
@@ -31,29 +31,14 @@ export const GauntletWinner: FC<IGauntletWinnerProps> = ({ game, isRoyal }) => {
   const systems = useCommonStore((state) => state.systems);
   const hideMedia = useHideAdult() && isAdultGame(game);
 
-  const year = game.first_release
-    ? new Date(game.first_release * 1000).getFullYear()
-    : undefined;
-
   const platformName = (id: string) =>
     systems?.find((system) => system._id === id)?.name;
 
   const facts = [
-    {
-      label: "Platforms",
-      value: (game.platformIds ?? []).map(platformName).filter(Boolean),
-    },
-    { label: "Genres", value: game.genres ?? [] },
     { label: "Game modes", value: game.modes ?? [] },
     { label: "Themes", value: game.themes ?? [] },
     { label: "Languages", value: game.languages ?? [] },
   ].filter((fact) => fact.value.length);
-
-  const platforms = (game.platformIds ?? []).flatMap((id) => {
-    const platform = systems?.find((system) => system._id === id);
-
-    return platform ? [platform] : [];
-  });
 
   const releases = [...(game.release_dates ?? [])].sort(
     (a, b) => a.date - b.date
@@ -72,23 +57,7 @@ export const GauntletWinner: FC<IGauntletWinnerProps> = ({ game, isRoyal }) => {
             {isRoyal ? "Last one standing" : "The wheel chose"}
           </p>
           <h2 className={styles.winner__name}>{game.name}</h2>
-          <div className={styles.winner__chips}>
-            {!!year && <Chip>{year}</Chip>}
-            {!!game.type && <Chip>{game.type}</Chip>}
-            {!!game.genres?.[0] && <Chip>{game.genres[0]}</Chip>}
-          </div>
-          {!!platforms.length && (
-            <div className={styles.winner__chips}>
-              {platforms.map((platform) => (
-                <Chip
-                  key={platform._id}
-                  href={`/games/platform/${platform.slug}`}
-                >
-                  {platform.name}
-                </Chip>
-              ))}
-            </div>
-          )}
+          <GameFacts game={game} className={styles.winner__info} />
           <Link href={`/games/${game.slug}`} className={styles.winner__open}>
             <SvgOpenWindow />
             Open game page

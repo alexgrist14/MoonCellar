@@ -157,7 +157,11 @@ export const TRIM_IGDB_STAGE = {
     igdb: {
       $cond: [
         { $ifNull: ["$igdb", false] },
-        { gameId: "$igdb.gameId", total_rating: "$igdb.total_rating" },
+        {
+          gameId: "$igdb.gameId",
+          total_rating: "$igdb.total_rating",
+          total_rating_count: "$igdb.total_rating_count",
+        },
         "$$REMOVE",
       ],
     },

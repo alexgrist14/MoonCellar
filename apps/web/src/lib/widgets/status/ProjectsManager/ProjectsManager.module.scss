@@ -1,0 +1,77 @@
+.hint {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.code {
+  padding-inline: var(--padding-x05);
+  border-radius: var(--radius-x1);
+  background-color: var(--color-bg-tertiary);
+  font-family: monospace;
+  font-size: 0.92em;
+  overflow-wrap: anywhere;
+}
+
+.token {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x3);
+}
+
+.project {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--gap-x2);
+}
+
+.slug {
+  font-family: monospace;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.actions {
+  display: flex;
+  gap: var(--gap-x2);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x4);
+
+  &__fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gap-x3);
+
+    @include mediaSm {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  &__blocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-x5);
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--gap-x2);
+  }
+}
+
+.tokens {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x4);
+}
+
+.connector {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-x2);
+}

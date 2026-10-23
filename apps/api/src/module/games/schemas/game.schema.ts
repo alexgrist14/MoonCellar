@@ -66,7 +66,7 @@ export class Game {
   first_release: number;
   @Prop({ type: [Object] })
   release_dates: IReleaseDate[];
-  @Prop({ ref: Platform.name })
+  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: Platform.name })
   platformIds: mongoose.Types.ObjectId[];
   @Prop()
   status: string;

@@ -575,9 +575,9 @@ export class GameAiDraftService implements OnModuleInit {
       .catch((err) => this.logger.error(err, "Failed to save a draft result"));
   }
 
-  private async createDraft(
+  async createDraft(
     query: string,
-    addStep: (step: string) => Promise<unknown>
+    addStep: (step: string) => Promise<unknown> = async () => undefined
   ): Promise<Partial<IAddGameRequest>> {
     const [platforms, filters] = await Promise.all([
       this.Platforms.find().select("_id name slug").lean(),

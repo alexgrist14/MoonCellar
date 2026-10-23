@@ -67,13 +67,14 @@ header image when the app has none).
   - the library hero art as the background.
 
   The game is saved like one added by hand (`isCustom`), so a later IGDB match only fills its
-  empty fields. A skipped Steam conflict cannot be reopened.
+  empty fields. Undo new game on the conflict card deletes it again while nobody uses it.
 
 ## Catalogue: achievement counts
 
 Every game with a Steam app id gets `steamAchievements: { appId, total, updatedAt }`, read from
 `ISteamUserStats/GetSchemaForGame`. The game page shows it in the "Achievements" block with the
-Steam logo, next to the sum of its RetroAchievements sets.
+Steam logo, next to its RetroAchievements sets; the row opens the game's global achievements page
+(`steamcommunity.com/stats/<appId>/achievements`) in a new tab.
 
 | | |
 |---|---|
