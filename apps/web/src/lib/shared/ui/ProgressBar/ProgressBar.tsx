@@ -2,7 +2,8 @@ import { FC, ProgressHTMLAttributes } from "react";
 import classNames from "classnames";
 import styles from "./ProgressBar.module.scss";
 
-export type ProgressBarTone = "neutral" | "accent" | "attention" | "negative";
+export type ProgressBarTone =
+  "neutral" | "accent" | "positive" | "attention" | "negative";
 
 interface IProgressBarProps extends Omit<
   ProgressHTMLAttributes<HTMLProgressElement>,

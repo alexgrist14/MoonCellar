@@ -1,0 +1,1033 @@
+<!-- artifact: https://claude.ai/artifact/VVYWGFyU7YwJ9vXev3jjRi -->
+<title>Project status hub</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* mooncellar-tokens:start */
+/* Generated from apps/web/src/lib/app/styles/vars by
+   `bun --filter web sync:tokens`. Do not edit by hand. */
+:root {
+  /* vars/_colors.scss */
+  --color-neutral-5: #080a0b;
+  --color-neutral-10: #0d1011;
+  --color-neutral-15: #121516;
+  --color-neutral-20: #161b1d;
+  --color-neutral-25: #1a2022;
+  --color-neutral-30: #1f2628;
+  --color-neutral-35: #262d2f;
+  --color-neutral-40: #2f3537;
+  --color-neutral-45: #383e40;
+  --color-neutral-50: #3f4750;
+  --color-neutral-55: #50575d;
+  --color-neutral-60: #5e6a6e;
+  --color-neutral-70: #747d82;
+  --color-neutral-80: #9192a1;
+  --color-neutral-85: #b0b2bc;
+  --color-neutral-90: #d9d9d9;
+  --color-neutral-95: #eaeaea;
+  --color-neutral-100: #ffffff;
+  --color-blue: #3d6bff;
+  --color-blue-light: #00d4ff;
+  --color-cyan: #48cae4;
+  --color-gray: #afb3b9;
+  --color-white: #e8edf5;
+  --color-yellow: #ffc451;
+  --color-yellow-light: #f9f871;
+  --color-orange: #ff8862;
+  --color-pink: #ff4b8f;
+  --color-violet: #9b5de5;
+  --color-green: #2dc653;
+  --color-red: #e5383b;
+  --color-positive: #00c292;
+  --color-negative: #d02729;
+  --color-primary: var(--color-neutral-30);
+  --color-secondary: var(--color-neutral-90);
+  --color-contrast: var(--color-neutral-100);
+  --color-contrast-reverse: var(--color-neutral-5);
+  --color-attention: #ffc451;
+  --color-text-primary: var(--color-neutral-100);
+  --color-text-secondary: var(--color-neutral-90);
+  --color-text-muted: var(--color-neutral-85);
+  --color-accent: #6951ee;
+  --color-bg-primary: #191d24;
+  --color-bg-secondary: #212731;
+  --color-bg-tertiary: #2c3340;
+  --color-bg-accent: #6951ee;
+  --color-bg-hover: #374151;
+  --color-bg-positive: #00c292;
+  --color-bg-primary-tint: #191d24ee;
+  --color-bg-secondary-tint: #212731ee;
+  --color-bg-tertiary-tint: #2c3340ee;
+  --color-bg-accent-tint: #6951eeee;
+  --color-bg-positive-tint: #00c292ee;
+  --color-border-primary: var(--color-neutral-35);
+  --color-scrollbar-track: var(--color-neutral-15);
+  --color-scrollbar-thumb: var(--color-neutral-80);
+  --color-border-secondary: var(--color-neutral-85);
+
+  /* vars/_common.scss */
+  --padding-x05: calc(var(--padding-x1) * 0.5);
+  --padding-x1: 4px;
+  --padding-x2: calc(var(--padding-x1) * 2);
+  --padding-x3: calc(var(--padding-x1) * 3);
+  --padding-x4: calc(var(--padding-x1) * 4);
+  --padding-x5: calc(var(--padding-x1) * 5);
+  --padding-x6: calc(var(--padding-x1) * 6);
+  --padding-x7: calc(var(--padding-x1) * 7);
+  --padding-x8: calc(var(--padding-x1) * 8);
+  --padding-x9: calc(var(--padding-x1) * 9);
+  --padding-x10: calc(var(--padding-x1) * 10);
+  --padding-x11: calc(var(--padding-x1) * 11);
+  --padding-x12: calc(var(--padding-x1) * 12);
+  --padding-x13: calc(var(--padding-x1) * 13);
+  --padding-x14: calc(var(--padding-x1) * 14);
+  --padding-x15: calc(var(--padding-x1) * 15);
+  --padding-x16: calc(var(--padding-x1) * 16);
+  --padding-x17: calc(var(--padding-x1) * 17);
+  --padding-x18: calc(var(--padding-x1) * 18);
+  --padding-x19: calc(var(--padding-x1) * 19);
+  --padding-x20: calc(var(--padding-x1) * 20);
+  --padding-x25: calc(var(--padding-x1) * 25);
+  --radius-x1: 4px;
+  --radius-x2: calc(var(--radius-x1) * 2);
+  --radius-x3: calc(var(--radius-x1) * 3);
+  --radius-x4: calc(var(--radius-x1) * 4);
+  --radius-x5: calc(var(--radius-x1) * 5);
+  --radius-x6: calc(var(--radius-x1) * 6);
+  --radius-x7: calc(var(--radius-x1) * 7);
+  --radius-x8: calc(var(--radius-x1) * 8);
+  --radius-x9: calc(var(--radius-x1) * 9);
+  --radius-x10: calc(var(--radius-x1) * 10);
+  --radius-control: var(--radius-x4);
+  --radius-button: var(--radius-x3);
+  --gap-x05: calc(var(--gap-x1) * 0.5);
+  --gap-x1: 4px;
+  --gap-x2: calc(var(--gap-x1) * 2);
+  --gap-x3: calc(var(--gap-x1) * 3);
+  --gap-x4: calc(var(--gap-x1) * 4);
+  --gap-x5: calc(var(--gap-x1) * 5);
+  --gap-x6: calc(var(--gap-x1) * 6);
+  --gap-x7: calc(var(--gap-x1) * 7);
+  --gap-x8: calc(var(--gap-x1) * 8);
+  --gap-x9: calc(var(--gap-x1) * 9);
+  --gap-x10: calc(var(--gap-x1) * 10);
+  --gap-x11: calc(var(--gap-x1) * 11);
+  --gap-x12: calc(var(--gap-x1) * 12);
+  --blur-x1: 6px;
+  --rich-text-gap: 8px;
+  --duration-instant: 1ms;
+  --duration-fast: 160ms;
+  --duration-base: 280ms;
+  --duration-slow: 400ms;
+  --delay-stagger: 90ms;
+  --easing-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --easing-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --reveal-offset: 12px;
+  --reveal-scale: 0.96;
+  --header-height: 45px;
+  --container-padding-top: calc(var(--header-height) + var(--padding-x3));
+  --container-padding-bottom: var(--padding-x3);
+  --page-height-available: calc(
+    100dvh - var(--container-padding-top) - var(--container-padding-bottom)
+  );
+
+  /* vars/_components.scss */
+  --game-completed-color: var(--color-green);
+  --game-dropped-color: var(--color-red);
+  --game-playing-color: var(--color-blue);
+  --game-wishlist-color: var(--color-violet);
+  --game-backlog-color: var(--color-white);
+  --game-played-color: var(--color-cyan);
+  --game-mastered-color: var(--color-yellow);
+  --cover-ratio: 528/704;
+  --shadow-basic: 0px 4px 4px var(--color-neutral-5);
+  --shadow-text: drop-shadow(0 1px 2px var(--color-neutral-5))
+    drop-shadow(0 0 6px var(--color-neutral-5));
+  --glow-accent: 0 0 0.4rem var(--color-accent);
+  --glow-accent-sm: 0 0 0.15rem var(--color-accent);
+  --avatar-size-sm: var(--padding-x6);
+  --navigation-progress-height: 1px;
+  --navigation-progress-z-index: 1002;
+  --bprogress-color: var(--color-accent) !important;
+  --bprogress-height: var(--navigation-progress-height) !important;
+  --bprogress-box-shadow: var(--glow-accent) !important;
+  --bprogress-z-index: var(--navigation-progress-z-index) !important;
+  --modal-text-width: min(720px, calc(100vw - var(--padding-x10)));
+  --rich-editor-image-width: 400px;
+  --rich-editor-separator-height: 18px;
+  --playthrough-modal-width: min(80vw, 400px);
+  --header-logo-height: 85%;
+  --header-logo-height-sm: 72%;
+  --tab-count-color: color-mix(in srgb, currentColor 60%, transparent);
+  --playthrough-modal-height: min(70dvh, 500px);
+  --playthrough-modal-width-lg: min(88vw, 760px);
+  --playthrough-modal-height-lg: min(86dvh, 780px);
+  --games-card-min-width: 180px;
+  --list-card-min-width: 180px;
+  --range-track-height: 6px;
+  --progress-bar-height: 6px;
+  --progress-bar-sweep-duration: 1200ms;
+  --range-thumb-size: 20px;
+  --range-thumb-width: 44px;
+  --range-thumb-height: 24px;
+  --scrollbar-horizontal-size: 6px;
+  --scrollbar-arrow-width: 32px;
+  --scrollbar-fade-width: 48px;
+  --game-keywords-collapsed-height: 66px;
+  --game-hero-artwork-height: 300px;
+  --game-hero-artwork-height-sm: 180px;
+  --game-hero-cover-width: 200px;
+  --game-hero-cover-offset: 104px;
+  --game-hero-counters-width: 360px;
+  --game-facts-label-width: 84px;
+  --game-rating-popover-width: 320px;
+  --popover-width: 320px;
+  --achievements-icon-size: 44px;
+  --achievements-icon-size-sm: 48px;
+  --port-achievement-icon-size-sm: 32px;
+  --port-game-card-width: 140px;
+  --port-game-card-width-sm: 96px;
+  --popover-max-height: 320px;
+  --popover-sheet-max-height: 85dvh;
+  --textarea-handle-size: 20px;
+  --image-generator-preview-width: 160px;
+  --ai-drafts-count-width: 88px;
+  --image-finder-portrait-width: 216px;
+  --image-finder-landscape-width: 320px;
+  --site-sessions-modal-width: min(560px, calc(100vw - var(--padding-x8)));
+  --image-generator-elements-width: min(640px, calc(100vw - var(--padding-x8)));
+  --popover-sheet-grabber-width: 40px;
+  --popover-sheet-grabber-height: 5px;
+  --drawer-width: max(20vw, 460px);
+  --drawer-z-index: 5;
+  --expandable-scroll-height: 132px;
+  --expandable-fade-height: 32px;
+  --date-picker-width: 300px;
+  --date-picker-field-min-width: 140px;
+  --game-card-min-width: 160px;
+  --playthrough-platform-min-width: 200px;
+  --playthrough-time-min-width: 120px;
+  --date-picker-cell-size: 34px;
+  --emoji-picker-width: 328px;
+  --emoji-picker-cell-size: 34px;
+  --emoji-picker-group-size: 28px;
+  --emoji-picker-grid-height: 238px;
+  --game-hero-scrim: linear-gradient(
+    180deg,
+    #191d248c 0%,
+    #191d2400 30%,
+    #212731d1 72%,
+    var(--color-bg-secondary) 100%
+  );
+  --spoiler-blur: 7px;
+  --community-avatar-size: 36px;
+  --community-reply-avatar-size: 28px;
+  --community-review-clamp-height: 132px;
+  --community-distribution-height: 8px;
+  --community-distribution-min-width: 240px;
+  --community-dot-size: 7px;
+  --community-loading-height: 96px;
+  --user-review-card-width: 170px;
+  --user-review-card-width-sm: 140px;
+  --user-review-rating-filter-width: 260px;
+  --vndb-review-height: max(360px, calc(100vh - 420px));
+  --vndb-cover-width: 120px;
+  --vndb-search-width: 320px;
+  --conflicts-state-filter-width: 240px;
+  --conflicts-ai-limit-width: 96px;
+  --vndb-candidate-cover-width: 64px;
+  --empty-state-image-size: 180px;
+  --empty-state-image-size-sm: 96px;
+  --empty-state-inline-text-min-width: 200px;
+  --empty-state-page-content-width: 420px;
+  --badge-negative-color: var(--color-orange);
+  --badge-tint-strength: 16%;
+  --stat-tile-bg: var(--color-bg-primary);
+  --not-found-image-height: 240px;
+  --not-found-backdrop-size: 400px;
+  --favorite-color: var(--color-pink);
+  --moon-phase-lit-color: var(--color-neutral-95);
+  --moon-phase-dark-color: var(--color-bg-hover);
+  --moon-phase-unknown-color: var(--color-text-muted);
+  --moon-phase-unknown-fill: var(--color-bg-secondary);
+  --release-calendar-card-width: 172px;
+  --release-calendar-card-width-sm: var(--game-card-min-width);
+  --release-calendar-month-height: 16px;
+  --release-calendar-node-size: 28px;
+  --release-calendar-axis-color: var(--color-bg-hover);
+  --game-controls-icon-size: 24px;
+  --game-controls-icon-size-sm: 20px;
+  --game-controls-badge-size: 15px;
+  --list-card-row-mosaic-size: 44px;
+  --list-card-count-height: 20px;
+  --list-search-width: 320px;
+  --list-row-cover-width: 40px;
+  --profile-hero-height: 168px;
+  --profile-avatar-size: 112px;
+  --profile-avatar-size-sm: 72px;
+  --activity-cover-width: 80px;
+  --people-avatar-size: 22px;
+  --character-card-width: 128px;
+  --character-card-width-sm: 104px;
+  --character-profile-portrait-width: 200px;
+  --character-editor-portrait-width: 150px;
+  --image-picker-thumb-width: 160px;
+  --game-images-modal-width: min(92vw, 960px);
+  --game-port-achievements-modal-width: min(92vw, 960px);
+  --requests-queue-width: 440px;
+  --list-sort-width: 280px;
+  --field-control-height: 40px;
+  --gauntlet-mode-cards-width: 300px;
+  --gauntlet-winner-cover-width: 200px;
+  --gauntlet-winner-cover-width-mobile: 220px;
+  --gauntlet-wheel-max-width: 50vw;
+  --gauntlet-fact-label-width: 110px;
+  --object-field-min-width: 160px;
+  --requests-panel-min-height: 240px;
+  --page-skeleton-crumbs-width: 160px;
+  --page-skeleton-title-width: 240px;
+  --search-modal-width: 900px;
+  --search-tab-height: 36px;
+  --reaction-active-color: var(--color-accent);
+  --tabs-muted-opacity: 0.55;
+  --burger-animation-duration: 600ms;
+  --status-menu-width: 248px;
+  --status-menu-active-bg: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  --status-pending-color: color-mix(
+    in srgb,
+    var(--color-positive) 38%,
+    var(--color-bg-primary)
+  );
+  --status-map-cell: 9px;
+  --status-login-min-height: 640px;
+  --status-edit-modal-width: min(560px, calc(100vw - var(--padding-x8)));
+}
+/* mooncellar-tokens:end */
+
+  :root {
+    color-scheme: dark;
+    --mock-ui: "Hanken Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mock-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --mock-ground: var(--color-neutral-10);
+    --mock-hairline: var(--color-neutral-30);
+    --mock-accent-dim: color-mix(in srgb, var(--color-accent) 16%, transparent);
+    --mock-positive-dim: color-mix(in srgb, var(--color-positive) 16%, transparent);
+    --mock-login-width: 380px;
+    --mock-phone-width: 390px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--mock-ground);
+    color: var(--color-text-primary);
+    font-family: var(--mock-ui);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .shell {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding-inline: var(--padding-x6);
+    padding-block: var(--padding-x14) var(--padding-x20);
+  }
+
+  @media (max-width: 520px) {
+    .shell { padding-inline: var(--padding-x4); padding-block: var(--padding-x9) var(--padding-x14); }
+  }
+
+  h1, h2, h3, h4 { margin: 0; text-wrap: balance; }
+  p { margin: 0; }
+  button, input { font: inherit; color: inherit; }
+  ul, ol { margin: 0; padding: 0; list-style: none; }
+
+  .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-gray); margin: 0; }
+  .masthead { display: flex; flex-direction: column; gap: var(--gap-x4); }
+  .masthead h1 { font-size: 34px; line-height: 1.15; font-weight: 700; letter-spacing: -0.5px; }
+  .lede { color: var(--color-text-secondary); max-width: 70ch; }
+  code.t { font-family: var(--mock-mono); font-size: 12px; color: var(--color-yellow); }
+
+  .flow {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1px;
+    background: var(--mock-hairline);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x4);
+    overflow: hidden;
+    margin: var(--padding-x2) 0 0;
+    counter-reset: step;
+  }
+  .flow div { background: var(--color-bg-primary); padding: var(--padding-x4); counter-increment: step; }
+  .flow dt { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-gray); margin-bottom: var(--padding-x1); }
+  .flow dt::before { content: counter(step) " · "; color: var(--color-accent); }
+  .flow dd { margin: 0; font-size: 13px; color: var(--color-text-secondary); }
+
+  .screen { margin-top: var(--padding-x16); }
+  .screen__head { display: flex; align-items: baseline; gap: var(--gap-x3); flex-wrap: wrap; margin-bottom: var(--padding-x2); }
+  .screen__head h2 { font-size: 23px; font-weight: 700; letter-spacing: -0.2px; }
+  .screen__route { font-family: var(--mock-mono); font-size: 12px; color: var(--color-accent); border: 1px solid var(--color-accent); border-radius: var(--radius-x1); padding: 1px 7px; }
+  .screen__thesis { color: var(--color-text-muted); max-width: 74ch; margin-bottom: var(--padding-x5); }
+
+  .stage {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x4);
+    padding: var(--padding-x5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x4);
+  }
+  .stage--center { align-items: center; padding-block: var(--padding-x12); }
+  @media (max-width: 520px) { .stage { padding: var(--padding-x3); } }
+
+  .states { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--gap-x4); }
+  .state-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-gray); margin-bottom: var(--padding-x2); }
+
+  .box {
+    background: color-mix(in srgb, var(--color-bg-secondary) 90%, transparent);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-x5);
+    padding: var(--padding-x5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-x4);
+    min-width: 0;
+  }
+  @media (max-width: 520px) { .box { padding: var(--padding-x4); } }
+  .box__head { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-x3); flex-wrap: wrap; }
+  .box__title { font-size: 18px; font-weight: 700; }
+  .box__sub { font-size: 13px; color: var(--color-text-muted); }
+
+  .svg { width: 18px; height: 18px; flex: none; }
+  .svg path { fill: none; stroke: currentColor; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap-x2);
+    border: 0;
+    border-radius: var(--radius-button);
+    padding: var(--padding-x2) var(--padding-x4);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+    white-space: nowrap;
+  }
+  .btn:hover { background: var(--color-bg-hover); }
+  .btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  .btn--accent { background: var(--color-accent); }
+  .btn--accent:hover { background: color-mix(in srgb, var(--color-accent) 85%, var(--color-neutral-100)); }
+  .btn--ghost { background: transparent; color: var(--color-text-muted); }
+  .btn--ghost:hover { color: var(--color-text-primary); }
+  .btn--compact { padding: var(--padding-x1) var(--padding-x2); font-size: 13px; }
+  .btn--wide { width: 100%; }
+  .btn[disabled] { opacity: 0.5; cursor: default; }
+
+  .field { display: flex; flex-direction: column; gap: var(--gap-x1); min-width: 0; }
+  .field label { font-size: 13px; color: var(--color-text-muted); }
+  .input {
+    width: 100%;
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-control);
+    padding: var(--padding-x2) var(--padding-x3);
+    font-size: 14px;
+    min-width: 0;
+  }
+  .input::placeholder { color: var(--color-gray); }
+  .input:focus { outline: 2px solid var(--color-accent); outline-offset: -1px; border-color: transparent; }
+  .input--mono { font-family: var(--mock-mono); font-size: 12px; }
+  .error-line { font-size: 13px; color: var(--color-negative); }
+
+  .login { width: 100%; max-width: var(--mock-login-width); }
+  .login__logo { height: 28px; align-self: center; }
+  .login__title { font-size: 20px; font-weight: 700; text-align: center; }
+  .login__hint { font-size: 13px; color: var(--color-text-muted); text-align: center; }
+  .login form { display: flex; flex-direction: column; gap: var(--gap-x3); }
+
+  .empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--gap-x3); padding-block: var(--padding-x6); }
+  .empty__icon { width: 40px; height: 40px; color: var(--color-text-muted); }
+  .empty__title { font-size: 20px; font-weight: 700; }
+  .empty__text { color: var(--color-text-secondary); max-width: 46ch; font-size: 14px; }
+  .empty__actions { display: flex; gap: var(--gap-x2); flex-wrap: wrap; justify-content: center; }
+  .inline-empty { display: flex; gap: var(--gap-x3); align-items: flex-start; padding: var(--padding-x4); border: 1px dashed var(--color-border-primary); border-radius: var(--radius-x3); font-size: 14px; color: var(--color-text-secondary); }
+  .inline-empty .svg { color: var(--color-text-muted); margin-top: 2px; }
+
+  .hub { display: grid; grid-template-columns: var(--status-menu-width) 1fr; gap: var(--gap-x4); align-items: start; }
+  @media (max-width: 860px) { .hub { grid-template-columns: 1fr; } }
+  .hub__main { display: flex; flex-direction: column; gap: var(--gap-x4); min-width: 0; }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-x3); flex-direction: row; padding-block: var(--padding-x3); }
+  .topbar__brand { display: flex; align-items: center; gap: var(--gap-x3); }
+  .topbar__brand img { height: 22px; }
+  .topbar__label { font-size: 13px; color: var(--color-text-muted); border-left: 1px solid var(--color-border-primary); padding-left: var(--padding-x3); }
+  .topbar__user { display: flex; align-items: center; gap: var(--gap-x2); font-size: 14px; color: var(--color-text-secondary); }
+  .avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(140deg, var(--color-accent), var(--color-neutral-30)); }
+
+  .menu { gap: var(--gap-x1); }
+  .menu__caption { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-gray); padding-inline: var(--padding-x2); }
+  .menu__item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2px var(--gap-x2);
+    padding: var(--padding-x2) var(--padding-x3);
+    border-radius: var(--radius-x3);
+    cursor: pointer;
+    color: var(--color-text-secondary);
+  }
+  .menu__item:hover { background: var(--color-bg-tertiary); color: var(--color-text-primary); }
+  .menu__item[aria-current="page"] { background: var(--mock-accent-dim); color: var(--color-text-primary); }
+  .menu__name { font-weight: 600; font-size: 14px; }
+  .menu__kinds { display: flex; gap: var(--gap-x1); color: var(--color-text-muted); align-items: center; }
+  .menu__kinds .svg { width: 14px; height: 14px; }
+  .menu__meta { grid-column: 1 / -1; font-size: 12px; color: var(--color-text-muted); }
+  .menu__sep { height: 1px; background: var(--color-border-primary); margin-block: var(--padding-x2); }
+
+  .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--gap-x3); flex-wrap: wrap; }
+  .page-head h3 { font-size: 26px; font-weight: 700; letter-spacing: -0.3px; }
+  .page-head__meta { display: flex; align-items: center; gap: var(--gap-x1); font-size: 13px; color: var(--color-text-muted); }
+  .page-head__meta .svg { width: 15px; height: 15px; }
+
+  .tabs { display: flex; border-bottom: 1px solid var(--color-bg-hover); }
+  .tabs button { border: 0; background: none; padding: var(--padding-x2) var(--padding-x4); font-size: 14px; font-weight: 600; color: var(--color-text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; display: inline-flex; gap: var(--gap-x2); align-items: center; }
+  .tabs button[aria-selected="true"] { color: var(--color-text-primary); border-bottom-color: var(--color-accent); }
+  .tabs .count { font-size: 12px; color: var(--color-text-muted); font-weight: 500; }
+
+  .seg { display: inline-flex; gap: var(--gap-x05); padding: var(--padding-x05); border-radius: var(--radius-x4); background: var(--color-bg-tertiary); flex-wrap: wrap; }
+  .seg button { border: 0; background: transparent; color: var(--color-text-muted); font-size: 13px; padding: var(--padding-x1) var(--padding-x3); border-radius: var(--radius-x3); cursor: pointer; }
+  .seg button:hover { color: var(--color-text-primary); }
+  .seg button[aria-pressed="true"] { background: var(--color-accent); color: var(--color-text-primary); }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: var(--gap-x3); }
+  .tile { border: 1px solid var(--color-border-primary); border-radius: var(--radius-x4); padding: var(--padding-x3) var(--padding-x4); display: flex; flex-direction: column; gap: 2px; }
+  .tile__label { font-size: 12px; color: var(--color-text-muted); }
+  .tile__value { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; }
+  .tile__hint { font-size: 12px; color: var(--color-text-muted); }
+
+  .bar { height: 6px; border-radius: var(--radius-x1); background: var(--color-bg-primary); overflow: hidden; display: flex; }
+  .bar span { display: block; height: 100%; }
+  .bar .done { background: var(--color-positive); }
+  .bar .taken { background: var(--color-accent); }
+  .bar .pending { background: var(--status-pending-color); }
+
+  .cats { display: flex; flex-direction: column; gap: var(--gap-x3); }
+  .cat { display: grid; grid-template-columns: 110px 1fr 128px; gap: var(--gap-x3); align-items: center; font-size: 14px; }
+  .cat__name { font-family: var(--mock-mono); font-size: 13px; color: var(--color-text-secondary); }
+  .cat__num { font-variant-numeric: tabular-nums; text-align: right; color: var(--color-text-muted); font-size: 13px; }
+  @media (max-width: 520px) { .cat { grid-template-columns: 84px 1fr; } .cat__num { grid-column: 2; text-align: left; } }
+
+  .badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; line-height: 18px; padding-inline: var(--padding-x2); border-radius: var(--radius-x2); background: var(--color-bg-tertiary); color: var(--color-text-secondary); white-space: nowrap; }
+  .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .badge--done { color: var(--color-positive); background: var(--mock-positive-dim); }
+  .badge--taken { color: var(--color-text-primary); background: var(--mock-accent-dim); }
+  .badge--taken::before { background: var(--color-accent); }
+  .badge--waiting { color: var(--color-yellow); }
+  .badge--free { color: var(--color-text-muted); }
+
+  .table { border: 1px solid var(--color-border-primary); border-radius: var(--radius-x4); overflow: hidden; font-size: 14px; }
+  .table__row { display: grid; grid-template-columns: var(--cols); gap: var(--gap-x3); padding: var(--padding-x2) var(--padding-x3); align-items: center; border-top: 1px solid var(--color-border-primary); }
+  .table__row:first-child { border-top: 0; }
+  .table__row--head { background: var(--color-bg-tertiary); font-size: 12px; font-weight: 600; color: var(--color-text-muted); }
+  .table__row--group { background: color-mix(in srgb, var(--color-bg-tertiary) 45%, transparent); font-size: 13px; font-weight: 600; color: var(--color-text-secondary); grid-template-columns: 1fr auto; }
+  .table__row--group span:last-child { color: var(--color-text-muted); font-weight: 500; }
+  .mono { font-family: var(--mock-mono); font-size: 12px; color: var(--color-text-secondary); }
+  .num { font-variant-numeric: tabular-nums; text-align: right; color: var(--color-text-secondary); }
+  .muted { color: var(--color-text-muted); }
+  .clamp { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  @media (max-width: 640px) {
+    .table__row:not(.table__row--group) { grid-template-columns: 1fr auto; }
+    .table__row--head { display: none; }
+    .table__row > .hide-sm { display: none; }
+  }
+
+  .split { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--gap-x4); align-items: start; }
+  @media (max-width: 960px) { .split { grid-template-columns: 1fr; } }
+
+  .map { display: grid; grid-template-columns: repeat(auto-fill, var(--status-map-cell)); gap: 2px; }
+  .map i { width: var(--status-map-cell); height: var(--status-map-cell); border-radius: 2px; background: var(--color-bg-tertiary); }
+  .map i.d { background: var(--color-positive); }
+  .map i.t { background: var(--color-accent); }
+  .map i.p { background: var(--status-pending-color); }
+  .legend { display: flex; gap: var(--gap-x4); flex-wrap: wrap; font-size: 12px; color: var(--color-text-muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+  .feed { display: flex; flex-direction: column; }
+  .feed li { display: grid; grid-template-columns: auto 1fr auto; gap: var(--gap-x3); padding-block: var(--padding-x2); border-top: 1px solid var(--color-border-primary); font-size: 14px; align-items: baseline; }
+  .feed li:first-child { border-top: 0; }
+  .feed__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-text-muted); }
+  .feed__dot--done { background: var(--color-positive); }
+  .feed__dot--taken { background: var(--color-accent); }
+  .feed__time { font-size: 12px; color: var(--color-text-muted); white-space: nowrap; }
+
+  .skeleton { border-radius: var(--radius-x2); background: linear-gradient(90deg, var(--color-bg-tertiary), var(--color-bg-hover), var(--color-bg-tertiary)); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; }
+  @keyframes shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+
+  .token { display: grid; grid-template-columns: 1fr auto; gap: var(--gap-x2); }
+  .callout { display: flex; gap: var(--gap-x2); font-size: 13px; color: var(--color-text-secondary); padding: var(--padding-x3); border-radius: var(--radius-x3); background: var(--mock-accent-dim); }
+  .checks { display: flex; gap: var(--gap-x4); flex-wrap: wrap; font-size: 14px; color: var(--color-text-secondary); }
+  .checks label { display: inline-flex; gap: var(--gap-x2); align-items: center; }
+  .check { width: 18px; height: 18px; border-radius: var(--radius-x1); border: 1px solid var(--color-border-secondary); display: inline-grid; place-items: center; }
+  .check--on { background: var(--color-accent); border-color: var(--color-accent); }
+  .check .svg { width: 14px; height: 14px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap-x3); }
+  @media (max-width: 560px) { .form-grid { grid-template-columns: 1fr; } }
+
+  .phones { display: flex; gap: var(--gap-x6); flex-wrap: wrap; justify-content: center; }
+  .phone { width: 100%; max-width: var(--mock-phone-width); border: 1px solid var(--color-border-primary); border-radius: var(--radius-x8); padding: var(--padding-x3); background: var(--mock-ground); display: flex; flex-direction: column; gap: var(--gap-x3); }
+  .select { display: flex; justify-content: space-between; align-items: center; gap: var(--gap-x2); background: var(--color-bg-primary); border: 1px solid var(--color-border-primary); border-radius: var(--radius-control); padding: var(--padding-x2) var(--padding-x3); font-size: 14px; }
+  .select .svg { width: 12px; height: 12px; color: var(--color-text-muted); }
+  .select .svg path { fill: currentColor; stroke: none; }
+
+  .decisions { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--gap-x3); }
+  .decisions div { border: 1px solid var(--color-border-primary); border-radius: var(--radius-x4); padding: var(--padding-x4); background: var(--color-bg-primary); }
+  .decisions h4 { font-size: 14px; margin-bottom: var(--padding-x1); }
+  .decisions p { font-size: 13px; color: var(--color-text-muted); }
+
+  .note {
+    margin-top: var(--padding-x12);
+    font-size: 13px;
+    color: var(--color-gray);
+    border-left: 2px solid var(--color-border-primary);
+    padding-left: var(--padding-x3);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: var(--duration-instant) !important; animation-duration: var(--duration-instant) !important; }
+  }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-lock" viewBox="0 0 24 24"><path stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" d="M6.5 10.5h11a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1Zm2.5 0V7.5a3 3 0 0 1 6 0v3"/></symbol>
+  <symbol id="i-list" viewBox="0 0 18 18"><path stroke-width="1.6" stroke-linecap="round" d="M6 4.5h10M6 9h10M6 13.5h10M2.6 4.5h.01M2.6 9h.01M2.6 13.5h.01"/></symbol>
+  <symbol id="i-code" viewBox="0 0 18 18"><path stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="m6 4-4 5 4 5M12 4l4 5-4 5"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><path stroke-width="1.6" stroke-linecap="round" d="M12 3.5a8.5 8.5 0 1 0 0 17a8.5 8.5 0 0 0 0-17M12 7.5V12l3 2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path stroke-width="1.5" stroke-linecap="round" d="M12 4v16M4 12h16"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 512 512"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/></symbol>
+</svg>
+
+<div class="shell">
+  <header class="masthead">
+    <p class="eyebrow">MoonCellar · project status hub</p>
+    <h1>Project status hub</h1>
+    <p class="lede">
+      A private site at <code class="t">status.mooncellar.space</code> where admins follow every MoonCellar
+      project: sign in with a MoonCellar account, pick a project from the menu, read its page. A page is
+      built from the blocks the project publishes — a plan of tasks, decompilation progress, or both — so a
+      new project needs data, not a new screen. It replaces the static page behind a browser password.
+    </p>
+    <dl class="flow">
+      <div><dt>Sign in</dt><dd>The site's own account, through the shared sign-in form. The cookies are the ones mooncellar.space already uses.</dd></div>
+      <div><dt>Admins only</dt><dd><code class="t">GET /admin/access</code> decides; anyone else sees "No access", not the data.</dd></div>
+      <div><dt>Pick a project</dt><dd>The menu lists every project with the blocks it has and when it last uploaded.</dd></div>
+      <div><dt>Read its blocks</dt><dd>Plan and Decompilation render from JSON the project uploads with its own token.</dd></div>
+    </dl>
+  </header>
+
+  <section class="screen">
+    <div class="screen__head"><h2>Sign in</h2><span class="screen__route">status.mooncellar.space/login</span></div>
+    <p class="screen__thesis">
+      The shared <code class="t">AuthModal</code> form placed on a page: a new <code class="t">isPage</code> prop drops the close
+      button and the sign-up switch, because the hub only lets existing admins in. Any hub URL without a
+      session lands here and returns to that URL after signing in.
+    </p>
+    <div class="states">
+      <div>
+        <p class="state-label">Default</p>
+        <div class="stage stage--center">
+          <div class="box login">
+            <img class="login__logo" src="logo-text.png" alt="MoonCellar">
+            <h3 class="login__title">Sign in to Status</h3>
+            <p class="login__hint">Project status for the MoonCellar team.</p>
+            <form onsubmit="return false">
+              <div class="field"><label for="e1">Email</label><input class="input" id="e1" type="email" placeholder="you@example.com" autocomplete="email"></div>
+              <div class="field"><label for="p1">Password</label><input class="input" id="p1" type="password" placeholder="Password" autocomplete="current-password"></div>
+              <button class="btn btn--accent btn--wide" type="submit">Sign in</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p class="state-label">Wrong password</p>
+        <div class="stage stage--center">
+          <div class="box login">
+            <img class="login__logo" src="logo-text.png" alt="MoonCellar">
+            <h3 class="login__title">Sign in to Status</h3>
+            <p class="login__hint">Project status for the MoonCellar team.</p>
+            <form onsubmit="return false">
+              <div class="field"><label for="e2">Email</label><input class="input" id="e2" type="email" value="alex@mooncellar.space"></div>
+              <div class="field"><label for="p2">Password</label><input class="input" id="p2" type="password" value="wrongpass"></div>
+              <p class="error-line">Invalid email or password</p>
+              <button class="btn btn--accent btn--wide" type="submit">Sign in</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="screen__head"><h2>No access</h2><span class="screen__route">any hub URL, signed in without the admin role</span></div>
+    <p class="screen__thesis">
+      The shared <code class="t">EmptyState</code> in its <code class="t">page</code> shape. Nothing about projects is fetched
+      or shown; signing out goes through <code class="t">POST /auth/:id/logout</code>, the only way to clear the
+      httpOnly cookies.
+    </p>
+    <div class="stage stage--center">
+      <div class="box login">
+        <div class="empty">
+          <svg class="svg empty__icon"><use href="#i-lock"/></svg>
+          <h3 class="empty__title">No access</h3>
+          <p class="empty__text">Status is open to MoonCellar admins. You are signed in as <b>moonwalker</b>.</p>
+          <div class="empty__actions">
+            <button class="btn" type="button">Sign out</button>
+            <button class="btn btn--ghost" type="button">Go to MoonCellar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="screen__head"><h2>Project page — Decompilation</h2><span class="screen__route">/rooftops</span></div>
+    <p class="screen__thesis">
+      The menu on the left, the project on the right. A project with several blocks gets the shared
+      <code class="t">Tabs</code> (default theme) under its title, one tab per block, kept in the URL
+      (<code class="t">/rooftops/plan</code>). The Decompilation block is what the old page showed: totals,
+      categories, areas, the function map, files and the feed.
+    </p>
+    <div class="stage">
+      <div class="box topbar">
+        <div class="topbar__brand"><img src="logo-text.png" alt="MoonCellar"><span class="topbar__label">Status</span></div>
+        <div class="topbar__user"><span class="avatar"></span><span>sergeyhist</span><button class="btn btn--ghost btn--compact" type="button">Sign out</button></div>
+      </div>
+      <div class="hub">
+        <nav class="box menu" aria-label="Projects">
+          <p class="menu__caption">Projects</p>
+          <a class="menu__item">
+            <span class="menu__name">MoonCellar</span>
+            <span class="menu__kinds"><svg class="svg"><use href="#i-list"/></svg></span>
+            <span class="menu__meta">Plan · 18 of 42 done · 12 min ago</span>
+          </a>
+          <a class="menu__item" aria-current="page">
+            <span class="menu__name">Rooftops</span>
+            <span class="menu__kinds"><svg class="svg"><use href="#i-code"/></svg><svg class="svg"><use href="#i-list"/></svg></span>
+            <span class="menu__meta">44.9% decompiled · 3 min ago</span>
+          </a>
+          <div class="menu__sep"></div>
+          <a class="menu__item"><span class="menu__name">Manage projects</span></a>
+        </nav>
+
+        <div class="hub__main">
+          <div class="box">
+            <div class="page-head">
+              <h3>Rooftops</h3>
+              <span class="page-head__meta"><svg class="svg"><use href="#i-clock"/></svg>Updated 3 min ago · main <span class="mono">a41c2e9</span></span>
+            </div>
+            <div class="tabs" role="tablist">
+              <button role="tab" aria-selected="true" type="button">Decompilation</button>
+              <button role="tab" aria-selected="false" type="button">Plan <span class="count">268</span></button>
+            </div>
+            <div class="tiles">
+              <div class="tile"><span class="tile__label">Functions</span><span class="tile__value">7,644</span><span class="tile__hint">of 17,012 · 44.9%</span></div>
+              <div class="tile"><span class="tile__label">By bytes</span><span class="tile__value">38.0%</span><span class="tile__hint">724 KB of 1.9 MB</span></div>
+              <div class="tile"><span class="tile__label">In work</span><span class="tile__value">3</span><span class="tile__hint">files claimed</span></div>
+              <div class="tile"><span class="tile__label">Waiting to merge</span><span class="tile__value">41</span><span class="tile__hint">functions in work/* branches</span></div>
+            </div>
+          </div>
+
+          <div class="split">
+            <div class="box">
+              <div class="box__head"><span class="box__title">Categories</span><span class="box__sub">functions done</span></div>
+              <div class="cats">
+                <div class="cat"><span class="cat__name">game</span><div class="bar"><span class="done" style="width:100%"></span></div><span class="cat__num">3,500 / 3,500</span></div>
+                <div class="cat"><span class="cat__name">engine</span><div class="bar"><span class="done" style="width:100%"></span></div><span class="cat__num">3,092 / 3,092</span></div>
+                <div class="cat"><span class="cat__name">renderer</span><div class="bar"><span class="done" style="width:19.6%"></span><span class="pending" style="width:1.9%"></span></div><span class="cat__num">412 / 2,106</span></div>
+                <div class="cat"><span class="cat__name">platform</span><div class="bar"><span class="done" style="width:32.3%"></span></div><span class="cat__num">640 / 1,980</span></div>
+                <div class="cat"><span class="cat__name">network</span><div class="bar"></div><span class="cat__num">0 / 1,402</span></div>
+                <div class="cat"><span class="cat__name">stdlib</span><div class="bar"></div><span class="cat__num">0 / 4,932</span></div>
+              </div>
+            </div>
+            <div class="box">
+              <div class="box__head"><span class="box__title">Areas</span></div>
+              <div class="table" style="--cols: 1fr 1fr 88px">
+                <div class="table__row table__row--head"><span>Area</span><span>Led by</span><span class="num">Done</span></div>
+                <div class="table__row"><span>world</span><span class="muted hide-sm">sergeyhist</span><span class="num">100%</span></div>
+                <div class="table__row"><span>ui</span><span class="muted hide-sm">alexgrist14</span><span class="num">100%</span></div>
+                <div class="table__row"><span>renderer</span><span class="muted hide-sm">alexgrist14</span><span class="num">19.6%</span></div>
+                <div class="table__row"><span>platform</span><span class="muted hide-sm">sergeyhist</span><span class="num">32.3%</span></div>
+                <div class="table__row"><span>network</span><span class="muted hide-sm">—</span><span class="num">0%</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="box">
+            <div class="box__head">
+              <span class="box__title">Function map</span>
+              <div class="legend">
+                <span><i style="background:var(--color-positive)"></i>Done in main</span>
+                <span><i style="background:var(--status-pending-color)"></i>Done in a branch</span>
+                <span><i style="background:var(--color-accent)"></i>Claimed</span>
+                <span><i style="background:var(--color-bg-tertiary)"></i>Not started</span>
+              </div>
+            </div>
+            <div class="map" id="map" aria-label="One cell per function, in address order"></div>
+          </div>
+
+          <div class="split">
+            <div class="box">
+              <div class="box__head">
+                <span class="box__title">Files</span>
+                <div class="seg" role="group" aria-label="Files">
+                  <button aria-pressed="true" type="button">In work</button>
+                  <button aria-pressed="false" type="button">Free</button>
+                  <button aria-pressed="false" type="button">Done</button>
+                </div>
+              </div>
+              <div class="table" style="--cols: 1fr 90px 120px">
+                <div class="table__row table__row--head"><span>File</span><span class="num">Functions</span><span>Who</span></div>
+                <div class="table__row"><span class="mono">renderer/Mesh.cpp</span><span class="num hide-sm">18 / 42</span><span class="badge badge--taken">alexgrist14</span></div>
+                <div class="table__row"><span class="mono">renderer/Texture.cpp</span><span class="num hide-sm">6 / 31</span><span class="badge badge--taken">alexgrist14</span></div>
+                <div class="table__row"><span class="mono">platform/AudioQueue.cpp</span><span class="num hide-sm">27 / 27</span><span class="badge badge--done">ready to merge</span></div>
+              </div>
+            </div>
+            <div class="box">
+              <div class="box__head"><span class="box__title">Feed</span></div>
+              <ul class="feed">
+                <li><span class="feed__dot feed__dot--done"></span><span>Merged <span class="mono">work/sergeyhist/platform</span> · +27 functions</span><span class="feed__time">3 min</span></li>
+                <li><span class="feed__dot feed__dot--taken"></span><span>alexgrist14 took <span class="mono">renderer/Texture.cpp</span></span><span class="feed__time">14 min</span></li>
+                <li><span class="feed__dot feed__dot--done"></span><span>sergeyhist finished <span class="mono">platform/AudioQueue.cpp</span></span><span class="feed__time">1 h</span></li>
+                <li><span class="feed__dot"></span><span>Plan: task 214 marked done</span><span class="feed__time">2 h</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="screen__head"><h2>Project page — Plan</h2><span class="screen__route">/mooncellar</span></div>
+    <p class="screen__thesis">
+      The same block for every project with a plan. Totals on top, a segmented filter by state, then the
+      shared <code class="t">Table</code> grouped by section. A task that waits names what it waits for; a
+      task in progress names who leads it. On a phone the table turns into cards with the title as the head.
+    </p>
+    <div class="stage">
+      <div class="hub">
+        <nav class="box menu" aria-label="Projects">
+          <p class="menu__caption">Projects</p>
+          <a class="menu__item" aria-current="page">
+            <span class="menu__name">MoonCellar</span>
+            <span class="menu__kinds"><svg class="svg"><use href="#i-list"/></svg></span>
+            <span class="menu__meta">Plan · 18 of 42 done · 12 min ago</span>
+          </a>
+          <a class="menu__item">
+            <span class="menu__name">Rooftops</span>
+            <span class="menu__kinds"><svg class="svg"><use href="#i-code"/></svg><svg class="svg"><use href="#i-list"/></svg></span>
+            <span class="menu__meta">44.9% decompiled · 3 min ago</span>
+          </a>
+          <div class="menu__sep"></div>
+          <a class="menu__item"><span class="menu__name">Manage projects</span></a>
+        </nav>
+        <div class="hub__main">
+          <div class="box">
+            <div class="page-head">
+              <h3>MoonCellar</h3>
+              <span class="page-head__meta"><svg class="svg"><use href="#i-clock"/></svg>Updated 12 min ago</span>
+            </div>
+            <div class="tiles">
+              <div class="tile"><span class="tile__label">Tasks</span><span class="tile__value">42</span><span class="tile__hint">in 5 sections</span></div>
+              <div class="tile"><span class="tile__label">Done</span><span class="tile__value" style="color:var(--color-positive)">18</span><span class="tile__hint">43%</span></div>
+              <div class="tile"><span class="tile__label">In progress</span><span class="tile__value">4</span><span class="tile__hint">2 people</span></div>
+              <div class="tile"><span class="tile__label">Free</span><span class="tile__value">15</span><span class="tile__hint">can be taken</span></div>
+              <div class="tile"><span class="tile__label">Waiting</span><span class="tile__value" style="color:var(--color-yellow)">5</span><span class="tile__hint">on other tasks</span></div>
+            </div>
+            <div class="bar" aria-label="18 done, 4 in progress of 42">
+              <span class="done" style="width:42.9%"></span><span class="taken" style="width:9.5%"></span>
+            </div>
+          </div>
+
+          <div class="box">
+            <div class="box__head">
+              <span class="box__title">Tasks</span>
+              <div class="seg" role="group" aria-label="Show tasks">
+                <button aria-pressed="true" type="button">All</button>
+                <button aria-pressed="false" type="button">In progress</button>
+                <button aria-pressed="false" type="button">Free</button>
+                <button aria-pressed="false" type="button">Waiting</button>
+                <button aria-pressed="false" type="button">Done</button>
+              </div>
+            </div>
+            <div class="table" style="--cols: 52px 1fr 150px 44px">
+              <div class="table__row table__row--head"><span>#</span><span>Task</span><span>State</span><span class="num">Size</span></div>
+              <div class="table__row table__row--group"><span>Status hub</span><span>1 of 4 done</span></div>
+              <div class="table__row"><span class="mono hide-sm">H1</span><span class="clamp">Sign-in page and project menu at status.mooncellar.space, admins only</span><span class="badge badge--taken">sergeyhist</span><span class="num hide-sm">L</span></div>
+              <div class="table__row"><span class="mono hide-sm">H2</span><span class="clamp">Projects API: a project uploads its blocks with its own token, admins read them</span><span class="badge badge--done">Done</span><span class="num hide-sm">M</span></div>
+              <div class="table__row"><span class="mono hide-sm">H3</span><span class="clamp">Plan block: totals, state filter, tasks grouped by section</span><span class="badge badge--waiting">Waits for H1</span><span class="num hide-sm">S</span></div>
+              <div class="table__row"><span class="mono hide-sm">H4</span><span class="clamp">Weekly digest of finished tasks in notifications</span><span class="badge badge--free">Free</span><span class="num hide-sm">S</span></div>
+              <div class="table__row table__row--group"><span>Lists</span><span>3 of 6 done</span></div>
+              <div class="table__row"><span class="mono hide-sm">L4</span><span class="clamp">Collaborative lists: invite a friend to add and reorder games, with a history of who changed what and when, and a way to roll a change back</span><span class="badge badge--taken">alexgrist14</span><span class="num hide-sm">L</span></div>
+              <div class="table__row"><span class="mono hide-sm">L5</span><span class="clamp">Steam wishlist import into a list</span><span class="badge badge--free">Free</span><span class="num hide-sm">M</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="screen__head"><h2>States of a project page</h2></div>
+    <p class="screen__thesis">
+      Loading keeps the frame and shows the shared <code class="t">Skeleton</code>. A project created but never
+      uploaded shows an inline <code class="t">EmptyState</code> that tells the admin what to send. An upload
+      older than a day is marked in the header so a silent project is noticed.
+    </p>
+    <div class="states">
+      <div>
+        <p class="state-label">Loading</p>
+        <div class="box">
+          <div class="skeleton" style="height:30px;width:40%"></div>
+          <div class="tiles">
+            <div class="tile"><div class="skeleton" style="height:14px;width:60%"></div><div class="skeleton" style="height:28px;width:50%;margin-top:6px"></div></div>
+            <div class="tile"><div class="skeleton" style="height:14px;width:60%"></div><div class="skeleton" style="height:28px;width:50%;margin-top:6px"></div></div>
+          </div>
+          <div class="skeleton" style="height:120px"></div>
+        </div>
+      </div>
+      <div>
+        <p class="state-label">No data yet</p>
+        <div class="box">
+          <div class="page-head"><h3>Glassline</h3><span class="page-head__meta">Never uploaded</span></div>
+          <div class="inline-empty">
+            <svg class="svg"><use href="#i-list"/></svg>
+            <span>Nothing uploaded yet. The project sends its blocks with its token:
+              <span class="mono">PUT /projects/glassline/data/plan</span>. Create or rotate the token in Manage projects.</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p class="state-label">Stale upload</p>
+        <div class="box">
+          <div class="page-head">
+            <h3>Rooftops</h3>
+            <span class="page-head__meta" style="color:var(--color-yellow)"><svg class="svg"><use href="#i-clock"/></svg>Updated 3 days ago</span>
+          </div>
+          <p class="box__sub">The header turns yellow after 24 hours without an upload; the data stays readable.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="screen__head"><h2>Manage projects</h2><span class="screen__route">/manage</span></div>
+    <p class="screen__thesis">
+      Admins add a project, choose its blocks and get its upload token — shown once, stored only as a hash.
+      Rotating issues a new token and stops the old one at once. Blocks are fixed types the hub knows how
+      to render; a new type is new code, a new project is not.
+    </p>
+    <div class="stage">
+      <div class="box">
+        <div class="box__head"><span class="box__title">Projects</span><button class="btn btn--accent btn--compact" type="button"><svg class="svg" style="width:16px;height:16px"><use href="#i-plus"/></svg>New project</button></div>
+        <div class="table" style="--cols: 1fr 1fr 1fr 150px">
+          <div class="table__row table__row--head"><span>Project</span><span>Blocks</span><span>Last upload</span><span>Token</span></div>
+          <div class="table__row"><span><b>MoonCellar</b> <span class="mono muted">mooncellar</span></span><span class="muted hide-sm">Plan</span><span class="muted hide-sm">12 min ago · CI</span><button class="btn btn--compact" type="button">Rotate</button></div>
+          <div class="table__row"><span><b>Rooftops</b> <span class="mono muted">rooftops</span></span><span class="muted hide-sm">Decompilation, Plan</span><span class="muted hide-sm">3 min ago</span><button class="btn btn--compact" type="button">Rotate</button></div>
+          <div class="table__row"><span><b>Glassline</b> <span class="mono muted">glassline</span></span><span class="muted hide-sm">Plan</span><span class="muted hide-sm">Never</span><button class="btn btn--compact" type="button">Rotate</button></div>
+        </div>
+      </div>
+      <div class="states">
+        <div class="box">
+          <span class="box__title">New project</span>
+          <div class="form-grid">
+            <div class="field"><label for="n1">Name</label><input class="input" id="n1" value="Glassline"></div>
+            <div class="field"><label for="n2">Address</label><input class="input input--mono" id="n2" value="glassline"></div>
+          </div>
+          <div class="checks">
+            <label><span class="check check--on"><svg class="svg"><use href="#i-check"/></svg></span>Plan</label>
+            <label><span class="check"></span>Decompilation</label>
+          </div>
+          <button class="btn btn--accent" type="button" style="align-self:flex-start">Create</button>
+        </div>
+        <div class="box">
+          <span class="box__title">Token for Glassline</span>
+          <div class="callout">Copy it now: it is not shown again. Keep it in the project's CI secret or in a file outside the repository.</div>
+          <div class="token"><input class="input input--mono" readonly value="mcp_glassline_7Qe2rV9xKp4mWb1sTz8LdN3c"><button class="btn" type="button">Copy</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="screen__head"><h2>Phone</h2><span class="screen__route">390px</span></div>
+    <p class="screen__thesis">
+      Below 860px the menu folds into a shared <code class="t">Dropdown</code> above the page; block tabs and
+      the plan filter wrap; tables become cards.
+    </p>
+    <div class="phones">
+      <div class="phone">
+        <div class="box topbar" style="padding:var(--padding-x3)">
+          <div class="topbar__brand"><img src="logo-text.png" alt="MoonCellar" style="height:18px"><span class="topbar__label">Status</span></div>
+          <span class="avatar"></span>
+        </div>
+        <div class="select"><span><b>Rooftops</b> · 44.9% decompiled</span><svg class="svg"><use href="#i-chevron"/></svg></div>
+        <div class="box">
+          <div class="page-head"><h3>Rooftops</h3><span class="page-head__meta">3 min ago</span></div>
+          <div class="tabs" role="tablist">
+            <button role="tab" aria-selected="false" type="button">Decompilation</button>
+            <button role="tab" aria-selected="true" type="button">Plan <span class="count">268</span></button>
+          </div>
+          <div class="seg" role="group" aria-label="Show tasks">
+            <button aria-pressed="false" type="button">All</button>
+            <button aria-pressed="true" type="button">In progress</button>
+            <button aria-pressed="false" type="button">Free</button>
+          </div>
+          <div class="table" style="--cols: 52px 1fr 150px 44px">
+            <div class="table__row"><span class="clamp">Sign-in page and project menu, admins only</span><span class="badge badge--taken">sergeyhist</span></div>
+            <div class="table__row"><span class="clamp">Collaborative lists with history</span><span class="badge badge--taken">alexgrist14</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="screen__head"><h2>What gets built</h2></div>
+    <div class="decisions">
+      <div><h4>Pages in apps/web, served by host</h4><p>The hub is a route group of the existing app, answered for <code class="t">status.mooncellar.space</code> only, so it uses the shared UI kit and the site's sign-in. No new container.</p></div>
+      <div><h4>API module projects</h4><p><code class="t">PUT /projects/:slug/data/:block</code> with the project token; <code class="t">GET</code> and project management behind the admin role. Blocks are stored as the JSON the project sent.</p></div>
+      <div><h4>Two block types</h4><p><b>Plan</b>: sections of tasks with id, title, state, owner, waits-for, size. <b>Decompilation</b>: totals, categories, areas, the function map, files and the feed.</p></div>
+      <div><h4>No browser password</h4><p>nginx proxies the host to the app; the basic-auth file and the static folder on the server go away.</p></div>
+    </div>
+  </section>
+
+  <p class="note">
+    Colours, spacing and radii are the project's own tokens: the <code class="t">:root</code>
+    block above is generated from <code class="t">apps/web/src/lib/app/styles/vars</code> by
+    <code class="t">bun --filter web sync:tokens</code>. The hub's own sizes and the pending-merge
+    colour shipped as <code class="t">--status-*</code> tokens in <code class="t">vars/_components.scss</code>.
+    No new icons. The typeface is substituted — Hanken Grotesk stands in for ApercuPro, whose licensed
+    file cannot be served from a third-party host.
+  </p>
+</div>
+
+<script>
+  (function () {
+    var map = document.getElementById("map");
+    var cells = [];
+    var seed = 7;
+    function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+    for (var i = 0; i < 520; i++) {
+      var r = rnd();
+      var cls = i < 240 ? "d" : i < 300 ? (r < 0.7 ? "d" : r < 0.8 ? "p" : r < 0.88 ? "t" : "") : (r < 0.08 ? "d" : r < 0.11 ? "t" : r < 0.13 ? "p" : "");
+      cells.push('<i class="' + cls + '"></i>');
+    }
+    map.innerHTML = cells.join("");
+  })();
+</script>

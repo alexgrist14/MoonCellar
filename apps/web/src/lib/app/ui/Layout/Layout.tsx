@@ -19,13 +19,14 @@ import { gamesApi, userAPI } from "@/src/lib/shared/api";
 import { platformsAPI } from "@/src/lib/shared/api/platforms.api";
 import { ErrorHandler } from "@/src/lib/shared/ui/ErrorHandler";
 import classNames from "classnames";
-import { usePathname } from "next/navigation";
+import { usePathname, useSelectedLayoutSegment } from "next/navigation";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useGameFiltersQuery } from "@/src/lib/entities/game/api/game.queries";
 import {
   PAGE_SCROLL_ID,
   scrollPageToTop,
 } from "@/src/lib/shared/utils/common.utils";
+import { STATUS_SEGMENT } from "@/src/lib/shared/constants";
 import { usePlatformsQuery } from "@/src/lib/entities/platform/api/platform.queries";
 
 interface ILayoutProps {
@@ -48,7 +49,7 @@ const hasBottomBar = (pathname: string) =>
   BOTTOM_BAR_ROUTES.includes(pathname) ||
   BOTTOM_BAR_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 
-export const Layout: FC<ILayoutProps> = ({ children, className }) => {
+const SiteLayout: FC<ILayoutProps> = ({ children, className }) => {
   const {
     setGenres,
     setGameModes,
@@ -166,3 +167,39 @@ export const Layout: FC<ILayoutProps> = ({ children, className }) => {
     </div>
   );
 };
+
+const StatusLayout: FC<ILayoutProps> = ({ children, className }) => {
+  const scrollContentRef = useRef<HTMLDivElement>(null);
+
+  useMediaStore();
+
+  return (
+    <div className={classNames(className, styles.layout)}>
+      <ErrorHandler />
+      <Scrollbar
+        id={PAGE_SCROLL_ID}
+        initialContentRef={scrollContentRef}
+        classNameContainer={styles.scrollbars__container}
+        classNameContent={styles.scrollbars__content}
+        classNameScrollbar={styles.scrollbars__scrollbar}
+        type="absolute"
+      >
+        <main className="container container_bare">{children}</main>
+      </Scrollbar>
+      <ToastConnector />
+      <ModalsConnector />
+      <DrawerConnector />
+      <div id="expand-connector"></div>
+      <div id="pagination-connector"></div>
+      <div id="tooltip-connector"></div>
+      <div id="dropdown-connector"></div>
+    </div>
+  );
+};
+
+export const Layout: FC<ILayoutProps> = (props) =>
+  useSelectedLayoutSegment() === STATUS_SEGMENT ? (
+    <StatusLayout {...props} />
+  ) : (
+    <SiteLayout {...props} />
+  );

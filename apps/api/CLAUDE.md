@@ -110,6 +110,26 @@ an instance of Module)`. Use a default import; tsc reports the call as `TS2349`.
   not aggregation-pipeline updates, so a string id would be stored as a string next to ObjectIds
   and the `$in` checks that deduplicate the list would never match it.
 
+## Projects (status hub)
+
+- **A project's upload token is stored only as its sha256 (`tokenHash`, `select: false`), and the
+  check is `timingSafeEqual` on the hashes.** The create and rotate answers are the only place the
+  token exists; there is no endpoint that reads it back, so a lost token means a new one.
+- **`PUT /projects/:slug/data/:block` answers the same 401 for a missing header, a wrong token and a
+  project that does not exist,** so the public endpoint does not tell which addresses are taken. It
+  sits in its own controller (`ProjectUploadsController`) because the admin controller's class-level
+  JWT and role guards would otherwise run before the token check.
+- **A block is validated with its schema (`PROJECT_BLOCK_SCHEMAS`) and stored as a JSON string in
+  `projectdata.body`, never as a document.** Decompilation units are keyed by file paths full of dots,
+  which Mongo field names handle badly, and the admin read returns the string untouched
+  (`@Header("Content-Type", "application/json")`). The menu's progress comes from `uploads` on the
+  project, written with each upload by `getProjectBlockProgress`, so listing projects never reads a
+  block.
+- **Uploads are gzip in practice:** the global JSON limit is 2 MB of decoded body and the API's nginx
+  block keeps the default 1 MB, which a medium decompilation catalogue passes only compressed.
+- **Project addresses in `RESERVED_PROJECT_SLUGS` are routes of the hub** (`login`, `manage`, …); a
+  project there would never be reachable. Extend the list together with a new top-level hub route.
+
 ## Notifications
 
 - **A module whose provider injects `NotificationsService` must import `NotificationsModule`, and

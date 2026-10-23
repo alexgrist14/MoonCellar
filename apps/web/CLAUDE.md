@@ -532,6 +532,32 @@ break silently when ignored:
   rating is `getCombinedRating` in `@mooncellar/schemas`, wrapped as `getAverageRating` in
   `src/lib/shared/utils/rating.utils.ts`.
 
+## Status hub
+
+The admin-only project status site at `status.mooncellar.space` is part of this app; what it
+shows and how projects upload to it is in [`docs/status-hub.md`](../../docs/status-hub.md).
+
+- **The hub is reached by host, through the `beforeFiles` rewrites in `next.config.mjs`, never by
+  a path on `mooncellar.space`.** A host starting with `status.` maps `/`, `/<a>` and `/<a>/<b>` to
+  `src/app/status/...`; `src/app/status/layout.tsx` answers 404 on any other host. Links inside the
+  hub are host paths (`/rooftops/plan`, `/manage`) — never `/status/...`, which the rewrites skip.
+- **Every exclusion in those rewrites ends at the segment, `(?:/|$)`, never at `$`.** Next applies
+  the `beforeFiles` rules one after another to the already rewritten path: with `status$` the
+  two-segment rule took `/status/login` as `first = "status"`, so `/login` became
+  `/status/status/login`, rendered the gated layout with `slug = "status"`, and the sign-in page
+  showed the gate's loader in an endless redirect to itself.
+- **`Layout` renders `StatusLayout` when `useSelectedLayoutSegment()` is `STATUS_SEGMENT`.** It
+  keeps the page scroll, the connectors and `useMediaStore`, and none of the site's chrome or
+  background work — the header, filters, platforms, the `/royal` and `/notifications` sockets, the
+  last-online pings. Hooks of the site go in `SiteLayout`, or every hub page starts them too.
+- **Access is decided on the server by `src/app/status/(gated)/layout.tsx`** with
+  `GET /admin/access` and the request's cookies: 200 renders `StatusShell`, 403
+  `StatusNoAccessPage`, 401 `StatusGate` (a refresh token present: refresh and `router.refresh()`;
+  otherwise `/login?next=<page>`). The sign-in route sits outside `(gated)`, or it would gate itself.
+- **The hub draws only from `@mooncellar/schemas` block data, never from a project's own format.**
+  A project converts its data into `PlanBlockSchema` / `DecompBlockSchema` before uploading; a
+  block the hub cannot draw is a new block type in the schema, the API and `widgets/status`.
+
 ## Drawer
 
 - **Open long content beside the page with `drawer.open(node, { title })` from

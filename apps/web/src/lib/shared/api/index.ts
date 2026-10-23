@@ -21,3 +21,4 @@ export * from "./ra.api";
 export * from "./gauntlet-history.api";
 export * from "./game-auth.api";
 export * from "./port-achievements.api";
+export * from "./projects.api";

@@ -175,6 +175,17 @@
   --reaction-active-color: var(--color-accent);
   --tabs-muted-opacity: 0.55;
   --burger-animation-duration: 600ms;
+
+  --status-menu-width: 248px;
+  --status-menu-active-bg: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  --status-pending-color: color-mix(
+    in srgb,
+    var(--color-positive) 38%,
+    var(--color-bg-primary)
+  );
+  --status-map-cell: 9px;
+  --status-login-min-height: 640px;
+  --status-edit-modal-width: min(560px, calc(100vw - var(--padding-x8)));
 }
 
 @media (max-width: 768px) {

@@ -1,0 +1,20 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-x3);
+  min-height: max(var(--page-height-available), var(--status-login-min-height));
+
+  &__title {
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  &__hint {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+}
