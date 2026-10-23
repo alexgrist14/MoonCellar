@@ -43,15 +43,7 @@ describe("parsePlan", () => {
       size: "S",
     });
     expect(hub.tasks[2].waitsFor).toEqual(["H2"]);
+    expect(hub.tasks[1].depends).toEqual(["H1"]);
     expect(hub.tasks[0].owner).toBeUndefined();
-  });
-
-  it("reads the real plan", () => {
-    const real = Bun.file(new URL("../docs/plan.md", import.meta.url));
-    return real
-      .text()
-      .then((text) =>
-        expect(parsePlan(text).sections.length).toBeGreaterThan(0)
-      );
   });
 });

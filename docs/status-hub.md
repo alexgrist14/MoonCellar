@@ -71,9 +71,23 @@ through the API. Nobody keeps it in a file any more; a project with a markdown p
   409 unless `"force": true`; deleting is for admins on the site only.
 - **Import**: a plan arrives once, into an empty hub plan — `PUT /projects/:slug/plan`, or the older
   `PUT /projects/:slug/data/plan` — with done tasks' `doneAt` when known. After that both answer 409.
-  `bun scripts/import-plan.ts [--file plan.md]` parses a markdown plan in the format of
-  [`plan.md`](./plan.md) and imports it with the token `bun scripts/hub-connect.ts mooncellar` saved
-  (or `STATUS_HUB_TOKEN`; `STATUS_HUB_PROJECT` for another project).
+  `bun scripts/import-plan.ts --file <plan.md>` parses a markdown plan (sections `## X. Title`, rows
+  `| id | task | who | depends | done when | size |`, `✓` after a done id) and imports it with the
+  token `bun scripts/hub-connect.ts <project>` saved (or `STATUS_HUB_TOKEN`; `STATUS_HUB_PROJECT`
+  picks the project, `mooncellar` by default).
+
+## The plan from a terminal and from agents
+
+`bun scripts/tasks.ts` reads and changes a project's plan through the API with the machine's token:
+`list [--free]`, `show <id>`, `take`, `release`, `done`, `reopen`, `add <section> "<task>"`,
+`section "<title>"`, `edit`, `url`. It acts for git `user.name` in lower case (`--as` or
+`STATUS_HUB_AS` for someone else) and needs `--force` to override someone else's task. It and
+`import-plan.ts` share `scripts/hub-client.ts` (`STATUS_HUB_URL`, `STATUS_HUB_WEB`,
+`STATUS_HUB_PROJECT`, `STATUS_HUB_TOKEN`).
+
+Agents in this repository have two commands in `.claude/commands/`: `/hub` connects the machine (runs
+`hub-connect.ts mooncellar`, the user presses "Allow") and gives the link; `/task [id]` lists the free
+tasks or takes one, does it in a branch, opens a PR and, once it is merged, marks the task done.
 
 ## Uploading
 
@@ -110,8 +124,8 @@ gzip -c plan.json | curl -X PUT https://api.mooncellar.space/projects/<project>/
   message, so the endpoint does not tell which projects exist.
 
 Projects send their Decompilation blocks from their own tooling, usually right after a merge into
-their `main`. The MoonCellar project's plan started as [`docs/plan.md`](./plan.md) and lives in the hub
-once imported.
+their `main`. The MoonCellar project's plan lives in the hub (imported once from a markdown file that
+is gone now): read and change it on the site or with `bun scripts/tasks.ts`.
 
 ## API
 
