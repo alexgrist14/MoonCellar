@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { ITableHeaders, ITableRows } from "@/src/lib/shared/types/table.type";
 import { useStatesStore } from "@/src/lib/shared/store/states.store";
+import { Button } from "../Button";
 import { Table } from "./Table";
 
 interface IGameRow {
@@ -245,6 +246,42 @@ export const DimmedRows: Story = {
       </>
     ),
   ],
+};
+
+interface IActionsRow {
+  name: string;
+  used: string;
+  actions: string;
+}
+
+export const ActionsColumn: Story = {
+  render: () => (
+    <Table<IActionsRow>
+      initialSortingKey="name"
+      columnStyles={{
+        name: { width: "1fr", minWidth: "140px" },
+        used: { width: "130px", minWidth: "110px" },
+        actions: { width: "96px", minWidth: "96px" },
+      }}
+      headers={{
+        name: { content: "Name" },
+        used: { content: "Last upload" },
+        actions: { content: "", isNotSortable: true },
+      }}
+      rows={[
+        {
+          name: { content: "deck@HistMate" },
+          used: { content: "8 hours ago" },
+          actions: { content: <Button compact>Revoke</Button> },
+        },
+        {
+          name: { content: "CI" },
+          used: { content: "" },
+          actions: { content: <Button compact>Revoke</Button> },
+        },
+      ]}
+    />
+  ),
 };
 
 interface IDiffRow {
