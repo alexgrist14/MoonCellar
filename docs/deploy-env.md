@@ -187,6 +187,10 @@ file on the server, the next infra deploy overwrites it.
 - **A config that fails `nginx -t` is rolled back:** the previous file is kept as
   `/etc/nginx/mooncellar.conf.prev`, copied back, and the deploy goes red with the old
   configuration still serving.
+- **`client_max_body_size` of a `server` block must cover the largest upload its app accepts.**
+  `api.mooncellar.space` and `game.mooncellar.space` set `8m`; without it nginx's default of
+  1 MB answers 413 itself, with no CORS headers, so the browser reports
+  `No 'Access-Control-Allow-Origin' header` and axios a Network Error instead of the real status.
 - The deploy user must be able to run `certbot`, `nginx` and `systemctl`, which in practice means
   `root`.
 

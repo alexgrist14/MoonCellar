@@ -151,8 +151,8 @@ gzip -c plan.json | curl -X PUT https://api.mooncellar.space/projects/<project>/
 
 - The body is validated against the block's schema; a failure answers 400 naming the fields, and
   nothing is stored. The answer of a success is the upload (`updatedAt`, `size`, `done`, `total`).
-- A block replaces the previous one whole. Send gzip: the API reads at most 2 MB of JSON, nginx
-  passes 1 MB of body.
+- A block replaces the previous one whole. The API reads at most 2 MB of JSON, counted after gzip
+  is decoded; nginx passes up to 8 MB of body.
 - A wrong token, a project that does not exist and a missing header all answer 401 with the same
   message, so the endpoint does not tell which projects exist.
 

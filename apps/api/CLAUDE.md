@@ -144,8 +144,9 @@ an instance of Module)`. Use a default import; tsc reports the call as `TS2349`.
 - **`PUT /projects/:slug/data/plan` imports into an empty plan and answers 409 afterwards.** It is how a
   project that used to upload its plan migrates by itself; once the plan lives in the hub, a stale
   uploader must not overwrite what people changed on the site.
-- **Uploads are gzip in practice:** the global JSON limit is 2 MB of decoded body and the API's nginx
-  block keeps the default 1 MB, which a medium decompilation catalogue passes only compressed.
+- **The global JSON limit is 2 MB of decoded body, gzip or not;** the API's nginx block passes up
+  to 8 MB (`client_max_body_size`, sized for the 5 MiB `COMMENT_IMAGE_MAX_BYTES` plus multipart
+  overhead), so for a JSON upload the API's limit is the one that answers.
 - **Project addresses in `RESERVED_PROJECT_SLUGS` are routes of the hub** (`login`, `manage`, …); a
   project there would never be reachable. Extend the list together with a new top-level hub route.
 

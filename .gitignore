@@ -57,3 +57,6 @@ infra/prometheus/metrics_token
 storybook-static/
 docs/.vitepress/cache/
 docs/.vitepress/dist/
+
+.claude/settings.json
+.claude/settings.json.graphify-bak

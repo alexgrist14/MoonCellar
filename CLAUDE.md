@@ -206,6 +206,11 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
   `Connection` and reads for 15 s, so WebSockets never connect and every long-polling GET ends as a
   504 that the browser shows as a CORS error on `socket.io/?EIO=4&transport=polling`, followed by
   `400` on the next POST. Details in `docs/sockets.md`.
+- **Every `server` block in that file whose app takes uploads sets `client_max_body_size` above
+  the app's own largest limit** — `api.mooncellar.space` and `game.mooncellar.space` take `8m`
+  (the editor's images are 5 MiB, `COMMENT_IMAGE_MAX_BYTES`). nginx's default of 1 MB answers 413
+  without CORS headers, so the browser shows a CORS error on the upload and the app says "The
+  server could not be reached"; raising an upload limit in the API means raising it here too.
 
 - **`infra/searxng/` is mounted read-write into the SearXNG container, and the container can
   chown it to its own user.** A file in the repository that the host user cannot write breaks the
@@ -257,7 +262,8 @@ This project uses **bun** exclusively. Using `npm` is forbidden.
 This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
 
 Rules:
-- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- When graphify-out/graph.json exists, run `graphify query "<question>"` before your first grep, search or source-file read for a codebase question, and put this rule in every subagent prompt that explores code. Read raw files only for lines the graph or an earlier read already located. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
 - If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
 - Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
 - After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+- A committed graphify-out/graph.json is rewritten whole on every build, so a large diff to it in a pull request is expected. Do not flag it as churn or suggest skipping the graph rebuild or its hooks.
