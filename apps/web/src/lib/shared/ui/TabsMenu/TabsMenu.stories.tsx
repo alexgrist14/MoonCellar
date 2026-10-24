@@ -13,9 +13,11 @@ const TABS = [
 const TabsMenuDemo = ({
   isWithCounts,
   hiddenIndex,
+  isWithLinks,
 }: {
   isWithCounts?: boolean;
   hiddenIndex?: number;
+  isWithLinks?: boolean;
 }) => {
   const [activeIndex, setActiveIndex] = useState(1);
 
@@ -27,6 +29,7 @@ const TabsMenuDemo = ({
         tabName: tab.tabName,
         count: isWithCounts ? tab.count : undefined,
         isHidden: index === hiddenIndex,
+        href: isWithLinks ? `#${tab.tabName.toLowerCase()}` : undefined,
         onTabClick: () => setActiveIndex(index),
       }))}
     />
@@ -55,6 +58,13 @@ export const Open: Story = {
 
 export const WithHiddenTab: Story = {
   args: { hiddenIndex: 4 },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button"));
+  },
+};
+
+export const WithLinks: Story = {
+  args: { isWithCounts: true, isWithLinks: true },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("button"));
   },

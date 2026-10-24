@@ -161,6 +161,7 @@ export const Tabs: FC<ITabs> = ({
           count: content.count,
           ariaLabel: content.ariaLabel,
           isHidden: content.isHidden,
+          href: content.tabLink,
           onTabClick: () => selectTab(content, i),
         }))}
       />

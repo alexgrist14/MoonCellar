@@ -65,8 +65,9 @@ editing controls.
      when the user has port achievements
    - `all` and each status → `widgets/user/UserGames`. It is one Games page: a `Tabs` row
      (`isFit` in a horizontal `Scrollbar`) of All, Playing … Dropped with their game counts sits
-     on top, each tab a `tabLink` to its route, so the URL is the selected tab; on a narrow screen
-     the row scrolls the selected tab into view. The navigation has a single Games entry, active on
+     on top, each tab a `tabLink` to its route, so the URL is the selected tab. Below `$screenMd` it
+     is a `TabsMenu` selector titled "Games" (`mobileMenuTitle`), as in the admin; above it, a row
+     too wide for the panel scrolls the selected tab into view. The navigation has a single Games entry, active on
      all of these routes, that opens Playing (so does Games in the header's account menu); the
      Profile tab's Games counter opens All. Status categories are never rows of the navigation
    - `lists` / `liked` → `widgets/user/UserLists` (`kind="liked"`)

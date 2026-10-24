@@ -14,12 +14,12 @@ suffix used next to tab names.
 
 `TabsMenu`:
 
-| Prop          | Type                                                                                                                        | Default | Purpose                                                                                 |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------- | ------- | --------------------------------------------------------------------------------------- |
-| `tabs`        | `{ tabName: string; prefix?: ReactNode; count?: number; ariaLabel?: string; isHidden?: boolean; onTabClick: () => void }[]` | —       | Tabs in order; `isHidden` skips the menu item but keeps its index, `ariaLabel` names it |
-| `activeIndex` | `number`                                                                                                                    | —       | Index shown on the trigger                                                              |
-| `title`       | `string`                                                                                                                    | —       | Popover title                                                                           |
-| `className`   | `string`                                                                                                                    | —       | Class on the wrapper                                                                    |
+| Prop          | Type                                                                                                                                       | Default | Purpose                                                                                                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `tabs`        | `{ tabName: string; prefix?: ReactNode; count?: number; ariaLabel?: string; isHidden?: boolean; href?: string; onTabClick: () => void }[]` | —       | Tabs in order; `isHidden` skips the menu item but keeps its index, `ariaLabel` names it, `href` renders the item as a `Link` to that route (it still calls `onTabClick`) |
+| `activeIndex` | `number`                                                                                                                                   | —       | Index shown on the trigger                                                                                                                                               |
+| `title`       | `string`                                                                                                                                   | —       | Popover title                                                                                                                                                            |
+| `className`   | `string`                                                                                                                                   | —       | Class on the wrapper                                                                                                                                                     |
 
 `TabCount`: `count?: number` — renders `(count)`, or nothing for `0`/`undefined`.
 
@@ -51,8 +51,11 @@ import { TabsMenu } from "@/src/lib/shared/ui/TabsMenu";
 - **The menu renders into `#dropdown-connector`** through `Popover` (falling back to `body`), and
   closes on an outside click.
 - **`tabName` is the React key of the menu items,** so tab names must be unique.
+- **A tab with `href` is a real link.** `Tabs` passes each tab's `tabLink` as `href`, so a row of
+  route tabs given `mobileMenuTitle` still navigates from the menu; without it the menu only called
+  `onTabClick`, and link tabs did nothing on a phone.
 - Unlike most shared UI it carries `"use client"`.
 
 ## Storybook
 
-`Shared/TabsMenu` — `Default`, `WithCounts`, `Open`, `WithHiddenTab`.
+`Shared/TabsMenu` — `Default`, `WithCounts`, `Open`, `WithHiddenTab`, `WithLinks`.

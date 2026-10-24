@@ -16,6 +16,7 @@
   flex-direction: column;
 
   &__item {
+    display: block;
     width: 100%;
     padding: var(--padding-x3) var(--padding-x4);
     border: none;
