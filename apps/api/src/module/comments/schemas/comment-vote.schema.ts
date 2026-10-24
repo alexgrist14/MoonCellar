@@ -13,12 +13,8 @@ export class CommentVote {
   target: ICommentVoteTarget;
   @Prop({ type: mongoose.Schema.Types.ObjectId, required: true })
   targetId: mongoose.Types.ObjectId;
-  @Prop({
-    type: mongoose.Schema.Types.ObjectId,
-    ref: Game.name,
-    required: true,
-  })
-  gameId: mongoose.Types.ObjectId;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Game.name, default: null })
+  gameId: mongoose.Types.ObjectId | null;
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: User.name,

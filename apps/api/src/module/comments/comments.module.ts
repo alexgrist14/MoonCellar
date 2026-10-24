@@ -1,5 +1,9 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
+import {
+  Article,
+  ArticleDatabaseSchema,
+} from "../articles/schemas/article.schema";
 import { Game, GameDatabaseSchema } from "../games/schemas/game.schema";
 import {
   Platform,
@@ -60,6 +64,7 @@ import { NotificationsModule } from "../notifications/notifications.module";
       { name: CommentVote.name, schema: CommentVoteDatabaseSchema },
       { name: CommentReport.name, schema: CommentReportDatabaseSchema },
       { name: Game.name, schema: GameDatabaseSchema },
+      { name: Article.name, schema: ArticleDatabaseSchema },
       { name: Platform.name, schema: PlatformDatabaseSchema },
       { name: Playthrough.name, schema: PlaythroughDatabaseSchema },
       { name: User.name, schema: UserSchema },

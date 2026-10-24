@@ -19,7 +19,7 @@ export class VotesService {
   async setVote(
     target: ICommentVoteTarget,
     targetId: IObjectIdLike,
-    gameId: IObjectIdLike,
+    gameId: IObjectIdLike | null,
     userId: IObjectIdLike,
     isActive: boolean
   ) {

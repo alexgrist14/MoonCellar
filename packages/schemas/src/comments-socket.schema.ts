@@ -15,9 +15,16 @@ export enum CommentsSocketEvent {
   COMMENT_LIKES = "comment:likes",
 }
 
-export const DiscussionRoomRequestSchema = z.object({
-  gameId: ObjectIdSchema.describe("Game whose discussion the socket follows"),
-});
+export const DiscussionRoomRequestSchema = z.union([
+  z.object({
+    gameId: ObjectIdSchema.describe("Game whose discussion the socket follows"),
+  }),
+  z.object({
+    articleId: ObjectIdSchema.describe(
+      "News post whose comments the socket follows"
+    ),
+  }),
+]);
 
 export const DiscussionRoomResponseSchema = z.object({
   ok: z.boolean().describe("Whether the socket joined or left the room"),
@@ -25,7 +32,14 @@ export const DiscussionRoomResponseSchema = z.object({
 });
 
 const CommentEventSchema = z.object({
-  gameId: z.string().describe("Game id, the room the event was sent to"),
+  gameId: z
+    .string()
+    .nullable()
+    .describe("Game of the discussion, null for a news post comment"),
+  articleId: z
+    .string()
+    .nullable()
+    .describe("News post of the comments, null for a game comment"),
   commentId: z.string().describe("Comment id"),
 });
 

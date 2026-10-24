@@ -31,6 +31,12 @@ export const ReportedCommentGameSchema = z.object({
   slug: z.string().describe("Game slug"),
 });
 
+export const ReportedCommentArticleSchema = z.object({
+  _id: z.string().describe("News post id"),
+  title: z.string().describe("News post title"),
+  slug: z.string().describe("News post slug"),
+});
+
 export const ReportedCommentSchema = z.object({
   status: CommentStatusSchema.describe("Current moderation status"),
   body: z
@@ -43,6 +49,9 @@ export const ReportedCommentSchema = z.object({
   isOnReview: z.boolean().describe("The comment discusses a review"),
   author: CommunityAuthorSchema.nullable().describe("Author"),
   game: ReportedCommentGameSchema.nullable().describe("Game of the discussion"),
+  article: ReportedCommentArticleSchema.nullable().describe(
+    "News post the comment is under"
+  ),
 });
 
 export const CommentReportGroupSchema = z.object({

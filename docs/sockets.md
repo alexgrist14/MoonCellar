@@ -4,7 +4,7 @@ MoonCellar keeps five real-time channels open over Socket.IO, all served by the 
 
 | Namespace | Who connects | What it does |
 |---|---|---|
-| `/comments` | Anyone with a game's Discussion tab open | **Notifications only.** Tells other readers that a comment was posted, edited, moderated or liked. Every change still goes through REST. |
+| `/comments` | Anyone with a game's Discussion tab open, or a news post's comments in view | **Notifications only.** Tells other readers that a comment was posted, edited, moderated or liked. Every change still goes through REST. |
 | `/royal` | Every signed-in user, on every page | **State.** Royal games — the user's list of games for the royal wheel — are read and changed over this socket and pushed to the user's other tabs and devices. |
 | `/notifications` | Every signed-in user, on every page | **Notifications only.** Pushes a new or regrouped notification and the unread count to the user's tabs. The list and every change go through REST. |
 | `/activity` | Anyone with a profile's activity feed open | **Notifications only.** Tells open feeds that the user's activity log changed, so they refetch it. |
@@ -49,16 +49,19 @@ Verified on 2026-09-15 with Bun 1.4.2, NestJS 11.2, Socket.IO 4.8.3, MongoDB 8.2
 
 ## `/comments` — live discussion
 
-The Discussion tab of a game page updates live: when someone posts, edits, deletes, hides or likes
-a comment, every other open Discussion tab of that game reflects it without a reload.
+The Discussion tab of a game page and the comments under a news post update live: when someone
+posts, edits, deletes, hides or likes a comment, every other reader of that game's discussion or
+that post's comments sees it without a reload. A comment belongs to exactly one of the two
+(`gameId` or `articleId`), and the namespace, the events and the client hooks are the same for
+both.
 
 | | |
 |---|---|
-| Rooms | `discussion:<gameId>`, one per game |
+| Rooms | `discussion:game:<gameId>` and `discussion:article:<articleId>`, one per game or post (`getDiscussionRoom`) |
 | Authentication | None — the socket is anonymous |
 | Server code | `apps/api/src/module/comments/gateways/comments.gateway.ts` |
 | Client code | `apps/web/src/lib/shared/socket/comments.socket.ts`, `socket-id.ts`, `apps/web/src/lib/entities/comment/api/comment.socket.ts` |
-| Only consumer | `DiscussionTab` (`apps/web/src/lib/features/game/ui/GameCommunity/components/DiscussionTab.tsx`) |
+| Only consumer | `CommentThread` (`apps/web/src/lib/features/comments/ui/CommentThread/CommentThread.tsx`), rendered by the game page's Discussion tab (`widgets/game/GameCommunity`) and under a news post (`widgets/news/ArticleComments`) |
 
 ### Flow
 
@@ -79,19 +82,20 @@ sequenceDiagram
   Note over A: excluded from the broadcast,<br/>its cache is already updated
 ```
 
-1. The user opens the Discussion tab. `DiscussionTab` mounts and calls
-   `useDiscussionSocket(gameId)`, which subscribes to the events and calls
-   `followDiscussion(gameId)`. That opens the shared socket if it is not open yet and emits
-   `discussion:join`.
+1. The user opens a game's Discussion tab, or scrolls a news post's comments within 400px of the
+   screen. `CommentThread` calls `useDiscussionSocket(target)` — `target` is
+   `{ type: "game" | "article", id }` — which subscribes to the events and calls
+   `followDiscussion(target)`. That opens the shared socket if it is not open yet and emits
+   `discussion:join` with `{ gameId }` or `{ articleId }`.
 2. Someone changes a comment through REST. The controller reads the `x-socket-id` header, the
    service writes to MongoDB and then calls a `CommentsGateway` method, which emits to the game's
    room **except** the socket named in the header.
 3. Every other tab in the room receives the event and updates its React Query cache — either by
    patching the cached comment or by invalidating the affected lists so they refetch.
-4. When the tab unmounts (the user leaves the game page), the hook unfollows. The socket leaves
-   the room, and when no game is followed any more it disconnects.
+4. When the thread unmounts (the user leaves the page), the hook unfollows. The socket leaves
+   the room, and when nothing is followed any more it disconnects.
 5. After a dropped connection Socket.IO reconnects on its own. The server has forgotten the
-   socket's rooms by then, so the client re-joins every followed game on `connect`, and on
+   socket's rooms by then, so the client re-joins every followed discussion on `connect`, and on
    `reconnect` invalidates the discussion caches to pick up whatever happened while it was offline.
 
 ### Connection
@@ -101,31 +105,35 @@ sequenceDiagram
   therefore be a bare origin — with a path such as `/v1` the client asks for namespace
   `/v1/comments` and fails with `Invalid namespace`.
 - **Lifecycle.** One socket per browser tab, created lazily (`autoConnect: false`) and shared by
-  every followed game. It opens when the first Discussion tab mounts and closes when the last one
-  unmounts. A game page whose Discussion tab is never opened opens no connection.
-- **Authentication.** None. Everything a socket receives is what `GET /games/:gameId/comments`
-  already returns to an anonymous visitor, so there is nothing to protect on the connection.
+  every followed discussion. It opens when the first thread starts following and closes when the
+  last one unmounts. A game page whose Discussion tab is never opened opens no connection, and
+  neither does a news post read without scrolling down to its comments (`CommentThread
+  isDeferred`).
+- **Authentication.** None. Everything a socket receives is what `GET /games/:gameId/comments` and
+  `GET /articles/:articleId/comments` already return to an anonymous visitor, so there is nothing
+  to protect on the connection.
 
 ### Client → server events
 
-Both events take `{ gameId }` and answer through an ack when the client asks for one. The web
-client emits them without an ack; the ack exists for scripts and tests.
+Both events take `{ gameId }` or `{ articleId }` and answer through an ack when the client asks
+for one. The web client emits them without an ack; the ack exists for scripts and tests.
 
 | Event | Payload | Ack |
 |---|---|---|
-| `discussion:join` | `{ gameId: string }` — 24 hex characters | `{ ok: true }` |
-| | | `{ ok: false, error: "Invalid game id" }` |
+| `discussion:join` | `{ gameId: string }` or `{ articleId: string }` — 24 hex characters | `{ ok: true }` |
+| | | `{ ok: false, error: "Invalid game or post id" }` |
 | | | `{ ok: false, error: "Too many discussions followed" }` |
-| `discussion:leave` | `{ gameId: string }` | `{ ok: true }` or `{ ok: false, error: "Invalid game id" }` |
+| `discussion:leave` | `{ gameId: string }` or `{ articleId: string }` | `{ ok: true }` or `{ ok: false, error: "Invalid game or post id" }` |
 
-- One socket may follow at most `DISCUSSION_ROOMS_LIMIT` (10) games. Joining a game it already
+- One socket may follow at most `DISCUSSION_ROOMS_LIMIT` (10) discussions. Joining one it already
   follows always succeeds.
-- The server does not check that the game exists. A room for a non-existent game simply never
-  receives anything.
+- The server does not check that the game or post exists. A room for a non-existent one simply
+  never receives anything.
 
 ### Server → client events
 
-Every event is sent to `discussion:<gameId>`, minus the socket named in `x-socket-id`. Counts are
+Every event is sent to the room of the comment's game or post, minus the socket named in
+`x-socket-id`. Every event carries both `gameId` and `articleId`, one of them `null`. Counts are
 the **absolute values after the change**, never deltas, so applying an event twice — or on top of
 the author's own optimistic update — cannot double-count.
 
@@ -135,12 +143,13 @@ Emitted by `CommentsService.createComment` — `POST /comments`.
 
 | Field | Type | Meaning |
 |---|---|---|
-| `gameId` | string | Game, also the room |
+| `gameId` | string \| null | Game, also the room; `null` for a comment under a news post |
+| `articleId` | string \| null | News post, also the room; `null` for a game comment |
 | `commentId` | string | The new comment |
 | `parentId` | string \| null | Top-level comment of the thread; `null` for a top-level comment |
 | `parentRepliesCount` | number \| null | The parent's visible replies after the insert; `null` for a top-level comment |
 
-Client: a top-level comment invalidates the discussion lists of the game (both sorts), because
+Client: a top-level comment invalidates the discussion lists of the game or post (both sorts), because
 where it lands depends on the sort and the page. A reply sets the parent's `repliesCount` and
 invalidates that parent's replies list.
 
@@ -150,7 +159,8 @@ Emitted by `CommentsService.updateComment` — `PATCH /comments/:id`.
 
 | Field | Type | Meaning |
 |---|---|---|
-| `gameId`, `commentId` | string | |
+| `gameId`, `articleId` | string \| null | |
+| `commentId` | string | |
 | `body` | string | Sanitized rich text |
 | `isSpoiler` | boolean | |
 | `updatedAt` | string | ISO date |
@@ -165,7 +175,8 @@ Emitted by `CommentsService.changeStatus` — `DELETE /comments/:id` (`deleted`)
 
 | Field | Type | Meaning |
 |---|---|---|
-| `gameId`, `commentId` | string | |
+| `gameId`, `articleId` | string \| null | |
+| `commentId` | string | |
 | `parentId` | string \| null | Top-level comment of the thread |
 | `parentRepliesCount` | number \| null | The parent's visible replies after the change; `null` when the count did not change or the comment is top-level |
 | `status` | `"visible"` \| `"hidden"` \| `"deleted"` | New status |
@@ -182,7 +193,8 @@ actually changed.
 
 | Field | Type | Meaning |
 |---|---|---|
-| `gameId`, `commentId` | string | |
+| `gameId`, `articleId` | string \| null | |
+| `commentId` | string | |
 | `likesCount` | number | Likes after the change |
 
 Client: sets `likesCount` on the cached comment. The reader's own `isLiked` is left alone.
@@ -206,7 +218,7 @@ event would only make it refetch the same data, so the change request names the 
 
 | Feature | On the socket |
 |---|---|
-| New top-level comments appearing in an open Discussion tab | Yes — `comment:created` |
+| New top-level comments appearing in an open Discussion tab or under a post | Yes — `comment:created` |
 | Reply counters and open reply threads | Yes — `comment:created`, `comment:status` |
 | Edited comment text and spoiler flag | Yes — `comment:updated` |
 | Deleted, hidden and restored comments | Yes — `comment:status` |
@@ -217,13 +229,14 @@ event would only make it refetch the same data, so the change request names the 
 
 | Feature | Why |
 |---|---|
-| Loading comments, pagination, sorting | REST (`GET /games/:gameId/comments`, `GET /comments/:id/replies`) |
+| Loading comments, pagination, sorting | REST (`GET /games/:gameId/comments`, `GET /articles/:articleId/comments`, `GET /comments/:id/replies`) |
 | Posting, editing, deleting, liking, reporting, moderating | REST; the socket only announces the result |
 | Reviews tab and helpful votes (`/reviews/:id/helpful`) | Not wired; the reviews list refreshes on its own `staleTime` |
 | Reports (`POST /comments/:id/report`) and `reportsCount` | Admin-only data, never broadcast to an anonymous room |
 | The reader's own `isLiked` / `isReported` | Viewer-specific; a like from another tab of the same user updates the count, not the heart |
 | Hidden comment bodies for admins | Viewer-specific; fetched through REST after `comment:status` |
 | Tab counter before the Discussion tab is opened | The socket is not connected until then |
+| A news post's comments before they are scrolled near | The thread neither fetches nor follows until then |
 
 The rule behind the split: a room is anonymous, so an event may contain only what an anonymous
 reader already gets from REST. `CommentsService.decorate()` fills viewer-specific fields for one
@@ -243,14 +256,14 @@ in the room.
 
 | File | Role |
 |---|---|
-| `shared/socket/comments.socket.ts` | The singleton socket; `followDiscussion(gameId)` counts followers per game, joins on first follow, leaves on last unfollow, disconnects when nothing is followed, re-joins everything on `connect` |
+| `shared/socket/comments.socket.ts` | The singleton socket; `followDiscussion(target)` counts followers per game or post (`getCommentTargetKey`), joins on first follow, leaves on last unfollow, disconnects when nothing is followed, re-joins everything on `connect` |
 | `shared/socket/socket-id.ts` | The current socket id, with no dependencies, so `shared/api` can read it without pulling `socket.io-client` into every bundle |
-| `entities/comment/api/comment.socket.ts` | `useDiscussionSocket(gameId)`: event → React Query cache |
+| `entities/comment/api/comment.socket.ts` | `useDiscussionSocket(target, enabled)`: event → React Query cache |
 | `entities/comment/api/comment.cache.ts` | `setCommentInCache` and `invalidateDiscussion`, shared by the mutations and the socket hook |
-| `features/game/ui/GameCommunity/components/DiscussionTab.tsx` | Calls `useDiscussionSocket(game._id)` |
+| `features/comments/ui/CommentThread/CommentThread.tsx` | Calls `useDiscussionSocket(target, isReached)` |
 
-Handlers ignore events whose `gameId` differs from their own, so two followed games never write
-into each other's cache.
+Handlers ignore events of another game or post (`isCommentOfTarget`), so two followed discussions
+never write into each other's cache.
 
 ---
 
@@ -623,7 +636,7 @@ Client: invalidates those conflict items, the summaries and the list.
    controller. `/royal`: go through `RoyalGamesGateway.change()`, which pushes `royal:changed`.
    `/conflicts`: call the gateway from `ConflictsService` after the write. `/notifications`: call
    `NotificationsService.notify()` / `retract()` / `removeBySubject()`, never the gateway.
-4. Handle it on the client — `useDiscussionSocket` for `/comments` (filter by `gameId`),
+4. Handle it on the client — `useDiscussionSocket` for `/comments` (filter with `isCommentOfTarget`),
    `royal.requests.ts` and `useRoyalGamesSync` for `/royal`, `useNotificationsSync` for
    `/notifications`, `useConflictsSocket` for `/conflicts`.
 5. `/comments` events carry only public, absolute values; if the reader's view depends on who they

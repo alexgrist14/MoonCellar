@@ -477,10 +477,22 @@ break silently when ignored:
   `comments.api.ts` reads the socket id from `shared/socket/socket-id.ts`, which has no
   dependencies; only `shared/socket/comments.socket.ts` loads the client, and only
   `useDiscussionSocket` imports that.
-- **The socket opens only from the Discussion tab.** `DiscussionTab` mounts after the tab is first
-  opened, so a game page nobody discusses holds no connection. Keep `useDiscussionSocket` out of
-  `GamePage` and `GameCommunity`, or every visitor of the 10 000 game pages opens a socket to the
-  API.
+- **The socket opens only from a `CommentThread` someone is reading.** On a game page the thread
+  mounts after the Discussion tab is first opened, so a game page nobody discusses holds no
+  connection; under a news post it is `isDeferred` and neither fetches nor follows until it comes
+  within 400px of the screen. Keep `useDiscussionSocket` out of `GamePage`, `GameCommunity`,
+  `ArticlePage` and `ArticleComments`, or every visitor of the 10 000 game pages and of every post
+  opens a socket to the API.
+- **A comment thread takes a target, `{ type: "game" | "article", id }`, and every comment hook
+  and query key goes through it** (`commentQueryKeys.discussion(target)`, `useCommentsQuery`, the
+  comment mutations, `useDiscussionSocket`). Build request fields and socket payloads with
+  `getCommentTargetFields` and compare events with `isCommentOfTarget` from
+  `@mooncellar/schemas`. A post's comments live under `/articles/:id/comments` and are created
+  with `articleId`, and their events carry `gameId: null`, so code written against a bare game id
+  silently reads, posts and listens to nothing for a post.
+- **`ReviewItem` and `CommentItem` share `CommentThread.module.scss`, which is why both live in the
+  `features/comments` slice.** `GameReviews` must not import `features/game`: the "Write a review"
+  modal (`PlaythroughModal`) is opened by `widgets/game/GameCommunity` through `onWriteReview`.
 - **`NEXT_PUBLIC_API_URL` must stay a bare origin.** Socket.IO reads the path of the URL it is
   given as the namespace, so `https://api.mooncellar.space/v1` would ask for namespace
   `/v1/comments` and the connection fails with `Invalid namespace`. The full contract is in

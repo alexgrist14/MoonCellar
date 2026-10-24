@@ -16,6 +16,7 @@ const SILENCE_MS = 200;
 
 const createdEvent = {
   gameId: GAME_ID,
+  articleId: null,
   commentId: "comment-id",
   parentId: null,
   parentRepliesCount: null,
@@ -65,6 +66,12 @@ describe("CommentsGateway", () => {
     event: CommentsSocketEvent = CommentsSocketEvent.JOIN_DISCUSSION
   ): Promise<IDiscussionRoomResponse> => socket.emitWithAck(event, { gameId });
 
+  const followPost = (
+    socket: Socket,
+    articleId: string
+  ): Promise<IDiscussionRoomResponse> =>
+    socket.emitWithAck(CommentsSocketEvent.JOIN_DISCUSSION, { articleId });
+
   const nextEvent = (socket: Socket, event: CommentsSocketEvent) =>
     new Promise((resolve) => socket.once(event, resolve));
 
@@ -104,7 +111,12 @@ describe("CommentsGateway", () => {
     const [author, reader] = await Promise.all([connect(), connect()]);
     await Promise.all([follow(author, GAME_ID), follow(reader, GAME_ID)]);
 
-    const event = { gameId: GAME_ID, commentId: "comment-id", likesCount: 3 };
+    const event = {
+      gameId: GAME_ID,
+      articleId: null,
+      commentId: "comment-id",
+      likesCount: 3,
+    };
     const authorSilent = isSilent(author, CommentsSocketEvent.COMMENT_LIKES);
     const readerReceived = nextEvent(reader, CommentsSocketEvent.COMMENT_LIKES);
 
@@ -128,12 +140,37 @@ describe("CommentsGateway", () => {
     await expect(silent).resolves.toBe(true);
   });
 
-  it("rejects a malformed game id", async () => {
+  it("delivers a news post's events to its followers only", async () => {
+    const [postReader, gameReader] = await Promise.all([connect(), connect()]);
+
+    await expect(followPost(postReader, GAME_ID)).resolves.toEqual({
+      ok: true,
+    });
+    await follow(gameReader, GAME_ID);
+
+    const event = { ...createdEvent, gameId: null, articleId: GAME_ID };
+    const received = nextEvent(postReader, CommentsSocketEvent.COMMENT_CREATED);
+    const gameSilent = isSilent(
+      gameReader,
+      CommentsSocketEvent.COMMENT_CREATED
+    );
+
+    gateway.commentCreated(event);
+
+    await expect(received).resolves.toEqual(event);
+    await expect(gameSilent).resolves.toBe(true);
+  });
+
+  it("rejects a malformed game or post id", async () => {
     const socket = await connect();
 
     await expect(follow(socket, "not-a-game")).resolves.toEqual({
       ok: false,
-      error: "Invalid game id",
+      error: "Invalid game or post id",
+    });
+    await expect(followPost(socket, "not-a-post")).resolves.toEqual({
+      ok: false,
+      error: "Invalid game or post id",
     });
   });
 

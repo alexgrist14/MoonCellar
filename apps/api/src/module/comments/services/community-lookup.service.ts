@@ -50,10 +50,13 @@ export class CommunityLookupService {
     );
   }
 
-  async getAuthorPlaythroughs(gameId: IObjectIdLike, userIds: IObjectIdLike[]) {
+  async getAuthorPlaythroughs(
+    gameId: IObjectIdLike | null,
+    userIds: IObjectIdLike[]
+  ) {
     const result = new Map<string, IAuthorPlaythrough>();
 
-    if (!userIds.length) return result;
+    if (!gameId || !userIds.length) return result;
 
     const playthroughs = await this.Playthroughs.find(
       {
@@ -82,8 +85,8 @@ export class CommunityLookupService {
     return result;
   }
 
-  async getRatings(gameId: IObjectIdLike, userIds: IObjectIdLike[]) {
-    if (!userIds.length) return new Map<string, number | null>();
+  async getRatings(gameId: IObjectIdLike | null, userIds: IObjectIdLike[]) {
+    if (!gameId || !userIds.length) return new Map<string, number | null>();
 
     const ratings = await this.Ratings.find(
       {
@@ -102,7 +105,9 @@ export class CommunityLookupService {
     if (!platformIds.length) return new Map<string, string>();
 
     const platforms = await this.Platforms.find(
-      { _id: { $in: asObjectIds(platformIds) } } as FilterQuery<PlatformDocument>,
+      {
+        _id: { $in: asObjectIds(platformIds) },
+      } as FilterQuery<PlatformDocument>,
       { name: 1 }
     ).lean();
 

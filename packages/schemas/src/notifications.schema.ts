@@ -45,6 +45,8 @@ export const FOLLOWING_ACTIVITIES = [
 export const NotificationPayloadSchema = z.object({
   gameSlug: z.string().optional().describe("Game the comment belongs to"),
   gameName: z.string().optional(),
+  articleSlug: z.string().optional().describe("News post the comment is under"),
+  articleTitle: z.string().optional(),
   listSlug: z.string().optional().describe("Liked list, owned by the reader"),
   listName: z.string().optional(),
   decision: z

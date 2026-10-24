@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { type HydratedDocument } from "mongoose";
 import { type ICommentStatus } from "@mooncellar/schemas";
+import { Article } from "../../articles/schemas/article.schema";
 import { Game } from "../../games/schemas/game.schema";
 import { Playthrough } from "../../games/schemas/playthroughs.schema";
 import { User } from "../../user/schemas/user.schema";
@@ -9,12 +10,14 @@ export type GameCommentDocument = HydratedDocument<GameComment>;
 
 @Schema({ timestamps: true })
 export class GameComment {
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Game.name, default: null })
+  gameId: mongoose.Types.ObjectId | null;
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    ref: Game.name,
-    required: true,
+    ref: Article.name,
+    default: null,
   })
-  gameId: mongoose.Types.ObjectId;
+  articleId: mongoose.Types.ObjectId | null;
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: User.name,
@@ -53,6 +56,13 @@ export const GameCommentDatabaseSchema =
 GameCommentDatabaseSchema.index({ gameId: 1, parentId: 1, createdAt: -1 });
 GameCommentDatabaseSchema.index({
   gameId: 1,
+  parentId: 1,
+  likesCount: -1,
+  createdAt: -1,
+});
+GameCommentDatabaseSchema.index({ articleId: 1, parentId: 1, createdAt: -1 });
+GameCommentDatabaseSchema.index({
+  articleId: 1,
   parentId: 1,
   likesCount: -1,
   createdAt: -1,

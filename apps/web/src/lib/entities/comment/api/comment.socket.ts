@@ -5,7 +5,9 @@ import {
   ICommentCreatedEvent,
   ICommentLikesEvent,
   ICommentStatusEvent,
+  ICommentTarget,
   ICommentUpdatedEvent,
+  isCommentOfTarget,
 } from "@mooncellar/schemas";
 import {
   followDiscussion,
@@ -14,12 +16,16 @@ import {
 import { invalidateDiscussion, setCommentInCache } from "./comment.cache";
 import { commentQueryKeys } from "./comment.query-keys";
 
-export const useDiscussionSocket = (gameId: string) => {
+export const useDiscussionSocket = (
+  { type, id }: ICommentTarget,
+  enabled = true
+) => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (!gameId) return;
+    if (!id || !enabled) return;
 
+    const target: ICommentTarget = { type, id };
     const socket = getCommentsSocket();
 
     const setRepliesCount = (
@@ -28,18 +34,18 @@ export const useDiscussionSocket = (gameId: string) => {
     ) => {
       if (!parentId || repliesCount === null) return;
 
-      setCommentInCache(queryClient, gameId, parentId, (parent) => ({
+      setCommentInCache(queryClient, target, parentId, (parent) => ({
         ...parent,
         repliesCount,
       }));
     };
 
     const onCreated = (event: ICommentCreatedEvent) => {
-      if (event.gameId !== gameId) return;
+      if (!isCommentOfTarget(event, target)) return;
 
       if (!event.parentId) {
         queryClient.invalidateQueries({
-          queryKey: commentQueryKeys.discussion(gameId),
+          queryKey: commentQueryKeys.discussion(target),
         });
         return;
       }
@@ -51,9 +57,9 @@ export const useDiscussionSocket = (gameId: string) => {
     };
 
     const onUpdated = (event: ICommentUpdatedEvent) => {
-      if (event.gameId !== gameId) return;
+      if (!isCommentOfTarget(event, target)) return;
 
-      setCommentInCache(queryClient, gameId, event.commentId, (comment) => ({
+      setCommentInCache(queryClient, target, event.commentId, (comment) => ({
         ...comment,
         body: event.body,
         isSpoiler: event.isSpoiler,
@@ -62,22 +68,22 @@ export const useDiscussionSocket = (gameId: string) => {
     };
 
     const onStatus = (event: ICommentStatusEvent) => {
-      if (event.gameId !== gameId) return;
+      if (!isCommentOfTarget(event, target)) return;
 
       setRepliesCount(event.parentId, event.parentRepliesCount);
-      invalidateDiscussion(queryClient, gameId);
+      invalidateDiscussion(queryClient, target);
     };
 
     const onLikes = (event: ICommentLikesEvent) => {
-      if (event.gameId !== gameId) return;
+      if (!isCommentOfTarget(event, target)) return;
 
-      setCommentInCache(queryClient, gameId, event.commentId, (comment) => ({
+      setCommentInCache(queryClient, target, event.commentId, (comment) => ({
         ...comment,
         likesCount: event.likesCount,
       }));
     };
 
-    const onReconnect = () => invalidateDiscussion(queryClient, gameId);
+    const onReconnect = () => invalidateDiscussion(queryClient, target);
 
     socket.on(CommentsSocketEvent.COMMENT_CREATED, onCreated);
     socket.on(CommentsSocketEvent.COMMENT_UPDATED, onUpdated);
@@ -85,7 +91,7 @@ export const useDiscussionSocket = (gameId: string) => {
     socket.on(CommentsSocketEvent.COMMENT_LIKES, onLikes);
     socket.io.on("reconnect", onReconnect);
 
-    const unfollow = followDiscussion(gameId);
+    const unfollow = followDiscussion(target);
 
     return () => {
       unfollow();
@@ -95,5 +101,5 @@ export const useDiscussionSocket = (gameId: string) => {
       socket.off(CommentsSocketEvent.COMMENT_LIKES, onLikes);
       socket.io.off("reconnect", onReconnect);
     };
-  }, [gameId, queryClient]);
+  }, [type, id, enabled, queryClient]);
 };

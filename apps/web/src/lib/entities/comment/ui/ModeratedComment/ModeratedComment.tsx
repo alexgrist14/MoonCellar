@@ -29,13 +29,18 @@ export const ModeratedComment: FC<IModeratedCommentProps> = ({
   <li className={classNames(styles.card, { [styles.card_busy]: isBusy })}>
     <div className={styles.card__head}>
       <div className={styles.card__context}>
-        {comment?.game ? (
+        {comment?.article ? (
+          <Link href={`/news/${comment.article.slug}`} target="_blank">
+            {comment.article.title}
+          </Link>
+        ) : comment?.game ? (
           <Link href={`/games/${comment.game.slug}`} target="_blank">
             {comment.game.name}
           </Link>
         ) : (
           <span>Unknown game</span>
         )}
+        {!!comment?.article && <Badge tone="muted">News</Badge>}
         {comment?.isReply && <Badge tone="muted">Reply</Badge>}
         {comment?.isOnReview && <Badge tone="muted">On a review</Badge>}
         {!!comment && (

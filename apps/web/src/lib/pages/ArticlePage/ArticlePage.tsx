@@ -18,6 +18,7 @@ import {
   NEWS_HREF,
 } from "@/src/lib/entities/article/model";
 import { ArticleLinks } from "@/src/lib/entities/article/ui/ArticleLinks";
+import { ArticleComments } from "@/src/lib/widgets/news/ArticleComments";
 import { ArticleGamePanel } from "@/src/lib/widgets/news/ArticleGamePanel";
 import { useHideAdult } from "@/src/lib/shared/hooks/useHideAdult";
 import { useIsAuthHydrated } from "@/src/lib/shared/hooks/useIsAuthHydrated";
@@ -140,6 +141,11 @@ export const ArticlePage: FC<IArticlePageProps> = ({
           )}
           <RichText content={article.content} size="article" />
         </Box>
+
+        <ArticleComments
+          articleId={article._id}
+          className={styles.page__comments}
+        />
       </div>
     </>
   );

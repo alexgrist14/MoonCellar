@@ -21,16 +21,23 @@ news shows the latest posts there instead. Public.
 - A game article: the full game through `gamesApi.getByIds({ _ids: [id] })` and its player
   counts through `gamesApi.getStats`, both server-side.
 - Site news: the four latest posts (`articlesAPI.getArticles({ take: 4 })`), minus this one.
+- Comments load on the client from `GET /articles/:articleId/comments` through
+  `widgets/news/ArticleComments`; nothing of them is in the server render.
 
 ## Composition
 
 1. `BGImage` with the game, or the default one for site news.
-2. A grid capped at `--news-page-width` with areas `head side / body side`; below `media960` it
-   stacks `head / side / body` for a game article and `head / body / side` for site news.
+2. A grid capped at `--news-page-width` with areas `head side / body side / comments side`; below
+   `media960` it stacks `head / side / body / comments` for a game article and
+   `head / body / comments / side` for site news.
 3. Head `Box`: `Breadcrumbs`, a meta row (`Badge` with the kind, date, reading time, "Edit post"
    for admins), the `h1`, the summary, the author with `Avatar`.
 4. Side: `widgets/news/ArticleGamePanel`, or a `Box` "Latest posts" with `ArticleLinks`.
 5. Body `Box`: the post image (or the game's first artwork) and `RichText size="article"`.
+6. `widgets/news/ArticleComments`: a "Comments" `Box` (`id="comments"`) with
+   `features/comments/ui/CommentThread` for the post — the same editor, votes, reports and
+   moderation as game comments. Guests read the comments and get "Sign in to join the
+   discussion" instead of the form.
 
 ## Rules and gotchas
 
@@ -43,3 +50,12 @@ news shows the latest posts there instead. Public.
   auth store.
 - Panel padding is `--article-box-padding`, which drops to `--padding-x3` below 768px; pass it
   through `contentStyle`, never a class on `Box`'s content.
+- **The comments are deferred (`CommentThread isDeferred`).** They are fetched and the `/comments`
+  socket is followed only once the panel comes within 400px of the screen, so a reader who never
+  scrolls down opens no connection. The route is ISR, so they could not be server-rendered
+  anyway.
+- **`#comments` (the link of every notification about a post comment) is scrolled to by
+  `ArticleComments` itself**, in an effect, as `GameCommunity` does for `#discussion`: the page
+  scrolls `#page-scroll`, not the document, and the browser's own fragment jump left the post at
+  the top. `scroll-margin-top: var(--container-padding-top)` on the panel keeps its heading clear
+  of the header.

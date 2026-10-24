@@ -62,7 +62,29 @@ export class CommentsController {
     @Query() dto: GetCommentsRequestDto,
     @Req() request: ICommunityRequest
   ) {
-    return this.comments.getComments(gameId, dto, request.user);
+    return this.comments.getComments(
+      { type: "game", id: gameId },
+      dto,
+      request.user
+    );
+  }
+
+  @Get("articles/:articleId/comments")
+  @ApiOperation({
+    summary: "Get top-level comments under a published news post",
+  })
+  @ApiCreatedResponse({ type: CommentsResponseDto })
+  @UseGuards(OptionalJwtGuard)
+  async getArticleComments(
+    @Param("articleId") articleId: string,
+    @Query() dto: GetCommentsRequestDto,
+    @Req() request: ICommunityRequest
+  ) {
+    return this.comments.getComments(
+      { type: "article", id: articleId },
+      dto,
+      request.user
+    );
   }
 
   @Get("comments/:id/replies")
@@ -87,11 +109,7 @@ export class CommentsController {
     @Body() dto: CreateCommentRequestDto,
     @Req() request: IAuthorizedRequest
   ) {
-    return this.comments.createComment(
-      dto,
-      request.user,
-      getSocketId(request)
-    );
+    return this.comments.createComment(dto, request.user, getSocketId(request));
   }
 
   @Patch("comments/:id")
@@ -123,11 +141,7 @@ export class CommentsController {
     @Param("id") id: string,
     @Req() request: IAuthorizedRequest
   ) {
-    return this.comments.deleteComment(
-      id,
-      request.user,
-      getSocketId(request)
-    );
+    return this.comments.deleteComment(id, request.user, getSocketId(request));
   }
 
   @Put("comments/:id/like")
@@ -140,12 +154,7 @@ export class CommentsController {
     @Param("id") id: string,
     @Req() request: IAuthorizedRequest
   ) {
-    return this.comments.setLike(
-      id,
-      request.user,
-      true,
-      getSocketId(request)
-    );
+    return this.comments.setLike(id, request.user, true, getSocketId(request));
   }
 
   @Delete("comments/:id/like")
@@ -158,12 +167,7 @@ export class CommentsController {
     @Param("id") id: string,
     @Req() request: IAuthorizedRequest
   ) {
-    return this.comments.setLike(
-      id,
-      request.user,
-      false,
-      getSocketId(request)
-    );
+    return this.comments.setLike(id, request.user, false, getSocketId(request));
   }
 
   @Post("comments/:id/report")

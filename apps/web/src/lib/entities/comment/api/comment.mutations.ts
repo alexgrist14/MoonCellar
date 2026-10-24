@@ -4,6 +4,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import {
+  ICommentTarget,
   ICreateCommentRequest,
   IReview,
   IReviewsResponse,
@@ -117,7 +118,7 @@ export const useReviewHelpfulMutation = (gameId: string) => {
   });
 };
 
-export const useCommentLikeMutation = (gameId: string) => {
+export const useCommentLikeMutation = (target: ICommentTarget) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -129,22 +130,22 @@ export const useCommentLikeMutation = (gameId: string) => {
       isLiked: boolean;
     }) => commentsAPI.setLike(commentId, isLiked).then(({ data }) => data),
     onMutate: ({ commentId, isLiked }) =>
-      setCommentInCache(queryClient, gameId, commentId, (comment) => ({
+      setCommentInCache(queryClient, target, commentId, (comment) => ({
         ...comment,
         isLiked,
         likesCount: Math.max(0, comment.likesCount + (isLiked ? 1 : -1)),
       })),
     onSuccess: (vote, { commentId }) =>
-      setCommentInCache(queryClient, gameId, commentId, (comment) => ({
+      setCommentInCache(queryClient, target, commentId, (comment) => ({
         ...comment,
         isLiked: vote.isActive,
         likesCount: vote.count,
       })),
-    onError: () => invalidateDiscussion(queryClient, gameId),
+    onError: () => invalidateDiscussion(queryClient, target),
   });
 };
 
-export const useCreateCommentMutation = (gameId: string) => {
+export const useCreateCommentMutation = (target: ICommentTarget) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -153,11 +154,11 @@ export const useCreateCommentMutation = (gameId: string) => {
     onSuccess: (comment) => {
       if (!comment.parentId) {
         return queryClient.invalidateQueries({
-          queryKey: commentQueryKeys.discussion(gameId),
+          queryKey: commentQueryKeys.discussion(target),
         });
       }
 
-      setCommentInCache(queryClient, gameId, comment.parentId, (parent) => ({
+      setCommentInCache(queryClient, target, comment.parentId, (parent) => ({
         ...parent,
         repliesCount: parent.repliesCount + 1,
       }));
@@ -169,7 +170,7 @@ export const useCreateCommentMutation = (gameId: string) => {
   });
 };
 
-export const useUpdateCommentMutation = (gameId: string) => {
+export const useUpdateCommentMutation = (target: ICommentTarget) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -181,28 +182,28 @@ export const useUpdateCommentMutation = (gameId: string) => {
       data: IUpdateCommentRequest;
     }) => commentsAPI.update(commentId, data).then(({ data }) => data),
     onSuccess: (comment) =>
-      setCommentInCache(queryClient, gameId, comment._id, () => comment),
+      setCommentInCache(queryClient, target, comment._id, () => comment),
   });
 };
 
-export const useDeleteCommentMutation = (gameId: string) => {
+export const useDeleteCommentMutation = (target: ICommentTarget) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (commentId: string) =>
       commentsAPI.remove(commentId).then(({ data }) => data),
-    onSuccess: () => invalidateDiscussion(queryClient, gameId),
+    onSuccess: () => invalidateDiscussion(queryClient, target),
   });
 };
 
-export const useReportCommentMutation = (gameId: string) => {
+export const useReportCommentMutation = (target: ICommentTarget) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (commentId: string) =>
       commentsAPI.report(commentId).then(({ data }) => data),
     onSuccess: (_result, commentId) => {
-      setCommentInCache(queryClient, gameId, commentId, (comment) => ({
+      setCommentInCache(queryClient, target, commentId, (comment) => ({
         ...comment,
         isReported: true,
       }));
@@ -211,7 +212,7 @@ export const useReportCommentMutation = (gameId: string) => {
   });
 };
 
-export const useCommentStatusMutation = (gameId: string) => {
+export const useCommentStatusMutation = (target: ICommentTarget) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -223,6 +224,6 @@ export const useCommentStatusMutation = (gameId: string) => {
       status: "visible" | "hidden";
     }) =>
       commentsAPI.updateStatus(commentId, { status }).then(({ data }) => data),
-    onSuccess: () => invalidateDiscussion(queryClient, gameId),
+    onSuccess: () => invalidateDiscussion(queryClient, target),
   });
 };

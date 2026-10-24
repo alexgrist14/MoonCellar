@@ -1,5 +1,9 @@
 import { InfiniteData, QueryClient } from "@tanstack/react-query";
-import { IComment, ICommentsResponse } from "@mooncellar/schemas";
+import {
+  IComment,
+  ICommentsResponse,
+  ICommentTarget,
+} from "@mooncellar/schemas";
 import { commentQueryKeys } from "./comment.query-keys";
 
 const updateCommentPages = (
@@ -19,11 +23,11 @@ const updateCommentPages = (
 
 export const setCommentInCache = (
   queryClient: QueryClient,
-  gameId: string,
+  target: ICommentTarget,
   commentId: string,
   update: (comment: IComment) => IComment
 ) => {
-  [commentQueryKeys.discussion(gameId), commentQueryKeys.replies()].forEach(
+  [commentQueryKeys.discussion(target), commentQueryKeys.replies()].forEach(
     (queryKey) =>
       queryClient.setQueriesData<InfiniteData<ICommentsResponse, number>>(
         { queryKey },
@@ -32,10 +36,13 @@ export const setCommentInCache = (
   );
 };
 
-export const invalidateDiscussion = (queryClient: QueryClient, gameId: string) =>
+export const invalidateDiscussion = (
+  queryClient: QueryClient,
+  target: ICommentTarget
+) =>
   Promise.all([
     queryClient.invalidateQueries({
-      queryKey: commentQueryKeys.discussion(gameId),
+      queryKey: commentQueryKeys.discussion(target),
     }),
     queryClient.invalidateQueries({ queryKey: commentQueryKeys.replies() }),
   ]);

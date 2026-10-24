@@ -16,6 +16,7 @@ const getRoles = (handler: object) => Reflect.getMetadata(ROLES_KEY, handler);
 
 const PUBLIC_HANDLERS: [string, object][] = [
   ["getComments", CommentsController.prototype.getComments],
+  ["getArticleComments", CommentsController.prototype.getArticleComments],
   ["getReplies", CommentsController.prototype.getReplies],
   ["getReviews", ReviewsController.prototype.getReviews],
 ];

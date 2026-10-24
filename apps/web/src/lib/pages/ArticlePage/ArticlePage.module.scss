@@ -3,7 +3,8 @@
   grid-template-columns: minmax(0, 1fr) var(--news-sidebar-width);
   grid-template-areas:
     "head side"
-    "body side";
+    "body side"
+    "comments side";
   gap: var(--gap-x4);
   align-items: start;
   width: 100%;
@@ -16,6 +17,11 @@
 
   &__body {
     grid-area: body;
+  }
+
+  &__comments {
+    grid-area: comments;
+    scroll-margin-top: var(--container-padding-top);
   }
 
   &__side {
@@ -34,7 +40,8 @@
     grid-template-areas:
       "head"
       "side"
-      "body";
+      "body"
+      "comments";
     gap: var(--gap-x2);
 
     &__side {
@@ -45,6 +52,7 @@
       grid-template-areas:
         "head"
         "body"
+        "comments"
         "side";
     }
   }

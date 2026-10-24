@@ -9,11 +9,6 @@ import {
 } from "@mooncellar/schemas";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
-import { modal } from "@/src/lib/shared/ui/Modal";
-import {
-  PLAYTHROUGH_MODAL_ID,
-  PlaythroughModal,
-} from "@/src/lib/features/game/ui/PlaythroughModal";
 import { SvgComment, SvgPen } from "@/src/lib/shared/ui/svg";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
@@ -23,17 +18,19 @@ import {
   useReviewsQuery,
 } from "@/src/lib/entities/comment/api/comment.queries";
 import { useReviewHelpfulMutation } from "@/src/lib/entities/comment/api/comment.mutations";
-import styles from "@/src/lib/features/game/ui/GameCommunity/GameCommunity.module.scss";
-import { useRequireAuth } from "@/src/lib/features/game/ui/GameCommunity/useRequireAuth";
-import { ReviewItem } from "./ReviewItem";
-import { ReviewsSummary } from "./ReviewsSummary";
+import threadStyles from "@/src/lib/features/comments/ui/CommentThread/CommentThread.module.scss";
+import { useRequireAuth } from "@/src/lib/features/comments/model";
+import { EntrySkeleton } from "@/src/lib/features/comments/ui/CommentThread/components/EntrySkeleton";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
-import { EntrySkeleton } from "./EntrySkeleton";
+import styles from "./GameReviews.module.scss";
+import { ReviewItem } from "./components/ReviewItem";
+import { ReviewsSummary } from "./components/ReviewsSummary";
 
-interface IReviewsTabProps {
+interface IGameReviewsProps {
   game: IGameResponse;
   initialReviews?: IReviewsResponse;
   onDiscuss: (review: IReview) => void;
+  onWriteReview: (userId: string) => void;
 }
 
 const sortOptions: { value: IReviewsSort; label: string }[] = [
@@ -41,10 +38,11 @@ const sortOptions: { value: IReviewsSort; label: string }[] = [
   { value: "new", label: "Newest" },
 ];
 
-export const ReviewsTab: FC<IReviewsTabProps> = ({
+export const GameReviews: FC<IGameReviewsProps> = ({
   game,
   initialReviews,
   onDiscuss,
+  onWriteReview,
 }) => {
   const requireAuth = useRequireAuth();
 
@@ -67,12 +65,7 @@ export const ReviewsTab: FC<IReviewsTabProps> = ({
   const summary = data?.pages[0]?.summary ?? initialReviews?.summary;
 
   const openReviewModal = () =>
-    requireAuth((profile) =>
-      modal.open(
-        <PlaythroughModal game={game} userId={profile._id} isReview />,
-        { id: PLAYTHROUGH_MODAL_ID, isResizable: true }
-      )
-    );
+    requireAuth((profile) => onWriteReview(profile._id));
 
   const toggleHelpful = (review: IReview) =>
     requireAuth((profile) => {
@@ -111,9 +104,9 @@ export const ReviewsTab: FC<IReviewsTabProps> = ({
   }
 
   return (
-    <div className={styles.tab}>
+    <div className={threadStyles.tab}>
       <ReviewsSummary summary={summary} />
-      <div className={styles.toolbar}>
+      <div className={threadStyles.toolbar}>
         <Tabs
           theme="segmented"
           ariaLabel="Filter reviews by status"
@@ -158,7 +151,7 @@ export const ReviewsTab: FC<IReviewsTabProps> = ({
       {isLoaderShown ? (
         <EntrySkeleton />
       ) : (
-        <div className={styles.feed}>
+        <div className={threadStyles.feed}>
           {reviews.map((review) => (
             <ReviewItem
               key={review._id}
@@ -169,7 +162,7 @@ export const ReviewsTab: FC<IReviewsTabProps> = ({
           ))}
         </div>
       )}
-      <div className={styles.footer}>
+      <div className={threadStyles.footer}>
         {hasNextPage ? (
           <Button
             color={ButtonColor.DEFAULT}

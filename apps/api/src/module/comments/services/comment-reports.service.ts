@@ -12,6 +12,7 @@ import {
   type IReportedComment,
   type IResolveCommentReportsResponse,
 } from "@mooncellar/schemas";
+import { Article } from "../../articles/schemas/article.schema";
 import { Game, type GameDocument } from "../../games/schemas/game.schema";
 import { type User } from "../../user/schemas/user.schema";
 import {
@@ -48,6 +49,7 @@ const toIsoDate = (date: Date) => new Date(date).toISOString();
 
 const COMMENT_PROJECTION = {
   gameId: 1,
+  articleId: 1,
   userId: 1,
   parentId: 1,
   reviewId: 1,
@@ -67,6 +69,8 @@ export class CommentReportsService {
     private Comments: Model<GameCommentDocument>,
     @InjectModel(Game.name)
     private Games: Model<GameDocument>,
+    @InjectModel(Article.name)
+    private Articles: Model<Article>,
     private readonly comments: CommentsService,
     private readonly lookup: CommunityLookupService
   ) {}
@@ -155,13 +159,23 @@ export class CommentReportsService {
     extraAuthorIds: (mongoose.Types.ObjectId | null | undefined)[] = []
   ) {
     const gameIds = uniqueIds(comments.map((comment) => comment.gameId));
-    const games = gameIds.length
-      ? await this.Games.find(
-          { _id: { $in: gameIds } } as FilterQuery<GameDocument>,
-          { name: 1, slug: 1 }
-        ).lean()
-      : [];
+    const articleIds = uniqueIds(comments.map((comment) => comment.articleId));
+    const [games, articles] = await Promise.all([
+      this.Games.find({ _id: { $in: gameIds } } as FilterQuery<GameDocument>, {
+        name: 1,
+        slug: 1,
+      }).lean<{ _id: mongoose.Types.ObjectId; name: string; slug: string }[]>(),
+      this.Articles.find({ _id: { $in: articleIds } } as FilterQuery<Article>, {
+        title: 1,
+        slug: 1,
+      }).lean<
+        { _id: mongoose.Types.ObjectId; title: string; slug: string }[]
+      >(),
+    ]);
     const gamesById = new Map(games.map((game) => [String(game._id), game]));
+    const articlesById = new Map(
+      articles.map((article) => [String(article._id), article])
+    );
 
     const authors = await this.lookup.getAuthors(
       uniqueIds([
@@ -174,6 +188,7 @@ export class CommentReportsService {
 
     const describe = (comment: ILeanComment): IReportedComment => {
       const game = gamesById.get(String(comment.gameId));
+      const article = articlesById.get(String(comment.articleId));
 
       return {
         status: comment.status,
@@ -186,6 +201,13 @@ export class CommentReportsService {
         author: getAuthor(comment.userId),
         game: game
           ? { _id: String(game._id), name: game.name, slug: game.slug }
+          : null,
+        article: article
+          ? {
+              _id: String(article._id),
+              title: article.title,
+              slug: article.slug,
+            }
           : null,
       };
     };

@@ -11,11 +11,15 @@ import {
   CommentsSocketEvent,
   DISCUSSION_ROOMS_LIMIT,
   DiscussionRoomRequestSchema,
+  getCommentTarget,
+  getCommentTargetKey,
   type ICommentCreatedEvent,
   type ICommentLikesEvent,
   type ICommentsClientEvents,
   type ICommentsServerEvents,
   type ICommentStatusEvent,
+  type ICommentTarget,
+  type ICommentTargetFields,
   type ICommentUpdatedEvent,
   type IDiscussionRoomResponse,
 } from "@mooncellar/schemas";
@@ -27,7 +31,10 @@ type ICommentsNamespace = Namespace<
 
 type ICommentsSocket = Socket<ICommentsClientEvents, ICommentsServerEvents>;
 
-export const getDiscussionRoom = (gameId: string) => `discussion:${gameId}`;
+const INVALID_DISCUSSION = "Invalid game or post id";
+
+export const getDiscussionRoom = (target: ICommentTarget) =>
+  `discussion:${getCommentTargetKey(target)}`;
 
 @WebSocketGateway({ namespace: COMMENTS_SOCKET_NAMESPACE })
 export class CommentsGateway {
@@ -39,11 +46,11 @@ export class CommentsGateway {
     @ConnectedSocket() socket: ICommentsSocket,
     @MessageBody() payload: unknown
   ): Promise<IDiscussionRoomResponse> {
-    const request = DiscussionRoomRequestSchema.safeParse(payload);
+    const target = this.parseTarget(payload);
 
-    if (!request.success) return { ok: false, error: "Invalid game id" };
+    if (!target) return { ok: false, error: INVALID_DISCUSSION };
 
-    const room = getDiscussionRoom(request.data.gameId);
+    const room = getDiscussionRoom(target);
 
     if (!socket.rooms.has(room) && socket.rooms.size > DISCUSSION_ROOMS_LIMIT) {
       return { ok: false, error: "Too many discussions followed" };
@@ -59,45 +66,55 @@ export class CommentsGateway {
     @ConnectedSocket() socket: ICommentsSocket,
     @MessageBody() payload: unknown
   ): Promise<IDiscussionRoomResponse> {
-    const request = DiscussionRoomRequestSchema.safeParse(payload);
+    const target = this.parseTarget(payload);
 
-    if (!request.success) return { ok: false, error: "Invalid game id" };
+    if (!target) return { ok: false, error: INVALID_DISCUSSION };
 
-    await socket.leave(getDiscussionRoom(request.data.gameId));
+    await socket.leave(getDiscussionRoom(target));
 
     return { ok: true };
   }
 
   commentCreated(event: ICommentCreatedEvent, socketId?: string) {
-    this.toDiscussion(event.gameId, socketId)?.emit(
+    this.toDiscussion(event, socketId)?.emit(
       CommentsSocketEvent.COMMENT_CREATED,
       event
     );
   }
 
   commentUpdated(event: ICommentUpdatedEvent, socketId?: string) {
-    this.toDiscussion(event.gameId, socketId)?.emit(
+    this.toDiscussion(event, socketId)?.emit(
       CommentsSocketEvent.COMMENT_UPDATED,
       event
     );
   }
 
   commentStatusChanged(event: ICommentStatusEvent, socketId?: string) {
-    this.toDiscussion(event.gameId, socketId)?.emit(
+    this.toDiscussion(event, socketId)?.emit(
       CommentsSocketEvent.COMMENT_STATUS,
       event
     );
   }
 
   commentLikesChanged(event: ICommentLikesEvent, socketId?: string) {
-    this.toDiscussion(event.gameId, socketId)?.emit(
+    this.toDiscussion(event, socketId)?.emit(
       CommentsSocketEvent.COMMENT_LIKES,
       event
     );
   }
 
-  private toDiscussion(gameId: string, socketId?: string) {
-    const room = this.server?.to(getDiscussionRoom(gameId));
+  private parseTarget(payload: unknown) {
+    const request = DiscussionRoomRequestSchema.safeParse(payload);
+
+    return request.success ? getCommentTarget(request.data) : null;
+  }
+
+  private toDiscussion(event: ICommentTargetFields, socketId?: string) {
+    const target = getCommentTarget(event);
+
+    if (!target) return undefined;
+
+    const room = this.server?.to(getDiscussionRoom(target));
 
     return socketId ? room?.except(socketId) : room;
   }

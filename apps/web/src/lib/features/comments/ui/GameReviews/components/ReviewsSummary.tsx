@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { IReviewsSummary } from "@mooncellar/schemas";
 import { ScoreValue } from "@/src/lib/shared/ui/ScoreValue";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
-import styles from "@/src/lib/features/game/ui/GameCommunity/GameCommunity.module.scss";
+import styles from "@/src/lib/features/comments/ui/GameReviews/GameReviews.module.scss";
 
 export const ReviewsSummary: FC<{ summary: IReviewsSummary }> = ({
   summary,

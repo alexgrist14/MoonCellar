@@ -23,7 +23,7 @@ import { GameReleaseDates } from "@/src/lib/entities/game/ui/GameReleaseDates";
 import { GameMultiplayer } from "@/src/lib/entities/game/ui/GameMultiplayer";
 import { GameCharacters } from "@/src/lib/widgets/game/GameCharacters";
 import { GameRelated } from "@/src/lib/widgets/game/GameRelated";
-import { GameCommunity } from "@/src/lib/features/game/ui/GameCommunity";
+import { GameCommunity } from "@/src/lib/widgets/game/GameCommunity";
 import { IPortGameAchievements } from "@/src/lib/entities/port-achievement/model";
 
 interface IGamePageProps {

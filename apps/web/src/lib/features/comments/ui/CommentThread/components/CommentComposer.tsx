@@ -8,8 +8,8 @@ import { Checkbox } from "@/src/lib/shared/ui/Checkbox";
 import { IRichEditorHandle, RichEditor } from "@/src/lib/shared/ui/RichEditor";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { toast } from "@/src/lib/shared/utils/toast.utils";
-import styles from "@/src/lib/features/game/ui/GameCommunity/GameCommunity.module.scss";
-import { useRequireAuth } from "@/src/lib/features/game/ui/GameCommunity/useRequireAuth";
+import styles from "@/src/lib/features/comments/ui/CommentThread/CommentThread.module.scss";
+import { useRequireAuth } from "@/src/lib/features/comments/model";
 
 interface ICommentComposerProps {
   submitLabel: string;

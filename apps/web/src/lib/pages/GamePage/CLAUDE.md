@@ -62,8 +62,9 @@ landing page — there are about 10 000 of them.
    when `useHideAdult()` is true.
 5. `entities/game/ui/GameDetails` — the remaining catalogue facts.
 6. `widgets/game/GameRelated`.
-7. `features/game/ui/GameCommunity` — reviews (seeded with `initialReviews`) and the
-   Discussion tab.
+7. `widgets/game/GameCommunity` — `features/comments/ui/GameReviews` (seeded with
+   `initialReviews`) and the Discussion tab, `features/comments/ui/CommentThread` with the game as
+   its target.
 8. Two columns: `GameReleaseDates`, `GameMultiplayer`.
 9. `features/game/ui/GameAdminControls` — admin-only `ExpandMenu` with parse/delete/revalidate.
 
@@ -89,7 +90,8 @@ landing page — there are about 10 000 of them.
 - **Admin edits must call `revalidateGamePage` before `router.refresh()`.** A refresh alone is
   answered from the same cached entry and refills the cache with stale data.
 - **Keep `useDiscussionSocket` out of `GamePage` and `GameCommunity`.** The socket opens only
-  when the Discussion tab mounts; anywhere higher, every visitor opens a socket.
+  when the Discussion tab mounts its `CommentThread`; anywhere higher, every visitor opens a
+  socket.
 - **Nothing read during render may differ between server and client** — no `document` lookups,
   no `Math.random()`. `ExpandMenu`'s portal and `BGImage`'s choice both broke hydration on every
   game page before.

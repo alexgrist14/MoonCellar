@@ -2,8 +2,11 @@ import { io, type Socket } from "socket.io-client";
 import {
   COMMENTS_SOCKET_NAMESPACE,
   CommentsSocketEvent,
+  getCommentTargetFields,
+  getCommentTargetKey,
   type ICommentsClientEvents,
   type ICommentsServerEvents,
+  type ICommentTarget,
 } from "@mooncellar/schemas";
 import { API_URL } from "@/src/lib/shared/constants";
 import { setSocketId } from "./socket-id";
@@ -15,20 +18,22 @@ export type ICommentsSocket = Socket<
 
 let commentsSocket: ICommentsSocket | undefined;
 
-const followers = new Map<string, number>();
+const followers = new Map<string, { target: ICommentTarget; count: number }>();
 
 export const getCommentsSocket = () => {
   if (commentsSocket) return commentsSocket;
 
-  const socket: ICommentsSocket = io(
-    `${API_URL}${COMMENTS_SOCKET_NAMESPACE}`,
-    { autoConnect: false }
-  );
+  const socket: ICommentsSocket = io(`${API_URL}${COMMENTS_SOCKET_NAMESPACE}`, {
+    autoConnect: false,
+  });
 
   socket.on("connect", () => {
     setSocketId(socket.id);
-    followers.forEach((_count, gameId) =>
-      socket.emit(CommentsSocketEvent.JOIN_DISCUSSION, { gameId })
+    followers.forEach(({ target }) =>
+      socket.emit(
+        CommentsSocketEvent.JOIN_DISCUSSION,
+        getCommentTargetFields(target)
+      )
     );
   });
   socket.on("disconnect", () => setSocketId(undefined));
@@ -38,33 +43,40 @@ export const getCommentsSocket = () => {
   return socket;
 };
 
-export const followDiscussion = (gameId: string) => {
+export const followDiscussion = (target: ICommentTarget) => {
   const socket = getCommentsSocket();
-  const count = followers.get(gameId) ?? 0;
+  const key = getCommentTargetKey(target);
+  const count = followers.get(key)?.count ?? 0;
 
-  followers.set(gameId, count + 1);
+  followers.set(key, { target, count: count + 1 });
 
   if (!socket.active) {
     socket.connect();
   } else if (socket.connected && !count) {
-    socket.emit(CommentsSocketEvent.JOIN_DISCUSSION, { gameId });
+    socket.emit(
+      CommentsSocketEvent.JOIN_DISCUSSION,
+      getCommentTargetFields(target)
+    );
   }
 
   return () => {
-    const remaining = (followers.get(gameId) ?? 1) - 1;
+    const remaining = (followers.get(key)?.count ?? 1) - 1;
 
     if (remaining > 0) {
-      followers.set(gameId, remaining);
+      followers.set(key, { target, count: remaining });
       return;
     }
 
-    followers.delete(gameId);
+    followers.delete(key);
 
     if (!followers.size) {
       socket.disconnect();
       return;
     }
 
-    socket.emit(CommentsSocketEvent.LEAVE_DISCUSSION, { gameId });
+    socket.emit(
+      CommentsSocketEvent.LEAVE_DISCUSSION,
+      getCommentTargetFields(target)
+    );
   };
 };

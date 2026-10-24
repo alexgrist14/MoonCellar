@@ -10,8 +10,11 @@ import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { ReactionButton } from "@/src/lib/shared/ui/ReactionButton";
 import { ScoreValue } from "@/src/lib/shared/ui/ScoreValue";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
-import styles from "@/src/lib/features/game/ui/GameCommunity/GameCommunity.module.scss";
-import { AuthorName, CommunityAvatar } from "./CommunityAuthor";
+import styles from "@/src/lib/features/comments/ui/CommentThread/CommentThread.module.scss";
+import {
+  AuthorName,
+  CommunityAvatar,
+} from "@/src/lib/features/comments/ui/CommentThread/components/CommunityAuthor";
 import { AuthorStatus } from "@/src/lib/shared/ui/AuthorStatus";
 
 interface IReviewItemProps {

@@ -1,8 +1,15 @@
-import { FC, useEffect, useState } from "react";
-import { ICommentsSort, IGameResponse, IReview } from "@mooncellar/schemas";
+import { FC, useEffect, useRef, useState } from "react";
+import {
+  getCommentTargetFields,
+  getCommentTargetKey,
+  ICommentsSort,
+  ICommentTarget,
+  IReview,
+} from "@mooncellar/schemas";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { EmptyState } from "@/src/lib/shared/ui/EmptyState";
 import { SvgClose } from "@/src/lib/shared/ui/svg";
+import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import {
   flattenPages,
@@ -10,19 +17,21 @@ import {
 } from "@/src/lib/entities/comment/api/comment.queries";
 import { useCreateCommentMutation } from "@/src/lib/entities/comment/api/comment.mutations";
 import { useDiscussionSocket } from "@/src/lib/entities/comment/api/comment.socket";
-import styles from "@/src/lib/features/game/ui/GameCommunity/GameCommunity.module.scss";
-import { getPlainTextExcerpt } from "@/src/lib/features/game/ui/GameCommunity/utils";
-import { CommentComposer } from "./CommentComposer";
-import { CommentItem } from "./CommentItem";
-import { CommentQuote } from "./CommentQuote";
-import { Tabs } from "@/src/lib/shared/ui/Tabs";
-import { EntrySkeleton } from "./EntrySkeleton";
+import { getPlainTextExcerpt } from "@/src/lib/features/comments/model";
+import styles from "./CommentThread.module.scss";
+import { CommentComposer } from "./components/CommentComposer";
+import { CommentItem } from "./components/CommentItem";
+import { CommentQuote } from "./components/CommentQuote";
+import { EntrySkeleton } from "./components/EntrySkeleton";
 
-interface IDiscussionTabProps {
-  game: IGameResponse;
+interface ICommentThreadProps {
+  target: ICommentTarget;
+  placeholder: string;
+  emptyTitle: string;
   discussedReview?: IReview;
-  onClearReview: () => void;
-  onTotal: (total: number) => void;
+  isDeferred?: boolean;
+  onClearReview?: () => void;
+  onTotal?: (total: number) => void;
 }
 
 const sortOptions: { value: ICommentsSort; label: string }[] = [
@@ -31,40 +40,61 @@ const sortOptions: { value: ICommentsSort; label: string }[] = [
 ];
 
 const REVIEW_EXCERPT_LENGTH = 160;
+const DEFERRED_ROOT_MARGIN = "400px 0px";
 
-export const DiscussionTab: FC<IDiscussionTabProps> = ({
-  game,
+export const CommentThread: FC<ICommentThreadProps> = ({
+  target,
+  placeholder,
+  emptyTitle,
   discussedReview,
+  isDeferred,
   onClearReview,
   onTotal,
 }) => {
+  const rootRef = useRef<HTMLDivElement>(null);
   const [sort, setSort] = useState<ICommentsSort>("top");
+  const [isReached, setIsReached] = useState(!isDeferred);
 
   const { data, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } =
-    useCommentsQuery(game._id, sort);
-  const { mutateAsync: createComment } = useCreateCommentMutation(game._id);
+    useCommentsQuery(target, sort, isReached);
+  const { mutateAsync: createComment } = useCreateCommentMutation(target);
 
-  useDiscussionSocket(game._id);
+  useDiscussionSocket(target, isReached);
 
-  const isLoaderShown = useMinimumLoading(isLoading);
+  useEffect(() => {
+    const root = rootRef.current;
+
+    if (isReached || !root) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) setIsReached(true);
+      },
+      { rootMargin: DEFERRED_ROOT_MARGIN }
+    );
+
+    observer.observe(root);
+
+    return () => observer.disconnect();
+  }, [isReached]);
+
+  const isLoaderShown = useMinimumLoading(isLoading || !isReached);
   const comments = flattenPages(data?.pages);
   const total = data?.pages[0]?.total;
   const reviewAuthor = discussedReview?.author?.userName ?? "a player";
 
   useEffect(() => {
-    if (total !== undefined) onTotal(total);
+    if (total !== undefined) onTotal?.(total);
   }, [total, onTotal]);
 
   return (
-    <div className={styles.tab}>
+    <div ref={rootRef} className={styles.tab}>
       <CommentComposer
-        key={discussedReview?._id ?? game._id}
+        key={discussedReview?._id ?? getCommentTargetKey(target)}
         submitLabel="Post"
         pendingLabel="Posting…"
         placeholder={
-          discussedReview
-            ? "What do you think about this review?"
-            : "Ask about a boss, a route or a build…"
+          discussedReview ? "What do you think about this review?" : placeholder
         }
         context={
           !!discussedReview && (
@@ -79,26 +109,28 @@ export const DiscussionTab: FC<IDiscussionTabProps> = ({
                 REVIEW_EXCERPT_LENGTH
               )}
               action={
-                <Button
-                  type="button"
-                  color={ButtonColor.GHOST}
-                  compact
-                  tooltip="Stop discussing this review"
-                  onClick={onClearReview}
-                >
-                  <SvgClose size="16" style={{ color: "inherit" }} />
-                </Button>
+                !!onClearReview && (
+                  <Button
+                    type="button"
+                    color={ButtonColor.GHOST}
+                    compact
+                    tooltip="Stop discussing this review"
+                    onClick={onClearReview}
+                  >
+                    <SvgClose size="16" style={{ color: "inherit" }} />
+                  </Button>
+                )
               }
             />
           )
         }
         onSubmit={(body, isSpoiler) =>
           createComment({
-            gameId: game._id,
+            ...getCommentTargetFields(target),
             body,
             isSpoiler,
             ...(!!discussedReview && { reviewId: discussedReview._id }),
-          }).then(onClearReview)
+          }).then(() => onClearReview?.())
         }
       />
       <div className={styles.toolbar}>
@@ -122,18 +154,11 @@ export const DiscussionTab: FC<IDiscussionTabProps> = ({
       {isLoaderShown ? (
         <EntrySkeleton />
       ) : !comments.length ? (
-        <EmptyState
-          variant="compact"
-          title="No discussion yet. Start it with a question or a tip."
-        />
+        <EmptyState variant="compact" title={emptyTitle} />
       ) : (
         <div className={styles.feed}>
           {comments.map((comment) => (
-            <CommentItem
-              key={comment._id}
-              comment={comment}
-              gameId={game._id}
-            />
+            <CommentItem key={comment._id} comment={comment} target={target} />
           ))}
         </div>
       )}

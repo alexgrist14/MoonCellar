@@ -100,3 +100,46 @@ describe("following-activity", () => {
     expect(getNotificationHref(notification)).toBe("/user/anna");
   });
 });
+
+describe("comments under a news post", () => {
+  const notification = {
+    _id: "n2",
+    type: "comment-reply",
+    actors: [{ _id: "u1", userName: "anna" }],
+    actorsCount: 1,
+    payload: { articleSlug: "patch-notes", articleTitle: "Patch notes" },
+    isRead: false,
+    createdAt: "2026-10-24T00:00:00.000Z",
+    updatedAt: "2026-10-24T00:00:00.000Z",
+  } as INotification;
+
+  it("names the post and links to its comments", () => {
+    expect(getNotificationSentence(notification)).toBe(
+      "anna replied to your comment on Patch notes"
+    );
+    expect(
+      getNotificationSentence({ ...notification, type: "comment-like" })
+    ).toBe("anna liked your comment on Patch notes");
+    expect(
+      getNotificationSentence({
+        ...notification,
+        type: "comment-moderated",
+        actors: [],
+        actorsCount: 0,
+        payload: { ...notification.payload, status: "hidden" },
+      })
+    ).toBe("A moderator hid your comment on Patch notes");
+    expect(getNotificationHref(notification)).toBe(
+      "/news/patch-notes#comments"
+    );
+  });
+
+  it("keeps game comments linking to the game's discussion", () => {
+    expect(
+      getNotificationHref({
+        ...notification,
+        payload: { gameSlug: "portal-2", gameName: "Portal 2" },
+      })
+    ).toBe("/games/portal-2#discussion");
+  });
+});

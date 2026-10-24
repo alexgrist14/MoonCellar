@@ -5,6 +5,7 @@ import {
 } from "@tanstack/react-query";
 import {
   ICommentsSort,
+  ICommentTarget,
   IGetUserReviewsRequest,
   IReviewCategory,
   IReviewsResponse,
@@ -74,19 +75,19 @@ export const useUserReviewsQuery = (
   });
 
 export const useCommentsQuery = (
-  gameId: string,
+  target: ICommentTarget,
   sort: ICommentsSort,
   enabled = true
 ) =>
   useInfiniteQuery({
-    queryKey: commentQueryKeys.discussionList(gameId, sort),
+    queryKey: commentQueryKeys.discussionList(target, sort),
     queryFn: ({ pageParam }) =>
       commentsAPI
-        .getComments(gameId, { sort, page: pageParam })
+        .getComments(target, { sort, page: pageParam })
         .then(({ data }) => data),
     initialPageParam: 1,
     getNextPageParam,
-    enabled: enabled && !!gameId,
+    enabled: enabled && !!target.id,
     staleTime: 60000,
   });
 

@@ -31,6 +31,7 @@ const createService = (statuses: (string | null)[]) => {
     {} as never,
     Comments as never,
     {} as never,
+    {} as never,
     comments as never,
     {} as never
   );
@@ -127,5 +128,65 @@ describe("CommentReportsService.resolve", () => {
     await expect(
       service.resolve("not-an-id", "dismiss", moderator as never)
     ).rejects.toBeInstanceOf(BadRequestException);
+  });
+});
+
+describe("CommentReportsService.getComments", () => {
+  it("names the game or the news post each comment belongs to", async () => {
+    const gameId = new mongoose.Types.ObjectId();
+    const articleId = new mongoose.Types.ObjectId();
+    const userId = new mongoose.Types.ObjectId();
+    const base = {
+      userId,
+      parentId: null,
+      reviewId: null,
+      body: "<p>Hi</p>",
+      isSpoiler: false,
+      status: "visible",
+      reportsCount: 0,
+      createdAt: new Date("2026-10-24T00:00:00Z"),
+      updatedAt: new Date("2026-10-24T00:00:00Z"),
+    };
+    const rows = [
+      { ...base, _id: new mongoose.Types.ObjectId(), gameId, articleId: null },
+      { ...base, _id: new mongoose.Types.ObjectId(), gameId: null, articleId },
+    ];
+    const chain = {
+      sort: () => chain,
+      skip: () => chain,
+      limit: () => chain,
+      lean: jest.fn().mockResolvedValue(rows),
+    };
+    const lean = <T>(value: T) => ({
+      lean: jest.fn().mockResolvedValue(value),
+    });
+    const service = new CommentReportsService(
+      {} as never,
+      {
+        find: () => chain,
+        countDocuments: jest.fn().mockResolvedValue(2),
+      } as never,
+      {
+        find: () => lean([{ _id: gameId, name: "Portal 2", slug: "portal-2" }]),
+      } as never,
+      {
+        find: () =>
+          lean([{ _id: articleId, title: "Patch notes", slug: "patch-notes" }]),
+      } as never,
+      {} as never,
+      { getAuthors: jest.fn().mockResolvedValue(new Map()) } as never
+    );
+
+    const { results } = await service.getComments({
+      page: 1,
+      take: 20,
+    } as never);
+
+    expect(
+      results.map(({ game, article }) => [game?.slug, article?.slug])
+    ).toEqual([
+      ["portal-2", undefined],
+      [undefined, "patch-notes"],
+    ]);
   });
 });

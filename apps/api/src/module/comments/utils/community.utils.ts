@@ -24,6 +24,17 @@ export const getViewerId = (viewer: IViewer) =>
 export const isAdminViewer = (viewer: IViewer) =>
   !!viewer?.roles?.includes(RolesEnum.ADMIN);
 
+export const toCommentTargetFields = ({
+  gameId,
+  articleId,
+}: {
+  gameId?: IObjectIdLike | null;
+  articleId?: IObjectIdLike | null;
+}) => ({
+  gameId: gameId ? String(gameId) : null,
+  articleId: articleId ? String(articleId) : null,
+});
+
 export const isSameId = (first: unknown, second: unknown) =>
   String(first) === String(second);
 
@@ -32,9 +43,7 @@ export const isDuplicateKeyError = (error: unknown) =>
 
 export const uniqueIds = (ids: (IObjectIdLike | null | undefined)[]) => [
   ...new Map(
-    ids
-      .filter((id): id is IObjectIdLike => !!id)
-      .map((id) => [String(id), id])
+    ids.filter((id): id is IObjectIdLike => !!id).map((id) => [String(id), id])
   ).values(),
 ];
 

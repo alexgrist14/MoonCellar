@@ -9,14 +9,18 @@ import {
 import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { type FilterQuery, Model } from "mongoose";
 import {
+  getCommentTarget,
   type IComment,
   type ICommentReportResolution,
   type ICommentStatus,
+  type ICommentTarget,
   type ICreateCommentParams,
   type IGetCommentsParams,
   type IGetRepliesParams,
+  type INotification,
   type IUpdateCommentParams,
 } from "@mooncellar/schemas";
+import { Article } from "../../articles/schemas/article.schema";
 import { Game, type GameDocument } from "../../games/schemas/game.schema";
 import {
   type IPlaythroughDocument,
@@ -43,6 +47,7 @@ import {
   isAdminViewer,
   isDuplicateKeyError,
   isSameId,
+  toCommentTargetFields,
   toObjectId,
   uniqueIds,
 } from "../utils/community.utils";
@@ -55,6 +60,14 @@ const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_COMMENTS = 5;
 const REVIEW_EXCERPT_LENGTH = 160;
 
+type ISubjectFilter =
+  { gameId: mongoose.Types.ObjectId } | { articleId: mongoose.Types.ObjectId };
+
+type ISubjectPayload = Pick<
+  INotification["payload"],
+  "gameSlug" | "gameName" | "articleSlug" | "articleTitle"
+>;
+
 @Injectable()
 export class CommentsService {
   constructor(
@@ -64,6 +77,8 @@ export class CommentsService {
     private Reports: Model<CommentReportDocument>,
     @InjectModel(Game.name)
     private Games: Model<GameDocument>,
+    @InjectModel(Article.name)
+    private Articles: Model<Article>,
     @InjectModel(Playthrough.name)
     private Playthroughs: Model<IPlaythroughDocument>,
     private readonly votes: VotesService,
@@ -76,13 +91,51 @@ export class CommentsService {
     return isAdminViewer(viewer) ? ["visible", "hidden"] : ["visible"];
   }
 
+  private async findSubject(target: ICommentTarget): Promise<{
+    filter: ISubjectFilter;
+    payload: ISubjectPayload;
+  }> {
+    if (target.type === "article") {
+      const articleId = toObjectId(target.id, "post id");
+      const article = await this.Articles.findOne({
+        _id: articleId,
+        status: "published",
+      })
+        .select("slug title")
+        .lean<{ slug: string; title: string }>();
+
+      if (!article) throw new NotFoundException("The post was not found");
+
+      return {
+        filter: { articleId },
+        payload: { articleSlug: article.slug, articleTitle: article.title },
+      };
+    }
+
+    const gameId = toObjectId(target.id, "game id");
+    const game = await this.Games.findById(gameId)
+      .select("slug name")
+      .lean<{ slug: string; name: string }>();
+
+    if (!game) throw new NotFoundException("Game not found");
+
+    return {
+      filter: { gameId },
+      payload: { gameSlug: game.slug, gameName: game.name },
+    };
+  }
+
   async getComments(
-    gameId: string,
+    target: ICommentTarget,
     { sort, page, take }: IGetCommentsParams,
     viewer: IViewer
   ) {
+    const subject: ISubjectFilter =
+      target.type === "game"
+        ? { gameId: toObjectId(target.id, "game id") }
+        : (await this.findSubject(target)).filter;
     const match = {
-      gameId: toObjectId(gameId, "game id"),
+      ...subject,
       parentId: null,
       $or: [
         { status: { $in: this.readableStatuses(viewer) } },
@@ -140,13 +193,15 @@ export class CommentsService {
     socketId?: string
   ) {
     const userId = getViewerId(viewer);
-    const gameId = toObjectId(data.gameId, "game id");
+    const target = getCommentTarget(data);
 
-    const game = await this.Games.findById(gameId)
-      .select("slug name")
-      .lean<{ slug: string; name: string }>();
+    if (!target) {
+      throw new BadRequestException(
+        "Name either the game or the news post the comment is about"
+      );
+    }
 
-    if (!game) throw new NotFoundException("Game not found");
+    const subject = await this.findSubject(target);
 
     const recentCount = await this.Comments.countDocuments({
       userId,
@@ -172,7 +227,7 @@ export class CommentsService {
     if (data.parentId) {
       const parent = await this.Comments.findOne({
         _id: toObjectId(data.parentId, "comment id"),
-        gameId,
+        ...subject.filter,
       }).lean<ILeanComment>();
 
       if (!parent) throw new NotFoundException("Comment not found");
@@ -187,7 +242,7 @@ export class CommentsService {
     } else if (data.reviewId) {
       const review = await this.Playthroughs.findOne({
         _id: toObjectId(data.reviewId, "review id"),
-        gameId,
+        ...subject.filter,
         isPublic: true,
       } as FilterQuery<IPlaythroughDocument>)
         .select("userId")
@@ -203,7 +258,7 @@ export class CommentsService {
     }
 
     const comment = await this.Comments.create({
-      gameId,
+      ...subject.filter,
       userId,
       parentId,
       replyToId,
@@ -218,7 +273,7 @@ export class CommentsService {
 
     this.events.commentCreated(
       {
-        gameId: String(gameId),
+        ...toCommentTargetFields(comment),
         commentId: String(comment._id),
         parentId: parentId ? String(parentId) : null,
         parentRepliesCount,
@@ -232,7 +287,7 @@ export class CommentsService {
         actorId: userId,
         type: reviewId ? "review-comment" : "comment-reply",
         subjectId: reviewId ?? comment._id,
-        payload: { gameSlug: game.slug, gameName: game.name },
+        payload: subject.payload,
       });
     }
 
@@ -265,7 +320,7 @@ export class CommentsService {
 
     this.events.commentUpdated(
       {
-        gameId: String(comment.gameId),
+        ...toCommentTargetFields(comment),
         commentId: String(comment._id),
         body: comment.body,
         isSpoiler: comment.isSpoiler,
@@ -340,7 +395,7 @@ export class CommentsService {
     if (isChanged && updated) {
       this.events.commentLikesChanged(
         {
-          gameId: String(comment.gameId),
+          ...toCommentTargetFields(comment),
           commentId: String(comment._id),
           likesCount: updated.likesCount,
         },
@@ -436,7 +491,7 @@ export class CommentsService {
 
     this.events.commentStatusChanged(
       {
-        gameId: String(comment.gameId),
+        ...toCommentTargetFields(comment),
         commentId: String(comment._id),
         parentId: comment.parentId ? String(comment.parentId) : null,
         parentRepliesCount,
@@ -459,7 +514,7 @@ export class CommentsService {
       userId: comment.userId,
       type: "comment-moderated",
       subjectId: comment._id,
-      payload: { ...(await this.getGamePayload(comment.gameId)), status },
+      payload: { ...(await this.getSubjectPayload(comment)), status },
     });
   }
 
@@ -481,11 +536,27 @@ export class CommentsService {
 
     return this.notifications.notify({
       ...target,
-      payload: await this.getGamePayload(comment.gameId),
+      payload: await this.getSubjectPayload(comment),
     });
   }
 
-  private async getGamePayload(gameId: mongoose.Types.ObjectId) {
+  private async getSubjectPayload({
+    gameId,
+    articleId,
+  }: Pick<ILeanComment, "gameId" | "articleId">): Promise<ISubjectPayload> {
+    if (articleId) {
+      const article = await this.Articles.findById(articleId)
+        .select("slug title")
+        .lean<{ slug: string; title: string }>()
+        .catch(() => null);
+
+      return article
+        ? { articleSlug: article.slug, articleTitle: article.title }
+        : {};
+    }
+
+    if (!gameId) return {};
+
     const game = await this.Games.findById(gameId)
       .select("slug name")
       .lean<{ slug: string; name: string }>()
@@ -605,7 +676,7 @@ export class CommentsService {
 
       return {
         _id: id,
-        gameId: String(comment.gameId),
+        ...toCommentTargetFields(comment),
         userId: isCommentReadable ? authorId : "",
         parentId: comment.parentId ? String(comment.parentId) : null,
         replyToId: comment.replyToId ? String(comment.replyToId) : null,

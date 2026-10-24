@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { Skeleton } from "@/src/lib/shared/ui/Skeleton";
-import styles from "@/src/lib/features/game/ui/GameCommunity/GameCommunity.module.scss";
+import styles from "@/src/lib/features/comments/ui/CommentThread/CommentThread.module.scss";
 
 export const EntrySkeleton: FC<{ count?: number }> = ({ count = 3 }) => (
   <div className={styles.feed} role="status" aria-label="Loading">

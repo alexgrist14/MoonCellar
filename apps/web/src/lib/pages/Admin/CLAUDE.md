@@ -36,7 +36,8 @@ whose account is an admin ever see it — everyone else gets a 404.
 3. The active tab:
    - Users → `widgets/admin/UserList`.
    - Games → segmented `Tabs` List / Requests: `GameList` or `RequestsReview kind="game"`.
-   - Comments → List / Reports: `CommentList` (opens on Visible comments) or `ReportList`.
+   - Comments → List / Reports: `CommentList` (opens on Visible comments) or `ReportList`. Each
+     card (`ModeratedComment`) links the game, or the news post with a "News" badge.
    - Conflicts → `Conflicts`.
    - Characters → List / Requests: `CharactersAdmin` or `RequestsReview kind="character"`.
    - Images → `ImageGenerator`.

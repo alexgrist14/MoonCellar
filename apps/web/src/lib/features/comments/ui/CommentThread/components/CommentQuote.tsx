@@ -1,5 +1,5 @@
 import { FC, ReactNode } from "react";
-import styles from "@/src/lib/features/game/ui/GameCommunity/GameCommunity.module.scss";
+import styles from "@/src/lib/features/comments/ui/CommentThread/CommentThread.module.scss";
 
 interface ICommentQuoteProps {
   label: ReactNode;

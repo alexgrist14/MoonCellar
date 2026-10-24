@@ -95,12 +95,17 @@ export const getNotificationText = (
   const { payload } = notification;
   const actors = getActorsLabel(notification);
   const game = payload.gameName ?? null;
+  const commented = payload.gameName ?? payload.articleTitle ?? null;
 
   switch (notification.type) {
     case "follow":
       return { actors, action: "started following you", subject: null };
     case "comment-reply":
-      return { actors, action: "replied to your comment on", subject: game };
+      return {
+        actors,
+        action: "replied to your comment on",
+        subject: commented,
+      };
     case "review-comment":
       return { actors, action: "commented on your review of", subject: game };
     case "review-helpful":
@@ -110,7 +115,7 @@ export const getNotificationText = (
         subject: game,
       };
     case "comment-like":
-      return { actors, action: "liked your comment on", subject: game };
+      return { actors, action: "liked your comment on", subject: commented };
     case "list-like":
       return {
         actors,
@@ -143,7 +148,7 @@ export const getNotificationText = (
         action: `A moderator ${
           payload.status === "deleted" ? "removed" : "hid"
         } your comment on`,
-        subject: game,
+        subject: commented,
       };
   }
 };
@@ -171,6 +176,8 @@ export const getNotificationHref = (
     case "wishlist-release":
       return payload.gameSlug ? `/games/${payload.gameSlug}` : null;
     default:
+      if (payload.articleSlug) return `/news/${payload.articleSlug}#comments`;
+
       return payload.gameSlug ? `/games/${payload.gameSlug}#discussion` : null;
   }
 };

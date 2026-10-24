@@ -1,11 +1,16 @@
 import { FC, useCallback, useEffect, useState } from "react";
 import { IGameResponse, IReview, IReviewsResponse } from "@mooncellar/schemas";
 import { Box } from "@/src/lib/shared/ui/Box";
+import { modal } from "@/src/lib/shared/ui/Modal";
 import { Tabs } from "@/src/lib/shared/ui/Tabs";
 import { useReviewsQuery } from "@/src/lib/entities/comment/api/comment.queries";
+import { CommentThread } from "@/src/lib/features/comments/ui/CommentThread";
+import { GameReviews } from "@/src/lib/features/comments/ui/GameReviews";
+import {
+  PLAYTHROUGH_MODAL_ID,
+  PlaythroughModal,
+} from "@/src/lib/features/game/ui/PlaythroughModal";
 import styles from "./GameCommunity.module.scss";
-import { ReviewsTab } from "./components/ReviewsTab";
-import { DiscussionTab } from "./components/DiscussionTab";
 
 interface IGameCommunityProps {
   game: IGameResponse;
@@ -77,6 +82,12 @@ export const GameCommunity: FC<IGameCommunityProps> = ({
     []
   );
 
+  const writeReview = (userId: string) =>
+    modal.open(<PlaythroughModal game={game} userId={userId} isReview />, {
+      id: PLAYTHROUGH_MODAL_ID,
+      isResizable: true,
+    });
+
   return (
     <Box
       id={COMMUNITY_ID}
@@ -100,16 +111,19 @@ export const GameCommunity: FC<IGameCommunityProps> = ({
         ]}
       />
       <div hidden={tabIndex !== REVIEWS_TAB}>
-        <ReviewsTab
+        <GameReviews
           game={game}
           initialReviews={initialReviews}
           onDiscuss={discussReview}
+          onWriteReview={writeReview}
         />
       </div>
       {isDiscussionOpened && (
         <div hidden={tabIndex !== DISCUSSION_TAB}>
-          <DiscussionTab
-            game={game}
+          <CommentThread
+            target={{ type: "game", id: game._id }}
+            placeholder="Ask about a boss, a route or a build…"
+            emptyTitle="No discussion yet. Start it with a question or a tip."
             discussedReview={discussedReview}
             onClearReview={clearDiscussedReview}
             onTotal={setDiscussionTotal}

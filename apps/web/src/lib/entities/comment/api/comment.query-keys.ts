@@ -1,5 +1,7 @@
 import {
+  getCommentTargetKey,
   ICommentsSort,
+  ICommentTarget,
   IGetUserReviewsRequest,
   IReviewCategory,
   IReviewsSort,
@@ -18,10 +20,14 @@ export const commentQueryKeys = {
     [...commentQueryKeys.all, "user-reviews", userId] as const,
   userReviewsList: (userId: string, params: IGetUserReviewsRequest) =>
     [...commentQueryKeys.userReviews(userId), params] as const,
-  discussion: (gameId: string) =>
-    [...commentQueryKeys.all, "discussion", gameId] as const,
-  discussionList: (gameId: string, sort: ICommentsSort) =>
-    [...commentQueryKeys.discussion(gameId), sort] as const,
+  discussion: (target: ICommentTarget) =>
+    [
+      ...commentQueryKeys.all,
+      "discussion",
+      getCommentTargetKey(target),
+    ] as const,
+  discussionList: (target: ICommentTarget, sort: ICommentsSort) =>
+    [...commentQueryKeys.discussion(target), sort] as const,
   replies: () => [...commentQueryKeys.all, "replies"] as const,
   repliesList: (commentId: string) =>
     [...commentQueryKeys.replies(), commentId] as const,

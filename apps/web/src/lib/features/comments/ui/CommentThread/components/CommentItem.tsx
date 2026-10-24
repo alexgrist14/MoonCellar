@@ -1,6 +1,10 @@
 import { FC, useState } from "react";
 import classNames from "classnames";
-import { IComment } from "@mooncellar/schemas";
+import {
+  getCommentTargetFields,
+  IComment,
+  ICommentTarget,
+} from "@mooncellar/schemas";
 import { RichText } from "@/src/lib/shared/ui/RichText";
 import { Spoiler } from "@/src/lib/shared/ui/Spoiler";
 import { modal } from "@/src/lib/shared/ui/Modal";
@@ -28,9 +32,11 @@ import {
   useReportCommentMutation,
   useUpdateCommentMutation,
 } from "@/src/lib/entities/comment/api/comment.mutations";
-import styles from "@/src/lib/features/game/ui/GameCommunity/GameCommunity.module.scss";
-import { useRequireAuth } from "@/src/lib/features/game/ui/GameCommunity/useRequireAuth";
-import { getPlainTextExcerpt } from "@/src/lib/features/game/ui/GameCommunity/utils";
+import styles from "@/src/lib/features/comments/ui/CommentThread/CommentThread.module.scss";
+import {
+  getPlainTextExcerpt,
+  useRequireAuth,
+} from "@/src/lib/features/comments/model";
 import { AuthorName, CommunityAvatar } from "./CommunityAuthor";
 import { AuthorStatus } from "@/src/lib/shared/ui/AuthorStatus";
 import { CommentComposer } from "./CommentComposer";
@@ -39,7 +45,7 @@ import { CommentReplies } from "./CommentReplies";
 
 interface ICommentItemProps {
   comment: IComment;
-  gameId: string;
+  target: ICommentTarget;
   isReply?: boolean;
 }
 
@@ -47,7 +53,7 @@ const REPLY_EXCERPT_LENGTH = 140;
 
 export const CommentItem: FC<ICommentItemProps> = ({
   comment,
-  gameId,
+  target,
   isReply,
 }) => {
   const profile = useAuthStore((state) => state.profile);
@@ -58,14 +64,14 @@ export const CommentItem: FC<ICommentItemProps> = ({
   const [isReplying, setIsReplying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  const { mutate: setLike } = useCommentLikeMutation(gameId);
-  const { mutateAsync: createComment } = useCreateCommentMutation(gameId);
-  const { mutateAsync: updateComment } = useUpdateCommentMutation(gameId);
+  const { mutate: setLike } = useCommentLikeMutation(target);
+  const { mutateAsync: createComment } = useCreateCommentMutation(target);
+  const { mutateAsync: updateComment } = useUpdateCommentMutation(target);
   const { mutate: deleteComment, isPending: isDeleting } =
-    useDeleteCommentMutation(gameId);
-  const { mutate: reportComment } = useReportCommentMutation(gameId);
+    useDeleteCommentMutation(target);
+  const { mutate: reportComment } = useReportCommentMutation(target);
   const { mutate: setStatus, isPending: isChangingStatus } =
-    useCommentStatusMutation(gameId);
+    useCommentStatusMutation(target);
 
   const isBusy = useMinimumLoading(isDeleting || isChangingStatus);
 
@@ -124,7 +130,7 @@ export const CommentItem: FC<ICommentItemProps> = ({
       onCancel={() => setIsReplying(false)}
       onSubmit={(body, isSpoiler) =>
         createComment({
-          gameId,
+          ...getCommentTargetFields(target),
           parentId: comment._id,
           body,
           isSpoiler,
@@ -234,9 +240,7 @@ export const CommentItem: FC<ICommentItemProps> = ({
               />
             ) : (
               <Spoiler isActive={comment.isSpoiler}>
-                <RichText
-                  content={comment.body}
-                />
+                <RichText content={comment.body} />
               </Spoiler>
             )}
             <div className={styles.entry__actions}>
@@ -320,7 +324,7 @@ export const CommentItem: FC<ICommentItemProps> = ({
             <div className={styles.thread}>
               {replyComposer}
               {isRepliesOpen ? (
-                <CommentReplies commentId={comment._id} gameId={gameId} />
+                <CommentReplies commentId={comment._id} target={target} />
               ) : (
                 !!comment.repliesCount && (
                   <Button
@@ -328,6 +332,7 @@ export const CommentItem: FC<ICommentItemProps> = ({
                     color={ButtonColor.GHOST}
                     compact
                     isAccentText
+                    className={styles.threadAction}
                     onClick={() => setIsRepliesOpen(true)}
                   >
                     <SvgComment size="16" style={{ color: "inherit" }} />

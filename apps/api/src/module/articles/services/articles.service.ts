@@ -22,7 +22,11 @@ import {
   type IGetArticlesResponse,
   type ISaveArticleRequest,
 } from "@mooncellar/schemas";
+import { CommentReport } from "../../comments/schemas/comment-report.schema";
+import { CommentVote } from "../../comments/schemas/comment-vote.schema";
+import { GameComment } from "../../comments/schemas/game-comment.schema";
 import { Game } from "../../games/schemas/game.schema";
+import { NotificationsService } from "../../notifications/services/notifications.service";
 import { User } from "../../user/schemas/user.schema";
 import { Article } from "../schemas/article.schema";
 import { setPagination } from "../../../shared/pagination";
@@ -66,7 +70,14 @@ export class ArticlesService {
   constructor(
     @InjectModel(Article.name) private readonly articleModel: Model<Article>,
     @InjectModel(Game.name) private readonly gameModel: Model<Game>,
-    @InjectModel(User.name) private readonly userModel: Model<User>
+    @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(GameComment.name)
+    private readonly commentModel: Model<GameComment>,
+    @InjectModel(CommentVote.name)
+    private readonly voteModel: Model<CommentVote>,
+    @InjectModel(CommentReport.name)
+    private readonly reportModel: Model<CommentReport>,
+    private readonly notifications: NotificationsService
   ) {}
 
   private presentationStages(): PipelineStage.FacetPipelineStage[] {
@@ -389,10 +400,31 @@ export class ArticlesService {
   }
 
   async remove(id: string) {
-    const { deletedCount } = await this.articleModel.deleteOne({
-      _id: toObjectId(id, "post id"),
-    });
+    const _id = toObjectId(id, "post id");
+    const { deletedCount } = await this.articleModel.deleteOne({ _id });
 
     if (!deletedCount) throw new NotFoundException("The post was not found");
+
+    await this.removeComments(_id);
+  }
+
+  private async removeComments(articleId: mongoose.Types.ObjectId) {
+    const commentIds: mongoose.Types.ObjectId[] =
+      await this.commentModel.distinct("_id", { articleId });
+
+    if (!commentIds.length) return;
+
+    await Promise.all([
+      this.commentModel.deleteMany({ _id: { $in: commentIds } }),
+      this.voteModel.deleteMany({
+        target: "comment",
+        targetId: { $in: commentIds },
+      }),
+      this.reportModel.deleteMany({ commentId: { $in: commentIds } }),
+    ]);
+
+    commentIds.forEach(
+      (commentId) => void this.notifications.removeBySubject(commentId)
+    );
   }
 }

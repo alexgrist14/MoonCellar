@@ -36,7 +36,14 @@ export const AuthorPlaythroughSchema = PlaythroughSchema.pick({
 
 export const CommentSchema = z.object({
   _id: z.string().describe("Comment id"),
-  gameId: z.string().describe("Game id"),
+  gameId: z
+    .string()
+    .nullable()
+    .describe("Game of the discussion, null for a comment under a news post"),
+  articleId: z
+    .string()
+    .nullable()
+    .describe("News post the comment is under, null for a game comment"),
   userId: z.string().describe("Author id"),
   parentId: z
     .string()
@@ -113,18 +120,32 @@ export const GetRepliesRequestSchema = GetCommentsRequestSchema.omit({
   sort: true,
 });
 
-export const CreateCommentRequestSchema = z.object({
-  gameId: z.string().nonempty().describe("Game id"),
-  parentId: z.string().optional().describe("Comment to reply to"),
-  reviewId: z.string().optional().describe("Review to discuss"),
+export const UpdateCommentRequestSchema = z.object({
   body: z.string().nonempty().max(COMMENT_MAX_LENGTH).describe("Rich text"),
   isSpoiler: z.boolean().default(false).describe("Contains spoilers"),
 });
 
-export const UpdateCommentRequestSchema = CreateCommentRequestSchema.pick({
-  body: true,
-  isSpoiler: true,
-});
+export const CreateCommentRequestSchema = UpdateCommentRequestSchema.extend({
+  gameId: z.string().nonempty().optional().describe("Game to discuss"),
+  articleId: z
+    .string()
+    .nonempty()
+    .optional()
+    .describe("News post to comment on"),
+  parentId: z.string().optional().describe("Comment to reply to"),
+  reviewId: z
+    .string()
+    .optional()
+    .describe("Review to discuss, game comments only"),
+})
+  .refine((comment) => !!comment.gameId !== !!comment.articleId, {
+    message: "Name either the game or the news post the comment is about",
+    path: ["gameId"],
+  })
+  .refine((comment) => !comment.reviewId || !!comment.gameId, {
+    message: "Only a game comment can discuss a review",
+    path: ["reviewId"],
+  });
 
 export const UpdateCommentStatusRequestSchema = z.object({
   status: CommentStatusSchema.exclude(["deleted"]).describe("New status"),

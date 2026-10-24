@@ -309,6 +309,16 @@ an instance of Module)`. Use a default import; tsc reports the call as `TS2349`.
   the feed group and sort by it, in UTC (`$year`/`$month`, `getPublishedRange`); the web formats
   dates in UTC too, or a post published near midnight lands in a different month than the
   archive counts it in.
+- **A comment belongs to a game or to a news post: exactly one of `gameId` and `articleId` is set,
+  in one `gamecomments` collection.** `CreateCommentRequestSchema` refuses both or neither and a
+  `reviewId` on a post comment; `CommentsService.findSubject` checks the game, or that the post is
+  published (404 "The post was not found" for a draft). Every event carries both fields and the
+  gateway picks the room from them (`discussion:game:<id>` / `discussion:article:<id>`), so a new
+  event built with `gameId` alone never reaches a post's readers. A post comment has no author
+  playthrough, and its notifications carry `articleSlug`/`articleTitle` instead of the game.
+- **Deleting a post deletes its comments, their votes and reports, and the notifications about
+  them** (`ArticlesService.removeComments`). Comments are site content tied to the post; left
+  behind they would sit in the moderation lists with no post to open. Unpublishing keeps them.
 - **Post images must be Space URLs** (`image` starting with `S3_CDN_URL`): the editor uploads
   through `POST /file/comment-image`, and the web renders the image with `next/image`, which
   only knows the configured hosts. Both `image` and `content` are in `REFERENCE_SOURCES`, or the

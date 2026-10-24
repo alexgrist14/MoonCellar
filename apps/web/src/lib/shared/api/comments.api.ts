@@ -2,6 +2,7 @@ import { API_URL } from "@/src/lib/shared/constants";
 import {
   IComment,
   ICommentsResponse,
+  ICommentTarget,
   ICreateCommentRequest,
   IGetCommentsRequest,
   IGetRepliesRequest,
@@ -47,10 +48,16 @@ const setReviewHelpful = (reviewId: string, isHelpful: boolean) => {
     : agent.delete<IVoteResponse>(url);
 };
 
-const getComments = (gameId: string, params: IGetCommentsRequest) => {
-  return agent.get<ICommentsResponse>(`${API_URL}/games/${gameId}/comments`, {
-    params,
-  });
+const TARGET_PATHS: Record<ICommentTarget["type"], string> = {
+  game: "games",
+  article: "articles",
+};
+
+const getComments = (target: ICommentTarget, params: IGetCommentsRequest) => {
+  return agent.get<ICommentsResponse>(
+    `${API_URL}/${TARGET_PATHS[target.type]}/${target.id}/comments`,
+    { params }
+  );
 };
 
 const getReplies = (commentId: string, params: IGetRepliesRequest) => {

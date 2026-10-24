@@ -16,18 +16,22 @@ yet. Each user can turn types off under Settings → Notifications.
 | Type | Recipient | Written by | Groups by | Links to |
 |---|---|---|---|---|
 | `follow` | The followed user | `UserFollowingsService.addUserFollowing` | One group per recipient | The first follower's profile |
-| `comment-reply` | Author of the comment replied to | `CommentsService.createComment` | Nothing: each reply is its own | `/games/<slug>#discussion` |
+| `comment-reply` | Author of the comment replied to | `CommentsService.createComment` | Nothing: each reply is its own | `/games/<slug>#discussion`, or `/news/<slug>#comments` under a post |
 | `review-comment` | Author of the review | `CommentsService.createComment` | The review | `/games/<slug>#discussion` |
 | `review-helpful` | Author of the review | `ReviewsService.setHelpful` | The review | `/games/<slug>#reviews` |
-| `comment-like` | Author of the comment | `CommentsService.setLike` | The comment | `/games/<slug>#discussion` |
+| `comment-like` | Author of the comment | `CommentsService.setLike` | The comment | `/games/<slug>#discussion`, or `/news/<slug>#comments` under a post |
 | `list-like` | Owner of the list | `CustomListsService.setLike` | The list | The list |
 | `request-decided` | Author of the request | `ContentRequestsService.decide` | Nothing | `/requests` |
 | `wishlist-release` | Everyone with the game in `wishlist` | `WishlistReleasesService`, daily at 09:00 Moscow | Nothing: one per game | The game page |
 | `following-activity` | Every follower of the user | `UserLogsService.recordUserLog`, when a log entry is created or changed (a playthrough, a rating, a favourite) | The followed user, the game and the part of the log (playthrough, rating, favourite): one unread notification per person, game and part | That user's profile, where the activity feed is |
-| `comment-moderated` | Author of the comment | `CommentsService.changeStatus` (hide or delete by someone else) | The comment | `/games/<slug>#discussion` |
+| `comment-moderated` | Author of the comment | `CommentsService.changeStatus` (hide or delete by someone else) | The comment | `/games/<slug>#discussion`, or `/news/<slug>#comments` under a post |
 
 `#discussion` opens the game page's Discussion tab and `#reviews` its Reviews tab, and both
-scroll to the block (`GameCommunity`).
+scroll to the block (`widgets/game/GameCommunity`). `#comments` scrolls a news post to its comments
+(`widgets/news/ArticleComments`). A comment under a post carries `articleSlug` and `articleTitle`
+in the payload instead of `gameSlug` and `gameName`, so the sentence names the post ("replied to
+your comment on Patch notes"). Deleting a post deletes its comments and every notification about
+them.
 
 `following-activity` says what happened, from `payload.activity` (`getFollowingActivity` in
 `apps/api/src/module/user/utils/user-logs.utils.ts`): a rating ("rated Portal 2 8/10"), a
@@ -70,7 +74,7 @@ One document in `notifications` per group of events:
 | `subjectId` | What it is about: the comment, review, list, request, or the recipient for `follow` |
 | `groupKey` | `type:subjectId`, plus `:groupId` when `notify()` is given one (the game and the log part for `following-activity`) |
 | `actorIds` | Everyone behind it, latest first; empty for moderation and requests |
-| `payload` | What the text and the link need: game slug and name, list slug and name, decision, request kind and name, the moderator's reason, the moderation status |
+| `payload` | What the text and the link need: game slug and name, news post slug and title, list slug and name, decision, request kind and name, the moderator's reason, the moderation status |
 | `isRead`, `readAt` | Read state |
 | `createdAt`, `updatedAt` | `updatedAt` moves whenever an event joins the group; the list sorts by it |
 

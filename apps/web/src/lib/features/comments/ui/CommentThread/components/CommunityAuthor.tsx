@@ -3,7 +3,7 @@ import Link from "next/link";
 import classNames from "classnames";
 import { ICommunityAuthor } from "@mooncellar/schemas";
 import { Avatar } from "@/src/lib/shared/ui/Avatar";
-import styles from "@/src/lib/features/game/ui/GameCommunity/GameCommunity.module.scss";
+import styles from "@/src/lib/features/comments/ui/CommentThread/CommentThread.module.scss";
 
 interface ICommunityAuthorProps {
   author: ICommunityAuthor | null;
