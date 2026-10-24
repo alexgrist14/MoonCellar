@@ -2,6 +2,7 @@
 
 import { FC, ReactNode, useRef, useState } from "react";
 import classNames from "classnames";
+import Link from "next/link";
 import { Button, ButtonColor } from "../Button";
 import { Popover } from "../Popover";
 import { SvgBurger } from "../svg";
@@ -17,6 +18,7 @@ interface ITabsMenuProps {
     count?: number;
     ariaLabel?: string;
     isHidden?: boolean;
+    href?: string;
     onTabClick: () => void;
   }[];
   activeIndex: number;
@@ -55,29 +57,41 @@ export const TabsMenu: FC<ITabsMenuProps> = ({
         contentStyle={{ padding: "var(--padding-x2)" }}
       >
         <nav className={styles.menu}>
-          {tabs.map((tab, index) =>
-            tab.isHidden ? null : (
-              <button
-                key={tab.tabName}
-                type="button"
-                aria-label={tab.ariaLabel}
-                aria-current={index === activeIndex ? "page" : undefined}
-                className={classNames(styles.menu__item, {
-                  [styles.menu__item_active]: index === activeIndex,
-                })}
-                onClick={() => {
-                  setIsOpen(false);
-                  tab.onTabClick();
-                }}
-              >
+          {tabs.map((tab, index) => {
+            if (tab.isHidden) return null;
+
+            const itemProps = {
+              "aria-label": tab.ariaLabel,
+              "aria-current":
+                index === activeIndex ? ("page" as const) : undefined,
+              className: classNames(styles.menu__item, {
+                [styles.menu__item_active]: index === activeIndex,
+              }),
+              onClick: () => {
+                setIsOpen(false);
+                tab.onTabClick();
+              },
+            };
+            const content = (
+              <>
                 {!!tab.prefix && (
                   <span className={styles.prefix}>{tab.prefix}</span>
                 )}
                 {tab.tabName}
                 <TabCount count={tab.count} />
+              </>
+            );
+
+            return tab.href ? (
+              <Link key={tab.tabName} href={tab.href} {...itemProps}>
+                {content}
+              </Link>
+            ) : (
+              <button key={tab.tabName} type="button" {...itemProps}>
+                {content}
               </button>
-            )
-          )}
+            );
+          })}
         </nav>
       </Popover>
     </div>

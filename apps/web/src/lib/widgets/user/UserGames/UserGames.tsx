@@ -245,6 +245,7 @@ export const UserGames: FC<UserGamesProps> = ({
         <Tabs
           isFit
           ariaLabel="Game categories"
+          mobileMenuTitle="Games"
           contents={GAMES_TABS.map((tab) => ({
             tabName: profileTabLabels[tab],
             count: gameIdsByTab[tab]?.size ?? 0,

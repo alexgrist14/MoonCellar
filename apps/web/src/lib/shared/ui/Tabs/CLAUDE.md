@@ -79,6 +79,8 @@ import { Tabs } from "@/src/lib/shared/ui/Tabs";
 - A long `segmented` row (status filters with counts) needs `isWrap`; without it the row is
   `nowrap` and runs past a narrow container.
 - Its buttons carry `type="button"`, so it is safe inside a `<form>`.
+- With `mobileMenuTitle`, a `tabLink` tab becomes a link in the `TabsMenu` too, so route tabs
+  (the profile's Games page) collapse into the same selector as the admin's section tabs.
 - A tab with `tabLink` is wrapped in `Link` (which takes the tab's `className`); its button gets
   the same `tabs__button` class and `aria-pressed` as a plain tab. The `Link` itself takes `flex: 1`;
   stretching only the button inside left link tabs at their content width.
