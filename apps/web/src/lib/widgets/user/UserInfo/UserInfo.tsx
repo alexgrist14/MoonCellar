@@ -3,6 +3,7 @@ import {
   FAVOURITE_CHARACTERS_TAB,
   ACTIVITY_TAB,
   RETROACHIEVEMENTS_TAB,
+  PORTS_TAB,
   STEAM_TAB,
   FAVOURITE_GAMES_TAB,
 } from "@/src/lib/shared/constants/user.const";
@@ -300,7 +301,13 @@ export const UserInfo: FC<UserInfoProps> = ({
         />
       )}
 
-      {!hiddenBlocks.has("ports") && <UserPortAchievements userId={id} />}
+      {!hiddenBlocks.has("ports") && (
+        <UserPortAchievements
+          userId={id}
+          isPreview
+          onShowAll={() => goTo(PORTS_TAB)}
+        />
+      )}
 
       {isListsVisible && (
         <section className={styles.lists} aria-labelledby="profile-lists">

@@ -7,38 +7,44 @@ import { modal } from "@/src/lib/shared/ui/Modal";
 import { ProgressBar } from "@/src/lib/shared/ui/ProgressBar";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { useIsAuthHydrated } from "@/src/lib/shared/hooks/useIsAuthHydrated";
-import { usePortPlayerAchievementsQuery } from "@/src/lib/entities/port-achievement/api";
+import { Skeleton } from "@/src/lib/shared/ui/Skeleton";
+import { IGameAchievementList, IGameDefinitionInfo } from "@mooncellar/schemas";
 import {
-  IPortGameAchievements,
-  mergePortAchievements,
-} from "@/src/lib/entities/port-achievement/model";
+  usePortAchievementsQuery,
+  usePortPlayerAchievementsQuery,
+} from "@/src/lib/entities/port-achievement/api";
+import { mergePortAchievements } from "@/src/lib/entities/port-achievement/model";
 import { PortAchievementCard } from "@/src/lib/entities/port-achievement/ui/PortAchievementCard";
 
 export const GAME_PORT_ACHIEVEMENTS_MODAL_ID = "game-port-achievements";
 
 interface IGamePortAchievementsModalProps {
-  achievements: IPortGameAchievements;
+  port: IGameDefinitionInfo;
+  achievements?: IGameAchievementList;
 }
 
-// The catalogue comes with the server render; the viewer's own states load in the browser
+// The game page passes the catalogue from its server render, a game card lets it load here; the
+// viewer's own states always load in the browser
 export const GamePortAchievementsModal: FC<IGamePortAchievementsModalProps> = ({
+  port,
   achievements,
 }) => {
   const isHydrated = useIsAuthHydrated();
   const profileId = useAuthStore((state) => state.profile?._id);
+  const { data: loaded } = usePortAchievementsQuery(port.slug, !achievements);
+  const catalogue = achievements ?? loaded;
   const { data: player } = usePortPlayerAchievementsQuery(
-    achievements.game,
+    port.slug,
     isHydrated ? profileId : undefined
   );
-  const items = mergePortAchievements(
-    achievements.achievements,
-    player?.achievements
-  );
+  const items = catalogue
+    ? mergePortAchievements(catalogue.achievements, player?.achievements)
+    : [];
 
   return (
     <Box
-      title={achievements.port.name}
-      titleCount={achievements.total}
+      title={port.name}
+      titleCount={catalogue?.total ?? port.achievements}
       isTitleStart
       onClose={() => modal.close(GAME_PORT_ACHIEVEMENTS_MODAL_ID)}
       isWithScrollBar
@@ -47,9 +53,9 @@ export const GamePortAchievementsModal: FC<IGamePortAchievementsModalProps> = ({
     >
       <div className={styles.port}>
         <p className={styles.port__note}>
-          Achievements of {achievements.port.name}, the PC port by MoonCellar
-          Team. They unlock in the game and reach this page through the
-          player&apos;s MoonCellar account.
+          Achievements of {port.name}, the PC port by MoonCellar Team. They
+          unlock in the game and reach this page through the player&apos;s
+          MoonCellar account.
         </p>
         {!!player && (
           <div className={styles.port__summary}>
@@ -65,11 +71,20 @@ export const GamePortAchievementsModal: FC<IGamePortAchievementsModalProps> = ({
           </div>
         )}
         <ul className={styles.port__grid}>
-          {items.map((achievement) => (
-            <li key={achievement.key} className={styles.port__item}>
-              <PortAchievementCard achievement={achievement} />
-            </li>
-          ))}
+          {catalogue
+            ? items.map((achievement) => (
+                <li key={achievement.key} className={styles.port__item}>
+                  <PortAchievementCard achievement={achievement} />
+                </li>
+              ))
+            : Array.from({ length: port.achievements }, (_, index) => (
+                <li key={index} className={styles.port__item}>
+                  <Skeleton
+                    height="calc(var(--achievements-icon-size) + 2 * var(--padding-x3))"
+                    radius="var(--radius-x3)"
+                  />
+                </li>
+              ))}
         </ul>
       </div>
     </Box>

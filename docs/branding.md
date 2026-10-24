@@ -130,3 +130,7 @@ The system account (`MoonCellar`, owner of the generated lists) and notification
 behind them (moderation, request decisions, wishlist releases) use `logo-icon.png` as the avatar:
 `SYSTEM_USER_AVATAR` in `@mooncellar/schemas`, the site-relative path `/images/logo-icon.png`,
 stored as is in `users.avatar`.
+
+`logo-icon.png` at 16px also marks MoonCellar Team ports inside the site: the port's row in a game
+page's Achievements block and the chip in a game card's bottom-right rail, both opening the port's
+achievements.

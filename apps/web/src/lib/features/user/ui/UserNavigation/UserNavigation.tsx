@@ -9,9 +9,11 @@ import {
   FAVOURITE_GAMES_TAB,
   ACTIVITY_TAB,
   RETROACHIEVEMENTS_TAB,
+  PORTS_TAB,
   STEAM_TAB,
   userListCategories,
 } from "@/src/lib/shared/constants/user.const";
+import { usePortPlayerGamesQuery } from "@/src/lib/entities/port-achievement/api";
 import { useUserRaGamesQuery } from "@/src/lib/entities/user/api/user.queries";
 import { SvgSettings } from "@/src/lib/shared/ui/svg";
 import { IPlaythrough } from "@mooncellar/schemas";
@@ -55,6 +57,8 @@ export const UserNavigation: FC<{
     user._id,
     !!user.raUsername
   );
+
+  const { data: portGames = [] } = usePortPlayerGamesQuery(user._id);
 
   const visibleLists = useMemo(
     () =>
@@ -177,6 +181,18 @@ export const UserNavigation: FC<{
                   .length ??
                 0}
             </span>
+          </Button>
+        )}
+        {!!portGames.length && (
+          <Button
+            className={styles.btn}
+            active={currentList === PORTS_TAB}
+            color={ButtonColor.TRANSPARENT}
+            href={getProfileHref(user.userName, PORTS_TAB)}
+            onClick={closeMenu}
+          >
+            <span className={styles.label}>MoonCellar</span>
+            <span className={styles.count}>{portGames.length}</span>
           </Button>
         )}
         {(isAuthedUser || !!visibleLists.length) && (

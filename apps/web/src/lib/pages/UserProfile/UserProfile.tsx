@@ -7,6 +7,7 @@ import {
   FAVOURITE_GAMES_TAB,
   ACTIVITY_TAB,
   RETROACHIEVEMENTS_TAB,
+  PORTS_TAB,
   STEAM_TAB,
   profileTabLabels,
   userListCategories,
@@ -22,6 +23,7 @@ import { UserGames } from "@/src/lib/widgets/user/UserGames";
 import { UserReviews } from "@/src/lib/widgets/user/UserReviews";
 import { UserRaGames } from "@/src/lib/widgets/user/UserRaGames";
 import { UserSteamGames } from "@/src/lib/widgets/user/UserSteamGames";
+import { UserPortAchievements } from "@/src/lib/widgets/user/UserPortAchievements";
 import { ActivityTimeline } from "@/src/lib/features/user/ui/ActivityTimeline";
 import { UserLists } from "@/src/lib/widgets/user/UserLists";
 import { UserInfo } from "@/src/lib/widgets/user/UserInfo";
@@ -242,6 +244,7 @@ export const UserProfile: FC<UserProfileProps> = ({
               steam={displayUser.steam}
             />
           )}
+          {tab === PORTS_TAB && <UserPortAchievements userId={user._id} />}
           {tab === RETROACHIEVEMENTS_TAB && (
             <UserRaGames
               userId={user._id}

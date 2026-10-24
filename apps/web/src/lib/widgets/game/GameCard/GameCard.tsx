@@ -45,6 +45,11 @@ import { useGameSteamProgress } from "@/src/lib/features/game/model/useGameSteam
 import { useRoyalGames } from "@/src/lib/entities/royal/model/useRoyalGames";
 import { Checkbox } from "@/src/lib/shared/ui/Checkbox";
 import { EXPAND_KEEP_OPEN_ATTRIBUTE } from "@/src/lib/shared/ui/ExpandMenu";
+import { usePortGameProgress } from "@/src/lib/entities/port-achievement/api";
+import {
+  GAME_PORT_ACHIEVEMENTS_MODAL_ID,
+  GamePortAchievementsModal,
+} from "@/src/lib/widgets/game/GamePortAchievementsModal";
 
 const STATUS_ICONS: Record<CategoriesType, FC<ISvgBaseProps>> = {
   wishlist: SvgBookmark,
@@ -164,6 +169,11 @@ export const GameCard = memo(
       isMastered: isSteamMastered,
       steamId,
     } = useGameSteamProgress(game);
+
+    const { port, progress: portProgress } = usePortGameProgress(
+      game.slug,
+      profile?._id
+    );
 
     // useCloseEvents([cardRef], () => setIsActive(false));
 
@@ -317,13 +327,44 @@ export const GameCard = memo(
               </Tooltip>
             </div>
           )}
-          {(!!game.retroachievements?.length || !!steamTotal) && (
+          {(!!game.retroachievements?.length || !!steamTotal || !!port) && (
             <div
               className={classNames(
                 styles.card__rail,
                 styles.card__rail_bottomRight
               )}
             >
+              {!!port && (
+                <Tooltip
+                  content={
+                    portProgress
+                      ? `${port.name}: ${portProgress.unlocked} / ${portProgress.total}`
+                      : `${port.name}: ${port.achievements} achievements`
+                  }
+                >
+                  <div
+                    role="button"
+                    aria-label={`${port.name} achievements`}
+                    className={styles.card__achievement}
+                    data-prevent-progress
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+
+                      modal.open(<GamePortAchievementsModal port={port} />, {
+                        id: GAME_PORT_ACHIEVEMENTS_MODAL_ID,
+                      });
+                    }}
+                  >
+                    <Image
+                      src="/images/logo-icon.png"
+                      alt=""
+                      width={16}
+                      height={16}
+                    />
+                  </div>
+                </Tooltip>
+              )}
               {!!steamTotal && (
                 <Tooltip
                   content={

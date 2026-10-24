@@ -159,9 +159,12 @@ project's `docs/achievements.md`): `format`, `game`, and per achievement a `key`
 - **On the site.** A game's `siteGame` (in `GET /games`) is the slug of its page on
   mooncellar.space: that page counts the port's achievements in its Achievements block, in a row
   named after the port (its `name`), which
-  opens a modal with all of them and the viewer's own states, and a profile shows the player's
-  progress in each port (`apps/web`: `entities/port-achievement`,
-  `widgets/game/GamePortAchievementsModal`, `widgets/user/UserPortAchievements`). The site reaches the
+  opens a modal with all of them and the viewer's own states. Every game card of that page's game
+  carries the moon mark in its bottom-right rail, which opens the same modal and loads the
+  catalogue in the browser. A profile shows the player's ports compactly on its Profile tab and in
+  full, with every achievement's icon, on its own MoonCellar tab (`/user/<name>/mooncellar`)
+  (`apps/web`: `entities/port-achievement`, `widgets/game/GamePortAchievementsModal`,
+  `widgets/game/GameCard`, `widgets/user/UserPortAchievements`). The site reaches the
   service at `NEXT_PUBLIC_GAME_URL` from the browser — without cookies, which its CORS does not
   allow — and at `INTERNAL_GAME_URL` from the server. Icons are drawn as CSS masks so they take the
   page's colours, which needs the CORS header on `/icons/` too (it has it, like every route).
