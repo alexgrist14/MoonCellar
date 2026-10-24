@@ -2,7 +2,7 @@ import { SortType } from "@/src/lib/shared/types/sort.type";
 import { CategoriesFilterType } from "@/src/lib/shared/types/user.type";
 import { useMinimumLoading } from "@/src/lib/shared/hooks/useMinimumLoading";
 import { Pagination } from "@/src/lib/shared/ui/Pagination";
-import { FC, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { useDebounce } from "use-debounce";
 import styles from "./UserGames.module.scss";
 import { useSearchParams } from "next/navigation";
@@ -24,8 +24,18 @@ import {
   SortControl,
 } from "@/src/lib/shared/ui/SortControl";
 import { useGamesByIdsQuery } from "@/src/lib/entities/game/api/game.queries";
+import { Tabs } from "@/src/lib/shared/ui/Tabs";
+import { Scrollbar } from "@/src/lib/shared/ui/Scrollbar";
+import {
+  profileTabLabels,
+  userListCategories,
+} from "@/src/lib/shared/constants/user.const";
+import { getProfileHref } from "@/src/lib/shared/utils/links.utils";
 
 const MIN_SEARCH_LENGTH = 2;
+
+const GAMES_TABS: CategoriesFilterType[] = ["all", ...userListCategories];
+const GAMES_TABS_SCROLL_ID = "user-games-tabs";
 
 const GAME_SORT_OPTIONS: ISortControlOption<SortType>[] = [
   { value: SortType.DATE_ADDED, label: "Date added" },
@@ -38,12 +48,14 @@ interface UserGamesProps {
   playthroughs: IPlaythrough[];
   ratings: IUserRating[];
   list: CategoriesFilterType;
+  userName: string;
 }
 
 export const UserGames: FC<UserGamesProps> = ({
   playthroughs,
   ratings,
   list,
+  userName,
 }) => {
   const [selectedSort, setSelectedSort] = useState<SortType>(
     SortType.DATE_ADDED
@@ -68,6 +80,34 @@ export const UserGames: FC<UserGamesProps> = ({
       return res;
     }, {});
   }, [playthroughs]);
+
+  const gameIdsByTab = useMemo(() => {
+    const ids: Partial<Record<CategoriesFilterType, Set<string>>> = {
+      all: new Set(),
+    };
+
+    playthroughs?.forEach((play) => {
+      if (!play.gameId) return;
+      const category = play.isMastered ? "mastered" : play.category;
+      (ids[category] ??= new Set()).add(play.gameId);
+      ids.all?.add(play.gameId);
+    });
+
+    return ids;
+  }, [playthroughs]);
+
+  useEffect(() => {
+    const row = document.getElementById(GAMES_TABS_SCROLL_ID);
+    const tab = row?.querySelector(
+      `a[href="${getProfileHref(userName, list)}"]`
+    );
+    if (!row || !tab) return;
+
+    const rowRect = row.getBoundingClientRect();
+    const tabRect = tab.getBoundingClientRect();
+    row.scrollLeft +=
+      tabRect.left - rowRect.left - (rowRect.width - tabRect.width) / 2;
+  }, [list, userName]);
 
   const commentsCountByGame = useMemo(() => {
     return playthroughs?.reduce((res: { [key: string]: number }, play) => {
@@ -194,32 +234,52 @@ export const UserGames: FC<UserGamesProps> = ({
 
   const total = visibleIds.length;
 
-  const searchField = (
-    <div className={styles.games__toolbar}>
-      <div className={styles.games__search}>
-        <Input
-          placeholder="Search by name"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+  const header = (
+    <div className={styles.games__header}>
+      <Scrollbar
+        id={GAMES_TABS_SCROLL_ID}
+        isHorizontal
+        type="absolute"
+        contentStyle={{ paddingInline: 0 }}
+      >
+        <Tabs
+          isFit
+          ariaLabel="Game categories"
+          contents={GAMES_TABS.map((tab) => ({
+            tabName: profileTabLabels[tab],
+            count: gameIdsByTab[tab]?.size ?? 0,
+            tabLink: getProfileHref(userName, tab),
+          }))}
+          defaultTabIndex={GAMES_TABS.indexOf(list)}
+          isUseDefaultIndex
+        />
+      </Scrollbar>
+      <div className={styles.games__toolbar}>
+        <div className={styles.games__search}>
+          <Input
+            placeholder="Search by name"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <SortControl
+          className={styles.games__sort}
+          options={GAME_SORT_OPTIONS}
+          sortBy={selectedSort}
+          sortOrder={sortOrder}
+          onChange={(nextSort, nextOrder) => {
+            setSelectedSort(nextSort ?? selectedSort);
+            setSortOrder(nextOrder);
+          }}
         />
       </div>
-      <SortControl
-        className={styles.games__sort}
-        options={GAME_SORT_OPTIONS}
-        sortBy={selectedSort}
-        sortOrder={sortOrder}
-        onChange={(nextSort, nextOrder) => {
-          setSelectedSort(nextSort ?? selectedSort);
-          setSortOrder(nextOrder);
-        }}
-      />
     </div>
   );
 
   if (isLoading)
     return (
       <>
-        {searchField}
+        {header}
         <GamesCards
           isLoading
           skeletonCount={pageGameIds.length || 10}
@@ -233,7 +293,7 @@ export const UserGames: FC<UserGamesProps> = ({
   if (!pageGameIds.length)
     return (
       <>
-        {searchField}
+        {header}
         <EmptyState
           title={isSearchActive ? "Nothing found" : "List is empty"}
           description={
@@ -247,7 +307,7 @@ export const UserGames: FC<UserGamesProps> = ({
 
   return (
     <>
-      {searchField}
+      {header}
       <GamesCards
         games={games}
         gameClassName={styles.games__game}

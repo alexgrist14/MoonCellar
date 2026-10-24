@@ -43,7 +43,7 @@ export const UserMenu: FC = () => {
       )}
       items={[
         { label: "Profile", href: getProfileHref(profile.userName) },
-        { label: "Games", href: getProfileHref(profile.userName, "all") },
+        { label: "Games", href: getProfileHref(profile.userName, "playing") },
         { label: "Lists", href: getProfileHref(profile.userName, "lists") },
         { label: "Reviews", href: getProfileHref(profile.userName, "reviews") },
         { label: "Requests", href: "/requests" },
