@@ -260,6 +260,7 @@ export const UserProfile: FC<UserProfileProps> = ({
               list={tab as CategoriesFilterType}
               playthroughs={effectivePlaythroughs}
               ratings={ratings}
+              userName={displayUser.userName}
             />
           )}
           {children}

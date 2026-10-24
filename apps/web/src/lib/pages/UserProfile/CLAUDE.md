@@ -59,7 +59,12 @@ editing controls.
      `siteGame`), "unlocked of total · %", a progress bar, the last unlock date and every
      achievement's icon, muted until unlocked, with its texts in a `Tooltip`. Hidden while the
      user has none
-   - `all` and each status → `widgets/user/UserGames`
+   - `all` and each status → `widgets/user/UserGames`. It is one Games page: a `Tabs` row
+     (`isFit` in a horizontal `Scrollbar`) of All, Playing … Dropped with their game counts sits
+     on top, each tab a `tabLink` to its route, so the URL is the selected tab; on a narrow screen
+     the row scrolls the selected tab into view. The navigation has a single Games entry, active on
+     all of these routes, that opens Playing (so does Games in the header's account menu); the
+     Profile tab's Games counter opens All. Status categories are never rows of the navigation
    - `lists` / `liked` → `widgets/user/UserLists` (`kind="liked"`)
    - `favourites/games` → `widgets/user/FavoriteGames`; `favourites/characters` →
      `FavoriteCharacters`. They are one Favourites page: both routes render a `Tabs` row
@@ -94,7 +99,8 @@ editing controls.
      its section is closed. "Game devices" (`features/user/ui/GameDevices`) lists the game ports signed in through `/link` (`GET /auth/game/sessions`) and signs one out with `DELETE /auth/game/sessions/:id`. Its "Danger zone" opens `features/user/ui/DeleteAccountModal`, which asks for the password, calls `DELETE /user/account/:userId`, clears the auth store and the React Query cache and goes home; its "App" section installs the PWA through `useInstallApp` (the browser's install prompt where there is one, menu instructions otherwise) and links the APK releases
 4. Desktop column: `features/user/ui/UserNavigation` (tabs and counts; sorting lives in `UserGames` and `UserReviews`, above their content).
    Its first block — avatar and name, linking to Profile and active there — is shown on every
-   tab. Settings is not a tab in it: the owner reaches it from the gear icon at the right of
+   tab. The second holds every other entry, Games first, then Reviews, Favourites,
+   RetroAchievements, Steam, Lists, Liked lists and Activity. Settings is not a tab in it: the owner reaches it from the gear icon at the right of
    that block, and from the account menu in the header.
 
 ## Loading state

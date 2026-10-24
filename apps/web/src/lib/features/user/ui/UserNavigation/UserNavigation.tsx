@@ -13,7 +13,6 @@ import {
   userListCategories,
 } from "@/src/lib/shared/constants/user.const";
 import { useUserRaGamesQuery } from "@/src/lib/entities/user/api/user.queries";
-import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import { SvgSettings } from "@/src/lib/shared/ui/svg";
 import { IPlaythrough } from "@mooncellar/schemas";
 import { useAdvancedRouter } from "@/src/lib/shared/hooks/useAdvancedRouter";
@@ -114,42 +113,14 @@ export const UserNavigation: FC<{
       <Box>
         <Button
           className={styles.btn}
-          active={currentList === "all"}
+          active={isGamesTab}
           color={ButtonColor.TRANSPARENT}
-          href={getProfileHref(user.userName, "all")}
+          href={getProfileHref(user.userName, "playing")}
           onClick={closeMenu}
         >
-          <span className={styles.label}>All</span>
+          <span className={styles.label}>Games</span>
           <span className={styles.count}>{allPlays.length}</span>
         </Button>
-        {userListCategories.map((category, i) => {
-          const plays = playthroughs?.reduce((res: IPlaythrough[], play) => {
-            if (
-              ((play.category === category && !play.isMastered) ||
-                (category === "mastered" && play.isMastered)) &&
-              !res.some((p) => p.gameId === play.gameId)
-            ) {
-              res.push(play);
-            }
-            return res;
-          }, []);
-
-          return (
-            <Button
-              key={category + i}
-              className={styles.btn}
-              active={currentList === category}
-              color={ButtonColor.TRANSPARENT}
-              href={getProfileHref(user.userName, category.toLowerCase())}
-              onClick={closeMenu}
-            >
-              <span className={styles.label}>{commonUtils.upFL(category)}</span>
-              <span className={styles.count}>{plays.length}</span>
-            </Button>
-          );
-        })}
-      </Box>
-      <Box>
         <Button
           className={styles.btn}
           active={isReviewsTab}
