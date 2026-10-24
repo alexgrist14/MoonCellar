@@ -42,3 +42,8 @@ export const useDeleteArticleMutation = () => {
     },
   });
 };
+
+export const useRegisterArticleViewMutation = () =>
+  useMutation({
+    mutationFn: (id: string) => articlesAPI.registerView(id),
+  });

@@ -12,6 +12,8 @@ const MONTH_FORMAT = new Intl.DateTimeFormat("en-GB", {
   timeZone: "UTC",
 });
 
+const COUNT_FORMAT = new Intl.NumberFormat("en-US");
+
 export const ARTICLE_TYPE_LABELS: Record<IArticleType, string> = {
   news: "Site news",
   game: "Game article",
@@ -23,6 +25,12 @@ export const getArticleHref = (slug: string) => `${NEWS_HREF}/${slug}`;
 
 export const formatArticleDate = (value?: string | null) =>
   value ? DATE_FORMAT.format(new Date(value)) : "";
+
+export const formatArticleViewCount = (views: number) =>
+  COUNT_FORMAT.format(views);
+
+export const formatArticleViews = (views: number) =>
+  `${formatArticleViewCount(views)} ${views === 1 ? "view" : "views"}`;
 
 export const formatArchiveMonth = (month: number) =>
   MONTH_FORMAT.format(new Date(Date.UTC(2000, month - 1, 1)));

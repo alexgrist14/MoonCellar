@@ -1,5 +1,6 @@
 import { createZodDto } from "nestjs-zod";
 import {
+  AdminArticleSchema,
   ArticleArchiveSchema,
   ArticleSchema,
   GetAdminArticlesRequestSchema,
@@ -12,6 +13,8 @@ import {
 } from "@mooncellar/schemas";
 
 export class ArticleDto extends createZodDto(ArticleSchema) {}
+
+export class AdminArticleDto extends createZodDto(AdminArticleSchema) {}
 
 export class GetArticlesRequestDto extends createZodDto(
   GetArticlesRequestSchema

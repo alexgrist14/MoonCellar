@@ -1,9 +1,13 @@
 import {
   buildArticleArchive,
   countReadingMinutes,
+  getArticleVisitorKey,
   getPublishedRange,
   slugifyArticleTitle,
 } from "./articles.utils";
+
+const BROWSER =
+  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0 Safari/537.36";
 
 describe("slugifyArticleTitle", () => {
   it("keeps latin words and drops punctuation and accents", () => {
@@ -65,5 +69,51 @@ describe("buildArticleArchive", () => {
         { year: 2025, count: 2, months: [{ month: 11, count: 2 }] },
       ],
     });
+  });
+});
+
+describe("getArticleVisitorKey", () => {
+  it("keeps one key per signed-in user wherever they open the post from", () => {
+    const first = getArticleVisitorKey({
+      userId: "u1",
+      ip: "10.0.0.1",
+      userAgent: BROWSER,
+    });
+
+    expect(first).toMatch(/^[a-f\d]{64}$/);
+    expect(
+      getArticleVisitorKey({ userId: "u1", ip: "10.0.0.2", userAgent: BROWSER })
+    ).toBe(first);
+    expect(
+      getArticleVisitorKey({ userId: "u2", ip: "10.0.0.1", userAgent: BROWSER })
+    ).not.toBe(first);
+  });
+
+  it("tells guests apart by address and browser", () => {
+    const guest = getArticleVisitorKey({ ip: "10.0.0.1", userAgent: BROWSER });
+
+    expect(getArticleVisitorKey({ ip: "10.0.0.1", userAgent: BROWSER })).toBe(
+      guest
+    );
+    expect(
+      getArticleVisitorKey({ ip: "10.0.0.2", userAgent: BROWSER })
+    ).not.toBe(guest);
+    expect(
+      getArticleVisitorKey({ ip: "10.0.0.1", userAgent: `${BROWSER} Edg/141` })
+    ).not.toBe(guest);
+  });
+
+  it("counts no view for crawlers or a request without a browser", () => {
+    expect(
+      getArticleVisitorKey({
+        ip: "66.249.66.1",
+        userAgent:
+          "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+      })
+    ).toBeNull();
+    expect(
+      getArticleVisitorKey({ ip: "10.0.0.1", userAgent: "curl/8.9.1" })
+    ).toBeNull();
+    expect(getArticleVisitorKey({ ip: "10.0.0.1" })).toBeNull();
   });
 });

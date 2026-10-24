@@ -1,6 +1,6 @@
 "use client";
 
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import classNames from "classnames";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,8 +11,13 @@ import {
   IGameStats,
 } from "@mooncellar/schemas";
 import {
+  useAdminArticleQuery,
+  useRegisterArticleViewMutation,
+} from "@/src/lib/entities/article/api";
+import {
   ARTICLE_TYPE_LABELS,
   formatArticleDate,
+  formatArticleViews,
   getArticleHref,
   getArticleImage,
   NEWS_HREF,
@@ -29,7 +34,7 @@ import { Box } from "@/src/lib/shared/ui/Box";
 import { Breadcrumbs } from "@/src/lib/shared/ui/Breadcrumbs";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
 import { RichText } from "@/src/lib/shared/ui/RichText";
-import { SvgPen } from "@/src/lib/shared/ui/svg";
+import { SvgEye, SvgPen } from "@/src/lib/shared/ui/svg";
 import styles from "./ArticlePage.module.scss";
 
 interface IArticlePageProps {
@@ -51,6 +56,16 @@ export const ArticlePage: FC<IArticlePageProps> = ({
   const isAuthHydrated = useIsAuthHydrated();
   const isAdmin = useAuthStore((s) => s.isAdmin);
   const others = latest?.filter((item) => item._id !== article._id) ?? [];
+  const { mutate: registerView, status: viewStatus } =
+    useRegisterArticleViewMutation();
+  const isViewSettled = viewStatus === "success" || viewStatus === "error";
+  const { data: adminArticle } = useAdminArticleQuery(
+    isAuthHydrated && isAdmin && isViewSettled ? article._id : undefined
+  );
+
+  useEffect(() => {
+    registerView(article._id);
+  }, [article._id, registerView]);
 
   return (
     <>
@@ -75,15 +90,22 @@ export const ArticlePage: FC<IArticlePageProps> = ({
             <span aria-hidden="true">·</span>
             <span>{article.readingMinutes} min read</span>
             {isAuthHydrated && isAdmin && (
-              <Button
-                href={`/admin/news/${article._id}`}
-                color={ButtonColor.GHOST}
-                compact
-                className={styles.meta__edit}
-              >
-                <SvgPen size="16" style={{ color: "inherit" }} />
-                Edit post
-              </Button>
+              <span className={styles.meta__admin}>
+                {adminArticle && (
+                  <span className={styles.meta__views}>
+                    <SvgEye size="16" style={{ color: "inherit" }} />
+                    {formatArticleViews(adminArticle.views)}
+                  </span>
+                )}
+                <Button
+                  href={`/admin/news/${article._id}`}
+                  color={ButtonColor.GHOST}
+                  compact
+                >
+                  <SvgPen size="16" style={{ color: "inherit" }} />
+                  Edit post
+                </Button>
+              </span>
             )}
           </div>
           <h1 className={styles.title}>{article.title}</h1>

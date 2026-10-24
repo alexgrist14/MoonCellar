@@ -1,6 +1,29 @@
+import { createHash } from "node:crypto";
 import type { IArticleArchive } from "@mooncellar/schemas";
 
 const WORDS_PER_MINUTE = 200;
+const BOT_USER_AGENT_PATTERN =
+  /bot|crawl|spider|slurp|preview|headless|lighthouse|curl|wget|python|axios|node-fetch/i;
+
+export const ARTICLE_VIEW_WINDOW_SECONDS = 30 * 60;
+
+export interface IArticleVisitor {
+  userId?: string | null;
+  ip?: string | null;
+  userAgent?: string | null;
+}
+
+export const getArticleVisitorKey = ({
+  userId,
+  ip,
+  userAgent,
+}: IArticleVisitor) => {
+  if (!userAgent || BOT_USER_AGENT_PATTERN.test(userAgent)) return null;
+
+  const identity = userId ? `user:${userId}` : `ip:${ip ?? ""}|${userAgent}`;
+
+  return createHash("sha256").update(identity).digest("hex");
+};
 
 export const slugifyArticleTitle = (title: string) => {
   const slug = title

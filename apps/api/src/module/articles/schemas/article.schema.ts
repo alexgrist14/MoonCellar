@@ -34,6 +34,8 @@ export class Article {
   readingMinutes: number;
   @Prop({ type: Date, default: null })
   publishedAt: Date | null;
+  @Prop({ type: Number, default: 0 })
+  views: number;
   createdAt: Date;
   updatedAt: Date;
 }

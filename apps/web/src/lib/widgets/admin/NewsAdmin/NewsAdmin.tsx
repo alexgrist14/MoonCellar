@@ -7,6 +7,7 @@ import { useAdminArticlesQuery } from "@/src/lib/entities/article/api";
 import {
   ARTICLE_TYPE_LABELS,
   formatArticleDate,
+  formatArticleViewCount,
 } from "@/src/lib/entities/article/model";
 import { Badge } from "@/src/lib/shared/ui/Badge";
 import { Button, ButtonColor } from "@/src/lib/shared/ui/Button";
@@ -21,6 +22,7 @@ interface INewsAdminRow {
   kind: unknown;
   game: unknown;
   status: unknown;
+  views: unknown;
   published: unknown;
   updated: unknown;
 }
@@ -30,6 +32,7 @@ const HEADERS: ITableHeaders<INewsAdminRow> = {
   kind: { content: "Kind" },
   game: { content: "Game" },
   status: { content: "Status" },
+  views: { content: "Views" },
   published: { content: "Published" },
   updated: { content: "Updated" },
 };
@@ -56,6 +59,11 @@ export const NewsAdmin: FC = () => {
           {article.status === "published" ? "Published" : "Draft"}
         </Badge>
       ),
+    },
+    views: {
+      content: article.publishedAt
+        ? formatArticleViewCount(article.views)
+        : "—",
     },
     published: { content: formatArticleDate(article.publishedAt) || "—" },
     updated: { content: formatArticleDate(article.updatedAt) },

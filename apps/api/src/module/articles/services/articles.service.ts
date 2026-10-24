@@ -11,6 +11,8 @@ import mongoose, {
 } from "mongoose";
 import {
   ADULT_THEME_NAME,
+  type IAdminArticle,
+  type IAdminArticleListItem,
   type IArticle,
   type IArticleArchive,
   type IArticleListItem,
@@ -25,6 +27,7 @@ import {
 import { Game } from "../../games/schemas/game.schema";
 import { User } from "../../user/schemas/user.schema";
 import { Article } from "../schemas/article.schema";
+import { ArticleView } from "../schemas/article-view.schema";
 import { setPagination } from "../../../shared/pagination";
 import { getS3CdnUrl } from "../../../shared/s3";
 import { sanitizeRichText } from "../../../shared/utils/rich-text.utils";
@@ -33,10 +36,13 @@ import {
   toIsoString,
   toObjectId,
 } from "../../collections/utils/collections.utils";
+import { isDuplicateKeyError } from "../../comments/utils/community.utils";
 import {
   buildArticleArchive,
   countReadingMinutes,
+  getArticleVisitorKey,
   getPublishedRange,
+  type IArticleVisitor,
   slugifyArticleTitle,
 } from "../utils/articles.utils";
 
@@ -65,6 +71,8 @@ const PUBLISHED: FilterQuery<Article> = { status: "published" };
 export class ArticlesService {
   constructor(
     @InjectModel(Article.name) private readonly articleModel: Model<Article>,
+    @InjectModel(ArticleView.name)
+    private readonly viewModel: Model<ArticleView>,
     @InjectModel(Game.name) private readonly gameModel: Model<Game>,
     @InjectModel(User.name) private readonly userModel: Model<User>
   ) {}
@@ -153,6 +161,10 @@ export class ArticlesService {
     return { ...this.toListItem(doc), content: doc.content ?? "" };
   }
 
+  private toAdminListItem(doc: IAggregatedArticle): IAdminArticleListItem {
+    return { ...this.toListItem(doc), views: doc.views ?? 0 };
+  }
+
   private async findOne(match: FilterQuery<Article>) {
     const [doc] = await this.articleModel.aggregate<IAggregatedArticle>([
       { $match: match },
@@ -160,7 +172,7 @@ export class ArticlesService {
       ...this.presentationStages(),
     ]);
 
-    return doc ? this.toArticle(doc) : null;
+    return doc ?? null;
   }
 
   async getArticles(query: IGetArticlesQuery): Promise<IGetArticlesResponse> {
@@ -249,11 +261,43 @@ export class ArticlesService {
   }
 
   async getBySlug(slug: string): Promise<IArticle> {
-    const article = await this.findOne({ ...PUBLISHED, slug });
+    const doc = await this.findOne({ ...PUBLISHED, slug });
 
-    if (!article) throw new NotFoundException("The post was not found");
+    if (!doc) throw new NotFoundException("The post was not found");
 
-    return article;
+    return this.toArticle(doc);
+  }
+
+  async registerView(id: string, visitor: IArticleVisitor) {
+    const articleId = toObjectId(id, "post id");
+
+    if (!(await this.articleModel.exists({ ...PUBLISHED, _id: articleId }))) {
+      throw new NotFoundException("The post was not found");
+    }
+
+    const key = getArticleVisitorKey(visitor);
+
+    if (!key) return;
+
+    try {
+      const { upsertedCount } = await this.viewModel.updateOne(
+        { articleId, visitor: key },
+        { $setOnInsert: { createdAt: new Date() } },
+        { upsert: true }
+      );
+
+      if (!upsertedCount) return;
+    } catch (error) {
+      if (isDuplicateKeyError(error)) return;
+
+      throw error;
+    }
+
+    await this.articleModel.updateOne(
+      { _id: articleId },
+      { $inc: { views: 1 } },
+      { timestamps: false }
+    );
   }
 
   async getAdminArticles(
@@ -273,15 +317,18 @@ export class ArticlesService {
       this.articleModel.countDocuments(match),
     ]);
 
-    return { results: results.map((doc) => this.toListItem(doc)), total };
+    return {
+      results: results.map((doc) => this.toAdminListItem(doc)),
+      total,
+    };
   }
 
-  async getAdminArticle(id: string): Promise<IArticle> {
-    const article = await this.findOne({ _id: toObjectId(id, "post id") });
+  async getAdminArticle(id: string): Promise<IAdminArticle> {
+    const doc = await this.findOne({ _id: toObjectId(id, "post id") });
 
-    if (!article) throw new NotFoundException("The post was not found");
+    if (!doc) throw new NotFoundException("The post was not found");
 
-    return article;
+    return { ...this.toArticle(doc), views: doc.views ?? 0 };
   }
 
   private async findFreeSlug(

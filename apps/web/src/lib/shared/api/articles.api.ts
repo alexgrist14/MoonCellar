@@ -1,4 +1,5 @@
 import {
+  IAdminArticle,
   IArticle,
   IArticleArchive,
   IGetAdminArticlesRequest,
@@ -20,12 +21,15 @@ export const articlesAPI = {
   getSlugs: () => agent.get<IGetArticleSlugsResponse>(`${ARTICLES_URL}/slugs`),
   getBySlug: (slug: string) =>
     agent.get<IArticle>(`${ARTICLES_URL}/by-slug`, { params: { slug } }),
+  registerView: (id: string) =>
+    agent.post(`${ARTICLES_URL}/${id}/views`, undefined, { isSilent: true }),
   getAdminArticles: (params: IGetAdminArticlesRequest) =>
     agent.get<IGetAdminArticlesResponse>(`${ARTICLES_URL}/admin`, { params }),
   getAdminArticle: (id: string) =>
-    agent.get<IArticle>(`${ARTICLES_URL}/admin/${id}`),
-  create: (dto: ISaveArticleRequest) => agent.post<IArticle>(ARTICLES_URL, dto),
+    agent.get<IAdminArticle>(`${ARTICLES_URL}/admin/${id}`),
+  create: (dto: ISaveArticleRequest) =>
+    agent.post<IAdminArticle>(ARTICLES_URL, dto),
   update: (id: string, dto: ISaveArticleRequest) =>
-    agent.patch<IArticle>(`${ARTICLES_URL}/${id}`, dto),
+    agent.patch<IAdminArticle>(`${ARTICLES_URL}/${id}`, dto),
   remove: (id: string) => agent.delete(`${ARTICLES_URL}/${id}`),
 };
