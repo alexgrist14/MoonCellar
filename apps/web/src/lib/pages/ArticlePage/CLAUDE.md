@@ -23,6 +23,11 @@ news shows the latest posts there instead. Public.
 - Site news: the four latest posts (`articlesAPI.getArticles({ take: 4 })`), minus this one.
 - Comments load on the client from `GET /articles/:articleId/comments` through
   `widgets/news/ArticleComments`; nothing of them is in the server render.
+- On the client, every open registers a view: `useRegisterArticleViewMutation` posts
+  `POST /articles/:id/views` once per mount, silently (`isSilent`, a failure toasts nothing). The
+  API counts one view per visitor per 30 minutes, so reloads in a row do not inflate it.
+- An admin's count comes from `useAdminArticleQuery(article._id)` — the only response that carries
+  `views` — enabled once the view request has settled, so the number includes this open.
 
 ## Composition
 
@@ -32,9 +37,14 @@ news shows the latest posts there instead. Public.
    `head / body / comments / side` for site news.
 3. Head `Box`: `Breadcrumbs`, a meta row (`Badge` with the kind, date, reading time, "Edit post"
    for admins), the `h1`, the summary, the author with `Avatar`.
-4. Side: `widgets/news/ArticleGamePanel`, or a `Box` "Latest posts" with `ArticleLinks`.
-5. Body `Box`: the post image (or the game's first artwork) and `RichText size="article"`.
-6. `widgets/news/ArticleComments`: a "Comments" `Box` (`id="comments"`) with
+4. A grid capped at `--news-page-width` with areas `head side / body side`; below `media960` it
+   stacks `head / side / body` for a game article and `head / body / side` for site news.
+5. Head `Box`: `Breadcrumbs`, a meta row (`Badge` with the kind, date, reading time; for admins the
+   view count and "Edit post", pushed to the right), the `h1`, the summary, the author with
+   `Avatar`.
+6. Side: `widgets/news/ArticleGamePanel`, or a `Box` "Latest posts" with `ArticleLinks`.
+7. Body `Box`: the post image (or the game's first artwork) and `RichText size="article"`.
+8. `widgets/news/ArticleComments`: a "Comments" `Box` (`id="comments"`) with
    `features/comments/ui/CommentThread` for the post — the same editor, votes, reports and
    moderation as game comments. Guests read the comments and get "Sign in to join the
    discussion" instead of the form.
@@ -48,6 +58,9 @@ news shows the latest posts there instead. Public.
   the background and the post image (`getArticleImage`, `isArticleMediaHidden`). The text stays.
 - **"Edit post" waits for `useIsAuthHydrated`**, like every admin control read from the persisted
   auth store.
+- **The view count is never part of the route's data.** The page is ISR, so anything the server
+  render reads is cached in the HTML every visitor gets; `GET /articles/by-slug` does not return
+  `views`, and the count is loaded on the client for admins only.
 - Panel padding is `--article-box-padding`, which drops to `--padding-x3` below 768px; pass it
   through `contentStyle`, never a class on `Box`'s content.
 - **The comments are deferred (`CommentThread isDeferred`).** They are fetched and the `/comments`

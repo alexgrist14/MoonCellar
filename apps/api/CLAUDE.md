@@ -133,7 +133,7 @@ an instance of Module)`. Use a default import; tsc reports the call as `TS2349`.
   project, written with each upload by `getProjectBlockProgress`, so listing projects never reads a
   block.
 - **A plan is one `projectplans` document per project, and every task change is one
-  `findOneAndUpdate` that matches the task by `$elemMatch` on its id *and* the owner and done flag read
+  `findOneAndUpdate` that matches the task by `$elemMatch` on its id _and_ the owner and done flag read
   just before.** Two people taking the same task at once: the second update matches nothing and answers
   409 "changed meanwhile". Never write `tasks.$` with a query that matches the array a second way (a
   top-level `"tasks.done"` next to the `$elemMatch`): the positional operator then points at whichever
@@ -319,6 +319,18 @@ an instance of Module)`. Use a default import; tsc reports the call as `TS2349`.
 - **Deleting a post deletes its comments, their votes and reports, and the notifications about
   them** (`ArticlesService.removeComments`). Comments are site content tied to the post; left
   behind they would sit in the moderation lists with no post to open. Unpublishing keeps them.
+- **A post's views change only through `POST /articles/:id/views`, with `$inc` and
+  `timestamps: false`.** `updatedAt` is the sitemap's `lastmod` for the post and the order of the
+  admin list, so a view that moved it would make every read post look freshly edited. A view is
+  counted once per visitor per `ARTICLE_VIEW_WINDOW_SECONDS` (30 minutes): `articleviews` holds a
+  row per post and visitor — a sha256 of the user id, or of the address and user agent for a
+  guest — under a unique index, and a TTL index on `createdAt` drops it after the window. The
+  hash is not a user id and the row lives 30 minutes, which is why account deletion does not
+  clean the collection. Crawlers and requests without a browser user agent are not counted, and
+  a draft answers 404.
+- **`views` appears only in admin responses** (`AdminArticleSchema`, `AdminArticleListItemSchema`:
+  `GET /articles/admin`, `GET /articles/admin/:id`, create and update). The public post is served
+  through an ISR page, so a count in `GET /articles/by-slug` would land in the cached HTML.
 - **Post images must be Space URLs** (`image` starting with `S3_CDN_URL`): the editor uploads
   through `POST /file/comment-image`, and the web renders the image with `next/image`, which
   only knows the configured hosts. Both `image` and `content` are in `REFERENCE_SOURCES`, or the

@@ -42,8 +42,9 @@ whose account is an admin ever see it — everyone else gets a 404.
    - Characters → List / Requests: `CharactersAdmin` or `RequestsReview kind="character"`.
    - Images → `ImageGenerator`.
    - Sites → `SiteSessions`.
-   - News → `NewsAdmin`: every post, drafts included, newest edit first; a row opens
-     `/admin/news/<id>` (`pages/ArticleEditPage`), "Write a post" opens `/admin/news/new`.
+   - News → `NewsAdmin`: every post, drafts included, newest edit first, with its view count
+     (`—` for a post never published); a row opens `/admin/news/<id>` (`pages/ArticleEditPage`),
+     "Write a post" opens `/admin/news/new`.
 
 ## Rules and gotchas
 

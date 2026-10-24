@@ -6,6 +6,12 @@ import { toast } from "@/src/lib/shared/utils/toast.utils";
 import { useAuthStore } from "@/src/lib/shared/store/auth.store";
 import { logger } from "@/src/lib/shared/utils/logger.utils";
 
+declare module "axios" {
+  interface AxiosRequestConfig {
+    isSilent?: boolean;
+  }
+}
+
 export const agent = axios.create({
   withCredentials: true,
 });
@@ -62,7 +68,10 @@ agent.interceptors.response.use(
       errorMessage,
     });
 
-    toast.error({ title: "Error", description: errorMessage });
+    if (!config?.isSilent) {
+      toast.error({ title: "Error", description: errorMessage });
+    }
+
     return Promise.reject(err);
   }
 );

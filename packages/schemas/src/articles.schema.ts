@@ -45,6 +45,22 @@ export const ArticleSchema = z.object({
 
 export const ArticleListItemSchema = ArticleSchema.omit({ content: true });
 
+const ArticleViewsSchema = z.object({
+  views: z
+    .number()
+    .describe(
+      "Opens of the published post, one per visitor visit; admins only"
+    ),
+});
+
+export const AdminArticleSchema = ArticleSchema.extend(
+  ArticleViewsSchema.shape
+);
+
+export const AdminArticleListItemSchema = ArticleListItemSchema.extend(
+  ArticleViewsSchema.shape
+);
+
 export const ArticleCountsSchema = z.object({
   all: z.number().describe("Posts of every kind"),
   news: z.number().describe("Site news"),
@@ -128,7 +144,7 @@ export const GetAdminArticlesRequestSchema = z.object({
 });
 
 export const GetAdminArticlesResponseSchema = z.object({
-  results: ArticleListItemSchema.array(),
+  results: AdminArticleListItemSchema.array(),
   total: z.number(),
 });
 
@@ -168,6 +184,8 @@ export type IArticleStatus = z.infer<typeof ArticleStatusSchema>;
 export type IArticleGame = z.infer<typeof ArticleGameSchema>;
 export type IArticle = z.infer<typeof ArticleSchema>;
 export type IArticleListItem = z.infer<typeof ArticleListItemSchema>;
+export type IAdminArticle = z.infer<typeof AdminArticleSchema>;
+export type IAdminArticleListItem = z.infer<typeof AdminArticleListItemSchema>;
 export type IArticleCounts = z.infer<typeof ArticleCountsSchema>;
 export type IGetArticlesRequest = z.input<typeof GetArticlesRequestSchema>;
 export type IGetArticlesQuery = z.infer<typeof GetArticlesRequestSchema>;

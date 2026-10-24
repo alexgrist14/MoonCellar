@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -14,6 +16,7 @@ import { AuthGuard } from "@nestjs/passport";
 import {
   ApiCookieAuth,
   ApiCreatedResponse,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -21,6 +24,7 @@ import {
 import type mongoose from "mongoose";
 import { RolesEnum } from "@mooncellar/schemas";
 import {
+  AdminArticleDto,
   ArticleArchiveDto,
   ArticleDto,
   GetAdminArticlesRequestDto,
@@ -31,7 +35,11 @@ import {
   GetArticlesResponseDto,
   SaveArticleRequestDto,
 } from "../../../shared/zod/dto/articles.dto";
-import type { IAuthorizedRequest } from "../../comments/types/community.type";
+import { OptionalJwtGuard } from "../../auth/optional-jwt.guard";
+import type {
+  IAuthorizedRequest,
+  ICommunityRequest,
+} from "../../comments/types/community.type";
 import { Roles } from "../../roles/roles.decorator";
 import { RolesGuard } from "../../roles/roles.guard";
 import { ArticlesService } from "../services/articles.service";
@@ -69,6 +77,24 @@ export class ArticlesController {
     return this.articles.getBySlug(dto.slug);
   }
 
+  @Post(":id/views")
+  @UseGuards(OptionalJwtGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: "Count an open of a published post, once per visitor visit",
+  })
+  @ApiNoContentResponse()
+  async registerView(
+    @Param("id") id: string,
+    @Req() request: ICommunityRequest
+  ) {
+    await this.articles.registerView(id, {
+      userId: request.user ? String(request.user._id) : null,
+      ip: request.ip,
+      userAgent: request.headers["user-agent"],
+    });
+  }
+
   @Get("admin")
   @UseGuards(AuthGuard("jwt"), RolesGuard)
   @Roles(RolesEnum.ADMIN)
@@ -84,7 +110,7 @@ export class ArticlesController {
   @Roles(RolesEnum.ADMIN)
   @ApiCookieAuth()
   @ApiOperation({ summary: "Get any post for editing" })
-  @ApiOkResponse({ type: ArticleDto })
+  @ApiOkResponse({ type: AdminArticleDto })
   async getAdminArticle(@Param("id") id: string) {
     return this.articles.getAdminArticle(id);
   }
@@ -94,7 +120,7 @@ export class ArticlesController {
   @Roles(RolesEnum.ADMIN)
   @ApiCookieAuth()
   @ApiOperation({ summary: "Create a post" })
-  @ApiCreatedResponse({ type: ArticleDto })
+  @ApiCreatedResponse({ type: AdminArticleDto })
   async create(
     @Body() dto: SaveArticleRequestDto,
     @Req() request: IAuthorizedRequest
@@ -110,7 +136,7 @@ export class ArticlesController {
   @Roles(RolesEnum.ADMIN)
   @ApiCookieAuth()
   @ApiOperation({ summary: "Replace a post's fields" })
-  @ApiOkResponse({ type: ArticleDto })
+  @ApiOkResponse({ type: AdminArticleDto })
   async update(@Param("id") id: string, @Body() dto: SaveArticleRequestDto) {
     return this.articles.update(id, dto);
   }

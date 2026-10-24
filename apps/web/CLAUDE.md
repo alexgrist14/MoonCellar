@@ -651,6 +651,10 @@ shows and how projects upload to it is in [`docs/status-hub.md`](../../docs/stat
   open (`ConfirmModal` already does when `onConfirm` rejects) — and keep `toast.error` for failures
   that never reached `agent`. Anything that makes a request the user did not ask for — a background
   refetch above all — turns a routine failure into a notification they cannot explain.
+- **A request the user did not make passes `{ isSilent: true }` in its axios config.** The
+  interceptor then logs the failure and toasts nothing; `agent.api.ts` declares the flag on
+  `AxiosRequestConfig`. The view a post registers on open (`articlesAPI.registerView`) is one: a
+  reader who only opened the page must not get an error about it.
 - **A mutation that deletes a resource must not leave a query for that resource to refetch.**
   Deleting a list used to invalidate `listQueryKeys.all`, which included the `bySlug` query the open
   list page was still rendering: it refetched, got `404 List not found`, and the interceptor toasted
