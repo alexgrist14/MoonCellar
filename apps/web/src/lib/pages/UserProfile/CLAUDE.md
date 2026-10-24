@@ -52,13 +52,17 @@ editing controls.
 1. `BGImage` with the user's background (the store's copy for the owner).
 2. Mobile only: `UserNavigationMenu` (`features/user/ui/UserNavigation`) — the shared icon-only burger `ExpandMenu`, bottom-right, holding `UserNavigation`. A custom list page uses the same component; never inline a copy.
 3. `Box`: `Breadcrumbs` on every tab except Profile, then the tab:
-   - `profile` → `widgets/user/UserInfo`. Its `ports` block, `widgets/user/UserPortAchievements`,
-     has no tab of its own: the MoonCellar Team ports the user has achievements in, from the game
-     service (`GET /achievements/players/:userId`, then each port's
-     `/games/:game/achievements/players/:userId`), each as the site's game card (the port's
-     `siteGame`), "unlocked of total · %", a progress bar, the last unlock date and every
-     achievement's icon, muted until unlocked, with its texts in a `Tooltip`. Hidden while the
-     user has none
+   - `profile` → `widgets/user/UserInfo`. Its `ports` block is `widgets/user/UserPortAchievements`
+     with `isPreview`: the MoonCellar Team ports the user has achievements in, Steam-style — each
+     port's site game card (its `siteGame`) in a three-row subgrid with a `Badge` "unlocked /
+     total" ("Mastered" when complete) and "% · last unlock date", at most two rows, and "All"
+     leading to the `mooncellar` tab. Hidden while the user has none
+   - `mooncellar` (`PORTS_TAB`) → the same widget in full: every port from the game service
+     (`GET /achievements/players/:userId`, then each port's
+     `/games/:game/achievements/players/:userId`), each as the game card, "unlocked of total · %",
+     a progress bar, the last unlock date and every achievement's icon, muted until unlocked, with
+     its texts in a `Tooltip` (`UserPortGame`). The navigation shows its MoonCellar entry only
+     when the user has port achievements
    - `all` and each status → `widgets/user/UserGames`. It is one Games page: a `Tabs` row
      (`isFit` in a horizontal `Scrollbar`) of All, Playing … Dropped with their game counts sits
      on top, each tab a `tabLink` to its route, so the URL is the selected tab; on a narrow screen
@@ -100,7 +104,7 @@ editing controls.
 4. Desktop column: `features/user/ui/UserNavigation` (tabs and counts; sorting lives in `UserGames` and `UserReviews`, above their content).
    Its first block — avatar and name, linking to Profile and active there — is shown on every
    tab. The second holds every other entry, Games first, then Reviews, Favourites,
-   RetroAchievements, Steam, Lists, Liked lists and Activity. Settings is not a tab in it: the owner reaches it from the gear icon at the right of
+   RetroAchievements, Steam, MoonCellar, Lists, Liked lists and Activity. Settings is not a tab in it: the owner reaches it from the gear icon at the right of
    that block, and from the account menu in the header.
 
 ## Loading state
@@ -129,12 +133,12 @@ editing controls.
   (divisors of `takeLogs`).
 
 - **Every card block on the Profile tab shows at most two whole rows, never a fixed number of
-  cards** — favourite games, favourite characters, RetroAchievements, lists and liked lists; the
-  activity feed is the exception and keeps its 12 entries. `useGridRows` (`shared/hooks`) reads the
+  cards** — favourite games, favourite characters, RetroAchievements, MoonCellar Team ports, lists
+  and liked lists; the activity feed is the exception and keeps its 12 entries. `useGridRows` (`shared/hooks`) reads the
   grid's column count and hides the cards past the second row (they stay in the HTML), so a
   block shows 12, 8, 6 or 4 cards depending on the width; `ListCardsGrid` takes it as `maxRows`.
   A block renders a cap (12 games, 20 characters, 12 lists) so the first paint is not a full list.
-  Favourite games and RetroAchievements use fixed columns: 6, 4 up to `$screenLaptop` (1250px),
+  Favourite games, RetroAchievements and the ports use fixed columns: 6, 4 up to `$screenLaptop` (1250px),
   3 up to `mediaLg`, 2 up to `mediaSm`. Never write "the first N" in copy: N depends on the screen.
 
 - **Trust the cookie's `authUserId` only when the store's profile has the same id.** A browser

@@ -54,7 +54,10 @@ export const GameAchievementsBlock: FC<IGameAchievementsBlockProps> = ({
             title: `${portTotal} achievements in ${portAchievements.port.name}, the PC port by MoonCellar Team`,
             onClick: () =>
               modal.open(
-                <GamePortAchievementsModal achievements={portAchievements} />,
+                <GamePortAchievementsModal
+                  port={portAchievements.port}
+                  achievements={portAchievements}
+                />,
                 { id: GAME_PORT_ACHIEVEMENTS_MODAL_ID }
               ),
           },

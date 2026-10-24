@@ -19,7 +19,7 @@ import { Tooltip } from "@/src/lib/shared/ui/Tooltip";
 import { commonUtils } from "@/src/lib/shared/utils/common.utils";
 import styles from "./UserPortAchievements.module.scss";
 
-const CARD_STYLE = {
+export const PORT_CARD_STYLE = {
   width: "100%",
   minWidth: 0,
   maxWidth: "none",
@@ -55,9 +55,9 @@ export const UserPortGame: FC<IUserPortGameProps> = ({
       {hasCard && (
         <div className={styles.game__card}>
           {game ? (
-            <GameCard game={game} style={CARD_STYLE} />
+            <GameCard game={game} style={PORT_CARD_STYLE} />
           ) : (
-            <GameCardSkeleton style={CARD_STYLE} />
+            <GameCardSkeleton style={PORT_CARD_STYLE} />
           )}
         </div>
       )}

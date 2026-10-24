@@ -33,6 +33,7 @@ export const legacyProfileTabs: Record<string, string> = {
 export const RETROACHIEVEMENTS_TAB = "retroachievements";
 export const ACTIVITY_TAB = "activity";
 export const STEAM_TAB = "steam";
+export const PORTS_TAB = "mooncellar";
 
 export const PROFILE_BLOCK_LABELS: Record<IProfileBlock, string> = {
   counters: "Games, reviews and followers counters",
@@ -57,6 +58,7 @@ export const profileTabs = [
   ACTIVITY_TAB,
   RETROACHIEVEMENTS_TAB,
   STEAM_TAB,
+  PORTS_TAB,
   "settings",
 ];
 
@@ -77,6 +79,7 @@ export const profileTabLabels: Record<string, string> = {
   [ACTIVITY_TAB]: "Activity",
   [RETROACHIEVEMENTS_TAB]: "RetroAchievements",
   [STEAM_TAB]: "Steam",
+  [PORTS_TAB]: "MoonCellar Team ports",
   settings: "Settings",
 };
 
